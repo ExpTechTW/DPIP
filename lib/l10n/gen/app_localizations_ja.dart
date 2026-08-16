@@ -224,6 +224,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateDownload => 'ダウンロード';
 
   @override
+  String get changelogShowSnapshots => 'スナップショットを表示';
+
+  @override
   String get changelogTitle => '更新履歴';
 
   @override

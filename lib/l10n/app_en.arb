@@ -239,6 +239,8 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "Download",
+  "changelogShowSnapshots": "Show snapshots",
+  "@changelogShowSnapshots": { "description": "Changelog action that reveals pre-release snapshots" },
   "changelogTitle": "Changelog",
   "reportFilterOrderDesc": "Descending",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

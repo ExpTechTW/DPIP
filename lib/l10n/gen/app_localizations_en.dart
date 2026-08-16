@@ -227,6 +227,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateDownload => 'Download';
 
   @override
+  String get changelogShowSnapshots => 'Show snapshots';
+
+  @override
   String get changelogTitle => 'Changelog';
 
   @override

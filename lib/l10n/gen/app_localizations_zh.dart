@@ -222,6 +222,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateDownload => '下載更新';
 
   @override
+  String get changelogShowSnapshots => '顯示測試版';
+
+  @override
   String get changelogTitle => '更新日誌';
 
   @override
@@ -3081,6 +3084,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get updateDownload => '下载更新';
+
+  @override
+  String get changelogShowSnapshots => '显示测试版';
 
   @override
   String get changelogTitle => '更新日志';
@@ -5944,6 +5950,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get updateDownload => '下載更新';
 
   @override
+  String get changelogShowSnapshots => '顯示測試版';
+
+  @override
   String get changelogTitle => '更新日誌';
 
   @override
@@ -8803,6 +8812,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get updateDownload => '下載更新';
+
+  @override
+  String get changelogShowSnapshots => '顯示測試版';
 
   @override
   String get changelogTitle => '更新日誌';

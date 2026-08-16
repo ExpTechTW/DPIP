@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "Unduh",
+  "changelogShowSnapshots": "Tampilkan snapshot",
   "changelogTitle": "Catatan pembaruan",
   "reportFilterOrderDesc": "Menurun",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

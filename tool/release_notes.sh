@@ -140,8 +140,8 @@ zh_body() { half "$1" chinese | sed '1d' | trim; }
 # the line in a dimmer form rather than in front of the text.
 first_seen_in() {
   [ "$kind" = "--release" ] || return 0
-  git tag --list '[0-9][0-9]w[0-9][0-9]*' --contains "$1" 2>/dev/null |
-    sort | head -n 1
+  git tag --list '[0-9][0-9]w[0-9][0-9]*' 'snapshot/[0-9][0-9]w[0-9][0-9]*' \
+    --contains "$1" 2>/dev/null | sed 's#^snapshot/##' | sort | head -n 1
 }
 
 entries() { # <shas> <english|chinese>
@@ -234,7 +234,8 @@ repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
     printf '**完整差異 / Full changelog**: https://github.com/%s/compare/%s...v%s\n\n' \
       "$repo" "$since" "$label"
     snapshots="$(git tag --list '[0-9][0-9]w[0-9][0-9]*' \
-      --contains "$since" 2>/dev/null | sort || true)"
+      'snapshot/[0-9][0-9]w[0-9][0-9]*' --contains "$since" 2>/dev/null |
+      sort || true)"
     if [ -n "$snapshots" ]; then
       printf '<details>\n<summary>包含的快照 · Snapshots covered</summary>\n\n'
       printf '%s\n' "$snapshots" | sed "s#^#- https://github.com/$repo/releases/tag/#"

@@ -17,11 +17,21 @@
 /// never has to, because Apple is told the *train* number instead and never
 /// sees the label at all.
 ///
-/// Both are stamped in at build time by `tool/version.sh` through CI. A local
-/// `flutter run` gets neither, and falls back to the platform's own values —
-/// which is why [ensureLoaded] exists rather than a pair of constants.
+/// Three sources, in order of how much they know:
+///
+/// 1. **CI's `--dart-define`** — the authority for a published build.
+/// 2. **`lib/core/build_info.g.dart`** — written by the git hooks from the same
+///    `tool/version.sh`, so a local `flutter run` names itself correctly too. A
+///    debug build otherwise fell back to the pubspec placeholder and reported
+///    `26.1.0 (1)`, a version that exists nowhere.
+/// 3. **The platform's own version** — a build made outside a repository, where
+///    neither of the above could be filled in.
+///
+/// Which is why [ensureLoaded] exists rather than a pair of constants: the
+/// third source is asynchronous.
 library;
 
+import 'package:dpip/core/build_info.g.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 abstract final class AppBuild {
@@ -30,6 +40,14 @@ abstract final class AppBuild {
   /// What CI stamped in, empty on a local build.
   static const String _definedLabel = String.fromEnvironment('DPIP_LABEL');
   static const int _definedCode = int.fromEnvironment('DPIP_CODE');
+
+  /// What the git hooks wrote, empty outside a repository.
+  static String get _generatedLabel => kBuildLabel;
+  static int get _generatedCode => kBuildCode;
+
+  static String get _bestLabel =>
+      _definedLabel.isNotEmpty ? _definedLabel : _generatedLabel;
+  static int get _bestCode => _definedCode > 0 ? _definedCode : _generatedCode;
 
   static String? _label;
   static int? _code;
@@ -40,32 +58,30 @@ abstract final class AppBuild {
   /// [label] falls back to whatever was defined and [code] to 0.
   static Future<void> ensureLoaded() async {
     if (_label != null) return;
-    if (_definedLabel.isNotEmpty && _definedCode > 0) {
-      _label = _definedLabel;
-      _code = _definedCode;
+    if (_bestLabel.isNotEmpty && _bestCode > 0) {
+      _label = _bestLabel;
+      _code = _bestCode;
       return;
     }
     try {
       final info = await PackageInfo.fromPlatform();
-      _label = _definedLabel.isNotEmpty ? _definedLabel : info.version;
-      _code = _definedCode > 0
-          ? _definedCode
-          : int.tryParse(info.buildNumber) ?? 0;
+      _label = _bestLabel.isNotEmpty ? _bestLabel : info.version;
+      _code = _bestCode > 0 ? _bestCode : int.tryParse(info.buildNumber) ?? 0;
     } on Object {
       // A version readout is never worth failing a launch over.
-      _label = _definedLabel.isNotEmpty ? _definedLabel : 'dev';
-      _code = _definedCode;
+      _label = _bestLabel.isNotEmpty ? _bestLabel : 'dev';
+      _code = _bestCode;
     }
   }
 
   /// The name this build goes by — the only version a user is shown.
   static String get label =>
-      _label ?? (_definedLabel.isEmpty ? 'dev' : _definedLabel);
+      _label ?? (_bestLabel.isEmpty ? 'dev' : _bestLabel);
 
   /// The ordinal. Higher is newer, always; nothing else about it means
   /// anything. 0 means "unknown", which no comparison may treat as oldest —
   /// see [isNewerThan].
-  static int get code => _code ?? _definedCode;
+  static int get code => _code ?? _bestCode;
 
   /// Whether [candidate] is a build worth updating to.
   ///

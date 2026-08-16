@@ -224,6 +224,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get updateDownload => '다운로드';
 
   @override
+  String get changelogShowSnapshots => '스냅샷 표시';
+
+  @override
   String get changelogTitle => '변경 로그';
 
   @override

@@ -226,6 +226,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get updateDownload => 'Unduh';
 
   @override
+  String get changelogShowSnapshots => 'Tampilkan snapshot';
+
+  @override
   String get changelogTitle => 'Catatan pembaruan';
 
   @override

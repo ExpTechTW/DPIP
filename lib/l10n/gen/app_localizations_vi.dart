@@ -226,6 +226,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get updateDownload => 'Tải xuống';
 
   @override
+  String get changelogShowSnapshots => 'Hiện bản thử nghiệm';
+
+  @override
   String get changelogTitle => 'Nhật ký cập nhật';
 
   @override

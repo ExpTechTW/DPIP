@@ -227,6 +227,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get updateDownload => 'I-download';
 
   @override
+  String get changelogShowSnapshots => 'Ipakita ang snapshot';
+
+  @override
   String get changelogTitle => 'Changelog';
 
   @override

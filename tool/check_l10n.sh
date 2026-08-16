@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# Localization gate — enforces the i18n contract from CLAUDE.md without needing a
+# Localization gate — enforces the i18n contract from DESIGN.md without needing a
 # build or `pub get`, so it fails fast in CI and can be run locally any time.
 # Sibling to tool/check_layering.sh; same output style, zero new packages
 # (bash + python3, both already in CI).
 #
-# Rules (see CLAUDE.md → Conventions → Localization):
+# Rules (see DESIGN.md → Localization):
 #   1. ARB parity: every non-template lib/l10n/app_*.arb self-describes with
 #      @@locale + languageName (the picker is derived from languageName, never a
 #      hardcoded list) and its message-key SET exactly matches the template —
@@ -266,7 +266,7 @@ fi
 
 if [ "$fail" -ne 0 ]; then
   echo ""
-  echo "Localization violations found — see CLAUDE.md → Conventions → Localization."
+  echo "Localization violations found — see DESIGN.md → Localization."
   exit 1
 fi
 

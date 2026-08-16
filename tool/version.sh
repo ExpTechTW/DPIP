@@ -139,7 +139,14 @@ else
   # week; the letters would have run to `ej` while a tester could download
   # perhaps five things, none of them named consecutively.
   prefix="${year}w$(printf '%02d' "$week")"
-  n=$(($(git tag --list "${prefix}*" | wc -l | tr -d ' ') + 1))
+  # Both namespaces. A snapshot is tagged with its bare label — `26w33a` — and
+  # `v[0-9]*` is what makes a build a release, so the two never collide. Early
+  # runs published `snapshot/26w33a` instead, and counting only the bare form
+  # missed them: every run then computed `a`, and the release step died on a
+  # tag that already existed. Counting both is what lets those keep their place
+  # in the sequence rather than being handed out twice.
+  n=$(($(git tag --list "${prefix}*" "snapshot/${prefix}*" |
+    wc -l | tr -d ' ') + 1))
   letter=""
   i=$((n - 1))
   while :; do
@@ -153,7 +160,8 @@ else
   # a tag deleted by hand. Walking forward past whatever exists costs nothing
   # and keeps the name unique, which is what actually matters: a duplicate tag
   # fails the release at the last step, after both platforms have been built.
-  while git rev-parse -q --verify "refs/tags/$label" >/dev/null; do
+  while git rev-parse -q --verify "refs/tags/$label" >/dev/null ||
+    git rev-parse -q --verify "refs/tags/snapshot/$label" >/dev/null; do
     n=$((n + 1))
     letter=""
     i=$((n - 1))

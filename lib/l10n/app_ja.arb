@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play ストア",
   "updateDownload": "ダウンロード",
+  "changelogShowSnapshots": "スナップショットを表示",
   "changelogTitle": "更新履歴",
   "reportFilterOrderDesc": "降順",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

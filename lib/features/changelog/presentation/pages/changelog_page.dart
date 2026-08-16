@@ -6,6 +6,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/version/app_build.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
@@ -36,9 +37,44 @@ class _ChangelogPageState extends State<ChangelogPage> {
   bool _didAutoExpand = false;
   final _refresh = RefreshSignal();
 
+  /// Everything fetched so far, oldest page last.
+  ///
+  /// Pages accumulate here rather than being re-fetched whole: a snapshot is
+  /// published on every push, so the list only grows, and re-reading all of it
+  /// to add thirty entries would get slower every week.
+  final List<ReleaseNote> _notes = [];
+  final ScrollController _scroll = ScrollController();
+  int _page = 1;
+  bool _loading = false;
+
+  /// A page shorter than the API's own page size is the last one — GitHub says
+  /// so by answering short, and that is cheaper than parsing the `Link` header
+  /// the response also carries.
+  bool _exhausted = false;
+
+  /// Whether snapshots are shown alongside releases.
+  ///
+  /// **On by default**: the page's job is to say what has changed, and a
+  /// snapshot is a change that shipped. Hiding them would mean a build someone
+  /// is actually running has no entry — every commit on main publishes one, so
+  /// most installed builds *are* snapshots, and the row marked "installed"
+  /// would be missing for them.
+  ///
+  /// The toggle is for the opposite want: someone tracking releases only, who
+  /// can turn the rest off.
+  bool _showSnapshots = true;
+
+  List<ReleaseNote> get _visible => _showSnapshots
+      ? _notes
+      : [
+          for (final note in _notes)
+            if (!note.prerelease) note,
+        ];
+
   @override
   void initState() {
     super.initState();
+    _scroll.addListener(_onScroll);
     // The build's own name, not the platform's: `PackageInfo.version` is the
     // train Apple was told (`26.1.0`), which every snapshot in a release cycle
     // shares. Marking "installed" against it would tick the wrong entry.
@@ -49,8 +85,43 @@ class _ChangelogPageState extends State<ChangelogPage> {
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
     _refresh.dispose();
     super.dispose();
+  }
+
+  /// Fetches the next page while the reader is still a screen away from the
+  /// end, so the list grows before it runs out under them.
+  void _onScroll() {
+    if (!_scroll.hasClients || _loading || _exhausted) return;
+    final remaining = _scroll.position.maxScrollExtent - _scroll.offset;
+    if (remaining < MediaQuery.sizeOf(context).height) _loadMore();
+  }
+
+  Future<void> _loadMore() async {
+    if (_loading || _exhausted) return;
+    setState(() => _loading = true);
+    final result = await context.read<ChangelogRepository>().releases(
+      page: _page + 1,
+    );
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      switch (result) {
+        case Ok(:final value):
+          _page++;
+          if (value.length < ChangelogRepository.pageSize) _exhausted = true;
+          // Guard against a duplicate: page one merges `/releases/latest`,
+          // which can also appear on a later page.
+          final seen = {for (final n in _notes) n.tagName};
+          _notes.addAll(value.where((n) => !seen.contains(n.tagName)));
+        case Err():
+          // A failed page is not an error state — the list already on screen
+          // is still good. Scrolling again retries.
+          break;
+      }
+    });
   }
 
   @override
@@ -58,9 +129,23 @@ class _ChangelogPageState extends State<ChangelogPage> {
     final l10n = AppLocalizations.of(context);
     final repo = context.read<ChangelogRepository>();
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.changelogTitle)),
+      appBar: AppBar(
+        title: Text(l10n.changelogTitle),
+        actions: [
+          // Everything shows by default; this narrows it to releases. An
+          // action rather than a setting, because it changes what this one
+          // page shows and nothing else.
+          IconButton(
+            onPressed: () => setState(() => _showSnapshots = !_showSnapshots),
+            isSelected: _showSnapshots,
+            icon: const Icon(Icons.science_outlined),
+            selectedIcon: const Icon(Icons.science),
+            tooltip: l10n.changelogShowSnapshots,
+          ),
+        ],
+      ),
       body: AsyncView<List<ReleaseNote>>(
-        future: repo.releases,
+        future: () => repo.releases(page: 1),
         refreshSignal: _refresh,
         isEmpty: (notes) => notes.isEmpty,
         empty: (_) => EmptyView(
@@ -68,13 +153,20 @@ class _ChangelogPageState extends State<ChangelogPage> {
           message: l10n.changelogEmpty,
         ),
         builder: (context, notes) {
-          _maybeAutoExpand(notes);
+          _seedFirstPage(notes);
+          final visible = _visible;
+          _maybeAutoExpand(visible);
           return RefreshIndicator(
             onRefresh: () async {
+              setState(() {
+                _notes.clear();
+                _page = 1;
+                _exhausted = false;
+              });
               _refresh.fire();
-              await repo.releases();
             },
             child: ListView.builder(
+              controller: _scroll,
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.fromLTRB(
                 AppSpacing.lg,
@@ -82,14 +174,27 @@ class _ChangelogPageState extends State<ChangelogPage> {
                 AppSpacing.lg,
                 AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
               ),
-              itemCount: notes.length,
+              // One extra row while more is coming, for the spinner.
+              itemCount: visible.length + (_exhausted ? 0 : 1),
               itemBuilder: (context, index) {
-                final note = notes[index];
+                if (index >= visible.length) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                    child: Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  );
+                }
+                final note = visible[index];
                 return _ReleaseTile(
                   note: note,
                   isCurrent: _isCurrent(note),
                   isFirst: index == 0,
-                  isLast: index == notes.length - 1,
+                  isLast: index == visible.length - 1 && _exhausted,
                   expanded: _expandedTag == note.tagName,
                   onToggle: () => setState(() {
                     _expandedTag = _expandedTag == note.tagName
@@ -103,6 +208,17 @@ class _ChangelogPageState extends State<ChangelogPage> {
         },
       ),
     );
+  }
+
+  /// Adopts the first page `AsyncView` fetched, so it is not fetched twice.
+  ///
+  /// The page owns the accumulated list from then on; `AsyncView` keeps owning
+  /// the loading and error states for that first request, which is the one
+  /// where there is nothing on screen yet to fall back to.
+  void _seedFirstPage(List<ReleaseNote> notes) {
+    if (_notes.isNotEmpty || notes.isEmpty) return;
+    _notes.addAll(notes);
+    if (notes.length < ChangelogRepository.pageSize) _exhausted = true;
   }
 
   void _maybeAutoExpand(List<ReleaseNote> notes) {

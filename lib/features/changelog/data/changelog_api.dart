@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 
 /// Fetches release notes from GitHub. Absolute URL so [EtagInterceptor] can
 /// still revalidate (`If-None-Match` / `304`).
@@ -14,9 +15,20 @@ class ChangelogApi {
   static const String releasesUrl =
       'https://api.github.com/repos/ExpTechTW/DPIP/releases';
 
-  /// Newest first; drafts are filtered out by GitHub's default listing.
+  /// One page of releases, newest first; drafts are filtered out by GitHub's
+  /// default listing.
   ///
-  /// The listing **and** `/releases/latest`, merged.
+  /// Paginated because a snapshot is published on every push, so the list only
+  /// grows — and a reader who opens the page wants the top of it, not two
+  /// hundred entries fetched to be scrolled past. GitHub takes `page` and
+  /// `per_page` and answers a short page when there is no more.
+  ///
+  /// Cost is bounded by the ETag interceptor rather than by fetching less:
+  /// GitHub's unauthenticated limit is 60 requests an hour, and a conditional
+  /// request that comes back `304` does not count against it. A page already
+  /// seen is therefore free to ask for again.
+  ///
+  /// Page one is the listing **and** `/releases/latest`, merged.
   ///
   /// One page is not enough on its own any more: a snapshot is published on
   /// every push to main, so within days the newest *stable* release is off
@@ -26,13 +38,18 @@ class ChangelogApi {
   /// it cannot be pushed off by snapshot volume however many there are.
   ///
   /// Raising `per_page` instead would only move the cliff.
-  Future<List<dynamic>> getReleases() async {
-    final page = await _client.getAbsolute(
+  Future<List<dynamic>> getReleases({int page = 1}) async {
+    final body = await _client.getAbsolute(
       releasesUrl,
-      query: const {'per_page': 30},
+      query: {'per_page': ChangelogRepository.pageSize, 'page': page},
       headers: _headers,
     );
-    final releases = [...(page as List?) ?? const []];
+    final releases = [...(body as List?) ?? const []];
+
+    // Only on the first page. `/releases/latest` is a *supplement* for the
+    // newest stable, which a page of snapshots would otherwise bury; adding it
+    // to page two would merely repeat it.
+    if (page > 1) return releases;
 
     try {
       final latest = await _client.getAbsolute(

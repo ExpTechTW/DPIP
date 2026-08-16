@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "I-download",
+  "changelogShowSnapshots": "Ipakita ang snapshot",
   "changelogTitle": "Changelog",
   "reportFilterOrderDesc": "Pababa",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

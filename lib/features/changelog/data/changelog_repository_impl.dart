@@ -14,10 +14,11 @@ class ChangelogRepositoryImpl implements ChangelogRepository {
   final ChangelogApi _api;
 
   @override
-  Future<Result<List<ReleaseNote>>> releases() => guardResult(() async {
-    final raw = await _api.getReleases();
-    return parseReleases(raw);
-  });
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) =>
+      guardResult(() async {
+        final raw = await _api.getReleases(page: page);
+        return parseReleases(raw);
+      });
 
   /// Skips unmappable entries so one bad release never blanks the list.
   static List<ReleaseNote> parseReleases(List<dynamic> raw) {

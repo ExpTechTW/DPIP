@@ -12,6 +12,7 @@ import 'package:dpip/core/platform/install_source.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/presentation/widgets/update_prompt.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -28,21 +29,28 @@ class _FakeRepository implements ChangelogRepository {
   final List<ReleaseNote> notes;
 
   @override
-  Future<Result<List<ReleaseNote>>> releases() async => Ok(notes);
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async => Ok(notes);
 }
 
-ReleaseNote _note(String tag, {required bool pre}) => ReleaseNote(
+/// A release advertises its ordinal in the note body, invisibly — see
+/// `buildCodeOf`. Every build carries one now (CI stamps it, and the git hooks
+/// write it for a debug build), so a release without one is never offered.
+ReleaseNote _note(String tag, {required bool pre, int? build}) => ReleaseNote(
   tagName: tag,
   name: tag,
+  body: build == null ? '' : '<!-- dpip-build: $build -->',
   prerelease: pre,
   publishedAt: DateTime.utc(2026, 1, 1),
   htmlUrl: 'https://github.com/ExpTechTW/DPIP/releases/tag/$tag',
 );
 
+/// What the running build claims to be, for the ordinal comparison.
+const int _currentBuild = 1000;
+
 final _releases = [
-  _note('v3.2.1', pre: false),
-  _note('v3.2.0', pre: false),
-  _note('v3.9.9', pre: true),
+  _note('v3.2.1', pre: false, build: 1010),
+  _note('v3.2.0', pre: false, build: 900),
+  _note('v3.9.9', pre: true, build: 1005),
 ];
 
 Future<SettingsStore> _pump(
@@ -104,6 +112,12 @@ Future<SettingsStore> _pump(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // Pin what the running build claims to be. Without this it is whatever the
+  // git hooks wrote into build_info.g.dart for the checkout the suite happens
+  // to run on — which is above every ordinal below, so nothing would ever be
+  // offered and the failure would look like a broken prompt.
+  setUp(() => AppBuild.debugSet(label: '3.2.0', code: _currentBuild));
+
   testWidgets('names the new version and offers all three ways out', (
     tester,
   ) async {
@@ -122,7 +136,10 @@ void main() {
       tester,
       version: '3.9.9',
       source: InstallSource.testFlight,
-      repository: _FakeRepository([_note('v3.9.91', pre: true), ..._releases]),
+      repository: _FakeRepository([
+        _note('v3.9.91', pre: true, build: 1020),
+        ..._releases,
+      ]),
     );
 
     expect(find.text('Version v3.9.91 is out.'), findsOneWidget);
@@ -131,6 +148,10 @@ void main() {
   });
 
   testWidgets('says nothing when the build is already current', (tester) async {
+    // Current by *ordinal*, which is what decides now — the version string
+    // cannot, because a snapshot named for a later week legitimately precedes
+    // the release it led to.
+    AppBuild.debugSet(label: '3.2.1', code: 1010);
     await _pump(tester, version: '3.2.1');
     expect(find.byType(AlertDialog), findsNothing);
   });
@@ -170,6 +191,6 @@ void main() {
 
 class _FailingRepository implements ChangelogRepository {
   @override
-  Future<Result<List<ReleaseNote>>> releases() async =>
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
       const Err(NetworkFailure('offline'));
 }
