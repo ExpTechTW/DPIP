@@ -91,7 +91,10 @@ jobs:
             runs-on: macos-latest
     runs-on: ${{ matrix.runs-on }}
     steps:
+      # Full history: tool/gen_build_info.sh counts commits and reads tags.
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       # Flutter/Dart come from mise.toml, the same pin ci.yml and every
       # developer use. A published build is the one that most needs to be
@@ -130,6 +133,11 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
+
+      # The committed copy is a stub; the real values come from git. CI also
+      # passes them with --dart-define below, so this is belt and braces — but
+      # it is what makes the file compile at all.
+      - run: bash tool/gen_build_info.sh
 
       - run: mise exec -- flutter pub get
 

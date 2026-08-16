@@ -81,10 +81,21 @@ jobs:
       # Committed *.freezed.dart / *.g.dart must match a fresh build — a stale
       # generated file (e.g. after editing a model without regenerating) fails
       # here instead of shipping.
+      # What git knows about this build. Committed as a stub — see the header
+      # of the generated file — so CI has to write the real values itself.
+      # Without this the checkout compiles whatever symbols the stub happens to
+      # declare, and a new one added locally is invisible until a store build
+      # fails: the file is `skip-worktree`, so a developer's own copy has the
+      # symbol and their `flutter analyze` passes while CI's does not.
+      - name: Build info
+        run: bash tool/check_build_info.sh
+
       - name: Codegen is up to date
         run: |
           mise exec -- dart run build_runner build --delete-conflicting-outputs
-          git diff --exit-code || {
+          # build_info.g.dart is excluded because it *cannot* match: it holds
+          # the hash of the commit it is committed in.
+          git diff --exit-code -- . ':!lib/core/build_info.g.dart' || {
             echo "::error::Working tree dirty after build_runner (stale codegen, or pubspec.lock rewritten — e.g. a path override leaked into the lockfile). Run: dart run build_runner build && flutter pub get (without pubspec_overrides.yaml) and commit."
             git --no-pager diff --stat
             git --no-pager diff
