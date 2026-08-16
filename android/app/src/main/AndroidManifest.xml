@@ -81,6 +81,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <!-- An app update cancels every alarm the package had
+                     scheduled, and Android does not restore them. Without
+                     this, a device that takes an update and is not opened
+                     loses its background spine silently — the state a user who
+                     "installed the fix" is in. -->
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 
