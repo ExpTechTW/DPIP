@@ -142,19 +142,42 @@ void main() {
     expect(find.byType(LineChart), findsNothing);
   });
 
-  testWidgets('samples with no battery reading are skipped', (tester) async {
+  testWidgets('samples with no battery reading break the line', (tester) async {
     await tester.pumpWidget(
       _wrap(
         MeshBatteryChart(
           samples: [
             _sample(0, battery: 92),
-            _sample(5), // utilization-only sample
+            _sample(5, battery: 91),
+            _sample(10), // utilization-only sample — a gap
+            _sample(15, battery: 90),
+            _sample(20, battery: 89),
+          ],
+        ),
+      ),
+    );
+    final chart = tester.widget<LineChart>(find.byType(LineChart));
+    // Two runs of readings, not one line bridged across the gap.
+    expect(chart.data.lineBarsData, hasLength(2));
+    expect(chart.data.lineBarsData[0].spots, hasLength(2));
+    expect(chart.data.lineBarsData[1].spots, hasLength(2));
+  });
+
+  testWidgets('a single-point run draws no line at all', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        MeshBatteryChart(
+          samples: [
+            _sample(0, battery: 92),
+            _sample(5), // gap
             _sample(10, battery: 91),
           ],
         ),
       ),
     );
     final chart = tester.widget<LineChart>(find.byType(LineChart));
-    expect(chart.data.lineBarsData.single.spots, hasLength(2));
+    // Every run is one point — there is no line to draw, and inventing one
+    // would be exactly the false continuity this chart refuses.
+    expect(chart.data.lineBarsData, isEmpty);
   });
 }

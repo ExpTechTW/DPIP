@@ -96,8 +96,8 @@ class MeshUtilizationChart extends StatelessWidget {
       last: points.last.at,
       series: [
         // Air time first so the channel line draws over its fill.
-        _line(points, (s) => s.airUtilTx, airColor, filled: true),
-        _line(points, (s) => s.channelUtilization, channelColor),
+        ..._line(points, (s) => s.airUtilTx, airColor, filled: true),
+        ..._line(points, (s) => s.channelUtilization, channelColor),
       ],
       tooltipUnit: '%',
     );
@@ -122,14 +122,21 @@ class MeshBatteryChart extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.brightness == Brightness.dark ? _dark : _light;
 
-    final points = [
+    // Enough battery readings to draw a line.
+    final batteryPoints = [
       for (final sample in samples)
         if (sample.batteryPercent != null) sample,
     ];
-    if (points.length < 2) return const _NoHistory();
+    if (batteryPoints.length < 2) return const _NoHistory();
 
-    final voltage = points.last.voltage;
-    final drain = _drainPerHour(points);
+    // The chart plots **every** sample, gapped or not: a sample without a
+    // battery reading sits on the time axis as a hole, and `_line` breaks
+    // there. Filtering first — as the old code did — handed `_line` a
+    // gapless series and re-bridged the gap it was supposed to show.
+    final points = samples;
+    final current = batteryPoints.last.batteryPercent!;
+    final voltage = batteryPoints.last.voltage;
+    final drain = _drainPerHour(batteryPoints);
 
     return _MeshChart(
       legend: [
@@ -137,7 +144,7 @@ class MeshBatteryChart extends StatelessWidget {
           color: color,
           label: l10n.meshtasticBattery,
           // l10n-ignore: percentage readout
-          text: '${points.last.batteryPercent!.clamp(0, 100)}%',
+          text: '${current.clamp(0, 100)}%',
         ),
         if (voltage != null)
           _LegendEntry(
@@ -151,11 +158,8 @@ class MeshBatteryChart extends StatelessWidget {
         if (drain != null && drain < -0.05) ...[
           // l10n-ignore: rate readout
           (l10n.meshtasticStatDrain, '${drain.toStringAsFixed(1)}%/h'),
-          if (points.last.batteryPercent! <= 100)
-            (
-              l10n.meshtasticStatEta,
-              _etaLabel(l10n, points.last.batteryPercent!, drain),
-            ),
+          if (current <= 100)
+            (l10n.meshtasticStatEta, _etaLabel(l10n, current, drain)),
         ] else if (drain != null && drain > 0.05)
           (l10n.meshtasticStatTrend, l10n.meshtasticStatCharging)
         else if (drain != null)
@@ -168,11 +172,11 @@ class MeshBatteryChart extends StatelessWidget {
       first: points.first.at,
       last: points.last.at,
       series: [
-        _line(
+        ..._line(
           points,
           // 101 means external power; the line stays a battery line, capped
           // at full.
-          (s) => s.batteryPercent!.clamp(0, 100).toDouble(),
+          (s) => s.batteryPercent?.clamp(0, 100).toDouble(),
           color,
           filled: true,
         ),
@@ -278,8 +282,8 @@ class MeshNodesChart extends StatelessWidget {
       first: points.first.at,
       last: points.last.at,
       series: [
-        _line(points, (s) => s.nodesTotal?.toDouble(), totalColor),
-        _line(
+        ..._line(points, (s) => s.nodesTotal?.toDouble(), totalColor),
+        ..._line(
           points,
           (s) => s.nodesOnline?.toDouble(),
           onlineColor,
@@ -342,8 +346,8 @@ class MeshTrafficChart extends StatelessWidget {
       first: points.first.at,
       last: points.last.at,
       series: [
-        _line(points, (s) => s.rxPackets?.toDouble(), rxColor, filled: true),
-        _line(points, (s) => s.txPackets?.toDouble(), txColor),
+        ..._line(points, (s) => s.rxPackets?.toDouble(), rxColor, filled: true),
+        ..._line(points, (s) => s.txPackets?.toDouble(), txColor),
       ],
       tooltipUnit: '',
     );
@@ -352,37 +356,57 @@ class MeshTrafficChart extends StatelessWidget {
 
 /// One line series in the shared style: thin, softly curved, optional
 /// gradient fill fading to nothing so stacked fills never turn to mud.
-LineChartBarData _line(
+///
+/// Returns **one bar per continuous run** of readings: a sample without a
+/// value is a gap, and a line across a gap would claim readings that never
+/// happened — the radio reports telemetry on its own cadence, so a missed
+/// report must read as a hole, not as a straight bridge. Runs of a single
+/// point are dropped (there is no line in one point).
+List<LineChartBarData> _line(
   List<MeshMetricSample> points,
   double? Function(MeshMetricSample) value,
   Color color, {
   bool filled = false,
-}) => LineChartBarData(
-  spots: [
-    for (final sample in points)
-      if (value(sample) != null)
-        FlSpot(sample.at.millisecondsSinceEpoch.toDouble(), value(sample)!),
-  ],
-  color: color,
-  barWidth: 2,
-  isCurved: true,
-  curveSmoothness: 0.2,
-  preventCurveOverShooting: true,
-  dotData: const FlDotData(show: false),
-  belowBarData: BarAreaData(
-    show: filled,
-    gradient: filled
-        ? LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              color.withValues(alpha: 0.22),
-              color.withValues(alpha: 0.02),
-            ],
-          )
-        : null,
-  ),
-);
+}) {
+  final gradient = filled
+      ? LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            color.withValues(alpha: 0.22),
+            color.withValues(alpha: 0.02),
+          ],
+        )
+      : null;
+  LineChartBarData bar(List<FlSpot> spots) => LineChartBarData(
+    spots: spots,
+    color: color,
+    barWidth: 2,
+    isCurved: true,
+    curveSmoothness: 0.2,
+    preventCurveOverShooting: true,
+    dotData: const FlDotData(show: false),
+    belowBarData: BarAreaData(show: filled, gradient: gradient),
+  );
+
+  final bars = <LineChartBarData>[];
+  var run = <FlSpot>[];
+  void flush() {
+    if (run.length >= 2) bars.add(bar(run));
+    run = <FlSpot>[];
+  }
+
+  for (final sample in points) {
+    final v = value(sample);
+    if (v == null) {
+      flush();
+      continue;
+    }
+    run.add(FlSpot(sample.at.millisecondsSinceEpoch.toDouble(), v));
+  }
+  flush();
+  return bars;
+}
 
 /// The shared chart shell: legend, stats line, and a touch-enabled line chart
 /// with the day's bounds and midpoint on the time axis.

@@ -379,24 +379,28 @@ class _NodeDetail extends StatelessWidget {
     BuildContext context,
     List<MeshNodeSample> samples,
   ) {
-    if (samples.length < 2) return const [];
-
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
+    // Null marks a break: a sample where the node did not report (or was on
+    // external power) must split the line, not be bridged by it.
     final snr = [
-      for (final s in samples)
-        if (s.snr != 0) s.snr,
+      for (final s in samples) (s.snr == null || s.snr == 0) ? null : s.snr,
     ];
     final battery = [
       for (final s in samples)
-        if (s.battery != null && s.battery! <= 100) s.battery!.toDouble(),
+        (s.battery != null && s.battery! <= 100) ? s.battery!.toDouble() : null,
     ];
-    if (snr.length < 2 && battery.length < 2) return const [];
+    if (snr.whereType<double>().length < 2 &&
+        battery.whereType<double>().length < 2) {
+      return const [];
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final showSnr = snr.whereType<double>().length >= 2;
+    final showBattery = battery.whereType<double>().length >= 2;
 
     return [
       const SizedBox(height: AppSpacing.lg),
-      if (snr.length >= 2) ...[
+      if (showSnr) ...[
         _TrendBlock(
           icon: Icons.network_check_outlined,
           label: l10n.meshtasticSnrTrend,
@@ -407,7 +411,7 @@ class _NodeDetail extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
       ],
-      if (battery.length >= 2)
+      if (showBattery)
         _TrendBlock(
           icon: Icons.battery_std_outlined,
           label: l10n.meshtasticBatteryTrend,
@@ -605,13 +609,16 @@ class _TrendBlock extends StatelessWidget {
   final IconData icon;
   final String label;
   final String unit;
-  final List<double> values;
+
+  /// Null marks a break in the series — the line splits there.
+  final List<double?> values;
   final Color tone;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final latest = values.lastWhere((v) => v != null, orElse: () => null);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -623,8 +630,10 @@ class _TrendBlock extends StatelessWidget {
             const Spacer(),
             Text(
               // l10n-ignore: current-value readout
-              '${values.last.toStringAsFixed(values.last.abs() < 100 ? 1 : 0)}'
-              '$unit',
+              latest == null
+                  ? '—'
+                  : '${latest.toStringAsFixed(latest.abs() < 100 ? 1 : 0)}'
+                        '$unit',
               style: theme.textTheme.labelMedium?.copyWith(
                 color: tone,
                 fontWeight: FontWeight.w600,
@@ -649,16 +658,26 @@ class _TrendBlock extends StatelessWidget {
 /// Draws a thin line through [values] with a soft fill beneath it, scaled so
 /// the extremes sit on the block's top and bottom edges — a flat line should
 /// still fill the block, or the eye reads it as "nothing happened".
+///
+/// A null value is a **break**: the line splits and restarts, rather than
+/// claiming a reading the node never reported.
 class _SparklinePainter extends CustomPainter {
   const _SparklinePainter({required this.values, required this.tone});
 
-  final List<double> values;
+  final List<double?> values;
   final Color tone;
 
   @override
   void paint(Canvas canvas, Size size) {
-    var lo = values.first, hi = values.first;
-    for (final v in values) {
+    // The indices that actually hold a reading, and the band they span.
+    final present = <int>[];
+    for (var i = 0; i < values.length; i++) {
+      if (values[i] != null) present.add(i);
+    }
+    if (present.isEmpty) return;
+    var lo = values[present.first]!, hi = lo;
+    for (final i in present) {
+      final v = values[i]!;
       if (v < lo) lo = v;
       if (v > hi) hi = v;
     }
@@ -669,31 +688,13 @@ class _SparklinePainter extends CustomPainter {
       hi += 1;
     }
     final span = hi - lo;
+    final denom = (values.length - 1).clamp(1, 1 << 30);
 
     Offset point(int i) {
-      final x = size.width * i / (values.length - 1);
-      final y = size.height - size.height * (values[i] - lo) / span;
+      final x = size.width * i / denom;
+      final y = size.height - size.height * (values[i]! - lo) / span;
       return Offset(x, y);
     }
-
-    final path = Path()..moveTo(point(0).dx, point(0).dy);
-    for (var i = 1; i < values.length; i++) {
-      path.lineTo(point(i).dx, point(i).dy);
-    }
-
-    final fill = Path.from(path)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(
-      fill,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [tone.withValues(alpha: 0.22), tone.withValues(alpha: 0.02)],
-        ).createShader(Offset.zero & size),
-    );
 
     final stroke = Paint()
       ..style = PaintingStyle.stroke
@@ -701,10 +702,44 @@ class _SparklinePainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round
       ..strokeCap = StrokeCap.round
       ..color = tone;
-    canvas.drawPath(path, stroke);
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [tone.withValues(alpha: 0.22), tone.withValues(alpha: 0.02)],
+      ).createShader(Offset.zero & size);
 
-    final last = point(values.length - 1);
-    canvas.drawCircle(last, 3, Paint()..color = tone);
+    // One run per stretch of consecutive readings; a gap breaks it.
+    var runStart = -1;
+    void flush(int runEnd) {
+      if (runEnd - runStart < 2) {
+        runStart = -1;
+        return;
+      }
+      final path = Path()..moveTo(point(runStart).dx, point(runStart).dy);
+      for (var i = runStart + 1; i < runEnd; i++) {
+        path.lineTo(point(i).dx, point(i).dy);
+      }
+      final fill = Path.from(path)
+        ..lineTo(size.width * (runEnd - 1) / denom, size.height)
+        ..lineTo(size.width * runStart / denom, size.height)
+        ..close();
+      canvas.drawPath(fill, fillPaint);
+      canvas.drawPath(path, stroke);
+      runStart = -1;
+    }
+
+    for (var i = 0; i < values.length; i++) {
+      if (values[i] == null) {
+        if (runStart != -1) flush(i);
+      } else if (runStart == -1) {
+        runStart = i;
+      }
+    }
+    if (runStart != -1) flush(values.length);
+
+    // The latest reading still dots the line's end, wherever it sits.
+    canvas.drawCircle(point(present.last), 3, Paint()..color = tone);
   }
 
   @override

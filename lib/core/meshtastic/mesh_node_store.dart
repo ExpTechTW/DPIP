@@ -25,11 +25,14 @@ import 'package:flutter/foundation.dart';
 
 /// One point in a node's telemetry history — what the sheet's trend charts
 /// plot. Kept in memory only (see [MeshNodeStore.historyLimit]).
+///
+/// [snr] is null when the node did not report a reading at that time — a gap
+/// the trend must draw as a break, not bridge.
 class MeshNodeSample {
-  const MeshNodeSample({required this.time, required this.snr, this.battery});
+  const MeshNodeSample({required this.time, this.snr, this.battery});
 
   final DateTime time;
-  final double snr;
+  final double? snr;
   final int? battery;
 }
 
@@ -226,7 +229,7 @@ class MeshNodeStore extends ChangeNotifier {
         if (ringStart == null || sample.at.millisecondsSinceEpoch < ringStart)
           MeshNodeSample(
             time: sample.at,
-            snr: sample.snr ?? 0,
+            snr: sample.snr,
             battery: sample.battery,
           ),
       ...ring,
