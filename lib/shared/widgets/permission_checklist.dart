@@ -22,6 +22,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
+import 'package:dpip/core/platform/background_execution.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
 import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -65,6 +66,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   final BatteryOptimization _battery = BatteryOptimization();
   final UnusedAppRestrictionsService _unusedApp =
       UnusedAppRestrictionsService();
+  final BackgroundExecutionService _execution = BackgroundExecutionService();
 
   bool _notify = false;
   bool _critical = false;
@@ -78,6 +80,12 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   /// frame on a device that turns out to be exempt is worse than showing it
   /// a frame late.
   UnusedAppRestrictions _unusedAppStatus = UnusedAppRestrictions.unavailable;
+
+  /// Whether the OS will run background work at all, and what the vendor adds
+  /// on top. Starts unknown for the same reason as above — every field defaults
+  /// to the healthy answer, so nothing is accused before the platform speaks.
+  BackgroundExecutionStatus _executionStatus =
+      const BackgroundExecutionStatus();
 
   @override
   void initState() {
@@ -111,11 +119,14 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
     final unusedApp = await _unusedApp.status();
+    final execution = await _execution.status();
     if (!mounted) return;
     Log.info(
       'permission state: notify=$notify critical=$critical '
       'location=$locationGranted background=$backgroundGranted '
-      'battery=$batteryOk unusedApp=${unusedApp.name}',
+      'battery=$batteryOk unusedApp=${unusedApp.name} '
+      'bgExec=${execution.restricted ? "restricted" : "ok"} '
+      'bucket=${execution.standbyBucket} vendor=${execution.manufacturer}',
     );
     // The shell's badge reads PermissionHealth, not this widget's private copy,
     // so without this the page would show a fresh grant while the dot stayed
@@ -128,6 +139,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       _background = backgroundGranted;
       _batteryOk = batteryOk;
       _unusedAppStatus = unusedApp;
+      _executionStatus = execution;
     });
     widget.onChanged?.call(
       PermissionState(
@@ -232,6 +244,28 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     await _unusedApp.openSettings(); // re-checked on resume
   }
 
+  /// The manufacturer as a person would write it. `Build.MANUFACTURER` is not
+  /// display text — it arrives as `samsung`, `HUAWEI`, `Xiaomi` — and this
+  /// string is read inside a sentence, so it is title-cased rather than shown
+  /// raw. Multi-word names keep every word capitalised.
+  String get _vendorName {
+    final raw = _executionStatus.manufacturer?.trim() ?? '';
+    if (raw.isEmpty) return raw;
+    return raw
+        .split(RegExp(r'\s+'))
+        .map(
+          (word) => word.length <= 1
+              ? word.toUpperCase()
+              : word[0].toUpperCase() + word.substring(1).toLowerCase(),
+        )
+        .join(' ');
+  }
+
+  Future<void> _openExecutionSettings() async {
+    final opened = await _execution.openSettings(); // re-checked on resume
+    Log.info('permission[background execution]: opened $opened');
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -272,6 +306,23 @@ class _PermissionChecklistState extends State<PermissionChecklist>
           granted: _background,
           onGrant: _location ? _grantBackground : null,
         ),
+        // Not a permission and not optional: the OS can refuse to run this
+        // app's background work while every grant above still reads "granted".
+        // On iOS it is the sharpest failure on the page — with Background App
+        // Refresh off, no significant-change or region event is delivered at
+        // all, so the location spine reports itself armed and never fires.
+        // Hidden until the platform answers, and hidden when a management
+        // profile owns the switch, because then there is nothing to tap.
+        if (_executionStatus.known && !_executionStatus.lockedByPolicy) ...[
+          const SizedBox(height: AppSpacing.sm),
+          PermissionRow(
+            icon: Icons.play_circle_outline,
+            title: l10n.onboardingPermBackgroundExec,
+            description: l10n.onboardingPermBackgroundExecDesc,
+            granted: !_executionStatus.restricted,
+            onGrant: _openExecutionSettings,
+          ),
+        ],
         if (Platform.isAndroid) ...[
           const SizedBox(height: AppSpacing.sm),
           PermissionRow(
@@ -295,6 +346,24 @@ class _PermissionChecklistState extends State<PermissionChecklist>
               onGrant: _exemptUnusedApp,
             ),
           ],
+          // The manufacturer's own battery manager, which no API reports and
+          // none exempts. Samsung puts an app it considers unused to sleep after
+          // about three days — two orders of magnitude sooner than Android's own
+          // hibernation — and Xiaomi, Huawei, OPPO and vivo each gate background
+          // work behind an "auto-start" switch that is off by default. Advisory
+          // because it is genuinely unmeasurable: a tick here would be a claim
+          // the app cannot support, and a permanent warning would be worse.
+          if (_executionStatus.vendorManaged) ...[
+            const SizedBox(height: AppSpacing.sm),
+            PermissionRow(
+              icon: Icons.factory_outlined,
+              title: l10n.onboardingPermVendorPower,
+              description: l10n.onboardingPermVendorPowerDesc(_vendorName),
+              granted: false,
+              advisory: true,
+              onGrant: _openExecutionSettings,
+            ),
+          ],
         ],
       ],
     );
@@ -309,6 +378,7 @@ class PermissionRow extends StatelessWidget {
     required this.description,
     required this.granted,
     required this.onGrant,
+    this.advisory = false,
   });
 
   final IconData icon;
@@ -318,6 +388,13 @@ class PermissionRow extends StatelessWidget {
 
   /// Grant handler; null disables the button (e.g. background before foreground).
   final Future<void> Function()? onGrant;
+
+  /// A state the app cannot measure — it can only point at the screen where the
+  /// user changes it. Such a row never shows a tick and never shows the
+  /// unsatisfied styling, because both would be claims: a tick we cannot verify,
+  /// or a permanent red mark for something that may already be fine. It offers
+  /// the settings screen and says so, and [granted] is ignored.
+  final bool advisory;
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +408,12 @@ class PermissionRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: theme.colorScheme.primary),
+          Icon(
+            icon,
+            color: advisory
+                ? theme.colorScheme.onSurfaceVariant
+                : theme.colorScheme.primary,
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -354,7 +436,12 @@ class PermissionRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.md),
-          if (granted)
+          if (advisory)
+            OutlinedButton(
+              onPressed: onGrant == null ? null : () => onGrant!(),
+              child: Text(l10n.permissionOpenSettings),
+            )
+          else if (granted)
             Icon(Icons.check_circle, color: theme.colorScheme.primary)
           else
             FilledButton.tonal(
