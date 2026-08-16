@@ -91,7 +91,7 @@ check_one() { # <subject> <body> <label>
   # a `grep -P` that BSD grep does not have (and would silently pass on a Mac),
   # and it catches kana, Hangul and emoji in the same breath.
   if printf '%s' "$subject" | LC_ALL=C grep -q '[^ -~]'; then
-    note "summary must be plain-ASCII English — 中文 belongs under '$MARKER'"
+    note "summary must be plain-ASCII English — 中文 belongs in the entry lines"
     bad=1
   fi
 

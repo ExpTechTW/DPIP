@@ -749,7 +749,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dpmDisasterTsunami => '海嘯';
 
   @override
-  String get changelogTypeStable => '正式';
+  String get changelogTypeStable => '正式版';
 
   @override
   String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
@@ -2028,7 +2028,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerAed => 'AED';
 
   @override
-  String get changelogTypePrerelease => '公測';
+  String get changelogTypePrerelease => '測試版';
 
   @override
   String get reportFilterIntensityInfoModernBody =>
@@ -3625,7 +3625,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get dpmDisasterTsunami => '海啸';
 
   @override
-  String get changelogTypeStable => '正式';
+  String get changelogTypeStable => '正式版';
 
   @override
   String get mapLayerSatelliteTransparentClear => '晴空 = 透明,显示底图';
@@ -4904,7 +4904,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerAed => 'AED';
 
   @override
-  String get changelogTypePrerelease => '公测';
+  String get changelogTypePrerelease => '测试版';
 
   @override
   String get reportFilterIntensityInfoModernBody =>
@@ -6501,7 +6501,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get dpmDisasterTsunami => '海嘯';
 
   @override
-  String get changelogTypeStable => '正式';
+  String get changelogTypeStable => '正式版';
 
   @override
   String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
@@ -7780,7 +7780,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerAed => 'AED';
 
   @override
-  String get changelogTypePrerelease => '公測';
+  String get changelogTypePrerelease => '測試版';
 
   @override
   String get reportFilterIntensityInfoModernBody =>
@@ -9377,7 +9377,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get dpmDisasterTsunami => '海嘯';
 
   @override
-  String get changelogTypeStable => '正式';
+  String get changelogTypeStable => '正式版';
 
   @override
   String get mapLayerSatelliteTransparentClear => '晴空 = 透明,顯示底圖';
@@ -10656,7 +10656,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerAed => 'AED';
 
   @override
-  String get changelogTypePrerelease => '公測';
+  String get changelogTypePrerelease => '測試版';
 
   @override
   String get reportFilterIntensityInfoModernBody =>

@@ -344,7 +344,7 @@
   "typhoonForecastLead": "預測 +{hours} 小時",
   "dpmDisasterTsunami": "海嘯",
   "@mapAppOpenFailed": {},
-  "changelogTypeStable": "正式",
+  "changelogTypeStable": "正式版",
   "mapLayerSatelliteTransparentClear": "晴空 = 透明,顯示底圖",
   "@skyTimeAuto": {
     "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
@@ -992,7 +992,7 @@
   "typhoonLegendCurrent": "目前中心",
   "aedAddress": "地址",
   "mapLayerAed": "AED",
-  "changelogTypePrerelease": "公測",
+  "changelogTypePrerelease": "測試版",
   "reportFilterIntensityInfoModernBody": "震度為 0–4、5弱、5強、6弱、6強、7。篩選滑桿依新制；列表中較早的地震會以舊制標示顯示。",
   "typhoonOverlayWeatherNone": "無",
   "mapLayerStyleGray": "灰階（JMA）",

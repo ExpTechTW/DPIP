@@ -344,7 +344,7 @@
   "typhoonForecastLead": "预测 +{hours} 小时",
   "dpmDisasterTsunami": "海啸",
   "@mapAppOpenFailed": {},
-  "changelogTypeStable": "正式",
+  "changelogTypeStable": "正式版",
   "mapLayerSatelliteTransparentClear": "晴空 = 透明,显示底图",
   "@skyTimeAuto": {
     "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
@@ -992,7 +992,7 @@
   "typhoonLegendCurrent": "目前中心",
   "aedAddress": "地址",
   "mapLayerAed": "AED",
-  "changelogTypePrerelease": "公测",
+  "changelogTypePrerelease": "测试版",
   "reportFilterIntensityInfoModernBody": "震度为 0–4、5弱、5强、6弱、6强、7。筛选滑杆依新制；列表中较早的地震会以旧制标示显示。",
   "typhoonOverlayWeatherNone": "无",
   "mapLayerStyleGray": "灰度（JMA）",
