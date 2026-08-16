@@ -141,9 +141,8 @@ class MapMenuDivider extends StatelessWidget {
       ),
       child: Divider(
         height: 1,
-        color: Theme.of(
-          context,
-        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+        color: Theme.of(context).colorScheme.outlineVariant
+            .withValues(alpha: 0.5),
       ),
     );
   }

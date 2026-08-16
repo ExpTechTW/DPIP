@@ -41,31 +41,42 @@ const Map<int, WeatherMode> _phenomenonMode = {
   19: WeatherMode.thunderstorm, // 有雷
 };
 
-/// Ones digit → a distinct icon, finer than the eight backdrop modes.
+/// Ones digit → a distinct glyph, finer than the eight backdrop modes.
 ///
-/// `0` (the plain family sky) is absent here on purpose: a clear-day 100 must
-/// stay a sun, not fall through to the text fallback. The [weatherModeFor]
-/// mode still picks the accent colour, so a phenomenon only refines the glyph.
+/// Drawn from the bundled weather font, which exists precisely because
+/// Flutter's icon set has no rain glyph: the three rain intensities, the
+/// rain-snow mixes and hail are all unavailable in `Icons`, so the table below
+/// used to approximate them with snowflakes and dots.
+///
+/// `0` (the plain family sky) is absent on purpose — it resolves through
+/// [_familySky], which also chooses between the day and night glyph. The
+/// accent colour still follows [weatherModeFor], so a phenomenon only refines
+/// the glyph, never the tint.
+///
+/// A few suffixes deliberately share a glyph, because they name the same
+/// picture at different strengths (有霾/有靄; 有閃電/有雷聲/有雷; the three
+/// hail codes) — the strength is carried by [weatherRainIntensity] and the
+/// backdrop, not by inventing a distinction the icon cannot show.
 const Map<int, IconData> _phenomenonIcon = {
-  1: Icons.blur_on_outlined, // 有霾 — suspended dust, not a fog bank
-  2: Icons.blur_on_outlined, // 有靄
-  3: Icons.bolt_outlined, // 有閃電 — lightning with no rain on the ground
-  4: Icons.bolt_outlined, // 有雷聲
-  5: Icons.foggy, // 有霧 — a real fog bank reads denser than 霾
-  6: rainy, // 有雨 — the cloud-and-rain mark, not a single drop
-  7: Icons.sunny_snowing, // 有雨雪 — the sun-through-snow glyph reads as the mix
-  8: Icons.snowing, // 有大雪
-  9: Icons.ac_unit_outlined, // 有雪珠
-  10: Icons.ac_unit_outlined, // 有冰珠
-  11: rainyLight, // 有陣雨 — a shower, lighter drops than steady 有雨
-  12: Icons.cloudy_snowing, // 陣雨雪
-  13: Icons.grain_outlined, // 有雹
-  14: Icons.thunderstorm_outlined, // 有雷雨
-  15: Icons.thunderstorm_outlined, // 有雷雪
-  16: Icons.thunderstorm_outlined, // 有雷雹
-  17: Icons.thunderstorm, // 大雷雨 — filled: the heaviest rung, visually heavier
-  18: Icons.thunderstorm, // 大雷雹
-  19: Icons.bolt_outlined, // 有雷
+  1: mist, // 有霾 — suspended dust: streaks, no cloud
+  2: mist, // 有靄 — light mist, the same picture as 霾
+  3: bolt, // 有閃電 — lightning with no rain on the ground
+  4: bolt, // 有雷聲
+  5: foggy, // 有霧 — a real fog bank reads denser than 霾
+  6: rainy, // 有雨 — steady rain
+  7: rainySnow, // 有雨雪 — the dedicated rain-and-snow glyph
+  8: snowingHeavy, // 有大雪
+  9: weatherSnowy, // 有雪珠 — graupel
+  10: snowflake, // 有冰珠 — bare ice crystals
+  11: rainyLight, // 有陣雨 — a shower, lighter than steady 有雨
+  12: weatherMix, // 陣雨雪 — intermittent mixed precipitation
+  13: weatherHail, // 有雹
+  14: thunderstorm, // 有雷雨
+  15: cloudySnowing, // 有雷雪 — snow from a storm cloud
+  16: weatherHail, // 有雷雹 — hail is the distinguishing hazard
+  17: rainyHeavy, // 大雷雨 — torrential; the rain is what does the damage
+  18: weatherHail, // 大雷雹
+  19: bolt, // 有雷
 };
 
 /// The plain sky of a code's family (its hundreds digit), used when the ones
@@ -77,6 +88,18 @@ WeatherMode _familyMode(int code) => switch (code ~/ 100) {
   3 => WeatherMode.overcast,
   _ => WeatherMode.auto,
 };
+
+/// The plain-sky glyph for a family, by daylight.
+///
+/// This is the one place day and night differ: a clear midnight drawn as a sun
+/// is wrong in a way every user notices, and 陰 (full overcast) is the same
+/// picture either way because there is nothing behind the cloud to show.
+IconData _familySky(WeatherMode mode, {required bool isNight}) =>
+    switch (mode) {
+      WeatherMode.clear => isNight ? clearNight : clearDay,
+      WeatherMode.cloudy => isNight ? partlyCloudyNight : partlyCloudyDay,
+      _ => cloudy,
+    };
 
 /// The backdrop mode for a CWB [code]: the phenomenon (ones digit) wins over
 /// the family sky, and `0`/unknown codes fall back to [WeatherMode.auto].
@@ -118,15 +141,19 @@ double? weatherSnowIntensity(int code) {
 /// Icon + accent for a forecast point's [weather] text and [weatherCode].
 ///
 /// Codes are authoritative: the phenomenon's own icon ([_phenomenonIcon]) wins
-/// when the suffix has one, then the family sky ([weatherModeFor]) for the
-/// plain `0` suffix, and only a missing/unknown code falls back to the text.
-/// The accent colour always follows the resolved mode, so 陣雨 and 大雷雨 share
-/// their family's tint while still reading as different glyphs.
+/// when the suffix has one, then the family sky for the plain `0` suffix, and
+/// only a missing/unknown code falls back to the text. The accent colour always
+/// follows the resolved mode, so 陣雨 and 大雷雨 share their family's tint while
+/// still reading as different glyphs.
+///
+/// [isNight] only selects between the day and night form of a plain sky; a
+/// phenomenon looks the same at any hour.
 (IconData, Color?) weatherVisual(
   String weather,
   int weatherCode,
-  ColorScheme colors,
-) {
+  ColorScheme colors, {
+  bool isNight = false,
+}) {
   if (weatherCode > 0) {
     final phenomenon = _phenomenonIcon[weatherCode % 100];
     if (phenomenon != null) {
@@ -136,15 +163,16 @@ double? weatherSnowIntensity(int code) {
   final mode = weatherModeFor(weatherCode);
   return switch (mode) {
     // A missing/unknown code has no mode to key off — fall back to the text.
-    WeatherMode.auto => _fallback(weather, colors),
-    WeatherMode.thunderstorm => (Icons.thunderstorm_outlined, colors.tertiary),
-    WeatherMode.snow => (Icons.ac_unit_outlined, colors.primary),
+    WeatherMode.auto => _fallback(weather, colors, isNight: isNight),
+    WeatherMode.thunderstorm => (thunderstorm, colors.tertiary),
+    WeatherMode.snow => (snowing, colors.primary),
     WeatherMode.rain => (rainy, colors.primary),
-    WeatherMode.fog => (Icons.blur_on_outlined, colors.onSurfaceVariant),
-    WeatherMode.sand => (Icons.air_outlined, colors.onSurfaceVariant),
-    WeatherMode.clear => (Icons.wb_sunny_outlined, colors.tertiary),
-    WeatherMode.cloudy => (Icons.wb_cloudy_outlined, colors.onSurfaceVariant),
-    WeatherMode.overcast => (Icons.cloud_outlined, colors.onSurfaceVariant),
+    WeatherMode.fog => (foggy, colors.onSurfaceVariant),
+    WeatherMode.sand => (air, colors.onSurfaceVariant),
+    WeatherMode.clear || WeatherMode.cloudy || WeatherMode.overcast => (
+      _familySky(mode, isNight: isNight),
+      _accent(mode, colors),
+    ),
   };
 }
 
@@ -161,18 +189,25 @@ Color? _accent(WeatherMode mode, ColorScheme colors) => switch (mode) {
 
 /// Text-only fallback for codes that resolve to [WeatherMode.auto] (missing or
 /// unknown) — the pre-table substring matching.
-(IconData, Color?) _fallback(String weather, ColorScheme colors) {
-  if (weather.contains('雷')) {
-    return (Icons.thunderstorm_outlined, colors.tertiary);
-  }
-  if (weather.contains('雪')) {
-    return (Icons.ac_unit_outlined, colors.primary);
-  }
-  if (weather.contains('雨')) {
-    return (rainy, colors.primary);
+(IconData, Color?) _fallback(
+  String weather,
+  ColorScheme colors, {
+  required bool isNight,
+}) {
+  if (weather.contains('雷')) return (thunderstorm, colors.tertiary);
+  if (weather.contains('雪')) return (snowing, colors.primary);
+  if (weather.contains('雨')) return (rainy, colors.primary);
+  if (weather.contains('霧') || weather.contains('靄')) {
+    return (foggy, colors.onSurfaceVariant);
   }
   if (weather.contains('晴')) {
-    return (Icons.wb_sunny_outlined, colors.tertiary);
+    return (isNight ? clearNight : clearDay, colors.tertiary);
   }
-  return (Icons.cloud_outlined, colors.onSurfaceVariant);
+  if (weather.contains('多雲')) {
+    return (
+      isNight ? partlyCloudyNight : partlyCloudyDay,
+      colors.onSurfaceVariant,
+    );
+  }
+  return (cloudy, colors.onSurfaceVariant);
 }

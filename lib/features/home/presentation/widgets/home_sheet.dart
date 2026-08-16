@@ -93,6 +93,11 @@ class HomeSheet extends StatelessWidget {
     return lerpDouble(_restAlpha, 1, t)!;
   }
 
+  /// Quantises a 0..1 ramp into [levels] discrete steps — full-screen blur
+  /// sigmas then only change on level crossings, so the filter isn't fed a
+  /// fresh value on every drag tick.
+  static double _step(double t, int levels) => (t * levels).round() / levels;
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -113,10 +118,16 @@ class HomeSheet extends StatelessWidget {
         );
         final surfaceAlpha = _surfaceAlpha(e);
         final weatherOpacity = HomeChrome.weatherReveal(e);
+        // Quantised so the full-screen backdrop blur re-renders on a few level
+        // changes through the drag instead of a fresh sigma every pixel —
+        // same ladder trick as [_ScrollBlurredWeather]'s scroll blur.
         final blur =
             24.0 *
-            (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
-            (1 - weatherOpacity);
+            _step(
+              (surfaceAlpha / _restAlpha).clamp(0.0, 1.0) *
+                  (1 - weatherOpacity),
+              6,
+            );
         final borderRadius = BorderRadius.vertical(
           top: Radius.circular(lerpDouble(AppRadius.lg, 0, flush)!),
         );
@@ -137,8 +148,8 @@ class HomeSheet extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 // Frosted map-through backdrop, dominant while collapsed.
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+                _CachedBlur(
+                  sigma: blur,
                   child: ColoredBox(
                     color: colors.surface.withValues(alpha: surfaceAlpha),
                   ),
@@ -192,6 +203,55 @@ class HomeSheet extends StatelessWidget {
       ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
 }
 
+/// A [BackdropFilter] that reuses its [ImageFilter] instance while [sigma]
+/// stays on the same quantised step.
+///
+/// [ImageFilter] has no value equality, so a fresh `blur(...)` per drag tick
+/// marks the whole-screen blur layer dirty and recomposites it every frame
+/// even though the sigma only changes on a few level crossings (the sheet
+/// quantises it to 6 steps). Reusing the instance keeps the layer cached
+/// between steps — the same pattern [_ScrollBlurredWeather] uses.
+class _CachedBlur extends StatefulWidget {
+  const _CachedBlur({required this.sigma, required this.child});
+
+  final double sigma;
+  final Widget child;
+
+  @override
+  State<_CachedBlur> createState() => _CachedBlurState();
+}
+
+class _CachedBlurState extends State<_CachedBlur> {
+  ImageFilter? _filter;
+  double _sigma = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.sigma != _sigma) {
+      _sigma = widget.sigma;
+      _filter = ImageFilter.blur(sigmaX: _sigma, sigmaY: _sigma);
+    }
+    // A sigma of 0 is not a cheap blur, it is a full-cost one that returns the
+    // pixels it was given: the layer is still pushed, the backdrop still read
+    // back and resampled. The sheet quantises to 6 steps, so the top step of
+    // its travel (roughly extent 0.988 upward, where the surface has gone fully
+    // opaque and the blur is no longer wanted) lands on exactly 0 — and that is
+    // the *resting* posture at full extent, not a moment in a gesture. Directly
+    // over the map platform view, this is the backdrop-filter path Flutter's own
+    // docs single out as expensive on iOS.
+    //
+    // `enabled` short-circuits inside RenderBackdropFilter.paint before the
+    // filter resolves or the layer is pushed, and leaves the widget, element and
+    // render object in place — so it cannot cause the re-parent flash this file
+    // warns about in [_ScrollBlurredWeather].
+    return BackdropFilter(
+      filter: _filter!,
+      enabled: _sigma > 0,
+      child: widget.child,
+    );
+  }
+}
+
 /// Blurs and dims [child] in step with [scrollController], so the sky reads as
 /// depth of field behind the content once the sheet's list scrolls the hero's
 /// rain trend card up past the fold — the counterpart to `HomeContent`'s hero
@@ -217,7 +277,7 @@ class HomeSheet extends StatelessWidget {
 /// so only this small leaf repaints on every scroll tick — not the sheet's
 /// whole frosted-chrome tree, which is the mistake `HomeSheet`'s own class doc
 /// warns against for the drag case.
-class _ScrollBlurredWeather extends StatelessWidget {
+class _ScrollBlurredWeather extends StatefulWidget {
   const _ScrollBlurredWeather({
     required this.scrollController,
     required this.child,
@@ -226,6 +286,11 @@ class _ScrollBlurredWeather extends StatelessWidget {
   final ScrollController scrollController;
   final Widget child;
 
+  @override
+  State<_ScrollBlurredWeather> createState() => _ScrollBlurredWeatherState();
+}
+
+class _ScrollBlurredWeatherState extends State<_ScrollBlurredWeather> {
   /// Scroll distance over which blur reaches its peak. Short on purpose: the
   /// trend card itself is most of a screen's scroll away, and holding the sky
   /// crisp for that whole distance would make the blur feel disconnected from
@@ -244,14 +309,25 @@ class _ScrollBlurredWeather extends StatelessWidget {
   /// turning the whole backdrop into a black hole at the top of the gesture.
   static const double _maxDim = 0.45;
 
+  /// The filter instance last handed to the [ImageFiltered] — [ImageFilter]
+  /// has no value equality, so a fresh `blur(...)` every scroll tick would
+  /// make the full-screen blur layer recomposite on **every** tick even though
+  /// the sigma quantises to the same value. Reusing the instance keeps the
+  /// layer cached for the whole 4-step scroll ramp.
+  ImageFilter? _filter;
+
+  /// Sigma the cached [_filter] was built for — the ladder is quantised, so
+  /// this only differs on the handful of step crossings.
+  double _filterSigma = -1;
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: scrollController,
-      child: child,
+      listenable: widget.scrollController,
+      child: widget.child,
       builder: (context, child) {
-        final offset = scrollController.hasClients
-            ? scrollController.offset
+        final offset = widget.scrollController.hasClients
+            ? widget.scrollController.offset
             : 0.0;
         final t = (offset / _rampExtent).clamp(0.0, 1.0);
         // Quantised so the full-screen blur re-renders only on a few level
@@ -263,6 +339,10 @@ class _ScrollBlurredWeather extends StatelessWidget {
         final step = (t * 4).round() / 4;
         final sigma = _maxSigma * step;
         final dim = _maxDim * step;
+        if (sigma != _filterSigma) {
+          _filterSigma = sigma;
+          _filter = ImageFilter.blur(sigmaX: sigma, sigmaY: sigma);
+        }
         // The tree's SHAPE never changes — a blur that toggles via `enabled`
         // and an always-present transparent dim. Returning the bare child at
         // rest (as an early version did) re-parents the sky's element the
@@ -275,7 +355,7 @@ class _ScrollBlurredWeather extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+              imageFilter: _filter!,
               // No-op at rest, so no offscreen layer is composited — the sheet
               // spends most of its time here, and ImageFiltered.enabled skips
               // the filter without touching the tree shape.

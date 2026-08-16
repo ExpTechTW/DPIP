@@ -3,6 +3,7 @@ library;
 
 import 'dart:io';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -59,18 +60,17 @@ void main() {
       f(refraction);
       sh.setImageSampler(0, content);
       final r = ui.PictureRecorder();
-      ui.Canvas(
-        r,
-      ).drawRect(const Rect.fromLTWH(0, 0, 360, 300), Paint()..shader = sh);
+      ui.Canvas(r)
+          .drawRect(const Rect.fromLTWH(0, 0, 360, 300), Paint()..shader = sh);
       return r.endRecording().toImageSync(w, h);
     }
 
     final off = await render(0.0, 6.0);
     final on = await render(1.0, 6.0);
 
-    Future<List<int>> px(ui.Image im) async => (await im.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    ))!.buffer.asUint8List();
+    Future<List<int>> px(ui.Image im) async =>
+        (await im.toByteData(format: ui.ImageByteFormat.rawRgba))!.buffer
+            .asUint8List();
     final a = await px(off), b = await px(on);
     var diff = 0;
     for (var k = 0; k < a.length; k += 4) {
@@ -86,9 +86,8 @@ void main() {
     final out = rec.endRecording().toImageSync(730, 300);
     final png = await out.toByteData(format: ui.ImageByteFormat.png);
     Directory('build/sky_preview').createSync(recursive: true);
-    File(
-      'build/sky_preview/_rain_glass.png',
-    ).writeAsBytesSync(png!.buffer.asUint8List());
+    File('build/sky_preview/_rain_glass.png')
+        .writeAsBytesSync(png!.buffer.asUint8List());
     expect(
       diff,
       greaterThan(500),

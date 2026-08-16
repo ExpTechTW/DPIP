@@ -7,7 +7,7 @@ import 'dart:ui' as ui;
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
@@ -24,7 +24,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Renders the hero block ([HomeContent] flush, on a located township) at a
 /// real device size, so the "does the rain trend card actually reach the
@@ -111,10 +110,11 @@ void main() {
     );
     addTearDown(tester.view.reset);
 
-    SharedPreferences.setMockInitialValues({
-      'home.savedRegionCodes': ['100'],
-    });
-    final store = RegionStore(Prefs(await SharedPreferences.getInstance()));
+    final store = RegionStore(
+      SettingsStore.inMemory({
+        'home.savedRegionCodes': ['100'],
+      }),
+    );
     store
       ..select(1) // 所在地
       ..setCurrentCode('100'); // located, so the hero block is in play

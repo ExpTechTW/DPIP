@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/realtime/ticker.dart';
@@ -32,19 +34,44 @@ class RealtimeService {
   /// Starts every registered channel and the periodic clock resync (call after
   /// the first frame). The initial sync is kicked off at bootstrap; the ticker
   /// then re-anchors every [_clockSyncInterval].
-  void startAll() {
+  ///
+  /// [stagger] offsets each channel's first poll by one interval, so a burst
+  /// of feeds doesn't all hit the network (and the UI isolate's JSON decode)
+  /// on the same post-first-frame tick — a 250 ms lead on EEW is nothing, but
+  /// it smooths the first seconds on a slow phone. Zero (the default) keeps
+  /// [start] synchronous, which the service tests rely on.
+  void startAll({Duration stagger = Duration.zero}) {
+    var delay = Duration.zero;
     for (final channel in _channels) {
-      channel.start();
+      if (stagger == Duration.zero) {
+        channel.start();
+      } else {
+        unawaited(Future<void>.delayed(delay, channel.start));
+        delay += stagger;
+      }
     }
     _startClockSync();
   }
 
-  /// App went to background: pause every channel (stop polling, keep state) and
-  /// halt the resync ticker to save battery. (On iOS the process is suspended
-  /// anyway; [onForeground] re-anchors on return.)
-  void onBackground() {
+  /// App went to background: pause every channel (stop polling, keep state),
+  /// release any connection a channel's source is holding, and halt the resync
+  /// ticker to save battery. (On iOS the process is suspended anyway;
+  /// [onForeground] re-anchors on return.)
+  void onBackground() => _pauseAll(releaseTransport: true);
+
+  /// The app is on screen but not receiving events — a notification shade, the
+  /// app switcher, an incoming call, a permission dialog.
+  ///
+  /// Distinct from [onBackground] because these are frequent and usually
+  /// momentary. Polling stops (nobody is reading the feed), but a held-open
+  /// connection stays: dropping it would reconnect on every shade pull, which
+  /// costs more radio than the polling it saves and flaps a safety-critical
+  /// feed through `offline` for no reason.
+  void onInterrupted() => _pauseAll(releaseTransport: false);
+
+  void _pauseAll({required bool releaseTransport}) {
     for (final channel in _channels) {
-      channel.pause();
+      channel.pause(releaseTransport: releaseTransport);
     }
     _stopClockSync();
   }

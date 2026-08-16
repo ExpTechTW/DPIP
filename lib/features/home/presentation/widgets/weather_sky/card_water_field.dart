@@ -256,13 +256,23 @@ class CardWaterField {
     final diameter = 2 * _particleRadius * unit;
     final slop = _b2LinearSlop * unit;
 
+    // Scratch reused across iterations: this runs five times per 20 ms tick,
+    // and allocating four fresh Float32Lists each pass (a thousand a second
+    // while it rains) is GC churn for buffers whose lifetime is one call.
+    _ensureScratch();
+    final edge = _edgeScratch;
+    final weight = _weightScratch;
+    final bodyW = _bodyWScratch;
+    final accum = _accumScratch;
+    weight.fillRange(0, _live, 0);
+    bodyW.fillRange(0, _live, 0);
+
     // Resolved once per iteration, not re-looked-up per section: positions
     // (and so each particle's column) are fixed until Integrate, at the very
     // end. `double.infinity` for a column with nothing solid in it compares
     // false against every finite y below, which is what lets the rest of this
     // function stay unaware a surface is not flat at all — see
     // [CardWaterSurface].
-    final edge = Float32List(_live);
     for (var i = 0; i < _live; i++) {
       edge[i] = surface?.heightAt(_p.x[i]) ?? topEdge;
     }
@@ -286,8 +296,6 @@ class CardWaterField {
 
     // Contacts. Screen y grows downward, so "above the edge" is y < edge[i]
     // and the signed surface distance is edge[i] - y.
-    final weight = Float32List(_live);
-    final bodyW = Float32List(_live);
     for (var i = 0; i < _live; i++) {
       final d = edge[i] - _p.y[i];
       if (d < diameter) {
@@ -303,7 +311,6 @@ class CardWaterField {
     final ppw = preset.pressure * criticalPressure;
     final maxPressure = _b2MaxParticlePressure * criticalPressure;
     final vpp = dt / (_density * diameter);
-    final accum = Float32List(_live);
     for (var i = 0; i < _live; i++) {
       accum[i] = math.min(
         ppw * math.max(0.0, weight[i] - _b2MinParticleWeight),
@@ -399,6 +406,21 @@ class CardWaterField {
 
   bool _hasForce = false;
 
+  /// Per-iteration scratch, grown to the live population on demand — see the
+  /// note at the top of [_solveIteration].
+  Float32List _edgeScratch = Float32List(0);
+  Float32List _weightScratch = Float32List(0);
+  Float32List _bodyWScratch = Float32List(0);
+  Float32List _accumScratch = Float32List(0);
+
+  void _ensureScratch() {
+    if (_edgeScratch.length >= _live) return;
+    _edgeScratch = Float32List(_live);
+    _weightScratch = Float32List(_live);
+    _bodyWScratch = Float32List(_live);
+    _accumScratch = Float32List(_live);
+  }
+
   /// LiquidFun's b2Settings, and the derived particle mass.
   static const double _b2LinearSlop = 0.005;
   static const double _b2MinParticleWeight = 1.0;
@@ -421,8 +443,9 @@ class CardWaterField {
 
   /// Contact pairs within one diameter, with their weights and normals.
   List<_Contact> _buildPairs(double diameter, Float32List weight) {
-    final out = <_Contact>[];
+    final out = _pairsScratch..clear();
     if (_live < 2) return out;
+    final d2Max = diameter * diameter;
     final buckets = <int, List<int>>{};
     for (var i = 0; i < _live; i++) {
       (buckets[_cellKey(_p.x[i], _p.y[i], diameter)] ??= <int>[]).add(i);
@@ -439,7 +462,7 @@ class CardWaterField {
             final dx = _p.x[j] - _p.x[i];
             final dy = _p.y[j] - _p.y[i];
             final d2 = dx * dx + dy * dy;
-            if (d2 >= diameter * diameter || d2 < 1e-12) continue;
+            if (d2 >= d2Max || d2 < 1e-12) continue;
             final d = math.sqrt(d2);
             final w = 1.0 - d / diameter;
             weight[i] += w;
@@ -451,6 +474,9 @@ class CardWaterField {
     }
     return out;
   }
+
+  /// Contact list reused across iterations — cleared, never reallocated.
+  final List<_Contact> _pairsScratch = <_Contact>[];
 
   /// the emitter's `particleSystem.setRadius(0.01)`, in world units.
   static const double _particleRadius = 0.01;
@@ -897,7 +923,9 @@ Future<Uint8List> _rasterize(ui.Image source, int size) async {
     Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
     Paint()..filterQuality = FilterQuality.medium,
   );
-  final image = recorder.endRecording().toImageSync(size, size);
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(size, size);
+  picture.dispose();
   final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
   image.dispose();
   return data!.buffer.asUint8List();
@@ -950,7 +978,10 @@ Future<ui.Image> _imageFromRgba(Uint8List rgba, int size) {
         canvas.drawRect(Rect.fromLTWH(x.toDouble(), y.toDouble(), 1, 1), paint);
       }
     }
-    return recorder.endRecording().toImageSync(size, size);
+    final picture = recorder.endRecording();
+    final image = picture.toImageSync(size, size);
+    picture.dispose();
+    return image;
   }
 
   return (build(false), build(true));

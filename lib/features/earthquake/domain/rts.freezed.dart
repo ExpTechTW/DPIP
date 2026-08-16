@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'rts.dart';
@@ -9,6 +9,7 @@ part of 'rts.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -66,7 +67,7 @@ class _$RtsCopyWithImpl<$Res>
 /// Create a copy of Rts
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? station = null,Object? box = null,Object? intensities = null,Object? time = null,}) {
-  return _then(_self.copyWith(
+  return _then(Rts(
 station: null == station ? _self.station : station // ignore: cast_nullable_to_non_nullable
 as Map<String, RtsStation>,box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,intensities: null == intensities ? _self.intensities : intensities // ignore: cast_nullable_to_non_nullable
@@ -212,7 +213,7 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 @JsonSerializable()
 
 class _Rts implements Rts {
-  const _Rts({final  Map<String, RtsStation> station = const <String, RtsStation>{}, final  Map<String, dynamic> box = const <String, dynamic>{}, @JsonKey(name: 'int') final  List<dynamic> intensities = const <dynamic>[], this.time = 0}): _station = station,_box = box,_intensities = intensities;
+  const _Rts({ Map<String, RtsStation> station = const <String, RtsStation>{},  Map<String, dynamic> box = const <String, dynamic>{}, @JsonKey(name: 'int')  List<dynamic> intensities = const <dynamic>[], this.time = 0}): _station = station,_box = box,_intensities = intensities;
   factory _Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 
  final  Map<String, RtsStation> _station;
@@ -305,10 +306,7 @@ as int,
 /// @nodoc
 mixin _$RtsStation {
 
- double get pga; double get pgv;@JsonKey(name: 'i') double get intensityRaw;@JsonKey(name: 'I') double get intensity;// The wire carries the trigger flag as 0/1 (absent while calm) — decode it
-// like the other API bools, or a triggered station would throw on parse
-// and drop the whole snapshot right when the big-event data matters most.
-@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool get alert;
+ double get pga; double get pgv;@JsonKey(name: 'i') double get intensityRaw;@JsonKey(name: 'I') double get intensity;@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool get alert;
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -359,7 +357,7 @@ class _$RtsStationCopyWithImpl<$Res>
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,Object? alert = null,}) {
-  return _then(_self.copyWith(
+  return _then(RtsStation(
 pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
 as double,pgv: null == pgv ? _self.pgv : pgv // ignore: cast_nullable_to_non_nullable
 as double,intensityRaw: null == intensityRaw ? _self.intensityRaw : intensityRaw // ignore: cast_nullable_to_non_nullable
@@ -513,9 +511,6 @@ class _RtsStation implements RtsStation {
 @override@JsonKey() final  double pgv;
 @override@JsonKey(name: 'i') final  double intensityRaw;
 @override@JsonKey(name: 'I') final  double intensity;
-// The wire carries the trigger flag as 0/1 (absent while calm) — decode it
-// like the other API bools, or a triggered station would throw on parse
-// and drop the whole snapshot right when the big-event data matters most.
 @override@JsonKey(fromJson: boolishInt, toJson: intFromBool) final  bool alert;
 
 /// Create a copy of RtsStation

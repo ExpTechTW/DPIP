@@ -1,6 +1,6 @@
 import 'package:dpip/core/settings/home_area.dart';
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 
 /// The user's Home regions — nationwide, the current GPS township, and up to
@@ -14,11 +14,11 @@ import 'package:flutter/foundation.dart';
 ///
 /// Replaces the placeholder `AreaSelection`.
 class RegionStore extends ChangeNotifier {
-  RegionStore(this._prefs)
+  RegionStore(this._settings)
     : _saved =
-          _prefs.getStringList(PreferenceKeys.savedRegionCodes) ?? const [];
+          _settings.getStringList(SettingKeys.savedRegionCodes) ?? const [];
 
-  final Prefs _prefs;
+  final SettingsStore _settings;
 
   /// Maximum saved townships (besides nationwide + current location).
   static const int maxSaved = 3;
@@ -145,5 +145,5 @@ class RegionStore extends ChangeNotifier {
   }
 
   void _persist() =>
-      _prefs.setStringList(PreferenceKeys.savedRegionCodes, _saved);
+      _settings.setStringList(SettingKeys.savedRegionCodes, _saved);
 }

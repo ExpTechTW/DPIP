@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'weather_forecast.dart';
@@ -9,6 +9,7 @@ part of 'weather_forecast.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -67,7 +68,7 @@ class _$WeatherForecastCopyWithImpl<$Res>
 /// Create a copy of WeatherForecast
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? updateTime = null,Object? forecast = null,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherForecast(
 updateTime: null == updateTime ? _self.updateTime : updateTime // ignore: cast_nullable_to_non_nullable
 as int,forecast: null == forecast ? _self.forecast : forecast // ignore: cast_nullable_to_non_nullable
 as List<WeatherForecastPoint>,
@@ -211,7 +212,7 @@ return $default(_that.updateTime,_that.forecast);case _:
 @JsonSerializable()
 
 class _WeatherForecast extends WeatherForecast {
-  const _WeatherForecast({required this.updateTime, required final  List<WeatherForecastPoint> forecast}): _forecast = forecast,super._();
+  const _WeatherForecast({required this.updateTime, required  List<WeatherForecastPoint> forecast}): _forecast = forecast,super._();
   factory _WeatherForecast.fromJson(Map<String, dynamic> json) => _$WeatherForecastFromJson(json);
 
 /// Publish time, Unix **milliseconds** (13-digit) — see [updatedAt].
@@ -347,7 +348,7 @@ class _$WeatherForecastPointCopyWithImpl<$Res>
 /// Create a copy of WeatherForecastPoint
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? temperature = null,Object? apparentTemp = null,Object? humidity = null,Object? weather = null,Object? weatherCode = null,Object? pop = null,Object? wind = null,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherForecastPoint(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as String,temperature: null == temperature ? _self.temperature : temperature // ignore: cast_nullable_to_non_nullable
 as double,apparentTemp: null == apparentTemp ? _self.apparentTemp : apparentTemp // ignore: cast_nullable_to_non_nullable
@@ -656,7 +657,7 @@ class _$ForecastWindCopyWithImpl<$Res>
 /// Create a copy of ForecastWind
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? direction = null,Object? speed = null,Object? beaufort = null,}) {
-  return _then(_self.copyWith(
+  return _then(ForecastWind(
 direction: null == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
 as String,speed: null == speed ? _self.speed : speed // ignore: cast_nullable_to_non_nullable
 as double,beaufort: null == beaufort ? _self.beaufort : beaufort // ignore: cast_nullable_to_non_nullable

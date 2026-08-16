@@ -123,9 +123,8 @@ class _FreshnessBanner extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               label,
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(color: foreground),
+              style: Theme.of(context).textTheme.labelLarge
+                  ?.copyWith(color: foreground),
             ),
           ],
         ),

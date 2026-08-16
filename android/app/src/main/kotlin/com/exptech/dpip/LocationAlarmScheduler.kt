@@ -54,10 +54,46 @@ object LocationAlarmScheduler {
         )
     }
 
+    /**
+     * Schedules the fallback at its stored interval — the "the geofence did not
+     * take, don't leave this device with nothing" path.
+     *
+     * Every place that arms a geofence needs this, because every one of them can
+     * fail: the channel on app start, [GeofenceReceiver] re-centring after an
+     * exit or recovering from a GEOFENCE_NOT_AVAILABLE, and
+     * [LocationBootReceiver] after a reboot. A failure with no fallback is
+     * silent and permanent — the geofence is the only spine on a Play-services
+     * device, so nothing is left to notice or retry.
+     */
+    fun ensure(context: Context) {
+        if (!BgLocationStore.enabled(context)) return
+        val interval = BgLocationStore.prefs(context)
+            .getLong(BgLocationStore.KEY_INTERVAL_MIN, DEFAULT_INTERVAL_MIN)
+        schedule(context, interval)
+    }
+
     /** Cancels any pending wake-up. */
     fun cancel(context: Context) {
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am.cancel(pendingIntent(context))
+    }
+
+    /**
+     * Whether an alarm is currently pending — diagnostics only.
+     *
+     * `FLAG_NO_CREATE` returns null when no matching PendingIntent exists, which
+     * is the only way to ask AlarmManager "is something scheduled?"; there is no
+     * query API. It must carry the same flags and request code as
+     * [pendingIntent] or it will not match.
+     */
+    fun isScheduled(context: Context): Boolean {
+        val intent = Intent(context, LocationAlarmReceiver::class.java)
+        return PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+        ) != null
     }
 
     private fun pendingIntent(context: Context): PendingIntent {

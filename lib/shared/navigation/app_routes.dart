@@ -48,6 +48,34 @@ abstract final class AppRoutes {
   static const String weatherRanking = 'weatherRanking';
   static const String weatherRankingPath = 'weather-ranking';
 
+  /// Lunar phase — nested under [dataPath]. Local computation only.
+  static const String moon = 'moon';
+  static const String moonPath = 'moon';
+
+  /// Daylight, twilight and the solar terms — nested under [dataPath].
+  static const String sun = 'sun';
+  static const String sunPath = 'sun';
+
+  /// The planets tonight — nested under [dataPath].
+  static const String planets = 'planets';
+  static const String planetsPath = 'planets';
+
+  /// Tonight's observing window and what is up — nested under [dataPath].
+  static const String tonight = 'tonight';
+  static const String tonightPath = 'tonight';
+
+  /// 農曆 and upcoming eclipses — nested under [dataPath].
+  static const String almanac = 'almanac';
+  static const String almanacPath = 'almanac';
+
+  /// The naked-eye sky chart — nested under [dataPath].
+  static const String skyChart = 'skyChart';
+  static const String skyChartPath = 'sky-chart';
+
+  /// Astronomical tidal forcing — nested under [dataPath].
+  static const String tide = 'tide';
+  static const String tidePath = 'tide';
+
   static const String more = 'more';
   static const String morePath = '/more';
 
@@ -77,6 +105,10 @@ abstract final class AppRoutes {
   static const String log = 'log';
   static const String logPath = '/log';
 
+  /// LoRa mesh (Meshtastic) BLE test page — scan/connect/chat against a radio.
+  static const String meshtastic = 'meshtastic';
+  static const String meshtasticPath = '/meshtastic';
+
   /// App release notes (GitHub releases).
   static const String changelog = 'changelog';
   static const String changelogPath = '/changelog';
@@ -93,6 +125,11 @@ abstract final class AppRoutes {
 
   static const String regionSelectCity = 'regionSelectCity';
   static const String regionSelectCityPath = ':city';
+
+  /// Permission checklist (權限檢查) — the same rows onboarding shows, kept
+  /// reachable afterwards because a missing alert is usually a missing grant.
+  static const String permissions = 'permissions';
+  static const String permissionsPath = '/permissions';
 
   // Per-channel push notification settings.
   static const String notifySettings = 'notifySettings';

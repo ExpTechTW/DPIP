@@ -36,9 +36,8 @@ class IntensityLegend extends StatelessWidget {
     // Pin the line height so a label's box never exceeds a [_cell]-tall row —
     // otherwise the taller default line height spaces the EEW cells apart and
     // the intended continuous bar fragments.
-    final labelStyle = Theme.of(
-      context,
-    ).textTheme.labelSmall?.copyWith(height: 1);
+    final labelStyle = Theme.of(context).textTheme.labelSmall
+        ?.copyWith(height: 1);
     return mode == IntensityLegendMode.rts
         ? _rtsScale(labelStyle)
         : _eewScale(labelStyle);

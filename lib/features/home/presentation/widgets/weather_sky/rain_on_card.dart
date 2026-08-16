@@ -203,29 +203,39 @@ class _RainOnCardState extends State<RainOnCard>
     // sprites.py` — the kernel is a blurred disc, the normal map an analytic
     // hemisphere, so they are the same *functions* the engine samples.
     try {
-      final kernel = await _decodeAsset(
-        'assets/weather/particles/particle_blurred.webp',
-      );
-      final normalMap = await _decodeAsset(
-        'assets/weather/particles/drop_normal.webp',
-      );
-      final (pos, neg) = await bakeParticleSprites(
-        kernel: kernel,
-        normalMap: normalMap,
-      );
-      kernel.dispose();
-      normalMap.dispose();
-      if (!mounted) {
-        pos.dispose();
-        neg.dispose();
-        return;
-      }
+      // Shared across every card and every mount, like [_fallbackSprites]:
+      // each mounted card used to decode both textures and bake its own
+      // sprite pair — several cards rain at once on Home, and the pair was
+      // never disposed with the State either, so scrolling leaked bakes.
+      final (pos, neg) = await (_bakedSprites ??= _bakeShared());
+      if (!mounted) return;
       _primary.spritePos = pos;
       _primary.spriteNeg = neg;
       _secondary.spritePos = pos;
       _secondary.spriteNeg = neg;
     } catch (error, stackTrace) {
+      // Evict so a later mount retries rather than caching the failure.
+      _bakedSprites = null;
       Log.handle(error, stackTrace, 'Failed to bake the drop sprite');
+    }
+  }
+
+  /// The one baked sprite pair, app-lifetime — never disposed, exactly like
+  /// [_fallbackSprites].
+  static Future<(ui.Image, ui.Image)>? _bakedSprites;
+
+  static Future<(ui.Image, ui.Image)> _bakeShared() async {
+    final kernel = await _decodeAsset(
+      'assets/weather/particles/particle_blurred.webp',
+    );
+    final normalMap = await _decodeAsset(
+      'assets/weather/particles/drop_normal.webp',
+    );
+    try {
+      return await bakeParticleSprites(kernel: kernel, normalMap: normalMap);
+    } finally {
+      kernel.dispose();
+      normalMap.dispose();
     }
   }
 
@@ -262,8 +272,19 @@ class _RainOnCardState extends State<RainOnCard>
     // since the ticker was stopped (a closed gate cuts the water outright).
     // If rain should be running but the ticker is idle, re-check the gate
     // once this frame settles and restart if it is open.
+    //
+    // The opacity term is not optional. Without it this block undoes the
+    // [_syncRunning] call directly above it: fading out stops the ticker, which
+    // makes `!_ticker.isActive` true, which schedules a resume that restarts it
+    // — so the header card, whose opacity reaches exactly 0 once the hero
+    // scrolls past the fold, kept stepping two water solvers and bumping
+    // [_frame] every vsync while [_CardWaterPainter] returned without drawing a
+    // pixel. Nothing else stopped it: this card is mounted with `gated: false`,
+    // so the position gate is a constant `true`, and rain never drains below the
+    // intensity floor.
     if (widget.active &&
         widget.intensity > 0.001 &&
+        widget.opacity > 0.004 &&
         !_ticker.isActive &&
         !_resumeScheduled) {
       _resumeScheduled = true;
@@ -277,7 +298,13 @@ class _RainOnCardState extends State<RainOnCard>
   void _resumeIfGateOpen() {
     if (!mounted) return;
     _syncPositionGate();
-    if (_gateOpen && widget.active && widget.intensity > 0.001) {
+    // Same gate set as [_syncRunning], opacity included — a resume that used a
+    // weaker test than the stop it is undoing is how the ticker came back to
+    // life on an invisible card.
+    if (_gateOpen &&
+        widget.active &&
+        widget.intensity > 0.001 &&
+        widget.opacity > 0.004) {
       _last = Duration.zero;
       _ticker.start();
     }
@@ -631,10 +658,13 @@ class _CardWaterPainter extends CustomPainter {
     primary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     secondary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     offscreen.restore();
-    return recorder.endRecording().toImageSync(
+    final picture = recorder.endRecording();
+    final image = picture.toImageSync(
       fieldSize.width.ceil(),
       fieldSize.height.ceil(),
     );
+    picture.dispose();
+    return image;
   }
 
   @override

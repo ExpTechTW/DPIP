@@ -103,6 +103,74 @@ class DataPage extends StatelessWidget {
                 ),
             ],
           ),
+          SectionHeader(l10n.dataSectionAstronomy),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            crossAxisSpacing: AppSpacing.sm,
+            mainAxisSpacing: AppSpacing.sm,
+            childAspectRatio: 1.45,
+            children: [
+              for (final (route, icon, label, accent)
+                  in <(String, IconData, String, Color)>[
+                    (
+                      AppRoutes.moon,
+                      Icons.nightlight_outlined,
+                      l10n.moonTitle,
+                      colors.tertiary,
+                    ),
+                    (
+                      AppRoutes.sun,
+                      Icons.wb_sunny_outlined,
+                      l10n.sunTitle,
+                      colors.primary,
+                    ),
+                    (
+                      AppRoutes.planets,
+                      Icons.blur_circular_outlined,
+                      l10n.planetsTitle,
+                      colors.secondary,
+                    ),
+                    (
+                      AppRoutes.tonight,
+                      Icons.dark_mode_outlined,
+                      l10n.tonightTitle,
+                      colors.primary,
+                    ),
+                    (
+                      AppRoutes.skyChart,
+                      Icons.auto_awesome_outlined,
+                      l10n.skyChartTitle,
+                      colors.tertiary,
+                    ),
+                    (
+                      AppRoutes.almanac,
+                      Icons.calendar_month_outlined,
+                      l10n.almanacTitle,
+                      colors.secondary,
+                    ),
+                    (
+                      AppRoutes.tide,
+                      Icons.waves_outlined,
+                      l10n.tideTitle,
+                      colors.primary,
+                    ),
+                  ])
+                _RankingGridTile(
+                  icon: icon,
+                  title: label,
+                  accent: accent,
+                  onTap: () => context.pushNamed(route),
+                ),
+            ],
+          ),
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +49,7 @@ class BaseMap extends StatefulWidget {
     this.showUserLocation = true,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
+    this.tabIndex,
   });
 
   /// Bounding box for the nationwide (全國) framing — the Taiwan main island
@@ -137,13 +139,34 @@ class BaseMap extends StatefulWidget {
   /// Per-surface zoom ceiling (DPM AED may go to 16).
   final double maxZoomPreference;
 
+  /// Shell tab that owns this surface, if any — the map pauses its native
+  /// render loop while that tab is hidden and resumes when it comes back.
+  /// A hidden tab keeps its platform view alive (see `StatefulShellRoute.
+  /// indexedStack`), so without this the map would keep producing frames —
+  /// and burning GPU — offstage. `null` belongs to no branch (a full-screen
+  /// route, a preview outside the shell), so only the shell-level tests apply:
+  /// it still pauses when a page covers the shell or the app leaves the
+  /// foreground.
+  final int? tabIndex;
+
   @override
   State<BaseMap> createState() => _BaseMapState();
 }
 
-class _BaseMapState extends State<BaseMap> {
+class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   /// Set once the platform view reports in — the readiness gate for the retry.
   MapLibreMapController? _controller;
+
+  /// The shell's visible-tab notifier ([VisibleTabScope.of] may be null when
+  /// this surface lives outside the shell — then it never pauses).
+  VisibleTab? _visibleTab;
+
+  /// Last-applied pause state, so [setRenderPaused] fires only on transitions.
+  bool _renderPaused = false;
+
+  /// Whether the app itself is in the foreground. The render loop is native, so
+  /// it does not stop just because Flutter stops producing frames.
+  bool _foreground = true;
 
   /// Bumped to remount the map's platform view after a failed first attempt
   /// (see [_scheduleReadinessRetry]).
@@ -154,14 +177,68 @@ class _BaseMapState extends State<BaseMap> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scheduleReadinessRetry();
+  }
+
+  /// A backgrounded app still owns its platform views, and MapLibre draws from
+  /// its own native render loop rather than Flutter's — so the engine going
+  /// quiet does not stop it. Pause it explicitly and resume on return.
+  ///
+  /// `inactive` is left running on purpose: it fires for a transient overlay
+  /// (the notification shade, the app switcher preview) where the map is still
+  /// on screen and a paused surface would be visibly frozen.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = switch (state) {
+      AppLifecycleState.paused ||
+      AppLifecycleState.hidden ||
+      AppLifecycleState.detached => false,
+      AppLifecycleState.resumed || AppLifecycleState.inactive => true,
+    };
+    if (foreground == _foreground) return;
+    _foreground = foreground;
+    _syncRender();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_onTabChanged);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_onTabChanged);
+    _syncRender();
   }
 
   @override
   void dispose() {
+    _visibleTab?.removeListener(_onTabChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _readinessTimer?.cancel();
     super.dispose();
   }
+
+  /// A surface is worth drawing only while the app is in the foreground *and*
+  /// the surface is in front of the user — its branch selected and nothing
+  /// pushed over the shell ([VisibleTab.isOnScreen]). No scope at all means the
+  /// map lives outside the shell (a full-screen route, a preview), where the
+  /// only thing that can hide it is the app leaving the foreground.
+  ///
+  /// The controller may not exist yet — the state is kept and applied when the
+  /// platform view reports in ([_onMapCreated]), so `_renderPaused` only records
+  /// states that actually reached the platform.
+  void _syncRender() {
+    final onScreen = _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
+    final pause = !(_foreground && onScreen);
+    final controller = _controller;
+    if (controller == null || pause == _renderPaused) return;
+    _renderPaused = pause;
+    controller.setRenderPaused(pause);
+  }
+
+  void _onTabChanged() => _syncRender();
 
   /// Forwards map readiness to the caller and stops the retry timer.
   void _onMapCreated(MapLibreMapController controller) {
@@ -170,6 +247,7 @@ class _BaseMapState extends State<BaseMap> {
     // A remount (retry) may have superseded this element — never hand a stale
     // controller, whose native view is being torn down, to the caller.
     if (!mounted) return;
+    _syncRender();
     widget.onMapCreated?.call(controller);
   }
 
@@ -194,6 +272,24 @@ class _BaseMapState extends State<BaseMap> {
     });
   }
 
+  /// Style string memoised per palette — all other inputs are const, and
+  /// Every [build] used to re-interpolate the full style JSON — the string
+  /// only varies by palette and by the town-label directory, so it is memoised
+  /// on that pair.
+  static final Map<(MapPalette, String), String> _styleCache = {};
+
+  static String _styleString(MapPalette palette, String townLabelData) =>
+      _styleCache.putIfAbsent(
+        (palette, townLabelData),
+        () => exptechVectorStyle(
+          palette,
+          basemapTileUrl: basemapOriginTileUrl,
+          glyphsUrl: glyphsOriginUrl,
+          terrainTileUrl: terrainOriginTileUrl,
+          townLabelData: townLabelData,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final palette = MapColors.of(Theme.of(context).brightness);
@@ -216,15 +312,14 @@ class _BaseMapState extends State<BaseMap> {
       ),
       // Brightness flip / AED overlay changes this string → MapLibre reloads
       // style; layers re-attach via [onStyleLoaded] (see [MapScaffold]).
-      // Township-name labels come from the app's own town directory (a unique
-      // GeoJSON point per township), never the tile polygons — see
-      // [townLabelGeoJson].
-      styleString: exptechVectorStyle(
+      // The interpolated string only varies by palette and the town directory,
+      // so it is memoised — every rebuild used to re-run the ~2 KB
+      // interpolation and the per-town GeoJSON stringification. Township-name
+      // labels come from the app's own directory (a unique GeoJSON point per
+      // township), never the tile polygons — see [townLabelGeoJson].
+      styleString: _styleString(
         palette,
-        basemapTileUrl: basemapOriginTileUrl,
-        glyphsUrl: glyphsOriginUrl,
-        terrainTileUrl: terrainOriginTileUrl,
-        townLabelData: townLabelGeoJson(context.read<TownDirectory>()),
+        townLabelGeoJson(context.read<TownDirectory>()),
       ),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).

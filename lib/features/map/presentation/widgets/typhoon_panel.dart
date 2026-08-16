@@ -1067,9 +1067,8 @@ class _TappedWaypoint extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        tooltip: MaterialLocalizations.of(
-                          context,
-                        ).closeButtonTooltip,
+                        tooltip: MaterialLocalizations.of(context)
+                            .closeButtonTooltip,
                         icon: const Icon(Icons.close, size: 18),
                         onPressed: layer.clearForecastSelection,
                       ),
@@ -1177,9 +1176,8 @@ class _WaypointDivider extends StatelessWidget {
       ),
       child: Divider(
         height: 1,
-        color: Theme.of(
-          context,
-        ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+        color: Theme.of(context).colorScheme.outlineVariant
+            .withValues(alpha: 0.5),
       ),
     );
   }

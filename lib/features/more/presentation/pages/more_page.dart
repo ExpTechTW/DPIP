@@ -1,12 +1,15 @@
+import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -34,16 +37,18 @@ class MorePage extends StatelessWidget {
           bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
-          // Support CTA, kept prominent at the top in its own headerless group.
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.favorite_border,
-                title: l10n.sponsorTitle,
-                onTap: () => context.pushNamed(AppRoutes.sponsor),
-              ),
-            ],
-          ),
+          // The two calls to action, in their own headerless block above every
+          // menu group — and in rank order. Support is the page's one ask, so
+          // it is the only row that carries a gradient, a glow and a filled
+          // badge; Discord follows it as the clear second, tinted and badged
+          // but flat, so the pair reads as a hierarchy rather than as two
+          // competing banners.
+          const _SupportCallout(),
+          const _DiscordCallout(),
+          // The news entry, right behind the two calls to action: it used to
+          // sit four rows deep in the links list, but it is how ExpTech
+          // reaches everyone at once.
+          const _AnnouncementCard(),
           SectionHeader(l10n.moreSectionRegion),
           _MoreGroup(children: [const _SavedRegionsTile()]),
           SectionHeader(l10n.moreSectionNotify),
@@ -53,6 +58,28 @@ class MorePage extends StatelessWidget {
                 icon: Icons.notifications_outlined,
                 title: l10n.notifySettingsMenu,
                 onTap: () => context.pushNamed(AppRoutes.notifySettings),
+              ),
+              // Kept beside the notification settings: when an alert does not
+              // arrive, the grant is the first thing to check.
+              _MoreTile(
+                icon: Icons.verified_user_outlined,
+                title: l10n.permissionsTitle,
+                // The same dot the More tab carries, on the row it leads to —
+                // otherwise the tab says something is wrong and the page the
+                // user opens looks no different from every other row.
+                alert: context.select<PermissionHealth, bool>(
+                  (health) => health.needsAttention,
+                ),
+                onTap: () => context.pushNamed(AppRoutes.permissions),
+              ),
+              // What the system says actually went out — a status page, kept
+              // in the notification group because that is where you look when
+              // an alert did not arrive.
+              _MoreLinkTile(
+                icon: Icons.notifications_active_outlined,
+                title: l10n.moreNotifyLog,
+                host: 'status.exptech.com.tw',
+                url: 'https://status.exptech.com.tw/notify',
               ),
             ],
           ),
@@ -74,6 +101,23 @@ class MorePage extends StatelessWidget {
                 title: l10n.defaultMapLayerSettings,
                 subtitle: mapLayer.label(l10n),
                 onTap: () => context.pushNamed(AppRoutes.defaultMapLayer),
+              ),
+            ],
+          ),
+          // Its own section rather than a row under 進階: the LoRa mesh is the
+          // app's off-grid reception path, not a developer curiosity, and the
+          // radio it pairs with is a physical thing the user owns and manages.
+          SectionHeader(l10n.moreSectionMesh),
+          _MoreGroup(
+            children: [
+              _MoreTile(
+                icon: Icons.router_outlined,
+                title: l10n.meshtasticTitle,
+                // A message arrived in a conversation the user has not read —
+                // the same state as the chat page's unread pills, selected
+                // down to one boolean so only this tile rebuilds.
+                alert: context.select<MeshUnread, bool>((u) => u.hasUnread),
+                onTap: () => context.pushNamed(AppRoutes.meshtastic),
               ),
             ],
           ),
@@ -127,24 +171,6 @@ class MorePage extends StatelessWidget {
                 url: 'https://status.exptech.dev/status',
               ),
               _MoreLinkTile(
-                icon: Icons.campaign_outlined,
-                title: l10n.moreAnnouncements,
-                host: 'announcement.exptech.com.tw',
-                url: 'https://announcement.exptech.com.tw/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.discord,
-                title: l10n.moreDiscord,
-                host: 'exptech.com.tw/dc',
-                url: 'https://exptech.com.tw/dc',
-              ),
-              _MoreLinkTile(
-                icon: Icons.notifications_active_outlined,
-                title: l10n.moreNotifyLog,
-                host: 'status.exptech.com.tw',
-                url: 'https://status.exptech.com.tw/notify',
-              ),
-              _MoreLinkTile(
                 icon: Icons.smart_display_outlined,
                 title: l10n.moreYoutube,
                 host: 'youtube.com/@exptechtw',
@@ -172,8 +198,7 @@ class MorePage extends StatelessWidget {
                 icon: Icons.android,
                 title: l10n.moreGooglePlay,
                 host: 'play.google.com',
-                url:
-                    'https://play.google.com/store/apps/details?id=com.exptech.dpip',
+                url: 'https://play.google.com/store/apps/details?id=com.exptech.dpip',
               ),
               _MoreLinkTile(
                 icon: Icons.apple,
@@ -259,18 +284,24 @@ class _MoreTile extends StatelessWidget {
     required this.icon,
     required this.title,
     this.subtitle,
+    this.alert = false,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String? subtitle;
+
+  /// Marks the row with the same dot the shell uses, for something the user
+  /// should act on. Off for every row that is merely a destination.
+  final bool alert;
+
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(icon),
+      leading: alert ? Badge(child: Icon(icon)) : Icon(icon),
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       trailing: const Icon(Icons.chevron_right),
@@ -350,9 +381,8 @@ class _SavedRegionsTileState extends State<_SavedRegionsTile> {
                           saved.length,
                           RegionStore.maxSaved,
                         ),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall
+                            ?.copyWith(color: colors.onSurfaceVariant),
                       ),
                     ),
                   ),
@@ -497,19 +527,292 @@ class _MoreLinkTile extends StatelessWidget {
     );
   }
 
-  Future<void> _open(BuildContext context) async {
-    // Capture context-bound objects before the async gap.
-    final messenger = ScaffoldMessenger.of(context);
-    final failed = AppLocalizations.of(context).moreLinkOpenFailed;
-    try {
-      final ok = await launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode.externalApplication,
-      );
-      if (!ok) throw Exception('launchUrl returned false for $url');
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'open external link $url');
-      messenger.showSnackBar(SnackBar(content: Text(failed)));
-    }
+  Future<void> _open(BuildContext context) => openExternalLink(context, url);
+}
+
+/// Opens [url] in the browser, reporting a failure to the user rather than
+/// leaving a row that silently does nothing.
+Future<void> openExternalLink(BuildContext context, String url) async {
+  // Capture context-bound objects before the async gap.
+  final messenger = ScaffoldMessenger.of(context);
+  final failed = AppLocalizations.of(context).moreLinkOpenFailed;
+  try {
+    final ok = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok) throw Exception('launchUrl returned false for $url');
+  } catch (error, stackTrace) {
+    Log.handle(error, stackTrace, 'open external link $url');
+    messenger.showSnackBar(SnackBar(content: Text(failed)));
+  }
+}
+
+/// The page's primary call to action.
+///
+/// DPIP carries no ads, so this is the only thing on the page actually asking
+/// the user for something. It is painted in [AppGold] — the one colour in the
+/// app from outside the [ColorScheme], because a card tinted from the same seed
+/// as everything else reads as another menu row, whatever weight it is given.
+/// Gold is what makes it read as *paid*.
+///
+/// The construction is the same either way: a one-hue gradient for the sheen, a
+/// warm cast underneath so it looks lit rather than printed on, a hairline
+/// along the edge, and a filled badge carrying the most saturated step.
+class _SupportCallout extends StatelessWidget {
+  const _SupportCallout();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final gold = AppGold.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xs,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: AppRadius.large,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [gold.fillStart, gold.fillEnd],
+          ),
+          // A warm cast rather than a grey drop shadow — it lifts the card off
+          // the page and reads as light on metal, not as a floating rectangle.
+          boxShadow: [
+            BoxShadow(
+              color: gold.glow,
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          border: Border.all(color: gold.edge),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            borderRadius: AppRadius.large,
+            onTap: () => context.pushNamed(AppRoutes.sponsor),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  // Filled, not outlined: the one active affordance on a page
+                  // whose every other row is an outlined icon.
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: gold.badge,
+                    ),
+                    child: Icon(Icons.favorite, color: gold.onBadge, size: 22),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.sponsorTitle,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: gold.ink,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.sponsorCalloutBody,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: gold.ink.withValues(alpha: 0.78),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Icon(
+                    Icons.chevron_right,
+                    color: gold.ink.withValues(alpha: 0.6),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The page's second call to action, directly under [_SupportCallout].
+///
+/// Deliberately one step down: the same badge-and-two-lines construction, but
+/// a flat secondary container with no gradient and no shadow. That is what
+/// makes the ranking legible — if this card also glowed, neither would lead.
+class _DiscordCallout extends StatelessWidget {
+  const _DiscordCallout();
+
+  static const String _url = 'https://exptech.com.tw/dc';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: colors.secondaryContainer,
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openExternalLink(context, _url),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.secondary,
+                  ),
+                  child: Icon(
+                    Icons.discord,
+                    color: colors.onSecondary,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.moreDiscord,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSecondaryContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.moreDiscordCalloutBody,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSecondaryContainer.withValues(
+                            alpha: 0.75,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  Icons.open_in_new,
+                  size: 18,
+                  color: colors.onSecondaryContainer.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The news entry, directly under the two calls to action.
+///
+/// Not a call to action — it asks nothing of the user — so it carries none of
+/// their weight: a flat neutral card, no gradient, no glow. It stays at the
+/// top anyway, because announcements are how ExpTech reaches everyone at
+/// once, and the row it replaced sat four deep in the links list.
+class _AnnouncementCard extends StatelessWidget {
+  const _AnnouncementCard();
+
+  static const String _url = 'https://announcement.exptech.com.tw/';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: colors.surfaceContainerHigh,
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openExternalLink(context, _url),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.surfaceContainerHighest,
+                  ),
+                  child: Icon(
+                    Icons.campaign_outlined,
+                    color: colors.onSurfaceVariant,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.moreAnnouncements,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colors.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'announcement.exptech.com.tw',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  Icons.open_in_new,
+                  size: 18,
+                  color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

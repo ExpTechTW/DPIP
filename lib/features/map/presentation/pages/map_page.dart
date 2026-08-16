@@ -10,7 +10,10 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/features/map/presentation/layers/lightning_layer.dart';
+import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
@@ -46,6 +49,10 @@ import 'package:provider/provider.dart';
 /// the scaffold remounts when that preference changes so the new default wins.
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
+
+  /// Shell branch index of the map tab — [BaseMap] pauses its native render
+  /// loop while this tab is hidden.
+  static const int tabIndex = 2;
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -89,6 +96,10 @@ class _MapPageState extends State<MapPage> {
     WindMapLayer(context.read<MeteorWeatherRepository>()),
     RainMapLayer(context.read<MeteorRainRepository>()),
     DisasterMapLayer(context.read<DisasterMapRepository>()),
+    MeshNodeMapLayer(
+      context.read<MeshNodeStore>(),
+      service: context.read<MeshtasticService>(),
+    ),
   ];
 
   @override
@@ -98,6 +109,7 @@ class _MapPageState extends State<MapPage> {
       key: ValueKey(initialId),
       layers: _layers,
       initialLayerId: initialId,
+      tabIndex: MapPage.tabIndex,
     );
   }
 }

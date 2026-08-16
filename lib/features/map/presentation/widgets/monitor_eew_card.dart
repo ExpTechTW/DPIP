@@ -11,6 +11,9 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/widgets/second_ticker.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -41,8 +44,12 @@ class MonitorEewCard extends StatefulWidget {
   State<MonitorEewCard> createState() => _MonitorEewCardState();
 }
 
-class _MonitorEewCardState extends State<MonitorEewCard> {
-  Timer? _ticker;
+class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
+  /// The RTS panel's own gate suppresses feed-notify rebuilds behind other
+  /// tabs, but the countdown has its own timer — same gate here.
+  @override
+  bool get secondTickerActive =>
+      VisibleTabScope.of(context)?.isOnScreen(MapPage.tabIndex) ?? true;
 
   /// The CWA P/S travel-time table once it resolves — the countdown settles on
   /// the table's arrival time the moment it loads (see [estimateLocalShaking]).
@@ -55,12 +62,8 @@ class _MonitorEewCardState extends State<MonitorEewCard> {
   @override
   void initState() {
     super.initState();
-    // Countdown only needs per-second ticks while an alert is up, which is the
-    // card's whole life here. Start it once; the tiles re-read the calibrated
-    // clock on every tick.
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
+    // The per-second countdown rebuild lives in [SecondTicker]; the gate
+    // above stops it behind other tabs and under the lock screen.
     context.read<Future<SeismicTravelTimeTable>>().then((table) {
       if (mounted) setState(() => _table = table);
     });
@@ -69,12 +72,6 @@ class _MonitorEewCardState extends State<MonitorEewCard> {
         setState(() => _fix = LatLng(fix.lat, fix.lng));
       }
     });
-  }
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
   }
 
   @override

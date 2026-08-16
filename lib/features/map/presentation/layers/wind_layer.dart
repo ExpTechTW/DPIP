@@ -6,6 +6,7 @@ library;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
 import 'package:dpip/features/map/presentation/wind_speed.dart';
@@ -32,7 +33,10 @@ class WindMapLayer
 
   /// The rendered arrow PNGs, cached — the glyph never changes; each bucket's
   /// colour + black outline are baked in at render time.
+  // Baked bitmaps carry the corrected colours painted into them, so they
+  // must be re-baked when the setting moves — see [VisionCache].
   List<Uint8List>? _arrowBytes;
+  ColorVision? _arrowVision;
 
   String _arrowImageFor(int bucket) => '$_arrowImageId-$bucket';
 
@@ -92,6 +96,8 @@ class WindMapLayer
     MapLibreMapController controller,
     String sourceId,
   ) async {
+    if (_arrowVision != AppColorVision.current) _arrowBytes = null;
+    _arrowVision = AppColorVision.current;
     final bytes = _arrowBytes ??= await _renderArrow();
     // One coloured, outline-baked PNG per bucket (no SDF — see [_renderArrow]).
     for (var i = 0; i < windBuckets.length; i++) {
@@ -195,7 +201,7 @@ class WindMapLayer
           fontSize: 80,
           fontFamily: icon.fontFamily,
           package: icon.fontPackage,
-          color: const Color(0xFF000000),
+          color: const Color(0xFF000000).vision,
         ),
       ),
     )..layout();
@@ -295,6 +301,8 @@ class WindMapLayer
 
   // The shared discrete ramp (white → pink), declared here so the base
   // contract's dot/legend machinery reads the same colours the arrows use.
+  // The bucket colours are corrected at their definition ([windBuckets]), so
+  // they arrive here already transformed — `toHexRgb` stays a pure converter.
   @override
   List<(double, String)> get colorStops => [
     for (final (at, color) in windBuckets) (at, color.toHexRgb()),
@@ -304,12 +312,14 @@ class WindMapLayer
   /// the arrow `step`, with a navigation glyph so the legend matches the map.
   @override
   Widget buildLegend(BuildContext context) {
-    const rows = <(String, String)>[
-      ('≥ 32.7', '#FF006B'),
-      ('13.9 – 32.6', '#8000FF'),
-      ('8.0 – 13.8', '#0085FF'),
-      ('3.4 – 7.9', '#00FFF0'),
-      ('0.1 – 3.3', '#FFFFFF'),
+    // Corrected here, exactly as [windBuckets] is at its own definition: the
+    // arrows are app-drawn glyphs, so the key follows the setting with them.
+    final rows = <(String, String)>[
+      ('≥ 32.7', '#FF006B'.vision),
+      ('13.9 – 32.6', '#8000FF'.vision),
+      ('8.0 – 13.8', '#0085FF'.vision),
+      ('3.4 – 7.9', '#00FFF0'.vision),
+      ('0.1 – 3.3', '#FFFFFF'.vision),
     ];
     final outline = Theme.of(context).colorScheme.outline;
     return MapLegendCard(

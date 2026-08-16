@@ -8,7 +8,9 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
+import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
@@ -102,8 +104,13 @@ class HomeSheetHeader extends StatelessWidget {
     // cloud placeholder only shows before the first reading arrives.
     final weather = data == null
         ? null
-        : weatherVisual(data.weather, data.weatherCode, colors);
-    final conditionIcon = weather?.$1 ?? Icons.cloud_outlined;
+        : weatherVisual(
+            data.weather,
+            data.weatherCode,
+            colors,
+            isNight: isNightAt(AppTime.utc),
+          );
+    final conditionIcon = weather?.$1 ?? cloudy;
     final conditionAccent = weather?.$2 ?? secondary;
 
     // 全國 has no township weather — name only. 所在地 without GPS: say so

@@ -39,6 +39,20 @@ abstract final class AppTime {
   /// Whether the clock has completed at least one NTP sync.
   static bool get isSynced => _clock?.isSynced ?? false;
 
+  /// Re-expresses a timestamp minted by the **device** clock in calibrated
+  /// time, so it can be compared with [utc].
+  ///
+  /// Needed wherever a stamp comes from outside the app and carries the
+  /// device's own idea of now — an OS location fix, a filesystem mtime. Ageing
+  /// such a stamp against [utc] measures the clock offset plus the age, and on
+  /// a device whose clock runs ahead it yields a *negative* age, which reads
+  /// as "newer than now" and passes every freshness test.
+  ///
+  /// Before the first sync the correction is zero and this is the identity, as
+  /// it should be: with no calibration the device clock is all there is.
+  static DateTime fromDevice(DateTime deviceStamp) =>
+      deviceStamp.toUtc().add(_clock?.offset ?? Duration.zero);
+
   /// Forces an immediate resync (best-effort; no-op before [install]).
   static Future<void> sync() async => _clock?.sync();
 }

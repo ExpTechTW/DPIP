@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'typhoon_probability.dart';
@@ -9,6 +9,7 @@ part of 'typhoon_probability.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -65,7 +66,7 @@ class _$ProbabilityLevelCopyWithImpl<$Res>
 /// Create a copy of ProbabilityLevel
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? p = null,Object? coords = null,}) {
-  return _then(_self.copyWith(
+  return _then(ProbabilityLevel(
 p: null == p ? _self.p : p // ignore: cast_nullable_to_non_nullable
 as int,coords: null == coords ? _self.coords : coords // ignore: cast_nullable_to_non_nullable
 as List<LatLng>,
@@ -209,7 +210,7 @@ return $default(_that.p,_that.coords);case _:
 
 
 class _ProbabilityLevel implements ProbabilityLevel {
-  const _ProbabilityLevel({required this.p, required final  List<LatLng> coords}): _coords = coords;
+  const _ProbabilityLevel({required this.p, required  List<LatLng> coords}): _coords = coords;
   
 
 /// Strike probability (%).
@@ -335,7 +336,7 @@ class _$CycloneProbabilityCopyWithImpl<$Res>
 /// Create a copy of CycloneProbability
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? tdNo = freezed,Object? levels = null,}) {
-  return _then(_self.copyWith(
+  return _then(CycloneProbability(
 tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
 as String?,levels: null == levels ? _self.levels : levels // ignore: cast_nullable_to_non_nullable
 as List<ProbabilityLevel>,
@@ -479,7 +480,7 @@ return $default(_that.tdNo,_that.levels);case _:
 
 
 class _CycloneProbability implements CycloneProbability {
-  const _CycloneProbability({this.tdNo, required final  List<ProbabilityLevel> levels}): _levels = levels;
+  const _CycloneProbability({this.tdNo, required  List<ProbabilityLevel> levels}): _levels = levels;
   
 
 /// CWA tropical-depression number; may be blank when upstream can't match.
@@ -602,7 +603,7 @@ class _$TyphoonProbabilityCopyWithImpl<$Res>
 /// Create a copy of TyphoonProbability
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
-  return _then(_self.copyWith(
+  return _then(TyphoonProbability(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
 as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
 as List<CycloneProbability>,
@@ -746,7 +747,7 @@ return $default(_that.updated,_that.cyclones);case _:
 
 
 class _TyphoonProbability implements TyphoonProbability {
-  const _TyphoonProbability({required this.updated, required final  List<CycloneProbability> cyclones}): _cyclones = cyclones;
+  const _TyphoonProbability({required this.updated, required  List<CycloneProbability> cyclones}): _cyclones = cyclones;
   
 
 @override final  int updated;

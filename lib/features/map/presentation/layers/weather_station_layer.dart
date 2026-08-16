@@ -9,6 +9,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
@@ -37,6 +38,13 @@ abstract class WeatherStationLayer<
 
   final StationValueRepository<S, T> _repository;
 
+  /// The dot's hairline, separating stations that sit on top of each other.
+  ///
+  /// A getter, not a `const`: the colour-vision transform runs at the
+  /// definition and isn't a compile-time constant. (It is the identity on white
+  /// — routed anyway so the rule holds uniformly if this is ever tinted.)
+  static String get _strokeColor => '#FFFFFF'.vision;
+
   /// The observation value this layer plots, or null if missing for a station.
   double? valueOf(O observation);
 
@@ -47,6 +55,11 @@ abstract class WeatherStationLayer<
   int get decimals;
 
   /// `(value, hex colour)` stops for the dot colour, ascending by value.
+  ///
+  /// **Supplied already colour-vision corrected**: a concrete layer routes each
+  /// stop through `.vision` where it declares the ramp, and this class must not
+  /// transform them again — the one list feeds the map expression, the sheet's
+  /// value colour and the legend, so a second pass would compound on all three.
   List<(double, String)> get colorStops;
 
   /// Whether to draw the value-coloured dot. A subclass may replace it with its
@@ -141,7 +154,7 @@ abstract class WeatherStationLayer<
         CircleLayerProperties(
           circleColor: _colorExpression(),
           circleRadius: 6,
-          circleStrokeColor: '#FFFFFF',
+          circleStrokeColor: _strokeColor,
           circleStrokeWidth: 1,
           circleOpacity: 0.9,
         ),

@@ -23,6 +23,23 @@ abstract class RealtimeSource<T> {
   /// whose default `==` is identity (e.g. `List`).
   bool sameData(T? a, T? b) => identical(a, b) || a == b;
 
+  /// Drops any transport the source is holding open while the app is in the
+  /// background, where nothing is watching the feed.
+  ///
+  /// A poll source needs nothing here: the channel simply stops calling [fetch],
+  /// so it costs nothing while paused. A **connection-holding** source does not
+  /// get that for free — an idle socket keeps the radio awake and keeps taking
+  /// delivery of a continuous feed (RTS streams ~1 Hz) that no one will read.
+  /// Overriding this is safe for the safety-critical feeds because background
+  /// alerting is push's job, never the stream's.
+  void pause() {}
+
+  /// Re-opens whatever [pause] dropped. The channel calls this before its first
+  /// post-resume [fetch], and a source that reconnects asynchronously simply
+  /// answers `Err` until it is back — the same answer it gives on any reconnect,
+  /// so the channel ages the feed with its ordinary logic.
+  void resume() {}
+
   /// Releases any transport the source holds (e.g. an open SSE connection). A
   /// poll source is stateless per [fetch] and uses this no-op default; a
   /// connection-holding source (SSE) overrides it. The channel calls this from

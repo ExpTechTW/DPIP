@@ -13,6 +13,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -33,6 +34,7 @@ import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/intensity_icon_renderer.dart';
 import 'package:dpip/features/earthquake/replay_session.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
@@ -53,7 +55,6 @@ import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -96,14 +97,36 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       context.read<RealtimeService>().clock,
       widget.replayTimestamp,
     )..start();
-    _ticker = Timer.periodic(
+    _startTicker();
+    // The session's channels live outside RealtimeService (a replay must not
+    // look like a live feed), so its lifecycle pause never reaches them —
+    // this page pauses its own polling and its 5 Hz UI tick itself, or a
+    // backgrounded replay keeps two polls a second running indefinitely.
+    _lifecycle = AppLifecycleListener(
+      onPause: () {
+        _ticker?.cancel();
+        _ticker = null;
+        _session.pause();
+      },
+      onResume: () {
+        _startTicker();
+        _session.resume();
+      },
+    );
+  }
+
+  void _startTicker() {
+    _ticker ??= Timer.periodic(
       const Duration(milliseconds: 200),
       (_) => _tick.value++,
     );
   }
 
+  late final AppLifecycleListener _lifecycle;
+
   @override
   void dispose() {
+    _lifecycle.dispose();
     _ticker?.cancel();
     _tick.dispose();
     _session.dispose();
@@ -363,8 +386,22 @@ class _ReplayMapState extends State<_ReplayMap> {
     });
   }
 
+  /// Pauses the 1 Hz blink while the app is backgrounded — its platform
+  /// visibility writes would keep running under the lock screen otherwise.
+  /// Restarting on resume just resets the blink phase, which is invisible.
+  late final AppLifecycleListener _blinkLifecycle = AppLifecycleListener(
+    onPause: () {
+      _blinkTimer?.cancel();
+      _blinkTimer = null;
+    },
+    onResume: () {
+      if (_ready) _setupBlink();
+    },
+  );
+
   @override
   void dispose() {
+    _blinkLifecycle.dispose();
     widget.rts.removeListener(_onRts);
     widget.tick.removeListener(_onTick);
     _blinkTimer?.cancel();
@@ -439,8 +476,8 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (controller == null) return;
     _dark = Theme.of(context).brightness == Brightness.dark;
     try {
-      final data = await rootBundle.load('assets/map/icons/cross.png');
-      await controller.addImage(_crossIcon, data.buffer.asUint8List());
+      final data = await IntensityIconRenderer.render('cross');
+      await controller.addImage(_crossIcon, data);
       await _loadIntensityIcons(controller);
 
       await controller.addSource(
@@ -504,7 +541,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.addFillLayer(
         _eewSourceId,
         _sWaveFillLayerId,
-        const FillLayerProperties(fillColor: '#FF3B30', fillOpacity: 0.16),
+        FillLayerProperties(fillColor: '#FF3B30'.vision, fillOpacity: 0.16),
         belowLayerId: landLayerId,
         filter: const [
           '==',
@@ -515,7 +552,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.addLineLayer(
         _eewSourceId,
         _pWaveLayerId,
-        const LineLayerProperties(lineColor: '#00E5FF', lineWidth: 2),
+        LineLayerProperties(lineColor: '#00E5FF'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',
@@ -526,7 +563,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.addLineLayer(
         _eewSourceId,
         _sWaveLayerId,
-        const LineLayerProperties(lineColor: '#FF3B30', lineWidth: 2),
+        LineLayerProperties(lineColor: '#FF3B30'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',
@@ -641,13 +678,28 @@ class _ReplayMapState extends State<_ReplayMap> {
     await _syncStationMode();
   }
 
+  /// Whether [_eewSourceId] currently holds the empty collection — mirrors
+  /// the live monitor's flag. The old blanket `alerts.isEmpty` skip made the
+  /// one *clearing* write unreachable: once the replayed alert expired, the
+  /// last P/S wavefront rings and the county shaking fill stayed frozen on
+  /// the map for the rest of the replay.
+  bool _eewSourceEmpty = true;
+
   Future<void> _updateEew() async {
     final controller = _controller;
     if (controller == null || !_ready) return;
+    final empty = widget.eew.alerts.isEmpty;
+    // Nothing to draw and nothing drawn — skip the per-tick round trip.
+    if (empty && _eewSourceEmpty) return;
     try {
-      await controller.setGeoJsonSource(_eewSourceId, _eewGeoJson());
+      await controller.setGeoJsonSource(
+        _eewSourceId,
+        empty ? _emptyCollection : _eewGeoJson(),
+      );
+      _eewSourceEmpty = empty;
     } catch (_) {
-      // Source not on the map yet (mid style-reload) — the next update retries.
+      // Source not on the map yet (mid style-reload) — the next update
+      // retries; the flag is untouched because the write never landed.
     }
     await _updateAreaFill(controller);
   }
@@ -749,15 +801,13 @@ class _ReplayMapState extends State<_ReplayMap> {
     return {'type': 'FeatureCollection', 'features': features};
   }
 
-  /// Registers the 18 intensity icons (1–9 light + dark) — cheap PNGs, loaded
-  /// once per style load, mirroring the report detail map.
+  /// Registers the 18 intensity icons (1–9 light + dark) plus the epicentre
+  /// cross — drawn in code (see [IntensityIconRenderer]), loaded once per style
+  /// load, mirroring the report detail map.
   Future<void> _loadIntensityIcons(MapLibreMapController controller) async {
-    for (final level in [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
-      for (final dark in const [false, true]) {
-        final name = _intensityIcon(level, dark: dark);
-        final bytes = await rootBundle.load('assets/map/icons/$name.png');
-        await controller.addImage(name, bytes.buffer.asUint8List());
-      }
+    final icons = await IntensityIconRenderer.renderAll();
+    for (final entry in icons.entries) {
+      await controller.addImage(entry.key, entry.value);
     }
   }
 
@@ -1035,13 +1085,15 @@ class _ReplayStatusBar extends StatelessWidget {
     );
   }
 
+  static final DateFormat _clockFormat = DateFormat('HH:mm:ss');
+
   Widget _buildContent(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     final taipeiTime = AppTime.taipei(clock.now());
-    final timeText = DateFormat('HH:mm:ss').format(taipeiTime);
+    final timeText = _clockFormat.format(taipeiTime);
 
     final (Color dot, String? statusWord) = switch (rts.status) {
       RealtimeStatus.live => (Colors.green, null),

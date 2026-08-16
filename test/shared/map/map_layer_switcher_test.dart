@@ -1,12 +1,11 @@
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Minimal [MapLayer] for switcher tests — identity + label (+ optional
 /// subtitle) only.
@@ -53,10 +52,7 @@ void main() {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    SharedPreferences.setMockInitialValues(initial);
-    final controller = MapLayerOrderController(
-      Prefs(await SharedPreferences.getInstance()),
-    );
+    final controller = MapLayerOrderController(SettingsStore.inMemory(initial));
     await tester.pumpWidget(
       ChangeNotifierProvider<MapLayerOrderController>.value(
         value: controller,
@@ -325,38 +321,39 @@ void main() {
     expect(controller.categoryOrder, isEmpty);
   });
 
-  testWidgets('reset restores the grouped default and clears both preferences', (
-    tester,
-  ) async {
-    // A saved order that flips the forecast pair and moves a category — a
-    // grouped-default order would disable the reset button (nothing to restore).
-    final controller = await pumpSwitcher(tester, {
-      'map.layerOrder': ['qpesums', 'satellite', 'rain', 'typhoon', 'radar'],
-      'map.layerCategoryOrder': ['radar', 'typhoon'],
-    });
-    await tester.tap(find.text('Radar echo'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.tune));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'reset restores the grouped default and clears both preferences',
+    (tester) async {
+      // A saved order that flips the forecast pair and moves a category — a
+      // grouped-default order would disable the reset button (nothing to restore).
+      final controller = await pumpSwitcher(tester, {
+        'map.layerOrder': ['qpesums', 'satellite', 'rain', 'typhoon', 'radar'],
+        'map.layerCategoryOrder': ['radar', 'typhoon'],
+      });
+      await tester.tap(find.text('Radar echo'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.tune));
+      await tester.pumpAndSettle();
 
-    final l10n = AppLocalizations.of(
-      tester.element(find.byType(MapLayerSwitcher)),
-    );
-    await tester.tap(find.text(l10n.mapLayerOrderReset));
-    await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(
+        tester.element(find.byType(MapLayerSwitcher)),
+      );
+      await tester.tap(find.text(l10n.mapLayerOrderReset));
+      await tester.pumpAndSettle();
 
-    // The category list falls back to the grouped default…
-    final inEditor = find.descendant(
-      of: find.byType(ReorderableListView),
-      matching: find.text(l10n.mapLayerCategoryForecast),
-    );
-    await tester.tap(inEditor);
-    await tester.pumpAndSettle();
-    // …and precip is back before the wind models within the forecast group.
-    expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'ECMWF')));
-    expect(topOf(tester, 'ECMWF'), lessThan(topOf(tester, 'GFS')));
-    // Both preferences are cleared.
-    expect(controller.order, isEmpty);
-    expect(controller.categoryOrder, isEmpty);
-  });
+      // The category list falls back to the grouped default…
+      final inEditor = find.descendant(
+        of: find.byType(ReorderableListView),
+        matching: find.text(l10n.mapLayerCategoryForecast),
+      );
+      await tester.tap(inEditor);
+      await tester.pumpAndSettle();
+      // …and precip is back before the wind models within the forecast group.
+      expect(topOf(tester, 'Precip'), lessThan(topOf(tester, 'ECMWF')));
+      expect(topOf(tester, 'ECMWF'), lessThan(topOf(tester, 'GFS')));
+      // Both preferences are cleared.
+      expect(controller.order, isEmpty);
+      expect(controller.categoryOrder, isEmpty);
+    },
+  );
 }

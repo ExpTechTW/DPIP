@@ -62,6 +62,10 @@ MapLayerCategory categoryOf(String layerId) {
     // purely an instrument.
     'qpesums' => MapLayerCategory.forecast,
     'dpm' => MapLayerCategory.life,
+    // Grouped with the everyday-facility layer rather than given a category of
+    // its own: a mesh node is a thing you go and find, like an AED or a
+    // shelter, and a one-item group would be a header with one row under it.
+    'meshtastic' => MapLayerCategory.life,
     _ => MapLayerCategory.weather,
   };
 }

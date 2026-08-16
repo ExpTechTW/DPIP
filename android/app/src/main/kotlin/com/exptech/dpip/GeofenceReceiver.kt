@@ -44,7 +44,12 @@ class GeofenceReceiver : BroadcastReceiver() {
                 val location = event.triggeringLocation ?: FusedFix.get(appContext)
                 if (location != null && BgLocationStore.enabled(appContext)) {
                     // Re-centre first (spine safety), then report (best-effort).
-                    GeofenceManager.register(appContext, location.latitude, location.longitude)
+                    // A refused re-centre leaves this device with no fence and
+                    // no alarm — the exit that got us here already consumed the
+                    // old one — so the fallback catches it.
+                    GeofenceManager.register(
+                        appContext, location.latitude, location.longitude,
+                    ) { armed -> if (!armed) LocationAlarmScheduler.ensure(appContext) }
                     BgLocationStore.report(appContext, location.latitude, location.longitude)
                 } else if (location == null) {
                     // No fix at all — re-arm around the last centre so a future
@@ -59,11 +64,25 @@ class GeofenceReceiver : BroadcastReceiver() {
         }.start()
     }
 
+    /// Re-arms around the last known centre after the platform dropped the
+    /// fence, and falls back to the alarm if it cannot.
+    ///
+    /// This is the path a `GEOFENCE_NOT_AVAILABLE` takes, and the reason the
+    /// fallback matters most here: that error usually means the user just
+    /// turned Location off, so the re-arm attempted in the same breath is
+    /// almost certain to fail. Without the fallback the device is left with no
+    /// fence and — on a Play-services device, where the geofence is the only
+    /// spine — no alarm either, and nothing that will ever notice. Turning
+    /// Location back on does not re-arm anything: Play services does not
+    /// restore removed geofences, and no broadcast brings us back.
     private fun reArm(context: Context) {
-        if (BgLocationStore.enabled(context) && BgLocationStore.hasLast(context)) {
-            GeofenceManager.register(
-                context, BgLocationStore.lastLat(context), BgLocationStore.lastLng(context),
-            )
+        if (!BgLocationStore.enabled(context)) return
+        if (!BgLocationStore.hasLast(context)) {
+            LocationAlarmScheduler.ensure(context)
+            return
         }
+        GeofenceManager.register(
+            context, BgLocationStore.lastLat(context), BgLocationStore.lastLng(context),
+        ) { armed -> if (!armed) LocationAlarmScheduler.ensure(context) }
     }
 }

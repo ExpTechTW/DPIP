@@ -22,6 +22,10 @@ abstract class ReleaseNote with _$ReleaseNote {
     /// Whether this is a pre-release (公測).
     required bool prerelease,
 
+    /// The release's own page on GitHub — the update destination for a build
+    /// that came from no store (a sideloaded APK), where the APK asset lives.
+    @JsonKey(name: 'html_url') @Default('') String htmlUrl,
+
     /// Publish time (ISO-8601 from GitHub).
     @JsonKey(name: 'published_at') required DateTime publishedAt,
   }) = _ReleaseNote;

@@ -92,9 +92,9 @@ class HomeContent extends StatelessWidget {
     // overrides it to the bottom-nav bar's reserved height, so this reads
     // straight off the platform view (see the original `_build` doc). Computed
     // once here, not per scroll tick.
-    final bottomSafeArea = MediaQueryData.fromView(
-      View.of(context),
-    ).padding.bottom;
+    final bottomSafeArea = MediaQueryData.fromView(View.of(context))
+        .padding
+        .bottom;
     // The sky re-bakes rarely; the scroll focus dial moves on every tick. The
     // ListView's *shell* rebuilds only when the sky changes — the scroll-driven
     // reveal/focus dial lives one level down, on the panel's own listenable,
@@ -184,12 +184,17 @@ class HomeContent extends StatelessWidget {
               // scroll tick rebuilds this panel's cards rather than the whole
               // ListView shell around it (which rebuilds only when the sky
               // re-bakes, in [build]).
-              child: ListenableBuilder(
-                listenable: scrollController,
-                builder: (context, _) {
-                  final offset = scrollController.hasClients
-                      ? scrollController.offset
-                      : 0.0;
+              child: _SaturatingOffsetBuilder(
+                controller: scrollController,
+                // Every dial below is a pure clamp of the offset, and the
+                // longest ramp saturates at [_forecastExpandExtent] — past it,
+                // and on any repeated offset, nothing in this panel can
+                // change, so the raw controller's per-pixel notifications
+                // (60–120 Hz through every drag and fling settle) used to
+                // rebuild the whole panel for identical output. Keep this the
+                // max of the ramp extents if a longer ramp is ever added.
+                saturation: _forecastExpandExtent,
+                builder: (context, offset) {
                   // The cards read as a pane of the sky only while the sky is
                   // the point (hero showing). Once the list scrolls, they
                   // solidify back into solid plates and their ink back onto
@@ -536,9 +541,8 @@ class HomeSheetHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(
-      context,
-    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
+    final color = Theme.of(context).colorScheme.onSurfaceVariant
+        .withValues(alpha: 0.4);
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -551,4 +555,67 @@ class HomeSheetHandle extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Rebuilds [builder] only when the scroll offset, clamped to
+/// `[0, saturation]`, actually changes.
+///
+/// A [ScrollController] notifies on every scrolled pixel. The panel this
+/// drives derives everything from clamping ramps that saturate early, so most
+/// of those notifications produce byte-identical output — the clamp runs
+/// here, in the listener, and [ValueNotifier]'s own equality drops the
+/// duplicates before any widget rebuilds.
+class _SaturatingOffsetBuilder extends StatefulWidget {
+  const _SaturatingOffsetBuilder({
+    required this.controller,
+    required this.saturation,
+    required this.builder,
+  });
+
+  final ScrollController controller;
+  final double saturation;
+  final Widget Function(BuildContext context, double offset) builder;
+
+  @override
+  State<_SaturatingOffsetBuilder> createState() =>
+      _SaturatingOffsetBuilderState();
+}
+
+class _SaturatingOffsetBuilderState extends State<_SaturatingOffsetBuilder> {
+  late final ValueNotifier<double> _offset = ValueNotifier(_read());
+
+  double _read() => widget.controller.hasClients
+      ? widget.controller.offset.clamp(0.0, widget.saturation)
+      : 0.0;
+
+  void _onScroll() => _offset.value = _read();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onScroll);
+  }
+
+  @override
+  void didUpdateWidget(_SaturatingOffsetBuilder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.controller, widget.controller)) {
+      oldWidget.controller.removeListener(_onScroll);
+      widget.controller.addListener(_onScroll);
+      _onScroll();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onScroll);
+    _offset.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<double>(
+    valueListenable: _offset,
+    builder: (context, offset, _) => widget.builder(context, offset),
+  );
 }

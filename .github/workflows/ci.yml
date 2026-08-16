@@ -27,9 +27,14 @@ jobs:
       - name: Localization gate
         run: bash tool/check_l10n.sh
 
-      # Prefs gate — SharedPreferences only via the typed Prefs facade.
-      - name: Prefs gate
-        run: bash tool/check_prefs.sh
+      # Storage gate — settings via the typed SettingsStore; sqflite only in
+      # the store that owns each table.
+      - name: Storage gate
+        run: bash tool/check_storage.sh
+
+      # Every channel sound must resolve, or the channel is rejected on device.
+      - name: Notification-sound gate
+        run: bash tool/check_notification_sounds.sh
 
       # Lockfile must not embed a machine-local path (pubspec_overrides leak).
       - name: pubspec.lock path gate

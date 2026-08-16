@@ -1,6 +1,8 @@
 /// CWA tropical-cyclone intensity from sustained wind (m/s).
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
+
 /// Near-centre max mean wind → CWA class (TD / mild / moderate / intense).
 enum TyphoonIntensity {
   /// 熱帶性低氣壓 — below 17.2 m/s.
@@ -22,10 +24,10 @@ extension TyphoonIntensityWire on TyphoonIntensity {
 
   /// Past-track stroke colour (hex) for map + legend.
   String get colorHex => switch (this) {
-    TyphoonIntensity.td => '#2196F3',
-    TyphoonIntensity.mild => '#43A047',
-    TyphoonIntensity.moderate => '#FB8C00',
-    TyphoonIntensity.intense => '#E53935',
+    TyphoonIntensity.td => '#2196F3'.vision,
+    TyphoonIntensity.mild => '#43A047'.vision,
+    TyphoonIntensity.moderate => '#FB8C00'.vision,
+    TyphoonIntensity.intense => '#E53935'.vision,
   };
 }
 

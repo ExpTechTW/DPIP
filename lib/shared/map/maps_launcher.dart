@@ -117,9 +117,8 @@ Future<MapApp?> showMapAppPicker(BuildContext context, MapLaunchTarget target) {
             ),
             child: Text(
               l10n.dpmOpenInMaps,
-              style: Theme.of(
-                sheetContext,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(sheetContext).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
           for (final app in [

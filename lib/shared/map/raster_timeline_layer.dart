@@ -47,6 +47,15 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// target keep loading. Only then does it re-warm the band and mount the new
 /// neighbours transparent, so the next drag across them touches neither disk
 /// nor network.
+///
+/// ## Colour
+/// Nothing here declares any, and that is not an oversight: every pixel a frame
+/// draws arrives as a finished server-rendered tile, and MapLibre's raster layer
+/// exposes no colour matrix — so a colour-vision correction cannot reach these
+/// frames at all. A subclass's scale/legend colours are therefore exempt too
+/// (`ColorVisionFilter.rasterExempt`): a key that disagreed with the picture
+/// would be worse than one that is merely hard to read. The only paint values
+/// below are opacities, which the correction never touches.
 abstract class RasterTimelineLayer implements MapLayer {
   RasterTimelineLayer(this.source);
 
@@ -73,7 +82,7 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// This is the **guaranteed** band: [fill] warm always covers it. Beyond it,
   /// [MapTileCache.warm]'s fill mode keeps topping the mirror up outward from
   /// the current frame until it is nearly full — the actual reach is set by
-  /// the memory cap, not by taste, so a 24 MB mirror easily covers far more.
+  /// the memory cap, not by taste, so a 48 MB mirror easily covers far more.
   @protected
   int get warmRadius => 4;
 
@@ -81,10 +90,12 @@ abstract class RasterTimelineLayer implements MapLayer {
   ///
   /// A cap on the spread, not a target: a fill warm injects centre → ±1 → ±2 …
   /// and stops at the native mirror's cap ([MapTileCache.defaultMemoryBytes]),
-  /// so beyond this only the most distant frames stay cold. Kept finite so a
-  /// hundreds-of-frames history never unfolds into one giant URL list.
+  /// so beyond this only the most distant frames stay cold. Sized to what a
+  /// 48 MB mirror can actually hold — a radar frame's viewport is roughly
+  /// 100–400 KB of webp, so a ±64 band is a believable full-mirror working set
+  /// rather than a number that silently under-fills the new budget.
   @protected
-  int get maxWarmRadius => 24;
+  int get maxWarmRadius => 64;
 
   /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
   /// removed outright — `visibility: none` keeps GPU textures for a fast
@@ -103,6 +114,31 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// every boundary twice, at two weights, and the pair reads as a smear.
   @protected
   String? get rasterBelowLayerId => outlineLayerId;
+
+  /// The seam between this layer's frames and the chrome drawn over them.
+  ///
+  /// Every frame mounts **below** this layer and every piece of chrome mounts
+  /// **above** it, which is the only thing that keeps the two apart while the
+  /// timeline is being scrubbed. `belowLayerId` inserts *immediately* below its
+  /// anchor, so when the frames and the borders shared one anchor
+  /// ([rasterBelowLayerId]) each newly-mounted frame landed on top of the
+  /// borders that were added at attach — the county and township lines sank
+  /// under the echo the moment the user dragged the timeline, and stayed there.
+  ///
+  /// It is an empty GeoJSON line layer: it draws nothing and costs nothing, it
+  /// exists only to hold a position in the style's layer order.
+  String get frameSeamLayerId => '$id-frame-seam';
+
+  String get _frameSeamSourceId => '$id-frame-seam-src';
+
+  /// Where chrome drawn *over* the frames anchors — above [frameSeamLayerId],
+  /// under the same style layer the frames are held beneath.
+  ///
+  /// Chrome must not pick its own anchor: one that resolves below the seam puts
+  /// the overlay under the raster it is supposed to annotate, which is how the
+  /// radar scan-range circle came to be drawn beneath the echo.
+  @protected
+  String? get chromeBelowLayerId => rasterBelowLayerId;
 
   /// What the frame times *are*, for the timeline caption above the date.
   ///
@@ -185,10 +221,16 @@ abstract class RasterTimelineLayer implements MapLayer {
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
 
   @override
+  bool get overlayFollowsCamera => true;
+
+  @override
   void onMapGestureStart() {}
 
   @override
   void onMapGestureEnd() {}
+
+  @override
+  void onSurfaceVisibility(bool visible) {}
 
   // --- Frame bookkeeping -----------------------------------------------------
 
@@ -207,6 +249,9 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   String? _shownFrameId;
   bool _attached = false;
+
+  /// Whether [frameSeamLayerId] is currently on the map.
+  bool _seamMounted = false;
 
   /// The frame index the warm band is currently centred on — the gate that
   /// keeps a scrub from re-warming (or re-fetching the visible region) for
@@ -403,11 +448,13 @@ abstract class RasterTimelineLayer implements MapLayer {
     await _retireOutside(controller, ring);
     await _warmBand(controller, index);
 
-    for (final id in ring) {
-      if (id == frameId) continue;
-      await _mount(controller, id, 0);
-      _ring.add(id);
-    }
+    // The neighbours mount on independent ids — parallelise the platform
+    // round trips instead of serialising up to four of them.
+    await Future.wait([
+      for (final id in ring)
+        if (id != frameId) _mount(controller, id, 0),
+    ]);
+    _ring.addAll(ring);
     await _evictOverflow(controller, keep: ring);
   }
 
@@ -436,6 +483,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       );
       return;
     }
+    await _ensureSeam(controller);
     await controller.addSource(
       _sourceId(id),
       RasterSourceProperties(tiles: [source.tileUrl(id)], tileSize: 256),
@@ -444,9 +492,47 @@ abstract class RasterTimelineLayer implements MapLayer {
       _sourceId(id),
       _layerId(id),
       _mountPaint(value),
-      belowLayerId: rasterBelowLayerId,
+      // Under the seam, never under the shared anchor: chrome sits between the
+      // two, and anchoring here is what stops a scrub from burying it.
+      belowLayerId: _seamMounted ? frameSeamLayerId : rasterBelowLayerId,
     );
     _resident.add(id);
+  }
+
+  /// Puts the seam on the map once, before the first frame.
+  ///
+  /// Best-effort: if it cannot be added the frames fall back to the shared
+  /// anchor, which is the old behaviour — a scrub that re-buries the borders is
+  /// worse than the alternative, but a map with no echo at all is worse still.
+  Future<void> _ensureSeam(MapLibreMapController controller) async {
+    if (_seamMounted) return;
+    try {
+      await controller.addGeoJsonSource(_frameSeamSourceId, const {
+        'type': 'FeatureCollection',
+        'features': <Object>[],
+      });
+      await controller.addLineLayer(
+        _frameSeamSourceId,
+        frameSeamLayerId,
+        const LineLayerProperties(lineOpacity: 0),
+        belowLayerId: rasterBelowLayerId,
+        enableInteraction: false,
+      );
+      _seamMounted = true;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, '$id frame seam');
+    }
+  }
+
+  Future<void> _removeSeam(MapLibreMapController controller) async {
+    if (!_seamMounted) return;
+    _seamMounted = false;
+    try {
+      await controller.removeLayer(frameSeamLayerId);
+    } catch (_) {}
+    try {
+      await controller.removeSource(_frameSeamSourceId);
+    } catch (_) {}
   }
 
   /// Hides every ring member that fell outside [keep] and abandons their tile
@@ -580,6 +666,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       await _removeFrame(controller, id);
     }
     if (_attached) await onDetached(controller);
+    await _removeSeam(controller);
     _reset();
   }
 
@@ -607,15 +694,24 @@ abstract class RasterTimelineLayer implements MapLayer {
     _shownFrameId = null;
     _warmCentre = null;
     _attached = false;
+    // A style reload drops every runtime layer, the seam included.
+    _seamMounted = false;
   }
 }
 
 /// Decodes a frame id into its instant.
 ///
 /// Ids are Unix seconds (or milliseconds — both are in use across endpoints);
-/// an ISO-8601 string is accepted as a fallback.
+/// an ISO-8601 string is accepted as a fallback. Memoised per id: the ids are
+/// globally unique (timestamps), so a re-parse — every time a layer reloads
+/// its frames — is pure waste.
 @visibleForTesting
-DateTime parseFrameTime(String id) {
+DateTime parseFrameTime(String id) =>
+    _frameTimeCache.putIfAbsent(id, () => _parse(id));
+
+final Map<String, DateTime> _frameTimeCache = {};
+
+DateTime _parse(String id) {
   final epoch = int.tryParse(id);
   if (epoch != null) {
     final ms = epoch >= 1000000000000 ? epoch : epoch * 1000;

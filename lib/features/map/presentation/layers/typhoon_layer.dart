@@ -5,6 +5,7 @@ library;
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -115,11 +116,17 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
 
   bool _rangeShown = false;
   bool _globalShown = false;
+
   final Set<AdminBoundary> _boundariesShown = {};
 
   /// Blue-grey, matching the radar surface — distinct from every dBZ colour so
   /// the coverage outline is never mistaken for an echo.
-  static const String _rangeColor = '#78909C';
+  ///
+  /// A getter rather than a `const`: this is an app-drawn vector line, so it
+  /// follows the colour-vision setting and is re-read every time the outline is
+  /// added. The dBZ echo underneath is server-rendered raster and cannot follow
+  /// — see [ColorVisionFilter.rasterExempt].
+  static String get _rangeColor => '#78909C'.vision;
 
   /// Radar / IR tile ids (Unix seconds), ascending — for bulletin alignment.
   List<int> _radarSecs = const [];
@@ -143,6 +150,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
   static const String _src = 'typhoon-src';
   static const String _wxSrc = 'typhoon-wx-src';
   static const String _wxLyr = 'typhoon-wx-lyr';
+
   static const String _warnLyr = 'typhoon-warning-areas';
   static const String _probLyr = 'typhoon-probability';
   static const String _coneLyr = 'typhoon-cone';
@@ -497,22 +505,22 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _src,
       _probLyr,
       FillLayerProperties(
-        fillColor: const [
+        fillColor: <Object>[
           'match',
-          ['get', 'p'],
+          const <Object>['get', 'p'],
           100,
-          'rgba(183, 28, 28, 0.40)',
+          'rgba(183, 28, 28, 0.40)'.vision,
           80,
-          'rgba(211, 47, 47, 0.32)',
+          'rgba(211, 47, 47, 0.32)'.vision,
           60,
-          'rgba(239, 83, 80, 0.26)',
+          'rgba(239, 83, 80, 0.26)'.vision,
           40,
-          'rgba(255, 138, 101, 0.20)',
+          'rgba(255, 138, 101, 0.20)'.vision,
           20,
-          'rgba(255, 183, 77, 0.16)',
-          'rgba(255, 183, 77, 0.12)',
+          'rgba(255, 183, 77, 0.16)'.vision,
+          'rgba(255, 183, 77, 0.12)'.vision,
         ],
-        fillOutlineColor: 'rgba(183, 28, 28, 0.55)',
+        fillOutlineColor: 'rgba(183, 28, 28, 0.55)'.vision,
         visibility: showProb ? 'visible' : 'none',
       ),
       filter: _kindIs('probability'),
@@ -524,8 +532,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _coneLyr,
       FillLayerProperties(
         // Hollow outline — fill fully transparent so track/radar stay readable.
-        fillColor: 'rgba(255,82,82,0)',
-        fillOutlineColor: 'rgba(255,82,82,0.85)',
+        fillColor: 'rgba(255,82,82,0)'.vision,
+        fillOutlineColor: 'rgba(255,82,82,0.85)'.vision,
         visibility: showProb ? 'none' : 'visible',
       ),
       filter: _kindIs('cone'),
@@ -539,8 +547,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _src,
       _c15Lyr,
       FillLayerProperties(
-        fillColor: 'rgba(156, 39, 176, 0.16)',
-        fillOutlineColor: 'rgba(123, 31, 162, 0.9)',
+        fillColor: 'rgba(156, 39, 176, 0.16)'.vision,
+        fillOutlineColor: 'rgba(123, 31, 162, 0.9)'.vision,
         visibility: showL7 ? 'visible' : 'none',
       ),
       filter: _kindIs('circle15'),
@@ -551,7 +559,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _src,
       _avg15Lyr,
       LineLayerProperties(
-        lineColor: '#9C27B0',
+        lineColor: '#9C27B0'.vision,
         lineWidth: 2,
         lineDasharray: const [2, 1.5],
         lineCap: 'butt',
@@ -565,8 +573,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _src,
       _c25Lyr,
       FillLayerProperties(
-        fillColor: 'rgba(255, 193, 7, 0.16)',
-        fillOutlineColor: 'rgba(255, 160, 0, 0.9)',
+        fillColor: 'rgba(255, 193, 7, 0.16)'.vision,
+        fillOutlineColor: 'rgba(255, 160, 0, 0.9)'.vision,
         visibility: showL7 ? 'none' : 'visible',
       ),
       filter: _kindIs('circle25'),
@@ -577,7 +585,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _src,
       _avg25Lyr,
       LineLayerProperties(
-        lineColor: '#FFC107',
+        lineColor: '#FFC107'.vision,
         lineWidth: 2,
         lineDasharray: const [2, 1.5],
         lineCap: 'butt',
@@ -591,7 +599,10 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       _src,
       _pastLyr,
       LineLayerProperties(
-        // CWA intensity on each segment (`properties.intensity`).
+        // CWA intensity on each segment (`properties.intensity`). The four
+        // intensity colours are corrected at their own definition
+        // ([TyphoonIntensity.colorHex]) and arrive here already transformed;
+        // only the unknown-intensity fallback is declared in this file.
         lineColor: <Object>[
           'match',
           <Object>['get', 'intensity'],
@@ -603,7 +614,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           TyphoonIntensity.moderate.colorHex,
           TyphoonIntensity.intense.wire,
           TyphoonIntensity.intense.colorHex,
-          '#B0BEC5',
+          '#B0BEC5'.vision,
         ],
         lineWidth: 3,
         lineCap: 'round',
@@ -615,10 +626,10 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     await controller.addLineLayer(
       _src,
       _forecastLyr,
-      const LineLayerProperties(
-        lineColor: '#EF5350',
+      LineLayerProperties(
+        lineColor: '#EF5350'.vision,
         lineWidth: 3,
-        lineDasharray: [2, 1.5],
+        lineDasharray: const [2, 1.5],
         lineCap: 'round',
       ),
       filter: _kindIs('forecast'),
@@ -627,10 +638,10 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     await controller.addCircleLayer(
       _src,
       _fpointLyr,
-      const CircleLayerProperties(
+      CircleLayerProperties(
         circleRadius: 4,
-        circleColor: '#FF7043',
-        circleStrokeColor: '#FFFFFF',
+        circleColor: '#FF7043'.vision,
+        circleStrokeColor: '#FFFFFF'.vision,
         circleStrokeWidth: 1.5,
       ),
       filter: _kindIs('forecastPoint'),
@@ -639,14 +650,14 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     await controller.addSymbolLayer(
       _src,
       _fpointLabelLyr,
-      const SymbolLayerProperties(
-        textField: ['get', 'label'],
-        textFont: ['Noto Sans TC Regular'],
+      SymbolLayerProperties(
+        textField: const ['get', 'label'],
+        textFont: const ['Noto Sans TC Regular'],
         textSize: 11,
-        textColor: '#FFFFFF',
-        textHaloColor: '#000000',
+        textColor: '#FFFFFF'.vision,
+        textHaloColor: '#000000'.vision,
         textHaloWidth: 1.2,
-        textOffset: [0, 1.2],
+        textOffset: const [0, 1.2],
         textAllowOverlap: false,
         textOptional: true,
       ),
@@ -658,9 +669,9 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     await controller.addCircleLayer(
       _src,
       _currentLyr,
-      const CircleLayerProperties(
+      CircleLayerProperties(
         // Selected storm larger; others still tappable.
-        circleRadius: [
+        circleRadius: const [
           'case',
           [
             '==',
@@ -670,8 +681,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           8,
           5,
         ],
-        circleColor: '#D32F2F',
-        circleOpacity: [
+        circleColor: '#D32F2F'.vision,
+        circleOpacity: const [
           'case',
           [
             '==',
@@ -681,8 +692,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           1,
           0.55,
         ],
-        circleStrokeColor: '#FFFFFF',
-        circleStrokeWidth: [
+        circleStrokeColor: '#FFFFFF'.vision,
+        circleStrokeWidth: const [
           'case',
           [
             '==',
@@ -700,14 +711,14 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     await controller.addSymbolLayer(
       _src,
       _currentLabelLyr,
-      const SymbolLayerProperties(
-        textField: ['get', 'label'],
-        textFont: ['Noto Sans TC Regular'],
+      SymbolLayerProperties(
+        textField: const ['get', 'label'],
+        textFont: const ['Noto Sans TC Regular'],
         textSize: 13,
-        textColor: '#FFFFFF',
-        textHaloColor: '#B71C1C',
+        textColor: '#FFFFFF'.vision,
+        textHaloColor: '#B71C1C'.vision,
         textHaloWidth: 1.4,
-        textOffset: [0, 1.35],
+        textOffset: const [0, 1.35],
         textAllowOverlap: true,
         textOptional: false,
       ),
@@ -732,8 +743,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       'exptech',
       _warnLyr,
       FillLayerProperties(
-        fillColor: 'rgba(255, 193, 7, 0.22)',
-        fillOutlineColor: 'rgba(255, 143, 0, 0.85)',
+        fillColor: 'rgba(255, 193, 7, 0.22)'.vision,
+        fillOutlineColor: 'rgba(255, 143, 0, 0.85)'.vision,
         visibility: showWarningAreas.value ? 'visible' : 'none',
       ),
       sourceLayer: 'city',
@@ -879,18 +890,14 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
         if (wantBoundaries.contains(boundary) == shown) continue;
         if (shown) {
           _boundariesShown.remove(boundary);
-          await AdminOutline.remove(controller, boundary);
+          await _removeBoundaryFrame(controller, boundary);
         } else {
           _boundariesShown.add(boundary);
-          await AdminOutline.add(
+          await _addBoundaryFrame(
             controller,
             boundary,
-            lineColor: isRadar
-                ? AdminOutline.lineColor
-                : boundary == AdminBoundary.town
-                ? satelliteTownOutlineColor
-                : satelliteOutlineColor,
-            belowLayerId: below,
+            isRadar: isRadar,
+            below: below,
           );
         }
       }
@@ -906,6 +913,60 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
         'Failed to sync the typhoon weather chrome',
       );
     }
+  }
+
+  /// Adds [boundary]'s frame in the look the current underlay wants.
+  ///
+  /// The satellite underlay draws the county frame exactly like the standalone
+  /// B13 layer does — a bare bright-yellow line. The shared cased stroke reads
+  /// as a *black* border over opaque IR: the dark casing dominates the thin
+  /// yellow core, which is the look the user did not ask for.
+  Future<void> _addBoundaryFrame(
+    MapLibreMapController controller,
+    AdminBoundary boundary, {
+    required bool isRadar,
+    required String below,
+  }) async {
+    if (!isRadar && boundary == AdminBoundary.county) {
+      await controller.addLineLayer(
+        AdminOutline.sourceId,
+        satelliteCountyOutlineLayerId,
+        LineLayerProperties(lineColor: satelliteOutlineColor, lineWidth: 1.0),
+        sourceLayer: 'city',
+        belowLayerId: below,
+        enableInteraction: false,
+      );
+      return;
+    }
+    await AdminOutline.add(
+      controller,
+      boundary,
+      lineColor: isRadar
+          ? AdminOutline.lineColor
+          : boundary == AdminBoundary.town
+          ? satelliteTownOutlineColor
+          : satelliteOutlineColor,
+      belowLayerId: below,
+    );
+  }
+
+  /// Removes [boundary]'s frame, undoing whichever look [_addBoundaryFrame]
+  /// drew — the satellite county line lives under its own layer id.
+  ///
+  /// Both looks are removed unconditionally: [setWeatherOverlay] flips
+  /// `weatherOverlay` *before* the queued sync runs, so a teardown cannot know
+  /// which look a boundary was drawn with — guessing leaves one of them behind
+  /// over the other underlay.
+  Future<void> _removeBoundaryFrame(
+    MapLibreMapController controller,
+    AdminBoundary boundary,
+  ) async {
+    if (boundary == AdminBoundary.county) {
+      try {
+        await controller.removeLayer(satelliteCountyOutlineLayerId);
+      } catch (_) {}
+    }
+    await AdminOutline.remove(controller, boundary);
   }
 
   Future<void> _syncWeatherOverlay(MapLibreMapController controller) async {
@@ -994,7 +1055,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     }
     for (final boundary in _boundariesShown.toList()) {
       _boundariesShown.remove(boundary);
-      await AdminOutline.remove(controller, boundary);
+      await _removeBoundaryFrame(controller, boundary);
     }
     try {
       await controller.removeLayer(_wxLyr);
@@ -1017,13 +1078,16 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     _queue(() async {
       final showProb = showProbability.value;
       final showL7 = stormBand.value == TyphoonStormBand.level7;
-      await _setLayerVisibility(controller, _probLyr, showProb);
-      await _setLayerVisibility(controller, _coneLyr, !showProb);
-      await _setLayerVisibility(controller, _warnLyr, showWarningAreas.value);
-      await _setLayerVisibility(controller, _c15Lyr, showL7);
-      await _setLayerVisibility(controller, _avg15Lyr, showL7);
-      await _setLayerVisibility(controller, _c25Lyr, !showL7);
-      await _setLayerVisibility(controller, _avg25Lyr, !showL7);
+      // Each call swallows its own failure — parallelise the round trips.
+      await Future.wait([
+        _setLayerVisibility(controller, _probLyr, showProb),
+        _setLayerVisibility(controller, _coneLyr, !showProb),
+        _setLayerVisibility(controller, _warnLyr, showWarningAreas.value),
+        _setLayerVisibility(controller, _c15Lyr, showL7),
+        _setLayerVisibility(controller, _avg15Lyr, showL7),
+        _setLayerVisibility(controller, _c25Lyr, !showL7),
+        _setLayerVisibility(controller, _avg25Lyr, !showL7),
+      ]);
     });
   }
 
@@ -1161,50 +1225,50 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           child: SymbolLegend(
             items: [
               SymbolLegendItem(
-                swatch: const _TrackSwatch(
-                  color: Color(0xFF2196F3),
+                swatch: _TrackSwatch(
+                  color: const Color(0xFF2196F3).vision,
                   dashed: false,
                 ),
                 label: l10n.typhoonIntensityTd,
               ),
               SymbolLegendItem(
-                swatch: const _TrackSwatch(
-                  color: Color(0xFF43A047),
+                swatch: _TrackSwatch(
+                  color: const Color(0xFF43A047).vision,
                   dashed: false,
                 ),
                 label: l10n.typhoonIntensityMild,
               ),
               SymbolLegendItem(
-                swatch: const _TrackSwatch(
-                  color: Color(0xFFFB8C00),
+                swatch: _TrackSwatch(
+                  color: const Color(0xFFFB8C00).vision,
                   dashed: false,
                 ),
                 label: l10n.typhoonIntensityModerate,
               ),
               SymbolLegendItem(
-                swatch: const _TrackSwatch(
-                  color: Color(0xFFE53935),
+                swatch: _TrackSwatch(
+                  color: const Color(0xFFE53935).vision,
                   dashed: false,
                 ),
                 label: l10n.typhoonIntensityIntense,
               ),
               SymbolLegendItem(
-                swatch: const _TrackSwatch(
-                  color: Color(0xFFEF5350),
+                swatch: _TrackSwatch(
+                  color: const Color(0xFFEF5350).vision,
                   dashed: true,
                 ),
                 label: l10n.typhoonLegendForecast,
               ),
               SymbolLegendItem(
-                swatch: const LegendDot(
-                  color: Color(0xFFFF7043),
+                swatch: LegendDot(
+                  color: const Color(0xFFFF7043).vision,
                   borderWidth: 1,
                 ),
                 label: l10n.typhoonLegendForecastPoint,
               ),
               SymbolLegendItem(
-                swatch: const LegendDot(
-                  color: Color(0xFFD32F2F),
+                swatch: LegendDot(
+                  color: const Color(0xFFD32F2F).vision,
                   size: 10,
                   borderWidth: 1,
                 ),
@@ -1217,7 +1281,8 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     height: 10,
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: const Color(0xFFFF5252).withValues(alpha: 0.9),
+                        color: const Color(0xFFFF5252).vision
+                            .withValues(alpha: 0.9),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(2),
@@ -1231,16 +1296,17 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     width: 16,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF9C27B0).withValues(alpha: 0.35),
-                      border: Border.all(color: const Color(0xFF7B1FA2)),
+                      color: const Color(0xFF9C27B0).vision
+                          .withValues(alpha: 0.35),
+                      border: Border.all(color: const Color(0xFF7B1FA2).vision),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   label: l10n.typhoonLegendCircle15,
                 ),
                 SymbolLegendItem(
-                  swatch: const _TrackSwatch(
-                    color: Color(0xFF9C27B0),
+                  swatch: _TrackSwatch(
+                    color: const Color(0xFF9C27B0).vision,
                     dashed: true,
                   ),
                   label: l10n.typhoonLegendCircleAvg,
@@ -1251,16 +1317,17 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     width: 16,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC107).withValues(alpha: 0.35),
-                      border: Border.all(color: const Color(0xFFFFA000)),
+                      color: const Color(0xFFFFC107).vision
+                          .withValues(alpha: 0.35),
+                      border: Border.all(color: const Color(0xFFFFA000).vision),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   label: l10n.typhoonLegendCircle25,
                 ),
                 SymbolLegendItem(
-                  swatch: const _TrackSwatch(
-                    color: Color(0xFFFFC107),
+                  swatch: _TrackSwatch(
+                    color: const Color(0xFFFFC107).vision,
                     dashed: true,
                   ),
                   label: l10n.typhoonLegendCircleAvg,
@@ -1272,8 +1339,9 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     width: 16,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFB71C1C).withValues(alpha: 0.4),
-                      border: Border.all(color: const Color(0xFFB71C1C)),
+                      color: const Color(0xFFB71C1C).vision
+                          .withValues(alpha: 0.4),
+                      border: Border.all(color: const Color(0xFFB71C1C).vision),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -1285,8 +1353,9 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     width: 16,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC107).withValues(alpha: 0.35),
-                      border: Border.all(color: const Color(0xFFFF8F00)),
+                      color: const Color(0xFFFFC107).vision
+                          .withValues(alpha: 0.35),
+                      border: Border.all(color: const Color(0xFFFF8F00).vision),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -1294,22 +1363,26 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                 ),
               if (isRadar && showScanRange.value)
                 SymbolLegendItem(
-                  swatch: const LineSwatch(
-                    color: Color(0xFF78909C),
+                  swatch: LineSwatch(
+                    color: const Color(0xFF78909C).vision,
                     width: 1.5,
                     opacity: 0.7,
-                    dash: [3, 2],
+                    dash: const [3, 2],
                   ),
                   label: l10n.radarScanRange,
                 ),
               if (isSatellite && showCountyOutline.value)
                 SymbolLegendItem(
-                  swatch: const LineSwatch(
-                    color: Color(0xFFFFD400),
+                  swatch: LineSwatch(
+                    color: const Color(0xFFFFD400).vision,
                     width: 1.0,
                   ),
                   label: l10n.mapLayerSatelliteGlobalOutline,
                 ),
+              // The two admin-outline colours are corrected where they are
+              // declared (`AdminOutline.lineColor` / `satelliteOutlineColor`),
+              // so they are read here as-is — `colorFromHexRgb` stays a pure
+              // converter and must never transform.
               if ((isRadar || isSatellite) && showCountyOutline.value)
                 SymbolLegendItem(
                   swatch: LineSwatch(
@@ -1318,7 +1391,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     )!,
                     width: AdminBoundary.county.lineWidth,
                     opacity: AdminBoundary.county.lineOpacity,
-                    casingColor: const Color(0xFF000000),
+                    casingColor: const Color(0xFF000000).vision,
                     casingWidth: AdminBoundary.county.casingWidth,
                     casingOpacity: AdminBoundary.county.casingOpacity,
                   ),
@@ -1334,7 +1407,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
                     )!,
                     width: AdminBoundary.town.lineWidth,
                     opacity: AdminBoundary.town.lineOpacity,
-                    casingColor: const Color(0xFF000000),
+                    casingColor: const Color(0xFF000000).vision,
                     casingWidth: AdminBoundary.town.casingWidth,
                     casingOpacity: AdminBoundary.town.casingOpacity,
                   ),

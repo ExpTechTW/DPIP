@@ -3,8 +3,8 @@
 /// internal layer sequence across launches.
 library;
 
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
 
 /// Holds the user's saved layer order (layer ids) and category order (category
@@ -12,13 +12,13 @@ import 'package:flutter/foundation.dart';
 /// surface resolves them against its own layer set / the current category set —
 /// see `orderedLayers` / `orderedCategories` in `shared/map/map_layer_order.dart`.
 class MapLayerOrderController extends ChangeNotifier {
-  MapLayerOrderController(this._prefs)
-    : _order = _prefs.getStringList(PreferenceKeys.mapLayerOrder) ?? const [],
+  MapLayerOrderController(this._settings)
+    : _order = _settings.getStringList(SettingKeys.mapLayerOrder) ?? const [],
       _categoryOrder =
-          _prefs.getStringList(PreferenceKeys.mapLayerCategoryOrder) ??
+          _settings.getStringList(SettingKeys.mapLayerCategoryOrder) ??
           const [];
 
-  final Prefs _prefs;
+  final SettingsStore _settings;
   List<String> _order;
   List<String> _categoryOrder;
 
@@ -36,7 +36,7 @@ class MapLayerOrderController extends ChangeNotifier {
   Future<void> setOrder(List<String> order) async {
     if (listEquals(order, _order)) return;
     _order = List.of(order);
-    await _prefs.setStringList(PreferenceKeys.mapLayerOrder, _order);
+    await _settings.setStringList(SettingKeys.mapLayerOrder, _order);
     notifyListeners();
   }
 
@@ -46,8 +46,8 @@ class MapLayerOrderController extends ChangeNotifier {
   Future<void> setCategoryOrder(List<String> order) async {
     if (listEquals(order, _categoryOrder)) return;
     _categoryOrder = List.of(order);
-    await _prefs.setStringList(
-      PreferenceKeys.mapLayerCategoryOrder,
+    await _settings.setStringList(
+      SettingKeys.mapLayerCategoryOrder,
       _categoryOrder,
     );
     notifyListeners();
@@ -59,12 +59,12 @@ class MapLayerOrderController extends ChangeNotifier {
     var changed = false;
     if (_order.isNotEmpty) {
       _order = const [];
-      await _prefs.remove(PreferenceKeys.mapLayerOrder);
+      await _settings.remove(SettingKeys.mapLayerOrder);
       changed = true;
     }
     if (_categoryOrder.isNotEmpty) {
       _categoryOrder = const [];
-      await _prefs.remove(PreferenceKeys.mapLayerCategoryOrder);
+      await _settings.remove(SettingKeys.mapLayerCategoryOrder);
       changed = true;
     }
     if (changed) notifyListeners();

@@ -5,6 +5,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
@@ -120,10 +121,30 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _eewListening = false;
   bool _added = false;
   RealtimeStatus? _appliedStatus;
+
+  /// Whether the EEW source on the map currently holds [_emptyCollection].
+  ///
+  /// [_pushUpdate] ends with an unconditional [_pushEew], and the RTS feed
+  /// notifies about once a second, so a **calm** feed was re-uploading the same
+  /// empty collection — a platform-channel round trip and a native GeoJSON
+  /// source replacement — once per second for as long as the layer was
+  /// attached, which includes while the map tab is hidden (pausing the render
+  /// loop does not stop the Dart listener). Tracking what is actually on the
+  /// map turns that into a boolean test.
+  ///
+  /// Only the *empty* case is guarded. While an alert is live the wavefront
+  /// geometry is a function of the calibrated clock, so every 200 ms tick
+  /// genuinely differs and must still be sent.
+  bool _eewSourceEmpty = true;
   bool _stationsFetching = false;
   int _stationRetries = 0;
   SeismicTravelTimeTable? _travelTime;
   Timer? _eewTicker;
+
+  /// Identity of the last payload pushed to the source: `null` when offline
+  /// (empty collection was sent), else the feed's data object — skips the
+  /// per-tick round trip when a status change re-notifies without new data.
+  Object? _lastSent;
 
   static const String _sourceId = 'rts-src';
   static const String _circleId = 'rts-circle';
@@ -146,7 +167,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// A neutral hairline separating overlapping dots — legacy uses the theme's
   /// outlineVariant, but render() has no BuildContext, so a mid-grey that reads
   /// on both light and dark tiles stands in.
-  static const String _strokeColor = '#9E9E9E';
+  ///
+  /// A getter, not a `const`: the colour-vision transform runs at the
+  /// definition and isn't a compile-time constant. (It is the identity on a
+  /// pure grey — routing it anyway keeps the rule uniform for whoever tints
+  /// this later.)
+  static String get _strokeColor => '#9E9E9E'.vision;
   static const Map<String, dynamic> _emptyCollection = {
     'type': 'FeatureCollection',
     'features': <dynamic>[],
@@ -208,6 +234,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     await _setupEew(controller);
     _added = true;
     _appliedStatus = null;
+    // [_setupEew] has just seeded the source with [_emptyCollection].
+    _eewSourceEmpty = true;
     await _pushUpdate();
     if (!_listening) {
       _feed.addListener(_onFeed);
@@ -217,6 +245,14 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       _eew.addListener(_onEew);
       _eewListening = true;
     }
+    _startEewTicker();
+    _travelTimeTable.then((table) {
+      _travelTime = table;
+      unawaited(_pushEew());
+    });
+  }
+
+  void _startEewTicker() {
     _eewTicker?.cancel();
     _eewTicker = Timer.periodic(_eewTick, (_) {
       // Only repaint while an alert is actually up — a calm feed needs no
@@ -227,29 +263,60 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           (_eew.state.data?.isNotEmpty ?? false);
       if (live) unawaited(_pushEew());
     });
-    _travelTimeTable.then((table) {
-      _travelTime = table;
-      unawaited(_pushEew());
-    });
   }
 
   void _onFeed() => unawaited(_pushUpdate());
 
   void _onEew() => unawaited(_pushEew());
 
+  /// Whether the hosting surface can currently be seen. The feeds keep
+  /// polling either way — they are safety feeds and the monitor panel's
+  /// freshness depends on them — but re-uploading a full station GeoJSON at
+  /// 1 Hz (and the EEW wavefront at 5 Hz) to a map that sits behind another
+  /// tab is a platform-channel serialisation nobody can see.
+  bool _surfaceVisible = true;
+
+  @override
+  void onSurfaceVisibility(bool visible) {
+    _surfaceVisible = visible;
+    if (visible) {
+      // One catch-up on the visible edge: the skipped uploads left the map at
+      // whatever second it was hidden on.
+      _lastSent = null;
+      _appliedStatus = null;
+      if (_added) {
+        _startEewTicker();
+        unawaited(_pushUpdate());
+      }
+    } else {
+      // The 5 Hz wavefront ticker stops outright — during a live alert in
+      // the background it was five timer wakeups a second for uploads the
+      // gate above was already discarding.
+      _eewTicker?.cancel();
+      _eewTicker = null;
+    }
+  }
+
   Future<void> _pushUpdate() async {
     final controller = _controller;
-    if (controller == null || !_added) return;
+    if (controller == null || !_added || !_surfaceVisible) return;
     if (_stations.isEmpty) await _ensureStations();
     final status = _feed.state.status;
     // Never present aged shaking as current: hide the dots when the feed is
     // offline, and dim them while stale (the monitor panel flags the status too).
     final offline = status == RealtimeStatus.offline;
+    // A status-only change (stale→live etc.) re-notifies without new data —
+    // don't re-send the same payload, just re-apply the opacity below.
+    final data = _feed.state.data;
+    final payloadKey = offline ? null : data;
     try {
-      await controller.setGeoJsonSource(
-        _sourceId,
-        offline ? _emptyCollection : _geoJson(),
-      );
+      if (!identical(payloadKey, _lastSent)) {
+        _lastSent = payloadKey;
+        await controller.setGeoJsonSource(
+          _sourceId,
+          offline ? _emptyCollection : _geoJson(),
+        );
+      }
       if (status != _appliedStatus) {
         _appliedStatus = status;
         final opacity = status == RealtimeStatus.live
@@ -269,17 +336,22 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// expanding wavefront, so anything not live renders nothing.
   Future<void> _pushEew() async {
     final controller = _controller;
-    if (controller == null || !_added) return;
+    if (controller == null || !_added || !_surfaceVisible) return;
     final live =
         _eew.state.status == RealtimeStatus.live &&
         (_eew.state.data?.isNotEmpty ?? false);
+    // Nothing to draw and nothing drawn — the overwhelmingly common case.
+    if (!live && _eewSourceEmpty) return;
     try {
       await controller.setGeoJsonSource(
         _eewSourceId,
         live ? _eewGeoJson() : _emptyCollection,
       );
+      _eewSourceEmpty = !live;
     } catch (_) {
       // Source not on the map (mid style-reload); the next render re-adds it.
+      // The flag is left alone: the write never landed, so whatever was on the
+      // map before still is.
     }
   }
 
@@ -303,7 +375,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       await controller.addFillLayer(
         _eewSourceId,
         _eewSWaveFillId,
-        const FillLayerProperties(fillColor: '#FF3B30', fillOpacity: 0.16),
+        // Vector geometry we draw ourselves, so it recolours with the app.
+        FillLayerProperties(fillColor: '#FF3B30'.vision, fillOpacity: 0.16),
         belowLayerId: landLayerId,
         filter: const [
           '==',
@@ -314,7 +387,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       await controller.addLineLayer(
         _eewSourceId,
         _eewPWaveId,
-        const LineLayerProperties(lineColor: '#00E5FF', lineWidth: 2),
+        LineLayerProperties(lineColor: '#00E5FF'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',
@@ -325,7 +398,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       await controller.addLineLayer(
         _eewSourceId,
         _eewSWaveId,
-        const LineLayerProperties(lineColor: '#FF3B30', lineWidth: 2),
+        LineLayerProperties(lineColor: '#FF3B30'.vision, lineWidth: 2),
         belowLayerId: townLabelLayerId,
         filter: const [
           '==',

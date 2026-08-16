@@ -157,6 +157,7 @@ class WeatherSkyPainter extends CustomPainter {
   // Asset keys, matching `pubspec.yaml`.
   static const String cloudsAsset = 'shaders/cloud/clouds.frag';
   static const String nightAsset = 'shaders/weather/night.frag';
+  static const String nightFieldAsset = 'shaders/weather/night_field.frag';
   static const String lightningAsset = 'shaders/weather/lightning.frag';
   static const String sunFlareAsset = 'shaders/weather/sun_flare.frag';
   static const String rainbowAsset = 'shaders/weather/rainbow.frag';
@@ -240,8 +241,44 @@ class WeatherSkyPainter extends CustomPainter {
     // the procedural band stays off.
     set(0.0);
 
+    // The star field is static apart from the per-star shimmer/twinkle the
+    // display shader animates itself — bake it once (the field tiles, so one
+    // texture serves any view size) and hand it to the shader. The bake is a
+    // synchronous GPU rasterisation, but it happens once, not per frame.
+    if (_nightField == null) {
+      final bake = shaders[nightFieldAsset];
+      if (bake != null) {
+        bake.setFloat(0, _nightFieldSize.toDouble());
+        bake.setFloat(1, _nightFieldSize.toDouble());
+        final recorder = ui.PictureRecorder();
+        ui.Canvas(recorder).drawRect(
+          Offset.zero & Size.square(_nightFieldSize.toDouble()),
+          Paint()..shader = bake,
+        );
+        final picture = recorder.endRecording();
+        final image = picture.toImageSync(_nightFieldSize, _nightFieldSize);
+        picture.dispose();
+        _nightField?.dispose();
+        _nightField = image;
+      }
+    }
+    if (_nightField == null) {
+      // Bake failed (shader not loaded yet) — nothing to sample; skip the
+      // frame rather than render a black sky.
+      return;
+    }
+    shader.setImageSampler(0, _nightField!);
     _fill(canvas, size, shader);
   }
+
+  /// Baked star-field texture (RGBA = the four star layers), produced once by
+  /// [night_field.frag]. Shared across painters: the field is view-size
+  /// independent (it tiles), so one bake serves every sky.
+  static ui.Image? _nightField;
+
+  /// Bake texture edge, in pixels — 4 bright cells at 128 px each. The 16-cell
+  /// faint layer's stars stay ~4 px wide at this resolution.
+  static const int _nightFieldSize = 512;
 
   // --- clouds -------------------------------------------------------------
   void _paintClouds(Canvas canvas, Size size) {
@@ -551,19 +588,37 @@ class WeatherSkyPainter extends CustomPainter {
     shader.setFloat(0, quarter.width);
     shader.setFloat(1, quarter.height);
 
-    final recorder = ui.PictureRecorder();
-    ui.Canvas(
-      recorder,
-    ).drawRect(Offset.zero & quarter, Paint()..shader = shader);
-    final picture = recorder.endRecording();
-    final small = picture.toImageSync(
-      quarter.width.toInt(),
-      quarter.height.toInt(),
+    // The bake is a synchronous GPU rasterisation on the UI thread, and the
+    // sun's motion is slow (a keyframed arc + ~2 rad/s rays) — re-bake only
+    // when a ~150 ms time bucket (or any other uniform) actually crosses, and
+    // blit the cached image in between. The key covers every shader input, so
+    // the cache can never serve a stale frame.
+    final bakeKey = (
+      quarter.width,
+      quarter.height,
+      (frame.time / 0.15).floorToDouble(),
+      sunX,
+      sunY,
+      intensity,
+      golden,
+      frame.cloudCoverage,
     );
-    picture.dispose();
+    if (_sunFlare == null || bakeKey != _sunFlareKey) {
+      _sunFlareKey = bakeKey;
+      _sunFlare?.dispose();
+      final recorder = ui.PictureRecorder();
+      ui.Canvas(recorder)
+          .drawRect(Offset.zero & quarter, Paint()..shader = shader);
+      final picture = recorder.endRecording();
+      _sunFlare = picture.toImageSync(
+        quarter.width.toInt(),
+        quarter.height.toInt(),
+      );
+      picture.dispose();
+    }
 
     canvas.drawImageRect(
-      small,
+      _sunFlare!,
       Offset.zero & quarter,
       Offset.zero & size,
       Paint()
@@ -571,8 +626,13 @@ class WeatherSkyPainter extends CustomPainter {
         ..filterQuality = FilterQuality.low
         ..blendMode = BlendMode.plus,
     );
-    small.dispose();
   }
+
+  /// Quarter-res sun flare, re-baked only on input change — see
+  /// [_paintSunFlare]. One shared image: only the home sky draws the sun.
+  static ui.Image? _sunFlare;
+  static (double, double, double, double, double, double, double, double)
+  _sunFlareKey = (0, 0, 0, 0, 0, 0, 0, 0);
 
   // --- rainbow ------------------------------------------------------------
   void _paintRainbow(Canvas canvas, Size size) {

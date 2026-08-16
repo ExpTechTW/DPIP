@@ -1,4 +1,5 @@
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -45,7 +46,10 @@ class MapFrame {
 /// happened. For observations the answer is unchanged.
 int nowFrameIndex(List<MapFrame> frames, {DateTime? now}) {
   if (frames.isEmpty) return 0;
-  final at = now ?? DateTime.now();
+  // The frame times are server timestamps, so the default clock must be the
+  // calibrated one, not the device wall clock — a device clock that drifted
+  // (or a timezone the device changed) would pick the wrong "now" frame.
+  final at = now ?? AppTime.utc;
   // Frames are chronological, so scan from the newest backwards.
   for (var i = frames.length - 1; i >= 0; i--) {
     if (!frames[i].time.isAfter(at)) return i;
@@ -164,6 +168,17 @@ abstract interface class MapLayer {
   /// Rebuilds on camera idle so projections stay in sync.
   Widget buildMapOverlay(BuildContext context);
 
+  /// Whether [buildMapOverlay]'s subtree must be **rebuilt from scratch** on
+  /// every camera settle so its screen-space projections are recomputed.
+  ///
+  /// True for a static overlay (typhoon callouts): it projects once per build,
+  /// so a settle has to throw the subtree away. False for an overlay that reads
+  /// the live camera itself every frame — re-keying one of those destroys its
+  /// [State] on every pan, zoom and tap, which for an animation means the
+  /// ticker, the simulation and the accumulated buffer are all rebuilt each
+  /// time (see `WindParticleOverlay`).
+  bool get overlayFollowsCamera => true;
+
   /// Camera settled after pan/zoom — sheet layers may prefetch viewport tiles.
   Future<void> onCameraIdle(MapLibreMapController controller);
 
@@ -176,6 +191,12 @@ abstract interface class MapLayer {
 
   /// Gesture finished (pointer up with no camera motion, or camera idle).
   void onMapGestureEnd();
+
+  /// The hosting surface was hidden or revealed — a tab switch, or a page
+  /// pushed over the shell. A realtime layer should stop platform-channel
+  /// writes while hidden (the data source keeps polling; the *map* is what
+  /// nobody can see) and push one catch-up on the visible edge.
+  void onSurfaceVisibility(bool visible);
 
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
@@ -263,6 +284,9 @@ mixin MapLayerDefaults implements MapLayer {
   }) => const SizedBox.shrink();
 
   @override
+  bool get overlayFollowsCamera => true;
+
+  @override
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
 
   @override
@@ -276,6 +300,9 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   void onMapGestureEnd() {}
+
+  @override
+  void onSurfaceVisibility(bool visible) {}
 
   @override
   double get mapMinZoom => BaseMap.defaultMinZoom;

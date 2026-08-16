@@ -156,11 +156,9 @@ void main() {
       ],
     });
 
-    final served =
-        await fromNative('getBatch', {
-              'urls': [hole, glyph],
-            })
-            as Map;
+    final served = await fromNative('getBatch', {
+      'urls': [hole, glyph],
+    }) as Map;
     expect(
       served[hole],
       isNotNull,
@@ -189,11 +187,9 @@ void main() {
     final stored = await store.readBytes(terrainUrl);
     expect(stored, isNotNull);
     expect(stored!.bytes, bytes);
-    final served =
-        await fromNative('getBatch', {
-              'urls': [terrainUrl],
-            })
-            as Map;
+    final served = await fromNative('getBatch', {
+      'urls': [terrainUrl],
+    }) as Map;
     expect((served[terrainUrl] as Map)['data'], bytes);
   });
 }

@@ -13,6 +13,14 @@ import 'package:dpip/features/location/presentation/pages/region_select_page.dar
 import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/features/data/presentation/pages/moon_page.dart';
+import 'package:dpip/features/data/presentation/pages/almanac_page.dart';
+import 'package:dpip/features/data/presentation/pages/planets_page.dart';
+import 'package:dpip/features/data/presentation/pages/sky_chart_page.dart';
+import 'package:dpip/features/data/presentation/pages/tide_page.dart';
+import 'package:dpip/features/data/presentation/pages/tonight_page.dart';
+import 'package:dpip/features/data/presentation/pages/sun_page.dart';
+import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -21,9 +29,11 @@ import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/features/settings/presentation/pages/default_map_layer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
+import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -35,6 +45,9 @@ import 'package:provider/provider.dart';
 /// page widgets to navigate.
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.homePath,
+  // Lets the shell notice that one of the full-screen routes below has covered
+  // it, so the tabs underneath can idle instead of animating at nobody.
+  observers: [shellRouteObserver],
   // First launch: hold everything behind onboarding until it's completed. The
   // redirect reads the app-wide OnboardingStore (mounted above the router), so
   // finishing onboarding (which flips the flag) lets a goNamed(home) through.
@@ -108,6 +121,41 @@ final GoRouter appRouter = GoRouter(
                     ),
                   ),
                 ),
+                GoRoute(
+                  path: AppRoutes.moonPath,
+                  name: AppRoutes.moon,
+                  builder: (_, _) => const MoonPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.sunPath,
+                  name: AppRoutes.sun,
+                  builder: (_, _) => const SunPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.planetsPath,
+                  name: AppRoutes.planets,
+                  builder: (_, _) => const PlanetsPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.tonightPath,
+                  name: AppRoutes.tonight,
+                  builder: (_, _) => const TonightPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.almanacPath,
+                  name: AppRoutes.almanac,
+                  builder: (_, _) => const AlmanacPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.skyChartPath,
+                  name: AppRoutes.skyChart,
+                  builder: (_, _) => const SkyChartPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.tidePath,
+                  name: AppRoutes.tide,
+                  builder: (_, _) => const TidePage(),
+                ),
               ],
             ),
           ],
@@ -125,6 +173,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
       builder: (_, _) => const LogPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.meshtasticPath,
+      name: AppRoutes.meshtastic,
+      builder: (_, _) => const MeshtasticPage(),
     ),
     GoRoute(
       path: AppRoutes.changelogPath,
@@ -174,6 +227,11 @@ final GoRouter appRouter = GoRouter(
           ),
         ),
       ],
+    ),
+    GoRoute(
+      path: AppRoutes.permissionsPath,
+      name: AppRoutes.permissions,
+      builder: (_, _) => const PermissionsPage(),
     ),
     GoRoute(
       path: AppRoutes.notifySettingsPath,

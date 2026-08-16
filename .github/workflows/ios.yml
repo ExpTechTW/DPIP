@@ -1,8 +1,9 @@
 name: Build iOS
 
+# Pull requests only. A push to `main` is handled by release-internal.yml,
+# which builds the signed, uploadable artifact — running this as well would
+# spend a second runner producing an unsigned one nobody installs.
 on:
-  push:
-    branches: ["main"]
   pull_request:
     branches: ["main"]
 

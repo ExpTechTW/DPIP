@@ -44,7 +44,7 @@ abstract base class FrameTileRepository implements RasterFrameSource {
   /// How close to native's mirror cap a fill warm fills to — a little under the
   /// cap (native trims only beyond it), so the mirror stays full but never
   /// churns.
-  static const double _fillTarget = 0.85;
+  static const double _fillTarget = 0.9;
 
   @override
   Future<void> warmFrameTiles({

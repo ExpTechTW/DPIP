@@ -128,6 +128,13 @@ void main() {
         0.1, // iCloudCover
         0.0, // iGalaxy
       ],
+      samplers: 1,
+    ),
+    (
+      asset: 'shaders/weather/night_field.frag',
+      floats: [
+        512, 512, // iResolution
+      ],
       samplers: 0,
     ),
     (
@@ -218,6 +225,40 @@ void main() {
       expect(opaque, greaterThan(0), reason: '${c.asset} painted nothing');
     });
   }
+
+  test('night_field bakes a star in every layer', () async {
+    // Each of the four RGBA channels carries its own star layer; a layer that
+    // is uniformly dark means its grid formula broke (e.g. a hash or scale
+    // regression) and the night sky would silently lose that tier.
+    const size = 256;
+    final program = await ui.FragmentProgram.fromAsset(
+      'shaders/weather/night_field.frag',
+    );
+    final shader = program.fragmentShader();
+    shader.setFloat(0, size.toDouble());
+    shader.setFloat(1, size.toDouble());
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawRect(
+      Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
+      Paint()..shader = shader,
+    );
+    final image = recorder.endRecording().toImageSync(size, size);
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    final px = bytes!.buffer.asUint8List();
+
+    final bright = [0, 0, 0, 0];
+    for (var i = 0; i < px.length; i += 4) {
+      for (var c = 0; c < 4; c++) {
+        // A star core reaches ~2.0·smoothstep → clamps to 255; count pixels
+        // that are clearly lit, not just noise.
+        if (px[i + c] > 90) bright[c]++;
+      }
+    }
+    expect(bright[0], greaterThan(0), reason: 'bright-pass core layer dark');
+    expect(bright[1], greaterThan(0), reason: 'bright-pass glow layer dark');
+    expect(bright[2], greaterThan(0), reason: 'medium-pass layer dark');
+    expect(bright[3], greaterThan(0), reason: 'faint-pass layer dark');
+  });
 }
 
 ui.Image _solidImage(Color color, int width, int height) {

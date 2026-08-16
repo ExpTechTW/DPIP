@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/platform/device_info.dart';
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
@@ -88,8 +90,15 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   /// upscales. This port draws every layer in one pass, so a
   /// single scale has to serve both; 0.75 matches the precipitation layers,
   /// which are the ones that suffer most from being softened, and leaves the
-  /// cloud deck only slightly sharper than the original.
-  static const double _renderScale = 0.75;
+  /// cloud deck only slightly sharper than the original. The low tier draws
+  /// at 0.6 — a softer upscale, not a lower frame rate.
+  static const double _renderScaleHigh = 0.75;
+  static const double _renderScaleLow = 0.6;
+
+  /// The device tier, resolved once before the particles are built (their
+  /// pools depend on it). Null only while the first tier probe is in flight;
+  /// the backdrop holds its flat fallback colour until [_load] lands.
+  RenderTier? _tier;
 
   /// Number of cloud sprites in `assets/weather/clouds/`.
   static const int _spriteCount = 12;
@@ -101,6 +110,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   static const List<String> _layerAssets = [
     WeatherSkyPainter.nightAsset,
+    WeatherSkyPainter.nightFieldAsset,
     WeatherSkyPainter.cloudsAsset,
     WeatherSkyPainter.lightningAsset,
     WeatherSkyPainter.sunFlareAsset,
@@ -123,11 +133,51 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   /// Wall-clock of the previous frame, for the particle integration step.
   double _lastFrameSeconds = 0;
 
+  /// The painter instance from the last animated frame, reused while the
+  /// animation is stopped so rebuilds of the subtree above don't repaint the
+  /// sky (see the [CustomPaint] construction in build).
+  WeatherSkyPainter? _lastPainter;
+
+  /// UTC day of the cached [_sun] / [_moon] (sunrise/sunset move ~1 min
+  /// per day; the moon phase by ~2.5 % per day — frame-level recomputation is
+  /// pure waste, and day-level caching keeps them exact for a whole session).
+  int _dayKey = -1;
+  ({double sunrise, double sunset}) _sun = (sunrise: 5.6, sunset: 18.4);
+  double _moon = 0;
+
+  /// Local minute of the cached [_position] / [_sky]. The keyframe ring only
+  /// advances ~17 frames over a day, so one tick a minute is ~1/85,000 of the
+  /// ring — far below the LUT's own resolution. Batching to the minute means
+  /// the scattering bake (256×256 + 256×141 rasterise + CPU readback +
+  /// gradient rebuild) runs once a minute instead of once a second, which is
+  /// the difference between a cheap backdrop and one that drops a frame
+  /// mid-animation on a low-end GPU.
+  int _minuteKey = -1;
+  double _position = 0;
+  ResolvedSky? _sky;
+
   @override
   void initState() {
     super.initState();
     _syncRunning();
-    _load();
+    _init();
+  }
+
+  /// Resolves the device tier, then loads shaders/sprites/particles — the
+  /// particle pools and render scale depend on the tier, so it must land
+  /// first. A tier probe failure keeps full quality (never degrade an
+  /// experience on a measurement we didn't get).
+  Future<void> _init() async {
+    RenderTier tier;
+    try {
+      tier = renderTierFor(await DeviceInfoService.load());
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'Device tier probe failed');
+      tier = RenderTier.high;
+    }
+    if (!mounted) return;
+    _tier = tier;
+    await _load();
   }
 
   Future<void> _load() async {
@@ -229,13 +279,16 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
           ? SkyLutCache(transmittance, skyLut)
           : null;
       // The rain atlas packs four width variants; snow is a single cell.
+      final lowEnd = _tier == RenderTier.low;
       _rain = rainAtlas == null
           ? null
           : PrecipitationField(
               atlas: rainAtlas,
               // The reference's storm preset pool; lighter rain uses proportionally
-              // fewer, which is how it expresses intensity.
-              capacity: 1792,
+              // fewer, which is how it expresses intensity. The low tier caps at
+              // the 大雨 pool — the storm's full 1792-drop budget is the single
+              // most expensive layer a low-end GPU can be asked to draw.
+              capacity: lowEnd ? 1024 : 1792,
               variants: 4,
               cell: const Size(32, 68),
               seed: 7,
@@ -244,7 +297,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
           ? null
           : PrecipitationField(
               atlas: snowAtlas,
-              capacity: 900,
+              capacity: lowEnd ? 640 : 900,
               cell: const Size(40, 40),
               tumble: true,
               seed: 11,
@@ -318,18 +371,35 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
             final dt = (frame.time - _lastFrameSeconds).clamp(0.0, 1 / 20);
             _lastFrameSeconds = frame.time;
 
-            return CustomPaint(
-              size: Size.infinite,
-              painter: WeatherSkyPainter(
-                shaders: _shaders,
-                lutCache: cache,
-                cloudSprites: _sprites,
-                sunTextures: _sunTextures,
-                frame: frame,
-                rainField: _rain,
-                snowField: _snow,
-                dt: dt,
-              ),
+            // While the animation is stopped (`active: false` — the sheet is
+            // collapsed, or the sky sits under the scroll blur), the scene
+            // cannot change, so a rebuilt painter is byte-identical. Handing
+            // the *same* painter instance back lets RenderCustomPaint skip
+            // the repaint on those rebuilds (it compares by identity) — the
+            // scroll-driven rebuilds of the subtree above this widget
+            // (`_ScrollBlurredWeather`) then cost an element update instead
+            // of a full-screen shader stack re-render on every scroll tick.
+            final moving = widget.active && dt > 0;
+            final painter = moving || _lastPainter == null
+                ? WeatherSkyPainter(
+                    shaders: _shaders,
+                    lutCache: cache,
+                    cloudSprites: _sprites,
+                    sunTextures: _sunTextures,
+                    frame: frame,
+                    rainField: _rain,
+                    snowField: _snow,
+                    dt: dt,
+                  )
+                : _lastPainter!;
+            _lastPainter = painter;
+            // Its own layer, so a repaint of the sky stops at this boundary
+            // instead of dirtying the layer it shares with the sheet's frosted
+            // chrome and the map's overlay — on Home those are full-screen
+            // offscreen passes, and re-rasterising them once per animated frame
+            // is the single most expensive thing this widget can ask for.
+            return RepaintBoundary(
+              child: CustomPaint(size: Size.infinite, painter: painter),
             );
           },
         );
@@ -339,16 +409,19 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
         }
 
         // Rasterise small and let the transform upscale bilinearly.
+        final scale = _tier == RenderTier.low
+            ? _renderScaleLow
+            : _renderScaleHigh;
         return ClipRect(
           child: Align(
             alignment: Alignment.topLeft,
             child: Transform.scale(
-              scale: 1 / _renderScale,
+              scale: 1 / scale,
               alignment: Alignment.topLeft,
               filterQuality: FilterQuality.low,
               child: SizedBox(
-                width: (constraints.maxWidth * _renderScale).ceilToDouble(),
-                height: (constraints.maxHeight * _renderScale).ceilToDouble(),
+                width: (constraints.maxWidth * scale).ceilToDouble(),
+                height: (constraints.maxHeight * scale).ceilToDouble(),
                 child: painted,
               ),
             ),
@@ -372,32 +445,11 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     final rain = widget.rainIntensity ?? look.rain;
     final snow = widget.snowIntensity ?? look.snow;
 
-    // Anchor the ring to the day's real sunrise and sunset, so dawn keyframes
-    // land at dawn in December as well as June.
-    final sun = sunTimes(
-      utc,
-      latitude: widget.latitude,
-      longitude: widget.longitude,
-    );
-    final hour =
-        skyTimeHour(widget.timeMode) ??
-        (local.hour + local.minute / 60.0 + local.second / 3600.0);
-    final position = keyframePosition(
-      hour,
-      frameCount: frames.length,
-      sunrise: sun.sunrise,
-      sunset: sun.sunset,
-    );
-
-    final sky = resolveSky(
-      frames,
-      position: position,
-      humidity: widget.humidity,
-    );
+    _syncSky(utc, local, frames);
 
     return SkyFrame(
       time: time,
-      sky: sky,
+      sky: _sky!,
       cloudLayout: look.layout,
       cloudCoverage: look.coverage,
       rain: rain,
@@ -406,9 +458,45 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       rainbow: look.rainbow,
       wind: look.wind,
       lightning: look.lightning ? _lightningAt(time) : LightningFrame.none,
-      moonPhase: _moonPhase(utc),
-      keyframePosition: position,
+      moonPhase: _moon,
+      keyframePosition: _position,
     );
+  }
+
+  /// Recomputes the sky pieces that have their own cadence — the sun anchor and
+  /// moon phase once a day, the keyframe ring position once a minute — and
+  /// caches them for the per-frame [SkyFrame] assembly.
+  ///
+  /// This is what keeps the per-frame cost of `_buildFrame` down to the parts
+  /// that genuinely move every frame ([_lightningAt], particle time): before
+  /// this, the ephemeris ran (and the LUT re-baked, see [_minuteKey]) on every
+  /// tick.
+  void _syncSky(DateTime utc, DateTime local, List<SkyKeyframe> frames) {
+    final dayKey = utc.millisecondsSinceEpoch ~/ 86400000;
+    if (dayKey != _dayKey) {
+      _dayKey = dayKey;
+      // Anchor the ring to the day's real sunrise and sunset, so dawn keyframes
+      // land at dawn in December as well as June.
+      _sun = sunTimes(
+        utc,
+        latitude: widget.latitude,
+        longitude: widget.longitude,
+      );
+      _moon = _moonPhase(utc);
+    }
+    final minuteKey = local.millisecondsSinceEpoch ~/ 60000;
+    if (minuteKey != _minuteKey) {
+      _minuteKey = minuteKey;
+      final hour =
+          skyTimeHour(widget.timeMode) ?? (local.hour + local.minute / 60.0);
+      _position = keyframePosition(
+        hour,
+        frameCount: frames.length,
+        sunrise: _sun.sunrise,
+        sunset: _sun.sunset,
+      );
+      _sky = resolveSky(frames, position: _position, humidity: widget.humidity);
+    }
   }
 
   Color _fallbackColour(WeatherMode mode) => switch (mode) {

@@ -48,6 +48,14 @@ class _HomePageState extends State<HomePage> {
   HomeSheetExtent? _extent;
   HomeResetSignal? _resetSignal;
 
+  /// Whether this page is the shell's visible tab — gates the sheet's
+  /// [TickerMode] so its animated backdrop never runs behind another tab.
+  bool _tabVisible = true;
+
+  /// The shell's visible-tab notifier; `null` outside the shell (tests,
+  /// previews) means always visible.
+  VisibleTab? _visibleTab;
+
   /// Peak blur sigma over the exposed map once the sheet is fully up — matches
   /// the sheet's own frosted blur ([HomeSheet] at full opacity) so the map's
   /// edge crossing under the sheet doesn't read as a hard transition.
@@ -58,6 +66,13 @@ class _HomePageState extends State<HomePage> {
   /// content and is never dimmed with it.
   static const double _mapDimPeak = 0.35;
 
+  /// The filter instance last handed to the [ImageFiltered] — [ImageFilter]
+  /// has no value equality, so a fresh `blur(...)` per drag tick would
+  /// recomposite the full-screen blur every frame even though the sigma
+  /// quantises to the same step (same pattern as [_CachedBlur] in HomeSheet).
+  ImageFilter? _mapBlur;
+  double _mapBlurSigma = -1;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -67,6 +82,25 @@ class _HomePageState extends State<HomePage> {
       _resetSignal?.removeListener(_resetSheet);
       _resetSignal = signal..addListener(_resetSheet);
     }
+    // Subscribes to the notifier itself: the scope never notifies dependents
+    // (same instance handed down — see VisibleTabScope's doc), so this gate
+    // would otherwise freeze at its first value and the backdrop tickers would
+    // keep running behind every other tab.
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_syncTabVisibility);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_syncTabVisibility);
+    _syncTabVisibility();
+  }
+
+  void _syncTabVisibility() {
+    // Covered by a pushed full-screen page counts as hidden, not just switched
+    // away from: the sky's shaders and particle field would otherwise keep
+    // stepping under an opaque route (see [VisibleTab.shellOnTop]).
+    final visible = _visibleTab?.isOnScreen(HomePage.tabIndex) ?? true;
+    if (visible == _tabVisible) return;
+    setState(() => _tabVisible = visible);
   }
 
   /// Publishes the live extent so the chrome (region bar + bottom nav) can
@@ -96,6 +130,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _visibleTab?.removeListener(_syncTabVisibility);
     _resetSignal?.removeListener(_resetSheet);
     _sheet.dispose();
     super.dispose();
@@ -108,7 +143,14 @@ class _HomePageState extends State<HomePage> {
     // The station's live reading drives both the look and the continuous
     // channels: the code picks the mode (keyframes/clouds), and the rain/snow
     // intensity + humidity ride along as overrides where the code carries them.
-    final data = context.watch<HomeWeatherController>().weather?.data;
+    // A slice, not the whole controller: the controller notifies twice per
+    // fetch (loading-start, then completion) and RefreshOnAppear refetches on
+    // every return to Home — watching it rebuilt the entire dashboard for
+    // byte-identical data. The freezed type's value equality makes identical
+    // payloads a no-op here.
+    final data = context.select<HomeWeatherController, WeatherRealtimeData?>(
+      (c) => c.weather?.data,
+    );
     final backdrop = resolveBackdrop(experimental.weatherMode, data);
     final weatherMode = backdrop.mode;
     final rainIntensity = backdrop.rain;
@@ -117,6 +159,13 @@ class _HomePageState extends State<HomePage> {
     final humidityPct = backdrop.humidity;
     final humidity = humidityPct == null ? null : humidityPct / 100;
     final extent = context.read<HomeSheetExtent>();
+    // The shell's IndexedStack keeps every tab mounted, so Home's animated
+    // backdrop (weather ticker, particle field, card-water shaders) would keep
+    // running behind any other tab — burning the low-end GPU that page is
+    // trying to draw with. [TickerMode] mutes every ticker under the sheet
+    // while Home is hidden; they resume on return (the sky's dt clamp absorbs
+    // the gap, exactly as a background-resume does).
+    final visible = _tabVisible;
     return RefreshOnAppear(
       tabIndex: HomePage.tabIndex,
       onAppear: _refresh,
@@ -163,8 +212,17 @@ class _HomePageState extends State<HomePage> {
                     valueListenable: extent,
                     builder: (context, extentValue, _) {
                       final t = HomeChrome.mapDim(extentValue);
-                      final sigma = t * _mapBlurPeak;
+                      // Quantised like the sheet's own blur: the exposed map's
+                      // full-screen blur recomposites on level crossings only.
+                      final sigma = _mapBlurPeak * ((t * 6).round() / 6);
                       final dim = t * _mapDimPeak;
+                      if (sigma != _mapBlurSigma) {
+                        _mapBlurSigma = sigma;
+                        _mapBlur = ImageFilter.blur(
+                          sigmaX: sigma,
+                          sigmaY: sigma,
+                        );
+                      }
                       // The tree's shape never changes — no SizedBox/ImageFiltered
                       // swap at t=0, which would re-parent the subtree right over
                       // the map platform view at the exact edge the sheet starts
@@ -172,10 +230,7 @@ class _HomePageState extends State<HomePage> {
                       // `enabled` makes the filter a no-op at rest without
                       // touching the tree.
                       return ImageFiltered(
-                        imageFilter: ImageFilter.blur(
-                          sigmaX: sigma,
-                          sigmaY: sigma,
-                        ),
+                        imageFilter: _mapBlur!,
                         enabled: t > 0,
                         child: ColoredBox(
                           color: Colors.black.withValues(alpha: dim),
@@ -188,27 +243,30 @@ class _HomePageState extends State<HomePage> {
               // The one weather sheet — full-screen behind the region bar so its
               // weather fills up into (and past) the bar.
               Positioned.fill(
-                child: NotificationListener<DraggableScrollableNotification>(
-                  onNotification: _onExtentChanged,
-                  child: DraggableScrollableSheet(
-                    controller: _sheet,
-                    // Built-in velocity-aware snapping between the two detents, so
-                    // a flick keeps its momentum and settles up. The old manual
-                    // pointer-up settle snapped by position only (no velocity), so
-                    // any short drag up sprang back to rest with no inertia.
-                    snap: true,
-                    // Floor = rest: the sheet is never smaller than its default.
-                    initialChildSize: HomeSheet.restExtent,
-                    minChildSize: HomeSheet.restExtent,
-                    maxChildSize: HomeSheet.maxExtent,
-                    builder: (context, scrollController) => HomeSheet(
-                      scrollController: scrollController,
-                      extent: extent,
-                      weatherMode: weatherMode,
-                      skyTimeMode: skyTimeMode,
-                      rainIntensity: rainIntensity,
-                      snowIntensity: snowIntensity,
-                      humidity: humidity == null ? null : humidity / 100,
+                child: TickerMode(
+                  enabled: visible,
+                  child: NotificationListener<DraggableScrollableNotification>(
+                    onNotification: _onExtentChanged,
+                    child: DraggableScrollableSheet(
+                      controller: _sheet,
+                      // Built-in velocity-aware snapping between the two detents, so
+                      // a flick keeps its momentum and settles up. The old manual
+                      // pointer-up settle snapped by position only (no velocity), so
+                      // any short drag up sprang back to rest with no inertia.
+                      snap: true,
+                      // Floor = rest: the sheet is never smaller than its default.
+                      initialChildSize: HomeSheet.restExtent,
+                      minChildSize: HomeSheet.restExtent,
+                      maxChildSize: HomeSheet.maxExtent,
+                      builder: (context, scrollController) => HomeSheet(
+                        scrollController: scrollController,
+                        extent: extent,
+                        weatherMode: weatherMode,
+                        skyTimeMode: skyTimeMode,
+                        rainIntensity: rainIntensity,
+                        snowIntensity: snowIntensity,
+                        humidity: humidity == null ? null : humidity / 100,
+                      ),
                     ),
                   ),
                 ),

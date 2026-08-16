@@ -12,6 +12,7 @@ import 'package:dpip/features/earthquake/presentation/widgets/report_filter_shee
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
@@ -304,8 +305,13 @@ class _DaySection extends StatelessWidget {
     if (day == today.subtract(const Duration(days: 1))) {
       return l10n.reportListYesterday;
     }
-    return DateFormat.yMMMEd(locale).format(day);
+    // Parsing a locale's pattern is not free — memoised per locale.
+    return _dayFormats
+        .putIfAbsent(locale, () => DateFormat.yMMMEd(locale))
+        .format(day);
   }
+
+  static final Map<String, DateFormat> _dayFormats = {};
 }
 
 class _ReportTile extends StatelessWidget {
@@ -313,13 +319,15 @@ class _ReportTile extends StatelessWidget {
 
   final PartialEarthquakeReport report;
 
+  static final DateFormat _stampFormat = DateFormat('HH:mm:ss');
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
     final taipei = AppTime.taipei(report.originTimeUtc);
-    final stamp = DateFormat('HH:mm:ss').format(taipei);
+    final stamp = _stampFormat.format(taipei);
     final intensity = Intensity.displayForReport(
       report.intensity,
       report.originTimeUtc,
@@ -339,10 +347,6 @@ class _ReportTile extends StatelessWidget {
             IntensityBadge(
               label: intensity.label,
               color: intensityColor,
-              // 小區域 reports (no CWA serial) draw as a hollow ring over the
-              // surface — the legacy `IntensityBox(border: !hasNumber)`
-              // distinction, so numbered reports (solid fill) read apart from
-              // local-felt ones at a glance without leaning on a text hint.
               outlined: !report.hasNumber,
             ),
             const SizedBox(width: AppSpacing.md),
@@ -374,7 +378,9 @@ class _ReportTile extends StatelessWidget {
             Text(
               l10n.reportListMagnitude(mag),
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: colors.onSurface,
+                color: report.hasNumber
+                    ? ReportColors.numberedMagnitude
+                    : colors.onSurface,
                 fontWeight: FontWeight.w800,
                 height: 1,
                 letterSpacing: -0.5,

@@ -1,0 +1,907 @@
+/// The draggable detail sheet for the Meshtastic node layer.
+///
+/// Same mechanics as the station sheet (and the typhoon panel before it):
+/// bottom-aligned, `expand: false` so the map above stays tappable, and a key
+/// remount to pop or collapse it. Sharing that skeleton is the point — a map
+/// sheet the user has already learned to drag should not behave differently
+/// just because this layer is newer.
+///
+/// It is always mounted, resting at its handle when nothing is selected, so
+/// there is a permanent affordance saying "there is something to drag here".
+library;
+
+import 'package:dpip/core/a11y/color_vision.dart';
+import 'package:dpip/app/theme/app_radius.dart';
+import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/models/series_runs.dart';
+import 'package:dpip/shared/widgets/empty_view.dart';
+import 'package:dpip/shared/widgets/sheet_extent.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+class MeshNodeSheet extends StatefulWidget {
+  const MeshNodeSheet({
+    super.key,
+    required this.store,
+    required this.selected,
+    required this.selectionRevision,
+    required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
+    required this.onTraceRoute,
+    required this.onClose,
+  });
+
+  final MeshNodeStore store;
+
+  /// The tapped node's number, or null.
+  final ValueListenable<int?> selected;
+
+  /// Bumped on every selecting tap, so re-tapping the same node re-pops a
+  /// sheet the user collapsed.
+  final ValueListenable<int> selectionRevision;
+
+  /// Traceroute in flight or its latest result — what the trace button shows.
+  final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
+  /// Sends a traceroute probe to the tapped node.
+  final ValueChanged<int> onTraceRoute;
+
+  final VoidCallback onClose;
+
+  /// Collapsed peek height — also what the layer reports as its bottom chrome.
+  ///
+  /// Matches the station sheet's, and deliberately not smaller: at 0.12 the
+  /// tray read as a hairline the user had to discover, rather than a handle
+  /// that is obviously there to be pulled.
+  static const double peekExtent = 0.14;
+  static const double _rest = 0.38;
+  static const double _expanded = 1;
+
+  @override
+  State<MeshNodeSheet> createState() => _MeshNodeSheetState();
+}
+
+class _MeshNodeSheetState extends State<MeshNodeSheet> {
+  /// Live sheet fraction — drives the chrome (grip, flush top) only.
+  final ValueNotifier<double> _extent = ValueNotifier(MeshNodeSheet.peekExtent);
+
+  int? _seededRevision;
+  int? _seededNode;
+
+  @override
+  void dispose() {
+    _extent.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<int>(
+      valueListenable: widget.selectionRevision,
+      builder: (context, revision, _) => ValueListenableBuilder<int?>(
+        valueListenable: widget.selected,
+        builder: (context, nodeNum, _) {
+          final initial = nodeNum == null
+              ? MeshNodeSheet.peekExtent
+              : MeshNodeSheet._rest;
+          // The key remount is what sets `initialChildSize`; seed the chrome to
+          // match, because the sheet only notifies its extent after a drag.
+          if (revision != _seededRevision || nodeNum != _seededNode) {
+            _seededRevision = revision;
+            _seededNode = nodeNum;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _extent.value = initial;
+            });
+          }
+          return ExtentSheetChrome(
+            extent: _extent,
+            keyValue: nodeNum == null ? 'peek' : 'sel-$revision',
+            initial: initial,
+            min: MeshNodeSheet.peekExtent,
+            max: MeshNodeSheet._expanded,
+            snapSizes: const [MeshNodeSheet._rest],
+            content: (context, scrollController) => _Body(
+              store: widget.store,
+              nodeNum: nodeNum,
+              scrollController: scrollController,
+              extent: _extent,
+              routeState: widget.routeState,
+              connected: widget.connected,
+              traceCooldown: widget.traceCooldown,
+              onTraceRoute: widget.onTraceRoute,
+              onClose: widget.onClose,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body({
+    required this.store,
+    required this.nodeNum,
+    required this.scrollController,
+    required this.extent,
+    required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
+    required this.onTraceRoute,
+    required this.onClose,
+  });
+
+  final MeshNodeStore store;
+  final int? nodeNum;
+  final ScrollController scrollController;
+  final ValueNotifier<double> extent;
+  final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
+  final ValueChanged<int> onTraceRoute;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    // Rebuilt on the store too, so charge and last-heard keep moving while the
+    // sheet is open — a panel frozen at the moment of the tap is wrong within
+    // a minute.
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) {
+        final node = nodeNum == null ? null : store.byNum(nodeNum!);
+        return ListView(
+          controller: scrollController,
+          padding: EdgeInsets.zero,
+          children: [
+            SheetGrip(extent: extent),
+            if (node == null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                child: EmptyView(
+                  icon: Icons.hub_outlined,
+                  message: l10n.meshtasticTapNode,
+                ),
+              )
+            else
+              _NodeDetail(
+                node: node,
+                store: store,
+                online: store.isOnline(node),
+                routeState: routeState,
+                connected: connected,
+                traceCooldown: traceCooldown,
+                onTraceRoute: onTraceRoute,
+                onClose: onClose,
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _NodeDetail extends StatelessWidget {
+  const _NodeDetail({
+    required this.node,
+    required this.store,
+    required this.online,
+    required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
+    required this.onTraceRoute,
+    required this.onClose,
+  });
+
+  final MeshNode node;
+  final MeshNodeStore store;
+  final bool online;
+  final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
+  final ValueChanged<int> onTraceRoute;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.sm,
+        AppSpacing.xl,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Identity — the name at title weight, its id beneath at label
+          //    weight. One thing to read first, not five things at once.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      node.displayName.isEmpty
+                          // l10n-ignore: node id fallback
+                          ? '0x${node.num.toRadixString(16)}'
+                          : node.displayName,
+                      style: theme.textTheme.titleLarge,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      // l10n-ignore: node id in the hex form the mesh uses
+                      '!${node.num.toRadixString(16)}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: onClose,
+                icon: const Icon(Icons.close),
+                tooltip: l10n.commonClose,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 2. State — chips, because these are categories, not measurements.
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              _StatusChip(
+                icon: online ? Icons.circle : Icons.circle_outlined,
+                label: online ? l10n.meshtasticOnline : l10n.meshtasticSilent,
+                tone: online ? colors.primary : colors.outline,
+              ),
+              if (node.viaMqtt)
+                _StatusChip(
+                  icon: Icons.cloud_outlined,
+                  label: l10n.meshtasticViaMqtt,
+                  tone: const Color(0xFF7E57C2).vision,
+                ),
+              // How far, for free — the radio derives it from the plaintext
+              // header of packets it already heard. Absent rather than "0"
+              // when unknown: a node whose firmware predates the field, or one
+              // reached only over MQTT, has no hop distance, and rendering
+              // that as "direct" would claim reach nobody measured.
+              if (node.hopsAway != null)
+                _StatusChip(
+                  icon: node.hopsAway == 0
+                      ? Icons.wifi_tethering
+                      : Icons.multiple_stop,
+                  label: node.hopsAway == 0
+                      ? l10n.meshtasticDirect
+                      : l10n.meshtasticHopsAway(node.hopsAway!),
+                  tone: node.hopsAway == 0 ? colors.primary : colors.tertiary,
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // 2.5 Trace — the one action this sheet offers: ask the mesh how
+          //    this node is reached. The dashed answer draws on the map.
+          _TraceRow(
+            connected: connected,
+            traceCooldown: traceCooldown,
+            nodeNum: node.num,
+            routeState: routeState,
+            onTraceRoute: onTraceRoute,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // 3. Readings — the numbers, given room to be read as numbers.
+          Row(
+            children: [
+              if (node.batteryLevel != null)
+                _Metric(
+                  icon: node.batteryLevel! > 100
+                      ? Icons.power_outlined
+                      : Icons.battery_std_outlined,
+                  label: l10n.meshtasticBattery,
+                  value: node.batteryLevel! > 100
+                      ? l10n.meshtasticExternalPower
+                      // l10n-ignore: percentage readout
+                      : '${node.batteryLevel}%',
+                ),
+              if (node.snr != 0)
+                _Metric(
+                  icon: Icons.network_check_outlined,
+                  // l10n-ignore: signal-to-noise label
+                  label: 'SNR',
+                  // l10n-ignore: decibel readout
+                  value: '${node.snr.toStringAsFixed(1)} dB',
+                ),
+              if (node.lastHeard != null)
+                _Metric(
+                  icon: Icons.schedule_outlined,
+                  label: l10n.meshtasticLastHeard,
+                  value: _relative(node.lastHeard!),
+                ),
+            ],
+          ),
+
+          // 4. Position last — the least-read line, so it does not compete.
+          if (node.latitude != null && node.longitude != null) ...[
+            const SizedBox(height: AppSpacing.lg),
+            Row(
+              children: [
+                Icon(
+                  Icons.place_outlined,
+                  size: 16,
+                  color: colors.onSurfaceVariant,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  // l10n-ignore: coordinates
+                  '${node.latitude!.toStringAsFixed(4)}, '
+                  '${node.longitude!.toStringAsFixed(4)}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+                if (store.distanceToMyRadioKm(node) != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  Icon(
+                    Icons.near_me_outlined,
+                    size: 14,
+                    color: colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    '${l10n.meshtasticDistance} '
+                    // l10n-ignore: metric distance readout
+                    '${_formatKm(store.distanceToMyRadioKm(node)!)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+
+          // 5. Trends — the last hour of this node's own telemetry, so SNR
+          //    and battery read as a story rather than a single number.
+          ..._trends(context),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _trends(BuildContext context) {
+    // A day of persisted samples with the live ring on top — the in-memory
+    // ring alone covers minutes on a busy mesh. The ring renders immediately
+    // while the day loads.
+    return [
+      FutureBuilder<List<MeshNodeSample>>(
+        future: store.dayHistoryOf(node.num),
+        initialData: store.historyOf(node.num),
+        builder: (context, snapshot) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: _trendBlocks(context, snapshot.data ?? const []),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _trendBlocks(
+    BuildContext context,
+    List<MeshNodeSample> samples,
+  ) {
+    // Each entry carries **when** it was observed, not just what. The painter
+    // needs both: a null splits the line, but so does a jump in time, and a
+    // sample the node simply never produced leaves no null behind to find —
+    // the recorder writes a row only when there is something to write, so an
+    // hours-long silence is two adjacent entries, not a hole in the list.
+    final snr = [
+      for (final s in samples)
+        (s.time, (s.snr == null || s.snr == 0) ? null : s.snr),
+    ];
+    final battery = [
+      for (final s in samples)
+        (
+          s.time,
+          (s.battery != null && s.battery! <= 100)
+              ? s.battery!.toDouble()
+              : null,
+        ),
+    ];
+    var snrCount = 0, batteryCount = 0;
+    for (final (_, v) in snr) {
+      if (v != null) snrCount++;
+    }
+    for (final (_, v) in battery) {
+      if (v != null) batteryCount++;
+    }
+    if (snrCount < 2 && batteryCount < 2) return const [];
+
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final showSnr = snrCount >= 2;
+    final showBattery = batteryCount >= 2;
+
+    return [
+      const SizedBox(height: AppSpacing.lg),
+      if (showSnr) ...[
+        _TrendBlock(
+          icon: Icons.network_check_outlined,
+          label: l10n.meshtasticSnrTrend,
+          // l10n-ignore: decibel unit
+          unit: ' dB',
+          values: snr,
+          tone: online ? colors.primary : colors.outline,
+        ),
+        const SizedBox(height: AppSpacing.md),
+      ],
+      if (showBattery)
+        _TrendBlock(
+          icon: Icons.battery_std_outlined,
+          label: l10n.meshtasticBatteryTrend,
+          // l10n-ignore: percent unit
+          unit: '%',
+          values: battery,
+          tone: colors.tertiary,
+        ),
+    ];
+  }
+
+  // l10n-ignore: compact distance readout
+  String _formatKm(double km) {
+    if (km < 1) return '${(km * 1000).round()} m';
+    if (km < 100) return '${km.toStringAsFixed(1)} km';
+    return '${km.round()} km';
+  }
+
+  // l10n-ignore: compact age readout
+  String _relative(DateTime at) {
+    // Same calibrated clock the store stamped the sample with — a wall clock
+    // here and AppTime there would disagree by whatever the device clock has
+    // drifted (or been set to), which is exactly the discrepancy that makes an
+    // age readout lie.
+    final age = AppTime.utc.toLocal().difference(at);
+    if (age.inMinutes < 1) return 'now';
+    if (age.inMinutes < 60) return '${age.inMinutes}m';
+    if (age.inHours < 24) return '${age.inHours}h';
+    return '${age.inDays}d';
+  }
+}
+
+/// The trace action and its outcome, read straight from the layer's state so
+/// only this row rebuilds when the probe progresses.
+class _TraceRow extends StatelessWidget {
+  const _TraceRow({
+    required this.nodeNum,
+    required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
+    required this.onTraceRoute,
+  });
+
+  final int nodeNum;
+  final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
+  final ValueChanged<int> onTraceRoute;
+
+  /// The full throttle window, so the countdown ring knows what fraction is
+  /// left. Mirrors the layer's constant — this is presentation; the number
+  /// that actually gates a send lives there.
+  static const double _cooldownWindow = 30;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return ValueListenableBuilder<bool>(
+      valueListenable: connected,
+      builder: (context, connected, _) =>
+          ValueListenableBuilder<MeshRouteState>(
+            valueListenable: routeState,
+            builder: (context, state, _) => ValueListenableBuilder<int>(
+              valueListenable: traceCooldown,
+              builder: (context, cooldown, _) =>
+                  _row(context, l10n, colors, state, connected, cooldown),
+            ),
+          ),
+    );
+  }
+
+  Widget _row(
+    BuildContext context,
+    AppLocalizations l10n,
+    ColorScheme colors,
+    MeshRouteState state,
+    bool connected,
+    int cooldown,
+  ) {
+    final tracing = state.tracing;
+    // A probe in flight owns the button; only once it settles does the wait
+    // for the next one take over.
+    final waiting = !tracing && cooldown > 0;
+    final outcome = _outcome(l10n, state, nodeNum);
+    return Row(
+      children: [
+        FilledButton.tonalIcon(
+          // Disabled without a radio, and while the radio's own throttle has
+          // not run out: offering the action and then failing it tells the
+          // user less than the greyed-out button already does.
+          onPressed: tracing || waiting || !connected
+              ? null
+              : () => onTraceRoute(nodeNum),
+          icon: tracing
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : waiting
+              // The same ring run backwards: the wait has a known end, so it
+              // empties rather than spinning — a spinner would say only that
+              // something is happening, when what matters is how much is left.
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(end: cooldown / _cooldownWindow),
+                    // One second, matching the tick, so the ring sweeps
+                    // instead of stepping.
+                    duration: const Duration(seconds: 1),
+                    curve: Curves.linear,
+                    builder: (context, value, _) =>
+                        CircularProgressIndicator(value: value, strokeWidth: 2),
+                  ),
+                )
+              : const Icon(Icons.route_outlined, size: 18),
+          label: Text(
+            tracing
+                ? l10n.meshtasticTracing
+                : waiting
+                // l10n-ignore: seconds remaining beside the translated label
+                ? '${l10n.meshtasticTraceRoute} $cooldown'
+                : l10n.meshtasticTraceRoute,
+          ),
+        ),
+        // Beside the button: why it is disabled, or what the last probe
+        // found. Every settled state says something — a result for *this*
+        // node reads as hops, a failure reads in red, and a reply we could
+        // not make sense of says so rather than leaving the row blank, which
+        // looked exactly like the button doing nothing.
+        //
+        // A result for a *different* node stays silent on purpose: it belongs
+        // to the dashed line still on the map, not to this sheet.
+        if (!connected) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              l10n.meshtasticTraceOffline,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
+            ),
+          ),
+        ] else if (waiting && outcome == null) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              l10n.meshtasticTraceCooldown,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
+            ),
+          ),
+        ] else if (!tracing && outcome != null) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              outcome.$1,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: outcome.$2 ? colors.error : colors.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// What to print beside the button, and whether it is an error — null while
+  /// there is nothing to say (never traced, or the answer belongs to another
+  /// node).
+  (String, bool)? _outcome(
+    AppLocalizations l10n,
+    MeshRouteState state,
+    int nodeNum,
+  ) {
+    final result = state.result;
+    if (result != null && result.target == nodeNum) {
+      return (
+        result.relayCount == 0
+            ? l10n.meshtasticTraceDirect
+            : l10n.meshtasticTraceHops(result.relayCount),
+        false,
+      );
+    }
+    // The radio's own words when it gave them — "TraceRoute can only be sent
+    // once every 30 seconds" is actionable in a way that "no reply" is not,
+    // and it is not ours to translate: it came off the firmware.
+    if (state.failed) {
+      return (state.reason ?? l10n.meshtasticTraceNoReply, true);
+    }
+    // A reply landed but named no destination — a payload we could not
+    // decode. Rare, and the log carries the detail; the row only has to stop
+    // being blank.
+    if (result != null && result.target == null) {
+      return (l10n.meshtasticTraceUnreadable, true);
+    }
+    return null;
+  }
+}
+
+/// A category, not a number — so it wears a chip rather than a value slot.
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.icon,
+    required this.label,
+    required this.tone,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: AppRadius.small,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: tone),
+          const SizedBox(width: AppSpacing.sm),
+          Text(label, style: theme.textTheme.labelMedium),
+        ],
+      ),
+    );
+  }
+}
+
+/// One reading: the value large, its name small underneath — the number is
+/// what the user came for, the label only says which number it is.
+class _Metric extends StatelessWidget {
+  const _Metric({required this.icon, required this.label, required this.value});
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: colors.onSurfaceVariant),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A labelled sparkline: the trend's name and current value on top, the line
+/// itself below. Deliberately not a fl_chart — a 2-line plot needs no axes,
+/// no tooltips, and no dependency draw, just a painter.
+class _TrendBlock extends StatelessWidget {
+  const _TrendBlock({
+    required this.icon,
+    required this.label,
+    required this.unit,
+    required this.values,
+    required this.tone,
+  });
+
+  final IconData icon;
+  final String label;
+  final String unit;
+
+  /// When and what. A null value breaks the line; so does a gap in time.
+  final List<SeriesPoint<double>> values;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    double? latest;
+    for (final (_, v) in values.reversed) {
+      if (v != null) {
+        latest = v;
+        break;
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 14, color: colors.onSurfaceVariant),
+            const SizedBox(width: AppSpacing.xs),
+            Text(label, style: theme.textTheme.labelMedium),
+            const Spacer(),
+            Text(
+              // l10n-ignore: current-value readout
+              latest == null
+                  ? '—'
+                  : '${latest.toStringAsFixed(latest.abs() < 100 ? 1 : 0)}'
+                        '$unit',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: tone,
+                fontWeight: FontWeight.w600,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        SizedBox(
+          height: 44,
+          width: double.infinity,
+          child: CustomPaint(
+            painter: _SparklinePainter(values: values, tone: tone),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Draws a thin line through [values] with a soft fill beneath it, scaled so
+/// the extremes sit on the block's top and bottom edges — a flat line should
+/// still fill the block, or the eye reads it as "nothing happened".
+///
+/// The x axis is **time**, not position: samples are written on whatever
+/// cadence the node was heard at, so plotting by index would compress a quiet
+/// hour and stretch a busy one into the same width.
+///
+/// A break comes from a null value *or* a gap in time — see [splitSeriesRuns].
+class _SparklinePainter extends CustomPainter {
+  const _SparklinePainter({required this.values, required this.tone});
+
+  final List<SeriesPoint<double>> values;
+  final Color tone;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final present = [for (final (_, v) in values) ?v];
+    if (present.isEmpty) return;
+    var lo = present.first, hi = lo;
+    for (final v in present) {
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    if (hi - lo < 1e-9) {
+      // A perfectly flat series needs a band to breathe in, or the line is
+      // invisible against the fill.
+      lo -= 1;
+      hi += 1;
+    }
+    final span = hi - lo;
+    final t0 = values.first.$1.millisecondsSinceEpoch;
+    final width = values.last.$1.millisecondsSinceEpoch - t0;
+    final denom = width <= 0 ? 1 : width;
+
+    Offset point(DateTime time, double value) => Offset(
+      size.width * (time.millisecondsSinceEpoch - t0) / denom,
+      size.height - size.height * (value - lo) / span,
+    );
+
+    final stroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeJoin = StrokeJoin.round
+      ..strokeCap = StrokeCap.round
+      ..color = tone;
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [tone.withValues(alpha: 0.22), tone.withValues(alpha: 0.02)],
+      ).createShader(Offset.zero & size);
+
+    // One run per stretch of genuinely continuous observation.
+    Offset? last;
+    for (final run in splitSeriesRuns(values)) {
+      final points = [for (final (time, v) in run) point(time, v!)];
+      last = points.last;
+      if (points.length < 2) continue;
+      final path = Path()..moveTo(points.first.dx, points.first.dy);
+      for (final p in points.skip(1)) {
+        path.lineTo(p.dx, p.dy);
+      }
+      final fill = Path.from(path)
+        ..lineTo(points.last.dx, size.height)
+        ..lineTo(points.first.dx, size.height)
+        ..close();
+      canvas.drawPath(fill, fillPaint);
+      canvas.drawPath(path, stroke);
+    }
+
+    // The latest reading still dots the line's end, wherever it sits.
+    if (last != null) canvas.drawCircle(last, 3, Paint()..color = tone);
+  }
+
+  @override
+  bool shouldRepaint(_SparklinePainter oldDelegate) =>
+      oldDelegate.values != values || oldDelegate.tone != tone;
+}

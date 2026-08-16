@@ -2,19 +2,18 @@
 /// time — notifications, critical alerts (iOS), location, and a battery
 /// exemption (Android). Permissions are encouraged but the step can be finished
 /// regardless (they're changeable later in system settings).
+///
+/// The rows themselves are [PermissionChecklist], shared with the standalone
+/// 權限檢查 page so the same list can be consulted later, on the day an alert
+/// did not arrive. This page adds only the onboarding framing: a heading, and
+/// the nudge before finishing without the two that matter.
 library;
 
-import 'dart:io';
-
-import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:dpip/core/geo/location_service.dart';
-import 'package:dpip/core/notifications/notification_service.dart';
-import 'package:dpip/core/platform/battery_optimization.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_scaffold.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/permission_checklist.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class OnboardingPermissionsPage extends StatefulWidget {
   const OnboardingPermissionsPage({super.key, required this.onFinish});
@@ -26,78 +25,9 @@ class OnboardingPermissionsPage extends StatefulWidget {
       _OnboardingPermissionsPageState();
 }
 
-class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
-    with WidgetsBindingObserver {
-  final BatteryOptimization _battery = BatteryOptimization();
-
-  bool _notify = false;
-  bool _critical = false;
-  bool _location = false;
-  bool _background = false;
-  bool _batteryOk = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // The battery / settings prompts are resolved outside the app; re-check on
-    // return.
-    if (state == AppLifecycleState.resumed) _refresh();
-  }
-
-  Future<void> _refresh() async {
-    final notifications = context.read<NotificationService>();
-    final location = context.read<LocationService>();
-    final notify = await notifications.isAllowed();
-    final critical = Platform.isIOS
-        ? await notifications.criticalAllowed()
-        : false;
-    final locationGranted = await location.granted();
-    final backgroundGranted = await location.backgroundGranted();
-    final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
-    if (!mounted) return;
-    setState(() {
-      _notify = notify;
-      _critical = critical;
-      _location = locationGranted;
-      _background = backgroundGranted;
-      _batteryOk = batteryOk;
-    });
-  }
-
-  Future<void> _grantNotify() async {
-    await context.read<NotificationService>().requestPermission();
-    if (mounted) await _refresh();
-  }
-
-  // Foreground location only. Background ("Always") is a SEPARATE step —
-  // Android 11+ silently denies both if they're requested in the same gesture.
-  Future<void> _grantLocation() async {
-    await context.read<LocationService>().requestPermission();
-    if (mounted) await _refresh();
-  }
-
-  // Background ("Always"): only meaningful after foreground is granted; on
-  // Android 11+ this routes to Settings, re-checked on resume.
-  Future<void> _grantBackground() async {
-    await context.read<LocationService>().requestBackground();
-    if (mounted) await _refresh();
-  }
-
-  Future<void> _grantBattery() async {
-    await _battery.request(); // re-checked on resume
-  }
+class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage> {
+  /// The last state the checklist reported — what [_finish] reads.
+  PermissionState? _state;
 
   /// Finishes onboarding — but if a permission that makes localized alerts work
   /// (notifications or location) is still missing, confirm first. We *can't*
@@ -105,7 +35,7 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
   /// permission), so this is a strong nudge, never a block; a persistent in-app
   /// banner keeps reminding afterwards.
   Future<void> _finish() async {
-    if (_notify && _location) {
+    if (_state?.essentialsGranted ?? false) {
       widget.onFinish();
       return;
     }
@@ -135,47 +65,6 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    final rows = <Widget>[
-      _PermissionRow(
-        icon: Icons.notifications_active_outlined,
-        title: l10n.onboardingPermNotify,
-        description: l10n.onboardingPermNotifyDesc,
-        granted: _notify,
-        onGrant: _grantNotify,
-      ),
-      if (Platform.isIOS)
-        _PermissionRow(
-          icon: Icons.notification_important_outlined,
-          title: l10n.onboardingPermCritical,
-          description: l10n.onboardingPermCriticalDesc,
-          granted: _critical,
-          onGrant: _grantNotify,
-        ),
-      _PermissionRow(
-        icon: Icons.location_on_outlined,
-        title: l10n.onboardingPermLocation,
-        description: l10n.onboardingPermLocationDesc,
-        granted: _location,
-        onGrant: _grantLocation,
-      ),
-      // Background ("Always") — a separate step, unlocked once foreground is on.
-      _PermissionRow(
-        icon: Icons.my_location_outlined,
-        title: l10n.onboardingPermBackground,
-        description: l10n.onboardingPermBackgroundDesc,
-        granted: _background,
-        onGrant: _location ? _grantBackground : null,
-      ),
-      if (Platform.isAndroid)
-        _PermissionRow(
-          icon: Icons.battery_saver_outlined,
-          title: l10n.onboardingPermBattery,
-          description: l10n.onboardingPermBatteryDesc,
-          granted: _batteryOk,
-          onGrant: _grantBattery,
-        ),
-    ];
-
     return OnboardingScaffold(
       requireScrollToEnd: false,
       actionBuilder: (context, _) =>
@@ -197,77 +86,9 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage>
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          for (final row in rows) ...[
-            row,
-            const SizedBox(height: AppSpacing.md),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// One permission: icon, title, description, and a grant control (a filled
-/// tonal button, or a check once granted).
-class _PermissionRow extends StatelessWidget {
-  const _PermissionRow({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.granted,
-    required this.onGrant,
-  });
-
-  final IconData icon;
-  final String title;
-  final String description;
-  final bool granted;
-
-  /// Grant handler; null disables the button (e.g. background before foreground).
-  final Future<void> Function()? onGrant;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: AppRadius.medium,
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: theme.colorScheme.primary),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+          PermissionChecklist(
+            onChanged: (state) => setState(() => _state = state),
           ),
-          const SizedBox(width: AppSpacing.md),
-          if (granted)
-            Icon(Icons.check_circle, color: theme.colorScheme.primary)
-          else
-            FilledButton.tonal(
-              onPressed: onGrant == null ? null : () => onGrant!(),
-              child: Text(l10n.onboardingGrant),
-            ),
         ],
       ),
     );

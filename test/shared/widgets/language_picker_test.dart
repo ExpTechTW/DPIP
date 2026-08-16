@@ -12,8 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:dpip/core/settings/prefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
 void main() {
   testWidgets('selecting 系統預設 clears an existing override', (tester) async {
@@ -24,9 +23,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    SharedPreferences.setMockInitialValues({'app.locale': 'ja'});
     final controller = LocaleController(
-      Prefs(await SharedPreferences.getInstance()),
+      SettingsStore.inMemory({'app.locale': 'ja'}),
     );
     expect(controller.locale, const Locale('ja'));
 

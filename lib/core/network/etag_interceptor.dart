@@ -113,11 +113,15 @@ class EtagInterceptor extends Interceptor {
   /// Best-effort transferred-byte estimate: the server's `Content-Length` when
   /// present (the compressed wire size), else the decoded body length (an upper
   /// bound — the platform strips Content-Length when it transparently gunzips).
-  static int _downBytes(Response<dynamic> response) {
+  ///
+  /// [encoded] hands over an already-serialised JSON body so the fallback
+  /// counts it (UTF-8, bit-identical metering) without encoding again.
+  static int _downBytes(Response<dynamic> response, {String? encoded}) {
     final length = int.tryParse(
       response.headers.value(Headers.contentLengthHeader) ?? '',
     );
     if (length != null && length > 0) return length;
+    if (encoded != null) return utf8.encode(encoded).length;
     final data = response.data;
     if (data == null) return 0;
     if (data is List<int>) return data.length;
@@ -194,11 +198,15 @@ class EtagInterceptor extends Interceptor {
             return;
           }
         } else {
-          final cached = await _store.read(url);
+          // readJson, not read + jsonDecode: this is the hottest cache path
+          // (the big station catalogues 304 on almost every open), and the
+          // parse belongs on the worker hop the store's gunzip already pays —
+          // Dio's own isolate offload never sees a 304, it has no body.
+          final cached = await _store.readJson(url);
           if (cached != null) {
             // Present the revalidated cache as a normal 200 to callers above.
             response.statusCode = 200;
-            response.data = jsonDecode(cached.body);
+            response.data = cached.data;
             response.headers.set('etag', cached.etag);
             final usage = _usage;
             if (usage != null) {
@@ -223,7 +231,20 @@ class EtagInterceptor extends Interceptor {
         );
         return;
       } else if (response.statusCode == 200) {
-        final down = _downBytes(response);
+        // Encode the JSON body once and reuse it for both the byte estimate
+        // and the store write. It used to be serialised twice — once inside
+        // _downBytes' no-Content-Length fallback (the *normal* case here: the
+        // platform strips Content-Length when it transparently gunzips) and
+        // again for the store — which was two full passes over a 100 KB
+        // object graph on the UI isolate, per cache miss, at first page load.
+        final String? jsonBody = binary || response.data == null
+            ? null
+            : response.data is String
+            ? response.data as String
+            : jsonEncode(response.data);
+        final down = jsonBody != null
+            ? _downBytes(response, encoded: jsonBody)
+            : _downBytes(response);
         final immutable =
             binary && response.data != null && isImmutableTile(options.uri);
         var etag = response.headers.value('etag');
@@ -250,7 +271,7 @@ class EtagInterceptor extends Interceptor {
               _store.write(
                 url,
                 etag: etag,
-                body: jsonEncode(response.data),
+                body: jsonBody!,
                 contentType: response.headers.value(Headers.contentTypeHeader),
                 size: down,
               ),

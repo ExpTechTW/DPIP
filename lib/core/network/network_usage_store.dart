@@ -114,9 +114,6 @@ class NetworkUsageStore {
 
   static const String _buckets = 'net_bucket';
 
-  /// Pre-window schema: lifetime counters. Dropped on migration.
-  static const String _legacyTotals = 'net_total';
-
   static const int _hourMs = 3600 * 1000;
   static const int _windowHours = 24 * 7;
 
@@ -145,10 +142,7 @@ class NetworkUsageStore {
   /// Brings a bucket table created by an older build up to date.
   ///
   /// [createSchema] runs on every open with `IF NOT EXISTS`, so an installed
-  /// database never picks up new columns on its own. Saved bytes and hit/miss
-  /// counts used to be lifetime running totals in a separate table; that table
-  /// is dropped here, because a number that only grows can't be windowed after
-  /// the fact and leaving it would just be a second, contradictory answer.
+  /// database never picks up new columns on its own.
   static Future<void> _migrate(Database db) async {
     try {
       final existing = {
@@ -161,30 +155,37 @@ class NetworkUsageStore {
           'ALTER TABLE $_buckets ADD COLUMN $column INTEGER NOT NULL DEFAULT 0',
         );
       }
-      await db.execute('DROP TABLE IF EXISTS $_legacyTotals');
     } catch (_) {
       // Accounting is diagnostic-only; never break the open on it.
     }
   }
 
-  /// Queues one cacheable response for a coalesced flush: [down] bytes
-  /// downloaded, whether it was a cache [hit], and the bytes [saved] by that
-  /// hit. Completes when the event is buffered (not when SQLite lands).
+  /// Queues [count] cacheable responses for a coalesced flush: [down] bytes
+  /// downloaded between them, whether they were cache [hit]s, and the bytes
+  /// [saved] by those hits. Completes when the event is buffered (not when
+  /// SQLite lands).
+  ///
+  /// [count] is what lets a tile batch be one call. A viewport served from
+  /// cache is dozens of identical hits, and recording them one at a time
+  /// re-crossed [flushEvery] mid-batch — a `net_bucket` transaction, plus its
+  /// 7-day sweep, per 64 tiles. The aggregate written is the same sum either
+  /// way.
   Future<void> record({
     required int down,
     required bool hit,
     required int saved,
+    int count = 1,
   }) async {
     final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
     final pending = _pendingByHour.putIfAbsent(hour, _Pending.new);
     pending.down += down;
     pending.saved += saved;
     if (hit) {
-      pending.hits += 1;
+      pending.hits += count;
     } else {
-      pending.misses += 1;
+      pending.misses += count;
     }
-    _pendingEvents += 1;
+    _pendingEvents += count;
     if (_pendingEvents >= flushEvery) {
       unawaited(flush());
     } else {
@@ -234,6 +235,26 @@ class NetworkUsageStore {
           whereArgs: [hour - _windowHours],
         );
       });
+    } catch (_) {
+      // Accounting is diagnostic-only; never surface a failure.
+    }
+  }
+
+  /// Drops buckets past the reporting window, whether or not there is
+  /// anything buffered to write.
+  ///
+  /// [flush] also trims, but only as part of writing an aggregate — it returns
+  /// early when nothing is pending. So an app sitting idle with no network
+  /// traffic (the very state in which nothing else prunes either) kept its
+  /// buckets indefinitely. This is what the hourly sweep calls.
+  Future<void> prune() async {
+    try {
+      final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
+      await _db.delete(
+        _buckets,
+        where: 'hour < ?',
+        whereArgs: [hour - _windowHours],
+      );
     } catch (_) {
       // Accounting is diagnostic-only; never surface a failure.
     }

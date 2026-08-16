@@ -1,7 +1,11 @@
 /// Shared fakes for the raster timeline layers (radar, satellite).
 library;
 
+import 'dart:math' show Point;
+
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/shared/map/map_style.dart'
+    show landLayerId, outlineLayerId, townLabelLayerId;
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -48,6 +52,10 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
 
 /// Records the MapLibre calls a layer makes, and the last state of each layer.
 class RecordingMapController implements MapLibreMapController {
+  RecordingMapController({CameraPosition? camera})
+    : _camera =
+          camera ?? const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
+
   final List<String> calls = [];
 
   /// Property keys of each `setLayerProperties` call, in order — what actually
@@ -81,6 +89,21 @@ class RecordingMapController implements MapLibreMapController {
   final Map<String, Object?> mountTransitions = {};
 
   @override
+  Future<void> addHillshadeLayer(
+    String sourceId,
+    String layerId,
+    HillshadeLayerProperties properties, {
+    String? belowLayerId,
+    String? sourceLayer,
+    double? minzoom,
+    double? maxzoom,
+  }) async {
+    calls.add('addHillshadeLayer:$layerId');
+    _insert(layerId, belowLayerId);
+    below[layerId] = belowLayerId;
+  }
+
+  @override
   Future<void> addRasterLayer(
     String sourceId,
     String layerId,
@@ -91,6 +114,8 @@ class RecordingMapController implements MapLibreMapController {
     double? maxzoom,
   }) async {
     calls.add('addRasterLayer:$layerId');
+    _insert(layerId, belowLayerId);
+    below[layerId] = belowLayerId;
     mountTransitions[layerId] = properties
         .toJson()['raster-opacity-transition'];
     _record(layerId, properties);
@@ -111,12 +136,45 @@ class RecordingMapController implements MapLibreMapController {
     below[layerId] = belowLayerId;
     lineColor[layerId] = properties.toJson()['line-color']?.toString();
     calls.add('addLineLayer:$layerId');
+    _insert(layerId, belowLayerId);
   }
 
   /// What each line/fill layer was anchored below — null means "on top", which
   /// is the difference between a border that survives a raster and one that
   /// disappears under it.
   final Map<String, String?> below = {};
+
+  /// The style's layer order, bottom-most first — what actually decides what
+  /// covers what.
+  ///
+  /// Recording the `belowLayerId` alone is not enough to catch a stacking bug:
+  /// the frames and the borders can quote the *same* anchor and still end up in
+  /// either order, because MapLibre inserts a layer **immediately below** its
+  /// anchor and so the most recently added one ends up highest. That is exactly
+  /// how a timeline scrub used to bury the county borders under the echo. So
+  /// this models the real insertion, seeded with the base style's own layers.
+  final List<String> order = [landLayerId, outlineLayerId, townLabelLayerId];
+
+  void _insert(String layerId, String? belowLayerId) {
+    order.remove(layerId);
+    final anchor = belowLayerId == null ? -1 : order.indexOf(belowLayerId);
+    if (anchor < 0) {
+      order.add(layerId); // no anchor (or unknown) — on top
+    } else {
+      order.insert(anchor, layerId);
+    }
+  }
+
+  /// Whether [above] is drawn over [below_] — the question every ordering test
+  /// is really asking. Fails loudly on a layer that was never added, so a typo
+  /// cannot read as a pass.
+  bool isAbove(String above, String below_) {
+    final a = order.indexOf(above);
+    final b = order.indexOf(below_);
+    if (a < 0) throw StateError('$above was never added');
+    if (b < 0) throw StateError('$below_ was never added');
+    return a > b;
+  }
 
   /// The anchor recorded for [layerId]; also null when never added, so pair it
   /// with a `calls` assertion.
@@ -143,11 +201,14 @@ class RecordingMapController implements MapLibreMapController {
   }) async {
     below[layerId] = belowLayerId;
     calls.add('addFillLayer:$layerId');
+    _insert(layerId, belowLayerId);
   }
 
   @override
-  Future<void> removeLayer(String layerId) async =>
-      calls.add('removeLayer:$layerId');
+  Future<void> removeLayer(String layerId) async {
+    calls.add('removeLayer:$layerId');
+    order.remove(layerId);
+  }
 
   @override
   Future<void> removeSource(String sourceId) async =>
@@ -193,9 +254,18 @@ class RecordingMapController implements MapLibreMapController {
   );
 
   @override
-  CameraPosition? get cameraPosition =>
-      const CameraPosition(target: LatLng(23.5, 121), zoom: 7);
+  Future<List<Point<num>>> toScreenLocationBatch(
+    Iterable<LatLng> coords,
+  ) async => [for (final c in coords) Point(c.longitude, c.latitude)];
+
+  /// Camera the [cameraPosition] getter reports — a wind-overlay test can
+  /// zoom out to put more of the field in view (the default z7 viewport holds
+  /// only a handful of particles, too few to assert anything about).
+  final CameraPosition _camera;
 
   @override
-  dynamic noSuchMethod(Invocation invocation) => null;
+  CameraPosition? get cameraPosition => _camera;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => Future<void>.value();
 }

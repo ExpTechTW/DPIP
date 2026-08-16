@@ -13,12 +13,14 @@ void main() {
     AppRoutes.earthquake,
     AppRoutes.eew,
     AppRoutes.more,
+    AppRoutes.meshtastic,
   };
   const knownGroups = {
     'group_eew',
     'group_eq',
     'group_info',
     'group_tsunami',
+    'group_mesh',
     'group_other',
   };
 

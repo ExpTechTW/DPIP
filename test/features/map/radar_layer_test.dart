@@ -1,5 +1,6 @@
 import 'package:dpip/shared/map/admin_outline.dart';
-import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
+import 'package:dpip/shared/map/map_style.dart'
+    show outlineLayerId, townLabelLayerId;
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -312,11 +313,26 @@ void main() {
       // The base style draws its own borders under the raster. Leaving the echo
       // beneath them meant they always showed through, so the switchable copies
       // on top would have been a second set at a second weight — and switching
-      // them off would still not have given a clean raster.
+      // them off would still not have given a clean raster. The raster anchors
+      // just under the township labels, so place names are never buried.
+      // Asserted as the resulting order rather than as the anchor string:
+      // the frames anchor to this layer's own seam now (so a scrub cannot
+      // insert one above the borders — see `layer_stacking_test.dart`), and
+      // only the order says whether that still puts them where they belong.
       for (final call in controller.calls.where(
         (c) => c.startsWith('addRasterLayer:'),
       )) {
-        expect(controller.belowOf(call.split(':').last), isNull, reason: call);
+        final frame = call.split(':').last;
+        expect(
+          controller.isAbove(frame, outlineLayerId),
+          isTrue,
+          reason: '$call is under the base style border',
+        );
+        expect(
+          controller.isAbove(townLabelLayerId, frame),
+          isTrue,
+          reason: '$call buries the township labels',
+        );
       }
     });
 

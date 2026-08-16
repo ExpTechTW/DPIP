@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'typhoon_track.dart';
@@ -9,6 +9,7 @@ part of 'typhoon_track.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -69,7 +70,7 @@ class _$TrackFixCopyWithImpl<$Res>
 /// Create a copy of TrackFix
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? latitude = null,Object? longitude = null,Object? wind = freezed,Object? gust = freezed,Object? pressure = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(TrackFix(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
@@ -355,7 +356,7 @@ class _$TrackNowCopyWithImpl<$Res>
 /// Create a copy of TrackNow
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? speed = freezed,Object? direction = freezed,Object? move = freezed,Object? c15 = freezed,Object? c25 = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(TrackNow(
 speed: freezed == speed ? _self.speed : speed // ignore: cast_nullable_to_non_nullable
 as double?,direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
 as String?,move: freezed == move ? _self.move : move // ignore: cast_nullable_to_non_nullable
@@ -526,7 +527,7 @@ return $default(_that.speed,_that.direction,_that.move,_that.c15,_that.c25);case
 @JsonSerializable()
 
 class _TrackNow implements TrackNow {
-  const _TrackNow({this.speed, @JsonKey(name: 'dir') this.direction, final  List<String>? move, this.c15, this.c25}): _move = move;
+  const _TrackNow({this.speed, @JsonKey(name: 'dir') this.direction,  List<String>? move, this.c15, this.c25}): _move = move;
   factory _TrackNow.fromJson(Map<String, dynamic> json) => _$TrackNowFromJson(json);
 
 /// Translation speed (km/hr).
@@ -701,7 +702,7 @@ class _$TrackForecastCopyWithImpl<$Res>
 /// Create a copy of TrackForecast
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? tau = null,Object? time = null,Object? latitude = null,Object? longitude = null,Object? wind = freezed,Object? gust = freezed,Object? pressure = freezed,Object? speed = freezed,Object? direction = freezed,Object? r15 = freezed,Object? r70 = freezed,Object? state = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(TrackForecast(
 tau: null == tau ? _self.tau : tau // ignore: cast_nullable_to_non_nullable
 as int,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
@@ -855,7 +856,7 @@ return $default(_that.tau,_that.time,_that.latitude,_that.longitude,_that.wind,_
 @JsonSerializable()
 
 class _TrackForecast implements TrackForecast {
-  const _TrackForecast({required this.tau, @JsonKey(name: 't') required this.time, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'lon') required this.longitude, this.wind, this.gust, @JsonKey(name: 'pres') this.pressure, this.speed, @JsonKey(name: 'dir') this.direction, this.r15, this.r70, final  List<String>? state}): _state = state;
+  const _TrackForecast({required this.tau, @JsonKey(name: 't') required this.time, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'lon') required this.longitude, this.wind, this.gust, @JsonKey(name: 'pres') this.pressure, this.speed, @JsonKey(name: 'dir') this.direction, this.r15, this.r70,  List<String>? state}): _state = state;
   factory _TrackForecast.fromJson(Map<String, dynamic> json) => _$TrackForecastFromJson(json);
 
 /// Forecast lead time (hours).
@@ -1015,7 +1016,7 @@ class _$TyphoonTrackCopyWithImpl<$Res>
 /// Create a copy of TyphoonTrack
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? cwaName = freezed,Object? year = null,Object? tdNo = freezed,Object? tyNo = freezed,Object? analysis = null,Object? now = freezed,Object? forecast = null,}) {
-  return _then(_self.copyWith(
+  return _then(TyphoonTrack(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,cwaName: freezed == cwaName ? _self.cwaName : cwaName // ignore: cast_nullable_to_non_nullable
 as String?,year: null == year ? _self.year : year // ignore: cast_nullable_to_non_nullable
@@ -1177,7 +1178,7 @@ return $default(_that.name,_that.cwaName,_that.year,_that.tdNo,_that.tyNo,_that.
 @JsonSerializable()
 
 class _TyphoonTrack implements TyphoonTrack {
-  const _TyphoonTrack({required this.name, this.cwaName, required this.year, this.tdNo, this.tyNo, required final  List<TrackFix> analysis, this.now, required final  List<TrackForecast> forecast}): _analysis = analysis,_forecast = forecast;
+  const _TyphoonTrack({required this.name, this.cwaName, required this.year, this.tdNo, this.tyNo, required  List<TrackFix> analysis, this.now, required  List<TrackForecast> forecast}): _analysis = analysis,_forecast = forecast;
   factory _TyphoonTrack.fromJson(Map<String, dynamic> json) => _$TyphoonTrackFromJson(json);
 
 @override final  String name;
@@ -1335,7 +1336,7 @@ class _$TrackPayloadCopyWithImpl<$Res>
 /// Create a copy of TrackPayload
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
-  return _then(_self.copyWith(
+  return _then(TrackPayload(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
 as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
 as List<TyphoonTrack>,
@@ -1479,7 +1480,7 @@ return $default(_that.updated,_that.cyclones);case _:
 @JsonSerializable()
 
 class _TrackPayload implements TrackPayload {
-  const _TrackPayload({required this.updated, required final  List<TyphoonTrack> cyclones}): _cyclones = cyclones;
+  const _TrackPayload({required this.updated, required  List<TyphoonTrack> cyclones}): _cyclones = cyclones;
   factory _TrackPayload.fromJson(Map<String, dynamic> json) => _$TrackPayloadFromJson(json);
 
 @override final  int updated;

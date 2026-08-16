@@ -162,8 +162,18 @@ double mercatorLat(double y) =>
     math.pi;
 
 /// Project a geographic point into the map view. The camera's target sits at
-/// the viewport centre and the view rotates clockwise with [WindCamera.bearing];
-/// tilt is always zero in this app (the map disables it), so no perspective.
+/// the viewport centre; tilt is always zero in this app (the map disables it),
+/// so no perspective.
+///
+/// The view rotates by **minus** [WindCamera.bearing], which is what MapLibre
+/// itself does (`mat4.rotateZ(m, m, -this.bearingInRadians)` when it builds the
+/// projection) and what the definition of bearing requires: a bearing of 90°
+/// means *east is up*, so a point due east must land above the centre and north
+/// must fall to the left.
+///
+/// The sign was positive here, which is invisible at bearing 0 — the only
+/// orientation anyone tests by eye — and puts the field at twice the bearing
+/// off as soon as the map is turned. At 90° it drew the wind field upside down.
 Offset projectLatLng(WindCamera cam, double lat, double lng, Size size) {
   final world = _worldSize(cam.zoom);
   final wx = (lng + 180) / 360 * world;
@@ -181,7 +191,7 @@ Offset projectLatLng(WindCamera cam, double lat, double lng, Size size) {
   // centred at 121°E should do with 175°W.
   final dx = _wrapWorld(wx - cx, world);
   final dy = wy - cy;
-  final r = cam.bearing * math.pi / 180;
+  final r = -cam.bearing * math.pi / 180;
   final cosR = math.cos(r);
   final sinR = math.sin(r);
   return Offset(
@@ -197,7 +207,10 @@ WindViewport viewportBounds(WindCamera cam, Size size) {
   final world = _worldSize(cam.zoom);
   final cx = (cam.centerLng + 180) / 360 * world;
   final cy = mercatorY(cam.centerLat) * world;
-  final r = cam.bearing * math.pi / 180;
+  // The exact inverse of [projectLatLng]'s rotation, so the bounds describe
+  // the region actually on screen. A mismatch here respawns particles outside
+  // the view, which drains the field from wherever the user is looking.
+  final r = -cam.bearing * math.pi / 180;
   final cosR = math.cos(r);
   final sinR = math.sin(r);
   var minX = double.infinity, maxX = -double.infinity;
@@ -234,6 +247,11 @@ double _wrapWorld(double dx, double world) =>
 /// its latitude span) so advection is projection-free. Nothing remembers where
 /// the particle has been — the streak behind it is the trail buffer's business,
 /// not the particle's.
+///
+/// Screen position is two plain doubles plus a flag instead of a nullable
+/// [Offset]: the simulation allocates nothing per particle per frame, and the
+/// stamp pass has the coordinates it needs without unwrapping an object the
+/// GC would have to collect.
 class WindParticle {
   WindParticle(this.x, this.y);
 
@@ -244,9 +262,13 @@ class WindParticle {
   /// is stamped, so faster air reads as a brighter streak.
   double speed = 0;
 
-  /// Where the particle is on screen, or null when it is off the field or out
-  /// of view and so has nothing to stamp this frame.
-  Offset? screen;
+  /// Screen x/y of the last step, valid only when [visible].
+  double sx = 0;
+  double sy = 0;
+
+  /// Whether the last step landed the particle inside the viewport, where it
+  /// has something to stamp.
+  bool visible = false;
 }
 
 /// The animation state — a population advected through a [WindField].
@@ -256,11 +278,30 @@ class WindParticleSim {
   /// at z3 down to 1024 at z7 and a fixed number matches neither end.
   WindParticleSim(this.field, {int count = 6400, math.Random? random})
     : _random = random ?? math.Random(),
+      _mercY = _buildMercY(field),
+      _secLat = _buildSecLat(field),
       particles = [for (var i = 0; i < count; i++) WindParticle(0, 0)];
 
   final WindField field;
   final math.Random _random;
   final List<WindParticle> particles;
+
+  /// Field-space y → mercator-y lookup, so the projection per particle per
+  /// frame is two array reads instead of a `log` + `tan`.
+  ///
+  /// The web's GPU shader evaluates the projection per vertex for free; the
+  /// CPU port would spend ~6000 transcendentals a frame on the same thing.
+  /// The LUT is built over this field's own latitude span (y ∈ [0, 1]) with
+  /// linear interpolation; its error stays under a pixel at any zoom this
+  /// layer can show.
+  final Float64List _mercY;
+
+  /// Field-space y → 1/cos(latitude) — the longitude-step correction
+  /// ([step]'s `u / cos(lat)` term). The latitude axis is the same linear
+  /// span as [_mercY], so the same table shape and interpolant serve it.
+  final Float64List _secLat;
+
+  static const int _mercYEntries = 1024;
 
   bool _seeded = false;
 
@@ -284,32 +325,46 @@ class WindParticleSim {
     final world = _worldSize(cam.zoom);
     final cx = (cam.centerLng + 180) / 360 * world;
     final cy = mercatorY(cam.centerLat) * world;
-    final r = cam.bearing * math.pi / 180;
+    // Minus the bearing — see [projectLatLng]; this loop inlines that same
+    // projection, so it has to turn the same way.
+    final r = -cam.bearing * math.pi / 180;
     final cosR = math.cos(r);
     final sinR = math.sin(r);
     final halfWidth = size.width / 2;
     final halfHeight = size.height / 2;
-    final latScale = field.dLat * field.height;
-    const degToRad = math.pi / 180;
+    // In-view margins, hoisted: these four products are invariant across the
+    // population, and the loop below runs 6400 times a frame.
+    final xLo = -0.1 * size.width;
+    final xHi = 1.1 * size.width;
+    final yLo = -0.1 * size.height;
+    final yHi = 1.1 * size.height;
+    // `lon0 + x·360` folds into a per-frame constant plus one multiply.
+    final xOffset = (field.lon0 + 180) / 360 * world;
+    final mercY = _mercY;
+    final secLat = _secLat;
 
     for (final p in particles) {
       final (u, v) = _sampleUV(p.x, p.y);
       p.speed = math.sqrt(u * u + v * v);
-      final lat = field.lat0 + p.y * latScale;
-      p.x = (p.x + u / math.cos(lat * degToRad) * fieldStep) % 1.0;
+      // 1/cos(latitude) comes from a LUT (see [_secLat]) — a `cos` per
+      // particle per frame was 6400 transcendentals on this same loop.
+      p.x = (p.x + u * _lutAt(secLat, p.y) * fieldStep) % 1.0;
       p.y -= v * fieldStep;
 
-      final wx = (field.lon0 + p.x * 360 + 180) / 360 * world;
-      final wy = mercatorY(field.lat0 + p.y * latScale) * world;
-      final dx = _wrapWorld(wx - cx, world);
-      final dy = wy - cy;
-      final screen = Offset(
-        halfWidth + dx * cosR - dy * sinR,
-        halfHeight + dx * sinR + dy * cosR,
-      );
-      final onField = p.y >= 0 && p.y <= 1;
-      final inView = onField && _inView(screen, size);
-      p.screen = inView ? screen : null;
+      // Off the grid is nothing to stamp: mark it invisible and recycle
+      // without paying for a projection nobody will see.
+      if (p.y < 0 || p.y > 1) {
+        p.visible = false;
+        _respawn(p, fieldSpace);
+        continue;
+      }
+
+      final dx = _wrapWorld(xOffset + p.x * world - cx, world);
+      final dy = _lutAt(mercY, p.y) * world - cy;
+      p.sx = halfWidth + dx * cosR - dy * sinR;
+      p.sy = halfHeight + dx * sinR + dy * cosR;
+      final inView = p.sx >= xLo && p.sx <= xHi && p.sy >= yLo && p.sy <= yHi;
+      p.visible = inView;
 
       // Recycle a particle that has left, and occasionally a healthy one — the
       // field would otherwise empty out of wherever the density weighting is
@@ -338,11 +393,38 @@ class WindParticleSim {
     }
   }
 
-  bool _inView(Offset screen, Size size) =>
-      screen.dx >= -0.1 * size.width &&
-      screen.dx <= 1.1 * size.width &&
-      screen.dy >= -0.1 * size.height &&
-      screen.dy <= 1.1 * size.height;
+  static Float64List _buildMercY(WindField field) {
+    final lut = Float64List(_mercYEntries);
+    final latScale = field.dLat * field.height;
+    for (var i = 0; i < _mercYEntries; i++) {
+      lut[i] = mercatorY(field.lat0 + i / (_mercYEntries - 1) * latScale);
+    }
+    return lut;
+  }
+
+  static Float64List _buildSecLat(WindField field) {
+    final lut = Float64List(_mercYEntries);
+    final latScale = field.dLat * field.height;
+    const degToRad = math.pi / 180;
+    for (var i = 0; i < _mercYEntries; i++) {
+      lut[i] =
+          1 /
+          math.cos(
+            (field.lat0 + i / (_mercYEntries - 1) * latScale) * degToRad,
+          );
+    }
+    return lut;
+  }
+
+  /// Linear interpolation into a field-space-y LUT ([_buildMercY] /
+  /// [_buildSecLat]). Out-of-range y (a particle about to respawn) extends
+  /// the edge value linearly — the same way the raw trig it replaces behaved.
+  static double _lutAt(Float64List lut, double y) {
+    final t = y * (_mercYEntries - 1);
+    final i = math.min(_mercYEntries - 2, math.max(0, t.floor()));
+    final f = t - i;
+    return lut[i] + (lut[i + 1] - lut[i]) * f;
+  }
 
   /// The viewport's rectangle in field space (fractions of the field's
   /// longitude / latitude span), for seeding and respawning.
@@ -412,13 +494,14 @@ class WindParticleSim {
     // Columns wrap — the grid's last column neighbours its first, and clamping
     // there flattens the wind along the whole seam. Rows do not: there is no
     // cell north of the north pole.
-    final i0 = fx.floor() % field.width;
+    final fxFloor = fx.floor();
+    final i0 = fxFloor % field.width;
     final i1 = (i0 + 1) % field.width;
     var j0 = fy.floor();
     if (j0 < 0) j0 = 0;
     if (j0 >= field.height) j0 = field.height - 1;
     final j1 = j0 + 1 < field.height ? j0 + 1 : j0;
-    final tx = fx - fx.floorToDouble();
+    final tx = fx - fxFloor.toDouble();
     final ty = (fy - j0).clamp(0.0, 1.0);
     final row0 = j0 * field.width;
     final row1 = j1 * field.width;
@@ -446,8 +529,12 @@ class WindParticleSim {
     final d = plane[row1 + i1];
     final top = a + (b - a) * tx;
     final bottom = c + (d - c) * tx;
-    return lo + (top + (bottom - top) * ty) / 255 * (hi - lo);
+    return lo + (top + (bottom - top) * ty) * _unitScale(hi - lo);
   }
+
+  /// Precomputed `(span) / 255` — the per-call division was one per plane per
+  /// particle per frame.
+  static double _unitScale(double span) => span / 255;
 
   double _lerp(double a, double b, double t) => a + (b - a) * t;
 }

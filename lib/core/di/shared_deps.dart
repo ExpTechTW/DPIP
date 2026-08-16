@@ -3,11 +3,21 @@ import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/meshtastic/domain/dpip_mesh_gateway.dart';
+import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
+import 'package:dpip/core/astro/tle_store.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
+import 'package:dpip/core/storage/app_database.dart';
+import 'package:dpip/core/meshtastic/mesh_alerts.dart';
+import 'package:dpip/core/meshtastic/mesh_link.dart';
+import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
@@ -16,8 +26,10 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/color_vision_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
@@ -31,7 +43,9 @@ import 'package:dpip/shared/map/map_tile_warmer.dart';
 /// one line in the aggregate list — never another named field on the app root.
 class SharedDeps {
   const SharedDeps({
-    required this.prefs,
+    required this.settings,
+    required this.database,
+    required this.tleStore,
     required this.apiClient,
     required this.regions,
     required this.experimental,
@@ -45,18 +59,28 @@ class SharedDeps {
     required this.deviceLocationReporter,
     required this.backgroundLocation,
     required this.locationMonitor,
+    required this.permissionHealth,
     required this.onboarding,
     required this.locale,
     required this.theme,
+    required this.colorVision,
+    required this.display,
     required this.defaultMapLayer,
     required this.mapLayerOrder,
+    required this.meshtastic,
+    required this.meshLink,
+    required this.meshAlerts,
+    required this.meshNodes,
+    required this.meshUnread,
+    this.meshStore,
+    required this.meshGateway,
     this.etagCache,
     this.networkUsage,
     this.mapTileCache,
   });
 
   /// Persistence for feature-local settings.
-  final Prefs prefs;
+  final SettingsStore settings;
 
   /// Region-aware HTTP surface for datasources.
   final ApiClient apiClient;
@@ -102,6 +126,9 @@ class SharedDeps {
   /// GPS / permission changes mid-session.
   final LocationMonitor locationMonitor;
 
+  /// One app-wide answer to whether alerts can still reach the user.
+  final PermissionHealth permissionHealth;
+
   /// First-launch onboarding completion (also provided) — gates the router and
   /// the app's permission requests.
   final OnboardingStore onboarding;
@@ -112,11 +139,48 @@ class SharedDeps {
   /// The selected theme mode (also provided; drives `MaterialApp.themeMode`).
   final ThemeController theme;
 
+  /// The colour-vision correction setting.
+  final ColorVisionController colorVision;
+
+  /// Text size / weight / contrast.
+  final DisplaySettings display;
+
   /// Default Map-tab overlay (also provided; drives nav chrome + map open).
   final DefaultMapLayerController defaultMapLayer;
 
   /// User-customised map layer-picker order (also provided).
   final MapLayerOrderController mapLayerOrder;
+
+  /// LoRa mesh (Meshtastic) over BLE — off-grid emergency messaging.
+  final MeshtasticService meshtastic;
+
+  /// Keeps the chosen radio attached across pages, drops and app restarts, and
+  /// provisions it for DPIP.
+  final MeshLink meshLink;
+
+  /// Local notifications for mesh traffic (no push involved).
+  final MeshAlerts meshAlerts;
+
+  /// The last known mesh node table — persisted, so the map and the node list
+  /// have something to show with no radio attached.
+  final MeshNodeStore meshNodes;
+
+  /// Unread mesh conversations — read by the chat page and the More tab's dot.
+  final MeshUnread meshUnread;
+
+  /// The mesh conversation log and utilization history (SQLite). Null when
+  /// the database couldn't be opened — the log is then session-only.
+  final MeshStore? meshStore;
+
+  /// Both SQLite files. Held so a settings screen can clear the cache without
+  /// any store handing out a handle to the durable one.
+  final AppDatabase database;
+
+  /// Orbital elements — its own table, its own store.
+  final TleStore tleStore;
+
+  /// DPIP disaster payloads in and out of the mesh — the seam feeds use.
+  final DpipMeshGateway meshGateway;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.

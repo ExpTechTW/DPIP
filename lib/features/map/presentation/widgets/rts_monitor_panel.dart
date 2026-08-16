@@ -11,8 +11,10 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +22,7 @@ import 'package:intl/intl.dart';
 /// The RTS layer's overlay, laid over the full map (via the scaffold's
 /// `buildSheet` slot): the active EEW alert cards above a freshness strip at
 /// the bottom. Small so the map stays visible and interactive above it.
-class RtsMonitorPanel extends StatelessWidget {
+class RtsMonitorPanel extends StatefulWidget {
   const RtsMonitorPanel({super.key, required this.feed, required this.eew});
 
   final RealtimeNotifier<Rts> feed;
@@ -41,6 +43,70 @@ class RtsMonitorPanel extends StatelessWidget {
   static const double maxEewListHeight = 240;
 
   @override
+  State<RtsMonitorPanel> createState() => _RtsMonitorPanelState();
+}
+
+class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
+  /// Whether the map tab is the shell's visible one. The RTS feed keeps
+  /// notifying at ~1 Hz behind other tabs (the polling itself must continue —
+  /// it is a safety feed), but rebuilding a hidden panel for every poll is
+  /// work nobody sees; a hidden notify becomes a no-op and the panel catches
+  /// up in one build on return.
+  bool _visible = true;
+  VisibleTab? _visibleTab;
+
+  void _onData() {
+    if (_visible && mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.feed.addListener(_onData);
+    widget.eew.addListener(_onData);
+  }
+
+  @override
+  void didUpdateWidget(RtsMonitorPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.feed, widget.feed)) {
+      oldWidget.feed.removeListener(_onData);
+      widget.feed.addListener(_onData);
+    }
+    if (!identical(oldWidget.eew, widget.eew)) {
+      oldWidget.eew.removeListener(_onData);
+      widget.eew.addListener(_onData);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_syncVisibility);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_syncVisibility);
+    _syncVisibility();
+  }
+
+  void _syncVisibility() {
+    final visible = _visibleTab?.isOnScreen(MapPage.tabIndex) ?? true;
+    if (visible == _visible) return;
+    _visible = visible;
+    // Coming back: one build to catch up on everything missed while hidden.
+    if (visible && mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.feed.removeListener(_onData);
+    widget.eew.removeListener(_onData);
+    _visibleTab?.removeListener(_syncVisibility);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -48,17 +114,14 @@ class RtsMonitorPanel extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          child: ListenableBuilder(
-            listenable: Listenable.merge([feed, eew]),
-            builder: (context, _) => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _EewAlerts(eew: eew),
-                const SizedBox(height: AppSpacing.sm),
-                _StatusBar(state: feed.state),
-              ],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _EewAlerts(eew: widget.eew),
+              const SizedBox(height: AppSpacing.sm),
+              _StatusBar(state: widget.feed.state),
+            ],
           ),
         ),
       ),

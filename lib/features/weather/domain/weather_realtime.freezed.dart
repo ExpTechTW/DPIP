@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'weather_realtime.dart';
@@ -9,6 +9,7 @@ part of 'weather_realtime.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -71,7 +72,7 @@ class _$WeatherRealtimeCopyWithImpl<$Res>
 /// Create a copy of WeatherRealtime
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? station = null,Object? time = null,Object? data = null,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherRealtime(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,station: null == station ? _self.station : station // ignore: cast_nullable_to_non_nullable
 as WeatherRealtimeStation,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
@@ -386,7 +387,7 @@ class _$WeatherRealtimeStationCopyWithImpl<$Res>
 /// Create a copy of WeatherRealtimeStation
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? latitude = null,Object? longitude = null,Object? altitude = null,Object? distance = null,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherRealtimeStation(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
@@ -667,7 +668,7 @@ class _$WeatherRealtimeDataCopyWithImpl<$Res>
 /// Create a copy of WeatherRealtimeData
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? weather = null,Object? weatherCode = null,Object? temperature = freezed,Object? humidity = freezed,Object? rain = freezed,Object? wind = null,Object? gust = null,Object? visibility = freezed,Object? visibilityText = freezed,Object? pressure = freezed,Object? sunshine = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherRealtimeData(
 weather: null == weather ? _self.weather : weather // ignore: cast_nullable_to_non_nullable
 as String,weatherCode: null == weatherCode ? _self.weatherCode : weatherCode // ignore: cast_nullable_to_non_nullable
 as int,temperature: freezed == temperature ? _self.temperature : temperature // ignore: cast_nullable_to_non_nullable
@@ -1000,7 +1001,7 @@ class _$WeatherWindCopyWithImpl<$Res>
 /// Create a copy of WeatherWind
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? direction = freezed,Object? speed = freezed,Object? beaufort = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherWind(
 direction: freezed == direction ? _self.direction : direction // ignore: cast_nullable_to_non_nullable
 as String?,speed: freezed == speed ? _self.speed : speed // ignore: cast_nullable_to_non_nullable
 as double?,beaufort: freezed == beaufort ? _self.beaufort : beaufort // ignore: cast_nullable_to_non_nullable

@@ -2,6 +2,7 @@
 /// selectable window (`now` / `10m` / `1h` / …), tap → trend sheet.
 library;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
 import 'package:dpip/features/weather/domain/rain_interval.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
@@ -62,17 +63,17 @@ class RainMapLayer
 
   /// Legacy precipitation colour ramp (mm).
   @override
-  List<(double, String)> get colorStops => const [
-    (0, '#c2c2c2'),
-    (10, '#9cfcff'),
-    (30, '#059bff'),
-    (50, '#39ff03'),
-    (100, '#fffb03'),
-    (200, '#ff9500'),
-    (300, '#ff0000'),
-    (500, '#fb00ff'),
-    (1000, '#960099'),
-    (2000, '#000000'),
+  List<(double, String)> get colorStops => [
+    (0, '#c2c2c2'.vision),
+    (10, '#9cfcff'.vision),
+    (30, '#059bff'.vision),
+    (50, '#39ff03'.vision),
+    (100, '#fffb03'.vision),
+    (200, '#ff9500'.vision),
+    (300, '#ff0000'.vision),
+    (500, '#fb00ff'.vision),
+    (1000, '#960099'.vision),
+    (2000, '#000000'.vision),
   ];
 
   @override

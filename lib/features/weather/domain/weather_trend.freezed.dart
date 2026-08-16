@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'weather_trend.dart';
@@ -9,6 +9,7 @@ part of 'weather_trend.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -71,7 +72,7 @@ class _$WeatherTrendCopyWithImpl<$Res>
 /// Create a copy of WeatherTrend
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? range = null,Object? times = null,Object? temperature = null,Object? humidity = null,Object? pressure = null,Object? windSpeed = null,Object? windDirection = null,}) {
-  return _then(_self.copyWith(
+  return _then(WeatherTrend(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,range: null == range ? _self.range : range // ignore: cast_nullable_to_non_nullable
 as String,times: null == times ? _self.times : times // ignore: cast_nullable_to_non_nullable
@@ -221,7 +222,7 @@ return $default(_that.id,_that.range,_that.times,_that.temperature,_that.humidit
 
 
 class _WeatherTrend implements WeatherTrend {
-  const _WeatherTrend({required this.id, required this.range, required final  List<int> times, required final  List<double?> temperature, required final  List<int?> humidity, required final  List<double?> pressure, required final  List<double?> windSpeed, required final  List<int?> windDirection}): _times = times,_temperature = temperature,_humidity = humidity,_pressure = pressure,_windSpeed = windSpeed,_windDirection = windDirection;
+  const _WeatherTrend({required this.id, required this.range, required  List<int> times, required  List<double?> temperature, required  List<int?> humidity, required  List<double?> pressure, required  List<double?> windSpeed, required  List<int?> windDirection}): _times = times,_temperature = temperature,_humidity = humidity,_pressure = pressure,_windSpeed = windSpeed,_windDirection = windDirection;
   
 
 /// 6-char station code (the `/station` directory key).

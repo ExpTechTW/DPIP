@@ -5,11 +5,11 @@ library;
 import 'dart:async';
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -100,7 +100,10 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
         await RadarScanRange.add(
           controller,
           outlineColor: scanRangeColor,
-          belowLayerId: outlineLayerId,
+          // The layer's chrome anchor, not the base style's county outline:
+          // that one sits *below* the raster, so the circle was being drawn
+          // under the echo it exists to bound.
+          belowLayerId: chromeBelowLayerId,
           sourceId: scanRangeSourceId,
           layerId: scanRangeLayerId,
         );
@@ -125,11 +128,13 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
     return [
       if (showScanRange.value)
         SymbolLegendItem(
-          swatch: const LineSwatch(
-            color: Color(0xFF78909C),
+          // The same blue-grey the outline is drawn in, and corrected the same
+          // way: the ring is a vector line this app draws, not raster pixels.
+          swatch: LineSwatch(
+            color: const Color(0xFF78909C).vision,
             width: 1.5,
             opacity: 0.7,
-            dash: [3, 2],
+            dash: const [3, 2],
           ),
           label: l10n.radarScanRange,
         ),
@@ -149,9 +154,8 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
         const SizedBox(height: AppSpacing.sm),
         Divider(
           height: 1,
-          color: Theme.of(
-            context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: Theme.of(context).colorScheme.outlineVariant
+              .withValues(alpha: 0.5),
         ),
         const SizedBox(height: AppSpacing.sm),
         SymbolLegend(items: overlays),

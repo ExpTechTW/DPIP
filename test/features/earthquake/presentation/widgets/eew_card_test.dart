@@ -2,7 +2,7 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -12,7 +12,6 @@ import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// An alert whose origin sits ~30s in the future, so the S-wave countdown is
 /// always positive while the card is pumped (the estimate adds travel seconds on
@@ -87,10 +86,11 @@ const _table = SeismicTravelTimeTable({
 
 /// Pumps the card with a [RegionStore] whose selection is fixed by [select].
 Future<RegionStore> _store({int select = 2}) async {
-  SharedPreferences.setMockInitialValues({
-    'home.savedRegionCodes': ['100'],
-  });
-  final store = RegionStore(Prefs(await SharedPreferences.getInstance()));
+  final store = RegionStore(
+    SettingsStore.inMemory({
+      'home.savedRegionCodes': ['100'],
+    }),
+  );
   store.select(select);
   return store;
 }

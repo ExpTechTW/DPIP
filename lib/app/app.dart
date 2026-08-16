@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
@@ -5,8 +7,10 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
@@ -14,6 +18,8 @@ import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/color_vision_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -47,26 +53,76 @@ class DpipApp extends StatelessWidget {
         deviceLocationReporter: deps.deviceLocationReporter,
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
+        permissionHealth: deps.permissionHealth,
         onboarding: deps.onboarding,
-        // Rebuild MaterialApp when the language override or theme mode changes
-        // (a null locale / system mode follows the OS).
-        child: Consumer2<LocaleController, ThemeController>(
-          builder: (context, localeController, themeController, _) =>
-              MaterialApp.router(
-                title: 'DPIP',
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.light,
-                darkTheme: AppTheme.dark,
-                themeMode: themeController.mode,
-                locale: localeController.locale,
-                localeListResolutionCallback: resolveAppLocale,
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
-                // Home locale first, so an unmatched device language falls back to
-                // Traditional Chinese (Taiwan), not the English template.
-                supportedLocales: appSupportedLocales,
-                routerConfig: appRouter,
-              ),
-        ),
+        // Rebuild MaterialApp when the language override, theme mode or
+        // colour-vision setting changes (a null locale / system mode follows
+        // the OS).
+        //
+        // Colour vision is in here because the map's style string is derived
+        // from MapColors, which is now corrected: rebuilding from the root is
+        // what re-derives it, which changes the memo key, which makes MapLibre
+        // reload the style and every layer re-apply its paint. Without this the
+        // legends would recolour and the map would not.
+        child:
+            Consumer4<
+              LocaleController,
+              ThemeController,
+              ColorVisionController,
+              DisplaySettings
+            >(
+              builder:
+                  (
+                    context,
+                    localeController,
+                    themeController,
+                    _,
+                    display,
+                    _,
+                  ) => MaterialApp.router(
+                    title: 'DPIP',
+                    debugShowCheckedModeBanner: false,
+                    theme: AppTheme.of(
+                      Brightness.light,
+                      weight: display.textWeight,
+                      contrast: display.contrast,
+                    ),
+                    darkTheme: AppTheme.of(
+                      Brightness.dark,
+                      weight: display.textWeight,
+                      contrast: display.contrast,
+                    ),
+                    themeMode: themeController.mode,
+                    locale: localeController.locale,
+                    localeListResolutionCallback: resolveAppLocale,
+                    localizationsDelegates:
+                        AppLocalizations.localizationsDelegates,
+                    // Home locale first, so an unmatched device language falls back to
+                    // Traditional Chinese (Taiwan), not the English template.
+                    supportedLocales: appSupportedLocales,
+                    routerConfig: appRouter,
+                    // Text size is applied here, not in the theme: this
+                    // ThemeData declares only a colorScheme, and
+                    // textTheme.apply(fontSizeFactor:) asserts on Material's
+                    // colour-only default. Composed with the platform's own
+                    // scaler rather than replacing it — a user who has already
+                    // enlarged text system-wide has said something, and
+                    // overwriting it would shrink the app for exactly the
+                    // people who need it largest.
+                    builder: (context, child) {
+                      final media = MediaQuery.of(context);
+                      return MediaQuery(
+                        data: media.copyWith(
+                          textScaler: ComposedTextScaler(
+                            media.textScaler,
+                            display.textScale.factor,
+                          ),
+                        ),
+                        child: child ?? const SizedBox.shrink(),
+                      );
+                    },
+                  ),
+            ),
       ),
     );
   }
@@ -88,6 +144,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.deviceLocationReporter,
     required this.backgroundLocation,
     required this.locationMonitor,
+    required this.permissionHealth,
     required this.onboarding,
     required this.child,
   });
@@ -99,6 +156,7 @@ class _AppServicesHost extends StatefulWidget {
   final DeviceLocationReporter deviceLocationReporter;
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
+  final PermissionHealth permissionHealth;
   final OnboardingStore onboarding;
   final Widget child;
 
@@ -119,7 +177,15 @@ class _AppServicesHostState extends State<_AppServicesHost>
     NotificationTaps.onTap = routeNotificationTap;
     widget.onboarding.addListener(_onOnboardingChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.realtimeService.startAll();
+      Log.debug(
+        'first frame rendered ${Log.sinceStart.elapsedMilliseconds} ms '
+        'after start',
+      );
+      // Spread the first polls so the post-first-frame burst doesn't hammer
+      // the network and UI isolate at once (EEW leads; the rest follow).
+      widget.realtimeService.startAll(
+        stagger: const Duration(milliseconds: 250),
+      );
       NotificationTaps.drainPending();
       // Permissions belong to onboarding — only run the permission-dependent
       // setup once it's complete (immediately for returning users).
@@ -140,6 +206,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     if (_ready) return;
     _ready = true;
     widget.locationMonitor.start();
+    widget.permissionHealth.start();
     _startLocationIfGranted();
   }
 
@@ -150,16 +217,25 @@ class _AppServicesHostState extends State<_AppServicesHost>
     // warm foreground is the reliable re-arm point. (The monitor handles the
     // foreground reporter + town on resume.)
     if (state == AppLifecycleState.resumed && _ready) _armBackground();
+    // Going to the background is the moment the process is most likely to be
+    // killed, and the buffered log lines are exactly what would explain why.
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited(Log.flush());
+    }
   }
 
   /// Resolves the current township and starts reporting — but only when
   /// foreground location is already granted. Never requests (see [_onReady]).
   Future<void> _startLocationIfGranted() async {
     if (!await widget.locationService.granted()) return;
+    if (!mounted) return;
+    // Independent of the town fix below, which can take up to 10 s cold —
+    // foreground move reporting starts immediately rather than behind it.
+    widget.deviceLocationReporter.start();
     final town = await widget.locationService.currentTown();
     if (!mounted) return;
     widget.regionStore.setCurrentCode(town?.code);
-    widget.deviceLocationReporter.start();
     await _armBackground();
   }
 
@@ -167,11 +243,24 @@ class _AppServicesHostState extends State<_AppServicesHost>
   /// ("Always") location is actually granted — on both platforms (iOS delivers
   /// zero SLC/region events without Always, so assuming it is armed is wrong).
   /// Idempotent; safe to call on every resume.
+  /// Both gates below are silent to the user and each fully disables background
+  /// reporting, so they are logged: the two commonest reasons a device stops
+  /// reporting are a push token that never arrived and an "Always" grant the
+  /// user never made, and neither leaves any other trace. The log is persisted
+  /// and replayed in the in-app log page, which is where this gets diagnosed
+  /// from a user's phone.
   Future<void> _armBackground() async {
     final token = widget.notificationService.token;
-    if (token == null) return;
-    if (!await widget.locationService.backgroundGranted()) return;
+    if (token == null) {
+      Log.info('background location: no push token yet — not armed');
+      return;
+    }
+    if (!await widget.locationService.backgroundGranted()) {
+      Log.info('background location: "Always" not granted — not armed');
+      return;
+    }
     if (!mounted) return;
+    Log.info('background location: arming');
     widget.backgroundLocation.start(token);
   }
 
@@ -182,6 +271,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     WidgetsBinding.instance.removeObserver(this);
     _observer.dispose();
     widget.locationMonitor.dispose();
+    widget.permissionHealth.dispose();
     widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();
     super.dispose();

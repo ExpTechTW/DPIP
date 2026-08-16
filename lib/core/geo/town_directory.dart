@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math' as math;
 
 import 'package:dpip/core/geo/geo_math.dart';
@@ -29,12 +30,15 @@ class TownDirectory {
       }),
   });
 
-  /// Loads and decodes the bundled directory (`gzip` → JSON).
+  /// Loads and decodes the bundled directory in a background isolate
+  /// (`gzip` → JSON); the towns are then built on the UI isolate.
   static Future<TownDirectory> load() async {
     final bytes = await rootBundle.load('assets/location.json.gz');
-    final json =
-        jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))
-            as Map<String, dynamic>;
+    final json = await Isolate.run(
+      () =>
+          jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))
+              as Map<String, dynamic>,
+    );
     return TownDirectory.fromJson(json);
   }
 

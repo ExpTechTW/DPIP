@@ -32,6 +32,12 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
   private static let platformKey = "dpip.bgloc.platform"
   private static let lastLatKey = "dpip.bgloc.lastLat"
   private static let lastLngKey = "dpip.bgloc.lastLng"
+  // Diagnostics only — none of this drives behaviour. "Tried at T and failed"
+  // is what separates "never fired" from "fires but cannot reach the server",
+  // and neither was previously distinguishable from the outside.
+  private static let lastReportAtKey = "dpip.bgloc.lastReportAt"
+  private static let lastReportOkKey = "dpip.bgloc.lastReportOk"
+  private static let lastReportCodeKey = "dpip.bgloc.lastReportCode"
   private static let regionId = "dpip.bg.region"
   private static let regionRadius: CLLocationDistance = 250
   // Skip a report within this distance of the last one, so SLC + region + visit
@@ -83,8 +89,74 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       defaults.set(false, forKey: Self.enabledKey)
       stopMonitoring()
       result(nil)
+    case "diagnostics":
+      result(diagnostics())
     default:
       result(FlutterMethodNotImplemented)
+    }
+  }
+
+  /// A snapshot of whether background reporting is actually working, for the
+  /// developer page. Keys are shared with the Android channel so one UI renders
+  /// both.
+  ///
+  /// `armed` is deliberately the *observable* answer rather than a stored flag:
+  /// iOS will happily accept `startMonitoringSignificantLocationChanges()`
+  /// without Always authorization and simply never deliver, so trusting a
+  /// "we called start" bit would report healthy on exactly the broken device.
+  /// `monitoredRegions` is the one piece of real evidence Core Location gives
+  /// back, so the region is what `armed` is derived from.
+  /// Built as `[String: Any]` with absent keys rather than `[String: Any?]`
+  /// with nil values: a Swift dictionary holding `Optional.none` has no
+  /// well-defined bridge to the NSDictionary the standard method codec encodes.
+  /// The Dart side reads a missing key as null, which is the same thing.
+  private func diagnostics() -> [String: Any] {
+    let status = manager.authorizationStatus
+    let regionArmed = manager.monitoredRegions.contains { $0.identifier == Self.regionId }
+    let always = status == .authorizedAlways
+    let lastReportAt = defaults.double(forKey: Self.lastReportAtKey)
+
+    var out: [String: Any] = [
+      "enabled": defaults.bool(forKey: Self.enabledKey),
+      "authorization": Self.describe(status),
+      // Authorization alone is not evidence: iOS accepts
+      // startMonitoringSignificantLocationChanges() without Always and simply
+      // never delivers, so a stored "we called start" bit would read healthy on
+      // exactly the broken device. monitoredRegions is the one thing Core
+      // Location will actually confirm back.
+      "armed": always && regionArmed,
+      "spine": always ? (regionArmed ? "significant-change+region" : "significant-change") : "none",
+      "hasToken": defaults.string(forKey: Self.tokenKey) != nil,
+      "detail": [
+        CLLocationManager.significantLocationChangeMonitoringAvailable()
+          ? "SLC available" : "SLC unavailable",
+        CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self)
+          ? "region monitoring available" : "region monitoring unavailable",
+        "\(manager.monitoredRegions.count) region(s) monitored",
+        manager.allowsBackgroundLocationUpdates
+          ? "background updates allowed" : "background updates NOT allowed",
+      ].joined(separator: ", "),
+    ]
+    if lastReportAt != 0 {
+      out["lastReportAt"] = Int(lastReportAt * 1000)
+      out["lastReportOk"] = defaults.bool(forKey: Self.lastReportOkKey)
+      out["lastReportCode"] = defaults.integer(forKey: Self.lastReportCodeKey)
+    }
+    if defaults.object(forKey: Self.lastLatKey) != nil {
+      out["centreLat"] = defaults.double(forKey: Self.lastLatKey)
+      out["centreLng"] = defaults.double(forKey: Self.lastLngKey)
+    }
+    return out
+  }
+
+  private static func describe(_ status: CLAuthorizationStatus) -> String {
+    switch status {
+    case .authorizedAlways: return "always"
+    case .authorizedWhenInUse: return "whenInUse"
+    case .denied: return "denied"
+    case .restricted: return "restricted"
+    case .notDetermined: return "notDetermined"
+    @unknown default: return "unknown"
     }
   }
 
@@ -191,7 +263,13 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
     // A short-lived background task so the GET can finish after a background
     // relaunch (the wake window is brief); cancel it if the window closes first.
     var task = UIBackgroundTaskIdentifier.invalid
-    let dataTask = URLSession.shared.dataTask(with: url) { _, _, _ in
+    let dataTask = URLSession.shared.dataTask(with: url) { [weak self] _, response, _ in
+      let code = (response as? HTTPURLResponse)?.statusCode ?? -1
+      if let defaults = self?.defaults {
+        defaults.set(Date().timeIntervalSince1970, forKey: Self.lastReportAtKey)
+        defaults.set((200..<300).contains(code), forKey: Self.lastReportOkKey)
+        defaults.set(code, forKey: Self.lastReportCodeKey)
+      }
       if task != .invalid {
         UIApplication.shared.endBackgroundTask(task)
         task = .invalid

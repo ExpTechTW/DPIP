@@ -2,6 +2,9 @@ import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
+import 'package:dpip/features/changelog/presentation/widgets/update_prompt.dart';
+import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
@@ -32,7 +35,7 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends State<MainShell> with RouteAware {
   /// Index of the data branch (see the destinations in [build]) — the only
   /// branch with nested routes, so leaving it while a replay is on screen
   /// needs the replay closed (see [_closeReplayOnBranchLeave]).
@@ -45,8 +48,44 @@ class _MainShellState extends State<MainShell> {
   /// (see [RefreshOnAppear]).
   final VisibleTab _visibleTab = VisibleTab();
 
+  /// The shell's own route on the root navigator, while subscribed to
+  /// [shellRouteObserver]. Held so the subscription can be dropped again.
+  ModalRoute<void>? _shellRoute;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The shell is built by StatefulShellRoute, so this is the shell's route on
+    // the *root* navigator — the one a full-screen page is pushed on top of.
+    final route = ModalRoute.of<void>(context);
+    if (identical(route, _shellRoute)) return;
+    if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
+    _shellRoute = route;
+    if (route != null) shellRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void didPushNext() => _setShellOnTop(false);
+
+  @override
+  void didPopNext() => _setShellOnTop(true);
+
+  @override
+  void didPush() => _setShellOnTop(true);
+
+  /// Publishes after the frame, for the same reason the branch index does: a
+  /// subscription lands during `didChangeDependencies` (mid-build), and pages
+  /// listening to this call `setState` on the edge.
+  void _setShellOnTop(bool value) {
+    if (_visibleTab.shellOnTop == value) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _visibleTab.shellOnTop = value;
+    });
+  }
+
   @override
   void dispose() {
+    if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _visibleTab.dispose();
     super.dispose();
   }
@@ -56,6 +95,18 @@ class _MainShellState extends State<MainShell> {
     final l10n = AppLocalizations.of(context);
     final index = widget.navigationShell.currentIndex;
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
+    // `select`, not `watch`: the whole shell (every mounted tab with it) must
+    // not rebuild because an unrelated permission field moved.
+    final needsPermissionAttention = context.select<PermissionHealth, bool>(
+      (health) => health.needsAttention,
+    );
+    // Unread mesh messages ride the same dot: both mean "the More tab holds
+    // something you have not dealt with", and two dots on one icon say
+    // nothing more than one.
+    final hasMeshUnread = context.select<MeshUnread, bool>(
+      (unread) => unread.hasUnread,
+    );
+    final moreAttention = needsPermissionAttention || hasMeshUnread;
 
     // Reset Home's sheet as we *leave* Home — while it is hidden — so it is back
     // at rest (chrome shown) whenever Home is next shown, by a nav tap or a
@@ -99,8 +150,20 @@ class _MainShellState extends State<MainShell> {
         label: l10n.navData,
       ),
       NavigationDestination(
-        icon: const Icon(Icons.menu),
-        selectedIcon: const Icon(Icons.menu),
+        // The dot is the only place the shell says anything is wrong, and what
+        // is wrong is that an alert may not reach this user — so it rides the
+        // tab that leads to the fix.
+        // Both icons, not just the unselected one: NavigationBar fades to
+        // selectedIcon on tap, so badging only `icon` made the dot vanish the
+        // moment the user opened the tab it was pointing at.
+        icon: _AttentionBadge(
+          show: moreAttention,
+          child: const Icon(Icons.menu),
+        ),
+        selectedIcon: _AttentionBadge(
+          show: moreAttention,
+          child: const Icon(Icons.menu),
+        ),
         label: l10n.navMore,
       ),
     ];
@@ -113,6 +176,9 @@ class _MainShellState extends State<MainShell> {
       body: Column(
         children: [
           const PermissionBanners(),
+          // Renders nothing; checks once after the first frame whether this
+          // build's channel has a newer release, and says so once per version.
+          const UpdatePrompt(),
           Expanded(
             child: VisibleTabScope(
               visibleTab: _visibleTab,
@@ -208,5 +274,27 @@ class _MainShellState extends State<MainShell> {
     return pages != null &&
         pages.isNotEmpty &&
         pages.last.name == AppRoutes.earthquakeReplay;
+  }
+}
+
+/// A dot over [child] while a permission the app needs is missing.
+///
+/// [Badge] with no label is Material's small dot, which is the whole vocabulary
+/// here: the shell does not say what is wrong, only that something is, and the
+/// tab it sits on leads to the page that does. Announced for screen readers,
+/// where a dot is otherwise silent.
+class _AttentionBadge extends StatelessWidget {
+  const _AttentionBadge({required this.show, required this.child});
+
+  final bool show;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!show) return child;
+    return Semantics(
+      label: AppLocalizations.of(context).permissionsAttention,
+      child: Badge(child: child),
+    );
   }
 }

@@ -8,7 +8,7 @@ import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
@@ -31,7 +31,6 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class _FakeWeatherRepository implements MeteorWeatherRepository {
   @override
@@ -152,10 +151,11 @@ Widget _wrap(RegionStore store, HomeSheetExtent extent) {
 }
 
 Future<RegionStore> _store() async {
-  SharedPreferences.setMockInitialValues({
-    'home.savedRegionCodes': ['100'],
-  });
-  return RegionStore(Prefs(await SharedPreferences.getInstance()));
+  return RegionStore(
+    SettingsStore.inMemory({
+      'home.savedRegionCodes': ['100'],
+    }),
+  );
 }
 
 void main() {

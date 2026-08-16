@@ -1,3 +1,4 @@
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/scan_range_overlay_menu.dart';
@@ -33,7 +34,7 @@ class QpesumsMapLayer extends RasterTimelineLayer
   String get scanRangeLayerId => 'qpesums-scan-range-outline';
 
   @override
-  String get scanRangeColor => '#78909C';
+  String get scanRangeColor => '#78909C'.vision;
 
   /// The forecast covers the base style's borders, so this layer supplies its
   /// own on top — same reasoning as radar, and the same chrome. The raster

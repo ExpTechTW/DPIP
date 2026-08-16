@@ -35,11 +35,24 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, MapCacheChannel.NAME)
             .setMethodCallHandler(MapCacheChannel(applicationContext))
 
+        MethodChannel(messenger, StorageScanChannel.NAME)
+            .setMethodCallHandler(StorageScanChannel(applicationContext))
+
         MethodChannel(messenger, BackgroundLocationChannel.NAME)
             .setMethodCallHandler(BackgroundLocationChannel(applicationContext))
 
         MethodChannel(messenger, BatteryOptimizationChannel.NAME)
             .setMethodCallHandler(BatteryOptimizationChannel(applicationContext))
+
+        MethodChannel(messenger, UnusedAppRestrictionsChannel.NAME)
+            .setMethodCallHandler(UnusedAppRestrictionsChannel(applicationContext))
+
+        MethodChannel(messenger, BackgroundExecutionChannel.NAME)
+            .setMethodCallHandler(BackgroundExecutionChannel(applicationContext))
+
+        // Activity-scoped: the keep-awake window flag belongs to this window.
+        MethodChannel(messenger, ScreenWakeChannel.NAME)
+            .setMethodCallHandler(ScreenWakeChannel(this))
 
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))

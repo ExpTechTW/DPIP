@@ -4,8 +4,8 @@ Guidance for working in this repository. See `ARCHITECTURE.md` for the folder
 structure, `api.md` for the API/region map, and `DESIGN.md` for the design
 system (colours, spacing, radius, motion, typography, shared components).
 
-DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
-(clean Flutter 3.44 baseline, feature-first architecture).
+DPIP is a Taiwan disaster-prevention app, mid-rewrite (clean Flutter 3.47
+baseline, feature-first architecture).
 
 ## Toolchain
 
@@ -37,8 +37,15 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   `analysis_options.yaml`, so it fails analysis.
 - Uncaught Flutter/async errors are captured automatically
   (`Log.installErrorHandlers()` in `bootstrap.dart`).
-- In-app log viewer: the **App 日誌** page (More tab → `LogPage`), backed by the
-  same `Log` history.
+- The log is **persisted** to the `logs` table of the durable database with a
+  rolling **24-hour** retention (`core/logging/log_store.dart`). Writes are
+  buffered and flushed on a timer, on a burst, and when the app backgrounds —
+  a log call never costs a database round-trip, and the store never throws
+  (it is called from error handlers, where a failure would replace a
+  diagnostic with a crash). Retention runs on write, not on read.
+- In-app log viewer: the **App 日誌** page (More tab → `LogPage`), which shows
+  the live session and replays the last 24 hours from the table on open, so it
+  covers the launch that crashed rather than only the current one.
 
 ## Conventions
 
@@ -58,14 +65,20 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   (`AppSpacing` / `AppRadius` / `AppMotion`), `ColorScheme` roles, and shared
   components (`shared/widgets/`). Never hardcode spacing, radius, duration, or
   colour where a token/role exists. Full reference: `DESIGN.md`.
-- **State management:** `provider`. App-wide services are provided in
-  `app/app.dart`; feature state lives in the feature's `presentation`.
-- **Networking:** never call hosts directly — use the region-aware API surface
-  (`api/redundant_api.dart`, `api/exclusive_api.dart`, `api/external_api.dart`).
-  No DNS-balanced bare hosts. See `api.md`. `ApiClient` fails over to the next
-  region **only** on transient/server faults (connection drop, timeout, 5xx) and
-  logs each failover; a 4xx or a cancellation throws immediately (it would recur
-  on every region). Pass a `CancelToken` to abort a superseded request. Fatal and
+- **State management:** `provider`. `bootstrap()` assembles the shared
+  infrastructure into a `SharedDeps` (`core/di/shared_deps.dart`) and hands it
+  to each feature's `*Providers(deps)` aggregate (wired through
+  `core/di/core_providers.dart`); feature state lives in the feature's
+  `presentation`.
+- **Networking:** never call hosts directly — use the region-aware `ApiClient`
+  (`core/network/api_client.dart`) with an `ApiTier` from
+  `core/network/api_region.dart` (LB vs Core, exclusive vs multi-active) and
+  path constants from `core/network/api_paths.dart`. No DNS-balanced bare
+  hosts. See `api.md`. `ApiClient` fails over to the next region **only** on
+  transient/server faults (connection drop, timeout, 5xx) and logs each
+  failover; a 4xx or a cancellation throws immediately (it would recur on every
+  region). Pass a `CancelToken` to abort a superseded request. SSE streams go
+  through `ApiClient.openStream` + `core/network/sse_client.dart`. Fatal and
   handled errors forward to an optional `CrashSink` set on `Log` (Crashlytics
   wire-up point).
 - **Data & errors (contract):** models are `@freezed` value types with generated
@@ -123,13 +136,46 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   background messages display via awesome so each honours its channel; a
   `notification`-payload message is shown by the OS. Alert categories live in
   `notification_channels.dart` — bump `version` when one changes so Android
-  re-creates it. Taps funnel through `NotificationTaps` (core carries the channel
+  re-creates it. Permission requests go through
+  `NotificationService`, which asks the plugin to prompt **only** when the OS
+  status is `notDetermined`: once iOS has been told "no", awesome opens the
+  settings page itself and parks its completion until the app returns, so the
+  awaited Future can simply never come back. A decided state therefore returns
+  `PermissionOutcome.needsSettings` without calling the plugin, and every
+  request carries a timeout so a button can never be inert. Channels register
+  as one batch; if that
+  batch is rejected the service falls back to registering them individually, so
+  one bad channel costs only itself and is named in the log instead of leaving
+  the app with no channels *and* no push transport. (`initialize` needs at
+  least one channel, so the fallback seeds itself with the first one that is
+  accepted.) `tool/check_notification_sounds.sh` catches an unresolvable
+  `resource://raw/<name>` before it ships. Taps funnel through `NotificationTaps` (core carries the channel
   key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
   APNs auth key to the Firebase console for iOS; push only works on a physical
   device; permission is requested after the first frame for now (move to
-  onboarding); backend token registration (`/v2/location`) needs the not-yet-
-  ported location feature — the token is stored (`NotificationService.token`)
-  meanwhile.
+  onboarding). The push token registers through the location feature
+  (`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves.
+- **LoRa mesh (`core/meshtastic/`):** the off-grid path. Three layers, each with
+  one job. `MeshtasticService` (domain) is the **transport** — connect/scan,
+  packet streams, `sendData`, and the radio's channel/region config; its BLE
+  impl lives in `data/` over the vendored `third_party/meshtastic_flutter`
+  (locally forked — see its CHANGELOG). `MeshLink` (created in `bootstrap`, not
+  by a page) owns the **session**: the chosen radio is persisted and *is* the
+  intent to stay connected, so it survives page changes, drops and app
+  restarts; only `detach()` stops it. It also provisions the radio after every
+  connect. `DpipMeshGateway` is the **data plane**: DPIP disaster payloads ride
+  `PRIVATE_APP` (256) inside a 5-byte versioned envelope (`dpip_mesh.dart`) on
+  the fixed `DPIP` channel (PSK `AQ==`, region `TW`) — never on
+  `TEXT_MESSAGE_APP`, which belongs to the user's chat. A feed broadcasts by
+  handing over a `DpipMeshPacket` and receives by listening to `inbound`; it
+  never sees Bluetooth. Wire codes and the envelope layout are pinned by tests
+  — changing one is a protocol break, so bump the version instead. Mesh
+  delivery is **best-effort** (lossy, duty-cycle limited, unacknowledged): a
+  safety-critical feed may add it as a path, never rely on it as the only one.
+  Radio writes go through local admin messages (`from == 0` exempts them from
+  the remote-admin session key); a channel write is read back before it counts,
+  and a region change is confirmed by the user because the firmware reboots the
+  radio and takes every other channel with it.
 - **Native-first:** prefer platform channels / built-ins over third-party
   plugins where practical (e.g. `core/platform/` device_info, compass).
 - **Icons:** use Flutter's built-in Material `Icons` only — no third-party icon
@@ -137,31 +183,55 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
   rows, actions, and inactive states; use the **filled** variant (`Icons.foo`)
   for the selected/active state (e.g. the bottom-nav `selectedIcon`). Every
   list row in a menu carries a leading icon.
+  The one exception is **weather**: Flutter's bundled font has no rain glyph at
+  all (nor mixed precipitation, nor hail), so weather surfaces draw from
+  `core/weather/weather_icons.dart` — a 6.7 KB subset of Material Symbols
+  Outlined bundled as a *font asset*, not a package. **Never hand-write an
+  `IconData` codepoint**: that file and the font are both generated by
+  `tool/build_weather_icons.py` from Google's `.codepoints` manifest, because a
+  guessed codepoint is a valid `IconData` that silently draws the wrong picture
+  — `rainy` was once declared as `0xf07c2`, which is `Icons.severe_cold`, and
+  every rainy hour rendered a snowflake. Add a glyph by adding its Material
+  Symbols *name* to `GLYPHS` and re-running the tool;
+  `test/core/weather/weather_icons_test.dart` rasterises every glyph and fails
+  on one that is missing or duplicated.
 - **Localization (i18n):** every user-facing string goes through
   `AppLocalizations` (`AppLocalizations.of(context).<key>`) — never hardcode
   display text. ARB sources live in `lib/l10n/` (`app_en.arb` is the template,
-  `app_zh.arb` is Traditional Chinese, the Taiwan default; `zh_Hant_HK` /
-  `zh_Hans` cover HK/Simplified); generated code is in `lib/l10n/gen/`. Each ARB
-  **self-describes** with a `languageName` key (the locale's own name), and the
-  language picker (`shared/widgets/language_picker.dart`) is built from
+  `app_zh.arb` is Traditional Chinese, the Taiwan default; `zh_TW`,
+  `zh_Hant_HK` / `zh_Hans` cover HK/Simplified, plus ja/ko/th/vi/fil/id);
+  generated code is in `lib/l10n/gen/`. Each ARB **self-describes** with a
+  `languageName` key (the locale's own name), and the language picker
+  (`shared/widgets/language_picker.dart`) is built from
   `AppLocalizations.supportedLocales` + that key — never a hardcoded list. So a
   language is added by just dropping in `app_<locale>.arb` (with `languageName`);
-  the home/fallback locale is the one constant in `core/settings/locale_config.dart`.
-  Enforced by `tool/check_l10n.sh` (a CI gate, no packages): ARB key-parity with
-  the template + no hardcoded CJK/kana/Hangul/Thai string literals in
-  `features/*/presentation/**` or `shared/widgets/**`. A genuinely non-display or
-  throwaway literal is exempted with `// l10n-ignore: <reason>` (that line/the one
-  above) or `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
-- **Persistence keys (contract):** all `SharedPreferences` access goes through
-  the typed `Prefs` facade (`core/settings/prefs.dart`), keyed by a `PrefKey<T>`
-  from the `PreferenceKeys` registry (`core/settings/preference_keys.dart`) —
-  **never a raw string, never `SharedPreferences` directly.** `PrefKey`'s
-  constructor is private, so a key can only be minted in the registry; `Prefs`
-  has no `String`-taking overload, so an ad-hoc key can't reach storage — the
-  compiler rejects it, not review. Add a setting = add one `PrefKey<T>` constant
-  + use it; never change an existing key string without a migration. Only
-  `prefs.dart` (wraps it) and `bootstrap.dart` (mints the one instance) may
-  import `shared_preferences`, enforced by `tool/check_prefs.sh`.
+  the home/fallback locale is the one constant in
+  `core/settings/locale_config.dart`. Enforced by `tool/check_l10n.sh` (a CI
+  gate, no packages): ARB key-parity with the template + no hardcoded
+  CJK/kana/Hangul/Thai string literals in `features/*/presentation/**` or
+  `shared/widgets/**`. A genuinely non-display or throwaway literal is exempted
+  with `// l10n-ignore: <reason>` (that line/the one above) or
+  `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
+- **Persistence (contract):** everything persisted lives in **SQLite**, split
+  into two files by *durability*: `dpip.db` in application-support (settings,
+  `tle`, `mesh_*`) and `http_etag_cache.db` in the platform cache directory
+  (`http_cache`, `net_bucket`). The split is the point — the OS may empty the
+  cache directory whenever it wants space, so nothing that cannot be re-fetched
+  may live there, and `AppDatabase.clearCache()` holds no handle to the durable
+  file, which makes "clear cache deleted my settings" unavailable rather than
+  merely avoided. Tables are one-per-category and each is owned by exactly one
+  store (`core/storage/app_database.dart` documents the map).
+  Settings go through the typed `SettingsStore` facade
+  (`core/settings/settings_store.dart`), keyed by a `SettingKey<T>` from the
+  `SettingKeys` registry (`core/settings/setting_keys.dart`) — **never a raw
+  string**. `SettingKey`'s constructor is private, so a key can only be minted
+  in the registry; `SettingsStore` has no `String`-taking overload, so an
+  ad-hoc key can't reach storage — the compiler rejects it, not review. Reads
+  are synchronous (the table is loaded into memory once at bootstrap); writes
+  are async and log rather than throw. Add a setting = add one `SettingKey<T>`;
+  never change an existing key string without a migration. `shared_preferences`
+  is **not a dependency** — nothing may import it — and only a table's owning
+  store may import `sqflite`; both enforced by `tool/check_storage.sh`.
 - Every file starts with a doc comment; one public declaration = one clear
   responsibility.
 
@@ -170,12 +240,14 @@ DPIP is a Taiwan disaster-prevention app, mid-rewrite on the `rewrite` branch
 `.github/workflows/ci.yml` runs on every push/PR and must stay green. It uses
 the mise-pinned toolchain and runs, in order: the layering gate
 (`tool/check_layering.sh`), the localization gate (`tool/check_l10n.sh`), the
-prefs gate (`tool/check_prefs.sh`), `dart format --set-exit-if-changed`, a
-codegen-drift check (`build_runner` + `git diff --exit-code` — committed
-`*.g.dart` / `*.freezed.dart` must match a fresh build), `flutter analyze`, and
-`flutter test`. The three bash gates need only bash + python3 (no toolchain), so
-they fail fast. Run these locally before pushing. Safety-critical seismic math
-is pinned by golden tests (`test/features/earthquake/eew_estimator_test.dart`);
+storage gate (`tool/check_storage.sh`), the lockfile gate (`tool/check_pubspec_lock.sh`),
+`dart format --set-exit-if-changed`, a codegen-drift check (`build_runner` +
+`git diff --exit-code` — committed `*.g.dart` / `*.freezed.dart` must match a
+fresh build), `flutter analyze`, and `flutter test`. The four bash gates need
+only bash + python3 (no toolchain), so they fail fast. `android.yml` /
+`ios.yml` build release artifacts, and `review.yml` adds an automated PR
+review. Run these locally before pushing. Safety-critical seismic math is
+pinned by golden tests (`test/features/earthquake/eew_estimator_test.dart`);
 if you change the EEW estimator, update those goldens deliberately.
 
 ## Commits

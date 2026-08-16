@@ -120,6 +120,9 @@ class PrecipitationField {
     // `tint` never varies per particle — only alpha does — so pack its RGB
     // once and OR in the 8-bit alpha instead of building a `Color` per drop.
     final rgb = tint.toARGB32() & 0x00FFFFFF;
+    // The horizontal wind deflection (`fall * wind * 0.6`) folds into a
+    // single invariant multiplier instead of re-multiplying per drop.
+    final windX = wind * 0.6;
 
     var n = 0;
     for (var i = 0; i < live; i++) {
@@ -130,7 +133,7 @@ class PrecipitationField {
       final speedScale = 0.12 + 0.88 * depth;
       final fall = baseFall * speedScale;
       _p.y[i] += fall;
-      _p.x[i] += fall * wind * 0.6;
+      _p.x[i] += fall * windX;
 
       // Age is the *only* respawn trigger, as in the reference: a drop that has fallen
       // off the bottom stays dead for the rest of its 3 s life. Recycling it on

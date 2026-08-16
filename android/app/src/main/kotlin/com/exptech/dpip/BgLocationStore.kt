@@ -23,6 +23,15 @@ object BgLocationStore {
     const val KEY_HAS_LAST = "has_last"
     const val KEY_INTERVAL_MIN = "interval_min" // alarm fallback only
 
+    // Diagnostics. None of this drives behaviour — it exists so the developer
+    // page can answer "is background reporting actually working?" from a user's
+    // phone. The Geofencing API has no way to ask whether a fence is live, so
+    // whether one was ever armed has to be remembered here.
+    const val KEY_ARMED = "geofence_armed"
+    const val KEY_LAST_REPORT_AT = "last_report_at"
+    const val KEY_LAST_REPORT_OK = "last_report_ok"
+    const val KEY_LAST_REPORT_CODE = "last_report_code"
+
     fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -38,8 +47,18 @@ object BgLocationStore {
     }
 
     fun disable(context: Context) {
-        prefs(context).edit().putBoolean(KEY_ENABLED, false).apply()
+        prefs(context).edit()
+            .putBoolean(KEY_ENABLED, false)
+            .putBoolean(KEY_ARMED, false)
+            .apply()
     }
+
+    /** Records whether a geofence is currently monitoring — diagnostics only. */
+    fun setArmed(context: Context, armed: Boolean) {
+        prefs(context).edit().putBoolean(KEY_ARMED, armed).apply()
+    }
+
+    fun armed(context: Context): Boolean = prefs(context).getBoolean(KEY_ARMED, false)
 
     fun saveLast(context: Context, lat: Double, lng: Double) {
         prefs(context).edit()
@@ -67,6 +86,7 @@ object BgLocationStore {
         val token = prefs.getString(KEY_TOKEN, null) ?: return
         val version = prefs.getString(KEY_VERSION, null) ?: return
         val platform = prefs.getInt(KEY_PLATFORM, 0)
+        var code = -1
         try {
             val url = URL(
                 "https://api.core-tnn1.exptech.dev/api/v2/location/" +
@@ -76,11 +96,18 @@ object BgLocationStore {
                 requestMethod = "GET"
                 connectTimeout = 10_000
                 readTimeout = 10_000
-                responseCode // fire the request
+                code = responseCode // fire the request
                 disconnect()
             }
         } catch (e: Exception) {
-            // Best-effort; the next trigger retries.
+            // Best-effort; the next trigger retries. The outcome is still
+            // recorded below — "tried at T and failed" is the diagnostic that
+            // separates "never fired" from "fires but cannot reach the server".
         }
+        prefs.edit()
+            .putLong(KEY_LAST_REPORT_AT, System.currentTimeMillis())
+            .putBoolean(KEY_LAST_REPORT_OK, code in 200..299)
+            .putInt(KEY_LAST_REPORT_CODE, code)
+            .apply()
     }
 }

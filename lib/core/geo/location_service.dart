@@ -1,10 +1,13 @@
 import 'dart:async';
 
-import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_status.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/permissions/permission_outcome.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// A GPS coordinate fix in decimal degrees.
@@ -64,32 +67,39 @@ class LocationService {
   /// be requested in-app (permanently denied, or Android 11+ background
   /// location). Best-effort.
   Future<void> openSettings() async {
-    try {
-      await Geolocator.openAppSettings();
-    } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'openAppSettings');
-    }
+    Log.info('permission: opening app settings');
+    await openAppSettingsPage();
   }
 
   /// Requests **foreground** location permission (call from a screen, after
-  /// explaining why); returns whether a fix is now permitted. If permission is
-  /// permanently denied, re-requesting can't prompt, so it routes to Settings.
-  /// Never throws.
-  Future<bool> requestPermission() async {
+  /// explaining why).
+  ///
+  /// Reports what happened rather than opening Settings itself. It used to
+  /// jump straight there on a permanent denial, which drops the user into a
+  /// system screen with no idea why they are looking at it — the caller can
+  /// explain first now. Never throws.
+  Future<PermissionOutcome> requestPermission() async {
     try {
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.deniedForever) {
-        await Geolocator.openAppSettings();
-        return false;
+        return PermissionOutcome.needsSettings;
       }
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
-      return permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse;
+      Log.info('permission: location request -> $permission');
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
+        return PermissionOutcome.granted;
+      }
+      // A refusal at the prompt turns into a permanent one on both platforms:
+      // iOS never asks twice, and Android stops after the second refusal.
+      return permission == LocationPermission.deniedForever
+          ? PermissionOutcome.needsSettings
+          : PermissionOutcome.denied;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'requestPermission');
-      return false;
+      return PermissionOutcome.denied;
     }
   }
 
@@ -130,24 +140,26 @@ class LocationService {
   /// there "Allow all the time" only exists in system Settings. So: try the
   /// in-app prompt, and if that doesn't land on "Always", open Settings, where
   /// the grant lives. Either way the caller re-checks on resume. Never throws.
-  Future<bool> requestBackground() async {
+  Future<PermissionOutcome> requestBackground() async {
     try {
       final current = await Geolocator.checkPermission();
-      if (current == LocationPermission.always) return true;
+      Log.info('permission: background location, current = $current');
+      if (current == LocationPermission.always) {
+        return PermissionOutcome.granted;
+      }
       if (current == LocationPermission.deniedForever) {
-        await Geolocator.openAppSettings();
-        return false;
+        return PermissionOutcome.needsSettings;
       }
       if (await Geolocator.requestPermission() == LocationPermission.always) {
-        return true;
+        return PermissionOutcome.granted;
       }
       // Couldn't escalate in-app (iOS after "While Using", or Android 11+) —
-      // "Always" lives in system Settings.
-      await Geolocator.openAppSettings();
-      return false;
+      // "Always" lives in system Settings, and the caller says so before
+      // sending anyone there.
+      return PermissionOutcome.needsSettings;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'requestBackground');
-      return false;
+      return PermissionOutcome.denied;
     }
   }
 
@@ -279,6 +291,28 @@ class LocationService {
     return (lat: position.latitude, lng: position.longitude);
   }
 
-  static bool _isFresh(DateTime timestamp) =>
-      DateTime.now().toUtc().difference(timestamp.toUtc()) <= _maxLastKnownAge;
+  /// Whether a cached fix is recent enough to answer with instead of asking
+  /// the GPS again.
+  ///
+  /// The stamp comes from the OS (`CLLocation.timestamp` / `Location.getTime`)
+  /// and is therefore in **device** time, while the comparison wants
+  /// calibrated time — subtracting one from the other measures the clock
+  /// offset as well as the age. So the device stamp is re-expressed first.
+  ///
+  /// Two clocks, and neither is right in every case: a clock set *forward*
+  /// after a good fix ages it out (a wasted 10-second request), a clock set
+  /// *back* keeps an arbitrarily old fix alive. Taking the **larger** of the
+  /// two ages fails toward stale, which for the reading that decides whose
+  /// hazards a user is shown is the only safe direction.
+  ///
+  /// A negative age — a stamp from the future — is never fresh. It is not a
+  /// young fix; it is a clock disagreement, and accepting it is how a fix of
+  /// any age passes. Same convention as `staleness.dart`.
+  static bool _isFresh(DateTime timestamp) {
+    final calibrated = AppTime.utc.difference(AppTime.fromDevice(timestamp));
+    final byDevice = DateTime.now().toUtc().difference(timestamp.toUtc());
+    if (calibrated.isNegative || byDevice.isNegative) return false;
+    final age = calibrated > byDevice ? calibrated : byDevice;
+    return age <= _maxLastKnownAge;
+  }
 }

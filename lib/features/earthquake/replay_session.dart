@@ -85,6 +85,27 @@ class ReplaySession {
 
   /// Stops polling and releases both channels — call exactly once, when the
   /// replay page is popped.
+  /// Stops the polling while the app is backgrounded.
+  ///
+  /// These channels are built raw — deliberately outside [RealtimeService], so
+  /// a replay can't be mistaken for a live feed — which also means the
+  /// service's lifecycle pause never reaches them: backgrounding mid-replay
+  /// left two network polls a second running for as long as the OS let the
+  /// process live. The replay clock keeps ticking on purpose, so a resumed
+  /// replay rejoins its timeline instead of freezing where it was left.
+  void pause() {
+    _rtsChannel.pause(releaseTransport: true);
+    _eewChannel.pause(releaseTransport: true);
+  }
+
+  /// Restarts the polling on foreground. Idempotent, like the channels' own
+  /// resume — the lifecycle listener fires `onResume` after a mere `inactive`
+  /// (notification shade) with no preceding pause.
+  void resume() {
+    _rtsChannel.resume();
+    _eewChannel.resume();
+  }
+
   void dispose() {
     rts.dispose();
     eew.dispose();

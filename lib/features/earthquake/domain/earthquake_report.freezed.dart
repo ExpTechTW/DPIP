@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'earthquake_report.dart';
@@ -9,6 +9,7 @@ part of 'earthquake_report.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -67,7 +68,7 @@ class _$EarthquakeReportCopyWithImpl<$Res>
 /// Create a copy of EarthquakeReport
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? longitude = null,Object? latitude = null,Object? location = null,Object? depth = null,Object? magnitude = null,Object? list = null,Object? time = null,Object? trem = null,}) {
-  return _then(_self.copyWith(
+  return _then(EarthquakeReport(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
@@ -218,7 +219,7 @@ return $default(_that.id,_that.longitude,_that.latitude,_that.location,_that.dep
 @JsonSerializable()
 
 class _EarthquakeReport extends EarthquakeReport {
-  const _EarthquakeReport({required this.id, @JsonKey(name: 'lon') required this.longitude, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'loc') required this.location, required this.depth, @JsonKey(name: 'mag') required this.magnitude, required final  Map<String, AreaIntensity> list, required this.time, required this.trem}): _list = list,super._();
+  const _EarthquakeReport({required this.id, @JsonKey(name: 'lon') required this.longitude, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'loc') required this.location, required this.depth, @JsonKey(name: 'mag') required this.magnitude, required  Map<String, AreaIntensity> list, required this.time, required this.trem}): _list = list,super._();
   factory _EarthquakeReport.fromJson(Map<String, dynamic> json) => _$EarthquakeReportFromJson(json);
 
 @override final  String id;
@@ -361,7 +362,7 @@ class _$AreaIntensityCopyWithImpl<$Res>
 /// Create a copy of AreaIntensity
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? intensity = null,Object? town = null,}) {
-  return _then(_self.copyWith(
+  return _then(AreaIntensity(
 intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
 as int,town: null == town ? _self.town : town // ignore: cast_nullable_to_non_nullable
 as Map<String, StationIntensity>,
@@ -505,7 +506,7 @@ return $default(_that.intensity,_that.town);case _:
 @JsonSerializable()
 
 class _AreaIntensity implements AreaIntensity {
-  const _AreaIntensity({@JsonKey(name: 'int') required this.intensity, required final  Map<String, StationIntensity> town}): _town = town;
+  const _AreaIntensity({@JsonKey(name: 'int') required this.intensity, required  Map<String, StationIntensity> town}): _town = town;
   factory _AreaIntensity.fromJson(Map<String, dynamic> json) => _$AreaIntensityFromJson(json);
 
 @override@JsonKey(name: 'int') final  int intensity;
@@ -633,7 +634,7 @@ class _$StationIntensityCopyWithImpl<$Res>
 /// Create a copy of StationIntensity
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? longitude = null,Object? latitude = null,Object? intensity = null,}) {
-  return _then(_self.copyWith(
+  return _then(StationIntensity(
 longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable

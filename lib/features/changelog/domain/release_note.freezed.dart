@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'release_note.dart';
@@ -9,6 +9,7 @@ part of 'release_note.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -19,7 +20,9 @@ mixin _$ReleaseNote {
 @JsonKey(name: 'tag_name') String get tagName;/// Display title (usually same as [tagName]).
  String get name;/// Markdown body.
  String get body;/// Whether this is a pre-release (公測).
- bool get prerelease;/// Publish time (ISO-8601 from GitHub).
+ bool get prerelease;/// The release's own page on GitHub — the update destination for a build
+/// that came from no store (a sideloaded APK), where the APK asset lives.
+@JsonKey(name: 'html_url') String get htmlUrl;/// Publish time (ISO-8601 from GitHub).
 @JsonKey(name: 'published_at') DateTime get publishedAt;
 /// Create a copy of ReleaseNote
 /// with the given fields replaced by the non-null parameter values.
@@ -33,16 +36,16 @@ $ReleaseNoteCopyWith<ReleaseNote> get copyWith => _$ReleaseNoteCopyWithImpl<Rele
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tagName,name,body,prerelease,publishedAt);
+int get hashCode => Object.hash(runtimeType,tagName,name,body,prerelease,htmlUrl,publishedAt);
 
 @override
 String toString() {
-  return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, publishedAt: $publishedAt)';
+  return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, htmlUrl: $htmlUrl, publishedAt: $publishedAt)';
 }
 
 
@@ -53,7 +56,7 @@ abstract mixin class $ReleaseNoteCopyWith<$Res>  {
   factory $ReleaseNoteCopyWith(ReleaseNote value, $Res Function(ReleaseNote) _then) = _$ReleaseNoteCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'tag_name') String tagName, String name, String body, bool prerelease,@JsonKey(name: 'published_at') DateTime publishedAt
+@JsonKey(name: 'tag_name') String tagName, String name, String body, bool prerelease,@JsonKey(name: 'html_url') String htmlUrl,@JsonKey(name: 'published_at') DateTime publishedAt
 });
 
 
@@ -70,13 +73,14 @@ class _$ReleaseNoteCopyWithImpl<$Res>
 
 /// Create a copy of ReleaseNote
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? tagName = null,Object? name = null,Object? body = null,Object? prerelease = null,Object? publishedAt = null,}) {
-  return _then(_self.copyWith(
+@pragma('vm:prefer-inline') @override $Res call({Object? tagName = null,Object? name = null,Object? body = null,Object? prerelease = null,Object? htmlUrl = null,Object? publishedAt = null,}) {
+  return _then(ReleaseNote(
 tagName: null == tagName ? _self.tagName : tagName // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String,prerelease: null == prerelease ? _self.prerelease : prerelease // ignore: cast_nullable_to_non_nullable
-as bool,publishedAt: null == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
+as bool,htmlUrl: null == htmlUrl ? _self.htmlUrl : htmlUrl // ignore: cast_nullable_to_non_nullable
+as String,publishedAt: null == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
@@ -162,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'tag_name')  String tagName,  String name,  String body,  bool prerelease, @JsonKey(name: 'published_at')  DateTime publishedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'tag_name')  String tagName,  String name,  String body,  bool prerelease, @JsonKey(name: 'html_url')  String htmlUrl, @JsonKey(name: 'published_at')  DateTime publishedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ReleaseNote() when $default != null:
-return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.publishedAt);case _:
+return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.htmlUrl,_that.publishedAt);case _:
   return orElse();
 
 }
@@ -183,10 +187,10 @@ return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.publi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'tag_name')  String tagName,  String name,  String body,  bool prerelease, @JsonKey(name: 'published_at')  DateTime publishedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'tag_name')  String tagName,  String name,  String body,  bool prerelease, @JsonKey(name: 'html_url')  String htmlUrl, @JsonKey(name: 'published_at')  DateTime publishedAt)  $default,) {final _that = this;
 switch (_that) {
 case _ReleaseNote():
-return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.publishedAt);case _:
+return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.htmlUrl,_that.publishedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +207,10 @@ return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.publi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'tag_name')  String tagName,  String name,  String body,  bool prerelease, @JsonKey(name: 'published_at')  DateTime publishedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'tag_name')  String tagName,  String name,  String body,  bool prerelease, @JsonKey(name: 'html_url')  String htmlUrl, @JsonKey(name: 'published_at')  DateTime publishedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ReleaseNote() when $default != null:
-return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.publishedAt);case _:
+return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.htmlUrl,_that.publishedAt);case _:
   return null;
 
 }
@@ -218,7 +222,7 @@ return $default(_that.tagName,_that.name,_that.body,_that.prerelease,_that.publi
 @JsonSerializable()
 
 class _ReleaseNote implements ReleaseNote {
-  const _ReleaseNote({@JsonKey(name: 'tag_name') required this.tagName, this.name = '', this.body = '', required this.prerelease, @JsonKey(name: 'published_at') required this.publishedAt});
+  const _ReleaseNote({@JsonKey(name: 'tag_name') required this.tagName, this.name = '', this.body = '', required this.prerelease, @JsonKey(name: 'html_url') this.htmlUrl = '', @JsonKey(name: 'published_at') required this.publishedAt});
   factory _ReleaseNote.fromJson(Map<String, dynamic> json) => _$ReleaseNoteFromJson(json);
 
 /// Tag name (`v3.2.1`).
@@ -229,6 +233,9 @@ class _ReleaseNote implements ReleaseNote {
 @override@JsonKey() final  String body;
 /// Whether this is a pre-release (公測).
 @override final  bool prerelease;
+/// The release's own page on GitHub — the update destination for a build
+/// that came from no store (a sideloaded APK), where the APK asset lives.
+@override@JsonKey(name: 'html_url') final  String htmlUrl;
 /// Publish time (ISO-8601 from GitHub).
 @override@JsonKey(name: 'published_at') final  DateTime publishedAt;
 
@@ -245,16 +252,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tagName,name,body,prerelease,publishedAt);
+int get hashCode => Object.hash(runtimeType,tagName,name,body,prerelease,htmlUrl,publishedAt);
 
 @override
 String toString() {
-  return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, publishedAt: $publishedAt)';
+  return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, htmlUrl: $htmlUrl, publishedAt: $publishedAt)';
 }
 
 
@@ -265,7 +272,7 @@ abstract mixin class _$ReleaseNoteCopyWith<$Res> implements $ReleaseNoteCopyWith
   factory _$ReleaseNoteCopyWith(_ReleaseNote value, $Res Function(_ReleaseNote) _then) = __$ReleaseNoteCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'tag_name') String tagName, String name, String body, bool prerelease,@JsonKey(name: 'published_at') DateTime publishedAt
+@JsonKey(name: 'tag_name') String tagName, String name, String body, bool prerelease,@JsonKey(name: 'html_url') String htmlUrl,@JsonKey(name: 'published_at') DateTime publishedAt
 });
 
 
@@ -282,13 +289,14 @@ class __$ReleaseNoteCopyWithImpl<$Res>
 
 /// Create a copy of ReleaseNote
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? tagName = null,Object? name = null,Object? body = null,Object? prerelease = null,Object? publishedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? tagName = null,Object? name = null,Object? body = null,Object? prerelease = null,Object? htmlUrl = null,Object? publishedAt = null,}) {
   return _then(_ReleaseNote(
 tagName: null == tagName ? _self.tagName : tagName // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String,prerelease: null == prerelease ? _self.prerelease : prerelease // ignore: cast_nullable_to_non_nullable
-as bool,publishedAt: null == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
+as bool,htmlUrl: null == htmlUrl ? _self.htmlUrl : htmlUrl // ignore: cast_nullable_to_non_nullable
+as String,publishedAt: null == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }

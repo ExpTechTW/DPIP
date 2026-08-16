@@ -378,9 +378,8 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
                   title: categoryLabel(editing, AppLocalizations.of(context)),
                   left: IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).backButtonTooltip,
+                    tooltip: MaterialLocalizations.of(context)
+                        .backButtonTooltip,
                     onPressed: () => setState(() => _editing = null),
                   ),
                   right: closeButton,

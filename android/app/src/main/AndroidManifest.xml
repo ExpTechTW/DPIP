@@ -18,6 +18,17 @@
          keeps running on aggressive battery managers (safety-app use). -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
+    <!-- Bluetooth (meshtastic_flutter / flutter_blue_plus): connect to LoRa
+         mesh radios over BLE. The maxSdkVersion=30 pair is the legacy API;
+         CONNECT/SCAN cover Android 12+ (runtime permissions, requested by the
+         package's initialize()). Scanning never needs location — the app's
+         fine-location permission exists for its own alerting, not the scan. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"/>
+
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"

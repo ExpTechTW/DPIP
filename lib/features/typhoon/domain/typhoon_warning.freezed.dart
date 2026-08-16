@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'typhoon_warning.dart';
@@ -9,6 +9,7 @@ part of 'typhoon_warning.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -71,7 +72,7 @@ class _$WarningFixCopyWithImpl<$Res>
 /// Create a copy of WarningFix
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? latitude = null,Object? longitude = null,Object? wind = freezed,Object? gust = freezed,Object? pressure = freezed,Object? r15 = freezed,Object? scale = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(WarningFix(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
@@ -221,7 +222,7 @@ return $default(_that.time,_that.latitude,_that.longitude,_that.wind,_that.gust,
 @JsonSerializable()
 
 class _WarningFix implements WarningFix {
-  const _WarningFix({@JsonKey(name: 't') required this.time, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'lon') required this.longitude, this.wind, this.gust, @JsonKey(name: 'pres') this.pressure, this.r15, final  List<String>? scale}): _scale = scale;
+  const _WarningFix({@JsonKey(name: 't') required this.time, @JsonKey(name: 'lat') required this.latitude, @JsonKey(name: 'lon') required this.longitude, this.wind, this.gust, @JsonKey(name: 'pres') this.pressure, this.r15,  List<String>? scale}): _scale = scale;
   factory _WarningFix.fromJson(Map<String, dynamic> json) => _$WarningFixFromJson(json);
 
 @override@JsonKey(name: 't') final  int time;
@@ -372,7 +373,7 @@ class _$WarningTyphoonCopyWithImpl<$Res>
 /// Create a copy of WarningTyphoon
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? no = freezed,Object? name = null,Object? cwaName = freezed,Object? reportNo = freezed,Object? category = freezed,Object? analysis = null,Object? prediction = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(WarningTyphoon(
 no: freezed == no ? _self.no : no // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,cwaName: freezed == cwaName ? _self.cwaName : cwaName // ignore: cast_nullable_to_non_nullable
@@ -698,7 +699,7 @@ class _$WarningSectionCopyWithImpl<$Res>
 /// Create a copy of WarningSection
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? text = null,}) {
-  return _then(_self.copyWith(
+  return _then(WarningSection(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
 as String,
@@ -964,7 +965,7 @@ class _$WarningAreaCopyWithImpl<$Res>
 /// Create a copy of WarningArea
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? code = null,}) {
-  return _then(_self.copyWith(
+  return _then(WarningArea(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as String,
@@ -1237,7 +1238,7 @@ class _$TyphoonWarningCopyWithImpl<$Res>
 /// Create a copy of TyphoonWarning
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? tdNo = freezed,Object? active = null,Object? id = null,Object? sent = null,Object? status = null,Object? msgType = null,Object? scope = null,Object? event = null,Object? urgency = null,Object? severity = null,Object? certainty = null,Object? effective = null,Object? onset = null,Object? expires = null,Object? headline = null,Object? senderName = null,Object? typhoon = freezed,Object? sections = null,Object? areas = null,}) {
-  return _then(_self.copyWith(
+  return _then(TyphoonWarning(
 tdNo: freezed == tdNo ? _self.tdNo : tdNo // ignore: cast_nullable_to_non_nullable
 as String?,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
@@ -1410,7 +1411,7 @@ return $default(_that.tdNo,_that.active,_that.id,_that.sent,_that.status,_that.m
 @JsonSerializable()
 
 class _TyphoonWarning implements TyphoonWarning {
-  const _TyphoonWarning({this.tdNo, required this.active, required this.id, required this.sent, required this.status, required this.msgType, required this.scope, required this.event, required this.urgency, required this.severity, required this.certainty, required this.effective, required this.onset, required this.expires, required this.headline, required this.senderName, this.typhoon, required final  List<WarningSection> sections, required final  List<WarningArea> areas}): _sections = sections,_areas = areas;
+  const _TyphoonWarning({this.tdNo, required this.active, required this.id, required this.sent, required this.status, required this.msgType, required this.scope, required this.event, required this.urgency, required this.severity, required this.certainty, required this.effective, required this.onset, required this.expires, required this.headline, required this.senderName, this.typhoon, required  List<WarningSection> sections, required  List<WarningArea> areas}): _sections = sections,_areas = areas;
   factory _TyphoonWarning.fromJson(Map<String, dynamic> json) => _$TyphoonWarningFromJson(json);
 
 /// Matched CWA `tdNo` from the active cyclone index; blank when the
@@ -1596,7 +1597,7 @@ class _$WarningPayloadCopyWithImpl<$Res>
 /// Create a copy of WarningPayload
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? updated = null,Object? cyclones = null,}) {
-  return _then(_self.copyWith(
+  return _then(WarningPayload(
 updated: null == updated ? _self.updated : updated // ignore: cast_nullable_to_non_nullable
 as int,cyclones: null == cyclones ? _self.cyclones : cyclones // ignore: cast_nullable_to_non_nullable
 as List<TyphoonWarning>,
@@ -1740,7 +1741,7 @@ return $default(_that.updated,_that.cyclones);case _:
 
 
 class _WarningPayload implements WarningPayload {
-  const _WarningPayload({required this.updated, required final  List<TyphoonWarning> cyclones}): _cyclones = cyclones;
+  const _WarningPayload({required this.updated, required  List<TyphoonWarning> cyclones}): _cyclones = cyclones;
   
 
 @override final  int updated;

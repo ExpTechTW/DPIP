@@ -93,7 +93,10 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
     // presenting the last-known township as where the user is. Clearing the
     // code puts the whole app back in the "can't locate" state (nationwide map
     // + the header's notice) instead of a stale place.
-    if (wasUsable && !nowUsable) {
+    // The first refresh only seeds [_status] — its "previous" is the optimistic
+    // initial value, not a confirmed usable state, so it must never clear a
+    // township that a fix may already have published while it was in flight.
+    if (_seeded && wasUsable && !nowUsable) {
       _publishedCode = null;
       _regions.setCurrentCode(null);
     }

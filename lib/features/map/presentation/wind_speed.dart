@@ -4,15 +4,16 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
 
 /// The five speed buckets, weakest first — the same thresholds / colours as the
 /// legacy wind layer.
-const windBuckets = <(double threshold, Color color)>[
-  (0, Color(0xFFFFFFFF)), // 白 — calm
-  (3.4, Color(0xFF00FFF0)), // 青
-  (8.0, Color(0xFF0085FF)), // 藍
-  (13.9, Color(0xFF8000FF)), // 紫
-  (32.7, Color(0xFFFF006B)), // 粉 — strongest
+final windBuckets = <(double threshold, Color color)>[
+  (0, Color(0xFFFFFFFF).vision), // 白 — calm
+  (3.4, Color(0xFF00FFF0).vision), // 青
+  (8.0, Color(0xFF0085FF).vision), // 藍
+  (13.9, Color(0xFF8000FF).vision), // 紫
+  (32.7, Color(0xFFFF006B).vision), // 粉 — strongest
 ];
 
 /// Bucket index for [value] (0 = calm … 4 = strongest).

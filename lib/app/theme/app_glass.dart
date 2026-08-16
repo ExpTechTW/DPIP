@@ -1,3 +1,4 @@
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:flutter/material.dart';
@@ -132,7 +133,11 @@ Color inkOverWeather(
   double reveal, {
   required bool skyIsLight,
 }) {
-  final target = skyIsLight ? const Color(0xFF121212) : Colors.white;
+  // Routed through `.vision` at the definition like every other app-owned
+  // literal. Both ink targets here are achromatic, so the correction is the
+  // identity for them today — the call is what keeps that true if the ink is
+  // ever given a tint.
+  final target = skyIsLight ? const Color(0xFF121212).vision : Colors.white;
   return Color.lerp(colors.onSurface, target, reveal)!;
 }
 
@@ -143,7 +148,7 @@ Color inkOverWeatherVariant(
   required bool skyIsLight,
 }) {
   final target = skyIsLight
-      ? const Color(0xFF5A5A5A)
+      ? const Color(0xFF5A5A5A).vision
       : Colors.white.withValues(alpha: 0.75);
   return Color.lerp(colors.onSurfaceVariant, target, reveal)!;
 }

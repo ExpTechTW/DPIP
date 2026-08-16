@@ -1,8 +1,8 @@
 /// The app's selected theme mode (light / dark / follow the system).
 library;
 
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/material.dart';
 
 /// Holds the user's chosen [ThemeMode], persisted across launches.
@@ -13,12 +13,12 @@ import 'package:flutter/material.dart';
 /// `themeMode`. Persisted as `light` / `dark` (system is stored as absence, so
 /// the default is a missing key, not a magic string).
 class ThemeController extends ChangeNotifier {
-  ThemeController(this._prefs);
+  ThemeController(this._settings);
 
-  final Prefs _prefs;
+  final SettingsStore _settings;
 
   /// The chosen theme mode, or [ThemeMode.system] when unset.
-  ThemeMode get mode => switch (_prefs.getString(PreferenceKeys.themeMode)) {
+  ThemeMode get mode => switch (_settings.getString(SettingKeys.themeMode)) {
     'light' => ThemeMode.light,
     'dark' => ThemeMode.dark,
     _ => ThemeMode.system,
@@ -27,13 +27,16 @@ class ThemeController extends ChangeNotifier {
   /// Sets the theme mode; [ThemeMode.system] clears the override (back to the OS
   /// setting).
   Future<void> setMode(ThemeMode mode) async {
+    // Re-picking the current mode must not rewrite settings or rebuild
+    // MaterialApp — same change-guard as RegionStore.select.
+    if (mode == this.mode) return;
     switch (mode) {
       case ThemeMode.system:
-        await _prefs.remove(PreferenceKeys.themeMode);
+        await _settings.remove(SettingKeys.themeMode);
       case ThemeMode.light:
-        await _prefs.setString(PreferenceKeys.themeMode, 'light');
+        await _settings.setString(SettingKeys.themeMode, 'light');
       case ThemeMode.dark:
-        await _prefs.setString(PreferenceKeys.themeMode, 'dark');
+        await _settings.setString(SettingKeys.themeMode, 'dark');
     }
     notifyListeners();
   }

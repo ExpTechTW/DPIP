@@ -7,12 +7,22 @@ library;
 import 'dart:convert';
 import 'dart:ui' show Brightness;
 
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/shared/map/town_label_points.g.dart';
 import 'package:dpip/core/network/api_paths.dart';
 
 /// One brightness's cartographic hex colours — MapLibre paint strings only.
 ///
 /// Do not invent map hexes at call sites; resolve via [MapColors.of].
+///
+/// A **value** type, deliberately: the palettes are no longer compile-time
+/// constants (their colours run through `.vision` at their definition, so they
+/// follow the colour-vision setting), which means every read builds a fresh
+/// instance. `BaseMap` memoises the interpolated style JSON on the palette, and
+/// with identity equality that cache would miss on every build and grow without
+/// bound. Equal colours are the same palette; a vision change makes a different
+/// one, and the style is rebuilt exactly once for it.
 final class MapPalette {
   const MapPalette({
     required this.background,
@@ -40,28 +50,52 @@ final class MapPalette {
 
   /// Township name halo — the outline that lifts [label] off the fill.
   final String labelHalo;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MapPalette &&
+          other.background == background &&
+          other.fill == fill &&
+          other.outline == outline &&
+          other.townOutline == townOutline &&
+          other.label == label &&
+          other.labelHalo == labelHalo;
+
+  @override
+  int get hashCode =>
+      Object.hash(background, fill, outline, townOutline, label, labelHalo);
 }
 
 /// Sole registry of base-map paint colours (light + dark).
+///
+/// Every hex below is the *standard-vision* value, routed through `.vision` at
+/// its definition so the whole cartography is recoloured with the rest of the
+/// app when a colour-vision correction is on. This is the only place the base
+/// map's colours are declared, so it is the only place the transform belongs —
+/// never in `colorFromHexRgb`/`toHexRgb`, which would double any colour that
+/// round-trips between the map and a legend. The transform is not a
+/// compile-time constant, so these are getters rather than `static const`;
+/// [MapPalette] carries value equality so the style cache still hits.
 abstract final class MapColors {
   /// Dark-mode cartography (default disaster-map look).
-  static const dark = MapPalette(
-    background: '#1f2025',
-    fill: '#3F4045',
-    outline: '#a9b4bc',
-    townOutline: '#6A6B72',
-    label: '#FFFFFF',
-    labelHalo: '#000000',
+  static MapPalette get dark => MapPalette(
+    background: '#1f2025'.vision,
+    fill: '#3F4045'.vision,
+    outline: '#a9b4bc'.vision,
+    townOutline: '#6A6B72'.vision,
+    label: '#FFFFFF'.vision,
+    labelHalo: '#000000'.vision,
   );
 
   /// Light-mode cartography — pale sea, mid-grey land.
-  static const light = MapPalette(
-    background: '#E0E0E0',
-    fill: '#ADADAD',
-    outline: '#6B6B6B',
-    townOutline: '#9A9A9A',
-    label: '#141414',
-    labelHalo: '#FFFFFF',
+  static MapPalette get light => MapPalette(
+    background: '#E0E0E0'.vision,
+    fill: '#ADADAD'.vision,
+    outline: '#6B6B6B'.vision,
+    townOutline: '#9A9A9A'.vision,
+    label: '#141414'.vision,
+    labelHalo: '#FFFFFF'.vision,
   );
 
   /// Palette for the given UI [brightness].
@@ -96,30 +130,61 @@ const String townOutlineLayerId = 'town-outline';
 const String townLabelLayerId = 'town-label';
 
 /// Id of the GeoJSON point source backing [townLabelLayerId] — one point per
-/// township at its official centroid (see [townLabelGeoJson]).
+/// township, in the middle of it (see [townLabelGeoJson]).
 const String townLabelSourceId = 'town-label-src';
 
 /// Empty GeoJSON FeatureCollection — the [exptechVectorStyle] default when no
 /// directory is supplied (tests), so the baked style always parses.
 const String emptyTownLabelData = '{"type":"FeatureCollection","features":[]}';
 
+/// The last collection built, keyed by the directory it was built from.
+///
+/// Every `BaseMap.build` asks for this, and the answer is a ~41 KB string over
+/// 368 features that only changes when the directory instance does — which is
+/// once, at bootstrap. Rebuilding it per build is pure garbage.
+TownDirectory? _labelCacheKey;
+String? _labelCacheValue;
+
 /// Builds the township-name label data — a GeoJSON FeatureCollection with one
-/// Point per township at the directory's official centroid.
+/// Point per township, placed at the point inside it furthest from any edge.
 ///
 /// Labels must NOT come from the vector tiles' `town` polygon layer: a township
 /// polygon that crosses a tile boundary is clipped into several tile pieces,
 /// each with its own centroid, so reading names off the polygons rendered the
 /// same township name more than once after a zoom changed the tile grid. A
-/// directory point is unique per township by construction, so exactly one label
-/// ever places per name.
+/// point per township is unique by construction, so exactly one label ever
+/// places per name.
+///
+/// The position comes from [townLabelPoints], not from [TownDirectory]'s
+/// `lat`/`lng`. The directory point is the administrative seat, so a label drawn
+/// there sits whereever the district office happens to be — for a mountain
+/// township, in the inhabited valley at one corner of a shape that runs tens of
+/// kilometres into the range (臺中市和平區's was 42 km from the middle). The
+/// directory point is deliberately left alone because `TownDirectory.nearest`
+/// still needs it: that is the GPS→township fallback used at sea and in
+/// boundary gaps, where the nearest *settlement* is the right answer and the
+/// geometric middle is not.
+///
+/// A township with no baked point falls back to the directory — a label
+/// slightly off is better than a name missing from the map.
 String townLabelGeoJson(TownDirectory directory) {
+  if (identical(_labelCacheKey, directory)) return _labelCacheValue!;
   final features = [
     for (final town in directory.all)
-      '{"type":"Feature",'
-          '"geometry":{"type":"Point","coordinates":[${town.lng},${town.lat}]},'
-          '"properties":{"name":${jsonEncode(town.townName)}}}',
+      if (townLabelPoints[town.code] case final point?)
+        '{"type":"Feature",'
+            '"geometry":{"type":"Point","coordinates":[${point.$2},${point.$1}]},'
+            '"properties":{"name":${jsonEncode(town.townName)}}}'
+      else
+        '{"type":"Feature",'
+            '"geometry":{"type":"Point","coordinates":[${town.lng},${town.lat}]},'
+            '"properties":{"name":${jsonEncode(town.townName)}}}',
   ];
-  return '{"type":"FeatureCollection","features":[${features.join(',')}]}';
+  final json =
+      '{"type":"FeatureCollection","features":[${features.join(',')}]}';
+  _labelCacheKey = directory;
+  _labelCacheValue = json;
+  return json;
 }
 
 /// Township labels start placing at this zoom; [townLabelFadeZoom] finishes the
@@ -156,9 +221,19 @@ const String terrainOriginTileUrl =
 const String glyphsOriginUrl =
     'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf';
 
+/// Id of the raster-dem source backing [terrainHillshadeLayerId]. Also used by
+/// [MapScaffold], which removes the source when the relief is switched off —
+/// the id must match what the baked style declares.
+const String terrainSourceId = 'terrain';
+
+/// Hillshade lighting shared by the baked style and the runtime layer
+/// [MapScaffold] adds back — one source of truth, so both can't drift.
+const double terrainIlluminationDirection = 335;
+const double terrainExaggeration = 0.3;
+
 /// Id of the hillshade layer the base style bakes when [terrainTileUrl] is
-/// given — [MapScaffold] toggles its visibility for the "terrain relief"
-/// switch, so the id must be stable across style reloads.
+/// given — [MapScaffold] adds/removes it for the "terrain relief" switch, so
+/// the id must be stable across style reloads.
 const String terrainHillshadeLayerId = 'terrain-hillshade';
 
 /// Builds the ExpTech vector base-map style as a MapLibre style JSON string.
@@ -197,13 +272,13 @@ String exptechVectorStyle(
   final terrain = terrainTileUrl == null
       ? ''
       : '''
-  ,"terrain": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
+  ,"$terrainSourceId": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
   final hillshade = terrainTileUrl == null
       ? ''
       : '''
-  ,{ "id": "$terrainHillshadeLayerId", "type": "hillshade", "source": "terrain", "paint": {
-      "hillshade-illumination-direction": 335,
-      "hillshade-exaggeration": 0.3
+  ,{ "id": "$terrainHillshadeLayerId", "type": "hillshade", "source": "$terrainSourceId", "paint": {
+      "hillshade-illumination-direction": $terrainIlluminationDirection,
+      "hillshade-exaggeration": $terrainExaggeration
     } }''';
   return '''
 {
@@ -238,18 +313,25 @@ String exptechVectorStyle(
 }
 
 /// Purple used to highlight the selected township (fill + border).
-const String selectedColor = '#7C4DFF';
+///
+/// A getter, not a `const`: `.vision` runs at the definition, so the highlight
+/// is recoloured with the rest of the map.
+String get selectedColor => '#7C4DFF'.vision;
 
 /// Bright yellow country / county borders drawn **over** satellite imagery.
 ///
 /// The hue that stays legible on true-colour satellite (which is overall
 /// dark); tune it per channel if another imagery needs it. [AdminBoundary]
 /// overlays keep their own white core — only satellite is yellow.
-const String satelliteOutlineColor = '#FFD400';
+///
+/// Transformed, unlike the imagery underneath it: this is a vector line the app
+/// draws itself, not a description of the satellite pixels, so correcting it
+/// costs nothing and keeps it distinct from the other borders on the map.
+String get satelliteOutlineColor => '#FFD400'.vision;
 
 /// Satellite township borders — dark yellow ([satelliteOutlineColor]'s
 /// secondary), the fine mesh beneath the county/country frame.
-const String satelliteTownOutlineColor = '#B79A00';
+String get satelliteTownOutlineColor => '#B79A00'.vision;
 
 /// Runtime line layer: world land / country edges (`global` source-layer).
 const String satelliteGlobalOutlineLayerId = 'satellite-global-outline';

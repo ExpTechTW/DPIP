@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<Prefs> prefs([Map<String, Object> initial = const {}]) async {
-    SharedPreferences.setMockInitialValues(initial);
-    return Prefs(await SharedPreferences.getInstance());
+  Future<SettingsStore> settings([
+    Map<String, Object> initial = const {},
+  ]) async {
+    return SettingsStore.inMemory(initial);
   }
 
   // Deterministic win — production defaults to 1-in-4.
@@ -25,7 +25,7 @@ void main() {
     var t = DateTime.utc(2024, 1, 1);
     DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs(),
+      settings: await settings(),
       now: () => t,
       uploadRoll: always,
       onMoved: (fix) async {
@@ -54,7 +54,7 @@ void main() {
     final reported = <GpsFix>[];
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs(),
+      settings: await settings(),
       uploadRoll: always,
       onMoved: (fix) async {
         reported.add(fix);
@@ -78,7 +78,7 @@ void main() {
     var t = DateTime.utc(2024, 1, 1);
     DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs(),
+      settings: await settings(),
       now: () => t,
       uploadRoll: always,
       onMoved: (fix) async {
@@ -99,14 +99,14 @@ void main() {
 
   test('skips API inside 60s using persisted stamp (silent)', () async {
     final stamped = DateTime.utc(2024, 1, 1).millisecondsSinceEpoch;
-    final p = await prefs({
-      PreferenceKeys.deviceLocationUpdatedAtMs.name: stamped,
+    final p = await settings({
+      SettingKeys.deviceLocationUpdatedAtMs.name: stamped,
     });
     final positions = StreamController<GpsFix>();
     var calls = 0;
     DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: p,
+      settings: p,
       now: () => DateTime.utc(2024, 1, 1, 0, 0, 30), // +30s
       uploadRoll: always,
       onMoved: (fix) async {
@@ -132,7 +132,7 @@ void main() {
         controllers.add(controller);
         return controller.stream;
       },
-      prefs: await prefs(),
+      settings: await settings(),
       uploadRoll: always,
       onMoved: (fix) async {
         reported.add(fix);
@@ -161,7 +161,7 @@ void main() {
     final positions = StreamController<GpsFix>();
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs(),
+      settings: await settings(),
       uploadRoll: always,
       onMoved: (fix) async => true,
     );
@@ -186,7 +186,7 @@ void main() {
     final positions = StreamController<GpsFix>();
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs(),
+      settings: await settings(),
       uploadRoll: always,
       onMoved: (fix) async => throw StateError('no token'),
     );
@@ -206,8 +206,8 @@ void main() {
     final positions = StreamController<GpsFix>();
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs({
-        PreferenceKeys.deviceLocationUpdatedAtMs.name: stamped,
+      settings: await settings({
+        SettingKeys.deviceLocationUpdatedAtMs.name: stamped,
       }),
       now: () => DateTime.utc(2024, 1, 1, 0, 0, 10),
       uploadRoll: always,
@@ -227,13 +227,13 @@ void main() {
   });
 
   test('1-in-4 miss skips API without burning the 60s stamp', () async {
-    final p = await prefs();
+    final p = await settings();
     final positions = StreamController<GpsFix>();
     var calls = 0;
     final t = DateTime.utc(2024, 1, 1);
     DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: p,
+      settings: p,
       now: () => t,
       uploadRoll: never,
       onMoved: (fix) async {
@@ -245,7 +245,7 @@ void main() {
     positions.add((lat: 25.0, lng: 121.0));
     await pumpEventQueue();
     expect(calls, 0);
-    expect(p.getInt(PreferenceKeys.deviceLocationUpdatedAtMs), isNull);
+    expect(p.getInt(SettingKeys.deviceLocationUpdatedAtMs), isNull);
     await positions.close();
   });
 
@@ -255,8 +255,8 @@ void main() {
     var rolls = 0;
     DeviceLocationReporter(
       positions: () => positions.stream,
-      prefs: await prefs({
-        PreferenceKeys.deviceLocationUpdatedAtMs.name: stamped,
+      settings: await settings({
+        SettingKeys.deviceLocationUpdatedAtMs.name: stamped,
       }),
       now: () => DateTime.utc(2024, 1, 1, 0, 0, 30),
       uploadRoll: () {

@@ -25,10 +25,30 @@ public class DeviceInfoPlugin: NSObject, FlutterPlugin {
         "osVersion": UIDevice.current.systemVersion,
         "sdkInt": NSNull(),
         "identifier": UIDevice.current.identifierForVendor?.uuidString as Any,
+        "totalMemoryMb": ProcessInfo.processInfo.physicalMemory / 1024 / 1024,
       ])
+    case "getInstallSource":
+      result(DeviceInfoPlugin.installSource())
     default:
       result(FlutterMethodNotImplemented)
     }
+  }
+
+  /// Where this build came from — which decides where an update prompt sends
+  /// the user.
+  ///
+  /// The App Store receipt's filename is the marker: TestFlight (and a debug
+  /// build run from Xcode) gets a `sandboxReceipt`, an App Store install gets
+  /// `receipt`. A DEBUG build is never a store install, so it is reported as a
+  /// sideload rather than as TestFlight, which would otherwise put every
+  /// developer on the beta channel.
+  private static func installSource() -> String {
+    #if DEBUG
+      return "sideload"
+    #else
+      guard let receipt = Bundle.main.appStoreReceiptURL else { return "sideload" }
+      return receipt.lastPathComponent == "sandboxReceipt" ? "testFlight" : "appStore"
+    #endif
   }
 
   /// The hardware identifier, e.g. `iPhone16,1`.

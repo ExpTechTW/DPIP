@@ -3,10 +3,9 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/weather/data/frame_tile_api.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// A Dio adapter that records the URLs it is asked to fetch and answers a
 /// fixed delta-encoded list, so the list endpoint a channel resolves to is
@@ -75,8 +74,7 @@ void main() {
     late RegionSelection regions;
 
     setUp(() async {
-      SharedPreferences.setMockInitialValues({});
-      regions = RegionSelection(Prefs(await SharedPreferences.getInstance()));
+      regions = RegionSelection(SettingsStore.inMemory({}));
     });
 
     test('each satellite channel hits its own list endpoint', () async {

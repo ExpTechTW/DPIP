@@ -16,9 +16,10 @@ class TremStationRepositoryImpl implements TremStationRepository {
   @override
   Future<Result<Map<String, SeismicStation>>> stations() => guardResult(
     () async {
-      final data =
-          await _client.get(ApiTier.legacyApi, '/api/v1/trem/station')
-              as Map<String, dynamic>;
+      final data = await _client.get(
+        ApiTier.legacyApi,
+        '/api/v1/trem/station',
+      ) as Map<String, dynamic>;
       final directory = <String, SeismicStation>{};
       for (final entry in data.entries) {
         // `{ id: { net, info: [ {code, lat, lon, time}… ], work } }` — the last

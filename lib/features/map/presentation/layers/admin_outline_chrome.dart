@@ -5,6 +5,7 @@ library;
 import 'dart:async';
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
@@ -125,7 +126,11 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
           await AdminOutline.remove(controller, boundary);
         } else {
           _boundariesShown.add(boundary);
-          await AdminOutline.add(controller, boundary);
+          await AdminOutline.add(
+            controller,
+            boundary,
+            belowLayerId: chromeBelowLayerId,
+          );
         }
       }
     } catch (error, stackTrace) {
@@ -135,6 +140,11 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
 
   /// The admin chrome's legend entries, following the toggles — a legend naming
   /// a line that is not on the map is worse than no legend.
+  ///
+  /// The core stroke's colour arrives already colour-vision corrected from
+  /// [AdminOutline.lineColor]'s own definition — converting it to a [Color]
+  /// here must not correct it a second time. Only the casing black, declared in
+  /// this file, is corrected here.
   List<SymbolLegendItem> adminLegendItems(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return [
@@ -144,7 +154,7 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
             color: colorFromHexRgb(AdminOutline.lineColor)!,
             width: AdminBoundary.global.lineWidth,
             opacity: AdminBoundary.global.lineOpacity,
-            casingColor: const Color(0xFF000000),
+            casingColor: const Color(0xFF000000).vision,
             casingWidth: AdminBoundary.global.casingWidth,
             casingOpacity: AdminBoundary.global.casingOpacity,
           ),
@@ -156,7 +166,7 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
             color: colorFromHexRgb(AdminOutline.lineColor)!,
             width: AdminBoundary.county.lineWidth,
             opacity: AdminBoundary.county.lineOpacity,
-            casingColor: const Color(0xFF000000),
+            casingColor: const Color(0xFF000000).vision,
             casingWidth: AdminBoundary.county.casingWidth,
             casingOpacity: AdminBoundary.county.casingOpacity,
           ),
@@ -168,7 +178,7 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
             color: colorFromHexRgb(AdminOutline.lineColor)!,
             width: AdminBoundary.town.lineWidth,
             opacity: AdminBoundary.town.lineOpacity,
-            casingColor: const Color(0xFF000000),
+            casingColor: const Color(0xFF000000).vision,
             casingWidth: AdminBoundary.town.casingWidth,
             casingOpacity: AdminBoundary.town.casingOpacity,
           ),
@@ -189,9 +199,8 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
         const SizedBox(height: AppSpacing.sm),
         Divider(
           height: 1,
-          color: Theme.of(
-            context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+          color: Theme.of(context).colorScheme.outlineVariant
+              .withValues(alpha: 0.5),
         ),
         const SizedBox(height: AppSpacing.sm),
         SymbolLegend(items: overlays),

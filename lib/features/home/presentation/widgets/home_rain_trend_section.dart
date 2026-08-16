@@ -262,7 +262,12 @@ class _NoData extends StatelessWidget {
 
 /// The trend's bar chart: one rod per minute, no mm / numeric Y labels — height
 /// alone carries intensity; the bottom axis labels minutes from now.
-class _Chart extends StatelessWidget {
+///
+/// Stateful so the chart object is only rebuilt when an input actually
+/// changes: the sheet's scroll tick rebuilds this subtree every frame, and
+/// fl_chart re-lays-out the whole 60-rod set on every build even when the data
+/// is identical.
+class _Chart extends StatefulWidget {
   const _Chart({
     required this.data,
     required this.now,
@@ -287,12 +292,19 @@ class _Chart extends StatelessWidget {
   static const double _plotBand = _chartHeight - _titleBand;
 
   /// Pixels the label occupies, so the tick can be re-centred on its axis.
+  /// Memoised — the labels are a handful of fixed strings laid out at a fixed
+  /// font size, and this ran 6× per scroll tick.
+  static final Map<String, double> _labelWidths = {};
+
   static double _textWidth(String text, TextStyle? style) {
-    final painter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    return painter.width;
+    final key = '$text|${style?.fontSize ?? 0}';
+    return _labelWidths.putIfAbsent(key, () {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      return painter.width;
+    });
   }
 
   final RainHourTrend data;
@@ -306,7 +318,32 @@ class _Chart extends StatelessWidget {
   final Color secondary;
 
   @override
-  Widget build(BuildContext context) {
+  State<_Chart> createState() => _ChartState();
+}
+
+class _ChartState extends State<_Chart> {
+  late Widget _chart = _build();
+
+  @override
+  void didUpdateWidget(covariant _Chart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data ||
+        !oldWidget.now.isAtSameMomentAs(widget.now) ||
+        oldWidget.barColor != widget.barColor ||
+        oldWidget.secondary != widget.secondary) {
+      _chart = _build();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => _chart;
+
+  Widget _build() {
+    final data = widget.data;
+    final now = widget.now;
+    final barColor = widget.barColor;
+    final secondary = widget.secondary;
+    final context = this.context;
     final l10n = AppLocalizations.of(context);
     // The chart runs from "now"; the data covers [start, start+60 m) only.
     // Minutes outside that window have no forecast — [headEnd] bars before the
@@ -322,7 +359,7 @@ class _Chart extends StatelessWidget {
     double valueAt(int i) {
       final source = i + elapsed;
       if (source < 0 || source >= data.mm.length) return 0;
-      return math.min(data.mm[source], _maxMm);
+      return math.min(data.mm[source], _Chart._maxMm);
     }
 
     // Minutes outside the forecast window carry no forecast — render their rods
@@ -346,7 +383,7 @@ class _Chart extends StatelessWidget {
         final bar = BarChart(
           BarChartData(
             minY: 0,
-            maxY: _maxMm,
+            maxY: _Chart._maxMm,
             alignment: BarChartAlignment.spaceBetween,
             groupsSpace: 0,
             barGroups: [
@@ -423,20 +460,19 @@ class _Chart extends StatelessWidget {
                   interval: 1,
                   getTitlesWidget: (value, meta) {
                     final minute = value.round();
-                    if (!_ticks.contains(minute)) {
+                    if (!_Chart._ticks.contains(minute)) {
                       return const SizedBox.shrink();
                     }
                     final label = minute == 0
                         ? l10n.mapTimelineNow
                         : l10n.homeRainTrendMinute(minute);
-                    final style = Theme.of(
-                      context,
-                    ).textTheme.labelSmall?.copyWith(color: secondary);
+                    final style = Theme.of(context).textTheme.labelSmall
+                        ?.copyWith(color: secondary);
                     // fl_chart centres every title widget on its tick's axis
                     // position, so a bare [tick, label] row would push the tick
                     // left of the bar (X=0's lands off the chart). Mirroring the
                     // label width on the left re-centres the tick on the axis.
-                    final labelWidth = _textWidth(label, style);
+                    final labelWidth = _Chart._textWidth(label, style);
                     return Padding(
                       padding: EdgeInsets.only(
                         left: labelWidth + AppSpacing.xs,
@@ -478,7 +514,7 @@ class _Chart extends StatelessWidget {
                 left: 0,
                 top: 0,
                 width: headX,
-                height: _plotBand,
+                height: _Chart._plotBand,
                 child: _NoDataLabel(
                   color: secondary,
                   text: l10n.homeRainTrendNoData,
@@ -489,7 +525,7 @@ class _Chart extends StatelessWidget {
                 left: tailX,
                 top: 0,
                 right: 0,
-                height: _plotBand,
+                height: _Chart._plotBand,
                 child: _NoDataLabel(
                   color: secondary,
                   text: l10n.homeRainTrendNoData,
@@ -500,7 +536,7 @@ class _Chart extends StatelessWidget {
       },
     );
 
-    return SizedBox(height: _chartHeight, child: chart);
+    return SizedBox(height: _Chart._chartHeight, child: chart);
   }
 }
 

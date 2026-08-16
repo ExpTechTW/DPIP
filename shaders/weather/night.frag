@@ -2,17 +2,20 @@
 // engine's the reference shader (stars) and the look of
 // The reference shader (band).
 //
-// Stars follow the reference's `drawStars` closely: the sky is diced into `numCells`
-// cells, each holding one star at a hashed offset, drawn as a smoothstep of
-// the distance to that centre. Three passes at 4/8/16 cells give bright,
-// medium and faint stars. The bright pass also gets the reference's glow stack — a
-// wide halo, a four-point diffraction cross built from the angle modulo 90°,
-// and a tight core — gated by a slow per-star twinkle so only a few sparkle
-// at once instead of the whole field shimmering.
+// The star field itself is pre-baked into a tiling RGBA texture
+// ([night_field.frag]: R = bright-core stars, G = bright glow, B = medium
+// stars, A = faint stars) and sampled here — the CPU-side bake runs once per
+// sky size, not per frame. What stays per-frame:
 //
-// The reference samples a starmap texture for the galaxy; this draws the band
-// procedurally: a rotated, softly-bounded strip filled with fbm dust and
-// scattered faint stars, which needs no 4K texture upload.
+//   * the per-star shimmer (`star *= 1.2 + sin(…)·0.6`) — recomputed per cell
+//     from the same hashes the bake used, so every star keeps its own phase;
+//   * the glow's twinkle gate (`glow *= 0.5 + sin(…)·0.5`) — ditto, bright
+//     cells only;
+//   * the slow drift (`coord += iTime·0.004`).
+//
+// The hash grid repeats every 4 cells (`hash22(mod(cellID, numCells))`), and
+// the texture tiles via `fract(coord / 4.0)` on the same cycle — sampling is
+// exactly equivalent to the original per-pixel field, not an approximation.
 //
 // There is no moon: the reference's scene has no moon layer at all, and the one this
 // file used to draw was invented.
@@ -25,6 +28,7 @@
 //   iScroll      (9)     parallax offset in pixels
 //   iCloudCover  (10)    0..1 cloud cover, dims the field
 //   iGalaxy      (11)    Milky Way strength 0..1
+//   sampler 0            iStarField — the baked RGBA star texture
 #include <flutter/runtime_effect.glsl>
 
 precision highp float;
@@ -36,6 +40,8 @@ uniform float iAlpha;
 uniform float iScroll;
 uniform float iCloudCover;
 uniform float iGalaxy;
+
+uniform sampler2D iStarField;
 
 out vec4 fragColor;
 
@@ -76,54 +82,29 @@ float fbm(vec2 p) {
   return v;
 }
 
-/// One star field pass. [numCells] sets density, [size] the radius, [br] the
-/// brightness; [showGlow] adds the halo and diffraction spikes.
-float drawStars(vec2 coord, float numCells, float size, float br,
-                bool showGlow) {
-  vec2 bigCoord = coord * numCells;
-  vec2 cellID = floor(bigCoord);
+/// The bright pass's star centre in cell [cell] — the same hash the bake used,
+/// so per-star shimmer/twinkle phases line up with the sampled field.
+vec2 starCenter(vec2 cell, float numCells, bool glow) {
+  vec2 rnd = hash22(mod(cell, numCells));
+  vec2 offset = rnd * 0.7 + rnd.x * 0.3;
+  return cell + (glow ? mix(vec2(0.1), vec2(0.9), offset)
+                      : mix(vec2(0.01), vec2(0.99), offset));
+}
 
-  vec2 rnd = hash22(mod(cellID, numCells));
-  vec2 centerOffset = rnd * 0.7 + rnd.x * 0.3;
-  // Keep glowing stars away from the cell edge so their halo is not clipped.
-  vec2 center = cellID + (showGlow ? mix(vec2(0.1), vec2(0.9), centerOffset)
-                                   : mix(vec2(0.01), vec2(0.99), centerOffset));
+/// The `star *= 1.2 + sin(…)·0.6` shimmer for the star in [cell].
+float shimmer(vec2 cell, float numCells) {
+  vec2 center = starCenter(cell, numCells, false);
+  return 1.2 + sin(center.y * 10.0 + center.x * 71.9 + iTime * 2.0) * 0.6;
+}
 
-  vec2 offset = (bigCoord - center) / (numCells * size);
-  float d = dot(offset, offset);
-  if (d > 0.16 || (!showGlow && d > 0.0025)) return 0.0;
-
-  float sqrtd = 1.0 - sqrt(d);
-  float star = br * smoothstep(0.95, 1.0, sqrtd);
-  // Base shimmer, always on and subtle.
-  star *= 1.2 + sin(center.y * 10.0 + center.x * 71.9 + iTime * 2.0) * 0.6;
-
-  if (!showGlow) return star;
-
-  // Wide halo.
-  float glow = pow(clamp(br * smoothstep(0.6, 1.0, sqrtd), 0.0, 2.0), 3.5) *
-               0.016666667;
-
-  // Four-point diffraction cross: the spike is longest at ±45°/±135°.
-  float angle = atan(offset.y, offset.x) + PI * 0.25;
-  float angleOffset = abs(mod(angle, PI * 0.5) - PI * 0.25);
-  float len = mix(0.76, 0.88, sqrt(angleOffset) / (PI * 0.25));
-  glow += smoothstep(len + 0.05, 1.1, sqrtd) * 0.5;
-
-  // Tight core.
-  if (sqrtd > 0.895) {
-    float core = clamp(br * smoothstep(0.895, 1.0, sqrtd), 0.0, 2.0);
-    glow += core * core * 0.33333333;
-  }
-
-  // Twinkle gate: mostly dark, with a brief sine pulse every interval.
+/// The bright pass's twinkle gate (`glow *= 0.5 + sin(…)·0.5`) for [cell].
+float twinkle(vec2 cell) {
+  vec2 center = starCenter(cell, 4.0, true);
   float t = center.y * 721.3 + center.x * 37.1 + iTime * 2.0;
   float phase = mod(t, (2.0 + kTwinkleInterval) * PI) <= TWO_PI
       ? mod(t, TWO_PI)
       : TWO_PI;
-  glow *= 0.5 + sin(phase - PI * 0.5) * 0.5;
-
-  return star + glow;
+  return 0.5 + sin(phase - PI * 0.5) * 0.5;
 }
 
 void main() {
@@ -160,17 +141,24 @@ void main() {
     float density = band * mix(0.35, 1.0, dust) * (1.0 - 0.65 * dark);
 
     col += iGalaxyTint * density * 0.22 * galaxy * horizonFade;
-    // Unresolved stars inside the band.
-    col += vec3(1.0) * drawStars(coord * 1.3, 26.0, 0.02, 0.35, false) *
-           band * galaxy * horizonFade;
   }
 
-  // --- star field --------------------------------------------------------
-  col += vec3(0.74, 0.74, 0.74) * drawStars(coord, 4.0, 0.08, 2.0, true) *
+  // --- star field (sampled, per-cell animation) --------------------------
+  // The baked texture holds bright-cell world [0,4]; the field repeats on the
+  // same 4-cell cycle, so `fract` wraps exactly.
+  vec4 field = texture(iStarField, fract(coord / 4.0));
+
+  vec2 cell4 = floor(coord / 4.0);
+  vec2 cell8 = floor(coord / 8.0);
+  vec2 cell16 = floor(coord / 16.0);
+
+  // Bright pass: the glow rides the twinkle gate, the core star the shimmer.
+  col += vec3(0.74, 0.74, 0.74) *
+         (field.r * shimmer(cell4, 4.0) + field.g * twinkle(cell4)) *
          horizonFade;
-  col += vec3(0.97, 0.85, 0.80) * drawStars(coord, 8.0, 0.05, 1.0, false) *
+  col += vec3(0.97, 0.85, 0.80) * field.b * shimmer(cell8, 8.0) *
          horizonFade;
-  col += vec3(0.85, 0.90, 1.00) * drawStars(coord, 16.0, 0.025, 0.5, false) *
+  col += vec3(0.85, 0.90, 1.00) * field.a * shimmer(cell16, 16.0) *
          horizonFade;
 
   col *= alpha;

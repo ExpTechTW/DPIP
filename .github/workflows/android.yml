@@ -1,8 +1,9 @@
 name: Build Android
 
+# Pull requests only. A push to `main` is handled by release-internal.yml,
+# which builds the signed, uploadable artifact — running this as well would
+# spend a second runner producing an unsigned one nobody installs.
 on:
-  push:
-    branches: ["main"]
   pull_request:
     branches: ["main"]
 
@@ -101,7 +102,7 @@ jobs:
           EOF
 
       - name: Build Release APK
-        run: flutter build apk --release --target-platform android-arm64,android-x64
+        run: flutter build apk --release
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4

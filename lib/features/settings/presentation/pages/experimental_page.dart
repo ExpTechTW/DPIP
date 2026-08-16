@@ -52,16 +52,18 @@ class ExperimentalPage extends StatelessWidget {
     );
   }
 
+  // The same glyphs the weather surfaces use, so the mode picker previews
+  // what it will actually draw.
   IconData _iconFor(WeatherMode mode) => switch (mode) {
     WeatherMode.auto => Icons.auto_mode,
-    WeatherMode.clear => Icons.wb_sunny_outlined,
-    WeatherMode.cloudy => Icons.filter_drama_outlined,
-    WeatherMode.overcast => Icons.cloud_outlined,
+    WeatherMode.clear => clearDay,
+    WeatherMode.cloudy => partlyCloudyDay,
+    WeatherMode.overcast => cloudy,
     WeatherMode.rain => rainy,
-    WeatherMode.snow => Icons.ac_unit_outlined,
-    WeatherMode.sand => Icons.blur_on_outlined,
-    WeatherMode.fog => Icons.foggy,
-    WeatherMode.thunderstorm => Icons.thunderstorm_outlined,
+    WeatherMode.snow => snowing,
+    WeatherMode.sand => air,
+    WeatherMode.fog => foggy,
+    WeatherMode.thunderstorm => thunderstorm,
   };
 
   String _labelFor(WeatherMode mode, AppLocalizations l10n) => switch (mode) {

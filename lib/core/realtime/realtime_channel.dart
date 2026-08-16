@@ -19,7 +19,16 @@ abstract interface class RealtimeChannelBase {
 
   /// Stops polling, discards any in-flight fetch, and keeps the last state
   /// (e.g. app backgrounded).
-  void pause();
+  ///
+  /// [releaseTransport] additionally drops whatever connection the source is
+  /// holding open. It is **off** by default because pausing is not only for a
+  /// real background: a notification-shade pull, the app switcher, an incoming
+  /// call, and every permission dialog all report `inactive`, and tearing a
+  /// socket down for those would reconnect constantly — costing far more than
+  /// the poll it saves, and flapping a safety-critical feed's freshness through
+  /// `offline` each time. Only a genuine background (`paused`/`hidden`) passes
+  /// this.
+  void pause({bool releaseTransport = false});
 
   /// Resumes polling: recomputes status immediately, then refetches.
   void resume();
@@ -120,18 +129,23 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
   }
 
   @override
-  void pause() {
+  void pause({bool releaseTransport = false}) {
     _epoch++; // invalidate any in-flight fetch
     _fetching = false;
     _inFlight = null;
     _tickerHandle?.cancel();
     _tickerHandle = null;
+    // Stopping the ticker is enough to idle a poll source, but not one holding
+    // a connection open — that keeps costing radio and packets with no reader.
+    // Only on a real background, though: see [RealtimeChannelBase.pause].
+    if (releaseTransport) _source.pause();
   }
 
   @override
   void resume() {
     if (_disposed) return;
     _startMark = _elapsed.elapsed;
+    _source.resume(); // before the refetch below, which is what re-opens it
     _recompute(); // flip an aged snapshot to stale/offline before refetching
     _tickerHandle ??= _ticker.start(_config.pollInterval, _onTick);
     unawaited(_fetch());

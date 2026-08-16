@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
-import 'package:dpip/core/settings/preference_keys.dart';
-import 'package:dpip/core/settings/prefs.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
 /// Reports the device location to the backend when it **moves a threshold
 /// distance** — not when the user switches the Home region.
@@ -16,7 +16,7 @@ import 'package:dpip/core/settings/prefs.dart';
 /// skipped, and a report failure is logged, never thrown.
 ///
 /// Upload gates (in order):
-/// 1. **60s throttle** — keyed by [PreferenceKeys.deviceLocationUpdatedAtMs].
+/// 1. **60s throttle** — keyed by [SettingKeys.deviceLocationUpdatedAtMs].
 ///    Inside the window: still publish [fixes], skip API silently.
 /// 2. **1-in-4 lottery** — after the throttle clears; a miss skips without
 ///    burning the stamp so a later move can try again.
@@ -35,7 +35,7 @@ class DeviceLocationReporter {
   DeviceLocationReporter({
     required this._positions,
     required this._onMoved,
-    required this._prefs,
+    required this._settings,
     this.minUploadInterval = const Duration(seconds: 60),
     DateTime Function()? now,
     bool Function()? uploadRoll,
@@ -44,7 +44,7 @@ class DeviceLocationReporter {
 
   final Stream<GpsFix> Function() _positions;
   final Future<bool> Function(GpsFix fix) _onMoved;
-  final Prefs _prefs;
+  final SettingsStore _settings;
   final DateTime Function() _now;
   final bool Function() _uploadRoll;
 
@@ -106,8 +106,18 @@ class DeviceLocationReporter {
     if (!_fixes.isClosed) _fixes.add(fix);
 
     final nowMs = _now().toUtc().millisecondsSinceEpoch;
-    final lastMs = _prefs.getInt(PreferenceKeys.deviceLocationUpdatedAtMs);
-    if (lastMs != null && nowMs - lastMs < minUploadInterval.inMilliseconds) {
+    final lastMs = _settings.getInt(SettingKeys.deviceLocationUpdatedAtMs);
+    // `nowMs - lastMs >= 0` is not redundant: the stored stamp survives a
+    // clock change, so a device set back (or a first SNTP sync that pulls the
+    // clock back) leaves a stamp in the future. The throttle would then hold
+    // for the whole offset — hours of a moving user reporting nothing — and
+    // it would never expire on its own, because the comparison only gets more
+    // negative as real time passes. A future stamp means the window is not
+    // measurable, so it does not apply.
+    final since = lastMs == null ? null : nowMs - lastMs;
+    if (since != null &&
+        since >= 0 &&
+        since < minUploadInterval.inMilliseconds) {
       return; // silent — no API, no log
     }
     if (!_uploadRoll()) return; // 1-in-4 miss — no stamp
@@ -115,11 +125,11 @@ class DeviceLocationReporter {
     try {
       final attempted = await _onMoved(fix);
       if (attempted) {
-        await _prefs.setInt(PreferenceKeys.deviceLocationUpdatedAtMs, nowMs);
+        await _settings.setInt(SettingKeys.deviceLocationUpdatedAtMs, nowMs);
       }
     } catch (error, stackTrace) {
       // Cool down after hard failures (incl. HTTP 429) so we don't retry-storm.
-      await _prefs.setInt(PreferenceKeys.deviceLocationUpdatedAtMs, nowMs);
+      await _settings.setInt(SettingKeys.deviceLocationUpdatedAtMs, nowMs);
       Log.handle(error, stackTrace, 'updateDeviceLocation');
     }
   }

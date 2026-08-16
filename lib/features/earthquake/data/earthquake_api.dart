@@ -133,11 +133,10 @@ class EarthquakeApi {
       'cityMaxInt': ?cityMaxInt,
     };
     return (await _client.get(
-          ApiTier.coreApi,
-          '/api/v2/eq/report',
-          query: query,
-        ))
-        as List<dynamic>;
+      ApiTier.coreApi,
+      '/api/v2/eq/report',
+      query: query,
+    )) as List<dynamic>;
   }
 
   /// Full earthquake report by [reportId] (includes area `list`).

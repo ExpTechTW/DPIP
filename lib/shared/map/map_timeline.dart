@@ -1,5 +1,7 @@
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/a11y/color_vision.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,8 @@ class MapTimeline extends StatefulWidget {
     this.caption,
     this.framePeriod,
     this.dataTime,
+    this.timeFormat,
+    this.itemExtent = _defaultSlotWidth,
   });
 
   /// Frames in chronological order (oldest first); must be non-empty.
@@ -45,6 +49,18 @@ class MapTimeline extends StatefulWidget {
   /// What the frame times are, shown above the date — "observed" by default,
   /// "forecast" for a forecast layer.
   final String? caption;
+
+  /// Tick / big-label time format — defaults to HH:mm. A daily timeline (e.g.
+  /// lunar phases) passes `M/d` so the ruler reads dates instead of a clock.
+  final DateFormat? timeFormat;
+
+  /// Slot width per frame — the scroll offset that centres frame `i` is
+  /// `i * itemExtent` (the leading/trailing pads are symmetric). Radar frames
+  /// sit 14 px apart; a daily timeline needs a wider slot to stay draggable.
+  final double itemExtent;
+
+  /// Default frame slot width.
+  static const double _defaultSlotWidth = 14;
 
   /// How long one frame's data represents, when it is a period rather than a
   /// point. A next-hour forecast's frame at 21:00 covers 21:00–22:00, so the
@@ -68,9 +84,6 @@ class _MapTimelineState extends State<MapTimeline> {
   // The data-time line: the model run's issue time, `8/11 14:00`.
   static final DateFormat _data = DateFormat('M/d HH:mm');
 
-  /// Slot width per frame — the scroll offset that centres frame `i` is
-  /// `i * _slotWidth` (the leading/trailing pads are symmetric).
-  static const double _slotWidth = 14;
   static const double _rulerHeight = 48;
 
   /// Formatted labels per frame, built once per frame set.
@@ -83,7 +96,8 @@ class _MapTimelineState extends State<MapTimeline> {
   List<String> _dates = const [];
 
   void _cacheLabels() {
-    _times = [for (final frame in widget.frames) _time.format(frame.time)];
+    final format = widget.timeFormat ?? _time;
+    _times = [for (final frame in widget.frames) format.format(frame.time)];
     _dates = [for (final frame in widget.frames) _date.format(frame.time)];
   }
 
@@ -105,9 +119,9 @@ class _MapTimelineState extends State<MapTimeline> {
   }
 
   /// Seeded so the first paint already sits on the selected frame (no flash),
-  /// since `i * _slotWidth` centres frame `i`.
+  /// since `i * itemExtent` centres frame `i`.
   late final ScrollController _scroll = ScrollController(
-    initialScrollOffset: widget.selectedIndex * _slotWidth,
+    initialScrollOffset: widget.selectedIndex * widget.itemExtent,
   );
 
   /// The frame under the scrubber right now — follows the live scroll so the
@@ -143,12 +157,14 @@ class _MapTimelineState extends State<MapTimeline> {
     super.dispose();
   }
 
-  int get _centredIndex =>
-      (_scroll.offset / _slotWidth).round().clamp(0, widget.frames.length - 1);
+  int get _centredIndex => (_scroll.offset / widget.itemExtent).round().clamp(
+    0,
+    widget.frames.length - 1,
+  );
 
   void _centreOn(int index, {required bool animate}) {
     if (!_scroll.hasClients) return;
-    final target = (index * _slotWidth).clamp(
+    final target = (index * widget.itemExtent).clamp(
       0.0,
       _scroll.position.maxScrollExtent,
     );
@@ -196,11 +212,13 @@ class _MapTimelineState extends State<MapTimeline> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    // Asked of the clock rather than of the list, so a forecast's "現在" lands
-    // on the present rather than on its furthest step.
-    final nowIndex = nowFrameIndex(widget.frames);
+    // Asked of the calibrated clock rather than of the list, so a forecast's
+    // "現在" lands on the present rather than on its furthest step — and the
+    // clock resyncs on foreground, so returning from the background moves the
+    // marker to the real now instead of the device clock's guess.
+    final nowIndex = nowFrameIndex(widget.frames, now: AppTime.utc);
     final era = _eraOf(_liveIndex, nowIndex);
-    final labelStep = (48 / _slotWidth).ceil();
+    final labelStep = (48 / widget.itemExtent).ceil();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -278,10 +296,10 @@ class _MapTimelineState extends State<MapTimeline> {
             children: [
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final pad = (constraints.maxWidth - _slotWidth) / 2;
+                  final pad = (constraints.maxWidth - widget.itemExtent) / 2;
                   // ListView.builder (not a Row) so a week of frames only ever
                   // builds the ~dozens of ticks on screen. itemExtent keeps the
-                  // centring math: offset `i * _slotWidth` centres frame `i`.
+                  // centring math: offset `i * itemExtent` centres frame `i`.
                   return NotificationListener<ScrollNotification>(
                     onNotification: _onScroll,
                     child: ListView.builder(
@@ -289,10 +307,10 @@ class _MapTimelineState extends State<MapTimeline> {
                       scrollDirection: Axis.horizontal,
                       physics: const _ScrubPhysics(),
                       padding: EdgeInsets.symmetric(horizontal: pad),
-                      itemExtent: _slotWidth,
+                      itemExtent: widget.itemExtent,
                       itemCount: widget.frames.length,
                       itemBuilder: (context, i) => _Tick(
-                        width: _slotWidth,
+                        width: widget.itemExtent,
                         label: i % labelStep == 0 ? _times[i] : null,
                         labelColor: _eraColor(
                           _eraOf(i, nowIndex),
@@ -340,12 +358,16 @@ TimelineEra _eraOf(int index, int nowIndex) =>
 /// The hues are fixed (not theme roles) because they are the semantics: 歷史
 /// blue, 現在 green, 未來 purple — a dark surface gets the lighter shade of the
 /// same hue, a light surface the deeper one.
-const Color _pastLight = Color(0xFF1565C0);
-const Color _pastDark = Color(0xFF64B5F6);
-const Color _nowLight = Color(0xFF2E7D32);
-const Color _nowDark = Color(0xFF81C784);
-const Color _futureLight = Color(0xFF7B1FA2);
-const Color _futureDark = Color(0xFFBA68C8);
+///
+/// Blue/green/purple is exactly the triple a deficient eye flattens, so each
+/// literal is routed through `.vision` at its definition. That transform is not
+/// a compile-time constant, hence getters rather than `const`.
+Color get _pastLight => const Color(0xFF1565C0).vision;
+Color get _pastDark => const Color(0xFF64B5F6).vision;
+Color get _nowLight => const Color(0xFF2E7D32).vision;
+Color get _nowDark => const Color(0xFF81C784).vision;
+Color get _futureLight => const Color(0xFF7B1FA2).vision;
+Color get _futureDark => const Color(0xFFBA68C8).vision;
 
 Color _eraColor(TimelineEra era, Brightness brightness) => switch (era) {
   TimelineEra.past => brightness == Brightness.dark ? _pastDark : _pastLight,

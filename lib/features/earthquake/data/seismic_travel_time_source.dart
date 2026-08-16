@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -17,20 +18,25 @@ class SeismicTravelTimeSource {
 
   Future<SeismicTravelTimeTable> load() async {
     final bytes = await rootBundle.load('assets/travel_time.json.gz');
-    final json =
-        jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))
-            as Map<String, dynamic>;
-    final rowsByDepth = <int, List<TravelTimeRow>>{
-      for (final entry in json.entries)
-        int.parse(entry.key): [
-          for (final row in entry.value as List)
-            (
-              p: ((row as Map)['P'] as num).toDouble(),
-              r: (row['R'] as num).toDouble(),
-              s: (row['S'] as num).toDouble(),
-            ),
-        ],
-    };
+    // gzip, JSON decode *and* the row build all off the UI isolate: this is a
+    // 213 KB asset (833 KB inflated, 25,016 rows) and it loads at bootstrap,
+    // so the assembly would land in the first-frame window.
+    final rowsByDepth = await Isolate.run(() {
+      final json = jsonDecode(
+        utf8.decode(gzip.decode(bytes.buffer.asUint8List())),
+      ) as Map<String, dynamic>;
+      return <int, List<TravelTimeRow>>{
+        for (final entry in json.entries)
+          int.parse(entry.key): [
+            for (final row in entry.value as List)
+              (
+                p: ((row as Map)['P'] as num).toDouble(),
+                r: (row['R'] as num).toDouble(),
+                s: (row['S'] as num).toDouble(),
+              ),
+          ],
+      };
+    });
     return SeismicTravelTimeTable(rowsByDepth);
   }
 }

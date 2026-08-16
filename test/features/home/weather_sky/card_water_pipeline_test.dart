@@ -101,15 +101,15 @@ void main() {
     );
 
     // rawRgba is premultiplied — the stored channel values, no division.
-    final outPx = (await image.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    ))!.buffer.asUint8List();
-    final posPx = (await pos.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    ))!.buffer.asUint8List();
-    final negPx = (await neg.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    ))!.buffer.asUint8List();
+    final outPx = (await image.toByteData(format: ui.ImageByteFormat.rawRgba))!
+        .buffer
+        .asUint8List();
+    final posPx = (await pos.toByteData(format: ui.ImageByteFormat.rawRgba))!
+        .buffer
+        .asUint8List();
+    final negPx = (await neg.toByteData(format: ui.ImageByteFormat.rawRgba))!
+        .buffer
+        .asUint8List();
 
     // Float reference — the reference shader's rain branch with the self-aliased
     // ambient, evaluated at texel centres where the shader's bilinear
@@ -238,12 +238,12 @@ void main() {
         kernel: kernel,
         normalMap: normalMap,
       );
-      final posPx = (await pos.toByteData(
-        format: ui.ImageByteFormat.rawRgba,
-      ))!.buffer.asUint8List();
-      final negPx = (await neg.toByteData(
-        format: ui.ImageByteFormat.rawRgba,
-      ))!.buffer.asUint8List();
+      final posPx = (await pos.toByteData(format: ui.ImageByteFormat.rawRgba))!
+          .buffer
+          .asUint8List();
+      final negPx = (await neg.toByteData(format: ui.ImageByteFormat.rawRgba))!
+          .buffer
+          .asUint8List();
       int at(Uint8List px, int x, int y, int c) => px[(y * 64 + x) * 4 + c];
 
       const c = 32;

@@ -5,8 +5,7 @@ library;
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dpip/core/settings/prefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,8 +13,7 @@ void main() {
   Future<LocaleController> controller([
     Map<String, Object> initial = const {},
   ]) async {
-    SharedPreferences.setMockInitialValues(initial);
-    return LocaleController(Prefs(await SharedPreferences.getInstance()));
+    return LocaleController(SettingsStore.inMemory(initial));
   }
 
   test('defaults to null (follow system) when nothing is stored', () async {

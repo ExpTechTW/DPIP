@@ -4,6 +4,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -19,6 +20,8 @@ import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart'
+    show VisibleTab, VisibleTabScope;
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,24 @@ import 'package:provider/provider.dart';
 /// Basemap XYZ origin — warmed from the app's tile store into MapLibre's tile
 /// memory on camera idle. LB has no ETag; the store keys these by URL hash.
 const String _basemapTileUrl = basemapOriginTileUrl;
+
+/// The runtime DEM source — identical to what the baked style declares (see
+/// [exptechVectorStyle]), so [MapScaffold] can rebuild the relief after
+/// removing it, with no drift between the two descriptions.
+const RasterDemSourceProperties _terrainSourceProps = RasterDemSourceProperties(
+  tiles: [terrainOriginTileUrl],
+  bounds: [110.0, 10.0, 132.0, 35.0],
+  minzoom: 0,
+  maxzoom: 12,
+  tileSize: 512,
+  encoding: 'mapbox',
+);
+
+/// The runtime hillshade layer — same id, same paint as the baked style.
+const HillshadeLayerProperties _terrainLayerProps = HillshadeLayerProperties(
+  hillshadeIlluminationDirection: terrainIlluminationDirection,
+  hillshadeExaggeration: terrainExaggeration,
+);
 
 /// The reusable map surface — a base map with a switchable, time-scrubbable
 /// overlay layer.
@@ -41,8 +62,12 @@ const String _basemapTileUrl = basemapOriginTileUrl;
 /// calls never overlap, and a generation counter drops results from a superseded
 /// layer load so a slow fetch can't render onto the wrong layer.
 class MapScaffold extends StatefulWidget {
-  const MapScaffold({super.key, required this.layers, this.initialLayerId})
-    : assert(layers.length > 0, 'MapScaffold needs at least one layer');
+  const MapScaffold({
+    super.key,
+    required this.layers,
+    this.initialLayerId,
+    this.tabIndex,
+  }) : assert(layers.length > 0, 'MapScaffold needs at least one layer');
 
   /// The layers this surface offers; [initialLayerId] (or the first entry) is
   /// shown initially.
@@ -52,13 +77,21 @@ class MapScaffold extends StatefulWidget {
   /// missing → [layers].first.
   final String? initialLayerId;
 
+  /// Shell tab owning this surface — forwarded to [BaseMap] so the map pauses
+  /// its native render loop while the tab is hidden. `null` never pauses.
+  final int? tabIndex;
+
   @override
   State<MapScaffold> createState() => _MapScaffoldState();
 }
 
-class _MapScaffoldState extends State<MapScaffold> {
+class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
+
+  /// The shell's visible-tab notifier — same contract as [BaseMap]: null
+  /// (full-screen routes, previews) means always visible.
+  VisibleTab? _visibleTab;
 
   /// Whether the initial framing has run. Only on first load — a reload (theme
   /// change) keeps whatever the user has panned/zoomed to.
@@ -94,7 +127,10 @@ class _MapScaffoldState extends State<MapScaffold> {
   Future<void> _mapOps = Future<void>.value();
 
   /// Bumped on camera idle so screen-space [MapLayer.buildMapOverlay] reprojects.
-  int _cameraEpoch = 0;
+  /// A [ValueNotifier], not a `setState` bump: only the overlay subtree (which
+  /// keys off it) rebuilds, instead of the whole scaffold — every pan/zoom
+  /// settle used to rebuild the platform view, chrome and legend too.
+  final ValueNotifier<int> _cameraEpoch = ValueNotifier(0);
 
   /// Basemap tile warm-up. Its own warmer so a layer's cancel can't abort it.
   MapTileWarmer? _basemapWarmer;
@@ -128,6 +164,13 @@ class _MapScaffoldState extends State<MapScaffold> {
   /// the relief is the terrain feature's whole point.
   final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
 
+  /// Whether the terrain source + hillshade layer are actually on the map.
+  ///
+  /// This mirrors the native state so the toggle can add/remove instead of
+  /// flipping visibility (see [_syncTerrain]). A style reload re-bakes both,
+  /// so [_onStyleLoaded] sets it back to true and re-syncs.
+  bool _terrainOnMap = false;
+
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
   LatLngBounds? _target;
@@ -145,6 +188,12 @@ class _MapScaffoldState extends State<MapScaffold> {
   bool _reframeOnMeasure = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final handoff = context.read<MapCameraHandoff>();
@@ -157,17 +206,90 @@ class _MapScaffoldState extends State<MapScaffold> {
       _stationHandoff?.removeListener(_onStationHandoff);
       _stationHandoff = station..addListener(_onStationHandoff);
     }
+    final visibleTab = VisibleTabScope.of(context);
+    if (identical(visibleTab, _visibleTab)) return;
+    _visibleTab?.removeListener(_onTabChanged);
+    _visibleTab = visibleTab;
+    visibleTab?.addListener(_onTabChanged);
+    _wasVisible = _isVisible;
   }
+
+  /// Whether this surface is on screen — its branch selected and nothing pushed
+  /// over the shell. A null tab (full-screen routes, previews) belongs to no
+  /// branch, so only the shell test applies. Same contract as [BaseMap].
+  bool get _isVisible =>
+      _appForeground && (_visibleTab?.isOnScreen(widget.tabIndex) ?? true);
+
+  /// Whether the app itself is in the foreground — the same definition
+  /// [BaseMap] uses (`inactive` still counts as foreground, so a
+  /// notification-shade pull does not flap the layers).
+  bool _appForeground = true;
+
+  /// [_isVisible] as of the last notification, so [_onTabChanged] can fire on
+  /// the hidden → visible **edge** rather than on every notification where the
+  /// map happens to be visible.
+  ///
+  /// The notifier reports two independent things (which branch is selected, and
+  /// whether a page covers the shell), so without this a page pushed *over* the
+  /// map would deliver a notification while the map is still the selected
+  /// branch — and re-fetch the whole timeline for the act of opening settings,
+  /// then again on the way back.
+  bool _wasVisible = true;
 
   @override
   void dispose() {
+    _visibleTab?.removeListener(_onTabChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _bearing.dispose();
+    _cameraEpoch.dispose();
     _showTownLabels.dispose();
     _showTerrain.dispose();
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
     super.dispose();
+  }
+
+  /// The timeline's "now" and its frames went stale while this surface was
+  /// off-screen — the app backgrounded, or the user sat on another tab.
+  ///
+  /// Re-fetch and re-centre on the present, but only when this map can be
+  /// seen: the IndexedStack keeps hidden tabs mounted, and a hidden map has
+  /// no timeline to update. Non-timeline layers are skipped entirely — their
+  /// data sources (RTS, the mesh node store) refresh themselves, and a bare
+  /// re-render would only flash the map.
+  void _onTabChanged() {
+    final visible = _isVisible;
+    final changed = visible != _wasVisible;
+    final returned = visible && !_wasVisible;
+    _wasVisible = visible;
+    // Both edges, before the timeline reload: a realtime layer skips its
+    // platform uploads while hidden and flushes once on return.
+    if (changed) _active.onSurfaceVisibility(visible);
+    if (!returned) return;
+    if (_active.usesTimeline) unawaited(_loadActive());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = switch (state) {
+      AppLifecycleState.paused ||
+      AppLifecycleState.hidden ||
+      AppLifecycleState.detached => false,
+      AppLifecycleState.resumed || AppLifecycleState.inactive => true,
+    };
+    if (foreground != _appForeground) {
+      _appForeground = foreground;
+      // Backgrounding is the same edge as leaving the tab: realtime layers
+      // stop their platform uploads (and their repaint tickers) while nobody
+      // can see the map, and flush once on the way back.
+      _onTabChanged();
+    }
+    if (state != AppLifecycleState.resumed || !_isVisible) return;
+    // Coming back from the background is the same event as re-entering the
+    // tab: what is on screen has been sitting there unattended. A radar frame
+    // every 10 minutes means a half-hour away is three frames missed.
+    if (_active.usesTimeline) unawaited(_loadActive());
   }
 
   /// A framing request arrived (map re-opened from Home / the nav bar) — apply it
@@ -370,24 +492,60 @@ class _MapScaffoldState extends State<MapScaffold> {
   void _setShowTerrain(bool value) {
     if (_showTerrain.value == value) return;
     _showTerrain.value = value;
-    _applyTerrainVisibility();
+    _syncTerrain();
   }
 
-  /// Pushes the terrain-relief setting onto a live map. Like the township
-  /// labels, the base style's hillshade layer survives style reloads (which
-  /// reset it to visible), so this also runs after every [_onStyleLoaded].
-  void _applyTerrainVisibility() {
+  /// Pushes the terrain-relief setting onto a live map — by **adding and
+  /// removing**, not by flipping `visibility`.
+  ///
+  /// MapLibre only stops loading a source's tiles when no layer references it:
+  /// `visibility: none` merely stops rendering, so the DEM kept downloading,
+  /// decoding and holding memory (roughly 1 MB of texture plus 1 MB of float
+  /// mesh per 512px tile, ~49 tiles for a hillshade viewport) with the switch
+  /// off. So off means removeLayer + removeSource — tiles, memory and network
+  /// all released — and on re-adds both with the same id, source and paint the
+  /// baked style used (see [_terrainSourceProps] / [_terrainLayerProps]).
+  ///
+  /// Style reloads re-bake both from the style string, so [_onStyleLoaded]
+  /// re-asserts the user's choice here.
+  void _syncTerrain() {
     final controller = _controller;
     if (controller == null) return;
-    unawaited(
-      controller
-          .setLayerVisibility(terrainHillshadeLayerId, _showTerrain.value)
-          .catchError((Object e, StackTrace st) {
-            // The layer only exists in styles built with terrainTileUrl; a
-            // surface that never baked it has nothing to hide.
-            Log.handle(e, st, 'Failed to sync the terrain relief');
-          }),
-    );
+    unawaited(_syncTerrainLoop(controller));
+  }
+
+  Future<void> _syncTerrainLoop(MapLibreMapController controller) async {
+    // Loop until the map matches the setting: a rapid double-tap flips the
+    // notifier while an add/remove is mid-flight, and each iteration re-reads
+    // it, so the last tap always wins.
+    var dirty = true;
+    while (dirty) {
+      dirty = false;
+      final show = _showTerrain.value;
+      try {
+        if (show && !_terrainOnMap) {
+          await controller.addSource(terrainSourceId, _terrainSourceProps);
+          await controller.addHillshadeLayer(
+            terrainSourceId,
+            terrainHillshadeLayerId,
+            _terrainLayerProps,
+            belowLayerId: townOutlineLayerId,
+          );
+          _terrainOnMap = true;
+        } else if (!show && _terrainOnMap) {
+          await controller.removeLayer(terrainHillshadeLayerId);
+          await controller.removeSource(terrainSourceId);
+          _terrainOnMap = false;
+        }
+      } catch (error, stackTrace) {
+        // A style that never baked the terrain has nothing to remove, and a
+        // mid-reload call can race the native side. Log and stop; the next
+        // toggle or style load re-syncs.
+        Log.handle(error, stackTrace, 'terrain sync');
+        return;
+      }
+      if (_showTerrain.value != show) dirty = true;
+    }
   }
 
   /// Pushes the township-label setting onto a live map. The base style's
@@ -410,6 +568,7 @@ class _MapScaffoldState extends State<MapScaffold> {
     if (warmer == null) return;
     try {
       final bounds = await controller.getVisibleRegion();
+      final zoom = controller.cameraPosition?.zoom ?? 8;
       await warmer.warmViewportAbsolute(
         urlFor: (z, x, y) => _basemapTileUrl
             .replaceAll('{z}', '$z')
@@ -419,10 +578,35 @@ class _MapScaffoldState extends State<MapScaffold> {
         west: bounds.southwest.longitude,
         north: bounds.northeast.latitude,
         east: bounds.northeast.longitude,
-        zoom: controller.cameraPosition?.zoom ?? 8,
+        zoom: zoom,
         maxZoom: 12,
         logLabel: 'basemap',
       );
+      // DEM tiles too — the relief renders at every zoom, so warm them the
+      // same way as the basemap. Native downloads a hillshade viewport as one
+      // burst of 512px meshes the first time; warming from the store makes a
+      // repeat visit an SQLite hit instead of a re-download.
+      //
+      // Only while the relief is on: with it off the DEM source is removed
+      // from the style, MapLibre will never request these tiles, and warming
+      // them was a viewport of downloads per camera settle for pixels that
+      // cannot be drawn. Gated on the toggle (the user's intent), not on
+      // `_terrainOnMap`, which is transiently wrong mid style-reload.
+      if (_showTerrain.value) {
+        await warmer.warmViewportAbsolute(
+          urlFor: (z, x, y) => terrainOriginTileUrl
+              .replaceAll('{z}', '$z')
+              .replaceAll('{x}', '$x')
+              .replaceAll('{y}', '$y'),
+          south: bounds.southwest.latitude,
+          west: bounds.southwest.longitude,
+          north: bounds.northeast.latitude,
+          east: bounds.northeast.longitude,
+          zoom: zoom,
+          maxZoom: 12,
+          logLabel: 'terrain',
+        );
+      }
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'basemap viewport warm');
     }
@@ -460,8 +644,10 @@ class _MapScaffoldState extends State<MapScaffold> {
     unawaited(_applyCameraHandoff());
     // A reload resets the base style's township-label layer to visible.
     _applyTownLabelVisibility();
-    // …and so does the hillshade layer — re-assert the user's choice.
-    _applyTerrainVisibility();
+    // …and re-bakes the terrain source + hillshade layer, so re-assert the
+    // user's choice — which removes both when the relief is off.
+    _terrainOnMap = true;
+    _syncTerrain();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -491,7 +677,12 @@ class _MapScaffoldState extends State<MapScaffold> {
       ok: (frames) {
         setState(() {
           _frames = frames;
-          _selectedIndex = nowFrameIndex(frames);
+          // The calibrated clock, not device time: the frames are server
+          // timestamps, and a device clock that drifted (or a timezone the
+          // device changed) would pick the wrong "now" frame. The NTP resync
+          // on foreground is what makes this actually correct after a
+          // background stretch.
+          _selectedIndex = nowFrameIndex(frames, now: AppTime.utc);
         });
         if (frames.isNotEmpty) {
           // Register the set, then reveal the present (a layer adds tiles
@@ -663,16 +854,19 @@ class _MapScaffoldState extends State<MapScaffold> {
               final c = _controller;
               if (c == null || !c.isCameraMoving) {
                 _active.onMapGestureEnd();
-                if (mounted) setState(() => _cameraEpoch++);
+                _cameraEpoch.value++;
               }
             },
             onPointerCancel: (_) {
               _active.onMapGestureEnd();
-              if (mounted) setState(() => _cameraEpoch++);
+              _cameraEpoch.value++;
             },
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
               maxZoomPreference: _active.mapMaxZoom,
+              // The map tab owns this surface — pause native rendering when the
+              // user is on another tab (indexedStack keeps it mounted).
+              tabIndex: widget.tabIndex,
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),
@@ -684,8 +878,7 @@ class _MapScaffoldState extends State<MapScaffold> {
                   unawaited(_active.onCameraIdle(controller));
                   unawaited(_warmBasemap(controller));
                 }
-                if (!mounted) return;
-                setState(() => _cameraEpoch++);
+                _cameraEpoch.value++;
               },
               // The native compass lives inside the platform view, so any
               // Flutter overlay paints over it — MapScaffold draws its own
@@ -696,11 +889,24 @@ class _MapScaffoldState extends State<MapScaffold> {
         ),
         // Screen-space Flutter overlays (e.g. typhoon forecast tips) — under
         // chrome/sheet so they don't steal taps; IgnorePointer keeps pan/zoom.
+        // Only this subtree rebuilds on a camera settle (ValueListenableBuilder
+        // + keyed reprojection); the map and chrome stay put.
         Positioned.fill(
           child: IgnorePointer(
-            child: KeyedSubtree(
-              key: ValueKey<Object>('${_active.id}-$_cameraEpoch'),
-              child: _active.buildMapOverlay(context),
+            child: ValueListenableBuilder<int>(
+              valueListenable: _cameraEpoch,
+              builder: (context, epoch, _) => KeyedSubtree(
+                // The epoch is in the key only for overlays that project once
+                // per build: changing it discards the subtree's State, which is
+                // the point for a callout and ruinous for an animation that
+                // owns a ticker and a frame buffer.
+                key: ValueKey<Object>(
+                  _active.overlayFollowsCamera
+                      ? '${_active.id}-$epoch'
+                      : _active.id,
+                ),
+                child: _active.buildMapOverlay(context),
+              ),
             ),
           ),
         ),

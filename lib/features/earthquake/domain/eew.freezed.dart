@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'eew.dart';
@@ -9,6 +9,7 @@ part of 'eew.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -66,7 +67,7 @@ class _$EewCopyWithImpl<$Res>
 /// Create a copy of Eew
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? agency = null,Object? id = null,Object? serial = null,Object? status = null,Object? isFinal = null,Object? info = null,}) {
-  return _then(_self.copyWith(
+  return _then(Eew(
 agency: null == agency ? _self.agency : agency // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,serial: null == serial ? _self.serial : serial // ignore: cast_nullable_to_non_nullable
@@ -362,7 +363,7 @@ class _$EewInfoCopyWithImpl<$Res>
 /// Create a copy of EewInfo
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? time = null,Object? longitude = null,Object? latitude = null,Object? depth = null,Object? magnitude = null,Object? location = null,Object? max = null,}) {
-  return _then(_self.copyWith(
+  return _then(EewInfo(
 time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable

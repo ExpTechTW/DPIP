@@ -80,6 +80,11 @@ abstract final class AdminOutline {
   static const String sourceId = 'exptech';
 
   /// Wide dark under-stroke, so a border reads against pale echo.
+  ///
+  /// Not routed through `.vision`, and it does not need to be: the correction
+  /// is the identity on a neutral (a grey loses no channel to redistribute), so
+  /// black and white come back unchanged. Staying `const` also keeps
+  /// [lineColor] usable as [add]'s default argument.
   static const String casingColor = '#000000';
 
   /// Narrow light core, so it reads against dark echo and the basemap.

@@ -16,12 +16,14 @@
 /// gzip work for the whole batch done in a single isolate hop rather than one
 /// per row.
 ///
-/// Eviction: last-used (`time`) older than [maxAge], then LRU trim to
-/// [maxBytes]. Age expiry is one indexed `DELETE` per write (a batch counts as
-/// one); the byte budget is **amortized**, because knowing the total means
-/// summing every blob in the table — running that per tile written made a scrub
-/// quadratic on the UI isolate. Last-used bumps are likewise **buffered** and
-/// flushed in batches (same idea as [NetworkUsageStore]). All ops best-effort.
+/// Eviction: byte budget only. Entries live until the store's total body size
+/// passes [maxBytes]; then the least-recently-used rows drop, oldest (`time`)
+/// first, until the total is back under the ceiling. Nothing expires by age —
+/// a 30-day-old map tile that is still being hit keeps its slot. The byte
+/// budget is **amortized**, because knowing the total means summing every blob
+/// in the table — running that per tile written made a scrub quadratic on the
+/// UI isolate. Last-used bumps are likewise **buffered** and flushed in
+/// batches (same idea as [NetworkUsageStore]). All ops best-effort.
 ///
 /// When a [NetworkUsageStore] is wired, every successful [readBytes] serve
 /// records one hit + saved wire bytes — callers must not also meter those
@@ -40,6 +42,21 @@ import 'package:sqflite/sqflite.dart';
 /// A cached HTTP response: the server [etag] to revalidate with, the response
 /// [body] (the JSON-encoded payload), its [contentType], and [size] — the wire
 /// bytes the original download cost (so a `304` can report the traffic saved).
+/// A revalidated JSON entry, already decoded — see [EtagCacheStore.readJson].
+class CachedJson {
+  const CachedJson({
+    required this.etag,
+    required this.data,
+    required this.size,
+  });
+
+  final String etag;
+  final Object? data;
+
+  /// Wire bytes the original download cost — what a 304 reports as saved.
+  final int size;
+}
+
 class CachedResponse {
   const CachedResponse({
     required this.etag,
@@ -93,12 +110,21 @@ typedef _EncodedWrite = ({
 
 /// See library doc.
 class EtagCacheStore {
-  EtagCacheStore(
-    this._db, {
-    this.maxAge = const Duration(days: 7),
-    this.maxBytes = defaultMaxBytes,
-    this._usage,
-  });
+  EtagCacheStore(this._db, {this.maxBytes = defaultMaxBytes, this._usage}) {
+    // Seed the monotonic LRU key from what is already stored, so a clock that
+    // moved back between runs cannot make this session's writes sort under the
+    // last session's. Best-effort: a failure only costs ordering, and the
+    // first write re-establishes it.
+    unawaited(
+      _db
+          .rawQuery('SELECT MAX(time) AS newest FROM $_table')
+          .then((rows) {
+            final newest = (rows.first['newest'] as num?)?.toInt() ?? 0;
+            if (newest > _lastStamp) _lastStamp = newest;
+          })
+          .catchError((Object _) {}),
+    );
+  }
 
   final Database _db;
 
@@ -107,14 +133,13 @@ class EtagCacheStore {
   /// at the interceptor / MapLibre put path.
   final NetworkUsageStore? _usage;
 
-  /// Entries whose **last-used** is older than this are swept on the next write.
-  final Duration maxAge;
-
-  /// Soft ceiling on `SUM(LENGTH(body))` — least-recently-used rows drop first.
+  /// Ceiling on `SUM(LENGTH(body))` — least-recently-used rows drop first,
+  /// oldest (`time`) first, only once the store is over it. Entries never
+  /// expire by age.
   final int maxBytes;
 
-  /// Default size budget (~150 MB of body blobs on disk).
-  static const int defaultMaxBytes = 150 * 1024 * 1024;
+  /// Default size budget (~350 MB of body blobs on disk).
+  static const int defaultMaxBytes = 350 * 1024 * 1024;
 
   /// SQLite page-cache size in kibibytes (negative PRAGMA = KiB, not pages).
   static const int defaultPageCacheKiB = 25 * 1024;
@@ -152,6 +177,9 @@ class EtagCacheStore {
 
   /// Rows written between byte-budget sweeps (see [_trimToBudget]).
   static const _sweepEvery = 96;
+
+  /// Rows read per pass when picking eviction victims (see [_trimToBudget]).
+  static const _trimScanChunk = 512;
 
   /// Compressed bytes above which a batch inflate is worth an isolate hop.
   static const _isolateThreshold = 64 * 1024;
@@ -216,6 +244,51 @@ class EtagCacheStore {
         size: (row['size'] as num).toInt(),
       );
     } catch (_) {
+      return null;
+    }
+  }
+
+  /// Returns the cached JSON entry for [url] **decoded to its object**, or
+  /// null on a miss or a corrupt body.
+  ///
+  /// The parse rides the same worker hop the gunzip already pays: the 304
+  /// revalidation path is the app's hottest cache path (the station
+  /// catalogues are 65–130 KB and almost never change), and `read()` +
+  /// `jsonDecode` on the caller's side put exactly that parse on the UI
+  /// isolate — the one path Dio's own ≥50 KB isolate offload cannot see,
+  /// because a 304 has no body for the transformer to parse.
+  Future<CachedJson?> readJson(String url) async {
+    try {
+      final row = await _queryRow(url);
+      if (row == null || (row['kind'] as int) != kindJson) return null;
+      _scheduleTouch(url);
+      final blob = row['body'] as Uint8List;
+      final Object? data;
+      if (blob.length >= 2 && blob[0] == 0x1f && blob[1] == 0x8b) {
+        data = blob.length > 16 * 1024
+            // One hop for gunzip + utf8 + parse. The fused decoder is the
+            // same pair Dio uses, so the object shape is identical to a
+            // fresh response's.
+            ? await Isolate.run(
+                () => const Utf8Decoder()
+                    .fuse(const JsonDecoder())
+                    .convert(gzip.decode(blob)),
+              )
+            : const Utf8Decoder()
+                  .fuse(const JsonDecoder())
+                  .convert(gzip.decode(blob));
+      } else {
+        data = const Utf8Decoder().fuse(const JsonDecoder()).convert(blob);
+      }
+      return CachedJson(
+        etag: row['etag'] as String,
+        data: data,
+        size: (row['size'] as num).toInt(),
+      );
+    } catch (_) {
+      // A corrupt entry reads as a miss: the interceptor then rejects the
+      // 304 as retryable and the retry fetches a full 200 — safer than
+      // surfacing a decode throw from inside an interceptor.
       return null;
     }
   }
@@ -290,7 +363,14 @@ class EtagCacheStore {
       }
       final inflated = await _gunzipAll(compressed, compressedBytes);
 
+      // The batch touches and meters **once** at the end. Doing either per row
+      // turned one viewport into a burst of transactions: the touch buffer
+      // crossed [_touchFlushEvery] several times mid-loop, and so did the usage
+      // store's own flush counter. What lands is identical either way — the
+      // touch `time` is stamped at flush, and the usage aggregate is a sum.
       final out = <String, CachedBytes>{};
+      final served = <String>[];
+      var savedBytes = 0;
       for (final row in rows) {
         final kind = row['kind'] as int;
         if (kind != kindBinary && kind != kindBinaryGzip) continue;
@@ -299,16 +379,19 @@ class EtagCacheStore {
             ? inflated[key]
             : Uint8List.fromList(row['body'] as Uint8List);
         if (bytes == null) continue;
-        if (touch) _scheduleTouch(key);
         final entry = CachedBytes(
           etag: row['etag'] as String,
           bytes: bytes,
           contentType: row['content_type'] as String?,
           size: (row['size'] as num).toInt(),
         );
-        _recordBinaryHit(entry);
+        served.add(key);
+        savedBytes += entry.size;
         out[key] = entry;
       }
+      if (served.isEmpty) return out;
+      if (touch) _scheduleTouchAll(served);
+      _recordBinaryHits(served.length, savedBytes);
       return out;
     } catch (_) {
       return const {};
@@ -389,7 +472,7 @@ class EtagCacheStore {
     if (writes.isEmpty) return;
     try {
       final encoded = await _encodeBinaryAll(writes);
-      final now = DateTime.now().millisecondsSinceEpoch;
+      final now = _lruStamp();
       await _db.transaction((txn) async {
         for (final row in encoded) {
           await txn.insert(_table, {
@@ -411,6 +494,23 @@ class EtagCacheStore {
     } catch (_) {}
   }
 
+  /// The LRU ordering key: wall time, but never allowed to go backwards.
+  ///
+  /// `time` is only ever compared with other rows' `time` — it is a sequence
+  /// number that happens to be readable as a date. A clock set back (or the
+  /// first SNTP sync pulling it back) would stamp fresh writes *older* than
+  /// rows already in the table, so eviction would throw away exactly what was
+  /// just fetched and keep what nobody has touched in weeks. Monotonicity is
+  /// the only property this key actually needs.
+  int _lruStamp() {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now > _lastStamp) _lastStamp = now;
+    return _lastStamp;
+  }
+
+  /// Seeded from the table on open, so the guarantee survives a restart.
+  int _lastStamp = 0;
+
   Future<void> _insert(
     String url, {
     required String etag,
@@ -426,21 +526,19 @@ class EtagCacheStore {
       'kind': kind,
       'body': body,
       'size': size,
-      'time': DateTime.now().millisecondsSinceEpoch,
+      'time': _lruStamp(),
     }, conflictAlgorithm: ConflictAlgorithm.replace);
     await _noteWrite(body.length, 1);
   }
 
   /// Post-write maintenance, split by what it actually costs.
   ///
-  /// **Age expiry** is one indexed `DELETE` and normally removes nothing, so it
-  /// runs every write — and because tile traffic goes through
-  /// [writeBytesBatch], "every write" already means once per burst.
-  ///
   /// **The byte budget** is the expensive half: knowing the total means summing
   /// every blob in the table. That is amortized over [_sweepEvery] writes, or
   /// forced the moment the running total says the store is over budget. Doing
-  /// it per write made a viewport of tiles a full-table scan per tile.
+  /// it per write made a viewport of tiles a full-table scan per tile. Nothing
+  /// expires by age — only the budget trims, and only once the store is over
+  /// it.
   Future<void> _noteWrite(int addedBytes, int rows) async {
     _writesSinceSweep += rows;
     final tracked = _trackedBytes;
@@ -453,27 +551,24 @@ class EtagCacheStore {
       return;
     }
 
-    // Eviction orders by `time` (last-used) — land buffered bumps first, or a
-    // just-read entry would look untouched and be swept.
-    await _flushTouches();
-    await _db.delete(
-      _table,
-      where: 'time < ?',
-      whereArgs: [
-        DateTime.now().millisecondsSinceEpoch - maxAge.inMilliseconds,
-      ],
-    );
-
     if (tracked != null &&
         _trackedBytes! <= maxBytes &&
         _writesSinceSweep < _sweepEvery) {
       return;
     }
+    // Trim orders by `time` (last-used) — land buffered bumps first, or a
+    // just-read entry would look untouched and be swept. Only the trim needs
+    // that, which is why the flush sits *under* the guard: above it, every
+    // tile batch paid an `UPDATE … IN (…)` transaction for a sweep that was
+    // not going to run.
+    await _flushTouches();
     await _trimToBudget();
   }
 
-  /// Recounts stored bytes and drops least-recently-used rows until the total
-  /// is within [maxBytes].
+  /// Recounts stored bytes and drops least-recently-used rows — oldest
+  /// (`time`) first — until the total is within [maxBytes]. A no-op (beyond
+  /// the recount) when the store is under the ceiling: the budget trims only
+  /// when it is actually over.
   Future<void> _trimToBudget() async {
     _writesSinceSweep = 0;
     var total = await _measureBytes();
@@ -481,20 +576,39 @@ class EtagCacheStore {
       _trackedBytes = total;
       return;
     }
-    final rows = await _db.rawQuery(
-      'SELECT key, LENGTH(body) AS b FROM $_table ORDER BY time ASC',
-    );
-    final keys = <String>[];
-    for (final row in rows) {
-      if (total <= maxBytes) break;
-      keys.add(row['key'] as String);
-      total -= (row['b'] as num).toInt();
+    // Only the oldest rows can be victims, and the surplus is normally one
+    // sweep's worth of tiles — so page the ordering instead of hauling every
+    // key and blob length in the table (tens of thousands of rows at a 350 MB
+    // budget) across the platform channel to look at the first few. The `ORDER
+    // BY` is unchanged, so the `time` index still serves it without a sort.
+    final victims = <String>{};
+    for (var offset = 0; total > maxBytes; offset += _trimScanChunk) {
+      final rows = await _db.rawQuery(
+        'SELECT key, LENGTH(body) AS b FROM $_table '
+        'ORDER BY time ASC LIMIT ? OFFSET ?',
+        [_trimScanChunk, offset],
+      );
+      if (rows.isEmpty) break;
+      for (final row in rows) {
+        if (total <= maxBytes) break;
+        // Rows tie on `time`, so a page boundary may re-show one. Counting a
+        // key once keeps the running total exact — an over-count would stop
+        // the trim early and leave the store over budget.
+        if (!victims.add(row['key'] as String)) continue;
+        total -= (row['b'] as num).toInt();
+      }
     }
-    if (keys.isNotEmpty) {
+    final keys = victims.toList(growable: false);
+    // Chunked for the same bound-parameter ceiling the read path respects: a
+    // single `IN (…)` of every victim throws "too many SQL variables" once a
+    // trim has to drop more than ~1000 rows, which would abort the sweep.
+    for (var i = 0; i < keys.length; i += _readInChunk) {
+      final end = i + _readInChunk;
+      final chunk = end < keys.length ? keys.sublist(i, end) : keys.sublist(i);
       await _db.delete(
         _table,
-        where: 'key IN (${List.filled(keys.length, '?').join(',')})',
-        whereArgs: keys,
+        where: 'key IN (${List.filled(chunk.length, '?').join(',')})',
+        whereArgs: chunk,
       );
     }
     _trackedBytes = total;
@@ -507,12 +621,40 @@ class EtagCacheStore {
     return (rows.first['b'] as num).toInt();
   }
 
+  /// Brings the store back inside its byte budget.
+  ///
+  /// The budget is normally enforced on write, amortized over [_sweepEvery]
+  /// rows — which is right, because a cache only grows when something writes
+  /// to it. What that misses is the *carry-over*: a session that ended over
+  /// budget (killed mid-tile-batch, or the ceiling lowered between releases)
+  /// stays over until 96 more writes happen to occur. On an app left open with
+  /// the map closed, that is never. Cheap when already inside the ceiling —
+  /// one `SUM(LENGTH(body))` and no deletes.
+  Future<void> prune() async {
+    try {
+      await _flushTouches();
+      await _trimToBudget();
+    } catch (_) {
+      // A cache that will not trim is a disk cost, not a fault; every other
+      // path in this file swallows the same way.
+    }
+  }
+
   /// Deletes every cached entry.
   Future<void> clear() async {
     try {
       await _db.delete(_table);
       _trackedBytes = 0;
       _writesSinceSweep = 0;
+    } catch (_) {}
+  }
+
+  /// Shrinks the database file back to its contents (free pages from cleared
+  /// rows return to the OS — a body budget of 350 MB does not shrink the file
+  /// on its own). Costly: only call after a full [clear], never per-write.
+  Future<void> compact() async {
+    try {
+      await _db.execute('VACUUM');
     } catch (_) {}
   }
 
@@ -693,14 +835,39 @@ class EtagCacheStore {
     return false;
   }
 
-  void _recordBinaryHit(CachedBytes entry) {
+  void _recordBinaryHit(CachedBytes entry) => _recordBinaryHits(1, entry.size);
+
+  /// Meters [hits] serves worth [saved] wire bytes as one usage event.
+  ///
+  /// A batch is one call, not one per row: [NetworkUsageStore] flushes on an
+  /// event count, so a metered viewport used to write `net_bucket` (and run its
+  /// 7-day sweep) several times while answering a single [readBytesBatch]. The
+  /// aggregate is the same sum either way.
+  void _recordBinaryHits(int hits, int saved) {
     final usage = _usage;
     if (usage == null) return;
-    unawaited(usage.record(down: 0, hit: true, saved: entry.size));
+    unawaited(usage.record(down: 0, hit: true, saved: saved, count: hits));
   }
 
   void _scheduleTouch(String url) {
     _pendingTouch.add(url);
+    _armTouchFlush();
+  }
+
+  /// Batch form of [_scheduleTouch] — one flush decision per viewport.
+  ///
+  /// Per-key scheduling re-crossed [_touchFlushEvery] inside the loop, so a
+  /// full [readBytesBatch] fired an `UPDATE … IN (…)` transaction every 48
+  /// rows while it was still assembling the answer. Coalescing cannot reorder
+  /// the LRU: the buffered bump is stamped with the time of the *flush*, so
+  /// every key in the batch lands on the same instant either way, and
+  /// [_noteWrite] still flushes before a trim reads `time`.
+  void _scheduleTouchAll(Iterable<String> urls) {
+    _pendingTouch.addAll(urls);
+    _armTouchFlush();
+  }
+
+  void _armTouchFlush() {
     if (_pendingTouch.length >= _touchFlushEvery) {
       unawaited(_flushTouches());
       return;
@@ -734,7 +901,7 @@ class EtagCacheStore {
 
     final urls = _pendingTouch.toList(growable: false);
     _pendingTouch.clear();
-    final now = DateTime.now().millisecondsSinceEpoch;
+    final now = _lruStamp();
     try {
       await _db.transaction((txn) async {
         for (var i = 0; i < urls.length; i += _touchInChunk) {

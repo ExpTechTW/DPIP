@@ -1,17 +1,19 @@
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:dpip/core/settings/prefs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  late SettingsStore settings;
+
   Future<RegionStore> makeStore([List<String>? saved]) async {
-    SharedPreferences.setMockInitialValues(
+    settings = SettingsStore.inMemory(
       saved == null ? {} : {'home.savedRegionCodes': saved},
     );
-    return RegionStore(Prefs(await SharedPreferences.getInstance()));
+    return RegionStore(settings);
   }
 
   test(
@@ -48,8 +50,11 @@ void main() {
     expect(store.addSaved('400'), isFalse); // at the cap
     expect(store.savedCodes, ['100', '200', '300']);
 
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getStringList('home.savedRegionCodes'), ['100', '200', '300']);
+    expect(settings.getStringList(SettingKeys.savedRegionCodes), [
+      '100',
+      '200',
+      '300',
+    ]);
   });
 
   test('removeSaved drops the code and keeps the selection valid', () async {
@@ -80,8 +85,11 @@ void main() {
     store.reorderSaved(0, 2);
     expect(store.savedCodes, ['200', '300', '100']);
 
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getStringList('home.savedRegionCodes'), ['200', '300', '100']);
+    expect(settings.getStringList(SettingKeys.savedRegionCodes), [
+      '200',
+      '300',
+      '100',
+    ]);
   });
 
   test('reorderSaved keeps the same area selected', () async {

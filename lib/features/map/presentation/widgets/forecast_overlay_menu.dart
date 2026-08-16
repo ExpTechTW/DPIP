@@ -62,10 +62,10 @@ class ForecastOverlayMenu extends StatelessWidget {
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.tune,
             tooltip: l10n.windForecastOverlayMenuTooltip,
-            // The dot marks "not the defaults". County and town ship on, 國界
-            // and labels off, so it lights up when one has moved.
+            // The dot marks "not the defaults". County, town, and 國界 ship on,
+            // labels off, so it lights up when one has moved.
             active:
-                showGlobal ||
+                !showGlobal ||
                 !showCounty ||
                 !showTown ||
                 !showLabels ||

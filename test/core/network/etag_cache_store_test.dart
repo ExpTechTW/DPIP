@@ -294,7 +294,7 @@ void main() {
     expect(await store.read('https://x/a'), isNull);
   });
 
-  test('a write sweeps entries last-used older than maxAge (7 days)', () async {
+  test('entries never expire by age — only the byte budget trims', () async {
     await store.write('https://x/old', etag: '1', body: 'A');
     final eightDaysAgo = DateTime.now()
         .subtract(const Duration(days: 8))
@@ -310,33 +310,11 @@ void main() {
 
     expect(
       await store.read('https://x/old'),
-      isNull,
-      reason: 'expired evicted',
+      isNotNull,
+      reason: 'an old entry that still fits the budget must survive any write',
     );
     expect(await store.read('https://x/new'), isNotNull);
   });
-
-  test(
-    'a recent read keeps an otherwise-old entry past the age sweep',
-    () async {
-      await store.write('https://x/kept', etag: '1', body: 'A');
-      final eightDaysAgo = DateTime.now()
-          .subtract(const Duration(days: 8))
-          .millisecondsSinceEpoch;
-      await db.update(
-        'http_cache',
-        {'time': eightDaysAgo},
-        where: 'key = ?',
-        whereArgs: ['https://x/kept'],
-      );
-      expect(await store.read('https://x/kept'), isNotNull);
-      // Allow async touch to land.
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-
-      await store.write('https://x/new', etag: '2', body: 'B');
-      expect(await store.read('https://x/kept'), isNotNull);
-    },
-  );
 
   test('size round-trips', () async {
     await store.write('https://x/a', etag: '1', body: 'ABCDE', size: 4096);
@@ -410,8 +388,8 @@ void main() {
       bytes: fat,
       contentType: 'image/webp',
     );
-    // Pin last-used near "now" so the 7-day age sweep won't eat them, but b
-    // stays older than a (buffered touch timers can't scramble the order).
+    // Pin last-used near "now" so the LRU order is explicit, with b older
+    // than a (buffered touch timers can't scramble the order).
     final now = DateTime.now().millisecondsSinceEpoch;
     await db.update(
       'http_cache',
@@ -435,5 +413,119 @@ void main() {
     expect(await tight.readBytes('https://x/b'), isNull, reason: 'unread LRU');
     expect(await tight.readBytes('https://x/a'), isNotNull);
     expect(await tight.readBytes('https://x/c'), isNotNull);
+  });
+
+  test(
+    'over budget trims oldest-first and stops once back under the ceiling',
+    () async {
+      // Three 100-byte rows against a ceiling that fits two: the oldest must
+      // go, the two newest stay, and the trim must not overshoot (delete more
+      // than the surplus).
+      final fat = Uint8List(100);
+      final tight = EtagCacheStore(db, maxBytes: 250);
+
+      await tight.writeBytes(
+        'https://x/a',
+        etag: '1',
+        bytes: fat,
+        contentType: 'image/webp',
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 2));
+      await tight.writeBytes(
+        'https://x/b',
+        etag: '2',
+        bytes: fat,
+        contentType: 'image/webp',
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 2));
+      await tight.writeBytes(
+        'https://x/c',
+        etag: '3',
+        bytes: fat,
+        contentType: 'image/webp',
+      );
+
+      expect(await tight.readBytes('https://x/a'), isNull, reason: 'oldest');
+      expect(await tight.readBytes('https://x/b'), isNotNull);
+      expect(await tight.readBytes('https://x/c'), isNotNull);
+      final stats = await tight.stats();
+      expect(stats.bytes, lessThanOrEqualTo(250));
+      expect(
+        stats.bytes,
+        greaterThanOrEqualTo(200),
+        reason: 'trims only the surplus',
+      );
+    },
+  );
+
+  test('an under-budget write never trims, however old the rows are', () async {
+    final fat = Uint8List(100);
+    final tight = EtagCacheStore(db, maxBytes: 10 * 1024 * 1024);
+    await tight.writeBytes(
+      'https://x/old',
+      etag: '1',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+    final eightDaysAgo = DateTime.now()
+        .subtract(const Duration(days: 8))
+        .millisecondsSinceEpoch;
+    await db.update(
+      'http_cache',
+      {'time': eightDaysAgo},
+      where: 'key = ?',
+      whereArgs: ['https://x/old'],
+    );
+
+    await tight.writeBytes(
+      'https://x/new',
+      etag: '2',
+      bytes: fat,
+      contentType: 'image/webp',
+    );
+
+    expect(await tight.readBytes('https://x/old'), isNotNull);
+    expect(await tight.readBytes('https://x/new'), isNotNull);
+  });
+
+  test('readJson decodes a large body to the same object as read', () async {
+    // The 304 path's parse rides the store's worker hop now; the object it
+    // hands the interceptor must be exactly what jsonDecode(read().body)
+    // produced, or a revalidated response differs from a fresh one.
+    final big = {
+      'stations': [
+        for (var i = 0; i < 2000; i++)
+          {'id': 'S$i', 'lat': 23.5 + i * 0.001, 'name': '站$i'},
+      ],
+    };
+    await store.write(
+      'https://example.test/catalog',
+      etag: '"c1"',
+      body: jsonEncode(big),
+      contentType: 'application/json',
+      size: 1234,
+    );
+
+    final viaJson = await store.readJson('https://example.test/catalog');
+    final viaText = await store.read('https://example.test/catalog');
+    expect(viaJson, isNotNull);
+    expect(viaJson!.etag, '"c1"');
+    expect(viaJson.size, 1234);
+    expect(viaJson.data, jsonDecode(viaText!.body));
+  });
+
+  test('readJson reads a corrupt entry as a miss, not a throw', () async {
+    // The interceptor turns a miss into a retryable reject and the retry
+    // fetches a full 200 — a decode throw inside an interceptor would be a
+    // failed request instead.
+    await db.insert('http_cache', {
+      'key': 'https://example.test/broken',
+      'etag': '"x"',
+      'kind': EtagCacheStore.kindJson,
+      'body': Uint8List.fromList([0x7b, 0x22]), // truncated '{"'
+      'size': 2,
+      'time': 0,
+    });
+    expect(await store.readJson('https://example.test/broken'), isNull);
   });
 }

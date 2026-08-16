@@ -4,7 +4,7 @@ library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
-import 'package:dpip/core/platform/app_settings.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -81,13 +81,12 @@ class _NotificationPermissionBannerState
               Expanded(
                 child: Text(
                   l10n.notifyBannerDisabled,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.onErrorContainer,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: colors.onErrorContainer),
                 ),
               ),
               TextButton(
-                onPressed: openAppSettings,
+                onPressed: openAppSettingsPage,
                 child: Text(l10n.locationBannerFix),
               ),
             ],

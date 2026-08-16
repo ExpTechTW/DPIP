@@ -78,11 +78,6 @@ void main() {
       'CREATE TABLE net_bucket (hour INTEGER PRIMARY KEY, '
       'down INTEGER NOT NULL DEFAULT 0)',
     );
-    await db.execute(
-      'CREATE TABLE net_total ('
-      'k TEXT PRIMARY KEY, v INTEGER NOT NULL DEFAULT 0)',
-    );
-    await db.insert('net_total', {'k': 'saved', 'v': 999});
 
     await NetworkUsageStore.createSchema(db);
     final s = store();
@@ -91,16 +86,6 @@ void main() {
     final stats = await s.stats();
     expect(stats.saved24h, 60);
     expect(stats.hits24h, 1);
-    expect(
-      await db.rawQuery(
-        "SELECT name FROM sqlite_master "
-        "WHERE type='table' AND name='net_total'",
-      ),
-      isEmpty,
-      reason:
-          'lifetime totals cannot be windowed after the fact, and leaving them '
-          'would be a second contradictory answer',
-    );
   });
 
   test(
