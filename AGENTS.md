@@ -28,13 +28,22 @@ The short version:
 - Everything else may be a summary line alone.
 - A change that affects one platform carries a `Platform: android` or
   `Platform: ios` trailer; omit it when both are affected.
+- **Choose the type by whether a user can see it**, not by which folder moved.
+  A user-visible behaviour change filed under `build:` never reaches a release
+  note; a 142-line script is not `docs:` because documentation sits beside it.
 - **One thing per commit.** Two features in one commit become one changelog
   entry that has to pick a category, cannot be reverted separately, and cannot
   be isolated by `git bisect`. No gate can check this — whether two changes are
-  "the same thing" is a judgement — so it is on you and on review.
-- **Write down everything the commit changes.** The release note is generated
-  from the message, so anything left out is invisible to users, and the message
-  cannot be edited once pushed.
+  "the same thing" is a judgement — so it is on you and on review. The tells,
+  none of them fatal on its own: an *and* in the summary, a summary that lists,
+  a body whose halves are unrelated, one file of prose beside one of code, and
+  needing two types to describe it honestly.
+- **Write down everything the commit changes**, and write *why*. The diff
+  already says what; what it cannot say is what would otherwise have gone
+  wrong, why this approach, and what was given up. The release note is
+  generated from the message, so anything left out is invisible to users — and
+  the message cannot be edited once pushed. Record the dead ends too: an
+  approach that looked right and was not will be tried again otherwise.
 
 ### Never attribute the tool
 
