@@ -81,14 +81,26 @@ void main() {
     });
 
     test('prune drops what is past retention and keeps the rest', () async {
+      // Retention is on when *we* received it, not on the radio's stamp — so
+      // the old message has to be genuinely old to us, which means storing it
+      // while the clock says so.
+      clock = clock.subtract(const Duration(days: 31));
+      await store().addMessage(message('ancient', at: clock));
+      clock = clock.add(const Duration(days: 31));
       final s = store();
-      await s.addMessage(
-        message('ancient', at: clock.subtract(const Duration(days: 31))),
-      );
       await s.addMessage(message('recent'));
 
       await s.prune();
       expect((await s.messages()).single.text, 'recent');
+    });
+
+    test('a radio whose clock is a year behind keeps its messages', () async {
+      final s = store();
+      await s.addMessage(
+        message('heard now', at: clock.subtract(const Duration(days: 365))),
+      );
+      await s.prune();
+      expect(await s.messages(), hasLength(1));
     });
 
     test('clearMessages empties the table', () async {

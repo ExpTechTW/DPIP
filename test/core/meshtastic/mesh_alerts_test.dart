@@ -34,8 +34,7 @@ void main() {
         timestamp: at ?? clock,
       );
 
-  MeshNode node(int num) =>
-      MeshNode(num: num, displayName: 'node $num', isOnline: true);
+  MeshNode node(int num) => MeshNode(num: num, displayName: 'node $num');
 
   Future<void> settle() => Future<void>.delayed(Duration.zero);
 
@@ -63,9 +62,7 @@ void main() {
         ..channels = const [
           MeshChannel(index: 2, name: 'DPIP', psk: [1], enabled: true),
         ]
-        ..nodes.add(
-          const MeshNode(num: 0x1234, displayName: '保大 node', isOnline: true),
-        );
+        ..nodes.add(const MeshNode(num: 0x1234, displayName: '保大 node'));
       await settle();
 
       service.messages.add(

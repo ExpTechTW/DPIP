@@ -110,8 +110,19 @@ class MeshUnread extends ChangeNotifier {
 
   /// Forgets everything — the log was cleared.
   void reset() {
-    if (_unread.isEmpty && _dividerChannel == null) return;
+    // The read positions go too. They are positions *in the log*, and the log
+    // is gone: keeping them would mark the first message of the next
+    // conversation as already read, because it sorts below a cursor left over
+    // from the last one.
+    final hadState =
+        _unread.isNotEmpty ||
+        _dividerChannel != null ||
+        _lastReads.isNotEmpty ||
+        _newest.isNotEmpty;
+    if (!hadState) return;
     _unread.clear();
+    _lastReads.clear();
+    _newest.clear();
     _dividerChannel = null;
     _dividerTs = null;
     notifyListeners();

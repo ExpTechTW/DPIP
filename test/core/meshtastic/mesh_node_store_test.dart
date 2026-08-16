@@ -23,16 +23,17 @@ void main() {
     double snr = 0,
     DateTime? heard,
     bool viaMqtt = false,
+    int? hops,
   }) => MeshNode(
     num: num,
     displayName: name,
-    isOnline: true,
     batteryLevel: battery,
-    lastHeard: heard,
+    lastHeard: heard ?? clock,
     latitude: lat,
     longitude: lon,
     snr: snr,
     viaMqtt: viaMqtt,
+    hopsAway: hops,
   );
 
   /// Nodes now live in the `mesh_nodes` table, so a restart test needs the
@@ -132,7 +133,7 @@ void main() {
     service.nodes
       ..add(node(1, heard: clock.subtract(const Duration(minutes: 1))))
       ..add(node(2, heard: clock.subtract(const Duration(hours: 3))))
-      ..add(node(3));
+      ..add(MeshNode(num: 3, displayName: 'never')); // no lastHeard at all
     await Future<void>.delayed(Duration.zero);
 
     expect(store.isOnline(store.byNum(1)!), isTrue);
@@ -144,9 +145,16 @@ void main() {
     final db = await memoryDb();
     final (store, service) = await makeStore(db: db);
     for (var i = 0; i < MeshNodeStore.maxNodes + 5; i++) {
-      service.nodes.add(node(i, heard: clock.subtract(Duration(minutes: i))));
+      service.nodes.add(node(i, heard: clock.subtract(Duration(seconds: i))));
     }
     await flush();
+
+    // In memory as well as on disk. The cap used to apply only when writing,
+    // so a bridged mesh reporting thousands of nodes kept every one of them
+    // in RAM and re-sorted the lot on each rebuild.
+    expect(store.count, MeshNodeStore.maxNodes);
+    expect(store.byNum(0), isNotNull);
+    expect(store.byNum(MeshNodeStore.maxNodes + 4), isNull);
 
     expect(await MeshStore(db).readNodes(), hasLength(MeshNodeStore.maxNodes));
 
@@ -154,6 +162,27 @@ void main() {
     // 0 was heard most recently, the tail is the oldest.
     expect(restored.byNum(0), isNotNull);
     expect(restored.byNum(MeshNodeStore.maxNodes + 4), isNull);
+  });
+
+  test('the map only draws what was heard inside its window', () async {
+    final (store, service) = await makeStore();
+    service.nodes
+      ..add(node(1, lat: 23.5, lon: 120.5))
+      ..add(
+        node(
+          2,
+          lat: 24.5,
+          lon: 121.5,
+          heard: clock.subtract(const Duration(hours: 25)),
+        ),
+      );
+    await Future<void>.delayed(Duration.zero);
+
+    // A dot on a disaster map reads as "there is a radio there"; a day-old
+    // sighting cannot support that. The node stays in the list, where its
+    // last-heard time is written beside it.
+    expect(store.positioned.map((n) => n.num), [1]);
+    expect(store.byNum(2), isNotNull);
   });
 
   group('MQTT nodes', () {
@@ -311,6 +340,63 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(store.distanceToMyRadioKm(store.byNum(1)!), isNull);
+    });
+  });
+
+  group('hop distance', () {
+    test('an unknown distance stays null, never 0', () async {
+      final db = await memoryDb();
+      addTearDown(db.close);
+      await MeshStore.createSchema(db);
+      await MeshStore(db).writeNodes([
+        {'num': 7, 'name': 'far', 'snr': 0.0, 'via_mqtt': 0},
+      ]);
+
+      final (store, _) = await makeStore(db: db);
+      // 0 would read as "direct neighbour" on the map and in the sheet — a
+      // plausible, wrong claim about reach.
+      expect(store.byNum(7)?.hopsAway, isNull);
+      store.dispose();
+    });
+
+    test('survives a sighting that does not carry it', () async {
+      final (store, service) = await makeStore();
+      service.nodes.add(node(7, name: 'relay', hops: 2));
+      await pumpEventQueue();
+      // The radio sends NodeInfo only during the config download, so every
+      // later sighting arrives without a hop count.
+      service.nodes.add(node(7, name: 'relay'));
+      await pumpEventQueue();
+      expect(store.byNum(7)?.hopsAway, 2);
+      store.dispose();
+    });
+
+    test(
+      'a direct neighbour is 0, and that is not the same as unknown',
+      () async {
+        final (store, service) = await makeStore();
+        service.nodes
+          ..add(node(1, name: 'near', hops: 0))
+          ..add(node(2, name: 'unknown'));
+        await pumpEventQueue();
+        expect(store.byNum(1)?.hopsAway, 0);
+        expect(store.byNum(2)?.hopsAway, isNull);
+        store.dispose();
+      },
+    );
+
+    test('round-trips through the table', () async {
+      final db = await memoryDb();
+      addTearDown(db.close);
+      final (first, service) = await makeStore(db: db);
+      service.nodes.add(node(9, name: 'via two', hops: 2));
+      await pumpEventQueue();
+      await flush();
+      first.dispose();
+
+      final (second, _) = await makeStore(db: db);
+      expect(second.byNum(9)?.hopsAway, 2);
+      second.dispose();
     });
   });
 }

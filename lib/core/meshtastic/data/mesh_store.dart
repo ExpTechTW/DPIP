@@ -48,6 +48,13 @@ class MeshMetricSample {
     this.nodesOnline,
     this.rxPackets,
     this.txPackets,
+    this.lsRx,
+    this.lsRxBad,
+    this.lsTx,
+    this.lsRxDupe,
+    this.lsTxRelay,
+    this.lsTxRelayCancel,
+    this.heapFree,
   });
 
   final DateTime at;
@@ -74,6 +81,34 @@ class MeshMetricSample {
   /// resetting on a reconnect and each point means "activity in this slice".
   final int? rxPackets;
   final int? txPackets;
+
+  /// The **radio's own** counters over the same slice, also as deltas.
+  ///
+  /// Not a duplicate of [rxPackets]/[txPackets]: those count what reached the
+  /// app over BLE, these count what the modem actually saw. The gap between
+  /// them is packets the radio heard on channels we have no key for, plus
+  /// anything the BLE queue dropped — which makes the disagreement a
+  /// measurement rather than an inconsistency.
+  final int? lsRx;
+
+  /// Packets that failed CRC. Climbing while airtime stays flat is
+  /// interference; climbing with airtime is congestion.
+  final int? lsRxBad;
+
+  final int? lsTx;
+
+  /// Packets discarded as duplicates the mesh had already delivered. Near
+  /// zero means this radio is somebody's only path.
+  final int? lsRxDupe;
+
+  /// Rebroadcasts this radio performed, and ones it abandoned because another
+  /// node got there first.
+  final int? lsTxRelay;
+  final int? lsTxRelayCancel;
+
+  /// Free heap **at this moment** — a level, not a delta. Its slope across the
+  /// day is what forecasts a firmware reboot.
+  final int? heapFree;
 }
 
 /// One reading from a *neighbouring* node.
@@ -124,10 +159,16 @@ class MeshStore {
     // mechanism), so every statement is a launch-window platform round trip —
     // one probe for the ALTER-added columns, then everything else as a single
     // batch commit, instead of ten serial awaits.
-    final metricColumns = {
-      for (final row in await db.rawQuery('PRAGMA table_info($_metrics)'))
-        row['name'] as String,
-    };
+    // One probe per table that has gained columns since it shipped. An empty
+    // set means the table does not exist yet, so the CREATE below makes it
+    // without them and every ALTER is needed.
+    final existing = <String, Set<String>>{};
+    for (final table in _alterColumns.keys) {
+      existing[table] = {
+        for (final row in await db.rawQuery('PRAGMA table_info($table)'))
+          row['name'] as String,
+      };
+    }
 
     final batch = db.batch()
       // The node table the radio hands over on every connect, kept for the
@@ -224,35 +265,75 @@ class MeshStore {
         'last_read INTEGER NOT NULL)',
       );
 
-    // Columns added after `mesh_metrics` shipped arrive by ALTER — IF NOT
-    // EXISTS does nothing for a table that already exists. On a fresh table
-    // the probe above ran before the CREATE, so the set is empty and the
-    // ALTERs are needed; on an installed one it names what is present.
-    for (final (column, type) in _metricAlterColumns) {
-      if (metricColumns.isEmpty || metricColumns.contains(column)) continue;
-      batch.execute('ALTER TABLE $_metrics ADD COLUMN $column $type');
+    // Columns added after a table shipped arrive by ALTER — IF NOT EXISTS does
+    // nothing for a table that already exists. On an installed one the probe
+    // names what is present; on a fresh one the set is empty, so the ALTERs run
+    // after the CREATE below.
+    for (final entry in _alterColumns.entries) {
+      final present = existing[entry.key]!;
+      if (present.isEmpty) continue;
+      for (final (column, type) in entry.value) {
+        if (present.contains(column)) continue;
+        batch.execute('ALTER TABLE ${entry.key} ADD COLUMN $column $type');
+      }
     }
     await batch.commit(noResult: true);
-    // A fresh install: the metrics CREATE above already carries none of the
-    // ALTER columns, so add them now that the table exists.
-    if (metricColumns.isEmpty) {
-      final fresh = db.batch();
-      for (final (column, type) in _metricAlterColumns) {
-        fresh.execute('ALTER TABLE $_metrics ADD COLUMN $column $type');
+    // A fresh install: the CREATEs above carry none of the ALTER columns, so
+    // add them now that the tables exist.
+    final fresh = db.batch();
+    var any = false;
+    for (final entry in _alterColumns.entries) {
+      if (existing[entry.key]!.isNotEmpty) continue;
+      for (final (column, type) in entry.value) {
+        fresh.execute('ALTER TABLE ${entry.key} ADD COLUMN $column $type');
+        any = true;
       }
-      await fresh.commit(noResult: true);
     }
+    if (any) await fresh.commit(noResult: true);
   }
 
-  /// Columns added to [_metrics] after it shipped — one list so the fresh and
-  /// installed paths cannot drift.
-  static const List<(String, String)> _metricAlterColumns = [
-    ('voltage', 'REAL'),
-    ('nodes_total', 'INTEGER'),
-    ('nodes_online', 'INTEGER'),
-    ('rx_packets', 'INTEGER'),
-    ('tx_packets', 'INTEGER'),
-  ];
+  /// Columns added to a table after it shipped — one list per table so the
+  /// fresh and installed paths cannot drift.
+  static const Map<String, List<(String, String)>> _alterColumns = {
+    _metrics: [
+      ('voltage', 'REAL'),
+      ('nodes_total', 'INTEGER'),
+      ('nodes_online', 'INTEGER'),
+      ('rx_packets', 'INTEGER'),
+      ('tx_packets', 'INTEGER'),
+      // The radio's own counters (`LocalStats`), stored as per-sample deltas
+      // like the traffic columns above. These are ground truth from the modem;
+      // `rx_packets`/`tx_packets` are what survived the BLE link, and the two
+      // disagreeing is itself the diagnostic.
+      ('ls_rx', 'INTEGER'),
+      ('ls_rx_bad', 'INTEGER'),
+      ('ls_tx', 'INTEGER'),
+      ('ls_rx_dupe', 'INTEGER'),
+      ('ls_tx_relay', 'INTEGER'),
+      ('ls_tx_relay_cancel', 'INTEGER'),
+      // Absolute, not a delta: free heap is a level, and its slope over a day
+      // is what forecasts a reboot.
+      ('heap_free', 'INTEGER'),
+    ],
+    // How many hops away the node was when last heard. NULL means *unknown*,
+    // which is not the same as 0 — an unset protobuf uint32 reads as 0, i.e.
+    // "direct neighbour", which is a plausible and silently wrong answer.
+    _nodes: [('hops_away', 'INTEGER')],
+    // When *we* stored the row, by the calibrated clock.
+    //
+    // `ts` is the radio's own `rx_time` for an incoming message, and DPIP does
+    // not set that clock. Ageing it out against our clock meant a radio whose
+    // RTC sat more than the retention window in the past had every message it
+    // delivered deleted by the next sweep — silently, because the chat keeps
+    // its in-memory list, on the one durable table whose contents cannot be
+    // re-fetched. Retention and ordering use this column; `ts` stays for
+    // display and for the identity index.
+    //
+    // NULL on rows written before it existed, and those are kept: an old row's
+    // true arrival time is unknowable, and deleting on a guess is the failure
+    // this column exists to stop.
+    _messages: [('received_at', 'INTEGER')],
+  };
 
   /// Appends [message], ignoring one the log already holds. Returns whether it
   /// was new — the caller uses that to decide whether to notify or re-render.
@@ -260,6 +341,7 @@ class MeshStore {
     try {
       final id = await _db.insert(_messages, {
         'ts': message.timestamp.millisecondsSinceEpoch,
+        'received_at': _now().millisecondsSinceEpoch,
         'node': message.from,
         'channel': message.channel,
         'text': message.text,
@@ -283,7 +365,12 @@ class MeshStore {
         _messages,
         where: channel == null ? null : 'channel = ?',
         whereArgs: channel == null ? null : [channel],
-        orderBy: 'ts DESC, id DESC',
+        // Arrival order, falling back to the radio's stamp for rows written
+        // before the column existed. Ranking incoming (radio clock) and
+        // outgoing (our clock) rows together by `ts` put a reply above the
+        // message it answered — visible only after a restart, because live
+        // inserts land in arrival order anyway.
+        orderBy: 'COALESCE(received_at, ts) DESC, id DESC',
         limit: limit,
       );
       return [for (final row in rows) _readMessage(row)];
@@ -375,7 +462,14 @@ class MeshStore {
 
   Future<void> clearMessages() async {
     try {
-      await _db.delete(_messages);
+      // The read cursors go with the messages, in one transaction. Left
+      // behind, they point past a log that no longer exists — so the first
+      // message to arrive after a clear lands *below* a cursor that outlived
+      // its conversation and is counted as already read.
+      await _db.transaction((txn) async {
+        await txn.delete(_messages);
+        await txn.delete(_reads);
+      });
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store clearMessages');
     }
@@ -395,16 +489,39 @@ class MeshStore {
         'nodes_online': sample.nodesOnline,
         'rx_packets': sample.rxPackets,
         'tx_packets': sample.txPackets,
+        'ls_rx': sample.lsRx,
+        'ls_rx_bad': sample.lsRxBad,
+        'ls_tx': sample.lsTx,
+        'ls_rx_dupe': sample.lsRxDupe,
+        'ls_tx_relay': sample.lsTxRelay,
+        'ls_tx_relay_cancel': sample.lsTxRelayCancel,
+        'heap_free': sample.heapFree,
       }, conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store addMetric');
     }
   }
 
+  /// The start of [window] for [table] — from now, or from the newest row when
+  /// that is older, so a clock that jumped forward cannot age out data that is
+  /// not old. See the cutoff in [prune].
+  Future<int> _windowStart(String table, Duration window, DateTime now) async {
+    final nowMs = now.millisecondsSinceEpoch;
+    try {
+      final rows = await _db.rawQuery('SELECT MAX(ts) AS newest FROM $table');
+      final newest = (rows.first['newest'] as num?)?.toInt();
+      final anchor = newest != null && newest < nowMs ? newest : nowMs;
+      return anchor - window.inMilliseconds;
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'mesh store window start');
+      return nowMs - window.inMilliseconds;
+    }
+  }
+
   /// Utilization samples inside [metricRetention], oldest first — chart order.
   Future<List<MeshMetricSample>> metrics() async {
     try {
-      final since = _now().subtract(metricRetention).millisecondsSinceEpoch;
+      final since = await _windowStart(_metrics, metricRetention, _now());
       final rows = await _db.query(
         _metrics,
         where: 'ts >= ?',
@@ -423,6 +540,13 @@ class MeshStore {
             nodesOnline: (row['nodes_online'] as num?)?.toInt(),
             rxPackets: (row['rx_packets'] as num?)?.toInt(),
             txPackets: (row['tx_packets'] as num?)?.toInt(),
+            lsRx: (row['ls_rx'] as num?)?.toInt(),
+            lsRxBad: (row['ls_rx_bad'] as num?)?.toInt(),
+            lsTx: (row['ls_tx'] as num?)?.toInt(),
+            lsRxDupe: (row['ls_rx_dupe'] as num?)?.toInt(),
+            lsTxRelay: (row['ls_tx_relay'] as num?)?.toInt(),
+            lsTxRelayCancel: (row['ls_tx_relay_cancel'] as num?)?.toInt(),
+            heapFree: (row['heap_free'] as num?)?.toInt(),
           ),
       ];
     } catch (error, stackTrace) {
@@ -460,7 +584,7 @@ class MeshStore {
   /// one neighbour.
   Future<List<MeshNodeMetricSample>> nodeMetrics({int? node}) async {
     try {
-      final since = _now().subtract(metricRetention).millisecondsSinceEpoch;
+      final since = await _windowStart(_nodeMetrics, metricRetention, _now());
       final rows = await _db.query(
         _nodeMetrics,
         where: node == null ? 'ts >= ?' : 'ts >= ? AND node = ?',
@@ -488,9 +612,12 @@ class MeshStore {
   Future<void> prune() async {
     try {
       final now = _now();
+      // On `received_at`, never on `ts` — see [_alterColumns]. A row with no
+      // arrival time survives: it predates the column, and its true age is
+      // unknowable.
       await _db.delete(
         _messages,
-        where: 'ts < ?',
+        where: 'received_at IS NOT NULL AND received_at < ?',
         whereArgs: [now.subtract(messageRetention).millisecondsSinceEpoch],
       );
       // Rows written before the channel-hash guard existed can carry a hash
@@ -498,12 +625,30 @@ class MeshStore {
       // conversations in the picker. The guard stops new ones — this clears
       // the legacy ones. Slot indices are 0–7, fixed by the firmware.
       await _db.delete(_messages, where: 'channel > 7 OR channel < 0');
-      final metricCutoff = now.subtract(metricRetention).millisecondsSinceEpoch;
+      // The same shape guard on the read cursors, which are keyed by the same
+      // channel number and had no prune path at all.
+      await _db.delete(_reads, where: 'channel > 7 OR channel < 0');
+      // Measured from the newest row when that is *older* than now, not from
+      // now alone.
+      //
+      // `ServerClock` is monotonic only between syncs: the first successful
+      // one steps the clock by the device's whole error. Rows written before
+      // the step carry device time, and a cutoff taken purely from the stepped
+      // clock can land after every one of them — deleting a day of telemetry
+      // including the sample from a minute ago. Anchoring to the data bounds
+      // a forward step to one window's worth.
+      //
+      // The cost, accepted deliberately: while the radio is away the newest
+      // row stops advancing, so the last window's samples are kept rather than
+      // aged out. That is a ceiling, not growth — nothing new arrives to
+      // accumulate — and every chart windows from *now* regardless, so a stale
+      // day is never drawn as current.
+      final metricCutoff = await _windowStart(_metrics, metricRetention, now);
       await _db.delete(_metrics, where: 'ts < ?', whereArgs: [metricCutoff]);
       await _db.delete(
         _nodeMetrics,
         where: 'ts < ?',
-        whereArgs: [metricCutoff],
+        whereArgs: [await _windowStart(_nodeMetrics, metricRetention, now)],
       );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store prune');
@@ -556,7 +701,11 @@ class MeshStore {
     }
   }
 
-  Future<List<Map<String, Object?>>> readNodes({int limit = 250}) async {
+  /// [limit] is the caller's cap, not the table's — the store keeps whatever
+  /// was written and the node table's owner decides how much of it it wants.
+  /// The default is generous rather than meaningful; a caller that cares
+  /// passes its own.
+  Future<List<Map<String, Object?>>> readNodes({int limit = 5000}) async {
     try {
       return await _db.query(_nodes, orderBy: 'last_heard DESC', limit: limit);
     } catch (error, stackTrace) {

@@ -210,10 +210,15 @@ void main() {
     final db = await _open();
     addTearDown(db.close);
     final now = DateTime.utc(2026, 8, 15, 12);
-    await MeshStore(
-      db,
-      now: () => now,
-    ).addMetric(MeshMetricSample(at: now.subtract(const Duration(days: 3))));
+    final mesh = MeshStore(db, now: () => now);
+    // Two samples three days apart: the newer one anchors the window, so the
+    // older is genuinely outside it. A single old row would be *kept* — see
+    // the cutoff in `MeshStore.prune`, which will not let a clock that moved
+    // forward delete the only telemetry there is.
+    await mesh.addMetric(
+      MeshMetricSample(at: now.subtract(const Duration(days: 3))),
+    );
+    await mesh.addMetric(MeshMetricSample(at: now));
     await db.insert(logTable, {
       'time': now.subtract(const Duration(days: 3)).millisecondsSinceEpoch,
       'level': 'info',
@@ -234,7 +239,7 @@ void main() {
       httpCache: EtagCacheStore(db),
     ).sweep();
 
-    expect(await _count(db, 'mesh_metrics'), 0);
+    expect(await _count(db, 'mesh_metrics'), 1);
     expect(await _count(db, logTable), 0);
     expect(await _count(db, 'net_bucket'), 0);
   });

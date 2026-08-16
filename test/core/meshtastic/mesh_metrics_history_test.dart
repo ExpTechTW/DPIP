@@ -136,7 +136,7 @@ void main() {
       addTearDown(db.close);
       final store = MeshStore(db, now: () => _now);
       await store.addNodeMetrics([
-        MeshNodeMetricSample(at: _ago(const Duration(hours: 2)), node: 7),
+        MeshNodeMetricSample(at: _ago(Duration.zero), node: 7),
         MeshNodeMetricSample(at: _ago(const Duration(hours: 25)), node: 7),
       ]);
       // Enforced on read as well as by the sweep: a missed sweep must cost

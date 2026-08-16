@@ -68,17 +68,30 @@ abstract class MeshtasticService {
   /// seam the DPIP data plane listens on (see `dpip_mesh_gateway.dart`).
   Stream<MeshDataPacket> get dataStream;
 
-  /// Broadcasts [payload] on [portnum] over [channel] (the counterpart of
-  /// [dataStream]).
+  /// Sends [payload] on [portnum] over [channel] (the counterpart of
+  /// [dataStream]) — to the whole mesh, or to [destination] alone.
   ///
   /// [portnum] is a Meshtastic app port; DPIP traffic uses
-  /// [MeshPorts.private]. Payloads are capped by the LoRa frame — see
-  /// [MeshPorts.maxPayloadBytes]. [wantResponse] asks the destination to
-  /// unicast a reply, which is how [traceRoute] collects its answer.
-  Future<Result<void>> sendData({
+  /// [MeshPorts.private] and broadcasts (no [destination]), because a warning
+  /// is for everyone in range. [destination] addresses one node instead, which
+  /// some ports *require*: the firmware refuses a multi-hop
+  /// [MeshPorts.traceroute] to the broadcast address outright, since one probe
+  /// would make every node that heard it answer every other — see [traceRoute].
+  ///
+  /// Payloads are capped by the LoRa frame — see [MeshPorts.maxPayloadBytes].
+  /// [wantResponse] asks the destination to unicast a reply, which is how
+  /// [traceRoute] collects its answer. [wantAck] asks the mesh to retransmit
+  /// until the destination confirms.
+  ///
+  /// Returns the **packet id** it went out with — the only handle on a packet
+  /// once it leaves. The radio names it in a refusal ([noticeStream]), and a
+  /// reply carries it back, which is how a caller tells its own answer from
+  /// someone else's.
+  Future<Result<int>> sendData({
     required int portnum,
     required List<int> payload,
     int channel = 0,
+    int? destination,
     bool wantAck = false,
     bool wantResponse = false,
   });
@@ -90,10 +103,37 @@ abstract class MeshtasticService {
   /// passes), 30 s of firmware cooldown between attempts, and only nodes on
   /// the same channel key can participate — the cheapest on-demand path
   /// probe the mesh offers.
-  Future<Result<void>> traceRoute(int nodeNum);
+  ///
+  /// Addressed to [nodeNum], never broadcast: the radio's own firmware drops a
+  /// multi-hop traceroute aimed at the broadcast address and warns the phone
+  /// (`Multi-hop traceroute to broadcast address is not allowed`), because
+  /// one such probe would amplify into every node interrogating every other.
+  Future<Result<int>> traceRoute(int nodeNum);
 
   /// Traceroute replies ([MeshPorts.traceroute] packets), decoded.
   Stream<MeshRoute> get routeStream;
+
+  /// The attached radio's own packet counters, as it reports them.
+  ///
+  /// The cheapest ground truth in the app: the firmware sends `LocalStats`
+  /// straight down the BLE link every ~15 minutes and never over the air, so
+  /// reading it costs nothing at all. It answers what no other signal can —
+  /// how many packets the *modem* actually saw versus how many survived the
+  /// link to us, how many were corrupt, how many were duplicates the mesh
+  /// already had, and how often this radio relayed for someone else.
+  Stream<MeshLocalStats> get localStatsStream;
+
+  /// The last [localStatsStream] value, or null before the first arrives.
+  MeshLocalStats? get localStats;
+
+  /// The radio talking back about something we asked it to do — a refusal, a
+  /// rate limit, a warning.
+  ///
+  /// Without this every in-radio rejection is indistinguishable from silence:
+  /// the send returns [Ok] (the packet did reach the radio), nothing goes on
+  /// the air, and the caller waits out its timeout for an answer that was
+  /// never coming. The radio said what was wrong — this is where it is heard.
+  Stream<MeshNotice> get noticeStream;
 
   /// Packet counters for the current session.
   ///
@@ -133,6 +173,19 @@ abstract class MeshtasticService {
   /// when radio parameters change, so the link drops for ~10 s and every
   /// other Meshtastic client of that radio is affected too. Ask first.
   Future<Result<void>> applyRegion(String region);
+
+  /// Sets the radio's clock to [utc], unless it already has a better source.
+  ///
+  /// The radio stamps every packet it delivers with its own RTC, and DPIP does
+  /// not otherwise set it — so a radio that inherited a wrong time from a
+  /// mis-set phone or a mesh peer times-stamps the whole conversation and the
+  /// whole node table wrongly, and the app ages both against a calibrated
+  /// clock. One local admin write fixes the source instead of every consumer.
+  ///
+  /// Safe to send unconditionally: the firmware ranks its own time sources and
+  /// refuses a downgrade, so a GPS-disciplined radio ignores it. Returns
+  /// whether the write reached the radio.
+  Future<Result<bool>> setRadioTime(DateTime utc);
 
   /// Whether a radio is connected and configured.
   bool get isConnected;
@@ -329,16 +382,112 @@ class MeshRouteHop {
 /// LoRa links are asymmetric, which is why the route back is recorded
 /// separately — the way back can differ from the way there.
 class MeshRoute {
-  const MeshRoute({required this.towards, required this.back});
+  const MeshRoute({
+    required this.towards,
+    required this.back,
+    required this.target,
+  });
 
-  /// Origin → destination, with the origin itself as the first hop.
+  /// Nothing came back (a decode failure, or no reply at all).
+  const MeshRoute.none() : towards = const [], back = const [], target = null;
+
+  /// Origin → destination, both endpoints included.
+  ///
+  /// The wire carries only the hops *between* them — see [decodeMeshRoute],
+  /// which puts the ends back. So a direct neighbour is a two-entry list, not
+  /// an empty one.
   final List<MeshRouteHop> towards;
 
-  /// Destination → origin (only firmware ≥ 2.5 records it).
+  /// Destination → origin (only firmware ≥ 2.5 records it), same convention.
   final List<MeshRouteHop> back;
 
-  /// The destination the probe reached, or null when the reply did not say.
-  int? get target => towards.isEmpty ? null : towards.last.num;
+  /// The node the probe reached — taken from the reply's sender, not guessed
+  /// from the hop list.
+  ///
+  /// It cannot be read off [towards]: the wire's route excludes both
+  /// endpoints, so the last entry there is the final *relay* on a multi-hop
+  /// path and nothing at all on a direct one.
+  final int? target;
+
+  /// Relays between the two ends — 0 for a direct neighbour.
+  int get relayCount => towards.length < 2 ? 0 : towards.length - 2;
+}
+
+/// The attached radio's counters, cumulative since it booted.
+///
+/// Every field is a running total, so a consumer wants the *difference*
+/// between two samples — and must check [uptime] first, because a reboot
+/// zeroes the lot and a naive subtraction turns that into a huge negative
+/// spike.
+class MeshLocalStats {
+  const MeshLocalStats({
+    required this.uptime,
+    required this.rxPackets,
+    required this.rxBadPackets,
+    required this.txPackets,
+    required this.rxDupePackets,
+    required this.txRelay,
+    required this.txRelayCanceled,
+    required this.heapFree,
+    required this.heapTotal,
+    this.channelUtilization,
+    this.airUtilTx,
+    this.nodesOnline,
+    this.nodesTotal,
+  });
+
+  /// Time since boot — the reset detector. Going backwards between samples
+  /// means every other counter restarted too.
+  final Duration uptime;
+
+  /// Packets the modem demodulated, including ones the phone never saw.
+  final int rxPackets;
+
+  /// Packets that failed their CRC. Rising while channel utilization is flat
+  /// is interference, not congestion — nothing else separates the two.
+  final int rxBadPackets;
+
+  final int txPackets;
+
+  /// Packets discarded because the mesh had already delivered them. Near zero
+  /// means this radio sits on a single-path edge; high means dense, redundant
+  /// coverage. That ratio *is* the resilience of its physical position.
+  final int rxDupePackets;
+
+  /// Packets this radio rebroadcast for the mesh.
+  final int txRelay;
+
+  /// Rebroadcasts abandoned because someone else got there first. A low share
+  /// means this radio is the only path — the mesh depends on it; a high share
+  /// means it is redundant.
+  final int txRelayCanceled;
+
+  final int heapFree;
+  final int heapTotal;
+
+  final double? channelUtilization;
+  final double? airUtilTx;
+  final int? nodesOnline;
+  final int? nodesTotal;
+}
+
+/// Something the radio refused, limited or warned about.
+///
+/// [replyId] is the id of the packet it is about — match it against what
+/// [MeshtasticService.sendData] returned to know whether it concerns you. It
+/// is 0 for an unsolicited notice.
+class MeshNotice {
+  const MeshNotice({
+    required this.replyId,
+    required this.message,
+    required this.isError,
+  });
+
+  final int replyId;
+  final String message;
+
+  /// Error rather than warning/info — the firmware's own severity.
+  final bool isError;
 }
 
 /// A channel slot on the radio.
@@ -449,7 +598,6 @@ class MeshNode {
   const MeshNode({
     required this.num,
     required this.displayName,
-    required this.isOnline,
     this.batteryLevel,
     this.voltage,
     this.lastHeard,
@@ -457,13 +605,13 @@ class MeshNode {
     this.longitude,
     this.snr = 0,
     this.viaMqtt = false,
+    this.hopsAway,
   });
 
   /// Node id (radio number, hex elsewhere in the mesh UI).
   final int num;
 
   final String displayName;
-  final bool isOnline;
   final int? batteryLevel;
 
   /// Pack voltage, when the node reports it. Battery *percent* is the radio's
@@ -479,6 +627,19 @@ class MeshNode {
   /// the air. Such a node may be on the other side of the world, so it is not
   /// evidence of radio reach.
   final bool viaMqtt;
+
+  /// How many relays the node's last packet crossed to reach us — 0 for a
+  /// direct neighbour, null when the radio does not know.
+  ///
+  /// Free: the firmware derives it from the plaintext LoRa header of packets
+  /// it already heard, so it costs no transmission at all. It is a sample from
+  /// the last packet, not a property of the node — a node whose path changes
+  /// reports a different number without anything else changing.
+  ///
+  /// Null is *unknown*, never 0. A node running firmware older than the field,
+  /// or one heard only through MQTT, has no hop distance; showing those as
+  /// direct neighbours would overstate reach exactly where it matters.
+  final int? hopsAway;
 }
 
 /// A received text packet from the mesh.

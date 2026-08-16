@@ -27,7 +27,7 @@ import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform;
+    show TargetPlatform, defaultTargetPlatform, visibleForTesting;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart'
     show BluetoothAdapterState, BluetoothDevice, FlutterBluePlus, Guid;
 import 'package:logging/logging.dart' as logging;
@@ -58,7 +58,13 @@ class MeshtasticClientImpl implements MeshtasticService {
     _installLogBridge();
     final existing = _client;
     if (existing != null) return existing;
-    final created = mesh.MeshtasticClient();
+    // Every timestamp the transport stamps comes from the calibrated clock,
+    // not the device's. The 24-hour retention window and the chart axes are
+    // computed against `AppTime`, so a device clock that is off by three hours
+    // would file each reading three hours out of place — the retention would
+    // drop rows that are not old yet, and "last reading" would show the
+    // offset instead of the age.
+    final created = mesh.MeshtasticClient(now: () => AppTime.utc.toLocal());
     _client = created;
     // Counted here, from one permanent subscription — not inside the mapped
     // public streams, which run once per listener (and not at all when nobody
@@ -440,7 +446,6 @@ class MeshtasticClientImpl implements MeshtasticService {
     return MeshNode(
       num: node.num,
       displayName: node.displayName,
-      isOnline: node.isOnline,
       batteryLevel: node.batteryLevel,
       voltage: node.voltage,
       lastHeard: node.lastHeard,
@@ -448,6 +453,10 @@ class MeshtasticClientImpl implements MeshtasticService {
       longitude: node.longitude,
       snr: node.snr,
       viaMqtt: node.viaMqtt,
+      // Meaningless for a node reached over the internet, and the firmware
+      // does not clear it — an MQTT node keeps whatever its last RF sighting
+      // said, or 0.
+      hopsAway: node.viaMqtt ? null : node.hopsAway,
     );
   });
 
@@ -480,12 +489,7 @@ class MeshtasticClientImpl implements MeshtasticService {
           channel: packet.channel,
           // utf8, not String.fromCharCodes — multi-byte CJK survives.
           text: text,
-          // A radio with no time source stamps `rxTime` 0; that would date a
-          // message to 1970 instead of "just now" — most visible on the
-          // backlog replayed after a reconnect.
-          timestamp: packet.rxTime > 0
-              ? DateTime.fromMillisecondsSinceEpoch(packet.rxTime * 1000)
-              : AppTime.utc.toLocal(),
+          timestamp: receivedAt(packet.rxTime),
         );
       });
 
@@ -503,17 +507,16 @@ class MeshtasticClientImpl implements MeshtasticService {
           channel: packet.channel,
           portnum: packet.decoded!.portnum.value,
           payload: packet.decoded!.payload,
-          timestamp: packet.rxTime > 0
-              ? DateTime.fromMillisecondsSinceEpoch(packet.rxTime * 1000)
-              : AppTime.utc.toLocal(),
+          timestamp: receivedAt(packet.rxTime),
         );
       });
 
   @override
-  Future<Result<void>> sendData({
+  Future<Result<int>> sendData({
     required int portnum,
     required List<int> payload,
     int channel = 0,
+    int? destination,
     bool wantAck = false,
     bool wantResponse = false,
   }) async {
@@ -530,15 +533,20 @@ class MeshtasticClientImpl implements MeshtasticService {
       );
     }
     try {
-      await _c.sendData(
+      final id = await _c.sendData(
         portnum: port,
         payload: payload,
         channel: channel,
+        destination: destination,
+        // The radio's own configured limit, not a constant: a mesh set to 5
+        // hops was still being probed 3 deep, and the node 4 hops out simply
+        // never answered.
+        hopLimit: _c.loraConfig?.hopLimit,
         wantAck: wantAck,
         wantResponse: wantResponse,
       );
       _countTx(payload.length);
-      return const Ok(null);
+      return Ok(id);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'meshtastic sendData');
       return Err(_mapFailure(error));
@@ -546,21 +554,118 @@ class MeshtasticClientImpl implements MeshtasticService {
   }
 
   @override
-  Future<Result<void>> traceRoute(int nodeNum) {
-    // One-element route: "show me the way to this node". The firmware fills
-    // the chain in as the probe floods and returns it via wantResponse.
-    final request = mesh.RouteDiscovery(route: [nodeNum]);
+  Future<Result<int>> traceRoute(int nodeNum) {
+    final probe = traceRouteProbe(nodeNum, _c.nodes[nodeNum]?.channel);
     return sendData(
       portnum: MeshPorts.traceroute,
-      payload: request.writeToBuffer(),
+      payload: probe.payload,
+      channel: probe.channel,
+      destination: probe.destination,
+      // Both legs are retransmitted until confirmed — the reply inherits
+      // `wantAck` from the request (`MeshModule::setReplyTo`), so sending
+      // without it makes a multi-hop probe *and* its answer single-shot.
+      // Every official client sets it.
+      wantAck: true,
       wantResponse: true,
     );
   }
 
   @override
-  Stream<MeshRoute> get routeStream => dataStream
-      .where((packet) => packet.portnum == MeshPorts.traceroute)
-      .map((packet) => decodeMeshRoute(packet.payload));
+  Future<Result<bool>> setRadioTime(DateTime utc) async {
+    try {
+      // Sent unconditionally: the firmware ranks its own time sources
+      // (`perhapsSetRTC`: `if (q > currentQuality) shouldSet = true`, with GPS
+      // always allowed to reapply), so a radio with a GPS-disciplined clock
+      // ignores this write. Deciding here would mean guessing at a quality the
+      // phone is never told.
+      await _c.sendAdmin(
+        mesh.AdminMessage(
+          setTimeOnly: utc.toUtc().millisecondsSinceEpoch ~/ 1000,
+        ),
+      );
+      Log.info(
+        'meshtastic: set radio clock to ${utc.toUtc().toIso8601String()}',
+      );
+      return const Ok(true);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'meshtastic setRadioTime');
+      return Err(_mapFailure(error));
+    }
+  }
+
+  @override
+  Stream<MeshLocalStats> get localStatsStream =>
+      _c.localStatsStream.map(_toLocalStats);
+
+  @override
+  MeshLocalStats? get localStats {
+    final stats = _c.localStats;
+    return stats == null ? null : _toLocalStats(stats);
+  }
+
+  /// Every field guarded on its presence test: an old radio that omits one
+  /// would otherwise report a flawless 0 — no bad packets, no duplicates, a
+  /// perfect mesh — which is the most misleading possible reading.
+  MeshLocalStats _toLocalStats(mesh.LocalStats stats) => MeshLocalStats(
+    uptime: Duration(seconds: stats.uptimeSeconds),
+    rxPackets: stats.numPacketsRx,
+    rxBadPackets: stats.numPacketsRxBad,
+    txPackets: stats.numPacketsTx,
+    rxDupePackets: stats.numRxDupe,
+    txRelay: stats.numTxRelay,
+    txRelayCanceled: stats.numTxRelayCanceled,
+    heapFree: stats.heapFreeBytes,
+    heapTotal: stats.heapTotalBytes,
+    channelUtilization: stats.hasChannelUtilization()
+        ? stats.channelUtilization
+        : null,
+    airUtilTx: stats.hasAirUtilTx() ? stats.airUtilTx : null,
+    nodesOnline: stats.hasNumOnlineNodes() ? stats.numOnlineNodes : null,
+    nodesTotal: stats.hasNumTotalNodes() ? stats.numTotalNodes : null,
+  );
+
+  @override
+  Stream<MeshNotice> get noticeStream => _c.noticeStream.map(
+    (notice) => MeshNotice(
+      replyId: notice.replyId,
+      message: notice.message,
+      isError: notice.level.value >= mesh.LogRecord_Level.ERROR.value,
+    ),
+  );
+
+  @override
+  Stream<MeshRoute> get routeStream => _c.packetStream
+      .where((packet) {
+        if (packet.decoded?.portnum != mesh.PortNum.TRACEROUTE_APP) {
+          return false;
+        }
+        // Logged before the filter decides, not after: when a trace comes back
+        // empty the only question worth answering is whether the reply reached
+        // Dart at all, and a line that only prints for packets we accepted
+        // cannot answer it.
+        Log.debug(
+          'meshtastic traceroute rx: from=${packet.from.toRadixString(16)} '
+          'to=${packet.to.toRadixString(16)} '
+          'reqId=${packet.decoded!.requestId} '
+          'me=${_c.myNodeNum?.toRadixString(16)} '
+          'bytes=${packet.decoded!.payload.length}',
+        );
+        return isTraceRouteReply(
+          portnum: packet.decoded!.portnum.value,
+          requestId: packet.decoded!.requestId,
+          to: packet.to,
+          myNodeNum: _c.myNodeNum,
+        );
+      })
+      .map(
+        (packet) => decodeMeshRoute(
+          packet.decoded!.payload,
+          // We sent the probe, so we are the origin; the answer comes from
+          // the node it reached.
+          origin: _c.myNodeNum!,
+          destination: packet.from,
+        ),
+      );
 
   @override
   MeshTraffic get traffic => _counter.snapshot;
@@ -838,22 +943,138 @@ class MeshtasticClientImpl implements MeshtasticService {
 /// its own index — the origin, which sent rather than received, has none, and
 /// a list that came up short leaves the missing hops blank rather than
 /// misaligned.
-MeshRoute decodeMeshRoute(List<int> payload) {
+/// The wire form of a traceroute probe for [nodeNum], last heard on
+/// [nodeChannel] (null when the node DB has no entry).
+///
+/// Every field here is a correctness constraint the firmware or the protocol
+/// imposes, not a preference:
+///
+/// * **Empty payload.** Each hop *appends* itself to the `RouteDiscovery` it
+///   received, so anything seeded here returns as a hop that was never on the
+///   path — and shifts the per-hop SNR list against it.
+/// * **Addressed to the node, never broadcast.** The radio's own firmware
+///   refuses a multi-hop traceroute aimed at the broadcast address and answers
+///   the phone with a warning notification instead of a route, because one
+///   such probe would have every node that heard it interrogate every other.
+/// * **The node's own channel.** The probe is encrypted with that channel's
+///   key; a node sharing only a secondary channel cannot read one sent on the
+///   primary. A `channel` that is a hash rather than an index names no slot we
+///   can send on (see [isMeshChannelIndex]), so that falls back to primary.
+({List<int> payload, int channel, int destination}) traceRouteProbe(
+  int nodeNum,
+  int? nodeChannel,
+) => (
+  payload: mesh.RouteDiscovery().writeToBuffer(),
+  channel: nodeChannel != null && isMeshChannelIndex(nodeChannel)
+      ? nodeChannel
+      : 0,
+  destination: nodeNum,
+);
+
+/// Whether a packet is a traceroute **reply to us** rather than any of the
+/// traceroute traffic the mesh carries past this radio.
+///
+/// The port is shared: a stranger's probe that we relayed, and the answer to
+/// it, look exactly like our own. Accepting those resolves whatever probe we
+/// have in flight with someone else's path, and the map draws it as ours.
+///
+/// A reply is told apart by two things — a non-zero `requestId` (only a
+/// *response* carries the id of the request it answers; a fresh probe has
+/// none) and a destination of this radio.
+bool isTraceRouteReply({
+  required int? portnum,
+  required int requestId,
+  required int to,
+  required int? myNodeNum,
+}) =>
+    portnum == MeshPorts.traceroute &&
+    requestId != 0 &&
+    myNodeNum != null &&
+    to == myNodeNum;
+
+/// Rebuilds the traced path from a reply's `RouteDiscovery` and the packet
+/// header it arrived in.
+///
+/// **`route` on the wire holds only the hops *between* the two ends.** Each
+/// relay appends itself; the destination appends its SNR and returns before
+/// writing its id (`appendMyIDandSNR(..., SNRonly: isToUs(&p))`), and the
+/// origin never appends at all. So a direct neighbour answers with an *empty*
+/// route — a completely successful trace that reads identically to a failure
+/// unless the ends are put back, which is what [origin] and [destination] are
+/// for. Every official client does the same reconstruction.
+///
+/// SNR is offset by one against the rebuilt list: `snrTowards[i]` is what
+/// `hops[i + 1]` heard the probe at, because the origin received nothing. The
+/// firmware pads an unmeasured link with `INT8_MIN`.
+/// When a packet was heard, from the radio's `rx_time` — corrected for the two
+/// ways that field lies.
+///
+/// The stamp is the **radio's** clock, which DPIP does not set and which no
+/// firmware guarantees. Two failures matter:
+///
+/// * **Zero** — the radio has no time source at all. Dating the message to
+///   1970 is most visible on the backlog replayed after a reconnect.
+/// * **The future** — an RTC inherited from a mis-set phone, or from a mesh
+///   peer. A future stamp poisons everything downstream that assumes time only
+///   moves forward: the unread cursor parks ahead of anything that can ever
+///   arrive (so the conversation reads as fully read, permanently), and the
+///   message sorts above replies written after it.
+///
+/// A small allowance absorbs ordinary skew and the trip over BLE; beyond that
+/// the radio is not telling us when, so we use when *we* heard it.
+@visibleForTesting
+DateTime receivedAt(int rxTimeSeconds, {DateTime Function()? now}) {
+  final wall = (now ?? () => AppTime.utc.toLocal())();
+  if (rxTimeSeconds <= 0) return wall;
+  final stamped = DateTime.fromMillisecondsSinceEpoch(rxTimeSeconds * 1000);
+  return stamped.isAfter(wall.add(rxTimeSkewAllowance)) ? wall : stamped;
+}
+
+/// How far ahead of us a radio's clock may be before we stop believing it.
+const Duration rxTimeSkewAllowance = Duration(minutes: 5);
+
+MeshRoute decodeMeshRoute(
+  List<int> payload, {
+  required int origin,
+  required int destination,
+}) {
   try {
     final discovery = mesh.RouteDiscovery.fromBuffer(payload);
     return MeshRoute(
-      towards: _zipHops(discovery.route, discovery.snrTowards),
-      back: _zipHops(discovery.routeBack, discovery.snrBack),
+      target: destination,
+      towards: _zipHops([
+        origin,
+        ...discovery.route,
+        destination,
+      ], discovery.snrTowards),
+      // Absent on firmware that predates the return path — an empty list, not
+      // a one-link route the radio never measured.
+      back: discovery.routeBack.isEmpty && discovery.snrBack.isEmpty
+          ? const []
+          : _zipHops([
+              destination,
+              ...discovery.routeBack,
+              origin,
+            ], discovery.snrBack),
     );
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'mesh route decode');
-    return const MeshRoute(towards: [], back: []);
+    return const MeshRoute.none();
   }
 }
 
-List<MeshRouteHop> _zipHops(List<int> route, List<int> snrs) {
+/// Firmware's "this link was never measured" pad (`INT8_MIN`).
+const int _unknownSnr = -128;
+
+List<MeshRouteHop> _zipHops(List<int> hops, List<int> snrs) {
   return [
-    for (var i = 0; i < route.length; i++)
-      MeshRouteHop(num: route[i], snr: i < snrs.length ? snrs[i] / 4.0 : null),
+    for (var i = 0; i < hops.length; i++)
+      MeshRouteHop(
+        num: hops[i],
+        // The first hop is the sender: it heard nothing, so it has no reading.
+        snr: i > 0 && i - 1 < snrs.length && snrs[i - 1] != _unknownSnr
+            ? snrs[i - 1] / 4.0
+            : null,
+      ),
   ];
 }

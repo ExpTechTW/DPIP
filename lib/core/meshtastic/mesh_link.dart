@@ -26,6 +26,7 @@ import 'dart:async';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -521,6 +522,15 @@ class MeshLink extends ChangeNotifier {
         Log.warning('mesh link: provisioning failed — ${failure.message}');
     }
     _notify();
+
+    // Hand the radio our calibrated time. It stamps every packet it delivers
+    // with its own RTC, which nothing else in this app sets — so a radio that
+    // inherited a wrong clock (from a mis-set phone, or from a mesh peer)
+    // mis-dates the whole conversation and the whole node table, and the app
+    // then ages both against a calibrated clock. Fixing the source beats
+    // correcting every consumer. Best-effort: a radio that refuses costs us
+    // nothing we did not already have.
+    unawaited(_service.setRadioTime(AppTime.utc));
 
     // A radio that has never been configured has no region; setting it is what
     // the user came here for and costs them nothing. Any *other* region is

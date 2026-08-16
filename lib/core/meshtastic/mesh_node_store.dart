@@ -52,7 +52,16 @@ class MeshNodeStore extends ChangeNotifier {
   /// How many nodes are kept. A busy region's mesh runs to a few hundred; the
   /// least-recently-heard are dropped first, because a node nobody has heard
   /// from in weeks is the one least worth remembering.
-  static const int maxNodes = 250;
+  static const int maxNodes = 1000;
+
+  /// How far back the *map* looks.
+  ///
+  /// The store keeps more than this — a node's last known position is worth
+  /// remembering after it goes quiet — but a dot on a disaster map is read as
+  /// "there is a radio there", and a month-old sighting cannot support that
+  /// claim. Beyond the window the node stays in the list, where its "last
+  /// heard" is written next to it and can be judged.
+  static const Duration mapWindow = Duration(hours: 24);
 
   /// How long after its last transmission a node still counts as online. The
   /// firmware uses the same window for its own node list.
@@ -128,21 +137,37 @@ class MeshNodeStore extends ChangeNotifier {
   /// [nodes] does.
   int get count => _nodes.length;
 
-  /// The nodes the map can draw: they have a position, and — unless
-  /// [excludeMqtt] is off — they were heard over the air rather than through
-  /// an MQTT bridge.
-  List<MeshNode> get positioned => [
-    for (final node in _nodes.values)
-      if (node.latitude != null && node.longitude != null)
-        if (!_excludeMqtt || !node.viaMqtt) node,
-  ];
+  /// The nodes the map can draw: heard inside [mapWindow], carrying a
+  /// position, and — unless [excludeMqtt] is off — heard over the air rather
+  /// than through an MQTT bridge.
+  List<MeshNode> get positioned {
+    final cutoff = _now().subtract(mapWindow);
+    return [
+      for (final node in _nodes.values)
+        if (node.latitude != null && node.longitude != null)
+          if (!_excludeMqtt || !node.viaMqtt)
+            // A node with no heard time at all has nothing to place it in
+            // time, so it cannot be shown as present.
+            if (node.lastHeard != null && node.lastHeard!.isAfter(cutoff)) node,
+    ];
+  }
 
   /// How many positioned nodes [excludeMqtt] is currently hiding — so the UI
   /// can say what it left out instead of silently showing less.
   int get hiddenMqttCount {
     if (!_excludeMqtt) return 0;
+    final cutoff = _now().subtract(mapWindow);
+    // Counted over the same population the map draws from, or the readout
+    // would blame MQTT for nodes the time window hid.
     return _nodes.values
-        .where((n) => n.latitude != null && n.longitude != null && n.viaMqtt)
+        .where(
+          (n) =>
+              n.latitude != null &&
+              n.longitude != null &&
+              n.viaMqtt &&
+              n.lastHeard != null &&
+              n.lastHeard!.isAfter(cutoff),
+        )
         .length;
   }
 
@@ -186,17 +211,49 @@ class MeshNodeStore extends ChangeNotifier {
             displayName: node.displayName.isNotEmpty
                 ? node.displayName
                 : existing.displayName,
-            isOnline: node.isOnline,
             batteryLevel: node.batteryLevel ?? existing.batteryLevel,
             lastHeard: node.lastHeard ?? existing.lastHeard,
             latitude: node.latitude ?? existing.latitude,
             longitude: node.longitude ?? existing.longitude,
             snr: node.snr != 0 ? node.snr : existing.snr,
             viaMqtt: node.viaMqtt,
+            // Kept when the new sighting does not know — the radio only sends
+            // NodeInfo during the config download, so a live telemetry update
+            // carries no hop distance and must not erase the one we had.
+            hopsAway: node.hopsAway ?? existing.hopsAway,
           );
     _recordSample(node);
+    _evictBeyondCap();
     notifyListeners();
     _scheduleWrite();
+  }
+
+  /// Drops the least-recently-heard nodes once the table is over [maxNodes].
+  ///
+  /// The cap used to apply only when writing to disk, so memory grew without
+  /// limit: an MQTT-bridged mesh reports thousands of nodes, every one of them
+  /// stayed, and the [nodes] getter re-sorted the lot on every rebuild of a
+  /// page that rebuilds on every packet. It came right after a restart and
+  /// degraded again over hours — the hardest shape of slowdown to notice.
+  ///
+  /// Evicting the oldest is the same rule [_persist] uses, so what survives a
+  /// restart is what was already on screen. Only ever a handful of nodes at a
+  /// time, so the sort is over a list that is already nearly at the cap.
+  void _evictBeyondCap() {
+    if (_nodes.length <= maxNodes) return;
+    final ordered = _nodes.values.toList()
+      ..sort((a, b) {
+        final aHeard = a.lastHeard, bHeard = b.lastHeard;
+        // Never heard sorts last: it is the least evidence of anything.
+        if (aHeard == null && bHeard == null) return 0;
+        if (aHeard == null) return 1;
+        if (bHeard == null) return -1;
+        return bHeard.compareTo(aHeard);
+      });
+    for (final node in ordered.skip(maxNodes)) {
+      _nodes.remove(node.num);
+      _history.remove(node.num);
+    }
   }
 
   /// Keeps a node's recent telemetry so the sheet can draw trends.
@@ -361,6 +418,7 @@ class MeshNodeStore extends ChangeNotifier {
     'longitude': node.longitude,
     'snr': node.snr,
     'via_mqtt': node.viaMqtt ? 1 : 0,
+    'hops_away': node.hopsAway,
   };
 
   MeshNode? _fromRow(Map<String, Object?> row) {
@@ -373,15 +431,14 @@ class MeshNodeStore extends ChangeNotifier {
     return MeshNode(
       num: nodeNum,
       displayName: row['name'] as String? ?? '',
-      // Recomputed from `lastHeard`, never restored — see [isOnline].
-      isOnline:
-          lastHeard != null && _now().difference(lastHeard) < onlineWindow,
       batteryLevel: (row['battery'] as num?)?.toInt(),
       lastHeard: lastHeard,
       latitude: (row['latitude'] as num?)?.toDouble(),
       longitude: (row['longitude'] as num?)?.toDouble(),
       snr: (row['snr'] as num?)?.toDouble() ?? 0,
       viaMqtt: (row['via_mqtt'] as num?) == 1,
+      // NULL stays null: a stored 0 would claim a direct neighbour.
+      hopsAway: (row['hops_away'] as num?)?.toInt(),
     );
   }
 

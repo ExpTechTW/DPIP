@@ -115,35 +115,66 @@ class FakeMeshService implements MeshtasticService {
   }
 
   @override
-  Future<Result<void>> sendData({
+  Future<Result<int>> sendData({
     required int portnum,
     required List<int> payload,
     int channel = 0,
+    int? destination,
     bool wantAck = false,
     bool wantResponse = false,
   }) async {
     final failure = sendFailure;
     if (failure != null) return Err(failure);
     sentData.add((portnum: portnum, channel: channel, payload: payload));
-    return const Ok(null);
+    return Ok(nextPacketId++);
   }
 
   final routes = StreamController<MeshRoute>.broadcast();
 
+  /// Ids handed back by [sendData] / [traceRoute], so a test can match a
+  /// notice or a reply to the probe that caused it.
+  int nextPacketId = 1;
+
+  /// Times handed to the radio, so a test can assert the clock was set.
+  final radioTimes = <DateTime>[];
+
+  @override
+  Future<Result<bool>> setRadioTime(DateTime utc) async {
+    radioTimes.add(utc);
+    return const Ok(true);
+  }
+
+  /// The radio's own counters, and the stream a recorder samples from.
+  final localStatsUpdates = StreamController<MeshLocalStats>.broadcast();
+
+  MeshLocalStats? localStatsValue;
+
+  @override
+  Stream<MeshLocalStats> get localStatsStream => localStatsUpdates.stream;
+
+  @override
+  MeshLocalStats? get localStats => localStatsValue;
+
+  /// Notices the radio pushes back about a send.
+  final notices = StreamController<MeshNotice>.broadcast();
+
+  @override
+  Stream<MeshNotice> get noticeStream => notices.stream;
+
   /// Whether [traceRoute] fails, and what it was asked for.
-  Result<void> traceResult = const Ok(null);
+  Result<int>? traceResult;
   final List<int> tracedNodes = [];
 
   /// When set, [traceRoute] waits on it instead of answering [traceResult] —
   /// tests can hold a probe in flight.
-  Completer<Result<void>>? traceGate;
+  Completer<Result<int>>? traceGate;
 
   @override
-  Future<Result<void>> traceRoute(int nodeNum) async {
+  Future<Result<int>> traceRoute(int nodeNum) async {
     tracedNodes.add(nodeNum);
     final gate = traceGate;
     if (gate != null) return gate.future;
-    return traceResult;
+    return traceResult ?? Ok(nextPacketId++);
   }
 
   @override
