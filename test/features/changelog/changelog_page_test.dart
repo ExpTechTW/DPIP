@@ -77,7 +77,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
-  testWidgets('snapshots are hidden until asked for', (tester) async {
+  testWidgets('everything shows, snapshots included', (tester) async {
     final repo = _PagedRepository([
       [
         _note('26w33a', prerelease: true, day: 3),
@@ -87,12 +87,26 @@ void main() {
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
 
-    // They outnumber releases by an order of magnitude within a week.
+    // Most installed builds are snapshots — every commit on main publishes
+    // one — so hiding them would leave the build someone is running with no
+    // entry at all.
+    expect(find.text('26w33a'), findsWidgets);
+    expect(find.text('v26.1'), findsWidgets);
+  });
+
+  testWidgets('and the toggle narrows it to releases', (tester) async {
+    final repo = _PagedRepository([
+      [
+        _note('26w33a', prerelease: true, day: 3),
+        _note('v26.1', prerelease: false, day: 2),
+      ],
+    ]);
+    await tester.pumpWidget(_wrap(repo));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.science));
+    await tester.pumpAndSettle();
     expect(find.text('26w33a'), findsNothing);
     expect(find.text('v26.1'), findsWidgets);
-
-    await tester.tap(find.byIcon(Icons.science_outlined));
-    await tester.pumpAndSettle();
-    expect(find.text('26w33a'), findsWidgets);
   });
 }

@@ -54,11 +54,15 @@ class _ChangelogPageState extends State<ChangelogPage> {
 
   /// Whether snapshots are shown alongside releases.
   ///
-  /// Off by default. Every push publishes one, so within a week they outnumber
-  /// releases by an order of magnitude, and someone opening the changelog to
-  /// see what changed in the version they are running does not want to scroll
-  /// past two hundred of them. A tester does, and can say so.
-  bool _showSnapshots = false;
+  /// **On by default**: the page's job is to say what has changed, and a
+  /// snapshot is a change that shipped. Hiding them would mean a build someone
+  /// is actually running has no entry — every commit on main publishes one, so
+  /// most installed builds *are* snapshots, and the row marked "installed"
+  /// would be missing for them.
+  ///
+  /// The toggle is for the opposite want: someone tracking releases only, who
+  /// can turn the rest off.
+  bool _showSnapshots = true;
 
   List<ReleaseNote> get _visible => _showSnapshots
       ? _notes
@@ -128,9 +132,9 @@ class _ChangelogPageState extends State<ChangelogPage> {
       appBar: AppBar(
         title: Text(l10n.changelogTitle),
         actions: [
-          // Snapshots are hidden by default and this is how a tester asks for
-          // them — an action rather than a settings toggle, because it changes
-          // what this one page shows and nothing else.
+          // Everything shows by default; this narrows it to releases. An
+          // action rather than a setting, because it changes what this one
+          // page shows and nothing else.
           IconButton(
             onPressed: () => setState(() => _showSnapshots = !_showSnapshots),
             isSelected: _showSnapshots,
