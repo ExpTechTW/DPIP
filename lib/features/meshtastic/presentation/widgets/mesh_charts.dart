@@ -4,7 +4,7 @@
 /// current reading (identity never rests on colour alone), an analysis line of
 /// small stats where the data supports one, and a touch-enabled line chart on
 /// a recessive grid with the day's bounds and midpoint on the time axis.
-/// The shared scaffold ([_MeshChart]) is what keeps them from drifting apart.
+/// The shared scaffold ([MeshChart]) is what keeps them from drifting apart.
 ///
 /// Axis policy, per chart: utilization and battery live on axes whose meaning
 /// is fixed (percent — battery pinned to 0–100 so a healthy pack's 2% sag is
@@ -19,6 +19,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/models/series_runs.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -44,41 +45,48 @@ class MeshUtilizationChart extends StatelessWidget {
     final channelColor = dark ? _channelDark : _channelLight;
     final airColor = dark ? _airDark : _airLight;
 
-    final points = [
+    // Two lists on purpose. `readings` is what exists, and answers the
+    // legend, the stats and the axis bounds. `samples` is every slice of the
+    // day — including the ones that carried nothing — and is what gets
+    // plotted, so `_line` can break at the holes. Handing the filtered list to
+    // the plotter is what re-bridges a gap: the missing slices simply stop
+    // existing and the line runs straight across the time they occupied.
+    final readings = [
       for (final sample in samples)
         if (sample.channelUtilization != null || sample.airUtilTx != null)
           sample,
     ];
-    if (points.length < 2) return const _NoHistory();
+    if (readings.length < 2) return const MeshChartEmpty();
+    final points = samples;
 
     // The axis follows the data so a mesh idling under 10% is readable, with
     // a floor so a quiet radio isn't magnified into a dramatic one.
-    final peak = points.fold<double>(0, (max, sample) {
+    final peak = readings.fold<double>(0, (max, sample) {
       final channel = sample.channelUtilization ?? 0;
       final air = sample.airUtilTx ?? 0;
       return [max, channel, air].reduce((a, b) => a > b ? a : b);
     });
     final channelValues = [
-      for (final p in points)
+      for (final p in readings)
         if (p.channelUtilization != null) p.channelUtilization!,
     ];
     final avg = channelValues.isEmpty
         ? null
         : channelValues.reduce((a, b) => a + b) / channelValues.length;
 
-    return _MeshChart(
+    return MeshChart(
       legend: [
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: channelColor,
           label: l10n.meshtasticChannelUse,
           // l10n-ignore: percentage readout
-          text: _pct(points.last.channelUtilization),
+          text: _pct(readings.last.channelUtilization),
         ),
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: airColor,
           label: l10n.meshtasticAirtime,
           // l10n-ignore: percentage readout
-          text: _pct(points.last.airUtilTx),
+          text: _pct(readings.last.airUtilTx),
         ),
       ],
       stats: [
@@ -96,8 +104,8 @@ class MeshUtilizationChart extends StatelessWidget {
       last: points.last.at,
       series: [
         // Air time first so the channel line draws over its fill.
-        ..._line(points, (s) => s.airUtilTx, airColor, filled: true),
-        ..._line(points, (s) => s.channelUtilization, channelColor),
+        ...meshChartLine(points, (s) => s.airUtilTx, airColor, filled: true),
+        ...meshChartLine(points, (s) => s.channelUtilization, channelColor),
       ],
       tooltipUnit: '%',
     );
@@ -127,7 +135,7 @@ class MeshBatteryChart extends StatelessWidget {
       for (final sample in samples)
         if (sample.batteryPercent != null) sample,
     ];
-    if (batteryPoints.length < 2) return const _NoHistory();
+    if (batteryPoints.length < 2) return const MeshChartEmpty();
 
     // The chart plots **every** sample, gapped or not: a sample without a
     // battery reading sits on the time axis as a hole, and `_line` breaks
@@ -138,16 +146,16 @@ class MeshBatteryChart extends StatelessWidget {
     final voltage = batteryPoints.last.voltage;
     final drain = _drainPerHour(batteryPoints);
 
-    return _MeshChart(
+    return MeshChart(
       legend: [
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: color,
           label: l10n.meshtasticBattery,
           // l10n-ignore: percentage readout
           text: '${current.clamp(0, 100)}%',
         ),
         if (voltage != null)
-          _LegendEntry(
+          MeshChartLegendEntry(
             color: theme.colorScheme.outline,
             label: l10n.meshtasticVoltage,
             // l10n-ignore: volts readout
@@ -159,10 +167,17 @@ class MeshBatteryChart extends StatelessWidget {
           // l10n-ignore: rate readout
           (l10n.meshtasticStatDrain, '${drain.toStringAsFixed(1)}%/h'),
           if (current <= 100)
-            (l10n.meshtasticStatEta, _etaLabel(l10n, current, drain)),
-        ] else if (drain != null && drain > 0.05)
-          (l10n.meshtasticStatTrend, l10n.meshtasticStatCharging)
-        else if (drain != null)
+            (l10n.meshtasticStatEta, _etaLabel(l10n, current, -drain)),
+        ] else if (drain != null && drain > 0.05) ...[
+          (l10n.meshtasticStatTrend, l10n.meshtasticStatCharging),
+          // l10n-ignore: rate readout
+          (l10n.meshtasticStatDrain, '+${drain.toStringAsFixed(1)}%/h'),
+          // How long to full, by the same fit — the question a charging pack
+          // raises is when it will be ready, and it is the same arithmetic
+          // with the distance measured upwards.
+          if (current < 100)
+            (l10n.meshtasticStatFull, _etaLabel(l10n, 100 - current, drain)),
+        ] else if (drain != null)
           (l10n.meshtasticStatTrend, l10n.meshtasticStatStable),
       ],
       minY: 0,
@@ -172,7 +187,7 @@ class MeshBatteryChart extends StatelessWidget {
       first: points.first.at,
       last: points.last.at,
       series: [
-        ..._line(
+        ...meshChartLine(
           points,
           // 101 means external power; the line stays a battery line, capped
           // at full.
@@ -185,28 +200,68 @@ class MeshBatteryChart extends StatelessWidget {
     );
   }
 
-  /// Battery slope in %/hour from a least-squares fit over the on-battery
-  /// samples (external-power readings pin at 101 and would fake a charge).
+  /// How many readings the slope is fitted over.
+  ///
+  /// The *recent* trend, not the day's average. A pack that drained hard this
+  /// morning and has been flat since would otherwise keep predicting a death
+  /// that stopped approaching hours ago — and the estimate a user acts on is
+  /// about what the radio is doing now. Sixty readings is roughly the last
+  /// hour at the radio's usual cadence, long enough to average out the
+  /// quantisation and short enough to follow a change.
+  static const int _slopeWindow = 60;
+
+  /// …and never across a hole, whatever the count says.
+  ///
+  /// The count alone is not a window. After an outage there may be only a
+  /// handful of recent readings, and "the last sixty" then reaches back across
+  /// the hole to whatever preceded it — fitting one line through an hour of
+  /// now and an hour of yesterday, whose slope describes neither. So the fit
+  /// is confined to the **trailing continuous run**, by the same rule the
+  /// lines are drawn with ([splitSeriesRuns]).
+  ///
+  /// That rule is used rather than a fixed one-hour cutoff because it adapts
+  /// to the feed: at the radio's usual one-a-minute cadence sixty readings
+  /// *are* the last hour, and on a radio that reports hourly a fixed hour
+  /// would leave one reading and refuse to answer at all — throwing away a
+  /// perfectly good twelve-hour trend.
+
+  /// Battery slope in %/hour from a least-squares fit over the most recent
+  /// [_slopeWindow] on-battery samples (external-power readings pin at 101 and
+  /// would fake a charge).
   ///
   /// A fit, not first-minus-last: telemetry percent is quantised and noisy,
   /// and two arbitrary endpoints turn one noisy reading into the whole
-  /// answer. Null with under an hour of data — a slope from minutes is noise.
+  /// answer. Null with under an hour of readings — a slope from minutes is
+  /// noise.
   static double? _drainPerHour(List<MeshMetricSample> points) {
-    final usable = [
+    final onBattery = [
       for (final p in points)
         if (p.batteryPercent != null && p.batteryPercent! <= 100) p,
     ];
+    if (onBattery.isEmpty) return null;
+    final runs = splitSeriesRuns<int>([
+      for (final p in onBattery) (p.at, p.batteryPercent),
+    ]);
+    if (runs.isEmpty) return null;
+    final recent = runs.last;
+    final usable = recent.length <= _slopeWindow
+        ? recent
+        : recent.sublist(recent.length - _slopeWindow);
     if (usable.length < 3) return null;
+    // Enough elapsed time for the fit to mean something. Deliberately shorter
+    // than the hour [_slopeWindow] usually covers: sixty readings a minute
+    // apart span fifty-nine, and an hour-long guard would reject exactly the
+    // window this is fitted over.
     final spanMs =
-        usable.last.at.millisecondsSinceEpoch -
-        usable.first.at.millisecondsSinceEpoch;
-    if (spanMs < 3600 * 1000) return null;
+        usable.last.$1.millisecondsSinceEpoch -
+        usable.first.$1.millisecondsSinceEpoch;
+    if (spanMs < 20 * 60 * 1000) return null;
     final n = usable.length;
-    final t0 = usable.first.at.millisecondsSinceEpoch;
+    final t0 = usable.first.$1.millisecondsSinceEpoch;
     var sumX = 0.0, sumY = 0.0, sumXY = 0.0, sumX2 = 0.0;
-    for (final p in usable) {
-      final x = (p.at.millisecondsSinceEpoch - t0) / (3600 * 1000);
-      final y = p.batteryPercent!.toDouble();
+    for (final (at, battery) in usable) {
+      final x = (at.millisecondsSinceEpoch - t0) / (3600 * 1000);
+      final y = battery!.toDouble();
       sumX += x;
       sumY += y;
       sumXY += x * y;
@@ -217,8 +272,11 @@ class MeshBatteryChart extends StatelessWidget {
     return (n * sumXY - sumX * sumY) / denom;
   }
 
-  static String _etaLabel(AppLocalizations l10n, int battery, double drain) {
-    final hours = battery / -drain;
+  /// [distance] is how many percentage points remain to travel and [rate] how
+  /// many per hour it is travelling — both positive, whichever way it is
+  /// going.
+  static String _etaLabel(AppLocalizations l10n, int distance, double rate) {
+    final hours = distance / rate;
     if (hours >= 48) return l10n.meshtasticEtaDays((hours / 24).round());
     if (hours >= 1) return l10n.meshtasticEtaHours(hours.round());
     return l10n.meshtasticEtaHours(1);
@@ -247,32 +305,35 @@ class MeshNodesChart extends StatelessWidget {
     final totalColor = dark ? _totalDark : _totalLight;
     final onlineColor = dark ? _onlineDark : _onlineLight;
 
-    final points = [
+    // See [MeshUtilizationChart]: readings answer the legend, every sample
+    // gets plotted so the line can break where the radio said nothing.
+    final readings = [
       for (final sample in samples)
         if (sample.nodesTotal != null) sample,
     ];
-    if (points.length < 2) return const _NoHistory();
+    if (readings.length < 2) return const MeshChartEmpty();
+    final points = samples;
 
-    final peakOnline = points.fold<int>(
+    final peakOnline = readings.fold<int>(
       0,
       (max, s) => math.max(max, s.nodesOnline ?? 0),
     );
-    final ceiling = points.fold<int>(
+    final ceiling = readings.fold<int>(
       1,
       (max, s) => math.max(max, s.nodesTotal ?? 0),
     );
 
-    return _MeshChart(
+    return MeshChart(
       legend: [
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: totalColor,
           label: l10n.meshtasticNodesTotal,
-          text: '${points.last.nodesTotal}',
+          text: '${readings.last.nodesTotal}',
         ),
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: onlineColor,
           label: l10n.meshtasticNodesOnline,
-          text: '${points.last.nodesOnline ?? '—'}',
+          text: '${readings.last.nodesOnline ?? '—'}',
         ),
       ],
       stats: [(l10n.meshtasticStatPeak, '$peakOnline')],
@@ -282,8 +343,8 @@ class MeshNodesChart extends StatelessWidget {
       first: points.first.at,
       last: points.last.at,
       series: [
-        ..._line(points, (s) => s.nodesTotal?.toDouble(), totalColor),
-        ..._line(
+        ...meshChartLine(points, (s) => s.nodesTotal?.toDouble(), totalColor),
+        ...meshChartLine(
           points,
           (s) => s.nodesOnline?.toDouble(),
           onlineColor,
@@ -313,27 +374,30 @@ class MeshTrafficChart extends StatelessWidget {
     final rxColor = dark ? _rxDark : _rxLight;
     final txColor = dark ? _txDark : _txLight;
 
-    final points = [
+    // See [MeshUtilizationChart]: readings answer the legend, every sample
+    // gets plotted so the line can break where nothing was counted.
+    final readings = [
       for (final sample in samples)
         if (sample.rxPackets != null || sample.txPackets != null) sample,
     ];
-    if (points.length < 2) return const _NoHistory();
+    if (readings.length < 2) return const MeshChartEmpty();
+    final points = samples;
 
     var rxTotal = 0, txTotal = 0, peak = 0;
-    for (final p in points) {
+    for (final p in readings) {
       rxTotal += p.rxPackets ?? 0;
       txTotal += p.txPackets ?? 0;
       peak = math.max(peak, math.max(p.rxPackets ?? 0, p.txPackets ?? 0));
     }
 
-    return _MeshChart(
+    return MeshChart(
       legend: [
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: rxColor,
           label: l10n.meshtasticRx,
           text: '$rxTotal',
         ),
-        _LegendEntry(
+        MeshChartLegendEntry(
           color: txColor,
           label: l10n.meshtasticTx,
           text: '$txTotal',
@@ -346,8 +410,13 @@ class MeshTrafficChart extends StatelessWidget {
       first: points.first.at,
       last: points.last.at,
       series: [
-        ..._line(points, (s) => s.rxPackets?.toDouble(), rxColor, filled: true),
-        ..._line(points, (s) => s.txPackets?.toDouble(), txColor),
+        ...meshChartLine(
+          points,
+          (s) => s.rxPackets?.toDouble(),
+          rxColor,
+          filled: true,
+        ),
+        ...meshChartLine(points, (s) => s.txPackets?.toDouble(), txColor),
       ],
       tooltipUnit: '',
     );
@@ -357,12 +426,15 @@ class MeshTrafficChart extends StatelessWidget {
 /// One line series in the shared style: thin, softly curved, optional
 /// gradient fill fading to nothing so stacked fills never turn to mud.
 ///
-/// Returns **one bar per continuous run** of readings: a sample without a
-/// value is a gap, and a line across a gap would claim readings that never
-/// happened — the radio reports telemetry on its own cadence, so a missed
-/// report must read as a hole, not as a straight bridge. Runs of a single
-/// point are dropped (there is no line in one point).
-List<LineChartBarData> _line(
+/// Returns **one bar per continuous run** of readings — see [splitSeriesRuns]
+/// for what counts as continuous. Runs of a single point are dropped (there is
+/// no line in one point).
+///
+/// Breaking on a missing *value* alone was not enough: the recorder writes a
+/// row only when there is something to record, so an hours-long outage leaves
+/// no rows at all and the two halves of the day sit adjacent in the list with
+/// nothing null between them. The split is therefore on **time** as well.
+List<LineChartBarData> meshChartLine(
   List<MeshMetricSample> points,
   double? Function(MeshMetricSample) value,
   Color color, {
@@ -389,29 +461,24 @@ List<LineChartBarData> _line(
     belowBarData: BarAreaData(show: filled, gradient: gradient),
   );
 
-  final bars = <LineChartBarData>[];
-  var run = <FlSpot>[];
-  void flush() {
-    if (run.length >= 2) bars.add(bar(run));
-    run = <FlSpot>[];
-  }
-
-  for (final sample in points) {
-    final v = value(sample);
-    if (v == null) {
-      flush();
-      continue;
-    }
-    run.add(FlSpot(sample.at.millisecondsSinceEpoch.toDouble(), v));
-  }
-  flush();
-  return bars;
+  final runs = splitSeriesRuns<double>([
+    for (final sample in points) (sample.at, value(sample)),
+  ]);
+  return [
+    for (final run in runs)
+      if (run.length >= 2)
+        bar([
+          for (final (at, v) in run)
+            FlSpot(at.millisecondsSinceEpoch.toDouble(), v!),
+        ]),
+  ];
 }
 
 /// The shared chart shell: legend, stats line, and a touch-enabled line chart
 /// with the day's bounds and midpoint on the time axis.
-class _MeshChart extends StatelessWidget {
-  const _MeshChart({
+class MeshChart extends StatelessWidget {
+  const MeshChart({
+    super.key,
     required this.legend,
     required this.stats,
     required this.minY,
@@ -421,6 +488,7 @@ class _MeshChart extends StatelessWidget {
     required this.last,
     required this.series,
     required this.tooltipUnit,
+    this.caption = '',
   });
 
   final List<Widget> legend;
@@ -437,6 +505,11 @@ class _MeshChart extends StatelessWidget {
 
   /// Appended to tooltip values ('%' or '').
   final String tooltipUnit;
+
+  /// One sentence under the chart saying what the shape means, for readings
+  /// whose number is only legible to someone who already knows the mechanics.
+  /// Empty hides the line.
+  final String caption;
 
   @override
   Widget build(BuildContext context) {
@@ -571,18 +644,29 @@ class _MeshChart extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 20,
-                      // Bounds and midpoint: a day needs orientation inside
-                      // it, not a tick every hour.
-                      interval: span / 2,
-                      getTitlesWidget: (value, meta) => Padding(
-                        padding: const EdgeInsets.only(top: AppSpacing.xs),
-                        child: Text(
-                          _clock(value),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                      // Quarters, so the three interior ticks are the ones
+                      // that get drawn. A label is centred on its value, so a
+                      // tick sitting exactly on `minX` has half of itself
+                      // outside the plot — it collided with the y-axis labels
+                      // on the left and was clipped on the right. Skipping the
+                      // bounds costs nothing: the window is chosen by the
+                      // reader, so its ends are already known.
+                      interval: span / 4,
+                      getTitlesWidget: (value, meta) {
+                        final edge = span / 100;
+                        if (value <= firstMs + edge || value >= lastMs - edge) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: AppSpacing.xs),
+                          child: Text(
+                            _clock(value),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -591,6 +675,21 @@ class _MeshChart extends StatelessWidget {
             ),
           ),
         ),
+        if (caption.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            child: Text(
+              caption,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -608,8 +707,8 @@ class _MeshChart extends StatelessWidget {
 }
 
 /// The consistent empty state: not enough samples for a line yet.
-class _NoHistory extends StatelessWidget {
-  const _NoHistory();
+class MeshChartEmpty extends StatelessWidget {
+  const MeshChartEmpty({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -631,8 +730,9 @@ class _NoHistory extends StatelessWidget {
 
 /// A legend entry that also carries the latest reading — identity never rests
 /// on colour alone, and the number people actually want is the current one.
-class _LegendEntry extends StatelessWidget {
-  const _LegendEntry({
+class MeshChartLegendEntry extends StatelessWidget {
+  const MeshChartLegendEntry({
+    super.key,
     required this.color,
     required this.label,
     required this.text,

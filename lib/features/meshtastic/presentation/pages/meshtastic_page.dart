@@ -23,6 +23,8 @@ import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_charts.dart';
+import 'package:dpip/features/meshtastic/presentation/widgets/mesh_chart_section.dart';
+import 'package:dpip/features/meshtastic/presentation/widgets/mesh_ratio_chart.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -936,6 +938,132 @@ class _ChannelPicker extends StatelessWidget {
   }
 }
 
+/// The message log, with a way back down.
+///
+/// Scrolling up through a long conversation strands the reader: new messages
+/// keep landing at the bottom, the view stays where it was (correct — nothing
+/// should yank the page out from under someone reading), and the only way back
+/// is to fling. So a button appears once the bottom is off screen, exactly as
+/// Discord does it, and disappears when it would do nothing.
+class _ChatList extends StatefulWidget {
+  const _ChatList({
+    required this.messages,
+    required this.controller,
+    required this.firstUnread,
+  });
+
+  final List<MeshChatMessage> messages;
+  final MeshChatController controller;
+  final int firstUnread;
+
+  @override
+  State<_ChatList> createState() => _ChatListState();
+}
+
+class _ChatListState extends State<_ChatList> {
+  final ScrollController _scroll = ScrollController();
+  bool _canJump = false;
+
+  /// How far from the newest message counts as "away from the bottom".
+  ///
+  /// Not zero: the list settles a pixel or two off the edge after a layout,
+  /// and a button that flickers into view while the reader sits at the bottom
+  /// is worse than no button.
+  static const double _threshold = 240;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    // Reversed list: offset 0 *is* the newest message.
+    final canJump = _scroll.hasClients && _scroll.offset > _threshold;
+    if (canJump != _canJump) setState(() => _canJump = canJump);
+  }
+
+  void _jumpToLatest() {
+    if (!_scroll.hasClients) return;
+    // Animated rather than a jump: the reader needs to see that the *view*
+    // moved to the bottom, not that the content changed under them.
+    _scroll.animateTo(
+      0,
+      duration: AppMotion.medium,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Stack(
+      children: [
+        ListView.builder(
+          controller: _scroll,
+          reverse: true,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+          itemCount: widget.messages.length,
+          itemBuilder: (context, index) {
+            final message = widget.messages[index];
+            // Reversed: the next index is the *older* message, so the day
+            // label belongs to the oldest message of each day.
+            final older = index + 1 < widget.messages.length
+                ? widget.messages[index + 1]
+                : null;
+            final startsDay =
+                older == null || !_sameDay(older.timestamp, message.timestamp);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (startsDay) _DayLabel(date: message.timestamp),
+                // The Discord line: everything below it arrived since the user
+                // last read this conversation. Under the day label so a run
+                // that starts a new day reads date-then-new, not new-then-date.
+                if (index == widget.firstUnread) const _UnreadDivider(),
+                _Bubble(message: message, controller: widget.controller),
+              ],
+            );
+          },
+        ),
+        Positioned(
+          right: AppSpacing.lg,
+          bottom: AppSpacing.lg,
+          child: AnimatedSlide(
+            duration: AppMotion.fast,
+            curve: Curves.easeOut,
+            // Slides out downward rather than only fading: it comes from the
+            // bottom edge, which is where it takes you.
+            offset: _canJump ? Offset.zero : const Offset(0, 1.4),
+            child: AnimatedOpacity(
+              duration: AppMotion.fast,
+              opacity: _canJump ? 1 : 0,
+              child: IgnorePointer(
+                ignoring: !_canJump,
+                child: FloatingActionButton.small(
+                  onPressed: _jumpToLatest,
+                  tooltip: l10n.meshtasticJumpToLatest,
+                  child: const Icon(Icons.keyboard_double_arrow_down),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// The Discord-style unread rule: a red line with a pill naming what it is,
 /// sitting where the unseen messages begin.
 class _UnreadDivider extends StatelessWidget {
@@ -1044,38 +1172,16 @@ class _MessageLog extends StatelessWidget {
       }
     }
 
-    return ListView.builder(
-      reverse: true,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      itemCount: messages.length,
-      itemBuilder: (context, index) {
-        final message = messages[index];
-        // Reversed: the next index is the *older* message, so the day label
-        // belongs to the oldest message of each day.
-        final older = index + 1 < messages.length ? messages[index + 1] : null;
-        final startsDay =
-            older == null || !_sameDay(older.timestamp, message.timestamp);
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (startsDay) _DayLabel(date: message.timestamp),
-            // The Discord line: everything below it arrived since the user
-            // last read this conversation. Under the day label so a run that
-            // starts a new day reads date-then-new, not new-then-date.
-            if (index == firstUnread) const _UnreadDivider(),
-            _Bubble(message: message, controller: controller),
-          ],
-        );
-      },
+    return _ChatList(
+      messages: messages,
+      controller: controller,
+      firstUnread: firstUnread,
     );
   }
-
-  bool _sameDay(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
 }
+
+bool _sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
 
 class _DayLabel extends StatelessWidget {
   const _DayLabel({required this.date});
@@ -1595,14 +1701,39 @@ class _RadioSheet extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(l10n.meshtasticUtilization),
-                  MeshUtilizationChart(samples: samples),
-                  SectionHeader(l10n.meshtasticBatteryHistory),
-                  MeshBatteryChart(samples: samples),
-                  SectionHeader(l10n.meshtasticNodesHistory),
-                  MeshNodesChart(samples: samples),
-                  SectionHeader(l10n.meshtasticTrafficHistory),
-                  MeshTrafficChart(samples: samples),
+                  // Each chart carries its own window: "has the battery been
+                  // draining all day" and "did the error rate spike just now"
+                  // are different questions, and a reader comparing two of
+                  // them wants to hold one steady while moving the other.
+                  MeshChartSection(
+                    title: l10n.meshtasticUtilization,
+                    samples: samples,
+                    builder: (windowed) =>
+                        MeshUtilizationChart(samples: windowed),
+                  ),
+                  MeshChartSection(
+                    title: l10n.meshtasticBatteryHistory,
+                    samples: samples,
+                    builder: (windowed) => MeshBatteryChart(samples: windowed),
+                  ),
+                  MeshChartSection(
+                    title: l10n.meshtasticNodesHistory,
+                    samples: samples,
+                    builder: (windowed) => MeshNodesChart(samples: windowed),
+                  ),
+                  MeshChartSection(
+                    title: l10n.meshtasticTrafficHistory,
+                    samples: samples,
+                    builder: (windowed) => MeshTrafficChart(samples: windowed),
+                  ),
+                  // The radio's own counters, one full-width chart each.
+                  for (final ratio in MeshRatio.values)
+                    MeshChartSection(
+                      title: MeshRatioChart.titleOf(ratio, l10n),
+                      samples: samples,
+                      builder: (windowed) =>
+                          MeshRatioChart(ratio: ratio, samples: windowed),
+                    ),
                 ],
               );
             },
