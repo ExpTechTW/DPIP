@@ -15,8 +15,18 @@ import android.content.Intent
  */
 class LocationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         val appContext = context.applicationContext
+        BgLocationStore.noteWake(appContext, "boot")
+        // MY_PACKAGE_REPLACED as well as BOOT_COMPLETED: an app update cancels
+        // every alarm the package had scheduled and Android does not restore
+        // them, so a device that updates and is not opened loses its spine
+        // silently — which is exactly the state a user who "installed the fix"
+        // would be in.
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_MY_PACKAGE_REPLACED
+        ) {
+            return
+        }
         if (!BgLocationStore.enabled(appContext)) return
 
         if (!GmsAvailability.available(appContext) || !BgLocationStore.hasLast(appContext)) {

@@ -80,6 +80,51 @@ class BackgroundLocationService {
   }
 
   /// Disables background reporting.
+  /// Writes everything the native background path recorded into the app's own
+  /// log, and clears it.
+  ///
+  /// A background wake runs in a `BroadcastReceiver` (Android) with no Flutter
+  /// isolate, so nothing it does can reach [Log] as it happens — and
+  /// `android.util.Log` is logcat, which nobody can read from their own phone.
+  /// The Android background path was invisible in the one diagnostic a user is
+  /// able to send. Called once at bootstrap, so each line is reported once.
+  Future<void> drainBreadcrumbs() async {
+    try {
+      final lines =
+          await _channel.invokeListMethod<String>('drainBreadcrumbs') ??
+          const <String>[];
+      for (final line in lines) {
+        final tab = line.indexOf('\t');
+        if (tab < 0) {
+          Log.info('background location (native): $line');
+          continue;
+        }
+        final at = int.tryParse(line.substring(0, tab));
+        final when = at == null
+            ? ''
+            : ' at ${DateTime.fromMillisecondsSinceEpoch(at).toIso8601String()}';
+        Log.info(
+          'background location (native)$when: ${line.substring(tab + 1)}',
+        );
+      }
+    } on Object catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'background location breadcrumbs');
+    }
+  }
+
+  /// Runs the native report path now, with whatever fix the OS last had.
+  ///
+  /// Exists so the background path can be exercised without waiting for a
+  /// geofence crossing — the wait that made every previous attempt at this bug
+  /// untestable.
+  Future<void> reportNow() async {
+    try {
+      await _channel.invokeMethod<void>('reportNow');
+    } on Object catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'background location reportNow');
+    }
+  }
+
   Future<void> stop() async {
     try {
       await _channel.invokeMethod<void>('stop');
