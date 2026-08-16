@@ -17,7 +17,6 @@ void main() {
   MeshNode node(int num, {double snr = 0, int? battery}) => MeshNode(
     num: num,
     displayName: 'repeater',
-    isOnline: true,
     batteryLevel: battery,
     lastHeard: clock,
     latitude: 24.0,
@@ -36,20 +35,23 @@ void main() {
     return (store, service);
   }
 
-  Widget wrap(MeshNodeStore store) => MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: Scaffold(
-      body: MeshNodeSheet(
-        store: store,
-        selected: ValueNotifier(1),
-        selectionRevision: ValueNotifier(0),
-        routeState: ValueNotifier(const MeshRouteState.none()),
-        onTraceRoute: (_) {},
-        onClose: () {},
-      ),
-    ),
-  );
+  Widget wrap(MeshNodeStore store, {bool connected = true, int cooldown = 0}) =>
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: MeshNodeSheet(
+            store: store,
+            selected: ValueNotifier(1),
+            selectionRevision: ValueNotifier(0),
+            routeState: ValueNotifier(const MeshRouteState.none()),
+            connected: ValueNotifier(connected),
+            traceCooldown: ValueNotifier(cooldown),
+            onTraceRoute: (_) {},
+            onClose: () {},
+          ),
+        ),
+      );
 
   testWidgets('no trends until two distinct readings exist', (tester) async {
     final (store, service) = await makeStore();
@@ -101,6 +103,58 @@ void main() {
     expect(find.text('Signal trend (SNR)'), findsOneWidget);
     expect(find.text('Battery trend'), findsNothing);
 
+    // Let the store's debounced persist fire.
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  /// `FilledButton.tonalIcon` builds a private subclass, and `byType` matches
+  /// the exact runtime type — so the button is found by predicate.
+  Finder traceButton() => find.byWidgetPredicate((w) => w is FilledButton);
+
+  testWidgets('the trace button is disabled without a radio', (tester) async {
+    final (store, service) = await makeStore();
+    service.nodes.add(node(1, snr: -5));
+    await tester.pump();
+
+    await tester.pumpWidget(wrap(store, connected: false));
+    await tester.pump();
+
+    // A probe rides the BLE link; without it the button greys out and the row
+    // says why, rather than offering an action that can only fail.
+    expect(tester.widget<FilledButton>(traceButton()).onPressed, isNull);
+    expect(find.text('Radio not connected'), findsOneWidget);
+    // Let the store's debounced persist fire.
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  testWidgets('and enabled once the radio is attached', (tester) async {
+    final (store, service) = await makeStore();
+    service.nodes.add(node(1, snr: -5));
+    await tester.pump();
+
+    await tester.pumpWidget(wrap(store));
+    await tester.pump();
+
+    expect(tester.widget<FilledButton>(traceButton()).onPressed, isNotNull);
+    expect(find.text('Radio not connected'), findsNothing);
+    expect(find.text('Trace route'), findsOneWidget);
+    // Let the store's debounced persist fire.
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  testWidgets('a cooldown counts down on the button, disabled', (tester) async {
+    final (store, service) = await makeStore();
+    service.nodes.add(node(1, snr: -5));
+    await tester.pump();
+
+    await tester.pumpWidget(wrap(store, cooldown: 12));
+    await tester.pump();
+
+    // The radio refuses a second probe inside 30 s, so the button waits it
+    // out visibly instead of being live and answering with a refusal.
+    expect(tester.widget<FilledButton>(traceButton()).onPressed, isNull);
+    expect(find.text('Trace route 12'), findsOneWidget);
+    expect(find.text('Radio limits this to once every 30 s'), findsOneWidget);
     // Let the store's debounced persist fire.
     await tester.pump(const Duration(seconds: 2, milliseconds: 100));
   });

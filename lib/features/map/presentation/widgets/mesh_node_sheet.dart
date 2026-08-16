@@ -18,6 +18,7 @@ import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/models/series_runs.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
@@ -30,6 +31,8 @@ class MeshNodeSheet extends StatefulWidget {
     required this.selected,
     required this.selectionRevision,
     required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
     required this.onTraceRoute,
     required this.onClose,
   });
@@ -45,6 +48,13 @@ class MeshNodeSheet extends StatefulWidget {
 
   /// Traceroute in flight or its latest result — what the trace button shows.
   final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
 
   /// Sends a traceroute probe to the tapped node.
   final ValueChanged<int> onTraceRoute;
@@ -109,6 +119,8 @@ class _MeshNodeSheetState extends State<MeshNodeSheet> {
               scrollController: scrollController,
               extent: _extent,
               routeState: widget.routeState,
+              connected: widget.connected,
+              traceCooldown: widget.traceCooldown,
               onTraceRoute: widget.onTraceRoute,
               onClose: widget.onClose,
             ),
@@ -126,6 +138,8 @@ class _Body extends StatelessWidget {
     required this.scrollController,
     required this.extent,
     required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
     required this.onTraceRoute,
     required this.onClose,
   });
@@ -135,6 +149,14 @@ class _Body extends StatelessWidget {
   final ScrollController scrollController;
   final ValueNotifier<double> extent;
   final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
   final ValueChanged<int> onTraceRoute;
   final VoidCallback onClose;
 
@@ -167,6 +189,8 @@ class _Body extends StatelessWidget {
                 store: store,
                 online: store.isOnline(node),
                 routeState: routeState,
+                connected: connected,
+                traceCooldown: traceCooldown,
                 onTraceRoute: onTraceRoute,
                 onClose: onClose,
               ),
@@ -183,6 +207,8 @@ class _NodeDetail extends StatelessWidget {
     required this.store,
     required this.online,
     required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
     required this.onTraceRoute,
     required this.onClose,
   });
@@ -191,6 +217,14 @@ class _NodeDetail extends StatelessWidget {
   final MeshNodeStore store;
   final bool online;
   final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
   final ValueChanged<int> onTraceRoute;
   final VoidCallback onClose;
 
@@ -265,6 +299,21 @@ class _NodeDetail extends StatelessWidget {
                   label: l10n.meshtasticViaMqtt,
                   tone: const Color(0xFF7E57C2).vision,
                 ),
+              // How far, for free — the radio derives it from the plaintext
+              // header of packets it already heard. Absent rather than "0"
+              // when unknown: a node whose firmware predates the field, or one
+              // reached only over MQTT, has no hop distance, and rendering
+              // that as "direct" would claim reach nobody measured.
+              if (node.hopsAway != null)
+                _StatusChip(
+                  icon: node.hopsAway == 0
+                      ? Icons.wifi_tethering
+                      : Icons.multiple_stop,
+                  label: node.hopsAway == 0
+                      ? l10n.meshtasticDirect
+                      : l10n.meshtasticHopsAway(node.hopsAway!),
+                  tone: node.hopsAway == 0 ? colors.primary : colors.tertiary,
+                ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -272,6 +321,8 @@ class _NodeDetail extends StatelessWidget {
           // 2.5 Trace — the one action this sheet offers: ask the mesh how
           //    this node is reached. The dashed answer draws on the map.
           _TraceRow(
+            connected: connected,
+            traceCooldown: traceCooldown,
             nodeNum: node.num,
             routeState: routeState,
             onTraceRoute: onTraceRoute,
@@ -379,24 +430,37 @@ class _NodeDetail extends StatelessWidget {
     BuildContext context,
     List<MeshNodeSample> samples,
   ) {
-    // Null marks a break: a sample where the node did not report (or was on
-    // external power) must split the line, not be bridged by it.
+    // Each entry carries **when** it was observed, not just what. The painter
+    // needs both: a null splits the line, but so does a jump in time, and a
+    // sample the node simply never produced leaves no null behind to find —
+    // the recorder writes a row only when there is something to write, so an
+    // hours-long silence is two adjacent entries, not a hole in the list.
     final snr = [
-      for (final s in samples) (s.snr == null || s.snr == 0) ? null : s.snr,
+      for (final s in samples)
+        (s.time, (s.snr == null || s.snr == 0) ? null : s.snr),
     ];
     final battery = [
       for (final s in samples)
-        (s.battery != null && s.battery! <= 100) ? s.battery!.toDouble() : null,
+        (
+          s.time,
+          (s.battery != null && s.battery! <= 100)
+              ? s.battery!.toDouble()
+              : null,
+        ),
     ];
-    if (snr.whereType<double>().length < 2 &&
-        battery.whereType<double>().length < 2) {
-      return const [];
+    var snrCount = 0, batteryCount = 0;
+    for (final (_, v) in snr) {
+      if (v != null) snrCount++;
     }
+    for (final (_, v) in battery) {
+      if (v != null) batteryCount++;
+    }
+    if (snrCount < 2 && batteryCount < 2) return const [];
 
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final showSnr = snr.whereType<double>().length >= 2;
-    final showBattery = battery.whereType<double>().length >= 2;
+    final showSnr = snrCount >= 2;
+    final showBattery = batteryCount >= 2;
 
     return [
       const SizedBox(height: AppSpacing.lg),
@@ -450,72 +514,173 @@ class _TraceRow extends StatelessWidget {
   const _TraceRow({
     required this.nodeNum,
     required this.routeState,
+    required this.connected,
+    required this.traceCooldown,
     required this.onTraceRoute,
   });
 
   final int nodeNum;
   final ValueListenable<MeshRouteState> routeState;
+
+  /// Whether the radio is attached. A probe rides that link, so without it the
+  /// button is disabled rather than offered and then failed.
+  final ValueListenable<bool> connected;
+
+  /// Seconds until the radio will accept another probe; 0 when free.
+  final ValueListenable<int> traceCooldown;
+
   final ValueChanged<int> onTraceRoute;
+
+  /// The full throttle window, so the countdown ring knows what fraction is
+  /// left. Mirrors the layer's constant — this is presentation; the number
+  /// that actually gates a send lives there.
+  static const double _cooldownWindow = 30;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    return ValueListenableBuilder<MeshRouteState>(
-      valueListenable: routeState,
-      builder: (context, state, _) {
-        final tracing = state.tracing;
-        final result = state.result;
-        return Row(
-          children: [
-            FilledButton.tonalIcon(
-              onPressed: tracing ? null : () => onTraceRoute(nodeNum),
-              icon: tracing
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.route_outlined, size: 18),
-              label: Text(
-                tracing ? l10n.meshtasticTracing : l10n.meshtasticTraceRoute,
-              ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: connected,
+      builder: (context, connected, _) =>
+          ValueListenableBuilder<MeshRouteState>(
+            valueListenable: routeState,
+            builder: (context, state, _) => ValueListenableBuilder<int>(
+              valueListenable: traceCooldown,
+              builder: (context, cooldown, _) =>
+                  _row(context, l10n, colors, state, connected, cooldown),
             ),
-            // The outcome beside the button: the hop count of the last
-            // answer, or the failure. A result for a *different* node stays
-            // silent — it belongs to the dashed line still on the map.
-            if (!tracing && result != null && result.target == nodeNum) ...[
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  _summary(l10n, result),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-            ] else if (!tracing && state.failed) ...[
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  l10n.meshtasticTraceNoReply,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: colors.error),
-                ),
-              ),
-            ],
-          ],
-        );
-      },
+          ),
     );
   }
 
-  // l10n-ignore: numeric hop summary
-  String _summary(AppLocalizations l10n, MeshRoute route) {
-    final hops = route.towards.length - 1;
-    if (hops <= 0) return l10n.meshtasticTraceDirect;
-    return l10n.meshtasticTraceHops(hops);
+  Widget _row(
+    BuildContext context,
+    AppLocalizations l10n,
+    ColorScheme colors,
+    MeshRouteState state,
+    bool connected,
+    int cooldown,
+  ) {
+    final tracing = state.tracing;
+    // A probe in flight owns the button; only once it settles does the wait
+    // for the next one take over.
+    final waiting = !tracing && cooldown > 0;
+    final outcome = _outcome(l10n, state, nodeNum);
+    return Row(
+      children: [
+        FilledButton.tonalIcon(
+          // Disabled without a radio, and while the radio's own throttle has
+          // not run out: offering the action and then failing it tells the
+          // user less than the greyed-out button already does.
+          onPressed: tracing || waiting || !connected
+              ? null
+              : () => onTraceRoute(nodeNum),
+          icon: tracing
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : waiting
+              // The same ring run backwards: the wait has a known end, so it
+              // empties rather than spinning — a spinner would say only that
+              // something is happening, when what matters is how much is left.
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(end: cooldown / _cooldownWindow),
+                    // One second, matching the tick, so the ring sweeps
+                    // instead of stepping.
+                    duration: const Duration(seconds: 1),
+                    curve: Curves.linear,
+                    builder: (context, value, _) =>
+                        CircularProgressIndicator(value: value, strokeWidth: 2),
+                  ),
+                )
+              : const Icon(Icons.route_outlined, size: 18),
+          label: Text(
+            tracing
+                ? l10n.meshtasticTracing
+                : waiting
+                // l10n-ignore: seconds remaining beside the translated label
+                ? '${l10n.meshtasticTraceRoute} $cooldown'
+                : l10n.meshtasticTraceRoute,
+          ),
+        ),
+        // Beside the button: why it is disabled, or what the last probe
+        // found. Every settled state says something — a result for *this*
+        // node reads as hops, a failure reads in red, and a reply we could
+        // not make sense of says so rather than leaving the row blank, which
+        // looked exactly like the button doing nothing.
+        //
+        // A result for a *different* node stays silent on purpose: it belongs
+        // to the dashed line still on the map, not to this sheet.
+        if (!connected) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              l10n.meshtasticTraceOffline,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
+            ),
+          ),
+        ] else if (waiting && outcome == null) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              l10n.meshtasticTraceCooldown,
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurfaceVariant),
+            ),
+          ),
+        ] else if (!tracing && outcome != null) ...[
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              outcome.$1,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: outcome.$2 ? colors.error : colors.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// What to print beside the button, and whether it is an error — null while
+  /// there is nothing to say (never traced, or the answer belongs to another
+  /// node).
+  (String, bool)? _outcome(
+    AppLocalizations l10n,
+    MeshRouteState state,
+    int nodeNum,
+  ) {
+    final result = state.result;
+    if (result != null && result.target == nodeNum) {
+      return (
+        result.relayCount == 0
+            ? l10n.meshtasticTraceDirect
+            : l10n.meshtasticTraceHops(result.relayCount),
+        false,
+      );
+    }
+    // The radio's own words when it gave them — "TraceRoute can only be sent
+    // once every 30 seconds" is actionable in a way that "no reply" is not,
+    // and it is not ours to translate: it came off the firmware.
+    if (state.failed) {
+      return (state.reason ?? l10n.meshtasticTraceNoReply, true);
+    }
+    // A reply landed but named no destination — a payload we could not
+    // decode. Rare, and the log carries the detail; the row only has to stop
+    // being blank.
+    if (result != null && result.target == null) {
+      return (l10n.meshtasticTraceUnreadable, true);
+    }
+    return null;
   }
 }
 
@@ -610,15 +775,21 @@ class _TrendBlock extends StatelessWidget {
   final String label;
   final String unit;
 
-  /// Null marks a break in the series — the line splits there.
-  final List<double?> values;
+  /// When and what. A null value breaks the line; so does a gap in time.
+  final List<SeriesPoint<double>> values;
   final Color tone;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final latest = values.lastWhere((v) => v != null, orElse: () => null);
+    double? latest;
+    for (final (_, v) in values.reversed) {
+      if (v != null) {
+        latest = v;
+        break;
+      }
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -659,25 +830,23 @@ class _TrendBlock extends StatelessWidget {
 /// the extremes sit on the block's top and bottom edges — a flat line should
 /// still fill the block, or the eye reads it as "nothing happened".
 ///
-/// A null value is a **break**: the line splits and restarts, rather than
-/// claiming a reading the node never reported.
+/// The x axis is **time**, not position: samples are written on whatever
+/// cadence the node was heard at, so plotting by index would compress a quiet
+/// hour and stretch a busy one into the same width.
+///
+/// A break comes from a null value *or* a gap in time — see [splitSeriesRuns].
 class _SparklinePainter extends CustomPainter {
   const _SparklinePainter({required this.values, required this.tone});
 
-  final List<double?> values;
+  final List<SeriesPoint<double>> values;
   final Color tone;
 
   @override
   void paint(Canvas canvas, Size size) {
-    // The indices that actually hold a reading, and the band they span.
-    final present = <int>[];
-    for (var i = 0; i < values.length; i++) {
-      if (values[i] != null) present.add(i);
-    }
+    final present = [for (final (_, v) in values) ?v];
     if (present.isEmpty) return;
-    var lo = values[present.first]!, hi = lo;
-    for (final i in present) {
-      final v = values[i]!;
+    var lo = present.first, hi = lo;
+    for (final v in present) {
       if (v < lo) lo = v;
       if (v > hi) hi = v;
     }
@@ -688,13 +857,14 @@ class _SparklinePainter extends CustomPainter {
       hi += 1;
     }
     final span = hi - lo;
-    final denom = (values.length - 1).clamp(1, 1 << 30);
+    final t0 = values.first.$1.millisecondsSinceEpoch;
+    final width = values.last.$1.millisecondsSinceEpoch - t0;
+    final denom = width <= 0 ? 1 : width;
 
-    Offset point(int i) {
-      final x = size.width * i / denom;
-      final y = size.height - size.height * (values[i]! - lo) / span;
-      return Offset(x, y);
-    }
+    Offset point(DateTime time, double value) => Offset(
+      size.width * (time.millisecondsSinceEpoch - t0) / denom,
+      size.height - size.height * (value - lo) / span,
+    );
 
     final stroke = Paint()
       ..style = PaintingStyle.stroke
@@ -709,37 +879,26 @@ class _SparklinePainter extends CustomPainter {
         colors: [tone.withValues(alpha: 0.22), tone.withValues(alpha: 0.02)],
       ).createShader(Offset.zero & size);
 
-    // One run per stretch of consecutive readings; a gap breaks it.
-    var runStart = -1;
-    void flush(int runEnd) {
-      if (runEnd - runStart < 2) {
-        runStart = -1;
-        return;
-      }
-      final path = Path()..moveTo(point(runStart).dx, point(runStart).dy);
-      for (var i = runStart + 1; i < runEnd; i++) {
-        path.lineTo(point(i).dx, point(i).dy);
+    // One run per stretch of genuinely continuous observation.
+    Offset? last;
+    for (final run in splitSeriesRuns(values)) {
+      final points = [for (final (time, v) in run) point(time, v!)];
+      last = points.last;
+      if (points.length < 2) continue;
+      final path = Path()..moveTo(points.first.dx, points.first.dy);
+      for (final p in points.skip(1)) {
+        path.lineTo(p.dx, p.dy);
       }
       final fill = Path.from(path)
-        ..lineTo(size.width * (runEnd - 1) / denom, size.height)
-        ..lineTo(size.width * runStart / denom, size.height)
+        ..lineTo(points.last.dx, size.height)
+        ..lineTo(points.first.dx, size.height)
         ..close();
       canvas.drawPath(fill, fillPaint);
       canvas.drawPath(path, stroke);
-      runStart = -1;
     }
-
-    for (var i = 0; i < values.length; i++) {
-      if (values[i] == null) {
-        if (runStart != -1) flush(i);
-      } else if (runStart == -1) {
-        runStart = i;
-      }
-    }
-    if (runStart != -1) flush(values.length);
 
     // The latest reading still dots the line's end, wherever it sits.
-    canvas.drawCircle(point(present.last), 3, Paint()..color = tone);
+    if (last != null) canvas.drawCircle(last, 3, Paint()..color = tone);
   }
 
   @override

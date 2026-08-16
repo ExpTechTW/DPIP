@@ -36,7 +36,6 @@ void main() {
   MeshNode node(int num) => MeshNode(
     num: num,
     displayName: 'n${num.toRadixString(16)}',
-    isOnline: true,
     latitude: 24.0 + num / 1000,
     longitude: 121.0 + num / 1000,
   );
@@ -61,6 +60,7 @@ void main() {
 
       service.routes.add(
         MeshRoute(
+          target: 0x5678,
           towards: [hop(0x1234, snr: -5.5), hop(0x5678, snr: -4.75)],
           back: [hop(0x5678, snr: -4.75), hop(0x1234, snr: -5.5)],
         ),
@@ -87,7 +87,7 @@ void main() {
   });
 
   test('a second tap while a probe is in flight is ignored', () async {
-    service.traceGate = Completer<Result<void>>();
+    service.traceGate = Completer<Result<int>>();
     final first = layer.startTrace(0x5678);
     await pumpEventQueue();
 
@@ -95,9 +95,11 @@ void main() {
     expect(service.tracedNodes, [0x5678]);
 
     // The first probe settles and answers; only then is the gate open again.
-    service.traceGate!.complete(const Ok(null));
+    service.traceGate!.complete(const Ok(7));
     await first;
-    service.routes.add(MeshRoute(towards: [hop(0x5678)], back: []));
+    service.routes.add(
+      MeshRoute(target: 0x5678, towards: [hop(0x5678)], back: []),
+    );
     await pumpEventQueue();
 
     await layer.startTrace(0x1234);
@@ -113,20 +115,142 @@ void main() {
       async.flushMicrotasks();
       expect(layer.routeState.value.tracing, isTrue);
 
-      async.elapse(const Duration(seconds: 21));
+      async.elapse(const Duration(seconds: 61));
       final state = layer.routeState.value;
       expect(state.tracing, isFalse);
       expect(state.failed, isTrue);
     });
   });
 
-  test('clearing the layer drops the trace', () async {
+  test('clearing the layer drops a settled trace', () async {
     await layer.render(controller);
     await layer.startTrace(0x5678);
+    service.routes.add(
+      MeshRoute(target: 0x5678, towards: [hop(0x5678)], back: []),
+    );
+    await pumpEventQueue();
+
     await layer.clear(controller);
     final state = layer.routeState.value;
     expect(state.tracing, isFalse);
     expect(state.failed, isFalse);
     expect(state.result, isNull);
+  });
+
+  test('clearing while a probe is in flight does not abandon it', () async {
+    await layer.render(controller);
+    await layer.startTrace(0x5678);
+    // A base-map reload (a style option, a theme change) calls clear. That is
+    // not the user giving up on the trace, and the subscription is the only
+    // way its answer can arrive.
+    await layer.clear(controller);
+    expect(layer.routeState.value.tracing, isTrue);
+
+    await layer.render(controller);
+    service.routes.add(
+      MeshRoute(target: 0x5678, towards: [hop(0x5678)], back: []),
+    );
+    await pumpEventQueue();
+    expect(layer.routeState.value.result?.target, 0x5678);
+  });
+
+  test('the radio refusing the send is reported in its own words', () async {
+    await layer.render(controller);
+    service.nextPacketId = 99;
+    await layer.startTrace(0x5678);
+    service.notices.add(
+      const MeshNotice(
+        replyId: 99,
+        message: 'TraceRoute can only be sent once every 30 seconds',
+        isError: false,
+      ),
+    );
+    await pumpEventQueue();
+
+    final state = layer.routeState.value;
+    expect(state.failed, isTrue);
+    expect(state.reason, contains('30 seconds'));
+  });
+
+  test('a notice about someone else\'s packet is ignored', () async {
+    await layer.render(controller);
+    service.nextPacketId = 99;
+    await layer.startTrace(0x5678);
+    service.notices.add(
+      const MeshNotice(replyId: 12345, message: 'unrelated', isError: false),
+    );
+    await pumpEventQueue();
+    expect(layer.routeState.value.tracing, isTrue, reason: 'not our packet');
+  });
+
+  test('a reply for a different node does not resolve this probe', () async {
+    await layer.render(controller);
+    await layer.startTrace(0x5678);
+    service.routes.add(
+      MeshRoute(target: 0x1234, towards: [hop(0x1234)], back: []),
+    );
+    await pumpEventQueue();
+    expect(layer.routeState.value.tracing, isTrue);
+    expect(layer.routeState.value.result, isNull);
+  });
+
+  group('the radio\'s throttle', () {
+    test('an accepted probe starts the countdown', () async {
+      await layer.render(controller);
+      expect(layer.traceCooldown.value, 0);
+
+      await layer.startTrace(0x5678);
+      // The radio took the packet, so its 30 s clock started — the countdown
+      // begins now, not after the next press is refused.
+      expect(layer.traceCooldown.value, 30);
+    });
+
+    test('a refusal restarts it, since the remainder is unknowable', () async {
+      await layer.render(controller);
+      service.nextPacketId = 42;
+      await layer.startTrace(0x5678);
+      service.notices.add(
+        const MeshNotice(
+          replyId: 42,
+          message: 'TraceRoute can only be sent once every 30 seconds',
+          isError: false,
+        ),
+      );
+      await pumpEventQueue();
+
+      // Another client's probe may have started the radio's clock, so how
+      // much is left cannot be known — a full window is the safe bound.
+      expect(layer.traceCooldown.value, 30);
+      expect(layer.routeState.value.failed, isTrue);
+    });
+
+    test('it ticks down and frees the button', () {
+      fakeAsync((async) {
+        unawaited(layer.render(controller));
+        async.flushMicrotasks();
+        unawaited(layer.startTrace(0x5678));
+        async.flushMicrotasks();
+        expect(layer.traceCooldown.value, 30);
+
+        async.elapse(const Duration(seconds: 10));
+        expect(layer.traceCooldown.value, 20);
+
+        async.elapse(const Duration(seconds: 25));
+        expect(layer.traceCooldown.value, 0, reason: 'never below zero');
+        async.elapse(const Duration(seconds: 60));
+      });
+    });
+
+    test('losing the radio drops it — the count was about that link', () async {
+      await layer.render(controller);
+      await layer.startTrace(0x5678);
+      expect(layer.traceCooldown.value, 30);
+
+      service.connections.add(
+        const MeshConnectionStatus(state: MeshConnectionState.disconnected),
+      );
+      await pumpEventQueue();
+      expect(layer.traceCooldown.value, 0);
+    });
   });
 }

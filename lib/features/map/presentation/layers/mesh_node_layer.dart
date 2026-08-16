@@ -36,7 +36,12 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// probe is in flight, [result] when the destination answered, [failed]
 /// when the send failed or the reply never came.
 class MeshRouteState {
-  const MeshRouteState({this.target, this.result, this.failed = false});
+  const MeshRouteState({
+    this.target,
+    this.result,
+    this.failed = false,
+    this.reason,
+  });
 
   const MeshRouteState.none() : this();
 
@@ -48,6 +53,11 @@ class MeshRouteState {
 
   /// The last probe failed or timed out.
   final bool failed;
+
+  /// What the radio said was wrong, when it said anything — a rate limit, a
+  /// refusal. Null for a plain timeout, which is silence rather than an
+  /// answer.
+  final String? reason;
 
   bool get tracing => target != null;
   bool get hasRoute => result != null;
@@ -134,12 +144,52 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   ValueListenable<List<List<Offset>>> get routeSegments => _routeSegments;
 
   StreamSubscription<MeshRoute>? _routeSub;
+  StreamSubscription<MeshNotice>? _noticeSub;
+  StreamSubscription<MeshConnectionStatus>? _linkSub;
   Timer? _routeTimeout;
 
-  /// How long a probe may take before it counts as lost. The firmware's own
-  /// tracking window is 10 s and its cooldown 30 s, so a reply past ~15 s is
-  /// not coming.
-  static const Duration _traceTimeout = Duration(seconds: 20);
+  /// Whether the radio is attached right now — a probe needs it, so the sheet
+  /// disables the button without it rather than offering an action that can
+  /// only fail.
+  ///
+  /// Seeded from the transport rather than waiting for the first status
+  /// event, so a sheet opened on an already-connected radio is not briefly
+  /// greyed out.
+  late final ValueNotifier<bool> _connected = ValueNotifier(
+    _service.isConnected,
+  );
+
+  /// Live view of [_connected] for the sheet.
+  ValueListenable<bool> get connected => _connected;
+
+  /// Seconds left before the radio will accept another probe; 0 when free.
+  ///
+  /// The firmware throttles `TRACEROUTE_APP` from the phone to one every 30 s
+  /// and refuses the rest outright, so without this the button is live and the
+  /// answer to pressing it is a refusal. Counting down instead turns a hidden
+  /// rule into a visible wait.
+  final ValueNotifier<int> _traceCooldown = ValueNotifier(0);
+
+  ValueListenable<int> get traceCooldown => _traceCooldown;
+
+  Timer? _cooldownTicker;
+
+  /// The firmware's throttle (`PhoneAPI`, one traceroute per 30 s).
+  static const int _cooldownSeconds = 30;
+
+  /// The id of the probe in flight — how a reply, or the radio's refusal, is
+  /// told apart from one belonging to an earlier probe or another app.
+  int? _probeId;
+
+  /// How long a probe may take before it counts as lost.
+  ///
+  /// Both legs cross the mesh and each hop re-floods with its own random
+  /// backoff, so a 3-hop round trip on a slow modem preset is tens of
+  /// seconds; the reference clients scale their wait with the hop limit up to
+  /// ~80 s. (An earlier note here blamed the firmware's 10 s tracking window
+  /// and 30 s cooldown, but those govern the radio's *own screen* — a probe
+  /// from the phone reaches the mesh by another path and touches neither.)
+  static const Duration _traceTimeout = Duration(seconds: 60);
 
   @override
   String get id => 'meshtastic';
@@ -161,6 +211,7 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   @override
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
+    _watchLink();
     await _removeFromMap(controller);
     await controller.addSource(
       _sourceId,
@@ -279,27 +330,98 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   Future<void> startTrace(int nodeNum) async {
     if (_routeState.value.tracing) return;
     _listenRoutes();
+    _probeId = null;
     _routeState.value = MeshRouteState(target: nodeNum);
     final result = await _service.traceRoute(nodeNum);
+    _routeTimeout?.cancel();
     if (result is Err) {
-      _routeTimeout?.cancel();
       _routeState.value = const MeshRouteState(failed: true);
       return;
     }
-    _routeTimeout?.cancel();
-    _routeTimeout = Timer(_traceTimeout, () {
-      _routeState.value = const MeshRouteState(failed: true);
+    _probeId = result.valueOrNull;
+    // The radio took it, so its throttle clock just started — begin counting
+    // before the user can press again, not after the refusal.
+    _startCooldown();
+    _routeTimeout = Timer(_traceTimeout, _giveUp);
+  }
+
+  /// Runs the visible countdown to when the radio will accept another probe.
+  ///
+  /// A local countdown cannot be exact — the radio's clock also advances for
+  /// traceroutes *other* clients send, which we never see — so it is the upper
+  /// bound, restarted whenever the radio tells us it refused. Being a few
+  /// seconds pessimistic costs a wait; being optimistic costs a refusal, which
+  /// is what this exists to stop.
+  ///
+  /// Seconds counted down here rather than a wall-clock deadline: a device
+  /// clock that moves mid-probe would otherwise jump the countdown.
+  void _startCooldown() {
+    _traceCooldown.value = _cooldownSeconds;
+    _cooldownTicker?.cancel();
+    _cooldownTicker = Timer.periodic(const Duration(seconds: 1), (ticker) {
+      final left = _traceCooldown.value - 1;
+      _traceCooldown.value = left > 0 ? left : 0;
+      if (left <= 0) ticker.cancel();
     });
   }
 
-  /// Picks up the reply — subscribed lazily so an unvisited mesh page never
-  /// pays for the stream.
+  /// Picks up the reply, and anything the radio says about the probe —
+  /// subscribed lazily so an unvisited mesh page never pays for the streams.
   void _listenRoutes() {
     _routeSub ??= _service.routeStream.listen((route) {
+      // Only the answer to the probe on screen. Another node's reply, or a
+      // late one from a probe already given up on, would otherwise redraw the
+      // map with a path that answers a different question.
+      if (route.target != _routeState.value.target) return;
       _routeTimeout?.cancel();
       _routeState.value = MeshRouteState(result: route);
       unawaited(_projectRoute());
     });
+    _noticeSub ??= _service.noticeStream.listen((notice) {
+      // The radio refusing to send is an answer, and a faster one than the
+      // timeout: it names the reason ("TraceRoute can only be sent once every
+      // 30 seconds") instead of leaving a minute of spinner and a bare "no
+      // reply" that blames the mesh for something the radio did.
+      if (!_routeState.value.tracing || notice.replyId != _probeId) return;
+      _routeTimeout?.cancel();
+      _routeState.value = MeshRouteState(failed: true, reason: notice.message);
+      // Refused means the packet never went out, so the radio's clock did not
+      // restart — but we cannot see how much of it is left (another client's
+      // probe may have started it). A full window is the safe bound.
+      _startCooldown();
+    });
+  }
+
+  /// Tracks whether the radio is attached, for the sheet's trace button.
+  ///
+  /// Subscribed on render rather than in the constructor for the same reason
+  /// the route streams are: a map the user never opens pays nothing.
+  void _watchLink() {
+    _connected.value = _service.isConnected;
+    _linkSub ??= _service.connectionStream.listen((status) {
+      final connected = status.state == MeshConnectionState.connected;
+      if (_connected.value != connected) _connected.value = connected;
+      // A probe cannot survive the radio going away — its answer had to come
+      // back over that link.
+      if (!connected && _routeState.value.tracing) {
+        _routeTimeout?.cancel();
+        _routeState.value = const MeshRouteState(failed: true);
+      }
+      // A different radio has its own throttle clock, and this one's is
+      // unknowable after a drop — either way the count we were showing is
+      // about a link that no longer exists.
+      if (!connected) {
+        _cooldownTicker?.cancel();
+        _traceCooldown.value = 0;
+      }
+    });
+  }
+
+  /// The probe's time ran out. Guarded on [MeshRouteState.tracing] so a timer
+  /// that fires just after an answer landed cannot erase it.
+  void _giveUp() {
+    if (!_routeState.value.tracing) return;
+    _routeState.value = const MeshRouteState(failed: true);
   }
 
   /// Projects the traced hops to screen points, breaking the line where a
@@ -354,6 +476,8 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
     selected: _selected,
     selectionRevision: _selectionRevision,
     routeState: _routeState,
+    connected: _connected,
+    traceCooldown: _traceCooldown,
     onTraceRoute: (nodeNum) => unawaited(startTrace(nodeNum)),
     onClose: () {
       _selected.value = null;
@@ -424,6 +548,13 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
             'label': _twoLineLabel(node),
             'online': _store.isOnline(node) ? 1 : 0,
             'mqtt': node.viaMqtt ? 1 : 0,
+            // Direct neighbour — a node this radio hears itself, rather than
+            // through someone. Binary on purpose: at a 4.5–9 px dot, three
+            // grades of ring are indistinguishable, and the meaningful line is
+            // between "I can hear this" and "someone relays it for me".
+            // Unknown reads the same as not-direct, because that is the
+            // conservative claim.
+            'direct': node.hopsAway == 0 ? 1 : 0,
             'selected': node.num == _selected.value ? 1 : 0,
           },
         },
@@ -454,6 +585,12 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
       if (node.batteryLevel != null)
         node.batteryLevel! > 100 ? 'DC' : '${node.batteryLevel}%',
       if (node.snr != 0) 'SNR ${node.snr.toStringAsFixed(1)}',
+      // How far, when the radio knows. Written as text rather than encoded in
+      // the dot because it is a small integer with an "unknown" state, and an
+      // absent word is the only honest way to draw not-knowing — a shade or a
+      // size always looks like a value.
+      if (node.hopsAway != null)
+        node.hopsAway == 0 ? '0 hop' : '${node.hopsAway} hop',
     ];
     return parts.isEmpty ? name : '$name\n${parts.join(' · ')}';
   }
@@ -494,6 +631,15 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
         1,
       ],
       3.0,
+      // A heavier ring on a direct neighbour. Stroke *width*, not hue: hue is
+      // already spoken for by online/silent/MQTT, and adding a fourth meaning
+      // to it would make every dot ambiguous.
+      [
+        Expressions.equal,
+        [Expressions.get, 'direct'],
+        1,
+      ],
+      2.2,
       1.0,
     ],
     circleStrokeColor: [
@@ -549,9 +695,18 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
     _selected.value = null;
     _routeTimeout?.cancel();
     _routeSegments.value = const [];
-    _routeState.value = const MeshRouteState.none();
-    await _routeSub?.cancel();
-    _routeSub = null;
+    // A probe in flight survives a style rebuild: the subscriptions are the
+    // only way its answer can arrive, and the base map reloading (a layer
+    // switch, a theme change) is not the user abandoning the trace.
+    if (!_routeState.value.tracing) {
+      _routeState.value = const MeshRouteState.none();
+      await _routeSub?.cancel();
+      await _noticeSub?.cancel();
+      _routeSub = null;
+      _noticeSub = null;
+      await _linkSub?.cancel();
+      _linkSub = null;
+    }
     await _removeFromMap(controller);
     _controller = null;
   }
