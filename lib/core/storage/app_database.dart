@@ -19,14 +19,17 @@
 ///
 /// | file          | table            | category    |
 /// |---------------|------------------|-------------|
-/// | `dpip.db`     | `settings`       | config      |
-/// | `dpip.db`     | `logs`           | diagnostics |
-/// | `dpip.db`     | `tle`            | orbital data|
-/// | `dpip.db`     | `mesh_messages`  | meshtastic  |
-/// | `dpip.db`     | `mesh_metrics`   | meshtastic  |
-/// | `dpip.db`     | `mesh_nodes`     | meshtastic  |
-/// | `http_cache.db` | `http_cache`   | cache       |
-/// | `http_cache.db` | `net_bucket`   | cache       |
+/// | `dpip.db`            | `settings`          | config      |
+/// | `dpip.db`            | `logs`              | diagnostics |
+/// | `dpip.db`            | `tle`               | orbital data|
+/// | `dpip.db`            | `mesh_messages`     | meshtastic  |
+/// | `dpip.db`            | `mesh_channels`     | meshtastic  |
+/// | `dpip.db`            | `mesh_reads`        | meshtastic  |
+/// | `dpip.db`            | `mesh_metrics`      | meshtastic  |
+/// | `dpip.db`            | `mesh_node_metrics` | meshtastic  |
+/// | `dpip.db`            | `mesh_nodes`        | meshtastic  |
+/// | `http_etag_cache.db` | `http_cache`        | cache       |
+/// | `http_etag_cache.db` | `net_bucket`        | cache       |
 library;
 
 import 'package:dpip/core/logging/log.dart';
@@ -94,7 +97,7 @@ class AppDatabase {
   /// both the table and the retention window that is wrong.
   Future<List<TableStat>> tableStats() async => [
     ...await _statsFor(durable, 'dpip.db'),
-    ...await _statsFor(cache, 'http_cache.db'),
+    ...await _statsFor(cache, 'http_etag_cache.db'),
   ]..sort((a, b) => b.bytes.compareTo(a.bytes));
 
   static Future<List<TableStat>> _statsFor(Database? db, String file) async {

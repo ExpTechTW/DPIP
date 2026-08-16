@@ -214,8 +214,8 @@ baseline, feature-first architecture).
   `l10n-ignore-file` in a file's header doc. Config in `l10n.yaml`.
 - **Persistence (contract):** everything persisted lives in **SQLite**, split
   into two files by *durability*: `dpip.db` in application-support (settings,
-  `tle`, `mesh_*`) and `http_cache.db` in the platform cache directory
-  (`http_cache`, `net_usage`). The split is the point — the OS may empty the
+  `tle`, `mesh_*`) and `http_etag_cache.db` in the platform cache directory
+  (`http_cache`, `net_bucket`). The split is the point — the OS may empty the
   cache directory whenever it wants space, so nothing that cannot be re-fetched
   may live there, and `AppDatabase.clearCache()` holds no handle to the durable
   file, which makes "clear cache deleted my settings" unavailable rather than
