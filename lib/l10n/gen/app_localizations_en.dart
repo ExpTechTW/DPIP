@@ -2045,6 +2045,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreAnnouncements => 'Announcements';
 
   @override
+  String get moreVersionStable => 'Release';
+
+  @override
+  String get moreVersionSnapshot => 'Snapshot';
+
+  @override
   String get mapLayerSatelliteTransparentNoData =>
       'No data (land) = transparent';
 

@@ -2019,6 +2019,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreAnnouncements => '공지사항';
 
   @override
+  String get moreVersionStable => '정식 버전';
+
+  @override
+  String get moreVersionSnapshot => '테스트 버전';
+
+  @override
   String get mapLayerSatelliteTransparentNoData => '데이터 없음(육지) = 투명';
 
   @override

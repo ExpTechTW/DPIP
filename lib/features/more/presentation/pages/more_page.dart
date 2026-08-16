@@ -7,6 +7,7 @@ import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
@@ -49,6 +50,10 @@ class MorePage extends StatelessWidget {
           // sit four rows deep in the links list, but it is how ExpTech
           // reaches everyone at once.
           const _AnnouncementCard(),
+          // This build's identity, before any menu: which train the user is
+          // on, so a bug report can name itself and a tester can see at a
+          // glance whether they are ahead of or behind the store build.
+          const _VersionCard(),
           SectionHeader(l10n.moreSectionRegion),
           _MoreGroup(children: [const _SavedRegionsTile()]),
           SectionHeader(l10n.moreSectionNotify),
@@ -806,6 +811,119 @@ class _AnnouncementCard extends StatelessWidget {
                 Icon(
                   Icons.open_in_new,
                   size: 18,
+                  color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// This install's identity, in the same card voice as the announcements above
+/// it — the logo, the label, and which train it belongs to.
+///
+/// A DPIP label is either a plain `X.Y` (a release, `26.1`) or a weekly
+/// snapshot name (`26w33b`), and the two answer different questions: a release
+/// is what the stores ship, a snapshot is what a tester runs between them.
+/// Naming the current one here means a bug report can quote itself without
+/// digging through settings, and a tester looking at a lagging device can see
+/// at a glance which of the two trains it is sitting on.
+///
+/// The distinction is made by shape, not by lookup: the version string *is*
+/// the channel under the current scheme (a release label is `\d+\.\d+`, a
+/// snapshot is anything else).
+class _VersionCard extends StatelessWidget {
+  const _VersionCard();
+
+  /// A release label is a plain `major.minor`; every other shape (`26w33b`,
+  /// `dev`, a local build) is a snapshot.
+  static final RegExp _releaseLabel = RegExp(r'^\d+\.\d+$');
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final label = AppBuild.label;
+    final stable = _releaseLabel.hasMatch(label);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: colors.surfaceContainerHigh,
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.pushNamed(AppRoutes.changelog),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: AppRadius.medium,
+                  child: Image.asset('assets/DPIP.png', width: 44, height: 44),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'DPIP',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text(
+                            label,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: stable
+                                  ? colors.primaryContainer
+                                  : colors.tertiaryContainer,
+                              borderRadius: AppRadius.small,
+                            ),
+                            child: Text(
+                              stable
+                                  ? l10n.moreVersionStable
+                                  : l10n.moreVersionSnapshot,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: stable
+                                    ? colors.onPrimaryContainer
+                                    : colors.onTertiaryContainer,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  Icons.chevron_right,
                   color: colors.onSurfaceVariant.withValues(alpha: 0.6),
                 ),
               ],

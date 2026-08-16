@@ -980,6 +980,8 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "ประกาศ",
+  "moreVersionStable": "เวอร์ชันเต็ม",
+  "moreVersionSnapshot": "เวอร์ชันทดสอบ",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {
     "description": "Scan in progress"

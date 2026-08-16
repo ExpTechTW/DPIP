@@ -16,6 +16,7 @@ import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -48,6 +49,15 @@ GoRouter _router(List<String> visited) => GoRouter(
               return const SizedBox.shrink();
             },
           ),
+        // The version card opens this one.
+        GoRoute(
+          path: AppRoutes.changelog,
+          name: AppRoutes.changelog,
+          builder: (_, _) {
+            visited.add(AppRoutes.changelog);
+            return const SizedBox.shrink();
+          },
+        ),
       ],
     ),
   ],
@@ -207,5 +217,27 @@ void main() {
     unread.markVisible(2); // read it
     await tester.pump();
     expect(meshBadge(), findsNothing);
+  });
+
+  testWidgets('the version card names this build and its train', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    // The label the build reports — a fixed fake under test.
+    expect(
+      find.descendant(of: find.byType(InkWell), matching: find.text('DPIP')),
+      findsWidgets,
+    );
+    expect(find.text(AppBuild.label), findsOneWidget);
+    expect(find.text('Snapshot'), findsOneWidget);
+  });
+
+  testWidgets('the version card opens the changelog', (tester) async {
+    final visited = <String>[];
+    await _pump(tester, _router(visited));
+    // The card is the DPIP row with the chevron — tap its label.
+    await tester.tap(find.text('DPIP').first);
+    await tester.pumpAndSettle();
+    expect(visited, [AppRoutes.changelog]);
   });
 }

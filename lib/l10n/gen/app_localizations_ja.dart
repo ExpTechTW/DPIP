@@ -2012,6 +2012,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreAnnouncements => 'お知らせ';
 
   @override
+  String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionSnapshot => 'テスト版';
+
+  @override
   String get mapLayerSatelliteTransparentNoData => 'データなし(陸上) = 透明';
 
   @override

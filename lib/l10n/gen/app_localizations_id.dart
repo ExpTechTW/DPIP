@@ -2046,6 +2046,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreAnnouncements => 'Pengumuman';
 
   @override
+  String get moreVersionStable => 'Versi resmi';
+
+  @override
+  String get moreVersionSnapshot => 'Versi uji';
+
+  @override
   String get mapLayerSatelliteTransparentNoData =>
       'No data (land) = transparent';
 

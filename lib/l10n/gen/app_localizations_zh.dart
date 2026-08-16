@@ -2001,6 +2001,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionSnapshot => '測試版';
+
+  @override
   String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
 
   @override
@@ -4863,6 +4869,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreAnnouncements => '公告';
+
+  @override
+  String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionSnapshot => '測試版';
 
   @override
   String get mapLayerSatelliteTransparentNoData => '无资料(陆地) = 透明';
@@ -7729,6 +7741,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionSnapshot => '測試版';
+
+  @override
   String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';
 
   @override
@@ -10591,6 +10609,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreAnnouncements => '公告';
+
+  @override
+  String get moreVersionStable => '正式版';
+
+  @override
+  String get moreVersionSnapshot => '測試版';
 
   @override
   String get mapLayerSatelliteTransparentNoData => '無資料(陸地) = 透明';

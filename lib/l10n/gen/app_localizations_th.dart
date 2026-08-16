@@ -2040,6 +2040,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreAnnouncements => 'ประกาศ';
 
   @override
+  String get moreVersionStable => 'เวอร์ชันเต็ม';
+
+  @override
+  String get moreVersionSnapshot => 'เวอร์ชันทดสอบ';
+
+  @override
   String get mapLayerSatelliteTransparentNoData =>
       'No data (land) = transparent';
 

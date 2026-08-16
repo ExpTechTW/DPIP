@@ -2045,6 +2045,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreAnnouncements => 'Thông báo';
 
   @override
+  String get moreVersionStable => 'Bản chính thức';
+
+  @override
+  String get moreVersionSnapshot => 'Bản thử nghiệm';
+
+  @override
   String get mapLayerSatelliteTransparentNoData =>
       'No data (land) = transparent';
 

@@ -2055,6 +2055,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreAnnouncements => 'Mga Anunsyo';
 
   @override
+  String get moreVersionStable => 'Pormal na bersyon';
+
+  @override
+  String get moreVersionSnapshot => 'Bersyon ng pagsubok';
+
+  @override
   String get mapLayerSatelliteTransparentNoData =>
       'No data (land) = transparent';
 

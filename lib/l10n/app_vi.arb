@@ -980,6 +980,8 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "Thông báo",
+  "moreVersionStable": "Bản chính thức",
+  "moreVersionSnapshot": "Bản thử nghiệm",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {
     "description": "Scan in progress"

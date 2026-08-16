@@ -2775,6 +2775,10 @@
     "description": "AED city / district row label"
   },
   "moreAnnouncements": "Announcements",
+  "moreVersionStable": "Release",
+  "moreVersionSnapshot": "Snapshot",
+  "moreVersionStable": "Release",
+  "moreVersionSnapshot": "Snapshot",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {
     "description": "Scan in progress"

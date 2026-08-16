@@ -980,6 +980,8 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "기상청 적외 영상 관례：온도가 낮을수록 흰색",
   "moreAnnouncements": "공지사항",
+  "moreVersionStable": "정식 버전",
+  "moreVersionSnapshot": "테스트 버전",
   "mapLayerSatelliteTransparentNoData": "데이터 없음(육지) = 투명",
   "@meshtasticScanning": {
     "description": "Scan in progress"

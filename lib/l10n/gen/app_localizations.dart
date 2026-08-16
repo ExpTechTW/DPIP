@@ -3873,6 +3873,18 @@ abstract class AppLocalizations {
   /// **'Announcements'**
   String get moreAnnouncements;
 
+  /// No description provided for @moreVersionStable.
+  ///
+  /// In en, this message translates to:
+  /// **'Release'**
+  String get moreVersionStable;
+
+  /// No description provided for @moreVersionSnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Snapshot'**
+  String get moreVersionSnapshot;
+
   /// Satellite legend note: the SST retrieval has no value over land, drawn transparent
   ///
   /// In en, this message translates to:
