@@ -67,6 +67,21 @@ class AppLocalizationsKo extends AppLocalizations {
       'Android는 한동안 열지 않은 앱을 일시 중지하고 권한을 해제합니다. 그러면 재난 경보가 현재 위치로 전달되지 않습니다.';
 
   @override
+  String get onboardingPermBackgroundExec => '백그라운드 실행';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      '꺼져 있으면 위치를 보고하기 위해 앱이 깨어나지 않습니다.';
+
+  @override
+  String get onboardingPermVendorPower => '제조사 배터리 설정';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand은(는) 최근에 열지 않은 앱의 백그라운드 작업을 중지합니다. 앱에서 감지하거나 변경할 수 없으므로 직접 허용해 주세요.';
+  }
+
+  @override
   String get homeRainTrendScattered => '약한 비가 올 수 있어요';
 
   @override

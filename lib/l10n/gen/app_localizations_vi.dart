@@ -68,6 +68,21 @@ class AppLocalizationsVi extends AppLocalizations {
       'Android tạm dừng các ứng dụng bạn lâu không mở và thu hồi quyền của chúng, khiến cảnh báo thảm họa không đến được khu vực của bạn.';
 
   @override
+  String get onboardingPermBackgroundExec => 'Hoạt động nền';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      'Nếu tắt, ứng dụng sẽ không được đánh thức để báo vị trí của bạn.';
+
+  @override
+  String get onboardingPermVendorPower => 'Cài đặt pin của nhà sản xuất';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand dừng hoạt động nền của các ứng dụng bạn chưa mở gần đây. Ứng dụng không thể phát hiện hay thay đổi điều này — vui lòng cho phép thủ công.';
+  }
+
+  @override
   String get homeRainTrendScattered => 'Có thể có mưa rào nhẹ';
 
   @override

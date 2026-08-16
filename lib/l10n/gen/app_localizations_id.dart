@@ -68,6 +68,21 @@ class AppLocalizationsId extends AppLocalizations {
       'Android menjeda aplikasi yang lama tidak Anda buka dan mencabut izinnya, sehingga peringatan bencana tidak sampai ke wilayah Anda.';
 
   @override
+  String get onboardingPermBackgroundExec => 'Aktivitas latar belakang';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      'Jika mati, aplikasi tidak dibangunkan untuk melaporkan lokasi Anda.';
+
+  @override
+  String get onboardingPermVendorPower => 'Pengaturan baterai produsen';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand menghentikan kerja latar belakang aplikasi yang belum Anda buka baru-baru ini. Aplikasi tidak dapat mendeteksi atau mengubahnya — mohon izinkan secara manual.';
+  }
+
+  @override
   String get homeRainTrendScattered => 'Kemungkinan hujan ringan';
 
   @override

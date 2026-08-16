@@ -67,6 +67,20 @@ class AppLocalizationsZh extends AppLocalizations {
       'Android 會暫停你長期未開啟的 App 並撤銷其權限，這會讓災害警報無法送達你所在地。';
 
   @override
+  String get onboardingPermBackgroundExec => '背景執行';
+
+  @override
+  String get onboardingPermBackgroundExecDesc => '關閉時，App 不會被喚醒回報你的位置。';
+
+  @override
+  String get onboardingPermVendorPower => '手機廠商省電設定';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand 會停止你最近沒開過的 App 的背景作業。App 無法偵測或變更，請手動允許。';
+  }
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -2912,6 +2926,20 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   @override
   String get onboardingPermUnusedAppDesc =>
       'Android 会暂停你长期未开启的 App 并撤销其权限，这会让灾害警报无法送达你所在地。';
+
+  @override
+  String get onboardingPermBackgroundExec => '后台执行';
+
+  @override
+  String get onboardingPermBackgroundExecDesc => '关闭时，App 不会被唤醒回报你的位置。';
+
+  @override
+  String get onboardingPermVendorPower => '手机厂商省电设置';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand 会停止你最近没开过的 App 的后台作业。App 无法检测或更改，请手动允许。';
+  }
 
   @override
   String get homeRainTrendScattered => '可能会有零星降雨';
@@ -5761,6 +5789,20 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
       'Android 會暫停你長期未開啟嘅 App 並撤銷佢哋嘅權限，噉會令災害警報無法送到你所在地。';
 
   @override
+  String get onboardingPermBackgroundExec => '背景執行';
+
+  @override
+  String get onboardingPermBackgroundExecDesc => '關閉時，App 不會被喚醒回報你的位置。';
+
+  @override
+  String get onboardingPermVendorPower => '手機廠商省電設定';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand 會停止你最近沒開過的 App 的背景作業。App 無法偵測或變更，請手動允許。';
+  }
+
+  @override
   String get homeRainTrendScattered => '可能會有零星降雨';
 
   @override
@@ -8606,6 +8648,20 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get onboardingPermUnusedAppDesc =>
       'Android 會暫停你長期未開啟的 App 並撤銷其權限，這會讓災害警報無法送達你所在地。';
+
+  @override
+  String get onboardingPermBackgroundExec => '背景執行';
+
+  @override
+  String get onboardingPermBackgroundExecDesc => '關閉時，App 不會被喚醒回報你的位置。';
+
+  @override
+  String get onboardingPermVendorPower => '手機廠商省電設定';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand 會停止你最近沒開過的 App 的背景作業。App 無法偵測或變更，請手動允許。';
+  }
 
   @override
   String get homeRainTrendScattered => '可能會有零星降雨';

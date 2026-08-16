@@ -68,6 +68,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Android pauses apps you haven\'t opened in a while and revokes their permissions — which stops disaster alerts reaching your area.';
 
   @override
+  String get onboardingPermBackgroundExec => 'Background activity';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      'Without this the app is never woken to report where you are.';
+
+  @override
+  String get onboardingPermVendorPower => 'Manufacturer battery settings';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand stops background work for apps you have not opened recently. The app cannot detect or change this — please allow it by hand.';
+  }
+
+  @override
   String get homeRainTrendScattered => 'Light showers possible';
 
   @override

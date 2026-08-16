@@ -68,6 +68,21 @@ class AppLocalizationsTh extends AppLocalizations {
       'Android จะหยุดแอปที่คุณไม่ได้เปิดมาระยะหนึ่งและเพิกถอนสิทธิ์ ทำให้การแจ้งเตือนภัยพิบัติส่งไปยังพื้นที่ของคุณไม่ได้';
 
   @override
+  String get onboardingPermBackgroundExec => 'การทำงานเบื้องหลัง';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      'หากปิดอยู่ แอปจะไม่ถูกปลุกให้รายงานตำแหน่งของคุณ';
+
+  @override
+  String get onboardingPermVendorPower => 'การตั้งค่าแบตเตอรี่ของผู้ผลิต';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand จะหยุดการทำงานเบื้องหลังของแอปที่คุณไม่ได้เปิดเมื่อเร็ว ๆ นี้ แอปตรวจสอบหรือเปลี่ยนเองไม่ได้ กรุณาอนุญาตด้วยตนเอง';
+  }
+
+  @override
   String get homeRainTrendScattered => 'อาจมีฝนตกประปราย';
 
   @override

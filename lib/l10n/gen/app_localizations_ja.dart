@@ -67,6 +67,21 @@ class AppLocalizationsJa extends AppLocalizations {
       'Android はしばらく開いていないアプリを一時停止し、権限を取り消します。その結果、災害警報が現在地に届かなくなります。';
 
   @override
+  String get onboardingPermBackgroundExec => 'バックグラウンド動作';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      'オフにすると、位置を報告するためのアプリ起動が行われません。';
+
+  @override
+  String get onboardingPermVendorPower => 'メーカーの電池設定';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return '$brand は最近開いていないアプリのバックグラウンド動作を停止します。アプリからは検出も変更もできないため、手動で許可してください。';
+  }
+
+  @override
   String get homeRainTrendScattered => 'にわか雨の可能性があります';
 
   @override

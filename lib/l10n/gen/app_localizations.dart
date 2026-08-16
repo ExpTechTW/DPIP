@@ -219,6 +219,30 @@ abstract class AppLocalizations {
   /// **'Android pauses apps you haven\'t opened in a while and revokes their permissions — which stops disaster alerts reaching your area.'**
   String get onboardingPermUnusedAppDesc;
 
+  /// Permission row title: whether the OS lets the app run background work at all (Android 'Restricted' battery state / iOS Background App Refresh).
+  ///
+  /// In en, this message translates to:
+  /// **'Background activity'**
+  String get onboardingPermBackgroundExec;
+
+  /// Permission row description for background activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Without this the app is never woken to report where you are.'**
+  String get onboardingPermBackgroundExecDesc;
+
+  /// Permission row title shown only on manufacturers that add their own battery manager (Samsung, Xiaomi, Huawei, OPPO, vivo...).
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer battery settings'**
+  String get onboardingPermVendorPower;
+
+  /// Permission row description for the manufacturer battery manager. {brand} is the device manufacturer name.
+  ///
+  /// In en, this message translates to:
+  /// **'{brand} stops background work for apps you have not opened recently. The app cannot detect or change this — please allow it by hand.'**
+  String onboardingPermVendorPowerDesc(String brand);
+
   /// Home rain trend subtitle: peak intensity below the light-rain threshold
   ///
   /// In en, this message translates to:

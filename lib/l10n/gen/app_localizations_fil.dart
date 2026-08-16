@@ -68,6 +68,21 @@ class AppLocalizationsFil extends AppLocalizations {
       'Pinapahinto ng Android ang mga app na matagal mong hindi binuksan at binabawi ang mga pahintulot ng mga ito, kaya hindi na makakarating ang mga babala sa sakuna sa iyong lugar.';
 
   @override
+  String get onboardingPermBackgroundExec => 'Aktibidad sa background';
+
+  @override
+  String get onboardingPermBackgroundExecDesc =>
+      'Kapag naka-off, hindi ginigising ang app para iulat ang lokasyon mo.';
+
+  @override
+  String get onboardingPermVendorPower => 'Setting ng baterya ng manufacturer';
+
+  @override
+  String onboardingPermVendorPowerDesc(String brand) {
+    return 'Hinihinto ng $brand ang background na gawain ng mga app na hindi mo binuksan kamakailan. Hindi ito matutukoy o mababago ng app — pakipayagan nang manu-mano.';
+  }
+
+  @override
   String get homeRainTrendScattered => 'Posibleng mahinang ulan';
 
   @override
