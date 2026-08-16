@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
@@ -38,15 +37,12 @@ class DeviceLocationReporter {
     required this._settings,
     this.minUploadInterval = const Duration(seconds: 60),
     DateTime Function()? now,
-    bool Function()? uploadRoll,
-  }) : _now = now ?? DateTime.now,
-       _uploadRoll = uploadRoll ?? (() => Random().nextInt(4) == 0);
+  }) : _now = now ?? DateTime.now;
 
   final Stream<GpsFix> Function() _positions;
   final Future<bool> Function(GpsFix fix) _onMoved;
   final SettingsStore _settings;
   final DateTime Function() _now;
-  final bool Function() _uploadRoll;
 
   /// Minimum gap between `/v2/location` POSTs.
   final Duration minUploadInterval;
@@ -120,7 +116,6 @@ class DeviceLocationReporter {
         since < minUploadInterval.inMilliseconds) {
       return; // silent — no API, no log
     }
-    if (!_uploadRoll()) return; // 1-in-4 miss — no stamp
 
     try {
       final attempted = await _onMoved(fix);

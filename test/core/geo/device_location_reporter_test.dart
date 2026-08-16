@@ -16,8 +16,6 @@ void main() {
   }
 
   // Deterministic win — production defaults to 1-in-4.
-  bool always() => true;
-  bool never() => false;
 
   test('reports each distance-triggered move; skips identical fixes', () async {
     final positions = StreamController<GpsFix>();
@@ -27,7 +25,6 @@ void main() {
       positions: () => positions.stream,
       settings: await settings(),
       now: () => t,
-      uploadRoll: always,
       onMoved: (fix) async {
         reported.add(fix);
         return true;
@@ -55,7 +52,6 @@ void main() {
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
       settings: await settings(),
-      uploadRoll: always,
       onMoved: (fix) async {
         reported.add(fix);
         return true;
@@ -80,7 +76,6 @@ void main() {
       positions: () => positions.stream,
       settings: await settings(),
       now: () => t,
-      uploadRoll: always,
       onMoved: (fix) async {
         calls++;
         throw Exception('network down');
@@ -108,7 +103,6 @@ void main() {
       positions: () => positions.stream,
       settings: p,
       now: () => DateTime.utc(2024, 1, 1, 0, 0, 30), // +30s
-      uploadRoll: always,
       onMoved: (fix) async {
         calls++;
         return true;
@@ -133,7 +127,6 @@ void main() {
         return controller.stream;
       },
       settings: await settings(),
-      uploadRoll: always,
       onMoved: (fix) async {
         reported.add(fix);
         return true;
@@ -162,7 +155,6 @@ void main() {
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
       settings: await settings(),
-      uploadRoll: always,
       onMoved: (fix) async => true,
     );
     final seen = <GpsFix>[];
@@ -187,7 +179,6 @@ void main() {
     final reporter = DeviceLocationReporter(
       positions: () => positions.stream,
       settings: await settings(),
-      uploadRoll: always,
       onMoved: (fix) async => throw StateError('no token'),
     );
     final seen = <GpsFix>[];
@@ -210,7 +201,6 @@ void main() {
         SettingKeys.deviceLocationUpdatedAtMs.name: stamped,
       }),
       now: () => DateTime.utc(2024, 1, 1, 0, 0, 10),
-      uploadRoll: always,
       onMoved: (fix) async {
         fail('should not upload');
       },
@@ -223,54 +213,6 @@ void main() {
     await pumpEventQueue();
 
     expect(seen, [(lat: 23.5, lng: 120.4)]);
-    await positions.close();
-  });
-
-  test('1-in-4 miss skips API without burning the 60s stamp', () async {
-    final p = await settings();
-    final positions = StreamController<GpsFix>();
-    var calls = 0;
-    final t = DateTime.utc(2024, 1, 1);
-    DeviceLocationReporter(
-      positions: () => positions.stream,
-      settings: p,
-      now: () => t,
-      uploadRoll: never,
-      onMoved: (fix) async {
-        calls++;
-        return true;
-      },
-    ).start();
-
-    positions.add((lat: 25.0, lng: 121.0));
-    await pumpEventQueue();
-    expect(calls, 0);
-    expect(p.getInt(SettingKeys.deviceLocationUpdatedAtMs), isNull);
-    await positions.close();
-  });
-
-  test('throttle is checked before the lottery', () async {
-    final stamped = DateTime.utc(2024, 1, 1).millisecondsSinceEpoch;
-    final positions = StreamController<GpsFix>();
-    var rolls = 0;
-    DeviceLocationReporter(
-      positions: () => positions.stream,
-      settings: await settings({
-        SettingKeys.deviceLocationUpdatedAtMs.name: stamped,
-      }),
-      now: () => DateTime.utc(2024, 1, 1, 0, 0, 30),
-      uploadRoll: () {
-        rolls++;
-        return true;
-      },
-      onMoved: (fix) async {
-        fail('should not upload');
-      },
-    ).start();
-
-    positions.add((lat: 25.0, lng: 121.0));
-    await pumpEventQueue();
-    expect(rolls, 0); // never reached the lottery
     await positions.close();
   });
 }
