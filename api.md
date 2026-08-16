@@ -252,3 +252,8 @@ v5 氣象家族與其 static 快照（`static.core-tnn1` 的
 `core-tyo1` 之於 `eew?sse=1`、`api-1` 之於 `rts?sse=1` 都是 HTTP 200 但
 `application/json`（旗標被忽略）。`core-tnn1` 對兩者都回 401。這就是 SSE
 串流固定用 `lbApi` 的原因。
+
+---
+
+How the client reaches these — `ApiClient`, tiers, failover — is in
+[ARCHITECTURE.md § Networking](ARCHITECTURE.md#networking).

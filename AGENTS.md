@@ -1,13 +1,60 @@
-# AGENTS.md
+# Working in this repository
 
-Rules for any agent working in this repository. `CLAUDE.md` carries the
-architecture and the conventions for the code itself; this file is about how
-work enters the repository.
+DPIP is a Taiwan disaster-prevention app: a clean Flutter 3.47 rewrite,
+feature-first architecture.
+
+## Where things are written down
+
+Each topic has exactly one home. Nothing below is repeated elsewhere — the
+other files point here, and this file points at them.
+
+| File | Owns |
+|---|---|
+| **[ARCHITECTURE.md](ARCHITECTURE.md)** | Folder layout, layer rules, and every subsystem contract: logging, state, networking, data & errors, realtime, calibrated time, async-state UI, push, LoRa mesh, persistence |
+| **[DESIGN.md](DESIGN.md)** | Design tokens, colour, spacing, motion, typography, icons, localization, shared components |
+| **[api.md](api.md)** | API endpoints, the region map, and which tier each one lives on |
+| **[commit.md](commit.md)** | Commit format, in full (中文) |
+| **[README.md](README.md)** | What DPIP is, for people who do not work on it |
+| this file | Toolchain, running, verification, versions |
+
+## Toolchain
+
+Flutter and Dart are pinned by **mise** — run tools through it, so CI and every
+laptop use the same version:
+
+```sh
+mise exec -- flutter analyze
+```
+
+- After changing `@freezed` / `@JsonSerializable` models:
+  `mise exec -- dart run build_runner build --delete-conflicting-outputs`
+- After editing ARB files, localizations regenerate on the next build
+  (`generate: true`); by hand with `mise exec -- flutter gen-l10n`
+- Format with `mise exec -- dart format lib test tool`
+
+## Running
+
+```sh
+mise exec -- flutter run -d "iPhone 17 Pro"
+```
+
+Select the device with `-d <name|id>`. A bare `flutter run ios` treats `ios` as
+a target Dart file and fails with `Target file "ios" not found`.
+
+- If `flutter run` / `pub get` stalls at **Downloading packages**, resolve from
+  the local cache first: `mise exec -- flutter pub get --offline`, then re-run.
+- The visible simulator window in Xcode 26+ is **DeviceHub.app** — it replaced
+  `Simulator.app`, and `open -a Simulator` no longer works. `flutter run` boots
+  the simulator headless, so open it separately to see or touch anything:
+
+  ```sh
+  open "$(xcode-select -p)/../Applications/DeviceHub.app"
+  ```
 
 ## Commits
 
-The full specification, with examples, is in **[commit.md](commit.md)** (中文).
-The short version:
+The full specification, with examples, is **[commit.md](commit.md)**. The parts
+worth knowing before writing one:
 
 ```
 <type>(<scope>): <English summary>
@@ -19,74 +66,50 @@ The short version:
 <中文說明>
 ```
 
-- The summary is **plain-ASCII English**, ≤72 characters, imperative, no
-  trailing period. `<type>` is one of `feat` `fix` `perf` `refactor` `docs`
-  `test` `chore` `build` `ci` `style` `revert`.
-- `feat` / `fix` / `perf` **must** carry both languages. Those three are the
-  ones published, and the commit message *is* the release note — there is no
-  separate changelog to fix it in afterwards.
-- Everything else may be a summary line alone.
-- A change that affects one platform carries a `Platform: android` or
-  `Platform: ios` trailer; omit it when both are affected.
-- **Choose the type by whether a user can see it**, not by which folder moved.
-  A user-visible behaviour change filed under `build:` never reaches a release
-  note; a 142-line script is not `docs:` because documentation sits beside it.
-- **One thing per commit.** Two features in one commit become one changelog
-  entry that has to pick a category, cannot be reverted separately, and cannot
-  be isolated by `git bisect`. No gate can check this — whether two changes are
-  "the same thing" is a judgement — so it is on you and on review. The tells,
-  none of them fatal on its own: an *and* in the summary, a summary that lists,
-  a body whose halves are unrelated, one file of prose beside one of code, and
-  needing two types to describe it honestly.
-- **Write down everything the commit changes**, and write *why*. The diff
-  already says what; what it cannot say is what would otherwise have gone
-  wrong, why this approach, and what was given up. The release note is
-  generated from the message, so anything left out is invisible to users — and
-  the message cannot be edited once pushed. Record the dead ends too: an
-  approach that looked right and was not will be tried again otherwise.
-
-### Never attribute the tool
-
-Do **not** add, in any form:
-
-- `Co-Authored-By:` trailers
-- `Generated with …`, 🤖, a model name, or an agent's name
-
-A commit is authored by a person. An agent that writes itself into the record
-makes the history lie about who is accountable for the change — and that
-record is what someone reads years later when they need to ask why.
-
-`tool/check_commits.sh` enforces all of this and CI fails the build. A commit
-message cannot be edited after the fact, so a rejected one has to be fixed by
-`git rebase -i` and `git push --force-with-lease`. Run the gate locally before
-pushing:
-
-```sh
-tool/check_commits.sh origin/main..HEAD
-```
+- The commit message **is** the release note — `tool/release_notes.sh` reads
+  these bodies and publishes them, and a message cannot be edited once pushed.
+- `feat` / `fix` / `perf` carry both languages; everything else may be a
+  summary line alone.
+- Choose the type by **whether a user can see the change**, not by which folder
+  moved. A user-visible change filed under `build:` never reaches a release
+  note.
+- **One thing per commit.** No gate can check this — whether two changes are
+  the same thing is a judgement — so it is on you and on review.
+- **Never** add a `Co-Authored-By:` trailer, `Generated with …`, 🤖, a model
+  name or an agent's name. A commit is authored by a person; an agent that
+  writes itself into the record makes the history lie about who is accountable,
+  and that record is what someone reads years later to ask why.
 
 ## Before pushing
 
-Everything CI runs, in order — all of it must be clean:
+Everything CI runs, in order. All of it must be clean:
 
 ```sh
+tool/check_commits.sh origin/main..HEAD
 tool/check_layering.sh
 tool/check_l10n.sh
 tool/check_storage.sh
 tool/check_pubspec_lock.sh
-tool/check_commits.sh origin/main..HEAD
+tool/check_notification_sounds.sh
 mise exec -- dart format --set-exit-if-changed lib test tool
-mise exec -- dart run build_runner build --delete-conflicting-outputs
+mise exec -- dart run build_runner build --delete-conflicting-outputs   # then git diff --exit-code
 mise exec -- flutter analyze
 mise exec -- flutter test
 ```
 
-Tools go through `mise exec --`; see `CLAUDE.md` for why.
+The bash gates need only bash and python3, so they fail fast without the
+toolchain. `.github/workflows/ci.yml` runs the same list and must stay green;
+`android.yml` / `ios.yml` build artifacts and `review.yml` adds an automated PR
+review.
+
+Safety-critical seismic maths is pinned by golden tests
+(`test/features/earthquake/eew_estimator_test.dart`). If you change the EEW
+estimator, update those goldens deliberately.
 
 ## Versions
 
 Nobody edits a version by hand. `tool/version.sh` derives all three values from
-git state, and CI passes them to the build:
+git state and CI passes them to the build:
 
 | | | |
 |---|---|---|
@@ -94,13 +117,16 @@ git state, and CI passes them to the build:
 | `train` | what Apple is told | `26.1` |
 | `code` | what both stores sort by | `426000298` |
 
-`pubspec.yaml`'s `version:` is a placeholder for local runs only. Read the
-header of `tool/version.sh` before changing any of it — every constant in there
-is a fact about what has already shipped to a store, and a store refuses,
-permanently, any build whose ordinal is not above the last it accepted.
+Every commit on `main` publishes a snapshot; a `v*` tag publishes a release.
+`pubspec.yaml`'s `version:` is a placeholder for local runs only.
+
+Read the header of `tool/version.sh` before changing any of it. Every constant
+there is a fact about what has already shipped to a store, and a store refuses,
+permanently, any build whose ordinal is not above the last it accepted —
+deleting the build does not release the number.
 
 ## Reporting
 
-Say what was actually done. If a test fails, show the output; if something was
-skipped, say so. Do not report work as finished until it is verified — the
-commands above are what "verified" means here.
+Say what was actually done. If a test fails, show the output; if a step was
+skipped, say so. Do not report work as finished until it is verified — the list
+under *Before pushing* is what "verified" means here.
