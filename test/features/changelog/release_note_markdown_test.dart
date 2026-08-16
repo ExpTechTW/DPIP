@@ -33,10 +33,13 @@ MarkdownStyleSheet _sheetFrom(BuildContext context) {
   );
 }
 
-Future<void> _pump(WidgetTester tester) async {
+Future<void> _pump(
+  WidgetTester tester, {
+  Brightness brightness = Brightness.light,
+}) async {
   await tester.pumpWidget(
     MaterialApp(
-      theme: ThemeData(useMaterial3: true),
+      theme: ThemeData(useMaterial3: true, brightness: brightness),
       home: Scaffold(
         body: SingleChildScrollView(
           child: Builder(
@@ -62,6 +65,27 @@ void main() {
     expect(find.byType(Image), findsNothing);
     expect(find.byIcon(Icons.android), findsOneWidget);
     expect(find.byIcon(Icons.apple), findsNWidgets(2));
+  });
+
+  testWidgets('a tag carries its platform colour, per theme', (tester) async {
+    for (final (brightness, android) in [
+      (Brightness.light, const Color(0xFF1B8A50)),
+      (Brightness.dark, const Color(0xFF3DDC84)),
+    ]) {
+      // A fresh tree each time: pumping the same widget type reuses the
+      // elements, and the parsed markdown comes back with the old theme.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await _pump(tester, brightness: brightness);
+      expect(
+        tester.widget<Icon>(find.byIcon(Icons.android)).color,
+        android,
+        reason: 'Android green at 1.74:1 on a light surface is a smudge',
+      );
+      expect(
+        tester.widgetList<Icon>(find.byIcon(Icons.apple)).first.color,
+        const Color(0xFF8E8E93),
+      );
+    }
   });
 
   testWidgets('a tag and the words after it stay on one line', (tester) async {

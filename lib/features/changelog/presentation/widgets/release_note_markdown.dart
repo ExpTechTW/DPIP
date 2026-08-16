@@ -199,6 +199,7 @@ Widget platformTagIcon(Uri uri, String? title, String? alt) {
     _ => null,
   };
   if (icon == null) return Text(alt ?? '');
+  final brand = name == 'android.svg' ? _androidGreen : _appleGrey;
   return Text.rich(
     TextSpan(
       children: [
@@ -214,10 +215,7 @@ Widget platformTagIcon(Uri uri, String? title, String? alt) {
                   // Tied to the text it sits in, so it tracks the reader's
                   // font scale instead of staying 15 px while the words grow.
                   size: (style.fontSize ?? 14) + 1,
-                  // The colour the surrounding text already carries: the SVG
-                  // picks a fixed tint because an `<img>` inherits no theme,
-                  // but here the icon sits inside the theme and follows it.
-                  color: style.color,
+                  color: brand.resolve(Theme.of(context).brightness),
                 ),
               );
             },
@@ -227,3 +225,21 @@ Widget platformTagIcon(Uri uri, String? title, String? alt) {
     ),
   );
 }
+
+/// The platform brand colours, in the app.
+///
+/// The published SVGs are a single fixed tint each, because an `<img>` on
+/// GitHub inherits no theme. In the app the same mark is drawn twice — once
+/// per theme — so each carries the shade that survives its own background.
+///
+/// Android's own `#3DDC84` scores 1.74:1 on a light surface, which is not a
+/// mark, it is a smudge; the light variant keeps the hue and takes it to
+/// 4.27:1. Apple's `#8E8E93` is their system grey and already clears both
+/// (3.18:1 and 5.70:1), so it stands unchanged.
+extension type const _Brand((Color light, Color dark) shades) {
+  Color resolve(Brightness brightness) =>
+      brightness == Brightness.dark ? shades.$2 : shades.$1;
+}
+
+const _androidGreen = _Brand((Color(0xFF1B8A50), Color(0xFF3DDC84)));
+const _appleGrey = _Brand((Color(0xFF8E8E93), Color(0xFF8E8E93)));
