@@ -233,7 +233,19 @@ jobs:
           [ -n "$dir" ] || echo "::warning::no native symbol directory found; uploading without symbols"
           echo "dir=$dir" >> "$GITHUB_OUTPUT"
 
-      - name: Upload to Play internal testing
+      # A tag goes to production; everything else to internal testing.
+      #
+      # This is the only place the two differ on the store side. Play has real
+      # tracks, so "release" and "snapshot" are different destinations — unlike
+      # iOS, where there is one upload and only what happens *after* it differs
+      # (see the TestFlight step below).
+      #
+      # `status: completed` means the release rolls out to 100% once Google's
+      # review clears. A first automated production push may want `draft`
+      # instead — that lands it in the console for a human to roll out — or a
+      # staged `inProgress` with `userFraction`. Full rollout is what a tag
+      # means here, so that is what it does.
+      - name: Upload to Play
         if: matrix.platform == 'android'
         uses: r0adkll/upload-google-play@v1
         with:
@@ -241,7 +253,7 @@ jobs:
           packageName: com.exptech.dpip
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           # `track` is deprecated in favour of the plural, which takes a list.
-          tracks: internal
+          tracks: ${{ github.ref_type == 'tag' && 'production' || 'internal' }}
           status: completed
           releaseName: ${{ needs.version.outputs.label }}
           # Lets Play symbolicate native crashes (MapLibre, the mesh stack)
