@@ -16,9 +16,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Full history: the commit gate walks the range this push or PR adds, and
+      # a shallow clone has no base to compare against.
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
-      # Architecture gate first — pure grep, no toolchain, fails fast.
+      # The commit gate first, because it is the only failure that cannot be
+      # fixed by another commit. A message is immutable once pushed, so the
+      # repair is a rebase and a force-push — and the later that is discovered,
+      # the more there is to rebase.
+      - name: Commit message gate
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            range="origin/${{ github.base_ref }}..HEAD"
+            git fetch --quiet origin "${{ github.base_ref }}"
+          else
+            # A push event names what it replaced. On the first push to a new
+            # branch the before-sha is all zeroes, so fall back to the last
+            # commit alone.
+            before="${{ github.event.before }}"
+            case "$before" in
+            ''|0000000000000000000000000000000000000000) range="HEAD~1..HEAD" ;;
+            *) range="$before..HEAD" ;;
+            esac
+          fi
+          echo "checking $range"
+          bash tool/check_commits.sh "$range"
+
+      # Architecture gate — pure grep, no toolchain, fails fast.
       - name: Layering gate
         run: bash tool/check_layering.sh
 
