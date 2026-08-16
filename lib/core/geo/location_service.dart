@@ -291,12 +291,28 @@ class LocationService {
     return (lat: position.latitude, lng: position.longitude);
   }
 
-  static bool _isFresh(DateTime timestamp) =>
-      // The calibrated clock, not the wall clock: the last-known position is
-      // only worth using while it is genuinely current, and a user who set
-      // their clock forward would age a good fix out (a wasted 10-second
-      // location request) or — worse — set it back and keep trusting a fix
-      // that is 20 minutes old. AppTime is anchored to SNTP, so manual clock
-      // changes cannot move it.
-      AppTime.utc.difference(timestamp.toUtc()) <= _maxLastKnownAge;
+  /// Whether a cached fix is recent enough to answer with instead of asking
+  /// the GPS again.
+  ///
+  /// The stamp comes from the OS (`CLLocation.timestamp` / `Location.getTime`)
+  /// and is therefore in **device** time, while the comparison wants
+  /// calibrated time — subtracting one from the other measures the clock
+  /// offset as well as the age. So the device stamp is re-expressed first.
+  ///
+  /// Two clocks, and neither is right in every case: a clock set *forward*
+  /// after a good fix ages it out (a wasted 10-second request), a clock set
+  /// *back* keeps an arbitrarily old fix alive. Taking the **larger** of the
+  /// two ages fails toward stale, which for the reading that decides whose
+  /// hazards a user is shown is the only safe direction.
+  ///
+  /// A negative age — a stamp from the future — is never fresh. It is not a
+  /// young fix; it is a clock disagreement, and accepting it is how a fix of
+  /// any age passes. Same convention as `staleness.dart`.
+  static bool _isFresh(DateTime timestamp) {
+    final calibrated = AppTime.utc.difference(AppTime.fromDevice(timestamp));
+    final byDevice = DateTime.now().toUtc().difference(timestamp.toUtc());
+    if (calibrated.isNegative || byDevice.isNegative) return false;
+    final age = calibrated > byDevice ? calibrated : byDevice;
+    return age <= _maxLastKnownAge;
+  }
 }

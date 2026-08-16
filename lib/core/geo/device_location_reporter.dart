@@ -107,7 +107,17 @@ class DeviceLocationReporter {
 
     final nowMs = _now().toUtc().millisecondsSinceEpoch;
     final lastMs = _settings.getInt(SettingKeys.deviceLocationUpdatedAtMs);
-    if (lastMs != null && nowMs - lastMs < minUploadInterval.inMilliseconds) {
+    // `nowMs - lastMs >= 0` is not redundant: the stored stamp survives a
+    // clock change, so a device set back (or a first SNTP sync that pulls the
+    // clock back) leaves a stamp in the future. The throttle would then hold
+    // for the whole offset — hours of a moving user reporting nothing — and
+    // it would never expire on its own, because the comparison only gets more
+    // negative as real time passes. A future stamp means the window is not
+    // measurable, so it does not apply.
+    final since = lastMs == null ? null : nowMs - lastMs;
+    if (since != null &&
+        since >= 0 &&
+        since < minUploadInterval.inMilliseconds) {
       return; // silent — no API, no log
     }
     if (!_uploadRoll()) return; // 1-in-4 miss — no stamp

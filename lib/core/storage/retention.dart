@@ -97,7 +97,10 @@ class RetentionService {
   Future<void> sweep() async {
     if (_running) return;
     _running = true;
-    final started = DateTime.now();
+    // A stopwatch, not two wall-clock reads: this is an elapsed measurement,
+    // and a clock that steps mid-sweep (the first SNTP sync lands whenever it
+    // lands) would report the step instead of the duration.
+    final started = Stopwatch()..start();
     try {
       await mesh?.prune();
       await logs?.prune();
@@ -112,8 +115,7 @@ class RetentionService {
     } finally {
       _running = false;
     }
-    final elapsed = DateTime.now().difference(started).inMilliseconds;
-    Log.debug('retention: swept in ${elapsed}ms');
+    Log.debug('retention: swept in ${started.elapsedMilliseconds}ms');
   }
 
   void dispose() {

@@ -110,7 +110,21 @@ typedef _EncodedWrite = ({
 
 /// See library doc.
 class EtagCacheStore {
-  EtagCacheStore(this._db, {this.maxBytes = defaultMaxBytes, this._usage});
+  EtagCacheStore(this._db, {this.maxBytes = defaultMaxBytes, this._usage}) {
+    // Seed the monotonic LRU key from what is already stored, so a clock that
+    // moved back between runs cannot make this session's writes sort under the
+    // last session's. Best-effort: a failure only costs ordering, and the
+    // first write re-establishes it.
+    unawaited(
+      _db
+          .rawQuery('SELECT MAX(time) AS newest FROM $_table')
+          .then((rows) {
+            final newest = (rows.first['newest'] as num?)?.toInt() ?? 0;
+            if (newest > _lastStamp) _lastStamp = newest;
+          })
+          .catchError((Object _) {}),
+    );
+  }
 
   final Database _db;
 
@@ -458,7 +472,7 @@ class EtagCacheStore {
     if (writes.isEmpty) return;
     try {
       final encoded = await _encodeBinaryAll(writes);
-      final now = DateTime.now().millisecondsSinceEpoch;
+      final now = _lruStamp();
       await _db.transaction((txn) async {
         for (final row in encoded) {
           await txn.insert(_table, {
@@ -480,6 +494,23 @@ class EtagCacheStore {
     } catch (_) {}
   }
 
+  /// The LRU ordering key: wall time, but never allowed to go backwards.
+  ///
+  /// `time` is only ever compared with other rows' `time` — it is a sequence
+  /// number that happens to be readable as a date. A clock set back (or the
+  /// first SNTP sync pulling it back) would stamp fresh writes *older* than
+  /// rows already in the table, so eviction would throw away exactly what was
+  /// just fetched and keep what nobody has touched in weeks. Monotonicity is
+  /// the only property this key actually needs.
+  int _lruStamp() {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now > _lastStamp) _lastStamp = now;
+    return _lastStamp;
+  }
+
+  /// Seeded from the table on open, so the guarantee survives a restart.
+  int _lastStamp = 0;
+
   Future<void> _insert(
     String url, {
     required String etag,
@@ -495,7 +526,7 @@ class EtagCacheStore {
       'kind': kind,
       'body': body,
       'size': size,
-      'time': DateTime.now().millisecondsSinceEpoch,
+      'time': _lruStamp(),
     }, conflictAlgorithm: ConflictAlgorithm.replace);
     await _noteWrite(body.length, 1);
   }
@@ -870,7 +901,7 @@ class EtagCacheStore {
 
     final urls = _pendingTouch.toList(growable: false);
     _pendingTouch.clear();
-    final now = DateTime.now().millisecondsSinceEpoch;
+    final now = _lruStamp();
     try {
       await _db.transaction((txn) async {
         for (var i = 0; i < urls.length; i += _touchInChunk) {
