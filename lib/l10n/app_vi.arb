@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "Tải xuống",
+  "changelogShowSnapshots": "Hiện bản thử nghiệm",
   "changelogTitle": "Nhật ký cập nhật",
   "reportFilterOrderDesc": "Giảm dần",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

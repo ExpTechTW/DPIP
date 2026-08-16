@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #
-# Layering gate — enforces the architecture rules from CLAUDE.md without needing
+# Layering gate — enforces the architecture rules from ARCHITECTURE.md without needing
 # a build or `pub get`, so it fails fast in CI and can be run locally any time.
 #
-# Rules (see CLAUDE.md → Conventions → Architecture):
+# Rules (see ARCHITECTURE.md → Layer rules):
 #   1. lib/core and lib/shared must NOT import features.
 #   2. presentation must NOT import any feature's data layer (depend on domain).
 #   3. a feature must NOT import another feature's data or presentation
@@ -95,7 +95,7 @@ done < <(find lib -name '*.dart' ! -name '*.g.dart' ! -name '*.freezed.dart' | s
 
 if [ "$fail" -ne 0 ]; then
   echo ""
-  echo "Layering violations found — see CLAUDE.md → Conventions → Architecture."
+  echo "Layering violations found — see ARCHITECTURE.md → Layer rules."
   exit 1
 fi
 

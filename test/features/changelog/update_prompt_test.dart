@@ -28,7 +28,7 @@ class _FakeRepository implements ChangelogRepository {
   final List<ReleaseNote> notes;
 
   @override
-  Future<Result<List<ReleaseNote>>> releases() async => Ok(notes);
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async => Ok(notes);
 }
 
 ReleaseNote _note(String tag, {required bool pre}) => ReleaseNote(
@@ -170,6 +170,6 @@ void main() {
 
 class _FailingRepository implements ChangelogRepository {
   @override
-  Future<Result<List<ReleaseNote>>> releases() async =>
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
       const Err(NetworkFailure('offline'));
 }

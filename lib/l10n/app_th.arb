@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "ดาวน์โหลด",
+  "changelogShowSnapshots": "แสดงรุ่นทดสอบ",
   "changelogTitle": "บันทึกการอัปเดต",
   "reportFilterOrderDesc": "มาก→น้อย",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

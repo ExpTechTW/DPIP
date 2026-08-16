@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play 商店",
   "updateDownload": "下载更新",
+  "changelogShowSnapshots": "显示测试版",
   "changelogTitle": "更新日志",
   "reportFilterOrderDesc": "降序",
   "meshtasticExcludeMqttSubtitle": "经互联网桥接、并非无线电听到的节点",

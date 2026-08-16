@@ -513,6 +513,12 @@ abstract class AppLocalizations {
   /// **'Download'**
   String get updateDownload;
 
+  /// Changelog action that reveals pre-release snapshots
+  ///
+  /// In en, this message translates to:
+  /// **'Show snapshots'**
+  String get changelogShowSnapshots;
+
   /// More-menu entry and page title for GitHub release notes
   ///
   /// In en, this message translates to:

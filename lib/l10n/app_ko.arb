@@ -87,6 +87,7 @@
   "updateOpenTestFlight": "TestFlight",
   "updateOpenPlayStore": "Play 스토어",
   "updateDownload": "다운로드",
+  "changelogShowSnapshots": "스냅샷 표시",
   "changelogTitle": "변경 로그",
   "reportFilterOrderDesc": "내림차순",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",

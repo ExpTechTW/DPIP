@@ -226,6 +226,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get updateDownload => 'ดาวน์โหลด';
 
   @override
+  String get changelogShowSnapshots => 'แสดงรุ่นทดสอบ';
+
+  @override
   String get changelogTitle => 'บันทึกการอัปเดต';
 
   @override

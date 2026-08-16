@@ -13,7 +13,7 @@
 #    what "clearing the cache must not delete anything else" is about.
 #
 # Sibling to tool/check_layering.sh / check_l10n.sh; zero new packages.
-# See CLAUDE.md → Conventions.
+# See ARCHITECTURE.md → Persistence.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
