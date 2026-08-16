@@ -44,6 +44,25 @@ jobs:
           echo "checking $range"
           bash tool/check_commits.sh "$range"
 
+      # The commits on the branch are not what lands on main. This repo
+      # squash-merges, so GitHub builds the merged commit out of the PR's title
+      # and description — which this gate never saw. That is not hypothetical:
+      # `332fb8f3 Fix report (#529)` is on main, passes nothing, and can never
+      # be repaired. Check the message that will actually be committed.
+      - name: Commit message gate (squashed PR title)
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Via the environment, never interpolated into the script: a PR title
+          # is attacker-controlled text and `${{ }}` would paste it into bash.
+          {
+            printf '%s\n\n' "$PR_TITLE"
+            printf '%s\n' "$PR_BODY"
+          } > /tmp/pr_message.txt
+          bash tool/check_commits.sh --message /tmp/pr_message.txt
+
       # Architecture gate — pure grep, no toolchain, fails fast.
       - name: Layering gate
         run: bash tool/check_layering.sh

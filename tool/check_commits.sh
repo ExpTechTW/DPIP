@@ -10,11 +10,25 @@
 #
 # Usage:  tool/check_commits.sh [<range>]
 #         tool/check_commits.sh origin/main..HEAD
+#         tool/check_commits.sh --message <file>   # a literal message
 #
 # With no range it checks HEAD alone, which is what a commit-msg hook wants.
+#
+# `--message` exists for the squash-merge case. When a PR is squashed, the
+# commit that lands on `main` is built from the **PR title and description**,
+# not from the branch's commits — so a branch whose every commit passes this
+# gate can still put a malformed message on `main`, and did: `Fix report (#529)`
+# is on `main` now, was never a commit anybody wrote, and cannot be repaired.
+# CI feeds the PR title and body through this mode, so the message that will
+# actually be committed is the one that gets checked.
 set -uo pipefail
 
+mode=range
 range="${1:-HEAD~1..HEAD}"
+if [ "${1:-}" = "--message" ]; then
+  mode=message
+  msg_file="${2:?--message needs a file}"
+fi
 
 # Types that end up in front of a user, and therefore must be bilingual. The
 # rest (chore, ci, docs, style, test, build) may be one line: nobody reads a
@@ -35,17 +49,19 @@ note() {
   printf '  %s\n' "$1" >&2
 }
 
-commits="$(git rev-list --no-merges "$range" 2>/dev/null || true)"
-if [ -z "$commits" ]; then
-  echo "commit gate: no commits in $range"
-  exit 0
-fi
-
-for sha in $commits; do
-  subject="$(git log -1 --format=%s "$sha")"
-  body="$(git log -1 --format=%b "$sha")"
-  short="$(git log -1 --format=%h "$sha")"
+check_one() { # <subject> <body> <label>
+  local subject body short bad
+  subject="$1"
+  body="$2"
+  short="$3"
   bad=0
+
+  # GitHub appends ` (#123)` to the summary when a PR is squash-merged. The
+  # author did not write it and cannot prevent it, so counting it against the
+  # limit fails a commit that passed this very gate while the PR was open — and
+  # fails it on `main`, where the prescribed repair (rebase, force-push) is not
+  # available. Judge the summary the author actually wrote.
+  subject="$(printf '%s' "$subject" | sed -E 's/ \(#[0-9]+\)$//')"
 
   # 1. The summary line.
   if ! printf '%s' "$subject" | grep -Eq "^($ALL_TYPES)(\([a-z0-9._-]+\))?: .+"; then
@@ -119,10 +135,36 @@ for sha in $commits; do
     printf '\n✗ %s  %s\n' "$short" "$subject" >&2
     fail=1
   fi
-done
+}
+
+if [ "$mode" = message ]; then
+  check_one "$(head -n 1 "$msg_file")" "$(tail -n +2 "$msg_file")" "PR title"
+else
+  commits="$(git rev-list --no-merges "$range" 2>/dev/null || true)"
+  if [ -z "$commits" ]; then
+    echo "commit gate: no commits in $range"
+    exit 0
+  fi
+  for sha in $commits; do
+    check_one "$(git log -1 --format=%s "$sha")" \
+      "$(git log -1 --format=%b "$sha")" "$(git log -1 --format=%h "$sha")"
+  done
+fi
 
 if [ "$fail" -ne 0 ]; then
-  cat >&2 <<'EOF'
+  if [ "$mode" = message ]; then
+    # No rebase involved: nothing is committed yet. Editing the PR's title and
+    # description on GitHub is the whole fix, and it re-runs this check.
+    cat >&2 <<'EOF'
+
+This PR will be squash-merged, so the message above — built from the PR's
+**title and description** — is what gets committed to main, not the commits on
+the branch. Edit the title and description on GitHub and this re-runs.
+
+The format is in commit.md.
+EOF
+  else
+    cat >&2 <<'EOF'
 
 A commit message cannot be edited after the fact, so this has to be fixed by
 rewriting the commits and force-pushing the branch:
@@ -136,7 +178,12 @@ destroys their work.
 
 The format is in commit.md.
 EOF
+  fi
   exit 1
 fi
 
-echo "commit gate: $(printf '%s\n' "$commits" | wc -l | tr -d ' ') commit(s) OK"
+if [ "$mode" = message ]; then
+  echo "commit gate: the squashed message is OK"
+else
+  echo "commit gate: $(printf '%s\n' "$commits" | wc -l | tr -d ' ') commit(s) OK"
+fi
