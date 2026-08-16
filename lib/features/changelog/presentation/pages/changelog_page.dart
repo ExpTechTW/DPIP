@@ -19,6 +19,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:dpip/features/changelog/presentation/widgets/platform_tag.dart';
 
 /// Full-screen release list (More → 更新日誌). One row expands at a time;
 /// ETag revalidation keeps pull-to-refresh cheap when nothing changed.
@@ -457,41 +458,6 @@ class _TimelinePainter extends CustomPainter {
       old.railWidth != railWidth;
 }
 
-/// Draws the platform tags in a release note without fetching anything.
-///
-/// The notes mark an Android-only or iOS-only change with a 14 px SVG hosted
-/// in the repository, which is what GitHub renders. Here that would become an
-/// `Image.network` — and this app is read when the network is the thing that
-/// failed, so the tag would be a broken box exactly when the note matters
-/// most. The two known names map to a Material icon instead; anything else
-/// works — the builder cannot decline, so an unknown image becomes its own
-/// alt text rather than a failed request.
-Widget _platformIcon(Uri uri, String? title, String? alt) {
-  final name = uri.pathSegments.isEmpty ? '' : uri.pathSegments.last;
-  final icon = switch (name) {
-    'android.svg' => Icons.android,
-    'ios.svg' => Icons.apple,
-    _ => null,
-  };
-  return Builder(
-    builder: (context) {
-      final style = DefaultTextStyle.of(context).style;
-      if (icon == null) return Text(alt ?? '', style: style);
-      return Padding(
-        padding: const EdgeInsets.only(right: AppSpacing.xs),
-        child: Icon(
-          icon,
-          size: 16,
-          // The colour the surrounding text already carries: the SVG picks a
-          // fixed tint because an `<img>` inherits no theme, but here the icon
-          // sits inside the theme and should follow it.
-          color: style.color,
-        ),
-      );
-    },
-  );
-}
-
 class _ExpandedBody extends StatelessWidget {
   const _ExpandedBody({required this.body, required this.accent});
 
@@ -636,7 +602,7 @@ class _ExpandedBody extends StatelessWidget {
               styleSheet: sheet,
               softLineBreak: true,
               onTapLink: (text, href, title) => _openLink(href),
-              imageBuilder: _platformIcon,
+              imageBuilder: platformTagIcon,
             ),
           ),
         ),
