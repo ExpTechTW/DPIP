@@ -289,6 +289,33 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// shaking.
   static const String _rtsIntensityId = 'replay-rts-intensity';
 
+  /// Grey-dot layer for a triggered station whose discrete intensity rounds
+  /// down to 0 — see the layer's own setup comment in [_onStyleLoaded].
+  static const String _rtsIntensity0Id = 'replay-rts-intensity0';
+
+  /// Opaque only where `intensity == 0 && alert == 1` (ported from the
+  /// legacy monitor's `intensity0` layer) — every station is in this same
+  /// source, so a data expression picks the handful that qualify instead of
+  /// a second filtered layer.
+  static const List<Object> _intensity0OpacityExpression = [
+    'case',
+    [
+      'all',
+      [
+        '==',
+        ['get', 'intensity'],
+        0,
+      ],
+      [
+        '==',
+        ['get', 'alert'],
+        1,
+      ],
+    ],
+    1,
+    0,
+  ];
+
   static const String _boxSourceId = 'replay-box-src';
   static const String _boxLineLayerId = 'replay-box-line';
   static const String _eewSourceId = 'replay-eew-src';
@@ -492,6 +519,16 @@ class _ReplayMapState extends State<_ReplayMap> {
           circleRadius: _rtsRadiusExpression,
           circleStrokeColor: '#9E9E9E',
           circleStrokeWidth: 1,
+          // Higher intensity draws on top of a calmer, overlapping dot —
+          // ported from the legacy monitor's `circleSortKey: coalesce(get('i'),
+          // -5)`; missing this let station dots stack in whatever order the
+          // feed happened to list them, same class of bug as the box layer's
+          // missing sort key.
+          circleSortKey: const <Object>[
+            'coalesce',
+            ['get', 'i'],
+            -5,
+          ],
         ),
         // Station dots under the township names — the wavefront must never
         // hide where you are.
@@ -523,6 +560,24 @@ class _ReplayMapState extends State<_ReplayMap> {
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
           symbolZOrder: 'source',
+          visibility: 'none',
+        ),
+        belowLayerId: townLabelLayerId,
+      );
+
+      // A triggered station whose discrete intensity rounds down to 0 has no
+      // numeral badge (there's no `intensity-0` icon), but it's still live —
+      // ported from the legacy monitor's `intensity0` layer: a plain grey dot
+      // (opacity 1 only when `intensity == 0 && alert == 1`, via a data
+      // expression, not a filter — same source/feature as everything else)
+      // so a triggered-but-quiet station doesn't just vanish in icon mode.
+      await controller.addCircleLayer(
+        _rtsSourceId,
+        _rtsIntensity0Id,
+        const CircleLayerProperties(
+          circleColor: '#9E9E9E',
+          circleRadius: _rtsRadiusExpression,
+          circleOpacity: _intensity0OpacityExpression,
           visibility: 'none',
         ),
         belowLayerId: townLabelLayerId,
@@ -607,6 +662,12 @@ class _ReplayMapState extends State<_ReplayMap> {
           lineColor: _boxColorExpression,
           lineWidth: 2,
           visibility: 'none',
+          // Draw order for overlapping boxes — red (`i` highest) always on
+          // top, then yellow, then green, matching the legacy monitor's box
+          // layer (`lineSortKey: [Expressions.get, 'i']`). Without this,
+          // overlapping boxes stack in whatever order the feed happened to
+          // list them, so a low-intensity box could paint over a red one.
+          lineSortKey: <Object>['get', 'i'],
         ),
         // Detection-box borders stay under the township names.
         belowLayerId: townLabelLayerId,
@@ -641,7 +702,14 @@ class _ReplayMapState extends State<_ReplayMap> {
     unawaited(_updateBox());
   }
 
-  void _onTick() => unawaited(_updateEew());
+  void _onTick() {
+    unawaited(_updateEew());
+    // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every tick
+    // even between RTS polls, so it has to be re-evaluated here too — not
+    // just on [_onRts] — or a box stops blinking only whenever the next poll
+    // happens to land, well after the wavefront actually crossed it.
+    unawaited(_updateBox());
+  }
 
   Future<void> _updateRts() async {
     final controller = _controller;
@@ -793,6 +861,8 @@ class _ReplayMapState extends State<_ReplayMap> {
         },
         'properties': {
           'i': data.intensityRaw,
+          'intensity': level,
+          'alert': data.alert ? 1 : 0,
           'icon': level > 0 ? _intensityIcon(level, dark: _dark) : '',
           'label': '${entry.key}\n${data.intensityRaw.toStringAsFixed(1)}',
         },
@@ -827,6 +897,7 @@ class _ReplayMapState extends State<_ReplayMap> {
         controller.setLayerVisibility(_rtsCircleId, !iconMode),
         controller.setLayerVisibility(_rtsLabelId, !iconMode),
         controller.setLayerVisibility(_rtsIntensityId, iconMode),
+        controller.setLayerVisibility(_rtsIntensity0Id, iconMode),
       ]);
     } catch (_) {
       // Layers gone mid style-reload — the next update retries.
@@ -834,13 +905,19 @@ class _ReplayMapState extends State<_ReplayMap> {
   }
 
   /// One polygon per box id present in the live feed's `rts.box`, joined
-  /// against the static [grid] for its geometry.
+  /// against the static [grid] for its geometry — dropping any box the
+  /// S-wave has already fully swept past (see [_isBoxFullyCovered]) so it
+  /// stops blinking instead of blinking forever once it's no longer live
+  /// information.
   Map<String, dynamic> _boxGeoJson(RtsBoxGrid grid) {
+    final table = _travelTimeTable;
+    final now = widget.clock.now();
     final features = <Map<String, dynamic>>[];
     for (final entry in widget.rts.box.entries) {
       final id = int.tryParse(entry.key);
       final ring = id == null ? null : grid.rings[id];
       if (ring == null) continue;
+      if (table != null && _isBoxFullyCovered(ring, table, now)) continue;
       features.add({
         'type': 'Feature',
         'geometry': {
@@ -851,6 +928,37 @@ class _ReplayMapState extends State<_ReplayMap> {
       });
     }
     return {'type': 'FeatureCollection', 'features': features};
+  }
+
+  /// Whether every corner of [ring] is already within some active alert's
+  /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
+  /// dropped a detection box from the map (not just its blink) the instant
+  /// the wavefront had fully swept past it, since by then it's a stale
+  /// reading rather than live shaking data.
+  bool _isBoxFullyCovered(
+    List<List<double>> ring,
+    SeismicTravelTimeTable table,
+    DateTime now,
+  ) {
+    for (final eew in widget.eew.alerts) {
+      final info = eew.info;
+      final elapsed = now.difference(
+        DateTime.fromMillisecondsSinceEpoch(info.time, isUtc: true),
+      );
+      if (elapsed.isNegative) continue;
+      final radiusKm = table.waveRadius(info.depth, elapsed).s;
+      if (radiusKm <= 0) continue;
+      final epicenter = info.latlng;
+      final allCornersCovered = ring
+          .take(4)
+          .every(
+            (point) =>
+                epicenter.distanceTo(geo.LatLng(point[1], point[0])) / 1000 <=
+                radiusKm,
+          );
+      if (allCornersCovered) return true;
+    }
+    return false;
   }
 
   /// Epicentre cross + P/S wave-front rings, radii from the bundled CWA

@@ -121,13 +121,20 @@ LatLngBounds _reportBounds(EarthquakeReport report) => boundsFromPoints([
 ])!;
 
 /// One 震度 level's counties (縣市) and, per county, the felt area/town names —
-/// grouping by intensity first (highest first), not by county, mirrors the
-/// reference report layout: the level is stated once per group instead of
-/// once per chip.
+/// grouping by colour level first (highest first), not by county, mirrors
+/// the reference report layout: the level is stated once per group instead
+/// of once per chip. [label] is the group's display text — the plain digit
+/// for a pre-2020 舊制 report's remapped `5`/`6` (see
+/// [Intensity.displayForReport]), [Intensity.label] otherwise.
 class _IntensityGroup {
-  const _IntensityGroup({required this.intensity, required this.counties});
+  const _IntensityGroup({
+    required this.colorLevel,
+    required this.label,
+    required this.counties,
+  });
 
-  final int intensity;
+  final int colorLevel;
+  final String label;
   final List<_CountyAreas> counties;
 }
 
@@ -139,27 +146,35 @@ class _CountyAreas {
   final List<String> areaNames;
 }
 
-/// Regroups the report's county→town map by intensity level (highest first),
-/// then by county, preserving each county's/town's original (API) order
-/// within that.
+/// Regroups the report's county→town map by colour level (highest first,
+/// via [Intensity.displayForReport] so a pre-2020 舊制 report groups/colours
+/// correctly), then by county, preserving each county's/town's original
+/// (API) order within that.
 List<_IntensityGroup> _buildIntensityGroups(EarthquakeReport report) {
-  final byIntensity = <int, Map<String, List<String>>>{};
+  final byLevel = <int, Map<String, List<String>>>{};
+  final labelByLevel = <int, String>{};
   for (final MapEntry(key: countyName, value: area) in report.list.entries) {
     for (final MapEntry(key: townName, value: town) in area.town.entries) {
-      byIntensity
-          .putIfAbsent(town.intensity, () => {})
+      final presentation = Intensity.displayForReport(
+        town.intensity,
+        report.originTimeUtc,
+      );
+      labelByLevel[presentation.colorLevel] = presentation.label;
+      byLevel
+          .putIfAbsent(presentation.colorLevel, () => {})
           .putIfAbsent(countyName, () => [])
           .add(townName);
     }
   }
-  final levels = byIntensity.keys.toList()..sort((a, b) => b.compareTo(a));
+  final levels = byLevel.keys.toList()..sort((a, b) => b.compareTo(a));
   return [
-    for (final intensity in levels)
+    for (final level in levels)
       _IntensityGroup(
-        intensity: intensity,
+        colorLevel: level,
+        label: labelByLevel[level]!,
         counties: [
           for (final MapEntry(key: countyName, value: areaNames)
-              in byIntensity[intensity]!.entries)
+              in byLevel[level]!.entries)
             _CountyAreas(countyName: countyName, areaNames: areaNames),
         ],
       ),
@@ -316,7 +331,10 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
             'coordinates': [town.longitude, town.latitude],
           },
           'properties': {
-            'icon': 'intensity-${town.intensity}${dark ? '' : '-dark'}',
+            'icon': IntensityIconRenderer.nameFor(
+              Intensity.displayForReport(town.intensity, report.originTimeUtc),
+              useDarkSuffix: !dark,
+            ),
           },
         },
       {
@@ -970,7 +988,7 @@ class _LocalIntensitySection extends StatelessWidget {
                 _LocalIntensityRow(
                   isCurrent: rows[i].$1,
                   town: rows[i].$2,
-                  result: _nearestFeltIntensity(report, rows[i].$2),
+                  result: _nearestFeltIntensity(report, rows[i].$2, directory),
                 ),
               ],
             ],
@@ -982,20 +1000,31 @@ class _LocalIntensitySection extends StatelessWidget {
 }
 
 /// A felt reading found for a [_LocalIntensitySection] row: the nearest
-/// station within the location's own county, and its intensity.
-typedef _LocalIntensityResult = ({String stationName, int intensity});
+/// station within the location's own county, and its intensity presentation
+/// (via [Intensity.displayForReport], so a pre-2020 舊制 report's plain `5`/
+/// `6` label prints correctly instead of `5⁻`/`6⁻`).
+typedef _LocalIntensityResult = ({
+  String stationName,
+  IntensityPresentation presentation,
+});
 
 /// The felt intensity nearest to [town] within [report] — null when
 /// [report]'s felt-area list doesn't include [town]'s county at all (that
 /// list only ever contains counties with at least one felt reading, so a
-/// missing county means "no data here", not "checked and found nothing").
-/// Otherwise, the nearest of that county's stations by straight-line
-/// distance to [town]'s centroid stands in for "your township's reading" —
-/// the report's town-level keys are station names (sometimes landmarks, not
-/// administrative townships), so name-matching them to [town] isn't reliable.
+/// missing county means "no data here", not "checked and found nothing"),
+/// or when none of that county's stations actually resolve to [town]'s own
+/// township. Otherwise, the nearest of [town]'s township's stations by
+/// straight-line distance to its centroid stands in for "your township's
+/// reading" — the report's town-level keys are station names (sometimes
+/// landmarks, not administrative townships), so each candidate is reverse-
+/// geocoded via [directory] and matched by township code rather than by
+/// name. A same-county-but-different-township station is never close
+/// enough to substitute — 花蓮縣, say, runs the whole east coast, so a lone
+/// reading up at 秀林鄉和平 says nothing about 西寶.
 _LocalIntensityResult? _nearestFeltIntensity(
   EarthquakeReport report,
   Town town,
+  TownDirectory directory,
 ) {
   final area = report.list[town.cityName];
   if (area == null || area.town.isEmpty) return null;
@@ -1003,8 +1032,11 @@ _LocalIntensityResult? _nearestFeltIntensity(
   MapEntry<String, StationIntensity>? nearest;
   var nearestDistance = double.infinity;
   for (final entry in area.town.entries) {
+    final station = entry.value;
+    final stationTown = directory.nearest(station.latitude, station.longitude);
+    if (stationTown?.code != town.code) continue;
     final distance = here.distanceTo(
-      geo.LatLng(entry.value.latitude, entry.value.longitude),
+      geo.LatLng(station.latitude, station.longitude),
     );
     if (distance < nearestDistance) {
       nearestDistance = distance;
@@ -1012,7 +1044,13 @@ _LocalIntensityResult? _nearestFeltIntensity(
     }
   }
   if (nearest == null) return null;
-  return (stationName: nearest.key, intensity: nearest.value.intensity);
+  return (
+    stationName: nearest.key,
+    presentation: Intensity.displayForReport(
+      nearest.value.intensity,
+      report.originTimeUtc,
+    ),
+  );
 }
 
 class _LocalIntensityRow extends StatelessWidget {
@@ -1055,8 +1093,8 @@ class _LocalIntensityRow extends StatelessWidget {
           ),
           if (result case final result?)
             IntensityBadge(
-              label: Intensity.label(result.intensity),
-              color: IntensityColors.discrete(result.intensity),
+              label: result.presentation.label,
+              color: IntensityColors.discrete(result.presentation.colorLevel),
               size: 36,
             )
           else
@@ -1171,11 +1209,8 @@ class _IntensityGroupRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    // Raw wire intensity, not [Intensity.displayForReport] — per-town/group
-    // readings have always been on the fine 0–9 scale (only the top-level
-    // report max needed the pre-2020 legacy-scale remap).
-    final label = Intensity.label(group.intensity);
-    final color = IntensityColors.discrete(group.intensity);
+    final label = group.label;
+    final color = IntensityColors.discrete(group.colorLevel);
 
     return DecoratedBox(
       decoration: BoxDecoration(color: color.withValues(alpha: 0.14)),
@@ -1278,6 +1313,7 @@ class _CountySortedCard extends StatelessWidget {
             _CountyChipsRow(
               countyName: counties[i].key,
               area: counties[i].value,
+              originTimeUtc: report.originTimeUtc,
             ),
           ],
         ],
@@ -1287,10 +1323,18 @@ class _CountySortedCard extends StatelessWidget {
 }
 
 class _CountyChipsRow extends StatelessWidget {
-  const _CountyChipsRow({required this.countyName, required this.area});
+  const _CountyChipsRow({
+    required this.countyName,
+    required this.area,
+    required this.originTimeUtc,
+  });
 
   final String countyName;
   final AreaIntensity area;
+
+  /// The report's origin time — [Intensity.displayForReport] needs it to
+  /// tell a pre-2020 舊制 report's wire `5`/`6` from a 新制 report's.
+  final DateTime originTimeUtc;
 
   @override
   Widget build(BuildContext context) {
@@ -1313,7 +1357,13 @@ class _CountyChipsRow extends StatelessWidget {
             runSpacing: AppSpacing.sm,
             children: [
               for (final MapEntry(key: townName, value: town) in towns)
-                _TownChip(townName: townName, intensity: town.intensity),
+                _TownChip(
+                  townName: townName,
+                  presentation: Intensity.displayForReport(
+                    town.intensity,
+                    originTimeUtc,
+                  ),
+                ),
             ],
           ),
         ],
@@ -1344,19 +1394,16 @@ int _byCountyIntensityDesc(
 /// A single felt town/area — colour-coded by its own intensity (no group
 /// colour to borrow here, unlike the intensity-grouped mode's rows).
 class _TownChip extends StatelessWidget {
-  const _TownChip({required this.townName, required this.intensity});
+  const _TownChip({required this.townName, required this.presentation});
 
   final String townName;
-  final int intensity;
+  final IntensityPresentation presentation;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Raw wire intensity, not [Intensity.displayForReport] — the per-town
-    // reading has always been on the fine 0–9 scale (only the top-level
-    // report max needed the pre-2020 legacy-scale remap).
-    final label = Intensity.label(intensity);
-    final color = IntensityColors.discrete(intensity);
+    final label = presentation.label;
+    final color = IntensityColors.discrete(presentation.colorLevel);
 
     return Container(
       padding: const EdgeInsets.symmetric(
