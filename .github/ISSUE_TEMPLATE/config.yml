@@ -1,0 +1,14 @@
+# The chooser shown above the templates.
+#
+# `blank_issues_enabled: false` on purpose: almost every blank issue filed
+# against this app arrives without the version and the diagnostics dump, and
+# then costs a round trip to ask for them. The two templates ask up front.
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discord — 使用問題與即時討論
+    url: https://discord.gg/5dbHqV8ees
+    about: 不確定是不是 bug、想問怎麼設定、想聊聊，來這裡比開 issue 快。
+
+  - name: 🔒 回報安全性問題
+    url: https://github.com/ExpTechTW/DPIP/security/advisories/new
+    about: 安全性問題請走私密回報，不要開公開 issue。

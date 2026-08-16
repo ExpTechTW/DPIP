@@ -1,0 +1,35 @@
+name: 🔌 功能建議
+description: 提出新功能或改進現有功能
+title: "[Idea]: "
+labels: ["想法"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你想解決什麼問題
+      description: |
+        先講問題，再講做法。什麼情況下你會需要它、現在你怎麼繞過去。
+
+        直接寫「加一個 XX 按鈕」也可以，但寫出背後的情境通常會得到更好的解法。
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你想到的做法
+      description: 如果已經有想法的話。沒有也沒關係。
+    validations:
+      required: false
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 相關平台
+      options:
+        - 兩個平台
+        - 只有 iOS
+        - 只有 Android
+      default: 0
+    validations:
+      required: false

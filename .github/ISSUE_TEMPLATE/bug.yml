@@ -1,0 +1,95 @@
+name: 🚧 問題回報
+description: 回報你遇到的錯誤行為
+title: "[Bug]: "
+labels: ["錯誤"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝你花時間回報。
+
+        DPIP 是一個防災 app，很多問題和**時間、地點、當下收到什麼**綁在一起，
+        事後很難重建。下面幾欄看起來瑣碎，但少了它們通常就查不下去了。
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 平台
+      options:
+        - iOS
+        - Android
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: |
+        **更多 → 除錯資訊**最上面的 `Version` 那一行，長得像 `26w33a` 或 `26.1`。
+
+        請不要填商店或系統設定裡看到的版本號：那是送審用的名稱，同一個發布週期
+        內每個測試版都長一樣，對不到是哪一次組建。
+      placeholder: 26w33a
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: 裝置與系統版本
+      placeholder: iPhone 15 Pro / iOS 26.1
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 發生了什麼
+      description: 預期會發生什麼，實際發生了什麼。
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: false
+
+  - type: input
+    id: when
+    attributes:
+      label: 發生時間
+      description: |
+        大概的日期時間就好。伺服器端的紀錄要靠這個對得上。
+        如果和某次地震或某則警報有關，寫下是哪一次。
+      placeholder: 2026-08-17 03:20 左右，0817 花蓮那次地震
+    validations:
+      required: false
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 診斷資訊
+      description: |
+        **更多 → 除錯資訊 → 右上角「Copy all」**，然後整段貼在這裡。
+
+        裡面有權限狀態、背景執行是否被系統限制、推播 token 在不在、上次回報
+        位置的時間與結果。通知收不到和定位不更新這兩類問題，沒有這段基本上
+        只能用猜的。
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: media
+    attributes:
+      label: 截圖或錄影
+      description: 直接把檔案拖進來就可以。
+    validations:
+      required: false

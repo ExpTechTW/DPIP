@@ -1,0 +1,11 @@
+# Reviewers requested automatically when a path is touched.
+#
+# Restored after the rewrite reset (633fa422) dropped it. The per-area lines
+# from the old file are NOT restored: they pointed at `/lib/models/`,
+# `/lib/core/service.dart` and `/tools/update_translations.sh`, none of which
+# survived the rewrite, and a CODEOWNERS rule for a path that does not exist
+# is silently dead — it never fires and nothing warns you. Re-add per-area
+# owners deliberately against the current tree (see ARCHITECTURE.md) rather
+# than by translating the old paths, which no longer mean the same thing.
+
+/.github/  @exptechtw/dpip-developers
