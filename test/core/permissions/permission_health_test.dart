@@ -10,6 +10,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_execution.dart';
+import 'package:dpip/core/platform/battery_optimization.dart';
 import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,10 +30,35 @@ class _GrantedLocation extends LocationService {
 }
 
 class _AllowedNotifications extends NotificationService {
-  _AllowedNotifications(super.settings);
+  _AllowedNotifications(
+    super.settings, {
+    this.critical = true,
+    this.criticalApplies = false,
+  });
+
+  final bool critical;
+
+  /// Whether this platform has critical alerts at all. Overridden rather than
+  /// read from `Platform`, which is the only way to exercise the iOS branch —
+  /// the tests run on the host, where `Platform.isIOS` is false and the real
+  /// getter would make every case below the Android one.
+  @override
+  final bool criticalApplies;
+
+  @override
+  Future<bool> criticalAllowed() async => critical;
 
   @override
   Future<bool> isAllowed() async => true;
+}
+
+class _FakeBattery extends BatteryOptimization {
+  _FakeBattery(this._exempt);
+
+  final bool _exempt;
+
+  @override
+  Future<bool> isIgnoring() async => _exempt;
 }
 
 class _FakeExecution extends BackgroundExecutionService {
@@ -58,11 +84,19 @@ class _FakeUnusedApp extends UnusedAppRestrictionsService {
 PermissionHealth _health({
   required BackgroundExecutionStatus execution,
   required UnusedAppRestrictions unusedApp,
+  bool batteryExempt = true,
+  bool critical = true,
+  bool criticalApplies = false,
 }) => PermissionHealth(
   location: _GrantedLocation(),
-  notifications: _AllowedNotifications(SettingsStore.inMemory()),
+  notifications: _AllowedNotifications(
+    SettingsStore.inMemory(),
+    critical: critical,
+    criticalApplies: criticalApplies,
+  ),
   execution: _FakeExecution(execution),
   unusedApp: _FakeUnusedApp(unusedApp),
+  battery: _FakeBattery(batteryExempt),
 );
 
 void main() {
@@ -167,16 +201,53 @@ void main() {
     expect(health.needsAttention, isFalse);
   });
 
-  test('the battery exemption is deliberately not part of the badge', () async {
-    // There is no battery input to PermissionHealth at all, and that is the
-    // assertion: the geofence spine is designed to work without the Doze
-    // exemption, so it is an optimisation a user may knowingly decline. It
-    // stays on the permission page, which can explain it.
+  /// The app holds Apple's critical-alert entitlement, so this grant really is
+  /// the user's to give and to restore in Settings — and it is what makes a
+  /// life-threatening warning sound through silent mode and Do Not Disturb at
+  /// 3am, which is when it matters.
+  test('a denied critical-alert grant lights the badge on iOS', () async {
     final health = _health(
       execution: const BackgroundExecutionStatus(known: true),
       unusedApp: UnusedAppRestrictions.exempt,
+      critical: false,
+      criticalApplies: true,
     );
     await health.refresh();
+
+    expect(health.criticalAlertsAllowed, isFalse);
+    expect(health.needsAttention, isTrue);
+  });
+
+  test('Android is never accused of missing critical alerts', () async {
+    final health = _health(
+      execution: const BackgroundExecutionStatus(known: true),
+      unusedApp: UnusedAppRestrictions.exempt,
+      // What the platform reports where the permission does not exist. Reading
+      // it as "not granted" would put a permanent warning on every Android
+      // device, which is why the applicability check is a seam of its own.
+      critical: false,
+      criticalApplies: false,
+    );
+    await health.refresh();
+
+    expect(health.criticalAlertsAllowed, isTrue);
     expect(health.needsAttention, isFalse);
+  });
+
+  /// Doze does not stop a high-priority alert — FCM wakes the device for one —
+  /// but it does throttle `setAndAllowWhileIdle` to about one fire every nine
+  /// minutes, which puts the alarm spine's five-minute floor out of reach on the
+  /// devices where that alarm is the only spine, and it delays geofence
+  /// transitions. On a disaster app the latency is the product.
+  test('a device Doze can throttle lights the badge', () async {
+    final health = _health(
+      execution: const BackgroundExecutionStatus(known: true),
+      unusedApp: UnusedAppRestrictions.exempt,
+      batteryExempt: false,
+    );
+    await health.refresh();
+
+    expect(health.batteryExempt, isFalse);
+    expect(health.needsAttention, isTrue);
   });
 }

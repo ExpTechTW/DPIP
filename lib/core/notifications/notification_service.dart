@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -39,6 +40,16 @@ class NotificationService {
 
   /// Whether the OS has granted notification permission.
   Future<bool> isAllowed() => AwesomeNotifications().isNotificationAllowed();
+
+  /// Whether the critical-alert grant is a thing on this platform at all.
+  ///
+  /// Lives here rather than as a `Platform.isIOS` at each caller because this is
+  /// the platform seam, and because a caller that guessed wrong would be badly
+  /// wrong in one direction: [criticalAllowed] answers false on Android — the
+  /// permission does not exist there, the notification channel carries the
+  /// override instead — so treating that false as "not granted" would put a
+  /// permanent, unclearable warning on every Android device.
+  bool get criticalApplies => Platform.isIOS;
 
   /// Whether the **critical-alert** permission is granted — lets EEW override
   /// silent / Do-Not-Disturb (iOS; guarded by the app entitlement). Shown as a
