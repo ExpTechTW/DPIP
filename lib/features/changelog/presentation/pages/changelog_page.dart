@@ -5,6 +5,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -14,7 +15,6 @@ import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,8 +38,11 @@ class _ChangelogPageState extends State<ChangelogPage> {
   @override
   void initState() {
     super.initState();
-    PackageInfo.fromPlatform().then((info) {
-      if (mounted) setState(() => _installedVersion = info.version);
+    // The build's own name, not the platform's: `PackageInfo.version` is the
+    // train Apple was told (`26.1.0`), which every snapshot in a release cycle
+    // shares. Marking "installed" against it would tick the wrong entry.
+    AppBuild.ensureLoaded().then((_) {
+      if (mounted) setState(() => _installedVersion = AppBuild.label);
     });
   }
 

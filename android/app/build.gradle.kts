@@ -30,8 +30,15 @@ if (keystorePropertiesFile.exists()) {
 /// Both now come from `tool/version.sh` by way of CI, which is the one place
 /// that decides. Locally, where neither is set, the build falls back to
 /// Flutter's own numbers so `flutter run` keeps working.
-val dpipVersionCode: Int =
-    (System.getenv("DPIP_CODE") ?: "").toIntOrNull() ?: flutter.versionCode
+/// Play's ordinal, straight from Flutter's `--build-number`.
+///
+/// One source, not two. It used to also read a `DPIP_CODE` environment
+/// variable, which meant two ways to set the same field and no rule about
+/// which won — and the two carry different numbers now that each store has its
+/// own floor (`tool/version.sh`). Play's is deliberately the small one: it has
+/// published nothing, and a code that turns out to be too low fails the
+/// *upload*, before anything is served, which costs one line to fix.
+val dpipVersionCode: Int = flutter.versionCode
 
 val dpipVersionName: String =
     System.getenv("DPIP_LABEL")?.takeIf { it.isNotBlank() } ?: flutter.versionName

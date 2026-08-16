@@ -14,6 +14,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/build_info.g.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -155,7 +156,20 @@ class _DeveloperPageState extends State<DeveloperPage> {
       (
         title: 'App',
         fields: [
-          (label: 'Version', value: info.version),
+          // The build's own name — `26w33a`, `26.1` — which is the only
+          // version a user is ever asked for and the only one that is unique
+          // per build. It appears nowhere else: Apple is told the train
+          // (`26.1.0`) because it rejects anything with a letter in it, so
+          // every snapshot looks identical in TestFlight and in Settings →
+          // General → About. This row is where a tester finds out which one
+          // they actually have.
+          (label: 'Version', value: AppBuild.label),
+          // What the platform believes, kept beside it: it is what App Store
+          // Connect and Play show, so a support conversation needs both.
+          (
+            label: 'Store version',
+            value: '${info.version} (${info.buildNumber})',
+          ),
           (label: 'Build', value: buildRef),
           (label: 'Build mode', value: _buildMode),
         ],

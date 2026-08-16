@@ -37,13 +37,52 @@ void main() {
     expect(_run()['train'] as String, matches(r'^\d+(\.\d+){0,2}$'));
   });
 
-  test('the code clears what is published and stays under the ceiling', () {
+  test('one number serves both stores, and its digits say what it is', () {
     final code = _run()['code']! as int;
-    // Play refuses a build whose code is not above the last it accepted, and
-    // the old scheme's constant was 300909009.
-    expect(code, greaterThan(300909009));
+    final year = int.parse(
+      (Process.runSync('git', [
+                'log',
+                '-1',
+                '--date=format:%y',
+                '--format=%cd',
+              ]).stdout
+              as String)
+          .trim(),
+    );
+    final commits = int.parse(
+      (Process.runSync('git', [
+                'rev-list',
+                '--count',
+                'HEAD',
+                '--since=20$year-01-01T00:00:00Z',
+              ]).stdout
+              as String)
+          .trim(),
+    );
+    // `4 | yy | commits-this-year`, readable straight off the digits. The
+    // count is the only value anywhere that maps back to an exact revision —
+    // a label names a week, not a commit.
+    expect(code, 400000000 + year * 1000000 + commits);
+  });
+
+  test('the generation digit clears both stores at once', () {
+    final code = _run()['code']! as int;
+    // This is what lets the two platforms share one number, so it is worth a
+    // test rather than a comment.
+    //
+    //   300909022  published on Play (3.9.9 build 22 under the layout the app
+    //              shipped with); a versionCode is unique and increasing
+    //              app-wide and forever.
+    //   408283049  in TestFlight under train 26.1; within a train a build
+    //              number may only increase.
+    //
+    // Clearing the second is also what makes train 26.1 usable again — drop
+    // the generation to 3 and the year's first release could not be 26.1.
+    expect(code, greaterThan(300909022));
+    expect(code, greaterThan(408283049));
     // Android lint errors (`HighAppVersionCode`) a hundred million below
-    // Play's own 2,100,000,000 cap, so that is the working ceiling.
+    // Play's own 2,100,000,000 cap. Year 99 with a million commits in it still
+    // lands at 499,999,999.
     expect(code, lessThan(2000000000));
   });
 

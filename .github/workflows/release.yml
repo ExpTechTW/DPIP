@@ -30,7 +30,7 @@ jobs:
     steps:
       # Full history: the label counts this week's commits and the train reads
       # the newest tag. A shallow clone has neither.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -46,12 +46,18 @@ jobs:
           else
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           fi
-          echo "::notice::$DPIP_LABEL (train $DPIP_TRAIN, build $DPIP_CODE)"
+          echo "::notice::$DPIP_LABEL — $DPIP_TRAIN ($DPIP_CODE)"
 
       # The ordinal is the one value that must never repeat or go backwards: a
       # store that has accepted a code refuses every build at or below it,
-      # permanently. Checking here fails the run loudly instead of failing an
-      # upload later, when the artifacts have already been built.
+      # permanently, and deleting the build does not release the number.
+      # Checking here fails the run loudly instead of failing an upload later,
+      # when the artifacts have already been built.
+      #
+      # This only sees what *this* workflow published. A build uploaded by hand
+      # is invisible to it — which is how 408283049 reached TestFlight ahead of
+      # the scheme. The per-store floors in tool/version.sh are what cover
+      # those; raise one whenever something is shipped outside this workflow.
       - name: Ordinal must be higher than the last published one
         env:
           GH_TOKEN: ${{ github.token }}
@@ -85,7 +91,7 @@ jobs:
             runs-on: macos-latest
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Flutter/Dart come from mise.toml, the same pin ci.yml and every
       # developer use. A published build is the one that most needs to be
@@ -94,11 +100,36 @@ jobs:
       - uses: jdx/mise-action@v4
 
       - if: matrix.platform == 'android'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "25"
           cache: "gradle"
+
+      # Keyed on the lockfile, so it is reused until a dependency actually
+      # moves. Without it every release re-downloads the full package set —
+      # mise caches the SDK but knows nothing about pub.
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      # The iOS build resolves its dependencies through Swift Package Manager
+      # (there is no Podfile). Uncached, every release re-clones and rebuilds
+      # every package before the app's own code is even compiled — on the
+      # runner that bills at ten times the Linux rate.
+      - name: Cache Swift packages
+        if: matrix.platform == 'ios'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - run: mise exec -- flutter pub get
 
@@ -142,9 +173,14 @@ jobs:
       # the GitHub release, the AAB is the only thing Play accepts.
       - name: Build
         env:
+          # Only the label: gradle takes its versionCode from Flutter's
+          # `--build-number` above, so there is one source for it rather than
+          # two that can disagree.
           DPIP_LABEL: ${{ needs.version.outputs.label }}
-          DPIP_CODE: ${{ needs.version.outputs.code }}
         run: |
+          # One number for both stores — see tool/version.sh for why they can
+          # be aligned. It is also what the release advertises and what the
+          # update check compares, so nothing anywhere has to translate.
           COMMON="--build-name=${{ needs.version.outputs.train }} \
                   --build-number=${{ needs.version.outputs.code }} \
                   --dart-define=DPIP_LABEL=${{ needs.version.outputs.label }} \
@@ -204,7 +240,8 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.exptech.dpip
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: internal
+          # `track` is deprecated in favour of the plural, which takes a list.
+          tracks: internal
           status: completed
           releaseName: ${{ needs.version.outputs.label }}
           # Lets Play symbolicate native crashes (MapLibre, the mesh stack)
@@ -238,7 +275,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

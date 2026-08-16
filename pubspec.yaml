@@ -7,7 +7,7 @@ publish_to: 'none'
 # and stays legal semver, only because `flutter pub get` parses it: `26.1`
 # fails with "must have three numeric components" and `26w33a` does not parse
 # at all.
-version: 26.1.0+0
+version: 26.1.0+1
 
 environment:
   sdk: ^3.13.0

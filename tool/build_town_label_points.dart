@@ -61,11 +61,10 @@ void main() {
   // the Taiwan Strait, far roomier than its actual land — so "the polygon with
   // the most room" put the label out at sea. The seat is on the main body by
   // definition, which makes "the polygon containing it" the principled choice.
-  final seats = (jsonDecode(
-            utf8.decode(gzip.decode(File(_directory).readAsBytesSync())),
-          )
-          as Map<String, dynamic>)
-      .map(
+  final seats =
+      (jsonDecode(
+        utf8.decode(gzip.decode(File(_directory).readAsBytesSync())),
+      ) as Map<String, dynamic>).map(
         (code, value) => MapEntry(code, (
           lat: ((value as Map<String, dynamic>)['lat'] as num).toDouble(),
           lng: (value['lng'] as num).toDouble(),
@@ -95,7 +94,8 @@ void main() {
       final cell = _polylabel(rings);
       // A polygon holding the seat always beats one that does not, however
       // roomy the other is; among equals, room wins.
-      final better = best == null ||
+      final better =
+          best == null ||
           (holdsSeat && !bestHoldsSeat) ||
           (holdsSeat == bestHoldsSeat && cell.clearance > best.clearance);
       if (better) {
