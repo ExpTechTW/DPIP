@@ -1,7 +1,8 @@
 /// The locally rendered intensity markers must keep the legacy geometry: a
 /// full-bleed shell (white, or black in dark mode), an inner rounded square in
-/// the discrete intensity colour, and the level digit (black on the yellow /
-/// orange badges 4–5, white elsewhere). `cross` is the red × station marker.
+/// the discrete intensity colour, and the level label — `1`…`4`, then
+/// `5⁻`/`5⁺`/`6⁻`/`6⁺`/`7` (black on the yellow/orange badges 4–5, white
+/// elsewhere). `cross` is the red × station marker.
 library;
 
 import 'dart:typed_data';
@@ -71,12 +72,14 @@ void main() {
         badge & 0xFFFFFF,
         reason: '$name badge colour',
       );
-      final d = px(image, raw, 32, 32);
-      expect(
-        (d.$1 << 16) | (d.$2 << 8) | d.$3,
-        digit,
-        reason: '$name digit colour',
-      );
+      var foundDigit = false;
+      for (var dx = -6; dx <= 6 && !foundDigit; dx++) {
+        for (var dy = -6; dy <= 6 && !foundDigit; dy++) {
+          final d = px(image, raw, 32 + dx, 32 + dy);
+          if (((d.$1 << 16) | (d.$2 << 8) | d.$3) == digit) foundDigit = true;
+        }
+      }
+      expect(foundDigit, isTrue, reason: '$name digit colour');
       expect(px(image, raw, 0, 0).$4, lessThan(32), reason: '$name corner');
     }
   });
