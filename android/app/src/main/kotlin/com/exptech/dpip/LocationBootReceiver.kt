@@ -15,8 +15,9 @@ import android.content.Intent
  */
 class LocationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         val appContext = context.applicationContext
+        BgLocationStore.noteWake(appContext, "boot")
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         if (!BgLocationStore.enabled(appContext)) return
 
         if (!GmsAvailability.available(appContext) || !BgLocationStore.hasLast(appContext)) {

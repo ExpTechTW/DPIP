@@ -18,6 +18,13 @@ import java.util.concurrent.TimeUnit
  * recent cached fix (`maxUpdateAge`) to avoid a fresh acquisition when possible,
  * and falls back to the last known location. Blocks briefly — call off the main
  * thread (the receivers' `goAsync` window).
+ *
+ * Returns null when it cannot get one, which is a real outcome on a device with
+ * no Play services, no location permission, or location switched off — and
+ * every path here used to swallow the reason. That mattered: "the fix was
+ * null" is one of exactly two things `Last report: never` can mean, and there
+ * was no way to tell which, or why. Each failure now leaves a breadcrumb; none
+ * of it changes what the function returns.
  */
 object FusedFix {
     private const val MAX_AGE_MS = 120_000L
@@ -26,6 +33,7 @@ object FusedFix {
 
     @SuppressLint("MissingPermission")
     fun get(context: Context): Location? {
+        val why = StringBuilder()
         val client = LocationServices.getFusedLocationProviderClient(context)
         val request = CurrentLocationRequest.Builder()
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
@@ -39,20 +47,35 @@ object FusedFix {
                 TimeUnit.MILLISECONDS,
             )
         } catch (e: Exception) {
+            why.append("current: ").append(e.javaClass.simpleName)
             null
         }
         if (current != null) return current
+        if (why.isEmpty()) why.append("current: null")
         // Fall back to the last known location — but only if it's fresh, so a
         // stale fix can't report the wrong township or re-centre the geofence on
         // a point the device already left.
-        return try {
+        val fallback = try {
             val last = Tasks.await(
                 client.lastLocation, LAST_LOCATION_TIMEOUT_MS, TimeUnit.MILLISECONDS,
             )
-            if (last != null && isFresh(last)) last else null
+            when {
+                last == null -> {
+                    why.append(", last: null")
+                    null
+                }
+                !isFresh(last) -> {
+                    why.append(", last: stale")
+                    null
+                }
+                else -> last
+            }
         } catch (e: Exception) {
+            why.append(", last: ").append(e.javaClass.simpleName)
             null
         }
+        if (fallback == null) BgLocationStore.note(context, "no fix — $why")
+        return fallback
     }
 
     private fun isFresh(location: Location): Boolean {

@@ -229,6 +229,13 @@ Future<void> bootstrap() async {
     platform: reportPlatform,
     version: appVersion,
   );
+  // Replay whatever the native side recorded while there was no Dart to hear
+  // it. A background wake runs with no Flutter isolate at all, so nothing that
+  // path does can reach `Log` as it happens — which is why "it never reports"
+  // came with no evidence of *where* it stopped. Native keeps a small ring of
+  // breadcrumbs across process deaths; this is where they enter the log the
+  // user can actually send. Unawaited: a diagnostic must never delay a launch.
+  unawaited(backgroundLocation.drainBreadcrumbs());
 
   // Watches the OS location toggle / permission and recovers reporting after a
   // mid-session change; drives the "fix it" banner.

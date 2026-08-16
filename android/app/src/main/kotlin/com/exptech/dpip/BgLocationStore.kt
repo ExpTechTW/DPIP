@@ -83,8 +83,15 @@ object BgLocationStore {
      */
     fun report(context: Context, lat: Double, lng: Double) {
         val prefs = prefs(context)
-        val token = prefs.getString(KEY_TOKEN, null) ?: return
-        val version = prefs.getString(KEY_VERSION, null) ?: return
+        // Stamped even on the way out. These two returns sat *above* the stamp,
+        // so a run that never had a token was indistinguishable from one that
+        // never happened — and "never happened" is what the developer page
+        // showed for both, which is the ambiguity that made this bug survive
+        // three attempts. A negative code is a reason, not an HTTP status.
+        val token = prefs.getString(KEY_TOKEN, null)
+            ?: return stamp(prefs, NO_TOKEN)
+        val version = prefs.getString(KEY_VERSION, null)
+            ?: return stamp(prefs, NO_VERSION)
         val platform = prefs.getInt(KEY_PLATFORM, 0)
         var code = -1
         try {
@@ -104,10 +111,69 @@ object BgLocationStore {
             // recorded below — "tried at T and failed" is the diagnostic that
             // separates "never fired" from "fires but cannot reach the server".
         }
+        stamp(prefs, code)
+    }
+
+    /** No push token stored — the report has nowhere to go. */
+    const val NO_TOKEN = -2
+
+    /** No app version stored, which the endpoint's path needs. */
+    const val NO_VERSION = -3
+
+    private fun stamp(prefs: SharedPreferences, code: Int) {
         prefs.edit()
             .putLong(KEY_LAST_REPORT_AT, System.currentTimeMillis())
             .putBoolean(KEY_LAST_REPORT_OK, code in 200..299)
             .putInt(KEY_LAST_REPORT_CODE, code)
             .apply()
     }
+
+    /**
+     * A bounded ring of what the background path did, drained into the app's
+     * own log at the next launch.
+     *
+     * Every background wake runs in a `BroadcastReceiver` with no Flutter
+     * isolate, so nothing it does can reach `Log` — and `android.util.Log` is
+     * logcat, which nobody can read from their own phone. The Android
+     * background path was therefore invisible *by construction*, which is why
+     * three attempts at this bug had nothing to go on.
+     */
+    fun note(context: Context, message: String) {
+        val prefs = prefs(context)
+        val existing = prefs.getString(KEY_BREADCRUMBS, "").orEmpty()
+        val line = "${System.currentTimeMillis()}\t$message"
+        val kept = (existing.split('\n').filter { it.isNotBlank() } + line)
+            .takeLast(BREADCRUMB_LIMIT)
+        prefs.edit().putString(KEY_BREADCRUMBS, kept.joinToString("\n")).apply()
+    }
+
+    /** Reads the ring and clears it, so a line is reported once. */
+    fun drainBreadcrumbs(context: Context): List<String> {
+        val prefs = prefs(context)
+        val all = prefs.getString(KEY_BREADCRUMBS, "").orEmpty()
+        if (all.isBlank()) return emptyList()
+        prefs.edit().remove(KEY_BREADCRUMBS).apply()
+        return all.split('\n').filter { it.isNotBlank() }
+    }
+
+    /**
+     * Records that the OS woke us, before any guard can return.
+     *
+     * The highest-value question in a background-location bug is whether the
+     * wake happened at all, and nothing anywhere answered it: every receiver
+     * returned early on a disabled or unpermitted device without leaving a
+     * trace, so "the OS never called us" and "we ignored the call" looked
+     * identical.
+     */
+    fun noteWake(context: Context, kind: String) {
+        val prefs = prefs(context)
+        prefs.edit()
+            .putLong("wake_${kind}_at", System.currentTimeMillis())
+            .putInt("wake_${kind}_n", prefs.getInt("wake_${kind}_n", 0) + 1)
+            .apply()
+        note(context, "woke: $kind")
+    }
+
+    private const val KEY_BREADCRUMBS = "breadcrumbs"
+    private const val BREADCRUMB_LIMIT = 50
 }

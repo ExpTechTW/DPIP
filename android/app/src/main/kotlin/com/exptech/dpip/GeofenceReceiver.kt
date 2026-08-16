@@ -30,9 +30,22 @@ import com.google.android.gms.location.GeofencingEvent
 class GeofenceReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val appContext = context.applicationContext
+        // Before the guard: "the OS never woke us" and "we ignored the wake"
+        // used to look identical, and they need different fixes.
+        BgLocationStore.noteWake(appContext, "geofence")
         if (!BgLocationStore.enabled(appContext)) return
         val event = GeofencingEvent.fromIntent(intent) ?: return
         if (event.hasError()) {
+            // The error code *is* the diagnosis, and it was read and thrown
+            // away. GEOFENCE_NOT_AVAILABLE (1000, usually Google Location
+            // Accuracy off), TOO_MANY_GEOFENCES (1001) and
+            // TOO_MANY_PENDING_INTENTS (1002) are three unrelated bugs with
+            // three unrelated fixes and one identical silent outcome.
+            BgLocationStore.prefs(appContext).edit()
+                .putInt("last_geofence_error", event.errorCode)
+                .putLong("last_geofence_error_at", System.currentTimeMillis())
+                .apply()
+            BgLocationStore.note(appContext, "geofence error ${event.errorCode}")
             reArm(appContext) // service dropped the fence (e.g. location toggled)
             return
         }

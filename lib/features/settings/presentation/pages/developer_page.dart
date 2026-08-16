@@ -70,9 +70,35 @@ String _lastReport(Map<String, Object?> d) {
   final age = DateTime.now().difference(when);
   final ok = d['lastReportOk'] == true;
   final code = d['lastReportCode'];
-  final outcome = ok ? 'ok' : 'failed';
-  final suffix = code is int && code > 0 ? ' ($code)' : '';
-  return '${_age(age)} ago · $outcome$suffix';
+  return '${_age(age)} ago · ${_outcome(ok, code)}';
+}
+
+/// A negative code is a reason the request was never made, not an HTTP status.
+/// It has to read as one: `failed (-2)` sends whoever pastes it looking for a
+/// network fault that never happened.
+String _outcome(bool ok, Object? code) => switch (code) {
+  -2 => 'no push token',
+  -3 => 'no app version',
+  -1 => 'could not reach the server',
+  final int c when c > 0 => ok ? 'ok ($c)' : 'failed ($c)',
+  _ => ok ? 'ok' : 'failed',
+};
+
+/// How many times the OS woke the background path, by which spine woke it.
+///
+/// This is the row that separates the two failures a single `Last report:
+/// never` collapses into: the OS never called us, or it called and every call
+/// bailed out. They need opposite fixes.
+String _wakes(Map<String, Object?> d) {
+  final parts = <String>[
+    for (final (label, key) in const [
+      ('geofence', 'wakeGeofence'),
+      ('alarm', 'wakeAlarm'),
+      ('boot', 'wakeBoot'),
+    ])
+      if (d[key] case final int n when n > 0) '$label $n',
+  ];
+  return parts.isEmpty ? 'never woken' : parts.join(' · ');
 }
 
 String _age(Duration d) {
@@ -215,8 +241,23 @@ class _DeveloperPageState extends State<DeveloperPage> {
             value: bgLocation['authorization'] as String?,
           ),
           (label: 'Armed', value: _yesNo(bgLocation['armed'])),
+          // Why nothing is armed, when that is the answer. Without it the rows
+          // above read "Requested: yes / Armed: no" and stop, which is the
+          // shape this bug arrived in: a state with no stated cause.
+          if (bgLocation['blocked'] != null)
+            (label: 'Blocked by', value: bgLocation['blocked'] as String?),
           (label: 'Spine', value: bgLocation['spine'] as String?),
           (label: 'Push token held', value: _yesNo(bgLocation['hasToken'])),
+          // Wakes and reports are separate counts on purpose. "Woke 40 times,
+          // reported never" and "never woke" are different faults with
+          // different fixes, and a single last-report row cannot tell them
+          // apart — it says `never` for both.
+          (label: 'Wakes', value: _wakes(bgLocation)),
+          if (bgLocation['lastGeofenceError'] != null)
+            (
+              label: 'Geofence error',
+              value: bgLocation['lastGeofenceError'] as String?,
+            ),
           (label: 'Last report', value: _lastReport(bgLocation)),
           (label: 'Centred on', value: _centre(bgLocation)),
           (label: 'Detail', value: bgLocation['detail'] as String?),
@@ -472,6 +513,18 @@ class _DeveloperPageState extends State<DeveloperPage> {
       ..showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
   }
 
+  Future<void> _reportNow() async {
+    final backgroundLocation = context.read<BackgroundLocationService>();
+    final messenger = ScaffoldMessenger.of(context);
+    await backgroundLocation.reportNow();
+    await _load();
+    if (!mounted) return;
+    messenger.showSnackBar(
+      // l10n-ignore: developer-only page, deliberately untranslated
+      const SnackBar(content: Text('Reported — see Last report above')),
+    );
+  }
+
   /// Version-row taps: count to [_unlockVersionTaps], then unlock the
   /// experimental-features menu (see `ExperimentalSettings.unlock`). Shows the
   /// remaining count so the easter egg is discoverable, and confirms once it
@@ -566,6 +619,20 @@ class _DeveloperPageState extends State<DeveloperPage> {
                     _TableBreakdown(tables: _tables!),
                 ],
                 const SectionHeader('Maintenance'),
+                // Runs the background report path by hand, on the same code an
+                // OS wake runs. Waiting for a real geofence crossing means
+                // driving 200 m and hoping, with no way to tell a wake that
+                // never came from one that came and bailed — this reproduces
+                // the second half on demand, and the rows above then say what
+                // it did.
+                ListTile(
+                  leading: const Icon(Icons.my_location_outlined),
+                  title: const Text('Report location now'),
+                  subtitle: const Text(
+                    'Runs the background report path and refreshes the rows above',
+                  ),
+                  onTap: _reportNow,
+                ),
                 ListTile(
                   leading: Icon(
                     Icons.delete_sweep_outlined,

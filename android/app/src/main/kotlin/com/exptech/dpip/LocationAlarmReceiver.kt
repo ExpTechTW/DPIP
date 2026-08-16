@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit
 class LocationAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val appContext = context.applicationContext
+        BgLocationStore.noteWake(appContext, "alarm")
         if (!BgLocationStore.enabled(appContext)) return
 
         val prefs = BgLocationStore.prefs(appContext)

@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import io.flutter.plugin.common.MethodCall
@@ -39,6 +41,11 @@ class BackgroundLocationChannel(private val context: Context) :
                     return
                 }
                 BgLocationStore.saveConfig(context, token, version, platform)
+                BgLocationStore.note(
+                    context,
+                    "start: gms=${GmsAvailability.available(context)} " +
+                        "bgPermission=${GeofenceManager.hasPermission(context)}",
+                )
                 if (GmsAvailability.available(context)) {
                     // The alarm is NOT cancelled here. Arming the geofence needs
                     // a fix, and getting one can fail — location off at that
@@ -73,6 +80,35 @@ class BackgroundLocationChannel(private val context: Context) :
 
             "diagnostics" -> result.success(diagnostics())
 
+            // Everything the background path recorded since the last drain, so
+            // it can be written into the app's own log. A BroadcastReceiver has
+            // no Flutter isolate, so nothing it does could reach `Log` — the
+            // whole Android background path was invisible to the one diagnostic
+            // a user is able to send.
+            "drainBreadcrumbs" ->
+                result.success(BgLocationStore.drainBreadcrumbs(context))
+
+            // Runs the report path now, with the fix the OS last had. Makes the
+            // background path testable without waiting for a geofence crossing,
+            // which is the wait that has blocked every previous attempt at this.
+            // Answered only once the work is done, on the main thread: the
+            // caller re-reads the diagnostics the moment this returns, and
+            // replying early would show it the *previous* attempt's outcome
+            // and call it this one's.
+            "reportNow" -> {
+                val app = context.applicationContext
+                Thread {
+                    val fix = FusedFix.get(app)
+                    if (fix == null) {
+                        BgLocationStore.note(app, "reportNow: no fix")
+                    } else {
+                        BgLocationStore.note(app, "reportNow: reporting")
+                        BgLocationStore.report(app, fix.latitude, fix.longitude)
+                    }
+                    Handler(Looper.getMainLooper()).post { result.success(null) }
+                }.start()
+            }
+
             else -> result.notImplemented()
         }
     }
@@ -93,6 +129,7 @@ class BackgroundLocationChannel(private val context: Context) :
                 val location = FusedFix.get(appContext)
                 if (location == null) {
                     Log.w(TAG, "no fix available — geofence not armed, keeping the alarm")
+                    BgLocationStore.note(appContext, "arm: no fix, alarm only")
                     LocationAlarmScheduler.ensure(appContext)
                     return@Thread
                 }
@@ -100,15 +137,18 @@ class BackgroundLocationChannel(private val context: Context) :
                 // Arm the fence first (spine safety), then report.
                 GeofenceManager.register(appContext, location.latitude, location.longitude) { armed ->
                     if (armed) {
+                        BgLocationStore.note(appContext, "arm: geofence live")
                         LocationAlarmScheduler.cancel(appContext)
                     } else {
                         Log.w(TAG, "geofence refused — falling back to the alarm")
+                        BgLocationStore.note(appContext, "arm: geofence refused, alarm only")
                         LocationAlarmScheduler.ensure(appContext)
                     }
                 }
                 BgLocationStore.report(appContext, location.latitude, location.longitude)
             } catch (e: Exception) {
                 Log.w(TAG, "background location arm failed", e)
+                BgLocationStore.note(appContext, "arm failed: ${e.javaClass.simpleName}: ${e.message}")
                 LocationAlarmScheduler.ensure(appContext)
             }
         }.start()
@@ -126,8 +166,16 @@ class BackgroundLocationChannel(private val context: Context) :
     private fun diagnostics(): Map<String, Any?> {
         val prefs = BgLocationStore.prefs(context)
         val gms = GmsAvailability.available(context)
-        val fenceArmed = BgLocationStore.armed(context)
-        val alarmArmed = LocationAlarmScheduler.isScheduled(context)
+        // Armed means "something can actually produce a fix", not "something is
+        // scheduled". Both spines need ACCESS_BACKGROUND_LOCATION: without it
+        // `GeofenceManager.register` refuses and `LocationFetcher.getFix`
+        // returns null on every alarm — so the page used to read
+        // `armed: yes · spine: alarm` on precisely the device that could never
+        // report, which is the healthiest-looking possible reading of the
+        // broken state.
+        val canFix = GeofenceManager.hasPermission(context)
+        val fenceArmed = BgLocationStore.armed(context) && canFix
+        val alarmArmed = LocationAlarmScheduler.isScheduled(context) && canFix
         val lastReportAt = prefs.getLong(BgLocationStore.KEY_LAST_REPORT_AT, 0L)
         return mapOf(
             "enabled" to BgLocationStore.enabled(context),
@@ -139,6 +187,15 @@ class BackgroundLocationChannel(private val context: Context) :
                 else -> "none"
             },
             "hasToken" to (prefs.getString(BgLocationStore.KEY_TOKEN, null) != null),
+            "blocked" to if (canFix) null else "background location not granted",
+            // Wake counters. The first question in any background bug is
+            // whether the OS ever called us, and nothing answered it before.
+            "wakeGeofence" to prefs.getInt("wake_geofence_n", 0),
+            "wakeAlarm" to prefs.getInt("wake_alarm_n", 0),
+            "wakeBoot" to prefs.getInt("wake_boot_n", 0),
+            "lastGeofenceError" to (
+                prefs.getInt("last_geofence_error", 0).takeIf { it != 0 }
+            ),
             "lastReportAt" to (if (lastReportAt == 0L) null else lastReportAt),
             "lastReportOk" to (
                 if (lastReportAt == 0L) null
