@@ -248,7 +248,19 @@ jobs:
           # instead of showing raw addresses.
           debugSymbols: ${{ steps.symbols.outputs.dir }}
 
-      - name: Upload to TestFlight
+      # There is one iOS destination and this is it, for a snapshot and a
+      # release alike: App Store Connect. A build lands there, TestFlight is
+      # simply the view of builds that have landed, and the *same* build is
+      # what an App Store version is later built from — there is no separate
+      # "upload to the App Store".
+      #
+      # So a tag changes nothing here. What it would change is everything
+      # *after*: creating an `appStoreVersion`, attaching this build to it and
+      # submitting it for review. That is deliberately not automated — the
+      # first submission needs screenshots, review notes and export-compliance
+      # answers, and automating a step nobody has yet performed by hand is how
+      # a release gets stuck in a state no one recognises.
+      - name: Upload to App Store Connect
         if: matrix.platform == 'ios'
         uses: apple-actions/upload-testflight-build@v5
         with:
@@ -287,19 +299,21 @@ jobs:
       # The ordinal rides in the body as an HTML comment: GitHub renders it as
       # nothing, so the note stays a note while the app still has something
       # unambiguous to compare. See `buildCodeOf` in update_check.dart.
+      # Built from the commit messages themselves — see tool/release_notes.sh
+      # for why a release accumulates across the snapshots it followed while a
+      # snapshot is only a delta.
       - name: Release notes
         run: |
-          {
-            if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-              echo "Release **${{ needs.version.outputs.label }}**."
-            else
-              echo "Snapshot **${{ needs.version.outputs.label }}** — built from \`${GITHUB_SHA:0:7}\` on main."
-              echo
-              echo "Snapshots are cut from every commit and are not reviewed. Expect breakage."
-            fi
-            echo
-            echo "<!-- dpip-build: ${{ needs.version.outputs.code }} -->"
-          } > NOTES.md
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            bash tool/release_notes.sh \
+              "${{ needs.version.outputs.label }}" \
+              "${{ needs.version.outputs.code }}" --release > NOTES.md
+          else
+            bash tool/release_notes.sh \
+              "${{ needs.version.outputs.label }}" \
+              "${{ needs.version.outputs.code }}" > NOTES.md
+          fi
+          cat NOTES.md
 
       - name: Publish
         env:
