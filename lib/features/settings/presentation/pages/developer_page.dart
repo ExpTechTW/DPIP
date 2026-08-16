@@ -17,7 +17,9 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/platform/background_execution.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
@@ -134,6 +136,11 @@ class _DeveloperPageState extends State<DeveloperPage> {
     final tables = await database.tableStats();
     final device = await DeviceInfoService.load();
     final bgLocation = await backgroundLocation.diagnostics();
+    // The two states that silently end background reporting while every
+    // permission above still reads "granted" — and the two that were missing
+    // from the dump people paste when asking why they got no alert.
+    final execution = await BackgroundExecutionService().status();
+    final unusedApp = await UnusedAppRestrictionsService().status();
     // Track the build by the git commit it was built from (kGitCommit is kept
     // current by the .githooks generator — see tool/setup.sh), falling back to
     // the platform build number outside a repo.
@@ -199,6 +206,25 @@ class _DeveloperPageState extends State<DeveloperPage> {
           (label: 'Last report', value: _lastReport(bgLocation)),
           (label: 'Centred on', value: _centre(bgLocation)),
           (label: 'Detail', value: bgLocation['detail'] as String?),
+          (
+            label: 'Background execution',
+            value: !execution.known
+                ? 'unknown'
+                : execution.restricted
+                ? (execution.lockedByPolicy
+                      ? 'blocked by policy'
+                      : 'RESTRICTED')
+                : 'allowed',
+          ),
+          if (execution.standbyBucket != null)
+            (label: 'Standby bucket', value: execution.standbyBucket),
+          (label: 'Kept active', value: _keptActive(unusedApp)),
+          if (execution.vendorManaged)
+            (
+              label: 'Vendor power manager',
+              value:
+                  '${execution.manufacturer} — not detectable, check by hand',
+            ),
         ],
       ),
       (
@@ -320,6 +346,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
     if (kProfileMode) return 'profile';
     return 'debug';
   }
+
+  /// Android's hibernation state in the dump's own vocabulary. `unavailable` is
+  /// reported as "n/a" rather than as a problem: a device too old for the API,
+  /// or without the Play services that back-port it, has nothing to change.
+  static String _keptActive(UnusedAppRestrictions status) => switch (status) {
+    UnusedAppRestrictions.exempt => 'yes',
+    UnusedAppRestrictions.restricted => 'NO — will be hibernated',
+    UnusedAppRestrictions.unavailable => 'n/a',
+  };
 
   Future<String?> _fcmToken() async {
     try {
