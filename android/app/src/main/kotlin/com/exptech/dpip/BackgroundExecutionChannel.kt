@@ -35,8 +35,9 @@ import io.flutter.plugin.common.MethodChannel
  * exemption intent — Samsung's own guidance for developers is that there is
  * nothing to call. All this class can do is recognise the manufacturer and open
  * the vendor's own screen, which is why [openOemSettings] is a best-effort
- * chain of known component names ending at the standard app-details page rather
- * than a single documented intent.
+ * chain of known vendor screens — several OS generations deep per brand —
+ * ending at the standard app-details page rather than a single documented
+ * intent.
  */
 class BackgroundExecutionChannel(private val context: Context) :
     MethodChannel.MethodCallHandler {
@@ -46,104 +47,237 @@ class BackgroundExecutionChannel(private val context: Context) :
         private const val TAG = "BackgroundExecution"
 
         /**
-         * Vendor battery/auto-start screens, tried in order for a manufacturer.
+         * One way to reach a vendor's own battery / auto-start screen.
          *
-         * Undocumented and version-specific by nature — these are activities in
-         * the vendor's own system app, so they move and disappear between OS
-         * releases. That is why every one is attempted inside a try/catch and
-         * the standard app-details page is the last resort: this can degrade,
-         * but it must never throw or dead-end.
+         * Two shapes because the vendors use both: Huawei, Samsung and Meizu
+         * publish broadcast-style *actions*, everyone else only has an activity
+         * class. Actions are preferred where they exist — they survive the
+         * vendor renaming the activity, which is the thing that actually breaks.
+         */
+        private sealed class Screen {
+            data class Action(val name: String) : Screen()
+            data class Component(val pkg: String, val cls: String) : Screen()
+        }
+
+        /**
+         * Vendor screens, tried in order until one opens.
+         *
+         * Sourced from ExpTech's fork of `Disable-Battery-Optimizations`
+         * (KillerManager's device table), which carries several OS generations
+         * per vendor — hence the chains: OPPO alone has moved this screen
+         * between `com.coloros.safecenter`, `com.oppo.safe` and
+         * `com.color.safecenter`, and a device only has one of them. Ordered
+         * most-specific first, so the user lands on the auto-start or
+         * sleeping-apps list itself rather than a battery summary they then have
+         * to navigate.
+         *
+         * Undocumented and version-specific by nature — these are activities
+         * inside the vendor's own system app, so they move and disappear between
+         * releases. Every one is attempted inside a try/catch and the standard
+         * app-details page is the last resort: this can degrade, but it must
+         * never throw or dead-end.
          *
          * Deliberately not probed with `resolveActivity` first: on Android 11+
          * package visibility hides these components unless the app declares a
-         * `<queries>` entry for each vendor package, so a resolve check would
+         * `<queries>` entry for every vendor package, so a resolve check would
          * answer "unavailable" on precisely the devices that have the screen.
          * Trying and catching is both simpler and more accurate.
          */
-        private val OEM_SCREENS: Map<String, List<ComponentName>> = mapOf(
-            "xiaomi" to listOf(
-                ComponentName(
+        private val OEM_SCREENS: Map<String, List<Screen>> = buildMap {
+            val miui = listOf(
+                Screen.Component(
                     "com.miui.securitycenter",
                     "com.miui.permcenter.autostart.AutoStartManagementActivity",
                 ),
-            ),
-            "redmi" to listOf(
-                ComponentName(
-                    "com.miui.securitycenter",
-                    "com.miui.permcenter.autostart.AutoStartManagementActivity",
+                Screen.Component(
+                    "com.miui.powerkeeper",
+                    "com.miui.powerkeeper.ui.HiddenAppsConfigActivity",
                 ),
-            ),
-            "poco" to listOf(
-                ComponentName(
-                    "com.miui.securitycenter",
-                    "com.miui.permcenter.autostart.AutoStartManagementActivity",
+            )
+            for (brand in listOf("xiaomi", "redmi", "poco")) put(brand, miui)
+
+            val emui = listOf(
+                Screen.Action("huawei.intent.action.HSM_BOOTAPP_MANAGER"),
+                Screen.Component(
+                    "com.huawei.systemmanager",
+                    "com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
                 ),
-            ),
-            "huawei" to listOf(
-                ComponentName(
+                Screen.Component(
+                    "com.huawei.systemmanager",
+                    "com.huawei.systemmanager.appcontrol.activity.StartupAppControlActivity",
+                ),
+                Screen.Action("huawei.intent.action.HSM_PROTECTED_APPS"),
+                Screen.Component(
                     "com.huawei.systemmanager",
                     "com.huawei.systemmanager.optimize.process.ProtectActivity",
                 ),
-            ),
-            "honor" to listOf(
-                ComponentName(
-                    "com.huawei.systemmanager",
-                    "com.huawei.systemmanager.optimize.process.ProtectActivity",
+            )
+            for (brand in listOf("huawei", "honor")) put(brand, emui)
+
+            // The first entry is the "sleeping apps" list itself — the screen
+            // that actually holds the three-day timer, not the battery summary
+            // a generic instruction would land on.
+            put(
+                "samsung",
+                listOf(
+                    Screen.Component(
+                        "com.samsung.android.lool",
+                        "com.samsung.android.sm.ui.battery.AppSleepListActivity",
+                    ),
+                    Screen.Action("com.samsung.android.sm.ACTION_BATTERY"),
+                    Screen.Component(
+                        "com.samsung.android.lool",
+                        "com.samsung.android.sm.ui.battery.BatteryActivity",
+                    ),
                 ),
-            ),
-            "oppo" to listOf(
-                ComponentName(
+            )
+
+            val coloros = listOf(
+                Screen.Component(
                     "com.coloros.safecenter",
                     "com.coloros.safecenter.permission.startup.StartupAppListActivity",
                 ),
-            ),
-            "realme" to listOf(
-                ComponentName(
+                Screen.Component(
                     "com.coloros.safecenter",
-                    "com.coloros.safecenter.permission.startup.StartupAppListActivity",
+                    "com.coloros.safecenter.startupapp.StartupAppListActivity",
                 ),
-            ),
-            "vivo" to listOf(
-                ComponentName(
-                    "com.vivo.permissionmanager",
-                    "com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
+                Screen.Component(
+                    "com.oppo.safe",
+                    "com.oppo.safe.permission.startup.StartupAppListActivity",
                 ),
-            ),
-            "letv" to listOf(
-                ComponentName(
-                    "com.letv.android.letvsafe",
-                    "com.letv.android.letvsafe.AutobootManageActivity",
+                Screen.Component(
+                    "com.color.safecenter",
+                    "com.color.safecenter.permission.startup.StartupAppListActivity",
                 ),
-            ),
-            "tecno" to listOf(
-                ComponentName(
+                Screen.Component(
+                    "com.coloros.oppoguardelf",
+                    "com.coloros.powermanager.fuelgaue.PowerUsageModelActivity",
+                ),
+            )
+            for (brand in listOf("oppo", "realme")) put(brand, coloros)
+
+            put(
+                "vivo",
+                listOf(
+                    Screen.Component(
+                        "com.vivo.permissionmanager",
+                        "com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
+                    ),
+                    Screen.Component(
+                        "com.iqoo.secure",
+                        "com.iqoo.secure.ui.phoneoptimize.BgStartUpManager",
+                    ),
+                    Screen.Component(
+                        "com.iqoo.secure",
+                        "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity",
+                    ),
+                    Screen.Component(
+                        "com.vivo.abe",
+                        "com.vivo.applicationbehaviorengine.ui.ExcessivePowerManagerActivity",
+                    ),
+                ),
+            )
+
+            put(
+                "oneplus",
+                listOf(
+                    Screen.Component(
+                        "com.oneplus.security",
+                        "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity",
+                    ),
+                    Screen.Component(
+                        "com.oneplus.security",
+                        "com.oneplus.security.autorun.AutorunMainActivity",
+                    ),
+                    Screen.Component(
+                        "com.oneplus.security",
+                        "com.oneplus.security.highpowerapp.view.HighPowerAppActivity",
+                    ),
+                ),
+            )
+
+            put(
+                "meizu",
+                listOf(
+                    Screen.Action("com.meizu.power.PowerAppKilledNotification"),
+                    Screen.Component(
+                        "com.meizu.safe",
+                        "com.meizu.safe.powerui.PowerAppPermissionActivity",
+                    ),
+                    Screen.Component(
+                        "com.meizu.safe",
+                        "com.meizu.safe.powerui.AppPowerManagerActivity",
+                    ),
+                ),
+            )
+
+            put(
+                "asus",
+                listOf(
+                    Screen.Component(
+                        "com.asus.mobilemanager",
+                        "com.asus.mobilemanager.autostart.AutoStartActivity",
+                    ),
+                    Screen.Component(
+                        "com.asus.mobilemanager",
+                        "com.asus.mobilemanager.entry.FunctionActivity",
+                    ),
+                ),
+            )
+
+            put(
+                "zte",
+                listOf(
+                    Screen.Component(
+                        "com.zte.heartyservice",
+                        "com.zte.heartyservice.autorun.AppAutoRunManager",
+                    ),
+                    Screen.Component(
+                        "com.zte.heartyservice",
+                        "com.zte.heartyservice.setting.ClearAppSettingsActivity",
+                    ),
+                ),
+            )
+
+            put(
+                "letv",
+                listOf(
+                    Screen.Component(
+                        "com.letv.android.letvsafe",
+                        "com.letv.android.letvsafe.AutobootManageActivity",
+                    ),
+                ),
+            )
+
+            // The upstream table stores this class name with a leading space,
+            // which silently never resolves. Corrected here on purpose — do not
+            // "restore" it to match the source.
+            put(
+                "htc",
+                listOf(
+                    Screen.Component(
+                        "com.htc.pitroad",
+                        "com.htc.pitroad.landingpage.activity.LandingPageActivity",
+                    ),
+                ),
+            )
+
+            val transsion = listOf(
+                Screen.Component(
                     "com.transsion.phonemaster",
                     "com.cyin.himgr.autostart.AutoStartActivity",
                 ),
-            ),
-            "infinix" to listOf(
-                ComponentName(
-                    "com.transsion.phonemaster",
-                    "com.cyin.himgr.autostart.AutoStartActivity",
-                ),
-            ),
-        )
+            )
+            for (brand in listOf("tecno", "infinix", "itel")) put(brand, transsion)
+        }
 
         /**
-         * Manufacturers whose battery manager is known to stop background work
-         * on a days-not-months timescale, whether or not [OEM_SCREENS] has a
-         * component for them.
-         *
-         * Samsung and OnePlus are here without a component on purpose: their
-         * setting lives inside a screen with no stable entry point, so the row
-         * still has to appear (their users are the most affected) but the button
-         * can only reach the app-details page.
+         * Manufacturers whose battery manager stops background work on a
+         * days-not-months timescale. Every vendor with a screen above, plus any
+         * that is known to do it without offering one to open — the row still has
+         * to appear there, it just can only reach the app-details page.
          */
-        private val AGGRESSIVE = setOf(
-            "xiaomi", "redmi", "poco", "huawei", "honor", "oppo", "realme",
-            "vivo", "oneplus", "samsung", "letv", "tecno", "infinix", "meizu",
-            "asus", "nokia", "sony", "zte",
-        )
+        private val AGGRESSIVE: Set<String> = OEM_SCREENS.keys + setOf("nokia")
     }
 
     private val vendor: String get() = Build.MANUFACTURER.lowercase()
@@ -221,15 +355,17 @@ class BackgroundExecutionChannel(private val context: Context) :
      * instructions assume.
      */
     private fun openOemSettings(): String {
-        for (component in OEM_SCREENS[vendor].orEmpty()) {
+        for (screen in OEM_SCREENS[vendor].orEmpty()) {
+            val intent = when (screen) {
+                is Screen.Action -> Intent(screen.name)
+                is Screen.Component ->
+                    Intent().setComponent(ComponentName(screen.pkg, screen.cls))
+            }
             try {
-                context.startActivity(
-                    Intent().setComponent(component)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                )
+                context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 return "vendor"
             } catch (e: Exception) {
-                Log.i(TAG, "vendor screen ${component.className} unavailable", e)
+                Log.i(TAG, "vendor screen $screen unavailable", e)
             }
         }
         return try {
