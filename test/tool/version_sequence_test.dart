@@ -100,6 +100,18 @@ void main() {
     );
   });
 
+  test('a snapshot published under the old prefix keeps its place', () {
+    // The first runs tagged `snapshot/26w33a`, which the counter did not look
+    // for — so every run after computed `a` again and the release step died on
+    // a tag that already existed. Both namespaces are counted so the published
+    // ones keep their letters instead of being handed out twice.
+    git(['tag', 'snapshot/26w33a']);
+    expect(version()['label'], '26w33b');
+    git(['tag', '26w33b']);
+    commit('2026-08-11T10:00:00Z');
+    expect(version()['label'], '26w33c');
+  });
+
   test('a name already taken is skipped, not reused', () {
     // A run that tagged and then failed to publish leaves the count and the
     // tags disagreeing. A duplicate would fail the release at its last step,

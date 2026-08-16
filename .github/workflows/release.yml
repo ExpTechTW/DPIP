@@ -334,10 +334,15 @@ jobs:
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             tag="${GITHUB_REF_NAME}"
           else
-            # Snapshots get their own tag namespace so `v*` stays the release
-            # channel and `git tag --list 'v[0-9]*'` keeps naming real releases.
-            tag="snapshot/${{ needs.version.outputs.label }}"
-            git tag "$tag" && git push origin "$tag"
+            # The bare label. `v[0-9]*` is what makes a build a release, so a
+            # snapshot named `26w33a` is already in its own namespace — and it
+            # is the name tool/version.sh counts to work out the next letter.
+            # An earlier `snapshot/` prefix put the tags somewhere the counter
+            # did not look, so every run computed `a` and this step died on a
+            # tag that already existed.
+            tag="${{ needs.version.outputs.label }}"
+            git tag "$tag"
+            git push origin "$tag"
           fi
           gh release create "$tag" \
             --title "${{ needs.version.outputs.label }}" \
