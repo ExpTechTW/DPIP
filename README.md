@@ -1,159 +1,136 @@
 <div align="center">
-<a href="https://github.com/ExpTechTW/DPIP/tree/main"><img alt="status" src="https://img.shields.io/badge/status-stable-blue.svg"></a>
-<a href="https://github.com/ExpTechTW/DPIP/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/exptechtw/dpip"></a>
-<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/android.yml"><img alt="Android Build Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/android.yml/badge.svg"></a>
-<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/ios.yml"><img alt="iOS Build Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/ios.yml/badge.svg"></a>
-<a title="Crowdin" target="_blank" href="https://crowdin.com/project/dpip"><img alt="Crowdin Localization" src="https://badges.crowdin.net/dpip/localized.svg"></a>
-<a href="https://good-labs.github.io/greater-good-affirmation"><img alt="Greater Good" src="https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg"></a>
-<img alt="GitHub License" src="https://img.shields.io/github/license/exptechtw/dpip">
-<a href="https://exptech.dev"><img alt="website" src="https://img.shields.io/badge/website-exptech.dev-purple.svg"></a>
-<a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord"  src="https://img.shields.io/discord/926545182407688273?color=%235865F2&logo=discord&logoColor=white"></a>
+
+[![DPIP — 防災資訊整合平台：災害天氣與地震速報](.github/assets/splash.png)](#下載)
+
+**臺灣的防災資訊整合平台 —— 地震速報、即時震度、天氣與災害示警，都在同一個 App 裡。**
+
+[![Release](https://img.shields.io/github/v/release/exptechtw/dpip?label=%E7%99%BC%E5%B8%83)](https://github.com/ExpTechTW/DPIP/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/ExpTechTW/DPIP/ci.yml?branch=main&label=CI)](https://github.com/ExpTechTW/DPIP/actions/workflows/ci.yml)
+[![翻譯進度](https://badges.crowdin.net/dpip/localized.svg)](https://crowdin.com/project/dpip)
+
+[官網](https://exptech.dev) • [Discord](https://discord.gg/5dbHqV8ees) • [更新日誌](https://github.com/ExpTechTW/DPIP/releases) • [開發文件](AGENTS.md)
+
+<a href="https://play.google.com/store/apps/details?id=com.exptech.dpip"><img alt="下載 Google Play 版" height="48" src="https://play.google.com/intl/en_us/badges/static/images/badges/zh-tw_badge_web_generic.png"></a>
+<a href="https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"><img alt="下載 App Store 版" height="40" src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/zh-tw"></a>
+
 </div>
 
-DPIP（Disaster Prevention Information Platform）是由臺灣本土團隊開發的行動應用程式，整合了 TREM-Net（臺灣即時地震觀測網）的強震即時警報與地震資訊，以及中央氣象署的資料，為使用者提供一個整合、便捷的防災資訊平台。
+## DPIP 是什麼
 
-### 強震即時警報
+DPIP（Disaster Prevention Information Platform）是臺灣本土團隊開發的行動應用程式，把 TREM-Net（臺灣即時地震觀測網）的強震即時警報，和中央氣象署的天氣與災害資料，整合在同一個介面裡。
 
-強震即時警報（Earthquake Early Warning, EEW）系統透過部署於各地的地震波觀測站，在地震發生時即時回傳地震波數據至伺服器進行分析，並產生地震速報。這項技術能為使用者爭取數秒至數十秒的寶貴時間，讓民眾能及時採取防災應變及避難措施。
+地震發生時，地震波從震央傳到你所在的位置需要數秒到數十秒。強震即時警報就是在這段時間差裡送出通知 —— 讓你在搖晃抵達之前，還有時間趴下、掩護、穩住。
 
-### TREM-Net 臺灣即時地震觀測網
+> [!IMPORTANT]
+> **DPIP 的地震速報來自 TREM-Net，不是中央氣象署的官方警報，也不能取代它。**
+>
+> TREM-Net 是民間觀測網，速度可能較快，但**準確性與涵蓋範圍都不保證**，也沒有國家級警報的法律地位。請把 DPIP 當成官方警報之外的**補充**，不要當成替代品。手機的國家級警報（PWS）請保持開啟。
 
-TREM-Net 是一個自 2022 年 6 月起開始在全臺各地部署的觀測網專案，由兩個子系統組成：**SE-Net**（強震觀測網，使用加速度儀）及 **MS-Net**（微震觀測網，使用速度儀），共同記錄地震發生時的完整數據。
+## 能做什麼
 
-## 合作夥伴
+| | |
+|---|---|
+| **地震速報** | 地震發生時推播你所在地的預估震度，以及距離搖晃還有幾秒 |
+| **即時震度** | 地圖上即時顯示全臺各觀測站的實測震度 |
+| **地震報告** | 查詢歷史地震的震度分布、規模與深度 |
+| **天氣與雨量** | 你所在鄉鎮的天氣、雨量趨勢與雷達回波 |
+| **颱風** | 路徑預報、暴風圈範圍與警戒資訊 |
+| **災害示警** | 中央氣象署與國家災害防救科技中心的各類示警，疊在同一張地圖上 |
+| **多語言** | 介面支援 10 種語言 |
 
-我們很榮幸能與以下優秀的企業合作，共同推動防災資訊的普及：
-
-<h3>
-  <a href="https://www.geoscience.com.tw/">
-    巨科資訊有限公司
-    <img src="https://github.com/user-attachments/assets/34875ff1-ace2-4e92-ac32-d98e5717b62e" alt="巨科資訊有限公司" width="auto" height="28" align="right">
-  </a>
-</h3>
-
-巨科資訊有限公司是一家專注於地理資訊系統的專業公司，為我們的開發工作提供了寶貴的設備支援。他們的專業知識和資源對專案的發展起到了重要作用。
-
-<h3>
-  <a href="https://www.twds.com.tw/">
-    台灣數位串流有限公司
-    <img src="https://branding.twds.com.tw/assets/twds_text_standard.svg" alt="台灣數位串流有限公司" width="auto" height="28" align="right">
-  </a>
-</h3>
-
-台灣數位串流有限公司為我們提供了強大的雲端運算資源和網路頻寬支援，同時也提供了寶貴的技術諮詢。他們的支援確保了我們的服務能夠穩定且高效地運行。
-
-我們由衷感謝這些合作夥伴對開源社群的支持與貢獻。正是有了他們的協助，我們才能持續為使用者提供更好的服務。
+> [!NOTE]
+> 這個儲存庫正在進行架構重寫（feature-first 分層，見 [ARCHITECTURE.md](ARCHITECTURE.md)）。`main` 上的每一次提交都會發布一個快照版本，快照未經完整審查。想要穩定版本請從商店安裝。
 
 ## 資料來源
 
-本應用程式的資料來源包括：
-
-### 官方來源
+**官方**
 
 - [交通部中央氣象署](https://www.cwa.gov.tw/)
 - [國家災害防救科技中心](https://www.ncdr.nat.gov.tw/)
 
-### 非官方來源
+**非官方**
 
-- TREM-Net by [ExpTech Studio](https://exptech.dev/)
+- TREM-Net，由 [ExpTech Studio](https://exptech.dev/) 建置與維運
+
+TREM-Net 自 2022 年 6 月起在全臺部署，由兩個子系統組成：**SE-Net**（強震觀測網，加速度儀）與 **MS-Net**（微震觀測網，速度儀），共同記錄地震發生時的完整波形。
 
 ## 下載
 
-你可以在 [Play Store](https://play.google.com/store/apps/details?id=com.exptech.dpip) 和 [App Store](https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362) 上取得 DPIP。
+從商店安裝（建議）：
 
-你也可以從我們的 [Release 頁面](https://github.com/ExpTechTW/DPIP/releases/latest)上取得 DPIP 的安裝包進行手動安裝。
+- [Google Play](https://play.google.com/store/apps/details?id=com.exptech.dpip)
+- [App Store](https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362)
+
+也可以從 [Release 頁面](https://github.com/ExpTechTW/DPIP/releases/latest)取得 Android 安裝檔手動安裝。請注意 Release 頁面同時包含快照版本，那些未經完整審查。
 
 ## 翻譯
 
-DPIP 支援多語言，我們正在 Crowdin 平台上進行翻譯。如果你願意協助我們將這個專案翻譯成其他語言，歡迎加入我們的 Crowdin 翻譯社群。
+DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/project/dpip) 上進行，挑一個你熟悉的語言就能開始。
 
-你可以[點擊這裡前往我們的 Crowdin 專案頁面](https://crowdin.com/project/dpip)，選擇你熟悉的語言並開始翻譯。每一份貢獻都將幫助我們將防災資訊傳遞給更多的人！
+清單裡沒有你的語言，就到 [Issues](https://github.com/ExpTechTW/DPIP/issues) 開一則，我們會加上去。
 
-如果你沒有看到你熟悉的語言，歡迎在我們的 [Issue](https://github.com/ExpTechTW/DPIP/issues) 中提出新的語言請求，我們會盡快為你開啟。
+## 參與開發
 
-## 從原始碼建置
+工具鏈由 [mise](https://mise.jdx.dev/) 釘選版本，跑起來只要四步：
 
-### 環境需求
+```bash
+git clone https://github.com/ExpTechTW/DPIP.git
+cd DPIP
+mise install                       # 安裝 mise.toml 釘選的 Flutter
+bash tool/setup.sh                 # 一次性設定：git hooks、產生建置資訊
+mise exec -- flutter pub get
+mise exec -- flutter run
+```
 
-在開始建置之前，請確保你的開發環境已安裝並配置以下軟體：
+建置成安裝檔：
 
-- **Flutter SDK**: 由 [mise](https://mise.jdx.dev/) 管理（`mise.toml` 固定版本，請先 `mise install`）
-- [**Android Studio**](https://developer.android.com/studio?hl=ja) 或 [**Xcode**](https://developer.apple.com/jp/xcode/)（iOS 開發用）
-  - 也可以使用 [VSCode](https://code.visualstudio.com/) 或其他你喜歡的 IDE
-- _\*可選\*_ [**Git**](https://git-scm.com/): 用於複製存儲庫
+```bash
+mise exec -- flutter build apk --release        # Android
+mise exec -- flutter build ios --no-codesign    # iOS（不含簽章）
+```
 
-### 建置步驟
+> [!NOTE]
+> Android 需要 JDK 17 以上（Android Studio 內建的即可）。iOS 已改用 Swift Package Manager，不需要 CocoaPods。
 
-1. 取得原始碼
+**其餘所有事情都寫在別的地方，這裡不重複** —— 重複的文件一定會走鐘：
 
-   - **下載壓縮檔**
+| 想找 | 看 |
+|---|---|
+| 工具鏈、執行、推送前的驗證清單、版本規則 | [AGENTS.md](AGENTS.md) |
+| 資料夾結構、分層規則、各子系統的契約 | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| 設計 token、顏色、間距、動態、圖示、多語言 | [DESIGN.md](DESIGN.md) |
+| API 端點與區域對照 | [api.md](api.md) |
+| Commit 格式（CI 會擋） | [commit.md](commit.md) |
 
-     你可以直接在 Github 上下載存儲庫壓縮檔
+## 參與方式
 
-   - **使用 Git**
+- 回報問題或提出建議：[Issues](https://github.com/ExpTechTW/DPIP/issues)
+- 提交程式碼：[Fork](https://github.com/ExpTechTW/DPIP/fork) 這個儲存庫，開新分支修改，然後送 [Pull Request](https://github.com/ExpTechTW/DPIP/pulls)
+- 改進文件：上面那五份都歡迎
 
-     使用以下指令複製專案：
+送 PR 之前請先讀 [commit.md](commit.md)：commit 訊息會直接變成更新日誌，格式不合 CI 會擋下來。
 
-     ```bash
-     git clone https://github.com/ExpTechTW/DPIP.git
-     ```
+感謝所有讓 DPIP 成為可能的貢獻者：
 
-2. 進入專案目錄
+[![貢獻者](https://contrib.rocks/image?repo=exptechtw/DPIP)](https://github.com/exptechtw/DPIP/graphs/contributors)
 
-   ```bash
-   cd DPIP
-   ```
+## 合作夥伴
 
-3. 安裝相依套件
+| | |
+|---|---|
+| [<img alt="巨科資訊有限公司" height="28" src="https://github.com/user-attachments/assets/34875ff1-ace2-4e92-ac32-d98e5717b62e">](https://www.geoscience.com.tw/) | [巨科資訊有限公司](https://www.geoscience.com.tw/) 提供開發與測試所需的設備 |
+| [<img alt="台灣數位串流有限公司" height="28" src="https://branding.twds.com.tw/assets/twds_text_standard.svg">](https://www.twds.com.tw/) | [台灣數位串流有限公司](https://www.twds.com.tw/) 提供雲端運算資源、網路頻寬與技術諮詢 |
 
-   ```bash
-   mise exec -- flutter pub get
-   ```
+## 授權
 
-   > 若卡在 *Downloading packages*，改用本機快取：`mise exec -- flutter pub get --offline`
-
-4. 產生建置檔案
-
-   ```bash
-   mise exec -- dart run build_runner build --delete-conflicting-outputs
-   ```
-
-5. 建置應用程式
-
-   - **Android APK**
-
-     ```bash
-     mise exec -- flutter build apk --release
-     ```
-
-   - **iOS**
-
-     ```bash
-     mise exec -- flutter build ios --release
-     ```
-
-## 如何貢獻
-
-我們歡迎各種形式的貢獻！你可以透過以下方式參與專案：
-
-- 回報問題或提出新功能建議：請在 [Issues](https://github.com/ExpTechTW/DPIP/issues) 中提出
-- 提交程式碼：請 [Fork](https://github.com/ExpTechTW/DPIP/fork) 此倉庫，建立新分支進行修改，然後提交 [Pull Request](https://github.com/ExpTechTW/DPIP/pulls)
-- 改進文件：協助我們改進現有文件或撰寫新文件
-
-衷心感謝所有讓 DPIP 成為可能的貢獻者：
-
-<a href="https://github.com/exptechtw/DPIP/graphs/contributors"><img src="https://contrib.rocks/image?repo=exptechtw/DPIP" ></a>
-
-## 開放原始碼授權
-
-本專案以開放原始碼授權釋出，詳細授權資訊請見 GitHub 儲存庫。
+[DPIP Public License](LICENSE)。**這是 source-available 授權，不是開放原始碼授權** —— 原始碼公開可閱讀、可貢獻，但禁止商業使用，也禁止用來做出與 DPIP 競爭的產品。完整條款見 [LICENSE](LICENSE)。
 
 ## Star History
 
-<a href="https://star-history.com/#ExpTechTW/DPIP&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date" />
- </picture>
+<a href="https://star-history.com/#exptechtw/dpip&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=exptechtw%2Fdpip&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=exptechtw%2Fdpip&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=exptechtw%2Fdpip&type=Date" />
+  </picture>
 </a>
