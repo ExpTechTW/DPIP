@@ -431,6 +431,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticStatEta => 'คงเหลือ';
 
   @override
+  String get meshtasticStatFull => 'เต็มใน';
+
+  @override
   String get meshtasticStatTrend => 'แนวโน้ม';
 
   @override
@@ -702,6 +705,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => 'พระอาทิตย์ขึ้น';
+
+  @override
+  String get meshtasticJumpToLatest => 'ไปที่ล่าสุด';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2827,10 +2833,60 @@ class AppLocalizationsTh extends AppLocalizations {
   String get displayContrastHigh => 'สูง';
 
   @override
+  String get meshtasticDirect => 'เชื่อมตรง';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n ฮอป';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => 'ส่งต่อให้ผู้อื่น';
+
+  @override
+  String get meshtasticStatRelayShareHint => 'สัดส่วนของที่วิทยุนี้ส่ง';
+
+  @override
+  String get meshtasticStatRelayValue => 'อัตราส่งต่อสำเร็จ';
+
+  @override
+  String get meshtasticStatRelaySolePath =>
+      'มักเป็นเส้นทางเดียว — เมชพึ่งโหนดนี้';
+
+  @override
+  String get meshtasticStatRelayRedundant => 'โหนดอื่นครอบคลุมเส้นทางเดียวกัน';
+
+  @override
+  String get meshtasticStatRedundancy => 'รับซ้ำ';
+
+  @override
+  String get meshtasticStatThinEdge =>
+      'เส้นทางสำรองน้อย — รีเลย์เดียวล่มอาจตัดขาด';
+
+  @override
+  String get meshtasticStatWellCovered => 'มีหลายเส้นทางมาถึง';
+
+  @override
+  String get meshtasticStatErrorRate => 'อัตรารับผิดพลาด';
+
+  @override
+  String get meshtasticStatErrorRateHint =>
+      'เพิ่มขึ้นขณะ airtime คงที่ = สัญญาณรบกวน';
+
+  @override
   String get meshtasticTraceRoute => 'ติดตามเส้นทาง';
 
   @override
   String get meshtasticTracing => 'กำลังติดตาม…';
+
+  @override
+  String get meshtasticTraceUnreadable => 'อ่านการตอบกลับไม่ได้';
+
+  @override
+  String get meshtasticTraceOffline => 'ยังไม่ได้เชื่อมต่อวิทยุ';
+
+  @override
+  String get meshtasticTraceCooldown => 'วิทยุจำกัด 30 วินาทีต่อครั้ง';
 
   @override
   String get meshtasticTraceNoReply =>

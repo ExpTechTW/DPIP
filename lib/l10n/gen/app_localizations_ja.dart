@@ -426,6 +426,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get meshtasticStatEta => '残り目安';
 
   @override
+  String get meshtasticStatFull => '満充電まで';
+
+  @override
   String get meshtasticStatTrend => '傾向';
 
   @override
@@ -695,6 +698,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => '日の出';
+
+  @override
+  String get meshtasticJumpToLatest => '最新へ移動';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2792,10 +2798,57 @@ class AppLocalizationsJa extends AppLocalizations {
   String get displayContrastHigh => '高';
 
   @override
+  String get meshtasticDirect => '直接';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$nホップ';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => '他ノードの中継';
+
+  @override
+  String get meshtasticStatRelayShareHint => '送信量に占める割合';
+
+  @override
+  String get meshtasticStatRelayValue => '中継の完了率';
+
+  @override
+  String get meshtasticStatRelaySolePath => '唯一の経路になりがち — メッシュがこのノードに依存';
+
+  @override
+  String get meshtasticStatRelayRedundant => '他ノードも同じ経路を担う';
+
+  @override
+  String get meshtasticStatRedundancy => '重複受信';
+
+  @override
+  String get meshtasticStatThinEdge => '予備経路が少ない — 中継1つの停止で孤立の恐れ';
+
+  @override
+  String get meshtasticStatWellCovered => '複数の経路が届いている';
+
+  @override
+  String get meshtasticStatErrorRate => '受信エラー率';
+
+  @override
+  String get meshtasticStatErrorRateHint => '送信時間が横ばいで上昇＝混信';
+
+  @override
   String get meshtasticTraceRoute => 'ルート追跡';
 
   @override
   String get meshtasticTracing => '追跡中…';
+
+  @override
+  String get meshtasticTraceUnreadable => '応答を解読できません';
+
+  @override
+  String get meshtasticTraceOffline => '無線機に未接続';
+
+  @override
+  String get meshtasticTraceCooldown => '無線機は30秒に1回まで';
 
   @override
   String get meshtasticTraceNoReply => '応答なし — 圏外または別のキー';

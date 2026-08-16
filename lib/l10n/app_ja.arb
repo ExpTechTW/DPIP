@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "ピーク",
   "meshtasticStatDrain": "消費",
   "meshtasticStatEta": "残り目安",
+  "meshtasticStatFull": "満充電まで",
   "meshtasticStatTrend": "傾向",
   "meshtasticStatCharging": "充電中",
   "meshtasticStatStable": "安定",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "最新へ移動",
   "meshtasticNoMessages": "No messages yet",
   "onboardingPermNotifyDesc": "地震、天気、災害の発生時に、警報をすぐお届けします。",
   "radarTownOutline": "市町村境界",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "標準",
   "displayContrastMedium": "中",
   "displayContrastHigh": "高",
+  "meshtasticDirect": "直接",
+  "meshtasticHopsAway": "{n}ホップ",
+  "meshtasticStatRelayShare": "他ノードの中継",
+  "meshtasticStatRelayShareHint": "送信量に占める割合",
+  "meshtasticStatRelayValue": "中継の完了率",
+  "meshtasticStatRelaySolePath": "唯一の経路になりがち — メッシュがこのノードに依存",
+  "meshtasticStatRelayRedundant": "他ノードも同じ経路を担う",
+  "meshtasticStatRedundancy": "重複受信",
+  "meshtasticStatThinEdge": "予備経路が少ない — 中継1つの停止で孤立の恐れ",
+  "meshtasticStatWellCovered": "複数の経路が届いている",
+  "meshtasticStatErrorRate": "受信エラー率",
+  "meshtasticStatErrorRateHint": "送信時間が横ばいで上昇＝混信",
   "meshtasticTraceRoute": "ルート追跡",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "応答を解読できません",
+  "meshtasticTraceOffline": "無線機に未接続",
+  "meshtasticTraceCooldown": "無線機は30秒に1回まで",
   "meshtasticTraceNoReply": "応答なし — 圏外または別のキー",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

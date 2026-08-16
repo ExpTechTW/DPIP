@@ -435,6 +435,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get meshtasticStatEta => 'tatagal';
 
   @override
+  String get meshtasticStatFull => 'puno sa';
+
+  @override
   String get meshtasticStatTrend => 'trend';
 
   @override
@@ -709,6 +712,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => 'Pagsikat ng araw';
+
+  @override
+  String get meshtasticJumpToLatest => 'Pumunta sa pinakabago';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2844,10 +2850,61 @@ class AppLocalizationsFil extends AppLocalizations {
   String get displayContrastHigh => 'Mataas';
 
   @override
+  String get meshtasticDirect => 'Direkta';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n hop';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => 'Ipinasa para sa iba';
+
+  @override
+  String get meshtasticStatRelayShareHint => 'Bahagi ng ipinadala nito';
+
+  @override
+  String get meshtasticStatRelayValue => 'Natapos na relay';
+
+  @override
+  String get meshtasticStatRelaySolePath =>
+      'Madalas ang tanging daan — umaasa ang mesh dito';
+
+  @override
+  String get meshtasticStatRelayRedundant => 'May iba ring sumasaklaw';
+
+  @override
+  String get meshtasticStatRedundancy => 'Doblang natanggap';
+
+  @override
+  String get meshtasticStatThinEdge =>
+      'Kaunti ang alternatibong daan — puwedeng maputol';
+
+  @override
+  String get meshtasticStatWellCovered => 'Maraming daan ang umaabot dito';
+
+  @override
+  String get meshtasticStatErrorRate => 'Sirang natanggap';
+
+  @override
+  String get meshtasticStatErrorRateHint =>
+      'Tumataas habang patag ang airtime = interference';
+
+  @override
   String get meshtasticTraceRoute => 'Sundan ang ruta';
 
   @override
   String get meshtasticTracing => 'Sinusundan…';
+
+  @override
+  String get meshtasticTraceUnreadable => 'Hindi mabasang tugon';
+
+  @override
+  String get meshtasticTraceOffline => 'Hindi nakakonekta sa radyo';
+
+  @override
+  String get meshtasticTraceCooldown =>
+      'Isang beses kada 30 s lang ang pinapayagan ng radyo';
 
   @override
   String get meshtasticTraceNoReply =>

@@ -591,6 +591,8 @@
   "@meshtasticStatEta": {
     "description": "Mesh chart label"
   },
+  "meshtasticStatFull": "full in",
+  "@meshtasticStatFull": { "description": "Estimated time until the pack is full" },
   "meshtasticStatTrend": "trend",
   "@meshtasticStatTrend": {
     "description": "Mesh chart label"
@@ -945,6 +947,8 @@
   "@stationSheetEmpty": {
     "description": "Empty-state hint in the map station-value sheet, shown before any station is selected"
   },
+  "meshtasticJumpToLatest": "Jump to latest",
+  "@meshtasticJumpToLatest": { "description": "Chat button that scrolls back to the newest message" },
   "meshtasticNoMessages": "No messages yet",
   "@locationBannerPermission": {
     "description": "Banner when location permission is denied"
@@ -3775,6 +3779,30 @@
   "@displayContrastHigh": {
     "description": "Display settings option: displayContrastHigh"
   },
+  "meshtasticDirect": "Direct",
+  "@meshtasticDirect": { "description": "Node is a direct neighbour (0 hops)" },
+  "meshtasticHopsAway": "{n} hops",
+  "@meshtasticHopsAway": { "description": "How many relays away a node is", "placeholders": { "n": { "type": "int" } } },
+  "meshtasticStatRelayShare": "Relayed for others",
+  "@meshtasticStatRelayShare": { "description": "Radio stat tile" },
+  "meshtasticStatRelayShareHint": "Share of what this radio sent",
+  "@meshtasticStatRelayShareHint": { "description": "Radio stat tile" },
+  "meshtasticStatRelayValue": "Relays completed",
+  "@meshtasticStatRelayValue": { "description": "Radio stat tile" },
+  "meshtasticStatRelaySolePath": "Often the only path — the mesh leans on this node",
+  "@meshtasticStatRelaySolePath": { "description": "Radio stat tile" },
+  "meshtasticStatRelayRedundant": "Others cover the same hops",
+  "@meshtasticStatRelayRedundant": { "description": "Radio stat tile" },
+  "meshtasticStatRedundancy": "Duplicate receptions",
+  "@meshtasticStatRedundancy": { "description": "Radio stat tile" },
+  "meshtasticStatThinEdge": "Few spare paths — one relay failing could cut you off",
+  "@meshtasticStatThinEdge": { "description": "Radio stat tile" },
+  "meshtasticStatWellCovered": "Several paths reach here",
+  "@meshtasticStatWellCovered": { "description": "Radio stat tile" },
+  "meshtasticStatErrorRate": "Corrupt receptions",
+  "@meshtasticStatErrorRate": { "description": "Radio stat tile" },
+  "meshtasticStatErrorRateHint": "Rising while airtime is flat means interference",
+  "@meshtasticStatErrorRateHint": { "description": "Radio stat tile" },
   "meshtasticTraceRoute": "Trace route",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -3783,6 +3811,12 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "Unreadable reply",
+  "@meshtasticTraceUnreadable": { "description": "Traceroute outcome when the reply decoded to nothing usable" },
+  "meshtasticTraceOffline": "Radio not connected",
+  "@meshtasticTraceOffline": { "description": "Why the traceroute button is disabled — no radio link" },
+  "meshtasticTraceCooldown": "Radio limits this to once every 30 s",
+  "@meshtasticTraceCooldown": { "description": "Why the traceroute button is counting down" },
   "meshtasticTraceNoReply": "No reply — out of range or on another channel key",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

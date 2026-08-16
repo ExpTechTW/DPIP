@@ -433,6 +433,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get meshtasticStatEta => 'lasts';
 
   @override
+  String get meshtasticStatFull => 'full in';
+
+  @override
   String get meshtasticStatTrend => 'trend';
 
   @override
@@ -704,6 +707,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => 'Sunrise';
+
+  @override
+  String get meshtasticJumpToLatest => 'Jump to latest';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2833,10 +2839,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displayContrastHigh => 'High';
 
   @override
+  String get meshtasticDirect => 'Direct';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n hops';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => 'Relayed for others';
+
+  @override
+  String get meshtasticStatRelayShareHint => 'Share of what this radio sent';
+
+  @override
+  String get meshtasticStatRelayValue => 'Relays completed';
+
+  @override
+  String get meshtasticStatRelaySolePath =>
+      'Often the only path — the mesh leans on this node';
+
+  @override
+  String get meshtasticStatRelayRedundant => 'Others cover the same hops';
+
+  @override
+  String get meshtasticStatRedundancy => 'Duplicate receptions';
+
+  @override
+  String get meshtasticStatThinEdge =>
+      'Few spare paths — one relay failing could cut you off';
+
+  @override
+  String get meshtasticStatWellCovered => 'Several paths reach here';
+
+  @override
+  String get meshtasticStatErrorRate => 'Corrupt receptions';
+
+  @override
+  String get meshtasticStatErrorRateHint =>
+      'Rising while airtime is flat means interference';
+
+  @override
   String get meshtasticTraceRoute => 'Trace route';
 
   @override
   String get meshtasticTracing => 'Tracing…';
+
+  @override
+  String get meshtasticTraceUnreadable => 'Unreadable reply';
+
+  @override
+  String get meshtasticTraceOffline => 'Radio not connected';
+
+  @override
+  String get meshtasticTraceCooldown => 'Radio limits this to once every 30 s';
 
   @override
   String get meshtasticTraceNoReply =>

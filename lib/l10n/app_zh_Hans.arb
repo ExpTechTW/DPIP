@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "峰值",
   "meshtasticStatDrain": "掉电",
   "meshtasticStatEta": "预估可用",
+  "meshtasticStatFull": "充满",
   "meshtasticStatTrend": "趋势",
   "meshtasticStatCharging": "充电中",
   "meshtasticStatStable": "稳定",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "跳到最新",
   "meshtasticNoMessages": "尚无讯息",
   "onboardingPermNotifyDesc": "在地震、天气与灾害发生时，即时推送预警通知。",
   "radarTownOutline": "乡镇界线",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "标准",
   "displayContrastMedium": "中等",
   "displayContrastHigh": "高",
+  "meshtasticDirect": "直连",
+  "meshtasticHopsAway": "{n} 跳",
+  "meshtasticStatRelayShare": "为他人转发",
+  "meshtasticStatRelayShareHint": "占本机发送量的比例",
+  "meshtasticStatRelayValue": "转发成功率",
+  "meshtasticStatRelaySolePath": "经常是唯一路径 — 网络依赖此节点",
+  "meshtasticStatRelayRedundant": "其他节点也覆盖同样路径",
+  "meshtasticStatRedundancy": "重复接收",
+  "meshtasticStatThinEdge": "备援路径少 — 一个中继失效就可能断线",
+  "meshtasticStatWellCovered": "有多条路径可达",
+  "meshtasticStatErrorRate": "接收错误率",
+  "meshtasticStatErrorRateHint": "空中时间不变却升高 = 干扰",
   "meshtasticTraceRoute": "追蹤路由",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "无法解读的回复",
+  "meshtasticTraceOffline": "未连接至电台",
+  "meshtasticTraceCooldown": "电台限制每 30 秒一次",
   "meshtasticTraceNoReply": "沒有回應 — 超出範圍或金鑰不同",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

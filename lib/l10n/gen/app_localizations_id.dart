@@ -432,6 +432,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get meshtasticStatEta => 'bertahan';
 
   @override
+  String get meshtasticStatFull => 'penuh dalam';
+
+  @override
   String get meshtasticStatTrend => 'tren';
 
   @override
@@ -704,6 +707,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => 'Matahari terbit';
+
+  @override
+  String get meshtasticJumpToLatest => 'Ke yang terbaru';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2837,10 +2843,61 @@ class AppLocalizationsId extends AppLocalizations {
   String get displayContrastHigh => 'Tinggi';
 
   @override
+  String get meshtasticDirect => 'Langsung';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n lompatan';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => 'Diteruskan untuk lain';
+
+  @override
+  String get meshtasticStatRelayShareHint => 'Porsi dari yang dikirim';
+
+  @override
+  String get meshtasticStatRelayValue => 'Relai selesai';
+
+  @override
+  String get meshtasticStatRelaySolePath =>
+      'Sering satu-satunya jalur — mesh bergantung padanya';
+
+  @override
+  String get meshtasticStatRelayRedundant =>
+      'Node lain menutup jalur yang sama';
+
+  @override
+  String get meshtasticStatRedundancy => 'Penerimaan ganda';
+
+  @override
+  String get meshtasticStatThinEdge =>
+      'Sedikit jalur cadangan — satu relai gagal bisa memutus';
+
+  @override
+  String get meshtasticStatWellCovered => 'Beberapa jalur mencapai sini';
+
+  @override
+  String get meshtasticStatErrorRate => 'Penerimaan rusak';
+
+  @override
+  String get meshtasticStatErrorRateHint =>
+      'Naik saat airtime datar = interferensi';
+
+  @override
   String get meshtasticTraceRoute => 'Telusuri rute';
 
   @override
   String get meshtasticTracing => 'Menelusuri…';
+
+  @override
+  String get meshtasticTraceUnreadable => 'Balasan tak terbaca';
+
+  @override
+  String get meshtasticTraceOffline => 'Radio belum terhubung';
+
+  @override
+  String get meshtasticTraceCooldown => 'Radio membatasi sekali per 30 detik';
 
   @override
   String get meshtasticTraceNoReply =>

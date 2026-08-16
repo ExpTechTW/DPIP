@@ -424,6 +424,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get meshtasticStatEta => '預估可用';
 
   @override
+  String get meshtasticStatFull => '充滿';
+
+  @override
   String get meshtasticStatTrend => '趨勢';
 
   @override
@@ -692,6 +695,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => '日出';
+
+  @override
+  String get meshtasticJumpToLatest => '跳到最新';
 
   @override
   String get meshtasticNoMessages => '尚無訊息';
@@ -2782,10 +2788,57 @@ class AppLocalizationsZh extends AppLocalizations {
   String get displayContrastHigh => '高';
 
   @override
+  String get meshtasticDirect => '直連';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n 跳';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => '為他人轉發';
+
+  @override
+  String get meshtasticStatRelayShareHint => '佔本機發送量的比例';
+
+  @override
+  String get meshtasticStatRelayValue => '轉發成功率';
+
+  @override
+  String get meshtasticStatRelaySolePath => '經常是唯一路徑 — 網路依賴此節點';
+
+  @override
+  String get meshtasticStatRelayRedundant => '其他節點也覆蓋同樣路徑';
+
+  @override
+  String get meshtasticStatRedundancy => '重複接收';
+
+  @override
+  String get meshtasticStatThinEdge => '備援路徑少 — 一個中繼失效就可能斷線';
+
+  @override
+  String get meshtasticStatWellCovered => '有多條路徑可達';
+
+  @override
+  String get meshtasticStatErrorRate => '接收錯誤率';
+
+  @override
+  String get meshtasticStatErrorRateHint => '空中時間不變卻升高 = 干擾';
+
+  @override
   String get meshtasticTraceRoute => '追蹤路由';
 
   @override
   String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceUnreadable => '無法解讀的回覆';
+
+  @override
+  String get meshtasticTraceOffline => '未連線至電台';
+
+  @override
+  String get meshtasticTraceCooldown => '電台限制每 30 秒一次';
 
   @override
   String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
@@ -3218,6 +3271,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get meshtasticStatEta => '预估可用';
 
   @override
+  String get meshtasticStatFull => '充满';
+
+  @override
   String get meshtasticStatTrend => '趋势';
 
   @override
@@ -3486,6 +3542,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get skyTimeSunrise => '日出';
+
+  @override
+  String get meshtasticJumpToLatest => '跳到最新';
 
   @override
   String get meshtasticNoMessages => '尚无讯息';
@@ -5576,10 +5635,57 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get displayContrastHigh => '高';
 
   @override
+  String get meshtasticDirect => '直连';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n 跳';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => '为他人转发';
+
+  @override
+  String get meshtasticStatRelayShareHint => '占本机发送量的比例';
+
+  @override
+  String get meshtasticStatRelayValue => '转发成功率';
+
+  @override
+  String get meshtasticStatRelaySolePath => '经常是唯一路径 — 网络依赖此节点';
+
+  @override
+  String get meshtasticStatRelayRedundant => '其他节点也覆盖同样路径';
+
+  @override
+  String get meshtasticStatRedundancy => '重复接收';
+
+  @override
+  String get meshtasticStatThinEdge => '备援路径少 — 一个中继失效就可能断线';
+
+  @override
+  String get meshtasticStatWellCovered => '有多条路径可达';
+
+  @override
+  String get meshtasticStatErrorRate => '接收错误率';
+
+  @override
+  String get meshtasticStatErrorRateHint => '空中时间不变却升高 = 干扰';
+
+  @override
   String get meshtasticTraceRoute => '追蹤路由';
 
   @override
   String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceUnreadable => '无法解读的回复';
+
+  @override
+  String get meshtasticTraceOffline => '未连接至电台';
+
+  @override
+  String get meshtasticTraceCooldown => '电台限制每 30 秒一次';
 
   @override
   String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
@@ -6012,6 +6118,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get meshtasticStatEta => '預估可用';
 
   @override
+  String get meshtasticStatFull => '充滿';
+
+  @override
   String get meshtasticStatTrend => '趨勢';
 
   @override
@@ -6280,6 +6389,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get skyTimeSunrise => '日出';
+
+  @override
+  String get meshtasticJumpToLatest => '跳到最新';
 
   @override
   String get meshtasticNoMessages => '尚無訊息';
@@ -8370,10 +8482,57 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get displayContrastHigh => '高';
 
   @override
+  String get meshtasticDirect => '直連';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n 跳';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => '為他人轉發';
+
+  @override
+  String get meshtasticStatRelayShareHint => '佔本機發送量的比例';
+
+  @override
+  String get meshtasticStatRelayValue => '轉發成功率';
+
+  @override
+  String get meshtasticStatRelaySolePath => '經常是唯一路徑 — 網絡依賴此節點';
+
+  @override
+  String get meshtasticStatRelayRedundant => '其他節點也覆蓋同樣路徑';
+
+  @override
+  String get meshtasticStatRedundancy => '重複接收';
+
+  @override
+  String get meshtasticStatThinEdge => '備援路徑少 — 一個中繼失效就可能斷線';
+
+  @override
+  String get meshtasticStatWellCovered => '有多條路徑可達';
+
+  @override
+  String get meshtasticStatErrorRate => '接收錯誤率';
+
+  @override
+  String get meshtasticStatErrorRateHint => '空中時間不變卻升高 = 干擾';
+
+  @override
   String get meshtasticTraceRoute => '追蹤路由';
 
   @override
   String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceUnreadable => '無法解讀的回覆';
+
+  @override
+  String get meshtasticTraceOffline => '未連線至電台';
+
+  @override
+  String get meshtasticTraceCooldown => '電台限制每 30 秒一次';
 
   @override
   String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';
@@ -8806,6 +8965,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get meshtasticStatEta => '預估可用';
 
   @override
+  String get meshtasticStatFull => '充滿';
+
+  @override
   String get meshtasticStatTrend => '趨勢';
 
   @override
@@ -9074,6 +9236,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get skyTimeSunrise => '日出';
+
+  @override
+  String get meshtasticJumpToLatest => '跳到最新';
 
   @override
   String get meshtasticNoMessages => '尚無訊息';
@@ -11164,10 +11329,57 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get displayContrastHigh => '高';
 
   @override
+  String get meshtasticDirect => '直連';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n 跳';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => '為他人轉發';
+
+  @override
+  String get meshtasticStatRelayShareHint => '佔本機發送量的比例';
+
+  @override
+  String get meshtasticStatRelayValue => '轉發成功率';
+
+  @override
+  String get meshtasticStatRelaySolePath => '經常是唯一路徑 — 網路依賴此節點';
+
+  @override
+  String get meshtasticStatRelayRedundant => '其他節點也覆蓋同樣路徑';
+
+  @override
+  String get meshtasticStatRedundancy => '重複接收';
+
+  @override
+  String get meshtasticStatThinEdge => '備援路徑少 — 一個中繼失效就可能斷線';
+
+  @override
+  String get meshtasticStatWellCovered => '有多條路徑可達';
+
+  @override
+  String get meshtasticStatErrorRate => '接收錯誤率';
+
+  @override
+  String get meshtasticStatErrorRateHint => '空中時間不變卻升高 = 干擾';
+
+  @override
   String get meshtasticTraceRoute => '追蹤路由';
 
   @override
   String get meshtasticTracing => '追蹤中…';
+
+  @override
+  String get meshtasticTraceUnreadable => '無法解讀的回覆';
+
+  @override
+  String get meshtasticTraceOffline => '未連線至電台';
+
+  @override
+  String get meshtasticTraceCooldown => '電台限制每 30 秒一次';
 
   @override
   String get meshtasticTraceNoReply => '沒有回應 — 超出範圍或金鑰不同';

@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "puncak",
   "meshtasticStatDrain": "pengurasan",
   "meshtasticStatEta": "bertahan",
+  "meshtasticStatFull": "penuh dalam",
   "meshtasticStatTrend": "tren",
   "meshtasticStatCharging": "mengisi daya",
   "meshtasticStatStable": "stabil",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "Ke yang terbaru",
   "meshtasticNoMessages": "No messages yet",
   "onboardingPermNotifyDesc": "Menyampaikan peringatan gempa, cuaca, dan bencana pada saat terjadi.",
   "radarTownOutline": "Batas kecamatan",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "Standar",
   "displayContrastMedium": "Sedang",
   "displayContrastHigh": "Tinggi",
+  "meshtasticDirect": "Langsung",
+  "meshtasticHopsAway": "{n} lompatan",
+  "meshtasticStatRelayShare": "Diteruskan untuk lain",
+  "meshtasticStatRelayShareHint": "Porsi dari yang dikirim",
+  "meshtasticStatRelayValue": "Relai selesai",
+  "meshtasticStatRelaySolePath": "Sering satu-satunya jalur — mesh bergantung padanya",
+  "meshtasticStatRelayRedundant": "Node lain menutup jalur yang sama",
+  "meshtasticStatRedundancy": "Penerimaan ganda",
+  "meshtasticStatThinEdge": "Sedikit jalur cadangan — satu relai gagal bisa memutus",
+  "meshtasticStatWellCovered": "Beberapa jalur mencapai sini",
+  "meshtasticStatErrorRate": "Penerimaan rusak",
+  "meshtasticStatErrorRateHint": "Naik saat airtime datar = interferensi",
   "meshtasticTraceRoute": "Telusuri rute",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "Balasan tak terbaca",
+  "meshtasticTraceOffline": "Radio belum terhubung",
+  "meshtasticTraceCooldown": "Radio membatasi sekali per 30 detik",
   "meshtasticTraceNoReply": "Tidak ada balasan — di luar jangkauan atau kunci berbeda",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "최고",
   "meshtasticStatDrain": "소모",
   "meshtasticStatEta": "예상 지속",
+  "meshtasticStatFull": "완충까지",
   "meshtasticStatTrend": "추세",
   "meshtasticStatCharging": "충전 중",
   "meshtasticStatStable": "안정",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "최신으로 이동",
   "meshtasticNoMessages": "No messages yet",
   "onboardingPermNotifyDesc": "지진, 날씨, 재해가 발생하는 즉시 경보를 전달합니다.",
   "radarTownOutline": "읍·면·동 경계",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "표준",
   "displayContrastMedium": "중간",
   "displayContrastHigh": "높음",
+  "meshtasticDirect": "직접",
+  "meshtasticHopsAway": "{n}홉",
+  "meshtasticStatRelayShare": "타 노드 중계",
+  "meshtasticStatRelayShareHint": "이 라디오 송신 중 비율",
+  "meshtasticStatRelayValue": "중계 완료율",
+  "meshtasticStatRelaySolePath": "유일한 경로인 경우가 많음 — 메시가 이 노드에 의존",
+  "meshtasticStatRelayRedundant": "다른 노드도 같은 구간을 담당",
+  "meshtasticStatRedundancy": "중복 수신",
+  "meshtasticStatThinEdge": "예비 경로가 적음 — 중계 하나만 끊겨도 고립될 수 있음",
+  "meshtasticStatWellCovered": "여러 경로가 닿음",
+  "meshtasticStatErrorRate": "수신 오류율",
+  "meshtasticStatErrorRateHint": "에어타임이 그대로인데 상승하면 간섭",
   "meshtasticTraceRoute": "경로 추적",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "응답을 해석할 수 없음",
+  "meshtasticTraceOffline": "라디오 미연결",
+  "meshtasticTraceCooldown": "라디오는 30초에 한 번만 허용",
   "meshtasticTraceNoReply": "응답 없음 — 범위 밖 또는 다른 키",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

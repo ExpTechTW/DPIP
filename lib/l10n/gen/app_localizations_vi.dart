@@ -432,6 +432,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get meshtasticStatEta => 'còn dùng';
 
   @override
+  String get meshtasticStatFull => 'đầy sau';
+
+  @override
   String get meshtasticStatTrend => 'xu hướng';
 
   @override
@@ -703,6 +706,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => 'Bình minh';
+
+  @override
+  String get meshtasticJumpToLatest => 'Tới mới nhất';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2834,10 +2840,60 @@ class AppLocalizationsVi extends AppLocalizations {
   String get displayContrastHigh => 'Cao';
 
   @override
+  String get meshtasticDirect => 'Trực tiếp';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n bước';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => 'Chuyển tiếp hộ';
+
+  @override
+  String get meshtasticStatRelayShareHint => 'Tỷ lệ trong lượng gửi';
+
+  @override
+  String get meshtasticStatRelayValue => 'Tỷ lệ chuyển tiếp xong';
+
+  @override
+  String get meshtasticStatRelaySolePath =>
+      'Thường là đường duy nhất — mesh dựa vào nút này';
+
+  @override
+  String get meshtasticStatRelayRedundant => 'Nút khác cũng phủ chặng này';
+
+  @override
+  String get meshtasticStatRedundancy => 'Nhận trùng';
+
+  @override
+  String get meshtasticStatThinEdge =>
+      'Ít đường dự phòng — một trạm hỏng có thể mất kết nối';
+
+  @override
+  String get meshtasticStatWellCovered => 'Nhiều đường tới được đây';
+
+  @override
+  String get meshtasticStatErrorRate => 'Tỷ lệ nhận lỗi';
+
+  @override
+  String get meshtasticStatErrorRateHint =>
+      'Tăng khi airtime không đổi = nhiễu';
+
+  @override
   String get meshtasticTraceRoute => 'Truy vết đường đi';
 
   @override
   String get meshtasticTracing => 'Đang truy vết…';
+
+  @override
+  String get meshtasticTraceUnreadable => 'Phản hồi không đọc được';
+
+  @override
+  String get meshtasticTraceOffline => 'Chưa kết nối bộ đàm';
+
+  @override
+  String get meshtasticTraceCooldown => 'Bộ đàm giới hạn 30 giây một lần';
 
   @override
   String get meshtasticTraceNoReply =>

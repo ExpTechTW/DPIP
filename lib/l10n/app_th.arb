@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "สูงสุด",
   "meshtasticStatDrain": "อัตราลด",
   "meshtasticStatEta": "คงเหลือ",
+  "meshtasticStatFull": "เต็มใน",
   "meshtasticStatTrend": "แนวโน้ม",
   "meshtasticStatCharging": "กำลังชาร์จ",
   "meshtasticStatStable": "คงที่",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "ไปที่ล่าสุด",
   "meshtasticNoMessages": "No messages yet",
   "onboardingPermNotifyDesc": "ส่งการเตือนแผ่นดินไหว สภาพอากาศ และภัยพิบัติทันทีที่เกิดขึ้น",
   "radarTownOutline": "เส้นแบ่งเขตอำเภอ",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "มาตรฐาน",
   "displayContrastMedium": "ปานกลาง",
   "displayContrastHigh": "สูง",
+  "meshtasticDirect": "เชื่อมตรง",
+  "meshtasticHopsAway": "{n} ฮอป",
+  "meshtasticStatRelayShare": "ส่งต่อให้ผู้อื่น",
+  "meshtasticStatRelayShareHint": "สัดส่วนของที่วิทยุนี้ส่ง",
+  "meshtasticStatRelayValue": "อัตราส่งต่อสำเร็จ",
+  "meshtasticStatRelaySolePath": "มักเป็นเส้นทางเดียว — เมชพึ่งโหนดนี้",
+  "meshtasticStatRelayRedundant": "โหนดอื่นครอบคลุมเส้นทางเดียวกัน",
+  "meshtasticStatRedundancy": "รับซ้ำ",
+  "meshtasticStatThinEdge": "เส้นทางสำรองน้อย — รีเลย์เดียวล่มอาจตัดขาด",
+  "meshtasticStatWellCovered": "มีหลายเส้นทางมาถึง",
+  "meshtasticStatErrorRate": "อัตรารับผิดพลาด",
+  "meshtasticStatErrorRateHint": "เพิ่มขึ้นขณะ airtime คงที่ = สัญญาณรบกวน",
   "meshtasticTraceRoute": "ติดตามเส้นทาง",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "อ่านการตอบกลับไม่ได้",
+  "meshtasticTraceOffline": "ยังไม่ได้เชื่อมต่อวิทยุ",
+  "meshtasticTraceCooldown": "วิทยุจำกัด 30 วินาทีต่อครั้ง",
   "meshtasticTraceNoReply": "ไม่มีการตอบกลับ — อยู่นอกระยะหรือคีย์ต่างกัน",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

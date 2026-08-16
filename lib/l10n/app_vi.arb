@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "đỉnh",
   "meshtasticStatDrain": "tiêu hao",
   "meshtasticStatEta": "còn dùng",
+  "meshtasticStatFull": "đầy sau",
   "meshtasticStatTrend": "xu hướng",
   "meshtasticStatCharging": "đang sạc",
   "meshtasticStatStable": "ổn định",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "Tới mới nhất",
   "meshtasticNoMessages": "No messages yet",
   "onboardingPermNotifyDesc": "Gửi cảnh báo động đất, thời tiết và thảm họa ngay khi chúng xảy ra.",
   "radarTownOutline": "Ranh giới xã phường",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "Chuẩn",
   "displayContrastMedium": "Vừa",
   "displayContrastHigh": "Cao",
+  "meshtasticDirect": "Trực tiếp",
+  "meshtasticHopsAway": "{n} bước",
+  "meshtasticStatRelayShare": "Chuyển tiếp hộ",
+  "meshtasticStatRelayShareHint": "Tỷ lệ trong lượng gửi",
+  "meshtasticStatRelayValue": "Tỷ lệ chuyển tiếp xong",
+  "meshtasticStatRelaySolePath": "Thường là đường duy nhất — mesh dựa vào nút này",
+  "meshtasticStatRelayRedundant": "Nút khác cũng phủ chặng này",
+  "meshtasticStatRedundancy": "Nhận trùng",
+  "meshtasticStatThinEdge": "Ít đường dự phòng — một trạm hỏng có thể mất kết nối",
+  "meshtasticStatWellCovered": "Nhiều đường tới được đây",
+  "meshtasticStatErrorRate": "Tỷ lệ nhận lỗi",
+  "meshtasticStatErrorRateHint": "Tăng khi airtime không đổi = nhiễu",
   "meshtasticTraceRoute": "Truy vết đường đi",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "Phản hồi không đọc được",
+  "meshtasticTraceOffline": "Chưa kết nối bộ đàm",
+  "meshtasticTraceCooldown": "Bộ đàm giới hạn 30 giây một lần",
   "meshtasticTraceNoReply": "Không phản hồi — ngoài phạm vi hoặc khác khóa",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"

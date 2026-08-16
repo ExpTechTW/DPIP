@@ -897,6 +897,12 @@ abstract class AppLocalizations {
   /// **'lasts'**
   String get meshtasticStatEta;
 
+  /// Estimated time until the pack is full
+  ///
+  /// In en, this message translates to:
+  /// **'full in'**
+  String get meshtasticStatFull;
+
   /// Mesh chart label
   ///
   /// In en, this message translates to:
@@ -1406,6 +1412,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sunrise'**
   String get skyTimeSunrise;
+
+  /// Chat button that scrolls back to the newest message
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to latest'**
+  String get meshtasticJumpToLatest;
 
   /// Empty message log while connected
   ///
@@ -5403,6 +5415,78 @@ abstract class AppLocalizations {
   /// **'High'**
   String get displayContrastHigh;
 
+  /// Node is a direct neighbour (0 hops)
+  ///
+  /// In en, this message translates to:
+  /// **'Direct'**
+  String get meshtasticDirect;
+
+  /// How many relays away a node is
+  ///
+  /// In en, this message translates to:
+  /// **'{n} hops'**
+  String meshtasticHopsAway(int n);
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Relayed for others'**
+  String get meshtasticStatRelayShare;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Share of what this radio sent'**
+  String get meshtasticStatRelayShareHint;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Relays completed'**
+  String get meshtasticStatRelayValue;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Often the only path — the mesh leans on this node'**
+  String get meshtasticStatRelaySolePath;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Others cover the same hops'**
+  String get meshtasticStatRelayRedundant;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate receptions'**
+  String get meshtasticStatRedundancy;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Few spare paths — one relay failing could cut you off'**
+  String get meshtasticStatThinEdge;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Several paths reach here'**
+  String get meshtasticStatWellCovered;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Corrupt receptions'**
+  String get meshtasticStatErrorRate;
+
+  /// Radio stat tile
+  ///
+  /// In en, this message translates to:
+  /// **'Rising while airtime is flat means interference'**
+  String get meshtasticStatErrorRateHint;
+
   /// Sheet action: ask the mesh how this node is reached
   ///
   /// In en, this message translates to:
@@ -5414,6 +5498,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tracing…'**
   String get meshtasticTracing;
+
+  /// Traceroute outcome when the reply decoded to nothing usable
+  ///
+  /// In en, this message translates to:
+  /// **'Unreadable reply'**
+  String get meshtasticTraceUnreadable;
+
+  /// Why the traceroute button is disabled — no radio link
+  ///
+  /// In en, this message translates to:
+  /// **'Radio not connected'**
+  String get meshtasticTraceOffline;
+
+  /// Why the traceroute button is counting down
+  ///
+  /// In en, this message translates to:
+  /// **'Radio limits this to once every 30 s'**
+  String get meshtasticTraceCooldown;
 
   /// Traceroute outcome when the destination never answers
   ///

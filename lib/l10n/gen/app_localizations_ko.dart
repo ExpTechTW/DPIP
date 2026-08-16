@@ -427,6 +427,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticStatEta => '예상 지속';
 
   @override
+  String get meshtasticStatFull => '완충까지';
+
+  @override
   String get meshtasticStatTrend => '추세';
 
   @override
@@ -697,6 +700,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get skyTimeSunrise => '일출';
+
+  @override
+  String get meshtasticJumpToLatest => '최신으로 이동';
 
   @override
   String get meshtasticNoMessages => 'No messages yet';
@@ -2801,10 +2807,57 @@ class AppLocalizationsKo extends AppLocalizations {
   String get displayContrastHigh => '높음';
 
   @override
+  String get meshtasticDirect => '직접';
+
+  @override
+  String meshtasticHopsAway(int n) {
+    return '$n홉';
+  }
+
+  @override
+  String get meshtasticStatRelayShare => '타 노드 중계';
+
+  @override
+  String get meshtasticStatRelayShareHint => '이 라디오 송신 중 비율';
+
+  @override
+  String get meshtasticStatRelayValue => '중계 완료율';
+
+  @override
+  String get meshtasticStatRelaySolePath => '유일한 경로인 경우가 많음 — 메시가 이 노드에 의존';
+
+  @override
+  String get meshtasticStatRelayRedundant => '다른 노드도 같은 구간을 담당';
+
+  @override
+  String get meshtasticStatRedundancy => '중복 수신';
+
+  @override
+  String get meshtasticStatThinEdge => '예비 경로가 적음 — 중계 하나만 끊겨도 고립될 수 있음';
+
+  @override
+  String get meshtasticStatWellCovered => '여러 경로가 닿음';
+
+  @override
+  String get meshtasticStatErrorRate => '수신 오류율';
+
+  @override
+  String get meshtasticStatErrorRateHint => '에어타임이 그대로인데 상승하면 간섭';
+
+  @override
   String get meshtasticTraceRoute => '경로 추적';
 
   @override
   String get meshtasticTracing => '추적 중…';
+
+  @override
+  String get meshtasticTraceUnreadable => '응답을 해석할 수 없음';
+
+  @override
+  String get meshtasticTraceOffline => '라디오 미연결';
+
+  @override
+  String get meshtasticTraceCooldown => '라디오는 30초에 한 번만 허용';
 
   @override
   String get meshtasticTraceNoReply => '응답 없음 — 범위 밖 또는 다른 키';

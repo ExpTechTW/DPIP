@@ -197,6 +197,7 @@
   "meshtasticStatPeak": "peak",
   "meshtasticStatDrain": "ubos",
   "meshtasticStatEta": "tatagal",
+  "meshtasticStatFull": "puno sa",
   "meshtasticStatTrend": "trend",
   "meshtasticStatCharging": "nagcha-charge",
   "meshtasticStatStable": "stable",
@@ -324,6 +325,7 @@
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
+  "meshtasticJumpToLatest": "Pumunta sa pinakabago",
   "meshtasticNoMessages": "No messages yet",
   "onboardingPermNotifyDesc": "Ihatid ang mga alerto sa lindol, panahon, at sakuna sa sandaling maganap ang mga ito.",
   "radarTownOutline": "Mga hangganan ng bayan",
@@ -1813,6 +1815,18 @@
   "displayContrastStandard": "Karaniwan",
   "displayContrastMedium": "Katamtaman",
   "displayContrastHigh": "Mataas",
+  "meshtasticDirect": "Direkta",
+  "meshtasticHopsAway": "{n} hop",
+  "meshtasticStatRelayShare": "Ipinasa para sa iba",
+  "meshtasticStatRelayShareHint": "Bahagi ng ipinadala nito",
+  "meshtasticStatRelayValue": "Natapos na relay",
+  "meshtasticStatRelaySolePath": "Madalas ang tanging daan — umaasa ang mesh dito",
+  "meshtasticStatRelayRedundant": "May iba ring sumasaklaw",
+  "meshtasticStatRedundancy": "Doblang natanggap",
+  "meshtasticStatThinEdge": "Kaunti ang alternatibong daan — puwedeng maputol",
+  "meshtasticStatWellCovered": "Maraming daan ang umaabot dito",
+  "meshtasticStatErrorRate": "Sirang natanggap",
+  "meshtasticStatErrorRateHint": "Tumataas habang patag ang airtime = interference",
   "meshtasticTraceRoute": "Sundan ang ruta",
   "@meshtasticTraceRoute": {
     "description": "Sheet action: ask the mesh how this node is reached"
@@ -1821,6 +1835,9 @@
   "@meshtasticTracing": {
     "description": "Sheet button while a traceroute probe is in flight"
   },
+  "meshtasticTraceUnreadable": "Hindi mabasang tugon",
+  "meshtasticTraceOffline": "Hindi nakakonekta sa radyo",
+  "meshtasticTraceCooldown": "Isang beses kada 30 s lang ang pinapayagan ng radyo",
   "meshtasticTraceNoReply": "Walang tugon — wala sa saklaw o ibang key",
   "@meshtasticTraceNoReply": {
     "description": "Traceroute outcome when the destination never answers"
