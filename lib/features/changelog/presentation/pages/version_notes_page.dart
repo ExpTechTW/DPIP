@@ -16,7 +16,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
-import 'package:dpip/features/changelog/presentation/widgets/platform_tag.dart';
+import 'package:dpip/features/changelog/presentation/widgets/release_note_markdown.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
@@ -185,127 +185,15 @@ class _Body extends StatelessWidget {
         child: MarkdownBody(
           data: body,
           selectable: true,
-          styleSheet: _sheet(theme, colors, accent),
+          styleSheet: releaseNoteStyleSheet(theme, colors, accent),
           softLineBreak: true,
           // Without this the platform tags become Image.network — a fetch, for
           // a decoration, on a page read when the network is what failed.
           imageBuilder: platformTagIcon,
+          builders: releaseNoteBuilders(colors),
           onTapLink: (text, href, title) => _openLink(href),
         ),
       ),
-    );
-  }
-
-  MarkdownStyleSheet _sheet(ThemeData theme, ColorScheme colors, Color accent) {
-    return MarkdownStyleSheet(
-      p: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurface,
-        height: 1.6,
-      ),
-      pPadding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      h1: theme.textTheme.headlineSmall?.copyWith(
-        fontWeight: FontWeight.w800,
-        color: colors.onSurface,
-        letterSpacing: -0.3,
-      ),
-      h1Padding: const EdgeInsets.only(
-        top: AppSpacing.md,
-        bottom: AppSpacing.sm,
-      ),
-      h2: theme.textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.w800,
-        color: accent,
-        letterSpacing: -0.2,
-      ),
-      h2Padding: const EdgeInsets.only(
-        top: AppSpacing.md,
-        bottom: AppSpacing.sm,
-      ),
-      h3: theme.textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w700,
-        color: colors.onSurface,
-      ),
-      h3Padding: const EdgeInsets.only(
-        top: AppSpacing.sm,
-        bottom: AppSpacing.xs,
-      ),
-      h4: theme.textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w700,
-        color: colors.onSurfaceVariant,
-      ),
-      h4Padding: const EdgeInsets.only(
-        top: AppSpacing.sm,
-        bottom: AppSpacing.xs,
-      ),
-      em: theme.textTheme.bodyMedium?.copyWith(
-        fontStyle: FontStyle.italic,
-        color: colors.onSurfaceVariant,
-      ),
-      strong: theme.textTheme.bodyMedium?.copyWith(
-        fontWeight: FontWeight.w800,
-        color: colors.onSurface,
-      ),
-      del: theme.textTheme.bodyMedium?.copyWith(
-        decoration: TextDecoration.lineThrough,
-        color: colors.onSurfaceVariant,
-      ),
-      a: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.primary,
-        fontWeight: FontWeight.w600,
-        decoration: TextDecoration.underline,
-        decorationColor: colors.primary.withValues(alpha: 0.5),
-      ),
-      blockSpacing: AppSpacing.md,
-      listIndent: AppSpacing.xl,
-      listBullet: theme.textTheme.bodyMedium?.copyWith(
-        color: accent,
-        fontWeight: FontWeight.w800,
-      ),
-      listBulletPadding: const EdgeInsets.only(right: AppSpacing.sm),
-      blockquote: theme.textTheme.bodyMedium?.copyWith(
-        color: colors.onSurfaceVariant,
-        fontStyle: FontStyle.italic,
-        height: 1.5,
-      ),
-      blockquoteDecoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
-        borderRadius: AppRadius.small,
-        border: Border(left: BorderSide(color: accent, width: 4)),
-      ),
-      blockquotePadding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.md,
-        AppSpacing.sm,
-      ),
-      code: theme.textTheme.bodySmall?.copyWith(
-        fontFamily: 'monospace',
-        fontWeight: FontWeight.w600,
-        color: colors.primary,
-        backgroundColor: colors.primaryContainer.withValues(alpha: 0.45),
-      ),
-      codeblockPadding: const EdgeInsets.all(AppSpacing.md),
-      codeblockDecoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: AppRadius.small,
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.7)),
-      ),
-      horizontalRuleDecoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: accent.withValues(alpha: 0.35), width: 2),
-        ),
-      ),
-      tableHead: theme.textTheme.labelLarge?.copyWith(
-        fontWeight: FontWeight.w700,
-        color: colors.onSurface,
-      ),
-      tableBody: theme.textTheme.bodySmall?.copyWith(color: colors.onSurface),
-      tableBorder: TableBorder.all(color: colors.outlineVariant, width: 1),
-      tableCellsPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      checkbox: theme.textTheme.bodyMedium?.copyWith(color: accent),
     );
   }
 
