@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:logging/logging.dart';
@@ -20,6 +21,17 @@ import 'exceptions/meshtastic_exceptions.dart';
 
 /// Main client for communicating with Meshtastic devices over BLE
 class MeshtasticClient {
+  /// [now] supplies the clock every timestamp this client stamps is taken
+  /// from. It exists because the device clock is not a trustworthy baseline:
+  /// a phone whose clock is wrong (or that changed timezone) makes every
+  /// "when did this arrive" wrong by the same amount, and an app that windows
+  /// or plots those timestamps against a *corrected* clock gets an offset,
+  /// not an age. The caller passes whatever it calls authoritative; the
+  /// default keeps this package standalone.
+  MeshtasticClient({DateTime Function()? now}) : _now = now ?? DateTime.now;
+
+  final DateTime Function() _now;
+
   static final Logger _logger = Logger('MeshtasticClient');
 
   // Meshtastic BLE Service UUID
@@ -56,6 +68,12 @@ class MeshtasticClient {
       StreamController<NodeInfoWrapper>.broadcast();
   final StreamController<AdminMessage> _adminController =
       StreamController<AdminMessage>.broadcast();
+  final StreamController<ClientNotification> _noticeController =
+      StreamController<ClientNotification>.broadcast();
+  final StreamController<LocalStats> _localStatsController =
+      StreamController<LocalStats>.broadcast();
+
+  LocalStats? _localStats;
 
   // Configuration and state
   final Map<int, NodeInfoWrapper> _nodes = {};
@@ -90,6 +108,28 @@ class MeshtasticClient {
 
   /// Admin replies from the radio (channel/config reads, error responses).
   Stream<AdminMessage> get adminStream => _adminController.stream;
+
+  /// The radio talking back about something *we* asked it to do — a refusal,
+  /// a rate limit, a warning. `replyId` names the `ToRadio` packet id it is
+  /// about, so a caller can match one to a request it has in flight.
+  ///
+  /// Dropping these is why a rejected send used to look identical to a send
+  /// that went out and was never answered: the radio said exactly what was
+  /// wrong ("Multi-hop traceroute to broadcast address is not allowed",
+  /// "TraceRoute can only be sent once every 30 seconds") and nothing was
+  /// listening.
+  Stream<ClientNotification> get noticeStream => _noticeController.stream;
+
+  /// The attached radio's own counters, as it reports them (~every 15 min).
+  ///
+  /// Free in the strictest sense: `sendLocalStatsToPhone()` writes straight to
+  /// the BLE link, so nothing here costs a single symbol of airtime. The
+  /// counters are cumulative since boot and reset on reboot, so a consumer
+  /// wants deltas and an uptime-went-backwards check.
+  Stream<LocalStats> get localStatsStream => _localStatsController.stream;
+
+  /// The last [localStatsStream] value, or null before the first arrives.
+  LocalStats? get localStats => _localStats;
 
   // Getters for current state
   Map<int, NodeInfoWrapper> get nodes => Map.unmodifiable(_nodes);
@@ -389,6 +429,7 @@ class MeshtasticClient {
     _metricsAt.clear();
     _myNodeInfo = null;
     _config = null;
+    _localStats = null;
     _lora = null;
     _metadata = null;
     _moduleConfig = null;
@@ -412,21 +453,19 @@ class MeshtasticClient {
       throw const ConnectionException('Device configuration not complete');
     }
 
-    // Generate a random packet ID
-    final packetId = DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
-
     final packet = MeshPacket(
       from: _myNodeInfo?.myNodeNum ?? 0, // Set sender node ID
       to: destinationId ?? 0xFFFFFFFF, // 0xFFFFFFFF for broadcast
       channel: channel,
-      id: packetId,
+      id: _nextPacketId(),
       decoded: Data(
         portnum: PortNum.TEXT_MESSAGE_APP,
         payload: utf8.encode(message),
       ),
       wantAck: destinationId != null, // Request ACK for direct messages
-      hopLimit: 3,
-      priority: MeshPacket_Priority.DEFAULT,
+      // The radio's configured reach, not a constant: a mesh set to 5 hops
+      // had its chat silently capped at 3.
+      hopLimit: _hopLimit,
     );
 
     _logger.info(
@@ -453,22 +492,18 @@ class MeshtasticClient {
       latitudeI: (latitude * 1e7).round(),
       longitudeI: (longitude * 1e7).round(),
       altitude: altitude,
-      time: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      time: _now().millisecondsSinceEpoch ~/ 1000,
     );
-
-    // Generate a random packet ID
-    final packetId = DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
 
     final packet = MeshPacket(
       from: _myNodeInfo?.myNodeNum ?? 0, // Set sender node ID
       to: 0xFFFFFFFF, // Broadcast
-      id: packetId,
+      id: _nextPacketId(),
       decoded: Data(
         portnum: PortNum.POSITION_APP,
         payload: position.writeToBuffer(),
       ),
-      hopLimit: 3,
-      priority: MeshPacket_Priority.DEFAULT,
+      hopLimit: _hopLimit,
     );
 
     _logger.info(
@@ -484,11 +519,18 @@ class MeshtasticClient {
   /// overwrites it ("we don't let clients assign nodenums"), and a zero `from`
   /// is what marks a packet as locally originated, which is what exempts
   /// [sendAdmin] from the remote-admin session key.
-  Future<void> sendData({
+  /// Sends one data packet and returns the **packet id** it went out with.
+  ///
+  /// The id is the only handle on a packet after it leaves: the radio's
+  /// `QueueStatus` and its `ClientNotification` refusals both name it, and a
+  /// reply carries it in `decoded.request_id`. Returning it is what lets a
+  /// caller tell its own answer from someone else's.
+  Future<int> sendData({
     required PortNum portnum,
     required List<int> payload,
     int channel = 0,
     int? destination,
+    int? hopLimit,
     bool wantAck = false,
     bool wantResponse = false,
   }) async {
@@ -498,23 +540,30 @@ class MeshtasticClient {
     if (!isConfigured) {
       throw const ConnectionException('Device configuration not complete');
     }
+    final id = _nextPacketId();
     final packet = MeshPacket(
       to: destination ?? 0xFFFFFFFF,
       channel: channel,
-      id: _nextPacketId(),
+      id: id,
       decoded: Data(
         portnum: portnum,
         payload: payload,
         wantResponse: wantResponse,
       ),
       wantAck: wantAck,
-      hopLimit: 3,
-      priority: MeshPacket_Priority.DEFAULT,
+      // The radio's configured limit when the caller knows it, else the
+      // radio's own — this used to hardcode 3 for everyone.
+      hopLimit: hopLimit ?? _hopLimit,
+      // Priority left UNSET on purpose: the firmware's `fixPriority()` then
+      // promotes a `want_response` packet to RELIABLE, which pinning it to
+      // DEFAULT prevented — and DEFAULT is the first thing evicted when the
+      // TX queue fills.
     );
     _logger.info(
       'Sending $portnum: ${payload.length} bytes on channel $channel',
     );
     await _sendPacket(packet);
+    return id;
   }
 
   /// Sends an [AdminMessage] to the attached radio itself.
@@ -555,23 +604,86 @@ class MeshtasticClient {
   }
 
   /// Packet ids only need to be unique among in-flight packets.
-  int _nextPacketId() => DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
+  /// A fresh packet id: a random start, then strictly increasing.
+  ///
+  /// It used to be the wall clock in milliseconds, so two sends inside the
+  /// same millisecond produced the *same* id — and the firmware's
+  /// `wasSeenRecently` drops a duplicate id silently, which looks from here
+  /// like a packet that went out and was never answered. A counter cannot
+  /// collide with itself; the random start keeps it from colliding with the
+  /// ids of a previous session after a reconnect.
+  int _nextPacketId() {
+    _packetId = _packetId == 0
+        ? Random().nextInt(0x7FFFFFFF) + 1
+        : (_packetId + 1) & 0x7FFFFFFF;
+    // 0 is "unset" on the wire, so it can never be an id.
+    if (_packetId == 0) _packetId = 1;
+    return _packetId;
+  }
 
-  /// Takes the device metrics out of a telemetry packet.
+  int _packetId = 0;
+
+  /// How far a packet we originate may travel, in hops.
+  ///
+  /// The radio's configured `lora.hop_limit`, falling back to the firmware's
+  /// own default while the config download is still in flight. The firmware
+  /// substitutes its value only when the field is 0 *and* `want_ack` is set,
+  /// so sending a constant here is not corrected — it is obeyed.
+  ///
+  /// The header reserves 3 bits for this, so 7 is the ceiling whatever the
+  /// config says.
+  int get _hopLimit {
+    // `_lora`, not `_config`: the radio sends one `Config` per section and
+    // each overwrites the last, so only the accumulated LoRa copy is reliable.
+    final configured = _lora?.hopLimit ?? 0;
+    if (configured <= 0) return _defaultHopLimit;
+    return configured > _maxHopLimit ? _maxHopLimit : configured;
+  }
+
+  /// `HOP_RELIABLE` — the firmware's default reach.
+  static const int _defaultHopLimit = 3;
+
+  /// `HOP_MAX` — 3 bits in the packet header.
+  static const int _maxHopLimit = 7;
+
+  /// Takes the metrics out of a telemetry packet.
   ///
   /// This is where a live battery reading actually comes from — for the
   /// attached radio as much as for anyone else on the mesh, because it
   /// broadcasts its own telemetry like any other node. The node DB copy is
   /// updated too, so a re-emitted node carries the new numbers.
+  ///
+  /// `Telemetry` is a oneof, and the early return used to be
+  /// `if (!hasDeviceMetrics()) return;` — which silently discarded every other
+  /// variant, `LocalStats` above all. That one is the radio's own counter
+  /// block (packets sent/received/bad/duplicated, relays performed and
+  /// cancelled, free heap, uptime); the firmware sends it **to the phone
+  /// only**, never over the air, so it is the cheapest ground truth we have
+  /// and none of it was reaching Dart.
   void _absorbTelemetry(MeshPacketWrapper packet) {
     final payload = packet.decoded?.payload;
     if (payload == null || payload.isEmpty) return;
     try {
       final telemetry = Telemetry.fromBuffer(payload);
+      if (telemetry.hasLocalStats()) {
+        _localStats = telemetry.localStats;
+        _localStatsController.add(telemetry.localStats);
+        _logger.info(
+          'LocalStats: rx=${telemetry.localStats.numPacketsRx} '
+          'bad=${telemetry.localStats.numPacketsRxBad} '
+          'tx=${telemetry.localStats.numPacketsTx} '
+          'dupe=${telemetry.localStats.numRxDupe} '
+          'relay=${telemetry.localStats.numTxRelay} '
+          'relayCancel=${telemetry.localStats.numTxRelayCanceled} '
+          'heapFree=${telemetry.localStats.heapFreeBytes} '
+          'up=${telemetry.localStats.uptimeSeconds}s',
+        );
+        return;
+      }
       if (!telemetry.hasDeviceMetrics()) return;
       final from = packet.from;
       _metrics[from] = telemetry.deviceMetrics;
-      _metricsAt[from] = DateTime.now();
+      _metricsAt[from] = _now();
       final node = _nodes[from];
       if (node != null) {
         node.original.deviceMetrics = telemetry.deviceMetrics;
@@ -737,6 +849,25 @@ class MeshtasticClient {
         }
       }
 
+      if (fromRadio.hasClientNotification()) {
+        final notice = fromRadio.clientNotification;
+        _logger.warning(
+          'ClientNotification: level=${notice.level.name} '
+          'replyId=${notice.replyId} ${notice.message}',
+        );
+        _noticeController.add(notice);
+      }
+
+      if (fromRadio.hasQueueStatus()) {
+        final status = fromRadio.queueStatus;
+        // res != 0 is the radio refusing to queue the packet at all — the
+        // send "succeeded" from Dart's side and never reached the air.
+        _logger.info(
+          'QueueStatus: res=${status.res} free=${status.free} '
+          'maxlen=${status.maxlen} meshPacketId=${status.meshPacketId}',
+        );
+      }
+
       if (fromRadio.hasConfigCompleteId()) {
         _logger.info('Configuration complete');
         _markConfigured();
@@ -856,7 +987,7 @@ class MeshtasticClient {
       deviceAddress: _device?.remoteId.toString(),
       deviceName: _device?.platformName,
       errorMessage: errorMessage,
-      timestamp: DateTime.now(),
+      timestamp: _now(),
     );
 
     _connectionController.add(status);
@@ -871,5 +1002,7 @@ class MeshtasticClient {
     _packetController.close();
     _nodeController.close();
     _adminController.close();
+    _noticeController.close();
+    _localStatsController.close();
   }
 }

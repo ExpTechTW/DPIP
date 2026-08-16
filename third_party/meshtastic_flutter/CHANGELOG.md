@@ -66,3 +66,48 @@
 * Dropped the explicit `requestMtu(512)` — `connect()` already negotiates it on
   Android and ignores it elsewhere; this only bought a second round trip.
 * `cacheChannel` keeps the channel table current after a write.
+* `sendData` returns the **packet id** it sent with, and accepts `hopLimit`.
+  The id is the only handle on a packet once it leaves — the radio names it in
+  a `QueueStatus` and in every `ClientNotification` refusal, and a reply
+  carries it in `decoded.request_id`.
+* Packet ids are a random-seeded counter, not `millisecondsSinceEpoch`: two
+  sends in one millisecond produced the same id, and the firmware drops a
+  duplicate id silently (`wasSeenRecently`) — indistinguishable from a packet
+  that went out unanswered.
+* `hop_limit` is no longer hardcoded to 3 — on *any* send (data, text,
+  position). The firmware substitutes its configured value only when the field
+  is 0 *and* `want_ack` is set, so the constant was obeyed rather than
+  corrected: a mesh configured for 5 hops had its chat, its position
+  broadcasts and its traceroutes all capped at 3. Now read from the radio's
+  accumulated `lora` config (not `_config`, which each config section
+  overwrites), clamped to `HOP_MAX` (7 — the header reserves 3 bits) and
+  falling back to `HOP_RELIABLE` (3) until the config download lands.
+* Text and position sends share the packet-id counter and the UNSET priority
+  too, instead of each minting its own wall-clock id.
+* `priority` is left UNSET instead of pinned to `DEFAULT`, so the firmware's
+  `fixPriority()` can promote a `want_response` packet to RELIABLE — and it is
+  no longer first in line for eviction when the TX queue fills.
+* New `noticeStream`: `FromRadio.client_notification` is delivered instead of
+  discarded, and `queue_status` is logged. These are how the radio says it
+  refused to send ("Multi-hop traceroute to broadcast address is not allowed",
+  "TraceRoute can only be sent once every 30 seconds"); dropping them made
+  every in-radio rejection look exactly like a send that was never answered.
+* `NodeInfoWrapper.hopsAway` — read through `hasHopsAway()`, so an unset
+  `optional uint32` stays null instead of reading as `0` ("direct neighbour"),
+  which is a plausible and wrong claim about reach.
+* `LocalStats` is no longer discarded. `_absorbTelemetry` early-returned on
+  `!hasDeviceMetrics()`, which threw away every other `Telemetry` variant —
+  including the radio's own counter block (packets rx/tx/bad/duplicate, relays
+  performed and cancelled, free heap, uptime). The firmware sends it to the
+  phone only, never over the air, so it is the cheapest ground truth available
+  and none of it reached Dart. New `localStatsStream` + `localStats`.
+* `telemetry.pb.dart` / `telemetry.pbenum.dart` are exported from the package
+  barrel; `LocalStats` was unreachable to consumers without it.
+* `MeshtasticClient` takes an injectable `now` clock, and every timestamp it
+  stamps (`_metricsAt`, the connection-status stamp, the position packet's
+  `time`) comes from it instead of `DateTime.now()`. A host that windows or
+  plots those timestamps against a corrected clock was otherwise comparing two
+  different clocks: on a phone whose clock is wrong, "when did this reading
+  arrive" came out as the offset rather than the age, and a 24-hour retention
+  window cut in the wrong place. Defaults to `DateTime.now` so the package
+  stays standalone.

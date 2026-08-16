@@ -12,3 +12,7 @@ export 'generated/mesh.pb.dart';
 export 'generated/mesh.pbenum.dart';
 export 'generated/module_config.pb.dart';
 export 'generated/portnums.pbenum.dart';
+// Telemetry carries `LocalStats` — the radio's own counters, which it sends
+// to the phone and never over the air.
+export 'generated/telemetry.pb.dart';
+export 'generated/telemetry.pbenum.dart';

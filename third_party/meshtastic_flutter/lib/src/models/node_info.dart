@@ -32,6 +32,15 @@ class NodeInfoWrapper {
   /// Channel utilization
   int get channel => nodeInfo.channel;
 
+  /// How many hops away this node was when the radio last heard it, or null
+  /// when the radio does not know.
+  ///
+  /// Read through `hasHopsAway()` rather than the bare field: the protobuf is
+  /// `optional uint32`, so an unset value reads as `0` — "direct neighbour",
+  /// which is both plausible and wrong, and on a map is a claim about
+  /// reachability nobody made.
+  int? get hopsAway => nodeInfo.hasHopsAway() ? nodeInfo.hopsAway : null;
+
   /// Whether the node is online/reachable
   bool get isOnline =>
       nodeInfo.hasLastHeard() &&
