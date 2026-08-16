@@ -9,6 +9,7 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
@@ -66,7 +67,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
     show LicenseEntry, LicenseEntryWithLineBreaks, LicenseRegistry;
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -126,7 +126,9 @@ Future<void> bootstrap() async {
   // Boundaries too: independent of everything, and its isolate decode is the
   // longest single asset load — starting it here overlaps it with the DB opens.
   final townBoundaries = TownBoundaries.load();
-  final appVersionFuture = PackageInfo.fromPlatform().then((p) => p.version);
+  // The label a human reads, and the ordinal that orders — see [AppBuild].
+  // Stamped in by CI; falls back to the platform's own values locally.
+  final appVersionFuture = AppBuild.ensureLoaded().then((_) => AppBuild.label);
 
   final durable = await durableFuture;
   // Persist the log as early as the database allows: everything after this

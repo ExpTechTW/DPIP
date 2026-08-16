@@ -1,7 +1,13 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 3.9.9+1
+# A placeholder, not the source of truth. `tool/version.sh` decides what a
+# build is called and how it sorts, and CI passes both in with `--build-name`
+# / `--build-number`, which override this on every platform. It stays here,
+# and stays legal semver, only because `flutter pub get` parses it: `26.1`
+# fails with "must have three numeric components" and `26w33a` does not parse
+# at all.
+version: 26.1.0+0
 
 environment:
   sdk: ^3.13.0

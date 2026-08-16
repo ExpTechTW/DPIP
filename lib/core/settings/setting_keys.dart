@@ -174,6 +174,16 @@ abstract final class SettingKeys {
     'update.promptedVersion',
   );
 
+  /// The build ordinal the update dialog has already offered.
+  ///
+  /// The ordinal rather than the tag, because that is what decides "newer"
+  /// now: a label may be styled however it likes, so remembering the name
+  /// cannot answer "have I already offered something at least this new".
+  /// [updatePromptedVersion] stays for builds made before the ordinal existed.
+  static const SettingKey<int> updatePromptedBuild = SettingKey<int>._(
+    'update.promptedBuild',
+  );
+
   /// Selected LB / Core API region. See `RegionSelection`.
   ///
   /// Colon-form kept as-is (pre-existing storage address).

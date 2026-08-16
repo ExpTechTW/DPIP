@@ -12,6 +12,7 @@
 library;
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/platform/install_source.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -61,12 +62,14 @@ class _UpdatePromptState extends State<UpdatePrompt> {
       final update = findUpdate(
         releases: releases,
         currentVersion: info.version,
+        currentBuild: AppBuild.code,
         promptedVersion: settings.getString(SettingKeys.updatePromptedVersion),
+        promptedBuild: settings.getInt(SettingKeys.updatePromptedBuild) ?? 0,
         installSource: source,
       );
       Log.info(
-        'update check: current=${info.version} source=${source.name} '
-        'offer=${update?.tagName ?? 'none'}',
+        'update check: current=${AppBuild.label} build=${AppBuild.code} '
+        'source=${source.name} offer=${update?.tagName ?? 'none'}',
       );
       if (update == null || !mounted) return;
 
@@ -77,6 +80,10 @@ class _UpdatePromptState extends State<UpdatePrompt> {
         SettingKeys.updatePromptedVersion,
         update.tagName,
       );
+      final code = buildCodeOf(update);
+      if (code != null) {
+        await settings.setInt(SettingKeys.updatePromptedBuild, code);
+      }
       if (!mounted) return;
       await _show(update, source);
     } catch (error, stackTrace) {

@@ -1,0 +1,275 @@
+# Every commit on main is a snapshot; every tag is a release.
+#
+# The three values a build carries come from `tool/version.sh` and nowhere
+# else — no human edits a version, and `pubspec.yaml`'s stays a placeholder for
+# local runs. See that script for why the label, the train and the ordinal are
+# three separate things.
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  workflow_dispatch:
+
+# One release at a time. Two concurrent runs would publish two builds whose
+# ordinals were computed from different commits, and the loser would be the
+# newer one.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.v.outputs.label }}
+      train: ${{ steps.v.outputs.train }}
+      code: ${{ steps.v.outputs.code }}
+      prerelease: ${{ steps.v.outputs.prerelease }}
+    steps:
+      # Full history: the label counts this week's commits and the train reads
+      # the newest tag. A shallow clone has neither.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: v
+        run: |
+          eval "$(tool/version.sh)"
+          echo "label=$DPIP_LABEL" >> "$GITHUB_OUTPUT"
+          echo "train=$DPIP_TRAIN" >> "$GITHUB_OUTPUT"
+          echo "code=$DPIP_CODE" >> "$GITHUB_OUTPUT"
+          # A tag is a release; anything else is a snapshot.
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "::notice::$DPIP_LABEL (train $DPIP_TRAIN, build $DPIP_CODE)"
+
+      # The ordinal is the one value that must never repeat or go backwards: a
+      # store that has accepted a code refuses every build at or below it,
+      # permanently. Checking here fails the run loudly instead of failing an
+      # upload later, when the artifacts have already been built.
+      - name: Ordinal must be higher than the last published one
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous="$(gh release list --limit 30 --json tagName,body \
+            --jq '[.[] | .body | capture("<!--\\s*dpip-build:\\s*(?<c>\\d+)") | .c | tonumber] | max // 0')"
+          echo "previous=$previous current=${{ steps.v.outputs.code }}"
+          if [ "${{ steps.v.outputs.code }}" -le "$previous" ]; then
+            echo "::error::build ordinal ${{ steps.v.outputs.code }} is not above the published $previous"
+            exit 1
+          fi
+
+  build:
+    needs: version
+    strategy:
+      # Independent: one store failing must not stop the other shipping.
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            runs-on: ubuntu-latest
+          - platform: ios
+            runs-on: macos-latest
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Flutter/Dart come from mise.toml, the same pin ci.yml and every
+      # developer use. A published build is the one that most needs to be
+      # reproducible, so it must not be the one tracking whatever "stable"
+      # happens to mean on the day it runs.
+      - uses: jdx/mise-action@v4
+
+      - if: matrix.platform == 'android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "25"
+          cache: "gradle"
+
+      - run: mise exec -- flutter pub get
+
+      # Without these the release build silently falls back to the *debug*
+      # signing config (see `buildTypes.release` in android/app/build.gradle.kts),
+      # which is signed with the well-known keypair that ships in the Android
+      # SDK. Play refuses such a bundle outright, and a sideloaded APK signed
+      # with it can be "updated" by anyone — on a disaster app that is not a
+      # theoretical objection. The quoted heredoc keeps a `$` in a password from
+      # being eaten by the shell.
+      - name: Install the upload key
+        if: matrix.platform == 'android'
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/my-release-key.jks
+          cat > android/key.properties << 'EOF'
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=my-release-key.jks
+          EOF
+
+      # xcodebuild takes a *path* to the key, not the key. `printf` rather than
+      # `echo` so nothing is appended to the PEM.
+      - name: Install the App Store Connect API key
+        if: matrix.platform == 'ios'
+        run: |
+          mkdir -p "$RUNNER_TEMP/private_keys"
+          printf '%s' "${{ secrets.APPSTORE_API_PRIVATE_KEY }}" \
+            > "$RUNNER_TEMP/private_keys/AuthKey_${{ secrets.APPSTORE_API_KEY_ID }}.p8"
+
+      # `--build-name` is what reaches `CFBundleShortVersionString`, so it is
+      # the *train*: Apple rejects anything that is not one to three integers
+      # (ERROR ITMS-90060), at upload, TestFlight included. Android takes its
+      # `versionName` from `DPIP_LABEL` instead — see android/app/build.gradle.kts
+      # — so the store page shows the name a human was given.
+      #
+      # `DPIP_LABEL` also rides in as a dart-define, which is what the app
+      # itself displays on every platform.
+      #
+      # Android builds twice on purpose: the APK is what a person sideloads from
+      # the GitHub release, the AAB is the only thing Play accepts.
+      - name: Build
+        env:
+          DPIP_LABEL: ${{ needs.version.outputs.label }}
+          DPIP_CODE: ${{ needs.version.outputs.code }}
+        run: |
+          COMMON="--build-name=${{ needs.version.outputs.train }} \
+                  --build-number=${{ needs.version.outputs.code }} \
+                  --dart-define=DPIP_LABEL=${{ needs.version.outputs.label }} \
+                  --dart-define=DPIP_CODE=${{ needs.version.outputs.code }}"
+          if [ "${{ matrix.platform }}" = "android" ]; then
+            mise exec -- flutter build apk --release $COMMON
+            mise exec -- flutter build appbundle --release $COMMON
+            mv build/app/outputs/flutter-apk/app-release.apk \
+               "DPIP-${{ needs.version.outputs.label }}.apk"
+          else
+            # Two steps rather than `flutter build ipa`. Flutter passes
+            # `-allowProvisioningUpdates` but never the App Store Connect
+            # authentication flags, so on a runner with no signed-in Xcode
+            # account automatic signing has nothing to authenticate as. Driving
+            # xcodebuild directly is the only way to hand it the API key.
+            #
+            # The Flutter step still has to run first: it writes
+            # FLUTTER_BUILD_NUMBER into ios/Flutter/Generated.xcconfig, which is
+            # where Info.plist's CFBundleVersion comes from.
+            mise exec -- flutter build ios --release --no-codesign $COMMON
+            AUTH=(-allowProvisioningUpdates
+                  -authenticationKeyPath "$RUNNER_TEMP/private_keys/AuthKey_${{ secrets.APPSTORE_API_KEY_ID }}.p8"
+                  -authenticationKeyID "${{ secrets.APPSTORE_API_KEY_ID }}"
+                  -authenticationKeyIssuerID "${{ secrets.APPSTORE_ISSUER_ID }}")
+            ( cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner \
+                -configuration Release -sdk iphoneos \
+                -archivePath "$RUNNER_TEMP/Runner.xcarchive" "${AUTH[@]}" archive )
+            xcodebuild -exportArchive \
+              -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+              -exportOptionsPlist ios/ExportOptions.plist \
+              -exportPath "$RUNNER_TEMP/ipa" "${AUTH[@]}"
+            ipa="$(find "$RUNNER_TEMP/ipa" -maxdepth 1 -name '*.ipa' | head -1)"
+            if [ -z "$ipa" ]; then
+              echo "::error::export produced no .ipa"; ls -R "$RUNNER_TEMP/ipa" || true; exit 1
+            fi
+            mv "$ipa" "DPIP-${{ needs.version.outputs.label }}.ipa"
+          fi
+
+      # Resolved at run time, not hardcoded: the directory carries the AGP task
+      # name (`.../release/mergeReleaseNativeLibs/out/lib`), which is an
+      # implementation detail that has been renamed between AGP versions. An
+      # empty output makes the upload skip symbols rather than fail the release
+      # — losing symbolication is recoverable, losing the build is not.
+      - name: Locate native debug symbols
+        id: symbols
+        if: matrix.platform == 'android'
+        run: |
+          dir="$(find build/app/intermediates/merged_native_libs/release \
+                   -type d -name lib -path '*/out/*' 2>/dev/null | head -1)"
+          [ -n "$dir" ] || echo "::warning::no native symbol directory found; uploading without symbols"
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+
+      - name: Upload to Play internal testing
+        if: matrix.platform == 'android'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.exptech.dpip
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          releaseName: ${{ needs.version.outputs.label }}
+          # Lets Play symbolicate native crashes (MapLibre, the mesh stack)
+          # instead of showing raw addresses.
+          debugSymbols: ${{ steps.symbols.outputs.dir }}
+
+      - name: Upload to TestFlight
+        if: matrix.platform == 'ios'
+        uses: apple-actions/upload-testflight-build@v5
+        with:
+          app-path: DPIP-${{ needs.version.outputs.label }}.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+      # An Admin credential for the whole App Store Connect account. The runner
+      # is ephemeral, but removing it costs one line.
+      - name: Remove the API key
+        if: always() && matrix.platform == 'ios'
+        run: rm -rf "$RUNNER_TEMP/private_keys"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dpip-${{ matrix.platform }}
+          path: DPIP-*.*
+          if-no-files-found: error
+
+  publish:
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      # The ordinal rides in the body as an HTML comment: GitHub renders it as
+      # nothing, so the note stays a note while the app still has something
+      # unambiguous to compare. See `buildCodeOf` in update_check.dart.
+      - name: Release notes
+        run: |
+          {
+            if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+              echo "Release **${{ needs.version.outputs.label }}**."
+            else
+              echo "Snapshot **${{ needs.version.outputs.label }}** — built from \`${GITHUB_SHA:0:7}\` on main."
+              echo
+              echo "Snapshots are cut from every commit and are not reviewed. Expect breakage."
+            fi
+            echo
+            echo "<!-- dpip-build: ${{ needs.version.outputs.code }} -->"
+          } > NOTES.md
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            tag="${GITHUB_REF_NAME}"
+          else
+            # Snapshots get their own tag namespace so `v*` stays the release
+            # channel and `git tag --list 'v[0-9]*'` keeps naming real releases.
+            tag="snapshot/${{ needs.version.outputs.label }}"
+            git tag "$tag" && git push origin "$tag"
+          fi
+          gh release create "$tag" \
+            --title "${{ needs.version.outputs.label }}" \
+            --notes-file NOTES.md \
+            --prerelease="${{ needs.version.outputs.prerelease }}" \
+            artifacts/*

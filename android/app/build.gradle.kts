@@ -17,6 +17,25 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+/// The version the stores see, kept deliberately apart from the one people
+/// read.
+///
+/// `versionCode` is the *only* thing Play orders by, so it must increase and
+/// nothing else about it matters. `versionName` is free text and is the label
+/// a human was given — `26w33a`, `26.1`. Deriving one from the other, as this
+/// file used to (`major×10⁸ + minor×10⁶ + …`), welds them together: the label
+/// can then never be restyled, reordered or renamed without the ordinal
+/// moving with it, and a label that is not three integers cannot exist at all.
+///
+/// Both now come from `tool/version.sh` by way of CI, which is the one place
+/// that decides. Locally, where neither is set, the build falls back to
+/// Flutter's own numbers so `flutter run` keeps working.
+val dpipVersionCode: Int =
+    (System.getenv("DPIP_CODE") ?: "").toIntOrNull() ?: flutter.versionCode
+
+val dpipVersionName: String =
+    System.getenv("DPIP_LABEL")?.takeIf { it.isNotBlank() } ?: flutter.versionName
+
 android {
     namespace = "com.exptech.dpip"
     compileSdk = flutter.compileSdkVersion
@@ -33,8 +52,8 @@ android {
         applicationId = "com.exptech.dpip"
         minSdk = 26
         targetSdk = flutter.targetSdkVersion
-        versionCode = 300909009
-        versionName = flutter.versionName
+        versionCode = dpipVersionCode
+        versionName = dpipVersionName
 
         // Flutter ≥3.35 auto-sets release abiFilters to its 3 supported
         // architectures (union with whatever defaultConfig declares), so the
@@ -107,3 +126,4 @@ dependencies {
     // Backports java.time/etc. for awesome_notifications (see compileOptions).
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
+

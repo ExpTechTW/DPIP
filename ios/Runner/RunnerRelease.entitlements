@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Release and Profile builds only. The Debug counterpart in
+	     Runner.entitlements says `development`, and the two MUST stay split:
+	     Xcode does not rewrite aps-environment from the provisioning profile,
+	     so whatever is in the file is what gets signed in. A TestFlight or App
+	     Store build carrying `development` registers its device token with the
+	     APNs *sandbox* while the servers that send to it use production — the
+	     app looks healthy, the tokens look real, and no alert ever arrives.
+	     On this app that is the whole product. -->
+	<key>aps-environment</key>
+	<string>production</string>
+	<!-- Requires Apple's per-team critical-alert entitlement, and the App ID
+	     and provisioning profile must both carry it or signing fails outright. -->
+	<key>com.apple.developer.usernotifications.critical-alerts</key>
+	<true/>
+</dict>
+</plist>
