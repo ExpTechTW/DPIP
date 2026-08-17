@@ -13,6 +13,7 @@ import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
+import 'package:dpip/features/home/presentation/widgets/home_monitor_banner.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -296,10 +297,19 @@ class _HomePageState extends State<HomePage> {
                           blend: HomeChrome.regionBlend(sheetExtent.value),
                           dismiss: HomeChrome.regionDismiss(sheetExtent.value),
                         ),
-                        builder: (context, dials, _) => RegionBar(
-                          blend: dials.blend,
-                          dismiss: dials.dismiss,
-                          skyIsLight: skyIsLightFrom(sky, weatherMode),
+                        builder: (context, dials, _) => Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RegionBar(
+                              blend: dials.blend,
+                              dismiss: dials.dismiss,
+                              skyIsLight: skyIsLightFrom(sky, weatherMode),
+                            ),
+                            // Quick link to 強震監視器 — same dials as the
+                            // region bar above it, so the two move as one
+                            // piece of chrome as the sheet rises.
+                            HomeMonitorBanner(dismiss: dials.dismiss),
+                          ],
                         ),
                       ),
                 ),

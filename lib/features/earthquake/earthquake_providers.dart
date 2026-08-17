@@ -1,12 +1,15 @@
+import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
+import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
+import 'package:dpip/features/earthquake/data/monitor_demo.dart';
 import 'package:dpip/features/earthquake/data/rts_box_grid_source.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/trem_station_repository_impl.dart';
@@ -34,10 +37,26 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   final api = EarthquakeApi(deps.apiClient);
   final repository = EewRepositoryImpl(api);
   final reports = ReportRepositoryImpl(api);
+  final tremStations = TremStationRepositoryImpl(deps.apiClient);
 
-  // Live EEW over SSE (`/api/v2/eq/eew?sse=1`) — bursty, connection-open liveness.
+  // Bundled CWA P/S travel-time table (asset load, not network) — loaded once
+  // here and shared as a `Future` (mirrors `Future<TownBoundaries>` in
+  // `core_providers.dart`) so a consumer just awaits it, no repeated I/O.
+  final travelTimeTable = const SeismicTravelTimeSource().load();
+
+  // Bundled RTS box grid (asset load, not network) — same `Future` pattern.
+  final boxGrid = const RtsBoxGridSource().load();
+
+  // Live EEW over SSE (`/api/v2/eq/eew?sse=1`) — bursty, connection-open
+  // liveness. Debug runs with `DPIP_DEMO_MONITOR=1` swap in a synthetic alert
+  // instead (see monitor_demo.dart) — its parameters are read from the newest
+  // real earthquake report, so the 強震監視器 shows a plausible wavefront
+  // without waiting for a live event.
+  final eewSource = kMonitorDemoEnabled
+      ? DemoEewSource(reports) as RealtimeSource<List<Eew>>
+      : EewRealtimeSource(api.openEewSse) as RealtimeSource<List<Eew>>;
   final eewChannel = RealtimeChannel<List<Eew>>(
-    source: EewRealtimeSource(api.openEewSse),
+    source: eewSource,
     clock: deps.serverClock,
     elapsed: SystemElapsed(),
     ticker: const SystemTicker(),
@@ -49,8 +68,13 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
 
   // Live RTS over SSE (`/api/v2/trem/rts?sse=1`) — continuous ~1 Hz; the source
   // uses event-recency liveness, so a silent-but-open link ages to stale.
+  // The demo flag swaps in a synthetic snapshot generator the same way.
+  final rtsSource = kMonitorDemoEnabled
+      ? DemoRtsSource(stations: tremStations, grid: boxGrid)
+            as RealtimeSource<Rts>
+      : RtsRealtimeSource(api.openRtsSse) as RealtimeSource<Rts>;
   final rtsChannel = RealtimeChannel<Rts>(
-    source: RtsRealtimeSource(api.openRtsSse),
+    source: rtsSource,
     clock: deps.serverClock,
     elapsed: SystemElapsed(),
     ticker: const SystemTicker(),
@@ -59,14 +83,6 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   );
   deps.realtimeService.register(rtsChannel);
   final rtsController = RtsRealtimeController(rtsChannel);
-
-  // Bundled CWA P/S travel-time table (asset load, not network) — loaded once
-  // here and shared as a `Future` (mirrors `Future<TownBoundaries>` in
-  // `core_providers.dart`) so a consumer just awaits it, no repeated I/O.
-  final travelTimeTable = const SeismicTravelTimeSource().load();
-
-  // Bundled RTS box grid (asset load, not network) — same `Future` pattern.
-  final boxGrid = const RtsBoxGridSource().load();
 
   return [
     Provider<EewRepository>.value(value: repository),
@@ -85,8 +101,6 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     ),
     Provider<Future<SeismicTravelTimeTable>>.value(value: travelTimeTable),
     Provider<Future<RtsBoxGrid>>.value(value: boxGrid),
-    Provider<TremStationRepository>.value(
-      value: TremStationRepositoryImpl(deps.apiClient),
-    ),
+    Provider<TremStationRepository>.value(value: tremStations),
   ];
 }

@@ -30,7 +30,7 @@ library;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';

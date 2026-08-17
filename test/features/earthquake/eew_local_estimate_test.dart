@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:flutter_test/flutter_test.dart';
 

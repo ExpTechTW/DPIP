@@ -17,6 +17,7 @@ library;
 import 'dart:async';
 
 import 'package:dpip/shared/widgets/second_ticker.dart';
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -28,7 +29,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -188,6 +189,17 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.medium,
+        // Unlike the 地震頁 list (every row is already an EEW card, so the
+        // colour would be redundant), this one sits on the home dashboard
+        // among unrelated sections — it needs to stand out on its own, so it
+        // keeps the severity border the map monitor's card also carries.
+        side: BorderSide(
+          color: IntensityColors.discrete(maxIntensity.colorLevel),
+          width: 2,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
@@ -229,8 +241,8 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
                     child: EewEstimateTile(
                       label: l10n.eewLocalIntensity,
                       value: Intensity.label(estimate.scale),
-                      background: colors.primaryContainer,
-                      foreground: colors.onPrimaryContainer,
+                      background: IntensityColors.discrete(estimate.scale),
+                      foreground: IntensityColors.onDiscrete(estimate.scale),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),

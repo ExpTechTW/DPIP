@@ -1,11 +1,15 @@
 /// Full-screen map tab — assembles overlay layers for [MapScaffold].
 library;
 
+import 'package:dpip/core/build/demo_flags.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
+import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
@@ -89,6 +93,8 @@ class _MapPageState extends State<MapPage> {
       context.read<TremStationRepository>(),
       eew: context.read<RealtimeNotifier<List<Eew>>>(),
       travelTimeTable: context.read<Future<SeismicTravelTimeTable>>(),
+      boxGrid: context.read<Future<RtsBoxGrid>>(),
+      townDirectory: context.read<TownDirectory>(),
     ),
     TemperatureMapLayer(context.read<MeteorWeatherRepository>()),
     HumidityMapLayer(context.read<MeteorWeatherRepository>()),
@@ -104,11 +110,14 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final initialId = context.watch<DefaultMapLayerController>().layer.id;
+    // In demo mode the monitor is what there is to see — open straight on it.
+    final initial = kMonitorDemoEnabled
+        ? DefaultMapLayer.monitor
+        : context.watch<DefaultMapLayerController>().layer;
     return MapScaffold(
-      key: ValueKey(initialId),
+      key: ValueKey(initial.id),
       layers: _layers,
-      initialLayerId: initialId,
+      initialLayerId: initial.id,
       tabIndex: MapPage.tabIndex,
     );
   }

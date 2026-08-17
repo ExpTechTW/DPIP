@@ -8,7 +8,7 @@ library;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:dpip/features/earthquake/presentation/widgets/intensity_icon_renderer.dart';
+import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';

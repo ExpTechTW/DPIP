@@ -1,7 +1,8 @@
-/// The 強震監視器 overlay UI: the live EEW alert cards (every active report,
-/// listed like the replay page lists its alerts) above a bottom freshness strip
-/// showing the feed status, the snapshot time, and the live latency (s). The
-/// intensity legend lives on the scaffold via [MapLayer.buildLegend].
+/// The 強震監視器 overlay UI: the active EEW alert as a card (tap to cycle
+/// through more than one, same as the report replay page's map overlay) above
+/// a bottom freshness strip showing the feed status, the snapshot time, and the
+/// live latency (s). The intensity legend lives on the scaffold via
+/// [MapLayer.buildLegend].
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
@@ -15,12 +16,13 @@ import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/widgets/alert_cycle_chip.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// The RTS layer's overlay, laid over the full map (via the scaffold's
-/// `buildSheet` slot): the active EEW alert cards above a freshness strip at
+/// `buildSheet` slot): the active EEW alert card above a freshness strip at
 /// the bottom. Small so the map stays visible and interactive above it.
 class RtsMonitorPanel extends StatefulWidget {
   const RtsMonitorPanel({super.key, required this.feed, required this.eew});
@@ -33,14 +35,10 @@ class RtsMonitorPanel extends StatefulWidget {
   /// bounded child the scaffold can size; the map subtracts it when framing.
   static const double bottomStripFraction = 0.1;
 
-  /// …and the whole stack (status strip + up to [maxEewListHeight] of alert
-  /// cards) while an alert is active — deliberate framing subtracts this so an
-  /// epicentre is never framed behind its own alert.
+  /// …and the whole stack (status strip + the single alert card) while an
+  /// alert is active — deliberate framing subtracts this so an epicentre is
+  /// never framed behind its own alert.
   static const double expandedBottomFraction = 0.45;
-
-  /// Cap on the alert-card list so a burst of reports never pushes the status
-  /// strip off screen (same ceiling the replay page uses).
-  static const double maxEewListHeight = 240;
 
   @override
   State<RtsMonitorPanel> createState() => _RtsMonitorPanelState();
@@ -54,6 +52,10 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
   /// up in one build on return.
   bool _visible = true;
   VisibleTab? _visibleTab;
+
+  /// Which active alert the single EEW card currently shows — tapping the
+  /// card advances it through the alert set (mirrors the report replay page).
+  int _eewIndex = 0;
 
   void _onData() {
     if (_visible && mounted) setState(() {});
@@ -118,9 +120,13 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _EewAlerts(eew: widget.eew),
+              _EewAlert(
+                eew: widget.eew,
+                index: _eewIndex,
+                onCycle: (next) => setState(() => _eewIndex = next),
+              ),
               const SizedBox(height: AppSpacing.sm),
-              _StatusBar(state: widget.feed.state),
+              _StatusBar(state: widget.feed.state, eew: widget.eew),
             ],
           ),
         ),
@@ -129,13 +135,26 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
   }
 }
 
-/// Every active EEW alert as a card, capped in height so the status bar below
-/// is never pushed off screen. Renders nothing when calm or when the feed has
-/// aged past live — a stale alert must never be presented as a current one.
-class _EewAlerts extends StatelessWidget {
-  const _EewAlerts({required this.eew});
+/// One active EEW alert as a card — tapping it cycles through the rest of the
+/// active set (parallel earthquakes, overlapping reports), same UX as the
+/// report replay page's map overlay. Renders nothing when calm or when the
+/// feed has aged past live — a stale alert must never be presented as a
+/// current one.
+class _EewAlert extends StatelessWidget {
+  const _EewAlert({
+    required this.eew,
+    required this.index,
+    required this.onCycle,
+  });
 
   final RealtimeNotifier<List<Eew>> eew;
+
+  /// Which alert to show; clamped modulo the active count below, so a report
+  /// leaving the set mid-cycle can't point past the list.
+  final int index;
+
+  /// Reports the next index to show once the card is tapped.
+  final ValueChanged<int> onCycle;
 
   @override
   Widget build(BuildContext context) {
@@ -146,32 +165,40 @@ class _EewAlerts extends StatelessWidget {
         alerts.isEmpty) {
       return const SizedBox.shrink();
     }
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        maxHeight: RtsMonitorPanel.maxEewListHeight,
-      ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: alerts.length,
-        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (context, index) => MonitorEewCard(alert: alerts[index]),
-      ),
+    final current = index % alerts.length;
+    return MonitorEewCard(
+      alert: alerts[current],
+      trailing: alerts.length > 1
+          ? AlertCycleChip(position: current + 1, count: alerts.length)
+          : null,
+      onTap: alerts.length > 1
+          ? () => onCycle((current + 1) % alerts.length)
+          : null,
     );
   }
 }
 
 /// A compact bottom card: status dot + title + the snapshot time, then the live
-/// latency in seconds (or the feed status word when not live).
+/// latency in seconds (or the feed status word when not live). While an EEW
+/// alert is active it turns red-on-`errorContainer` as a whole — the legacy
+/// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
+/// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so the
+/// strip reads as urgent even collapsed, not just the card above it.
 class _StatusBar extends StatelessWidget {
-  const _StatusBar({required this.state});
+  const _StatusBar({required this.state, required this.eew});
 
   final RealtimeState<Rts> state;
+  final RealtimeNotifier<List<Eew>> eew;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+
+    final hasActiveEew =
+        eew.state.status == RealtimeStatus.live &&
+        (eew.state.data?.isNotEmpty ?? false);
 
     final time = state.data?.time ?? 0;
     final hasData = time != 0;
@@ -213,14 +240,19 @@ class _StatusBar extends StatelessWidget {
       ),
     };
 
+    final onTint = hasActiveEew ? colors.onErrorContainer : null;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: colors.surface.withValues(alpha: 0.94),
+        color: hasActiveEew
+            ? colors.errorContainer.withValues(alpha: 0.94)
+            : colors.surface.withValues(alpha: 0.94),
         borderRadius: AppRadius.medium,
+        border: hasActiveEew ? Border.all(color: colors.error, width: 2) : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.12),
@@ -241,6 +273,7 @@ class _StatusBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: onTint,
               ),
             ),
           ),
@@ -250,7 +283,7 @@ class _StatusBar extends StatelessWidget {
               dataTime,
               maxLines: 1,
               style: theme.textTheme.labelMedium?.copyWith(
-                color: colors.onSurfaceVariant,
+                color: onTint ?? colors.onSurfaceVariant,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
@@ -260,7 +293,7 @@ class _StatusBar extends StatelessWidget {
             trailing,
             maxLines: 1,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: trailingColor,
+              color: onTint ?? trailingColor,
               fontWeight: FontWeight.w600,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),

@@ -26,7 +26,8 @@ import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
+import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -34,10 +35,11 @@ import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
-import 'package:dpip/features/earthquake/presentation/widgets/intensity_icon_renderer.dart';
+import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/features/earthquake/replay_session.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/widgets/alert_cycle_chip.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
@@ -78,10 +80,11 @@ class ReportReplayPage extends StatefulWidget {
 class _ReportReplayPageState extends State<ReportReplayPage> {
   late final ReplaySession _session;
 
-  /// Bumped on a fixed cadence so the wave-front circles and the displayed
-  /// clock keep advancing every frame, independent of whether a poll actually
-  /// changed the underlying feed data (a realtime channel only emits on a
-  /// real transition — the wavefront still grows every tick in between).
+  /// Bumped on a fixed cadence so the displayed clock, the EEW countdown, and
+  /// the box-coverage check keep advancing independent of whether a poll
+  /// actually changed the underlying feed data (a realtime channel only emits
+  /// on a real transition). The wave-front rings redraw on their own, faster
+  /// cadence instead — see `_ReplayMapState._wavefrontTicker`.
   final ValueNotifier<int> _tick = ValueNotifier(0);
   Timer? _ticker;
 
@@ -226,6 +229,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                         );
                       },
                     ),
+                    const SizedBox(height: AppSpacing.sm),
                     _ReplayStatusBar(
                       clock: _session.clock,
                       tick: _tick,
@@ -282,38 +286,41 @@ class _ReplayMapState extends State<_ReplayMap> {
   static const String _rtsCircleId = 'replay-rts-circle';
   static const String _rtsLabelId = 'replay-rts-label';
 
-  /// Per-station discrete-intensity marker layer — the legacy monitor's
-  /// `intensity` layer. While a large event's detection boxes are up, the
-  /// station dots give way to these icons (`intensity-1`…`intensity-9`, same
-  /// PNGs the report map uses), one numeral per station over its estimated
-  /// shaking.
-  static const String _rtsIntensityId = 'replay-rts-intensity';
+  /// Per-station discrete-reading badge — a circular version of the legacy
+  /// monitor's square `intensity` layer (see [IntensityCircleRenderer]):
+  /// while a large event's detection boxes are up, each shaking station gets
+  /// a numbered badge over its dot instead of the plain colour, but the
+  /// shape stays a circle. `icon` is empty for a station with nothing to
+  /// badge, so a plain dot underneath just keeps showing through.
+  static const String _rtsIntensityCircleId = 'replay-rts-intensity-circle';
 
-  /// Grey-dot layer for a triggered station whose discrete intensity rounds
-  /// down to 0 — see the layer's own setup comment in [_onStyleLoaded].
-  static const String _rtsIntensity0Id = 'replay-rts-intensity0';
+  /// Shared by the dot layer's `circleSortKey` and the badge layer's
+  /// `symbolSortKey`: higher effective intensity draws on top in both, so a
+  /// calmer, overlapping station never hides a hotter one. Reads `sort` (see
+  /// [_rtsGeoJson]), the alert-aware value the badge is actually drawn from,
+  /// not the raw `i` — a sort key stuck on `i` let a lower badge draw over a
+  /// higher one the moment an alert's discrete reading diverged from the
+  /// station's own raw sensor value.
+  static const List<Object> _rtsSortKey = [
+    'coalesce',
+    ['get', 'sort'],
+    -5,
+  ];
 
-  /// Opaque only where `intensity == 0 && alert == 1` (ported from the
-  /// legacy monitor's `intensity0` layer) — every station is in this same
-  /// source, so a data expression picks the handful that qualify instead of
-  /// a second filtered layer.
-  static const List<Object> _intensity0OpacityExpression = [
-    'case',
-    [
-      'all',
-      [
-        '==',
-        ['get', 'intensity'],
-        0,
-      ],
-      [
-        '==',
-        ['get', 'alert'],
-        1,
-      ],
-    ],
-    1,
-    0,
+  /// The discrete-reading badge's on-map scale of its 64px artwork. The
+  /// legacy monitor's own badge layer used 0.2 at z5 → 0.8 at z10, but that
+  /// assumed native-resolution PNG assets — applied to a baked canvas here it
+  /// renders at only device-pixel size, ~13px on a 3x display and effectively
+  /// invisible. [ReportDetailPage] already solved this for the same 64px
+  /// canvas class ([IntensityIconRenderer]); reusing its scale here.
+  static const List<Object> _badgeIconSize = [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    5,
+    0.75,
+    15,
+    1.7,
   ];
 
   static const String _boxSourceId = 'replay-box-src';
@@ -355,11 +362,6 @@ class _ReplayMapState extends State<_ReplayMap> {
     8.0,
   ];
 
-  /// The intensity icon for scale index 1–9, dark or light artwork — the same
-  /// assets the report detail map registers.
-  static String _intensityIcon(int level, {required bool dark}) =>
-      dark ? 'intensity-$level-dark' : 'intensity-$level';
-
   MapLibreMapController? _controller;
   Map<String, SeismicStation> _stations = const {};
   bool _stationsFetching = false;
@@ -375,15 +377,6 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// changed, so the fill only updates when this key does.
   String? _fillEewKey;
 
-  /// Brightness at the last style load — the intensity icons come in light and
-  /// dark artwork ([IntensityIcon.light] / [.dark]) and the layer is rebuilt
-  /// on style reload, so the choice is made once per load.
-  bool _dark = false;
-
-  /// Whether the station layer is currently showing intensity icons (big-quake
-  /// box mode) instead of dots — the legacy monitor's `_lastIntensityLayersVisible`.
-  bool? _lastIconMode;
-
   /// Legacy-style blink: while a large event's detection boxes are on the map
   /// they (and the EEW epicentre cross) toggle visibility on a 1 s cadence so
   /// they stand out from the static replay surface — ported from the legacy
@@ -391,6 +384,16 @@ class _ReplayMapState extends State<_ReplayMap> {
   Timer? _blinkTimer;
   bool _boxVisible = true;
   bool _epicenterVisible = true;
+
+  /// Redraws the EEW wave-front rings at close to display-refresh rate —
+  /// independent of the page's own slower [_ReportReplayPageState._tick]
+  /// (which only needs to be fast enough for the status clock, the EEW
+  /// countdown, and the box-coverage check). The ring is real polygon
+  /// geometry ([circleFeature]), not a `circle-radius` paint property MapLibre
+  /// can tween on its own, so this is what stands between a silky-smooth
+  /// expansion and a visibly stepped one. Cheap to run unconditionally: a calm
+  /// [_updateEew] is a same-run early return, same as [_setupBlink]'s tick.
+  Timer? _wavefrontTicker;
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
   /// north, kept in sync from [BaseMap.onCameraMove].
@@ -413,16 +416,22 @@ class _ReplayMapState extends State<_ReplayMap> {
     });
   }
 
-  /// Pauses the 1 Hz blink while the app is backgrounded — its platform
-  /// visibility writes would keep running under the lock screen otherwise.
-  /// Restarting on resume just resets the blink phase, which is invisible.
+  /// Pauses the 1 Hz blink and the wave-front ticker while the app is
+  /// backgrounded — their platform writes would keep running under the lock
+  /// screen otherwise. Restarting on resume just resets the blink phase,
+  /// which is invisible.
   late final AppLifecycleListener _blinkLifecycle = AppLifecycleListener(
     onPause: () {
       _blinkTimer?.cancel();
       _blinkTimer = null;
+      _wavefrontTicker?.cancel();
+      _wavefrontTicker = null;
     },
     onResume: () {
-      if (_ready) _setupBlink();
+      if (_ready) {
+        _setupBlink();
+        _startWavefrontTicker();
+      }
     },
   );
 
@@ -432,8 +441,17 @@ class _ReplayMapState extends State<_ReplayMap> {
     widget.rts.removeListener(_onRts);
     widget.tick.removeListener(_onTick);
     _blinkTimer?.cancel();
+    _wavefrontTicker?.cancel();
     _bearing.dispose();
     super.dispose();
+  }
+
+  void _startWavefrontTicker() {
+    _wavefrontTicker?.cancel();
+    _wavefrontTicker = Timer.periodic(
+      const Duration(milliseconds: 16),
+      (_) => unawaited(_updateEew()),
+    );
   }
 
   /// Toggles the detection boxes and the epicentre cross every second while
@@ -501,11 +519,9 @@ class _ReplayMapState extends State<_ReplayMap> {
   Future<void> _onStyleLoaded() async {
     final controller = _controller;
     if (controller == null) return;
-    _dark = Theme.of(context).brightness == Brightness.dark;
     try {
       final data = await IntensityIconRenderer.render('cross');
       await controller.addImage(_crossIcon, data);
-      await _loadIntensityIcons(controller);
 
       await controller.addSource(
         _rtsSourceId,
@@ -515,7 +531,22 @@ class _ReplayMapState extends State<_ReplayMap> {
         _rtsSourceId,
         _rtsCircleId,
         CircleLayerProperties(
-          circleColor: InstrumentalIntensityColors.mapLibreInterpolate,
+          // A `grey`-flagged feature (see [_rtsGeoJson]) paints the discrete
+          // scale's own 0-grey instead of the continuous ramp: a station on
+          // a large event's alert list reading a flat 0 stays visibly part
+          // of the network rather than fading into whatever pale colour the
+          // ramp gives a near-zero reading — ported from the legacy
+          // monitor's separate `intensity0` grey layer.
+          circleColor: <Object>[
+            'case',
+            [
+              '==',
+              ['get', 'grey'],
+              1,
+            ],
+            IntensityColors.discrete(0).toHexRgb(),
+            InstrumentalIntensityColors.mapLibreInterpolate,
+          ],
           circleRadius: _rtsRadiusExpression,
           circleStrokeColor: '#9E9E9E',
           circleStrokeWidth: 1,
@@ -524,11 +555,7 @@ class _ReplayMapState extends State<_ReplayMap> {
           // -5)`; missing this let station dots stack in whatever order the
           // feed happened to list them, same class of bug as the box layer's
           // missing sort key.
-          circleSortKey: const <Object>[
-            'coalesce',
-            ['get', 'i'],
-            -5,
-          ],
+          circleSortKey: _rtsSortKey,
         ),
         // Station dots under the township names — the wavefront must never
         // hide where you are.
@@ -546,43 +573,69 @@ class _ReplayMapState extends State<_ReplayMap> {
         // collision (the layer order decides who wins placement).
         belowLayerId: townLabelLayerId,
       );
-
-      // The discrete-intensity markers — hidden until a big event's detection
-      // boxes arrive ([_syncStationMode] flips them on and drops the dots),
-      // ported from the legacy monitor's `intensity` layer: an icon per station
-      // picked from its discrete intensity, overlap allowed so the whole island
-      // reads at once. Icons, not text — the same artwork the report map uses.
+      await _loadIntensityCircleIcons(controller);
+      // The discrete-reading badge — always on top of the plain dot (added
+      // after the circle/label above, same anchor); `icon` is empty for
+      // most stations most of the time, so this is a no-op render for them.
       await controller.addSymbolLayer(
         _rtsSourceId,
-        _rtsIntensityId,
+        _rtsIntensityCircleId,
         const SymbolLayerProperties(
           iconImage: <Object>['get', 'icon'],
+          // The baked artwork is a fixed 64px canvas — left at the default
+          // 1.0 it drew full-size at every zoom, badge circles swallowing
+          // whole townships. Scales with zoom instead, same stops as the
+          // legacy monitor's own badge layer.
+          iconSize: _badgeIconSize,
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
-          symbolZOrder: 'source',
-          visibility: 'none',
+          // Same "stronger wins" rule as the dot layer's circleSortKey above
+          // — two badges can overlap just like two dots can, and a low
+          // reading must never paint over a high one. (`symbol-z-order`
+          // defaults to `auto`, which honours the sort key; naming it
+          // `source` here would silently drop back to feed-iteration order.)
+          symbolSortKey: _rtsSortKey,
         ),
         belowLayerId: townLabelLayerId,
       );
-
-      // A triggered station whose discrete intensity rounds down to 0 has no
-      // numeral badge (there's no `intensity-0` icon), but it's still live —
-      // ported from the legacy monitor's `intensity0` layer: a plain grey dot
-      // (opacity 1 only when `intensity == 0 && alert == 1`, via a data
-      // expression, not a filter — same source/feature as everything else)
-      // so a triggered-but-quiet station doesn't just vanish in icon mode.
-      await controller.addCircleLayer(
-        _rtsSourceId,
-        _rtsIntensity0Id,
-        const CircleLayerProperties(
-          circleColor: '#9E9E9E',
-          circleRadius: _rtsRadiusExpression,
-          circleOpacity: _intensity0OpacityExpression,
+    } catch (e, st) {
+      Log.handle(e, st, 'replay map render failed');
+    }
+    // RTS box grid, in its own try/catch — before the EEW wave/epicentre
+    // setup below, so it stacks *below* the epicentre cross and the P/S wave
+    // rings once both are anchored at the same [townLabelLayerId] (each
+    // insertion goes directly below its anchor, so the later one ends up on
+    // top) — matching the legacy monitor's insertion order: box, then wave
+    // rings, then epicentre last/topmost. Isolated so a failure here can
+    // never take down the station dots / EEW wave circles.
+    try {
+      await controller.addSource(
+        _boxSourceId,
+        GeojsonSourceProperties(data: _emptyCollection),
+      );
+      await controller.addLineLayer(
+        _boxSourceId,
+        _boxLineLayerId,
+        const LineLayerProperties(
+          lineColor: _boxColorExpression,
+          lineWidth: 2,
           visibility: 'none',
+          // Draw order for overlapping boxes — red (`i` highest) always on
+          // top, then yellow, then green, matching the legacy monitor's box
+          // layer (`lineSortKey: [Expressions.get, 'i']`). Without this,
+          // overlapping boxes stack in whatever order the feed happened to
+          // list them, so a low-intensity box could paint over a red one.
+          lineSortKey: <Object>['get', 'i'],
         ),
+        // Detection-box borders stay under the township names.
         belowLayerId: townLabelLayerId,
       );
-
+    } catch (e, st) {
+      Log.handle(e, st, 'replay box layer render failed');
+    }
+    // EEW epicentre + P/S wave rings, isolated so a failure here can never
+    // take down the station dots / box grid set up above.
+    try {
       await controller.addSource(
         _eewSourceId,
         GeojsonSourceProperties(data: _emptyCollection),
@@ -645,42 +698,13 @@ class _ReplayMapState extends State<_ReplayMap> {
     } catch (e, st) {
       Log.handle(e, st, 'replay map render failed');
     }
-    // RTS box grid, in its own try/catch after the rest of the map is up:
-    // replaces the station dots for a large event the feed reports at
-    // box-grid resolution instead of per-station (hidden until that data
-    // arrives — see [_updateBox]). Isolated so a failure here can never take
-    // down the station dots / EEW wave circles set up above.
-    try {
-      await controller.addSource(
-        _boxSourceId,
-        GeojsonSourceProperties(data: _emptyCollection),
-      );
-      await controller.addLineLayer(
-        _boxSourceId,
-        _boxLineLayerId,
-        const LineLayerProperties(
-          lineColor: _boxColorExpression,
-          lineWidth: 2,
-          visibility: 'none',
-          // Draw order for overlapping boxes — red (`i` highest) always on
-          // top, then yellow, then green, matching the legacy monitor's box
-          // layer (`lineSortKey: [Expressions.get, 'i']`). Without this,
-          // overlapping boxes stack in whatever order the feed happened to
-          // list them, so a low-intensity box could paint over a red one.
-          lineSortKey: <Object>['get', 'i'],
-        ),
-        // Detection-box borders stay under the township names.
-        belowLayerId: townLabelLayerId,
-      );
-    } catch (e, st) {
-      Log.handle(e, st, 'replay box layer render failed');
-    }
     _ready = true;
     await _ensureStations();
     unawaited(_updateRts());
     unawaited(_updateBox());
     unawaited(_updateEew());
     _setupBlink();
+    _startWavefrontTicker();
     _frameTaiwan();
   }
 
@@ -703,11 +727,12 @@ class _ReplayMapState extends State<_ReplayMap> {
   }
 
   void _onTick() {
-    unawaited(_updateEew());
-    // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every tick
-    // even between RTS polls, so it has to be re-evaluated here too — not
-    // just on [_onRts] — or a box stops blinking only whenever the next poll
-    // happens to land, well after the wavefront actually crossed it.
+    // A box's S-wave coverage (see [_isBoxFullyCovered]) grows continuously,
+    // so it has to be re-evaluated here too — not just on [_onRts] — or a box
+    // stops blinking only whenever the next poll happens to land, well after
+    // the wavefront actually crossed it. The wavefront itself redraws on its
+    // own, faster ticker ([_wavefrontTicker]) — this cadence is plenty for a
+    // coverage check nobody times to the millisecond.
     unawaited(_updateBox());
   }
 
@@ -719,6 +744,17 @@ class _ReplayMapState extends State<_ReplayMap> {
       await controller.setGeoJsonSource(_rtsSourceId, _rtsGeoJson());
     } catch (_) {
       // Source not on the map yet (mid style-reload) — the next update retries.
+    }
+  }
+
+  /// Registers the 18 circular discrete-reading badges (1–9 light + dark) —
+  /// drawn in code (see [IntensityCircleRenderer]), loaded once per style load.
+  Future<void> _loadIntensityCircleIcons(
+    MapLibreMapController controller,
+  ) async {
+    final icons = await IntensityCircleRenderer.renderAll();
+    for (final entry in icons.entries) {
+      await controller.addImage(entry.key, entry.value);
     }
   }
 
@@ -740,10 +776,6 @@ class _ReplayMapState extends State<_ReplayMap> {
     } catch (_) {
       // Source/layer not on the map yet (mid style-reload) — the next update retries.
     }
-    // Boxes and intensity icons are the same big-quake mode (legacy's
-    // `rtsVisible = hasRtsData && !hasBox`) — flip the station layer with the
-    // box state rather than on every EEW tick.
-    await _syncStationMode();
   }
 
   /// Whether [_eewSourceId] currently holds the empty collection — mirrors
@@ -845,14 +877,26 @@ class _ReplayMapState extends State<_ReplayMap> {
   }
 
   Map<String, dynamic> _rtsGeoJson() {
+    // Large event: the feed also carries box-grid data. The legacy monitor
+    // decluttered to just the stations that registered something and badged
+    // each with its discrete reading — ported here as a circular badge (see
+    // [_rtsIntensityCircleId]), never a shape swap: the dot underneath is
+    // still the same circle, the badge is just a fuller circle drawn over it.
+    final hasBox = widget.rts.box.isNotEmpty;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final features = <Map<String, dynamic>>[];
     for (final entry in widget.rts.stations.entries) {
       final station = _stations[entry.key];
       if (station == null) continue;
       final data = entry.value;
-      final level = Intensity.toScale(
-        data.alert ? data.intensity : data.intensityRaw,
-      );
+      // The value actually shown — an alerting station's badge/colour come
+      // from the broadcast discrete reading, not its own raw sensor value,
+      // exactly like the legacy monitor's `alert ? I : i` split.
+      final effective = data.alert ? data.intensity : data.intensityRaw;
+      final level = Intensity.toScale(effective);
+      // A calm, non-alerting 0 would otherwise paper the whole island in
+      // identical dots while the shaking area gets lost in the crowd.
+      if (hasBox && level == 0 && !data.alert) continue;
       features.add({
         'type': 'Feature',
         'geometry': {
@@ -861,48 +905,27 @@ class _ReplayMapState extends State<_ReplayMap> {
         },
         'properties': {
           'i': data.intensityRaw,
-          'intensity': level,
-          'alert': data.alert ? 1 : 0,
-          'icon': level > 0 ? _intensityIcon(level, dark: _dark) : '',
+          // Sort key for both the dot and the badge layer — see
+          // [_rtsSortKey] for why this must be [effective], not the raw `i`.
+          'sort': effective,
           'label': '${entry.key}\n${data.intensityRaw.toStringAsFixed(1)}',
+          'icon': hasBox && level > 0
+              ? _intensityCircleIcon(level, dark: dark)
+              : '',
+          // Only reachable when `alert` is true (the filter above already
+          // dropped a calm zero) — an alerting station reading a flat 0
+          // stays grey rather than a badge, matching the legacy monitor's
+          // separate `intensity0` layer.
+          'grey': hasBox && level == 0 ? 1 : 0,
         },
       });
     }
     return {'type': 'FeatureCollection', 'features': features};
   }
 
-  /// Registers the 18 intensity icons (1–9 light + dark) plus the epicentre
-  /// cross — drawn in code (see [IntensityIconRenderer]), loaded once per style
-  /// load, mirroring the report detail map.
-  Future<void> _loadIntensityIcons(MapLibreMapController controller) async {
-    final icons = await IntensityIconRenderer.renderAll();
-    for (final entry in icons.entries) {
-      await controller.addImage(entry.key, entry.value);
-    }
-  }
-
-  /// Switches the station layer between dots and intensity icons, exactly as
-  /// the legacy monitor's `_updateRtsFromCache` did: while a large event's
-  /// detection boxes are on the map, the per-station intensity icons replace
-  /// the coloured dots and their id/reading labels; the moment the boxes are
-  /// gone the dots come back.
-  Future<void> _syncStationMode() async {
-    final controller = _controller;
-    if (controller == null || !_ready) return;
-    final iconMode = widget.rts.box.isNotEmpty;
-    if (iconMode == _lastIconMode) return;
-    _lastIconMode = iconMode;
-    try {
-      await Future.wait([
-        controller.setLayerVisibility(_rtsCircleId, !iconMode),
-        controller.setLayerVisibility(_rtsLabelId, !iconMode),
-        controller.setLayerVisibility(_rtsIntensityId, iconMode),
-        controller.setLayerVisibility(_rtsIntensity0Id, iconMode),
-      ]);
-    } catch (_) {
-      // Layers gone mid style-reload — the next update retries.
-    }
-  }
+  /// The circular badge icon for scale index 1–9, dark or light artwork.
+  static String _intensityCircleIcon(int level, {required bool dark}) =>
+      dark ? 'circle-$level-dark' : 'circle-$level';
 
   /// One polygon per box id present in the live feed's `rts.box`, joined
   /// against the static [grid] for its geometry — dropping any box the
@@ -1100,6 +1123,8 @@ class _EewAlertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final originUtc = DateTime.fromMillisecondsSinceEpoch(eew.info.time);
+    final maxIntensity = Intensity.displayForReport(eew.info.max, originUtc);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -1108,7 +1133,13 @@ class _EewAlertCard extends StatelessWidget {
       color: colors.surfaceContainerHigh,
       shape: RoundedRectangleBorder(
         borderRadius: AppRadius.medium,
-        side: BorderSide(color: colors.outlineVariant),
+        // The border reads off the same discrete scale as the badge — a
+        // calm/low reading stays close to the neutral outline it replaces,
+        // a severe one is unmistakable before you even read the number.
+        side: BorderSide(
+          color: IntensityColors.discrete(maxIntensity.colorLevel),
+          width: 2,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -1119,7 +1150,7 @@ class _EewAlertCard extends StatelessWidget {
             eew: eew,
             clock: clock,
             trailing: count > 1
-                ? _AlertCountChip(position: position, count: count)
+                ? AlertCycleChip(position: position, count: count)
                 : null,
           ),
         ),
@@ -1128,47 +1159,13 @@ class _EewAlertCard extends StatelessWidget {
   }
 }
 
-/// A small "n/total" pill signalling that tapping the card cycles the alert.
-class _AlertCountChip extends StatelessWidget {
-  const _AlertCountChip({required this.position, required this.count});
-
-  final int position;
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 4,
-      ),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.swap_horiz, size: 14, color: colors.onSurfaceVariant),
-          const SizedBox(width: 2),
-          Text(
-            '$position/$count',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Bottom status card: a freshness dot, the replay clock (tinted orange, the
 /// legacy "this is replay, not live" signal), the RTS feed's status word when
-/// not healthy, and an EEW alert count when one is active.
+/// not healthy, and an EEW alert count when one is active. While an alert is
+/// active the whole strip turns red-on-`errorContainer` — the legacy
+/// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
+/// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so it
+/// reads as urgent even collapsed, not just the card above it.
 class _ReplayStatusBar extends StatelessWidget {
   const _ReplayStatusBar({
     required this.clock,
@@ -1211,6 +1208,8 @@ class _ReplayStatusBar extends StatelessWidget {
     };
 
     final alertCount = eew.alerts.length;
+    final hasActiveEew = alertCount > 0;
+    final onTint = hasActiveEew ? colors.onErrorContainer : null;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -1218,8 +1217,11 @@ class _ReplayStatusBar extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: colors.surface.withValues(alpha: 0.94),
+        color: hasActiveEew
+            ? colors.errorContainer.withValues(alpha: 0.94)
+            : colors.surface.withValues(alpha: 0.94),
         borderRadius: AppRadius.medium,
+        border: hasActiveEew ? Border.all(color: colors.error, width: 2) : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.12),
@@ -1238,6 +1240,7 @@ class _ReplayStatusBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: onTint,
               ),
             ),
           ),
@@ -1258,7 +1261,7 @@ class _ReplayStatusBar extends StatelessWidget {
             timeText,
             maxLines: 1,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: Colors.orange,
+              color: onTint ?? Colors.orange,
               fontWeight: FontWeight.w600,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
@@ -1269,7 +1272,7 @@ class _ReplayStatusBar extends StatelessWidget {
               statusWord,
               maxLines: 1,
               style: theme.textTheme.labelMedium?.copyWith(
-                color: colors.onSurfaceVariant,
+                color: onTint ?? colors.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),

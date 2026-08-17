@@ -21,6 +21,7 @@ library;
 import 'dart:async';
 
 import 'package:dpip/shared/widgets/second_ticker.dart';
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -30,7 +31,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
@@ -56,6 +57,11 @@ class EewCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
+      // No colour-coded border here — 強震監視器 (the map monitor and its
+      // replay, "frozen in time") already carries that signal; this is the
+      // calmer 地震速報 list, so a plain rounded card (still [AppRadius.medium],
+      // matching the other three EEW cards) is enough.
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.medium),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: EewCardContent(eew: eew, clock: clock),
@@ -222,8 +228,8 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
                 child: EewEstimateTile(
                   label: l10n.eewLocalIntensity,
                   value: Intensity.label(estimate.scale),
-                  background: colors.primaryContainer,
-                  foreground: colors.onPrimaryContainer,
+                  background: IntensityColors.discrete(estimate.scale),
+                  foreground: IntensityColors.onDiscrete(estimate.scale),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
