@@ -1,6 +1,6 @@
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Golden tests for the safety-critical EEW math.
