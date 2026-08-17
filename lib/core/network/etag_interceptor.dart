@@ -41,10 +41,22 @@ class EtagInterceptor extends Interceptor {
   /// Synthetic ETag for a cached immutable-tile `404` (empty body).
   static const String negativeTileEtag = 'W/"404"';
 
-  static bool _cacheable(RequestOptions o) =>
-      o.method.toUpperCase() == 'GET' &&
-      o.responseType != ResponseType.stream &&
-      !isUncacheablePath(o.uri.path);
+  /// Whether a request may enter the store.
+  ///
+  /// GET is the default cacheable verb; POST is only cached for status-exptech
+  /// dashboards, whose query body is a constant baked into the client and whose
+  /// URL therefore pins the result — content-addressed, like an immutable tile.
+  static bool _cacheable(RequestOptions o) {
+    if (o.method.toUpperCase() == 'GET') {
+      return o.responseType != ResponseType.stream &&
+          !isUncacheablePath(o.uri.path);
+    }
+    if (o.method.toUpperCase() == 'POST') {
+      return o.uri.host == 'status.exptech.dev' &&
+          o.responseType != ResponseType.stream;
+    }
+    return false;
+  }
 
   /// Paths that must never enter the ETag store (live / unique / personal).
   static bool isUncacheablePath(String path) {
@@ -85,6 +97,7 @@ class EtagInterceptor extends Interceptor {
     '${ApiPaths.dpm}/',
     '/gh/exptechtw/map-assets/', // glyph PBFs (jsDelivr)
     'avatars.githubusercontent.com/', // contributor avatars (content-addressed)
+    'scweb.cwa.gov.tw/', // CWA report image (filename embeds origin time)
   ];
 
   /// Whether [uri] names a content-addressed asset — see
@@ -187,6 +200,7 @@ class EtagInterceptor extends Interceptor {
     if (_cacheable(options)) {
       final url = options.uri.toString();
       final binary = _isBytes(options);
+      final post = options.method.toUpperCase() == 'POST';
       if (response.statusCode == 304) {
         if (binary) {
           final cached = await _store.readBytes(url);
@@ -247,14 +261,19 @@ class EtagInterceptor extends Interceptor {
             ? _downBytes(response, encoded: jsonBody)
             : _downBytes(response);
         final immutable =
-            binary && response.data != null && isImmutableTile(options.uri);
+            post ||
+            (binary && response.data != null && isImmutableTile(options.uri));
         var etag = response.headers.value('etag');
         if (immutable) {
-          // URL pins content — ignore server ETag, always store under URL hash.
+          // POST (a dashboard query whose body is a constant) and URL-pinned
+          // tiles both carry their content in the URL — ignore any server ETag
+          // and always store under the URL hash.
           etag = etagFromUrl(options.uri);
           response.headers.set('etag', etag);
         }
-        // Non-immutable: ETag only — no ETag ⇒ no store.
+        // Non-immutable: ETag only — no ETag ⇒ no store. Immutable responses
+        // always set the synthetic URL-hash ETag above, so this guard doubles
+        // as "immutable or server-etagged".
         if (etag != null && response.data != null) {
           if (binary) {
             final bytes = _asBytes(response.data);
@@ -311,6 +330,31 @@ class EtagInterceptor extends Interceptor {
       final usage = _usage;
       if (usage != null) {
         unawaited(usage.record(down: 0, hit: false, saved: 0));
+      }
+    }
+
+    // Offline fallback for status-dashboard POSTs: the query body is a
+    // constant, so the URL pins the content and a previously stored 200 is a
+    // perfectly good answer when the network refuses another one. This is the
+    // only place a POST is served from cache — online, the request always goes
+    // out and the fresh 200 replaces the entry.
+    if (!_isBytes(options) &&
+        options.method.toUpperCase() == 'POST' &&
+        status == null &&
+        options.uri.host == 'status.exptech.dev') {
+      final cached = await _store.readJson(options.uri.toString());
+      if (cached != null) {
+        handler.resolve(
+          Response<dynamic>(
+            requestOptions: options,
+            statusCode: 200,
+            data: cached.data,
+            headers: Headers.fromMap({
+              'etag': [cached.etag],
+            }),
+          ),
+        );
+        return;
       }
     }
     handler.next(err);

@@ -70,6 +70,9 @@ void main() {
   Dio dioWith(HttpClientAdapter adapter) =>
       createDio(etagCache: store)..httpClientAdapter = adapter;
 
+  Future<void> settle() =>
+      Future<void>.delayed(const Duration(milliseconds: 150));
+
   test('a 304 is served from cache as a 200 with the cached body', () async {
     final adapter = _FakeAdapter(body: '{"n":1}', etag: 'v1');
     final dio = dioWith(adapter);
@@ -165,6 +168,93 @@ void main() {
     expect(again.data, isEmpty);
     expect(adapter.calls, 1);
   });
+
+  test('a status-dashboard POST is cached under the URL hash', () async {
+    const url = 'https://status.exptech.dev/api/ds/query';
+    final adapter = _FakeAdapter(body: '{"results":{}}', etag: 'no-etag');
+    final dio = dioWith(adapter);
+
+    final first = await dio.post<dynamic>(url, data: {'queries': []});
+    expect(first.statusCode, 200);
+    expect(first.data, {'results': {}});
+    // Immutable POST: stored under a synthetic URL-hash ETag, ignoring the
+    // server's (here absent) ETag.
+    await settle();
+    final cached = await store.readJson(url);
+    expect(cached, isNotNull);
+    expect(cached!.etag, EtagInterceptor.etagFromUrl(Uri.parse(url)));
+    expect(cached.data, {'results': {}});
+
+    // A follow-up POST still goes to the network — online must always refresh —
+    // and again overwrites the entry (same URL hash, `replace`).
+    await dio.post<dynamic>(url, data: {'queries': []});
+    expect(adapter.calls, 2);
+    // Writes are fire-and-forget inside the interceptor (unawaited), so give
+    // the gzip+insert hop a beat before the read.
+    await settle();
+    expect(await store.readJson(url), isNotNull);
+  });
+
+  test('a status-dashboard POST serves the cached snapshot when offline', () async {
+    const url = 'https://status.exptech.dev/api/ds/query';
+    // Prime the store with a good snapshot, then make every network call fail.
+    final okAdapter = _FakeAdapter(body: '{"results":{"status":0}}');
+    final onlineDio = dioWith(okAdapter);
+    await onlineDio.post<dynamic>(url, data: {'queries': []});
+    await settle(); // let the fire-and-forget write land
+
+    final offline = _NetworkDownAdapter();
+    final dio = dioWith(offline);
+    final response = await dio.post<dynamic>(url, data: {'queries': []});
+    expect(response.statusCode, 200);
+    expect(response.data, {
+      'results': {'status': 0},
+    });
+    expect(
+      offline.calls,
+      1,
+      reason: 'network was attempted before falling back',
+    );
+  });
+
+  test(
+    'a failing POST on a non-dashboard host is not served from cache',
+    () async {
+      const url = 'https://status.other.test/api/ds/query';
+      final okAdapter = _FakeAdapter(body: '{"n":1}');
+      final onlineDio = dioWith(okAdapter);
+      await onlineDio.post<dynamic>(url, data: {'queries': []});
+      // Only status.exptech.dev is content-addressed for POST; a different host
+      // with a status-like URL must not grow an offline fallback policy by
+      // accident.
+      final dio = dioWith(_NetworkDownAdapter());
+      await expectLater(
+        dio.post<dynamic>(url, data: {'queries': []}),
+        throwsA(isA<DioException>()),
+      );
+    },
+  );
+}
+
+/// Adapter that always fails with a connection error — models being offline.
+class _NetworkDownAdapter implements HttpClientAdapter {
+  int calls = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls++;
+    throw DioException.connectionError(
+      requestOptions: options,
+      reason: 'no network',
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
 
 /// Adapter that always returns [status] with an empty body.
