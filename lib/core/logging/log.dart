@@ -53,8 +53,28 @@ abstract final class Log {
   /// and keeps it private.
   static final _PersistedHistory _history = _PersistedHistory(_settings);
 
+  /// Console output, one plain line per entry.
+  ///
+  /// The default draws every line inside a box and paints it with ANSI escapes.
+  /// Neither survives the trip: `flutter run` prefixes each line with
+  /// `flutter: `, so a three-line box becomes three prefixed lines around one
+  /// message, and the escapes arrive as the literal text `^[[38;5;4m` because
+  /// nothing on that pipe interprets them. What was meant as colour reads as
+  /// noise, and the message is the only part anyone wanted.
+  ///
+  /// Colour is not lost so much as never delivered — turn `enableColors` back
+  /// on if the output is ever read somewhere that renders it.
+  static final TalkerLogger _logger = TalkerLogger(
+    settings: TalkerLoggerSettings(enableColors: false),
+    formatter: const _PlainFormatter(),
+  );
+
   /// The underlying Talker instance — used by the log screen and error hooks.
-  static final Talker talker = Talker(settings: _settings, history: _history);
+  static final Talker talker = Talker(
+    settings: _settings,
+    history: _history,
+    logger: _logger,
+  );
 
   /// How many lines the screen can show — Talker's own history ceiling, so
   /// reading more out of the database only evicts what was just read.
@@ -300,4 +320,13 @@ class _PersistedHistory implements TalkerHistory {
     // how a write loop starts.
     unawaited(Log.store?.clear() ?? Future<void>.value());
   }
+}
+
+/// One line, exactly the message. No border, no underline, no colour.
+class _PlainFormatter implements LoggerFormatter {
+  const _PlainFormatter();
+
+  @override
+  String fmt(LogDetails details, TalkerLoggerSettings settings) =>
+      details.message?.toString() ?? '';
 }
