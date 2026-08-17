@@ -4,6 +4,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -860,35 +861,42 @@ class _AnnouncementCard extends StatelessWidget {
 class _StatusCard extends StatelessWidget {
   const _StatusCard();
 
-  static const String _url = 'https://status.exptech.dev/status';
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    // The same dot the More tab carries: a service host the client has
+    // stopped reaching is as actionable as a missing permission.
+    final alert = context.select<EndpointHealthMonitor, bool>(
+      (health) => health.needsAttention,
+    );
     return Material(
       color: colors.surfaceContainerHigh,
       borderRadius: AppRadius.large,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => openExternalLink(context, _url),
+        onTap: () => context.pushNamed(AppRoutes.serverStatus),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colors.surfaceContainerHighest,
-                ),
-                child: Icon(
-                  Icons.dns_outlined,
-                  color: colors.onSurfaceVariant,
-                  size: 19,
+              Badge(
+                isLabelVisible: alert,
+                smallSize: 7,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.surfaceContainerHighest,
+                  ),
+                  child: Icon(
+                    Icons.dns_outlined,
+                    color: colors.onSurfaceVariant,
+                    size: 19,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -905,7 +913,7 @@ class _StatusCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.xs),
               Icon(
-                Icons.open_in_new,
+                Icons.chevron_right,
                 size: 14,
                 color: colors.onSurfaceVariant.withValues(alpha: 0.6),
               ),

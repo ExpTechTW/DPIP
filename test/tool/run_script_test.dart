@@ -47,11 +47,19 @@ void main() {
     expect(result.stdout, isNot(contains('flutter: ')));
   });
 
+  test('the wrapper marks the launch as its own', () {
+    // bootstrap warns when this is absent, because a launch that skips the
+    // script gets a different SDK and an uncoloured log, and says so nowhere.
+    expect(_script(), contains('--dart-define=DPIP_RUN_SH=1'));
+  });
+
   test('the wrapper runs flutter through mise', () {
     // A shell's PATH is resolved once and goes stale; `mise exec` re-reads
     // mise.toml every time. See AGENTS.md → Toolchain.
-    final script = File('${Directory.current.path}/tool/run.sh')
-        .readAsStringSync();
-    expect(script, contains('mise exec -- flutter run "\$@"'));
+    expect(_script(), contains('mise exec -- flutter run'));
+    expect(_script(), isNot(contains('\nflutter run')));
   });
 }
+
+String _script() =>
+    File('${Directory.current.path}/tool/run.sh').readAsStringSync();

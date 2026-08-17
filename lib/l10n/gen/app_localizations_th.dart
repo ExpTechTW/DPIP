@@ -1990,7 +1990,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get serverStatusLocalBody =>
-      'เซิร์ฟเวอร์ปกติไม่ได้แปลว่าการแจ้งเตือนจะถึงเสมอ ตรวจสอบสิทธิ์และการทำงานเบื้องหลัง:';
+      'ตัวชี้วัดเซิร์ฟเวอร์มาจากแดชบอร์ด ด้านล่างคือการตัดสินของอุปกรณ์นี้ต่อจุดเชื่อมต่อแบบ multi-active (แต่ละภูมิภาคของ LB / Core):';
 
   @override
   String get serverStatusAllUp => 'บริการทั้งหมดปกติ';
@@ -2009,6 +2009,116 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => 'อัปเดต';
+
+  @override
+  String get serverStatusWeb => 'สถานะเซิร์ฟเวอร์';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core เฉพาะ API (เรดาร์ / อากาศ / ลม)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core เฉพาะทรัพยากรคงที่';
+
+  @override
+  String get endpointTierLegacyApi => 'API เดิม (api-1)';
+
+  @override
+  String get endpointHealthOk => 'การเชื่อมต่อปกติ';
+
+  @override
+  String get endpointHealthDegraded => 'มีจุดเชื่อมต่อไม่เสถียร';
+
+  @override
+  String get endpointHealthDown => 'การเชื่อมต่อผิดปกติ';
+
+  @override
+  String get endpointHealthUnknown => 'ยังไม่มีข้อมูล';
+
+  @override
+  String get endpointHealthNone =>
+      'อุปกรณ์นี้ยังไม่ได้ส่งคำขอไปยังจุดเชื่อมต่อใด';
+
+  @override
+  String get endpointStateOk => 'ปกติ';
+
+  @override
+  String get endpointStateDegraded => 'ไม่เสถียร';
+
+  @override
+  String get endpointStateDown => 'ผิดปกติ';
+
+  @override
+  String get endpointStateUnknown => 'ไม่ทราบ';
+
+  @override
+  String get endpointLastSuccessNever => 'ยังไม่สำเร็จ';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
 
   @override
   String get feedConnecting => 'กำลังเชื่อมต่อ…';

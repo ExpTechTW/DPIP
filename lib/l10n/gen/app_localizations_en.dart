@@ -1994,7 +1994,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverStatusLocalBody =>
-      'A healthy server is not enough — alerts also need your device\'s permissions and background execution:';
+      'The server metrics above come from the dashboard; below is this device\'s own view of the multi-active endpoints — which LB / Core region actually answers:';
 
   @override
   String get serverStatusAllUp => 'All services operational';
@@ -2013,6 +2013,116 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => 'Updated';
+
+  @override
+  String get serverStatusWeb => 'Server status';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core-exclusive API (radar / weather / wind)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core-exclusive static';
+
+  @override
+  String get endpointTierLegacyApi => 'Legacy API (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Local connections healthy';
+
+  @override
+  String get endpointHealthDegraded => 'Some endpoints unstable';
+
+  @override
+  String get endpointHealthDown => 'Local connections failing';
+
+  @override
+  String get endpointHealthUnknown => 'No observations yet';
+
+  @override
+  String get endpointHealthNone =>
+      'This device has not yet sent a request to any endpoint.';
+
+  @override
+  String get endpointStateOk => 'OK';
+
+  @override
+  String get endpointStateDegraded => 'Unstable';
+
+  @override
+  String get endpointStateDown => 'Failing';
+
+  @override
+  String get endpointStateUnknown => 'Unknown';
+
+  @override
+  String get endpointLastSuccessNever => 'never succeeded';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
 
   @override
   String get feedConnecting => 'Connecting…';

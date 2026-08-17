@@ -1969,7 +1969,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get serverStatusLocalBody =>
-      '서버가 정상이어도 알림이 도착하지 않을 수 있습니다. 권한과 백그라운드 실행을 확인하세요:';
+      '서버 지표는 대시보드에서 가져오며, 아래는 이 기기가 실제로 연결 중인 멀티 액티브 엔드포인트(LB/Core 각 리전)의 판단입니다:';
 
   @override
   String get serverStatusAllUp => '모든 서비스 정상';
@@ -1988,6 +1988,114 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => '업데이트';
+
+  @override
+  String get serverStatusWeb => '서버 상태';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 전용 API (레이다 / 기상 / 바람)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 전용 정적 리소스';
+
+  @override
+  String get endpointTierLegacyApi => '레거시 API (api-1)';
+
+  @override
+  String get endpointHealthOk => '연결 정상';
+
+  @override
+  String get endpointHealthDegraded => '불안정한 엔드포인트 있음';
+
+  @override
+  String get endpointHealthDown => '연결 이상';
+
+  @override
+  String get endpointHealthUnknown => '관측 데이터 없음';
+
+  @override
+  String get endpointHealthNone => '이 기기는 아직 어떤 엔드포인트에도 요청하지 않았습니다.';
+
+  @override
+  String get endpointStateOk => '정상';
+
+  @override
+  String get endpointStateDegraded => '불안정';
+
+  @override
+  String get endpointStateDown => '이상';
+
+  @override
+  String get endpointStateUnknown => '알 수 없음';
+
+  @override
+  String get endpointLastSuccessNever => '미성공';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
 
   @override
   String get feedConnecting => '연결 중…';

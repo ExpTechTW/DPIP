@@ -26,4 +26,8 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Worth passing `-d`: piped, the tool cannot draw its interactive device picker
 # (target_devices.dart gates that on the logger's colour), so an ambiguous
 # device list falls back to a plain prompt.
-mise exec -- flutter run "$@" | "$here/colorize_logs.sh"
+# `DPIP_RUN_SH` is how the app knows it was started properly. A launch that
+# skips this script gets the wrong toolchain and an uncoloured log, and neither
+# announces itself — so bootstrap says so instead, in debug only.
+mise exec -- flutter run --dart-define=DPIP_RUN_SH=1 "$@" \
+  | "$here/colorize_logs.sh"

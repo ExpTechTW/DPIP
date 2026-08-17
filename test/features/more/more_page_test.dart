@@ -11,6 +11,7 @@ import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -86,6 +87,8 @@ Future<void> _pump(
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
         Provider(create: (_) => const TownDirectory({})),
         ChangeNotifierProvider(create: (_) => unread ?? MeshUnread(null)),
+        // The status card wears the same dot as the More tab.
+        ChangeNotifierProvider(create: (_) => EndpointHealthMonitor()),
         // MorePage badges its permission row from this. Both services are pure
         // constructors and nothing calls start(), so it holds its optimistic
         // defaults and the row renders unbadged — which is what these tests are

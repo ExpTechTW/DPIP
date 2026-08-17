@@ -38,8 +38,11 @@ mise exec -- flutter analyze
 tool/run.sh -d "iPhone 17 Pro"
 ```
 
-`flutter run` on the pinned toolchain with the log coloured — arguments pass
-through untouched, and hot reload still works, because the tool reads
+**This is the only supported way to start the app.** Not `flutter run`, and not
+`mise exec -- flutter run` — both work, and both are wrong in ways nothing
+tells you about, so a debug build started any other way says so in its log.
+
+Arguments pass through untouched, and hot reload still works: the tool reads
 `supportsColor` from stdout and its keystrokes from stdin, and a pipe only
 touches the first.
 

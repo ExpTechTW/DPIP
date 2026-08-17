@@ -1950,7 +1950,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get serverStatusLocal => '本機狀態';
 
   @override
-  String get serverStatusLocalBody => '伺服器正常不代表警報一定到得了，檢查本機權限與背景執行狀態：';
+  String get serverStatusLocalBody =>
+      '伺服器指標來自控制台，下方是本機對多活端點（LB / Core 各區）的實際連線判斷：';
 
   @override
   String get serverStatusAllUp => '所有服務正常';
@@ -1969,6 +1970,114 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => '更新於';
+
+  @override
+  String get serverStatusWeb => '伺服器狀態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 專屬 API（雷達 / 氣象 / 風場）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 專屬靜態資源';
+
+  @override
+  String get endpointTierLegacyApi => '舊版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本機連線正常';
+
+  @override
+  String get endpointHealthDegraded => '有端點連線不穩';
+
+  @override
+  String get endpointHealthDown => '本機連線異常';
+
+  @override
+  String get endpointHealthUnknown => '尚無觀測資料';
+
+  @override
+  String get endpointHealthNone => '本機尚未對任何端點發出請求。';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不穩';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
 
   @override
   String get feedConnecting => '連線中…';
@@ -4881,7 +4990,8 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get serverStatusLocal => '本机状态';
 
   @override
-  String get serverStatusLocalBody => '服务器正常不代表警报一定到达，请检查本机权限与后台执行状态：';
+  String get serverStatusLocalBody =>
+      '服务器指标来自控制台，下方是本机对多活端点（LB / Core 各区）的实际连接判断：';
 
   @override
   String get serverStatusAllUp => '所有服务正常';
@@ -4900,6 +5010,114 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get serverStatusUpdated => '更新于';
+
+  @override
+  String get serverStatusWeb => '服务器状态';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 专属 API（雷达 / 气象 / 风场）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 专属静态资源';
+
+  @override
+  String get endpointTierLegacyApi => '旧版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本机连接正常';
+
+  @override
+  String get endpointHealthDegraded => '有端点连接不稳';
+
+  @override
+  String get endpointHealthDown => '本机连接异常';
+
+  @override
+  String get endpointHealthUnknown => '暂无观测数据';
+
+  @override
+  String get endpointHealthNone => '本机尚未对任何端点发出请求。';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不稳';
+
+  @override
+  String get endpointStateDown => '异常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
 
   @override
   String get feedConnecting => '连接中…';
@@ -7812,7 +8030,8 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get serverStatusLocal => '本機狀態';
 
   @override
-  String get serverStatusLocalBody => '伺服器正常不代表警報一定到得了，檢查本機權限與背景執行狀態：';
+  String get serverStatusLocalBody =>
+      '伺服器指標來自控制台，下方是本機對多活端點（LB / Core 各區）的實際連線判斷：';
 
   @override
   String get serverStatusAllUp => '所有服務正常';
@@ -7831,6 +8050,114 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get serverStatusUpdated => '更新於';
+
+  @override
+  String get serverStatusWeb => '伺服器狀態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 專屬 API（雷達 / 氣象 / 風場）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 專屬靜態資源';
+
+  @override
+  String get endpointTierLegacyApi => '舊版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本機連線正常';
+
+  @override
+  String get endpointHealthDegraded => '有端點連線不穩';
+
+  @override
+  String get endpointHealthDown => '本機連線異常';
+
+  @override
+  String get endpointHealthUnknown => '尚無觀測資料';
+
+  @override
+  String get endpointHealthNone => '本機尚未對任何端點發出請求。';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不穩';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
 
   @override
   String get feedConnecting => '連接中…';
@@ -10743,7 +11070,8 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get serverStatusLocal => '本機狀態';
 
   @override
-  String get serverStatusLocalBody => '伺服器正常不代表警報一定到得了，檢查本機權限與背景執行狀態：';
+  String get serverStatusLocalBody =>
+      '伺服器指標來自控制台，下方是本機對多活端點（LB / Core 各區）的實際連線判斷：';
 
   @override
   String get serverStatusAllUp => '所有服務正常';
@@ -10762,6 +11090,114 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get serverStatusUpdated => '更新於';
+
+  @override
+  String get serverStatusWeb => '伺服器狀態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 專屬 API（雷達 / 氣象 / 風場）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 專屬靜態資源';
+
+  @override
+  String get endpointTierLegacyApi => '舊版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本機連線正常';
+
+  @override
+  String get endpointHealthDegraded => '有端點連線不穩';
+
+  @override
+  String get endpointHealthDown => '本機連線異常';
+
+  @override
+  String get endpointHealthUnknown => '尚無觀測資料';
+
+  @override
+  String get endpointHealthNone => '本機尚未對任何端點發出請求。';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不穩';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
 
   @override
   String get feedConnecting => '連線中…';

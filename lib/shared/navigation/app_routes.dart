@@ -142,4 +142,8 @@ abstract final class AppRoutes {
   // Support / in-app-purchase page.
   static const String sponsor = 'sponsor';
   static const String sponsorPath = '/sponsor';
+
+  /// ExpTech server status dashboard — pushed from the More hero cards.
+  static const String serverStatus = 'serverStatus';
+  static const String serverStatusPath = '/server-status';
 }

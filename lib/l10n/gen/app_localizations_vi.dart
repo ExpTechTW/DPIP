@@ -1995,7 +1995,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get serverStatusLocalBody =>
-      'Máy chủ bình thường chưa chắc cảnh báo đã đến được. Kiểm tra quyền và chạy nền:';
+      'Chỉ số máy chủ lấy từ dashboard; bên dưới là nhận định của thiết bị này về các máy chủ multi-active (từng khu vực LB / Core) mà thiết bị thực sự kết nối:';
 
   @override
   String get serverStatusAllUp => 'Tất cả dịch vụ hoạt động';
@@ -2014,6 +2014,116 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => 'Cập nhật';
+
+  @override
+  String get serverStatusWeb => 'Trạng thái máy chủ';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core độc quyền API (radar / thời tiết / gió)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core độc quyền tĩnh';
+
+  @override
+  String get endpointTierLegacyApi => 'API kế thừa (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Kết nối bình thường';
+
+  @override
+  String get endpointHealthDegraded => 'Có máy chủ không ổn định';
+
+  @override
+  String get endpointHealthDown => 'Kết nối bất thường';
+
+  @override
+  String get endpointHealthUnknown => 'Chưa có dữ liệu';
+
+  @override
+  String get endpointHealthNone =>
+      'Thiết bị này chưa gửi yêu cầu đến máy chủ nào.';
+
+  @override
+  String get endpointStateOk => 'Bình thường';
+
+  @override
+  String get endpointStateDegraded => 'Không ổn định';
+
+  @override
+  String get endpointStateDown => 'Bất thường';
+
+  @override
+  String get endpointStateUnknown => 'Không rõ';
+
+  @override
+  String get endpointLastSuccessNever => 'chưa thành công';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
 
   @override
   String get feedConnecting => 'Đang kết nối…';

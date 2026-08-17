@@ -69,4 +69,21 @@ void main() {
       expect(out.codeUnits, contains(_esc), reason: level);
     }
   });
+
+  test('an interrupt does not kill it before the writer finishes', () {
+    // Ctrl-C reaches every process in the foreground group. Without the trap
+    // the filter dies first and `flutter run` — still shutting down, still
+    // printing — writes into a closed pipe and reports EPIPE as an unhandled
+    // exception.
+    final script = '${Directory.current.path}/tool/colorize_logs.sh';
+    final result = Process.runSync('bash', [
+      '-c',
+      // A writer that keeps printing after the signal, as flutter does.
+      '( for i in 1 2 3; do echo "flutter: [INFO] | 1:00:0\$i 1ms | line \$i";'
+          ' sleep 0.2; done ) | $script & '
+          'pid=\$!; sleep 0.3; kill -INT \$pid 2>/dev/null; wait \$pid',
+    ]);
+    expect(result.exitCode, 0, reason: result.stderr.toString());
+    expect(result.stdout, contains('line 3'), reason: 'it read to the end');
+  });
 }

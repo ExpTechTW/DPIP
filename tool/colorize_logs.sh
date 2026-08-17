@@ -19,6 +19,19 @@
 # plain one, and the tag is what is being scanned for.
 set -euo pipefail
 
+# Outlive the thing being coloured.
+#
+# Ctrl-C goes to every process in the foreground group, so without this the
+# filter dies first and `flutter run` — still shutting down, still printing —
+# writes into a closed pipe and takes `EPIPE` as an unhandled exception:
+#
+#     FileSystemException: writeFrom failed (OS Error: Broken pipe, errno = 32)
+#         … ResidentRunner._serviceDisconnected
+#
+# Ignoring the interrupt leaves this reading until its stdin closes, which is
+# when the writer has genuinely finished.
+trap '' INT
+
 # Off when the output is not a terminal — piped to a file or another program,
 # escapes would be exactly the noise this exists to avoid.
 if [ -t 1 ]; then

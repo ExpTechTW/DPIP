@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kReleaseMode;
 
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/di/core_providers.dart';
@@ -14,6 +14,7 @@ import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
@@ -103,11 +104,34 @@ Stream<LicenseEntry> _weatherIconLicense() async* {
   );
 }
 
+/// Set by `tool/run.sh`, which is how the app is meant to be started.
+const bool _launchedByTool = bool.fromEnvironment('DPIP_RUN_SH');
+
+/// Says so when it was not.
+///
+/// Debug only, and a warning rather than a refusal — a disaster app that will
+/// not start is worse than one started the wrong way.
+///
+/// It is worth saying at all because both failures are silent. A bare
+/// `flutter run` uses whatever Flutter the shell's PATH resolved, which
+/// `mise activate` caches and does not refresh when mise.toml changes — so the
+/// app builds against a different SDK than CI with no sign of it. And the log
+/// arrives uncoloured, because colour is added by the pipe rather than by the
+/// app (see tool/colorize_logs.sh for why it cannot be added here).
+void _warnIfNotLaunchedByTool() {
+  if (!kDebugMode || _launchedByTool) return;
+  Log.warning(
+    'started outside tool/run.sh — this build may be on a different Flutter '
+    'than CI, and the log will not be coloured. Use: tool/run.sh -d <device>',
+  );
+}
+
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
+  _warnIfNotLaunchedByTool();
 
   // The bundled weather glyphs are Material Symbols (Apache-2.0). Registering
   // the licence puts it in the app's own 開放原始碼授權 page (More → licences),
@@ -150,7 +174,8 @@ Future<void> bootstrap() async {
   final mapLayerOrder = MapLayerOrderController(settings);
   final cache = await cacheFuture;
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
-  final apiClient = ApiClient(dio, regions);
+  final endpointHealth = EndpointHealthMonitor();
+  final apiClient = ApiClient(dio, regions, endpointHealth);
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
   // this must be bound before the first map is built.
   final mapTileCache = cache == null
@@ -307,6 +332,7 @@ Future<void> bootstrap() async {
     database: AppDatabase(durable: durable, cache: cache?.db),
     tleStore: TleStore(durable),
     meshGateway: DpipMeshGatewayImpl(meshtastic, () => meshLink.dpipChannel),
+    endpointHealth: endpointHealth,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
     mapTileCache: mapTileCache,

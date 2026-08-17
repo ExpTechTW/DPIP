@@ -2005,7 +2005,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get serverStatusLocalBody =>
-      'Hindi sapat na normal ang server — kailangan ding gumana ang mga pahintulot at background execution:';
+      'Ang mga sukatan ng server ay mula sa dashboard; sa ibaba ay ang sariling pagtingin ng device na ito sa mga multi-active endpoint (bawat rehiyon ng LB/Core) na aktwal na kumokonekta:';
 
   @override
   String get serverStatusAllUp => 'Lahat ng serbisyo ay normal';
@@ -2024,6 +2024,116 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => 'Na-update';
+
+  @override
+  String get serverStatusWeb => 'Katayuan ng server';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core-eksklusibong API (radar / panahon / hangin)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core-eksklusibong static';
+
+  @override
+  String get endpointTierLegacyApi => 'Legacy API (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Normal ang koneksyon';
+
+  @override
+  String get endpointHealthDegraded => 'May endpoint na hindi matatag';
+
+  @override
+  String get endpointHealthDown => 'May problema ang koneksyon';
+
+  @override
+  String get endpointHealthUnknown => 'Wala pang datos';
+
+  @override
+  String get endpointHealthNone =>
+      'Ang device na ito ay hindi pa nagpapadala ng kahit anong request sa endpoint.';
+
+  @override
+  String get endpointStateOk => 'Normal';
+
+  @override
+  String get endpointStateDegraded => 'Hindi matatag';
+
+  @override
+  String get endpointStateDown => 'May problema';
+
+  @override
+  String get endpointStateUnknown => 'Hindi alam';
+
+  @override
+  String get endpointLastSuccessNever => 'hindi pa nagtagumpay';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
 
   @override
   String get feedConnecting => 'Kumokonekta…';

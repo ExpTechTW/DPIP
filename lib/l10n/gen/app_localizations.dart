@@ -3792,7 +3792,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverStatusLocalBody.
   ///
   /// In en, this message translates to:
-  /// **'A healthy server is not enough — alerts also need your device\'s permissions and background execution:'**
+  /// **'The server metrics above come from the dashboard; below is this device\'s own view of the multi-active endpoints — which LB / Core region actually answers:'**
   String get serverStatusLocalBody;
 
   /// No description provided for @serverStatusAllUp.
@@ -3830,6 +3830,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Updated'**
   String get serverStatusUpdated;
+
+  /// No description provided for @serverStatusWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Server status'**
+  String get serverStatusWeb;
+
+  /// No description provided for @serverStatusWebUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'status.exptech.dev'**
+  String get serverStatusWebUrl;
+
+  /// No description provided for @endpointTierLbApi.
+  ///
+  /// In en, this message translates to:
+  /// **'LB API'**
+  String get endpointTierLbApi;
+
+  /// No description provided for @endpointTierLbStatic.
+  ///
+  /// In en, this message translates to:
+  /// **'LB Static'**
+  String get endpointTierLbStatic;
+
+  /// No description provided for @endpointTierCoreApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Core API'**
+  String get endpointTierCoreApi;
+
+  /// No description provided for @endpointTierCoreStatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Core Static'**
+  String get endpointTierCoreStatic;
+
+  /// No description provided for @endpointTierCoreExclusiveApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Core-exclusive API (radar / weather / wind)'**
+  String get endpointTierCoreExclusiveApi;
+
+  /// No description provided for @endpointTierCoreStaticExclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'Core-exclusive static'**
+  String get endpointTierCoreStaticExclusive;
+
+  /// No description provided for @endpointTierLegacyApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy API (api-1)'**
+  String get endpointTierLegacyApi;
+
+  /// No description provided for @endpointHealthOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Local connections healthy'**
+  String get endpointHealthOk;
+
+  /// No description provided for @endpointHealthDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Some endpoints unstable'**
+  String get endpointHealthDegraded;
+
+  /// No description provided for @endpointHealthDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Local connections failing'**
+  String get endpointHealthDown;
+
+  /// No description provided for @endpointHealthUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'No observations yet'**
+  String get endpointHealthUnknown;
+
+  /// No description provided for @endpointHealthNone.
+  ///
+  /// In en, this message translates to:
+  /// **'This device has not yet sent a request to any endpoint.'**
+  String get endpointHealthNone;
+
+  /// No description provided for @endpointStateOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get endpointStateOk;
+
+  /// No description provided for @endpointStateDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstable'**
+  String get endpointStateDegraded;
+
+  /// No description provided for @endpointStateDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Failing'**
+  String get endpointStateDown;
+
+  /// No description provided for @endpointStateUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get endpointStateUnknown;
+
+  /// No description provided for @endpointLastSuccessNever.
+  ///
+  /// In en, this message translates to:
+  /// **'never succeeded'**
+  String get endpointLastSuccessNever;
+
+  /// No description provided for @endpointServiceEew.
+  ///
+  /// In en, this message translates to:
+  /// **'EEW'**
+  String get endpointServiceEew;
+
+  /// No description provided for @endpointServiceRts.
+  ///
+  /// In en, this message translates to:
+  /// **'RTS'**
+  String get endpointServiceRts;
+
+  /// No description provided for @endpointServiceRadar.
+  ///
+  /// In en, this message translates to:
+  /// **'Radar'**
+  String get endpointServiceRadar;
+
+  /// No description provided for @endpointServiceSatellite.
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get endpointServiceSatellite;
+
+  /// No description provided for @endpointServiceQpesums.
+  ///
+  /// In en, this message translates to:
+  /// **'QPE'**
+  String get endpointServiceQpesums;
+
+  /// No description provided for @endpointServiceWind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get endpointServiceWind;
+
+  /// No description provided for @endpointServiceDpm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster points'**
+  String get endpointServiceDpm;
+
+  /// No description provided for @endpointServiceWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get endpointServiceWeather;
+
+  /// No description provided for @endpointServiceRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get endpointServiceRain;
+
+  /// No description provided for @endpointServiceLightning.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning'**
+  String get endpointServiceLightning;
+
+  /// No description provided for @endpointServiceTyphoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon'**
+  String get endpointServiceTyphoon;
+
+  /// No description provided for @endpointServiceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'EQ reports'**
+  String get endpointServiceReport;
+
+  /// No description provided for @endpointServiceTremStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Tremor station'**
+  String get endpointServiceTremStation;
+
+  /// No description provided for @endpointServiceEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get endpointServiceEvent;
+
+  /// No description provided for @endpointServiceLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get endpointServiceLocation;
+
+  /// No description provided for @endpointServiceNotify.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get endpointServiceNotify;
+
+  /// No description provided for @endpointServiceOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get endpointServiceOther;
 
   /// A realtime feed is establishing its first data
   ///

@@ -1962,7 +1962,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get serverStatusLocalBody =>
-      'サーバーが正常でも警報が届くとは限りません。権限とバックグラウンド実行を確認してください：';
+      'サーバー指標はダッシュボードから取得し、以下はこの端末が実際に接続しているマルチアクティブエンドポイント（LB / Core 各リージョン）の判定です：';
 
   @override
   String get serverStatusAllUp => 'すべて正常';
@@ -1981,6 +1981,114 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get serverStatusUpdated => '更新';
+
+  @override
+  String get serverStatusWeb => 'サーバー状態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 専用 API（レーダー / 気象 / 風）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 専用静的リソース';
+
+  @override
+  String get endpointTierLegacyApi => 'レガシー API（api-1）';
+
+  @override
+  String get endpointHealthOk => '接続正常';
+
+  @override
+  String get endpointHealthDegraded => '不安定なエンドポイントあり';
+
+  @override
+  String get endpointHealthDown => '接続異常';
+
+  @override
+  String get endpointHealthUnknown => '観測データなし';
+
+  @override
+  String get endpointHealthNone => 'この端末はまだどのエンドポイントにもリクエストしていません。';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不安定';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '不明';
+
+  @override
+  String get endpointLastSuccessNever => '未成功';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
 
   @override
   String get feedConnecting => '接続中…';

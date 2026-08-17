@@ -4,6 +4,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/changelog/presentation/widgets/update_prompt.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -100,13 +101,18 @@ class _MainShellState extends State<MainShell> with RouteAware {
     final needsPermissionAttention = context.select<PermissionHealth, bool>(
       (health) => health.needsAttention,
     );
-    // Unread mesh messages ride the same dot: both mean "the More tab holds
-    // something you have not dealt with", and two dots on one icon say
-    // nothing more than one.
+    // Endpoint health joins the same dot: a service host the client has
+    // stopped reaching is as much "something the More tab holds for you" as a
+    // missing permission. Two dots on one icon say nothing more than one.
+    final endpointAttention = context.select<EndpointHealthMonitor, bool>(
+      (health) => health.needsAttention,
+    );
+    // Unread mesh messages ride the same dot.
     final hasMeshUnread = context.select<MeshUnread, bool>(
       (unread) => unread.hasUnread,
     );
-    final moreAttention = needsPermissionAttention || hasMeshUnread;
+    final moreAttention =
+        needsPermissionAttention || endpointAttention || hasMeshUnread;
 
     // Reset Home's sheet as we *leave* Home — while it is hidden — so it is back
     // at rest (chrome shown) whenever Home is next shown, by a nav tap or a

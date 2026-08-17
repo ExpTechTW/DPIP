@@ -30,7 +30,13 @@ gate or the analyzer will tell you.
 - **A safety-critical feed that is `stale` or `offline` must never be presented
   as current.** → [ARCHITECTURE.md § Realtime feeds](ARCHITECTURE.md#realtime-feeds)
 - **Run tools through `mise exec --`**, or you are testing a different Flutter
-  than CI is. → [AGENTS.md § Toolchain](AGENTS.md#toolchain)
+  than CI is. A shell's PATH is resolved once and `mise activate` caches it, so
+  a toolchain bump leaves the old SDK on PATH until the session is replaced —
+  and a build against the wrong SDK announces nothing.
+  → [AGENTS.md § Toolchain](AGENTS.md#toolchain)
+- **Start the app with `tool/run.sh`**, never `flutter run` directly. Both run;
+  the difference is the SDK it resolves and whether the log is readable, and
+  neither is visible at the time. → [AGENTS.md § Running](AGENTS.md#running)
 - **No `Co-Authored-By`, no tool attribution, ever.**
   → [AGENTS.md § Commits](AGENTS.md#commits)
 
