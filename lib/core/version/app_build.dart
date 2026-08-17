@@ -41,6 +41,7 @@ abstract final class AppBuild {
   static const String _definedLabel = String.fromEnvironment('DPIP_LABEL');
   static const int _definedCode = int.fromEnvironment('DPIP_CODE');
   static const String _definedTrain = String.fromEnvironment('DPIP_TRAIN');
+  static const String _definedDate = String.fromEnvironment('DPIP_DATE');
 
   /// What the git hooks wrote, empty outside a repository.
   static String get _generatedLabel => kBuildLabel;
@@ -57,6 +58,12 @@ abstract final class AppBuild {
   /// on Android, so a published build reports the train (`26.1`) instead.
   /// The version card prints it as the release's fine-print line.
   static String? get platformVersion => _platformVersion;
+
+  /// The day this build was cut, `yy-MM-dd` in Taipei time (e.g. `26-08-17`).
+  /// Shown beside the type badge on the More page version card. Empty when
+  /// git could not answer, in which case the badge shows no date.
+  static String get buildDate =>
+      _definedDate.isNotEmpty ? _definedDate : kBuildDate;
 
   static String get _bestLabel =>
       _definedLabel.isNotEmpty ? _definedLabel : _generatedLabel;

@@ -26,6 +26,7 @@ jobs:
       label: ${{ steps.v.outputs.label }}
       train: ${{ steps.v.outputs.train }}
       code: ${{ steps.v.outputs.code }}
+      date: ${{ steps.v.outputs.date }}
       prerelease: ${{ steps.v.outputs.prerelease }}
     steps:
       # Full history: the label counts this week's commits and the train reads
@@ -40,13 +41,14 @@ jobs:
           echo "label=$DPIP_LABEL" >> "$GITHUB_OUTPUT"
           echo "train=$DPIP_TRAIN" >> "$GITHUB_OUTPUT"
           echo "code=$DPIP_CODE" >> "$GITHUB_OUTPUT"
+          echo "date=$DPIP_DATE" >> "$GITHUB_OUTPUT"
           # A tag is a release; anything else is a snapshot.
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           else
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           fi
-          echo "::notice::$DPIP_LABEL — $DPIP_TRAIN ($DPIP_CODE)"
+          echo "::notice::$DPIP_LABEL — $DPIP_TRAIN ($DPIP_CODE, built $DPIP_DATE)"
 
       # The ordinal is the one value that must never repeat or go backwards: a
       # store that has accepted a code refuses every build at or below it,
@@ -197,7 +199,8 @@ jobs:
                   --build-number=${{ needs.version.outputs.code }} \
                   --dart-define=DPIP_LABEL=${{ needs.version.outputs.label }} \
                   --dart-define=DPIP_CODE=${{ needs.version.outputs.code }} \
-                  --dart-define=DPIP_TRAIN=${{ needs.version.outputs.train }}"
+                  --dart-define=DPIP_TRAIN=${{ needs.version.outputs.train }} \
+                  --dart-define=DPIP_DATE=${{ needs.version.outputs.date }}"
           if [ "${{ matrix.platform }}" = "android" ]; then
             mise exec -- flutter build apk --release $COMMON
             mise exec -- flutter build appbundle --release $COMMON

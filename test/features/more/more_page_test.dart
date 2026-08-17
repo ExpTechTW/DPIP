@@ -282,6 +282,11 @@ void main() {
       findsWidgets,
     );
     expect(find.text('Snapshot'), findsOneWidget);
+    // The badge carries the day the build was cut — what the card's own
+    // stamp says, so a tester can tell which snapshot they are running.
+    if (AppBuild.buildDate.isNotEmpty) {
+      expect(find.text(AppBuild.buildDate), findsOneWidget);
+    }
   });
 
   testWidgets('the version card opens this version\x27s notes', (tester) async {

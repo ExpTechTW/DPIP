@@ -1075,25 +1075,44 @@ class _VersionCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               // Same treatment as the changelog's type chip: tinted wash,
               // hairline of the same hue, coloured label — not a solid fill,
-              // which is the one marker the changelog never uses.
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                  border: Border.all(color: typeColor.withValues(alpha: 0.45)),
-                ),
-                child: Text(
-                  stable ? l10n.moreVersionStable : l10n.moreVersionSnapshot,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: typeColor,
-                    letterSpacing: 0.2,
+              // which is the one marker the changelog never uses. The badge
+              // is followed by the day the build was cut.
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: typeColor.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(
+                        color: typeColor.withValues(alpha: 0.45),
+                      ),
+                    ),
+                    child: Text(
+                      stable
+                          ? l10n.moreVersionStable
+                          : l10n.moreVersionSnapshot,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: typeColor,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
                   ),
-                ),
+                  if (AppBuild.buildDate.isNotEmpty) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      AppBuild.buildDate,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
