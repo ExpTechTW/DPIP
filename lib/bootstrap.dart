@@ -70,7 +70,6 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:dpip/features/settings/settings_providers.dart';
 
 /// Initializes platform services and launches the app.
 ///
@@ -389,7 +388,6 @@ Future<void> bootstrap() async {
         ...typhoonProviders(deps),
         ...eventsProviders(deps),
         ...changelogProviders(deps),
-        ...settingsProviders(deps),
         ...notificationProviders(deps),
         ...meshtasticProviders(deps),
         ...sponsorProviders(),

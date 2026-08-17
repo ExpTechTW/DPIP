@@ -2793,6 +2793,12 @@ abstract class AppLocalizations {
   /// **'No notes for this release.'**
   String get changelogBodyEmpty;
 
+  /// No description provided for @changelogOpenOnGitHub.
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get changelogOpenOnGitHub;
+
   /// World-country-border overlay toggle in the map's reference-layer overlay menus.
   ///
   /// In en, this message translates to:
@@ -5912,6 +5918,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{n} hops'**
   String meshtasticTraceHops(int n);
+
+  /// More menu row that uploads a debug dump
+  ///
+  /// In en, this message translates to:
+  /// **'Dump debug info and logs'**
+  String get moreDumpDiagnostics;
+
+  /// Subtitle of the debug-dump row
+  ///
+  /// In en, this message translates to:
+  /// **'Uploads them and copies a link to paste into a report'**
+  String get moreDumpDiagnosticsHint;
+
+  /// Title of the dialog shown after a debug dump uploads
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded'**
+  String get dumpUploaded;
+
+  /// Says the uploaded dump link is already on the clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'The link is on your clipboard'**
+  String get dumpLinkCopied;
+
+  /// Button that copies the dump link to the clipboard again
+  ///
+  /// In en, this message translates to:
+  /// **'Copy again'**
+  String get dumpCopyAgain;
+
+  /// Shown when a debug dump could not be uploaded
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed — try again'**
+  String get dumpUploadFailed;
 }
 
 class _AppLocalizationsDelegate

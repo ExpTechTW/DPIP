@@ -1444,6 +1444,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get changelogBodyEmpty => 'ไม่มีคำอธิบายสำหรับรุ่นนี้';
 
   @override
+  String get changelogOpenOnGitHub => 'ดูบน GitHub';
+
+  @override
   String get radarGlobalOutline => 'เส้นแบ่งเขตประเทศ';
 
   @override
@@ -3097,4 +3100,23 @@ class AppLocalizationsTh extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n ฮอป';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'อัปโหลดข้อมูลดีบักและบันทึก';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'อัปโหลดแล้วคัดลอกลิงก์เพื่อแนบในรายงาน';
+
+  @override
+  String get dumpUploaded => 'อัปโหลดแล้ว';
+
+  @override
+  String get dumpLinkCopied => 'คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว';
+
+  @override
+  String get dumpCopyAgain => 'คัดลอกอีกครั้ง';
+
+  @override
+  String get dumpUploadFailed => 'อัปโหลดไม่สำเร็จ';
 }

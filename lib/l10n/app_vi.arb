@@ -686,6 +686,7 @@
   "meshtasticPreset": "Modem preset",
   "dataSectionSeismic": "Địa chấn",
   "changelogBodyEmpty": "Không có ghi chú cho bản phát hành này.",
+  "changelogOpenOnGitHub": "Xem trên GitHub",
   "radarGlobalOutline": "Biên giới quốc gia",
   "notifyEew": "Cảnh báo động đất khẩn cấp",
   "regionNationwide": "Toàn quốc",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "Tải lên thông tin gỡ lỗi và nhật ký",
+  "moreDumpDiagnosticsHint": "Tải lên rồi sao chép liên kết để đính kèm vào báo cáo",
+  "dumpUploaded": "Đã tải lên",
+  "dumpLinkCopied": "Đã sao chép liên kết vào bảng nhớ tạm",
+  "dumpCopyAgain": "Sao chép lại",
+  "dumpUploadFailed": "Tải lên thất bại"
 }

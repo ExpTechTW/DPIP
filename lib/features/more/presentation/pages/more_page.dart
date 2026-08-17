@@ -12,6 +12,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
+import 'package:dpip/shared/diagnostics/dump_action.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -146,6 +147,11 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreDeveloper,
                 onTap: () => context.pushNamed(AppRoutes.developer),
               ),
+              // Directly under the page it dumps. Everything a report needs
+              // is on that page already, and it was still being retyped row by
+              // row — this sends the whole thing, plus the log that explains
+              // it, and hands back one link.
+              const _DumpTile(),
             ],
           ),
           SectionHeader(l10n.moreSectionLinks),
@@ -328,6 +334,7 @@ class _MoreTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.alert = false,
+    this.trailing,
     required this.onTap,
   });
 
@@ -339,6 +346,11 @@ class _MoreTile extends StatelessWidget {
   /// should act on. Off for every row that is merely a destination.
   final bool alert;
 
+  /// Replaces the chevron. A row that *does* something rather than going
+  /// somewhere passes its own — a chevron on it promises a page that never
+  /// opens.
+  final Widget? trailing;
+
   final VoidCallback onTap;
 
   @override
@@ -347,7 +359,7 @@ class _MoreTile extends StatelessWidget {
       leading: alert ? Badge(child: Icon(icon)) : Icon(icon),
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: trailing ?? const Icon(Icons.chevron_right),
       onTap: onTap,
     );
   }
@@ -1176,6 +1188,50 @@ class _VersionCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Uploads the diagnostics and the log, and shows the link.
+///
+/// Stateful only to hold the spinner: the collection reads a dozen subsystems
+/// and the upload is a round trip, so without one the row looks like it did
+/// nothing and gets tapped again — which uploads twice.
+class _DumpTile extends StatefulWidget {
+  const _DumpTile();
+
+  @override
+  State<_DumpTile> createState() => _DumpTileState();
+}
+
+class _DumpTileState extends State<_DumpTile> {
+  bool _running = false;
+
+  Future<void> _run() async {
+    if (_running) return;
+    setState(() => _running = true);
+    try {
+      await runDiagnosticsDump(context);
+    } finally {
+      if (mounted) setState(() => _running = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _MoreTile(
+      icon: Icons.ios_share_outlined,
+      title: l10n.moreDumpDiagnostics,
+      subtitle: l10n.moreDumpDiagnosticsHint,
+      // Sized either way, so the row does not shift when the spinner arrives.
+      trailing: SizedBox.square(
+        dimension: 18,
+        child: _running
+            ? const CircularProgressIndicator(strokeWidth: 2)
+            : null,
+      ),
+      onTap: _run,
     );
   }
 }

@@ -2056,6 +2056,7 @@
     "description": "Himawari sea-surface-temperature (ACSPO L3C) layer name"
   },
   "changelogBodyEmpty": "No notes for this release.",
+  "changelogOpenOnGitHub": "View on GitHub",
   "radarGlobalOutline": "National borders",
   "@mapMyLocation": {
     "description": "Map control that centers the camera on the device GPS fix"
@@ -3958,5 +3959,29 @@
         "type": "int"
       }
     }
+  },
+  "moreDumpDiagnostics": "Dump debug info and logs",
+  "@moreDumpDiagnostics": {
+    "description": "More menu row that uploads a debug dump"
+  },
+  "moreDumpDiagnosticsHint": "Uploads them and copies a link to paste into a report",
+  "@moreDumpDiagnosticsHint": {
+    "description": "Subtitle of the debug-dump row"
+  },
+  "dumpUploaded": "Uploaded",
+  "@dumpUploaded": {
+    "description": "Title of the dialog shown after a debug dump uploads"
+  },
+  "dumpLinkCopied": "The link is on your clipboard",
+  "@dumpLinkCopied": {
+    "description": "Says the uploaded dump link is already on the clipboard"
+  },
+  "dumpCopyAgain": "Copy again",
+  "@dumpCopyAgain": {
+    "description": "Button that copies the dump link to the clipboard again"
+  },
+  "dumpUploadFailed": "Upload failed — try again",
+  "@dumpUploadFailed": {
+    "description": "Shown when a debug dump could not be uploaded"
   }
 }

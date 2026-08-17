@@ -686,6 +686,7 @@
   "meshtasticPreset": "调变预设",
   "dataSectionSeismic": "地震",
   "changelogBodyEmpty": "此版本没有说明。",
+  "changelogOpenOnGitHub": "在 GitHub 查看",
   "radarGlobalOutline": "国界",
   "notifyEew": "紧急地震预警",
   "regionNationwide": "全国",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "转储调试信息及日志",
+  "moreDumpDiagnosticsHint": "上传后复制链接，附在反馈里就不用贴一整页",
+  "dumpUploaded": "已上传",
+  "dumpLinkCopied": "链接已复制到剪贴板",
+  "dumpCopyAgain": "再复制一次",
+  "dumpUploadFailed": "上传失败，请稍后再试"
 }

@@ -1456,6 +1456,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get changelogBodyEmpty => 'Walang tala para sa release na ito.';
 
   @override
+  String get changelogOpenOnGitHub => 'Tingnan sa GitHub';
+
+  @override
   String get radarGlobalOutline => 'Mga hangganan ng bansa';
 
   @override
@@ -3116,4 +3119,23 @@ class AppLocalizationsFil extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n na relay';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'I-upload ang debug info at mga log';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Iuupload at kokopyahin ang link para ilakip sa ulat';
+
+  @override
+  String get dumpUploaded => 'Na-upload';
+
+  @override
+  String get dumpLinkCopied => 'Nakopya ang link sa clipboard';
+
+  @override
+  String get dumpCopyAgain => 'Kopyahin ulit';
+
+  @override
+  String get dumpUploadFailed => 'Nabigong mag-upload';
 }

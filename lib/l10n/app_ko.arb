@@ -686,6 +686,7 @@
   "meshtasticPreset": "Modem preset",
   "dataSectionSeismic": "지진",
   "changelogBodyEmpty": "이 릴리스에 대한 설명이 없습니다.",
+  "changelogOpenOnGitHub": "GitHub에서 보기",
   "radarGlobalOutline": "국경",
   "notifyEew": "긴급 지진 경보",
   "regionNationwide": "전국",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "디버그 정보 및 로그 업로드",
+  "moreDumpDiagnosticsHint": "업로드한 뒤 링크를 복사합니다",
+  "dumpUploaded": "업로드됨",
+  "dumpLinkCopied": "링크를 클립보드에 복사했습니다",
+  "dumpCopyAgain": "다시 복사",
+  "dumpUploadFailed": "업로드하지 못했습니다"
 }

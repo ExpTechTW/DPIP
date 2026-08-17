@@ -1432,6 +1432,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changelogBodyEmpty => '이 릴리스에 대한 설명이 없습니다.';
 
   @override
+  String get changelogOpenOnGitHub => 'GitHub에서 보기';
+
+  @override
   String get radarGlobalOutline => '국경';
 
   @override
@@ -3064,4 +3067,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n 홉';
   }
+
+  @override
+  String get moreDumpDiagnostics => '디버그 정보 및 로그 업로드';
+
+  @override
+  String get moreDumpDiagnosticsHint => '업로드한 뒤 링크를 복사합니다';
+
+  @override
+  String get dumpUploaded => '업로드됨';
+
+  @override
+  String get dumpLinkCopied => '링크를 클립보드에 복사했습니다';
+
+  @override
+  String get dumpCopyAgain => '다시 복사';
+
+  @override
+  String get dumpUploadFailed => '업로드하지 못했습니다';
 }

@@ -686,6 +686,7 @@
   "meshtasticPreset": "Modem preset",
   "dataSectionSeismic": "Seismik",
   "changelogBodyEmpty": "Tidak ada catatan untuk rilis ini.",
+  "changelogOpenOnGitHub": "Lihat di GitHub",
   "radarGlobalOutline": "Batas negara",
   "notifyEew": "Peringatan gempa darurat",
   "regionNationwide": "Seluruh negeri",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "Unggah info debug dan log",
+  "moreDumpDiagnosticsHint": "Mengunggah lalu menyalin tautan untuk dilampirkan ke laporan",
+  "dumpUploaded": "Terunggah",
+  "dumpLinkCopied": "Tautan disalin ke papan klip",
+  "dumpCopyAgain": "Salin lagi",
+  "dumpUploadFailed": "Gagal mengunggah"
 }

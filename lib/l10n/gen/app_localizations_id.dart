@@ -1447,6 +1447,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get changelogBodyEmpty => 'Tidak ada catatan untuk rilis ini.';
 
   @override
+  String get changelogOpenOnGitHub => 'Lihat di GitHub';
+
+  @override
   String get radarGlobalOutline => 'Batas negara';
 
   @override
@@ -3108,4 +3111,23 @@ class AppLocalizationsId extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n lompatan';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'Unggah info debug dan log';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Mengunggah lalu menyalin tautan untuk dilampirkan ke laporan';
+
+  @override
+  String get dumpUploaded => 'Terunggah';
+
+  @override
+  String get dumpLinkCopied => 'Tautan disalin ke papan klip';
+
+  @override
+  String get dumpCopyAgain => 'Salin lagi';
+
+  @override
+  String get dumpUploadFailed => 'Gagal mengunggah';
 }

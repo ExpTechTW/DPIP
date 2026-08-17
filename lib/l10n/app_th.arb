@@ -686,6 +686,7 @@
   "meshtasticPreset": "Modem preset",
   "dataSectionSeismic": "แผ่นดินไหว",
   "changelogBodyEmpty": "ไม่มีคำอธิบายสำหรับรุ่นนี้",
+  "changelogOpenOnGitHub": "ดูบน GitHub",
   "radarGlobalOutline": "เส้นแบ่งเขตประเทศ",
   "notifyEew": "การเตือนแผ่นดินไหวฉุกเฉิน",
   "regionNationwide": "ทั่วประเทศ",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "อัปโหลดข้อมูลดีบักและบันทึก",
+  "moreDumpDiagnosticsHint": "อัปโหลดแล้วคัดลอกลิงก์เพื่อแนบในรายงาน",
+  "dumpUploaded": "อัปโหลดแล้ว",
+  "dumpLinkCopied": "คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว",
+  "dumpCopyAgain": "คัดลอกอีกครั้ง",
+  "dumpUploadFailed": "อัปโหลดไม่สำเร็จ"
 }

@@ -1448,6 +1448,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get changelogBodyEmpty => 'Không có ghi chú cho bản phát hành này.';
 
   @override
+  String get changelogOpenOnGitHub => 'Xem trên GitHub';
+
+  @override
   String get radarGlobalOutline => 'Biên giới quốc gia';
 
   @override
@@ -3105,4 +3108,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n chặng';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'Tải lên thông tin gỡ lỗi và nhật ký';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Tải lên rồi sao chép liên kết để đính kèm vào báo cáo';
+
+  @override
+  String get dumpUploaded => 'Đã tải lên';
+
+  @override
+  String get dumpLinkCopied => 'Đã sao chép liên kết vào bảng nhớ tạm';
+
+  @override
+  String get dumpCopyAgain => 'Sao chép lại';
+
+  @override
+  String get dumpUploadFailed => 'Tải lên thất bại';
 }

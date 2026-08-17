@@ -3,7 +3,7 @@ library;
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:dpip/features/settings/domain/debug_dump.dart';
+import 'package:dpip/core/diagnostics/debug_dump.dart';
 
 void main() {
   List<String> lines(int n) => [

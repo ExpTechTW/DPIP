@@ -1419,6 +1419,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get changelogBodyEmpty => '此版本沒有說明。';
 
   @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
+
+  @override
   String get radarGlobalOutline => '國界';
 
   @override
@@ -3043,6 +3046,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上傳後複製連結，附在回報裡就不用貼一整頁';
+
+  @override
+  String get dumpUploaded => '已上傳';
+
+  @override
+  String get dumpLinkCopied => '連結已複製到剪貼簿';
+
+  @override
+  String get dumpCopyAgain => '再複製一次';
+
+  @override
+  String get dumpUploadFailed => '上傳失敗，請稍後再試';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4457,6 +4478,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get changelogBodyEmpty => '此版本没有说明。';
+
+  @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
 
   @override
   String get radarGlobalOutline => '国界';
@@ -6083,6 +6107,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '转储调试信息及日志';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上传后复制链接，附在反馈里就不用贴一整页';
+
+  @override
+  String get dumpUploaded => '已上传';
+
+  @override
+  String get dumpLinkCopied => '链接已复制到剪贴板';
+
+  @override
+  String get dumpCopyAgain => '再复制一次';
+
+  @override
+  String get dumpUploadFailed => '上传失败，请稍后再试';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -7497,6 +7539,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get changelogBodyEmpty => '此版本沒有說明。';
+
+  @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
 
   @override
   String get radarGlobalOutline => '國界';
@@ -9123,6 +9168,24 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上載後複製連結，附在回報裡就不用貼一整頁';
+
+  @override
+  String get dumpUploaded => '已上載';
+
+  @override
+  String get dumpLinkCopied => '連結已複製到剪貼簿';
+
+  @override
+  String get dumpCopyAgain => '再複製一次';
+
+  @override
+  String get dumpUploadFailed => '上載失敗，請稍後再試';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -10537,6 +10600,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get changelogBodyEmpty => '此版本沒有說明。';
+
+  @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
 
   @override
   String get radarGlobalOutline => '國界';
@@ -12163,4 +12229,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上傳後複製連結，附在回報裡就不用貼一整頁';
+
+  @override
+  String get dumpUploaded => '已上傳';
+
+  @override
+  String get dumpLinkCopied => '連結已複製到剪貼簿';
+
+  @override
+  String get dumpCopyAgain => '再複製一次';
+
+  @override
+  String get dumpUploadFailed => '上傳失敗，請稍後再試';
 }

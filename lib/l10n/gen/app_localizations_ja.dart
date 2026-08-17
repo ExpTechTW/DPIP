@@ -1428,6 +1428,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get changelogBodyEmpty => 'このリリースの説明はありません。';
 
   @override
+  String get changelogOpenOnGitHub => 'GitHub で見る';
+
+  @override
   String get radarGlobalOutline => '国境線';
 
   @override
@@ -3055,4 +3058,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n ホップ';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'デバッグ情報とログを送信';
+
+  @override
+  String get moreDumpDiagnosticsHint => 'アップロードしてリンクをコピーします';
+
+  @override
+  String get dumpUploaded => 'アップロードしました';
+
+  @override
+  String get dumpLinkCopied => 'リンクをクリップボードにコピーしました';
+
+  @override
+  String get dumpCopyAgain => 'もう一度コピー';
+
+  @override
+  String get dumpUploadFailed => 'アップロードに失敗しました';
 }

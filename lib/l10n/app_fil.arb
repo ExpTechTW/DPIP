@@ -686,6 +686,7 @@
   "meshtasticPreset": "Modem preset",
   "dataSectionSeismic": "Seismic",
   "changelogBodyEmpty": "Walang tala para sa release na ito.",
+  "changelogOpenOnGitHub": "Tingnan sa GitHub",
   "radarGlobalOutline": "Mga hangganan ng bansa",
   "notifyEew": "Emergency na alerto sa lindol",
   "regionNationwide": "Buong bansa",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "I-upload ang debug info at mga log",
+  "moreDumpDiagnosticsHint": "Iuupload at kokopyahin ang link para ilakip sa ulat",
+  "dumpUploaded": "Na-upload",
+  "dumpLinkCopied": "Nakopya ang link sa clipboard",
+  "dumpCopyAgain": "Kopyahin ulit",
+  "dumpUploadFailed": "Nabigong mag-upload"
 }

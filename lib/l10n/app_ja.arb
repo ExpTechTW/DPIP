@@ -686,6 +686,7 @@
   "meshtasticPreset": "Modem preset",
   "dataSectionSeismic": "地震",
   "changelogBodyEmpty": "このリリースの説明はありません。",
+  "changelogOpenOnGitHub": "GitHub で見る",
   "radarGlobalOutline": "国境線",
   "notifyEew": "緊急地震速報",
   "regionNationwide": "全国",
@@ -1920,5 +1921,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "デバッグ情報とログを送信",
+  "moreDumpDiagnosticsHint": "アップロードしてリンクをコピーします",
+  "dumpUploaded": "アップロードしました",
+  "dumpLinkCopied": "リンクをクリップボードにコピーしました",
+  "dumpCopyAgain": "もう一度コピー",
+  "dumpUploadFailed": "アップロードに失敗しました"
 }

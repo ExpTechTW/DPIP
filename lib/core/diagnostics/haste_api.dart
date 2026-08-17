@@ -2,7 +2,7 @@
 library;
 
 import 'package:dpip/core/network/api_client.dart';
-import 'package:dpip/features/settings/domain/dump_uploader.dart';
+import 'package:dpip/core/diagnostics/dump_uploader.dart';
 
 /// Posts a dump and returns the URL to read it at.
 ///
