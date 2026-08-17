@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:dpip/core/models/lat_lng.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/wave_time.dart';
 
 /// Earthquake Early Warning (EEW) shaking and wave-timing estimates.

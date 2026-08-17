@@ -16,7 +16,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/a11y/color_vision.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:flutter/painting.dart';
 

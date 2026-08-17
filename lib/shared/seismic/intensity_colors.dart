@@ -72,6 +72,16 @@ abstract final class IntensityColors {
   /// colour-vision setting; out-of-range clamps to the ends.
   static Color discrete(int level) => _corrected[level.clamp(0, 9)];
 
+  /// The readable ink colour for text/icons drawn directly on [discrete]'s
+  /// [level] fill — white on the scale's darker/more saturated stops, near-
+  /// black on the pale yellow ones (4, 5⁻); the same contrast rule
+  /// [IntensityBadge] already applies to its own label, generalised here so a
+  /// second caller (an [EewEstimateTile] background) doesn't have to guess.
+  static Color onDiscrete(int level) =>
+      ThemeData.estimateBrightnessForColor(discrete(level)) == Brightness.dark
+      ? Colors.white
+      : Colors.black87;
+
   /// The published CWA colour for [level] (0 → 9), **untransformed**.
   ///
   /// For a colour-vision *picker* only, which has to paint each option under
