@@ -643,9 +643,9 @@ class _HeroCards extends StatelessWidget {
 ///
 /// It shares the row construction of the two cards under it — badge, label,
 /// trailing arrow — so the right column reads as one aligned stack; the
-/// ranking is carried by the gold alone: a one-hue gradient for the sheen, a
-/// warm cast underneath so it looks lit rather than printed on, a hairline
-/// along the edge, and a filled badge holding the most saturated step.
+/// ranking is carried by the gold alone, rendered flat: a warm champagne
+/// fill, a hairline along the edge, and a filled badge holding the most
+/// saturated step.
 class _SupportCallout extends StatelessWidget {
   const _SupportCallout();
 
@@ -656,22 +656,12 @@ class _SupportCallout extends StatelessWidget {
     final gold = AppGold.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
+        color: gold.fill,
         borderRadius: AppRadius.large,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [gold.fillStart, gold.fillEnd],
-        ),
-        // A warm cast rather than a grey drop shadow — it lifts the card off
-        // the page and reads as light on metal, not as a floating rectangle.
-        boxShadow: [
-          BoxShadow(
-            color: gold.glow,
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
         border: Border.all(color: gold.edge),
+        // No gradient: the card sits on the same tonal plane as its two
+        // neighbours, and the ranking is carried by the gold colour alone —
+        // the badge is what reads as paid, not the sheen.
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -703,8 +693,8 @@ class _SupportCallout extends StatelessWidget {
                     l10n.sponsorTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                       color: gold.ink,
                     ),
                   ),
@@ -866,10 +856,12 @@ class _AnnouncementCard extends StatelessWidget {
 /// the channel under the current scheme (a release label is `\d+\.\d+`, a
 /// snapshot is anything else).
 ///
-/// The layout borrows the phone's "About" page voice — a pale wash behind the
-/// build (rather than a flat fill), the mark small at the top, and the
-/// version number as the thing the eye lands on — so the number, not the
-/// card, is what reads first.
+/// The layout borrows the phone's "About" page voice — the mark small at the
+/// top, and the version number as the thing the eye lands on — so the number,
+/// not the card, is what reads first. The card itself is flat, one tonal
+/// surface like the three cards across from it, and carries no gradient of its
+/// own: the only colour beyond text and badge is the [ShaderMask] gradient the
+/// number is painted in.
 class _VersionCard extends StatelessWidget {
   const _VersionCard();
 
@@ -883,6 +875,19 @@ class _VersionCard extends StatelessWidget {
   static const Color _stableColor = Color(0xFF2E7D32);
   static const Color _snapshotColor = Color(0xFFEF6C00);
 
+  /// The number the card leads with. A release names itself; a snapshot is
+  /// named for the week it was cut (`26w34a`), which reads as noise next to a
+  /// store listing — so it shows the release it builds toward, the last one
+  /// cut, reduced to `major.minor`. No release yet (legacy `3.9.9` answers
+  /// before the first modern tag): fall back to the label so the card never
+  /// quotes a version that does not exist.
+  static String _displayNumber(String label) {
+    if (_releaseLabel.hasMatch(label)) return label;
+    final last = AppBuild.lastRelease;
+    if (last.isEmpty) return label;
+    return last.split('.').take(2).join('.');
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -891,87 +896,88 @@ class _VersionCard extends StatelessWidget {
     final label = AppBuild.label;
     final stable = _releaseLabel.hasMatch(label);
     final typeColor = stable ? _stableColor : _snapshotColor;
-    return DecoratedBox(
-      decoration: BoxDecoration(
+    final number = _displayNumber(label);
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
         borderRadius: AppRadius.large,
-        // A lineage wash from the brand colour down to the surface — the same
-        // idea as the About page's card, kept inside the scheme.
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colors.primaryContainer,
-            colors.surfaceContainerHigh.withValues(alpha: 0.6),
-          ],
-        ),
-      ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          borderRadius: AppRadius.large,
-          onTap: () => context.pushNamed(AppRoutes.versionNotes),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: AppRadius.small,
-                      child: Image.asset(
-                        'assets/DPIP.png',
-                        width: 36,
-                        height: 36,
-                      ),
+        onTap: () => context.pushNamed(AppRoutes.versionNotes),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: AppRadius.small,
+                    child: Image.asset(
+                      'assets/DPIP.png',
+                      width: 36,
+                      height: 36,
                     ),
-                    const Spacer(),
-                    Icon(
-                      Icons.chevron_right,
-                      size: 20,
-                      color: colors.onSurfaceVariant.withValues(alpha: 0.7),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Text(
-                  'DPIP',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
                   ),
+                  const Spacer(),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: colors.onSurfaceVariant.withValues(alpha: 0.7),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                'DPIP',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
+              ),
+              const SizedBox(height: 2),
+              // Gradient number, not a plain rect fill: the one stroke of
+              // colour the flat card permits. White under srcIn — the gradient
+              // takes over the glyphs entirely.
+              ShaderMask(
+                shaderCallback: (rect) => LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [colors.primary, colors.tertiary],
+                ).createShader(rect),
+                child: Text(
+                  number,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: colors.onSurface,
+                    color: Colors.white,
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                // The chip carries the type colour directly — green against
-                // the pale wash for a release, orange for a snapshot.
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: typeColor.withValues(alpha: 0.88),
-                    borderRadius: AppRadius.small,
-                  ),
-                  child: Text(
-                    stable ? l10n.moreVersionStable : l10n.moreVersionSnapshot,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              // Same treatment as the changelog's type chip: tinted wash,
+              // hairline of the same hue, coloured label — not a solid fill,
+              // which is the one marker the changelog never uses.
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: typeColor.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  border: Border.all(color: typeColor.withValues(alpha: 0.45)),
+                ),
+                child: Text(
+                  stable ? l10n.moreVersionStable : l10n.moreVersionSnapshot,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: typeColor,
+                    letterSpacing: 0.2,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -7,6 +7,7 @@
 /// is a failure that only shows up on the day it matters.
 library;
 
+import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
@@ -187,14 +188,29 @@ void main() {
 
   testWidgets('the support callout outranks Discord visually', (tester) async {
     await _pump(tester, _router([]));
-    // The gradient + shadow belong to support alone: if Discord grew them too,
-    // neither would read as the lead.
-    final decorated = tester
-        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-        .map((d) => d.decoration)
-        .whereType<BoxDecoration>()
-        .where((d) => d.gradient != null && d.boxShadow != null);
-    expect(decorated, hasLength(1));
+    // The gold belongs to support alone: if Discord were gold too, neither
+    // would read as the lead. Both are flat now — the colour is the whole
+    // ranking, so assert that the two fills differ.
+    final gold = AppGold.of(tester.element(find.text('Support DPIP')));
+    final support = tester.widget<DecoratedBox>(
+      find
+          .ancestor(
+            of: find.text('Support DPIP'),
+            matching: find.byType(DecoratedBox),
+          )
+          .first,
+    );
+    final discord = tester.widget<Material>(
+      find
+          .ancestor(
+            of: find.text('Discord community'),
+            matching: find.byType(Material),
+          )
+          .first,
+    );
+    final supportDecoration = support.decoration as BoxDecoration;
+    expect(supportDecoration.color, gold.fill);
+    expect(discord.color, isNot(gold.fill));
   });
 
   testWidgets('the Meshtastic row carries a dot only while unread exists', (
@@ -223,12 +239,17 @@ void main() {
     tester,
   ) async {
     await _pump(tester, _router([]));
-    // The label the build reports — a fixed fake under test.
+    // The card leads with a number: a release names itself, a snapshot names
+    // the release it builds toward (the last one cut, reduced to major.minor).
+    final label = AppBuild.label;
+    final expected = RegExp(r'^\d+\.\d+$').hasMatch(label)
+        ? label
+        : AppBuild.lastRelease.split('.').take(2).join('.');
     expect(
       find.descendant(of: find.byType(InkWell), matching: find.text('DPIP')),
       findsWidgets,
     );
-    expect(find.text(AppBuild.label), findsOneWidget);
+    expect(find.text(expected), findsOneWidget);
     expect(find.text('Snapshot'), findsOneWidget);
   });
 
