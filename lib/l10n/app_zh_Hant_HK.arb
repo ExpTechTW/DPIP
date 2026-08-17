@@ -1923,7 +1923,7 @@
     }
   },
   "moreDumpDiagnostics": "傾印除錯資訊及日誌",
-  "moreDumpDiagnosticsHint": "上載後複製連結，附在回報裡就不用貼一整頁",
+  "moreDumpDiagnosticsHint": "上載後複製連結",
   "dumpUploaded": "已上載",
   "dumpLinkCopied": "連結已複製到剪貼簿",
   "dumpCopyAgain": "再複製一次",

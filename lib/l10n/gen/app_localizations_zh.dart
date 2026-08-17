@@ -3051,7 +3051,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
 
   @override
-  String get moreDumpDiagnosticsHint => '上傳後複製連結，附在回報裡就不用貼一整頁';
+  String get moreDumpDiagnosticsHint => '上傳後複製連結';
 
   @override
   String get dumpUploaded => '已上傳';
@@ -9173,7 +9173,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
 
   @override
-  String get moreDumpDiagnosticsHint => '上載後複製連結，附在回報裡就不用貼一整頁';
+  String get moreDumpDiagnosticsHint => '上載後複製連結';
 
   @override
   String get dumpUploaded => '已上載';
@@ -12234,7 +12234,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
 
   @override
-  String get moreDumpDiagnosticsHint => '上傳後複製連結，附在回報裡就不用貼一整頁';
+  String get moreDumpDiagnosticsHint => '上傳後複製連結';
 
   @override
   String get dumpUploaded => '已上傳';
