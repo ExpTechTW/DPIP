@@ -5,6 +5,8 @@
 /// rather than a detection.
 library;
 
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -53,6 +55,23 @@ void main() {
 
   test('the default build ships no escapes at all', () {
     // The common window — VS Code's Debug Console — prints them literally.
+    expect(Log.enableConsoleColor, isFalse);
+  });
+
+  test('iOS never emits them, flag or no flag', () {
+    // The platform's log path escapes the escape character, so even a
+    // terminal that supports ANSI receives a backslash and the sequence and
+    // prints it — flutter/flutter#20663. The flag cannot help there, so it
+    // does not apply there.
+    if (!Platform.isIOS) {
+      // The VM host is not iOS; assert the rule that produces the value
+      // rather than a value this platform cannot exercise.
+      expect(
+        Log.enableConsoleColor,
+        const bool.fromEnvironment('DPIP_LOG_COLOR'),
+      );
+      return;
+    }
     expect(Log.enableConsoleColor, isFalse);
   });
 }

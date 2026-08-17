@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/core/logging/crash_sink.dart';
 import 'package:dpip/core/logging/log_store.dart';
@@ -57,15 +58,24 @@ abstract final class Log {
   ///
   ///     flutter run --dart-define=DPIP_LOG_COLOR=true
   ///
-  /// Off by default, and a choice rather than a detection: the bytes are
-  /// written on the device and read in whatever window is attached to
-  /// `flutter run`, which the app cannot see. VS Code's **Debug Console** does
-  /// not interpret ANSI — that is where `^[[38;5;4m` came from — while its
-  /// **integrated terminal** does. Same app, same build, different window.
+  /// Off by default, opt-in, **and never on iOS**. Two different reasons, and
+  /// only one of them is about terminals:
+  ///
+  ///   * Whether an escape sequence renders is the window's business, and the
+  ///     app cannot see the window — the bytes are written on the device and
+  ///     read by whatever is attached to `flutter run`. VS Code's Debug
+  ///     Console prints them literally; its integrated terminal renders them.
+  ///     Same build, different window, so it has to be a choice.
+  ///   * On iOS it never arrives intact regardless. The platform's log path
+  ///     escapes the escape character itself, so even a terminal that does
+  ///     support ANSI receives a backslash followed by the sequence and prints
+  ///     it — flutter/flutter#20663. Turning the flag on there does nothing
+  ///     but add noise, so it does not turn on.
   ///
   /// Not a font, either: a font supplies glyphs, and an escape sequence is an
   /// instruction the terminal either acts on or prints.
-  static const bool enableConsoleColor = bool.fromEnvironment('DPIP_LOG_COLOR');
+  static final bool enableConsoleColor =
+      const bool.fromEnvironment('DPIP_LOG_COLOR') && !Platform.isIOS;
 
   /// Console output, one plain line per entry.
   ///
