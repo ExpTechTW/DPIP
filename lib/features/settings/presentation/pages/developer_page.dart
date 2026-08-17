@@ -24,6 +24,7 @@ import 'package:dpip/features/settings/presentation/widgets/storage_breakdown.da
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -135,9 +136,19 @@ class _DeveloperPageState extends State<DeveloperPage> {
       // NSURLCache keeps its own copy of responses behind the app's back.
       await const StorageScanner().clearSystemHttpCache();
       // iOS tmp is where transient native work (MapLibre tile handling,
-      // aborted snapshot writes) accumulates — nothing the app owns lives
-      // there, so it can be dropped wholesale.
-      await const StorageScanner().clearTmp();
+      // aborted snapshot writes) accumulates, so in a release build it can be
+      // dropped wholesale.
+      //
+      // Not in debug, where that is false and dangerous: `flutter run` puts
+      // the DevFS there — the live `main.dart.dill` this process is running
+      // from sits in `tmp/DPIP<random>/`. The native side wipes the whole
+      // directory, so pressing this while attached takes the kernel and the
+      // synced asset bundle with it. The dills grow back; the assets do not,
+      // because the tool decides what to resend from host state and never
+      // learns the device copy went away — a shader edit hot-reloads and then
+      // silently reverts. `tool/run.sh` sweeps the leftovers instead, from
+      // outside, where nothing is live.
+      if (kReleaseMode) await const StorageScanner().clearTmp();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'dev: clear cache');
     }

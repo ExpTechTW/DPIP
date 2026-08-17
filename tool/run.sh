@@ -23,6 +23,59 @@ set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Deletes the kernel snapshots earlier runs left inside the simulator.
+#
+# Every `flutter run` builds its DevFS root inside the app's own sandbox as
+# `tmp/DPIP<6 random>/DPIP/`, and three separate things stop it being cleaned
+# up. The VM hands the tool back the *inner* path, so even a clean `q` orphans
+# the outer directory. `cleanupAfterSignal()` never calls `_cleanupDevFS()`, so
+# Ctrl-C orphans the ~190 MB of dills inside it. And SIGHUP is not handled at
+# all, so closing the terminal window orphans everything. Nothing in the tool
+# or in Xcode ever sweeps them: this checkout had 116 directories and 6.84 GB
+# of them, the oldest 37 days old, before anyone looked.
+#
+# `DPIP` is the checkout folder's name, not the bundle id — the DevFS is named
+# `basename(projectRootPath)`. Rename the directory and this stops matching,
+# which is a sweep that quietly does nothing rather than one that deletes the
+# wrong thing.
+#
+# From the launcher and not from inside the app, because only the launcher can
+# be sure no DevFS is live. `main()` re-runs on every hot restart, by which
+# point this run's directory exists and the process has it mapped.
+sweep_leaked_devfs() {
+  local devices="$HOME/Library/Developer/CoreSimulator/Devices"
+  [[ -d $devices ]] || return 0
+
+  # A run in another terminal owns a DevFS right now. Skipping costs a sweep
+  # later; not skipping costs them a hot restart — and worse, silently reverts
+  # any asset or shader edit, because the tool decides what to resend from
+  # *host* state and never learns the device copy went away.
+  #
+  # A process check and deliberately not a timestamp: the outer directory's
+  # mtime is frozen at its birth while the dills inside it keep being
+  # rewritten, so any "older than" rule deletes the live one.
+  pgrep -qf 'flutter_tools\.snapshot run' && return 0
+  pgrep -qf '/Runner\.app/Runner' && return 0
+
+  # Every component up to the leaf is literal, and the leaf is `DPIP` plus
+  # exactly six characters directly under a container's own `tmp/` — there is
+  # no path this can reach outside a simulator's app data. `nullglob` is what
+  # keeps "nothing leaked" from handing the pattern itself to `rm`.
+  local -a leaked=()
+  shopt -s nullglob
+  leaked=("$devices"/*/data/Containers/Data/Application/*/tmp/DPIP??????)
+  shopt -u nullglob
+  ((${#leaked[@]})) || return 0
+
+  local freed
+  freed="$(du -x -s -k "${leaked[@]}" | awk '{s+=$1} END {printf "%.1f", s/1048576}')"
+  rm -rf -- "${leaked[@]}"
+  # stderr, so it survives the pipe into the colouriser as its own line.
+  printf 'run.sh: swept %d leaked DevFS dirs (%s GB)\n' "${#leaked[@]}" "$freed" >&2
+}
+
+sweep_leaked_devfs
+
 # Worth passing `-d`: piped, the tool cannot draw its interactive device picker
 # (target_devices.dart gates that on the logger's colour), so an ambiguous
 # device list falls back to a plain prompt.
