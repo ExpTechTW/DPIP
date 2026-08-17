@@ -55,13 +55,32 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
         run: |
-          # Via the environment, never interpolated into the script: a PR title
-          # is attacker-controlled text and `${{ }}` would paste it into bash.
+          # Via the environment, never through expression interpolation: a PR
+          # title is attacker-controlled text, and interpolating it would paste
+          # it straight into this shell.
+          #
+          # This comment may not name the syntax it is warning about. A `run`
+          # block is interpolated whole before bash ever sees it, so a literal
+          # empty expression here is a *workflow* syntax error — the run is
+          # refused before any job is created, which is reported as a failure
+          # with no failing step and the file path where the name should be.
+          # That is what took CI down; `#` is a shell comment, not a shield.
           {
             printf '%s\n\n' "$PR_TITLE"
             printf '%s\n' "$PR_BODY"
           } > /tmp/pr_message.txt
           bash tool/check_commits.sh --message /tmp/pr_message.txt
+
+      # The workflows themselves, because a broken one does not fail — it is
+      # *refused*. GitHub interpolates a `run` block whole before bash sees it,
+      # so an expression error anywhere in it, comment included, kills the run
+      # before a job exists: no failing step, and the file path where the name
+      # should be. Nothing in this repository could have caught that, and it
+      # took CI down on main for a day.
+      - name: Workflow gate
+        run: |
+          bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) >/dev/null
+          ./actionlint -shellcheck= .github/workflows/*.yml
 
       # Architecture gate — pure grep, no toolchain, fails fast.
       - name: Layering gate

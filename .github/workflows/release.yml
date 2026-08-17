@@ -61,6 +61,10 @@ jobs:
       - name: Ordinal must be higher than the last published one
         env:
           GH_TOKEN: ${{ github.token }}
+          # Through the environment rather than interpolated into the script:
+          # the value is ours, but a shell comparison built by string
+          # substitution is the shape that goes wrong when the value is not.
+          CODE: ${{ steps.v.outputs.code }}
         run: |
           # The REST endpoint rather than `gh release list`: that command has no
           # `body` field at all (it is only on `gh release view`), so the whole
@@ -72,9 +76,9 @@ jobs:
           # release anywhere in the list used to abort the run.
           previous="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
             --jq '[.[] | (.body // "") | capture("<!--\\s*dpip-build:\\s*(?<c>\\d+)") | .c | tonumber] | max // 0')"
-          echo "previous=$previous current=${{ steps.v.outputs.code }}"
-          if [ "${{ steps.v.outputs.code }}" -le "$previous" ]; then
-            echo "::error::build ordinal ${{ steps.v.outputs.code }} is not above the published $previous"
+          echo "previous=$previous current=$CODE"
+          if [ "$CODE" -le "$previous" ]; then
+            echo "::error::build ordinal $CODE is not above the published $previous"
             exit 1
           fi
 
