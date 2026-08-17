@@ -25,11 +25,13 @@ commit="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 label=""
 code="0"
 train=""
+date=""
 if version="$(tool/version.sh 2>/dev/null)"; then
   eval "$version"
   label="${DPIP_LABEL:-}"
   code="${DPIP_CODE:-0}"
   train="${DPIP_TRAIN:-}"
+  date="${DPIP_DATE:-}"
 fi
 
 new="$(cat <<EOF
@@ -51,6 +53,10 @@ const int kBuildCode = $code;
 /// The train number version.sh derives — '26.1'. Apple is told this and
 /// never the label; the More page version card shows it as the big number.
 const String kBuildTrain = '$train';
+
+/// The day the build was cut, 'yy-MM-dd' in Taipei time — the badge date on
+/// the More page version card. Empty when git could not answer.
+const String kBuildDate = '$date';
 EOF
 )"
 

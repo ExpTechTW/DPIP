@@ -6,6 +6,7 @@
 #   label  what a human sees            26.1        26w14a
 #   train  what Apple is told           26.1        26.1
 #   code   what both stores sort by     426000298   426000299
+#   date   the day the build was cut    26-08-17    26-08-17
 #
 # One code, not one per store. They can be aligned because the two floors do
 # not both apply at once — see FLOOR and BURNED_TRAINS below.
@@ -139,6 +140,11 @@ year_start="$(stamp %Y)-01-01T00:00:00+08:00"
 commits="$(git rev-list --count HEAD --since="$year_start")"
 code=$((SCHEME * 100000000 + 10#$year * 1000000 + commits))
 
+# The day this build was cut, `yy-MM-dd` in the same zone the label comes
+# from — so the badge date on the More page always matches the week an
+# onlooker is living in.
+date="$(stamp %y-%m-%d)"
+
 if [ -n "$exact_tag" ]; then
   # A release: the tag is the label. Apple is told a marketing version without
   # the patch — `26.2.1` advertises as `26.2` — and the hero card's big number
@@ -211,7 +217,9 @@ else
 fi
 
 if [ "${1:-}" = "--json" ]; then
-  printf '{"label":"%s","train":"%s","code":%s}\n' "$label" "$train" "$code"
+  printf '{"label":"%s","train":"%s","code":%s,"date":"%s"}\n' \
+    "$label" "$train" "$code" "$date"
 else
-  printf 'DPIP_LABEL=%s\nDPIP_TRAIN=%s\nDPIP_CODE=%s\n' "$label" "$train" "$code"
+  printf 'DPIP_LABEL=%s\nDPIP_TRAIN=%s\nDPIP_CODE=%s\nDPIP_DATE=%s\n' \
+    "$label" "$train" "$code" "$date"
 fi
