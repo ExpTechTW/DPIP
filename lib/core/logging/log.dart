@@ -41,7 +41,20 @@ abstract final class Log {
   /// into the table it came from, growing a duplicate on each visit.
   ///
   /// Writing to history is the whole intent: the screen reads history.
-  static void replay(TalkerData data) => _history.write(data);
+  ///
+  /// The normalisation below is what `_handleLogData` does on the way past,
+  /// and skipping the logger skips it too. The screen groups its filter chips
+  /// by `key` and colours a card by `key` first — so a line that arrives
+  /// without one is uncounted, uncoloured, and lands in a chip labelled
+  /// `undefined` together with every other level.
+  static void replay(TalkerData data) {
+    final key = data.key;
+    if (key != null) {
+      data.title = talker.settings.getTitleByKey(key);
+      data.pen = talker.settings.getPenByKey(key, fallbackPen: data.pen);
+    }
+    _history.write(data);
+  }
 
   /// Optional crash-reporting destination. When set (in `bootstrap`), handled
   /// and uncaught errors are forwarded here in addition to the in-app log.

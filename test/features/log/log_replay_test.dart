@@ -38,9 +38,29 @@ void main() {
     expect(replayed.generateTextMessage(), contains('a line'));
   });
 
-  test('the card is labelled with the level, not the word log', () {
-    // `TalkerData.title` defaults to the literal string `log`, so a replayed
-    // line has to be given one or every row reads `log`.
+  test('a replayed line lands in the filter chip for its level', () {
+    // The screen groups the chips and their counts by `TalkerData.key`, and
+    // colours a card by it too — not by the level and not by the title. A
+    // line without one is uncounted and grouped under `undefined`.
+    for (final level in LogLevel.values) {
+      final replayed = PersistedLog(
+        StoredLog(
+          time: DateTime.utc(2026, 8, 18),
+          level: level.name,
+          message: 'a line',
+        ),
+      );
+      expect(
+        replayed.key,
+        TalkerKey.fromLogLevel(level),
+        reason: 'level ${level.name}',
+      );
+    }
+  });
+
+  test('replaying fills in the title and pen the logger would have', () {
+    // `Log.replay` skips `_handleLogData`, which is where a live line gets
+    // these from its key.
     final replayed = PersistedLog(
       StoredLog(
         time: DateTime.utc(2026, 8, 18),
@@ -48,9 +68,12 @@ void main() {
         message: 'a line',
       ),
     );
-    expect(replayed.title, 'warning');
-    expect(replayed.generateTextMessage(), contains('warning'));
-    expect(replayed.generateTextMessage(), isNot(contains('[log]')));
+    Log.replay(replayed);
+    expect(
+      replayed.title,
+      Log.talker.settings.getTitleByKey(TalkerKey.warning),
+    );
+    expect(replayed.title, isNot('log'));
   });
 
   test('a stored error is carried with its message', () {

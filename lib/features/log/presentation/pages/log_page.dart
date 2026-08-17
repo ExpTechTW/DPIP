@@ -97,9 +97,9 @@ class _LogPageState extends State<LogPage> {
 ///
 /// Its level is carried across, not invented. Talker colours a card and the
 /// level filter narrows by `logLevel`, so a replayed line that arrives without
-/// one is uncoloured and unfilterable. The card's heading is `title`, which
-/// defaults to the literal string `log`, so both have to be given or a
-/// replayed line arrives grey, unfilterable, and labelled `log`.
+/// one is uncoloured, uncounted, and grouped under `undefined` with every
+/// other level — the screen keys its filter chips and its card colours on
+/// `TalkerData.key`, not on the level or the title.
 class PersistedLog extends TalkerLog {
   PersistedLog(StoredLog entry) : this._(entry, _level(entry.level));
 
@@ -109,7 +109,10 @@ class PersistedLog extends TalkerLog {
             ? entry.message
             : '${entry.message}\n${entry.error}',
         time: entry.time,
-        title: level.name,
+        // The screen counts its filter chips by `key` and colours a card by
+        // it, so a replayed line needs the same one a live line of that level
+        // would have had. `Log.replay` fills in the title and pen from it.
+        key: TalkerKey.fromLogLevel(level),
         logLevel: level,
         stackTrace: null,
       );
