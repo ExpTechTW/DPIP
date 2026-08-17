@@ -38,13 +38,35 @@ DPIP（Disaster Prevention Information Platform）是臺灣本土團隊開發的
 
 ## 資料來源
 
-| | |
-|---|---|
-| 強震即時警報 | [交通部中央氣象署](https://www.cwa.gov.tw/)（CWA）、[日本氣象廳](https://www.jma.go.jp/)（JMA）等 |
-| 天氣與災害示警 | [交通部中央氣象署](https://www.cwa.gov.tw/)、[國家災害防救科技中心](https://www.ncdr.nat.gov.tw/) |
-| 即時震度 | TREM-Net，由 [ExpTech Studio](https://exptech.dev/) 建置與維運 |
+### 地震
 
-TREM-Net 自 2022 年 6 月起在全臺部署，由兩個子系統組成：**SE-Net**（強震觀測網，加速度儀）與 **MS-Net**（微震觀測網，速度儀），共同記錄地震發生時的完整波形。
+| 資料 | 來源 |
+|---|---|
+| 強震即時警報 | [交通部中央氣象署](https://www.cwa.gov.tw/)（CWA） |
+| 緊急地震速報（可選） | [日本氣象廳](https://www.jma.go.jp/)（JMA、気象庁） |
+| 地震報告 | 交通部中央氣象署 |
+| 即時震度 | TREM-Net |
+
+### 氣象
+
+| 資料 | 來源 |
+|---|---|
+| 天氣、雨量、閃電 | 交通部中央氣象署 |
+| 颱風路徑、暴風圈、警報 | 交通部中央氣象署 |
+| 雷達回波 | 交通部中央氣象署 |
+| 未來一小時降水（QPESUMS） | 交通部中央氣象署 |
+| 衛星雲圖 | [日本氣象廳](https://www.jma.go.jp/)向日葵 8／9 號（Himawari），16 個觀測波段 |
+
+### 防災
+
+| 資料 | 來源 |
+|---|---|
+| 各類災害示警 | [國家災害防救科技中心](https://www.ncdr.nat.gov.tw/)（NCDR） |
+| 避難收容處所、AED、公廁 | 政府開放資料 |
+
+### 關於 TREM-Net
+
+TREM-Net 由 [ExpTech Studio](https://exptech.dev/) 建置與維運，自 2022 年 6 月起在全臺部署，由兩個子系統組成：**SE-Net**（強震觀測網，加速度儀）與 **MS-Net**（微震觀測網，速度儀），共同記錄地震發生時的完整波形。
 
 ## 下載
 
