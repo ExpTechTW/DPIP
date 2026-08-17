@@ -111,4 +111,35 @@ void main() {
     expect(Log.talker.history.length, before + 1);
     expect(streamed, 0, reason: 'nothing may write it back or print it');
   });
+
+  group('replay never costs the running session', () {
+    setUp(Log.talker.cleanHistory);
+
+    PersistedLog stored(String message, DateTime at) =>
+        PersistedLog(StoredLog(time: at, level: 'info', message: message));
+
+    test('a live line survives a full replay', () {
+      // The stored log is on disk and can be read again; the running session
+      // cannot. Evicting it to make room for history is backwards.
+      Log.talker.info('DPIP starting up');
+      for (var i = 0; i < Log.historyLimit + 50; i++) {
+        Log.replay(stored('old \$i', DateTime.utc(2026, 8, 17, 0, 0, i)));
+      }
+      final messages = Log.talker.history.map((e) => e.message).toList();
+      expect(messages, contains('DPIP starting up'));
+      expect(Log.talker.history.length, lessThanOrEqualTo(Log.historyLimit));
+    });
+
+    test('replayed lines read oldest first, in front of the live ones', () {
+      Log.talker.info('live');
+      // Newest first, as the query returns them.
+      Log.replay(stored('newer', DateTime.utc(2026, 8, 17, 2)));
+      Log.replay(stored('older', DateTime.utc(2026, 8, 17, 1)));
+      expect(Log.talker.history.map((e) => e.message).toList(), [
+        'older',
+        'newer',
+        'live',
+      ]);
+    });
+  });
 }

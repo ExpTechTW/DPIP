@@ -53,7 +53,7 @@ abstract final class Log {
       data.title = talker.settings.getTitleByKey(key);
       data.pen = talker.settings.getPenByKey(key, fallbackPen: data.pen);
     }
-    _history.write(data);
+    _history.replay(data);
   }
 
   /// Optional crash-reporting destination. When set (in `bootstrap`), handled
@@ -225,33 +225,55 @@ abstract final class Log {
   }
 }
 
-/// Talker's history, with the stored log tied to it.
+/// Talker's history, with the stored log tied to it and replay kept in its
+/// place.
 ///
-/// The screen's clear button calls `talker.cleanHistory()`, which empties the
-/// in-memory list and nothing else — so the log came straight back on the next
-/// visit, replayed out of the table it was never removed from. Clearing that
-/// looked broken because it was: the one thing a user presses it for is the
-/// one thing it did not do.
+/// Two things the default could not do.
 ///
-/// [clean] is synchronous and the delete is not, so the write is started and
-/// not waited on. Nothing reads the table between the two, and a failure there
-/// is already swallowed by [LogStore.clear] — reporting a logging failure
-/// through the logger is how a write loop starts.
+/// **Clearing.** The screen's clear button calls `talker.cleanHistory()`, which
+/// empties the in-memory list and nothing else — so the log came straight back
+/// on the next visit, replayed out of the table it was never removed from.
+///
+/// **Replay.** The default appends and evicts from the front, so replaying a
+/// day of stored lines pushed the *live* session out — `DPIP starting up`
+/// among them — and left the older lines sitting where the newer ones should
+/// be. That is backwards twice over: the stored log is on disk and can be read
+/// again, the running session cannot, and lines older than everything in
+/// memory belong in front of it. Replay therefore inserts at the front and
+/// only into free space.
 class _PersistedHistory implements TalkerHistory {
-  _PersistedHistory(TalkerSettings settings)
-    : _inMemory = DefaultTalkerHistory(settings);
+  _PersistedHistory(this._settings);
 
-  final DefaultTalkerHistory _inMemory;
+  final TalkerSettings _settings;
+  final _entries = <TalkerData>[];
+
+  bool get _writable => _settings.useHistory && _settings.enabled;
 
   @override
-  List<TalkerData> get history => _inMemory.history;
+  List<TalkerData> get history => _entries;
 
   @override
-  void write(TalkerData data) => _inMemory.write(data);
+  void write(TalkerData data) {
+    if (!_writable) return;
+    if (_entries.length >= _settings.maxHistoryItems) _entries.removeAt(0);
+    _entries.add(data);
+  }
+
+  /// A line read back off disk: older than everything here, and never worth
+  /// evicting something that is not.
+  void replay(TalkerData data) {
+    if (!_writable) return;
+    if (_entries.length >= _settings.maxHistoryItems) return;
+    _entries.insert(0, data);
+  }
 
   @override
   void clean() {
-    _inMemory.clean();
+    _entries.clear();
+    // Synchronous, and the delete is not, so the write is started and not
+    // waited on. Nothing reads the table in between, and a failure there is
+    // already swallowed — reporting a logging failure through the logger is
+    // how a write loop starts.
     unawaited(Log.store?.clear() ?? Future<void>.value());
   }
 }

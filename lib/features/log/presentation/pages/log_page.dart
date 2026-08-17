@@ -51,7 +51,9 @@ class _LogPageState extends State<LogPage> {
     // No more than the history can hold: reading further only evicts the lines
     // read just before it.
     final stored = await store.recent(limit: Log.historyLimit);
-    for (final entry in stored.reversed) {
+    // Newest first, as the query returns them: each is inserted at the front,
+    // so the oldest ends up furthest forward and the run reads in order.
+    for (final entry in stored) {
       if (oldestInMemory != null && !entry.time.isBefore(oldestInMemory)) {
         continue;
       }
