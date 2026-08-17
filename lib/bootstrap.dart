@@ -104,26 +104,46 @@ Stream<LicenseEntry> _weatherIconLicense() async* {
   );
 }
 
-/// Set by `tool/run.sh`, which is how the app is meant to be started.
+/// Set by `tool/run.sh` and `tool/run.ps1`, which is how the app is started.
 const bool _launchedByTool = bool.fromEnvironment('DPIP_RUN_SH');
 
-/// Says so when it was not.
+/// Refuses to start when it was not, and says what to run instead.
 ///
-/// Debug only, and a warning rather than a refusal — a disaster app that will
-/// not start is worse than one started the wrong way.
+/// Debug only — a release build is produced by `flutter build` in CI, which
+/// never sets this and must never be blocked by it.
 ///
-/// It is worth saying at all because both failures are silent. A bare
-/// `flutter run` uses whatever Flutter the shell's PATH resolved, which
-/// `mise activate` caches and does not refresh when mise.toml changes — so the
-/// app builds against a different SDK than CI with no sign of it. And the log
-/// arrives uncoloured, because colour is added by the pipe rather than by the
-/// app (see tool/colorize_logs.sh for why it cannot be added here).
-void _warnIfNotLaunchedByTool() {
+/// A refusal rather than a warning, because both alternatives are wrong
+/// *invisibly*. A bare `flutter run` resolves whatever SDK the shell's PATH
+/// cached, and `mise activate` does not refresh that when mise.toml changes —
+/// so the app builds against a different SDK than CI with nothing to show for
+/// it. `mise exec -- flutter run` fixes the SDK and still leaves the log
+/// unreadable, because colour has to be added by the pipe (see
+/// tool/colorize_logs.sh). A warning written into a log nobody can read yet is
+/// not much of a warning.
+///
+/// The instructions name every shell: this runs on the *device*, so it cannot
+/// see which machine launched it.
+void _refuseUnlessLaunchedByTool() {
   if (!kDebugMode || _launchedByTool) return;
-  Log.warning(
-    'started outside tool/run.sh — this build may be on a different Flutter '
-    'than CI, and the log will not be coloured. Use: tool/run.sh -d <device>',
-  );
+  const message =
+      'DPIP must be started through its run script.\n'
+      '\n'
+      '  macOS / Linux    tool/run.sh -d <device>\n'
+      '  Windows          tool\\run.ps1 -d <device>\n'
+      '                   (or, for a coloured log, Git Bash / WSL:\n'
+      '                    bash tool/run.sh -d <device>)\n'
+      '\n'
+      '`flutter run` and `mise exec -- flutter run` both start it, and both\n'
+      "are wrong in ways nothing tells you about: the first builds against\n"
+      "whatever SDK your shell's PATH cached rather than the one mise.toml\n"
+      'pins, and neither colours the log — that is added by the pipe the\n'
+      'script provides, not by the app.\n'
+      '\n'
+      'See AGENTS.md -> Running.';
+  // Through `Log` like everything else — it reaches the console as one plain
+  // line per entry, which is exactly the output being asked for here.
+  Log.error(message);
+  exit(1);
 }
 
 Future<void> bootstrap() async {
@@ -131,7 +151,7 @@ Future<void> bootstrap() async {
 
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
-  _warnIfNotLaunchedByTool();
+  _refuseUnlessLaunchedByTool();
 
   // The bundled weather glyphs are Material Symbols (Apache-2.0). Registering
   // the licence puts it in the app's own 開放原始碼授權 page (More → licences),

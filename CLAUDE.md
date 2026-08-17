@@ -34,9 +34,11 @@ gate or the analyzer will tell you.
   a toolchain bump leaves the old SDK on PATH until the session is replaced —
   and a build against the wrong SDK announces nothing.
   → [AGENTS.md § Toolchain](AGENTS.md#toolchain)
-- **Start the app with `tool/run.sh`**, never `flutter run` directly. Both run;
-  the difference is the SDK it resolves and whether the log is readable, and
-  neither is visible at the time. → [AGENTS.md § Running](AGENTS.md#running)
+- **Start the app with `tool/run.sh`** (`tool\run.ps1` on Windows), never
+  `flutter run` directly. A debug build refuses to start otherwise — both
+  alternatives run, and the difference is the SDK resolved and whether the log
+  is readable, neither of which is visible at the time.
+  → [AGENTS.md § Running](AGENTS.md#running)
 - **No `Co-Authored-By`, no tool attribution, ever.**
   → [AGENTS.md § Commits](AGENTS.md#commits)
 

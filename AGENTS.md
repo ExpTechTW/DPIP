@@ -38,9 +38,16 @@ mise exec -- flutter analyze
 tool/run.sh -d "iPhone 17 Pro"
 ```
 
+On Windows, `tool\run.ps1 -d "Pixel 9"` — or `bash tool/run.sh` under Git Bash
+or WSL, which is the one that colours the log. `run.ps1` deliberately does not
+pipe: `$LASTEXITCODE` is unreliable when a native command feeds a cmdlet
+(PowerShell/PowerShell#19848), and a wrapper that reports a failed build as a
+success is worse than an uncoloured one.
+
 **This is the only supported way to start the app.** Not `flutter run`, and not
-`mise exec -- flutter run` — both work, and both are wrong in ways nothing
-tells you about, so a debug build started any other way says so in its log.
+`mise exec -- flutter run` — both start it, and both are wrong in ways nothing
+tells you about, so **a debug build started any other way refuses to run** and
+prints the command to use instead.
 
 Arguments pass through untouched, and hot reload still works: the tool reads
 `supportsColor` from stdout and its keystrokes from stdin, and a pipe only

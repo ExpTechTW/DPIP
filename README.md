@@ -94,7 +94,7 @@ DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/proj
 
 ## 參與開發
 
-工具鏈由 [mise](https://mise.jdx.dev/) 釘選版本，跑起來只要四步：
+工具鏈由 [mise](https://mise.jdx.dev/) 釘選版本：
 
 ```bash
 git clone https://github.com/ExpTechTW/DPIP.git
@@ -102,8 +102,16 @@ cd DPIP
 mise install                       # 安裝 mise.toml 釘選的 Flutter
 bash tool/setup.sh                 # 一次性設定：git hooks、產生建置資訊
 mise exec -- flutter pub get
-mise exec -- flutter run
 ```
+
+啟動：
+
+| 系統 | 指令 |
+|---|---|
+| macOS、Linux | `tool/run.sh -d <裝置>` |
+| Windows | `tool\run.ps1 -d <裝置>`（或用 Git Bash／WSL 跑 `bash tool/run.sh`，日誌會上色） |
+
+**一定要用這個腳本，不要直接 `flutter run`。** debug 版本偵測到不是這樣啟動會拒絕執行並印出正確指令 —— 直接跑起來的話，用到的是你 shell 快取的那個 Flutter 而不是 `mise.toml` 釘選的那個，而且當下不會有任何徵兆。
 
 建置成安裝檔：
 
