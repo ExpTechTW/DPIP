@@ -114,14 +114,28 @@ commit_ts="$(commit_epoch HEAD)"
 
 # Two-digit year and ISO week of the commit, so a build is named after when it
 # was made rather than when it was published.
-year="$(date -u -r "$commit_ts" +%y 2>/dev/null || date -u -d "@$commit_ts" +%y)"
-week="$(date -u -r "$commit_ts" +%V 2>/dev/null || date -u -d "@$commit_ts" +%V)"
+#
+# **Asia/Taipei, not UTC.** A week here is the week the people who read the
+# label are living in, and they are eight hours ahead: computed in UTC, every
+# Monday between 00:00 and 08:00 Taipei falls in the *previous* ISO week. That
+# is not theoretical — `26w33e` was built at 07:47 on Monday 2026-08-17, which
+# is week 34 in Taipei and week 33 in UTC, and it shipped as `26w33e` while the
+# build an hour later became `26w34a`. Two consecutive snapshots, a week apart
+# by name. The rest of the app already reads dates this way (report days are
+# `Asia/Taipei 當日` — see api.md).
+readonly TZONE='Asia/Taipei'
+stamp() { # <format>
+  TZ="$TZONE" date -r "$commit_ts" "+$1" 2>/dev/null ||
+    TZ="$TZONE" date -d "@$commit_ts" "+$1"
+}
+year="$(stamp %y)"
+week="$(stamp %V)"
 # %V has a leading zero; the label does not want one.
 week=$((10#$week))
 
 # Commits since this year began, on the same clock the year came from. Needs
 # the full history — a shallow clone counts only what it fetched.
-year_start="$(date -u -r "$commit_ts" +%Y 2>/dev/null || date -u -d "@$commit_ts" +%Y)-01-01T00:00:00Z"
+year_start="$(stamp %Y)-01-01T00:00:00+08:00"
 commits="$(git rev-list --count HEAD --since="$year_start")"
 code=$((SCHEME * 100000000 + 10#$year * 1000000 + commits))
 

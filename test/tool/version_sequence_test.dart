@@ -55,6 +55,25 @@ void main() {
 
   tearDown(() => repo.deleteSync(recursive: true));
 
+  test('a week begins when it begins in Taipei, not in UTC', () {
+    // 26w33e was built at 07:47 on Monday 2026-08-17 — week 34 for everyone
+    // who reads the label, week 33 in UTC. It shipped as `26w33e`, and the
+    // build an hour later became `26w34a`: two consecutive snapshots a week
+    // apart by name. Every Monday has an eight-hour window that does this.
+    commit('2026-08-17T01:06:24Z'); // 09:06 Monday, Taipei — week 34 both ways
+    expect(version()['label'], '26w34a');
+
+    commit('2026-08-16T23:47:23Z'); // 07:47 Monday, Taipei — week 34, UTC 33
+    expect(
+      version()['label'],
+      startsWith('26w34'),
+      reason: 'a Monday-morning build belongs to the week Taipei is in',
+    );
+
+    commit('2026-08-16T15:00:00Z'); // 23:00 Sunday, Taipei — still week 33
+    expect(version()['label'], startsWith('26w33'));
+  });
+
   test('a snapshot is named for its week, and lettered in order', () {
     expect(version()['label'], '26w33a');
     git(['tag', '26w33a']);
