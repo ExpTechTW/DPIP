@@ -1,5 +1,6 @@
 import 'dart:ui' show ImageFilter;
 
+import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/home_area.dart';
@@ -16,6 +17,7 @@ import 'package:dpip/features/home/presentation/widgets/home_map_backdrop.dart';
 import 'package:dpip/features/home/presentation/widgets/home_monitor_banner.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -277,7 +279,10 @@ class _HomePageState extends State<HomePage> {
               // the bar itself stays feature-agnostic). Both dials sit at 0 for
               // most of the sheet's travel (they only move in its top ~15%), so
               // this selects the pair rather than rebuilding the badge carousel
-              // on every tick of the drag.
+              // on every tick of the drag. The gold support strip sits in the
+              // same overlay tree, flush under the bar — one shared
+              // listenable/selector, so the pair rebuilds as one subtree and
+              // never fights over the semantics tree mid-frame.
               Positioned(
                 top: 0,
                 left: 0,
@@ -297,24 +302,104 @@ class _HomePageState extends State<HomePage> {
                           blend: HomeChrome.regionBlend(sheetExtent.value),
                           dismiss: HomeChrome.regionDismiss(sheetExtent.value),
                         ),
-                        builder: (context, dials, _) => Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RegionBar(
-                              blend: dials.blend,
-                              dismiss: dials.dismiss,
-                              skyIsLight: skyIsLightFrom(sky, weatherMode),
-                            ),
-                            // Quick link to 強震監視器 — same dials as the
-                            // region bar above it, so the two move as one
-                            // piece of chrome as the sheet rises.
-                            HomeMonitorBanner(dismiss: dials.dismiss),
-                          ],
+                        builder: (context, dials, _) => SafeArea(
+                          bottom: false,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RegionBar(
+                                blend: dials.blend,
+                                dismiss: dials.dismiss,
+                                skyIsLight: skyIsLightFrom(sky, weatherMode),
+                              ),
+                              // Quick link to 強震監視器 — same dials as the
+                              // region bar above it, so the two move as one
+                              // piece of chrome as the sheet rises.
+                              //
+                              // Above the support pill on purpose: this one
+                              // only renders while an alert is active, and an
+                              // alert must not be pushed down the screen by a
+                              // donation prompt. When nothing is happening it
+                              // draws nothing, so the pill sits directly under
+                              // the bar anyway.
+                              HomeMonitorBanner(dismiss: dials.dismiss),
+                              _GoldSupportBar(
+                                blend: dials.blend,
+                                dismiss: dials.dismiss,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The gold support ask on Home, floating below the region bar.
+///
+/// Same tap-to-sponsor intent as the More tab's support card, but in miniature
+/// and on the page the user opens the app into. It rides the region bar's own
+/// dials so it fades and slides away with the chrome as the sheet climbs — a
+/// money ask that behaves like the rest of the bar, not an ad that refuses to
+/// leave. Rendered as a floating pill over the map, not another stacked bar.
+class _GoldSupportBar extends StatelessWidget {
+  const _GoldSupportBar({required this.blend, required this.dismiss});
+
+  final double blend;
+  final double dismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final gold = AppGold.of(context);
+    final hidden = (blend + dismiss).clamp(0.0, 1.0);
+    return IgnorePointer(
+      ignoring: hidden > 0.9,
+      child: Opacity(
+        opacity: 1 - hidden,
+        child: FractionalTranslation(
+          translation: Offset(0, -6 * dismiss),
+          child: Material(
+            color: gold.badge,
+            borderRadius: BorderRadius.zero,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () => context.pushNamed(AppRoutes.sponsor),
+              child: SizedBox(
+                height: 30,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        l10n.sponsorTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: gold.onBadge,
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 16,
+                      color: gold.onBadge.withValues(alpha: 0.85),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
