@@ -126,34 +126,75 @@ platform_tag() {
   esac
 }
 
-# Who to credit. The GitHub login where it can be resolved, so the note
-# @-mentions a real account; the commit author's display name otherwise, which
-# is all an offline laptop can know — and which mentions nobody, because a
-# display name is not a handle.
-author_of() {
-  local login="" repo="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
-  # Only for regenerating release-example.md / pre-release-example.md: those
-  # are built from a throwaway repository whose commits do not exist on GitHub,
-  # so the lookup below cannot resolve them and would fall back to a display
-  # name. Resolving by email instead is not an option — GitHub returns nothing
-  # for a private address, and searching by name finds `whes1015` *and*
-  # `whes101592`, so a guess can credit the wrong person. CI never sets this.
-  if [ -n "${DPIP_NOTE_AUTHOR:-}" ]; then
-    printf '%s' "$DPIP_NOTE_AUTHOR"
+# Who to credit.
+#
+# **Not the commit author.** GitHub squashes a pull request into one commit and
+# sets its author to whoever pressed the button, demoting everyone who actually
+# wrote it to a `Co-authored-by:` trailer. `41a3c1e8 Fix eew (#534)` is authored
+# by the maintainer who merged it and was written, every commit of it, by
+# someone else — so the note credited the wrong person, which is worse than
+# crediting nobody.
+#
+# So: when a summary carries a pull request number, the authors are the authors
+# of *that pull request's commits*. `Co-authored-by:` trailers are merged in
+# too, because a merge without a number still records them. The commit's own
+# author is the fallback, and the display name after that — all a laptop with
+# no network can know.
+readonly REPO_API='https://api.github.com/repos'
+
+# One field out of a JSON document. python3 because the shape is nested and
+# `sed` cannot see structure — it reads the first `"login"` on a line and calls
+# it the answer, which is right until the day it is not.
+api_json() { # <path> <python expression over `d`>
+  curl -sS --max-time 15 \
+    -H 'Accept: application/vnd.github+json' \
+    ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} \
+    "$REPO_API/${GITHUB_REPOSITORY:-ExpTechTW/DPIP}/$1" 2>/dev/null |
+    python3 -c "
+import json,sys
+try: d = json.load(sys.stdin)
+except Exception: raise SystemExit
+$2" 2>/dev/null || true
+}
+
+authors_of() {
+  local sha="$1" logins="" pr
+  pr="$(git log -1 --format=%s "$sha" | sed -n 's/.*(#\([0-9]*\))$/\1/p')"
+
+  # The pull request's own commits: the only place the real authors survive a
+  # squash intact.
+  if [ -n "$pr" ]; then
+    logins="$(api_json "pulls/$pr/commits" \
+      "print(' '.join(dict.fromkeys(c['author']['login'] for c in d if c.get('author'))))")"
+  fi
+
+  # Trailers, which a squash writes and a local clone can read with no network.
+  local trailer
+  trailer="$(git log -1 --format=%b "$sha" |
+    sed -n 's/^[Cc]o-authored-by: *\(.*\) <\(.*\)>.*/\2|\1/p')"
+  while IFS='|' read -r email name; do
+    [ -n "$name" ] || continue
+    # `1234+login@users.noreply.github.com` carries the login; a real address
+    # does not, and GitHub will not resolve one — so the name is used as given.
+    case "$email" in
+    *+*@users.noreply.github.com) logins="$logins ${email#*+}" ;;
+    *) logins="$logins $name" ;;
+    esac
+  done <<EOF
+$trailer
+EOF
+  logins="$(printf '%s' "${logins% }" | tr ' ' '\n' | sed 's/@users.noreply.github.com//' |
+    grep -v '^$' | awk '!seen[$0]++' | tr '\n' ' ')"
+
+  if [ -z "${logins// /}" ]; then
+    logins="$(api_json "commits/$sha" "print(d['author']['login'] if d.get('author') else '')")"
+  fi
+  if [ -z "${logins// /}" ]; then
+    printf '%s' "$(git log -1 --format=%an "$sha")"
     return
   fi
-  if command -v gh >/dev/null 2>&1; then
-    login="$(gh api "repos/$repo/commits/$1" \
-      --jq '.author.login // empty' 2>/dev/null || true)"
-  fi
-  if [ -z "$login" ] && command -v curl >/dev/null 2>&1; then
-    login="$(curl -sS --max-time 10 \
-      -H 'Accept: application/vnd.github+json' \
-      ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} \
-      "https://api.github.com/repos/$repo/commits/$1" 2>/dev/null |
-      sed -n 's/.*"login": *"\([^"]*\)".*/\1/p' | head -n 1 || true)"
-  fi
-  if [ -n "$login" ]; then printf '@%s' "$login"; else git log -1 --format=%an "$1"; fi
+  # `@a, @b` — every name that wrote it, in the order the pull request had them.
+  printf '%s' "$(printf '%s' "${logins% }" | sed 's/[^ ][^ ]*/@&/g; s/ /, /g')"
 }
 
 # The snapshot a change first shipped in — the nearest snapshot tag at or after
@@ -179,6 +220,8 @@ trap 'rm -rf "$work"' EXIT
 # The whole format, in one expression:  Category(locale): text
 readonly LINE_RE='^(New|Optimization|Fix)\(([A-Za-z]{2,3}(-[A-Za-z0-9]+)*)\):[[:space:]]*(.+)$'
 
+readonly repo_slug="${GITHUB_REPOSITORY:-ExpTechTW/DPIP}"
+
 locales=""
 for sha in $(git rev-list --no-merges --reverse "$range" 2>/dev/null); do
   # Read the body once. A commit with no changelog line contributes nothing and
@@ -187,7 +230,8 @@ for sha in $(git rev-list --no-merges --reverse "$range" 2>/dev/null); do
   printf '%s\n' "$body" | grep -Eq "$LINE_RE" || continue
 
   tag="$(platform_tag "$sha")"
-  who="$(author_of "$sha")"
+  who="$(authors_of "$sha")"
+  short="$(git log -1 --format=%h "$sha")"
   snapshot="$(first_seen_in "$sha")"
 
   while IFS= read -r line; do
@@ -198,8 +242,13 @@ for sha in $(git rev-list --no-merges --reverse "$range" 2>/dev/null); do
     # The pre-release an entry first shipped in, on the end of its own line. A
     # tester running snapshots reads it to see what they already have; an entry
     # with no marker is new in this release and nobody has seen it yet.
-    printf -- '- %s%s — %s%s\n' \
-      "$tag" "$text" "$who" "${snapshot:+ · \`$snapshot\`}" \
+    # The commit is linked from every entry: an entry says what changed, and
+    # the link is the only way to ask *how* without going looking for it. For a
+    # squashed pull request GitHub redirects that commit to the request, so one
+    # link answers both.
+    printf -- '- %s%s — %s ([`%s`](https://github.com/%s/commit/%s))%s\n' \
+      "$tag" "$text" "$who" "$short" "$repo_slug" "$sha" \
+      "${snapshot:+ · \`$snapshot\`}" \
       >>"$work/$category.$locale"
     case " $locales " in
     *" $locale "*) ;;

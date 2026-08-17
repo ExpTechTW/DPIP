@@ -98,11 +98,21 @@ check_one() { # <subject> <body> <label>
   # 2. Nothing that credits a tool. A commit is authored by a person; an agent
   #    that adds itself to the record makes the history lie about who is
   #    accountable for the change.
-  if printf '%s' "$body" | grep -Eqi '^(Co-Authored-By|Signed-off-by: .*(claude|copilot|cursor|gpt))'; then
-    note "no Co-Authored-By trailer"
+  # A tool crediting itself, not a person crediting a person. GitHub writes
+  # `Co-authored-by:` itself when it squashes a pull request whose commits have
+  # more than one author — and that trailer is the *only* remaining record of
+  # who wrote it, because the squash sets the author to whoever pressed merge.
+  # Banning the trailer outright therefore destroyed exactly the attribution it
+  # was meant to protect.
+  if printf '%s' "$body" |
+    grep -Eqi '^(Co-authored-by|Signed-off-by):.*(claude|copilot|cursor|gpt|codex|gemini|\[bot\]|noreply@anthropic|openai)'; then
+    note "no tool in a Co-authored-by / Signed-off-by trailer"
     bad=1
   fi
-  if printf '%s' "$body" | grep -Eqi 'generated with|🤖|co-?authored|claude\.com|openai\.com'; then
+  # `co-authored` is deliberately absent here: the rule above judges that
+  # trailer by *who* it credits, and repeating it as a bare keyword would take
+  # the decision back.
+  if printf '%s' "$body" | grep -Eqi 'generated with|🤖|claude\.com|openai\.com'; then
     note "no tool attribution in the message"
     bad=1
   fi

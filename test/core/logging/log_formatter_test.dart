@@ -34,17 +34,17 @@ void main() {
   tearDown(() => ansiColorDisabled = true);
 
   test('colour off: the line is exactly the message', () {
-    final out = format('[WARN] | 12:00 | hi', colour: false);
-    expect(out, '[WARN] | 12:00 | hi');
+    final out = format('[WARN] | 12:00:00 5ms | hi', colour: false);
+    expect(out, '[12:00:00][WARN]    : hi');
     expect(out.codeUnits, isNot(contains(_esc)));
   });
 
   test('colour on: only the tag is painted', () {
-    final out = format('[WARN] | 12:00 | hi', colour: true);
+    final out = format('[WARN] | 12:00:00 5ms | hi', colour: true);
     expect(out.codeUnits, contains(_esc), reason: 'the tag is coloured');
     // A fully coloured line is harder to read than a plain one, and a leak
     // into a window that cannot render it then costs one token, not the line.
-    final afterTag = out.substring(out.indexOf('|'));
+    final afterTag = out.substring(out.indexOf(': '));
     expect(afterTag.codeUnits, isNot(contains(_esc)));
     expect(out, contains('hi'));
   });

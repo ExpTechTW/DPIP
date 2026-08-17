@@ -352,17 +352,55 @@ class _PersistedHistory implements TalkerHistory {
 /// read than a plain one, and the tag is the part being scanned for; it is
 /// also short, so a leak into a window that cannot render it costs one token
 /// rather than the whole line.
+/// The widest tag DPIP writes, so every colon lands in the same column and the
+/// messages read as one.
+const int _tagWidth = 10; // `[CRITICAL]`
+
+/// One log line, in the shape both the console and the dump use.
+///
+///     [5:32:38][INFO]    : Firebase initialized
+///     [5:32:39][DEBUG]   : [rts] SSE served by {"location":"lb-tpe1"}
+///
+/// One shape for both, so a line pasted out of a terminal and a line pasted
+/// out of an uploaded dump are the same line — nobody has to learn two.
+String logLine({
+  required String tag,
+  required DateTime time,
+  required String message,
+}) {
+  final clock =
+      '${time.hour}:${time.minute.toString().padLeft(2, '0')}'
+      ':${time.second.toString().padLeft(2, '0')}';
+  return '[$clock]${'[$tag]'.padRight(_tagWidth)}: $message';
+}
+
+/// Rewrites Talker's own line into [logLine]'s shape, and colours the tag.
+///
+/// Talker hands a formatter the finished string rather than the entry, and its
+/// shape is fixed: `[TITLE] | TIME | message`. Rebuilding from that is a parse,
+/// which is why the pattern is pinned by a test — if Talker ever changes the
+/// layout, the test says so instead of the terminal.
 class TagFormatter implements LoggerFormatter {
   const TagFormatter();
 
+  /// `[INFO] | 5:32:38 655ms | message`
+  static final RegExp _talkerLine = RegExp(
+    r'^\[([^\]]+)\] \| (\d{1,2}):(\d{2}):(\d{2})[^|]*\| ',
+  );
+
   @override
   String fmt(LogDetails details, TalkerLoggerSettings settings) {
-    final message = details.message?.toString() ?? '';
-    if (!settings.enableColors) return message;
-    // `[WARN] | 4:23:50 79ms | …` — the tag is everything to the first `]`.
-    final end = message.indexOf(']');
-    if (end < 0) return message;
-    return details.pen.write(message.substring(0, end + 1)) +
-        message.substring(end + 1);
+    final raw = details.message?.toString() ?? '';
+    final match = _talkerLine.firstMatch(raw);
+    if (match == null) return raw;
+
+    final tag = match.group(1)!;
+    final clock = '${match.group(2)}:${match.group(3)}:${match.group(4)}';
+    final message = raw.substring(match.end);
+    final head = '[$clock]${'[$tag]'.padRight(_tagWidth)}';
+    if (!settings.enableColors) return '$head: $message';
+    // Only the tag is painted — see [Log.enableConsoleColor].
+    return '[$clock]${details.pen.write('[$tag]'.padRight(_tagWidth))}'
+        ': $message';
   }
 }

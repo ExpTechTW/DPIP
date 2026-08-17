@@ -44,12 +44,18 @@ fi
 
 # `flutter: ` prefixes every line the device prints; dropping it gives back a
 # terminal's worth of width, and nothing distinguishes those lines but it.
+# The tag no longer starts the line — a line is `[5:32:38][WARN]    : message`,
+# so each pattern has to carry the timestamp in front of it. That change broke
+# the colouring silently: every substitution simply stopped matching, and a
+# filter that matches nothing looks exactly like a filter that is working on
+# plain input.
+readonly CLOCK='^(\[[0-9]{1,2}:[0-9]{2}:[0-9]{2}\])'
+
 sed -E \
   -e "s/^flutter: ?//" \
-  -e "s/^\[CRITICAL\]/${MAGENTA}[CRITICAL]${RESET}/" \
-  -e "s/^\[ERROR\]/${RED}[ERROR]${RESET}/" \
-  -e "s/^\[WARN\]/${YELLOW}[WARN]${RESET}/" \
-  -e "s/^\[INFO\]/${BLUE}[INFO]${RESET}/" \
-  -e "s/^\[DEBUG\]/${GREY}[DEBUG]${RESET}/" \
-  -e "s/^\[VERBOSE\]/${GREY}[VERBOSE]${RESET}/" \
-  -e "s/\| ([0-9]+:[0-9]{2}:[0-9]{2} [0-9]+ms) \|/| ${DIM}\1${RESET} |/"
+  -e "s/${CLOCK}(\[CRITICAL\] *)/${DIM}\1${RESET}${MAGENTA}\2${RESET}/" \
+  -e "s/${CLOCK}(\[ERROR\] *)/${DIM}\1${RESET}${RED}\2${RESET}/" \
+  -e "s/${CLOCK}(\[WARN\] *)/${DIM}\1${RESET}${YELLOW}\2${RESET}/" \
+  -e "s/${CLOCK}(\[INFO\] *)/${DIM}\1${RESET}${BLUE}\2${RESET}/" \
+  -e "s/${CLOCK}(\[DEBUG\] *)/${DIM}\1${RESET}${GREY}\2${RESET}/" \
+  -e "s/${CLOCK}(\[VERBOSE\] *)/${DIM}\1${RESET}${GREY}\2${RESET}/"

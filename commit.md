@@ -271,8 +271,13 @@ ci: cache the Swift package resolution
 相符就找同語言、再找不到就退回英文（`<details>` 是 HTML，app 的 Markdown 渲染器
 不支援，不處理的話十種語言會全部攤在同一頁）。
 
-每一項後面標上提交者，CI 解析成 GitHub `@帳號`——**是 GitHub 帳號，不是 git 的
-顯示名稱**，顯示名稱 @ 不到任何人。
+每一項後面標上**真正寫它的人**，以及該則 commit 的連結。
+
+歸屬不是取 commit 的 author：GitHub squash 一個 PR 時會把作者設成按下合併的人。
+`41a3c1e8 Fix eew (#534)` 的作者是合併者，而它的每一行都是別人寫的。所以摘要帶
+`(#N)` 時，作者取自**那個 PR 自己的 commits**，再併入 `Co-authored-by:` trailer；
+都沒有才退回 commit 的 author。是 GitHub 帳號，不是 git 顯示名稱 —— 顯示名稱 @
+不到任何人。
 
 | | 涵蓋範圍 | 為什麼 |
 |---|---|---|

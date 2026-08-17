@@ -33,10 +33,10 @@ String run(String input, {bool tty = false}) {
 String _quote(String s) => "'${s.replaceAll("'", r"'\''")}'";
 
 void main() {
-  const line = 'flutter: [WARN] | 4:45:48 492ms | eew SSE not connected\n';
+  const line = 'flutter: [4:45:48][WARN]    : eew SSE not connected\n';
 
   test('the flutter: prefix is dropped', () {
-    expect(run(line), startsWith('[WARN]'));
+    expect(run(line), startsWith('[4:45:48][WARN]'));
   });
 
   test('nothing is coloured when the output is not a terminal', () {
@@ -65,7 +65,7 @@ void main() {
       'DEBUG',
       'VERBOSE',
     ]) {
-      final out = run('flutter: [$level] | 1:00:00 1ms | x\n', tty: true);
+      final out = run('flutter: [1:00:00][$level] : x\n', tty: true);
       expect(out.codeUnits, contains(_esc), reason: level);
     }
   });
