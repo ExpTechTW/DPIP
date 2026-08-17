@@ -134,8 +134,33 @@ void main() {
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
 
-    // Both @handles from the release body become avatars.
+    // Both @handles from the release body become avatar + name badges, and the
+    // name carries the login verbatim (no @ prefix).
     expect(find.byType(CircleAvatar), findsNWidgets(2));
+    expect(find.text('whes1015'), findsOneWidget);
+    expect(find.text('ExpTechTW'), findsOneWidget);
+  });
+
+  testWidgets('tapping a contributor name is safe even with no launcher', (
+    tester,
+  ) async {
+    final repo = _PagedRepository([
+      [
+        ReleaseNote(
+          tagName: 'v26.1',
+          name: 'v26.1',
+          body: '- a change — @whes1015',
+          prerelease: false,
+          publishedAt: DateTime.utc(2026, 8, 1),
+        ),
+      ],
+    ]);
+    await tester.pumpWidget(_wrap(repo));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('whes1015'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('a release without @handles has no contributor strip', (

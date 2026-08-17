@@ -1,10 +1,10 @@
-/// The contributor strip under a changelog entry — the GitHub release footer
-/// look: a stack of avatars for every `@handle` mentioned in the body.
+/// The contributor strip under a changelog entry — one badge per `@handle`
+/// mentioned in the body: avatar + name on a pill background.
 ///
 /// Avatars come from [ChangelogRepository.avatarBytes], so the bytes round-trip
 /// the app's ETag store (URL-addressed, like map tiles — revisiting a card is
-/// a local read, not a network round trip). Each slot is one `CircleAvatar`
-/// that fills when its bytes arrive and shows the login's initial otherwise.
+/// a local read, not a network round trip). Each badge is tappable and opens
+/// the contributor's GitHub profile.
 library;
 
 import 'dart:typed_data';
@@ -15,11 +15,9 @@ import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-/// How many avatars show before the rest collapse into a `+N` tail.
-const int _maxShown = 4;
-
-/// One row: overlapping avatar circles, then the `+N` overflow pill.
+/// One row per contributor: overlapping avatar + `@login`, each tappable.
 class ContributorStrip extends StatelessWidget {
   const ContributorStrip({super.key, required this.body});
 
@@ -30,8 +28,6 @@ class ContributorStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final contributors = contributorsFromBody(body);
     if (contributors.isEmpty) return const SizedBox.shrink();
-    final shown = contributors.take(_maxShown).toList();
-    final avatarWidth = 26 * shown.length - 6 * (shown.length - 1);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -39,35 +35,61 @@ class ContributorStrip extends StatelessWidget {
         AppSpacing.lg,
         AppSpacing.md,
       ),
-      child: Row(
+      child: Wrap(
+        spacing: AppSpacing.md,
+        runSpacing: AppSpacing.xs,
+        alignment: WrapAlignment.start,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          SizedBox(
-            width: avatarWidth.toDouble(),
-            height: 26,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                for (var i = 0; i < shown.length; i++)
-                  Positioned(
-                    left: (i * 20).toDouble(),
-                    child: _Avatar(contributor: shown[i]),
-                  ),
-              ],
-            ),
-          ),
-          if (contributors.length > _maxShown) ...[
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              '+${contributors.length - _maxShown}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
+          for (final contributor in contributors)
+            _ContributorChip(contributor: contributor),
         ],
       ),
     );
+  }
+}
+
+/// One badge — avatar + name on a shared pill, opening the profile on tap.
+class _ContributorChip extends StatelessWidget {
+  const _ContributorChip({required this.contributor});
+
+  final ReleaseContributor contributor;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final label = Theme.of(context).textTheme.labelLarge
+        ?.copyWith(color: colors.onSurfaceVariant, fontWeight: FontWeight.w600);
+    return Material(
+      color: colors.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(999),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _open(context),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _Avatar(contributor: contributor),
+              SizedBox(width: AppSpacing.sm),
+              Text(contributor.login, style: label),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _open(BuildContext context) async {
+    final uri = Uri.tryParse(contributor.htmlUrl);
+    if (uri == null) return;
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } on Object {
+      // A dead profile link is a cosmetic failure — never surface an error for
+      // what is, after all, a decorative strip.
+    }
   }
 }
 
@@ -107,28 +129,21 @@ class _AvatarState extends State<_Avatar> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        // A ring of the card colour keeps overlapping avatars separable.
-        border: Border.all(color: colors.surface, width: 2),
-      ),
-      child: CircleAvatar(
-        radius: 13,
-        backgroundColor: colors.surfaceContainerHighest,
-        foregroundImage: _bytes == null ? null : MemoryImage(_bytes!),
-        child: _bytes == null
-            ? Text(
-                widget.contributor.login.isEmpty
-                    ? '?'
-                    : widget.contributor.login[0].toUpperCase(),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w700,
-                ),
-              )
-            : null,
-      ),
+    return CircleAvatar(
+      radius: 12,
+      backgroundColor: colors.surfaceContainerHighest,
+      foregroundImage: _bytes == null ? null : MemoryImage(_bytes!),
+      child: _bytes == null
+          ? Text(
+              widget.contributor.login.isEmpty
+                  ? '?'
+                  : widget.contributor.login[0].toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            )
+          : null,
     );
   }
 }
