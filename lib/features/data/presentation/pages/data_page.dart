@@ -85,7 +85,8 @@ class DataPage extends StatelessWidget {
             ),
             crossAxisSpacing: AppSpacing.sm,
             mainAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 1.45,
+            // Wide and short: icon left, label right, one glance per tile.
+            childAspectRatio: 2.4,
             children: [
               for (final (tab, icon) in _weatherRankingEntries)
                 _RankingGridTile(
@@ -116,7 +117,7 @@ class DataPage extends StatelessWidget {
             ),
             crossAxisSpacing: AppSpacing.sm,
             mainAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 1.45,
+            childAspectRatio: 2.4,
             children: [
               for (final (route, icon, label, accent)
                   in <(String, IconData, String, Color)>[
@@ -179,6 +180,11 @@ class DataPage extends StatelessWidget {
 
 /// The seismic entry — a full-width highlighted card so the primary hazard
 /// surface stands out from the ranking grid below it.
+///
+/// Darker than a plain tonal card on purpose: this is the page's only wide
+/// surface and the one people reach for in an emergency, so it gets the
+/// strongest fill — a primary gradient with white text — and the grid cards
+/// below it stay quiet on `surfaceContainer`.
 class _SeismicCard extends StatelessWidget {
   const _SeismicCard({
     required this.icon,
@@ -195,48 +201,64 @@ class _SeismicCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Material(
-      color: colors.primaryContainer,
-      borderRadius: AppRadius.large,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: colors.secondaryContainer,
-                  borderRadius: AppRadius.medium,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: AppRadius.large,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colors.primary,
+            Color.lerp(colors.primary, colors.surface, 0.72)!,
+          ],
+        ),
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: AppRadius.large,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: colors.onPrimary.withValues(alpha: 0.18),
+                    borderRadius: AppRadius.medium,
+                  ),
+                  child: Icon(icon, color: colors.onPrimary),
                 ),
-                child: Icon(icon, color: colors.onSecondaryContainer),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: colors.onPrimaryContainer,
-                        fontWeight: FontWeight.w700,
+                const SizedBox(width: AppSpacing.lg),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: colors.onPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colors.onPrimaryContainer.withValues(alpha: 0.8),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.onPrimary.withValues(alpha: 0.78),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: colors.onPrimaryContainer),
-            ],
+                Icon(Icons.chevron_right, color: colors.onPrimary),
+              ],
+            ),
           ),
         ),
       ),
@@ -244,8 +266,13 @@ class _SeismicCard extends StatelessWidget {
   }
 }
 
-/// A metric card in the weather-ranking grid — tonal surface, icon badge, and
-/// the ranking label with a forward affordance.
+/// A metric card in a grid — tonal surface, leading icon badge, label, and a
+/// forward affordance.
+///
+/// Horizontal by design: the icon anchors the left edge, the label sits next
+/// to it at the line's natural height, and the chevron ends the row. Nothing
+/// below the label's line, so every tile reads at a glance and the two grids
+/// stay dense.
 class _RankingGridTile extends StatelessWidget {
   const _RankingGridTile({
     required this.icon,
@@ -271,35 +298,33 @@ class _RankingGridTile extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   color: accent.withValues(alpha: 0.14),
                   borderRadius: AppRadius.small,
                 ),
-                child: Icon(icon, size: 22, color: accent),
+                child: Icon(icon, size: 18, color: accent),
               ),
-              const Spacer(),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall,
-                    ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 18,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.chevron_right,
+                size: 16,
+                color: colors.onSurfaceVariant.withValues(alpha: 0.6),
               ),
             ],
           ),
