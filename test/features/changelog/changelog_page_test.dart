@@ -6,6 +6,9 @@
 /// front-end compiler.
 library;
 
+import 'dart:typed_data';
+
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
@@ -36,6 +39,10 @@ class _PagedRepository implements ChangelogRepository {
     if (page > pages.length) return const Ok([]);
     return Ok(pages[page - 1]);
   }
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
+      const Err(UnexpectedFailure('no network'));
 }
 
 Widget _wrap(ChangelogRepository repo) => Provider<ChangelogRepository>.value(
@@ -108,5 +115,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('26w33a'), findsNothing);
     expect(find.text('v26.1'), findsWidgets);
+  });
+
+  testWidgets('a release card foots the contributor avatars from its body', (
+    tester,
+  ) async {
+    final repo = _PagedRepository([
+      [
+        ReleaseNote(
+          tagName: 'v26.1',
+          name: 'v26.1',
+          body: '- a change — @whes1015\n- another — @ExpTechTW',
+          prerelease: false,
+          publishedAt: DateTime.utc(2026, 8, 1),
+        ),
+      ],
+    ]);
+    await tester.pumpWidget(_wrap(repo));
+    await tester.pumpAndSettle();
+
+    // Both @handles from the release body become avatars.
+    expect(find.byType(CircleAvatar), findsNWidgets(2));
+  });
+
+  testWidgets('a release without @handles has no contributor strip', (
+    tester,
+  ) async {
+    final repo = _PagedRepository([
+      [
+        ReleaseNote(
+          tagName: 'v26.1',
+          name: 'v26.1',
+          body: 'plain',
+          prerelease: false,
+          publishedAt: DateTime.utc(2026, 8, 1),
+        ),
+      ],
+    ]);
+    await tester.pumpWidget(_wrap(repo));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CircleAvatar), findsNothing);
   });
 }

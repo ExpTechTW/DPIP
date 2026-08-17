@@ -14,6 +14,276 @@ part of 'release_note.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$ReleaseContributor {
+
+/// Login, e.g. `whes1015`.
+ String get login;/// The user's GitHub profile.
+ String get htmlUrl;
+/// Create a copy of ReleaseContributor
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ReleaseContributorCopyWith<ReleaseContributor> get copyWith => _$ReleaseContributorCopyWithImpl<ReleaseContributor>(this as ReleaseContributor, _$identity);
+
+  /// Serializes this ReleaseContributor to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseContributor&&(identical(other.login, login) || other.login == login)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,login,htmlUrl);
+
+@override
+String toString() {
+  return 'ReleaseContributor(login: $login, htmlUrl: $htmlUrl)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $ReleaseContributorCopyWith<$Res>  {
+  factory $ReleaseContributorCopyWith(ReleaseContributor value, $Res Function(ReleaseContributor) _then) = _$ReleaseContributorCopyWithImpl;
+@useResult
+$Res call({
+ String login, String htmlUrl
+});
+
+
+
+
+}
+/// @nodoc
+class _$ReleaseContributorCopyWithImpl<$Res>
+    implements $ReleaseContributorCopyWith<$Res> {
+  _$ReleaseContributorCopyWithImpl(this._self, this._then);
+
+  final ReleaseContributor _self;
+  final $Res Function(ReleaseContributor) _then;
+
+/// Create a copy of ReleaseContributor
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? login = null,Object? htmlUrl = null,}) {
+  return _then(ReleaseContributor(
+login: null == login ? _self.login : login // ignore: cast_nullable_to_non_nullable
+as String,htmlUrl: null == htmlUrl ? _self.htmlUrl : htmlUrl // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [ReleaseContributor].
+extension ReleaseContributorPatterns on ReleaseContributor {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ReleaseContributor value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ReleaseContributor() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ReleaseContributor value)  $default,){
+final _that = this;
+switch (_that) {
+case _ReleaseContributor():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ReleaseContributor value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ReleaseContributor() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String login,  String htmlUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ReleaseContributor() when $default != null:
+return $default(_that.login,_that.htmlUrl);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String login,  String htmlUrl)  $default,) {final _that = this;
+switch (_that) {
+case _ReleaseContributor():
+return $default(_that.login,_that.htmlUrl);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String login,  String htmlUrl)?  $default,) {final _that = this;
+switch (_that) {
+case _ReleaseContributor() when $default != null:
+return $default(_that.login,_that.htmlUrl);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _ReleaseContributor implements ReleaseContributor {
+  const _ReleaseContributor({required this.login, this.htmlUrl = ''});
+  factory _ReleaseContributor.fromJson(Map<String, dynamic> json) => _$ReleaseContributorFromJson(json);
+
+/// Login, e.g. `whes1015`.
+@override final  String login;
+/// The user's GitHub profile.
+@override@JsonKey() final  String htmlUrl;
+
+/// Create a copy of ReleaseContributor
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ReleaseContributorCopyWith<_ReleaseContributor> get copyWith => __$ReleaseContributorCopyWithImpl<_ReleaseContributor>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$ReleaseContributorToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseContributor&&(identical(other.login, login) || other.login == login)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,login,htmlUrl);
+
+@override
+String toString() {
+  return 'ReleaseContributor(login: $login, htmlUrl: $htmlUrl)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ReleaseContributorCopyWith<$Res> implements $ReleaseContributorCopyWith<$Res> {
+  factory _$ReleaseContributorCopyWith(_ReleaseContributor value, $Res Function(_ReleaseContributor) _then) = __$ReleaseContributorCopyWithImpl;
+@override @useResult
+$Res call({
+ String login, String htmlUrl
+});
+
+
+
+
+}
+/// @nodoc
+class __$ReleaseContributorCopyWithImpl<$Res>
+    implements _$ReleaseContributorCopyWith<$Res> {
+  __$ReleaseContributorCopyWithImpl(this._self, this._then);
+
+  final _ReleaseContributor _self;
+  final $Res Function(_ReleaseContributor) _then;
+
+/// Create a copy of ReleaseContributor
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? login = null,Object? htmlUrl = null,}) {
+  return _then(_ReleaseContributor(
+login: null == login ? _self.login : login // ignore: cast_nullable_to_non_nullable
+as String,htmlUrl: null == htmlUrl ? _self.htmlUrl : htmlUrl // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$ReleaseNote {
 
 /// Tag name (`v3.2.1`).

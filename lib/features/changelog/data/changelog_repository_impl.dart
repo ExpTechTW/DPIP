@@ -1,6 +1,8 @@
 /// [ChangelogRepository] backed by [ChangelogApi].
 library;
 
+import 'dart:typed_data';
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/features/changelog/data/changelog_api.dart';
@@ -19,6 +21,10 @@ class ChangelogRepositoryImpl implements ChangelogRepository {
         final raw = await _api.getReleases(page: page);
         return parseReleases(raw);
       });
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) =>
+      guardResult(() => _api.getAvatarBytes(login));
 
   /// Skips unmappable entries so one bad release never blanks the list.
   static List<ReleaseNote> parseReleases(List<dynamic> raw) {

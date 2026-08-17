@@ -10,6 +10,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
+import 'package:dpip/features/changelog/presentation/widgets/release_contributors.dart';
 import 'package:dpip/features/changelog/presentation/widgets/release_note_markdown.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -395,6 +396,18 @@ class _ReleaseTile extends StatelessWidget {
                       )
                     : const SizedBox(width: double.infinity),
               ),
+              // The GitHub release footer — divider, then the contributor
+              // avatar stack. Always at the card's foot, expanded or not, so
+              // the strip reads as part of the release the way GitHub's page
+              // does.
+              if (contributorsFromBody(note.body).isNotEmpty) ...[
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: colors.outlineVariant.withValues(alpha: 0.55),
+                ),
+                ContributorStrip(body: note.body),
+              ],
             ],
           ),
         ),

@@ -1,8 +1,11 @@
 /// GitHub Releases API for the DPIP changelog.
 library;
 
+import 'dart:typed_data';
+
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
+import 'package:dpip/features/changelog/domain/release_note.dart';
 
 /// Fetches release notes from GitHub. Absolute URL so [EtagInterceptor] can
 /// still revalidate (`If-None-Match` / `304`).
@@ -69,6 +72,14 @@ class ChangelogApi {
       // fail the primary.
     }
     return releases;
+  }
+
+  /// The avatar bytes for [login]. `avatars.githubusercontent.com` answers any
+  /// login with its 64px picture; bytes round-trip through the ETag store so
+  /// revisits are local.
+  Future<Uint8List> getAvatarBytes(String login) async {
+    final payload = await _client.getBytesAbsolute(avatarUrlFor(login));
+    return payload.bytes;
   }
 
   static const Map<String, String> _headers = {

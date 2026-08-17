@@ -1,6 +1,8 @@
 /// Changelog repository contract.
 library;
 
+import 'dart:typed_data';
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 
@@ -18,4 +20,11 @@ abstract class ChangelogRepository {
   /// so the list only grows, and a page that returns fewer than
   /// [ChangelogApi.pageSize] entries is the last one.
   Future<Result<List<ReleaseNote>>> releases({int page});
+
+  /// The avatar bytes for [login], fetched through the app's Dio stack so the
+  /// ETag store caches it like any other asset (the URL is content-addressed:
+  /// `avatars.githubusercontent.com/<login>` always means the same picture).
+  ///
+  /// The bytes are the 64px avatar, rendered by the UI with `Image.memory`.
+  Future<Result<Uint8List>> avatarBytes(String login);
 }

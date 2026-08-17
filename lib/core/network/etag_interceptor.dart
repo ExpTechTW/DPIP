@@ -84,6 +84,7 @@ class EtagInterceptor extends Interceptor {
     '${ApiPaths.tiles}/wind/',
     '${ApiPaths.dpm}/',
     '/gh/exptechtw/map-assets/', // glyph PBFs (jsDelivr)
+    'avatars.githubusercontent.com/', // contributor avatars (content-addressed)
   ];
 
   /// Whether [uri] names a content-addressed asset — see
