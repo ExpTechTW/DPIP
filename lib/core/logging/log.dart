@@ -91,6 +91,53 @@ abstract final class Log {
     talker.history.removeWhere((entry) => entry.time.isBefore(cutoff));
   }
 
+  /// How many times one error may be reported before it is taken for a loop,
+  /// and the window it has to repeat in to count.
+  static const _repeatLimit = 8;
+  static const _repeatWindow = Duration(seconds: 5);
+
+  /// Signature -> (times seen, when the window opened). Capped, because the
+  /// keys come from error text and an app that produces endless *distinct*
+  /// errors must not also leak memory.
+  static final Map<String, (int, Duration)> _repeats = {};
+
+  /// Whether an error should be reported, or has become its own cause.
+  ///
+  /// Reporting an error is not free of consequence here: it goes to Talker,
+  /// whose stream the log screen rebuilds on and the persister writes to disk
+  /// from. So a fault raised *while rendering that screen* — a layout overflow
+  /// is the everyday one — re-enters through the rebuild it just caused, and
+  /// each turn adds a Crashlytics report and a database write. The screen
+  /// stops responding, which is what a user reports as "tapping the log
+  /// freezes the app".
+  ///
+  /// Avoiding one known overflow does not fix that; only breaking the loop
+  /// does. A distinct error is always reported — this drops the *repeat*.
+  static bool _admitError(String signature) {
+    final now = sinceStart.elapsed;
+    final prior = _repeats[signature];
+    if (prior == null || now - prior.$2 > _repeatWindow) {
+      if (_repeats.length > 64) _repeats.clear();
+      _repeats[signature] = (1, now);
+      return true;
+    }
+    final seen = prior.$1 + 1;
+    _repeats[signature] = (seen, prior.$2);
+    if (seen == _repeatLimit + 1) {
+      // Once, and through `info` rather than an error, so saying "this is
+      // looping" cannot itself be the next turn of the loop.
+      talker.info(
+        'error repeated $_repeatLimit times, suppressing: $signature',
+      );
+    }
+    return seen <= _repeatLimit;
+  }
+
+  /// Forgets what has been seen — for tests, and for anywhere that genuinely
+  /// wants a repeated error reported again.
+  @visibleForTesting
+  static void resetErrorRepeats() => _repeats.clear();
+
   /// Routes uncaught Flutter and async errors into the log and the [crashSink]
   /// (as fatal reports).
   ///
@@ -112,6 +159,9 @@ abstract final class Log {
       // creation `file:line`. Keep that rich dump in debug so such errors stay
       // locatable; release stays quiet (presentError is a near no-op there).
       if (kDebugMode) FlutterError.presentError(details);
+      // The library and summary rather than the stack: a layout fault reports
+      // a different stack every frame while being the same fault.
+      if (!_admitError('${details.library}/${details.summary}')) return;
       talker.handle(
         details.exception,
         details.stack,
@@ -125,6 +175,7 @@ abstract final class Log {
       );
     };
     PlatformDispatcher.instance.onError = (error, stack) {
+      if (!_admitError(error.runtimeType.toString())) return true;
       talker.handle(error, stack);
       crashSink?.report(error, stack, fatal: true);
       return true;
