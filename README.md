@@ -79,6 +79,13 @@ TREM-Net 由 [ExpTech Studio](https://exptech.dev/) 建置與維運，自 2022 �
 
 也可以從 [Release 頁面](https://github.com/ExpTechTW/DPIP/releases/latest)取得 Android 安裝檔手動安裝。請注意 Release 頁面同時包含快照版本，那些未經完整審查。
 
+想搶先體驗新功能？加入**測試版**：
+
+- [Android 測試版](https://play.google.com/apps/testing/com.exptech.dpip) —— 開啟 Google Play 的測試版申請頁
+- [iOS 測試版（TestFlight）](https://testflight.apple.com/join/8aPWtOxk) —— 需要在 iPhone、iPad 或 Mac 上先安裝 TestFlight
+
+測試版可能包含尚未完整審查的功能，遇到問題歡迎到 [Issues](https://github.com/ExpTechTW/DPIP/issues) 回報。
+
 ## 翻譯
 
 DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/project/dpip) 上進行，挑一個你熟悉的語言就能開始。
