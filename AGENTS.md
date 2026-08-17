@@ -75,6 +75,10 @@ New(en-US): <the same, in English>
 - The category is **declared, not inferred from the type** — so a user-visible
   fix that lives in a `chore:` commit still reaches the changelog, which the
   old type-derived mapping silently dropped.
+- **Rebase, never merge, and never leave the branch behind.** CI refuses both:
+  a merge commit is invisible to the gate (`--no-merges`), so anything arriving
+  through one is never judged, and a branch that is behind was tested against a
+  main that no longer exists. `git rebase origin/main` and force-with-lease.
 - **One thing per commit.** No gate can check this — whether two changes are
   the same thing is a judgement — so it is on you and on review.
 - **Never** add a `Co-Authored-By:` trailer, `Generated with …`, 🤖, a model

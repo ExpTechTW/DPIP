@@ -27,22 +27,67 @@ jobs:
       # repair is a rebase and a force-push — and the later that is discovered,
       # the more there is to rebase.
       - name: Commit message gate
+        env:
+          # Through the environment, like every other value here: a base ref is
+          # a branch name, and on a fork's pull request whoever opened it chose
+          # that name.
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            range="origin/${{ github.base_ref }}..HEAD"
-            git fetch --quiet origin "${{ github.base_ref }}"
+          if [ "$EVENT" = pull_request ]; then
+            # The branch's own tip, not the checked-out merge commit: a pull
+            # request builds a synthetic merge of the branch into the base, and
+            # every commit this gate judges has to be one somebody wrote.
+            git fetch --quiet origin "$BASE_REF"
+            range="$(git rev-parse "origin/$BASE_REF")..$HEAD_SHA"
           else
             # A push event names what it replaced. On the first push to a new
             # branch the before-sha is all zeroes, so fall back to the last
             # commit alone.
-            before="${{ github.event.before }}"
-            case "$before" in
+            case "$BEFORE" in
             ''|0000000000000000000000000000000000000000) range="HEAD~1..HEAD" ;;
-            *) range="$before..HEAD" ;;
+            *) range="$BEFORE..HEAD" ;;
             esac
           fi
           echo "checking $range"
           bash tool/check_commits.sh "$range"
+
+      # Rebased, not merged, and not behind.
+      #
+      # Two reasons, and neither is taste. A merge commit is invisible to the
+      # gate above — `check_commits.sh` walks with `--no-merges`, because a
+      # merge message is generated rather than written — so anything that
+      # arrives through one is never judged. And a branch that is behind was
+      # tested against a main that no longer exists; the gates that passed
+      # describe a tree nobody will ever have.
+      - name: Branch is rebased on the base
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --quiet origin "$BASE_REF"
+          base="$(git rev-parse "origin/$BASE_REF")"
+
+          if merges="$(git rev-list --merges "$base..$HEAD_SHA")" &&
+            [ -n "$merges" ]; then
+            echo "::error::this branch merges $BASE_REF instead of rebasing onto it"
+            git --no-pager log --format='  %h %s' --merges "$base..$HEAD_SHA"
+            printf '\n  git rebase origin/%s\n  git push --force-with-lease\n' "$BASE_REF"
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "$base" "$HEAD_SHA"; then
+            echo "::error::this branch is behind $BASE_REF; rebase before merging"
+            printf '  %s is %s commit(s) ahead of this branch\n' \
+              "$BASE_REF" "$(git rev-list --count "$HEAD_SHA..$base")"
+            printf '\n  git fetch origin\n  git rebase origin/%s\n  git push --force-with-lease\n' "$BASE_REF"
+            exit 1
+          fi
+
+          echo "branch gate: rebased on $BASE_REF, no merge commits"
 
       # The commits on the branch are not what lands on main. This repo
       # squash-merges, so GitHub builds the merged commit out of the PR's title

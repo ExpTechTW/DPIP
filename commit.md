@@ -307,6 +307,28 @@ ci: cache the Swift package resolution
 
 ---
 
+## 合併前必須 rebase
+
+CI 會擋兩件事（`ci.yml` 的「Branch is rebased on the base」）：
+
+| 擋什麼 | 為什麼 |
+|---|---|
+| 分支裡有 **merge commit** | `check_commits.sh` 用 `--no-merges` 走訪——merge 訊息是產生的不是寫的——所以**任何從 merge 進來的東西都不會被檢查**。用 merge 就等於繞過整個 gate |
+| 分支**落後** base | 它是對著一個已經不存在的 main 測過的；通過的那些 gate 描述的是一棵沒有人會拿到的樹 |
+
+```sh
+git fetch origin
+git rebase origin/main
+git push --force-with-lease
+```
+
+**PR 裡任何一則不合格，整個 CI 就失敗。** gate 走的是分支自己的頂端
+（`github.event.pull_request.head.sha`）而不是 checkout 出來的合併節點——
+pull request 會建一個分支併入 base 的合成 merge，而這個 gate 判的每一則都必須
+是有人真的寫過的。
+
+---
+
 ## 不合格怎麼辦
 
 CI 會印出哪一則、哪裡不對。因為訊息無法事後修改：
