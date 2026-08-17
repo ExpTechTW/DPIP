@@ -2080,6 +2080,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get regionManageTitle => '저장한 지역';
 
   @override
+  String get regionSaveNote =>
+      '알림은 GPS 기반 현재 위치를 기준으로 발송됩니다. 자주 가는 지역을 설정해도 알림 발송 위치는 바뀌지 않으며, 자주 가는 지역은 홈 화면에서 여러 지역의 상태를 빠르게 확인하기 위한 것입니다. 알림이 작동하려면 위치 권한을 반드시 허용해 주세요.';
+
+  @override
   String get typhoonLegendCone => '예보 원추';
 
   @override

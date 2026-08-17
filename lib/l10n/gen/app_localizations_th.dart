@@ -2102,6 +2102,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get regionManageTitle => 'พื้นที่ที่ใช้บ่อย';
 
   @override
+  String get regionSaveNote =>
+      'การแจ้งเตือนจะส่งตามตำแหน่ง GPS ของคุณ การตั้งพื้นที่โปรดไม่ได้เปลี่ยนตำแหน่งที่ส่งการแจ้งเตือน — พื้นที่โปรดใช้เพียงเพื่อดูสถานะแต่ละพื้นที่อย่างรวดเร็วบนหน้าหลัก กรุณาอนุญาตสิทธิ์ตำแหน่ง ไม่เช่นนั้นการแจ้งเตือนจะไม่ทำงาน';
+
+  @override
   String get typhoonLegendCone => 'กรวยพยากรณ์';
 
   @override

@@ -1012,6 +1012,10 @@
     "description": "Age of the last sent packet"
   },
   "regionManageTitle": "常用地區",
+  "regionSaveNote": "通知是以 GPS 所在地位置發送的，設定常用地區不會改變或影響通知發送，常用地區只是用於首頁快速查看不同區域狀態，所以務必授予 GPS 定位權限，否則通知無法運作",
+  "@regionSaveNote": {
+    "description": "常用地區與通知發送機制的說明"
+  },
   "typhoonLegendCone": "預測圓錐",
   "moreCwaEew": "中央氣象署強震即時警報",
   "onboardingPermsTitle": "權限授權",

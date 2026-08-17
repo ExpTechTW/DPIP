@@ -2107,6 +2107,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regionManageTitle => 'Saved regions';
 
   @override
+  String get regionSaveNote =>
+      'Notifications are sent based on your GPS location. Setting a saved region does not change where alerts are sent — saved regions only affect which areas the home screen shows at a glance. Grant location permission, or alerts cannot work.';
+
+  @override
   String get typhoonLegendCone => 'Forecast cone';
 
   @override

@@ -1012,6 +1012,10 @@
     "description": "Age of the last sent packet"
   },
   "regionManageTitle": "登録地域",
+  "regionSaveNote": "通知は GPS で取得した現在地に基づいて送信されます。よく使う地域を設定しても通知の送信先は変わりません。よく使う地域はホーム画面で各エリアの状況をすぐ確認するためのもので、通知を機能させるには位置情報の許可が必須です。",
+  "@regionSaveNote": {
+    "description": "通知とよく使う地域の仕組みについての説明"
+  },
   "typhoonLegendCone": "予報円",
   "moreCwaEew": "中央気象署 緊急地震速報",
   "onboardingPermsTitle": "権限の許可",

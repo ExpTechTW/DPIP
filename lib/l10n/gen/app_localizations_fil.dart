@@ -2117,6 +2117,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get regionManageTitle => 'Mga naka-save na rehiyon';
 
   @override
+  String get regionSaveNote =>
+      'Ipapadala ang mga abiso batay sa iyong lokasyon ng GPS. Ang pag-set ng paboritong lugar ay hindi nagbabago kung saan ipinapadala ang alerto — ang mga paboritong lugar ay para lang mabilis mong makita ang kalagayan ng bawat lugar sa home. Ibigay ang pahintulot sa lokasyon, kung hindi hindi gagana ang mga abiso.';
+
+  @override
   String get typhoonLegendCone => 'Kono ng forecast';
 
   @override

@@ -1012,6 +1012,10 @@
     "description": "Age of the last sent packet"
   },
   "regionManageTitle": "Khu vực đã lưu",
+  "regionSaveNote": "Thông báo được gửi dựa trên vị trí GPS của bạn. Việc đặt khu vực thường dùng không thay đổi nơi nhận cảnh báo — khu vực thường dùng chỉ giúp xem nhanh trạng thái từng khu vực trên trang chủ. Hãy cấp quyền vị trí, nếu không thông báo sẽ không hoạt động.",
+  "@regionSaveNote": {
+    "description": "Ghi chú về cơ chế thông báo và khu vực thường dùng"
+  },
   "typhoonLegendCone": "Nón dự báo",
   "moreCwaEew": "Cảnh báo sớm động đất của CWA",
   "onboardingPermsTitle": "Quyền truy cập",

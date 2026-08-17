@@ -2108,6 +2108,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get regionManageTitle => 'Wilayah tersimpan';
 
   @override
+  String get regionSaveNote =>
+      'Notifikasi dikirim berdasarkan lokasi GPS Anda. Menyimpan wilayah sering dipakai tidak mengubah tempat pengiriman peringatan — wilayah sering dipakai hanya agar status tiap wilayah terlihat cepat di beranda. Izinkan akses lokasi, jika tidak notifikasi tidak berfungsi.';
+
+  @override
   String get typhoonLegendCone => 'Kerucut prakiraan';
 
   @override

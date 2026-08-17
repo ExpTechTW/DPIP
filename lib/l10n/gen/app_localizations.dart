@@ -3993,6 +3993,12 @@ abstract class AppLocalizations {
   /// **'Saved regions'**
   String get regionManageTitle;
 
+  /// Note about how notifications and saved regions work
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are sent based on your GPS location. Setting a saved region does not change where alerts are sent — saved regions only affect which areas the home screen shows at a glance. Grant location permission, or alerts cannot work.'**
+  String get regionSaveNote;
+
   /// Typhoon map legend: uncertainty cone
   ///
   /// In en, this message translates to:

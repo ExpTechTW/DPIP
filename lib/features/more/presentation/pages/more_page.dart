@@ -43,7 +43,12 @@ class MorePage extends StatelessWidget {
           // and Discord and announcements split the bottom half of it.
           const _HeroCards(),
           SectionHeader(l10n.moreSectionRegion),
-          _MoreGroup(children: [const _SavedRegionsTile()]),
+          _MoreGroup(
+            children: [
+              const _SavedRegionsTile(),
+              _SaveNote(l10n: l10n),
+            ],
+          ),
           SectionHeader(l10n.moreSectionNotify),
           _MoreGroup(
             children: [
@@ -458,6 +463,44 @@ class _SavedRegionRow extends StatelessWidget {
       subtitle: Text(town?.cityName ?? ''),
       trailing: const Icon(Icons.more_horiz),
       onTap: onTap,
+    );
+  }
+}
+
+// The relationship note: alerts follow GPS, saved regions only change the
+// home screen. Rendered as a bold slogan row inside the Region group, right
+// under the saved-regions row — reads at a glance, no second card.
+class _SaveNote extends StatelessWidget {
+  const _SaveNote({required this.l10n});
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.location_on_outlined, size: 18, color: colors.primary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              l10n.regionSaveNote,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w700,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
