@@ -201,6 +201,56 @@ class MorePage extends StatelessWidget {
               ),
             ],
           ),
+          // The bleeding-edge builds, one per store, each with its own opt-in.
+          SectionHeader(l10n.moreSectionBeta),
+          _MoreGroup(
+            children: [
+              _MoreLinkTile(
+                icon: Icons.android,
+                title: l10n.moreAndroidBeta,
+                host: 'play.google.com',
+                url: 'https://play.google.com/apps/testing/com.exptech.dpip',
+              ),
+              _MoreLinkTile(
+                icon: Icons.apple,
+                title: l10n.moreTestFlight,
+                host: 'testflight.apple.com',
+                url: 'https://testflight.apple.com/join/8aPWtOxk',
+              ),
+            ],
+          ),
+          // The people who make DPIP run — the same list as the README.
+          SectionHeader(l10n.moreSectionPartners),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            child: Text(
+              l10n.morePartnersNote,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          _MoreGroup(
+            children: [
+              _MoreLinkTile(
+                icon: Icons.business_outlined,
+                title: l10n.morePartnerGeoscience,
+                host: 'geoscience.com.tw',
+                url: 'https://www.geoscience.com.tw/',
+              ),
+              _MoreLinkTile(
+                icon: Icons.cloud_outlined,
+                title: l10n.morePartnerTwds,
+                host: 'twds.com.tw',
+                url: 'https://www.twds.com.tw/',
+              ),
+            ],
+          ),
           SectionHeader(l10n.moreSectionAbout),
           _MoreGroup(
             children: [

@@ -124,6 +124,31 @@ void main() {
     }
   });
 
+  testWidgets('the beta and partners groups sit under 取得 App', (tester) async {
+    await _pump(tester, _router([]));
+    final l10n = AppLocalizations.of(tester.element(find.byType(MorePage)));
+    // Both beta channels plus both partners are rows.
+    expect(find.widgetWithText(ListTile, l10n.moreAndroidBeta), findsOneWidget);
+    expect(find.widgetWithText(ListTile, l10n.moreTestFlight), findsOneWidget);
+    expect(
+      find.widgetWithText(ListTile, l10n.morePartnerGeoscience),
+      findsOneWidget,
+    );
+    expect(find.widgetWithText(ListTile, l10n.morePartnerTwds), findsOneWidget);
+    // And they land below the store rows, in the 取得 App order.
+    final play = tester.getTopLeft(
+      find.widgetWithText(ListTile, 'Google Play'),
+    );
+    final beta = tester.getTopLeft(
+      find.widgetWithText(ListTile, l10n.moreAndroidBeta),
+    );
+    final partner = tester.getTopLeft(
+      find.widgetWithText(ListTile, l10n.morePartnerGeoscience),
+    );
+    expect(play.dy, lessThan(beta.dy));
+    expect(beta.dy, lessThan(partner.dy));
+  });
+
   testWidgets('permission check sits with the notification settings', (
     tester,
   ) async {
