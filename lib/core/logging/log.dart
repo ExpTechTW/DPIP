@@ -18,6 +18,23 @@ abstract final class Log {
 
   static final TalkerSettings _settings = TalkerSettings(
     useConsoleLogs: kDebugMode,
+    // The tag on every line, in the log screen and in the console alike.
+    // Upper case because it is a label, not prose, and it reads as a column
+    // when a hundred lines are scanned for the one that is not `INFO`.
+    // `WARN` rather than `WARNING` so the five that matter are within a
+    // character of each other and the messages after them line up.
+    //
+    // Display only: the `level` column stores the enum's own name, so a
+    // stored line still parses back to its [LogLevel].
+    titles: {
+      TalkerKey.verbose: 'VERBOSE',
+      TalkerKey.debug: 'DEBUG',
+      TalkerKey.info: 'INFO',
+      TalkerKey.warning: 'WARN',
+      TalkerKey.error: 'ERROR',
+      TalkerKey.critical: 'CRITICAL',
+      TalkerKey.exception: 'EXCEPTION',
+    },
   );
 
   /// Optional crash-reporting destination. When set (in `bootstrap`), handled

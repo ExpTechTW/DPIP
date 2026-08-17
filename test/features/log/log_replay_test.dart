@@ -138,4 +138,42 @@ void main() {
       'newer',
     ]);
   });
+
+  test('a level is tagged in upper case, in the app and the console alike', () {
+    // A label, not prose — and it reads as a column when a hundred lines are
+    // scanned for the one that is not INFO.
+    const expected = {
+      TalkerKey.verbose: 'VERBOSE',
+      TalkerKey.debug: 'DEBUG',
+      TalkerKey.info: 'INFO',
+      TalkerKey.warning: 'WARN',
+      TalkerKey.error: 'ERROR',
+      TalkerKey.critical: 'CRITICAL',
+    };
+    expected.forEach((key, tag) {
+      expect(Log.talker.settings.getTitleByKey(key), tag, reason: key);
+    });
+
+    // The same tag on a line read back out of the table.
+    final replayed = PersistedLog(
+      StoredLog(
+        time: DateTime.utc(2026, 8, 18),
+        level: 'warning',
+        message: 'a line',
+      ),
+    );
+    Log.reload([replayed]);
+    expect(replayed.title, 'WARN');
+    expect(replayed.generateTextMessage(), contains('[WARN]'));
+  });
+
+  test('the stored level stays the enum name, not the tag', () {
+    // Display is upper case; the column is data, and `PersistedLog` parses it
+    // back by `LogLevel.name`.
+    Log.talker.cleanHistory();
+    Log.warning('a line');
+    final data = Log.talker.history.single;
+    expect(data.logLevel?.name, 'warning');
+    expect(data.title, 'WARN');
+  });
 }
