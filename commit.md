@@ -296,10 +296,7 @@ ci: cache the Swift package resolution
 署名是 GitHub 帳號，CI 透過 API 解析。**不是 git 的顯示名稱**——顯示名稱 @ 不到
 任何人，而且用名字去搜會搜出不只一個帳號，猜錯比不標更糟。
 
-實際長相：[pre-release-example.md](pre-release-example.md) 與
-[release-example.md](release-example.md)，兩份都是 `tool/release_notes.sh` 真的
-產出來的（範例的署名用 `DPIP_NOTE_AUTHOR` 指定，因為臨時 repo 的 commit 不存在
-於 GitHub，API 查不到）。
+實際長相就是上面各節的範例，`tool/release_notes.sh` 直接照這個格式輸出。
 
 > **squash 會壓縮條目數。** 正則是逐行抓的，所以 squash 不會像舊格式那樣把內容
 > 弄壞——但四則 commit 的條目會全部掛在同一個作者和同一個快照下。要保留就用
