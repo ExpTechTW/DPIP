@@ -37,6 +37,10 @@ import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/features/settings/domain/dump_uploader.dart';
+import 'package:dpip/features/settings/domain/debug_dump.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 /// One labelled diagnostic value.
 typedef _Field = ({String label, String? value});
@@ -525,6 +529,54 @@ class _DeveloperPageState extends State<DeveloperPage> {
     );
   }
 
+  bool _dumping = false;
+
+  /// Uploads the diagnostics and the tail of the log, and copies the link.
+  ///
+  /// The two halves answer different questions and a report needs both: the
+  /// diagnostics say what this build and this device are, the log says what
+  /// they just did. Pasting them into a chat buries the conversation, so they
+  /// go to a paste and only the link comes back.
+  Future<void> _dump() async {
+    if (_dumping) return;
+    final diagnostics = _diagnosticsText();
+    if (diagnostics == null) return;
+    final uploader = context.read<DumpUploader>();
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _dumping = true);
+    try {
+      // Newest first, which is the order the budget spends from.
+      final lines = [
+        for (final entry in Log.talker.history.reversed)
+          logLine(
+            tag: entry.title ?? 'log',
+            time: entry.time,
+            message: entry.displayMessage,
+          ),
+      ];
+      final url = await uploader.upload(
+        buildDump(diagnostics: diagnostics, logLines: lines),
+      );
+      if (!mounted) return;
+      if (url == null) {
+        // l10n-ignore: developer diagnostics
+        messenger.showSnackBar(const SnackBar(content: Text('Upload failed')));
+        return;
+      }
+      await Clipboard.setData(ClipboardData(text: url));
+      if (!mounted) return;
+      // l10n-ignore: developer diagnostics
+      messenger.showSnackBar(SnackBar(content: Text('已複製 $url')));
+    } on Object catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'diagnostics dump');
+      if (!mounted) return;
+      // l10n-ignore: developer diagnostics
+      messenger.showSnackBar(const SnackBar(content: Text('Upload failed')));
+    } finally {
+      if (mounted) setState(() => _dumping = false);
+    }
+  }
+
   /// Version-row taps: count to [_unlockVersionTaps], then unlock the
   /// experimental-features menu (see `ExperimentalSettings.unlock`). Shows the
   /// remaining count so the easter egg is discoverable, and confirms once it
@@ -556,8 +608,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
   }
 
   void _copyAll() {
+    final text = _diagnosticsText();
+    if (text != null) _copy(text);
+  }
+
+  /// The diagnostics as one block — what `Copy all` copies and what a dump
+  /// carries above the log.
+  String? _diagnosticsText() {
     final sections = _sections;
-    if (sections == null) return;
+    if (sections == null) return null;
     final buffer = StringBuffer('DPIP diagnostics');
     for (final section in sections) {
       final fields = [
@@ -570,7 +629,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
         buffer.writeln('${field.label}: ${field.value ?? '—'}');
       }
     }
-    _copy(buffer.toString().trim());
+    return buffer.toString().trim();
   }
 
   @override
@@ -619,6 +678,15 @@ class _DeveloperPageState extends State<DeveloperPage> {
                     _TableBreakdown(tables: _tables!),
                 ],
                 const SectionHeader('Maintenance'),
+                ListTile(
+                  leading: const Icon(Icons.ios_share_outlined),
+                  // l10n-ignore: developer-only page, deliberately untranslated
+                  title: const Text('傾印除錯資訊及日誌'),
+                  // l10n-ignore: developer-only page, deliberately untranslated
+                  subtitle: const Text('上傳後複製連結，附在回報裡就不用貼一整頁'),
+                  trailing: _dumping ? const InlineLoading(size: 18) : null,
+                  onTap: _dumping ? null : _dump,
+                ),
                 // Runs the background report path by hand, on the same code an
                 // OS wake runs. Waiting for a real geofence crossing means
                 // driving 200 m and hoping, with no way to tell a wake that
