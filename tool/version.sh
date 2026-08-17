@@ -204,7 +204,11 @@ else
 fi
 
 if [ "${1:-}" = "--json" ]; then
-  printf '{"label":"%s","train":"%s","code":%s}\n' "$label" "$train" "$code"
+  # `last` is the newest release tag, `v` stripped — the previous major
+  # release a snapshot builds toward, shown on the More page version card.
+  printf '{"label":"%s","train":"%s","code":%s,"last":"%s"}\n' \
+    "$label" "$train" "$code" "${last_tag#v}"
 else
-  printf 'DPIP_LABEL=%s\nDPIP_TRAIN=%s\nDPIP_CODE=%s\n' "$label" "$train" "$code"
+  printf 'DPIP_LABEL=%s\nDPIP_TRAIN=%s\nDPIP_CODE=%s\nDPIP_LAST_RELEASE=%s\n' \
+    "$label" "$train" "$code" "${last_tag#v}"
 fi

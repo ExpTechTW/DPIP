@@ -40,10 +40,18 @@ abstract final class AppBuild {
   /// What CI stamped in, empty on a local build.
   static const String _definedLabel = String.fromEnvironment('DPIP_LABEL');
   static const int _definedCode = int.fromEnvironment('DPIP_CODE');
+  static const String _definedLast = String.fromEnvironment(
+    'DPIP_LAST_RELEASE',
+  );
 
   /// What the git hooks wrote, empty outside a repository.
   static String get _generatedLabel => kBuildLabel;
   static int get _generatedCode => kBuildCode;
+
+  /// The newest release this history knows, 'v' stripped. Empty before the
+  /// first release; a version card that wants a stable anchor number falls
+  /// back to [label] when it is.
+  static String get lastRelease => _last;
 
   static String get _bestLabel =>
       _definedLabel.isNotEmpty ? _definedLabel : _generatedLabel;
@@ -51,6 +59,7 @@ abstract final class AppBuild {
 
   static String? _label;
   static int? _code;
+  static String _last = _definedLast.isNotEmpty ? _definedLast : kLastRelease;
 
   /// Reads the platform's own version, for the builds CI did not stamp.
   ///
@@ -99,8 +108,13 @@ abstract final class AppBuild {
   }
 
   /// Test seam — sets both halves directly.
-  static void debugSet({required String label, required int code}) {
+  static void debugSet({
+    required String label,
+    required int code,
+    String? last,
+  }) {
     _label = label;
     _code = code;
+    if (last != null) _last = last;
   }
 }

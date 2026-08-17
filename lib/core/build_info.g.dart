@@ -18,3 +18,8 @@ const String kBuildLabel = '';
 
 /// The ordinal that goes with it; 0 when git could not answer.
 const int kBuildCode = 0;
+
+/// The newest release tag this history knows, 'v' stripped. Empty until
+/// tool/version.sh can read the history; the version card falls back to the
+/// label then.
+const String kLastRelease = '';

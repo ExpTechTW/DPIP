@@ -40,6 +40,7 @@ jobs:
           echo "label=$DPIP_LABEL" >> "$GITHUB_OUTPUT"
           echo "train=$DPIP_TRAIN" >> "$GITHUB_OUTPUT"
           echo "code=$DPIP_CODE" >> "$GITHUB_OUTPUT"
+          echo "last=$DPIP_LAST_RELEASE" >> "$GITHUB_OUTPUT"
           # A tag is a release; anything else is a snapshot.
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
@@ -196,7 +197,8 @@ jobs:
           COMMON="--build-name=${{ needs.version.outputs.train }} \
                   --build-number=${{ needs.version.outputs.code }} \
                   --dart-define=DPIP_LABEL=${{ needs.version.outputs.label }} \
-                  --dart-define=DPIP_CODE=${{ needs.version.outputs.code }}"
+                  --dart-define=DPIP_CODE=${{ needs.version.outputs.code }} \
+                  --dart-define=DPIP_LAST_RELEASE=${{ needs.version.outputs.last }}"
           if [ "${{ matrix.platform }}" = "android" ]; then
             mise exec -- flutter build apk --release $COMMON
             mise exec -- flutter build appbundle --release $COMMON
