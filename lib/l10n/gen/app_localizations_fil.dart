@@ -2055,6 +2055,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreAnnouncements => 'Mga Anunsyo';
 
   @override
+  String get moreTagline =>
+      'Platform para sa Integral na Impormasyon sa Kalamidad';
+
+  @override
   String get moreVersionStable => 'Pormal na bersyon';
 
   @override

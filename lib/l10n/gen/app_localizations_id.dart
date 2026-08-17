@@ -2046,6 +2046,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreAnnouncements => 'Pengumuman';
 
   @override
+  String get moreTagline => 'Platform Integrasi Informasi Bencana';
+
+  @override
   String get moreVersionStable => 'Versi resmi';
 
   @override

@@ -2012,6 +2012,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreAnnouncements => 'お知らせ';
 
   @override
+  String get moreTagline => '防災情報統合プラットフォーム';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override

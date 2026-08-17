@@ -2040,6 +2040,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreAnnouncements => 'ประกาศ';
 
   @override
+  String get moreTagline => 'แพลตฟอร์มรวมข้อมูลป้องกันภัยพิบัติ';
+
+  @override
   String get moreVersionStable => 'เวอร์ชันเต็ม';
 
   @override

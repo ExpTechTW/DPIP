@@ -3873,6 +3873,12 @@ abstract class AppLocalizations {
   /// **'Announcements'**
   String get moreAnnouncements;
 
+  /// No description provided for @moreTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster Prevention Information Platform'**
+  String get moreTagline;
+
   /// No description provided for @moreVersionStable.
   ///
   /// In en, this message translates to:

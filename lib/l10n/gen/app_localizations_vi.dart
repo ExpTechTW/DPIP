@@ -2045,6 +2045,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreAnnouncements => 'Thông báo';
 
   @override
+  String get moreTagline => 'Nền tảng tích hợp thông tin phòng chống thiên tai';
+
+  @override
   String get moreVersionStable => 'Bản chính thức';
 
   @override

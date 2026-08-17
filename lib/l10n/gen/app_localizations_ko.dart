@@ -2019,6 +2019,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreAnnouncements => '공지사항';
 
   @override
+  String get moreTagline => '재해 정보 통합 플랫폼';
+
+  @override
   String get moreVersionStable => '정식 버전';
 
   @override

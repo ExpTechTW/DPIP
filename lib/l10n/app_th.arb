@@ -980,6 +980,7 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "ประกาศ",
+  "moreTagline": "แพลตฟอร์มรวมข้อมูลป้องกันภัยพิบัติ",
   "moreVersionStable": "เวอร์ชันเต็ม",
   "moreVersionNotes": "เวอร์ชันปัจจุบัน",
   "moreVersionNotesEmpty": "ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้",

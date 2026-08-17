@@ -144,22 +144,23 @@ void main() {
     });
   }
 
-  testWidgets('the three top entries lead the page, in rank order', (
+  testWidgets('the three entries lead the page, support full-width last', (
     tester,
   ) async {
     await _pump(tester, _router([]));
-    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
     final discord = tester.getTopLeft(find.text('Discord community')).dy;
     final announcements = tester.getTopLeft(find.text('Announcements')).dy;
-    // Support first, Discord immediately under it, announcements next…
-    expect(discord, greaterThan(support));
+    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
+    // The right column stacks Discord above announcements; the full-width
+    // support card sits on its own line beneath both.
     expect(announcements, greaterThan(discord));
+    expect(support, greaterThan(announcements));
     // …and all three above every menu group.
     expect(
       tester
           .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
           .dy,
-      greaterThan(announcements),
+      greaterThan(support),
     );
   });
 
@@ -213,25 +214,25 @@ void main() {
     expect(discord.color, isNot(gold.fill));
   });
 
-  testWidgets('the three hero-card badges and labels share one line', (
+  testWidgets('the hero-card rows in the right column share one left edge', (
     tester,
   ) async {
     await _pump(tester, _router([]));
-    // The three cards stack in the right column; their icon circles and
-    // labels must start at the same left edge for the stack to read as
-    // aligned rows (vertical position differs — the cards have different
-    // heights by design).
+    // Discord, the announcement and the status card stack in the right
+    // column; their icon circles and labels must start at the same left edge
+    // for the stack to read as aligned rows (vertical position differs by
+    // design).
     final iconXs = [
-      tester.getCenter(find.byIcon(Icons.favorite)).dx,
       tester.getCenter(find.byIcon(Icons.discord)).dx,
       tester.getCenter(find.byIcon(Icons.campaign_outlined)).dx,
+      tester.getCenter(find.byIcon(Icons.dns_outlined)).dx,
     ];
     expect(iconXs.toSet(), hasLength(1));
 
     final textXs = [
-      tester.getTopLeft(find.text('Support DPIP')).dx,
       tester.getTopLeft(find.text('Discord community')).dx,
       tester.getTopLeft(find.text('Announcements')).dx,
+      tester.getTopLeft(find.text('Server status')).dx,
     ];
     expect(textXs.toSet(), hasLength(1));
   });

@@ -2045,6 +2045,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreAnnouncements => 'Announcements';
 
   @override
+  String get moreTagline => 'Disaster Prevention Information Platform';
+
+  @override
   String get moreVersionStable => 'Release';
 
   @override

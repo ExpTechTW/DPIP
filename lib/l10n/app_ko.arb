@@ -980,6 +980,7 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "기상청 적외 영상 관례：온도가 낮을수록 흰색",
   "moreAnnouncements": "공지사항",
+  "moreTagline": "재해 정보 통합 플랫폼",
   "moreVersionStable": "정식 버전",
   "moreVersionNotes": "현재 버전",
   "moreVersionNotesEmpty": "이 빌드의 업데이트 내역을 찾을 수 없습니다",

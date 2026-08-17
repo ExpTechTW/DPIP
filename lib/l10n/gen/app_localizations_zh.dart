@@ -2001,6 +2001,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreTagline => '防災資訊整合平台';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
@@ -4879,6 +4882,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreAnnouncements => '公告';
+
+  @override
+  String get moreTagline => '防灾信息整合平台';
 
   @override
   String get moreVersionStable => '正式版';
@@ -7761,6 +7767,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreTagline => '防災資訊整合平台';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
@@ -10639,6 +10648,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreAnnouncements => '公告';
+
+  @override
+  String get moreTagline => '防災資訊整合平台';
 
   @override
   String get moreVersionStable => '正式版';

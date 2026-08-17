@@ -163,12 +163,6 @@ class MorePage extends StatelessWidget {
                 url: 'https://report.exptech.dev/',
               ),
               _MoreLinkTile(
-                icon: Icons.dns_outlined,
-                title: l10n.moreServerStatus,
-                host: 'status.exptech.dev',
-                url: 'https://status.exptech.dev/status',
-              ),
-              _MoreLinkTile(
                 icon: Icons.smart_display_outlined,
                 title: l10n.moreYoutube,
                 host: 'youtube.com/@exptechtw',
@@ -596,38 +590,59 @@ Future<void> openExternalLink(BuildContext context, String url) async {
 class _HeroCards extends StatelessWidget {
   const _HeroCards();
 
-  static const double _height = 256;
+  /// Height of the left version card — it leads the block, so it gets to
+  /// declare its own height (its column uses a Spacer, which needs a bounded
+  /// height) while the small cards beside it are shorter by design.
+  static const double _versionHeight = 176;
+
+  /// Height of a small card (Discord, announcement, status) and, matching it,
+  /// the full-width support card below.
+  static const double _smallCardHeight = 56;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _height,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          0,
-          AppSpacing.lg,
-          AppSpacing.md,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Expanded(flex: 1, child: _VersionCard()),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: const [
-                  Expanded(flex: 2, child: _SupportCallout()),
-                  SizedBox(height: AppSpacing.xs),
-                  Expanded(flex: 1, child: _DiscordCallout()),
-                  SizedBox(height: AppSpacing.xs),
-                  Expanded(flex: 1, child: _AnnouncementCard()),
-                ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: _versionHeight,
+                  child: const _VersionCard(),
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  children: const [
+                    SizedBox(
+                      height: _smallCardHeight,
+                      child: _DiscordCallout(),
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    SizedBox(
+                      height: _smallCardHeight,
+                      child: _AnnouncementCard(),
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    SizedBox(height: _smallCardHeight, child: _StatusCard()),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: _smallCardHeight, child: const _SupportCallout()),
+        ],
       ),
     );
   }
@@ -839,6 +854,69 @@ class _AnnouncementCard extends StatelessWidget {
   }
 }
 
+/// Server status, directly under the announcement card — the same flat,
+/// quiet construction, because a status check is a passive read and needs no
+/// more weight than a link.
+class _StatusCard extends StatelessWidget {
+  const _StatusCard();
+
+  static const String _url = 'https://status.exptech.dev/status';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: colors.surfaceContainerHigh,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => openExternalLink(context, _url),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colors.surfaceContainerHighest,
+                ),
+                child: Icon(
+                  Icons.dns_outlined,
+                  color: colors.onSurfaceVariant,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  l10n.moreServerStatus,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.open_in_new,
+                size: 14,
+                color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// This install's identity — the logo, the label, and which train it belongs
 /// to — sized to lead the block.
 ///
@@ -872,6 +950,30 @@ class _VersionCard extends StatelessWidget {
   static const Color _stableColor = Color(0xFF2E7D32);
   static const Color _snapshotColor = Color(0xFFEF6C00);
 
+  /// The number's gradient, derived from the version string itself so every
+  /// build wears its own colours — 26w34a is one pair, 26w34b another — and
+  /// any one build stays stable across reloads. Two hues off the golden
+  /// angle (137.5°) harmonise regardless of the hash's starting point; the
+  /// lightness flips with the theme so the glyphs read on the card surface.
+  static List<Color> _hashGradient(String seed, Brightness brightness) {
+    var h = 7;
+    for (final rune in seed.runes) {
+      h = (h * 31 + rune) & 0x7fffffff;
+    }
+    final base = h % 360;
+    const saturation = 0.62;
+    final light = brightness == Brightness.dark ? 0.70 : 0.46;
+    return [
+      HSLColor.fromAHSL(1, base.toDouble(), saturation, light).toColor(),
+      HSLColor.fromAHSL(
+        1,
+        (base + 137.508) % 360,
+        saturation,
+        light - 0.10,
+      ).toColor(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -903,7 +1005,33 @@ class _VersionCard extends StatelessWidget {
                       height: 36,
                     ),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DPIP',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          l10n.moreTagline,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
                   Icon(
                     Icons.chevron_right,
                     size: 20,
@@ -912,14 +1040,6 @@ class _VersionCard extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              Text(
-                'DPIP',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 2),
               // Gradient number, not a plain rect fill: the one stroke of
               // colour the flat card permits. White under srcIn — the gradient
               // takes over the glyphs entirely.
@@ -927,11 +1047,11 @@ class _VersionCard extends StatelessWidget {
                 shaderCallback: (rect) => LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [colors.primary, colors.tertiary],
+                  colors: _hashGradient(train, theme.brightness),
                 ).createShader(rect),
                 child: Text(
                   train,
-                  style: theme.textTheme.displaySmall?.copyWith(
+                  style: theme.textTheme.displayMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     fontFeatures: const [FontFeature.tabularFigures()],
@@ -946,8 +1066,8 @@ class _VersionCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   label,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colors.onSurfaceVariant,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: colors.onSurface,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.2,
                   ),

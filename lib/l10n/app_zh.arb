@@ -980,6 +980,7 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "氣象廳灰階慣例：溫度越低越白",
   "moreAnnouncements": "公告",
+  "moreTagline": "防災資訊整合平台",
   "moreVersionStable": "正式版",
   "moreVersionNotes": "目前版本",
   "moreVersionNotesEmpty": "找不到目前版本的更新日誌",

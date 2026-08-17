@@ -980,6 +980,7 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "気象庁の赤外画像の慣例：温度が低いほど白",
   "moreAnnouncements": "お知らせ",
+  "moreTagline": "防災情報統合プラットフォーム",
   "moreVersionStable": "正式版",
   "moreVersionNotes": "現在のバージョン",
   "moreVersionNotesEmpty": "このビルドの更新履歴が見つかりません",

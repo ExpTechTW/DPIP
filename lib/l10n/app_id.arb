@@ -980,6 +980,7 @@
   "typhoonPickerNamed": "{name} TY {no}",
   "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
   "moreAnnouncements": "Pengumuman",
+  "moreTagline": "Platform Integrasi Informasi Bencana",
   "moreVersionStable": "Versi resmi",
   "moreVersionNotes": "Versi saat ini",
   "moreVersionNotesEmpty": "Tidak ada changelog untuk build ini",

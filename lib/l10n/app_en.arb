@@ -2775,11 +2775,10 @@
     "description": "AED city / district row label"
   },
   "moreAnnouncements": "Announcements",
+  "moreTagline": "Disaster Prevention Information Platform",
   "moreVersionStable": "Release",
   "moreVersionNotes": "This version",
   "moreVersionNotesEmpty": "No changelog for this build",
-  "moreVersionSnapshot": "Snapshot",
-  "moreVersionStable": "Release",
   "moreVersionSnapshot": "Snapshot",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {
