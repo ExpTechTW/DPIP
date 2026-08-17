@@ -264,7 +264,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get typhoonLegendCircle25 => '十級風暴風圈';
 
   @override
-  String get sponsorTitle => '支持 DPIP';
+  String get sponsorTitle => '支援 DPIP';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -590,7 +590,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sponsorIntro =>
-      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。';
 
   @override
   String get shelterAddressLabel => '地址';
@@ -1561,7 +1561,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+  String get sponsorCalloutBody => '沒有廣告，你的支援讓伺服器持續運作。';
 
   @override
   String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
@@ -6030,7 +6030,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get typhoonLegendCircle25 => '十級風暴風圈';
 
   @override
-  String get sponsorTitle => '支持 DPIP';
+  String get sponsorTitle => '支援 DPIP';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -6356,7 +6356,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get sponsorIntro =>
-      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。';
 
   @override
   String get shelterAddressLabel => '地址';
@@ -7327,7 +7327,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+  String get sponsorCalloutBody => '沒有廣告，你的支援讓伺服器持續運作。';
 
   @override
   String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
@@ -8913,7 +8913,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get typhoonLegendCircle25 => '十級風暴風圈';
 
   @override
-  String get sponsorTitle => '支持 DPIP';
+  String get sponsorTitle => '支援 DPIP';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -9239,7 +9239,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sponsorIntro =>
-      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。';
 
   @override
   String get shelterAddressLabel => '地址';
@@ -10210,7 +10210,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+  String get sponsorCalloutBody => '沒有廣告，你的支援讓伺服器持續運作。';
 
   @override
   String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
