@@ -53,6 +53,20 @@ abstract final class Log {
   /// and keeps it private.
   static final _PersistedHistory _history = _PersistedHistory(_settings);
 
+  /// Whether to colour the level tag in console output.
+  ///
+  ///     flutter run --dart-define=DPIP_LOG_COLOR=true
+  ///
+  /// Off by default, and a choice rather than a detection: the bytes are
+  /// written on the device and read in whatever window is attached to
+  /// `flutter run`, which the app cannot see. VS Code's **Debug Console** does
+  /// not interpret ANSI — that is where `^[[38;5;4m` came from — while its
+  /// **integrated terminal** does. Same app, same build, different window.
+  ///
+  /// Not a font, either: a font supplies glyphs, and an escape sequence is an
+  /// instruction the terminal either acts on or prints.
+  static const bool enableConsoleColor = bool.fromEnvironment('DPIP_LOG_COLOR');
+
   /// Console output, one plain line per entry.
   ///
   /// The default draws every line inside a box and paints it with ANSI escapes.
@@ -65,8 +79,8 @@ abstract final class Log {
   /// Colour is not lost so much as never delivered — turn `enableColors` back
   /// on if the output is ever read somewhere that renders it.
   static final TalkerLogger _logger = TalkerLogger(
-    settings: TalkerLoggerSettings(enableColors: false),
-    formatter: const _PlainFormatter(),
+    settings: TalkerLoggerSettings(enableColors: enableConsoleColor),
+    formatter: const TagFormatter(),
   );
 
   /// The underlying Talker instance — used by the log screen and error hooks.
@@ -322,11 +336,23 @@ class _PersistedHistory implements TalkerHistory {
   }
 }
 
-/// One line, exactly the message. No border, no underline, no colour.
-class _PlainFormatter implements LoggerFormatter {
-  const _PlainFormatter();
+/// One line: the level tag, then the message.
+///
+/// With colour on, only the tag is painted. A fully coloured line is harder to
+/// read than a plain one, and the tag is the part being scanned for; it is
+/// also short, so a leak into a window that cannot render it costs one token
+/// rather than the whole line.
+class TagFormatter implements LoggerFormatter {
+  const TagFormatter();
 
   @override
-  String fmt(LogDetails details, TalkerLoggerSettings settings) =>
-      details.message?.toString() ?? '';
+  String fmt(LogDetails details, TalkerLoggerSettings settings) {
+    final message = details.message?.toString() ?? '';
+    if (!settings.enableColors) return message;
+    // `[WARN] | 4:23:50 79ms | …` — the tag is everything to the first `]`.
+    final end = message.indexOf(']');
+    if (end < 0) return message;
+    return details.pen.write(message.substring(0, end + 1)) +
+        message.substring(end + 1);
+  }
 }
