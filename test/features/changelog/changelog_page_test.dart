@@ -134,14 +134,12 @@ void main() {
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
 
-    // Both @handles from the release body become avatar + name badges, and the
-    // name carries the login verbatim (no @ prefix).
+    // Both @handles from the release body become a stacked avatar pile — no
+    // pill, no name — and a lingering tap target is the avatar itself.
     expect(find.byType(CircleAvatar), findsNWidgets(2));
-    expect(find.text('whes1015'), findsOneWidget);
-    expect(find.text('ExpTechTW'), findsOneWidget);
   });
 
-  testWidgets('tapping a contributor name is safe even with no launcher', (
+  testWidgets('tapping a contributor avatar is safe even with no launcher', (
     tester,
   ) async {
     final repo = _PagedRepository([
@@ -158,7 +156,7 @@ void main() {
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('whes1015'));
+    await tester.tap(find.byType(CircleAvatar));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
@@ -173,6 +171,7 @@ void main() {
           name: 'v26.1',
           body: 'plain',
           prerelease: false,
+          htmlUrl: 'https://github.com/ExpTechTW/DPIP/releases/tag/v26.1',
           publishedAt: DateTime.utc(2026, 8, 1),
         ),
       ],
@@ -181,5 +180,28 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(CircleAvatar), findsNothing);
+    // Every card still carries the button to its release on GitHub.
+    expect(find.text('View on GitHub'), findsOneWidget);
+  });
+
+  testWidgets('the GitHub button opens the release page', (tester) async {
+    final repo = _PagedRepository([
+      [
+        ReleaseNote(
+          tagName: 'v26.1',
+          name: 'v26.1',
+          body: 'plain',
+          prerelease: false,
+          htmlUrl: 'https://github.com/ExpTechTW/DPIP/releases/tag/v26.1',
+          publishedAt: DateTime.utc(2026, 8, 1),
+        ),
+      ],
+    ]);
+    await tester.pumpWidget(_wrap(repo));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('View on GitHub'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }
