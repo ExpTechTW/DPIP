@@ -203,6 +203,29 @@ abstract final class Log {
   /// errors must not also leak memory.
   static final Map<String, (int, Duration)> _repeats = {};
 
+  /// Debug-only asserts raised from inside a package, said once and then
+  /// dropped for the rest of the session.
+  ///
+  /// Keyed on the summary rather than on the package, because there is nothing
+  /// here that names the package: the framework raises these from inside the
+  /// offending widget's own `build`, and the widget that *wrapped* it built in
+  /// a different Element and is not on the stack. So this cannot distinguish
+  /// a package's occurrence from one of ours — which is why the entry is still
+  /// logged once, with its summary, instead of being dropped silently.
+  ///
+  /// Delete an entry when its package fixes it; the log line is the reminder.
+  static const List<(String, String)> _knownBenignAsserts = [
+    (
+      'ListTile background color or ink splashes may be invisible',
+      'talker_flutter draws its Actions sheet as a coloured box with bare '
+          'ListTiles inside it (still true on 5.1.20), so opening that sheet '
+          'reports once per row. Debug-only, and the sheet renders correctly. '
+          'If this appears anywhere but the log screen, it is ours.',
+    ),
+  ];
+
+  static final Set<String> _saidAsserts = {};
+
   /// Whether an error should be reported, or has become its own cause.
   ///
   /// Reporting an error is not free of consequence here: it goes to Talker,
@@ -238,7 +261,10 @@ abstract final class Log {
   /// Forgets what has been seen — for tests, and for anywhere that genuinely
   /// wants a repeated error reported again.
   @visibleForTesting
-  static void resetErrorRepeats() => _repeats.clear();
+  static void resetErrorRepeats() {
+    _repeats.clear();
+    _saidAsserts.clear();
+  }
 
   /// Routes uncaught Flutter and async errors into the log and the [crashSink]
   /// (as fatal reports).
@@ -255,6 +281,15 @@ abstract final class Log {
           (details.exception as PlatformException).code == 'recreating_view') {
         return;
       }
+      // A known defect in somebody else's widget. One line, then silence —
+      // this one arrives once per row of a sheet, and the sheet it floods is
+      // the log screen itself.
+      final summary = details.summary.toString();
+      for (final (marker, explanation) in _knownBenignAsserts) {
+        if (!summary.contains(marker)) continue;
+        if (_saidAsserts.add(marker)) talker.warning('$summary $explanation');
+        return;
+      }
       // The library and summary rather than the stack: a layout fault reports
       // a different stack every frame while being the same fault.
       //
@@ -263,7 +298,7 @@ abstract final class Log {
       // not the terminal, which kept printing the same fault every frame while
       // the stored record stayed clean. That is the shape the flood took: the
       // data was fine and the console was unusable.
-      if (!_admitError('${details.library}/${details.summary}')) return;
+      if (!_admitError('${details.library}/$summary')) return;
       // Overriding onError replaces the framework's own console presentation,
       // whose dump carries the diagnostics our summary drops — for a layout
       // fault (e.g. a RenderFlex overflow) that includes *which* widget and its
