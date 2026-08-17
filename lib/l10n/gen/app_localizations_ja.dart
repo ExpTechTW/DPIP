@@ -2073,6 +2073,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get regionManageTitle => '登録地域';
 
   @override
+  String get regionSaveNote =>
+      '通知は GPS で取得した現在地に基づいて送信されます。よく使う地域を設定しても通知の送信先は変わりません。よく使う地域はホーム画面で各エリアの状況をすぐ確認するためのもので、通知を機能させるには位置情報の許可が必須です。';
+
+  @override
   String get typhoonLegendCone => '予報円';
 
   @override

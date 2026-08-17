@@ -2108,6 +2108,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get regionManageTitle => 'Khu vực đã lưu';
 
   @override
+  String get regionSaveNote =>
+      'Thông báo được gửi dựa trên vị trí GPS của bạn. Việc đặt khu vực thường dùng không thay đổi nơi nhận cảnh báo — khu vực thường dùng chỉ giúp xem nhanh trạng thái từng khu vực trên trang chủ. Hãy cấp quyền vị trí, nếu không thông báo sẽ không hoạt động.';
+
+  @override
   String get typhoonLegendCone => 'Nón dự báo';
 
   @override

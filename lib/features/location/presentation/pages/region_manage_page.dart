@@ -1,4 +1,4 @@
-/// Manages the user's saved 常用地區 (up to [RegionStore.maxSaved]).
+/// Lists the currently saved townships with a remove action, and an **add**
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';

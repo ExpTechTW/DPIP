@@ -2062,6 +2062,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get regionManageTitle => '常用地區';
 
   @override
+  String get regionSaveNote =>
+      '通知是以 GPS 所在地位置發送的，設定常用地區不會改變或影響通知發送，常用地區只是用於首頁快速查看不同區域狀態，所以務必授予 GPS 定位權限，否則通知無法運作';
+
+  @override
   String get typhoonLegendCone => '預測圓錐';
 
   @override
@@ -4936,6 +4940,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get regionManageTitle => '常用地区';
+
+  @override
+  String get regionSaveNote =>
+      '通知是基于 GPS 所在位置发送的，设置常用地区不会改变或影响通知发送，常用地区仅用于在首页快速查看不同区域状态，所以请务必授予 GPS 定位权限，否则通知无法运作';
 
   @override
   String get typhoonLegendCone => '预测圆锥';
@@ -7814,6 +7822,10 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get regionManageTitle => '常用地區';
 
   @override
+  String get regionSaveNote =>
+      '通知是以 GPS 所在地位置發送的，設定常用地區不會改變或影響通知發送，常用地區只是用於首頁快速查看不同區域狀態，所以務必授予 GPS 定位權限，否則通知無法運作';
+
+  @override
   String get typhoonLegendCone => '預測圓錐';
 
   @override
@@ -10688,6 +10700,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get regionManageTitle => '常用地區';
+
+  @override
+  String get regionSaveNote =>
+      '通知是以 GPS 所在地位置發送的，設定常用地區不會改變或影響通知發送，常用地區只是用於首頁快速查看不同區域狀態，所以務必授予 GPS 定位權限，否則通知無法運作';
 
   @override
   String get typhoonLegendCone => '預測圓錐';
