@@ -669,12 +669,9 @@ class _SupportCallout extends StatelessWidget {
           borderRadius: AppRadius.large,
           onTap: () => context.pushNamed(AppRoutes.sponsor),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Filled, not outlined: the one active affordance on a page
                 // whose every other row is an outlined icon.
@@ -688,7 +685,7 @@ class _SupportCallout extends StatelessWidget {
                   child: Icon(Icons.favorite, color: gold.onBadge, size: 19),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Flexible(
+                Expanded(
                   child: Text(
                     l10n.sponsorTitle,
                     maxLines: 1,
@@ -739,7 +736,7 @@ class _DiscordCallout extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 width: 34,
@@ -751,7 +748,7 @@ class _DiscordCallout extends StatelessWidget {
                 child: Icon(Icons.discord, color: colors.onSecondary, size: 19),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Flexible(
+              Expanded(
                 child: Text(
                   l10n.moreDiscord,
                   maxLines: 1,
@@ -801,7 +798,7 @@ class _AnnouncementCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 width: 34,
@@ -817,7 +814,7 @@ class _AnnouncementCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Flexible(
+              Expanded(
                 child: Text(
                   l10n.moreAnnouncements,
                   maxLines: 1,

@@ -213,6 +213,29 @@ void main() {
     expect(discord.color, isNot(gold.fill));
   });
 
+  testWidgets('the three hero-card badges and labels share one line', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    // The three cards stack in the right column; their icon circles and
+    // labels must start at the same left edge for the stack to read as
+    // aligned rows (vertical position differs — the cards have different
+    // heights by design).
+    final iconXs = [
+      tester.getCenter(find.byIcon(Icons.favorite)).dx,
+      tester.getCenter(find.byIcon(Icons.discord)).dx,
+      tester.getCenter(find.byIcon(Icons.campaign_outlined)).dx,
+    ];
+    expect(iconXs.toSet(), hasLength(1));
+
+    final textXs = [
+      tester.getTopLeft(find.text('Support DPIP')).dx,
+      tester.getTopLeft(find.text('Discord community')).dx,
+      tester.getTopLeft(find.text('Announcements')).dx,
+    ];
+    expect(textXs.toSet(), hasLength(1));
+  });
+
   testWidgets('the Meshtastic row carries a dot only while unread exists', (
     tester,
   ) async {
