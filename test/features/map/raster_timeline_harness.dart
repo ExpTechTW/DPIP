@@ -205,6 +205,40 @@ class RecordingMapController implements MapLibreMapController {
   }
 
   @override
+  Future<void> addSymbolLayer(
+    String sourceId,
+    String layerId,
+    SymbolLayerProperties properties, {
+    String? belowLayerId,
+    String? sourceLayer,
+    double? minzoom,
+    double? maxzoom,
+    dynamic filter,
+    bool enableInteraction = true,
+  }) async {
+    below[layerId] = belowLayerId;
+    calls.add('addSymbolLayer:$layerId');
+    _insert(layerId, belowLayerId);
+  }
+
+  @override
+  Future<void> addCircleLayer(
+    String sourceId,
+    String layerId,
+    CircleLayerProperties properties, {
+    String? belowLayerId,
+    String? sourceLayer,
+    double? minzoom,
+    double? maxzoom,
+    dynamic filter,
+    bool enableInteraction = true,
+  }) async {
+    below[layerId] = belowLayerId;
+    calls.add('addCircleLayer:$layerId');
+    _insert(layerId, belowLayerId);
+  }
+
+  @override
   Future<void> removeLayer(String layerId) async {
     calls.add('removeLayer:$layerId');
     order.remove(layerId);

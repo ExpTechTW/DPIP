@@ -14,6 +14,7 @@
 library;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
@@ -24,6 +25,7 @@ import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -158,6 +160,8 @@ _build({required List<Eew> alerts, required _FakeElapsed eewElapsed}) async {
           0: [(p: 1, r: 5, s: 2), (p: 10, r: 50, s: 20)],
         }),
       ),
+      boxGrid: Future<RtsBoxGrid>.value(const RtsBoxGrid({})),
+      townDirectory: const TownDirectory({}),
     ),
     eewChannel: eewChannel,
     rtsChannel: rtsChannel,
