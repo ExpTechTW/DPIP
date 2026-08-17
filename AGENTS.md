@@ -41,6 +41,17 @@ mise exec -- flutter run -d "iPhone 17 Pro"
 Select the device with `-d <name|id>`. A bare `flutter run ios` treats `ios` as
 a target Dart file and fails with `Target file "ios" not found`.
 
+- Colour the log by piping it, not by asking the app for colour:
+
+  ```sh
+  mise exec -- flutter run | tool/colorize_logs.sh
+  ```
+
+  On iOS an escape sequence cannot survive the trip — the platform's log path
+  escapes the escape character, so even a terminal that supports ANSI prints it
+  (flutter/flutter#20663). `dart:developer`'s `log` gets them through but
+  truncates past ~128 characters, which is where the diagnostic lines live. A
+  pipe has neither problem, and it also drops the `flutter: ` prefix.
 - If `flutter run` / `pub get` stalls at **Downloading packages**, resolve from
   the local cache first: `mise exec -- flutter pub get --offline`, then re-run.
 - The visible simulator window in Xcode 26+ is **DeviceHub.app** — it replaced
