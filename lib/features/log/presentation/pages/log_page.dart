@@ -56,7 +56,7 @@ class _LogPageState extends State<LogPage> {
       if (oldestInMemory != null && !entry.time.isBefore(oldestInMemory)) {
         continue;
       }
-      Log.talker.logCustom(_PersistedLog(entry));
+      Log.talker.logCustom(PersistedLog(entry));
     }
   }
 
@@ -78,18 +78,27 @@ class _LogPageState extends State<LogPage> {
   }
 }
 
-/// A replayed line, tagged so it is visibly from an earlier session rather
-/// than something that just happened.
-class _PersistedLog extends TalkerLog {
-  _PersistedLog(this.entry)
-    : super(entry.message, time: entry.time, stackTrace: null);
+/// A line read back out of the `logs` table.
+///
+/// Its level is carried across, not invented. Talker colours a card and the
+/// level filter narrows by `logLevel`, so a replayed line that arrives without
+/// one is uncoloured and unfilterable — the two things the log screen is read
+/// with. The stored string is a [LogLevel] name, written by `Log.persistTo`.
+class PersistedLog extends TalkerLog {
+  PersistedLog(StoredLog entry)
+    : super(
+        entry.error == null
+            ? entry.message
+            : '${entry.message}\n${entry.error}',
+        time: entry.time,
+        logLevel: _level(entry.level),
+        stackTrace: null,
+      );
 
-  final StoredLog entry;
-
-  @override
-  String get title => 'stored';
-
-  @override
-  String? get message =>
-      entry.error == null ? entry.message : '${entry.message}\n${entry.error}';
+  /// Unknown names fall to `info` rather than being dropped: a line whose
+  /// level cannot be read is still a line somebody needs to see.
+  static LogLevel _level(String name) => LogLevel.values.firstWhere(
+    (level) => level.name == name,
+    orElse: () => LogLevel.info,
+  );
 }

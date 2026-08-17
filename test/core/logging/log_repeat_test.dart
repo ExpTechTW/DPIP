@@ -44,6 +44,23 @@ void main() {
     expect(logged, greaterThan(0), reason: 'the first one is real');
   });
 
+  test('the console dump is suppressed too, not only the record', () {
+    // The flood this fixes: the log, the crash report and the database were
+    // all covered, but `FlutterError.presentError` sat before the check and
+    // kept printing the same fault every frame. The stored data looked fine
+    // and the terminal was unusable.
+    var dumps = 0;
+    final priorPresent = FlutterError.presentError;
+    FlutterError.presentError = (_) => dumps++;
+    addTearDown(() => FlutterError.presentError = priorPresent);
+
+    for (var i = 0; i < 100; i++) {
+      FlutterError.onError!(overflow());
+    }
+    expect(dumps, lessThan(100), reason: 'the terminal is a resource too');
+    expect(dumps, greaterThan(0), reason: 'the first few are how you find it');
+  });
+
   test('a different fault is never suppressed by another', () {
     for (var i = 0; i < 50; i++) {
       FlutterError.onError!(overflow());

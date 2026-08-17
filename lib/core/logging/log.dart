@@ -153,15 +153,22 @@ abstract final class Log {
           (details.exception as PlatformException).code == 'recreating_view') {
         return;
       }
+      // The library and summary rather than the stack: a layout fault reports
+      // a different stack every frame while being the same fault.
+      //
+      // Checked before the console dump below, not after. Left after it, the
+      // suppression covered the log, the crash report and the database — but
+      // not the terminal, which kept printing the same fault every frame while
+      // the stored record stayed clean. That is the shape the flood took: the
+      // data was fine and the console was unusable.
+      if (!_admitError('${details.library}/${details.summary}')) return;
       // Overriding onError replaces the framework's own console presentation,
       // whose dump carries the diagnostics our summary drops — for a layout
       // fault (e.g. a RenderFlex overflow) that includes *which* widget and its
       // creation `file:line`. Keep that rich dump in debug so such errors stay
       // locatable; release stays quiet (presentError is a near no-op there).
+      // The first few still print, which is what makes the fault findable.
       if (kDebugMode) FlutterError.presentError(details);
-      // The library and summary rather than the stack: a layout fault reports
-      // a different stack every frame while being the same fault.
-      if (!_admitError('${details.library}/${details.summary}')) return;
       talker.handle(
         details.exception,
         details.stack,
