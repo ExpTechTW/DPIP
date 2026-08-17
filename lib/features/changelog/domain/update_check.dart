@@ -52,8 +52,26 @@ enum UpdateChannel {
 UpdateChannel channelFor({
   required List<ReleaseNote> releases,
   required String currentVersion,
+  int currentBuild = 0,
   InstallSource installSource = InstallSource.unknown,
 }) {
+  // The ordinal first, because it is the only value that identifies one build.
+  // `AppVersion.tryParse` stops at the first letter, so every snapshot of a
+  // year collapses to the same number — `26w34a` and `26w40a` both parse to
+  // `26`. Matching on that finds *a* release of the right year rather than the
+  // one running, and it only ever gave the right channel because every `26w**`
+  // release happens to be a pre-release.
+  if (currentBuild > 0) {
+    for (final release in releases) {
+      if (buildCodeOf(release) == currentBuild) {
+        return release.prerelease
+            ? UpdateChannel.preRelease
+            : UpdateChannel.stable;
+      }
+    }
+  }
+
+  // Then the version string, for builds from before the ordinal existed.
   final current = AppVersion.tryParse(currentVersion);
   if (current != null) {
     for (final release in releases) {
@@ -64,6 +82,12 @@ UpdateChannel channelFor({
       }
     }
   }
+
+  // Neither matched — the running build is not in the page that was fetched,
+  // which a snapshot falls out of within days. TestFlight is proof of a
+  // pre-release; Play is not, because internal, open testing and production
+  // all install through `com.android.vending`, so a tester there would be put
+  // on the stable channel and offered a build older than the one they run.
   return installSource == InstallSource.testFlight
       ? UpdateChannel.preRelease
       : UpdateChannel.stable;
@@ -211,6 +235,7 @@ ReleaseNote? findUpdate({
   final channel = channelFor(
     releases: releases,
     currentVersion: currentVersion,
+    currentBuild: currentBuild,
     installSource: installSource,
   );
 

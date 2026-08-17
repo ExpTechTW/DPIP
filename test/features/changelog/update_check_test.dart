@@ -218,4 +218,64 @@ void main() {
       );
     });
   });
+
+  group('channelFor identifies the running build by its ordinal', () {
+    // Every snapshot of a year parses to the same number — `26w34a` and
+    // `26w40a` are both `26` — so a version-string match finds *a* release of
+    // that year rather than the one running.
+    ReleaseNote build(String tag, int code, {required bool pre}) => ReleaseNote(
+      tagName: tag,
+      name: tag,
+      body: '<!-- dpip-build: $code -->',
+      prerelease: pre,
+      publishedAt: DateTime.utc(2026, 8, 20).subtract(Duration(days: _day++)),
+      htmlUrl: '',
+    );
+
+    test('a snapshot stays on pre-release once a stable release exists', () {
+      final releases = [
+        build('v26.1', 426000400, pre: false),
+        build('26w34a', 426000331, pre: true),
+      ];
+      expect(
+        channelFor(
+          releases: releases,
+          currentVersion: '26w34a',
+          currentBuild: 426000331,
+        ),
+        UpdateChannel.preRelease,
+      );
+    });
+
+    test('an open-beta tester on Play is not called stable', () {
+      // Internal, open testing and production all install through
+      // `com.android.vending`, so the install source cannot tell them apart;
+      // only the ordinal can.
+      final releases = [
+        build('v26.1', 426000400, pre: false),
+        build('26w34a', 426000331, pre: true),
+      ];
+      expect(
+        channelFor(
+          releases: releases,
+          currentVersion: '26w34a',
+          currentBuild: 426000331,
+          installSource: InstallSource.playStore,
+        ),
+        UpdateChannel.preRelease,
+      );
+    });
+
+    test('a build the fetched page does not contain falls back', () {
+      expect(
+        channelFor(
+          releases: [build('v26.1', 426000400, pre: false)],
+          currentVersion: '26w34a',
+          currentBuild: 426000331,
+          installSource: InstallSource.testFlight,
+        ),
+        UpdateChannel.preRelease,
+      );
+    });
+  });
 }
