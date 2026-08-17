@@ -20,9 +20,9 @@ abstract final class Log {
     useConsoleLogs: kDebugMode,
   );
 
-  /// Held so [replay] can write to it. Talker builds one itself otherwise, and
-  /// keeps it private.
-  static final TalkerHistory _history = DefaultTalkerHistory(_settings);
+  /// Held so [replay] can write to it, and so clearing the screen clears the
+  /// table too. Talker builds one itself otherwise, and keeps it private.
+  static final _PersistedHistory _history = _PersistedHistory(_settings);
 
   /// The underlying Talker instance — used by the log screen and error hooks.
   static final Talker talker = Talker(settings: _settings, history: _history);
@@ -209,5 +209,36 @@ abstract final class Log {
       crashSink?.report(error, stack, fatal: true);
       return true;
     };
+  }
+}
+
+/// Talker's history, with the stored log tied to it.
+///
+/// The screen's clear button calls `talker.cleanHistory()`, which empties the
+/// in-memory list and nothing else — so the log came straight back on the next
+/// visit, replayed out of the table it was never removed from. Clearing that
+/// looked broken because it was: the one thing a user presses it for is the
+/// one thing it did not do.
+///
+/// [clean] is synchronous and the delete is not, so the write is started and
+/// not waited on. Nothing reads the table between the two, and a failure there
+/// is already swallowed by [LogStore.clear] — reporting a logging failure
+/// through the logger is how a write loop starts.
+class _PersistedHistory implements TalkerHistory {
+  _PersistedHistory(TalkerSettings settings)
+    : _inMemory = DefaultTalkerHistory(settings);
+
+  final DefaultTalkerHistory _inMemory;
+
+  @override
+  List<TalkerData> get history => _inMemory.history;
+
+  @override
+  void write(TalkerData data) => _inMemory.write(data);
+
+  @override
+  void clean() {
+    _inMemory.clean();
+    unawaited(Log.store?.clear() ?? Future<void>.value());
   }
 }
