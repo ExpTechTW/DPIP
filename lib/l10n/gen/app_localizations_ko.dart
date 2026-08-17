@@ -925,6 +925,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreSectionApp => '앱 다운로드';
 
   @override
+  String get moreSectionBeta => '테스트 버전';
+
+  @override
+  String get moreAndroidBeta => 'Android 테스트 버전';
+
+  @override
+  String get moreTestFlight => 'iOS 테스트 버전 (TestFlight)';
+
+  @override
+  String get moreSectionPartners => '파트너';
+
+  @override
+  String get morePartnersNote =>
+      '파트너십 순서대로 표시됩니다. 재난 예방에 기여한 개인과 기업에 감사드립니다. 그들의 기여 더봉에 DPIP가 가능했습니다.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       '진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.';
 
@@ -1938,6 +1960,34 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get appLogs => '앱 로그';
+
+  @override
+  String get serverStatusBody => 'ExpTech 서버의 실시간 상태입니다.';
+
+  @override
+  String get serverStatusLocal => '기기 상태';
+
+  @override
+  String get serverStatusLocalBody =>
+      '서버가 정상이어도 알림이 도착하지 않을 수 있습니다. 권한과 백그라운드 실행을 확인하세요:';
+
+  @override
+  String get serverStatusAllUp => '모든 서비스 정상';
+
+  @override
+  String get serverStatusDegraded => '성능 저하';
+
+  @override
+  String get serverStatusDown => '서비스 이상';
+
+  @override
+  String get serverStatusErrorRate => '5xx 오류율';
+
+  @override
+  String get serverStatusLatency => '평균 지연';
+
+  @override
+  String get serverStatusUpdated => '업데이트';
 
   @override
   String get feedConnecting => '연결 중…';

@@ -938,6 +938,28 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreSectionApp => 'Dapatkan aplikasi';
 
   @override
+  String get moreSectionBeta => 'Versi uji';
+
+  @override
+  String get moreAndroidBeta => 'Versi uji Android';
+
+  @override
+  String get moreTestFlight => 'Versi uji iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Mitra';
+
+  @override
+  String get morePartnersNote =>
+      'Urut sesuai waktu kemitraan. Terima kasih kepada para individu dan perusahaan yang berkontribusi pada penanggulangan bencana; kontribusi mereka membuat DPIP menjadi mungkin.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Hanya tingkat 0–7, tanpa pemisahan 5−/5+/6−/6+.';
 
@@ -1964,6 +1986,35 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get appLogs => 'Log aplikasi';
+
+  @override
+  String get serverStatusBody =>
+      'Status kesehatan server ExpTech secara real-time.';
+
+  @override
+  String get serverStatusLocal => 'Status perangkat';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Server normal belum tentu notifikasi sampai. Periksa izin dan eksekusi latar:';
+
+  @override
+  String get serverStatusAllUp => 'Semua layanan normal';
+
+  @override
+  String get serverStatusDegraded => 'Kinerja menurun';
+
+  @override
+  String get serverStatusDown => 'Layanan bermasalah';
+
+  @override
+  String get serverStatusErrorRate => 'Tingkat error 5xx';
+
+  @override
+  String get serverStatusLatency => 'Latensi rata-rata';
+
+  @override
+  String get serverStatusUpdated => 'Diperbarui';
 
   @override
   String get feedConnecting => 'Menghubungkan…';

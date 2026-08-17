@@ -944,6 +944,28 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreSectionApp => 'Kunin ang app';
 
   @override
+  String get moreSectionBeta => 'Bersyon ng pagsubok';
+
+  @override
+  String get moreAndroidBeta => 'Bersyon ng pagsubok sa Android';
+
+  @override
+  String get moreTestFlight => 'Bersyon ng pagsubok sa iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Mga kasosyo';
+
+  @override
+  String get morePartnersNote =>
+      'Nakaayos ayon sa tamang panahon ng pakikipagtulungan. Salamat sa mga indibidwal at kompanyang nag-ambag sa paghahanda sa kalamidad; ang kanilang kontribusyon ang nagbigay-daan sa DPIP.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Antas 0–7 lang; walang 5−/5+/6−/6+.';
 
@@ -1973,6 +1995,35 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get appLogs => 'Mga log ng app';
+
+  @override
+  String get serverStatusBody =>
+      'Real-time na kalusugan ng mga server ng ExpTech.';
+
+  @override
+  String get serverStatusLocal => 'Katayuan ng device';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Hindi sapat na normal ang server — kailangan ding gumana ang mga pahintulot at background execution:';
+
+  @override
+  String get serverStatusAllUp => 'Lahat ng serbisyo ay normal';
+
+  @override
+  String get serverStatusDegraded => 'Bumaba ang pagganap';
+
+  @override
+  String get serverStatusDown => 'May problema ang serbisyo';
+
+  @override
+  String get serverStatusErrorRate => 'Rate ng error na 5xx';
+
+  @override
+  String get serverStatusLatency => 'Karaniwang latency';
+
+  @override
+  String get serverStatusUpdated => 'Na-update';
 
   @override
   String get feedConnecting => 'Kumokonekta…';

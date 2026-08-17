@@ -923,6 +923,28 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreSectionApp => 'アプリを入手';
 
   @override
+  String get moreSectionBeta => 'テスト版';
+
+  @override
+  String get moreAndroidBeta => 'Android テスト版';
+
+  @override
+  String get moreTestFlight => 'iOS テスト版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => 'パートナー';
+
+  @override
+  String get morePartnersNote =>
+      '提携順に表示しています。防災への貢献で DPIP を支えてくださった個人・企業の皆様に感謝します。';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       '震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。';
 
@@ -1931,6 +1953,34 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get appLogs => 'アプリログ';
+
+  @override
+  String get serverStatusBody => 'ExpTech サーバーのリアルタイムの健全性です。';
+
+  @override
+  String get serverStatusLocal => 'デバイスの状態';
+
+  @override
+  String get serverStatusLocalBody =>
+      'サーバーが正常でも警報が届くとは限りません。権限とバックグラウンド実行を確認してください：';
+
+  @override
+  String get serverStatusAllUp => 'すべて正常';
+
+  @override
+  String get serverStatusDegraded => 'パフォーマンス低下';
+
+  @override
+  String get serverStatusDown => 'サービス異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx エラー率';
+
+  @override
+  String get serverStatusLatency => '平均遅延';
+
+  @override
+  String get serverStatusUpdated => '更新';
 
   @override
   String get feedConnecting => '接続中…';

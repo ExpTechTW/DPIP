@@ -29,15 +29,20 @@ const String logTable = 'logs';
 /// How long a line is kept.
 const Duration logRetention = Duration(hours: 24);
 
-/// A count backstop under the age rule, because the age rule trusts a clock.
+/// The hard ceiling on stored lines, enforced on every write.
 ///
-/// A device whose clock jumps forward makes every stored line look older than
-/// the window, and the age delete empties the table — throwing away the
-/// diagnostic record of the launch being investigated, which is the one thing
-/// this table exists for. Keeping the newest rows regardless means no clock
-/// event can leave it empty; it also caps a burst that outruns the hourly
-/// sweep. Comfortably above a normal day, so it only bites in those two cases.
-const int logMaxRows = 20000;
+/// Two jobs. It is a backstop under the age rule, because the age rule trusts
+/// a clock: a device whose clock jumps forward makes every stored line look
+/// older than the window, and the age delete empties the table — throwing away
+/// the record of the launch being investigated, which is the one thing this
+/// table exists for. Keeping the newest rows regardless means no clock event
+/// can leave it empty.
+///
+/// And it bounds a burst. A fault that logs every frame writes faster than any
+/// sweep runs, so the cap is applied in the same transaction as the insert
+/// rather than only on the hourly pass — the table cannot exceed this between
+/// sweeps, only within one batch.
+const int logMaxRows = 5000;
 
 /// One persisted line.
 class StoredLog {
@@ -174,6 +179,15 @@ class LogStore {
           whereArgs: [
             _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
           ],
+        );
+        // The count ceiling in the same transaction as the insert, so a burst
+        // cannot outrun it. `id` rather than `time` because it is the primary
+        // key and monotonic: a clock that steps backwards would otherwise make
+        // the newest rows look like the oldest and delete them.
+        await txn.rawDelete(
+          'DELETE FROM $logTable WHERE id NOT IN ('
+          'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
+          [logMaxRows],
         );
       });
     } on Object {

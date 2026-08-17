@@ -938,6 +938,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreSectionApp => 'Get the app';
 
   @override
+  String get moreSectionBeta => 'Beta';
+
+  @override
+  String get moreAndroidBeta => 'Android beta';
+
+  @override
+  String get moreTestFlight => 'iOS beta (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Partners';
+
+  @override
+  String get morePartnersNote =>
+      'Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Only levels 0–7. No 5− / 5+ / 6− / 6+ split.';
 
@@ -1963,6 +1985,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appLogs => 'App logs';
+
+  @override
+  String get serverStatusBody => 'Live health of the ExpTech servers.';
+
+  @override
+  String get serverStatusLocal => 'Local status';
+
+  @override
+  String get serverStatusLocalBody =>
+      'A healthy server is not enough — alerts also need your device\'s permissions and background execution:';
+
+  @override
+  String get serverStatusAllUp => 'All services operational';
+
+  @override
+  String get serverStatusDegraded => 'Services degraded';
+
+  @override
+  String get serverStatusDown => 'Service down';
+
+  @override
+  String get serverStatusErrorRate => '5xx error rate';
+
+  @override
+  String get serverStatusLatency => 'Avg latency';
+
+  @override
+  String get serverStatusUpdated => 'Updated';
 
   @override
   String get feedConnecting => 'Connecting…';

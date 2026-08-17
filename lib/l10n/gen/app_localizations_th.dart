@@ -935,6 +935,28 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreSectionApp => 'ดาวน์โหลดแอป';
 
   @override
+  String get moreSectionBeta => 'เวอร์ชันทดสอบ';
+
+  @override
+  String get moreAndroidBeta => 'เวอร์ชันทดอบ Android';
+
+  @override
+  String get moreTestFlight => 'เวอร์ชันทดอบ iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'พันธมิตร';
+
+  @override
+  String get morePartnersNote =>
+      'เรียงตามลำดับคู่ความร่วมมือ ขอบคุณบุคคลและบริษัทที่มีส่วนร่วมในการป้องกันภัยพิบัติ การสนับสนุนของพวกเขาทำให้ DPIP เกิดขึ้นได้';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'มีระดับ 0–7 เท่านั้น ไม่แยก 5−/5+/6−/6+';
 
@@ -1958,6 +1980,35 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get appLogs => 'บันทึกแอป';
+
+  @override
+  String get serverStatusBody =>
+      'สถานะสุขภาพแบบเรียลไทม์ของเซิร์ฟเวอร์ ExpTech';
+
+  @override
+  String get serverStatusLocal => 'สถานะอุปกรณ์';
+
+  @override
+  String get serverStatusLocalBody =>
+      'เซิร์ฟเวอร์ปกติไม่ได้แปลว่าการแจ้งเตือนจะถึงเสมอ ตรวจสอบสิทธิ์และการทำงานเบื้องหลัง:';
+
+  @override
+  String get serverStatusAllUp => 'บริการทั้งหมดปกติ';
+
+  @override
+  String get serverStatusDegraded => 'ประสิทธิภาพลดลง';
+
+  @override
+  String get serverStatusDown => 'บริการผิดปกติ';
+
+  @override
+  String get serverStatusErrorRate => 'อัตราข้อผิดพลาด 5xx';
+
+  @override
+  String get serverStatusLatency => 'ความหน่วงเฉลี่ย';
+
+  @override
+  String get serverStatusUpdated => 'อัปเดต';
 
   @override
   String get feedConnecting => 'กำลังเชื่อมต่อ…';

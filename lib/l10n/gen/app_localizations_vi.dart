@@ -938,6 +938,28 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreSectionApp => 'Tải ứng dụng';
 
   @override
+  String get moreSectionBeta => 'Bản thử nghiệm';
+
+  @override
+  String get moreAndroidBeta => 'Bản thử nghiệm Android';
+
+  @override
+  String get moreTestFlight => 'Bản thử nghiệm iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Đối tác';
+
+  @override
+  String get morePartnersNote =>
+      'Theo thứ tự hợp tác. Xin cảm ơn các cá nhân và công ty đã đóng góp cho công tác phòng chống thiên tai, nhờ đó DPIP mới có thể ra đời.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Chỉ có mức 0–7, không tách 5−/5+/6−/6+.';
 
@@ -1963,6 +1985,35 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get appLogs => 'Nhật ký ứng dụng';
+
+  @override
+  String get serverStatusBody =>
+      'Tình trạng thời gian thực của máy chủ ExpTech.';
+
+  @override
+  String get serverStatusLocal => 'Trạng thái thiết bị';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Máy chủ bình thường chưa chắc cảnh báo đã đến được. Kiểm tra quyền và chạy nền:';
+
+  @override
+  String get serverStatusAllUp => 'Tất cả dịch vụ hoạt động';
+
+  @override
+  String get serverStatusDegraded => 'Hiệu suất giảm';
+
+  @override
+  String get serverStatusDown => 'Dịch vụ lỗi';
+
+  @override
+  String get serverStatusErrorRate => 'Tỷ lệ lỗi 5xx';
+
+  @override
+  String get serverStatusLatency => 'Độ trễ trung bình';
+
+  @override
+  String get serverStatusUpdated => 'Cập nhật';
 
   @override
   String get feedConnecting => 'Đang kết nối…';

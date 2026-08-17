@@ -1839,6 +1839,48 @@ abstract class AppLocalizations {
   /// **'Get the app'**
   String get moreSectionApp;
 
+  /// No description provided for @moreSectionBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get moreSectionBeta;
+
+  /// No description provided for @moreAndroidBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Android beta'**
+  String get moreAndroidBeta;
+
+  /// No description provided for @moreTestFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'iOS beta (TestFlight)'**
+  String get moreTestFlight;
+
+  /// No description provided for @moreSectionPartners.
+  ///
+  /// In en, this message translates to:
+  /// **'Partners'**
+  String get moreSectionPartners;
+
+  /// No description provided for @morePartnersNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.'**
+  String get morePartnersNote;
+
+  /// No description provided for @morePartnerGeoscience.
+  ///
+  /// In en, this message translates to:
+  /// **'Geoscience'**
+  String get morePartnerGeoscience;
+
+  /// No description provided for @morePartnerTwds.
+  ///
+  /// In en, this message translates to:
+  /// **'TWDS'**
+  String get morePartnerTwds;
+
   /// No description provided for @reportFilterIntensityInfoLegacyBody.
   ///
   /// In en, this message translates to:
@@ -3734,6 +3776,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App logs'**
   String get appLogs;
+
+  /// No description provided for @serverStatusBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Live health of the ExpTech servers.'**
+  String get serverStatusBody;
+
+  /// No description provided for @serverStatusLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Local status'**
+  String get serverStatusLocal;
+
+  /// No description provided for @serverStatusLocalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A healthy server is not enough — alerts also need your device\'s permissions and background execution:'**
+  String get serverStatusLocalBody;
+
+  /// No description provided for @serverStatusAllUp.
+  ///
+  /// In en, this message translates to:
+  /// **'All services operational'**
+  String get serverStatusAllUp;
+
+  /// No description provided for @serverStatusDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Services degraded'**
+  String get serverStatusDegraded;
+
+  /// No description provided for @serverStatusDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Service down'**
+  String get serverStatusDown;
+
+  /// No description provided for @serverStatusErrorRate.
+  ///
+  /// In en, this message translates to:
+  /// **'5xx error rate'**
+  String get serverStatusErrorRate;
+
+  /// No description provided for @serverStatusLatency.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg latency'**
+  String get serverStatusLatency;
+
+  /// No description provided for @serverStatusUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get serverStatusUpdated;
 
   /// A realtime feed is establishing its first data
   ///

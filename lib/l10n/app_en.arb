@@ -240,7 +240,9 @@
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "Download",
   "changelogShowSnapshots": "Show snapshots",
-  "@changelogShowSnapshots": { "description": "Changelog action that reveals pre-release snapshots" },
+  "@changelogShowSnapshots": {
+    "description": "Changelog action that reveals pre-release snapshots"
+  },
   "changelogTitle": "Changelog",
   "reportFilterOrderDesc": "Descending",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
@@ -1307,6 +1309,13 @@
     "description": "Himawari CO₂-band channel (B16, 13.3 µm) layer name"
   },
   "moreSectionApp": "Get the app",
+  "moreSectionBeta": "Beta",
+  "moreAndroidBeta": "Android beta",
+  "moreTestFlight": "iOS beta (TestFlight)",
+  "moreSectionPartners": "Partners",
+  "morePartnersNote": "Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.",
+  "morePartnerGeoscience": "Geoscience",
+  "morePartnerTwds": "TWDS",
   "reportFilterIntensityInfoLegacyBody": "Only levels 0–7. No 5− / 5+ / 6− / 6+ split.",
   "@notifyTsunami": {
     "description": "Notify channel title"
@@ -2718,6 +2727,15 @@
   "lightningLegendCg": "Cloud-to-ground · {minutes} min",
   "skyTimeAuto": "Auto",
   "appLogs": "App logs",
+  "serverStatusBody": "Live health of the ExpTech servers.",
+  "serverStatusLocal": "Local status",
+  "serverStatusLocalBody": "A healthy server is not enough — alerts also need your device's permissions and background execution:",
+  "serverStatusAllUp": "All services operational",
+  "serverStatusDegraded": "Services degraded",
+  "serverStatusDown": "Service down",
+  "serverStatusErrorRate": "5xx error rate",
+  "serverStatusLatency": "Avg latency",
+  "serverStatusUpdated": "Updated",
   "feedConnecting": "Connecting…",
   "notifyBannerDisabled": "Notifications are off — you won't receive disaster alerts.",
   "@meshtasticNoNodes": {

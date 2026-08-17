@@ -919,6 +919,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreSectionApp => '取得 App';
 
   @override
+  String get moreSectionBeta => '測試版';
+
+  @override
+  String get moreAndroidBeta => 'Android 測試版';
+
+  @override
+  String get moreTestFlight => 'iOS 測試版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作夥伴';
+
+  @override
+  String get morePartnersNote => '依合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科資訊有限公司';
+
+  @override
+  String get morePartnerTwds => '台灣數位串流有限公司';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
 
   @override
@@ -1921,6 +1942,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get appLogs => 'App 日誌';
+
+  @override
+  String get serverStatusBody => '目前 ExpTech 伺服器的即時健康狀態。';
+
+  @override
+  String get serverStatusLocal => '本機狀態';
+
+  @override
+  String get serverStatusLocalBody => '伺服器正常不代表警報一定到得了，檢查本機權限與背景執行狀態：';
+
+  @override
+  String get serverStatusAllUp => '所有服務正常';
+
+  @override
+  String get serverStatusDegraded => '服務效能下降';
+
+  @override
+  String get serverStatusDown => '服務異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 錯誤率';
+
+  @override
+  String get serverStatusLatency => '平均延遲';
+
+  @override
+  String get serverStatusUpdated => '更新於';
 
   @override
   String get feedConnecting => '連線中…';
@@ -3802,6 +3850,27 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get moreSectionApp => '获取 App';
 
   @override
+  String get moreSectionBeta => '测试版';
+
+  @override
+  String get moreAndroidBeta => 'Android 测试版';
+
+  @override
+  String get moreTestFlight => 'iOS 测试版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作伙伴';
+
+  @override
+  String get morePartnersNote => '按合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科资讯有限公司';
+
+  @override
+  String get morePartnerTwds => '台湾数位串流有限公司';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度仅 0–7，没有 5弱／5强／6弱／6强。';
 
   @override
@@ -4804,6 +4873,33 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get appLogs => '应用日志';
+
+  @override
+  String get serverStatusBody => '目前 ExpTech 服务器的实时健康状态。';
+
+  @override
+  String get serverStatusLocal => '本机状态';
+
+  @override
+  String get serverStatusLocalBody => '服务器正常不代表警报一定到达，请检查本机权限与后台执行状态：';
+
+  @override
+  String get serverStatusAllUp => '所有服务正常';
+
+  @override
+  String get serverStatusDegraded => '服务性能下降';
+
+  @override
+  String get serverStatusDown => '服务异常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 错误率';
+
+  @override
+  String get serverStatusLatency => '平均延迟';
+
+  @override
+  String get serverStatusUpdated => '更新于';
 
   @override
   String get feedConnecting => '连接中…';
@@ -6685,6 +6781,27 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreSectionApp => '取得 App';
 
   @override
+  String get moreSectionBeta => '測試版';
+
+  @override
+  String get moreAndroidBeta => 'Android 測試版';
+
+  @override
+  String get moreTestFlight => 'iOS 測試版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作夥伴';
+
+  @override
+  String get morePartnersNote => '依合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科資訊有限公司';
+
+  @override
+  String get morePartnerTwds => '台灣數位串流有限公司';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
 
   @override
@@ -7687,6 +7804,33 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get appLogs => 'App 日誌';
+
+  @override
+  String get serverStatusBody => '目前 ExpTech 伺服器的即時健康狀態。';
+
+  @override
+  String get serverStatusLocal => '本機狀態';
+
+  @override
+  String get serverStatusLocalBody => '伺服器正常不代表警報一定到得了，檢查本機權限與背景執行狀態：';
+
+  @override
+  String get serverStatusAllUp => '所有服務正常';
+
+  @override
+  String get serverStatusDegraded => '服務效能下降';
+
+  @override
+  String get serverStatusDown => '服務異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 錯誤率';
+
+  @override
+  String get serverStatusLatency => '平均延遲';
+
+  @override
+  String get serverStatusUpdated => '更新於';
 
   @override
   String get feedConnecting => '連接中…';
@@ -9568,6 +9712,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get moreSectionApp => '取得 App';
 
   @override
+  String get moreSectionBeta => '測試版';
+
+  @override
+  String get moreAndroidBeta => 'Android 測試版';
+
+  @override
+  String get moreTestFlight => 'iOS 測試版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作夥伴';
+
+  @override
+  String get morePartnersNote => '依合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科資訊有限公司';
+
+  @override
+  String get morePartnerTwds => '台灣數位串流有限公司';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
 
   @override
@@ -10570,6 +10735,33 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get appLogs => 'App 日誌';
+
+  @override
+  String get serverStatusBody => '目前 ExpTech 伺服器的即時健康狀態。';
+
+  @override
+  String get serverStatusLocal => '本機狀態';
+
+  @override
+  String get serverStatusLocalBody => '伺服器正常不代表警報一定到得了，檢查本機權限與背景執行狀態：';
+
+  @override
+  String get serverStatusAllUp => '所有服務正常';
+
+  @override
+  String get serverStatusDegraded => '服務效能下降';
+
+  @override
+  String get serverStatusDown => '服務異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 錯誤率';
+
+  @override
+  String get serverStatusLatency => '平均延遲';
+
+  @override
+  String get serverStatusUpdated => '更新於';
 
   @override
   String get feedConnecting => '連線中…';
