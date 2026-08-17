@@ -105,7 +105,12 @@ Stream<LicenseEntry> _weatherIconLicense() async* {
 }
 
 /// Set by `tool/run.sh` and `tool/run.ps1`, which is how the app is started.
-const bool _launchedByTool = bool.fromEnvironment('DPIP_RUN_SH');
+///
+/// Any value counts, deliberately. `bool.fromEnvironment` reads only the exact
+/// string `true` and answers `false` to everything else — including `1`, which
+/// is what the script passed at first, so the guard fired on the very launch
+/// that had obeyed it.
+const bool _launchedByTool = String.fromEnvironment('DPIP_RUN_SH') != '';
 
 /// Refuses to start when it was not, and says what to run instead.
 ///

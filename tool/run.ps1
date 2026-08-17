@@ -22,6 +22,6 @@
 
 $ErrorActionPreference = 'Stop'
 
-& mise exec -- flutter run --dart-define=DPIP_RUN_SH=1 @args
+& mise exec -- flutter run --dart-define=DPIP_RUN_SH=true @args
 
 exit $LASTEXITCODE

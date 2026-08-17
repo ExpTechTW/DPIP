@@ -29,5 +29,5 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # `DPIP_RUN_SH` is how the app knows it was started properly. A launch that
 # skips this script gets the wrong toolchain and an uncoloured log, and neither
 # announces itself — so bootstrap says so instead, in debug only.
-mise exec -- flutter run --dart-define=DPIP_RUN_SH=1 "$@" \
+mise exec -- flutter run --dart-define=DPIP_RUN_SH=true "$@" \
   | "$here/colorize_logs.sh"

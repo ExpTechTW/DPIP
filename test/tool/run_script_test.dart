@@ -50,7 +50,10 @@ void main() {
   test('the wrapper marks the launch as its own', () {
     // bootstrap warns when this is absent, because a launch that skips the
     // script gets a different SDK and an uncoloured log, and says so nowhere.
-    expect(_script(), contains('--dart-define=DPIP_RUN_SH=1'));
+    // The exact value is pinned in launch_marker_test.dart — `=1` passed this
+    // assertion while being read as `false`, so the value is checked where the
+    // reader's rule is documented, not here.
+    expect(_script(), contains('DPIP_RUN_SH'));
   });
 
   test('the wrapper runs flutter through mise', () {

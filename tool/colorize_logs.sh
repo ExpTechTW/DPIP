@@ -45,7 +45,7 @@ fi
 # `flutter: ` prefixes every line the device prints; dropping it gives back a
 # terminal's worth of width, and nothing distinguishes those lines but it.
 sed -E \
-  -e "s/^flutter: //" \
+  -e "s/^flutter: ?//" \
   -e "s/^\[CRITICAL\]/${MAGENTA}[CRITICAL]${RESET}/" \
   -e "s/^\[ERROR\]/${RED}[ERROR]${RESET}/" \
   -e "s/^\[WARN\]/${YELLOW}[WARN]${RESET}/" \
