@@ -8,6 +8,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
+import 'package:dpip/features/home/presentation/widgets/home_monitor_banner.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -168,10 +169,14 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     if (controller == null || !_styleReady) return;
     // Read context-bound values before any await.
     final size = _mapViewSize ?? MediaQuery.sizeOf(context);
-    // The map fills the page, but the region bar is layered over its top and the
-    // sheet over its bottom, so the band actually visible is shorter at both
-    // ends. Frame into that band, not the whole map.
-    final topInset = MediaQuery.paddingOf(context).top + RegionBar.height;
+    // The map fills the page, but the region bar and the monitor banner below
+    // it are layered over its top and the sheet over its bottom, so the band
+    // actually visible is shorter at both ends. Frame into that band, not the
+    // whole map.
+    final topInset =
+        MediaQuery.paddingOf(context).top +
+        RegionBar.height +
+        HomeMonitorBanner.height;
     final boundariesFuture = context.read<Future<TownBoundaries>>();
     final selected = _regions?.selected;
     final code = switch (selected) {
