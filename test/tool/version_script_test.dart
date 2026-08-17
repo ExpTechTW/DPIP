@@ -24,15 +24,6 @@ void main() {
     expect(v['code'], isA<int>());
   });
 
-  test('last names the newest release tag, v stripped', () {
-    // `26w34a` has no release tag under it yet, but the script must still
-    // answer — either a `26.1`-style value once the first modern release
-    // exists, or the pre-26 legacy tag (empty string if no tag at all).
-    final v = _run();
-    expect(v['last'], isA<String>());
-    expect(v['last'], isNot(contains('v')));
-  });
-
   test('the train is something Apple will accept', () {
     // `CFBundleShortVersionString` must be "a period-separated list of at most
     // three non-negative integers" — ERROR ITMS-90060, enforced at upload, so

@@ -24,12 +24,12 @@ commit="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 # than printing something that is not true.
 label=""
 code="0"
-last_release=""
+train=""
 if version="$(tool/version.sh 2>/dev/null)"; then
   eval "$version"
   label="${DPIP_LABEL:-}"
   code="${DPIP_CODE:-0}"
-  last_release="${DPIP_LAST_RELEASE:-}"
+  train="${DPIP_TRAIN:-}"
 fi
 
 new="$(cat <<EOF
@@ -48,9 +48,9 @@ const String kBuildLabel = '$label';
 /// The ordinal that goes with it; 0 when git could not answer.
 const int kBuildCode = $code;
 
-/// The newest release tag this history knows, 'v' stripped — '26.1'. Empty
-/// before the first release, in which case the version card shows the label.
-const String kLastRelease = '$last_release';
+/// The train number version.sh derives — '26.1'. Apple is told this and
+/// never the label; the More page version card shows it as the big number.
+const String kBuildTrain = '$train';
 EOF
 )"
 

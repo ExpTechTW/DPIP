@@ -40,18 +40,16 @@ abstract final class AppBuild {
   /// What CI stamped in, empty on a local build.
   static const String _definedLabel = String.fromEnvironment('DPIP_LABEL');
   static const int _definedCode = int.fromEnvironment('DPIP_CODE');
-  static const String _definedLast = String.fromEnvironment(
-    'DPIP_LAST_RELEASE',
-  );
+  static const String _definedTrain = String.fromEnvironment('DPIP_TRAIN');
 
   /// What the git hooks wrote, empty outside a repository.
   static String get _generatedLabel => kBuildLabel;
   static int get _generatedCode => kBuildCode;
 
-  /// The newest release this history knows, 'v' stripped. Empty before the
-  /// first release; a version card that wants a stable anchor number falls
-  /// back to [label] when it is.
-  static String get lastRelease => _last;
+  /// The train number this build rides — the release a snapshot is heading
+  /// toward, e.g. `26.1`. Apple is told this and never the label. The More
+  /// page version card shows it as the big number, above the label.
+  static String get train => _train;
 
   static String get _bestLabel =>
       _definedLabel.isNotEmpty ? _definedLabel : _generatedLabel;
@@ -59,7 +57,7 @@ abstract final class AppBuild {
 
   static String? _label;
   static int? _code;
-  static String _last = _definedLast.isNotEmpty ? _definedLast : kLastRelease;
+  static String _train = _definedTrain.isNotEmpty ? _definedTrain : kBuildTrain;
 
   /// Reads the platform's own version, for the builds CI did not stamp.
   ///
@@ -111,10 +109,10 @@ abstract final class AppBuild {
   static void debugSet({
     required String label,
     required int code,
-    String? last,
+    String? train,
   }) {
     _label = label;
     _code = code;
-    if (last != null) _last = last;
+    if (train != null) _train = train;
   }
 }
