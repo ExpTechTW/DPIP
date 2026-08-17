@@ -97,8 +97,17 @@ class _MapTimelineState extends State<MapTimeline> {
 
   void _cacheLabels() {
     final format = widget.timeFormat ?? _time;
-    _times = [for (final frame in widget.frames) format.format(frame.time)];
-    _dates = [for (final frame in widget.frames) _date.format(frame.time)];
+    // A frame's [DateTime] may be minted in UTC (server timestamps, moon
+    // instants) or in local time — either way it expresses the same instant,
+    // and the ruler must read in the caller's local time, not in the UTC
+    // representation a `isUtc: true` value would print verbatim. toLocal is
+    // the identity for a local DateTime and the conversion for a UTC one.
+    _times = [
+      for (final frame in widget.frames) format.format(frame.time.toLocal()),
+    ];
+    _dates = [
+      for (final frame in widget.frames) _date.format(frame.time.toLocal()),
+    ];
   }
 
   /// The big time label: the selected instant, or — when the layer's frames
@@ -108,7 +117,9 @@ class _MapTimelineState extends State<MapTimeline> {
     final start = _times[_liveIndex];
     final period = widget.framePeriod;
     if (period == null) return start;
-    final end = _time.format(widget.frames[_liveIndex].time.add(period));
+    final end = _time.format(
+      widget.frames[_liveIndex].time.toLocal().add(period),
+    );
     return '$start – $end';
   }
 
