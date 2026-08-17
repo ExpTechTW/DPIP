@@ -7,6 +7,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 
 /// In-app log viewer. Reachable from the More tab; pushed as a full-screen
 /// route.
@@ -31,11 +32,7 @@ class LogPage extends StatefulWidget {
 }
 
 class _LogPageState extends State<LogPage> {
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_replayPersisted());
-  }
+  late final Future<void> _replayed = _replayPersisted();
 
   /// Pulls the persisted log into Talker's history, oldest first, so the
   /// screen reads in the order things happened.
@@ -51,29 +48,47 @@ class _LogPageState extends State<LogPage> {
     final oldestInMemory = Log.talker.history.isEmpty
         ? null
         : Log.talker.history.first.time;
-    final stored = await store.recent(limit: logMaxRows);
+    // No more than the history can hold: reading further only evicts the lines
+    // read just before it.
+    final stored = await store.recent(limit: Log.historyLimit);
     for (final entry in stored.reversed) {
       if (oldestInMemory != null && !entry.time.isBefore(oldestInMemory)) {
         continue;
       }
-      Log.talker.logCustom(PersistedLog(entry));
+      Log.replay(PersistedLog(entry));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return TalkerScreen(
-      talker: Log.talker,
-      appBarTitle: AppLocalizations.of(context).appLogs,
-      theme: TalkerScreenTheme(
-        backgroundColor: colors.surface,
-        textColor: colors.onSurface,
-        cardColor: colors.surfaceContainer,
-      ),
-      // Collapsed: a log this screen exists to scan is read by its summaries,
-      // and an expanded card is mostly stack trace.
-      isLogsExpanded: false,
+    final l10n = AppLocalizations.of(context);
+    final theme = TalkerScreenTheme(
+      backgroundColor: colors.surface,
+      textColor: colors.onSurface,
+      cardColor: colors.surfaceContainer,
+    );
+    // Built only once the replay is in, because Talker reads its history when
+    // the screen builds and writing to it afterwards would not show.
+    return FutureBuilder<void>(
+      future: _replayed,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Scaffold(
+            backgroundColor: colors.surface,
+            appBar: AppBar(title: Text(l10n.appLogs)),
+            body: const Center(child: InlineLoading()),
+          );
+        }
+        return TalkerScreen(
+          talker: Log.talker,
+          appBarTitle: l10n.appLogs,
+          theme: theme,
+          // Collapsed: a log this screen exists to scan is read by its
+          // summaries, and an expanded card is mostly stack trace.
+          isLogsExpanded: false,
+        );
+      },
     );
   }
 }
@@ -82,16 +97,20 @@ class _LogPageState extends State<LogPage> {
 ///
 /// Its level is carried across, not invented. Talker colours a card and the
 /// level filter narrows by `logLevel`, so a replayed line that arrives without
-/// one is uncoloured and unfilterable — the two things the log screen is read
-/// with. The stored string is a [LogLevel] name, written by `Log.persistTo`.
+/// one is uncoloured and unfilterable. The card's heading is `title`, which
+/// defaults to the literal string `log`, so both have to be given or a
+/// replayed line arrives grey, unfilterable, and labelled `log`.
 class PersistedLog extends TalkerLog {
-  PersistedLog(StoredLog entry)
+  PersistedLog(StoredLog entry) : this._(entry, _level(entry.level));
+
+  PersistedLog._(StoredLog entry, LogLevel level)
     : super(
         entry.error == null
             ? entry.message
             : '${entry.message}\n${entry.error}',
         time: entry.time,
-        logLevel: _level(entry.level),
+        title: level.name,
+        logLevel: level,
         stackTrace: null,
       );
 

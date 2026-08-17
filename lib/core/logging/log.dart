@@ -16,10 +16,32 @@ abstract final class Log {
   /// "how long after launch" (e.g. bootstrap-ready and first-frame markers).
   static final Stopwatch sinceStart = Stopwatch()..start();
 
-  /// The underlying Talker instance — used by the log screen and error hooks.
-  static final Talker talker = Talker(
-    settings: TalkerSettings(useConsoleLogs: kDebugMode),
+  static final TalkerSettings _settings = TalkerSettings(
+    useConsoleLogs: kDebugMode,
   );
+
+  /// Held so [replay] can write to it. Talker builds one itself otherwise, and
+  /// keeps it private.
+  static final TalkerHistory _history = DefaultTalkerHistory(_settings);
+
+  /// The underlying Talker instance — used by the log screen and error hooks.
+  static final Talker talker = Talker(settings: _settings, history: _history);
+
+  /// How many lines the screen can show — Talker's own history ceiling, so
+  /// reading more out of the database only evicts what was just read.
+  static int get historyLimit => _settings.maxHistoryItems;
+
+  /// Puts a line the log screen should show into its history, **without
+  /// logging it**.
+  ///
+  /// `logCustom` is the obvious way and the wrong one: it publishes to the
+  /// stream, which the persister writes from, and prints to the console when
+  /// console logs are on. Replaying a day of stored lines through it therefore
+  /// reprinted the whole table to the terminal *and* wrote every line back
+  /// into the table it came from, growing a duplicate on each visit.
+  ///
+  /// Writing to history is the whole intent: the screen reads history.
+  static void replay(TalkerData data) => _history.write(data);
 
   /// Optional crash-reporting destination. When set (in `bootstrap`), handled
   /// and uncaught errors are forwarded here in addition to the in-app log.
