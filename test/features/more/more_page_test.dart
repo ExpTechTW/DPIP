@@ -262,17 +262,19 @@ void main() {
     tester,
   ) async {
     await _pump(tester, _router([]));
-    // The card leads with a number: a release names itself, a snapshot names
-    // the release it builds toward (the last one cut, reduced to major.minor).
+    // The card leads with the train number (26.1 for both release and
+    // snapshot); a snapshot additionally prints its own label under it as
+    // fine print, so a tester can quote the exact build.
     final label = AppBuild.label;
-    final expected = RegExp(r'^\d+\.\d+$').hasMatch(label)
-        ? label
-        : AppBuild.lastRelease.split('.').take(2).join('.');
+    final stable = RegExp(r'^\d+\.\d+$').hasMatch(label);
+    expect(find.text(AppBuild.train), findsWidgets);
+    if (!stable) {
+      expect(find.text(label), findsOneWidget);
+    }
     expect(
       find.descendant(of: find.byType(InkWell), matching: find.text('DPIP')),
       findsWidgets,
     );
-    expect(find.text(expected), findsOneWidget);
     expect(find.text('Snapshot'), findsOneWidget);
   });
 

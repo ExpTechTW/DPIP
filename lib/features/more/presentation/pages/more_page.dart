@@ -872,19 +872,6 @@ class _VersionCard extends StatelessWidget {
   static const Color _stableColor = Color(0xFF2E7D32);
   static const Color _snapshotColor = Color(0xFFEF6C00);
 
-  /// The number the card leads with. A release names itself; a snapshot is
-  /// named for the week it was cut (`26w34a`), which reads as noise next to a
-  /// store listing — so it shows the release it builds toward, the last one
-  /// cut, reduced to `major.minor`. No release yet (legacy `3.9.9` answers
-  /// before the first modern tag): fall back to the label so the card never
-  /// quotes a version that does not exist.
-  static String _displayNumber(String label) {
-    if (_releaseLabel.hasMatch(label)) return label;
-    final last = AppBuild.lastRelease;
-    if (last.isEmpty) return label;
-    return last.split('.').take(2).join('.');
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -893,7 +880,7 @@ class _VersionCard extends StatelessWidget {
     final label = AppBuild.label;
     final stable = _releaseLabel.hasMatch(label);
     final typeColor = stable ? _stableColor : _snapshotColor;
-    final number = _displayNumber(label);
+    final train = AppBuild.train;
     return Material(
       color: colors.surfaceContainer,
       borderRadius: AppRadius.large,
@@ -943,14 +930,29 @@ class _VersionCard extends StatelessWidget {
                   colors: [colors.primary, colors.tertiary],
                 ).createShader(rect),
                 child: Text(
-                  number,
-                  style: theme.textTheme.headlineSmall?.copyWith(
+                  train,
+                  style: theme.textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     fontFeatures: const [FontFeature.tabularFigures()],
+                    height: 1,
                   ),
                 ),
               ),
+              // A snapshot is named for the week it was cut, not a store
+              // version, so the label goes below the number as fine print —
+              // smaller, but still a headline next to the badge.
+              if (!stable) ...[
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               // Same treatment as the changelog's type chip: tinted wash,
               // hairline of the same hue, coloured label — not a solid fill,
