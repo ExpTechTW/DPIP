@@ -1,0 +1,35 @@
+/// Debug-only feature flags, read at compile time from `--dart-define`.
+///
+/// Deliberately in core: a flag any feature (and any layer) may consult, with
+/// no dependency on the feature that implements the demo behaviour.
+library;
+
+import 'package:flutter/foundation.dart' show kDebugMode;
+
+/// `bool.fromEnvironment` only recognises the literal string `"true"` —
+/// `--dart-define=NAME=1`, the natural habit coming from most other tools'
+/// env-var conventions, silently reads as **off**, with nothing to say why.
+/// Reading the raw string first and accepting `1` too turns that into a
+/// working flag instead of a quiet no-op.
+const String _monitorDemoRaw = String.fromEnvironment('DPIP_DEMO_MONITOR');
+const String _monitorDemoSevereRaw = String.fromEnvironment(
+  'DPIP_DEMO_MONITOR_SEVERE',
+);
+
+/// Whether the 強震監視器 demo feeds are on: debug builds launched with
+/// `--dart-define=DPIP_DEMO_MONITOR=true` (or `=1`). The flag is forced off
+/// outside [kDebugMode] so a release build can never ship the synthetic feeds.
+const bool kMonitorDemoEnabled =
+    (_monitorDemoRaw == 'true' || _monitorDemoRaw == '1') && kDebugMode;
+
+/// Whether the demo event uses a fixed, severe preset (large magnitude,
+/// shallow depth) instead of the newest real report —
+/// `--dart-define=DPIP_DEMO_MONITOR_SEVERE=true` (or `=1`), alongside
+/// [kMonitorDemoEnabled] (a no-op without it, since only [kMonitorDemoEnabled]
+/// swaps the demo sources in at all). Lets a developer see the monitor's
+/// high-intensity styling — the EEW card's colour badge, the station dots'
+/// red/purple end of the scale — without waiting for an actual major
+/// earthquake to be the newest catalogue row.
+const bool kMonitorDemoSevereEnabled =
+    (_monitorDemoSevereRaw == 'true' || _monitorDemoSevereRaw == '1') &&
+    kDebugMode;
