@@ -1059,20 +1059,19 @@ class _VersionCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // A snapshot is named for the week it was cut, not a store
-              // version, so the label goes below the number as fine print —
-              // smaller, but still a headline next to the badge.
-              if (!stable) ...[
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
-                  ),
+              // Fine print below the number: a snapshot is named for the week
+              // it was cut, so it prints its own label; a release's label is
+              // identical to the train above, so it prints the platform's
+              // recorded version instead (what Settings → app shows).
+              const SizedBox(height: 2),
+              Text(
+                stable ? (AppBuild.platformVersion ?? train) : label,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
                 ),
-              ],
+              ),
               const SizedBox(height: AppSpacing.sm),
               // Same treatment as the changelog's type chip: tinted wash,
               // hairline of the same hue, coloured label — not a solid fill,

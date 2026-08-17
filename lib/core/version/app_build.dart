@@ -51,12 +51,20 @@ abstract final class AppBuild {
   /// page version card shows it as the big number, above the label.
   static String get train => _train;
 
+  /// The version the platform itself records for this build — what the OS
+  /// shows under Settings → app. For a local debug run that is the pubspec
+  /// placeholder (`26.1.0`); CI stamps `--build-name` on iOS and `DPIP_LABEL`
+  /// on Android, so a published build reports the train (`26.1`) instead.
+  /// The version card prints it as the release's fine-print line.
+  static String? get platformVersion => _platformVersion;
+
   static String get _bestLabel =>
       _definedLabel.isNotEmpty ? _definedLabel : _generatedLabel;
   static int get _bestCode => _definedCode > 0 ? _definedCode : _generatedCode;
 
   static String? _label;
   static int? _code;
+  static String? _platformVersion;
   static String _train = _definedTrain.isNotEmpty ? _definedTrain : kBuildTrain;
 
   /// Reads the platform's own version, for the builds CI did not stamp.
@@ -65,6 +73,15 @@ abstract final class AppBuild {
   /// [label] falls back to whatever was defined and [code] to 0.
   static Future<void> ensureLoaded() async {
     if (_label != null) return;
+    String platformVersion = '';
+    try {
+      final info = await PackageInfo.fromPlatform();
+      platformVersion = info.version;
+    } on Object {
+      // A version readout is never worth failing a launch over. The platform
+      // version line simply stays empty for that build.
+    }
+    _platformVersion = platformVersion;
     if (_bestLabel.isNotEmpty && _bestCode > 0) {
       _label = _bestLabel;
       _code = _bestCode;
@@ -110,9 +127,11 @@ abstract final class AppBuild {
     required String label,
     required int code,
     String? train,
+    String? platformVersion,
   }) {
     _label = label;
     _code = code;
     if (train != null) _train = train;
+    if (platformVersion != null) _platformVersion = platformVersion;
   }
 }

@@ -264,12 +264,17 @@ void main() {
   ) async {
     await _pump(tester, _router([]));
     // The card leads with the train number (26.1 for both release and
-    // snapshot); a snapshot additionally prints its own label under it as
-    // fine print, so a tester can quote the exact build.
+    // snapshot). Fine print under it: a snapshot prints its own label
+    // (26w34a), a release prints the platform's recorded version.
     final label = AppBuild.label;
     final stable = RegExp(r'^\d+\.\d+$').hasMatch(label);
     expect(find.text(AppBuild.train), findsWidgets);
-    if (!stable) {
+    if (stable) {
+      // The platform version is what Settings → app shows for a release; in
+      // these tests it is unset so the card falls back to the train, which is
+      // the same string the lead number printed — so it may appear twice.
+      expect(find.text(AppBuild.train), findsNWidgets(2));
+    } else {
       expect(find.text(label), findsOneWidget);
     }
     expect(
