@@ -8,6 +8,9 @@ import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
+import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -150,6 +153,21 @@ void main() {
       expect(find.text(l10n.eewSWave), findsOneWidget);
       // The countdown value is positive seconds, not "Arrived".
       expect(find.text(l10n.eewArrived), findsNothing);
+
+      // The local-estimate tile's colour must agree with the level it
+      // actually displays — not a fixed colour no matter how big the
+      // estimated shaking is (the S-wave tile stays fixed alert red; only
+      // the local-intensity one is level-scaled).
+      final tile = tester.widget<EewEstimateTile>(
+        find.widgetWithText(EewEstimateTile, l10n.eewLocalIntensity),
+      );
+      final level = [
+        for (var i = 0; i <= 9; i++)
+          if (Intensity.label(i) == tile.value) i,
+      ].single;
+      expect(tile.background, IntensityColors.discrete(level));
+      expect(tile.foreground, IntensityColors.onDiscrete(level));
+
       await tester.pumpWidget(const SizedBox());
     },
   );

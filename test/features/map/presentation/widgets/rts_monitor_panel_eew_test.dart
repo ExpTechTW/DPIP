@@ -162,7 +162,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'lists every active alert while the feeds are live (multi-report)',
+    'shows one alert at a time and cycles to the rest on tap (multi-report)',
     (tester) async {
       final feeds = await _liveFeeds(
         alerts: [
@@ -173,10 +173,19 @@ void main() {
       final store = await _store();
       await tester.pumpWidget(_wrap(feeds.rts, feeds.eew, store));
 
-      // The status strip is still there underneath the alert cards.
+      // The status strip is still there underneath the alert card, and only
+      // the first alert shows — the rest are a tap away, not a stacked list.
       expect(find.text('Seismic Monitor'), findsOneWidget);
       expect(find.text('花蓮縣'), findsOneWidget);
+      expect(find.text('臺東縣'), findsNothing);
+      expect(find.text('1/2'), findsOneWidget);
+
+      await tester.tap(find.text('花蓮縣'));
+      await tester.pump();
+
+      expect(find.text('花蓮縣'), findsNothing);
       expect(find.text('臺東縣'), findsOneWidget);
+      expect(find.text('2/2'), findsOneWidget);
 
       // Tear down so each card's countdown timer is cancelled.
       await tester.pumpWidget(const SizedBox());
@@ -195,6 +204,62 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
   });
+
+  testWidgets(
+    'the status strip turns red-on-errorContainer while an alert is active, '
+    'and back to plain once calm',
+    (tester) async {
+      // Finds the status strip's own Container by its distinctive boxShadow —
+      // both branches of its decoration set one, so this works whether the
+      // strip is currently tinted for an active alert or not, without
+      // guessing at ancestor ordering through the Scaffold/MaterialApp frame.
+      Finder statusStripContainer() => find.byWidgetPredicate(
+        (widget) =>
+            widget is Container &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration! as BoxDecoration).boxShadow != null,
+      );
+
+      final feeds = await _liveFeeds(alerts: [_alert()]);
+      final store = await _store();
+      await tester.pumpWidget(_wrap(feeds.rts, feeds.eew, store));
+
+      final colors = Theme.of(tester.element(find.text('Seismic Monitor')))
+          .colorScheme;
+
+      final active =
+          tester.widget<Container>(statusStripContainer()).decoration!
+              as BoxDecoration;
+      expect(
+        active.color,
+        colors.errorContainer.withValues(alpha: 0.94),
+        reason:
+            'an active alert must tint the whole strip, like the legacy '
+            "monitor's sheet did",
+      );
+      expect(
+        active.border,
+        isNotNull,
+        reason: 'an active alert must give the strip a red border too',
+      );
+
+      await tester.pumpWidget(const SizedBox());
+
+      final calmFeeds = await _liveFeeds();
+      await tester.pumpWidget(_wrap(calmFeeds.rts, calmFeeds.eew, store));
+      final calm =
+          tester.widget<Container>(statusStripContainer()).decoration!
+              as BoxDecoration;
+      expect(
+        calm.color,
+        colors.surface.withValues(alpha: 0.94),
+        reason: 'the tint must not linger once there is nothing active',
+      );
+      expect(calm.border, isNull);
+
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
 
   testWidgets('drops the alert cards once the EEW feed has aged past live', (
     tester,

@@ -24,7 +24,7 @@ import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
-import 'package:dpip/features/earthquake/domain/intensity.dart';
+import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
@@ -34,11 +34,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 /// One live EEW alert in the monitor's overlay sheet — compact so the map stays
-/// visible around it.
+/// visible around it. When [onTap] is set (the overlay has more than one active
+/// alert to cycle through), the whole card is tappable and [trailing] carries
+/// the "n/total" cycle chip — mirrors the report replay page's alert card.
 class MonitorEewCard extends StatefulWidget {
-  const MonitorEewCard({super.key, required this.alert});
+  const MonitorEewCard({
+    super.key,
+    required this.alert,
+    this.trailing,
+    this.onTap,
+  });
 
   final Eew alert;
+
+  /// An extra widget in the header row, before the intensity badge.
+  final Widget? trailing;
+
+  /// Advances to the next alert; null when there is only one (or the overlay
+  /// isn't meant to cycle).
+  final VoidCallback? onTap;
 
   @override
   State<MonitorEewCard> createState() => _MonitorEewCardState();
@@ -116,70 +130,83 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
       color: colors.surfaceContainerHigh,
       shape: RoundedRectangleBorder(
         borderRadius: AppRadius.medium,
-        side: BorderSide(color: colors.outlineVariant),
+        // The border reads off the same discrete scale as the badge — a
+        // calm/low reading stays close to the neutral outline it replaces,
+        // a severe one is unmistakable before you even read the number.
+        side: BorderSide(
+          color: IntensityColors.discrete(maxIntensity.colorLevel),
+          width: 2,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    info.location,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                IntensityBadge(
-                  label: maxIntensity.label,
-                  color: IntensityColors.discrete(maxIntensity.colorLevel),
-                  size: 32,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              l10n.eewSummary(
-                info.magnitude.toStringAsFixed(1),
-                info.depth.toStringAsFixed(0),
-              ),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            if (estimate != null) ...[
-              const SizedBox(height: AppSpacing.sm),
+      child: InkWell(
+        onTap: widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Row(
                 children: [
                   Expanded(
-                    child: EewEstimateTile(
-                      label: l10n.eewLocalIntensity,
-                      value: Intensity.label(estimate.scale),
-                      background: colors.primaryContainer,
-                      foreground: colors.onPrimaryContainer,
+                    child: Text(
+                      info.location,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
+                  if (widget.trailing != null) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    widget.trailing!,
+                  ],
                   const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: EewEstimateTile(
-                      label: l10n.eewSWave,
-                      value: arrived
-                          ? l10n.eewArrived
-                          : l10n.eewCountdown(remaining ?? 0),
-                      background: EewEstimateTile.alertRed(),
-                      foreground: Colors.white,
-                    ),
+                  IntensityBadge(
+                    label: maxIntensity.label,
+                    color: IntensityColors.discrete(maxIntensity.colorLevel),
+                    size: 32,
                   ),
                 ],
               ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.eewSummary(
+                  info.magnitude.toStringAsFixed(1),
+                  info.depth.toStringAsFixed(0),
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+              if (estimate != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    Expanded(
+                      child: EewEstimateTile(
+                        label: l10n.eewLocalIntensity,
+                        value: Intensity.label(estimate.scale),
+                        background: IntensityColors.discrete(estimate.scale),
+                        foreground: IntensityColors.onDiscrete(estimate.scale),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: EewEstimateTile(
+                        label: l10n.eewSWave,
+                        value: arrived
+                            ? l10n.eewArrived
+                            : l10n.eewCountdown(remaining ?? 0),
+                        background: EewEstimateTile.alertRed(),
+                        foreground: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
