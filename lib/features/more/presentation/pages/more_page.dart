@@ -641,9 +641,11 @@ class _HeroCards extends StatelessWidget {
 /// as everything else reads as another menu row, whatever weight it is given.
 /// Gold is what makes it read as *paid*.
 ///
-/// The construction is the same either way: a one-hue gradient for the sheen, a
+/// It shares the row construction of the two cards under it — badge, label,
+/// trailing arrow — so the right column reads as one aligned stack; the
+/// ranking is carried by the gold alone: a one-hue gradient for the sheen, a
 /// warm cast underneath so it looks lit rather than printed on, a hairline
-/// along the edge, and a filled badge carrying the most saturated step.
+/// along the edge, and a filled badge holding the most saturated step.
 class _SupportCallout extends StatelessWidget {
   const _SupportCallout();
 
@@ -678,30 +680,40 @@ class _SupportCallout extends StatelessWidget {
           onTap: () => context.pushNamed(AppRoutes.sponsor),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
+              horizontal: AppSpacing.sm,
               vertical: AppSpacing.sm,
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Filled, not outlined: the one active affordance on a page
                 // whose every other row is an outlined icon.
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: gold.badge,
                   ),
-                  child: Icon(Icons.favorite, color: gold.onBadge, size: 24),
+                  child: Icon(Icons.favorite, color: gold.onBadge, size: 19),
                 ),
-                Text(
-                  l10n.sponsorTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: gold.ink,
+                const SizedBox(width: AppSpacing.sm),
+                Flexible(
+                  child: Text(
+                    l10n.sponsorTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: gold.ink,
+                    ),
                   ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Icon(
+                  Icons.chevron_right,
+                  size: 14,
+                  color: gold.ink.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -714,9 +726,10 @@ class _SupportCallout extends StatelessWidget {
 
 /// The page's second call to action, directly under [_SupportCallout].
 ///
-/// Deliberately one step down: the same badge-and-two-lines construction, but
-/// a flat secondary container with no gradient and no shadow. That is what
-/// makes the ranking legible — if this card also glowed, neither would lead.
+/// Deliberately one step down: the same badge-and-label row as the callout
+/// above, but a flat secondary container with no gradient and no shadow. That
+/// is what makes the ranking legible — if this card also glowed, neither would
+/// lead.
 class _DiscordCallout extends StatelessWidget {
   const _DiscordCallout();
 
