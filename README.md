@@ -4,13 +4,15 @@
 
 **臺灣的防災資訊整合平台 —— 地震速報、即時震度、天氣與災害示警，都在同一個 App 裡。**
 
-[![Release](https://img.shields.io/github/v/release/exptechtw/dpip?label=%E7%99%BC%E5%B8%83)](https://github.com/ExpTechTW/DPIP/releases/latest)
+[![正式版](https://img.shields.io/github/v/release/exptechtw/dpip?label=%E6%AD%A3%E5%BC%8F%E7%89%88&color=1B8A50)](https://github.com/ExpTechTW/DPIP/releases/latest)
+[![測試版](https://img.shields.io/github/v/tag/exptechtw/dpip?sort=date&label=%E6%B8%AC%E8%A9%A6%E7%89%88&color=orange)](https://github.com/ExpTechTW/DPIP/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/ExpTechTW/DPIP/ci.yml?branch=main&label=CI)](https://github.com/ExpTechTW/DPIP/actions/workflows/ci.yml)
 [![翻譯進度](https://badges.crowdin.net/dpip/localized.svg)](https://crowdin.com/project/dpip)
+[![Discord](https://img.shields.io/discord/926545182407688273?logo=discord&logoColor=white&label=Discord&color=5865F2)](https://discord.gg/5dbHqV8ees)
 
-[官網](https://exptech.dev) • [Discord](https://discord.gg/5dbHqV8ees) • [更新日誌](https://github.com/ExpTechTW/DPIP/releases) • [開發文件](AGENTS.md)
+[官網](https://exptech.dev) • [更新日誌](https://github.com/ExpTechTW/DPIP/releases) • [開發文件](AGENTS.md)
 
-<a href="https://play.google.com/store/apps/details?id=com.exptech.dpip"><img alt="下載 Google Play 版" height="48" src="https://play.google.com/intl/en_us/badges/static/images/badges/zh-tw_badge_web_generic.png"></a>
+<a href="https://play.google.com/store/apps/details?id=com.exptech.dpip"><img alt="下載 Google Play 版" height="52" src="https://play.google.com/intl/en_us/badges/static/images/badges/zh-tw_badge_web_generic.png"></a>
 <a href="https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"><img alt="下載 App Store 版" height="40" src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/zh-tw"></a>
 
 </div>
