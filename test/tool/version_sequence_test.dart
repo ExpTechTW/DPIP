@@ -102,11 +102,13 @@ void main() {
     expect(release['train'], '26.1');
   });
 
-  test('the tag is the release name, verbatim', () {
+  test('the tag is the release name, verbatim; the train drops the patch', () {
     git(['tag', 'v26.1.1']);
     final v = version();
     expect(v['label'], '26.1.1');
-    expect(v['train'], '26.1.1');
+    // Apple's marketing version (and the hero card's big number) is the
+    // major.minor; the patch lives in the label/versionName alone.
+    expect(v['train'], '26.1');
   });
 
   test('a snapshot is named for the release it precedes', () {

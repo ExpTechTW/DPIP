@@ -140,9 +140,16 @@ commits="$(git rev-list --count HEAD --since="$year_start")"
 code=$((SCHEME * 100000000 + 10#$year * 1000000 + commits))
 
 if [ -n "$exact_tag" ]; then
-  # A release: the tag is the label, and the label is the train.
+  # A release: the tag is the label. Apple is told a marketing version without
+  # the patch — `26.2.1` advertises as `26.2` — and the hero card's big number
+  # is the same `major.minor`, because that is the number a user compares
+  # against the store page. A two-part label (`26.1`) is its own train.
   label="${exact_tag#v}"
-  train="$label"
+  if [[ "$label" =~ ^([0-9]+)\.([0-9]+)(\..*)?$ ]]; then
+    train="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+  else
+    train="$label"
+  fi
 else
   # A snapshot. The letter counts the snapshots already *published* this week,
   # so this build is the next one: the first is `a`, the second `b`.
