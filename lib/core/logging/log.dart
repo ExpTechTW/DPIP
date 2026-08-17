@@ -20,42 +20,6 @@ abstract final class Log {
     useConsoleLogs: kDebugMode,
   );
 
-  /// Held so [replay] can write to it, and so clearing the screen clears the
-  /// table too. Talker builds one itself otherwise, and keeps it private.
-  static final _PersistedHistory _history = _PersistedHistory(_settings);
-
-  /// The underlying Talker instance — used by the log screen and error hooks.
-  static final Talker talker = Talker(settings: _settings, history: _history);
-
-  /// How many lines the screen can show — Talker's own history ceiling, so
-  /// reading more out of the database only evicts what was just read.
-  static int get historyLimit => _settings.maxHistoryItems;
-
-  /// Puts a line the log screen should show into its history, **without
-  /// logging it**.
-  ///
-  /// `logCustom` is the obvious way and the wrong one: it publishes to the
-  /// stream, which the persister writes from, and prints to the console when
-  /// console logs are on. Replaying a day of stored lines through it therefore
-  /// reprinted the whole table to the terminal *and* wrote every line back
-  /// into the table it came from, growing a duplicate on each visit.
-  ///
-  /// Writing to history is the whole intent: the screen reads history.
-  ///
-  /// The normalisation below is what `_handleLogData` does on the way past,
-  /// and skipping the logger skips it too. The screen groups its filter chips
-  /// by `key` and colours a card by `key` first — so a line that arrives
-  /// without one is uncounted, uncoloured, and lands in a chip labelled
-  /// `undefined` together with every other level.
-  static void replay(TalkerData data) {
-    final key = data.key;
-    if (key != null) {
-      data.title = talker.settings.getTitleByKey(key);
-      data.pen = talker.settings.getPenByKey(key, fallbackPen: data.pen);
-    }
-    _history.replay(data);
-  }
-
   /// Optional crash-reporting destination. When set (in `bootstrap`), handled
   /// and uncaught errors are forwarded here in addition to the in-app log.
   static CrashSink? crashSink;
@@ -67,6 +31,18 @@ abstract final class Log {
 
   static StreamSubscription<TalkerData>? _bridge;
 
+  /// Held so the screen's history can be replaced from the table, and so
+  /// clearing it clears the table too. Talker builds one itself otherwise,
+  /// and keeps it private.
+  static final _PersistedHistory _history = _PersistedHistory(_settings);
+
+  /// The underlying Talker instance — used by the log screen and error hooks.
+  static final Talker talker = Talker(settings: _settings, history: _history);
+
+  /// How many lines the screen can show — Talker's own history ceiling, so
+  /// reading more out of the database only evicts what was just read.
+  static int get historyLimit => _settings.maxHistoryItems;
+
   /// Starts persisting every line to [store].
   ///
   /// Bridged off Talker's stream rather than added to each of the methods
@@ -76,17 +52,47 @@ abstract final class Log {
   static void persistTo(LogStore logStore) {
     store = logStore;
     _bridge?.cancel();
-    _bridge = talker.stream.listen((data) {
-      logStore.add(
-        StoredLog(
-          time: data.time,
-          level: data.logLevel?.name ?? 'info',
-          message: data.displayMessage,
-          error: (data.exception ?? data.error)?.toString(),
-          stackTrace: data.stackTrace?.toString(),
-        ),
-      );
-    });
+    _bridge = talker.stream.listen((data) => logStore.add(_stored(data)));
+    // Everything logged before the database opened is in memory and nowhere
+    // else — the startup lines, and whatever went wrong while opening it.
+    // Those are precisely the lines that explain a crash during launch, and
+    // they were never written. Subscribing first and copying after means a
+    // line arriving in between is stored twice rather than lost.
+    for (final data in List<TalkerData>.of(talker.history)) {
+      logStore.add(_stored(data));
+    }
+  }
+
+  static StoredLog _stored(TalkerData data) => StoredLog(
+    time: data.time,
+    level: data.logLevel?.name ?? 'info',
+    message: data.displayMessage,
+    error: (data.exception ?? data.error)?.toString(),
+    stackTrace: data.stackTrace?.toString(),
+  );
+
+  /// Replaces the screen's history with what is on disk.
+  ///
+  /// The database is the authority: every line goes through [persistTo], and
+  /// what was logged before it opened is copied in there, so memory holds
+  /// nothing the table does not. Keeping both and merging them was the source
+  /// of every ordering and eviction problem this screen had — a replayed line
+  /// evicting the running session, older lines sitting after newer ones,
+  /// duplicates on each visit.
+  ///
+  /// [lines] is newest first, the order the store returns.
+  static void reload(Iterable<TalkerData> lines) {
+    // What `_handleLogData` does on the way past, and what skipping the logger
+    // skips: the screen groups its filter chips by `key` and colours a card by
+    // it, so a line that arrives without a title and pen derived from that key
+    // is uncounted, uncoloured, and labelled `log`.
+    for (final data in lines) {
+      final key = data.key;
+      if (key == null) continue;
+      data.title = talker.settings.getTitleByKey(key);
+      data.pen = talker.settings.getPenByKey(key, fallbackPen: data.pen);
+    }
+    _history.replaceAll(lines.toList().reversed);
   }
 
   /// Writes anything still buffered — call when the app goes to the
@@ -247,24 +253,25 @@ class _PersistedHistory implements TalkerHistory {
   final TalkerSettings _settings;
   final _entries = <TalkerData>[];
 
-  bool get _writable => _settings.useHistory && _settings.enabled;
-
   @override
   List<TalkerData> get history => _entries;
 
   @override
   void write(TalkerData data) {
-    if (!_writable) return;
+    if (!_settings.useHistory || !_settings.enabled) return;
     if (_entries.length >= _settings.maxHistoryItems) _entries.removeAt(0);
     _entries.add(data);
   }
 
-  /// A line read back off disk: older than everything here, and never worth
-  /// evicting something that is not.
-  void replay(TalkerData data) {
-    if (!_writable) return;
-    if (_entries.length >= _settings.maxHistoryItems) return;
-    _entries.insert(0, data);
+  /// Oldest first. Used when the screen loads the stored log, which is the
+  /// whole truth rather than an addition to it.
+  void replaceAll(Iterable<TalkerData> lines) {
+    _entries
+      ..clear()
+      ..addAll(lines);
+    while (_entries.length > _settings.maxHistoryItems) {
+      _entries.removeAt(0);
+    }
   }
 
   @override

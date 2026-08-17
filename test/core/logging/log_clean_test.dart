@@ -56,4 +56,23 @@ void main() {
     Log.store = null;
     expect(Log.talker.cleanHistory, returnsNormally);
   });
+
+  test(
+    'lines logged before the database opened are written when it does',
+    () async {
+      // `Log.info('DPIP starting up')` runs at bootstrap.dart:111 and the store
+      // opens at :139, so the lines that explain a crash during launch were the
+      // ones never stored — and are the ones lost the moment the screen loads
+      // the table over the top of memory.
+      Log.store = null;
+      Log.talker.cleanHistory();
+      Log.info('DPIP starting up');
+
+      Log.persistTo(store);
+      await store.flush();
+
+      final stored = await store.recent();
+      expect(stored.map((e) => e.message), contains('DPIP starting up'));
+    },
+  );
 }

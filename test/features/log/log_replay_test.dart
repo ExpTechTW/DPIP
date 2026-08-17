@@ -68,7 +68,7 @@ void main() {
         message: 'a line',
       ),
     );
-    Log.replay(replayed);
+    Log.reload([replayed]);
     expect(
       replayed.title,
       Log.talker.settings.getTitleByKey(TalkerKey.warning),
@@ -89,57 +89,53 @@ void main() {
     expect(replayed.generateTextMessage(), contains('the detail'));
   });
 
-  test('a replayed line reaches history without being logged again', () {
+  test('loading the table does not log it again', () {
     // `logCustom` publishes to the stream, which the persister writes from,
-    // and prints to the console — so replaying the table reprinted it and
-    // wrote every line back into the table it came from.
+    // and prints to the console — so loading the table reprinted it and wrote
+    // every line back into the table it came from.
     var streamed = 0;
     final sub = Log.talker.stream.listen((_) => streamed++);
     addTearDown(sub.cancel);
 
-    final before = Log.talker.history.length;
-    Log.replay(
+    Log.reload([
       PersistedLog(
         StoredLog(
           time: DateTime.utc(2026, 8, 18),
           level: 'info',
-          message: 'replayed',
+          message: 'from the table',
         ),
       ),
-    );
+    ]);
 
-    expect(Log.talker.history.length, before + 1);
+    expect(Log.talker.history.map((e) => e.message), ['from the table']);
     expect(streamed, 0, reason: 'nothing may write it back or print it');
   });
 
-  group('replay never costs the running session', () {
-    setUp(Log.talker.cleanHistory);
-
-    PersistedLog stored(String message, DateTime at) =>
-        PersistedLog(StoredLog(time: at, level: 'info', message: message));
-
-    test('a live line survives a full replay', () {
-      // The stored log is on disk and can be read again; the running session
-      // cannot. Evicting it to make room for history is backwards.
-      Log.talker.info('DPIP starting up');
-      for (var i = 0; i < Log.historyLimit + 50; i++) {
-        Log.replay(stored('old \$i', DateTime.utc(2026, 8, 17, 0, 0, i)));
-      }
-      final messages = Log.talker.history.map((e) => e.message).toList();
-      expect(messages, contains('DPIP starting up'));
-      expect(Log.talker.history.length, lessThanOrEqualTo(Log.historyLimit));
-    });
-
-    test('replayed lines read oldest first, in front of the live ones', () {
-      Log.talker.info('live');
-      // Newest first, as the query returns them.
-      Log.replay(stored('newer', DateTime.utc(2026, 8, 17, 2)));
-      Log.replay(stored('older', DateTime.utc(2026, 8, 17, 1)));
-      expect(Log.talker.history.map((e) => e.message).toList(), [
-        'older',
-        'newer',
-        'live',
-      ]);
-    });
+  test('the table replaces history, it is not merged into it', () {
+    // Every line is persisted and the pre-database ones are copied in when it
+    // opens, so memory holds nothing the table does not. Merging the two is
+    // what produced every ordering and eviction fault this screen had.
+    Log.talker.info('in memory');
+    Log.reload([
+      PersistedLog(
+        StoredLog(
+          time: DateTime.utc(2026, 8, 17, 2),
+          level: 'info',
+          message: 'newer',
+        ),
+      ),
+      PersistedLog(
+        StoredLog(
+          time: DateTime.utc(2026, 8, 17, 1),
+          level: 'info',
+          message: 'older',
+        ),
+      ),
+    ]);
+    // Oldest first, and nothing of the merge left behind.
+    expect(Log.talker.history.map((e) => e.message).toList(), [
+      'older',
+      'newer',
+    ]);
   });
 }

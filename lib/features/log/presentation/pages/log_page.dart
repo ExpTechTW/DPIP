@@ -32,33 +32,23 @@ class LogPage extends StatefulWidget {
 }
 
 class _LogPageState extends State<LogPage> {
-  late final Future<void> _replayed = _replayPersisted();
+  late final Future<void> _loaded = _loadPersisted();
 
-  /// Pulls the persisted log into Talker's history, oldest first, so the
-  /// screen reads in the order things happened.
+  /// Loads the stored log into the screen.
   ///
-  /// Anything already in memory is skipped by timestamp: a session that has
-  /// been open all day would otherwise show every line twice.
-  Future<void> _replayPersisted() async {
+  /// The table is the whole record, not an addition to what is in memory:
+  /// every line is persisted, and the ones from before the database opened
+  /// are copied in when it does. So this replaces rather than merges — which
+  /// is what removed the ordering and eviction faults that merging kept
+  /// producing, and the duplicate a visit used to leave behind.
+  Future<void> _loadPersisted() async {
     final store = Log.store;
     if (store == null) return;
     // Flush first, or the newest lines — the ones the user came to read — are
     // still sitting in the write buffer.
     await store.flush();
-    final oldestInMemory = Log.talker.history.isEmpty
-        ? null
-        : Log.talker.history.first.time;
-    // No more than the history can hold: reading further only evicts the lines
-    // read just before it.
     final stored = await store.recent(limit: Log.historyLimit);
-    // Newest first, as the query returns them: each is inserted at the front,
-    // so the oldest ends up furthest forward and the run reads in order.
-    for (final entry in stored) {
-      if (oldestInMemory != null && !entry.time.isBefore(oldestInMemory)) {
-        continue;
-      }
-      Log.replay(PersistedLog(entry));
-    }
+    Log.reload([for (final entry in stored) PersistedLog(entry)]);
   }
 
   @override
@@ -73,7 +63,7 @@ class _LogPageState extends State<LogPage> {
     // Built only once the replay is in, because Talker reads its history when
     // the screen builds and writing to it afterwards would not show.
     return FutureBuilder<void>(
-      future: _replayed,
+      future: _loaded,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return Scaffold(
