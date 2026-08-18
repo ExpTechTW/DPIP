@@ -54,10 +54,11 @@ void main() {
   test('diagnostics are never cut to make room', () {
     // A partial diagnostic reads as a complete one and is answered as if it
     // were, which is worse than carrying no log at all.
-    final big = 'Version: 26w34b\n${'x' * 5000}';
+    // Sized past the limit so the log must be dropped for the diagnostics to fit.
+    final big = 'Version: 26w34b\n${'x' * (dumpLimit + 1000)}';
     final out = buildDump(diagnostics: big, logLines: lines(50));
     expect(out, contains('Version: 26w34b'));
-    expect(out, contains('x' * 5000));
+    expect(out, contains('x' * (dumpLimit + 1000)));
     expect(out, isNot(contains('line 0')));
   });
 

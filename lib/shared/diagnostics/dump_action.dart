@@ -22,8 +22,9 @@ import 'package:talker_flutter/talker_flutter.dart';
 ///
 /// The two halves answer different questions and a report needs both: the
 /// diagnostics say what this build and this device are, the log says what they
-/// just did. Pasting 4000 characters into a chat buries the conversation they
-/// are part of, so they go to a paste and only the link comes back.
+/// just did. Pasting tens of thousands of characters into a chat buries the
+/// conversation they are part of, so they go to a paste and only the link
+/// comes back.
 ///
 /// Returns true when a link was produced. Failures are reported to the user
 /// here and logged; the caller only has to stop showing its spinner.

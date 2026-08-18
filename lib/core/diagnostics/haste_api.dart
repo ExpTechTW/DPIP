@@ -7,8 +7,9 @@ import 'package:dpip/core/diagnostics/dump_uploader.dart';
 /// Posts a dump and returns the URL to read it at.
 ///
 /// A paste rather than an attachment because of where these end up: a bug
-/// report in Discord or an issue, where 4000 characters of log pasted inline
-/// buries everything around it and an attached file is not read at all.
+/// report in Discord or an issue, where tens of thousands of characters of log
+/// pasted inline buries everything around it and an attached file is not read
+/// at all.
 class HasteApi implements DumpUploader {
   const HasteApi(this._client);
 
