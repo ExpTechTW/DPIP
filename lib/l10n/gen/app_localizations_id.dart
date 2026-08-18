@@ -924,6 +924,27 @@ class AppLocalizationsId extends AppLocalizations {
   String get defaultMapLayerSettings => 'Lapisan peta bawaan';
 
   @override
+  String get eewSourceSettings => 'Sumber EEW';
+
+  @override
+  String get eewSourceSubtitle =>
+      'Pilih badan penerbit peringatan dini gempa yang ingin ditampilkan.';
+
+  @override
+  String get eewSourceAll => 'Semua sumber';
+
+  @override
+  String get eewSourceAllDescription =>
+      'Tampilkan peringatan dini gempa dari semua badan penerbit.';
+
+  @override
+  String get eewSourceCwaOnly => 'Hanya CWA';
+
+  @override
+  String get eewSourceCwaOnlyDescription =>
+      'Hanya tampilkan peringatan dini gempa yang diterbitkan oleh Badan Meteorologi Pusat Taiwan (CWA).';
+
+  @override
   String get moreSectionNotify => 'Notifikasi';
 
   @override

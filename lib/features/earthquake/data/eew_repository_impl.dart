@@ -10,13 +10,23 @@ import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 /// [Failure]s via [guardResult], so nothing above the data layer touches raw
 /// JSON or `dio`.
 class EewRepositoryImpl implements EewRepository {
-  const EewRepositoryImpl(this._api);
+  /// [cwaOnly] is read fresh on every [activeEews] call (a closure, not a
+  /// captured bool) so toggling `EewCwaOnlySettings` takes effect immediately.
+  const EewRepositoryImpl(this._api, {required this.cwaOnly});
 
   final EarthquakeApi _api;
+  final bool Function() cwaOnly;
 
   @override
   Future<Result<List<Eew>>> activeEews() => guardResult(() async {
     final raw = await _api.getEewRealtime();
-    return [for (final item in raw) Eew.fromJson(item as Map<String, dynamic>)];
+    final all = [
+      for (final item in raw) Eew.fromJson(item as Map<String, dynamic>),
+    ];
+    final onlyCwa = cwaOnly();
+    return [
+      for (final e in all)
+        if (!e.isJma && (!onlyCwa || e.isCwa)) e,
+    ];
   });
 }

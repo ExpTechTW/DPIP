@@ -437,6 +437,12 @@
   "meshtasticClearMessages": "Clear messages",
   "meshtasticNotifyMessages": "Notify on new messages",
   "defaultMapLayerSettings": "Lapisan peta bawaan",
+  "eewSourceSettings": "Sumber EEW",
+  "eewSourceSubtitle": "Pilih badan penerbit peringatan dini gempa yang ingin ditampilkan.",
+  "eewSourceAll": "Semua sumber",
+  "eewSourceAllDescription": "Tampilkan peringatan dini gempa dari semua badan penerbit.",
+  "eewSourceCwaOnly": "Hanya CWA",
+  "eewSourceCwaOnlyDescription": "Hanya tampilkan peringatan dini gempa yang diterbitkan oleh Badan Meteorologi Pusat Taiwan (CWA).",
   "moreSectionNotify": "Notifikasi",
   "@moonPhaseFull": {
     "description": "Phase: full moon"

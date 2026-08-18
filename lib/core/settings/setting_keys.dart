@@ -184,6 +184,13 @@ abstract final class SettingKeys {
     'update.promptedBuild',
   );
 
+  /// Whether the live/replay EEW feeds are filtered down to 中央氣象署 (CWA)
+  /// alerts only. Defaults to true, matching the legacy app. See
+  /// `EewCwaOnlySettings`.
+  static const SettingKey<bool> eewCwaOnly = SettingKey<bool>._(
+    'earthquake.eewCwaOnly',
+  );
+
   /// Selected LB / Core API region. See `RegionSelection`.
   ///
   /// Colon-form kept as-is (pre-existing storage address).

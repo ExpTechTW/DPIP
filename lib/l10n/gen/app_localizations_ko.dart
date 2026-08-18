@@ -912,6 +912,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get defaultMapLayerSettings => '지도 기본 레이어';
 
   @override
+  String get eewSourceSettings => '지진 조기경보 출처';
+
+  @override
+  String get eewSourceSubtitle => '표시할 지진 조기경보 발표 기관을 선택하세요.';
+
+  @override
+  String get eewSourceAll => '모든 출처';
+
+  @override
+  String get eewSourceAllDescription => '모든 발표 기관의 지진 조기경보를 표시합니다.';
+
+  @override
+  String get eewSourceCwaOnly => '중앙기상서만';
+
+  @override
+  String get eewSourceCwaOnlyDescription =>
+      '대만 중앙기상서(CWA)가 발표한 지진 조기경보만 표시합니다.';
+
+  @override
   String get moreSectionNotify => '알림';
 
   @override

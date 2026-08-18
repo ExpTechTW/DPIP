@@ -6,6 +6,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/version/app_build.dart';
@@ -29,6 +30,7 @@ class MorePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
+    final eewCwaOnly = context.watch<EewCwaOnlySettings>().enabled;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.navMore)),
       body: ListView(
@@ -101,6 +103,14 @@ class MorePage extends StatelessWidget {
                 title: l10n.defaultMapLayerSettings,
                 subtitle: mapLayer.label(l10n),
                 onTap: () => context.pushNamed(AppRoutes.defaultMapLayer),
+              ),
+              _MoreTile(
+                icon: Icons.filter_alt_outlined,
+                title: l10n.eewSourceSettings,
+                subtitle: eewCwaOnly
+                    ? l10n.eewSourceCwaOnly
+                    : l10n.eewSourceAll,
+                onTap: () => context.pushNamed(AppRoutes.eewSource),
               ),
             ],
           ),

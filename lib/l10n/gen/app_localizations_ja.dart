@@ -910,6 +910,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get defaultMapLayerSettings => '地図の初期レイヤー';
 
   @override
+  String get eewSourceSettings => '緊急地震速報の情報源';
+
+  @override
+  String get eewSourceSubtitle => '表示する緊急地震速報の発表機関を選択します。';
+
+  @override
+  String get eewSourceAll => 'すべての情報源';
+
+  @override
+  String get eewSourceAllDescription => 'すべての発表機関の緊急地震速報を表示します。';
+
+  @override
+  String get eewSourceCwaOnly => '中央気象署のみ';
+
+  @override
+  String get eewSourceCwaOnlyDescription => '台湾中央気象署（CWA）が発表した緊急地震速報のみを表示します。';
+
+  @override
   String get moreSectionNotify => '通知';
 
   @override

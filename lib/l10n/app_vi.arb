@@ -437,6 +437,12 @@
   "meshtasticClearMessages": "Clear messages",
   "meshtasticNotifyMessages": "Notify on new messages",
   "defaultMapLayerSettings": "Lớp bản đồ mặc định",
+  "eewSourceSettings": "Nguồn cảnh báo sớm động đất",
+  "eewSourceSubtitle": "Chọn cơ quan phát hành cảnh báo sớm động đất muốn hiển thị.",
+  "eewSourceAll": "Tất cả nguồn",
+  "eewSourceAllDescription": "Hiển thị cảnh báo sớm động đất từ mọi cơ quan phát hành.",
+  "eewSourceCwaOnly": "Chỉ CWA",
+  "eewSourceCwaOnlyDescription": "Chỉ hiển thị cảnh báo sớm động đất do Cục Khí tượng Trung ương Đài Loan (CWA) phát hành.",
   "moreSectionNotify": "Thông báo",
   "@moonPhaseFull": {
     "description": "Phase: full moon"

@@ -20,6 +20,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
@@ -99,6 +100,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       context.read<ApiClient>(),
       context.read<RealtimeService>().clock,
       widget.replayTimestamp,
+      cwaOnly: () => context.read<EewCwaOnlySettings>().enabled,
     )..start();
     _startTicker();
     // The session's channels live outside RealtimeService (a replay must not

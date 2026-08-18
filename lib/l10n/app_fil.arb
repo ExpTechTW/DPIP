@@ -437,6 +437,12 @@
   "meshtasticClearMessages": "Clear messages",
   "meshtasticNotifyMessages": "Notify on new messages",
   "defaultMapLayerSettings": "Default na layer ng mapa",
+  "eewSourceSettings": "Pinagmulan ng EEW",
+  "eewSourceSubtitle": "Piliin kung aling mga ahensya ang ipapakitang paunang babala sa lindol.",
+  "eewSourceAll": "Lahat ng pinagmulan",
+  "eewSourceAllDescription": "Ipakita ang paunang babala sa lindol mula sa bawat ahensyang naglalabas nito.",
+  "eewSourceCwaOnly": "CWA lang",
+  "eewSourceCwaOnlyDescription": "Ipakita lamang ang paunang babala sa lindol na inilabas ng Central Weather Administration (CWA) ng Taiwan.",
   "moreSectionNotify": "Mga Abiso",
   "@moonPhaseFull": {
     "description": "Phase: full moon"

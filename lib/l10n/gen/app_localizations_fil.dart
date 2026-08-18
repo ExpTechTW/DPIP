@@ -930,6 +930,27 @@ class AppLocalizationsFil extends AppLocalizations {
   String get defaultMapLayerSettings => 'Default na layer ng mapa';
 
   @override
+  String get eewSourceSettings => 'Pinagmulan ng EEW';
+
+  @override
+  String get eewSourceSubtitle =>
+      'Piliin kung aling mga ahensya ang ipapakitang paunang babala sa lindol.';
+
+  @override
+  String get eewSourceAll => 'Lahat ng pinagmulan';
+
+  @override
+  String get eewSourceAllDescription =>
+      'Ipakita ang paunang babala sa lindol mula sa bawat ahensyang naglalabas nito.';
+
+  @override
+  String get eewSourceCwaOnly => 'CWA lang';
+
+  @override
+  String get eewSourceCwaOnlyDescription =>
+      'Ipakita lamang ang paunang babala sa lindol na inilabas ng Central Weather Administration (CWA) ng Taiwan.';
+
+  @override
   String get moreSectionNotify => 'Mga Abiso';
 
   @override

@@ -35,11 +35,16 @@ class ReplaySession {
   );
 
   /// Builds a session replaying from [replayTimestamp] (Unix ms) at 1x speed.
+  ///
+  /// [cwaOnly] mirrors the live feed's `EewCwaOnlySettings` — a closure, read
+  /// fresh on every poll, so the replay honours the same setting the monitor
+  /// does without this factory depending on the settings layer directly.
   factory ReplaySession(
     ApiClient apiClient,
     Clock serverClock,
-    int replayTimestamp,
-  ) {
+    int replayTimestamp, {
+    required bool Function() cwaOnly,
+  }) {
     final api = EarthquakeApi(apiClient);
     final clock = ReplayClock(
       DateTime.fromMillisecondsSinceEpoch(replayTimestamp, isUtc: true),
@@ -53,7 +58,7 @@ class ReplaySession {
       label: 'rts-replay',
     );
     final eewChannel = RealtimeChannel<List<Eew>>(
-      source: EewReplaySource(api, clock),
+      source: EewReplaySource(api, clock, cwaOnly: cwaOnly),
       clock: serverClock,
       elapsed: SystemElapsed(),
       ticker: const SystemTicker(),

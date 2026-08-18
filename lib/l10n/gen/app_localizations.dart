@@ -1809,6 +1809,42 @@ abstract class AppLocalizations {
   /// **'Default map layer'**
   String get defaultMapLayerSettings;
 
+  /// No description provided for @eewSourceSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'EEW source'**
+  String get eewSourceSettings;
+
+  /// No description provided for @eewSourceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which agencies\' earthquake early warnings the app shows.'**
+  String get eewSourceSubtitle;
+
+  /// No description provided for @eewSourceAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All sources'**
+  String get eewSourceAll;
+
+  /// No description provided for @eewSourceAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show earthquake early warnings from every publishing agency.'**
+  String get eewSourceAllDescription;
+
+  /// No description provided for @eewSourceCwaOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'CWA only'**
+  String get eewSourceCwaOnly;
+
+  /// No description provided for @eewSourceCwaOnlyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only earthquake early warnings published by Taiwan\'s Central Weather Administration (CWA).'**
+  String get eewSourceCwaOnlyDescription;
+
   /// Section header on the More page for notification settings
   ///
   /// In en, this message translates to:

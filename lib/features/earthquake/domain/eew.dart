@@ -26,6 +26,18 @@ abstract class Eew with _$Eew {
   factory Eew.fromJson(Map<String, dynamic> json) => _$EewFromJson(json);
 }
 
+/// Whether [Eew.agency] is 中央氣象署 (CWA) — case-insensitive, since the wire
+/// value is lowercase (`'cwa'`) but nothing guarantees that stays true for
+/// every publishing agency the upstream feed ever adds.
+extension EewAgencyX on Eew {
+  bool get isCwa => agency.toLowerCase() == 'cwa';
+
+  /// Whether [Eew.agency] is 気象庁 (JMA) — unconditionally filtered out by
+  /// every EEW data source, regardless of `EewCwaOnlySettings`. Not a
+  /// selectable source: "所有來源" means every agency *except* this one.
+  bool get isJma => agency.toLowerCase() == 'jma';
+}
+
 /// The earthquake parameters carried by an [Eew].
 @freezed
 abstract class EewInfo with _$EewInfo {
