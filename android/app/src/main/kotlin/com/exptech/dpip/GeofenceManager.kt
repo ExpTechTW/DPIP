@@ -28,9 +28,46 @@ import com.google.android.gms.location.LocationServices
 object GeofenceManager {
     private const val TAG = "GeofenceManager"
     private const val ID = "dpip.bg.town"
-    private const val RADIUS_M = 200f
-    // Trade responsiveness for power: the OS may batch the exit check up to this.
-    private const val RESPONSIVENESS_MS = 300_000 // 5 min
+    /**
+     * How far the device must get from the last reported point before the fence
+     * calls it a move.
+     *
+     * 150 m, not the 200 m this used to be, and not less than 150 either. The
+     * geofencing service positions the device from network location — Wi-Fi and
+     * cell, not GNSS — which Google documents as accurate to 20–50 m with Wi-Fi
+     * around and to hundreds of metres without it. A fence tighter than about
+     * 100 m sits inside that error, and the device then oscillates in and out of
+     * it without moving at all. 150 m is the tightest radius that is still
+     * outside the noise.
+     */
+    private const val RADIUS_M = 150f
+
+    /**
+     * How long the service may sit on a delivered transition before telling us.
+     *
+     * Read it as an entitlement to be late that we hand to Play services, not as
+     * a sampling rate — the reference calls it "best-effort notification
+     * responsiveness", and warns that a small value "doesn't necessarily mean
+     * you will get notified right after the user enters or exits a geofence:
+     * internally, the geofence might adjust the responsiveness value to save
+     * power". A lower number cannot make delivery faster than the platform
+     * manages; it only stops us asking it to wait longer than that.
+     *
+     * Two minutes, down from the five this used to be. Five was the wrong trade
+     * for an app whose report decides which township the user is pushed
+     * earthquake alerts for: it granted Play services the right to hold a
+     * crossing for longer than the whole end-to-end latency usually is, on top
+     * of the 2-6 minutes of detection the guide already warns about.
+     *
+     * Not 0 either, even though 0 is the Builder's own default. Since Android
+     * 8.0 the background location limits put practical responsiveness at
+     * "approximately two minutes" whatever is asked for, and the reference says
+     * plainly that a bigger value "can save power significantly" — so the cost
+     * is monotone in what we request while the delivery below ~2 min is not
+     * ours to buy. 0 would pay a wakeup premium for latency the platform has
+     * already said it will not deliver.
+     */
+    private const val RESPONSIVENESS_MS = 120_000 // 2 min
     private const val REQUEST_CODE = 888891
 
     /** Whether background reporting can be armed (FINE + background location). */
@@ -86,8 +123,18 @@ object GeofenceManager {
             .build()
         val request = GeofencingRequest.Builder()
             // Fire immediately if we register while already OUTSIDE (e.g. re-arm
-            // around a stale centre after a reboot/GMS update) so the spine
-            // self-heals; harmless when the device is inside.
+            // around a stale centre after a reboot or a Play-services update) so
+            // the spine self-heals; harmless when the device is inside.
+            //
+            // EXIT *alone*, never OR'd with ENTER. The flag is documented as
+            // "trigger GEOFENCE_TRANSITION_EXIT at the moment when the geofence
+            // is added and if the device is already outside that geofence", but
+            // android/location-samples#103 reports that combining the two
+            // initial triggers yields enter events only — so adding an ENTER bit
+            // here would silently cost the self-heal this line exists for.
+            //
+            // Best-effort, not a guarantee, which is what the alarm watchdog
+            // behind the fence is for. See LocationAlarmScheduler.resetWatchdog.
             .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT)
             .addGeofence(geofence)
             .build()
