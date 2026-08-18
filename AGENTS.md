@@ -149,8 +149,8 @@ runs — CI calls these scripts rather than naming the commands itself, so the
 two cannot drift.
 
 CI judges **the commits on the branch**, never the pull request's title or
-description. Merge by rebase, so what lands on main is what was judged; a
-squash writes the PR's title and body instead, and nothing has read those.
+description — which is safe because rebase is the only merge this repository
+allows (Settings → Pull requests). What lands on main is what was judged.
 See [commit.md](commit.md). Individually, if you want to fail faster:
 
 ```sh

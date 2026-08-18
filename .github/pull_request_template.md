@@ -7,8 +7,8 @@
   失敗快得多，而且 `.githooks/pre-push` 本來就會替你跑一次。
 
   **這份描述不會被任何 gate 檢查，也不會進 main。** 被檢查的是分支上每一則
-  commit 訊息，進 main 的也是它們 —— 前提是用 rebase 合併。用 squash 的話，
-  進 main 的會是這裡的標題加描述，而那是沒有人看過的。
+  commit 訊息，進 main 的也是它們 —— 這個 repo 只開放 rebase 合併。所以要寫給
+  未來的人看的東西，寫在 commit 訊息裡，不是這裡。
 -->
 
 ## 這個 PR 做了什麼

@@ -178,23 +178,20 @@ except Exception: raise SystemExit
 $2" 2>/dev/null || true
 }
 
+# Who wrote the change, as a GitHub login.
+#
+# Only rebase merging is allowed here (Settings → Pull requests), so a commit on
+# main is the commit somebody wrote: its author is the author, and one lookup by
+# sha answers it. There used to be a fourth path that resolved `(#N)` back to a
+# pull request's own commits, because a squash sets the author to whoever
+# pressed merge — that is gone with squashing, and the deliberate cost is the
+# 282 commits already on main that came in that way. Their entries will credit
+# the merger unless a trailer says otherwise.
 authors_of() {
-  local sha="$1" logins="" pr
-  pr="$(git log -1 --format=%s "$sha" | sed -n 's/.*(#\([0-9]*\))$/\1/p')"
+  local sha="$1" logins=""
 
-  # The pull request's own commits: the only place the real authors survive a
-  # squash intact.
-  if [ -n "$pr" ]; then
-    # `per_page=100`, because the default is 30 and nothing said so: a pull
-    # request with more commits than that silently lost every author past the
-    # thirtieth. #533 had 63. 100 is the maximum the API accepts, and the
-    # endpoint itself stops at 250 commits whatever is asked for — past that the
-    # tail is unreachable and the trailers below are the only record left.
-    logins="$(api_json "pulls/$pr/commits?per_page=100" \
-      "print(' '.join(dict.fromkeys(c['author']['login'] for c in d if c.get('author'))))")"
-  fi
-
-  # Trailers, which a squash writes and a local clone can read with no network.
+  # Trailers first, and no network: when a co-author is recorded, they are the
+  # answer, and a local `notes.sh` run should not need the API to say so.
   local trailer
   trailer="$(git log -1 --format=%b "$sha" |
     sed -n 's/^[Cc]o-authored-by: *\(.*\) <\(.*\)>.*/\2|\1/p')"
@@ -219,7 +216,7 @@ EOF
     printf '%s' "$(git log -1 --format=%an "$sha")"
     return
   fi
-  # `@a, @b` — every name that wrote it, in the order the pull request had them.
+  # `@a, @b` — every name that wrote it, trailers first.
   printf '%s' "$(printf '%s' "${logins% }" | sed 's/[^ ][^ ]*/@&/g; s/ /, /g')"
 }
 
