@@ -163,6 +163,14 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// changed.
   String? _fillEewKey;
 
+  /// Which active alert the monitor panel's card currently shows — tapping it
+  /// cycles through the set (see `RtsMonitorPanel`). Owned here, not by the
+  /// panel widget, because the area fill ([_updateAreaFill]) has to track the
+  /// same selection: with two simultaneous quakes, the ground tint must
+  /// follow whichever one the card is actually showing, not always the
+  /// newest — the panel and the map are two views of one choice.
+  final ValueNotifier<int> eewIndex = ValueNotifier(0);
+
   /// Legacy-style blink: while a large event's detection boxes are on the map
   /// they (and the EEW epicentre cross) toggle visibility on a 1 s cadence so
   /// they stand out from the calm station dots — ported from the legacy
@@ -729,23 +737,31 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// `town` fill layer is recoloured with a `match` on each township's
   /// `CODE` (hidden counties beneath), so the felt-intensity wash reads over
   /// the base map without a second geometry source; when the alerts clear
-  /// the fills are restored. Recomputed only when the alert set's id/serial
-  /// combos change — the 368-town estimate is cheap but the platform churn
-  /// isn't.
+  /// the fills are restored.
+  ///
+  /// With two simultaneous quakes this must use whichever alert [eewIndex]
+  /// currently selects (the same one the monitor card is showing), not just
+  /// the newest — the ground tint and the card are one choice, not two.
+  /// Recomputed only when *that* alert's id/serial changes — cheap to check,
+  /// but the 368-town estimate + platform write isn't, so a repeat is
+  /// skipped. Keying on the selected alert alone (not the whole set) means
+  /// tapping to cycle, with the set otherwise unchanged, still invalidates
+  /// the cache.
   Future<void> _updateAreaFill(
     MapLibreMapController controller,
     List<Eew> alerts,
   ) async {
-    final key = alerts.isEmpty
+    final selected = alerts.isEmpty
         ? null
-        : alerts.map((e) => '${e.id}:${e.serial}').join(',');
+        : alerts[eewIndex.value % alerts.length];
+    final key = selected == null ? null : '${selected.id}:${selected.serial}';
     if (key == _fillEewKey) return;
     _fillEewKey = key;
 
     final baseFill = MapColors.of(_dark ? Brightness.dark : Brightness.light)
         .fill;
     try {
-      if (alerts.isEmpty) {
+      if (selected == null) {
         await controller.setLayerProperties(
           countyFillLayerId,
           FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
@@ -757,7 +773,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         return;
       }
 
-      final eew = alerts.first;
+      final eew = selected;
       final estimate = EewEstimator.areaPga(
         epicenter: eew.info.latlng,
         depth: eew.info.depth,
@@ -839,7 +855,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   @override
   Widget buildSheet(BuildContext context) {
     _captureBrightness(context);
-    return RtsMonitorPanel(feed: _feed, eew: _eew);
+    return RtsMonitorPanel(feed: _feed, eew: _eew, eewIndex: eewIndex);
   }
 
   @override

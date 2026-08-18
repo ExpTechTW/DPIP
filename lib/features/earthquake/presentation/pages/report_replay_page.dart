@@ -152,6 +152,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
               eew: _session.eew,
               tick: _tick,
               clock: _session.clock,
+              eewIndex: _eewIndex,
             ),
           ),
           Positioned(
@@ -262,6 +263,7 @@ class _ReplayMap extends StatefulWidget {
     required this.eew,
     required this.tick,
     required this.clock,
+    required this.eewIndex,
   });
 
   final TremStationRepository stationRepository;
@@ -277,6 +279,12 @@ class _ReplayMap extends StatefulWidget {
   final EewRealtimeController eew;
   final ValueNotifier<int> tick;
   final ReplayClock clock;
+
+  /// Which active alert the card above is currently showing — the ground
+  /// tint has to track the same selection (see `_ReplayMapState._updateAreaFill`),
+  /// so with two simultaneous quakes it follows whichever one the card is
+  /// showing, not always the newest.
+  final int eewIndex;
 
   @override
   State<_ReplayMap> createState() => _ReplayMapState();
@@ -813,19 +821,25 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// beneath), so the felt-intensity wash reads over the base map without a
   /// second geometry source; when the alerts clear the fills are restored.
   ///
-  /// Recomputed only when the alert set's id/serial combos change — the 368-
-  /// town estimate is cheap but the platform churn isn't.
+  /// With two simultaneous quakes this must use whichever alert
+  /// [_ReplayMap.eewIndex] currently selects (the same one the card above is
+  /// showing), not just the newest. Recomputed only when *that* alert's
+  /// id/serial changes — keying on the selected alert alone (not the whole
+  /// set) means cycling the card, with the set otherwise unchanged, still
+  /// invalidates the cache; the 368-town estimate is cheap but the platform
+  /// churn isn't, so a repeat is skipped.
   Future<void> _updateAreaFill(MapLibreMapController controller) async {
     final alerts = widget.eew.alerts;
-    final key = alerts.isEmpty
+    final selected = alerts.isEmpty
         ? null
-        : alerts.map((e) => '${e.id}:${e.serial}').join(',');
+        : alerts[widget.eewIndex % alerts.length];
+    final key = selected == null ? null : '${selected.id}:${selected.serial}';
     if (key == _fillEewKey) return;
     _fillEewKey = key;
 
     final baseFill = MapColors.of(Theme.of(context).brightness).fill;
     try {
-      if (alerts.isEmpty) {
+      if (selected == null) {
         await controller.setLayerProperties(
           countyFillLayerId,
           FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
@@ -837,7 +851,7 @@ class _ReplayMapState extends State<_ReplayMap> {
         return;
       }
 
-      final eew = alerts.first;
+      final eew = selected;
       final estimate = EewEstimator.areaPga(
         epicenter: eew.info.latlng,
         depth: eew.info.depth,

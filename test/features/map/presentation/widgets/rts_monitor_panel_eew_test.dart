@@ -122,8 +122,9 @@ _liveFeeds({List<Eew> alerts = const []}) async {
 Widget _wrap(
   RealtimeNotifier<Rts> rts,
   RealtimeNotifier<List<Eew>> eew,
-  RegionStore store,
-) => MaterialApp(
+  RegionStore store, {
+  ValueNotifier<int>? eewIndex,
+}) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
@@ -149,7 +150,11 @@ Widget _wrap(
       ),
     ],
     child: Scaffold(
-      body: RtsMonitorPanel(feed: rts, eew: eew),
+      body: RtsMonitorPanel(
+        feed: rts,
+        eew: eew,
+        eewIndex: eewIndex ?? ValueNotifier(0),
+      ),
     ),
   ),
 );
