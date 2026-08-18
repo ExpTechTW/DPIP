@@ -67,8 +67,7 @@ class DataPage extends StatelessWidget {
             ),
             child: _SeismicCard(
               icon: Icons.monitor_heart_outlined,
-              title: l10n.navEarthquake,
-              subtitle: l10n.dataEarthquakeSubtitle,
+              title: l10n.dataEarthquakeSubtitle,
               onTap: () => context.pushNamed(AppRoutes.earthquake),
             ),
           ),
@@ -181,84 +180,57 @@ class DataPage extends StatelessWidget {
 /// The seismic entry — a full-width highlighted card so the primary hazard
 /// surface stands out from the ranking grid below it.
 ///
-/// Darker than a plain tonal card on purpose: this is the page's only wide
-/// surface and the one people reach for in an emergency, so it gets the
-/// strongest fill — a primary gradient with white text — and the grid cards
-/// below it stay quiet on `surfaceContainer`.
+/// It stays full-width to retain the catalogue's visual priority, while its
+/// tonal surface and primary-container icon follow the quieter card language
+/// used by the grids below. The section header already says "Seismic", so the
+/// card carries one unambiguous destination label instead of repeating
+/// "Earthquake / Earthquake reports" on adjacent lines.
 class _SeismicCard extends StatelessWidget {
   const _SeismicCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
-  final String subtitle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.large,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colors.primary,
-            Color.lerp(colors.primary, colors.surface, 0.72)!,
-          ],
-        ),
-      ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          borderRadius: AppRadius.large,
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  decoration: BoxDecoration(
-                    color: colors.onPrimary.withValues(alpha: 0.18),
-                    borderRadius: AppRadius.medium,
-                  ),
-                  child: Icon(icon, color: colors.onPrimary),
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: AppRadius.medium,
                 ),
-                const SizedBox(width: AppSpacing.lg),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: colors.onPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colors.onPrimary.withValues(alpha: 0.78),
-                        ),
-                      ),
-                    ],
+                child: Icon(icon, color: colors.onPrimaryContainer),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                Icon(Icons.chevron_right, color: colors.onPrimary),
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+            ],
           ),
         ),
       ),
