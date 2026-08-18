@@ -2213,6 +2213,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreVersionNotes => '현재 버전';
 
   @override
+  String get releaseHighlightsTitle => '이번 업데이트';
+
+  @override
+  String get releaseHighlightsTabNormal => '변경된 점';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '기술 세부';
+
+  @override
+  String get releaseHighlightsEmpty => '아직 내용이 없습니다.';
+
+  @override
+  String get releaseHighlightsSeeNotes => '전체 릴리스 노트';
+
+  @override
+  String get highlightCardTechnical => '기술 세부';
+
+  @override
   String get moreVersionNotesEmpty => '이 빌드의 업데이트 내역을 찾을 수 없습니다';
 
   @override

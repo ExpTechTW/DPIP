@@ -2206,6 +2206,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreVersionNotes => '現在のバージョン';
 
   @override
+  String get releaseHighlightsTitle => '今回の更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '変更点';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '技術詳細';
+
+  @override
+  String get releaseHighlightsEmpty => 'まだコンテンツがありません。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '完全なリリースノート';
+
+  @override
+  String get highlightCardTechnical => '技術詳細';
+
+  @override
   String get moreVersionNotesEmpty => 'このビルドの更新履歴が見つかりません';
 
   @override

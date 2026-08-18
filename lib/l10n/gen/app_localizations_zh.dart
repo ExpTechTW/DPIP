@@ -2194,6 +2194,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreVersionNotes => '目前版本';
 
   @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改變';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技術';
+
+  @override
+  String get releaseHighlightsEmpty => '目前沒有內容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日誌';
+
+  @override
+  String get highlightCardTechnical => '技術細節';
+
+  @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
 
   @override
@@ -5283,6 +5301,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreVersionNotes => '当前版本';
+
+  @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改变';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技术';
+
+  @override
+  String get releaseHighlightsEmpty => '目前没有内容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日志';
+
+  @override
+  String get highlightCardTechnical => '技术细节';
 
   @override
   String get moreVersionNotesEmpty => '找不到当前版本的更新日志';
@@ -8376,6 +8412,24 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreVersionNotes => '目前版本';
 
   @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改變';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技術';
+
+  @override
+  String get releaseHighlightsEmpty => '目前沒有內容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日誌';
+
+  @override
+  String get highlightCardTechnical => '技術細節';
+
+  @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
 
   @override
@@ -11465,6 +11519,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreVersionNotes => '目前版本';
+
+  @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改變';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技術';
+
+  @override
+  String get releaseHighlightsEmpty => '目前沒有內容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日誌';
+
+  @override
+  String get highlightCardTechnical => '技術細節';
 
   @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';

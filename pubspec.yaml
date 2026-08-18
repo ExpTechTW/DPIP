@@ -71,6 +71,11 @@ dependencies:
   # text/JSON payloads decode as UTF-8 (fromCharCodes garbles CJK).
   meshtastic_flutter:
     path: third_party/meshtastic_flutter
+  # Version-highlight card content: each version's cards live here as Dart
+  # source (`lib/26.1/normal.dart`…). The app imports only the current version;
+  # older versions stay in the package as the archive and are never compiled.
+  dpip_release_highlights:
+    path: release_highlights
   # Direct dep: MeshtasticClientImpl's device map holds flutter_blue_plus's
   # BluetoothDevice (meshtastic_flutter doesn't re-export it).
   flutter_blue_plus: ^1.36.8

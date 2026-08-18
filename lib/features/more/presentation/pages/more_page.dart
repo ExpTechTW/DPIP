@@ -1059,7 +1059,7 @@ class _VersionCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: AppRadius.large,
-        onTap: () => context.pushNamed(AppRoutes.versionNotes),
+        onTap: () => context.pushNamed(AppRoutes.releaseHighlights),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(

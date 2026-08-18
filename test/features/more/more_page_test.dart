@@ -51,7 +51,15 @@ GoRouter _router(List<String> visited) => GoRouter(
               return const SizedBox.shrink();
             },
           ),
-        // The version card opens this one.
+        // The version card opens the highlights — which links onward to notes.
+        GoRoute(
+          path: AppRoutes.releaseHighlightsPath,
+          name: AppRoutes.releaseHighlights,
+          builder: (_, _) {
+            visited.add(AppRoutes.releaseHighlights);
+            return const SizedBox.shrink();
+          },
+        ),
         GoRoute(
           path: AppRoutes.versionNotesPath,
           name: AppRoutes.versionNotes,
@@ -317,12 +325,14 @@ void main() {
     }
   });
 
-  testWidgets('the version card opens this version\x27s notes', (tester) async {
+  testWidgets('the version card opens this version\x27s highlights', (
+    tester,
+  ) async {
     final visited = <String>[];
     await _pump(tester, _router(visited));
     // The card is the DPIP row with the chevron — tap its label.
     await tester.tap(find.text('DPIP').first);
     await tester.pumpAndSettle();
-    expect(visited, [AppRoutes.versionNotes]);
+    expect(visited, [AppRoutes.releaseHighlights]);
   });
 }

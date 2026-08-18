@@ -2243,6 +2243,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreVersionNotes => 'Versi saat ini';
 
   @override
+  String get releaseHighlightsTitle => 'Yang berubah';
+
+  @override
+  String get releaseHighlightsTabNormal => 'Untuk pengguna';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Mendalam';
+
+  @override
+  String get releaseHighlightsEmpty => 'Belum ada konten.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Catatan rilis lengkap';
+
+  @override
+  String get highlightCardTechnical => 'Teknis';
+
+  @override
   String get moreVersionNotesEmpty => 'Tidak ada changelog untuk build ini';
 
   @override

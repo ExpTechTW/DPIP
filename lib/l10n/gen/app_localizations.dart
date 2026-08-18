@@ -4257,6 +4257,42 @@ abstract class AppLocalizations {
   /// **'This version'**
   String get moreVersionNotes;
 
+  /// No description provided for @releaseHighlightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What changed in this release'**
+  String get releaseHighlightsTitle;
+
+  /// No description provided for @releaseHighlightsTabNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'For users'**
+  String get releaseHighlightsTabNormal;
+
+  /// No description provided for @releaseHighlightsTabAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep dive'**
+  String get releaseHighlightsTabAdvanced;
+
+  /// No description provided for @releaseHighlightsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet.'**
+  String get releaseHighlightsEmpty;
+
+  /// No description provided for @releaseHighlightsSeeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Full release notes'**
+  String get releaseHighlightsSeeNotes;
+
+  /// No description provided for @highlightCardTechnical.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical'**
+  String get highlightCardTechnical;
+
   /// No description provided for @moreVersionNotesEmpty.
   ///
   /// In en, this message translates to:

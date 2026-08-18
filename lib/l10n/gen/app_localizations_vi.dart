@@ -2240,6 +2240,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreVersionNotes => 'Phiên bản hiện tại';
 
   @override
+  String get releaseHighlightsTitle => 'Thay đổi trong bản này';
+
+  @override
+  String get releaseHighlightsTabNormal => 'Cho người dùng';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Đi sâu';
+
+  @override
+  String get releaseHighlightsEmpty => 'Chưa có nội dung.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Xem ghi chú đầy đủ';
+
+  @override
+  String get highlightCardTechnical => 'Kỹ thuật';
+
+  @override
   String get moreVersionNotesEmpty =>
       'Không tìm thấy nhật ký cập nhật cho bản này';
 

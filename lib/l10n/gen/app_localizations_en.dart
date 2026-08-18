@@ -2240,6 +2240,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreVersionNotes => 'This version';
 
   @override
+  String get releaseHighlightsTitle => 'What changed in this release';
+
+  @override
+  String get releaseHighlightsTabNormal => 'For users';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Deep dive';
+
+  @override
+  String get releaseHighlightsEmpty => 'Nothing here yet.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Full release notes';
+
+  @override
+  String get highlightCardTechnical => 'Technical';
+
+  @override
   String get moreVersionNotesEmpty => 'No changelog for this build';
 
   @override

@@ -117,6 +117,11 @@ abstract final class AppRoutes {
   static const String versionNotes = 'versionNotes';
   static const String versionNotesPath = '/version-notes';
 
+  /// This release's highlights — the version card's second detail page
+  /// (一般用戶 / 深入技術).
+  static const String releaseHighlights = 'releaseHighlights';
+  static const String releaseHighlightsPath = '/release-highlights';
+
   // Saved-region management: the manage page (view/remove saved townships)
   // opens the picker to add. Saved townships feed the Home region bar.
   static const String regionManage = 'regionManage';

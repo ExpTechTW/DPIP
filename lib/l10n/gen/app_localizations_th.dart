@@ -2235,6 +2235,24 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreVersionNotes => 'เวอร์ชันปัจจุบัน';
 
   @override
+  String get releaseHighlightsTitle => 'สิ่งที่เปลี่ยนแปลง';
+
+  @override
+  String get releaseHighlightsTabNormal => 'สำหรับผู้ใช้';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'เจาะลึก';
+
+  @override
+  String get releaseHighlightsEmpty => 'ยังไม่มีเนื้อหา';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'ดูบันทึกทั้งหมด';
+
+  @override
+  String get highlightCardTechnical => 'เทคนิค';
+
+  @override
   String get moreVersionNotesEmpty => 'ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้';
 
   @override

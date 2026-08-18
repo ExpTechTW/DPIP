@@ -2253,6 +2253,24 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreVersionNotes => 'Kasalukuyang bersyon';
 
   @override
+  String get releaseHighlightsTitle => 'Ano ang nagbago';
+
+  @override
+  String get releaseHighlightsTabNormal => 'Para sa mga user';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Mas malalim';
+
+  @override
+  String get releaseHighlightsEmpty => 'Wala pang laman.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Buong tala ng release';
+
+  @override
+  String get highlightCardTechnical => 'Teknikal';
+
+  @override
   String get moreVersionNotesEmpty => 'Walang changelog para sa build na ito';
 
   @override

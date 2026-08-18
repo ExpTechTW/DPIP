@@ -54,6 +54,7 @@ import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/changelog/changelog_providers.dart';
+import 'package:dpip/features/release_highlights/release_highlights_providers.dart';
 import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/events/events_providers.dart';
@@ -391,6 +392,7 @@ Future<void> bootstrap() async {
         ...changelogProviders(deps),
         ...notificationProviders(deps),
         ...meshtasticProviders(deps),
+        ...releaseHighlightsProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),
         ...statusProviders(deps),
