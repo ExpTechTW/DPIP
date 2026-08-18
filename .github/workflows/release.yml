@@ -365,6 +365,7 @@ jobs:
           cat NOTES.md
 
       - name: Publish
+        id: publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -386,3 +387,33 @@ jobs:
             --notes-file NOTES.md \
             --prerelease="${{ needs.version.outputs.prerelease }}" \
             artifacts/*
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      # Here rather than in a workflow of its own listening on `release`.
+      # GitHub refuses to start a workflow run from an event its own
+      # GITHUB_TOKEN caused, and the release above is created with exactly that
+      # token — an `on: release: [published]` workflow would sit silent forever
+      # and look like a Discord problem.
+      #
+      # `published` would also have been the only safe type to listen for:
+      # publishing a pre-release fires `published` *and* `prereleased`, so
+      # asking for both announces every snapshot twice.
+      - name: Announce on Discord
+        if: always() && steps.publish.outputs.tag != ''
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DPIP_EMOJI_ANDROID: ${{ secrets.DPIP_EMOJI_ANDROID }}
+          DPIP_EMOJI_IOS: ${{ secrets.DPIP_EMOJI_IOS }}
+          # Without it the release lookup runs unauthenticated, at 60 requests
+          # an hour shared across everything on this runner's IP.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK:-}" ]; then
+            echo "::notice::DISCORD_WEBHOOK is not set — nothing announced"
+            exit 0
+          fi
+          # A warning, not a failure. The build is published and the artifacts
+          # are downloadable by the time this runs; turning the job red over an
+          # announcement would say the release did not happen.
+          python3 tool/release/discord.py "${{ steps.publish.outputs.tag }}" ||
+            echo "::warning::Discord announcement failed — the release itself is fine"
