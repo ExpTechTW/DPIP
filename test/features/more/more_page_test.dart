@@ -15,6 +15,7 @@ import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -91,6 +92,7 @@ Future<void> _pump(
         ChangeNotifierProvider(
           create: (_) => DefaultMapLayerController(settings),
         ),
+        ChangeNotifierProvider(create: (_) => EewCwaOnlySettings(settings)),
         ChangeNotifierProvider(create: (_) => ExperimentalSettings(settings)),
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
         Provider(create: (_) => const TownDirectory({})),

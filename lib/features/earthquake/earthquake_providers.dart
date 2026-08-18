@@ -1,5 +1,6 @@
 import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
@@ -35,7 +36,8 @@ import 'package:provider/single_child_widget.dart';
 /// frame and needs every channel already registered on the shared service.
 List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   final api = EarthquakeApi(deps.apiClient);
-  final repository = EewRepositoryImpl(api);
+  final eewCwaOnly = EewCwaOnlySettings(deps.settings);
+  final repository = EewRepositoryImpl(api, cwaOnly: () => eewCwaOnly.enabled);
   final reports = ReportRepositoryImpl(api);
   final tremStations = TremStationRepositoryImpl(deps.apiClient);
 
@@ -54,7 +56,8 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   // without waiting for a live event.
   final eewSource = kMonitorDemoEnabled
       ? DemoEewSource(reports) as RealtimeSource<List<Eew>>
-      : EewRealtimeSource(api.openEewSse) as RealtimeSource<List<Eew>>;
+      : EewRealtimeSource(api.openEewSse, cwaOnly: () => eewCwaOnly.enabled)
+            as RealtimeSource<List<Eew>>;
   final eewChannel = RealtimeChannel<List<Eew>>(
     source: eewSource,
     clock: deps.serverClock,
@@ -86,6 +89,7 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
 
   return [
     Provider<EewRepository>.value(value: repository),
+    ChangeNotifierProvider<EewCwaOnlySettings>.value(value: eewCwaOnly),
     Provider<ReportRepository>.value(value: reports),
     ChangeNotifierProvider<EewRealtimeController>.value(value: eewController),
     ChangeNotifierProvider<RtsRealtimeController>.value(value: rtsController),

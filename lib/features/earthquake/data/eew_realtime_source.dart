@@ -21,14 +21,29 @@ import 'package:flutter/foundation.dart' show listEquals;
 class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   /// [connect] opens one EEW SSE connection — in production
   /// `EarthquakeApi.openEewSse`; the source calls it again to reconnect.
-  EewRealtimeSource(Stream<SseEvent> Function() connect)
-    : super(connect: connect, label: 'eew');
+  ///
+  /// [cwaOnly] is read fresh on every [decode] (a closure, not a captured
+  /// bool) so toggling `EewCwaOnlySettings` takes effect on the very next
+  /// event instead of needing the connection to be rebuilt.
+  EewRealtimeSource(
+    Stream<SseEvent> Function() connect, {
+    required this.cwaOnly,
+  }) : super(connect: connect, label: 'eew');
+
+  final bool Function() cwaOnly;
 
   @override
-  List<Eew> decode(String data) => [
-    for (final item in jsonDecode(data) as List)
-      Eew.fromJson(item as Map<String, dynamic>),
-  ];
+  List<Eew> decode(String data) {
+    final all = [
+      for (final item in jsonDecode(data) as List)
+        Eew.fromJson(item as Map<String, dynamic>),
+    ];
+    final onlyCwa = cwaOnly();
+    return [
+      for (final e in all)
+        if (!e.isJma && (!onlyCwa || e.isCwa)) e,
+    ];
+  }
 
   /// Null on purpose: EEW uses connection/fetch-freshness. `EewInfo.time` recedes
   /// within a single active event while fresh updates keep arriving, so payload

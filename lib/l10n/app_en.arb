@@ -1283,6 +1283,12 @@
   },
   "meshtasticNotifyMessages": "Notify on new messages",
   "defaultMapLayerSettings": "Default map layer",
+  "eewSourceSettings": "EEW source",
+  "eewSourceSubtitle": "Choose which agencies' earthquake early warnings the app shows.",
+  "eewSourceAll": "All sources",
+  "eewSourceAllDescription": "Show earthquake early warnings from every publishing agency.",
+  "eewSourceCwaOnly": "CWA only",
+  "eewSourceCwaOnlyDescription": "Show only earthquake early warnings published by Taiwan's Central Weather Administration (CWA).",
   "@regionAddButton": {
     "description": "Button to open the region picker to add a saved region"
   },

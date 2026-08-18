@@ -102,6 +102,10 @@ abstract final class AppRoutes {
   static const String defaultMapLayer = 'defaultMapLayer';
   static const String defaultMapLayerPath = '/default-map-layer';
 
+  /// Which agencies' EEW alerts the monitor/replay/list show.
+  static const String eewSource = 'eewSource';
+  static const String eewSourcePath = '/eew-source';
+
   static const String log = 'log';
   static const String logPath = '/log';
 

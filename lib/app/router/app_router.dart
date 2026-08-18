@@ -30,6 +30,7 @@ import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/features/settings/presentation/pages/default_map_layer_page.dart';
+import 'package:dpip/features/settings/presentation/pages/eew_source_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
 import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
@@ -216,6 +217,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.defaultMapLayerPath,
       name: AppRoutes.defaultMapLayer,
       builder: (_, _) => const DefaultMapLayerPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.eewSourcePath,
+      name: AppRoutes.eewSource,
+      builder: (_, _) => const EewSourcePage(),
     ),
     GoRoute(
       path: AppRoutes.regionManagePath,

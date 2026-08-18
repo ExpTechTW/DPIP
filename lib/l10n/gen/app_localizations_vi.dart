@@ -924,6 +924,27 @@ class AppLocalizationsVi extends AppLocalizations {
   String get defaultMapLayerSettings => 'Lớp bản đồ mặc định';
 
   @override
+  String get eewSourceSettings => 'Nguồn cảnh báo sớm động đất';
+
+  @override
+  String get eewSourceSubtitle =>
+      'Chọn cơ quan phát hành cảnh báo sớm động đất muốn hiển thị.';
+
+  @override
+  String get eewSourceAll => 'Tất cả nguồn';
+
+  @override
+  String get eewSourceAllDescription =>
+      'Hiển thị cảnh báo sớm động đất từ mọi cơ quan phát hành.';
+
+  @override
+  String get eewSourceCwaOnly => 'Chỉ CWA';
+
+  @override
+  String get eewSourceCwaOnlyDescription =>
+      'Chỉ hiển thị cảnh báo sớm động đất do Cục Khí tượng Trung ương Đài Loan (CWA) phát hành.';
+
+  @override
   String get moreSectionNotify => 'Thông báo';
 
   @override

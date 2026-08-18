@@ -921,6 +921,27 @@ class AppLocalizationsTh extends AppLocalizations {
   String get defaultMapLayerSettings => 'ชั้นแผนที่เริ่มต้น';
 
   @override
+  String get eewSourceSettings => 'แหล่งที่มาของ EEW';
+
+  @override
+  String get eewSourceSubtitle =>
+      'เลือกหน่วยงานที่ต้องการแสดงการแจ้งเตือนแผ่นดินไหวล่วงหน้า';
+
+  @override
+  String get eewSourceAll => 'ทุกแหล่งที่มา';
+
+  @override
+  String get eewSourceAllDescription =>
+      'แสดงการแจ้งเตือนแผ่นดินไหวล่วงหน้าจากทุกหน่วยงานที่เผยแพร่';
+
+  @override
+  String get eewSourceCwaOnly => 'เฉพาะ CWA เท่านั้น';
+
+  @override
+  String get eewSourceCwaOnlyDescription =>
+      'แสดงเฉพาะการแจ้งเตือนที่เผยแพร่โดยสำนักงานอุตุนิยมวิทยากลางไต้หวัน (CWA) เท่านั้น';
+
+  @override
   String get moreSectionNotify => 'การแจ้งเตือน';
 
   @override

@@ -906,6 +906,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get defaultMapLayerSettings => '地圖預設圖層';
 
   @override
+  String get eewSourceSettings => '地震速報來源';
+
+  @override
+  String get eewSourceSubtitle => '選擇要顯示哪些單位發布的地震速報。';
+
+  @override
+  String get eewSourceAll => '所有來源';
+
+  @override
+  String get eewSourceAllDescription => '顯示所有機構發布的地震速報。';
+
+  @override
+  String get eewSourceCwaOnly => '僅中央氣象署';
+
+  @override
+  String get eewSourceCwaOnlyDescription => '只顯示中央氣象署發布的地震速報。';
+
+  @override
   String get moreSectionNotify => '通知';
 
   @override
@@ -4018,6 +4036,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get defaultMapLayerSettings => '地图默认图层';
+
+  @override
+  String get eewSourceSettings => '地震速报来源';
+
+  @override
+  String get eewSourceSubtitle => '选择要显示哪些单位发布的地震速报。';
+
+  @override
+  String get eewSourceAll => '所有来源';
+
+  @override
+  String get eewSourceAllDescription => '显示所有机构发布的地震速报。';
+
+  @override
+  String get eewSourceCwaOnly => '仅中央气象署';
+
+  @override
+  String get eewSourceCwaOnlyDescription => '只显示中央气象署发布的地震速报。';
 
   @override
   String get moreSectionNotify => '通知';
@@ -7134,6 +7170,24 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get defaultMapLayerSettings => '地圖預設圖層';
 
   @override
+  String get eewSourceSettings => '地震速報來源';
+
+  @override
+  String get eewSourceSubtitle => '選擇要顯示哪些機構發布的地震速報。';
+
+  @override
+  String get eewSourceAll => '所有來源';
+
+  @override
+  String get eewSourceAllDescription => '顯示所有機構發布的地震速報。';
+
+  @override
+  String get eewSourceCwaOnly => '僅中央氣象署';
+
+  @override
+  String get eewSourceCwaOnlyDescription => '只顯示中央氣象署發布的地震速報。';
+
+  @override
   String get moreSectionNotify => '通知';
 
   @override
@@ -10246,6 +10300,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get defaultMapLayerSettings => '地圖預設圖層';
+
+  @override
+  String get eewSourceSettings => '地震速報來源';
+
+  @override
+  String get eewSourceSubtitle => '選擇要顯示哪些單位發布的地震速報。';
+
+  @override
+  String get eewSourceAll => '所有來源';
+
+  @override
+  String get eewSourceAllDescription => '顯示所有機構發布的地震速報。';
+
+  @override
+  String get eewSourceCwaOnly => '僅中央氣象署';
+
+  @override
+  String get eewSourceCwaOnlyDescription => '只顯示中央氣象署發布的地震速報。';
 
   @override
   String get moreSectionNotify => '通知';

@@ -437,6 +437,12 @@
   "meshtasticClearMessages": "Clear messages",
   "meshtasticNotifyMessages": "Notify on new messages",
   "defaultMapLayerSettings": "ชั้นแผนที่เริ่มต้น",
+  "eewSourceSettings": "แหล่งที่มาของ EEW",
+  "eewSourceSubtitle": "เลือกหน่วยงานที่ต้องการแสดงการแจ้งเตือนแผ่นดินไหวล่วงหน้า",
+  "eewSourceAll": "ทุกแหล่งที่มา",
+  "eewSourceAllDescription": "แสดงการแจ้งเตือนแผ่นดินไหวล่วงหน้าจากทุกหน่วยงานที่เผยแพร่",
+  "eewSourceCwaOnly": "เฉพาะ CWA เท่านั้น",
+  "eewSourceCwaOnlyDescription": "แสดงเฉพาะการแจ้งเตือนที่เผยแพร่โดยสำนักงานอุตุนิยมวิทยากลางไต้หวัน (CWA) เท่านั้น",
   "moreSectionNotify": "การแจ้งเตือน",
   "@moonPhaseFull": {
     "description": "Phase: full moon"

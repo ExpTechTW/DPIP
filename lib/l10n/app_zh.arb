@@ -437,6 +437,12 @@
   "meshtasticClearMessages": "清除訊息",
   "meshtasticNotifyMessages": "新訊息通知",
   "defaultMapLayerSettings": "地圖預設圖層",
+  "eewSourceSettings": "地震速報來源",
+  "eewSourceSubtitle": "選擇要顯示哪些單位發布的地震速報。",
+  "eewSourceAll": "所有來源",
+  "eewSourceAllDescription": "顯示所有機構發布的地震速報。",
+  "eewSourceCwaOnly": "僅中央氣象署",
+  "eewSourceCwaOnlyDescription": "只顯示中央氣象署發布的地震速報。",
   "moreSectionNotify": "通知",
   "@moonPhaseFull": {
     "description": "Phase: full moon"

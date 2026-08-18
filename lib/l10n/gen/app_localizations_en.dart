@@ -924,6 +924,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get defaultMapLayerSettings => 'Default map layer';
 
   @override
+  String get eewSourceSettings => 'EEW source';
+
+  @override
+  String get eewSourceSubtitle =>
+      'Choose which agencies\' earthquake early warnings the app shows.';
+
+  @override
+  String get eewSourceAll => 'All sources';
+
+  @override
+  String get eewSourceAllDescription =>
+      'Show earthquake early warnings from every publishing agency.';
+
+  @override
+  String get eewSourceCwaOnly => 'CWA only';
+
+  @override
+  String get eewSourceCwaOnlyDescription =>
+      'Show only earthquake early warnings published by Taiwan\'s Central Weather Administration (CWA).';
+
+  @override
   String get moreSectionNotify => 'Notifications';
 
   @override
