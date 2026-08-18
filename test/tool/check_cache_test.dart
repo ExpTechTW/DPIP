@@ -37,7 +37,11 @@ ProcessResult sh(Directory repo, String script, {String? noCache}) {
     'bash',
     ['-c', 'source tool/dev/_lib.sh\n$script'],
     workingDirectory: repo.path,
-    environment: noCache == null ? const {} : {'DPIP_NO_CACHE': noCache},
+    // Set either way, never merely omitted. `Process.run` inherits the parent
+    // environment, so a developer running the suite under DPIP_NO_CACHE=1 —
+    // which is exactly what somebody debugging the cache does — would have
+    // every caching test silently assert the opposite of what it says.
+    environment: {'DPIP_NO_CACHE': noCache ?? ''},
   );
 }
 
