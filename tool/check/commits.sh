@@ -2,15 +2,15 @@
 # Rejects a commit message that the release notes cannot be built from.
 #
 # This is a gate rather than a linter because the message *is* the changelog:
-# `tool/release_notes.sh` reads these bodies and publishes them, so a commit
+# `tool/release/notes.sh` reads these bodies and publishes them, so a commit
 # that does not carry both languages leaves a hole in a note that users read.
 # There is no second place to fix it — the message is immutable once pushed,
 # and the only repair is a rebase. Catching it at the gate is what keeps that
 # repair small.
 #
-# Usage:  tool/check_commits.sh [<range>]
-#         tool/check_commits.sh origin/main..HEAD
-#         tool/check_commits.sh --message <file>   # a literal message
+# Usage:  tool/check/commits.sh [<range>]
+#         tool/check/commits.sh origin/main..HEAD
+#         tool/check/commits.sh --message <file>   # a literal message
 #
 # With no range it checks HEAD alone, which is what a commit-msg hook wants.
 #
@@ -117,7 +117,7 @@ check_one() { # <subject> <body> <label>
     bad=1
   fi
 
-  # 3. Changelog lines. These are what tool/release_notes.sh publishes, so a
+  # 3. Changelog lines. These are what tool/release/notes.sh publishes, so a
   #    mistake here is a hole in something users read, and the message cannot
   #    be edited after it is pushed.
   # Whole-line match: the marker is only a mistake when it is being *used* as

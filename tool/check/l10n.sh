@@ -2,7 +2,7 @@
 #
 # Localization gate — enforces the i18n contract from DESIGN.md without needing a
 # build or `pub get`, so it fails fast in CI and can be run locally any time.
-# Sibling to tool/check_layering.sh; same output style, zero new packages
+# Sibling to tool/check/layering.sh; same output style, zero new packages
 # (bash + python3, both already in CI).
 #
 # Rules (see DESIGN.md → Localization):
@@ -24,10 +24,10 @@
 #                               localizing them is wasted effort. Audit both with
 #                               `grep -rn l10n-ignore lib`.
 #
-# Usage:  tool/check_l10n.sh   (run from anywhere; cd's to the repo root)
+# Usage:  tool/check/l10n.sh   (run from anywhere; cd's to the repo root)
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 fail=0
 report() {

@@ -14,7 +14,7 @@ Outputs, all into `assets/weather/sky/`:
     sun_profile.webp    540x2    flare falloff vs radius, per channel
     annulus.webp        540x4    the dispersed halo ring, per channel
 
-Run: `python3 tool/gen_sky_textures.py` (needs numpy, scipy, pillow).
+Run: `python3 tool/gen/sky_textures.py` (needs numpy, scipy, pillow).
 """
 
 import argparse

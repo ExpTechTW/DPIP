@@ -11,7 +11,7 @@
 /// repetitive, so gzip shrinks it far more than the float text (~1.3 MB → ~0.4
 /// MB). The bounding box is dropped — the loader recomputes it from the points.
 ///
-/// Run after changing the source: `dart run tool/build_town_boundaries.dart`.
+/// Run after changing the source: `dart run tool/gen/town_boundaries.dart`.
 /// The decoder is `TownBoundaries.fromBinary` in
 /// `lib/core/geo/town_boundaries.dart`; the format must stay in lockstep.
 library;

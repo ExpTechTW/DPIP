@@ -6,7 +6,7 @@
 # untouched.
 #
 # **It deliberately does not pipe.** The bash script colours the log by piping
-# it through tool/colorize_logs.sh, and the same shape here would be wrong:
+# it through tool/internal/colorize_logs.sh, and the same shape here would be wrong:
 # `$LASTEXITCODE` is not set reliably when a native command's output goes to a
 # cmdlet (PowerShell/PowerShell#19848), so a failed build would exit 0 and this
 # wrapper would hide the thing it wraps. That is the one defect a wrapper like

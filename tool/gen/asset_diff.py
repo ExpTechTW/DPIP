@@ -15,7 +15,7 @@ error metric. The header line under each pair carries the numbers that do
 matter — size, and whatever statistic that texture is judged on.
 
 Usage:
-    python3 tool/gen_asset_diff.py --old <dir-of-originals> --new <dir-of-new>
+    python3 tool/gen/asset_diff.py --old <dir-of-originals> --new <dir-of-new>
 
 Both directories are searched for the same filenames (extension-insensitive),
 so a `.png` replaced by a `.webp` still pairs up. Sheets land in

@@ -19,18 +19,35 @@ other files point here, and this file points at them.
 
 ## Toolchain
 
-Flutter and Dart are pinned by **mise** — run tools through it, so CI and every
-laptop use the same version:
+Flutter and Dart are pinned by **mise**, and **every workflow has a script under
+`tool/`**. Never type the toolchain yourself — not `flutter`, not `dart`, and
+not `mise exec`. A shell's PATH is resolved once and `mise activate` caches it,
+so a toolchain bump leaves the old SDK on PATH until the session is replaced,
+and a run against the wrong SDK announces nothing. The scripts are the only
+place the toolchain is named, so there is one line to get wrong instead of one
+per command. `tool/check/tooling.sh` enforces it.
 
 ```sh
-mise exec -- flutter analyze
+tool/dev/analyze.sh
 ```
 
-- After changing `@freezed` / `@JsonSerializable` models:
-  `mise exec -- dart run build_runner build --delete-conflicting-outputs`
-- After editing ARB files, localizations regenerate on the next build
-  (`generate: true`); by hand with `mise exec -- flutter gen-l10n`
-- Format with `mise exec -- dart format lib test tool`
+| Do this | Run |
+|---|---|
+| Start the app | `tool/run.sh` (see [Running](#running)) |
+| Run the tests | `tool/dev/test.sh` |
+| Format + analyze | `tool/dev/analyze.sh` |
+| Reformat in place | `tool/dev/format.sh` |
+| Resolve dependencies | `tool/dev/deps.sh` (`--offline` when pub.dev stalls) |
+| Regenerate after `@freezed` / `@JsonSerializable` edits | `tool/dev/codegen.sh` |
+| Regenerate l10n by hand (a build does it anyway) | `tool/dev/l10n.sh` |
+| Throw away the build output | `tool/dev/clean.sh` |
+| Release build | `tool/dev/build.sh {android\|bundle\|ios}` |
+| Everything CI runs | `tool/check.sh` |
+| One-time git-hook setup | `tool/dev/setup.sh` (`tool/run.sh` does it for you) |
+
+`tool/` is organised by what a script is for: `dev/` daily workflows, `check/`
+the CI gates, `release/` versioning and notes, `gen/` asset and code
+generators, `internal/` pieces other scripts call and nobody runs by hand.
 
 ## Running
 
@@ -44,10 +61,9 @@ pipe: `$LASTEXITCODE` is unreliable when a native command feeds a cmdlet
 (PowerShell/PowerShell#19848), and a wrapper that reports a failed build as a
 success is worse than an uncoloured one.
 
-**This is the only supported way to start the app.** Not `flutter run`, and not
-`mise exec -- flutter run` — both start it, and both are wrong in ways nothing
-tells you about, so **a debug build started any other way refuses to run** and
-prints the command to use instead.
+**This is the only supported way to start the app.** Every other way of
+starting it is wrong in a way nothing tells you about, so **a debug build
+started any other way refuses to run** and prints the command to use instead.
 
 Arguments pass through untouched, and hot reload still works: the tool reads
 `supportsColor` from stdout and its keystrokes from stdin, and a pipe only
@@ -56,15 +72,15 @@ touches the first.
 Select the device with `-d <name|id>`. A bare `flutter run ios` treats `ios` as
 a target Dart file and fails with `Target file "ios" not found`.
 
-- `tool/run.sh` is `mise exec -- flutter run … | tool/colorize_logs.sh`.
-  Colour is added by the pipe, not by the app: on iOS an escape sequence cannot
+- `tool/run.sh` runs the pinned `flutter run` and pipes it through
+  `tool/internal/colorize_logs.sh`. Colour is added by the pipe, not by the app: on iOS an escape sequence cannot
   survive the trip, because the platform's log path escapes the escape
   character and even a terminal that supports ANSI then prints it
   (flutter/flutter#20663). `dart:developer`'s `log` does deliver them, but
   truncates past ~128 characters — which is where the diagnostic lines are. The
   pipe has neither problem, and drops the `flutter: ` prefix as well.
-- If `flutter run` / `pub get` stalls at **Downloading packages**, resolve from
-  the local cache first: `mise exec -- flutter pub get --offline`, then re-run.
+- If a launch stalls at **Downloading packages**, resolve from the local cache
+  first with `tool/dev/deps.sh --offline`, then re-run.
 - The visible simulator window in Xcode 26+ is **DeviceHub.app** — it replaced
   `Simulator.app`, and `open -a Simulator` no longer works. `flutter run` boots
   the simulator headless, so open it separately to see or touch anything:
@@ -86,7 +102,7 @@ New(en-US): <the same, in English>
 ```
 
 - **Each `Category(locale):` line is one changelog entry**, extracted by
-  `tool/release_notes.sh` with a single regular expression. Categories are
+  `tool/release/notes.sh` with a single regular expression. Categories are
   `New` / `Optimization` / `Fix`; `zh-Hant` and `en-US` are required and the
   app's other locales are optional.
 - **There is no prose body.** Why it was done, what was tried, what bit you —
@@ -113,20 +129,28 @@ New(en-US): <the same, in English>
 Everything CI runs, in order. All of it must be clean:
 
 ```sh
-tool/check_commits.sh origin/main..HEAD
-tool/check_layering.sh
-tool/check_l10n.sh
-tool/check_storage.sh
-tool/check_pubspec_lock.sh
-tool/check_notification_sounds.sh
-mise exec -- dart format --set-exit-if-changed lib test tool
-mise exec -- dart run build_runner build --delete-conflicting-outputs   # then git diff --exit-code
-mise exec -- flutter analyze
-mise exec -- flutter test
+tool/check.sh
+```
+
+That is the whole list, and it is the same list `.github/workflows/ci.yml`
+runs — CI calls these scripts rather than naming the commands itself, so the
+two cannot drift. Individually, if you want to fail faster:
+
+```sh
+tool/check/commits.sh origin/main..HEAD
+tool/check/layering.sh
+tool/check/l10n.sh
+tool/check/storage.sh
+tool/check/pubspec_lock.sh
+tool/check/notification_sounds.sh
+tool/check/tooling.sh
+tool/dev/analyze.sh
+tool/dev/codegen.sh          # then git diff --exit-code
+tool/dev/test.sh
 ```
 
 The bash gates need only bash and python3, so they fail fast without the
-toolchain. `.github/workflows/ci.yml` runs the same list and must stay green;
+toolchain. `.github/workflows/ci.yml` must stay green;
 `android.yml` / `ios.yml` build artifacts and `review.yml` adds an automated PR
 review.
 
@@ -136,7 +160,7 @@ estimator, update those goldens deliberately.
 
 ## Versions
 
-Nobody edits a version by hand. `tool/version.sh` derives all three values from
+Nobody edits a version by hand. `tool/release/version.sh` derives all three values from
 git state and CI passes them to the build:
 
 | | | |
@@ -148,7 +172,7 @@ git state and CI passes them to the build:
 Every commit on `main` publishes a snapshot; a `v*` tag publishes a release.
 `pubspec.yaml`'s `version:` is a placeholder for local runs only.
 
-Read the header of `tool/version.sh` before changing any of it. Every constant
+Read the header of `tool/release/version.sh` before changing any of it. Every constant
 there is a fact about what has already shipped to a store, and a store refuses,
 permanently, any build whose ordinal is not above the last it accepted —
 deleting the build does not release the number.

@@ -1,4 +1,4 @@
-/// `tool/colorize_logs.sh` — colour added where ANSI actually works.
+/// `tool/internal/colorize_logs.sh` — colour added where ANSI actually works.
 ///
 /// The app writes plain text on purpose: on iOS the platform's log path
 /// escapes the escape character, so a terminal that supports ANSI still
@@ -14,7 +14,7 @@ const _esc = 27;
 
 /// Runs the script over [input]. Without a pty, stdout is not a terminal.
 String run(String input, {bool tty = false}) {
-  final script = '${Directory.current.path}/tool/colorize_logs.sh';
+  final script = '${Directory.current.path}/tool/internal/colorize_logs.sh';
   final result = tty
       // `script` lends the pipeline a pty, which is the only way to exercise
       // the branch that decides whether to emit anything at all.
@@ -75,7 +75,7 @@ void main() {
     // the filter dies first and `flutter run` — still shutting down, still
     // printing — writes into a closed pipe and reports EPIPE as an unhandled
     // exception.
-    final script = '${Directory.current.path}/tool/colorize_logs.sh';
+    final script = '${Directory.current.path}/tool/internal/colorize_logs.sh';
     final result = Process.runSync('bash', [
       '-c',
       // A writer that keeps printing after the signal, as flutter does.

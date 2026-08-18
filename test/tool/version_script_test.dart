@@ -1,4 +1,4 @@
-/// `tool/version.sh` — the one place a version is decided.
+/// `tool/release/version.sh` — the one place a version is decided.
 ///
 /// Tested because its three outputs fail late and expensively: a code that
 /// repeats is refused by a store permanently, and a train that is not one to
@@ -11,7 +11,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 Map<String, Object?> _run() {
-  final result = Process.runSync('bash', ['tool/version.sh', '--json']);
+  final result = Process.runSync('bash', ['tool/release/version.sh', '--json']);
   expect(result.exitCode, 0, reason: result.stderr.toString());
   return jsonDecode(result.stdout.toString()) as Map<String, Object?>;
 }
@@ -123,7 +123,10 @@ void main() {
     final tagResult = Process.runSync('git', ['tag', tag]);
     expect(tagResult.exitCode, 0, reason: tagResult.stderr.toString());
 
-    final result = Process.runSync('bash', ['tool/version.sh', '--json']);
+    final result = Process.runSync('bash', [
+      'tool/release/version.sh',
+      '--json',
+    ]);
     expect(result.exitCode, 0, reason: result.stderr.toString());
     final v = jsonDecode(result.stdout.toString()) as Map<String, Object?>;
     expect(v['label'], '26.2.1-test-temp');

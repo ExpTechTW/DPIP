@@ -11,17 +11,28 @@
 # the terminal. What is lost is flutter's own colour and its progress spinner,
 # which are redraw sequences that a pipe turns into litter anyway.
 #
-# `mise exec --` and not a bare `flutter`, because a shell's PATH is resolved
-# once and goes stale: `mise activate` caches it, so a toolchain bump leaves
-# the old version on PATH until the session is replaced. `mise exec` re-reads
-# mise.toml every time. See AGENTS.md → Toolchain.
+# The toolchain comes from `pinned` in tool/dev/_lib.sh, which is the only
+# place in the repo that names it. A shell's PATH is resolved once and goes
+# stale — `mise activate` caches it, so a toolchain bump leaves the old version
+# on PATH until the session is replaced. See AGENTS.md → Toolchain.
 #
 # `pipefail` is the part a wrapper like this usually gets wrong: without it the
 # pipeline reports the *colouriser's* status, so a build that failed would exit
 # 0 and the wrapper would hide the thing it wraps.
-set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/dev/_lib.sh"
+here="$(repo_root)"
+cd "$here"
 
-here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# A fresh clone that goes straight to running the app still gets the git hooks.
+#
+# Setup used to be a step you were told about in the README and therefore a step
+# people skipped, and skipping it is silent: build_info.g.dart keeps whatever
+# commit it was committed with, so the Debug-info page names a build that is not
+# the one running. Checked rather than run every time — `git config` on every
+# launch would be a write nobody asked for.
+if [[ "$(git config --get core.hooksPath || true)" != '.githooks' ]]; then
+  "$here/tool/dev/setup.sh"
+fi
 
 # Deletes the kernel snapshots earlier runs left inside the simulator.
 #
@@ -82,5 +93,5 @@ sweep_leaked_devfs
 # `DPIP_RUN_SH` is how the app knows it was started properly. A launch that
 # skips this script gets the wrong toolchain and an uncoloured log, and neither
 # announces itself — so bootstrap says so instead, in debug only.
-mise exec -- flutter run --dart-define=DPIP_RUN_SH=true "$@" \
-  | "$here/colorize_logs.sh"
+pinned flutter run --dart-define=DPIP_RUN_SH=true "$@" \
+  | "$here/tool/internal/colorize_logs.sh"

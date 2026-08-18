@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Colours DPIP's log lines on their way past, in the terminal.
 #
-# Usage:
-#     mise exec -- flutter run | tool/colorize_logs.sh
+# Not run by hand — `tool/run.sh` pipes into it. It lives under tool/internal/
+# for that reason: it is a part of the launcher, not a workflow of its own.
 #
 # The app writes plain text on purpose. Colour has to be added *here* rather
 # than there, because on iOS it cannot survive the trip: the platform's log

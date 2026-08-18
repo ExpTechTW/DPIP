@@ -22,7 +22,7 @@ ProcessResult runWith({required int exitCode, String stdout = ''}) {
   return Process.runSync('bash', [
     '-c',
     'set -euo pipefail\n'
-        '${bin.path}/flutter run | $root/tool/colorize_logs.sh',
+        '${bin.path}/flutter run | $root/tool/internal/colorize_logs.sh',
   ]);
 }
 
@@ -56,11 +56,66 @@ void main() {
     expect(_script(), contains('DPIP_RUN_SH'));
   });
 
-  test('the wrapper runs flutter through mise', () {
+  test('the wrapper runs flutter through the pinned toolchain', () {
     // A shell's PATH is resolved once and goes stale; `mise exec` re-reads
     // mise.toml every time. See AGENTS.md → Toolchain.
-    expect(_script(), contains('mise exec -- flutter run'));
+    expect(_script(), contains('pinned flutter run'));
     expect(_script(), isNot(contains('\nflutter run')));
+  });
+
+  test('the toolchain is named in exactly one place', () {
+    // The rule the whole tool/ layout exists to make true: `mise exec` appears
+    // in the one helper every script sources, and nowhere else. A second copy
+    // is a second thing to forget when the toolchain moves — and forgetting is
+    // silent, because the wrong SDK builds fine.
+    final offenders =
+        Directory('${Directory.current.path}/tool')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.sh'))
+            .where((f) => f.readAsStringSync().contains('mise exec'))
+            .map((f) => f.path.split('/tool/').last)
+            .toList()
+          ..sort();
+
+    // tooling.sh has to spell the string out to search for it.
+    expect(offenders, ['check/tooling.sh', 'dev/_lib.sh']);
+  });
+
+  test('the git hooks point at a script that exists', () {
+    // The hooks have no file extension, so a rename sweep over `*.sh` misses
+    // them — and the failure is one line of shell noise on every commit that
+    // nobody reads, while build_info.g.dart quietly stops being refreshed and
+    // the Debug-info page names the wrong build.
+    final hooks = Directory('${Directory.current.path}/.githooks').listSync();
+    expect(hooks, isNotEmpty);
+
+    for (final hook in hooks.whereType<File>()) {
+      final target = RegExp(r'show-toplevel\)"?/(\S+?)"')
+          .firstMatch(hook.readAsStringSync())
+          ?.group(1);
+      if (target == null) continue;
+      expect(
+        File('${Directory.current.path}/$target').existsSync(),
+        isTrue,
+        reason: '${hook.path.split('/').last} runs $target, which is not there',
+      );
+    }
+  });
+
+  test('every dev script goes through that helper', () {
+    final scripts = Directory('${Directory.current.path}/tool/dev')
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.sh') && !f.path.endsWith('_lib.sh'));
+
+    for (final script in scripts) {
+      expect(
+        script.readAsStringSync(),
+        contains('_lib.sh'),
+        reason: '${script.path.split('/').last} does not source the helper',
+      );
+    }
   });
 }
 

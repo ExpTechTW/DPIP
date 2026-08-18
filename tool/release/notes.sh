@@ -36,7 +36,7 @@
 #              between, and a delta would tell them about a fraction of what
 #              changed under them.
 #
-# Usage:  tool/release_notes.sh <label> <code> [--release]
+# Usage:  tool/release/notes.sh <label> <code> [--release]
 set -euo pipefail
 
 label="${1:?label required}"
@@ -48,7 +48,7 @@ kind="${3:-}"
 readonly PRIMARY='zh-Hant'
 
 # Category → heading, per language. Adding a language means adding rows here
-# and a locale to tool/check_commits.sh; nothing else changes.
+# and a locale to tool/check/commits.sh; nothing else changes.
 heading_for() { # <category> <locale>
   case "$2::$1" in
   zh-Hant::New | zh-Hant-HK::New) printf '🌟 新功能' ;;

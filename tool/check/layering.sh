@@ -11,10 +11,10 @@
 #   4. domain is the innermost, pure layer: no Flutter, no Dio, and it must not
 #      import any data or presentation (its own or another feature's).
 #
-# Usage:  tool/check_layering.sh   (run from the repo root)
+# Usage:  tool/check/layering.sh   (run from the repo root)
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 fail=0
 report() {

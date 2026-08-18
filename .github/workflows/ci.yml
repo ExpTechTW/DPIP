@@ -52,7 +52,7 @@ jobs:
             esac
           fi
           echo "checking $range"
-          bash tool/check_commits.sh "$range"
+          bash tool/check/commits.sh "$range"
 
       # Rebased, not merged, and not behind.
       #
@@ -114,7 +114,7 @@ jobs:
             printf '%s\n\n' "$PR_TITLE"
             printf '%s\n' "$PR_BODY"
           } > /tmp/pr_message.txt
-          bash tool/check_commits.sh --message /tmp/pr_message.txt
+          bash tool/check/commits.sh --message /tmp/pr_message.txt
 
       # The workflows themselves, because a broken one does not fail — it is
       # *refused*. GitHub interpolates a `run` block whole before bash sees it,
@@ -129,25 +129,32 @@ jobs:
 
       # Architecture gate — pure grep, no toolchain, fails fast.
       - name: Layering gate
-        run: bash tool/check_layering.sh
+        run: bash tool/check/layering.sh
 
       # Localization gate — bash + python3 (preinstalled), no toolchain either:
       # ARB parity + no hardcoded UI strings. See CLAUDE.md → Localization.
       - name: Localization gate
-        run: bash tool/check_l10n.sh
+        run: bash tool/check/l10n.sh
 
       # Storage gate — settings via the typed SettingsStore; sqflite only in
       # the store that owns each table.
       - name: Storage gate
-        run: bash tool/check_storage.sh
+        run: bash tool/check/storage.sh
 
       # Every channel sound must resolve, or the channel is rejected on device.
       - name: Notification-sound gate
-        run: bash tool/check_notification_sounds.sh
+        run: bash tool/check/notification_sounds.sh
 
       # Lockfile must not embed a machine-local path (pubspec_overrides leak).
       - name: pubspec.lock path gate
-        run: bash tool/check_pubspec_lock.sh
+        run: bash tool/check/pubspec_lock.sh
+
+      # Every workflow has a script under tool/; the docs and this file may not
+      # tell anyone to type the toolchain directly. A copied `flutter test` runs
+      # whatever SDK the shell cached, and running against the wrong SDK looks
+      # exactly like running against the right one.
+      - name: Tooling
+        run: bash tool/check/tooling.sh
 
       # Flutter/Dart come from mise.toml, so CI uses the exact pinned version
       # developers run locally — one source of truth. v4 = Node 24 runtime
@@ -156,10 +163,13 @@ jobs:
         uses: jdx/mise-action@v4
 
       - name: Install dependencies
-        run: mise exec -- flutter pub get
+        run: bash tool/dev/deps.sh
 
-      - name: Format
-        run: mise exec -- dart format --set-exit-if-changed lib test
+      # The same script a developer runs. CI naming its own commands is how CI
+      # and the local checklist drift apart, and the drift is only ever found
+      # by a red PR on a branch that was green.
+      - name: Format and analyze
+        run: bash tool/dev/analyze.sh
 
       # Committed *.freezed.dart / *.g.dart must match a fresh build — a stale
       # generated file (e.g. after editing a model without regenerating) fails
@@ -171,11 +181,11 @@ jobs:
       # fails: the file is `skip-worktree`, so a developer's own copy has the
       # symbol and their `flutter analyze` passes while CI's does not.
       - name: Build info
-        run: bash tool/check_build_info.sh
+        run: bash tool/check/build_info.sh
 
       - name: Codegen is up to date
         run: |
-          mise exec -- dart run build_runner build --delete-conflicting-outputs
+          bash tool/dev/codegen.sh
           # build_info.g.dart is excluded because it *cannot* match: it holds
           # the hash of the commit it is committed in.
           git diff --exit-code -- . ':!lib/core/build_info.g.dart' || {
@@ -185,9 +195,6 @@ jobs:
             exit 1
           }
 
-      - name: Analyze
-        run: mise exec -- flutter analyze
-
       # The ETag-cache tests run SQLite on the host via sqflite_common_ffi;
       # ubuntu ships libsqlite3.so.0 but not the unversioned symlink its loader
       # needs, so install the dev package.
@@ -195,4 +202,4 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
 
       - name: Test
-        run: mise exec -- flutter test
+        run: bash tool/dev/test.sh

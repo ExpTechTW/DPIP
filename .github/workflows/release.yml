@@ -1,6 +1,6 @@
 # Every commit on main is a snapshot; every tag is a release.
 #
-# The three values a build carries come from `tool/version.sh` and nowhere
+# The three values a build carries come from `tool/release/version.sh` and nowhere
 # else — no human edits a version, and `pubspec.yaml`'s stays a placeholder for
 # local runs. See that script for why the label, the train and the ordinal are
 # three separate things.
@@ -37,7 +37,7 @@ jobs:
 
       - id: v
         run: |
-          eval "$(tool/version.sh)"
+          eval "$(tool/release/version.sh)"
           echo "label=$DPIP_LABEL" >> "$GITHUB_OUTPUT"
           echo "train=$DPIP_TRAIN" >> "$GITHUB_OUTPUT"
           echo "code=$DPIP_CODE" >> "$GITHUB_OUTPUT"
@@ -58,7 +58,7 @@ jobs:
       #
       # This only sees what *this* workflow published. A build uploaded by hand
       # is invisible to it — which is how 408283049 reached TestFlight ahead of
-      # the scheme. The per-store floors in tool/version.sh are what cover
+      # the scheme. The per-store floors in tool/release/version.sh are what cover
       # those; raise one whenever something is shipped outside this workflow.
       - name: Ordinal must be higher than the last published one
         env:
@@ -97,7 +97,7 @@ jobs:
             runs-on: macos-latest
     runs-on: ${{ matrix.runs-on }}
     steps:
-      # Full history: tool/gen_build_info.sh counts commits and reads tags.
+      # Full history: tool/release/build_info.sh counts commits and reads tags.
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -143,9 +143,9 @@ jobs:
       # The committed copy is a stub; the real values come from git. CI also
       # passes them with --dart-define below, so this is belt and braces — but
       # it is what makes the file compile at all.
-      - run: bash tool/gen_build_info.sh
+      - run: bash tool/release/build_info.sh
 
-      - run: mise exec -- flutter pub get
+      - run: bash tool/dev/deps.sh
 
       # Without these the release build silently falls back to the *debug*
       # signing config (see `buildTypes.release` in android/app/build.gradle.kts),
@@ -192,7 +192,7 @@ jobs:
           # two that can disagree.
           DPIP_LABEL: ${{ needs.version.outputs.label }}
         run: |
-          # One number for both stores — see tool/version.sh for why they can
+          # One number for both stores — see tool/release/version.sh for why they can
           # be aligned. It is also what the release advertises and what the
           # update check compares, so nothing anywhere has to translate.
           COMMON="--build-name=${{ needs.version.outputs.train }} \
@@ -202,8 +202,8 @@ jobs:
                   --dart-define=DPIP_TRAIN=${{ needs.version.outputs.train }} \
                   --dart-define=DPIP_DATE=${{ needs.version.outputs.date }}"
           if [ "${{ matrix.platform }}" = "android" ]; then
-            mise exec -- flutter build apk --release $COMMON
-            mise exec -- flutter build appbundle --release $COMMON
+            bash tool/dev/build.sh android $COMMON
+            bash tool/dev/build.sh bundle $COMMON
             mv build/app/outputs/flutter-apk/app-release.apk \
                "DPIP-${{ needs.version.outputs.label }}.apk"
           else
@@ -216,7 +216,7 @@ jobs:
             # The Flutter step still has to run first: it writes
             # FLUTTER_BUILD_NUMBER into ios/Flutter/Generated.xcconfig, which is
             # where Info.plist's CFBundleVersion comes from.
-            mise exec -- flutter build ios --release --no-codesign $COMMON
+            bash tool/dev/build.sh ios $COMMON
             AUTH=(-allowProvisioningUpdates
                   -authenticationKeyPath "$RUNNER_TEMP/private_keys/AuthKey_${{ secrets.APPSTORE_API_KEY_ID }}.p8"
                   -authenticationKeyID "${{ secrets.APPSTORE_API_KEY_ID }}"
@@ -327,17 +327,17 @@ jobs:
       # The ordinal rides in the body as an HTML comment: GitHub renders it as
       # nothing, so the note stays a note while the app still has something
       # unambiguous to compare. See `buildCodeOf` in update_check.dart.
-      # Built from the commit messages themselves — see tool/release_notes.sh
+      # Built from the commit messages themselves — see tool/release/notes.sh
       # for why a release accumulates across the snapshots it followed while a
       # snapshot is only a delta.
       - name: Release notes
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            bash tool/release_notes.sh \
+            bash tool/release/notes.sh \
               "${{ needs.version.outputs.label }}" \
               "${{ needs.version.outputs.code }}" --release > NOTES.md
           else
-            bash tool/release_notes.sh \
+            bash tool/release/notes.sh \
               "${{ needs.version.outputs.label }}" \
               "${{ needs.version.outputs.code }}" > NOTES.md
           fi
@@ -352,7 +352,7 @@ jobs:
           else
             # The bare label. `v[0-9]*` is what makes a build a release, so a
             # snapshot named `26w33a` is already in its own namespace — and it
-            # is the name tool/version.sh counts to work out the next letter.
+            # is the name tool/release/version.sh counts to work out the next letter.
             # An earlier `snapshot/` prefix put the tags somewhere the counter
             # did not look, so every run computed `a` and this step died on a
             # tag that already existed.

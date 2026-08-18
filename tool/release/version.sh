@@ -32,8 +32,8 @@
 # without a store ever noticing, and a snapshot named `26w14a` can precede a
 # release named `26.1` without the number going backwards.
 #
-# Usage:  eval "$(tool/version.sh)"   → DPIP_LABEL, DPIP_TRAIN, DPIP_CODE
-#         tool/version.sh --json      → one JSON object
+# Usage:  eval "$(tool/release/version.sh)"   → DPIP_LABEL, DPIP_TRAIN, DPIP_CODE
+#         tool/release/version.sh --json      → one JSON object
 #
 # Needs full history: run actions/checkout with `fetch-depth: 0`.
 set -euo pipefail

@@ -13,9 +13,9 @@
 # Android resolves `resource://raw/x` against `res/raw/x.*`; iOS resolves the
 # same string against a file in the app bundle. Both are checked.
 #
-# Sibling to tool/check_layering.sh / check_storage.sh; zero new packages.
+# Sibling to tool/check/layering.sh / check_storage.sh; zero new packages.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 channels='lib/core/notifications/notification_channels.dart'
 android_raw='android/app/src/main/res/raw'

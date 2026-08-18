@@ -15,7 +15,7 @@ Outputs, all into `assets/weather/particles/`:
     particle_blurred.webp  64x64  the metaball kernel the card water splats
     drop_normal.webp     128x128  hemisphere normal map for one water drop
 
-Run: `python3 tool/gen_particle_sprites.py` (needs numpy, scipy, pillow).
+Run: `python3 tool/gen/particle_sprites.py` (needs numpy, scipy, pillow).
 """
 
 import argparse

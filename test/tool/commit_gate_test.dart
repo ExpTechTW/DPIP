@@ -1,4 +1,4 @@
-/// `tool/check_commits.sh` — the gate that decides what may be committed.
+/// `tool/check/commits.sh` — the gate that decides what may be committed.
 ///
 /// Tested because its failure branches only run on bad input, so nothing
 /// exercises them until CI rejects somebody. One of them referenced a variable
@@ -19,7 +19,7 @@ import 'package:flutter_test/flutter_test.dart';
     '${Directory.systemTemp.createTempSync('gate').path}/msg.txt',
   )..writeAsStringSync(message);
   final r = Process.runSync('bash', [
-    'tool/check_commits.sh',
+    'tool/check/commits.sh',
     '--message',
     file.path,
   ]);

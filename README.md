@@ -99,10 +99,11 @@ DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/proj
 ```bash
 git clone https://github.com/ExpTechTW/DPIP.git
 cd DPIP
-mise install                       # 安裝 mise.toml 釘選的 Flutter
-bash tool/setup.sh                 # 一次性設定：git hooks、產生建置資訊
-mise exec -- flutter pub get
+mise install          # 安裝 mise.toml 釘選的 Flutter
+tool/dev/deps.sh      # 取得套件
 ```
+
+git hooks 由 `tool/run.sh` 第一次啟動時自動裝好，不用另外做。只想建置不想跑的話，`tool/dev/setup.sh` 可以單獨裝。
 
 啟動：
 
@@ -111,14 +112,29 @@ mise exec -- flutter pub get
 | macOS、Linux | `tool/run.sh -d <裝置>` |
 | Windows | `tool\run.ps1 -d <裝置>`（或用 Git Bash／WSL 跑 `bash tool/run.sh`，日誌會上色） |
 
-**一定要用這個腳本，不要直接 `flutter run`。** debug 版本偵測到不是這樣啟動會拒絕執行並印出正確指令 —— 直接跑起來的話，用到的是你 shell 快取的那個 Flutter 而不是 `mise.toml` 釘選的那個，而且當下不會有任何徵兆。
+**一定要用這個腳本。** debug 版本偵測到不是這樣啟動會拒絕執行並印出正確指令 —— 直接跑起來的話，用到的是你 shell 快取的那個 Flutter 而不是 `mise.toml` 釘選的那個，而且當下不會有任何徵兆。
 
 建置成安裝檔：
 
 ```bash
-mise exec -- flutter build apk --release        # Android
-mise exec -- flutter build ios --no-codesign    # iOS（不含簽章）
+tool/dev/build.sh android    # APK
+tool/dev/build.sh bundle     # AAB（Play 實際收的格式）
+tool/dev/build.sh ios        # iOS（不含簽章）
 ```
+
+其餘每件事也都有腳本，`tool/` 底下分類放好：
+
+| 要做什麼 | 指令 |
+|---|---|
+| 跑測試 | `tool/dev/test.sh` |
+| 格式化 + 靜態分析 | `tool/dev/analyze.sh` |
+| 只格式化 | `tool/dev/format.sh` |
+| 重新產生 l10n | `tool/dev/l10n.sh` |
+| 重新產生 codegen | `tool/dev/codegen.sh` |
+| 砍掉重建 | `tool/dev/clean.sh` |
+| 跑完 CI 會跑的每一道關卡 | `tool/check.sh` |
+
+**不要自己打 `mise exec` 或 `flutter`。** 工具鏈只在腳本裡指定，這樣 CI 跟每一台機器跑的才是同一個版本 —— shell 的 PATH 只解析一次，`mise activate` 會把它快取起來，所以升級工具鏈之後舊的 SDK 還會留在 PATH 上，而用錯 SDK 建置出來的東西不會有任何徵兆。`tool/check/tooling.sh` 會擋住文件裡出現這種指令。
 
 > [!NOTE]
 > Android 需要 JDK 17 以上（Android Studio 內建的即可）。iOS 已改用 Swift Package Manager，不需要 CocoaPods。

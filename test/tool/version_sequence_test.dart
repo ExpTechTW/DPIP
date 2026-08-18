@@ -15,7 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late Directory repo;
-  final script = '${Directory.current.path}/tool/version.sh';
+  final script = '${Directory.current.path}/tool/release/version.sh';
 
   void git(List<String> args, {String? at}) {
     final result = Process.runSync(

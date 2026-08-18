@@ -7,7 +7,7 @@
 # `pub get` rewrite the lock back to git → dirty tree → false "codegen stale".
 set -euo pipefail
 
-root="$(cd "$(dirname "$0")/.." && pwd)"
+root="$(cd "$(dirname "$0")/../.." && pwd)"
 lock="$root/pubspec.lock"
 
 if [[ ! -f "$lock" ]]; then

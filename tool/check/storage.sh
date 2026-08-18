@@ -12,10 +12,10 @@
 #    would be a feature able to drop somebody else's table — which is exactly
 #    what "clearing the cache must not delete anything else" is about.
 #
-# Sibling to tool/check_layering.sh / check_l10n.sh; zero new packages.
+# Sibling to tool/check/layering.sh / check_l10n.sh; zero new packages.
 # See ARCHITECTURE.md → Persistence.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 sqflite_allow='lib/bootstrap.dart
 lib/core/settings/settings_store.dart
