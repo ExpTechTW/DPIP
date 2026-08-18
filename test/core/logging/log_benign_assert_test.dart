@@ -2,7 +2,7 @@
 /// into the log that sheet belongs to — a debug assert from talker_flutter,
 /// which paints that sheet as a coloured box with bare `ListTile`s inside it.
 /// Nothing this app can fix, and nothing a user is affected by, but it filled
-/// the terminal, the log page and the 4000-character dump budget.
+/// the terminal, the log page and the dump budget.
 ///
 /// The tests here pin the two halves of the compromise: it is said once, so it
 /// is on the record, and it is said only once, so it cannot flood. A real error

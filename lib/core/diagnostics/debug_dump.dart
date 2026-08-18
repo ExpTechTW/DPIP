@@ -7,7 +7,7 @@ library;
 /// a chat window will show without collapsing. The diagnostics are the part
 /// that cannot be trimmed (every row answers a question somebody asks), so the
 /// log takes whatever is left.
-const int dumpLimit = 4000;
+const int dumpLimit = 39995;
 
 const String _diagnosticsHeading = '=== 除錯資訊 ===';
 const String _logHeading = '=== 日誌紀錄 ===';
