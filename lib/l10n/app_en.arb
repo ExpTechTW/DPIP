@@ -1211,6 +1211,15 @@
   "@meshtasticEmptyMessage": {
     "description": "Placeholder for a text packet with no body"
   },
+  "meshtasticBinaryPayload": "Binary payload · {size}",
+  "@meshtasticBinaryPayload": {
+    "description": "Label above a chat message whose body was not text and is shown as a hex dump. {size} is a formatted byte count, e.g. \"24 B\".",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "@moreTremReport": {
     "description": "More-menu link to the TREM detection report website"
   },

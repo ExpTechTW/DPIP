@@ -1290,11 +1290,36 @@ class _Bubble extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                    // A hex dump is text too, so without this label the bubble
+                    // would be claiming somebody typed "48 65 6c 6c 6f".
+                    if (message.binary)
+                      Text(
+                        l10n.meshtasticBinaryPayload(
+                          _bytesLabel(MeshPayload.hexBytes(message.text)),
+                        ),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: muted,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     Text(
                       empty ? l10n.meshtasticEmptyMessage : message.text,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: empty ? muted : foreground,
                         fontStyle: empty ? FontStyle.italic : null,
+                        // Monospace so the pairs column up and a wrapped dump
+                        // still reads as bytes rather than as prose.
+                        //
+                        // 'monospace' is a generic family Skia resolves through
+                        // Android's font manager; CoreText has never heard of
+                        // it, so on iOS it silently falls back to the
+                        // proportional default and the columns stop lining up.
+                        // The fallbacks are what make the comment above true on
+                        // both platforms.
+                        fontFamily: message.binary ? 'monospace' : null,
+                        fontFamilyFallback: message.binary
+                            ? const ['Menlo', 'Courier']
+                            : null,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),

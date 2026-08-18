@@ -37,6 +37,7 @@ class MeshChatMessage {
     required this.text,
     required this.timestamp,
     this.outgoing = false,
+    this.binary = false,
   });
 
   /// Adapts a stored row.
@@ -45,7 +46,8 @@ class MeshChatMessage {
       channel = row.channel,
       text = row.text,
       timestamp = row.timestamp,
-      outgoing = row.outgoing;
+      outgoing = row.outgoing,
+      binary = row.binary;
 
   /// Sender node number (0 for [outgoing] — the local radio's own number is
   /// not part of the transport's surface, and the bubble never shows it).
@@ -54,6 +56,7 @@ class MeshChatMessage {
   /// Mesh channel index the message travelled on (0 = primary).
   final int channel;
 
+  /// What to show. A hex dump when [binary].
   final String text;
   final DateTime timestamp;
 
@@ -61,12 +64,17 @@ class MeshChatMessage {
   /// back, so a sent message is recorded locally).
   final bool outgoing;
 
+  /// The body was not text — [text] is a hex dump of it. Never true for an
+  /// outgoing message: the composer sends a string.
+  final bool binary;
+
   MeshStoredMessage toStored() => MeshStoredMessage(
     from: from,
     channel: channel,
     text: text,
     timestamp: timestamp,
     outgoing: outgoing,
+    binary: binary,
   );
 }
 
@@ -306,6 +314,7 @@ class MeshChatController extends ChangeNotifier {
         channel: message.channel,
         text: message.text,
         timestamp: message.timestamp,
+        binary: message.binary,
       ),
     );
   }

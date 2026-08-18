@@ -475,21 +475,24 @@ class MeshtasticClientImpl implements MeshtasticService {
       .where(_hasChannelIndex)
       .map((packet) {
         final payload = packet.decoded?.payload ?? const [];
-        final text = utf8.decode(payload, allowMalformed: true);
+        // utf8, not String.fromCharCodes — multi-byte CJK survives. Strict,
+        // not `allowMalformed`: a body that is not UTF-8 becomes a hex dump
+        // here, because this is the last place that still has the bytes.
+        final (text, binary) = MeshPayload.render(payload);
         // `bytes` distinguishes "the radio sent an empty body" from "the body
         // arrived but the UI didn't render it" — a blank row is otherwise
         // indistinguishable from a rendering bug.
         Log.info(
           'meshtastic message: from #${packet.from.toRadixString(16)} '
           'ch=${packet.channel} bytes=${payload.length} rxTime=${packet.rxTime} '
-          '"$text"',
+          '${binary ? 'binary' : '"$text"'}',
         );
         return MeshMessage(
           from: packet.from,
           channel: packet.channel,
-          // utf8, not String.fromCharCodes — multi-byte CJK survives.
           text: text,
           timestamp: receivedAt(packet.rxTime),
+          binary: binary,
         );
       });
 

@@ -12,6 +12,8 @@
 /// transport failures.
 library;
 
+import 'dart:convert';
+
 import 'package:dpip/core/error/result.dart';
 
 abstract class MeshtasticService {
@@ -649,10 +651,79 @@ class MeshMessage {
     required this.channel,
     required this.text,
     required this.timestamp,
+    this.binary = false,
   });
 
   final int from;
   final int channel;
+
+  /// What to show. For a [binary] packet this is the hex dump, already
+  /// formatted — see [MeshPayload.render].
   final String text;
   final DateTime timestamp;
+
+  /// The body was not text, and [text] is a hex dump of it rather than
+  /// something the sender typed.
+  ///
+  /// Carried rather than re-derived because it cannot be re-derived: a hex
+  /// dump is itself valid text, so by the time anything downstream sees the
+  /// string the distinction is gone.
+  final bool binary;
+}
+
+/// Turning a packet body into something a person can read.
+abstract final class MeshPayload {
+  /// One byte, lowercase, two digits, space-separated from the next.
+  ///
+  /// Not a full hexdump with offsets and an ASCII gutter: that wants ~68
+  /// columns and the chat bubble is capped at 78% of the screen, so it would
+  /// wrap into nonsense. Plain pairs wrap wherever they have to and paste
+  /// straight into `xxd -r -p` and every other tool that reads hex.
+  static String hex(List<int> bytes) =>
+      bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
+
+  /// How many bytes a [hex] string describes.
+  ///
+  /// The count is not stored anywhere — the dump is its own record of length,
+  /// and a second copy of a fact is a second thing that can disagree with it.
+  static int hexBytes(String hex) => (hex.length + 1) ~/ 3;
+
+  /// Decodes a body, and says whether it was text at all.
+  ///
+  /// Strict UTF-8, deliberately: `allowMalformed` substitutes U+FFFD per bad
+  /// sequence, which is how a binary body used to arrive in the chat as a row
+  /// of  with the real bytes discarded inside the decoder.
+  ///
+  /// Valid UTF-8 is not sufficient on its own, though, and assuming it was
+  /// left the original symptom in place for the most likely binary body of
+  /// all. Every byte below 0x80 decodes, so a protobuf misdirected onto
+  /// `TEXT_MESSAGE_APP` — `08 01 10 05 18 02` — comes back as six control
+  /// characters, draws as tofu, and is classified as something a person typed.
+  /// So a C0 control byte that is not tab, newline or carriage return means
+  /// binary: the same rule `git`, `file(1)` and `grep -I` use, and the same
+  /// reason.
+  ///
+  /// Non-empty bytes that decode to nothing are binary too. `utf8.decode`
+  /// silently swallows a leading BOM, so a three-byte body would otherwise be
+  /// reported to the user as an empty message.
+  static (String text, bool binary) render(List<int> bytes) {
+    final String text;
+    try {
+      text = utf8.decode(bytes);
+    } on FormatException {
+      return (hex(bytes), true);
+    }
+    if (bytes.isNotEmpty && text.isEmpty) return (hex(bytes), true);
+    if (bytes.any(_isControl)) return (hex(bytes), true);
+    return (text, false);
+  }
+
+  /// A C0 control byte with no business in a typed message.
+  ///
+  /// Tab, newline and carriage return are excluded because people send them;
+  /// DEL (0x7f) is not, because they do not. Checked on the raw bytes rather
+  /// than the decoded string so the test is the same one every other tool
+  /// applies, and so it cannot be confused by a multi-byte sequence.
+  static bool _isControl(int b) =>
+      (b < 0x20 && b != 0x09 && b != 0x0a && b != 0x0d) || b == 0x7f;
 }

@@ -174,6 +174,12 @@ class MeshAlerts extends ChangeNotifier {
   void _onMessage(MeshMessage message) {
     if (!_messagesEnabled) return;
     if (message.text.isEmpty) return;
+    // A binary body is not something a person sent, and its rendering is a hex
+    // dump — up to ~700 characters of it. Posting that into the shade under a
+    // sender's name says somebody typed it, which is the one thing the chat
+    // bubble grew a label to avoid claiming. The message is still recorded and
+    // still readable in the chat; it just does not wake anybody.
+    if (message.binary) return;
     // Already on screen, in that channel, with the app in front: not news.
     if (_appInForeground && _visibleChannel == message.channel) return;
     unawaited(
