@@ -331,6 +331,13 @@ jobs:
       # for why a release accumulates across the snapshots it followed while a
       # snapshot is only a delta.
       - name: Release notes
+        env:
+          # Actions does not put GITHUB_TOKEN in the environment; a step has to
+          # ask. Without it notes.sh resolves authors unauthenticated, at 60
+          # requests an hour shared across everything on that runner's IP — and
+          # a rate-limited release produced a note that credited nobody and said
+          # nothing about why.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             bash tool/release/notes.sh \
