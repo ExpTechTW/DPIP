@@ -402,8 +402,13 @@ jobs:
         if: always() && steps.publish.outputs.tag != ''
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DPIP_EMOJI_ANDROID: ${{ secrets.DPIP_EMOJI_ANDROID }}
-          DPIP_EMOJI_IOS: ${{ secrets.DPIP_EMOJI_IOS }}
+          # Not secrets: a custom emoji's id is visible to everyone who can see
+          # the server, and it is useless without the webhook that is. Here
+          # rather than as defaults in the script, so a fork announcing to its
+          # own server falls back to the unicode pair instead of referencing
+          # emoji it does not have.
+          DPIP_EMOJI_ANDROID: "<:android:1539201870935892028>"
+          DPIP_EMOJI_IOS: "<:ios:1539201897766981692>"
           # Without it the release lookup runs unauthenticated, at 60 requests
           # an hour shared across everything on this runner's IP.
           GITHUB_TOKEN: ${{ github.token }}
