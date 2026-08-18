@@ -42,7 +42,7 @@ tool/dev/analyze.sh
 | Regenerate l10n by hand (a build does it anyway) | `tool/dev/l10n.sh` |
 | Throw away the build output | `tool/dev/clean.sh` |
 | Release build | `tool/dev/build.sh {android\|bundle\|ios}` |
-| Everything CI runs | `tool/check.sh` |
+| Everything CI runs | `tool/check.sh` (content-hash cached: ~1 s when nothing changed) |
 | Before writing any commit | `tool/commit.sh` (see [commit.md](commit.md)) |
 | One-time git-hook setup | `tool/dev/setup.sh` (`tool/run.sh` does it for you) |
 

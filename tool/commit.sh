@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Everything you need to know before writing a commit message here.
 #
-#     tool/commit.sh                    # the briefing
+#     tool/commit.sh                    # the briefing, and every CI gate
 #     tool/commit.sh --message <file>   # also validate a draft message
-#     tool/commit.sh --check            # also run every CI gate first
+#     tool/commit.sh --no-check         # briefing only, skip the gates
+#     DPIP_NO_CACHE=1 tool/commit.sh    # re-run the gates, trusting no cache
 #
 # **Run this before every commit.** Not as ceremony — commit messages in this
 # repo are the changelog (`tool/release/notes.sh` reads them and publishes
@@ -39,13 +40,18 @@ note()    { printf '    %s%s%s\n' "$DIM" "$*" "$RESET"; }
 warn()    { printf '  %s!%s %s\n' "$YELLOW" "$RESET" "$*"; warnings=$((warnings + 1)); }
 block()   { printf '  %s✗%s %s\n' "$RED" "$RESET" "$*"; blockers=$((blockers + 1)); }
 
-run_gates=0
+# The gates run by default. Finding out from CI what a local script could have
+# told you in nine seconds costs a push, a wait, and usually a rebase — and the
+# reason it was ever optional was that it took a minute, which the content-hash
+# cache in dev/_lib.sh has now taken away.
+run_gates=1
 msg_file=''
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --check) run_gates=1; shift ;;
+    --no-check) run_gates=0; shift ;;
+    --check) shift ;;  # kept: it was the old opt-in, and is now the default
     --message) msg_file="${2:?--message needs a file}"; shift 2 ;;
-    *) printf 'usage: tool/commit.sh [--check] [--message <file>]\n' >&2; exit 2 ;;
+    *) printf 'usage: tool/commit.sh [--no-check] [--message <file>]\n' >&2; exit 2 ;;
   esac
 done
 
@@ -272,10 +278,17 @@ elif git rev-parse --verify --quiet "$base" >/dev/null; then
 fi
 
 if ((run_gates)); then
-  heading 'Full check (--check)'
-  if tool/check.sh; then ok 'every gate passed'; else block 'tool/check.sh failed'; fi
+  heading 'CI gates'
+  note 'Everything ci.yml runs. Each step is cached on a content hash of its'
+  note 'inputs, so an unchanged tree costs seconds instead of a minute.'
+  printf '\n'
+  if tool/check.sh; then
+    ok 'every gate passed — this is what CI will do'
+  else
+    block 'a gate failed — CI will fail the same way'
+  fi
 else
-  note 'Gates not run. `tool/commit.sh --check` runs them, or `tool/check.sh`.'
+  warn 'gates skipped (--no-check) — CI has not been reproduced'
 fi
 
 # ── Verdict ─────────────────────────────────────────────────────────────────

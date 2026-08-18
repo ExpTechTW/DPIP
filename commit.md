@@ -28,12 +28,27 @@ stage、不會 fetch、不改任何檔案 —— 但它會把「現在提交會�
 | ARB 只改了一部分 | 少一個語系的 key 會無聲退回英文 |
 | 訊息格式的樣板與三個會無聲失敗的規則 | 條目數對不齊、忘了寫 `Category` 行、署名 |
 | 現有 commit 過不過 gate | 過不了只能 rebase，越早知道越便宜 |
+| CI 的每一道 gate 過不過 | 推上去才發現，要多花一次 push、一次等待，通常還要一次 rebase |
 
-寫好草稿之後可以先驗再提交：
+**它預設會把 `.github/workflows/ci.yml` 的內容跑過一遍**（`tool/check.sh`），所以
+不會發生「推上去才知道會紅」。跑得起來是因為有內容雜湊快取：
+
+| | |
+|---|---|
+| 全新／有改動 | 約 50 秒 |
+| 樹沒動過 | **約 1 秒** |
+
+快取的 key 是那一步真正會讀到的檔案的**內容**雜湊 —— 不是 mtime。`dart format`、
+切分支、checkout 都會動到 mtime 卻沒有改變程式碼的意思，而一個 `git switch` 之後
+就把整個測試套件重跑一次的快取，是沒有人會留著的快取。改一個 byte 就會重跑；改完
+又改回去也還是命中（每個檢查保留最近 8 組 key）。
+
+**只有成功會被快取。** 失敗重跑很便宜，失敗被藏起來不便宜。
 
 ```sh
-tool/commit.sh --message <草稿檔>   # 只驗訊息
-tool/commit.sh --check             # 連 CI 的每一道 gate 一起跑
+tool/commit.sh --message <草稿檔>   # 額外驗一份還沒提交的訊息
+tool/commit.sh --no-check          # 只看簡報，不跑 gate
+DPIP_NO_CACHE=1 tool/commit.sh     # 什麼都不信，全部重跑
 ```
 
 提交完**再跑一次** —— 這時它檢查的是你剛寫的那一則。
