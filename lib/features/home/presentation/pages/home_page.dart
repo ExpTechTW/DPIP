@@ -302,33 +302,30 @@ class _HomePageState extends State<HomePage> {
                           blend: HomeChrome.regionBlend(sheetExtent.value),
                           dismiss: HomeChrome.regionDismiss(sheetExtent.value),
                         ),
-                        builder: (context, dials, _) => SafeArea(
-                          bottom: false,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RegionBar(
-                                blend: dials.blend,
-                                dismiss: dials.dismiss,
-                                skyIsLight: skyIsLightFrom(sky, weatherMode),
-                              ),
-                              // Quick link to 強震監視器 — same dials as the
-                              // region bar above it, so the two move as one
-                              // piece of chrome as the sheet rises.
-                              //
-                              // Above the support pill on purpose: this one
-                              // only renders while an alert is active, and an
-                              // alert must not be pushed down the screen by a
-                              // donation prompt. When nothing is happening it
-                              // draws nothing, so the pill sits directly under
-                              // the bar anyway.
-                              HomeMonitorBanner(dismiss: dials.dismiss),
-                              _GoldSupportBar(
-                                blend: dials.blend,
-                                dismiss: dials.dismiss,
-                              ),
-                            ],
-                          ),
+                        builder: (context, dials, _) => Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RegionBar(
+                              blend: dials.blend,
+                              dismiss: dials.dismiss,
+                              skyIsLight: skyIsLightFrom(sky, weatherMode),
+                            ),
+                            // Quick link to 強震監視器 — same dials as the
+                            // region bar above it, so the two move as one
+                            // piece of chrome as the sheet rises.
+                            //
+                            // Above the support pill on purpose: this one
+                            // only renders while an alert is active, and an
+                            // alert must not be pushed down the screen by a
+                            // donation prompt. When nothing is happening it
+                            // draws nothing, so the pill sits directly under
+                            // the bar anyway.
+                            HomeMonitorBanner(dismiss: dials.dismiss),
+                            _GoldSupportBar(
+                              blend: dials.blend,
+                              dismiss: dials.dismiss,
+                            ),
+                          ],
                         ),
                       ),
                 ),
