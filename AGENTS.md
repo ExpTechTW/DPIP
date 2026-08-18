@@ -43,6 +43,7 @@ tool/dev/analyze.sh
 | Throw away the build output | `tool/dev/clean.sh` |
 | Release build | `tool/dev/build.sh {android\|bundle\|ios}` |
 | Everything CI runs | `tool/check.sh` |
+| Before writing any commit | `tool/commit.sh` (see [commit.md](commit.md)) |
 | One-time git-hook setup | `tool/dev/setup.sh` (`tool/run.sh` does it for you) |
 
 `tool/` is organised by what a script is for: `dev/` daily workflows, `check/`

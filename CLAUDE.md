@@ -40,6 +40,11 @@ gate or the analyzer will tell you.
   alternatives run, and the difference is the SDK resolved and whether the log
   is readable, neither of which is visible at the time.
   → [AGENTS.md § Running](AGENTS.md#running)
+- **Run `tool/commit.sh` before every commit.** It reads and prints only. A
+  commit message here is the changelog and cannot be edited once pushed, so
+  every problem it names — behind the base, a merge commit, an unstaged new
+  file, a half-translated ARB — is one that costs a rebase to fix afterwards.
+  → [commit.md § 提交前必須跑](commit.md)
 - **No `Co-Authored-By`, no tool attribution, ever.**
   → [AGENTS.md § Commits](AGENTS.md#commits)
 

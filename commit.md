@@ -1,10 +1,46 @@
 # Commit 格式
 
-**commit 訊息就是更新日誌。** `tool/release_notes.sh` 直接讀這些訊息產生 GitHub
+**commit 訊息就是更新日誌。** `tool/release/notes.sh` 直接讀這些訊息產生 GitHub
 release 的內容，所以一則寫壞的 commit 會在使用者讀得到的地方留下一個洞——而
 commit 訊息推出去之後**改不了**，唯一的修法是 rebase。
 
-`tool/check_commits.sh` 是 CI gate，不合格直接失敗。
+`tool/check/commits.sh` 是 CI gate，不合格直接失敗。
+
+---
+
+## 提交前必須跑 `tool/commit.sh`
+
+```sh
+tool/commit.sh
+```
+
+**每一則 commit 之前都要跑，agent 尤其。** 它只讀不寫 —— 不會 commit、不會
+stage、不會 fetch、不改任何檔案 —— 但它會把「現在提交會出什麼事」一次講完：
+
+| 它會講 | 為什麼你需要在提交**之前**知道 |
+|---|---|
+| 你在哪個分支、HEAD 是什麼、base 多久沒動 | 在 `main` 上提交、或拿一個上禮拜的 `origin/main` 判斷落後幾則，兩個都是白做工 |
+| 落後 base 幾則、有沒有 merge commit | 兩個都會被 CI 擋，而且都只能用 rebase 修 |
+| staged / unstaged / untracked 各是什麼 | 未追蹤的檔案 CI 看不到 —— 少 stage 一個新檔案，只會在 runner 上失敗 |
+| 有沒有 stage 到不該進版控的東西 | `build/`、`.dart_tool/`、`build_info.g.dart` |
+| 這次改動碰到哪些 feature 與範圍 | 挑 `<scope>`；跨太多區就不要寫 scope |
+| 是不是只碰單一平台 | 提醒你補 `Platform:` trailer |
+| ARB 只改了一部分 | 少一個語系的 key 會無聲退回英文 |
+| 訊息格式的樣板與三個會無聲失敗的規則 | 條目數對不齊、忘了寫 `Category` 行、署名 |
+| 現有 commit 過不過 gate | 過不了只能 rebase，越早知道越便宜 |
+
+寫好草稿之後可以先驗再提交：
+
+```sh
+tool/commit.sh --message <草稿檔>   # 只驗訊息
+tool/commit.sh --check             # 連 CI 的每一道 gate 一起跑
+```
+
+提交完**再跑一次** —— 這時它檢查的是你剛寫的那一則。
+
+它不會替你判斷「這是不是一件事」，那件事沒有辦法自動判斷（見
+[一個 commit 一件事](#一個-commit-一件事)）；它只會在改動跨了太多 feature、
+或文件和程式混在一起的時候，提醒你停一下。
 
 ---
 
@@ -76,7 +112,7 @@ feat(mesh): show the radio's own packet counters
 ## 更新日誌條目
 
 **這是這份格式存在的理由。** 說明區塊裡的每一行 `Category(locale): 文字` 都是
-更新日誌的一個條目，`tool/release_notes.sh` 用一條正則表達式把它們抓出來。
+更新日誌的一個條目，`tool/release/notes.sh` 用一條正則表達式把它們抓出來。
 
 ```
 feat(map): overlay radar echo on the map
@@ -176,7 +212,7 @@ Android 14 requires a foregroundServiceType on every start…
 | 摘要裡有 **and** | `show one language and draw the tags locally` |
 | 摘要在**列舉** | `cut releases from tags, notes from commits, symbols from both` |
 | 說明分成**互不相關的兩段** | 第一段講語言、第二段講圖示 |
-| 一個檔案是**文件**、另一個是**程式** | `AGENTS.md` + `tool/check_commits.sh` |
+| 一個檔案是**文件**、另一個是**程式** | `AGENTS.md` + `tool/check/commits.sh` |
 | 需要**兩個 type** 才講得清楚 | 一半是 `fix` 一半是 `feat` |
 
 這五個都不是硬性錯誤——`fix: stop A and B from racing` 是合法的，兩者是同一個
@@ -301,7 +337,7 @@ ci: cache the Swift package resolution
 署名是 GitHub 帳號，CI 透過 API 解析。**不是 git 的顯示名稱**——顯示名稱 @ 不到
 任何人，而且用名字去搜會搜出不只一個帳號，猜錯比不標更糟。
 
-實際長相就是上面各節的範例，`tool/release_notes.sh` 直接照這個格式輸出。
+實際長相就是上面各節的範例，`tool/release/notes.sh` 直接照這個格式輸出。
 
 > **squash 會壓縮條目數。** 正則是逐行抓的，所以 squash 不會像舊格式那樣把內容
 > 弄壞——但四則 commit 的條目會全部掛在同一個作者和同一個快照下。要保留就用
@@ -346,5 +382,5 @@ git push --force-with-lease
 推之前先在本機驗：
 
 ```sh
-tool/check_commits.sh origin/main..HEAD
+tool/check/commits.sh origin/main..HEAD
 ```
