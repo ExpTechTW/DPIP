@@ -134,6 +134,31 @@ void main() {
     }
   });
 
+  test('the toolchain probe does not depend on a shell builtin', () {
+    // `mise exec` runs a binary, not a shell line. macOS ships
+    // /usr/bin/command as a real executable and Linux does not, so
+    // `mise exec -- command -v flutter` answered correctly on a laptop and
+    // answered nothing on every Linux runner — which the guard then reported as
+    // "the SDK is not installed". A probe that is wrong about the toolchain is
+    // worse than no probe.
+    // Code only. The comment above the fix has to be able to name the mistake
+    // it describes, the same way tool/check/tooling.sh lets prose spell out the
+    // command it bans.
+    final code = File('${Directory.current.path}/tool/dev/_lib.sh')
+        .readAsLinesSync()
+        .where((l) => !l.trimLeft().startsWith('#'))
+        .join('\n');
+
+    expect(code, contains('mise which flutter'));
+    for (final builtin in ['command -v', 'type -p', 'hash ']) {
+      expect(
+        code,
+        isNot(contains('mise exec -- $builtin')),
+        reason: '$builtin is a shell builtin; mise execs directly',
+      );
+    }
+  });
+
   test('the git hooks point at a script that exists', () {
     // The hooks have no file extension, so a rename sweep over `*.sh` misses
     // them — and the failure is one line of shell noise on every commit that
