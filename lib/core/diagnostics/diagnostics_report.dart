@@ -121,6 +121,10 @@ String _lastReport(Map<String, Object?> d) {
 String _outcome(bool ok, Object? code) => switch (code) {
   -2 => 'no push token',
   -3 => 'no app version',
+  // Not a failure: a report went out inside the last minute and this trigger
+  // was dropped on purpose. Without a name it reads as an error code, and the
+  // page exists so nobody has to guess what a number means.
+  -4 => 'throttled (a report went out under a minute ago)',
   -1 => 'could not reach the server',
   final int c when c > 0 => ok ? 'ok ($c)' : 'failed ($c)',
   _ => ok ? 'ok' : 'failed',

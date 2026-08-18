@@ -32,6 +32,12 @@ object BgLocationStore {
     const val KEY_LAST_REPORT_OK = "last_report_ok"
     const val KEY_LAST_REPORT_CODE = "last_report_code"
 
+    /** When a report was last *sent*, which is what the throttle measures. */
+    const val KEY_LAST_SENT_AT = "last_sent_at"
+
+    /** How many triggers the throttle has dropped, for the diagnostics page. */
+    const val KEY_THROTTLED_N = "throttled_n"
+
     fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -83,6 +89,29 @@ object BgLocationStore {
      */
     fun report(context: Context, lat: Double, lng: Double) {
         val prefs = prefs(context)
+
+        // At most one report a minute, across every trigger.
+        //
+        // Four callers fire this independently — the geofence, the alarm
+        // fallback, and two paths from Dart — and nothing coordinated them, so
+        // a crossing that arrived alongside an alarm sent two reports seconds
+        // apart. The server answers 429, the location never lands, and the app
+        // looks like it stopped reporting: on the device this was found on,
+        // `last_report_code` was 429 with the geofence armed and a fix in hand.
+        //
+        // Measured from KEY_LAST_SENT_AT, not KEY_LAST_REPORT_AT: the latter is
+        // stamped on every outcome including this one, so gating on it would
+        // let a burst of triggers push the window ahead of itself and starve
+        // reporting entirely.
+        val now = System.currentTimeMillis()
+        val sent = prefs.getLong(KEY_LAST_SENT_AT, 0L)
+        if (sent > 0L && now - sent < MIN_REPORT_INTERVAL_MS) {
+            prefs.edit()
+                .putInt(KEY_THROTTLED_N, prefs.getInt(KEY_THROTTLED_N, 0) + 1)
+                .apply()
+            stamp(prefs, THROTTLED)
+            return
+        }
         // Stamped even on the way out. These two returns sat *above* the stamp,
         // so a run that never had a token was indistinguishable from one that
         // never happened — and "never happened" is what the developer page
@@ -106,13 +135,27 @@ object BgLocationStore {
                 code = responseCode // fire the request
                 disconnect()
             }
+            prefs.edit().putLong(KEY_LAST_SENT_AT, now).apply()
         } catch (e: Exception) {
             // Best-effort; the next trigger retries. The outcome is still
             // recorded below — "tried at T and failed" is the diagnostic that
             // separates "never fired" from "fires but cannot reach the server".
+            //
+            // The exception's name is kept, because -1 on its own is not a
+            // diagnosis. On a device where the alarm path failed three times
+            // running while the app's own SSE connections were live, -1 was
+            // everything the app could say, and it fits UnknownHostException,
+            // a timeout, a TLS failure and a Doze network block equally well.
+            noteWake(context, "report failed: ${e.javaClass.simpleName}")
         }
         stamp(prefs, code)
     }
+
+    /** Dropped by the throttle — a report went out less than a minute ago. */
+    const val THROTTLED = -4
+
+    /** The floor between two reports, whichever trigger asks. */
+    const val MIN_REPORT_INTERVAL_MS = 60_000L
 
     /** No push token stored — the report has nowhere to go. */
     const val NO_TOKEN = -2
