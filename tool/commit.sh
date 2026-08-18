@@ -301,7 +301,13 @@ if ((run_gates)); then
   note 'inputs, so an unchanged tree costs seconds instead of a minute.'
   printf '\n'
   if tool/check.sh; then
-    ok 'every gate passed — this is what CI will do'
+    ok "every gate passed, on $(uname -s)"
+    # Said, because the difference has already cost a red CI: this runs CI's
+    # command list on *this* machine, and the runner is Linux. A test that
+    # shells out meets a different sed, a different awk and a different
+    # `script`, and passes here while failing there.
+    [[ "$(uname -s)" == Linux ]] ||
+      note 'CI runs Linux — a test that shells out can still differ there'
   else
     block 'a gate failed — CI will fail the same way'
   fi

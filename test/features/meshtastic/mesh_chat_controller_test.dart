@@ -61,6 +61,23 @@ void main() {
   Future<void> settle() =>
       Future<void>.delayed(const Duration(milliseconds: 150));
 
+  /// Waits until [store] holds [expected] messages.
+  ///
+  /// `_add` writes fire-and-forget and only adopts a message into the in-memory
+  /// list once the insert answers (mesh_chat_controller.dart:322-328), so both
+  /// halves of what these tests assert land *after* the controller has been
+  /// handed the packet. A fixed delay is therefore a guess about how fast the
+  /// machine is: 150 ms was enough on a laptop and not on CI, where the last
+  /// dozen inserts arrived after the test had already closed the database and
+  /// the failure read as `This database has already been closed`.
+  Future<void> drained(MeshStore store, int expected) async {
+    final deadline = DateTime.now().add(const Duration(seconds: 10));
+    while (DateTime.now().isBefore(deadline)) {
+      if ((await store.messages(limit: 100000)).length >= expected) return;
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    }
+  }
+
   test('keeps the newest messages first', () async {
     final (controller, service, _) = await makeController();
     for (var i = 0; i < 10; i++) {
@@ -78,7 +95,7 @@ void main() {
     for (var i = 0; i < MeshChatController.windowSize + 20; i++) {
       service.messages.add(message('m$i', seconds: i));
     }
-    await settle();
+    await drained(store, MeshChatController.windowSize + 20);
 
     expect(controller.messages, hasLength(MeshChatController.windowSize));
     // The store keeps everything — the window is a view, not a retention cap.
@@ -91,7 +108,7 @@ void main() {
   test('persists the log and reloads it after a restart', () async {
     final (controller, service, store) = await makeController();
     service.messages.add(message('hello'));
-    await settle();
+    await drained(store, 1);
     controller.dispose();
 
     final (restored, _, _) = await makeController(store);

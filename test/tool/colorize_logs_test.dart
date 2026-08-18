@@ -15,17 +15,21 @@ const _esc = 27;
 /// Runs the script over [input]. Without a pty, stdout is not a terminal.
 String run(String input, {bool tty = false}) {
   final script = '${Directory.current.path}/tool/internal/colorize_logs.sh';
+  final piped = 'printf %s ${_quote(input)} | $script';
+  // `script` lends the pipeline a pty, which is the only way to exercise the
+  // branch that decides whether to emit anything at all — and its argument
+  // order is the opposite on the two platforms this repository builds on.
+  // BSD takes the typescript file first and the command after it; util-linux
+  // wants the command behind `-c` and the file last. Written for BSD only, it
+  // passed on a laptop and hung Linux CI into a failure with no message.
   final result = tty
-      // `script` lends the pipeline a pty, which is the only way to exercise
-      // the branch that decides whether to emit anything at all.
-      ? Process.runSync('script', [
-          '-q',
-          '/dev/null',
-          'bash',
-          '-c',
-          'printf %s ${_quote(input)} | $script',
-        ])
-      : Process.runSync('bash', ['-c', 'printf %s ${_quote(input)} | $script']);
+      ? Process.runSync(
+          'script',
+          Platform.isMacOS
+              ? ['-q', '/dev/null', 'bash', '-c', piped]
+              : ['-q', '-c', piped, '/dev/null'],
+        )
+      : Process.runSync('bash', ['-c', piped]);
   expect(result.exitCode, 0, reason: result.stderr.toString());
   return result.stdout.toString();
 }
