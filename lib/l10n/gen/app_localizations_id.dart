@@ -1991,15 +1991,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get appLogs => 'Log aplikasi';
 
   @override
-  String get serverStatusBody =>
-      'Status kesehatan server ExpTech secara real-time.';
-
-  @override
   String get serverStatusLocal => 'Status perangkat';
 
   @override
   String get serverStatusLocalBody =>
-      'Metrik server berasal dari dashboard; di bawah ini adalah penilaian perangkat ini terhadap endpoint multi-active (tiap wilayah LB/Core) yang benar-benar terhubung:';
+      'Metrik server berasal dari dasbor. Di bawah ini adalah penilaian koneksi aktual perangkat ini ke endpoint multi-aktif (LB / Core tiap wilayah): aplikasi hanya mencatat lalu lintas yang benar-benar dikirim, jika endpoint belum pernah disentuh perangkat ini akan ditampilkan \'Belum diperiksa\'.';
 
   @override
   String get serverStatusAllUp => 'Semua layanan normal';
@@ -2024,6 +2020,38 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'Status ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'Status Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'Semua wilayah normal';
+
+  @override
+  String get serverStatusCloudflareOutage =>
+      'Cloudflare beberapa wilayah bermasalah';
+
+  @override
+  String get serverStatusCloudflareNone =>
+      'Tidak ada wilayah untuk ditampilkan.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Normal';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Kinerja menurun';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Gangguan sebagian';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Gangguan besar';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Tidak diketahui';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2058,10 +2086,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => 'Belum ada data';
-
-  @override
-  String get endpointHealthNone =>
-      'Perangkat ini belum mengirim permintaan ke endpoint mana pun.';
 
   @override
   String get endpointStateOk => 'Normal';
@@ -3130,4 +3154,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => 'Gagal mengunggah';
+
+  @override
+  String get statusLegendUnprobed => 'Belum diperiksa';
+
+  @override
+  String get statusLegendUnsupported => 'Tidak tersedia';
 }

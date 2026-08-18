@@ -1947,14 +1947,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appLogs => 'App 日誌';
 
   @override
-  String get serverStatusBody => '目前 ExpTech 伺服器的即時健康狀態。';
-
-  @override
   String get serverStatusLocal => '本機狀態';
 
   @override
   String get serverStatusLocalBody =>
-      '伺服器指標來自控制台，下方是本機對多活端點（LB / Core 各區）的實際連線判斷：';
+      '伺服器指標來自控制台。下方是本機對多活端點（LB / Core 各區）的實際連線判斷：APP 只被動記錄本機實際播送的流量，若該端點從未被本機觸發，就會顯示未探測。';
 
   @override
   String get serverStatusAllUp => '所有服務正常';
@@ -1979,6 +1976,36 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 状态';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 状态';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有区域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分区域异常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前没有可显示的区域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '性能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中断';
+
+  @override
+  String get serverStatusCloudflareMajor => '大规模中断';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2012,9 +2039,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => '尚無觀測資料';
-
-  @override
-  String get endpointHealthNone => '本機尚未對任何端點發出請求。';
 
   @override
   String get endpointStateOk => '正常';
@@ -3064,6 +3088,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => '上傳失敗，請稍後再試';
+
+  @override
+  String get statusLegendUnprobed => '未探測';
+
+  @override
+  String get statusLegendUnsupported => '不支援';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -5008,14 +5038,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get appLogs => '应用日志';
 
   @override
-  String get serverStatusBody => '目前 ExpTech 服务器的实时健康状态。';
-
-  @override
   String get serverStatusLocal => '本机状态';
 
   @override
   String get serverStatusLocalBody =>
-      '服务器指标来自控制台，下方是本机对多活端点（LB / Core 各区）的实际连接判断：';
+      '服务器指标来自控制台。下方是本机对多活端点（LB / Core 各区)的实际连接判断：APP 只被动记录本机实际播送的流量，若该端点从未被本机触发，就会显示未探测。';
 
   @override
   String get serverStatusAllUp => '所有服务正常';
@@ -5040,6 +5067,36 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 状态';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 状态';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有区域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分区域异常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前没有可显示的区域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '性能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中断';
+
+  @override
+  String get serverStatusCloudflareMajor => '大规模中断';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -5073,9 +5130,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get endpointHealthUnknown => '暂无观测数据';
-
-  @override
-  String get endpointHealthNone => '本机尚未对任何端点发出请求。';
 
   @override
   String get endpointStateOk => '正常';
@@ -6125,6 +6179,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get dumpUploadFailed => '上传失败，请稍后再试';
+
+  @override
+  String get statusLegendUnprobed => '未探测';
+
+  @override
+  String get statusLegendUnsupported => '不支持';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -8069,14 +8129,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get appLogs => 'App 日誌';
 
   @override
-  String get serverStatusBody => '目前 ExpTech 伺服器的即時健康狀態。';
-
-  @override
   String get serverStatusLocal => '本機狀態';
 
   @override
   String get serverStatusLocalBody =>
-      '伺服器指標來自控制台，下方是本機對多活端點（LB / Core 各區）的實際連線判斷：';
+      '伺服器指標來自控制台。下方是本機對多活端點（LB / Core 各區）的實際連線判斷：APP 只被動記錄本機實際播送的流量，若該端點從未被本機觸發，就會顯示未探測。';
 
   @override
   String get serverStatusAllUp => '所有服務正常';
@@ -8101,6 +8158,36 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 狀態';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 狀態';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有區域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分區域異常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前沒有可顯示的區域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '效能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中斷';
+
+  @override
+  String get serverStatusCloudflareMajor => '大規模中斷';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -8134,9 +8221,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get endpointHealthUnknown => '尚無觀測資料';
-
-  @override
-  String get endpointHealthNone => '本機尚未對任何端點發出請求。';
 
   @override
   String get endpointStateOk => '正常';
@@ -9186,6 +9270,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get dumpUploadFailed => '上載失敗，請稍後再試';
+
+  @override
+  String get statusLegendUnprobed => '未探測';
+
+  @override
+  String get statusLegendUnsupported => '不支援';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -11130,14 +11220,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get appLogs => 'App 日誌';
 
   @override
-  String get serverStatusBody => '目前 ExpTech 伺服器的即時健康狀態。';
-
-  @override
   String get serverStatusLocal => '本機狀態';
 
   @override
   String get serverStatusLocalBody =>
-      '伺服器指標來自控制台，下方是本機對多活端點（LB / Core 各區）的實際連線判斷：';
+      '伺服器指標來自控制台。下方是本機對多活端點（LB / Core 各區）的實際連線判斷：APP 只被動記錄本機實際播送的流量，若該端點從未被本機觸發，就會顯示未探測。';
 
   @override
   String get serverStatusAllUp => '所有服務正常';
@@ -11162,6 +11249,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 狀態';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 狀態';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有區域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分區域異常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前沒有可顯示的區域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '效能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中斷';
+
+  @override
+  String get serverStatusCloudflareMajor => '大規模中斷';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -11195,9 +11312,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get endpointHealthUnknown => '尚無觀測資料';
-
-  @override
-  String get endpointHealthNone => '本機尚未對任何端點發出請求。';
 
   @override
   String get endpointStateOk => '正常';
@@ -12247,4 +12361,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get dumpUploadFailed => '上傳失敗，請稍後再試';
+
+  @override
+  String get statusLegendUnprobed => '未探測';
+
+  @override
+  String get statusLegendUnsupported => '不支援';
 }

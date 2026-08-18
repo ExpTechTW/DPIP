@@ -1990,15 +1990,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appLogs => 'Nhật ký ứng dụng';
 
   @override
-  String get serverStatusBody =>
-      'Tình trạng thời gian thực của máy chủ ExpTech.';
-
-  @override
   String get serverStatusLocal => 'Trạng thái thiết bị';
 
   @override
   String get serverStatusLocalBody =>
-      'Chỉ số máy chủ lấy từ dashboard; bên dưới là nhận định của thiết bị này về các máy chủ multi-active (từng khu vực LB / Core) mà thiết bị thực sự kết nối:';
+      'Chỉ số máy chủ đến từ bảng điều khiển. Dưới đây là đánh giá kết nối thực tế của máy này với các endpoint đa hoạt động (LB / Core từng khu vực): ứng dụng chỉ ghi nhận thụ động lưu lượng thực tế, nếu endpoint chưa từng được máy này truy cập sẽ hiển thị \'Chưa dò\'.';
 
   @override
   String get serverStatusAllUp => 'Tất cả dịch vụ hoạt động';
@@ -2023,6 +2019,36 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'Trạng thái ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'Trạng thái Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'Tất cả khu vực hoạt động';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare có khu vực bất thường';
+
+  @override
+  String get serverStatusCloudflareNone => 'Không có khu vực nào để hiển thị.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Hoạt động';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Hiệu suất giảm';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Gián đoạn một phần';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Gián đoạn lớn';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Không rõ';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2057,10 +2083,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => 'Chưa có dữ liệu';
-
-  @override
-  String get endpointHealthNone =>
-      'Thiết bị này chưa gửi yêu cầu đến máy chủ nào.';
 
   @override
   String get endpointStateOk => 'Bình thường';
@@ -3127,4 +3149,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => 'Tải lên thất bại';
+
+  @override
+  String get statusLegendUnprobed => 'Chưa dò';
+
+  @override
+  String get statusLegendUnsupported => 'Không có';
 }

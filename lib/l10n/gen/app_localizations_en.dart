@@ -1990,14 +1990,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appLogs => 'App logs';
 
   @override
-  String get serverStatusBody => 'Live health of the ExpTech servers.';
-
-  @override
   String get serverStatusLocal => 'Local status';
 
   @override
   String get serverStatusLocalBody =>
-      'The server metrics above come from the dashboard; below is this device\'s own view of the multi-active endpoints — which LB / Core region actually answers:';
+      'Metrics come from the dashboard. Below is this device\'s own view of the multi-active endpoints (LB / Core per region): it passively records the traffic each endpoint actually serves, so a cell with no data means nothing was observed through this device yet.';
 
   @override
   String get serverStatusAllUp => 'All services operational';
@@ -2022,6 +2019,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech status';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare status';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'All regions operational';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare regional issue';
+
+  @override
+  String get serverStatusCloudflareNone => 'No regions to show.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Operational';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Degraded';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Partial outage';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Major outage';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Unknown';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2056,10 +2083,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => 'No observations yet';
-
-  @override
-  String get endpointHealthNone =>
-      'This device has not yet sent a request to any endpoint.';
 
   @override
   String get endpointStateOk => 'OK';
@@ -3124,4 +3147,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => 'Upload failed — try again';
+
+  @override
+  String get statusLegendUnprobed => 'Not yet probed';
+
+  @override
+  String get statusLegendUnsupported => 'Not offered';
 }

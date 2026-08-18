@@ -1985,15 +1985,11 @@ class AppLocalizationsTh extends AppLocalizations {
   String get appLogs => 'บันทึกแอป';
 
   @override
-  String get serverStatusBody =>
-      'สถานะสุขภาพแบบเรียลไทม์ของเซิร์ฟเวอร์ ExpTech';
-
-  @override
   String get serverStatusLocal => 'สถานะอุปกรณ์';
 
   @override
   String get serverStatusLocalBody =>
-      'ตัวชี้วัดเซิร์ฟเวอร์มาจากแดชบอร์ด ด้านล่างคือการตัดสินของอุปกรณ์นี้ต่อจุดเชื่อมต่อแบบ multi-active (แต่ละภูมิภาคของ LB / Core):';
+      'ตัวชี้วัดเซิร์ฟเวอร์มาจากแดชบอร์ด ด้านล่างคือการตัดสินการเชื่อมต่อจริงของเครื่องนี้ต่อเอนด์พอยต์แบบ multi-active (LB / Core แต่ละภูมิภาค): แอปบันทึกเฉพาะทราฟฟิกที่เครื่องนี้รับส่งจริงโดยไม่รบกวน ถ้ายังไม่เคยแตะเอนด์พอยต์นั้นจะแสดง \'ยังไม่ตรวจ\'';
 
   @override
   String get serverStatusAllUp => 'บริการทั้งหมดปกติ';
@@ -2018,6 +2014,36 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'สถานะ ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'สถานะ Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'ทุกภูมิภาคปกติ';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare บางภูมิภาคผิดปกติ';
+
+  @override
+  String get serverStatusCloudflareNone => 'ไม่มีภูมิภาคให้แสดง';
+
+  @override
+  String get serverStatusCloudflareOperational => 'ปกติ';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'ประสิทธิภาพลดลง';
+
+  @override
+  String get serverStatusCloudflarePartial => 'หยุดบางส่วน';
+
+  @override
+  String get serverStatusCloudflareMajor => 'หยุดบริการขนาดใหญ่';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'ไม่ทราบ';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2052,10 +2078,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => 'ยังไม่มีข้อมูล';
-
-  @override
-  String get endpointHealthNone =>
-      'อุปกรณ์นี้ยังไม่ได้ส่งคำขอไปยังจุดเชื่อมต่อใด';
 
   @override
   String get endpointStateOk => 'ปกติ';
@@ -3119,4 +3141,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => 'อัปโหลดไม่สำเร็จ';
+
+  @override
+  String get statusLegendUnprobed => 'ยังไม่ตรวจ';
+
+  @override
+  String get statusLegendUnsupported => 'ไม่รองรับ';
 }

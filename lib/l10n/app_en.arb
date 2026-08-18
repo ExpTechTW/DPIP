@@ -2728,9 +2728,8 @@
   "lightningLegendCg": "Cloud-to-ground · {minutes} min",
   "skyTimeAuto": "Auto",
   "appLogs": "App logs",
-  "serverStatusBody": "Live health of the ExpTech servers.",
   "serverStatusLocal": "Local status",
-  "serverStatusLocalBody": "The server metrics above come from the dashboard; below is this device's own view of the multi-active endpoints — which LB / Core region actually answers:",
+  "serverStatusLocalBody": "Metrics come from the dashboard. Below is this device's own view of the multi-active endpoints (LB / Core per region): it passively records the traffic each endpoint actually serves, so a cell with no data means nothing was observed through this device yet.",
   "serverStatusAllUp": "All services operational",
   "serverStatusDegraded": "Services degraded",
   "serverStatusDown": "Service down",
@@ -2739,6 +2738,16 @@
   "serverStatusUpdated": "Updated",
   "serverStatusWeb": "Server status",
   "serverStatusWebUrl": "status.exptech.dev",
+  "serverStatusExpTech": "ExpTech status",
+  "serverStatusCloudflare": "Cloudflare status",
+  "serverStatusCloudflareAllOperational": "All regions operational",
+  "serverStatusCloudflareOutage": "Cloudflare regional issue",
+  "serverStatusCloudflareNone": "No regions to show.",
+  "serverStatusCloudflareOperational": "Operational",
+  "serverStatusCloudflareDegraded": "Degraded",
+  "serverStatusCloudflarePartial": "Partial outage",
+  "serverStatusCloudflareMajor": "Major outage",
+  "serverStatusCloudflareUnknown": "Unknown",
   "endpointTierLbApi": "LB API",
   "endpointTierLbStatic": "LB Static",
   "endpointTierCoreApi": "Core API",
@@ -2750,7 +2759,6 @@
   "endpointHealthDegraded": "Some endpoints unstable",
   "endpointHealthDown": "Local connections failing",
   "endpointHealthUnknown": "No observations yet",
-  "endpointHealthNone": "This device has not yet sent a request to any endpoint.",
   "endpointStateOk": "OK",
   "endpointStateDegraded": "Unstable",
   "endpointStateDown": "Failing",
@@ -3983,5 +3991,7 @@
   "dumpUploadFailed": "Upload failed — try again",
   "@dumpUploadFailed": {
     "description": "Shown when a debug dump could not be uploaded"
-  }
+  },
+  "statusLegendUnprobed": "Not yet probed",
+  "statusLegendUnsupported": "Not offered"
 }

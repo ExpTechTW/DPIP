@@ -2000,15 +2000,11 @@ class AppLocalizationsFil extends AppLocalizations {
   String get appLogs => 'Mga log ng app';
 
   @override
-  String get serverStatusBody =>
-      'Real-time na kalusugan ng mga server ng ExpTech.';
-
-  @override
   String get serverStatusLocal => 'Katayuan ng device';
 
   @override
   String get serverStatusLocalBody =>
-      'Ang mga sukatan ng server ay mula sa dashboard; sa ibaba ay ang sariling pagtingin ng device na ito sa mga multi-active endpoint (bawat rehiyon ng LB/Core) na aktwal na kumokonekta:';
+      'Ang mga sukatan ng server ay mula sa dashboard. Nasa ibaba ang aktwal na paghusga ng device na ito sa mga multi-active na endpoint (LB / Core bawat rehiyon): pasibo lang itong nagtatala ng trapikong talagang pinapadala; kung hindi pa ito naantig ng device, lalabas ang \'Hindi pa nasuri\'.';
 
   @override
   String get serverStatusAllUp => 'Lahat ng serbisyo ay normal';
@@ -2033,6 +2029,38 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'Katayuan ng ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'Katayuan ng Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational =>
+      'Normal ang lahat ng lugar';
+
+  @override
+  String get serverStatusCloudflareOutage =>
+      'May problema ang Cloudflare sa ilang lugar';
+
+  @override
+  String get serverStatusCloudflareNone => 'Walang lugar na maipapakita.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Normal';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Bumaba ang pagganap';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Bahagyang pagkaantala';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Malaking pagkaantala';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Hindi alam';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2067,10 +2095,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => 'Wala pang datos';
-
-  @override
-  String get endpointHealthNone =>
-      'Ang device na ito ay hindi pa nagpapadala ng kahit anong request sa endpoint.';
 
   @override
   String get endpointStateOk => 'Normal';
@@ -3138,4 +3162,10 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => 'Nabigong mag-upload';
+
+  @override
+  String get statusLegendUnprobed => 'Hindi pa nasuri';
+
+  @override
+  String get statusLegendUnsupported => 'Hindi suportado';
 }

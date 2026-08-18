@@ -1958,14 +1958,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appLogs => 'アプリログ';
 
   @override
-  String get serverStatusBody => 'ExpTech サーバーのリアルタイムの健全性です。';
-
-  @override
   String get serverStatusLocal => 'デバイスの状態';
 
   @override
   String get serverStatusLocalBody =>
-      'サーバー指標はダッシュボードから取得し、以下はこの端末が実際に接続しているマルチアクティブエンドポイント（LB / Core 各リージョン）の判定です：';
+      'サーバー指標はダッシュボードからのものです。以下は本機のマルチアクティブエンドポイント（LB / Core 各リージョン）への実際の接続判断です：本機が実際に送受信したトラフィックだけを受動的に記録するため、まだ触れていないエンドポイントは「未探知」と表示されます。';
 
   @override
   String get serverStatusAllUp => 'すべて正常';
@@ -1990,6 +1987,36 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech ステータス';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare ステータス';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '全リージョン正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare の一部リージョンで異常';
+
+  @override
+  String get serverStatusCloudflareNone => '表示できるリージョンがありません。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '性能低下';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分停止';
+
+  @override
+  String get serverStatusCloudflareMajor => '大規模停止';
+
+  @override
+  String get serverStatusCloudflareUnknown => '不明';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2023,9 +2050,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => '観測データなし';
-
-  @override
-  String get endpointHealthNone => 'この端末はまだどのエンドポイントにもリクエストしていません。';
 
   @override
   String get endpointStateOk => '正常';
@@ -3076,4 +3100,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => 'アップロードに失敗しました';
+
+  @override
+  String get statusLegendUnprobed => '未探知';
+
+  @override
+  String get statusLegendUnsupported => '非対応';
 }

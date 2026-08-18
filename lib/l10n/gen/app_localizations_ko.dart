@@ -1965,14 +1965,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appLogs => '앱 로그';
 
   @override
-  String get serverStatusBody => 'ExpTech 서버의 실시간 상태입니다.';
-
-  @override
   String get serverStatusLocal => '기기 상태';
 
   @override
   String get serverStatusLocalBody =>
-      '서버 지표는 대시보드에서 가져오며, 아래는 이 기기가 실제로 연결 중인 멀티 액티브 엔드포인트(LB/Core 각 리전)의 판단입니다:';
+      '서버 지표는 대시보드에서 가져옵니다. 아래는 이 기기의 멀티 액티브 엔드포인트(LB / Core 각 지역)에 대한 실제 연결 판단입니다. 기기가 실제로 주고받은 트래픽만 수동적으로 기록하므로, 아직 접촉하지 않은 엔드포인트는 \'탐지 안 됨\'으로 표시됩니다.';
 
   @override
   String get serverStatusAllUp => '모든 서비스 정상';
@@ -1997,6 +1994,36 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 상태';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 상태';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '모든 리전 정상';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 일부 리전 이상';
+
+  @override
+  String get serverStatusCloudflareNone => '표시할 리전이 없습니다.';
+
+  @override
+  String get serverStatusCloudflareOperational => '정상';
+
+  @override
+  String get serverStatusCloudflareDegraded => '성능 저하';
+
+  @override
+  String get serverStatusCloudflarePartial => '부분 중단';
+
+  @override
+  String get serverStatusCloudflareMajor => '대규모 중단';
+
+  @override
+  String get serverStatusCloudflareUnknown => '알 수 없음';
 
   @override
   String get endpointTierLbApi => 'LB API';
@@ -2030,9 +2057,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get endpointHealthUnknown => '관측 데이터 없음';
-
-  @override
-  String get endpointHealthNone => '이 기기는 아직 어떤 엔드포인트에도 요청하지 않았습니다.';
 
   @override
   String get endpointStateOk => '정상';
@@ -3085,4 +3109,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dumpUploadFailed => '업로드하지 못했습니다';
+
+  @override
+  String get statusLegendUnprobed => '탐지 안 됨';
+
+  @override
+  String get statusLegendUnsupported => '미지원';
 }

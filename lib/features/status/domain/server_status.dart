@@ -1,11 +1,8 @@
 /// Server status snapshot from the ExpTech status dashboard.
 library;
 
-import 'package:flutter/foundation.dart';
-
 /// One Grafana query result — a single number plus the instance (host) it was
 /// measured on, when the query reports one.
-@immutable
 class StatusMetric {
   const StatusMetric({required this.value, this.instance});
 
@@ -20,7 +17,6 @@ class StatusMetric {
 
 /// The dashboard's three health signals, together with the instant they were
 /// observed.
-@immutable
 class ServerStatus {
   const ServerStatus({
     required this.recordedAt,

@@ -3783,12 +3783,6 @@ abstract class AppLocalizations {
   /// **'App logs'**
   String get appLogs;
 
-  /// No description provided for @serverStatusBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Live health of the ExpTech servers.'**
-  String get serverStatusBody;
-
   /// No description provided for @serverStatusLocal.
   ///
   /// In en, this message translates to:
@@ -3798,7 +3792,7 @@ abstract class AppLocalizations {
   /// No description provided for @serverStatusLocalBody.
   ///
   /// In en, this message translates to:
-  /// **'The server metrics above come from the dashboard; below is this device\'s own view of the multi-active endpoints — which LB / Core region actually answers:'**
+  /// **'Metrics come from the dashboard. Below is this device\'s own view of the multi-active endpoints (LB / Core per region): it passively records the traffic each endpoint actually serves, so a cell with no data means nothing was observed through this device yet.'**
   String get serverStatusLocalBody;
 
   /// No description provided for @serverStatusAllUp.
@@ -3848,6 +3842,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'status.exptech.dev'**
   String get serverStatusWebUrl;
+
+  /// No description provided for @serverStatusExpTech.
+  ///
+  /// In en, this message translates to:
+  /// **'ExpTech status'**
+  String get serverStatusExpTech;
+
+  /// No description provided for @serverStatusCloudflare.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudflare status'**
+  String get serverStatusCloudflare;
+
+  /// No description provided for @serverStatusCloudflareAllOperational.
+  ///
+  /// In en, this message translates to:
+  /// **'All regions operational'**
+  String get serverStatusCloudflareAllOperational;
+
+  /// No description provided for @serverStatusCloudflareOutage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudflare regional issue'**
+  String get serverStatusCloudflareOutage;
+
+  /// No description provided for @serverStatusCloudflareNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No regions to show.'**
+  String get serverStatusCloudflareNone;
+
+  /// No description provided for @serverStatusCloudflareOperational.
+  ///
+  /// In en, this message translates to:
+  /// **'Operational'**
+  String get serverStatusCloudflareOperational;
+
+  /// No description provided for @serverStatusCloudflareDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Degraded'**
+  String get serverStatusCloudflareDegraded;
+
+  /// No description provided for @serverStatusCloudflarePartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial outage'**
+  String get serverStatusCloudflarePartial;
+
+  /// No description provided for @serverStatusCloudflareMajor.
+  ///
+  /// In en, this message translates to:
+  /// **'Major outage'**
+  String get serverStatusCloudflareMajor;
+
+  /// No description provided for @serverStatusCloudflareUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get serverStatusCloudflareUnknown;
 
   /// No description provided for @endpointTierLbApi.
   ///
@@ -3914,12 +3968,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No observations yet'**
   String get endpointHealthUnknown;
-
-  /// No description provided for @endpointHealthNone.
-  ///
-  /// In en, this message translates to:
-  /// **'This device has not yet sent a request to any endpoint.'**
-  String get endpointHealthNone;
 
   /// No description provided for @endpointStateOk.
   ///
@@ -5954,6 +6002,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upload failed — try again'**
   String get dumpUploadFailed;
+
+  /// No description provided for @statusLegendUnprobed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet probed'**
+  String get statusLegendUnprobed;
+
+  /// No description provided for @statusLegendUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Not offered'**
+  String get statusLegendUnsupported;
 }
 
 class _AppLocalizationsDelegate
