@@ -252,7 +252,16 @@ locales=""
 for sha in $(git rev-list --no-merges --reverse "$range" 2>/dev/null); do
   # Read the body once. A commit with no changelog line contributes nothing and
   # costs no API call.
-  body="$(git log -1 --format=%b "$sha")"
+  # An entry may be hard-wrapped — commit.md's own Android example is — and the
+  # regex below is whole-line, so a continuation used to be dropped in silence.
+  # Three sentences shipped cut mid-clause in 41a3c1e8: "…on the monitor and
+  # the", with "replay map" left behind. Folded back on first, so what the
+  # writer wrote is what the reader gets.
+  body="$(git log -1 --format=%b "$sha" | awk '
+    /^[[:space:]]+[^[:space:]]/ && held { sub(/^[[:space:]]+/, " "); printf "%s", $0; next }
+    { if (held) printf "\n"; printf "%s", $0; held = 1 }
+    END { if (held) printf "\n" }
+  ')"
   printf '%s\n' "$body" | grep -Eq "$LINE_RE" || continue
 
   tag="$(platform_tag "$sha")"
