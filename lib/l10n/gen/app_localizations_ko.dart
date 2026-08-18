@@ -856,6 +856,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moonPhaseFull => 'Full moon';
 
   @override
+  String meshtasticBinaryPayload(String size) {
+    return '바이너리 데이터 · $size';
+  }
+
+  @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
 
   @override

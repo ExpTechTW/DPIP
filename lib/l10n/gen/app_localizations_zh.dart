@@ -850,6 +850,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moonPhaseFull => '滿月';
 
   @override
+  String meshtasticBinaryPayload(String size) {
+    return '二進位內容 · $size';
+  }
+
+  @override
   String get moonPhaseWaningGibbous => '虧凸月';
 
   @override
@@ -3957,6 +3962,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moonPhaseFull => '滿月';
+
+  @override
+  String meshtasticBinaryPayload(String size) {
+    return '二进制内容 · $size';
+  }
 
   @override
   String get moonPhaseWaningGibbous => '虧凸月';
@@ -7068,6 +7078,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moonPhaseFull => '滿月';
 
   @override
+  String meshtasticBinaryPayload(String size) {
+    return '二進位內容 · $size';
+  }
+
+  @override
   String get moonPhaseWaningGibbous => '虧凸月';
 
   @override
@@ -10175,6 +10190,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moonPhaseFull => '滿月';
+
+  @override
+  String meshtasticBinaryPayload(String size) {
+    return '二進位內容 · $size';
+  }
 
   @override
   String get moonPhaseWaningGibbous => '虧凸月';

@@ -867,6 +867,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moonPhaseFull => 'Full moon';
 
   @override
+  String meshtasticBinaryPayload(String size) {
+    return 'Binary payload · $size';
+  }
+
+  @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
 
   @override

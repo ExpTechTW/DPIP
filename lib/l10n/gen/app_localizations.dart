@@ -1707,6 +1707,12 @@ abstract class AppLocalizations {
   /// **'Full moon'**
   String get moonPhaseFull;
 
+  /// Label above a chat message whose body was not text and is shown as a hex dump. {size} is a formatted byte count, e.g. "24 B".
+  ///
+  /// In en, this message translates to:
+  /// **'Binary payload · {size}'**
+  String meshtasticBinaryPayload(String size);
+
   /// Phase: waning gibbous
   ///
   /// In en, this message translates to:

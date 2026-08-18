@@ -854,6 +854,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moonPhaseFull => 'Full moon';
 
   @override
+  String meshtasticBinaryPayload(String size) {
+    return 'バイナリデータ · $size';
+  }
+
+  @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
 
   @override

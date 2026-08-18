@@ -170,4 +170,63 @@ void main() {
       expect(row.airUtilTx, 0);
     });
   });
+
+  group('binary bodies', () {
+    test('the flag round-trips', () async {
+      await store().addMessage(
+        MeshStoredMessage(
+          from: 1,
+          channel: 0,
+          text: '01 ff 02',
+          timestamp: clock,
+          outgoing: false,
+          binary: true,
+        ),
+      );
+
+      final rows = await store().messages(channel: 0);
+
+      expect(rows.single.binary, isTrue);
+      expect(rows.single.text, '01 ff 02');
+    });
+
+    test('a text message is not binary', () async {
+      await store().addMessage(message('hello'));
+
+      expect((await store().messages(channel: 0)).single.binary, isFalse);
+    });
+
+    test('a row written before the column existed reads as text', () async {
+      // The `binary` column arrives by ALTER, so every row already on disk has
+      // NULL in it. Reading that as `null == 1` -> false is the whole contract;
+      // a `!` there would throw on the first message anyone had ever received.
+      //
+      // Simulated by putting the table back into its pre-column shape and
+      // re-running createSchema, which is exactly what an upgrade does.
+      await db.execute('DROP TABLE mesh_messages');
+      await db.execute('''
+        CREATE TABLE mesh_messages (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          ts INTEGER NOT NULL,
+          node INTEGER NOT NULL,
+          channel INTEGER NOT NULL,
+          text TEXT NOT NULL,
+          outgoing INTEGER NOT NULL DEFAULT 0
+        )
+      ''');
+      await db.insert('mesh_messages', {
+        'ts': clock.millisecondsSinceEpoch,
+        'node': 1,
+        'channel': 0,
+        'text': 'from before the column',
+        'outgoing': 0,
+      });
+
+      await MeshStore.createSchema(db);
+      final rows = await store().messages(channel: 0);
+
+      expect(rows.single.text, 'from before the column');
+      expect(rows.single.binary, isFalse);
+    });
+  });
 }

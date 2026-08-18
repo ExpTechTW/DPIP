@@ -27,13 +27,21 @@ class MeshStoredMessage {
     required this.text,
     required this.timestamp,
     required this.outgoing,
+    this.binary = false,
   });
 
   final int from;
   final int channel;
+
+  /// What to show. A hex dump when [binary].
   final String text;
   final DateTime timestamp;
   final bool outgoing;
+
+  /// The body was not text. Defaulted rather than required because every row
+  /// written before the column existed is text by construction — the decoder
+  /// that produced them could not represent anything else.
+  final bool binary;
 }
 
 /// One utilization sample, as the radio reported it.
@@ -332,7 +340,11 @@ class MeshStore {
     // NULL on rows written before it existed, and those are kept: an old row's
     // true arrival time is unknowable, and deleting on a guess is the failure
     // this column exists to stop.
-    _messages: [('received_at', 'INTEGER')],
+    // `binary` is nullable for the same reason `received_at` is: an existing
+    // row cannot be re-examined. It reads as 0 (text), which is exactly right —
+    // every row written before the column existed came out of a decoder that
+    // could not produce anything else.
+    _messages: [('received_at', 'INTEGER'), ('binary', 'INTEGER')],
   };
 
   /// Appends [message], ignoring one the log already holds. Returns whether it
@@ -346,6 +358,7 @@ class MeshStore {
         'channel': message.channel,
         'text': message.text,
         'outgoing': message.outgoing ? 1 : 0,
+        'binary': message.binary ? 1 : 0,
       }, conflictAlgorithm: ConflictAlgorithm.ignore);
       return id != 0;
     } catch (error, stackTrace) {
@@ -661,6 +674,9 @@ class MeshStore {
     text: row['text']! as String,
     timestamp: DateTime.fromMillisecondsSinceEpoch(row['ts']! as int),
     outgoing: (row['outgoing']! as int) == 1,
+    // Not `!`: the column post-dates the table, so a row written before the
+    // ALTER has NULL here and reads as text.
+    binary: (row['binary'] as int?) == 1,
   );
 
   /// Every stored node, most recently heard first.

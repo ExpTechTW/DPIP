@@ -873,6 +873,11 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moonPhaseFull => 'Full moon';
 
   @override
+  String meshtasticBinaryPayload(String size) {
+    return 'Binary na data · $size';
+  }
+
+  @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
 
   @override

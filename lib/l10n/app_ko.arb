@@ -413,6 +413,7 @@
   "@meshtasticEmptyMessage": {
     "description": "Placeholder for a text packet with no body"
   },
+  "meshtasticBinaryPayload": "바이너리 데이터 · {size}",
   "@radarGlobalOutlineHint": {
     "description": "Hint under the national-border toggle in the radar overlay menu."
   },
