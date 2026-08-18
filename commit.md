@@ -369,9 +369,10 @@ ci: cache the Swift package resolution
 
 實際長相就是上面各節的範例，`tool/release/notes.sh` 直接照這個格式輸出。
 
-> **squash 會壓縮條目數。** 正則是逐行抓的，所以 squash 不會像舊格式那樣把內容
-> 弄壞——但四則 commit 的條目會全部掛在同一個作者和同一個快照下。要保留就用
-> rebase-merge。
+> **不要用 squash 合併。** 兩個理由。第一，正則是逐行抓的，所以 squash 不會像舊
+> 格式那樣把內容弄壞，但四則 commit 的條目會全部掛在同一個作者和同一個快照下 ——
+> 正式版更新日誌上「這一項第一次出現在哪個測試版」的標記就沒了。第二，squash 的
+> 訊息來自 PR 的標題與描述，**而那兩樣沒有任何 gate 在看**（見下節）。
 
 ---
 
@@ -394,6 +395,19 @@ git push --force-with-lease
 （`github.event.pull_request.head.sha`）而不是 checkout 出來的合併節點——
 pull request 會建一個分支併入 base 的合成 merge，而這個 gate 判的每一則都必須
 是有人真的寫過的。
+
+### gate 只看 commit，不看 PR 標題與描述
+
+**PR 的標題和描述完全不在檢查範圍內。** 被判的是分支上每一則 commit ——
+它們是有人真的寫過的東西，而標題預設是從分支名生出來的（`Fix/version week`），
+描述可以是空的。
+
+代價要講清楚：**squash 合併時，進 main 的訊息是標題加描述，不是那些 commit。**
+所以 squash 會把一則沒有人檢查過的訊息寫進 main。唯一的後盾是 main 自己的 push
+事件會再跑一次 gate —— 那是事後偵測，不是預防，而且發現的時候已經在 main 上了。
+
+**所以：用 rebase 合併。** 這樣進 main 的就是那些已經被判過的 commit 本身，
+每一則也各自保留自己的更新日誌條目與快照標記。
 
 ---
 
