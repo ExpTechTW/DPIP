@@ -146,11 +146,32 @@ readonly REPO_API='https://api.github.com/repos'
 # `sed` cannot see structure — it reads the first `"login"` on a line and calls
 # it the answer, which is right until the day it is not.
 api_json() { # <path> <python expression over `d`>
-  curl -sS --max-time 15 \
+  local body status
+  body="$(curl -sS --max-time 15 -w '\n%{http_code}' \
     -H 'Accept: application/vnd.github+json' \
     ${GITHUB_TOKEN:+-H "Authorization: Bearer $GITHUB_TOKEN"} \
-    "$REPO_API/${GITHUB_REPOSITORY:-ExpTechTW/DPIP}/$1" 2>/dev/null |
-    python3 -c "
+    "$REPO_API/${GITHUB_REPOSITORY:-ExpTechTW/DPIP}/$1" 2>/dev/null)"
+  status="${body##*$'\n'}"
+  body="${body%$'\n'*}"
+
+  # Say so, once per call, rather than returning nothing and letting the note
+  # ship with no attribution. Unauthenticated the limit is 60 requests an hour
+  # *per IP*, shared with every other job on that runner, so a rate-limited
+  # release used to produce a note that looked finished and credited nobody.
+  case "$status" in
+  200) ;;
+  403 | 429)
+    printf 'notes.sh: GitHub rate-limited %s (HTTP %s) — attribution will be incomplete\n' \
+      "$1" "$status" >&2
+    return 0
+    ;;
+  *)
+    printf 'notes.sh: GitHub returned HTTP %s for %s\n' "$status" "$1" >&2
+    return 0
+    ;;
+  esac
+
+  printf '%s' "$body" | python3 -c "
 import json,sys
 try: d = json.load(sys.stdin)
 except Exception: raise SystemExit
@@ -164,7 +185,12 @@ authors_of() {
   # The pull request's own commits: the only place the real authors survive a
   # squash intact.
   if [ -n "$pr" ]; then
-    logins="$(api_json "pulls/$pr/commits" \
+    # `per_page=100`, because the default is 30 and nothing said so: a pull
+    # request with more commits than that silently lost every author past the
+    # thirtieth. #533 had 63. 100 is the maximum the API accepts, and the
+    # endpoint itself stops at 250 commits whatever is asked for — past that the
+    # tail is unreachable and the trailers below are the only record left.
+    logins="$(api_json "pulls/$pr/commits?per_page=100" \
       "print(' '.join(dict.fromkeys(c['author']['login'] for c in d if c.get('author'))))")"
   fi
 
