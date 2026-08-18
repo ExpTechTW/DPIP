@@ -27,7 +27,7 @@ if (keystorePropertiesFile.exists()) {
 /// can then never be restyled, reordered or renamed without the ordinal
 /// moving with it, and a label that is not three integers cannot exist at all.
 ///
-/// Both now come from `tool/version.sh` by way of CI, which is the one place
+/// Both now come from `tool/release/version.sh` by way of CI, which is the one place
 /// that decides. Locally, where neither is set, the build falls back to
 /// Flutter's own numbers so `flutter run` keeps working.
 /// Play's ordinal, straight from Flutter's `--build-number`.
@@ -35,7 +35,7 @@ if (keystorePropertiesFile.exists()) {
 /// One source, not two. It used to also read a `DPIP_CODE` environment
 /// variable, which meant two ways to set the same field and no rule about
 /// which won — and the two carry different numbers now that each store has its
-/// own floor (`tool/version.sh`). Play's is deliberately the small one: it has
+/// own floor (`tool/release/version.sh`). Play's is deliberately the small one: it has
 /// published nothing, and a code that turns out to be too low fails the
 /// *upload*, before anything is served, which costs one line to fix.
 val dpipVersionCode: Int = flutter.versionCode

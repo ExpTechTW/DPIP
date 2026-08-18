@@ -240,7 +240,9 @@
   "updateOpenPlayStore": "Play Store",
   "updateDownload": "Download",
   "changelogShowSnapshots": "Show snapshots",
-  "@changelogShowSnapshots": { "description": "Changelog action that reveals pre-release snapshots" },
+  "@changelogShowSnapshots": {
+    "description": "Changelog action that reveals pre-release snapshots"
+  },
   "changelogTitle": "Changelog",
   "reportFilterOrderDesc": "Descending",
   "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
@@ -1307,6 +1309,13 @@
     "description": "Himawari CO₂-band channel (B16, 13.3 µm) layer name"
   },
   "moreSectionApp": "Get the app",
+  "moreSectionBeta": "Beta",
+  "moreAndroidBeta": "Android beta",
+  "moreTestFlight": "iOS beta (TestFlight)",
+  "moreSectionPartners": "Partners",
+  "morePartnersNote": "Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.",
+  "morePartnerGeoscience": "Geoscience",
+  "morePartnerTwds": "TWDS",
   "reportFilterIntensityInfoLegacyBody": "Only levels 0–7. No 5− / 5+ / 6− / 6+ split.",
   "@notifyTsunami": {
     "description": "Notify channel title"
@@ -2047,6 +2056,7 @@
     "description": "Himawari sea-surface-temperature (ACSPO L3C) layer name"
   },
   "changelogBodyEmpty": "No notes for this release.",
+  "changelogOpenOnGitHub": "View on GitHub",
   "radarGlobalOutline": "National borders",
   "@mapMyLocation": {
     "description": "Map control that centers the camera on the device GPS fix"
@@ -2718,6 +2728,59 @@
   "lightningLegendCg": "Cloud-to-ground · {minutes} min",
   "skyTimeAuto": "Auto",
   "appLogs": "App logs",
+  "serverStatusLocal": "Local status",
+  "serverStatusLocalBody": "Metrics come from the dashboard. Below is this device's own view of the multi-active endpoints (LB / Core per region): it passively records the traffic each endpoint actually serves, so a cell with no data means nothing was observed through this device yet.",
+  "serverStatusAllUp": "All services operational",
+  "serverStatusDegraded": "Services degraded",
+  "serverStatusDown": "Service down",
+  "serverStatusErrorRate": "5xx error rate",
+  "serverStatusLatency": "Avg latency",
+  "serverStatusUpdated": "Updated",
+  "serverStatusWeb": "Server status",
+  "serverStatusWebUrl": "status.exptech.dev",
+  "serverStatusExpTech": "ExpTech status",
+  "serverStatusCloudflare": "Cloudflare status",
+  "serverStatusCloudflareAllOperational": "All regions operational",
+  "serverStatusCloudflareOutage": "Cloudflare regional issue",
+  "serverStatusCloudflareNone": "No regions to show.",
+  "serverStatusCloudflareOperational": "Operational",
+  "serverStatusCloudflareDegraded": "Degraded",
+  "serverStatusCloudflarePartial": "Partial outage",
+  "serverStatusCloudflareMajor": "Major outage",
+  "serverStatusCloudflareUnknown": "Unknown",
+  "endpointTierLbApi": "LB API",
+  "endpointTierLbStatic": "LB Static",
+  "endpointTierCoreApi": "Core API",
+  "endpointTierCoreStatic": "Core Static",
+  "endpointTierCoreExclusiveApi": "Core-exclusive API (radar / weather / wind)",
+  "endpointTierCoreStaticExclusive": "Core-exclusive static",
+  "endpointTierLegacyApi": "Legacy API (api-1)",
+  "endpointHealthOk": "Local connections healthy",
+  "endpointHealthDegraded": "Some endpoints unstable",
+  "endpointHealthDown": "Local connections failing",
+  "endpointHealthUnknown": "No observations yet",
+  "endpointStateOk": "OK",
+  "endpointStateDegraded": "Unstable",
+  "endpointStateDown": "Failing",
+  "endpointStateUnknown": "Unknown",
+  "endpointLastSuccessNever": "never succeeded",
+  "endpointServiceEew": "EEW",
+  "endpointServiceRts": "RTS",
+  "endpointServiceRadar": "Radar",
+  "endpointServiceSatellite": "Satellite",
+  "endpointServiceQpesums": "QPE",
+  "endpointServiceWind": "Wind",
+  "endpointServiceDpm": "Disaster points",
+  "endpointServiceWeather": "Weather",
+  "endpointServiceRain": "Rain",
+  "endpointServiceLightning": "Lightning",
+  "endpointServiceTyphoon": "Typhoon",
+  "endpointServiceReport": "EQ reports",
+  "endpointServiceTremStation": "Tremor station",
+  "endpointServiceEvent": "Events",
+  "endpointServiceLocation": "Location",
+  "endpointServiceNotify": "Notifications",
+  "endpointServiceOther": "Other",
   "feedConnecting": "Connecting…",
   "notifyBannerDisabled": "Notifications are off — you won't receive disaster alerts.",
   "@meshtasticNoNodes": {
@@ -2775,11 +2838,16 @@
     "description": "AED city / district row label"
   },
   "moreAnnouncements": "Announcements",
+  "moreTagline": "Disaster Prevention Information Platform",
   "moreVersionStable": "Release",
   "moreVersionNotes": "This version",
+  "releaseHighlightsTitle": "What changed in this release",
+  "releaseHighlightsTabNormal": "For users",
+  "releaseHighlightsTabAdvanced": "Deep dive",
+  "releaseHighlightsEmpty": "Nothing here yet.",
+  "releaseHighlightsSeeNotes": "Full release notes",
+  "highlightCardTechnical": "Technical",
   "moreVersionNotesEmpty": "No changelog for this build",
-  "moreVersionSnapshot": "Snapshot",
-  "moreVersionStable": "Release",
   "moreVersionSnapshot": "Snapshot",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {
@@ -3905,5 +3973,31 @@
         "type": "int"
       }
     }
-  }
+  },
+  "moreDumpDiagnostics": "Dump debug info and logs",
+  "@moreDumpDiagnostics": {
+    "description": "More menu row that uploads a debug dump"
+  },
+  "moreDumpDiagnosticsHint": "Uploads them and copies a link to paste into a report",
+  "@moreDumpDiagnosticsHint": {
+    "description": "Subtitle of the debug-dump row"
+  },
+  "dumpUploaded": "Uploaded",
+  "@dumpUploaded": {
+    "description": "Title of the dialog shown after a debug dump uploads"
+  },
+  "dumpLinkCopied": "The link is on your clipboard",
+  "@dumpLinkCopied": {
+    "description": "Says the uploaded dump link is already on the clipboard"
+  },
+  "dumpCopyAgain": "Copy again",
+  "@dumpCopyAgain": {
+    "description": "Button that copies the dump link to the clipboard again"
+  },
+  "dumpUploadFailed": "Upload failed — try again",
+  "@dumpUploadFailed": {
+    "description": "Shown when a debug dump could not be uploaded"
+  },
+  "statusLegendUnprobed": "Not yet probed",
+  "statusLegendUnsupported": "Not offered"
 }

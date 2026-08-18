@@ -935,6 +935,28 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreSectionApp => 'ดาวน์โหลดแอป';
 
   @override
+  String get moreSectionBeta => 'เวอร์ชันทดสอบ';
+
+  @override
+  String get moreAndroidBeta => 'เวอร์ชันทดอบ Android';
+
+  @override
+  String get moreTestFlight => 'เวอร์ชันทดอบ iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'พันธมิตร';
+
+  @override
+  String get morePartnersNote =>
+      'เรียงตามลำดับคู่ความร่วมมือ ขอบคุณบุคคลและบริษัทที่มีส่วนร่วมในการป้องกันภัยพิบัติ การสนับสนุนของพวกเขาทำให้ DPIP เกิดขึ้นได้';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'มีระดับ 0–7 เท่านั้น ไม่แยก 5−/5+/6−/6+';
 
@@ -1420,6 +1442,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => 'ไม่มีคำอธิบายสำหรับรุ่นนี้';
+
+  @override
+  String get changelogOpenOnGitHub => 'ดูบน GitHub';
 
   @override
   String get radarGlobalOutline => 'เส้นแบ่งเขตประเทศ';
@@ -1960,6 +1985,167 @@ class AppLocalizationsTh extends AppLocalizations {
   String get appLogs => 'บันทึกแอป';
 
   @override
+  String get serverStatusLocal => 'สถานะอุปกรณ์';
+
+  @override
+  String get serverStatusLocalBody =>
+      'ตัวชี้วัดเซิร์ฟเวอร์มาจากแดชบอร์ด ด้านล่างคือการตัดสินการเชื่อมต่อจริงของเครื่องนี้ต่อเอนด์พอยต์แบบ multi-active (LB / Core แต่ละภูมิภาค): แอปบันทึกเฉพาะทราฟฟิกที่เครื่องนี้รับส่งจริงโดยไม่รบกวน ถ้ายังไม่เคยแตะเอนด์พอยต์นั้นจะแสดง \'ยังไม่ตรวจ\'';
+
+  @override
+  String get serverStatusAllUp => 'บริการทั้งหมดปกติ';
+
+  @override
+  String get serverStatusDegraded => 'ประสิทธิภาพลดลง';
+
+  @override
+  String get serverStatusDown => 'บริการผิดปกติ';
+
+  @override
+  String get serverStatusErrorRate => 'อัตราข้อผิดพลาด 5xx';
+
+  @override
+  String get serverStatusLatency => 'ความหน่วงเฉลี่ย';
+
+  @override
+  String get serverStatusUpdated => 'อัปเดต';
+
+  @override
+  String get serverStatusWeb => 'สถานะเซิร์ฟเวอร์';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'สถานะ ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'สถานะ Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'ทุกภูมิภาคปกติ';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare บางภูมิภาคผิดปกติ';
+
+  @override
+  String get serverStatusCloudflareNone => 'ไม่มีภูมิภาคให้แสดง';
+
+  @override
+  String get serverStatusCloudflareOperational => 'ปกติ';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'ประสิทธิภาพลดลง';
+
+  @override
+  String get serverStatusCloudflarePartial => 'หยุดบางส่วน';
+
+  @override
+  String get serverStatusCloudflareMajor => 'หยุดบริการขนาดใหญ่';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'ไม่ทราบ';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core เฉพาะ API (เรดาร์ / อากาศ / ลม)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core เฉพาะทรัพยากรคงที่';
+
+  @override
+  String get endpointTierLegacyApi => 'API เดิม (api-1)';
+
+  @override
+  String get endpointHealthOk => 'การเชื่อมต่อปกติ';
+
+  @override
+  String get endpointHealthDegraded => 'มีจุดเชื่อมต่อไม่เสถียร';
+
+  @override
+  String get endpointHealthDown => 'การเชื่อมต่อผิดปกติ';
+
+  @override
+  String get endpointHealthUnknown => 'ยังไม่มีข้อมูล';
+
+  @override
+  String get endpointStateOk => 'ปกติ';
+
+  @override
+  String get endpointStateDegraded => 'ไม่เสถียร';
+
+  @override
+  String get endpointStateDown => 'ผิดปกติ';
+
+  @override
+  String get endpointStateUnknown => 'ไม่ทราบ';
+
+  @override
+  String get endpointLastSuccessNever => 'ยังไม่สำเร็จ';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => 'กำลังเชื่อมต่อ…';
 
   @override
@@ -2040,10 +2226,31 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreAnnouncements => 'ประกาศ';
 
   @override
+  String get moreTagline => 'แพลตฟอร์มรวมข้อมูลป้องกันภัยพิบัติ';
+
+  @override
   String get moreVersionStable => 'เวอร์ชันเต็ม';
 
   @override
   String get moreVersionNotes => 'เวอร์ชันปัจจุบัน';
+
+  @override
+  String get releaseHighlightsTitle => 'สิ่งที่เปลี่ยนแปลง';
+
+  @override
+  String get releaseHighlightsTabNormal => 'สำหรับผู้ใช้';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'เจาะลึก';
+
+  @override
+  String get releaseHighlightsEmpty => 'ยังไม่มีเนื้อหา';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'ดูบันทึกทั้งหมด';
+
+  @override
+  String get highlightCardTechnical => 'เทคนิค';
 
   @override
   String get moreVersionNotesEmpty => 'ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้';
@@ -2933,4 +3140,29 @@ class AppLocalizationsTh extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n ฮอป';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'อัปโหลดข้อมูลดีบักและบันทึก';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'อัปโหลดแล้วคัดลอกลิงก์เพื่อแนบในรายงาน';
+
+  @override
+  String get dumpUploaded => 'อัปโหลดแล้ว';
+
+  @override
+  String get dumpLinkCopied => 'คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว';
+
+  @override
+  String get dumpCopyAgain => 'คัดลอกอีกครั้ง';
+
+  @override
+  String get dumpUploadFailed => 'อัปโหลดไม่สำเร็จ';
+
+  @override
+  String get statusLegendUnprobed => 'ยังไม่ตรวจ';
+
+  @override
+  String get statusLegendUnsupported => 'ไม่รองรับ';
 }

@@ -15,7 +15,10 @@ import 'package:dpip/core/meshtastic/mesh_alerts.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/diagnostics/dump_uploader.dart';
+import 'package:dpip/core/diagnostics/haste_api.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -76,6 +79,13 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   Provider<MeshStore?>.value(value: deps.meshStore),
   Provider<DpipMeshGateway>.value(value: deps.meshGateway),
   Provider<ApiClient>.value(value: deps.apiClient),
+  // Where a diagnostics dump goes. The contract rather than the paste service
+  // behind it, so a page depends on "somewhere to send this" and not on Haste.
+  Provider<DumpUploader>.value(value: HasteApi(deps.apiClient)),
+  // Fed by ApiClient on every request outcome; read by the 伺服器狀態 page.
+  ChangeNotifierProvider<EndpointHealthMonitor>.value(
+    value: deps.endpointHealth,
+  ),
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.
   Provider<EtagCacheStore?>.value(value: deps.etagCache),
   Provider<NetworkUsageStore?>.value(value: deps.networkUsage),

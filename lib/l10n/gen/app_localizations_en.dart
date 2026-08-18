@@ -938,6 +938,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreSectionApp => 'Get the app';
 
   @override
+  String get moreSectionBeta => 'Beta';
+
+  @override
+  String get moreAndroidBeta => 'Android beta';
+
+  @override
+  String get moreTestFlight => 'iOS beta (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Partners';
+
+  @override
+  String get morePartnersNote =>
+      'Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Only levels 0–7. No 5− / 5+ / 6− / 6+ split.';
 
@@ -1423,6 +1445,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => 'No notes for this release.';
+
+  @override
+  String get changelogOpenOnGitHub => 'View on GitHub';
 
   @override
   String get radarGlobalOutline => 'National borders';
@@ -1965,6 +1990,167 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appLogs => 'App logs';
 
   @override
+  String get serverStatusLocal => 'Local status';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Metrics come from the dashboard. Below is this device\'s own view of the multi-active endpoints (LB / Core per region): it passively records the traffic each endpoint actually serves, so a cell with no data means nothing was observed through this device yet.';
+
+  @override
+  String get serverStatusAllUp => 'All services operational';
+
+  @override
+  String get serverStatusDegraded => 'Services degraded';
+
+  @override
+  String get serverStatusDown => 'Service down';
+
+  @override
+  String get serverStatusErrorRate => '5xx error rate';
+
+  @override
+  String get serverStatusLatency => 'Avg latency';
+
+  @override
+  String get serverStatusUpdated => 'Updated';
+
+  @override
+  String get serverStatusWeb => 'Server status';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech status';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare status';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'All regions operational';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare regional issue';
+
+  @override
+  String get serverStatusCloudflareNone => 'No regions to show.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Operational';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Degraded';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Partial outage';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Major outage';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Unknown';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core-exclusive API (radar / weather / wind)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core-exclusive static';
+
+  @override
+  String get endpointTierLegacyApi => 'Legacy API (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Local connections healthy';
+
+  @override
+  String get endpointHealthDegraded => 'Some endpoints unstable';
+
+  @override
+  String get endpointHealthDown => 'Local connections failing';
+
+  @override
+  String get endpointHealthUnknown => 'No observations yet';
+
+  @override
+  String get endpointStateOk => 'OK';
+
+  @override
+  String get endpointStateDegraded => 'Unstable';
+
+  @override
+  String get endpointStateDown => 'Failing';
+
+  @override
+  String get endpointStateUnknown => 'Unknown';
+
+  @override
+  String get endpointLastSuccessNever => 'never succeeded';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => 'Connecting…';
 
   @override
@@ -2045,10 +2231,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreAnnouncements => 'Announcements';
 
   @override
+  String get moreTagline => 'Disaster Prevention Information Platform';
+
+  @override
   String get moreVersionStable => 'Release';
 
   @override
   String get moreVersionNotes => 'This version';
+
+  @override
+  String get releaseHighlightsTitle => 'What changed in this release';
+
+  @override
+  String get releaseHighlightsTabNormal => 'For users';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Deep dive';
+
+  @override
+  String get releaseHighlightsEmpty => 'Nothing here yet.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Full release notes';
+
+  @override
+  String get highlightCardTechnical => 'Technical';
 
   @override
   String get moreVersionNotesEmpty => 'No changelog for this build';
@@ -2939,4 +3146,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n hops';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'Dump debug info and logs';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Uploads them and copies a link to paste into a report';
+
+  @override
+  String get dumpUploaded => 'Uploaded';
+
+  @override
+  String get dumpLinkCopied => 'The link is on your clipboard';
+
+  @override
+  String get dumpCopyAgain => 'Copy again';
+
+  @override
+  String get dumpUploadFailed => 'Upload failed — try again';
+
+  @override
+  String get statusLegendUnprobed => 'Not yet probed';
+
+  @override
+  String get statusLegendUnsupported => 'Not offered';
 }

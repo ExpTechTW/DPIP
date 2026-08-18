@@ -107,6 +107,8 @@ class BackgroundLocationService {
           'background location (native)$when: ${line.substring(tab + 1)}',
         );
       }
+    } on MissingPluginException {
+      // Unsupported platform / test harness — nothing to drain.
     } on Object catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'background location breadcrumbs');
     }

@@ -944,6 +944,28 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreSectionApp => 'Kunin ang app';
 
   @override
+  String get moreSectionBeta => 'Bersyon ng pagsubok';
+
+  @override
+  String get moreAndroidBeta => 'Bersyon ng pagsubok sa Android';
+
+  @override
+  String get moreTestFlight => 'Bersyon ng pagsubok sa iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Mga kasosyo';
+
+  @override
+  String get morePartnersNote =>
+      'Nakaayos ayon sa tamang panahon ng pakikipagtulungan. Salamat sa mga indibidwal at kompanyang nag-ambag sa paghahanda sa kalamidad; ang kanilang kontribusyon ang nagbigay-daan sa DPIP.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Antas 0–7 lang; walang 5−/5+/6−/6+.';
 
@@ -1432,6 +1454,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => 'Walang tala para sa release na ito.';
+
+  @override
+  String get changelogOpenOnGitHub => 'Tingnan sa GitHub';
 
   @override
   String get radarGlobalOutline => 'Mga hangganan ng bansa';
@@ -1975,6 +2000,169 @@ class AppLocalizationsFil extends AppLocalizations {
   String get appLogs => 'Mga log ng app';
 
   @override
+  String get serverStatusLocal => 'Katayuan ng device';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Ang mga sukatan ng server ay mula sa dashboard. Nasa ibaba ang aktwal na paghusga ng device na ito sa mga multi-active na endpoint (LB / Core bawat rehiyon): pasibo lang itong nagtatala ng trapikong talagang pinapadala; kung hindi pa ito naantig ng device, lalabas ang \'Hindi pa nasuri\'.';
+
+  @override
+  String get serverStatusAllUp => 'Lahat ng serbisyo ay normal';
+
+  @override
+  String get serverStatusDegraded => 'Bumaba ang pagganap';
+
+  @override
+  String get serverStatusDown => 'May problema ang serbisyo';
+
+  @override
+  String get serverStatusErrorRate => 'Rate ng error na 5xx';
+
+  @override
+  String get serverStatusLatency => 'Karaniwang latency';
+
+  @override
+  String get serverStatusUpdated => 'Na-update';
+
+  @override
+  String get serverStatusWeb => 'Katayuan ng server';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'Katayuan ng ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'Katayuan ng Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational =>
+      'Normal ang lahat ng lugar';
+
+  @override
+  String get serverStatusCloudflareOutage =>
+      'May problema ang Cloudflare sa ilang lugar';
+
+  @override
+  String get serverStatusCloudflareNone => 'Walang lugar na maipapakita.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Normal';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Bumaba ang pagganap';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Bahagyang pagkaantala';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Malaking pagkaantala';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Hindi alam';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core-eksklusibong API (radar / panahon / hangin)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core-eksklusibong static';
+
+  @override
+  String get endpointTierLegacyApi => 'Legacy API (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Normal ang koneksyon';
+
+  @override
+  String get endpointHealthDegraded => 'May endpoint na hindi matatag';
+
+  @override
+  String get endpointHealthDown => 'May problema ang koneksyon';
+
+  @override
+  String get endpointHealthUnknown => 'Wala pang datos';
+
+  @override
+  String get endpointStateOk => 'Normal';
+
+  @override
+  String get endpointStateDegraded => 'Hindi matatag';
+
+  @override
+  String get endpointStateDown => 'May problema';
+
+  @override
+  String get endpointStateUnknown => 'Hindi alam';
+
+  @override
+  String get endpointLastSuccessNever => 'hindi pa nagtagumpay';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => 'Kumokonekta…';
 
   @override
@@ -2055,10 +2243,32 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreAnnouncements => 'Mga Anunsyo';
 
   @override
+  String get moreTagline =>
+      'Platform para sa Integral na Impormasyon sa Kalamidad';
+
+  @override
   String get moreVersionStable => 'Pormal na bersyon';
 
   @override
   String get moreVersionNotes => 'Kasalukuyang bersyon';
+
+  @override
+  String get releaseHighlightsTitle => 'Ano ang nagbago';
+
+  @override
+  String get releaseHighlightsTabNormal => 'Para sa mga user';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Mas malalim';
+
+  @override
+  String get releaseHighlightsEmpty => 'Wala pang laman.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Buong tala ng release';
+
+  @override
+  String get highlightCardTechnical => 'Teknikal';
 
   @override
   String get moreVersionNotesEmpty => 'Walang changelog para sa build na ito';
@@ -2951,4 +3161,29 @@ class AppLocalizationsFil extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n na relay';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'I-upload ang debug info at mga log';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Iuupload at kokopyahin ang link para ilakip sa ulat';
+
+  @override
+  String get dumpUploaded => 'Na-upload';
+
+  @override
+  String get dumpLinkCopied => 'Nakopya ang link sa clipboard';
+
+  @override
+  String get dumpCopyAgain => 'Kopyahin ulit';
+
+  @override
+  String get dumpUploadFailed => 'Nabigong mag-upload';
+
+  @override
+  String get statusLegendUnprobed => 'Hindi pa nasuri';
+
+  @override
+  String get statusLegendUnsupported => 'Hindi suportado';
 }

@@ -1,0 +1,12 @@
+name: dpip_release_highlights
+description: >
+  Version-highlight cards for DPIP. Each version's card content lives here as
+  Dart source, per version and per kind (`lib/26.1/normal.dart`,
+  `lib/26.1/advanced.dart`). The app depends on this package via a path
+  dependency and imports only the *current* version — older versions stay here
+  as the archive and are never compiled into a build.
+publish_to: 'none'
+version: 0.0.0
+
+environment:
+  sdk: ^3.13.0

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kReleaseMode;
 
 import 'package:dpip/app/app.dart';
 import 'package:dpip/core/di/core_providers.dart';
@@ -14,6 +14,7 @@ import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/network/dio_client.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
@@ -53,6 +54,7 @@ import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/features/changelog/changelog_providers.dart';
+import 'package:dpip/features/release_highlights/release_highlights_providers.dart';
 import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/events/events_providers.dart';
@@ -60,6 +62,7 @@ import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/meshtastic/meshtastic_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
+import 'package:dpip/features/status/status_providers.dart';
 import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/firebase_options.dart';
@@ -103,11 +106,59 @@ Stream<LicenseEntry> _weatherIconLicense() async* {
   );
 }
 
+/// Set by `tool/run.sh` and `tool/run.ps1`, which is how the app is started.
+///
+/// Any value counts, deliberately. `bool.fromEnvironment` reads only the exact
+/// string `true` and answers `false` to everything else — including `1`, which
+/// is what the script passed at first, so the guard fired on the very launch
+/// that had obeyed it.
+const bool _launchedByTool = String.fromEnvironment('DPIP_RUN_SH') != '';
+
+/// Refuses to start when it was not, and says what to run instead.
+///
+/// Debug only — a release build is produced by `flutter build` in CI, which
+/// never sets this and must never be blocked by it.
+///
+/// A refusal rather than a warning, because both alternatives are wrong
+/// *invisibly*. A bare `flutter run` resolves whatever SDK the shell's PATH
+/// cached, and `mise activate` does not refresh that when mise.toml changes —
+/// so the app builds against a different SDK than CI with nothing to show for
+/// it. `mise exec -- flutter run` fixes the SDK and still leaves the log
+/// unreadable, because colour has to be added by the pipe (see
+/// tool/internal/colorize_logs.sh). A warning written into a log nobody can
+/// read yet is not much of a warning.
+///
+/// The instructions name every shell: this runs on the *device*, so it cannot
+/// see which machine launched it.
+void _refuseUnlessLaunchedByTool() {
+  if (!kDebugMode || _launchedByTool) return;
+  const message =
+      'DPIP must be started through its run script.\n'
+      '\n'
+      '  macOS / Linux    tool/run.sh -d <device>\n'
+      '  Windows          tool\\run.ps1 -d <device>\n'
+      '                   (or, for a coloured log, Git Bash / WSL:\n'
+      '                    bash tool/run.sh -d <device>)\n'
+      '\n'
+      '`flutter run` and `mise exec -- flutter run` both start it, and both\n'
+      "are wrong in ways nothing tells you about: the first builds against\n"
+      "whatever SDK your shell's PATH cached rather than the one mise.toml\n"
+      'pins, and neither colours the log — that is added by the pipe the\n'
+      'script provides, not by the app.\n'
+      '\n'
+      'See AGENTS.md -> Running.';
+  // Through `Log` like everything else — it reaches the console as one plain
+  // line per entry, which is exactly the output being asked for here.
+  Log.error(message);
+  exit(1);
+}
+
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
+  _refuseUnlessLaunchedByTool();
 
   // The bundled weather glyphs are Material Symbols (Apache-2.0). Registering
   // the licence puts it in the app's own 開放原始碼授權 page (More → licences),
@@ -150,7 +201,8 @@ Future<void> bootstrap() async {
   final mapLayerOrder = MapLayerOrderController(settings);
   final cache = await cacheFuture;
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
-  final apiClient = ApiClient(dio, regions);
+  final endpointHealth = EndpointHealthMonitor();
+  final apiClient = ApiClient(dio, regions, endpointHealth);
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
   // this must be bound before the first map is built.
   final mapTileCache = cache == null
@@ -307,6 +359,7 @@ Future<void> bootstrap() async {
     database: AppDatabase(durable: durable, cache: cache?.db),
     tleStore: TleStore(durable),
     meshGateway: DpipMeshGatewayImpl(meshtastic, () => meshLink.dpipChannel),
+    endpointHealth: endpointHealth,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
     mapTileCache: mapTileCache,
@@ -339,8 +392,10 @@ Future<void> bootstrap() async {
         ...changelogProviders(deps),
         ...notificationProviders(deps),
         ...meshtasticProviders(deps),
+        ...releaseHighlightsProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),
+        ...statusProviders(deps),
       ],
     ),
   );

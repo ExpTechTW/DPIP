@@ -13,6 +13,7 @@ import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -74,6 +75,7 @@ class SharedDeps {
     required this.meshUnread,
     this.meshStore,
     required this.meshGateway,
+    required this.endpointHealth,
     this.etagCache,
     this.networkUsage,
     this.mapTileCache,
@@ -181,6 +183,10 @@ class SharedDeps {
 
   /// DPIP disaster payloads in and out of the mesh — the seam feeds use.
   final DpipMeshGateway meshGateway;
+
+  /// Client-side health of the multi-active endpoints — fed by [apiClient],
+  /// rendered by the More → 伺服器狀態 screen.
+  final EndpointHealthMonitor endpointHealth;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.

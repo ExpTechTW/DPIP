@@ -101,6 +101,33 @@ void main() {
     expect(messages, ['new']);
   });
 
+  test('the row ceiling is applied on write, not only on the sweep', () async {
+    // A fault that logs every frame writes faster than any sweep runs, so the
+    // ceiling has to hold between sweeps — the freeze this guards against was
+    // the log screen feeding itself.
+    final (store, db) = await makeStore(flushAt: logMaxRows * 2);
+    for (var i = 0; i < logMaxRows + 250; i++) {
+      store.add(line('line $i', at: clock.add(Duration(seconds: i))));
+    }
+    await store.flush();
+    final rows = await db.rawQuery('SELECT COUNT(*) AS n FROM $logTable');
+    expect(rows.single['n'], logMaxRows);
+  });
+
+  test('the ceiling keeps the newest lines, not the oldest', () async {
+    final (store, _) = await makeStore(flushAt: logMaxRows * 2);
+    for (var i = 0; i < logMaxRows + 5; i++) {
+      store.add(line('line $i', at: clock.add(Duration(seconds: i))));
+    }
+    await store.flush();
+    expect(
+      (await store.recent(limit: 1)).single.message,
+      'line ${logMaxRows + 4}',
+    );
+    final all = await store.recent(limit: logMaxRows);
+    expect(all.map((e) => e.message), isNot(contains('line 0')));
+  });
+
   test('reads come back newest first', () async {
     final (store, _) = await makeStore();
     for (var i = 0; i < 3; i++) {

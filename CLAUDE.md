@@ -29,8 +29,23 @@ gate or the analyzer will tell you.
   → [ARCHITECTURE.md § Calibrated time](ARCHITECTURE.md#calibrated-time)
 - **A safety-critical feed that is `stale` or `offline` must never be presented
   as current.** → [ARCHITECTURE.md § Realtime feeds](ARCHITECTURE.md#realtime-feeds)
-- **Run tools through `mise exec --`**, or you are testing a different Flutter
-  than CI is. → [AGENTS.md § Toolchain](AGENTS.md#toolchain)
+- **mise is required, and every workflow has a script under `tool/`.** Never
+  type the toolchain: not `flutter`, not `dart`, not `mise exec`. A shell's PATH
+  is resolved once and `mise activate` caches it, so a toolchain bump leaves the
+  old SDK on PATH until the session is replaced — and a build against the wrong
+  SDK announces nothing at all: it compiles, it runs, its tests pass.
+  `tool/dev/test.sh`, `tool/dev/analyze.sh`, `tool/check.sh`.
+  → [AGENTS.md § Toolchain](AGENTS.md#toolchain)
+- **Start the app with `tool/run.sh`** (`tool\run.ps1` on Windows), never
+  anything else. A debug build refuses to start otherwise — both
+  alternatives run, and the difference is the SDK resolved and whether the log
+  is readable, neither of which is visible at the time.
+  → [AGENTS.md § Running](AGENTS.md#running)
+- **Run `tool/commit.sh` before every commit.** It reads and prints only. A
+  commit message here is the changelog and cannot be edited once pushed, so
+  every problem it names — behind the base, a merge commit, an unstaged new
+  file, a half-translated ARB — is one that costs a rebase to fix afterwards.
+  → [commit.md § 提交前必須跑](commit.md)
 - **No `Co-Authored-By`, no tool attribution, ever.**
   → [AGENTS.md § Commits](AGENTS.md#commits)
 

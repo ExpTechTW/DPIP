@@ -79,6 +79,13 @@ TREM-Net 由 [ExpTech Studio](https://exptech.dev/) 建置與維運，自 2022 �
 
 也可以從 [Release 頁面](https://github.com/ExpTechTW/DPIP/releases/latest)取得 Android 安裝檔手動安裝。請注意 Release 頁面同時包含快照版本，那些未經完整審查。
 
+想搶先體驗新功能？加入**測試版**：
+
+- [Android 測試版](https://play.google.com/apps/testing/com.exptech.dpip) —— 開啟 Google Play 的測試版申請頁
+- [iOS 測試版（TestFlight）](https://testflight.apple.com/join/8aPWtOxk) —— 需要在 iPhone、iPad 或 Mac 上先安裝 TestFlight
+
+測試版可能包含尚未完整審查的功能，遇到問題歡迎到 [Issues](https://github.com/ExpTechTW/DPIP/issues) 回報。
+
 ## 翻譯
 
 DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/project/dpip) 上進行，挑一個你熟悉的語言就能開始。
@@ -87,23 +94,57 @@ DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/proj
 
 ## 參與開發
 
-工具鏈由 [mise](https://mise.jdx.dev/) 釘選版本，跑起來只要四步：
+工具鏈由 [mise](https://mise.jdx.dev/) 釘選版本：
 
 ```bash
 git clone https://github.com/ExpTechTW/DPIP.git
 cd DPIP
-mise install                       # 安裝 mise.toml 釘選的 Flutter
-bash tool/setup.sh                 # 一次性設定：git hooks、產生建置資訊
-mise exec -- flutter pub get
-mise exec -- flutter run
+mise install          # 安裝 mise.toml 釘選的 Flutter
+tool/dev/deps.sh      # 取得套件
 ```
+
+git hooks 由 `tool/run.sh` 第一次啟動時自動裝好，不用另外做。只想建置不想跑的話，`tool/dev/setup.sh` 可以單獨裝。
+
+啟動：
+
+| 系統 | 指令 |
+|---|---|
+| macOS、Linux | `tool/run.sh -d <裝置>` |
+| Windows | `tool\run.ps1 -d <裝置>`（或用 Git Bash／WSL 跑 `bash tool/run.sh`，日誌會上色） |
+
+**一定要用這個腳本。** debug 版本偵測到不是這樣啟動會拒絕執行並印出正確指令 —— 直接跑起來的話，用到的是你 shell 快取的那個 Flutter 而不是 `mise.toml` 釘選的那個，而且當下不會有任何徵兆。
 
 建置成安裝檔：
 
 ```bash
-mise exec -- flutter build apk --release        # Android
-mise exec -- flutter build ios --no-codesign    # iOS（不含簽章）
+tool/dev/build.sh android    # APK
+tool/dev/build.sh bundle     # AAB（Play 實際收的格式）
+tool/dev/build.sh ios        # iOS（不含簽章）
 ```
+
+其餘每件事也都有腳本，`tool/` 底下分類放好：
+
+| 要做什麼 | 指令 |
+|---|---|
+| 跑測試 | `tool/dev/test.sh` |
+| 格式化 + 靜態分析 | `tool/dev/analyze.sh` |
+| 只格式化 | `tool/dev/format.sh` |
+| 重新產生 l10n | `tool/dev/l10n.sh` |
+| 重新產生 codegen | `tool/dev/codegen.sh` |
+| 砍掉重建 | `tool/dev/clean.sh` |
+| 跑完 CI 會跑的每一道關卡 | `tool/check.sh` |
+
+**mise 是必要條件，不是建議。** 沒有 mise 就不能建置這個專案 —— 腳本會直接拒絕執行並告訴你怎麼裝。
+
+**絕對不要自己打 `flutter`、`dart` 或 `mise exec`。** 工具鏈只在 `tool/dev/_lib.sh` 一個地方指定。理由不是整潔：shell 的 PATH 只解析一次，`mise activate` 會把它快取起來，所以升級工具鏈之後舊的 SDK 還留在 PATH 上 —— 而**用錯 SDK 一樣建得起來、跑得起來、測試也會過**，差別要到幾天後變成一個沒人重現得出來的失敗才浮現。
+
+三道防線：
+
+| 誰 | 擋什麼 |
+|---|---|
+| `tool/dev/_lib.sh` 的 `require_mise` | 沒裝 mise、沒有 `mise.toml`、或 flutter 解析到 mise 以外的路徑，一律拒絕執行 |
+| `tool/check/tooling.sh` | 文件與 CI 裡出現裸指令；`tool/` 裡任何腳本語法錯、沒有執行權限、或直接呼叫 `flutter` / `dart` / `mise exec` |
+| `tool/run.sh` | 啟動前把上面兩項都跑一次（0.34 秒） |
 
 > [!NOTE]
 > Android 需要 JDK 17 以上（Android Studio 內建的即可）。iOS 已改用 Swift Package Manager，不需要 CocoaPods。

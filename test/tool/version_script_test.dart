@@ -1,4 +1,4 @@
-/// `tool/version.sh` — the one place a version is decided.
+/// `tool/release/version.sh` — the one place a version is decided.
 ///
 /// Tested because its three outputs fail late and expensively: a code that
 /// repeats is refused by a store permanently, and a train that is not one to
@@ -11,7 +11,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 Map<String, Object?> _run() {
-  final result = Process.runSync('bash', ['tool/version.sh', '--json']);
+  final result = Process.runSync('bash', ['tool/release/version.sh', '--json']);
   expect(result.exitCode, 0, reason: result.stderr.toString());
   return jsonDecode(result.stdout.toString()) as Map<String, Object?>;
 }
@@ -88,14 +88,16 @@ void main() {
 
   test('the label is free to be a name, and the train is not it', () {
     // The separation *is* the feature: a snapshot is named for the week it was
-    // cut and uploads under the number of the release it precedes.
+    // cut and uploads under the number of the release it precedes. A release's
+    // train carries its major.minor, which is the number a user compares
+    // against the store page — never the patch.
     final v = _run();
     final label = v['label']! as String;
     if (label.contains('w')) {
       expect(label, matches(r'^\d{2}w\d{2}[a-z]+$'));
       expect(label, isNot(v['train']));
     } else {
-      expect(label, v['train']);
+      expect(v['train'], matches(r'^\d+\.\d+$'));
     }
   });
 
@@ -107,5 +109,27 @@ void main() {
         .readAsLinesSync()
         .firstWhere((l) => l.startsWith('version:'));
     expect(line.split(':')[1].trim(), matches(r'^\d+\.\d+\.\d+\+\d+$'));
+  });
+
+  test('a three-part release advertises its major.minor as the train', () {
+    // Apple's marketing version and the hero card's big number are the same
+    // thing, and neither wants the patch: `v26.2.1` is the full version (the
+    // label), but the train — and the card's leading number — is `26.2`. A
+    // two-part label (`26.1`) already is its own train.
+    const tag = 'v26.2.1-test-temp';
+    addTearDown(() {
+      Process.runSync('git', ['tag', '-d', tag]);
+    });
+    final tagResult = Process.runSync('git', ['tag', tag]);
+    expect(tagResult.exitCode, 0, reason: tagResult.stderr.toString());
+
+    final result = Process.runSync('bash', [
+      'tool/release/version.sh',
+      '--json',
+    ]);
+    expect(result.exitCode, 0, reason: result.stderr.toString());
+    final v = jsonDecode(result.stdout.toString()) as Map<String, Object?>;
+    expect(v['label'], '26.2.1-test-temp');
+    expect(v['train'], '26.2');
   });
 }

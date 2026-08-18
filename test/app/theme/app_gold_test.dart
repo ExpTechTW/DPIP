@@ -32,19 +32,12 @@ void main() {
     ('dark', AppGold.dark),
   ]) {
     group(name, () {
-      test('ink reads on both ends of the gradient', () {
-        // Both ends: a gradient that only passes at one end is unreadable
-        // across half the card.
-        for (final (where, fill) in [
-          ('start', gold.fillStart),
-          ('end', gold.fillEnd),
-        ]) {
-          expect(
-            _contrast(gold.ink, fill),
-            greaterThanOrEqualTo(4.5),
-            reason: '$name ink on the gradient $where',
-          );
-        }
+      test('ink reads on the fill', () {
+        expect(
+          _contrast(gold.ink, gold.fill),
+          greaterThanOrEqualTo(4.5),
+          reason: '$name ink on the fill',
+        );
       });
 
       test('the badge mark reads on the badge', () {
@@ -53,8 +46,8 @@ void main() {
 
       test('the badge separates from the card it sits on', () {
         // A filled badge is a non-text element: 3:1 is what makes it a shape
-        // rather than a smudge on the gradient behind it.
-        expect(_contrast(gold.badge, gold.fillEnd), greaterThanOrEqualTo(3));
+        // rather than a smudge on the fill behind it.
+        expect(_contrast(gold.badge, gold.fill), greaterThanOrEqualTo(3));
       });
     });
   }
@@ -64,8 +57,8 @@ void main() {
     // dark mode with an opacity. A dark fill that is not actually dark makes
     // the card glare on a near-black page.
     expect(
-      _luminance(AppGold.light.fillEnd),
-      greaterThan(_luminance(AppGold.dark.fillEnd) * 4),
+      _luminance(AppGold.light.fill),
+      greaterThan(_luminance(AppGold.dark.fill) * 4),
       reason: 'the dark fill is not meaningfully darker',
     );
     expect(

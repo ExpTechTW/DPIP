@@ -264,7 +264,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get typhoonLegendCircle25 => '十級風暴風圈';
 
   @override
-  String get sponsorTitle => '支持 DPIP';
+  String get sponsorTitle => '支援 DPIP';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -590,7 +590,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sponsorIntro =>
-      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。';
 
   @override
   String get shelterAddressLabel => '地址';
@@ -917,6 +917,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moreSectionApp => '取得 App';
+
+  @override
+  String get moreSectionBeta => '測試版';
+
+  @override
+  String get moreAndroidBeta => 'Android 測試版';
+
+  @override
+  String get moreTestFlight => 'iOS 測試版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作夥伴';
+
+  @override
+  String get morePartnersNote => '依合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科資訊有限公司';
+
+  @override
+  String get morePartnerTwds => '台灣數位串流有限公司';
 
   @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
@@ -1398,6 +1419,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get changelogBodyEmpty => '此版本沒有說明。';
 
   @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
+
+  @override
   String get radarGlobalOutline => '國界';
 
   @override
@@ -1561,7 +1585,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+  String get sponsorCalloutBody => '沒有廣告，你的支援讓伺服器持續運作。';
 
   @override
   String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
@@ -1923,6 +1947,166 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appLogs => 'App 日誌';
 
   @override
+  String get serverStatusLocal => '本機狀態';
+
+  @override
+  String get serverStatusLocalBody =>
+      '伺服器指標來自控制台。下方是本機對多活端點（LB / Core 各區）的實際連線判斷：APP 只被動記錄本機實際播送的流量，若該端點從未被本機觸發，就會顯示未探測。';
+
+  @override
+  String get serverStatusAllUp => '所有服務正常';
+
+  @override
+  String get serverStatusDegraded => '服務效能下降';
+
+  @override
+  String get serverStatusDown => '服務異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 錯誤率';
+
+  @override
+  String get serverStatusLatency => '平均延遲';
+
+  @override
+  String get serverStatusUpdated => '更新於';
+
+  @override
+  String get serverStatusWeb => '伺服器狀態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 状态';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 状态';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有区域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分区域异常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前没有可显示的区域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '性能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中断';
+
+  @override
+  String get serverStatusCloudflareMajor => '大规模中断';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 專屬 API（雷達 / 氣象 / 風場）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 專屬靜態資源';
+
+  @override
+  String get endpointTierLegacyApi => '舊版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本機連線正常';
+
+  @override
+  String get endpointHealthDegraded => '有端點連線不穩';
+
+  @override
+  String get endpointHealthDown => '本機連線異常';
+
+  @override
+  String get endpointHealthUnknown => '尚無觀測資料';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不穩';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
+
+  @override
   String get feedConnecting => '連線中…';
 
   @override
@@ -2001,10 +2185,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreTagline => '防災資訊整合平台';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
   String get moreVersionNotes => '目前版本';
+
+  @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改變';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技術';
+
+  @override
+  String get releaseHighlightsEmpty => '目前沒有內容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日誌';
+
+  @override
+  String get highlightCardTechnical => '技術細節';
 
   @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
@@ -2883,6 +3088,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上傳後複製連結';
+
+  @override
+  String get dumpUploaded => '已上傳';
+
+  @override
+  String get dumpLinkCopied => '連結已複製到剪貼簿';
+
+  @override
+  String get dumpCopyAgain => '再複製一次';
+
+  @override
+  String get dumpUploadFailed => '上傳失敗，請稍後再試';
+
+  @override
+  String get statusLegendUnprobed => '未探測';
+
+  @override
+  String get statusLegendUnsupported => '不支援';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3799,6 +4028,27 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get moreSectionApp => '获取 App';
 
   @override
+  String get moreSectionBeta => '测试版';
+
+  @override
+  String get moreAndroidBeta => 'Android 测试版';
+
+  @override
+  String get moreTestFlight => 'iOS 测试版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作伙伴';
+
+  @override
+  String get morePartnersNote => '按合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科资讯有限公司';
+
+  @override
+  String get morePartnerTwds => '台湾数位串流有限公司';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度仅 0–7，没有 5弱／5强／6弱／6强。';
 
   @override
@@ -4276,6 +4526,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get changelogBodyEmpty => '此版本没有说明。';
+
+  @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
 
   @override
   String get radarGlobalOutline => '国界';
@@ -4803,6 +5056,166 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get appLogs => '应用日志';
 
   @override
+  String get serverStatusLocal => '本机状态';
+
+  @override
+  String get serverStatusLocalBody =>
+      '服务器指标来自控制台。下方是本机对多活端点（LB / Core 各区)的实际连接判断：APP 只被动记录本机实际播送的流量，若该端点从未被本机触发，就会显示未探测。';
+
+  @override
+  String get serverStatusAllUp => '所有服务正常';
+
+  @override
+  String get serverStatusDegraded => '服务性能下降';
+
+  @override
+  String get serverStatusDown => '服务异常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 错误率';
+
+  @override
+  String get serverStatusLatency => '平均延迟';
+
+  @override
+  String get serverStatusUpdated => '更新于';
+
+  @override
+  String get serverStatusWeb => '服务器状态';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 状态';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 状态';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有区域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分区域异常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前没有可显示的区域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '性能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中断';
+
+  @override
+  String get serverStatusCloudflareMajor => '大规模中断';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 专属 API（雷达 / 气象 / 风场）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 专属静态资源';
+
+  @override
+  String get endpointTierLegacyApi => '旧版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本机连接正常';
+
+  @override
+  String get endpointHealthDegraded => '有端点连接不稳';
+
+  @override
+  String get endpointHealthDown => '本机连接异常';
+
+  @override
+  String get endpointHealthUnknown => '暂无观测数据';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不稳';
+
+  @override
+  String get endpointStateDown => '异常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
+
+  @override
   String get feedConnecting => '连接中…';
 
   @override
@@ -4881,10 +5294,31 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreTagline => '防灾信息整合平台';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
   String get moreVersionNotes => '当前版本';
+
+  @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改变';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技术';
+
+  @override
+  String get releaseHighlightsEmpty => '目前没有内容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日志';
+
+  @override
+  String get highlightCardTechnical => '技术细节';
 
   @override
   String get moreVersionNotesEmpty => '找不到当前版本的更新日志';
@@ -5763,6 +6197,30 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '转储调试信息及日志';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上传后复制链接，附在反馈里就不用贴一整页';
+
+  @override
+  String get dumpUploaded => '已上传';
+
+  @override
+  String get dumpLinkCopied => '链接已复制到剪贴板';
+
+  @override
+  String get dumpCopyAgain => '再复制一次';
+
+  @override
+  String get dumpUploadFailed => '上传失败，请稍后再试';
+
+  @override
+  String get statusLegendUnprobed => '未探测';
+
+  @override
+  String get statusLegendUnsupported => '不支持';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -6024,7 +6482,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get typhoonLegendCircle25 => '十級風暴風圈';
 
   @override
-  String get sponsorTitle => '支持 DPIP';
+  String get sponsorTitle => '支援 DPIP';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -6350,7 +6808,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get sponsorIntro =>
-      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。';
 
   @override
   String get shelterAddressLabel => '地址';
@@ -6677,6 +7135,27 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moreSectionApp => '取得 App';
+
+  @override
+  String get moreSectionBeta => '測試版';
+
+  @override
+  String get moreAndroidBeta => 'Android 測試版';
+
+  @override
+  String get moreTestFlight => 'iOS 測試版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作夥伴';
+
+  @override
+  String get morePartnersNote => '依合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科資訊有限公司';
+
+  @override
+  String get morePartnerTwds => '台灣數位串流有限公司';
 
   @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
@@ -7158,6 +7637,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get changelogBodyEmpty => '此版本沒有說明。';
 
   @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
+
+  @override
   String get radarGlobalOutline => '國界';
 
   @override
@@ -7321,7 +7803,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+  String get sponsorCalloutBody => '沒有廣告，你的支援讓伺服器持續運作。';
 
   @override
   String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
@@ -7683,6 +8165,166 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get appLogs => 'App 日誌';
 
   @override
+  String get serverStatusLocal => '本機狀態';
+
+  @override
+  String get serverStatusLocalBody =>
+      '伺服器指標來自控制台。下方是本機對多活端點（LB / Core 各區）的實際連線判斷：APP 只被動記錄本機實際播送的流量，若該端點從未被本機觸發，就會顯示未探測。';
+
+  @override
+  String get serverStatusAllUp => '所有服務正常';
+
+  @override
+  String get serverStatusDegraded => '服務效能下降';
+
+  @override
+  String get serverStatusDown => '服務異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 錯誤率';
+
+  @override
+  String get serverStatusLatency => '平均延遲';
+
+  @override
+  String get serverStatusUpdated => '更新於';
+
+  @override
+  String get serverStatusWeb => '伺服器狀態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 狀態';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 狀態';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有區域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分區域異常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前沒有可顯示的區域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '效能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中斷';
+
+  @override
+  String get serverStatusCloudflareMajor => '大規模中斷';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 專屬 API（雷達 / 氣象 / 風場）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 專屬靜態資源';
+
+  @override
+  String get endpointTierLegacyApi => '舊版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本機連線正常';
+
+  @override
+  String get endpointHealthDegraded => '有端點連線不穩';
+
+  @override
+  String get endpointHealthDown => '本機連線異常';
+
+  @override
+  String get endpointHealthUnknown => '尚無觀測資料';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不穩';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
+
+  @override
   String get feedConnecting => '連接中…';
 
   @override
@@ -7761,10 +8403,31 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreTagline => '防災資訊整合平台';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
   String get moreVersionNotes => '目前版本';
+
+  @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改變';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技術';
+
+  @override
+  String get releaseHighlightsEmpty => '目前沒有內容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日誌';
+
+  @override
+  String get highlightCardTechnical => '技術細節';
 
   @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
@@ -8643,6 +9306,30 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上載後複製連結';
+
+  @override
+  String get dumpUploaded => '已上載';
+
+  @override
+  String get dumpLinkCopied => '連結已複製到剪貼簿';
+
+  @override
+  String get dumpCopyAgain => '再複製一次';
+
+  @override
+  String get dumpUploadFailed => '上載失敗，請稍後再試';
+
+  @override
+  String get statusLegendUnprobed => '未探測';
+
+  @override
+  String get statusLegendUnsupported => '不支援';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -8904,7 +9591,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get typhoonLegendCircle25 => '十級風暴風圈';
 
   @override
-  String get sponsorTitle => '支持 DPIP';
+  String get sponsorTitle => '支援 DPIP';
 
   @override
   String get mapNavSatellite => '衛星';
@@ -9230,7 +9917,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get sponsorIntro =>
-      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支持能幫助我們維持伺服器運作並持續開發。';
+      'DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。';
 
   @override
   String get shelterAddressLabel => '地址';
@@ -9557,6 +10244,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreSectionApp => '取得 App';
+
+  @override
+  String get moreSectionBeta => '測試版';
+
+  @override
+  String get moreAndroidBeta => 'Android 測試版';
+
+  @override
+  String get moreTestFlight => 'iOS 測試版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => '合作夥伴';
+
+  @override
+  String get morePartnersNote => '依合作時間先後排列。感謝這些個人與公司對防災的貢獻，他們讓 DPIP 成為可能。';
+
+  @override
+  String get morePartnerGeoscience => '巨科資訊有限公司';
+
+  @override
+  String get morePartnerTwds => '台灣數位串流有限公司';
 
   @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
@@ -10038,6 +10746,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get changelogBodyEmpty => '此版本沒有說明。';
 
   @override
+  String get changelogOpenOnGitHub => '在 GitHub 查看';
+
+  @override
   String get radarGlobalOutline => '國界';
 
   @override
@@ -10201,7 +10912,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get onboardingPermLocation => '定位';
 
   @override
-  String get sponsorCalloutBody => '沒有廣告，你的支持讓伺服器持續運作。';
+  String get sponsorCalloutBody => '沒有廣告，你的支援讓伺服器持續運作。';
 
   @override
   String get moreDiscordCalloutBody => '加入社群，直接和開發團隊交流。';
@@ -10563,6 +11274,166 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get appLogs => 'App 日誌';
 
   @override
+  String get serverStatusLocal => '本機狀態';
+
+  @override
+  String get serverStatusLocalBody =>
+      '伺服器指標來自控制台。下方是本機對多活端點（LB / Core 各區）的實際連線判斷：APP 只被動記錄本機實際播送的流量，若該端點從未被本機觸發，就會顯示未探測。';
+
+  @override
+  String get serverStatusAllUp => '所有服務正常';
+
+  @override
+  String get serverStatusDegraded => '服務效能下降';
+
+  @override
+  String get serverStatusDown => '服務異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx 錯誤率';
+
+  @override
+  String get serverStatusLatency => '平均延遲';
+
+  @override
+  String get serverStatusUpdated => '更新於';
+
+  @override
+  String get serverStatusWeb => '伺服器狀態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 狀態';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 狀態';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '所有區域正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 部分區域異常';
+
+  @override
+  String get serverStatusCloudflareNone => '目前沒有可顯示的區域。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '效能下降';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分中斷';
+
+  @override
+  String get serverStatusCloudflareMajor => '大規模中斷';
+
+  @override
+  String get serverStatusCloudflareUnknown => '未知';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 專屬 API（雷達 / 氣象 / 風場）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 專屬靜態資源';
+
+  @override
+  String get endpointTierLegacyApi => '舊版 API（api-1）';
+
+  @override
+  String get endpointHealthOk => '本機連線正常';
+
+  @override
+  String get endpointHealthDegraded => '有端點連線不穩';
+
+  @override
+  String get endpointHealthDown => '本機連線異常';
+
+  @override
+  String get endpointHealthUnknown => '尚無觀測資料';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不穩';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '未知';
+
+  @override
+  String get endpointLastSuccessNever => '尚未成功';
+
+  @override
+  String get endpointServiceEew => '地震速報';
+
+  @override
+  String get endpointServiceRts => '強震即時警報';
+
+  @override
+  String get endpointServiceRadar => '雷達';
+
+  @override
+  String get endpointServiceSatellite => '衛星';
+
+  @override
+  String get endpointServiceQpesums => '定量降水';
+
+  @override
+  String get endpointServiceWind => '風場';
+
+  @override
+  String get endpointServiceDpm => '災害點位';
+
+  @override
+  String get endpointServiceWeather => '天氣';
+
+  @override
+  String get endpointServiceRain => '降雨';
+
+  @override
+  String get endpointServiceLightning => '閃電';
+
+  @override
+  String get endpointServiceTyphoon => '颱風';
+
+  @override
+  String get endpointServiceReport => '地震報告';
+
+  @override
+  String get endpointServiceTremStation => '震度站';
+
+  @override
+  String get endpointServiceEvent => '事件';
+
+  @override
+  String get endpointServiceLocation => '定位';
+
+  @override
+  String get endpointServiceNotify => '通知';
+
+  @override
+  String get endpointServiceOther => '其他';
+
+  @override
   String get feedConnecting => '連線中…';
 
   @override
@@ -10641,10 +11512,31 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get moreAnnouncements => '公告';
 
   @override
+  String get moreTagline => '防災資訊整合平台';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
   String get moreVersionNotes => '目前版本';
+
+  @override
+  String get releaseHighlightsTitle => '本次更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '做了哪些改變';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '深入技術';
+
+  @override
+  String get releaseHighlightsEmpty => '目前沒有內容。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '查看完整更新日誌';
+
+  @override
+  String get highlightCardTechnical => '技術細節';
 
   @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
@@ -11523,4 +12415,28 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String meshtasticTraceHops(int n) {
     return '$n 跳';
   }
+
+  @override
+  String get moreDumpDiagnostics => '傾印除錯資訊及日誌';
+
+  @override
+  String get moreDumpDiagnosticsHint => '上傳後複製連結';
+
+  @override
+  String get dumpUploaded => '已上傳';
+
+  @override
+  String get dumpLinkCopied => '連結已複製到剪貼簿';
+
+  @override
+  String get dumpCopyAgain => '再複製一次';
+
+  @override
+  String get dumpUploadFailed => '上傳失敗，請稍後再試';
+
+  @override
+  String get statusLegendUnprobed => '未探測';
+
+  @override
+  String get statusLegendUnsupported => '不支援';
 }

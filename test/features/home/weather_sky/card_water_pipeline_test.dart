@@ -227,7 +227,7 @@ void main() {
       final normalMap = await _decodeAsset(
         'assets/weather/particles/drop_normal.webp',
       );
-      // Both come from `tool/gen_particle_sprites.py`: a 64×64 blurred disc and
+      // Both come from `tool/gen/particle_sprites.py`: a 64×64 blurred disc and
       // a 128×128 analytic hemisphere. The numbers below are properties of
       // those two functions, so they hold for the generator's output as they
       // did for the textures it replaced.

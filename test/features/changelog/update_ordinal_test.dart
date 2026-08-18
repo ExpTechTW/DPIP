@@ -145,7 +145,7 @@ void main() {
   });
 
   group('localizedReleaseBody, per-language blocks', () {
-    // Verbatim output of tool/release_notes.sh, so a change to the publishing
+    // Verbatim output of tool/release/notes.sh, so a change to the publishing
     // format fails here rather than on a phone.
     const note = '''
 _快照，取自 main 的 `36c65c5`。未經審查，可能有問題。_

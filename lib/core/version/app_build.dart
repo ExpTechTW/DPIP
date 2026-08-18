@@ -21,7 +21,8 @@
 ///
 /// 1. **CI's `--dart-define`** — the authority for a published build.
 /// 2. **`lib/core/build_info.g.dart`** — written by the git hooks from the same
-///    `tool/version.sh`, so a local `flutter run` names itself correctly too. A
+///    `tool/release/version.sh`, so a local `flutter run` names itself
+///    correctly too. A
 ///    debug build otherwise fell back to the pubspec placeholder and reported
 ///    `26.1.0 (1)`, a version that exists nowhere.
 /// 3. **The platform's own version** — a build made outside a repository, where
@@ -40,10 +41,30 @@ abstract final class AppBuild {
   /// What CI stamped in, empty on a local build.
   static const String _definedLabel = String.fromEnvironment('DPIP_LABEL');
   static const int _definedCode = int.fromEnvironment('DPIP_CODE');
+  static const String _definedTrain = String.fromEnvironment('DPIP_TRAIN');
+  static const String _definedDate = String.fromEnvironment('DPIP_DATE');
 
   /// What the git hooks wrote, empty outside a repository.
   static String get _generatedLabel => kBuildLabel;
   static int get _generatedCode => kBuildCode;
+
+  /// The train number this build rides — the release a snapshot is heading
+  /// toward, e.g. `26.1`. Apple is told this and never the label. The More
+  /// page version card shows it as the big number, above the label.
+  static String get train => _train;
+
+  /// The version the platform itself records for this build — what the OS
+  /// shows under Settings → app. For a local debug run that is the pubspec
+  /// placeholder (`26.1.0`); CI stamps `--build-name` on iOS and `DPIP_LABEL`
+  /// on Android, so a published build reports the train (`26.1`) instead.
+  /// The version card prints it as the release's fine-print line.
+  static String? get platformVersion => _platformVersion;
+
+  /// The day this build was cut, `yy-MM-dd` in Taipei time (e.g. `26-08-17`).
+  /// Shown beside the type badge on the More page version card. Empty when
+  /// git could not answer, in which case the badge shows no date.
+  static String get buildDate =>
+      _definedDate.isNotEmpty ? _definedDate : kBuildDate;
 
   static String get _bestLabel =>
       _definedLabel.isNotEmpty ? _definedLabel : _generatedLabel;
@@ -51,6 +72,8 @@ abstract final class AppBuild {
 
   static String? _label;
   static int? _code;
+  static String? _platformVersion;
+  static String _train = _definedTrain.isNotEmpty ? _definedTrain : kBuildTrain;
 
   /// Reads the platform's own version, for the builds CI did not stamp.
   ///
@@ -58,6 +81,15 @@ abstract final class AppBuild {
   /// [label] falls back to whatever was defined and [code] to 0.
   static Future<void> ensureLoaded() async {
     if (_label != null) return;
+    String platformVersion = '';
+    try {
+      final info = await PackageInfo.fromPlatform();
+      platformVersion = info.version;
+    } on Object {
+      // A version readout is never worth failing a launch over. The platform
+      // version line simply stays empty for that build.
+    }
+    _platformVersion = platformVersion;
     if (_bestLabel.isNotEmpty && _bestCode > 0) {
       _label = _bestLabel;
       _code = _bestCode;
@@ -99,8 +131,15 @@ abstract final class AppBuild {
   }
 
   /// Test seam — sets both halves directly.
-  static void debugSet({required String label, required int code}) {
+  static void debugSet({
+    required String label,
+    required int code,
+    String? train,
+    String? platformVersion,
+  }) {
     _label = label;
     _code = code;
+    if (train != null) _train = train;
+    if (platformVersion != null) _platformVersion = platformVersion;
   }
 }

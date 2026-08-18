@@ -4,6 +4,7 @@
 library;
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
@@ -12,6 +13,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -1452,6 +1454,11 @@ class _TownChip extends StatelessWidget {
 
 /// 地震報告圖 — CWA's rendered report image; falls back to a plain message when
 /// it hasn't been generated yet or fails to load.
+///
+/// The bytes go through [ApiClient.getBytesAbsolute], so the shared ETag store
+/// caches the picture like any map tile — `Image.network` would hit Flutter's
+/// image pipeline, which has no SQLite store behind it and refetches on every
+/// visit.
 class _ReportImageCard extends StatefulWidget {
   const _ReportImageCard({required this.report});
 
@@ -1462,7 +1469,10 @@ class _ReportImageCard extends StatefulWidget {
 }
 
 class _ReportImageCardState extends State<_ReportImageCard> {
-  bool _failed = false;
+  late final Future<Uint8List> _bytes = context
+      .read<ApiClient>()
+      .getBytesAbsolute(widget.report.reportImageUrl.toString())
+      .then((payload) => payload.bytes);
 
   /// Placeholder height while loading / on failure — a guess, not the real
   /// aspect ratio (that varies per event), so it's only a skeleton size; the
@@ -1474,48 +1484,58 @@ class _ReportImageCardState extends State<_ReportImageCard> {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
 
-    if (_failed) {
-      return ClipRRect(
-        borderRadius: AppRadius.medium,
-        child: Container(
-          height: _placeholderHeight,
-          width: double.infinity,
-          color: colors.surfaceContainer,
-          alignment: Alignment.center,
-          child: Text(
-            l10n.reportDetailImageUnavailable,
-            style: TextStyle(color: colors.onSurfaceVariant),
-          ),
-        ),
-      );
-    }
-
-    return ClipRRect(
-      borderRadius: AppRadius.medium,
-      child: Image.network(
-        widget.report.reportImageUrl.toString(),
-        // No forced aspect ratio / BoxFit.cover — the report image's real
-        // proportions vary per event, so this sizes to the image's own
-        // natural aspect ratio at full width instead of cropping or padding.
-        width: double.infinity,
-        fit: BoxFit.contain,
-        loadingBuilder: (context, child, progress) {
-          if (progress == null) return child;
-          return Container(
-            height: _placeholderHeight,
-            width: double.infinity,
-            color: colors.surfaceContainer,
-            alignment: Alignment.center,
-            child: const InlineLoading(size: 36),
+    return FutureBuilder<Uint8List>(
+      future: _bytes,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return ClipRRect(
+            borderRadius: AppRadius.medium,
+            child: Container(
+              height: _placeholderHeight,
+              width: double.infinity,
+              color: colors.surfaceContainer,
+              alignment: Alignment.center,
+              child: Text(
+                l10n.reportDetailImageUnavailable,
+                style: TextStyle(color: colors.onSurfaceVariant),
+              ),
+            ),
           );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) setState(() => _failed = true);
-          });
-          return const SizedBox.shrink();
-        },
-      ),
+        }
+        if (!snapshot.hasData) {
+          return ClipRRect(
+            borderRadius: AppRadius.medium,
+            child: Container(
+              height: _placeholderHeight,
+              width: double.infinity,
+              color: colors.surfaceContainer,
+              alignment: Alignment.center,
+              child: const InlineLoading(size: 36),
+            ),
+          );
+        }
+        return ClipRRect(
+          borderRadius: AppRadius.medium,
+          child: Image.memory(
+            snapshot.data!,
+            // No forced aspect ratio / BoxFit.cover — the report image's real
+            // proportions vary per event, so this sizes to the image's own
+            // natural aspect ratio at full width instead of cropping or padding.
+            width: double.infinity,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: _placeholderHeight,
+              width: double.infinity,
+              color: colors.surfaceContainer,
+              alignment: Alignment.center,
+              child: Text(
+                l10n.reportDetailImageUnavailable,
+                style: TextStyle(color: colors.onSurfaceVariant),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

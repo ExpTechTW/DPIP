@@ -62,4 +62,34 @@ void main() {
 
     await expectLater(service.start('tok'), completes);
   });
+
+  test('a missing plugin does not surface as a thrown breadcrumb drain', () async {
+    // A channel with no platform implementation answers MissingPluginException
+    // — the test-harness / unsupported-platform case that bootstrap hits.
+    messenger.setMockMethodCallHandler(channel, null);
+    final service = BackgroundLocationService(
+      platform: 1,
+      version: '1',
+      channel: channel,
+    );
+
+    await expectLater(service.drainBreadcrumbs(), completes);
+  });
+
+  test(
+    'breadcrumbs land in the log rather than the exception stream',
+    () async {
+      messenger.setMockMethodCallHandler(
+        channel,
+        (_) async => ['100\tfix: thing'],
+      );
+      final service = BackgroundLocationService(
+        platform: 1,
+        version: '1',
+        channel: channel,
+      );
+
+      await expectLater(service.drainBreadcrumbs(), completes);
+    },
+  );
 }

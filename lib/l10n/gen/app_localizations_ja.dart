@@ -923,6 +923,28 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreSectionApp => 'アプリを入手';
 
   @override
+  String get moreSectionBeta => 'テスト版';
+
+  @override
+  String get moreAndroidBeta => 'Android テスト版';
+
+  @override
+  String get moreTestFlight => 'iOS テスト版（TestFlight）';
+
+  @override
+  String get moreSectionPartners => 'パートナー';
+
+  @override
+  String get morePartnersNote =>
+      '提携順に表示しています。防災への貢献で DPIP を支えてくださった個人・企業の皆様に感謝します。';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       '震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。';
 
@@ -1404,6 +1426,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => 'このリリースの説明はありません。';
+
+  @override
+  String get changelogOpenOnGitHub => 'GitHub で見る';
 
   @override
   String get radarGlobalOutline => '国境線';
@@ -1933,6 +1958,166 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appLogs => 'アプリログ';
 
   @override
+  String get serverStatusLocal => 'デバイスの状態';
+
+  @override
+  String get serverStatusLocalBody =>
+      'サーバー指標はダッシュボードからのものです。以下は本機のマルチアクティブエンドポイント（LB / Core 各リージョン）への実際の接続判断です：本機が実際に送受信したトラフィックだけを受動的に記録するため、まだ触れていないエンドポイントは「未探知」と表示されます。';
+
+  @override
+  String get serverStatusAllUp => 'すべて正常';
+
+  @override
+  String get serverStatusDegraded => 'パフォーマンス低下';
+
+  @override
+  String get serverStatusDown => 'サービス異常';
+
+  @override
+  String get serverStatusErrorRate => '5xx エラー率';
+
+  @override
+  String get serverStatusLatency => '平均遅延';
+
+  @override
+  String get serverStatusUpdated => '更新';
+
+  @override
+  String get serverStatusWeb => 'サーバー状態';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech ステータス';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare ステータス';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '全リージョン正常';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare の一部リージョンで異常';
+
+  @override
+  String get serverStatusCloudflareNone => '表示できるリージョンがありません。';
+
+  @override
+  String get serverStatusCloudflareOperational => '正常';
+
+  @override
+  String get serverStatusCloudflareDegraded => '性能低下';
+
+  @override
+  String get serverStatusCloudflarePartial => '部分停止';
+
+  @override
+  String get serverStatusCloudflareMajor => '大規模停止';
+
+  @override
+  String get serverStatusCloudflareUnknown => '不明';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 専用 API（レーダー / 気象 / 風）';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 専用静的リソース';
+
+  @override
+  String get endpointTierLegacyApi => 'レガシー API（api-1）';
+
+  @override
+  String get endpointHealthOk => '接続正常';
+
+  @override
+  String get endpointHealthDegraded => '不安定なエンドポイントあり';
+
+  @override
+  String get endpointHealthDown => '接続異常';
+
+  @override
+  String get endpointHealthUnknown => '観測データなし';
+
+  @override
+  String get endpointStateOk => '正常';
+
+  @override
+  String get endpointStateDegraded => '不安定';
+
+  @override
+  String get endpointStateDown => '異常';
+
+  @override
+  String get endpointStateUnknown => '不明';
+
+  @override
+  String get endpointLastSuccessNever => '未成功';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => '接続中…';
 
   @override
@@ -2012,10 +2197,31 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreAnnouncements => 'お知らせ';
 
   @override
+  String get moreTagline => '防災情報統合プラットフォーム';
+
+  @override
   String get moreVersionStable => '正式版';
 
   @override
   String get moreVersionNotes => '現在のバージョン';
+
+  @override
+  String get releaseHighlightsTitle => '今回の更新';
+
+  @override
+  String get releaseHighlightsTabNormal => '変更点';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '技術詳細';
+
+  @override
+  String get releaseHighlightsEmpty => 'まだコンテンツがありません。';
+
+  @override
+  String get releaseHighlightsSeeNotes => '完全なリリースノート';
+
+  @override
+  String get highlightCardTechnical => '技術詳細';
 
   @override
   String get moreVersionNotesEmpty => 'このビルドの更新履歴が見つかりません';
@@ -2894,4 +3100,28 @@ class AppLocalizationsJa extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n ホップ';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'デバッグ情報とログを送信';
+
+  @override
+  String get moreDumpDiagnosticsHint => 'アップロードしてリンクをコピーします';
+
+  @override
+  String get dumpUploaded => 'アップロードしました';
+
+  @override
+  String get dumpLinkCopied => 'リンクをクリップボードにコピーしました';
+
+  @override
+  String get dumpCopyAgain => 'もう一度コピー';
+
+  @override
+  String get dumpUploadFailed => 'アップロードに失敗しました';
+
+  @override
+  String get statusLegendUnprobed => '未探知';
+
+  @override
+  String get statusLegendUnsupported => '非対応';
 }

@@ -6,6 +6,8 @@
 /// into a nag that returns on every launch.
 library;
 
+import 'dart:typed_data';
+
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/platform/install_source.dart';
@@ -30,6 +32,10 @@ class _FakeRepository implements ChangelogRepository {
 
   @override
   Future<Result<List<ReleaseNote>>> releases({int page = 1}) async => Ok(notes);
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
+      const Err(UnexpectedFailure('no network'));
 }
 
 /// A release advertises its ordinal in the note body, invisibly — see
@@ -192,5 +198,9 @@ void main() {
 class _FailingRepository implements ChangelogRepository {
   @override
   Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
+      const Err(NetworkFailure('offline'));
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
       const Err(NetworkFailure('offline'));
 }

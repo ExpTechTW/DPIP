@@ -1,0 +1,670 @@
+{
+  "version": "26.1",
+  "kind": "normal",
+  "title": {
+    "zh_Hant": "DPIP 26.1 第 4 次大更新 做了哪些改變",
+    "zh_Hans": "DPIP 26.1 第 4 次大更新 做了哪些改变",
+    "en": "DPIP 26.1 — What the 4th major update changed",
+    "ja": "DPIP 26.1 第4回大型アップデートで変わったこと",
+    "ko": "DPIP 26.1 제4차 대규모 업데이트에서 바뀐 점",
+    "th": "DPIP 26.1 การอัปเดตครั้งใหญ่ครั้งที่ 4 เปลี่ยนอะไรบ้าง",
+    "vi": "DPIP 26.1 — Bản cập nhật lớn lần thứ 4 có gì mới",
+    "id": "DPIP 26.1 — Yang berubah di pembaruan besar ke-4",
+    "fil": "DPIP 26.1 — Ano ang binago ng ika-4 na malaking update"
+  },
+  "subtitle": {
+    "zh_Hant": "這次不是換皮——通訊、地圖、省電、啟動全部重做，讓警報更快到、更省流量地到。",
+    "zh_Hans": "这次不是换皮——通讯、地图、省电、启动全部重做，让警报更快到、更省流量地到。",
+    "en": "Not a reskin — networking, maps, battery and startup were all rebuilt, so alerts get to you faster and use far less data.",
+    "ja": "見た目だけの更新ではありません。通信・地図・省電力・起動を全て作り直し、警報がより速く、より少ない通信量で届くようになりました。",
+    "ko": "겉모습만 바뀐 게 아닙니다. 통신·지도·배터리·시작이 모두 재구축되어, 알림이 더 빠르고 더 적은 데이터로 도착합니다.",
+    "th": "ไม่ใช่แค่เปลี่ยนโฉม — ระบบสื่อสาร แผนที่ ประหยัดพลังงาน และการเริ่มต้นระบบถูกสร้างใหม่ทั้งหมด แจ้งเตือนถึงเร็วขึ้นและใช้ดาต้าน้อยลง",
+    "vi": "Không phải chỉ đổi giao diện — mạng, bản đồ, pin và khởi động đều được làm lại, để cảnh báo đến nhanh hơn và tốn ít dữ liệu hơn.",
+    "id": "Bukan sekadar ganti tampilan — jaringan, peta, baterai, dan startup semuanya dibangun ulang, agar peringatan lebih cepat sampai dan hemat data.",
+    "fil": "Hindi lang bagong itsura — muling ginawa ang network, mapa, baterya, at startup, para mas mabilis at mas tipid sa data ang alerto."
+  },
+  "cards": [
+    {
+      "id": "speed",
+      "icon": "bolt",
+      "title": {
+        "zh_Hant": "警報更快到",
+        "zh_Hans": "警报更快到",
+        "en": "Alerts arrive faster",
+        "ja": "警報がより速く届く",
+        "ko": "알림이 더 빨리 도착",
+        "th": "การแจ้งเตือนถึงเร็วขึ้น",
+        "vi": "Cảnh báo đến nhanh hơn",
+        "id": "Peringatan lebih cepat sampai",
+        "fil": "Mas mabilis dumating ang alerto"
+      },
+      "headline": {
+        "zh_Hant": "即時資料從每秒輪詢，改成伺服器主動推送",
+        "zh_Hans": "即时资料从每秒轮询，改成服务器主动推送",
+        "en": "Real-time data switched from 1-second polling to server push",
+        "ja": "リアルタイムデータが毎秒ポーリングからサーバー配信に",
+        "ko": "실시간 데이터가 초당 폴링에서 서버 푸시로",
+        "th": "ข้อมูลเรียลไทม์เปลี่ยนจากการดึงทุกวินาที เป็นการส่งจากเซิร์ฟเวอร์",
+        "vi": "Dữ liệu thời gian thực chuyển từ kéo mỗi giây sang máy chủ đẩy",
+        "id": "Data real-time berubah dari polling tiap detik menjadi push server",
+        "fil": "Real-time data: mula sa bawat segundong pagkuha, naging push mula sa server"
+      },
+      "body": {
+        "zh_Hant": "以前 App 每秒問一次伺服器「有沒有新資料？」；現在伺服器有資料才送來。地震速報 (EEW) 與強震監視 (RTS) 都改用串流傳輸——同樣的警報內容，更即時、更省流量。",
+        "zh_Hans": "以前 App 每秒问一次服务器「有没有新数据？」；现在服务器有数据才送来。地震速报 (EEW) 与强震监视 (RTS) 都改用串流传输——同样的警报内容，更即时、更省流量。",
+        "en": "The app used to ask the server 'anything new?' every second; now the server pushes only when there is something to say. Both the earthquake early warning (EEW) and strong-motion monitoring (RTS) feeds stream changes instead — the same alerts, delivered live on less data.",
+        "ja": "以前はアプリが毎秒サーバーに「新しいデータは？」と問い合わせていました。今はサーバーが更新があるときだけ送信します。緊急地震速報 (EEW) と強震モニタ (RTS) はどちらもストリーム配信に。同じ警報内容で、よりリアルタイム、より節約に。",
+        "ko": "예전엔 앱이 매초 서버에 \"새로운 데이터 있나요?\"라고 물었습니다. 이제는 서버가 새 데이터가 있을 때만 보냅니다. 지진조기경보(EEW)와 강진 모니터(RTS) 모두 스트리밍 전송으로 바뀌었습니다. 같은 알림 내용, 더 실시간, 더 적은 데이터.",
+        "th": "แต่ก่อนแอปถามเซิร์ฟเวอร์ทุกวินาทีว่า \"มีข้อมูลใหม่ไหม?\" ตอนนี้เซิร์ฟเวอร์ส่งเฉพาะเมื่อมีข้อมูลใหม่ การแจ้งเตือนแผ่นดินไหว (EEW) และการเฝ้าระวังแรงสั่นสะเทือน (RTS) เปลี่ยนเป็นสตรีมมิ่ง — เนื้อหาเดียวกัน แต่เร็วและประหยัดกว่า",
+        "vi": "Trước đây app hỏi máy chủ mỗi giây \"có gì mới không?\"; giờ máy chủ chỉ gửi khi có dữ liệu. Cảnh báo động đất (EEW) và giám sát rung lắc (RTS) đều chuyển sang truyền luồng — cùng nội dung cảnh báo, nhanh hơn và tốn ít dữ liệu hơn.",
+        "id": "Dulu aplikasi bertanya ke server setiap detik 'ada data baru?'; kini server hanya mengirim saat ada data baru. Peringatan dini gempa (EEW) dan pemantauan getaran (RTS) keduanya kini streaming — konten sama, lebih real-time, lebih hemat data.",
+        "fil": "Dati, nagtatanong ang app sa server bawat segundo kung 'may bago na ba?'; ngayon, nagpapadala lamang ang server kapag may pagbabago. Ang EEW at RTS ay streaming na — parehong alerto, mas real-time, mas tipid sa data."
+      },
+      "stat": {
+        "zh_Hant": "1 秒",
+        "zh_Hans": "1 秒",
+        "en": "1 s",
+        "ja": "1 秒",
+        "ko": "1초",
+        "th": "1 วิ",
+        "vi": "1 s",
+        "id": "1 dtk",
+        "fil": "1 s"
+      },
+      "statLabel": {
+        "zh_Hant": "以前的輪詢間隔，現在變為零輪詢——有變動才傳",
+        "zh_Hans": "以前的轮询间隔，现在变为零轮询——有变动才传",
+        "en": "the old polling interval — now zero polling, changes are pushed",
+        "ja": "従来のポーリング間隔。今はポーリングなし、変化時のみ送信",
+        "ko": "이전 폴링 간격. 이제는 폴링 없음, 변화만 전송",
+        "th": "ช่วงเวลาการดึงข้อมูลเดิม — ตอนนี้ไม่มีการดึงอีก ส่งเมื่อมีการเปลี่ยนแปลง",
+        "vi": "khoảng cách kéo dữ liệu trước đây — giờ không còn kéo nữa, chỉ đẩy khi thay đổi",
+        "id": "interval polling lama — kini tanpa polling, hanya kirim saat ada perubahan",
+        "fil": "dati nating interval sa pagkuha — wala nang polling, push na lang kapag may pagbabago"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "EEW 與 RTS 皆改為 SSE 串流",
+          "zh_Hans": "EEW 与 RTS 皆改为 SSE 串流",
+          "en": "Both EEW and RTS now stream over SSE",
+          "ja": "EEW と RTS は両方 SSE ストリームに",
+          "ko": "EEW와 RTS 모두 SSE 스트리밍으로",
+          "th": "EEW และ RTS เปลี่ยนเป็นสตรีมมิ่ง SSE",
+          "vi": "Cả EEW và RTS đều chuyển sang SSE",
+          "id": "EEW dan RTS kini streaming SSE",
+          "fil": "Ang EEW at RTS ay streaming na sa SSE"
+        },
+        {
+          "zh_Hant": "斷線自動重連，恢復秒回",
+          "zh_Hans": "断线自动重连，恢复秒回",
+          "en": "Auto-reconnect with instant recovery",
+          "ja": "切断は自動再接続、復旧は即座に",
+          "ko": "끊기면 자동 재연결, 즉시 복구",
+          "th": "ตัดการเชื่อมต่ออัตโนมัติ กลับมาทันที",
+          "vi": "Tự động kết nối lại khi mất, khôi phục tức thì",
+          "id": "Putus otomatis tersambung lagi, pulih seketika",
+          "fil": "Awtomatikong kumokonekta, mabilis gumaling"
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "icon": "data_saver",
+      "title": {
+        "zh_Hant": "省流量看得見",
+        "zh_Hans": "省流量看得见",
+        "en": "Data savings you can see",
+        "ja": "通信量の節約が見える",
+        "ko": "데이터 절약이 보인다",
+        "th": "ประหยัดดาต้าที่มองเห็นได้",
+        "vi": "Tiết kiệm dữ liệu thấy được",
+        "id": "Hemat data yang terlihat",
+        "fil": "Makikitang tipid sa data"
+      },
+      "headline": {
+        "zh_Hant": "磁碟智慧快取，看過的地圖不再重抓",
+        "zh_Hans": "磁盘智慧快取，看过的地图不再重抓",
+        "en": "Smart on-disk cache — maps you have seen are never re-fetched",
+        "ja": "ディスクの賢いキャッシュ。見た地図は再取得されない",
+        "ko": "디스크 스마트 캐시. 본 지도는 다시 받지 않습니다",
+        "th": "แคชอัจฉริยะบนดิสก์ — แผนที่ที่เคยดูไม่ต้องดาวน์โหลดซ้ำ",
+        "vi": "Bộ nhớ đệm thông minh — bản đồ đã xem không tải lại",
+        "id": "Cache cerdas di disk — peta yang pernah dilihat tidak diunduh ulang",
+        "fil": "Matalinong cache — hindi na muling kinukuhá ang mapang nakita na"
+      },
+      "body": {
+        "zh_Hant": "App 在磁碟上架起一個容納 350 MB 的快取，用 ETag 驗證機制決定什麼要重抓、什麼直接沿用。雷達、衛星、等高線圖層都受益——天天看地圖的人，長期能省下大量流量。",
+        "zh_Hans": "App 在磁盘上架起一个容纳 350 MB 的快取，用 ETag 验证机制决定什么要重抓、什么直接沿用。雷达、卫星、等高线图层都受益——天天看地图的人，长期能省下大量流量。",
+        "en": "The app keeps a 350 MB on-disk cache with ETag-based validation, deciding exactly what needs re-fetching. Radar, satellite and terrain layers all benefit — if you check the map every day, the data you save adds up.",
+        "ja": "アプリは 350 MB のディスクキャッシュを構え、ETag 検証で何を再取得するか、何をそのまま使うかを判断します。レーダー・衛星・地形レイヤーすべてが恩恵を受け、毎日地図を見る人ほど通信量の節約が積み上がります。",
+        "ko": "앱은 350MB 디스크 캐시를 두고, ETag 검증으로 무엇을 다시 받을지, 무엇을 그대로 쓸지 판단합니다. 레이더·위성·지형 레이어 모두 혜택을 받아, 매일 지도를 보는 사람일수록 절약이 쌓입니다.",
+        "th": "แอปมีแคชบนดิสก์ 350 MB พร้อมการตรวจสอบ ETag ว่าอะไรต้องโหลดใหม่ อะไรใช้ของเดิมได้ ระบบเรดาร์ ดาวเทียม และชั้นภูมิประเทศได้ประโยชน์ทั้งหมด — ยิ่งดูแผนที่บ่อย ยิ่งประหยัดดาต้ามาก",
+        "vi": "App lưu bộ nhớ đệm 350 MB trên đĩa, dùng cơ chế xác thực ETag để quyết định thứ gì cần tải lại. Radar, vệ tinh và lớp địa hình đều được hưởng lợi — càng xem bản đồ thường xuyên, càng tiết kiệm.",
+        "id": "App menyimpan cache 350 MB di disk, memakai validasi ETag untuk memutuskan apa yang perlu diambil ulang. Radar, satelit, dan lapisan medan semuanya diuntungkan — makin sering buka peta, makin banyak data yang dihemat.",
+        "fil": "May 350 MB na cache ang app sa disk, gamit ang ETag validation para malaman kung ano ang kailangang kunin ulit. Ang radar, satellite, at terrain layers lahat nakikinabang — mas madalas tingnan ang mapa, mas malaki ang matitipid."
+      },
+      "stat": {
+        "zh_Hant": "350 MB",
+        "zh_Hans": "350 MB",
+        "en": "350 MB",
+        "ja": "350 MB",
+        "ko": "350MB",
+        "th": "350 MB",
+        "vi": "350 MB",
+        "id": "350 MB",
+        "fil": "350 MB"
+      },
+      "statLabel": {
+        "zh_Hant": "智慧快取預算，全由 LRU 自動管理",
+        "zh_Hans": "智慧快取预算，全由 LRU 自动管理",
+        "en": "smart cache budget, fully LRU-managed",
+        "ja": "スマートキャッシュ予算、完全 LRU 管理",
+        "ko": "스마트 캐시 예산, LRU로 자동 관리",
+        "th": "งบแคชอัจฉริยะ จัดการ LRU อัตโนมัติ",
+        "vi": "hạn mức cache thông minh, tự quản lý bằng LRU",
+        "id": "budget cache cerdas, dikelola LRU otomatis",
+        "fil": "badget ng smart cache, LRU ang nagmamay-ari"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "ETag 驗證，只有真的更新才重抓",
+          "zh_Hans": "ETag 验证，只有真的更新才重抓",
+          "en": "ETag validation — only truly changed content is re-fetched",
+          "ja": "ETag 検証、本当に更新されたものだけ再取得",
+          "ko": "ETag 검증, 진짜 바뀐 것만 다시 받음",
+          "th": "ตรวจสอบ ETag — โหลดใหม่เฉพาะเมื่อมีเปลี่ยนจริง",
+          "vi": "Xác thực ETag — chỉ tải lại nội dung thực sự thay đổi",
+          "id": "Validasi ETag — hanya konten yang benar-benar berubah yang diambil ulang",
+          "fil": "ETag validation — ang tunay na nagbago lang ang kinukuha ulit"
+        },
+        {
+          "zh_Hant": "看過的雷達、衛星圖框秒開",
+          "zh_Hans": "看过的雷达、卫星图框秒开",
+          "en": "Frames you have seen open instantly",
+          "ja": "見たことのあるレーダー・衛星フレームは即表示",
+          "ko": "본 적 있는 레이더·위성 프레임 즉시 표시",
+          "th": "เฟรมเรดาร์และดาวเทียมที่เคยดูเปิดได้ทันที",
+          "vi": "Khung radar, vệ tinh đã xem mở tức thì",
+          "id": "Frame radar & satelit yang pernah dilihat langsung terbuka",
+          "fil": "Agad nabubuksan ang mga frame na nakita na"
+        }
+      ]
+    },
+    {
+      "id": "battery",
+      "icon": "battery_saver",
+      "title": {
+        "zh_Hant": "更省電、更懂你的位置",
+        "zh_Hans": "更省电、更懂你的位置",
+        "en": "Battery-friendly location tracking",
+        "ja": "省電力で賢い位置情報",
+        "ko": "배터리 친화적 위치 추적",
+        "th": "ติดตามตำแหน่งแบบประหยัดแบต",
+        "vi": "Theo dõi vị trí tiết kiệm pin",
+        "id": "Pelacakan lokasi yang hemat baterai",
+        "fil": "Pagsubaybay ng lokasyon na hindi pumapatay ng baterya"
+      },
+      "headline": {
+        "zh_Hant": "背景定位不再是耗電大戶",
+        "zh_Hans": "背景定位不再是耗电大户",
+        "en": "Background location is no longer a battery hog",
+        "ja": "バックグラウンド位置情報が電池食いではなくなった",
+        "ko": "백그라운드 위치 추적이 더 이상 배터리 대장이 아님",
+        "th": "การระบุตำแหน่งเบื้องหลังไม่กินแบตอีกต่อไป",
+        "vi": "Định vị nền không còn là kẻ ngốn pin",
+        "id": "Lokasi latar bukan lagi penghabis baterai",
+        "fil": "Hindi na baterya-drain ang background location"
+      },
+      "body": {
+        "zh_Hant": "新版把每 10 分鐘固定定位改成自適應間隔：移動越快定得越頻繁(最快 5 分鐘)，靜止時自動退到 60 分鐘。不需要前台服務，對 Android 的省電模式也更友善。",
+        "zh_Hans": "新版把每 10 分钟固定定位改成自适应间隔：移动越快定得越频繁(最快 5 分钟)，静止时自动退到 60 分钟。不需要前台服务，对 Android 的省电模式也更友善。",
+        "en": "Updates track movement instead of a fixed 10-minute timer: the faster you move the more often it locates (down to 5 minutes), and it eases back to 60 minutes when you stay put. No foreground service needed, and friendlier to Android's power-saving modes.",
+        "ja": "新版では固定 10 分ごとを適応型間隔に変更。動きが速いほど頻繁に(最速 5 分)、静止時は自動で 60 分に。フォアグラウンドサービス不要で、Android の省電力モードにも優しくなりました。",
+        "ko": "새 버전은 고정 10분 대신 적응형 간격으로 바뀌었습니다. 움직일수록 더 자주(최소 5분), 가만히 있으면 자동으로 60분으로. 포그라운드 서비스가 필요 없어졌고 Android 절전 모드에도 더 친절합니다.",
+        "th": "เวอร์ชันใหม่เปลี่ยนจากการระบุตำแหน่งทุก 10 นาที เป็นระยะห่างแบบปรับอัตโนมัติ ยิ่งเคลื่อนไหวเร็วยิ่งถี่ (ขั้นต่ำ 5 นาที) นิ่งอยู่ก็ขยายไป 60 นาที ไม่ต้องใช้ foreground service และเป็นมิตรกับโหมดประหยัดพลังงาน Android",
+        "vi": "Phiên bản mới đổi từ định vị mỗi 10 phút cố định sang khoảng cách thích ứng: di chuyển càng nhanh định vị càng thường xuyên (tối thiểu 5 phút), đứng yên tự giãn ra 60 phút. Không cần foreground service, thân thiện hơn với chế độ tiết kiệm pin Android.",
+        "id": "Versi baru mengganti lokasi tiap 10 menit tetap dengan interval adaptif: makin cepat bergerak makin sering (minimal 5 menit), diam otomatis mundur ke 60 menit. Tidak perlu foreground service, lebih ramah mode hemat baterai Android.",
+        "fil": "Pinalitan ng bagong bersyon ang fixed 10-minutong lokasyon ng adaptive interval: mas mabilis kumilos, mas madalas (hanggang 5 minuto); tahimik, awtomatikong 60 minuto. Wala nang foreground service, mas maayos sa power-saving ng Android."
+      },
+      "stat": {
+        "zh_Hant": "5–60 分",
+        "zh_Hans": "5–60 分",
+        "en": "5–60 min",
+        "ja": "5〜60 分",
+        "ko": "5~60분",
+        "th": "5–60 นาที",
+        "vi": "5–60 phút",
+        "id": "5–60 mnt",
+        "fil": "5–60 min"
+      },
+      "statLabel": {
+        "zh_Hant": "自適應定位間隔，移動越快定得越頻繁",
+        "zh_Hans": "自适应定位间隔，移动越快定得越频繁",
+        "en": "adaptive location interval — faster movement, more frequent fixes",
+        "ja": "適応型の位置情報間隔。速く動くほど頻繁に",
+        "ko": "적응형 위치 간격 — 빠르게 움직일수록 더 자주",
+        "th": "ระยะห่างการระบุตำแหน่งแบบปรับได้ — ขยับไว ระบุถี่ขึ้น",
+        "vi": "khoảng định vị thích ứng — càng di chuyển nhanh càng thường xuyên",
+        "id": "interval lokasi adaptif — makin cepat bergerak makin sering",
+        "fil": "adaptive na interval — mas mabilis gumalaw, mas madalas ang fix"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "靜止時自動退到 60 分鐘才定位一次",
+          "zh_Hans": "静止时自动退到 60 分钟才定位一次",
+          "en": "Eases back to once per 60 minutes when still",
+          "ja": "静止時は自動で 60 分に 1 回へ",
+          "ko": "가만히 있으면 자동으로 60분에 한 번으로",
+          "th": "อยู่นิ่ง ๆ จะขยับไปถี่ขึ้นเป็น 60 นาทีครั้ง",
+          "vi": "Đứng yên tự giãn ra 60 phút một lần",
+          "id": "Diam otomatis melambat ke sekali per 60 menit",
+          "fil": "Kapag tahimik, awtomatikong 60 minutong agwat"
+        },
+        {
+          "zh_Hant": "對 Android Doze 省電模式友善",
+          "zh_Hans": "对 Android Doze 省电模式友善",
+          "en": "Friendly to Android Doze power-saving",
+          "ja": "Android Doze 省電力モードに優しい",
+          "ko": "Android Doze 절전 모드에 친화적",
+          "th": "เป็นมิตรกับโหมดประหยัดพลังงาน Doze ของ Android",
+          "vi": "Thân thiện với chế độ tiết kiệm pin Doze của Android",
+          "id": "Ramah terhadap mode hemat daya Doze Android",
+          "fil": "Kaibigan ng Android Doze power-saving"
+        }
+      ]
+    },
+    {
+      "id": "startup",
+      "icon": "rocket_launch",
+      "title": {
+        "zh_Hant": "開得更快",
+        "zh_Hans": "开得更快",
+        "en": "Faster startup",
+        "ja": "起動が速い",
+        "ko": "더 빠른 시작",
+        "th": "เริ่มต้นเร็วขึ้น",
+        "vi": "Khởi động nhanh hơn",
+        "id": "Startup lebih cepat",
+        "fil": "Mas mabilis magsimula"
+      },
+      "headline": {
+        "zh_Hant": "冷啟動省下 1–2 秒，開 App 不再等",
+        "zh_Hans": "冷启动省下 1–2 秒，开 App 不再等",
+        "en": "Cold start saves 1–2 seconds — no more waiting",
+        "ja": "コールドスタートが 1〜2 秒短縮、待たされない",
+        "ko": "콜드 스타트 1~2초 단축, 기다리지 않아도 됩니다",
+        "th": "การเริ่มต้นครั้งแรกเร็วขึ้น 1–2 วินาที ไม่ต้องรออีกต่อไป",
+        "vi": "Khởi động lạnh nhanh hơn 1–2 giây, không còn chờ đợi",
+        "id": "Cold start hemat 1–2 detik, tak perlu menunggu",
+        "fil": "Makatipid sa cold start ng 1–2 segundo, hindi na maghihintay"
+      },
+      "body": {
+        "zh_Hant": "把推播初始化與裝置資訊讀取移到背景執行，多項資源同時載入。部分 Android 裝置實測省下 1–2 秒，之後又再省了 500ms 以上。",
+        "zh_Hans": "把推播初始化与装置资讯读取移到背景执行，多项资源同时载入。部分 Android 装置实测省下 1–2 秒，之后又再省了 500ms 以上。",
+        "en": "Push initialization and device-info reads moved off the critical path, and boot resources load in parallel. Measured on some Android devices at 1–2 seconds saved, then another 500 ms+ after the follow-up.",
+        "ja": "プッシュ初期化と端末情報の読み込みをバックグラウンド化、起動リソースを並列読み込み。一部の Android 端末で 1〜2 秒、その後の改善でさらに 500 ms 以上短縮されました。",
+        "ko": "푸시 초기화와 기기 정보 읽기를 백그라운드로 옮기고, 부팅 리소스를 병렬로 불러옵니다. 일부 Android 기기에서 1~2초, 이후 개선으로 500ms 이상 더 단축됐습니다.",
+        "th": "ย้ายการเริ่มต้นระบบแจ้งเตือนและการอ่านข้อมูลอุปกรณ์ไปทำงานเบื้องหลัง โหลดทรัพยากรพร้อมกัน บางรุ่น Android วัดผลได้เร็วขึ้น 1–2 วินาที และปรับปรุงอีก 500 มิลลิวินาทีขึ้นไป",
+        "vi": "Chuyển khởi tạo push và đọc thông tin thiết bị xuống nền, tải tài nguyên song song. Đo trên một số thiết bị Android tiết kiệm 1–2 giây, sau đó giảm thêm hơn 500ms.",
+        "id": "Inisialisasi push dan pembacaan info perangkat dipindah ke latar, sumber daya dimuat paralel. Terukur di sebagian perangkat Android hemat 1–2 detik, kemudian hemat lagi 500ms+.",
+        "fil": "Ang push init at pagbabasa ng device info ay nasa background na, at sabay-sabay na naglo-load ang boot resources. Sa ilang Android device, 1–2 segundong tipid, saka dagdag 500ms pa."
+      },
+      "stat": {
+        "zh_Hant": "1–2 秒",
+        "zh_Hans": "1–2 秒",
+        "en": "1–2 s",
+        "ja": "1〜2 秒",
+        "ko": "1~2초",
+        "th": "1–2 วิ",
+        "vi": "1–2 s",
+        "id": "1–2 dtk",
+        "fil": "1–2 s"
+      },
+      "statLabel": {
+        "zh_Hant": "部分 Android 裝置的冷啟動省時",
+        "zh_Hans": "部分 Android 装置的冷启动省时",
+        "en": "cold-start saving on some Android devices",
+        "ja": "一部 Android 端末のコールドスタート短縮時間",
+        "ko": "일부 Android 기기의 콜드 스타트 단축 시간",
+        "th": "เวลาที่ประหยัดได้ตอนเริ่มต้นบน Android บางรุ่น",
+        "vi": "thời gian khởi động lạnh tiết kiệm trên một số thiết bị Android",
+        "id": "penghematan cold start pada sebagian perangkat Android",
+        "fil": "tipid sa cold start sa ilang Android device"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "多項啟動資源平行載入",
+          "zh_Hans": "多项启动资源平行载入",
+          "en": "Boot resources load in parallel",
+          "ja": "起動リソースを並列読み込み",
+          "ko": "부팅 리소스를 병렬 로드",
+          "th": "โหลดทรัพยากรเริ่มต้นแบบขนาน",
+          "vi": "Tải tài nguyên khởi động song song",
+          "id": "Sumber daya boot dimuat paralel",
+          "fil": "Sabay-sabay na load ng boot resources"
+        },
+        {
+          "zh_Hant": "推播初始化不再擋住首幀",
+          "zh_Hans": "推播初始化不再挡住首帧",
+          "en": "Push init no longer blocks the first frame",
+          "ja": "プッシュ初期化が初回表示を妨げない",
+          "ko": "푸시 초기화가 첫 프레임을 막지 않음",
+          "th": "การเริ่มต้น push ไม่บล็อกเฟรมแรกอีกต่อไป",
+          "vi": "Khởi tạo push không còn chặn khung hình đầu",
+          "id": "Inisialisasi push tak lagi memblokir frame pertama",
+          "fil": "Hindi na hinaharangan ng push init ang unang frame"
+        }
+      ]
+    },
+    {
+      "id": "map",
+      "icon": "map",
+      "title": {
+        "zh_Hant": "地圖順滑拖曳 + 更小的安裝檔",
+        "zh_Hans": "地图顺滑拖曳 + 更小的安装档",
+        "en": "Silky map scrubbing, smaller install",
+        "ja": "なめらかな地図操作とインストール軽量化",
+        "ko": "부드러운 지도 조작 + 가벼운 설치",
+        "th": "ลากแผนที่ลื่นไหล + แอปเล็กลง",
+        "vi": "Lướt bản đồ mượt + cài đặt nhẹ hơn",
+        "id": "Geser peta mulus + ukuran instal lebih kecil",
+        "fil": "Makinis na pag-scroll ng mapa + mas maliit na app"
+      },
+      "headline": {
+        "zh_Hant": "拖曳時間軸看雷達，不再卡頓",
+        "zh_Hans": "拖曳时间轴看雷达,不再卡顿",
+        "en": "Scrubbing the radar timeline no longer stutters",
+        "ja": "レーダーのタイムラインをドラッグしてもカクつかない",
+        "ko": "레이더 타임라인을 드래그해도 버벅이지 않음",
+        "th": "ลากไทม์ไลน์เรดาร์แล้วไม่กระตุก",
+        "vi": "Kéo trục thời gian radar không còn giật",
+        "id": "Menggerus garis waktu radar tak lagi patah-patah",
+        "fil": "Hindi na nag-hu-hitch ang pag-scroll ng radar timeline"
+      },
+      "body": {
+        "zh_Hant": "地圖引擎全面換新。切換雷達幀變成兩次透明的屬性切換——零重新下載、零延遲。所有圖層共用同一個三層快取，暖機過的幀直接顯示。安裝檔也因為鄉鎮邊界重新編碼而縮小近 1 MB。",
+        "zh_Hans": "地图引擎全面换新。切换雷达帧变成两次透明的属性切换——零重新下载、零延迟。所有图层共用同一个三层快取，暖机过的帧直接显示。安装档也因为乡镇边界重新编码而缩小近 1 MB。",
+        "en": "The map engine was fully replaced. Switching radar frames is now two invisible property flips — zero re-downloads, zero latency. All layers share one three-tier cache, and warmed frames show instantly. The install also shrank by nearly 1 MB after town boundaries were re-encoded.",
+        "ja": "地図エンジンを全面的に刷新。レーダーのフレーム切り替えは透過的な 2 回のプロパティ切替になり、再ダウンロードゼロ・遅延ゼロ。全レイヤーが同じ 3 層キャッシュを共有し、ウォーム済みフレームは即表示。町境界の再エンコードでインストールも約 1 MB 縮小しました。",
+        "ko": "지도 엔진이 전면 교체됐습니다. 레이더 프레임 전환은 이제 투명한 속성 전환 두 번 — 재다운로드 0건, 지연 0. 모든 레이어가 같은 3단계 캐시를 공유하고, 예열된 프레임은 즉시 표시됩니다. 읍면 경계를 다시 인코딩해 설치 용량도 약 1MB 줄었습니다.",
+        "th": "เปลี่ยนเอนจินแผนที่ใหม่ทั้งระบบ การสลับเฟรมเรดาร์เหลือเพียงการเปลี่ยนคุณสมบัติแบบโปร่งใส 2 ครั้ง — ไม่ดาวน์โหลดซ้ำ ไม่ดีเลย์ ทุกเลเยอร์ใช้แคช 3 ชั้นร่วมกัน เฟรมที่วอร์มแล้วเปิดได้ทันที ไซส์แอปเล็กลงเกือบ 1 MB หลังเข้ารหัสขอบเขตเมืองใหม่",
+        "vi": "Engine bản đồ đã được thay mới hoàn toàn. Chuyển khung radar giờ chỉ là hai lần đổi thuộc tính trong suốt — không tải lại, không trễ. Mọi lớp dùng chung một cache ba tầng, khung đã làm nóng mở tức thì. Bản cài cũng nhẹ đi gần 1 MB sau khi tái mã hoá ranh giới thị trấn.",
+        "id": "Engine peta diganti total. Ganti frame radar kini hanya dua kali flip properti transparan — nol unduhan ulang, nol latensi. Semua layer berbagi satu cache tiga tingkat, frame yang sudah hangat langsung tampil. Ukuran instal juga menyusut hampir 1 MB setelah batas kota di-encode ulang.",
+        "fil": "Pinalitan nang buo ang map engine. Ang paglipat ng radar frame ay dalawang invisible na property flip na lang — walang re-download, walang delay. Lahat ng layer ay may isang three-tier cache, at agad lumalabas ang mga warmed frame. Lumiit din ng halos 1 MB ang app pagkatapos i-re-encode ang town boundaries."
+      },
+      "stat": {
+        "zh_Hant": "−1 MB",
+        "zh_Hans": "−1 MB",
+        "en": "−1 MB",
+        "ja": "−1 MB",
+        "ko": "−1MB",
+        "th": "−1 MB",
+        "vi": "−1 MB",
+        "id": "−1 MB",
+        "fil": "−1 MB"
+      },
+      "statLabel": {
+        "zh_Hant": "安裝檔因鄉鎮邊界重新編碼縮小",
+        "zh_Hans": "安装档因乡镇边界重新编码缩小",
+        "en": "install shrank after town boundaries were re-encoded",
+        "ja": "町境界の再エンコードでインストール縮小",
+        "ko": "읍면 경계 재인코딩으로 설치 축소",
+        "th": "แอปเล็กลงหลังเข้ารหัสขอบเขตเมืองใหม่",
+        "vi": "bản cài nhẹ hơn sau khi tái mã hoá ranh giới",
+        "id": "ukuran instal menyusut setelah batas kota di-encode ulang",
+        "fil": "lumiit ang app matapos i-re-encode ang boundary"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "零成本切幀，跟得上手指",
+          "zh_Hans": "零成本切帧，跟得上手指",
+          "en": "Zero-cost frame switching that follows your finger",
+          "ja": "ゼロコストでフレーム切替、指に追従",
+          "ko": "제로 코스트 프레임 전환, 손가락을 따라감",
+          "th": "สลับเฟรมแบบไร้ต้นทุน ตามนิ้วได้ทัน",
+          "vi": "Chuyển khung không tốn chi phí, theo kịp ngón tay",
+          "id": "Beralih frame tanpa biaya, mengikuti jari",
+          "fil": "Walang-bisang paglipat ng frame, sumasabay sa daliri"
+        },
+        {
+          "zh_Hant": "三層快取,暖機過的幀直接顯示",
+          "zh_Hans": "三层快取,暖机过的帧直接显示",
+          "en": "Three-tier cache shows warmed frames instantly",
+          "ja": "3 層キャッシュでウォーム済みフレームは即表示",
+          "ko": "3단계 캐시로 예열된 프레임 즉시 표시",
+          "th": "แคช 3 ชั้น แสดงเฟรมที่วอร์มแล้วทันที",
+          "vi": "Cache ba tầng hiển thị khung đã nóng tức thì",
+          "id": "Cache tiga tingkat langsung tampilkan frame hangat",
+          "fil": "Three-tier cache — agad lalabas ang warmed frame"
+        }
+      ]
+    },
+    {
+      "id": "accuracy",
+      "icon": "my_location",
+      "title": {
+        "zh_Hant": "位置判斷更準",
+        "zh_Hans": "位置判断更准",
+        "en": "More accurate location",
+        "ja": "位置判定がより正確に",
+        "ko": "더 정확한 위치 판단",
+        "th": "ระบุตำแหน่งแม่นยำขึ้น",
+        "vi": "Xác định vị trí chính xác hơn",
+        "id": "Lokasi lebih akurat",
+        "fil": "Mas tumpak na lokasyon"
+      },
+      "headline": {
+        "zh_Hant": "鄉鎮判定從中心點猜測，變成真正的幾何測試",
+        "zh_Hans": "乡镇判定从中心点猜测,变成真正的几何测试",
+        "en": "Township detection went from centroid guessing to real geometry",
+        "ja": "町判定が中心点の推測から、本当の幾何テストに",
+        "ko": "읍면 판정이 중심점 추측에서 진짜 기하 테스트로",
+        "th": "การระบุตำบลเปลี่ยนจากการเดาจากศูนย์กลาง เป็นการทดสอบเรขาคณิตจริง",
+        "vi": "Xác định thị trấn chuyển từ đoán tâm điểm sang phép thử hình học thật",
+        "id": "Penentuan kecamatan berubah dari tebakan titik pusat menjadi uji geometri sejati",
+        "fil": "Ang pagtukoy ng bayan ay hindi na hula sa gitna, kundi tunay na geometry"
+      },
+      "body": {
+        "zh_Hant": "在鄉鎮交界或邊緣時會判錯位置的舊演算法,已被精確的「點在多邊形內」幾何演算法取代。位置測量涵蓋正確的鄉鎮——在地警報更準確。",
+        "zh_Hans": "在乡镇交界或边缘时会判错位置的旧演算法,已被精确的「点在多边形内」几何演算法取代。位置测量涵盖正确的乡镇——在地警报更准确。",
+        "en": "The old algorithm that misjudged you at town borders has been replaced with an exact point-in-polygon geometry test. Your measured position now resolves to the correct township — so location-based alerts are more accurate.",
+        "ja": "町の境界や端で位置を誤判定した旧アルゴリズムは、正確な「ポリゴン内点判定」に置き換わりました。測位が正しい町に結びつき、ローカル警報がより正確になります。",
+        "ko": "읍면 경계에서 위치를 잘못 판정하던 기존 알고리즘은 정확한 \"다각형 내부 점 판정\"으로 바뀌었습니다. 측정 위치가 올바른 읍면에 연결되어, 지역 알림이 더 정확해졌습니다.",
+        "th": "อัลกอริทึมเดิมที่ระบุตำแหน่งผิดบริเวณชายแดนของตำบล ถูกแทนที่ด้วยการทดสอบจุดในรูปหลายเหลี่ยมที่แม่นยำ ตำแหน่งที่วัดได้ครอบคลุมตำบลที่ถูกต้อง — การแจ้งเตือนตามพื้นที่แม่นยำขึ้น",
+        "vi": "Thuật toán cũ hay xác định sai vị trí ở ranh giới thị trấn đã được thay thế bằng phép thử điểm-trong-đa-giác chính xác. Vị trí đo được gắn đúng thị trấn — cảnh báo theo khu vực chính xác hơn.",
+        "id": "Algoritma lama yang salah menilai posisi di perbatasan kota telah digantikan uji titik-di-dalam-poligon yang presisi. Posisi terukur kini masuk kecamatan yang tepat — peringatan berbasis lokasi lebih akurat.",
+        "fil": "Ang lumang algorithm na nagkakamali sa mga hangganan ng bayan ay pinalitan na ng eksaktong point-in-polygon geometry. Ang sukat na posisyon ay nasa tamang bayan — mas tumpak ang lokasyong alerto."
+      },
+      "stat": {
+        "zh_Hant": "1–3 個",
+        "zh_Hans": "1–3 个",
+        "en": "1–3",
+        "ja": "1〜3 個",
+        "ko": "1~3개",
+        "th": "1–3 จุด",
+        "vi": "1–3",
+        "id": "1–3",
+        "fil": "1–3"
+      },
+      "statLabel": {
+        "zh_Hant": "一次查詢只需測試的鄉鎮數(舊演算法要測 367 個)",
+        "zh_Hans": "一次查询只需测试的乡镇数(旧演算法要测 367 个)",
+        "en": "townships tested per query (the old algorithm checked all 367)",
+        "ja": "1 回の照会でテストする町の数(旧式は 367 個をチェック)",
+        "ko": "조회마다 테스트하는 읍면 수 (이전엔 367개 모두)",
+        "th": "จำนวนตำบลที่ทดสอบต่อการค้นหา (เดิมต้องทดสอบ 367 ตำบล)",
+        "vi": "số thị trấn cần kiểm tra mỗi truy vấn (cũ phải kiểm tra cả 367)",
+        "id": "jumlah kecamatan yang diuji per pencarian (lama harus uji 367)",
+        "fil": "bilang ng bayang tinitest kada query (dati 367 lahat)"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "邊界不再誤判,在地警報更準",
+          "zh_Hans": "边界不再误判,在地警报更准",
+          "en": "No more border misjudgment — alerts hit the right town",
+          "ja": "境界の誤判定がなくなり、ローカル警報が正確に",
+          "ko": "경계 오판이 사라져 지역 알림이 정확해짐",
+          "th": "ไม่ผิดที่ชายแดนอีกต่อไป การแจ้งเตือนตามพื้นที่แม่นยำขึ้น",
+          "vi": "Hết sai ranh giới, cảnh báo theo vùng chính xác hơn",
+          "id": "Tidak ada lagi salah batas, peringatan lokal lebih akurat",
+          "fil": "Wala nang maling hangganan, mas tumpak ang lokal na alerto"
+        }
+      ]
+    },
+    {
+      "id": "time",
+      "icon": "access_time",
+      "title": {
+        "zh_Hant": "時間不再被手機時鐘騙",
+        "zh_Hans": "时间不再被手机时钟骗",
+        "en": "Time is no longer fooled by your phone clock",
+        "ja": "スマホ時計に騙されない時間",
+        "ko": "휴대폰 시계에 속지 않는 시간",
+        "th": "เวลาไม่ถูกหลอกด้วยนาฬิกามือถืออีกต่อไป",
+        "vi": "Thời gian không còn bị lừa bởi đồng hồ điện thoại",
+        "id": "Waktu tak lagi tertipu jam ponsel",
+        "fil": "Hindi na nadadaya ng orasan ng phone ang oras"
+      },
+      "headline": {
+        "zh_Hant": "真正的網路校時 + 硬體鐘錨定",
+        "zh_Hans": "真正的网络校时 + 硬件钟锚定",
+        "en": "True network time sync, anchored to the hardware clock",
+        "ja": "本物のネットワーク時刻同期とハードウェア時計への固定",
+        "ko": "진짜 네트워크 시간 동기화 + 하드웨어 시계 앵커링",
+        "th": "ซิงค์เวลาจากเครือข่ายจริง + ยึดกับนาฬิกาฮาร์ดแวร์",
+        "vi": "Đồng bộ thời gian mạng thực sự + neo vào đồng hồ phần cứng",
+        "id": "Sinkronisasi waktu jaringan sejati + jangkar jam perangkat keras",
+        "fil": "Tunay na network time sync + naka-angkla sa hardware clock"
+      },
+      "body": {
+        "zh_Hant": "改用標準 SNTP 協定校時,並把時間錨定在硬體時鐘上。手動改時間、跨時區飛行都不會讓「距離搖晃還有幾秒」的倒數算錯。",
+        "zh_Hans": "改用标准 SNTP 协议校时,并把时间锚定在硬件时钟上。手动改时间、跨时区飞行都不会让「距离摇晃还有几秒」的倒数算错。",
+        "en": "Uses the standard SNTP protocol for time sync, anchored to the hardware clock. Manually changing the time or flying across time zones no longer breaks the countdown to shaking.",
+        "ja": "標準 SNTP プロトコルで時刻同期し、ハードウェア時計に固定。手動で時刻を変えたり、タイムゾーンをまたいだりしても、「揺れまであと何秒」のカウントダウンが狂いません。",
+        "ko": "표준 SNTP 프로토콜로 시간을 동기화하고 하드웨어 시계에 고정합니다. 수동으로 시간을 바꾸거나 다른 시간대로 비행해도 \"흔들림까지 몇 초\" 카운트다운이 틀리지 않습니다.",
+        "th": "ใช้โปรโตคอล SNTP มาตรฐานซิงค์เวลา และยึดกับนาฬิกาฮาร์ดแวร์ การเปลี่ยนเวลามือถือหรือข้ามโซนเวลา จะไม่ทำให้การนับถอยหลัง \"อีกกี่วินาทีจะสั่น\" คลาดเคลื่อน",
+        "vi": "Dùng giao thức SNTP chuẩn để đồng bộ giờ, neo vào đồng hồ phần cứng. Chỉnh giờ tay hay bay qua múi giờ không còn làm sai đếm ngược \"còn mấy giây nữa rung lắc\".",
+        "id": "Memakai protokol SNTP standar untuk sinkronisasi, berjangkar pada jam perangkat keras. Mengubah jam manual atau terbang lintas zona waktu tidak lagi membuat hitung mundur \"beberapa detik lagi bergetar\" salah.",
+        "fil": "Gumagamit ng standard na SNTP para sa time sync, naka-angkla sa hardware clock. Ang manu-manong pagbabago ng oras o paglipad sa ibang time zone ay hindi na nakasisira ng countdown sa pagyanig."
+      },
+      "stat": {
+        "zh_Hant": "SNTP",
+        "zh_Hans": "SNTP",
+        "en": "SNTP",
+        "ja": "SNTP",
+        "ko": "SNTP",
+        "th": "SNTP",
+        "vi": "SNTP",
+        "id": "SNTP",
+        "fil": "SNTP"
+      },
+      "statLabel": {
+        "zh_Hant": "標準網路校時協定(UDP/123)",
+        "zh_Hans": "标准网络校时协议(UDP/123)",
+        "en": "standard network time protocol (UDP/123)",
+        "ja": "標準ネットワーク時刻同期プロトコル (UDP/123)",
+        "ko": "표준 네트워크 시간 프로토콜 (UDP/123)",
+        "th": "โปรโตคอลเวลามาตรฐาน (UDP/123)",
+        "vi": "giao thức thời gian mạng chuẩn (UDP/123)",
+        "id": "protokol waktu jaringan standar (UDP/123)",
+        "fil": "standard network time protocol (UDP/123)"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "手動改鐘、跨時區都不影響倒數",
+          "zh_Hans": "手动改钟、跨时区都不影响倒数",
+          "en": "Manual clock changes or time-zone travel won't skew the countdown",
+          "ja": "手動の時計変更や時差移動でもカウントダウンは狂わない",
+          "ko": "수동 시계 변경, 시간대 이동에도 카운트다운 정상",
+          "th": "เปลี่ยนเวลามือถือหรือข้ามเขตเวลาก็ไม่กระทบการนับถอยหลัง",
+          "vi": "Đổi giờ tay hay đi qua múi giờ không làm lệch đếm ngược",
+          "id": "Ubah jam manual atau lintas zona waktu tidak memengaruhi hitung mundur",
+          "fil": "Hindi nagbabago ang countdown kahit palitan ang oras o mag-iba ng time zone"
+        }
+      ]
+    },
+    {
+      "id": "privacy",
+      "icon": "shield",
+      "title": {
+        "zh_Hant": "隱私與資料安全",
+        "zh_Hans": "隐私与资料安全",
+        "en": "Privacy and data safety",
+        "ja": "プライバシーとデータの安全性",
+        "ko": "개인정보와 데이터 안전",
+        "th": "ความเป็นส่วนตัวและความปลอดภัยของข้อมูล",
+        "vi": "Quyền riêng tư và an toàn dữ liệu",
+        "id": "Privasi dan keamanan data",
+        "fil": "Privacy at kaligtasan ng data"
+      },
+      "headline": {
+        "zh_Hant": "「清快取」真的只清快取",
+        "zh_Hans": "「清快取」真的只清快取",
+        "en": "'Clear cache' actually clears only the cache",
+        "ja": "「キャッシュを消す」は本当にキャッシュだけ消す",
+        "ko": "'캐시 지우기'는 정말 캐시만 지웁니다",
+        "th": "'ล้างแคช' ล้างเฉพาะแคชจริง ๆ",
+        "vi": "'Xoá bộ nhớ đệm' thực sự chỉ xoá bộ nhớ đệm",
+        "id": "'Bersihkan cache' benar-benar hanya membersihkan cache",
+        "fil": "'Clear cache' ay talagang cache lang ang nililinis"
+      },
+      "body": {
+        "zh_Hant": "你的設定、記錄與離線訊息存放在另一個「耐久」資料庫，清快取時物理上碰不到它。多餘資料同步壓縮,ETag token 永不落磁碟。",
+        "zh_Hans": "你的设定、记录与离线讯息存放在另一个「耐久」资料库,清快取时物理上碰不到它。多余资料同步压缩,ETag token 永不落磁盘。",
+        "en": "Your settings, history and offline messages live in a separate durable database that the cache cleaner cannot physically touch. Redundant data is compressed on write, and auth tokens never hit the disk cache.",
+        "ja": "設定・履歴・オフラインメッセージは別の「耐久」データベースに入っており、キャッシュ削除は物理的に触れません。冗長データは書き込み時に圧縮され、トークンがキャッシュディスクに保存されることはありません。",
+        "ko": "설정·기록·오프라인 메시지는 별도의 \"영구\" 데이터베이스에 있어, 캐시 정리가 물리적으로 건드릴 수 없습니다. 중복 데이터는 압축 저장되고, 토큰은 디스크 캐시에 닿지 않습니다.",
+        "th": "การตั้งค่า ประวัติ และข้อความออฟไลน์อยู่ในฐานข้อมูล \"ถาวร\" แยกต่างหาก ที่การล้างแคชไม่สามารถแตะถึงได้ ข้อมูลซ้ำซ้อนถูกบีบอัดตอนจัดเก็บ และ token ไม่ถูกเก็บลงดิสก์แคช",
+        "vi": "Cài đặt, lịch sử và tin nhắn ngoại tuyến nằm trong cơ sở dữ liệu \"bền vững\" riêng mà việc xoá cache không thể đụng tới. Dữ liệu dư thừa được nén khi ghi, token không bao giờ chạm vào ổ đĩa cache.",
+        "id": "Pengaturan, riwayat, dan pesan offline ada di database 'tahan lama' terpisah yang tak dapat disentuh pembersih cache. Data redundan dikompres saat ditulis, token tidak pernah menyentuh disk cache.",
+        "fil": "Ang settings, history, at offline messages ay nasa hiwalay na 'durable' database na hindi maaaring maapektuhan ng paglilinis ng cache. Ni-compress ang redundan na data, at hindi kailanman nahahawakan ng disk cache ang token."
+      },
+      "stat": {
+        "zh_Hant": "2 個",
+        "zh_Hans": "2 个",
+        "en": "2",
+        "ja": "2 つ",
+        "ko": "2개",
+        "th": "2 ฐาน",
+        "vi": "2",
+        "id": "2",
+        "fil": "2"
+      },
+      "statLabel": {
+        "zh_Hant": "資料庫:耐久(設定/記錄)與快取(可重抓)分開存放",
+        "zh_Hans": "数据库:耐久(设定/记录)与快取(可重抓)分开存放",
+        "en": "databases — durable (settings/logs) kept apart from cache (re-fetchable)",
+        "ja": "データベース:耐久(設定/ログ)とキャッシュ(再取得可)を分離",
+        "ko": "개 데이터베이스 — 영구(설정/기록)와 캐시(재다운로드 가능) 분리",
+        "th": "ฐานข้อมูล — ข้อมูลถาวร (ตั้งค่า/บันทึก) แยกจากแคช (โหลดใหม่ได้)",
+        "vi": "cơ sở dữ liệu — bền vững (cài đặt/nhật ký) tách khỏi cache (tải lại được)",
+        "id": "database — tangguh (pengaturan/log) dipisah dari cache (bisa diunduh ulang)",
+        "fil": "database — durable (settings/logs) hiwalay sa cache (pwedeng kunin ulit)"
+      },
+      "highlights": [
+        {
+          "zh_Hant": "清快取是結構保證,不是程式紀律",
+          "zh_Hans": "清快取是结构保证,不是程式纪律",
+          "en": "Cache-clearing safety is a structural guarantee, not code discipline",
+          "ja": "キャッシュ削除の安全性は構造的な保証、規律ではありません",
+          "ko": "캐시 정리 안전성은 구조적 보장, 습관이 아님",
+          "th": "ความปลอดภัยในการล้างแคชเป็นการรับประกันเชิงโครงสร้าง ไม่ใช่แค่ระเบียบโค้ด",
+          "vi": "An toàn khi xoá cache là cam kết cấu trúc, không phải kỷ luật code",
+          "id": "Keamanan bersihkan cache adalah jaminan struktural, bukan disiplin kode",
+          "fil": "Ang kaligtasan sa pag-clear ng cache ay structural guarantee, hindi disiplina sa code"
+        },
+        {
+          "zh_Hant": "token 永不落磁碟快取",
+          "zh_Hans": "token 永不落磁盘快取",
+          "en": "Auth tokens never touch the disk cache",
+          "ja": "トークンがキャッシュディスクに落ちない",
+          "ko": "토큰이 디스크 캐시에 저장되지 않음",
+          "th": "token ไม่ถูกเขียนลงแคชดิสก์",
+          "vi": "token không bao giờ chạm vào ổ đĩa cache",
+          "id": "token tidak pernah menyentuh disk cache",
+          "fil": "Hindi nahahawakan ng disk cache ang token"
+        }
+      ]
+    }
+  ]
+}

@@ -207,6 +207,36 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('a UTC-flagged frame renders in local time, not verbatim UTC', (
+    tester,
+  ) async {
+    // The lightning bug: DateFormat prints a `isUtc: true` DateTime as
+    // UTC (+00:00), so a strike at 22:34 Taipei read as 22:34 only because
+    // devices here share the zone — anywhere else it read an hour/… off.
+    // Same for any layer minting UTC frames (moon page). The ruler must
+    // show the frame in the device's local time.
+    final utc = DateTime.utc(2026, 7, 13, 14, 30); // 22:30 in UTC+8
+    final frames = [MapFrame(id: '0', time: utc)];
+    await tester.pumpWidget(
+      _wrap(frames: frames, selectedIndex: 0, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+
+    final localHours = utc.toLocal();
+    final expected =
+        '${localHours.hour.toString().padLeft(2, '0')}:'
+        '${localHours.minute.toString().padLeft(2, '0')}';
+    // The big label uses HH:mm; ticks format the same instant.
+    expect(find.text(expected), findsWidgets);
+    // And the date line (yyyy/MM/dd) must reflect the local day too — a UTC
+    // frame across midnight would otherwise print the UTC date.
+    final localDate =
+        '${localHours.year}/${localHours.month.toString().padLeft(2, '0')}/'
+        '${localHours.day.toString().padLeft(2, '0')}';
+    expect(find.text(localDate), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'switching to another layer\u0027s frames re-centres on its newest frame',
     (tester) async {

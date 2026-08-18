@@ -33,22 +33,19 @@ import 'package:flutter/material.dart';
 @immutable
 class AppGold {
   const AppGold({
-    required this.fillStart,
-    required this.fillEnd,
+    required this.fill,
     required this.ink,
     required this.badge,
     required this.onBadge,
     required this.edge,
-    required this.glow,
   });
 
-  /// Card gradient, top-left → bottom-right. Two stops of the same hue at
-  /// different lightness: a metal reads as a *sheen*, and a sheen is a
-  /// gradient across one hue, never a blend of two.
-  final Color fillStart;
-  final Color fillEnd;
+  /// The card's flat fill — one stop now, not a gradient: the support card
+  /// sits on the same tonal plane as its neighbours, and the ranking is
+  /// carried by the gold colour alone.
+  final Color fill;
 
-  /// Title and body ink on [fillStart]/[fillEnd].
+  /// Title and body ink on [fill].
   final Color ink;
 
   /// The filled circular badge, and the mark inside it — the strongest
@@ -59,34 +56,26 @@ class AppGold {
   /// Hairline along the card's edge, catching the light at the top.
   final Color edge;
 
-  /// The cast under the card. Warm, not grey: a neutral drop shadow makes gold
-  /// look printed on, a gold one makes it look lit.
-  final Color glow;
-
   /// Champagne on white: the fill has to be pale enough for dark ink, so the
   /// *ink* carries the metal — a deep bronze reads as gold leaf where a bright
   /// yellow would read as a highlighter.
   static AppGold get light => AppGold(
-    fillStart: const Color(0xFFFDF2D0).vision,
-    fillEnd: const Color(0xFFF3D89A).vision,
+    fill: const Color(0xFFFDF2D0).vision,
     ink: const Color(0xFF4A3208).vision,
     badge: const Color(0xFF87610F).vision,
     onBadge: const Color(0xFFFFF8E6).vision,
     edge: const Color(0x33A9822B).vision,
-    glow: const Color(0x2E8A6A1F).vision,
   );
 
   /// Deep amber on near-black: the fill carries the metal here, because a pale
   /// champagne on a dark page reads as plain cream. The ink lifts to a light
   /// gold so it stays legible on it.
   static AppGold get dark => AppGold(
-    fillStart: const Color(0xFF4A3811).vision,
-    fillEnd: const Color(0xFF2E230C).vision,
+    fill: const Color(0xFF4A3811).vision,
     ink: const Color(0xFFF7DFA5).vision,
     badge: const Color(0xFFE8C46A).vision,
     onBadge: const Color(0xFF3A2A06).vision,
     edge: const Color(0x40E8C46A).vision,
-    glow: const Color(0x33C9A34A).vision,
   );
 
   /// The palette for the ambient theme.

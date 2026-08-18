@@ -28,7 +28,7 @@
 
 ## 檢查清單
 
-- [ ] `tool/check_commits.sh origin/main..HEAD` 通過
+- [ ] `tool/check/commits.sh origin/main..HEAD` 通過
       —— commit 訊息就是更新日誌，格式見 [commit.md](../commit.md)
 - [ ] **一個 commit 一件事**（這條 gate 驗不了，靠自己和 review）
 - [ ] `mise exec -- flutter analyze` 與 `mise exec -- flutter test` 通過

@@ -925,6 +925,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreSectionApp => '앱 다운로드';
 
   @override
+  String get moreSectionBeta => '테스트 버전';
+
+  @override
+  String get moreAndroidBeta => 'Android 테스트 버전';
+
+  @override
+  String get moreTestFlight => 'iOS 테스트 버전 (TestFlight)';
+
+  @override
+  String get moreSectionPartners => '파트너';
+
+  @override
+  String get morePartnersNote =>
+      '파트너십 순서대로 표시됩니다. 재난 예방에 기여한 개인과 기업에 감사드립니다. 그들의 기여 더봉에 DPIP가 가능했습니다.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       '진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.';
 
@@ -1408,6 +1430,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => '이 릴리스에 대한 설명이 없습니다.';
+
+  @override
+  String get changelogOpenOnGitHub => 'GitHub에서 보기';
 
   @override
   String get radarGlobalOutline => '국경';
@@ -1940,6 +1965,166 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appLogs => '앱 로그';
 
   @override
+  String get serverStatusLocal => '기기 상태';
+
+  @override
+  String get serverStatusLocalBody =>
+      '서버 지표는 대시보드에서 가져옵니다. 아래는 이 기기의 멀티 액티브 엔드포인트(LB / Core 각 지역)에 대한 실제 연결 판단입니다. 기기가 실제로 주고받은 트래픽만 수동적으로 기록하므로, 아직 접촉하지 않은 엔드포인트는 \'탐지 안 됨\'으로 표시됩니다.';
+
+  @override
+  String get serverStatusAllUp => '모든 서비스 정상';
+
+  @override
+  String get serverStatusDegraded => '성능 저하';
+
+  @override
+  String get serverStatusDown => '서비스 이상';
+
+  @override
+  String get serverStatusErrorRate => '5xx 오류율';
+
+  @override
+  String get serverStatusLatency => '평균 지연';
+
+  @override
+  String get serverStatusUpdated => '업데이트';
+
+  @override
+  String get serverStatusWeb => '서버 상태';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'ExpTech 상태';
+
+  @override
+  String get serverStatusCloudflare => 'Cloudflare 상태';
+
+  @override
+  String get serverStatusCloudflareAllOperational => '모든 리전 정상';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare 일부 리전 이상';
+
+  @override
+  String get serverStatusCloudflareNone => '표시할 리전이 없습니다.';
+
+  @override
+  String get serverStatusCloudflareOperational => '정상';
+
+  @override
+  String get serverStatusCloudflareDegraded => '성능 저하';
+
+  @override
+  String get serverStatusCloudflarePartial => '부분 중단';
+
+  @override
+  String get serverStatusCloudflareMajor => '대규모 중단';
+
+  @override
+  String get serverStatusCloudflareUnknown => '알 수 없음';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi => 'Core 전용 API (레이다 / 기상 / 바람)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core 전용 정적 리소스';
+
+  @override
+  String get endpointTierLegacyApi => '레거시 API (api-1)';
+
+  @override
+  String get endpointHealthOk => '연결 정상';
+
+  @override
+  String get endpointHealthDegraded => '불안정한 엔드포인트 있음';
+
+  @override
+  String get endpointHealthDown => '연결 이상';
+
+  @override
+  String get endpointHealthUnknown => '관측 데이터 없음';
+
+  @override
+  String get endpointStateOk => '정상';
+
+  @override
+  String get endpointStateDegraded => '불안정';
+
+  @override
+  String get endpointStateDown => '이상';
+
+  @override
+  String get endpointStateUnknown => '알 수 없음';
+
+  @override
+  String get endpointLastSuccessNever => '미성공';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => '연결 중…';
 
   @override
@@ -2019,10 +2204,31 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreAnnouncements => '공지사항';
 
   @override
+  String get moreTagline => '재해 정보 통합 플랫폼';
+
+  @override
   String get moreVersionStable => '정식 버전';
 
   @override
   String get moreVersionNotes => '현재 버전';
+
+  @override
+  String get releaseHighlightsTitle => '이번 업데이트';
+
+  @override
+  String get releaseHighlightsTabNormal => '변경된 점';
+
+  @override
+  String get releaseHighlightsTabAdvanced => '기술 세부';
+
+  @override
+  String get releaseHighlightsEmpty => '아직 내용이 없습니다.';
+
+  @override
+  String get releaseHighlightsSeeNotes => '전체 릴리스 노트';
+
+  @override
+  String get highlightCardTechnical => '기술 세부';
 
   @override
   String get moreVersionNotesEmpty => '이 빌드의 업데이트 내역을 찾을 수 없습니다';
@@ -2903,4 +3109,28 @@ class AppLocalizationsKo extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n 홉';
   }
+
+  @override
+  String get moreDumpDiagnostics => '디버그 정보 및 로그 업로드';
+
+  @override
+  String get moreDumpDiagnosticsHint => '업로드한 뒤 링크를 복사합니다';
+
+  @override
+  String get dumpUploaded => '업로드됨';
+
+  @override
+  String get dumpLinkCopied => '링크를 클립보드에 복사했습니다';
+
+  @override
+  String get dumpCopyAgain => '다시 복사';
+
+  @override
+  String get dumpUploadFailed => '업로드하지 못했습니다';
+
+  @override
+  String get statusLegendUnprobed => '탐지 안 됨';
+
+  @override
+  String get statusLegendUnsupported => '미지원';
 }

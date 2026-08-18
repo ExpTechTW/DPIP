@@ -7,9 +7,11 @@
 /// is a failure that only shows up on the day it matters.
 library;
 
+import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -49,7 +51,15 @@ GoRouter _router(List<String> visited) => GoRouter(
               return const SizedBox.shrink();
             },
           ),
-        // The version card opens this one.
+        // The version card opens the highlights — which links onward to notes.
+        GoRoute(
+          path: AppRoutes.releaseHighlightsPath,
+          name: AppRoutes.releaseHighlights,
+          builder: (_, _) {
+            visited.add(AppRoutes.releaseHighlights);
+            return const SizedBox.shrink();
+          },
+        ),
         GoRoute(
           path: AppRoutes.versionNotesPath,
           name: AppRoutes.versionNotes,
@@ -85,6 +95,8 @@ Future<void> _pump(
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
         Provider(create: (_) => const TownDirectory({})),
         ChangeNotifierProvider(create: (_) => unread ?? MeshUnread(null)),
+        // The status card wears the same dot as the More tab.
+        ChangeNotifierProvider(create: (_) => EndpointHealthMonitor()),
         // MorePage badges its permission row from this. Both services are pure
         // constructors and nothing calls start(), so it holds its optimistic
         // defaults and the row renders unbadged — which is what these tests are
@@ -120,6 +132,31 @@ void main() {
     }
   });
 
+  testWidgets('the beta and partners groups sit under 取得 App', (tester) async {
+    await _pump(tester, _router([]));
+    final l10n = AppLocalizations.of(tester.element(find.byType(MorePage)));
+    // Both beta channels plus both partners are rows.
+    expect(find.widgetWithText(ListTile, l10n.moreAndroidBeta), findsOneWidget);
+    expect(find.widgetWithText(ListTile, l10n.moreTestFlight), findsOneWidget);
+    expect(
+      find.widgetWithText(ListTile, l10n.morePartnerGeoscience),
+      findsOneWidget,
+    );
+    expect(find.widgetWithText(ListTile, l10n.morePartnerTwds), findsOneWidget);
+    // And they land below the store rows, in the 取得 App order.
+    final play = tester.getTopLeft(
+      find.widgetWithText(ListTile, 'Google Play'),
+    );
+    final beta = tester.getTopLeft(
+      find.widgetWithText(ListTile, l10n.moreAndroidBeta),
+    );
+    final partner = tester.getTopLeft(
+      find.widgetWithText(ListTile, l10n.morePartnerGeoscience),
+    );
+    expect(play.dy, lessThan(beta.dy));
+    expect(beta.dy, lessThan(partner.dy));
+  });
+
   testWidgets('permission check sits with the notification settings', (
     tester,
   ) async {
@@ -143,22 +180,23 @@ void main() {
     });
   }
 
-  testWidgets('the three top entries lead the page, in rank order', (
+  testWidgets('the three entries lead the page, support full-width last', (
     tester,
   ) async {
     await _pump(tester, _router([]));
-    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
     final discord = tester.getTopLeft(find.text('Discord community')).dy;
     final announcements = tester.getTopLeft(find.text('Announcements')).dy;
-    // Support first, Discord immediately under it, announcements next…
-    expect(discord, greaterThan(support));
+    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
+    // The right column stacks Discord above announcements; the full-width
+    // support card sits on its own line beneath both.
     expect(announcements, greaterThan(discord));
+    expect(support, greaterThan(announcements));
     // …and all three above every menu group.
     expect(
       tester
           .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
           .dy,
-      greaterThan(announcements),
+      greaterThan(support),
     );
   });
 
@@ -187,14 +225,52 @@ void main() {
 
   testWidgets('the support callout outranks Discord visually', (tester) async {
     await _pump(tester, _router([]));
-    // The gradient + shadow belong to support alone: if Discord grew them too,
-    // neither would read as the lead.
-    final decorated = tester
-        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
-        .map((d) => d.decoration)
-        .whereType<BoxDecoration>()
-        .where((d) => d.gradient != null && d.boxShadow != null);
-    expect(decorated, hasLength(1));
+    // The gold belongs to support alone: if Discord were gold too, neither
+    // would read as the lead. Both are flat now — the colour is the whole
+    // ranking, so assert that the two fills differ.
+    final gold = AppGold.of(tester.element(find.text('Support DPIP')));
+    final support = tester.widget<DecoratedBox>(
+      find
+          .ancestor(
+            of: find.text('Support DPIP'),
+            matching: find.byType(DecoratedBox),
+          )
+          .first,
+    );
+    final discord = tester.widget<Material>(
+      find
+          .ancestor(
+            of: find.text('Discord community'),
+            matching: find.byType(Material),
+          )
+          .first,
+    );
+    final supportDecoration = support.decoration as BoxDecoration;
+    expect(supportDecoration.color, gold.fill);
+    expect(discord.color, isNot(gold.fill));
+  });
+
+  testWidgets('the hero-card rows in the right column share one left edge', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    // Discord, the announcement and the status card stack in the right
+    // column; their icon circles and labels must start at the same left edge
+    // for the stack to read as aligned rows (vertical position differs by
+    // design).
+    final iconXs = [
+      tester.getCenter(find.byIcon(Icons.discord)).dx,
+      tester.getCenter(find.byIcon(Icons.campaign_outlined)).dx,
+      tester.getCenter(find.byIcon(Icons.dns_outlined)).dx,
+    ];
+    expect(iconXs.toSet(), hasLength(1));
+
+    final textXs = [
+      tester.getTopLeft(find.text('Discord community')).dx,
+      tester.getTopLeft(find.text('Announcements')).dx,
+      tester.getTopLeft(find.text('Server status')).dx,
+    ];
+    expect(textXs.toSet(), hasLength(1));
   });
 
   testWidgets('the Meshtastic row carries a dot only while unread exists', (
@@ -223,21 +299,40 @@ void main() {
     tester,
   ) async {
     await _pump(tester, _router([]));
-    // The label the build reports — a fixed fake under test.
+    // The card leads with the train number (26.1 for both release and
+    // snapshot). Fine print under it: a snapshot prints its own label
+    // (26w34a), a release prints the platform's recorded version.
+    final label = AppBuild.label;
+    final stable = RegExp(r'^\d+\.\d+$').hasMatch(label);
+    expect(find.text(AppBuild.train), findsWidgets);
+    if (stable) {
+      // The platform version is what Settings → app shows for a release; in
+      // these tests it is unset so the card falls back to the train, which is
+      // the same string the lead number printed — so it may appear twice.
+      expect(find.text(AppBuild.train), findsNWidgets(2));
+    } else {
+      expect(find.text(label), findsOneWidget);
+    }
     expect(
       find.descendant(of: find.byType(InkWell), matching: find.text('DPIP')),
       findsWidgets,
     );
-    expect(find.text(AppBuild.label), findsOneWidget);
     expect(find.text('Snapshot'), findsOneWidget);
+    // The badge carries the day the build was cut — what the card's own
+    // stamp says, so a tester can tell which snapshot they are running.
+    if (AppBuild.buildDate.isNotEmpty) {
+      expect(find.text(AppBuild.buildDate), findsOneWidget);
+    }
   });
 
-  testWidgets('the version card opens this version\x27s notes', (tester) async {
+  testWidgets('the version card opens this version\x27s highlights', (
+    tester,
+  ) async {
     final visited = <String>[];
     await _pump(tester, _router(visited));
     // The card is the DPIP row with the chevron — tap its label.
     await tester.tap(find.text('DPIP').first);
     await tester.pumpAndSettle();
-    expect(visited, [AppRoutes.versionNotes]);
+    expect(visited, [AppRoutes.releaseHighlights]);
   });
 }

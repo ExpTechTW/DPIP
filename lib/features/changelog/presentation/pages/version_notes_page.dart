@@ -16,6 +16,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
+import 'package:dpip/features/changelog/presentation/widgets/release_contributors.dart';
 import 'package:dpip/features/changelog/presentation/widgets/release_note_markdown.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -162,7 +163,8 @@ class _Header extends StatelessWidget {
 }
 
 /// The release note body, rendered like the changelog's expanded tile so a
-/// user sees the same typography in both places.
+/// user sees the same typography in both places, with the contributor strip
+/// below.
 class _Body extends StatelessWidget {
   const _Body({required this.body, required this.accent});
 
@@ -181,17 +183,34 @@ class _Body extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: MarkdownBody(
-          data: body,
-          selectable: true,
-          styleSheet: releaseNoteStyleSheet(theme, colors, accent),
-          softLineBreak: true,
-          // Without this the platform tags become Image.network — a fetch, for
-          // a decoration, on a page read when the network is what failed.
-          imageBuilder: platformTagIcon,
-          builders: releaseNoteBuilders(colors),
-          onTapLink: (text, href, title) => _openLink(href),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: MarkdownBody(
+                data: body,
+                selectable: true,
+                styleSheet: releaseNoteStyleSheet(theme, colors, accent),
+                softLineBreak: true,
+                // Without this the platform tags become Image.network — a
+                // fetch, for a decoration, on a page read when the network is
+                // what failed.
+                imageBuilder: platformTagIcon,
+                builders: releaseNoteBuilders(colors),
+                onTapLink: (text, href, title) => _openLink(href),
+              ),
+            ),
+            if (contributorsFromBody(body).isNotEmpty) ...[
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: colors.outlineVariant.withValues(alpha: 0.55),
+              ),
+              ContributorStrip(body: body),
+            ],
+          ],
         ),
       ),
     );

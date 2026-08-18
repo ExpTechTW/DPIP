@@ -10,6 +10,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
+import 'package:dpip/features/changelog/presentation/widgets/release_contributors.dart';
 import 'package:dpip/features/changelog/presentation/widgets/release_note_markdown.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -395,6 +396,36 @@ class _ReleaseTile extends StatelessWidget {
                       )
                     : const SizedBox(width: double.infinity),
               ),
+              // The GitHub release footer — divider, then a single row holding the
+              // contributor badges and the button to the release's own page.
+              // Always at the card's foot, expanded or not, so the strip
+              // reads as part of the release the way GitHub's page does.
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: colors.outlineVariant.withValues(alpha: 0.55),
+              ),
+              if (contributorsFromBody(note.body).isNotEmpty ||
+                  note.htmlUrl.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                  ),
+                  child: Row(
+                    children: [
+                      ContributorStrip(
+                        body: note.body,
+                        padding: EdgeInsets.zero,
+                      ),
+                      const Spacer(),
+                      if (note.htmlUrl.isNotEmpty)
+                        _GitHubButton(url: note.htmlUrl),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -541,5 +572,53 @@ class _TypeChip extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Compact pill link to the release's own page on GitHub, styled to sit
+/// alongside the contributor badges.
+class _GitHubButton extends StatelessWidget {
+  const _GitHubButton({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: colors.surfaceContainerHighest.withValues(alpha: 0.6),
+      borderRadius: BorderRadius.circular(999),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _open(context),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 6, 12, 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.open_in_new, size: 13, color: colors.onSurfaceVariant),
+              const SizedBox(width: 4),
+              Text(
+                AppLocalizations.of(context).changelogOpenOnGitHub,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _open(BuildContext context) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e, st) {
+      Log.handle(e, st, 'changelog release link failed: $url');
+    }
   }
 }

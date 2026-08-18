@@ -4,6 +4,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -11,6 +12,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
+import 'package:dpip/shared/diagnostics/dump_action.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -145,6 +147,11 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreDeveloper,
                 onTap: () => context.pushNamed(AppRoutes.developer),
               ),
+              // Directly under the page it dumps. Everything a report needs
+              // is on that page already, and it was still being retyped row by
+              // row — this sends the whole thing, plus the log that explains
+              // it, and hands back one link.
+              const _DumpTile(),
             ],
           ),
           SectionHeader(l10n.moreSectionLinks),
@@ -161,12 +168,6 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreTremReport,
                 host: 'report.exptech.dev',
                 url: 'https://report.exptech.dev/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.dns_outlined,
-                title: l10n.moreServerStatus,
-                host: 'status.exptech.dev',
-                url: 'https://status.exptech.dev/status',
               ),
               _MoreLinkTile(
                 icon: Icons.smart_display_outlined,
@@ -203,6 +204,56 @@ class MorePage extends StatelessWidget {
                 title: l10n.moreAppStore,
                 host: 'apps.apple.com',
                 url: 'https://apps.apple.com/tw/app/dpip/id6468026362',
+              ),
+            ],
+          ),
+          // The bleeding-edge builds, one per store, each with its own opt-in.
+          SectionHeader(l10n.moreSectionBeta),
+          _MoreGroup(
+            children: [
+              _MoreLinkTile(
+                icon: Icons.android,
+                title: l10n.moreAndroidBeta,
+                host: 'play.google.com',
+                url: 'https://play.google.com/apps/testing/com.exptech.dpip',
+              ),
+              _MoreLinkTile(
+                icon: Icons.apple,
+                title: l10n.moreTestFlight,
+                host: 'testflight.apple.com',
+                url: 'https://testflight.apple.com/join/8aPWtOxk',
+              ),
+            ],
+          ),
+          // The people who make DPIP run — the same list as the README.
+          SectionHeader(l10n.moreSectionPartners),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            child: Text(
+              l10n.morePartnersNote,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          _MoreGroup(
+            children: [
+              _MoreLinkTile(
+                icon: Icons.business_outlined,
+                title: l10n.morePartnerGeoscience,
+                host: 'geoscience.com.tw',
+                url: 'https://www.geoscience.com.tw/',
+              ),
+              _MoreLinkTile(
+                icon: Icons.cloud_outlined,
+                title: l10n.morePartnerTwds,
+                host: 'twds.com.tw',
+                url: 'https://www.twds.com.tw/',
               ),
             ],
           ),
@@ -283,6 +334,7 @@ class _MoreTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.alert = false,
+    this.trailing,
     required this.onTap,
   });
 
@@ -294,6 +346,11 @@ class _MoreTile extends StatelessWidget {
   /// should act on. Off for every row that is merely a destination.
   final bool alert;
 
+  /// Replaces the chevron. A row that *does* something rather than going
+  /// somewhere passes its own — a chevron on it promises a page that never
+  /// opens.
+  final Widget? trailing;
+
   final VoidCallback onTap;
 
   @override
@@ -302,7 +359,7 @@ class _MoreTile extends StatelessWidget {
       leading: alert ? Badge(child: Icon(icon)) : Icon(icon),
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: trailing ?? const Icon(Icons.chevron_right),
       onTap: onTap,
     );
   }
@@ -596,38 +653,59 @@ Future<void> openExternalLink(BuildContext context, String url) async {
 class _HeroCards extends StatelessWidget {
   const _HeroCards();
 
-  static const double _height = 256;
+  /// Height of the left version card — it leads the block, so it gets to
+  /// declare its own height (its column uses a Spacer, which needs a bounded
+  /// height) while the small cards beside it are shorter by design.
+  static const double _versionHeight = 176;
+
+  /// Height of a small card (Discord, announcement, status) and, matching it,
+  /// the full-width support card below.
+  static const double _smallCardHeight = 56;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _height,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          0,
-          AppSpacing.lg,
-          AppSpacing.md,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Expanded(flex: 1, child: _VersionCard()),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: const [
-                  Expanded(flex: 2, child: _SupportCallout()),
-                  SizedBox(height: AppSpacing.xs),
-                  Expanded(flex: 1, child: _DiscordCallout()),
-                  SizedBox(height: AppSpacing.xs),
-                  Expanded(flex: 1, child: _AnnouncementCard()),
-                ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: _versionHeight,
+                  child: const _VersionCard(),
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  children: const [
+                    SizedBox(
+                      height: _smallCardHeight,
+                      child: _DiscordCallout(),
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    SizedBox(
+                      height: _smallCardHeight,
+                      child: _AnnouncementCard(),
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    SizedBox(height: _smallCardHeight, child: _StatusCard()),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: _smallCardHeight, child: const _SupportCallout()),
+        ],
       ),
     );
   }
@@ -641,9 +719,11 @@ class _HeroCards extends StatelessWidget {
 /// as everything else reads as another menu row, whatever weight it is given.
 /// Gold is what makes it read as *paid*.
 ///
-/// The construction is the same either way: a one-hue gradient for the sheen, a
-/// warm cast underneath so it looks lit rather than printed on, a hairline
-/// along the edge, and a filled badge carrying the most saturated step.
+/// It shares the row construction of the two cards under it — badge, label,
+/// trailing arrow — so the right column reads as one aligned stack; the
+/// ranking is carried by the gold alone, rendered flat: a warm champagne
+/// fill, a hairline along the edge, and a filled badge holding the most
+/// saturated step.
 class _SupportCallout extends StatelessWidget {
   const _SupportCallout();
 
@@ -654,22 +734,12 @@ class _SupportCallout extends StatelessWidget {
     final gold = AppGold.of(context);
     return DecoratedBox(
       decoration: BoxDecoration(
+        color: gold.fill,
         borderRadius: AppRadius.large,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [gold.fillStart, gold.fillEnd],
-        ),
-        // A warm cast rather than a grey drop shadow — it lifts the card off
-        // the page and reads as light on metal, not as a floating rectangle.
-        boxShadow: [
-          BoxShadow(
-            color: gold.glow,
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
         border: Border.all(color: gold.edge),
+        // No gradient: the card sits on the same tonal plane as its two
+        // neighbours, and the ranking is carried by the gold colour alone —
+        // the badge is what reads as paid, not the sheen.
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -677,31 +747,38 @@ class _SupportCallout extends StatelessWidget {
           borderRadius: AppRadius.large,
           onTap: () => context.pushNamed(AppRoutes.sponsor),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Filled, not outlined: the one active affordance on a page
                 // whose every other row is an outlined icon.
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: gold.badge,
                   ),
-                  child: Icon(Icons.favorite, color: gold.onBadge, size: 24),
+                  child: Icon(Icons.favorite, color: gold.onBadge, size: 19),
                 ),
-                Text(
-                  l10n.sponsorTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: gold.ink,
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    l10n.sponsorTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: gold.ink,
+                    ),
                   ),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Icon(
+                  Icons.chevron_right,
+                  size: 14,
+                  color: gold.ink.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -714,9 +791,10 @@ class _SupportCallout extends StatelessWidget {
 
 /// The page's second call to action, directly under [_SupportCallout].
 ///
-/// Deliberately one step down: the same badge-and-two-lines construction, but
-/// a flat secondary container with no gradient and no shadow. That is what
-/// makes the ranking legible — if this card also glowed, neither would lead.
+/// Deliberately one step down: the same badge-and-label row as the callout
+/// above, but a flat secondary container with no gradient and no shadow. That
+/// is what makes the ranking legible — if this card also glowed, neither would
+/// lead.
 class _DiscordCallout extends StatelessWidget {
   const _DiscordCallout();
 
@@ -736,7 +814,7 @@ class _DiscordCallout extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 width: 34,
@@ -748,7 +826,7 @@ class _DiscordCallout extends StatelessWidget {
                 child: Icon(Icons.discord, color: colors.onSecondary, size: 19),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Flexible(
+              Expanded(
                 child: Text(
                   l10n.moreDiscord,
                   maxLines: 1,
@@ -798,7 +876,7 @@ class _AnnouncementCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
                 width: 34,
@@ -814,7 +892,7 @@ class _AnnouncementCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Flexible(
+              Expanded(
                 child: Text(
                   l10n.moreAnnouncements,
                   maxLines: 1,
@@ -828,6 +906,76 @@ class _AnnouncementCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.xs),
               Icon(
                 Icons.open_in_new,
+                size: 14,
+                color: colors.onSurfaceVariant.withValues(alpha: 0.6),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Server status, directly under the announcement card — the same flat,
+/// quiet construction, because a status check is a passive read and needs no
+/// more weight than a link.
+class _StatusCard extends StatelessWidget {
+  const _StatusCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    // The same dot the More tab carries: a service host the client has
+    // stopped reaching is as actionable as a missing permission.
+    final alert = context.select<EndpointHealthMonitor, bool>(
+      (health) => health.needsAttention,
+    );
+    return Material(
+      color: colors.surfaceContainerHigh,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.pushNamed(AppRoutes.serverStatus),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Badge(
+                isLabelVisible: alert,
+                smallSize: 7,
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.surfaceContainerHighest,
+                  ),
+                  child: Icon(
+                    Icons.dns_outlined,
+                    color: colors.onSurfaceVariant,
+                    size: 19,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  l10n.moreServerStatus,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.chevron_right,
                 size: 14,
                 color: colors.onSurfaceVariant.withValues(alpha: 0.6),
               ),
@@ -853,10 +1001,12 @@ class _AnnouncementCard extends StatelessWidget {
 /// the channel under the current scheme (a release label is `\d+\.\d+`, a
 /// snapshot is anything else).
 ///
-/// The layout borrows the phone's "About" page voice — a pale wash behind the
-/// build (rather than a flat fill), the mark small at the top, and the
-/// version number as the thing the eye lands on — so the number, not the
-/// card, is what reads first.
+/// The layout borrows the phone's "About" page voice — the mark small at the
+/// top, and the version number as the thing the eye lands on — so the number,
+/// not the card, is what reads first. The card itself is flat, one tonal
+/// surface like the three cards across from it, and carries no gradient of its
+/// own: the only colour beyond text and badge is the [ShaderMask] gradient the
+/// number is painted in.
 class _VersionCard extends StatelessWidget {
   const _VersionCard();
 
@@ -870,6 +1020,30 @@ class _VersionCard extends StatelessWidget {
   static const Color _stableColor = Color(0xFF2E7D32);
   static const Color _snapshotColor = Color(0xFFEF6C00);
 
+  /// The number's gradient, derived from the version string itself so every
+  /// build wears its own colours — 26w34a is one pair, 26w34b another — and
+  /// any one build stays stable across reloads. Two hues off the golden
+  /// angle (137.5°) harmonise regardless of the hash's starting point; the
+  /// lightness flips with the theme so the glyphs read on the card surface.
+  static List<Color> _hashGradient(String seed, Brightness brightness) {
+    var h = 7;
+    for (final rune in seed.runes) {
+      h = (h * 31 + rune) & 0x7fffffff;
+    }
+    final base = h % 360;
+    const saturation = 0.62;
+    final light = brightness == Brightness.dark ? 0.70 : 0.46;
+    return [
+      HSLColor.fromAHSL(1, base.toDouble(), saturation, light).toColor(),
+      HSLColor.fromAHSL(
+        1,
+        (base + 137.508) % 360,
+        saturation,
+        light - 0.10,
+      ).toColor(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -878,90 +1052,186 @@ class _VersionCard extends StatelessWidget {
     final label = AppBuild.label;
     final stable = _releaseLabel.hasMatch(label);
     final typeColor = stable ? _stableColor : _snapshotColor;
-    return DecoratedBox(
-      decoration: BoxDecoration(
+    final train = AppBuild.train;
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.large,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
         borderRadius: AppRadius.large,
-        // A lineage wash from the brand colour down to the surface — the same
-        // idea as the About page's card, kept inside the scheme.
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colors.primaryContainer,
-            colors.surfaceContainerHigh.withValues(alpha: 0.6),
-          ],
-        ),
-      ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          borderRadius: AppRadius.large,
-          onTap: () => context.pushNamed(AppRoutes.versionNotes),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: AppRadius.small,
-                      child: Image.asset(
-                        'assets/DPIP.png',
-                        width: 36,
-                        height: 36,
+        onTap: () => context.pushNamed(AppRoutes.releaseHighlights),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: AppRadius.small,
+                    child: Image.asset(
+                      'assets/DPIP.png',
+                      width: 36,
+                      height: 36,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DPIP',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          l10n.moreTagline,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: colors.onSurfaceVariant.withValues(alpha: 0.7),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              // Gradient number, not a plain rect fill: the one stroke of
+              // colour the flat card permits. White under srcIn — the gradient
+              // takes over the glyphs entirely.
+              ShaderMask(
+                shaderCallback: (rect) => LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: _hashGradient(train, theme.brightness),
+                ).createShader(rect),
+                child: Text(
+                  train,
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    height: 1,
+                  ),
+                ),
+              ),
+              // Fine print below the number: a snapshot is named for the week
+              // it was cut, so it prints its own label; a release's label is
+              // identical to the train above, so it prints the platform's
+              // recorded version instead (what Settings → app shows).
+              const SizedBox(height: 2),
+              Text(
+                stable ? (AppBuild.platformVersion ?? train) : label,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              // Same treatment as the changelog's type chip: tinted wash,
+              // hairline of the same hue, coloured label — not a solid fill,
+              // which is the one marker the changelog never uses. The badge
+              // is followed by the day the build was cut.
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: typeColor.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(
+                        color: typeColor.withValues(alpha: 0.45),
                       ),
                     ),
-                    const Spacer(),
-                    Icon(
-                      Icons.chevron_right,
-                      size: 20,
-                      color: colors.onSurfaceVariant.withValues(alpha: 0.7),
+                    child: Text(
+                      stable
+                          ? l10n.moreVersionStable
+                          : l10n.moreVersionSnapshot,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: typeColor,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                  if (AppBuild.buildDate.isNotEmpty) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      AppBuild.buildDate,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
-                ),
-                const Spacer(),
-                Text(
-                  'DPIP',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: colors.onSurface,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                // The chip carries the type colour directly — green against
-                // the pale wash for a release, orange for a snapshot.
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: typeColor.withValues(alpha: 0.88),
-                    borderRadius: AppRadius.small,
-                  ),
-                  child: Text(
-                    stable ? l10n.moreVersionStable : l10n.moreVersionSnapshot,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Uploads the diagnostics and the log, and shows the link.
+///
+/// Stateful only to hold the spinner: the collection reads a dozen subsystems
+/// and the upload is a round trip, so without one the row looks like it did
+/// nothing and gets tapped again — which uploads twice.
+class _DumpTile extends StatefulWidget {
+  const _DumpTile();
+
+  @override
+  State<_DumpTile> createState() => _DumpTileState();
+}
+
+class _DumpTileState extends State<_DumpTile> {
+  bool _running = false;
+
+  Future<void> _run() async {
+    if (_running) return;
+    setState(() => _running = true);
+    try {
+      await runDiagnosticsDump(context);
+    } finally {
+      if (mounted) setState(() => _running = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _MoreTile(
+      icon: Icons.ios_share_outlined,
+      title: l10n.moreDumpDiagnostics,
+      subtitle: l10n.moreDumpDiagnosticsHint,
+      // Sized either way, so the row does not shift when the spinner arrives.
+      trailing: SizedBox.square(
+        dimension: 18,
+        child: _running
+            ? const CircularProgressIndicator(strokeWidth: 2)
+            : null,
+      ),
+      onTap: _run,
     );
   }
 }

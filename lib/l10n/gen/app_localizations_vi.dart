@@ -938,6 +938,28 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreSectionApp => 'Tải ứng dụng';
 
   @override
+  String get moreSectionBeta => 'Bản thử nghiệm';
+
+  @override
+  String get moreAndroidBeta => 'Bản thử nghiệm Android';
+
+  @override
+  String get moreTestFlight => 'Bản thử nghiệm iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Đối tác';
+
+  @override
+  String get morePartnersNote =>
+      'Theo thứ tự hợp tác. Xin cảm ơn các cá nhân và công ty đã đóng góp cho công tác phòng chống thiên tai, nhờ đó DPIP mới có thể ra đời.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Chỉ có mức 0–7, không tách 5−/5+/6−/6+.';
 
@@ -1424,6 +1446,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => 'Không có ghi chú cho bản phát hành này.';
+
+  @override
+  String get changelogOpenOnGitHub => 'Xem trên GitHub';
 
   @override
   String get radarGlobalOutline => 'Biên giới quốc gia';
@@ -1965,6 +1990,167 @@ class AppLocalizationsVi extends AppLocalizations {
   String get appLogs => 'Nhật ký ứng dụng';
 
   @override
+  String get serverStatusLocal => 'Trạng thái thiết bị';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Chỉ số máy chủ đến từ bảng điều khiển. Dưới đây là đánh giá kết nối thực tế của máy này với các endpoint đa hoạt động (LB / Core từng khu vực): ứng dụng chỉ ghi nhận thụ động lưu lượng thực tế, nếu endpoint chưa từng được máy này truy cập sẽ hiển thị \'Chưa dò\'.';
+
+  @override
+  String get serverStatusAllUp => 'Tất cả dịch vụ hoạt động';
+
+  @override
+  String get serverStatusDegraded => 'Hiệu suất giảm';
+
+  @override
+  String get serverStatusDown => 'Dịch vụ lỗi';
+
+  @override
+  String get serverStatusErrorRate => 'Tỷ lệ lỗi 5xx';
+
+  @override
+  String get serverStatusLatency => 'Độ trễ trung bình';
+
+  @override
+  String get serverStatusUpdated => 'Cập nhật';
+
+  @override
+  String get serverStatusWeb => 'Trạng thái máy chủ';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'Trạng thái ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'Trạng thái Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'Tất cả khu vực hoạt động';
+
+  @override
+  String get serverStatusCloudflareOutage => 'Cloudflare có khu vực bất thường';
+
+  @override
+  String get serverStatusCloudflareNone => 'Không có khu vực nào để hiển thị.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Hoạt động';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Hiệu suất giảm';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Gián đoạn một phần';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Gián đoạn lớn';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Không rõ';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core độc quyền API (radar / thời tiết / gió)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core độc quyền tĩnh';
+
+  @override
+  String get endpointTierLegacyApi => 'API kế thừa (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Kết nối bình thường';
+
+  @override
+  String get endpointHealthDegraded => 'Có máy chủ không ổn định';
+
+  @override
+  String get endpointHealthDown => 'Kết nối bất thường';
+
+  @override
+  String get endpointHealthUnknown => 'Chưa có dữ liệu';
+
+  @override
+  String get endpointStateOk => 'Bình thường';
+
+  @override
+  String get endpointStateDegraded => 'Không ổn định';
+
+  @override
+  String get endpointStateDown => 'Bất thường';
+
+  @override
+  String get endpointStateUnknown => 'Không rõ';
+
+  @override
+  String get endpointLastSuccessNever => 'chưa thành công';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => 'Đang kết nối…';
 
   @override
@@ -2045,10 +2231,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreAnnouncements => 'Thông báo';
 
   @override
+  String get moreTagline => 'Nền tảng tích hợp thông tin phòng chống thiên tai';
+
+  @override
   String get moreVersionStable => 'Bản chính thức';
 
   @override
   String get moreVersionNotes => 'Phiên bản hiện tại';
+
+  @override
+  String get releaseHighlightsTitle => 'Thay đổi trong bản này';
+
+  @override
+  String get releaseHighlightsTabNormal => 'Cho người dùng';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Đi sâu';
+
+  @override
+  String get releaseHighlightsEmpty => 'Chưa có nội dung.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Xem ghi chú đầy đủ';
+
+  @override
+  String get highlightCardTechnical => 'Kỹ thuật';
 
   @override
   String get moreVersionNotesEmpty =>
@@ -2941,4 +3148,29 @@ class AppLocalizationsVi extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n chặng';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'Tải lên thông tin gỡ lỗi và nhật ký';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Tải lên rồi sao chép liên kết để đính kèm vào báo cáo';
+
+  @override
+  String get dumpUploaded => 'Đã tải lên';
+
+  @override
+  String get dumpLinkCopied => 'Đã sao chép liên kết vào bảng nhớ tạm';
+
+  @override
+  String get dumpCopyAgain => 'Sao chép lại';
+
+  @override
+  String get dumpUploadFailed => 'Tải lên thất bại';
+
+  @override
+  String get statusLegendUnprobed => 'Chưa dò';
+
+  @override
+  String get statusLegendUnsupported => 'Không có';
 }

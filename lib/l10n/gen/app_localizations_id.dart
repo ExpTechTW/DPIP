@@ -938,6 +938,28 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreSectionApp => 'Dapatkan aplikasi';
 
   @override
+  String get moreSectionBeta => 'Versi uji';
+
+  @override
+  String get moreAndroidBeta => 'Versi uji Android';
+
+  @override
+  String get moreTestFlight => 'Versi uji iOS (TestFlight)';
+
+  @override
+  String get moreSectionPartners => 'Mitra';
+
+  @override
+  String get morePartnersNote =>
+      'Urut sesuai waktu kemitraan. Terima kasih kepada para individu dan perusahaan yang berkontribusi pada penanggulangan bencana; kontribusi mereka membuat DPIP menjadi mungkin.';
+
+  @override
+  String get morePartnerGeoscience => 'Geoscience';
+
+  @override
+  String get morePartnerTwds => 'TWDS';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Hanya tingkat 0–7, tanpa pemisahan 5−/5+/6−/6+.';
 
@@ -1423,6 +1445,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get changelogBodyEmpty => 'Tidak ada catatan untuk rilis ini.';
+
+  @override
+  String get changelogOpenOnGitHub => 'Lihat di GitHub';
 
   @override
   String get radarGlobalOutline => 'Batas negara';
@@ -1966,6 +1991,169 @@ class AppLocalizationsId extends AppLocalizations {
   String get appLogs => 'Log aplikasi';
 
   @override
+  String get serverStatusLocal => 'Status perangkat';
+
+  @override
+  String get serverStatusLocalBody =>
+      'Metrik server berasal dari dasbor. Di bawah ini adalah penilaian koneksi aktual perangkat ini ke endpoint multi-aktif (LB / Core tiap wilayah): aplikasi hanya mencatat lalu lintas yang benar-benar dikirim, jika endpoint belum pernah disentuh perangkat ini akan ditampilkan \'Belum diperiksa\'.';
+
+  @override
+  String get serverStatusAllUp => 'Semua layanan normal';
+
+  @override
+  String get serverStatusDegraded => 'Kinerja menurun';
+
+  @override
+  String get serverStatusDown => 'Layanan bermasalah';
+
+  @override
+  String get serverStatusErrorRate => 'Tingkat error 5xx';
+
+  @override
+  String get serverStatusLatency => 'Latensi rata-rata';
+
+  @override
+  String get serverStatusUpdated => 'Diperbarui';
+
+  @override
+  String get serverStatusWeb => 'Status server';
+
+  @override
+  String get serverStatusWebUrl => 'status.exptech.dev';
+
+  @override
+  String get serverStatusExpTech => 'Status ExpTech';
+
+  @override
+  String get serverStatusCloudflare => 'Status Cloudflare';
+
+  @override
+  String get serverStatusCloudflareAllOperational => 'Semua wilayah normal';
+
+  @override
+  String get serverStatusCloudflareOutage =>
+      'Cloudflare beberapa wilayah bermasalah';
+
+  @override
+  String get serverStatusCloudflareNone =>
+      'Tidak ada wilayah untuk ditampilkan.';
+
+  @override
+  String get serverStatusCloudflareOperational => 'Normal';
+
+  @override
+  String get serverStatusCloudflareDegraded => 'Kinerja menurun';
+
+  @override
+  String get serverStatusCloudflarePartial => 'Gangguan sebagian';
+
+  @override
+  String get serverStatusCloudflareMajor => 'Gangguan besar';
+
+  @override
+  String get serverStatusCloudflareUnknown => 'Tidak diketahui';
+
+  @override
+  String get endpointTierLbApi => 'LB API';
+
+  @override
+  String get endpointTierLbStatic => 'LB Static';
+
+  @override
+  String get endpointTierCoreApi => 'Core API';
+
+  @override
+  String get endpointTierCoreStatic => 'Core Static';
+
+  @override
+  String get endpointTierCoreExclusiveApi =>
+      'Core eksklusif API (radar / cuaca / angin)';
+
+  @override
+  String get endpointTierCoreStaticExclusive => 'Core eksklusif statis';
+
+  @override
+  String get endpointTierLegacyApi => 'API lama (api-1)';
+
+  @override
+  String get endpointHealthOk => 'Koneksi normal';
+
+  @override
+  String get endpointHealthDegraded => 'Ada endpoint tidak stabil';
+
+  @override
+  String get endpointHealthDown => 'Koneksi bermasalah';
+
+  @override
+  String get endpointHealthUnknown => 'Belum ada data';
+
+  @override
+  String get endpointStateOk => 'Normal';
+
+  @override
+  String get endpointStateDegraded => 'Tidak stabil';
+
+  @override
+  String get endpointStateDown => 'Bermasalah';
+
+  @override
+  String get endpointStateUnknown => 'Tidak diketahui';
+
+  @override
+  String get endpointLastSuccessNever => 'belum berhasil';
+
+  @override
+  String get endpointServiceEew => 'EEW';
+
+  @override
+  String get endpointServiceRts => 'RTS';
+
+  @override
+  String get endpointServiceRadar => 'Radar';
+
+  @override
+  String get endpointServiceSatellite => 'Satellite';
+
+  @override
+  String get endpointServiceQpesums => 'QPE';
+
+  @override
+  String get endpointServiceWind => 'Wind';
+
+  @override
+  String get endpointServiceDpm => 'Disaster points';
+
+  @override
+  String get endpointServiceWeather => 'Weather';
+
+  @override
+  String get endpointServiceRain => 'Rain';
+
+  @override
+  String get endpointServiceLightning => 'Lightning';
+
+  @override
+  String get endpointServiceTyphoon => 'Typhoon';
+
+  @override
+  String get endpointServiceReport => 'EQ reports';
+
+  @override
+  String get endpointServiceTremStation => 'Tremor station';
+
+  @override
+  String get endpointServiceEvent => 'Events';
+
+  @override
+  String get endpointServiceLocation => 'Location';
+
+  @override
+  String get endpointServiceNotify => 'Notifications';
+
+  @override
+  String get endpointServiceOther => 'Other';
+
+  @override
   String get feedConnecting => 'Menghubungkan…';
 
   @override
@@ -2046,10 +2234,31 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreAnnouncements => 'Pengumuman';
 
   @override
+  String get moreTagline => 'Platform Integrasi Informasi Bencana';
+
+  @override
   String get moreVersionStable => 'Versi resmi';
 
   @override
   String get moreVersionNotes => 'Versi saat ini';
+
+  @override
+  String get releaseHighlightsTitle => 'Yang berubah';
+
+  @override
+  String get releaseHighlightsTabNormal => 'Untuk pengguna';
+
+  @override
+  String get releaseHighlightsTabAdvanced => 'Mendalam';
+
+  @override
+  String get releaseHighlightsEmpty => 'Belum ada konten.';
+
+  @override
+  String get releaseHighlightsSeeNotes => 'Catatan rilis lengkap';
+
+  @override
+  String get highlightCardTechnical => 'Teknis';
 
   @override
   String get moreVersionNotesEmpty => 'Tidak ada changelog untuk build ini';
@@ -2944,4 +3153,29 @@ class AppLocalizationsId extends AppLocalizations {
   String meshtasticTraceHops(int n) {
     return '$n lompatan';
   }
+
+  @override
+  String get moreDumpDiagnostics => 'Unggah info debug dan log';
+
+  @override
+  String get moreDumpDiagnosticsHint =>
+      'Mengunggah lalu menyalin tautan untuk dilampirkan ke laporan';
+
+  @override
+  String get dumpUploaded => 'Terunggah';
+
+  @override
+  String get dumpLinkCopied => 'Tautan disalin ke papan klip';
+
+  @override
+  String get dumpCopyAgain => 'Salin lagi';
+
+  @override
+  String get dumpUploadFailed => 'Gagal mengunggah';
+
+  @override
+  String get statusLegendUnprobed => 'Belum diperiksa';
+
+  @override
+  String get statusLegendUnsupported => 'Tidak tersedia';
 }

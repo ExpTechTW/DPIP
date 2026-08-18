@@ -12,6 +12,7 @@ import 'package:dpip/features/location/presentation/pages/region_manage_page.dar
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
 import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/features/changelog/presentation/pages/version_notes_page.dart';
+import 'package:dpip/features/release_highlights/presentation/pages/release_highlights_page.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/data/presentation/pages/moon_page.dart';
@@ -32,6 +33,7 @@ import 'package:dpip/features/settings/presentation/pages/default_map_layer_page
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
 import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
+import 'package:dpip/features/status/presentation/pages/server_status_page.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -191,6 +193,11 @@ final GoRouter appRouter = GoRouter(
       builder: (_, _) => const VersionNotesPage(),
     ),
     GoRoute(
+      path: AppRoutes.releaseHighlightsPath,
+      name: AppRoutes.releaseHighlights,
+      builder: (_, _) => const ReleaseHighlightsPage(),
+    ),
+    GoRoute(
       path: AppRoutes.developerPath,
       name: AppRoutes.developer,
       builder: (_, _) => const DeveloperPage(),
@@ -248,6 +255,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.sponsorPath,
       name: AppRoutes.sponsor,
       builder: (_, _) => const SponsorPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.serverStatusPath,
+      name: AppRoutes.serverStatus,
+      builder: (_, _) => const ServerStatusPage(),
     ),
   ],
 );

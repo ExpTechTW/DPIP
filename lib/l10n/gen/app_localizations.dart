@@ -1839,6 +1839,48 @@ abstract class AppLocalizations {
   /// **'Get the app'**
   String get moreSectionApp;
 
+  /// No description provided for @moreSectionBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get moreSectionBeta;
+
+  /// No description provided for @moreAndroidBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Android beta'**
+  String get moreAndroidBeta;
+
+  /// No description provided for @moreTestFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'iOS beta (TestFlight)'**
+  String get moreTestFlight;
+
+  /// No description provided for @moreSectionPartners.
+  ///
+  /// In en, this message translates to:
+  /// **'Partners'**
+  String get moreSectionPartners;
+
+  /// No description provided for @morePartnersNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.'**
+  String get morePartnersNote;
+
+  /// No description provided for @morePartnerGeoscience.
+  ///
+  /// In en, this message translates to:
+  /// **'Geoscience'**
+  String get morePartnerGeoscience;
+
+  /// No description provided for @morePartnerTwds.
+  ///
+  /// In en, this message translates to:
+  /// **'TWDS'**
+  String get morePartnerTwds;
+
   /// No description provided for @reportFilterIntensityInfoLegacyBody.
   ///
   /// In en, this message translates to:
@@ -2750,6 +2792,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No notes for this release.'**
   String get changelogBodyEmpty;
+
+  /// No description provided for @changelogOpenOnGitHub.
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get changelogOpenOnGitHub;
 
   /// World-country-border overlay toggle in the map's reference-layer overlay menus.
   ///
@@ -3735,6 +3783,324 @@ abstract class AppLocalizations {
   /// **'App logs'**
   String get appLogs;
 
+  /// No description provided for @serverStatusLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Local status'**
+  String get serverStatusLocal;
+
+  /// No description provided for @serverStatusLocalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Metrics come from the dashboard. Below is this device\'s own view of the multi-active endpoints (LB / Core per region): it passively records the traffic each endpoint actually serves, so a cell with no data means nothing was observed through this device yet.'**
+  String get serverStatusLocalBody;
+
+  /// No description provided for @serverStatusAllUp.
+  ///
+  /// In en, this message translates to:
+  /// **'All services operational'**
+  String get serverStatusAllUp;
+
+  /// No description provided for @serverStatusDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Services degraded'**
+  String get serverStatusDegraded;
+
+  /// No description provided for @serverStatusDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Service down'**
+  String get serverStatusDown;
+
+  /// No description provided for @serverStatusErrorRate.
+  ///
+  /// In en, this message translates to:
+  /// **'5xx error rate'**
+  String get serverStatusErrorRate;
+
+  /// No description provided for @serverStatusLatency.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg latency'**
+  String get serverStatusLatency;
+
+  /// No description provided for @serverStatusUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get serverStatusUpdated;
+
+  /// No description provided for @serverStatusWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Server status'**
+  String get serverStatusWeb;
+
+  /// No description provided for @serverStatusWebUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'status.exptech.dev'**
+  String get serverStatusWebUrl;
+
+  /// No description provided for @serverStatusExpTech.
+  ///
+  /// In en, this message translates to:
+  /// **'ExpTech status'**
+  String get serverStatusExpTech;
+
+  /// No description provided for @serverStatusCloudflare.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudflare status'**
+  String get serverStatusCloudflare;
+
+  /// No description provided for @serverStatusCloudflareAllOperational.
+  ///
+  /// In en, this message translates to:
+  /// **'All regions operational'**
+  String get serverStatusCloudflareAllOperational;
+
+  /// No description provided for @serverStatusCloudflareOutage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudflare regional issue'**
+  String get serverStatusCloudflareOutage;
+
+  /// No description provided for @serverStatusCloudflareNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No regions to show.'**
+  String get serverStatusCloudflareNone;
+
+  /// No description provided for @serverStatusCloudflareOperational.
+  ///
+  /// In en, this message translates to:
+  /// **'Operational'**
+  String get serverStatusCloudflareOperational;
+
+  /// No description provided for @serverStatusCloudflareDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Degraded'**
+  String get serverStatusCloudflareDegraded;
+
+  /// No description provided for @serverStatusCloudflarePartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial outage'**
+  String get serverStatusCloudflarePartial;
+
+  /// No description provided for @serverStatusCloudflareMajor.
+  ///
+  /// In en, this message translates to:
+  /// **'Major outage'**
+  String get serverStatusCloudflareMajor;
+
+  /// No description provided for @serverStatusCloudflareUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get serverStatusCloudflareUnknown;
+
+  /// No description provided for @endpointTierLbApi.
+  ///
+  /// In en, this message translates to:
+  /// **'LB API'**
+  String get endpointTierLbApi;
+
+  /// No description provided for @endpointTierLbStatic.
+  ///
+  /// In en, this message translates to:
+  /// **'LB Static'**
+  String get endpointTierLbStatic;
+
+  /// No description provided for @endpointTierCoreApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Core API'**
+  String get endpointTierCoreApi;
+
+  /// No description provided for @endpointTierCoreStatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Core Static'**
+  String get endpointTierCoreStatic;
+
+  /// No description provided for @endpointTierCoreExclusiveApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Core-exclusive API (radar / weather / wind)'**
+  String get endpointTierCoreExclusiveApi;
+
+  /// No description provided for @endpointTierCoreStaticExclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'Core-exclusive static'**
+  String get endpointTierCoreStaticExclusive;
+
+  /// No description provided for @endpointTierLegacyApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy API (api-1)'**
+  String get endpointTierLegacyApi;
+
+  /// No description provided for @endpointHealthOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Local connections healthy'**
+  String get endpointHealthOk;
+
+  /// No description provided for @endpointHealthDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Some endpoints unstable'**
+  String get endpointHealthDegraded;
+
+  /// No description provided for @endpointHealthDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Local connections failing'**
+  String get endpointHealthDown;
+
+  /// No description provided for @endpointHealthUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'No observations yet'**
+  String get endpointHealthUnknown;
+
+  /// No description provided for @endpointStateOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get endpointStateOk;
+
+  /// No description provided for @endpointStateDegraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Unstable'**
+  String get endpointStateDegraded;
+
+  /// No description provided for @endpointStateDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Failing'**
+  String get endpointStateDown;
+
+  /// No description provided for @endpointStateUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get endpointStateUnknown;
+
+  /// No description provided for @endpointLastSuccessNever.
+  ///
+  /// In en, this message translates to:
+  /// **'never succeeded'**
+  String get endpointLastSuccessNever;
+
+  /// No description provided for @endpointServiceEew.
+  ///
+  /// In en, this message translates to:
+  /// **'EEW'**
+  String get endpointServiceEew;
+
+  /// No description provided for @endpointServiceRts.
+  ///
+  /// In en, this message translates to:
+  /// **'RTS'**
+  String get endpointServiceRts;
+
+  /// No description provided for @endpointServiceRadar.
+  ///
+  /// In en, this message translates to:
+  /// **'Radar'**
+  String get endpointServiceRadar;
+
+  /// No description provided for @endpointServiceSatellite.
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite'**
+  String get endpointServiceSatellite;
+
+  /// No description provided for @endpointServiceQpesums.
+  ///
+  /// In en, this message translates to:
+  /// **'QPE'**
+  String get endpointServiceQpesums;
+
+  /// No description provided for @endpointServiceWind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get endpointServiceWind;
+
+  /// No description provided for @endpointServiceDpm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster points'**
+  String get endpointServiceDpm;
+
+  /// No description provided for @endpointServiceWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get endpointServiceWeather;
+
+  /// No description provided for @endpointServiceRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get endpointServiceRain;
+
+  /// No description provided for @endpointServiceLightning.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning'**
+  String get endpointServiceLightning;
+
+  /// No description provided for @endpointServiceTyphoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Typhoon'**
+  String get endpointServiceTyphoon;
+
+  /// No description provided for @endpointServiceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'EQ reports'**
+  String get endpointServiceReport;
+
+  /// No description provided for @endpointServiceTremStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Tremor station'**
+  String get endpointServiceTremStation;
+
+  /// No description provided for @endpointServiceEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get endpointServiceEvent;
+
+  /// No description provided for @endpointServiceLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get endpointServiceLocation;
+
+  /// No description provided for @endpointServiceNotify.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get endpointServiceNotify;
+
+  /// No description provided for @endpointServiceOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get endpointServiceOther;
+
   /// A realtime feed is establishing its first data
   ///
   /// In en, this message translates to:
@@ -3873,6 +4239,12 @@ abstract class AppLocalizations {
   /// **'Announcements'**
   String get moreAnnouncements;
 
+  /// No description provided for @moreTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Disaster Prevention Information Platform'**
+  String get moreTagline;
+
   /// No description provided for @moreVersionStable.
   ///
   /// In en, this message translates to:
@@ -3884,6 +4256,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This version'**
   String get moreVersionNotes;
+
+  /// No description provided for @releaseHighlightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What changed in this release'**
+  String get releaseHighlightsTitle;
+
+  /// No description provided for @releaseHighlightsTabNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'For users'**
+  String get releaseHighlightsTabNormal;
+
+  /// No description provided for @releaseHighlightsTabAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep dive'**
+  String get releaseHighlightsTabAdvanced;
+
+  /// No description provided for @releaseHighlightsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet.'**
+  String get releaseHighlightsEmpty;
+
+  /// No description provided for @releaseHighlightsSeeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Full release notes'**
+  String get releaseHighlightsSeeNotes;
+
+  /// No description provided for @highlightCardTechnical.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical'**
+  String get highlightCardTechnical;
 
   /// No description provided for @moreVersionNotesEmpty.
   ///
@@ -5594,6 +6002,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{n} hops'**
   String meshtasticTraceHops(int n);
+
+  /// More menu row that uploads a debug dump
+  ///
+  /// In en, this message translates to:
+  /// **'Dump debug info and logs'**
+  String get moreDumpDiagnostics;
+
+  /// Subtitle of the debug-dump row
+  ///
+  /// In en, this message translates to:
+  /// **'Uploads them and copies a link to paste into a report'**
+  String get moreDumpDiagnosticsHint;
+
+  /// Title of the dialog shown after a debug dump uploads
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded'**
+  String get dumpUploaded;
+
+  /// Says the uploaded dump link is already on the clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'The link is on your clipboard'**
+  String get dumpLinkCopied;
+
+  /// Button that copies the dump link to the clipboard again
+  ///
+  /// In en, this message translates to:
+  /// **'Copy again'**
+  String get dumpCopyAgain;
+
+  /// Shown when a debug dump could not be uploaded
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed — try again'**
+  String get dumpUploadFailed;
+
+  /// No description provided for @statusLegendUnprobed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet probed'**
+  String get statusLegendUnprobed;
+
+  /// No description provided for @statusLegendUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Not offered'**
+  String get statusLegendUnsupported;
 }
 
 class _AppLocalizationsDelegate

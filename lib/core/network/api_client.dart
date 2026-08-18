@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/region_selection.dart';
 
 /// A live byte stream plus the handle that aborts it — the result of
@@ -34,10 +35,15 @@ class BytePayload {
 /// Paths are region-agnostic and begin at the version segment, e.g.
 /// `/v2/trem/rts` (the `api`/`static` role is part of the host subdomain).
 class ApiClient {
-  const ApiClient(this._dio, this._regions);
+  const ApiClient(this._dio, this._regions, [this._health]);
 
   final Dio _dio;
   final RegionSelection _regions;
+
+  /// Optional observer of per-host outcomes. When set, every retryable failure
+  /// and every success is reported — the More → 伺服器狀態 screen uses it to
+  /// show which region the client is actually seeing.
+  final EndpointHealthMonitor? _health;
 
   /// GET [path] on [tier] with failover; returns the decoded body.
   Future<dynamic> get(
@@ -105,6 +111,26 @@ class ApiClient {
     return response.data;
   }
 
+  /// Absolute-URL POST with JSON decode + ETag (no region failover).
+  ///
+  /// For third-party hosts (e.g. the Grafana status dashboard) whose query body
+  /// is a compile-time constant — the ETag interceptor treats the URL as the
+  /// content key and caches unconditionally, exactly like an immutable tile.
+  Future<dynamic> postAbsolute(
+    String url, {
+    Object? data,
+    Map<String, dynamic>? headers,
+    CancelToken? cancelToken,
+  }) async {
+    final response = await _dio.request<dynamic>(
+      url,
+      data: data,
+      cancelToken: cancelToken,
+      options: Options(method: 'POST', headers: headers),
+    );
+    return response.data;
+  }
+
   static BytePayload _bytePayload(Response<dynamic> response) {
     final data = response.data;
     final Uint8List bytes = switch (data) {
@@ -138,7 +164,8 @@ class ApiClient {
   /// timeouts, 5xx): a 4xx is a client error that would repeat on every region,
   /// and a cancellation is deliberate, so both throw immediately without trying
   /// the next host. Every failover is logged so a silent region switch is
-  /// visible. Pass a [cancelToken] to abort a superseded request.
+  /// visible, and reported to [_health] so the status screen can show it too.
+  /// Pass a [cancelToken] to abort a superseded request.
   Future<Response<dynamic>> request(
     ApiTier tier,
     String path, {
@@ -151,14 +178,17 @@ class ApiClient {
     final hosts = hostsFor(tier);
     for (var i = 0; i < hosts.length; i++) {
       try {
-        return await _dio.request(
+        final response = await _dio.request(
           '${hosts[i]}$path',
           data: data,
           queryParameters: query,
           cancelToken: cancelToken,
           options: (options ?? Options()).copyWith(method: method),
         );
+        _health?.success(tier, hosts[i], path);
+        return response;
       } on DioException catch (e) {
+        _health?.failure(tier, hosts[i], path);
         final isLastHost = i == hosts.length - 1;
         if (isLastHost || !_isRetryable(e)) rethrow;
         Log.warning(
@@ -204,8 +234,12 @@ class ApiClient {
             headers: headers,
           ),
         );
+        // A connected SSE is a host that answered — the stream itself may
+        // later end or error (the caller reconnects), but the host is up.
+        _health?.success(tier, hosts[i], path);
         return StreamedResponse(response.data!.stream, cancelToken.cancel);
       } on DioException catch (e) {
+        _health?.failure(tier, hosts[i], path);
         final isLastHost = i == hosts.length - 1;
         if (isLastHost || !_isRetryable(e)) rethrow;
         Log.warning(

@@ -6,6 +6,15 @@ part of 'release_note.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_ReleaseContributor _$ReleaseContributorFromJson(Map<String, dynamic> json) =>
+    _ReleaseContributor(
+      login: json['login'] as String,
+      htmlUrl: json['htmlUrl'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$ReleaseContributorToJson(_ReleaseContributor instance) =>
+    <String, dynamic>{'login': instance.login, 'htmlUrl': instance.htmlUrl};
+
 _ReleaseNote _$ReleaseNoteFromJson(Map<String, dynamic> json) => _ReleaseNote(
   tagName: json['tag_name'] as String,
   name: json['name'] as String? ?? '',
