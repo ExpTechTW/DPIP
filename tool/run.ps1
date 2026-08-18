@@ -22,6 +22,20 @@
 
 $ErrorActionPreference = 'Stop'
 
+# mise is not optional. A bare `flutter` builds, runs, and passes its tests off
+# whatever SDK the session cached — the difference from the pinned one never
+# appears in any line of output, and surfaces days later as a failure nobody
+# can reproduce.
+if (-not (Get-Command mise -ErrorAction SilentlyContinue)) {
+  Write-Error @'
+mise is not installed, and this repository does not build without it.
+
+Flutter and Dart are pinned in mise.toml so CI and every machine use one
+version. Install it from https://mise.jdx.dev, then run `mise install` here.
+'@
+  exit 1
+}
+
 & mise exec -- flutter run --dart-define=DPIP_RUN_SH=true @args
 
 exit $LASTEXITCODE

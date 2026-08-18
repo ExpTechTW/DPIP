@@ -134,7 +134,17 @@ tool/dev/build.sh ios        # iOS（不含簽章）
 | 砍掉重建 | `tool/dev/clean.sh` |
 | 跑完 CI 會跑的每一道關卡 | `tool/check.sh` |
 
-**不要自己打 `mise exec` 或 `flutter`。** 工具鏈只在腳本裡指定，這樣 CI 跟每一台機器跑的才是同一個版本 —— shell 的 PATH 只解析一次，`mise activate` 會把它快取起來，所以升級工具鏈之後舊的 SDK 還會留在 PATH 上，而用錯 SDK 建置出來的東西不會有任何徵兆。`tool/check/tooling.sh` 會擋住文件裡出現這種指令。
+**mise 是必要條件，不是建議。** 沒有 mise 就不能建置這個專案 —— 腳本會直接拒絕執行並告訴你怎麼裝。
+
+**絕對不要自己打 `flutter`、`dart` 或 `mise exec`。** 工具鏈只在 `tool/dev/_lib.sh` 一個地方指定。理由不是整潔：shell 的 PATH 只解析一次，`mise activate` 會把它快取起來，所以升級工具鏈之後舊的 SDK 還留在 PATH 上 —— 而**用錯 SDK 一樣建得起來、跑得起來、測試也會過**，差別要到幾天後變成一個沒人重現得出來的失敗才浮現。
+
+三道防線：
+
+| 誰 | 擋什麼 |
+|---|---|
+| `tool/dev/_lib.sh` 的 `require_mise` | 沒裝 mise、沒有 `mise.toml`、或 flutter 解析到 mise 以外的路徑，一律拒絕執行 |
+| `tool/check/tooling.sh` | 文件與 CI 裡出現裸指令；`tool/` 裡任何腳本語法錯、沒有執行權限、或直接呼叫 `flutter` / `dart` / `mise exec` |
+| `tool/run.sh` | 啟動前把上面兩項都跑一次（0.34 秒） |
 
 > [!NOTE]
 > Android 需要 JDK 17 以上（Android Studio 內建的即可）。iOS 已改用 Swift Package Manager，不需要 CocoaPods。

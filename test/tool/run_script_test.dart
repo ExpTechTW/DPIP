@@ -82,6 +82,23 @@ void main() {
     expect(offenders, ['check/tooling.sh', 'dev/_lib.sh']);
   });
 
+  test('the launcher refuses to start without mise', () {
+    // The rule that has no second chance: a bare `flutter` builds, runs and
+    // passes, off an SDK nobody chose. The launcher is where everybody passes
+    // through, so it is where the refusal has to live.
+    expect(_script(), contains('require_mise'));
+  });
+
+  test('the launcher checks the scripts before it starts anything', () {
+    expect(_script(), contains('tool/check/tooling.sh'));
+  });
+
+  test('the Windows launcher refuses too', () {
+    final ps1 = File('${Directory.current.path}/tool/run.ps1')
+        .readAsStringSync();
+    expect(ps1, contains('Get-Command mise'));
+  });
+
   test('the git hooks point at a script that exists', () {
     // The hooks have no file extension, so a rename sweep over `*.sh` misses
     // them — and the failure is one line of shell noise on every commit that

@@ -66,15 +66,36 @@ for wf in .github/workflows/*.yml; do
   )
 done
 
-# The scripts themselves are where `mise exec` belongs, so they are exempt —
-# but only through the one helper, or the exemption is just a bigger hole.
+# Every script in tool/, checked as a script.
+#
+# `tool/run.sh` runs this at launch, so these are the things worth catching
+# before anything else happens: a script that does not parse, one that is not
+# executable, and — the one that matters — one that reaches the toolchain
+# without going through the pin.
 while IFS= read -r script; do
+  bash -n "$script" 2>/dev/null || report "$script: does not parse"
+
+  [[ -x $script ]] || report "$script: is not executable (chmod +x)"
+
+  head -1 "$script" | grep -q '^#!/usr/bin/env bash$' ||
+    [[ $script == tool/dev/_lib.sh ]] ||
+    report "$script: no \`#!/usr/bin/env bash\` shebang"
+
   # The helper is where `mise exec` is supposed to be, and this file has to
   # spell the string out to look for it. Both are exempt by name rather than by
   # a pattern, so a third exemption has to be argued for.
-  [[ $script == tool/dev/_lib.sh || $script == tool/check/tooling.sh ]] && continue
-  if grep -qE '(^|[^[:alnum:]_/-])mise[[:space:]]+exec' "$script"; then
-    report "$script: calls \`mise exec\` directly — use \`pinned\` from tool/dev/_lib.sh"
+  if [[ $script != tool/dev/_lib.sh && $script != tool/check/tooling.sh ]]; then
+    grep -qE '(^|[^[:alnum:]_/-])mise[[:space:]]+exec' "$script" &&
+      report "$script: calls \`mise exec\` directly — use \`pinned\` from tool/dev/_lib.sh"
+  fi
+
+  # A bare `flutter` / `dart` as a command. This is the forbidden one: it runs
+  # whatever SDK the shell cached, it works, and nothing in its output ever says
+  # which SDK produced it. Matched only at the start of a command — after a
+  # newline, a pipe, `&&`, `;` or `$(` — so prose in a comment is untouched.
+  if grep -nE '(^|[|;&]|\$\()[[:space:]]*(flutter|dart)[[:space:]]+[a-z]' "$script" |
+     grep -v '^[0-9]*:[[:space:]]*#' | grep -q .; then
+    report "$script: runs a bare flutter/dart — every toolchain call goes through \`pinned\`"
   fi
 done < <(find tool -name '*.sh' -type f | sort)
 

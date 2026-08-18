@@ -23,6 +23,18 @@ source "$(dirname "${BASH_SOURCE[0]}")/dev/_lib.sh"
 here="$(repo_root)"
 cd "$here"
 
+# Nothing starts until mise owns the toolchain, and until every script in tool/
+# still parses and still goes through it. Both are cheap (0.02 s and 0.11 s) and
+# both fail in the same silent way if left unchecked: the app builds, runs, and
+# behaves — off the wrong SDK, or through a script somebody edited into calling
+# a bare `flutter`. The launch is the one moment everybody passes through, so it
+# is where the check belongs.
+require_mise
+"$here/tool/check/tooling.sh" >/dev/null || {
+  "$here/tool/check/tooling.sh"
+  exit 1
+}
+
 # A fresh clone that goes straight to running the app still gets the git hooks.
 #
 # Setup used to be a step you were told about in the README and therefore a step

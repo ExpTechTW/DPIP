@@ -29,11 +29,12 @@ gate or the analyzer will tell you.
   → [ARCHITECTURE.md § Calibrated time](ARCHITECTURE.md#calibrated-time)
 - **A safety-critical feed that is `stale` or `offline` must never be presented
   as current.** → [ARCHITECTURE.md § Realtime feeds](ARCHITECTURE.md#realtime-feeds)
-- **Every workflow has a script under `tool/`; never type the toolchain.** Not
-  `flutter`, not `dart`, not `mise exec`. A shell's PATH is resolved once and
-  `mise activate` caches it, so a toolchain bump leaves the old SDK on PATH
-  until the session is replaced — and a build against the wrong SDK announces
-  nothing. `tool/dev/test.sh`, `tool/dev/analyze.sh`, `tool/check.sh`.
+- **mise is required, and every workflow has a script under `tool/`.** Never
+  type the toolchain: not `flutter`, not `dart`, not `mise exec`. A shell's PATH
+  is resolved once and `mise activate` caches it, so a toolchain bump leaves the
+  old SDK on PATH until the session is replaced — and a build against the wrong
+  SDK announces nothing at all: it compiles, it runs, its tests pass.
+  `tool/dev/test.sh`, `tool/dev/analyze.sh`, `tool/check.sh`.
   → [AGENTS.md § Toolchain](AGENTS.md#toolchain)
 - **Start the app with `tool/run.sh`** (`tool\run.ps1` on Windows), never
   anything else. A debug build refuses to start otherwise — both

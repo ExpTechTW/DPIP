@@ -19,13 +19,24 @@ other files point here, and this file points at them.
 
 ## Toolchain
 
-Flutter and Dart are pinned by **mise**, and **every workflow has a script under
-`tool/`**. Never type the toolchain yourself — not `flutter`, not `dart`, and
-not `mise exec`. A shell's PATH is resolved once and `mise activate` caches it,
-so a toolchain bump leaves the old SDK on PATH until the session is replaced,
-and a run against the wrong SDK announces nothing. The scripts are the only
-place the toolchain is named, so there is one line to get wrong instead of one
-per command. `tool/check/tooling.sh` enforces it.
+**mise is required.** Not preferred — required. Without it the scripts refuse to
+run and tell you how to install it, because there is nothing to pin against and
+a build off the wrong SDK looks exactly like a build off the right one.
+
+Flutter and Dart are pinned in `mise.toml`, and **every workflow has a script
+under `tool/`**. Never type the toolchain yourself — not `flutter`, not `dart`,
+and not `mise exec`. A shell's PATH is resolved once and `mise activate` caches
+it, so a toolchain bump leaves the old SDK on PATH until the session is
+replaced, and a run against the wrong SDK announces nothing: it builds, it runs,
+its tests pass.
+
+Three things enforce it, none of which relies on anybody remembering:
+
+| Where | What it refuses |
+|---|---|
+| `require_mise` in `tool/dev/_lib.sh` | no mise, no `mise.toml`, or a flutter that resolves outside mise's own installs — the last one is the dangerous case, because `mise exec` will happily forward to a system SDK |
+| `tool/check/tooling.sh` | a bare toolchain command in the docs or CI; and, for every script in `tool/`, one that does not parse, is not executable, has no shebang, or reaches `flutter` / `dart` / `mise exec` without going through `pinned` |
+| `tool/run.sh` | runs both before it starts anything (0.34 s) |
 
 ```sh
 tool/dev/analyze.sh
