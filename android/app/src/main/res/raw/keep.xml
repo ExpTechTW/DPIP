@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Keeps the notification sounds in a shrunk build.
+
+  Every channel names its sound as a runtime string — `resource://raw/eew` in
+  lib/core/notifications/notification_channels.dart — so nothing in code or XML
+  ever references @raw/*, the resource shrinker concludes they are unused, and
+  a release APK ships without them. Android then refuses the channel outright:
+
+    PlatformException(INVALID_ARGUMENTS, Audio media is not valid,
+                      arguments.invalid.channel.sound, null)
+
+  On the device this was found on, that rejected 16 of 24 channels — every
+  earthquake early-warning channel among them — while the debug build, which is
+  not shrunk, registered all 24. tool/check/notification_sounds.sh could not
+  catch it: it reads the source tree, and the source tree is correct.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@raw/*" />
