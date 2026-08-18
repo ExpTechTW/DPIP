@@ -184,8 +184,6 @@ tool/dev/build.sh ios        # iOS（不含簽章）
 
 ## Star History
 
-## Star History
-
 <a href="https://www.star-history.com/?type=date&repos=exptechtw%2Fdpip">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=exptechtw/dpip&type=date&theme=dark&legend=top-left&sealed_token=W5nrby1cW41C6wO-pyTS03g09KIf7gK4LQILagMeXzRWFPhswq_OAHgFdq_mKh-QcVxUvdyYzc-IcWOEL3m-QhUH49bzP85hsXEwi6x5YRj6R8QeRcndYw" />
