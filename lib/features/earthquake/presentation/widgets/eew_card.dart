@@ -175,6 +175,19 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
+            Text(
+              widget.eew.agency.toUpperCase(),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              ' · ',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
             Expanded(
               child: Text(
                 l10n.eewSerial(widget.eew.serial),

@@ -129,11 +129,14 @@ Widget _wrap(RegionStore store, {Eew? eew, DateTime Function()? clock}) =>
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('shows serial, max-intensity badge, and summary', (tester) async {
+  testWidgets('shows source, serial, max-intensity badge, and summary', (
+    tester,
+  ) async {
     final store = await _store();
     await tester.pumpWidget(_wrap(store));
     final l10n = AppLocalizations.of(tester.element(find.byType(EewCard)));
 
+    expect(find.text('CWA'), findsOneWidget);
     expect(find.text('Report 3'), findsOneWidget);
     expect(find.byType(IntensityBadge), findsOneWidget);
     expect(find.text('花蓮縣'), findsOneWidget);
