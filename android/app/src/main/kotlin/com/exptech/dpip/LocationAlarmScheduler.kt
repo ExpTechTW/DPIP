@@ -64,6 +64,12 @@ object LocationAlarmScheduler {
      * [LocationBootReceiver] after a reboot. A failure with no fallback is
      * silent and permanent — the geofence is the only spine on a Play-services
      * device, so nothing is left to notice or retry.
+     *
+     * Always the adaptive interval, never [WATCHDOG_MIN], and deliberately not
+     * [nextDelayMinutes]. Every call site of this function is a site that has
+     * just established there is *no* fence, so the stored `armed` belief can
+     * only be wrong here — and wrong in the expensive direction, handing a
+     * fenceless device an hour of silence instead of five minutes.
      */
     fun ensure(context: Context) {
         if (!BgLocationStore.enabled(context)) return
@@ -72,7 +78,66 @@ object LocationAlarmScheduler {
         schedule(context, interval)
     }
 
-    /** Cancels any pending wake-up. */
+    /**
+     * How long the geofence may stay silent before the alarm goes looking.
+     *
+     * A geofence that arms is not a geofence that fires. The fence went live on
+     * a Pixel 9, the alarm was cancelled because it had, and the device then
+     * reported nothing for 133 minutes — no wake, no error, nothing to notice.
+     * `dumpsys alarm` held no pending alarm, `geofence_armed` was true, and the
+     * only breadcrumb was "arm: geofence live". Cancelling on `armed` made "the
+     * fence is working" and "the fence is dead" the same observation.
+     *
+     * So the alarm is a watchdog now, and the fence is what pets it: every time
+     * the fence proves it is alive the hour starts again, and the alarm only
+     * ever actually fires after a full hour of fence silence. Behind a working
+     * fence that costs nothing — a moving device re-arms far more often than
+     * hourly, so the alarm is perpetually pushed out and never runs.
+     */
+    const val WATCHDOG_MIN = 60L
+
+    /**
+     * The delay the next alarm should use, given what the spine currently is.
+     *
+     * Two regimes, one switch. With a geofence armed the alarm is a watchdog and
+     * the fence is the spine, so an hour is right. With no fence — a de-Googled
+     * device, or one where registration was refused — the alarm *is* the spine,
+     * and [nextIntervalMinutes]' adaptive 5–60 is right.
+     *
+     * Read from [BgLocationStore.armed] rather than from a second stored
+     * interval on purpose. [BgLocationStore.KEY_INTERVAL_MIN] stays what it has
+     * always been — the adaptive fallback value — and goes on being maintained
+     * underneath a live fence, so a device whose fence dies drops straight back
+     * onto a current interval instead of a stale one.
+     *
+     * `armed` is a belief, and nothing clears it when a fence dies quietly, so
+     * this can say "watchdog" about a device that has no fence. That is the one
+     * place the belief is allowed to be wrong: it costs an hour, which is the
+     * bound the watchdog was chosen to give in the first place. [ensure] is the
+     * function for every site that *knows* there is no fence.
+     */
+    fun nextDelayMinutes(context: Context): Long =
+        if (BgLocationStore.armed(context)) {
+            WATCHDOG_MIN
+        } else {
+            BgLocationStore.prefs(context)
+                .getLong(BgLocationStore.KEY_INTERVAL_MIN, DEFAULT_INTERVAL_MIN)
+        }
+
+    /**
+     * Restarts the hour, for when the geofence has just proved it is alive.
+     *
+     * Both proofs count: a fence that *arms* is talking to Play services, and a
+     * fence that *fires* is doing its job. Either one resets the countdown.
+     *
+     * Deliberately not [cancel]: the fence is the fast path, not the only path.
+     */
+    fun resetWatchdog(context: Context) {
+        if (!BgLocationStore.enabled(context)) return
+        schedule(context, WATCHDOG_MIN)
+    }
+
+    /** Cancels any pending wake-up. Only for turning reporting off entirely. */
     fun cancel(context: Context) {
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         am.cancel(pendingIntent(context))

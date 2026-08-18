@@ -55,6 +55,15 @@ class BackgroundLocationChannel(private val context: Context) :
                     // background reporting silently stopped until the next time
                     // the user opened the app. [armGeofence] stands the alarm
                     // down only once Play services confirms a fence is live.
+                    //
+                    // Schedule before arming, not after. Arming waits on a fix
+                    // (up to ~20 s) and then on an asynchronous registration,
+                    // and on a first-ever enable — or any stop/start from the
+                    // developer page, which cancels the alarm — there is nothing
+                    // pending for that whole window. A process death inside it
+                    // left reporting enabled with no fence and no alarm, and
+                    // nothing that would ever notice.
+                    LocationAlarmScheduler.ensure(context)
                     armGeofence(context.applicationContext)
                 } else {
                     GeofenceManager.remove(context)
@@ -138,7 +147,7 @@ class BackgroundLocationChannel(private val context: Context) :
                 GeofenceManager.register(appContext, location.latitude, location.longitude) { armed ->
                     if (armed) {
                         BgLocationStore.note(appContext, "arm: geofence live")
-                        LocationAlarmScheduler.cancel(appContext)
+                        LocationAlarmScheduler.resetWatchdog(appContext)
                     } else {
                         Log.w(TAG, "geofence refused — falling back to the alarm")
                         BgLocationStore.note(appContext, "arm: geofence refused, alarm only")

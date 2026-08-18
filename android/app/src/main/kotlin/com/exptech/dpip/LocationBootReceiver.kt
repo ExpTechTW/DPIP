@@ -44,7 +44,16 @@ class LocationBootReceiver : BroadcastReceiver() {
         GeofenceManager.register(
             appContext, BgLocationStore.lastLat(appContext), BgLocationStore.lastLng(appContext),
         ) { armed ->
-            if (!armed) LocationAlarmScheduler.ensure(appContext)
+            // Both branches schedule, and they must. A reboot clears every
+            // elapsed-realtime alarm the package had, and an app update cancels
+            // them too — so at this point the device has none, and the success
+            // branch returning without scheduling is the one path that leaves a
+            // fence with nothing at all behind it.
+            if (armed) {
+                LocationAlarmScheduler.resetWatchdog(appContext)
+            } else {
+                LocationAlarmScheduler.ensure(appContext)
+            }
             pending.finish()
         }
     }

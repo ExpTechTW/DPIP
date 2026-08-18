@@ -18,14 +18,12 @@ import java.util.concurrent.TimeUnit
  * self-rescheduling chain; it's then refined to the adapted interval. Runs off
  * the main thread in a `goAsync` window; state comes from [BgLocationStore].
  *
- * **The chain always has an exit.** Because the reschedule at the top is
- * unconditional, this receiver is the only thing that can stop it, and it does:
- * on a device with Play services it re-registers the geofence at the end of
- * every firing and cancels itself the moment Play services confirms a fence is
- * live. So a device that fell back to the alarm climbs back to the geofence
- * within one interval instead of staying on it until the user next opens the
- * app — and a device that never should have been on it in the first place gets
- * off it just as fast.
+ * **The chain never has an exit.** It used to: this receiver cancelled itself
+ * the moment Play services confirmed a fence was live. That is now a lengthening
+ * to [LocationAlarmScheduler.WATCHDOG_MIN] instead, because a fence
+ * that registers is not a fence that fires, and cancelling on `armed` made a
+ * fence that had quietly stopped firing indistinguishable from a device that
+ * was not moving. Only turning reporting off stops the chain.
  */
 class LocationAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -34,13 +32,19 @@ class LocationAlarmReceiver : BroadcastReceiver() {
         if (!BgLocationStore.enabled(appContext)) return
 
         val prefs = BgLocationStore.prefs(appContext)
+        // The adaptive fallback interval, which is maintained below whatever the
+        // fence is doing — so this stays the right answer for the moment the
+        // fence stops being the spine. It is NOT necessarily the delay to use.
         val stored = prefs.getLong(
             BgLocationStore.KEY_INTERVAL_MIN,
             LocationAlarmScheduler.DEFAULT_INTERVAL_MIN,
         )
         // Arm the next alarm BEFORE any blocking work, so the chain survives a
-        // kill during the fix/network wait.
-        LocationAlarmScheduler.schedule(appContext, stored)
+        // kill during the fix/network wait. The delay comes from
+        // `nextDelayMinutes`, not from `stored`: behind a live fence this is a
+        // watchdog on an hour, and reading `stored` here is what would collapse
+        // it back to the adaptive interval on the first firing.
+        LocationAlarmScheduler.schedule(appContext, LocationAlarmScheduler.nextDelayMinutes(appContext))
 
         val pending = goAsync()
         Thread {
@@ -60,10 +64,14 @@ class LocationAlarmReceiver : BroadcastReceiver() {
                     prefs.edit().putLong(BgLocationStore.KEY_INTERVAL_MIN, n).apply()
                     n
                 }
-                // Refine the provisional alarm to the adapted interval. This has
-                // to happen BEFORE the hand-back below: the cancel there arrives
-                // on a callback, so anything that schedules afterwards races it
-                // and wins, which would leave the alarm running for good.
+                // Refine the provisional alarm to the adapted interval.
+                //
+                // The order used to matter a great deal: the hand-back below
+                // cancelled the alarm from a callback, so anything that
+                // scheduled afterwards won the race and left it running for
+                // good. Now that arming only lengthens the alarm, losing that
+                // race costs a shorter interval instead of a silent device —
+                // which is the direction a race on a safety path should fail in.
                 if (next != stored && BgLocationStore.enabled(appContext)) {
                     LocationAlarmScheduler.schedule(appContext, next)
                 }
@@ -96,7 +104,7 @@ class LocationAlarmReceiver : BroadcastReceiver() {
                     GeofenceManager.register(
                         appContext, location.latitude, location.longitude,
                     ) { armed ->
-                        if (armed) LocationAlarmScheduler.cancel(appContext)
+                        if (armed) LocationAlarmScheduler.resetWatchdog(appContext)
                         settled.countDown()
                     }
                     // The callback lands on the main looper, which is free — this

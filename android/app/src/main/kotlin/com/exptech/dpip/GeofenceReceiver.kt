@@ -25,7 +25,8 @@ import com.google.android.gms.location.GeofencingEvent
  * move). If the platform supplies no triggering location and no fresh fix, or on
  * a geofence error, it re-arms around the last centre — combined with
  * `INITIAL_TRIGGER_EXIT` an already-outside device re-fires immediately, so the
- * spine self-heals instead of dying.
+ * spine self-heals instead of dying. Best-effort, not a guarantee, which is
+ * what the alarm watchdog behind the fence is for.
  */
 class GeofenceReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -46,10 +47,30 @@ class GeofenceReceiver : BroadcastReceiver() {
                 .putLong("last_geofence_error_at", System.currentTimeMillis())
                 .apply()
             BgLocationStore.note(appContext, "geofence error ${event.errorCode}")
+            // Before the re-arm, and unconditionally. An error broadcast is the
+            // strongest evidence there is that the spine is gone, so it must
+            // pull the alarm in to the adaptive interval — never leave it out at
+            // the watchdog hour on the strength of an `armed` flag that this
+            // very broadcast disproves. The re-arm below is asynchronous and
+            // this branch does not hold the broadcast open, so its callback may
+            // never land at all.
+            LocationAlarmScheduler.ensure(appContext)
             reArm(appContext) // service dropped the fence (e.g. location toggled)
             return
         }
         if (event.geofenceTransition != Geofence.GEOFENCE_TRANSITION_EXIT) return
+        // The fence just did its job, which is the strongest evidence there is
+        // that it works, so the watchdog's hour starts again from here — before
+        // any of the work below, all of which can fail. A fence firing on
+        // schedule keeps pushing the alarm out ahead of itself and it never
+        // actually runs; an hour of fence silence is what lets it through.
+        //
+        // Deliberately below the error branch. An error broadcast is proof that
+        // Play services can reach us, but it is also proof that the fence is
+        // *gone* — petting the watchdog there would push the alarm out by an
+        // hour at the exact moment the spine broke. That path re-arms instead,
+        // and falls back to the adaptive alarm when the re-arm is refused.
+        LocationAlarmScheduler.resetWatchdog(appContext)
 
         val pending = goAsync()
         Thread {
