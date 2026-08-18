@@ -339,11 +339,13 @@ ci: cache the Swift package resolution
 
 每一項後面標上**真正寫它的人**，以及該則 commit 的連結。
 
-歸屬不是取 commit 的 author：GitHub squash 一個 PR 時會把作者設成按下合併的人。
-`41a3c1e8 Fix eew (#534)` 的作者是合併者，而它的每一行都是別人寫的。所以摘要帶
-`(#N)` 時，作者取自**那個 PR 自己的 commits**，再併入 `Co-authored-by:` trailer；
-都沒有才退回 commit 的 author。是 GitHub 帳號，不是 git 顯示名稱 —— 顯示名稱 @
-不到任何人。
+歸屬先看 `Co-authored-by:` trailer，沒有就拿 SHA 問 GitHub 這則 commit 的作者
+帳號，再沒有才退回 git 的顯示名稱。要的是 GitHub 帳號，不是顯示名稱 —— 顯示名稱
+@ 不到任何人。
+
+只開放 rebase 合併，所以 main 上的 commit 就是有人寫的那則，作者就是作者。
+**main 上已經用 squash 進來的 282 則不往回相容**：沒有 trailer 的那些會標成按下
+合併的人。這是知情的取捨，不是疏漏 —— 下一份 note 裡的 `c5fdbd31` 就會這樣。
 
 | | 涵蓋範圍 | 為什麼 |
 |---|---|---|
@@ -369,10 +371,9 @@ ci: cache the Swift package resolution
 
 實際長相就是上面各節的範例，`tool/release/notes.sh` 直接照這個格式輸出。
 
-> **不要用 squash 合併。** 兩個理由。第一，正則是逐行抓的，所以 squash 不會像舊
-> 格式那樣把內容弄壞，但四則 commit 的條目會全部掛在同一個作者和同一個快照下 ——
-> 正式版更新日誌上「這一項第一次出現在哪個測試版」的標記就沒了。第二，squash 的
-> 訊息來自 PR 的標題與描述，**而那兩樣沒有任何 gate 在看**（見下節）。
+> **這裡只能 rebase 合併**，squash 和 merge commit 在 repo 設定裡都關掉了。
+> 每則條目的平台圖示、作者、快照標記、commit 連結，四樣都是從那則 commit 的 SHA
+> 推導的 —— squash 之後只剩一個 SHA，四樣就全部指向同一坨。
 
 ---
 
@@ -402,12 +403,13 @@ pull request 會建一個分支併入 base 的合成 merge，而這個 gate 判�
 它們是有人真的寫過的東西，而標題預設是從分支名生出來的（`Fix/version week`），
 描述可以是空的。
 
-代價要講清楚：**squash 合併時，進 main 的訊息是標題加描述，不是那些 commit。**
-所以 squash 會把一則沒有人檢查過的訊息寫進 main。唯一的後盾是 main 自己的 push
-事件會再跑一次 gate —— 那是事後偵測，不是預防，而且發現的時候已經在 main 上了。
+這樣是安全的，**前提是合併方式只有 rebase**，而那是 repo 設定裡強制的：
+Settings → Pull requests 只勾了 `Allow rebase merging`。所以進 main 的就是被
+gate 判過的那些 commit 本身，每一則也各自保留自己的條目、作者與快照標記。
 
-**所以：用 rebase 合併。** 這樣進 main 的就是那些已經被判過的 commit 本身，
-每一則也各自保留自己的更新日誌條目與快照標記。
+把 squash 打開就會破壞這個前提 —— 進 main 的會變成標題加描述，而那兩樣沒有任何
+東西在看。`332fb8f3 Fix report (#529)` 就是這樣進來的：不是任何人寫過的 commit，
+而且改不掉了。
 
 ---
 

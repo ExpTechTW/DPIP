@@ -89,11 +89,6 @@ jobs:
 
           echo "branch gate: rebased on $BASE_REF, no merge commits"
 
-      # The commits on the branch are not what lands on main. This repo
-      # squash-merges, so GitHub builds the merged commit out of the PR's title
-      # and description — which this gate never saw. That is not hypothetical:
-      # `332fb8f3 Fix report (#529)` is on main, passes nothing, and can never
-      # be repaired. Check the message that will actually be committed.
       # The workflows themselves, because a broken one does not fail — it is
       # *refused*. GitHub interpolates a `run` block whole before bash sees it,
       # so an expression error anywhere in it, comment included, kills the run

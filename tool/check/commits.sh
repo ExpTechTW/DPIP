@@ -14,13 +14,14 @@
 #
 # With no range it checks HEAD alone, which is what a commit-msg hook wants.
 #
-# `--message` exists for the squash-merge case. When a PR is squashed, the
-# commit that lands on `main` is built from the **PR title and description**,
-# not from the branch's commits — so a branch whose every commit passes this
-# gate can still put a malformed message on `main`, and did: `Fix report (#529)`
-# is on `main` now, was never a commit anybody wrote, and cannot be repaired.
-# CI feeds the PR title and body through this mode, so the message that will
-# actually be committed is the one that gets checked.
+# `--message` judges a message that is not a commit yet — a draft, before you
+# spend a `git commit` on it. `tool/commit.sh --message <file>` is the caller.
+#
+# It used to exist for a different reason: squash merging, where the commit that
+# lands on main is built from the PR title and description and no gate had ever
+# seen it. `332fb8f3 Fix report (#529)` is on main because of that — never a
+# commit anybody wrote, and unrepairable. Squash merging is off now (Settings →
+# Pull requests), so what lands on main is what this gate walked.
 set -uo pipefail
 
 mode=range
@@ -67,7 +68,7 @@ check_one() { # <subject> <body> <label>
   short="$3"
   bad=0
 
-  # GitHub appends ` (#123)` to the summary when a PR is squash-merged. The
+  # GitHub appends ` (#123)` to the summary of a merged pull request. The
   # author did not write it and cannot prevent it, so counting it against the
   # limit fails a commit that passed this very gate while the PR was open — and
   # fails it on `main`, where the prescribed repair (rebase, force-push) is not
@@ -223,9 +224,9 @@ if [ "$fail" -ne 0 ]; then
     # description on GitHub is the whole fix, and it re-runs this check.
     cat >&2 <<'EOF'
 
-This PR will be squash-merged, so the message above — built from the PR's
-**title and description** — is what gets committed to main, not the commits on
-the branch. Edit the title and description on GitHub and this re-runs.
+That message is a draft — nothing has been committed. Fix it and run again,
+which is the whole point of checking it before spending a `git commit` on it:
+once pushed, a message can only be repaired by a rebase and a force-push.
 
 The format is in commit.md.
 EOF
@@ -249,7 +250,7 @@ EOF
 fi
 
 if [ "$mode" = message ]; then
-  echo "commit gate: the squashed message is OK"
+  echo "commit gate: the draft message is OK"
 else
   echo "commit gate: $(printf '%s\n' "$commits" | wc -l | tr -d ' ') commit(s) OK"
 fi
