@@ -296,6 +296,20 @@ jobs:
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          # The upload finishes; the wait after it cannot. The action signs one
+          # App Store Connect JWT with a 600-second life (`n=600` in its bundled
+          # dist/index.js) and never re-signs it, while its own poll schedule
+          # sleeps 60 + 120 + 240 + 300 = 720 seconds before giving up. Any build
+          # that takes longer than the token lives reports
+          # `401 NOT_AUTHORIZED` — after the binary is already on TestFlight.
+          #
+          # Nothing here needs the wait: it exists so the action can write
+          # metadata afterwards, and this step sets neither `release-notes` nor
+          # `uses-non-exempt-encryption` — Info.plist already declares
+          # ITSAppUsesNonExemptEncryption. What is given up is being told when
+          # Apple rejects a binary during processing, which this step never told
+          # us anyway: it failed on the token whether processing passed or not.
+          wait-for-processing: 'false'
 
       # An Admin credential for the whole App Store Connect account. The runner
       # is ephemeral, but removing it costs one line.
