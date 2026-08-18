@@ -146,7 +146,12 @@ tool/check.sh
 
 That is the whole list, and it is the same list `.github/workflows/ci.yml`
 runs — CI calls these scripts rather than naming the commands itself, so the
-two cannot drift. Individually, if you want to fail faster:
+two cannot drift.
+
+CI judges **the commits on the branch**, never the pull request's title or
+description. Merge by rebase, so what lands on main is what was judged; a
+squash writes the PR's title and body instead, and nothing has read those.
+See [commit.md](commit.md). Individually, if you want to fail faster:
 
 ```sh
 tool/check/commits.sh origin/main..HEAD
