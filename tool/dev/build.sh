@@ -22,7 +22,9 @@ shift || true
 case "$target" in
   android) pinned flutter build apk --release "$@" ;;
   bundle)  pinned flutter build appbundle --release "$@" ;;
-  ios)     pinned flutter build ios --release --no-codesign "$@" ;;
+  # No --release: `flutter build ios` is release by default, and hardcoding it
+  # would fight the `--debug` the iOS smoke-test build passes.
+  ios)     pinned flutter build ios --no-codesign "$@" ;;
   *)
     printf 'usage: tool/dev/build.sh {android|bundle|ios} [flutter build args]\n' >&2
     exit 2

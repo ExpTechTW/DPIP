@@ -36,32 +36,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          cache: true
+      # Flutter and Dart come from mise.toml, the same pin CI and every laptop
+      # use. Not subosito/flutter-action with `channel: stable`: that resolves
+      # to whatever stable is on the day, so this job could ship an artifact
+      # built against an SDK nobody chose, and nothing in the build log would
+      # say so. See AGENTS.md → Toolchain.
+      - name: Install toolchain (mise)
+        uses: jdx/mise-action@v4
 
       # The iOS build uses Swift Package Manager, not CocoaPods (there is no
       # Podfile). Cache SPM's clone/artifact store keyed on the resolved pins.
       - name: Cache Swift Packages
         uses: actions/cache@v4
         with:
+          # build/ios/SourcePackages, not DerivedData. Flutter always passes
+          # -clonedSourcePackagesDirPath pointing there (ios/xcodeproj.dart), so
+          # DerivedData is never consulted for packages and caching it stored
+          # nothing. Losing this directory is what makes a launch print fifteen
+          # "Fetching from … (cached)" lines and cost 19-32 s.
           path: |
             ~/Library/Caches/org.swift.swiftpm
-            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+            build/ios/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
 
       - name: Install dependencies and run build_runner
         run: |
-          flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
+          bash tool/dev/deps.sh
+          bash tool/dev/codegen.sh
 
       - name: Build iOS App and create IPA
         run: |
-          flutter build ios --debug --no-codesign
+          bash tool/dev/build.sh ios --debug
           mkdir -p Payload
           cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
           zip -qr DPIP.ipa Payload
