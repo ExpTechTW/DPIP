@@ -7,6 +7,7 @@
 library;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -142,6 +143,7 @@ _build({
   List<Eew> alerts = const [],
   required SeismicTravelTimeTable table,
   required RtsBoxGrid grid,
+  TownDirectory townDirectory = const TownDirectory({}),
 }) async {
   final rtsElapsed = _FakeElapsed();
   final clock = _FakeClock(DateTime.utc(2026, 8, 12, 12));
@@ -175,7 +177,7 @@ _build({
       eew: RealtimeNotifier<List<Eew>>(eewChannel),
       travelTimeTable: Future<SeismicTravelTimeTable>.value(table),
       boxGrid: Future<RtsBoxGrid>.value(grid),
-      townDirectory: const TownDirectory({}),
+      townDirectory: townDirectory,
     ),
     rts: RealtimeNotifier<Rts>(rtsChannel),
     eew: RealtimeNotifier<List<Eew>>(eewChannel),
@@ -541,4 +543,61 @@ void main() {
       expect(byLabel['TWD002\n3.0']!['properties']['sort'], 3.0);
     },
   );
+
+  test('cycling between two simultaneous alerts repaints the ground tint for '
+      'whichever one is now selected', () async {
+    // A town near each epicentre, so `_updateAreaFill` has something to
+    // colour — an empty directory (the default `_build` uses) makes every
+    // push a no-op, which would hide the very bug this test exists to catch.
+    const directory = TownDirectory({
+      '100': Town(
+        code: '100',
+        city: '花蓮',
+        town: '新城',
+        lat: 24.1,
+        lng: 121.6,
+        cityLevel: '縣',
+        townLevel: '鄉',
+      ),
+    });
+    final origin = DateTime.now().toUtc().subtract(const Duration(seconds: 5));
+    final built = await _build(
+      alerts: [
+        _alert(id: 'a', origin: origin, longitude: 121.6, latitude: 24.1),
+        _alert(id: 'b', origin: origin, longitude: 121.0, latitude: 22.0),
+      ],
+      table: table,
+      grid: grid,
+      townDirectory: directory,
+    );
+    final controller = _RecordingController();
+    await built.layer.render(controller);
+    await pumpEventQueue();
+
+    int townPushes() =>
+        controller.calls.where((c) => c == 'set:town:null').length;
+
+    final afterFirst = townPushes();
+    expect(
+      afterFirst,
+      greaterThan(0),
+      reason: 'the selected alert must tint the map on render',
+    );
+
+    // Cycle the card to the second alert — same alert *set* (so the old,
+    // whole-set cache key would see no change and skip the repaint), just a
+    // different selection.
+    built.layer.eewIndex.value = 1;
+    built.layer.onSurfaceVisibility(false);
+    built.layer.onSurfaceVisibility(true);
+    await pumpEventQueue();
+
+    expect(
+      townPushes(),
+      greaterThan(afterFirst),
+      reason:
+          'switching which alert the card shows must repaint the ground '
+          'tint too — the card and the map are one choice, not two',
+    );
+  });
 }

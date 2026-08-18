@@ -25,10 +25,20 @@ import 'package:intl/intl.dart';
 /// `buildSheet` slot): the active EEW alert card above a freshness strip at
 /// the bottom. Small so the map stays visible and interactive above it.
 class RtsMonitorPanel extends StatefulWidget {
-  const RtsMonitorPanel({super.key, required this.feed, required this.eew});
+  const RtsMonitorPanel({
+    super.key,
+    required this.feed,
+    required this.eew,
+    required this.eewIndex,
+  });
 
   final RealtimeNotifier<Rts> feed;
   final RealtimeNotifier<List<Eew>> eew;
+
+  /// Which active alert the card shows — owned by [RtsMapLayer], not this
+  /// widget, because the map's own area fill has to track the same
+  /// selection (see `RtsMapLayer._updateAreaFill`).
+  final ValueNotifier<int> eewIndex;
 
   /// Roughly how much of the map height the bottom status strip covers at rest.
   /// Declared (not measured) because the strip is a floating overlay, not a
@@ -53,10 +63,6 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
   bool _visible = true;
   VisibleTab? _visibleTab;
 
-  /// Which active alert the single EEW card currently shows — tapping the
-  /// card advances it through the alert set (mirrors the report replay page).
-  int _eewIndex = 0;
-
   void _onData() {
     if (_visible && mounted) setState(() {});
   }
@@ -66,6 +72,7 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
     super.initState();
     widget.feed.addListener(_onData);
     widget.eew.addListener(_onData);
+    widget.eewIndex.addListener(_onData);
   }
 
   @override
@@ -78,6 +85,10 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
     if (!identical(oldWidget.eew, widget.eew)) {
       oldWidget.eew.removeListener(_onData);
       widget.eew.addListener(_onData);
+    }
+    if (!identical(oldWidget.eewIndex, widget.eewIndex)) {
+      oldWidget.eewIndex.removeListener(_onData);
+      widget.eewIndex.addListener(_onData);
     }
   }
 
@@ -104,6 +115,7 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
   void dispose() {
     widget.feed.removeListener(_onData);
     widget.eew.removeListener(_onData);
+    widget.eewIndex.removeListener(_onData);
     _visibleTab?.removeListener(_syncVisibility);
     super.dispose();
   }
@@ -122,8 +134,8 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
             children: [
               _EewAlert(
                 eew: widget.eew,
-                index: _eewIndex,
-                onCycle: (next) => setState(() => _eewIndex = next),
+                index: widget.eewIndex.value,
+                onCycle: (next) => widget.eewIndex.value = next,
               ),
               const SizedBox(height: AppSpacing.sm),
               _StatusBar(state: widget.feed.state, eew: widget.eew),
