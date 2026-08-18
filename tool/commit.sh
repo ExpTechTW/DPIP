@@ -4,7 +4,12 @@
 #     tool/commit.sh                    # the briefing, and every CI gate
 #     tool/commit.sh --message <file>   # also validate a draft message
 #     tool/commit.sh --no-check         # briefing only, skip the gates
+#     tool/commit.sh --push             # the stricter set, run before pushing
 #     DPIP_NO_CACHE=1 tool/commit.sh    # re-run the gates, trusting no cache
+#
+# `.githooks/pre-commit` and `.githooks/pre-push` run it for you. Printing a
+# blocker and being ignored is what this script did for its first day alive —
+# a check nothing enforces is a check, and then a habit, and then neither.
 #
 # **Run this before every commit.** Not as ceremony — commit messages in this
 # repo are the changelog (`tool/release/notes.sh` reads them and publishes
@@ -46,14 +51,27 @@ block()   { printf '  %s✗%s %s\n' "$RED" "$RESET" "$*"; blockers=$((blockers +
 # cache in dev/_lib.sh has now taken away.
 run_gates=1
 msg_file=''
+# Commit time or push time. They are not the same question, and conflating them
+# was the first version's mistake: being behind the base blocks a *merge*, not a
+# commit. Demanding a rebase before every commit would mean rebasing five times
+# an afternoon to record work that is not going anywhere yet — so at commit time
+# it is worth saying and not worth stopping for, and at push time it stops you.
+profile=commit
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-check) run_gates=0; shift ;;
     --check) shift ;;  # kept: it was the old opt-in, and is now the default
+    --push) profile=push; shift ;;
     --message) msg_file="${2:?--message needs a file}"; shift 2 ;;
-    *) printf 'usage: tool/commit.sh [--no-check] [--message <file>]\n' >&2; exit 2 ;;
+    *)
+      printf 'usage: tool/commit.sh [--push] [--no-check] [--message <file>]\n' >&2
+      exit 2
+      ;;
   esac
 done
+
+# Raises a blocker at push time and a warning at commit time.
+merge_time() { if [[ $profile == push ]]; then block "$@"; else warn "$@"; fi; }
 
 # ── Where you are ───────────────────────────────────────────────────────────
 heading 'Where you are'
@@ -92,7 +110,7 @@ if counts="$(git rev-list --left-right --count "$base...HEAD" 2>/dev/null)"; the
   printf '  %s commit(s) ahead, %s behind\n' "$ahead" "$behind"
 
   if ((behind > 0)); then
-    block "behind $base — CI refuses to merge a branch that is not rebased"
+    merge_time "behind $base — CI refuses to merge a branch that is not rebased"
     note 'Everything green on this branch was tested against a main that no'
     note 'longer exists, so the gates describe a tree nobody will get.'
     note ''

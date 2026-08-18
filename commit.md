@@ -14,7 +14,22 @@ commit 訊息推出去之後**改不了**，唯一的修法是 rebase。
 tool/commit.sh
 ```
 
-**每一則 commit 之前都要跑，agent 尤其。** 它只讀不寫 —— 不會 commit、不會
+**git hook 會自動跑，不用記得。** `tool/dev/setup.sh` 裝好 `.githooks` 之後
+（`tool/run.sh` 第一次啟動時會自動裝），`pre-commit` 和 `pre-push` 各跑一次，
+而且**真的會擋下來**：
+
+| hook | 跑什麼 | 擋什麼 |
+|---|---|---|
+| `pre-commit` | `tool/commit.sh --no-check` | 提交時就該修的：stage 到建置產物、`main` 分支、有 merge commit、現有 commit 訊息不合格 |
+| `pre-push` | `tool/commit.sh --push` | 上面全部，**外加落後 base**，以及 CI 的每一道 gate |
+
+**落後 base 在提交時只是警告、推送時才是 blocker。** 這兩個不是同一個問題：落後擋的是
+*合併*，不是提交。要求每次提交前都先 rebase，等於一個下午 rebase 五次來記錄一份還沒
+要去任何地方的工作 —— 然後大家就學會 `--no-verify` 了。
+
+真的要繞過時：`git commit --no-verify` / `git push --no-verify`。
+
+手動跑也可以，**agent 尤其**： 它只讀不寫 —— 不會 commit、不會
 stage、不會 fetch、不改任何檔案 —— 但它會把「現在提交會出什麼事」一次講完：
 
 | 它會講 | 為什麼你需要在提交**之前**知道 |

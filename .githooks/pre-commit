@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Refuses a commit that tool/commit.sh calls a blocker.
+#
+# It used to only print them. A check nothing enforces is a check, then a habit,
+# then neither — this one printed "behind origin/main" and was read and ignored
+# in the same minute.
+#
+# Commit-time severity only (see `profile` in tool/commit.sh): being behind the
+# base is a *merge* problem, and demanding a rebase to record work that is not
+# going anywhere yet would just teach everybody --no-verify. The gates do not
+# run here either — they belong to pre-push, where a minute is affordable and a
+# red CI is what it buys back.
+#
+#     git commit --no-verify        # the escape hatch, when you mean it
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+
+# Mid-rebase, mid-merge, mid-cherry-pick: `git commit` runs this hook while HEAD
+# is detached and the branch state is meaningless. Every answer it could give
+# there is about a tree that exists for the next few seconds.
+git_dir="$(git rev-parse --git-dir)"
+for state in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD; do
+  [[ -e "$git_dir/$state" ]] && exit 0
+done
+
+exec "$root/tool/commit.sh" --no-check

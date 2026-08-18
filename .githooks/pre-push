@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# The stricter half: everything that has to be true before anyone else sees it.
+#
+# Where the rebase check becomes a blocker, and where the CI gates run. A push
+# is the last moment a mistake is still free — after it, a bad commit message
+# can only be fixed by a rebase and a force-push, and a red CI costs a round
+# trip for everybody watching the PR.
+#
+# The gates are content-hash cached, so a push right after a green `tool/check.sh`
+# costs about a second.
+#
+#     git push --no-verify          # the escape hatch, when you mean it
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+exec "$root/tool/commit.sh" --push

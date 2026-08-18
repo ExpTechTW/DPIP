@@ -99,6 +99,41 @@ void main() {
     expect(ps1, contains('Get-Command mise'));
   });
 
+  test('the commit briefing is enforced, not merely printed', () {
+    // It printed "behind origin/main" and was read and ignored in the same
+    // minute. A check nothing enforces is a check, then a habit, then neither.
+    final preCommit = File('${Directory.current.path}/.githooks/pre-commit')
+        .readAsStringSync();
+    final prePush = File('${Directory.current.path}/.githooks/pre-push')
+        .readAsStringSync();
+
+    expect(preCommit, contains('tool/commit.sh'));
+    expect(prePush, contains('tool/commit.sh'));
+
+    // The two ask different questions. Commit time skips the gates, because a
+    // minute per commit teaches everybody --no-verify; push time runs them,
+    // because that is the last moment a mistake is still free.
+    expect(preCommit, contains('--no-check'));
+    expect(prePush, contains('--push'));
+  });
+
+  test('pre-commit stands aside mid-rebase and mid-merge', () {
+    // `git commit` runs the hook during a conflicted rebase, with HEAD detached
+    // and the branch state meaningless. Every answer it could give there is
+    // about a tree that exists for the next few seconds.
+    final hook = File('${Directory.current.path}/.githooks/pre-commit')
+        .readAsStringSync();
+
+    for (final state in [
+      'rebase-merge',
+      'rebase-apply',
+      'MERGE_HEAD',
+      'CHERRY_PICK_HEAD',
+    ]) {
+      expect(hook, contains(state), reason: '$state is not exempted');
+    }
+  });
+
   test('the git hooks point at a script that exists', () {
     // The hooks have no file extension, so a rename sweep over `*.sh` misses
     // them — and the failure is one line of shell noise on every commit that
