@@ -27,7 +27,7 @@ repo_root() { cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd; }
 #      or Homebrew SDK reached through a shim, which looks identical in every
 #      log line it will ever print.
 #
-# Checked once per process tree, not per call: `mise exec -- which flutter`
+# Checked once per process tree, not per call: `mise which flutter`
 # costs 0.02 s, which is nothing once and something across a hundred calls.
 require_mise() {
   [[ -n ${DPIP_MISE_CHECKED:-} ]] && return 0
@@ -55,12 +55,19 @@ EOF
     exit 1
   fi
 
+  # `mise which`, not `mise exec -- command -v`. `command` is a shell builtin,
+  # and mise execs directly rather than through a shell — macOS happens to ship
+  # /usr/bin/command as a real executable and Linux does not, so the probe
+  # passed on a laptop and reported "the SDK is not installed" on every Linux
+  # runner. Which is precisely the kind of works-here-fails-there this function
+  # exists to stop.
   local resolved
-  resolved="$(cd "$root" && mise exec -- command -v flutter 2>/dev/null || true)"
+  resolved="$(cd "$root" && mise which flutter 2>/dev/null || true)"
   if [[ -z $resolved ]]; then
     cat >&2 <<'EOF'
 
-  mise cannot provide flutter. The pin exists but the SDK is not installed:
+  mise knows the pin but cannot resolve flutter (`mise which flutter` answered
+  nothing). The SDK is probably not installed:
 
       mise install
 
