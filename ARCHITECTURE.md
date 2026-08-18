@@ -58,7 +58,7 @@ lib/
 - App-wide state several features consume lives outside any one of them —
   `core/settings/` for `ExperimentalSettings`, for instance.
 
-All five are enforced by `tool/check_layering.sh`, which CI runs first.
+All five are enforced by `tool/check/layering.sh`, which CI runs first.
 
 ## Conventions
 
@@ -222,7 +222,7 @@ batch is rejected the service falls back to registering them individually, so
 one bad channel costs only itself and is named in the log instead of leaving
 the app with no channels *and* no push transport. (`initialize` needs at
 least one channel, so the fallback seeds itself with the first one that is
-accepted.) `tool/check_notification_sounds.sh` catches an unresolvable
+accepted.) `tool/check/notification_sounds.sh` catches an unresolvable
 `resource://raw/<name>` before it ships. Taps funnel through `NotificationTaps` (core carries the channel
 key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
 APNs auth key to the Firebase console for iOS; push only works on a physical
@@ -280,6 +280,6 @@ are synchronous (the table is loaded into memory once at bootstrap); writes
 are async and log rather than throw. Add a setting = add one `SettingKey<T>`;
 never change an existing key string without a migration. `shared_preferences`
 is **not a dependency** — nothing may import it — and only a table's owning
-store may import `sqflite`; both enforced by `tool/check_storage.sh`.
+store may import `sqflite`; both enforced by `tool/check/storage.sh`.
 - Every file starts with a doc comment; one public declaration = one clear
 responsibility.

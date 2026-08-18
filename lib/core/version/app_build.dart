@@ -21,7 +21,8 @@
 ///
 /// 1. **CI's `--dart-define`** — the authority for a published build.
 /// 2. **`lib/core/build_info.g.dart`** — written by the git hooks from the same
-///    `tool/version.sh`, so a local `flutter run` names itself correctly too. A
+///    `tool/release/version.sh`, so a local `flutter run` names itself
+///    correctly too. A
 ///    debug build otherwise fell back to the pubspec placeholder and reported
 ///    `26.1.0 (1)`, a version that exists nowhere.
 /// 3. **The platform's own version** — a build made outside a repository, where

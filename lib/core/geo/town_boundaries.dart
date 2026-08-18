@@ -17,7 +17,7 @@ import 'package:flutter/services.dart' show rootBundle;
 /// box overlaps the query cell, so a lookup tests ~1–3 polygons instead of 367.
 ///
 /// The bundled asset (`town_boundaries.bin.gz`) is a gzipped **delta + zig-zag
-/// varint** encoding of the polygons (see `tool/build_town_boundaries.dart`):
+/// varint** encoding of the polygons (see `tool/gen/town_boundaries.dart`):
 /// coordinates are ≤4-decimal, so each is stored as the `×1e4` integer delta
 /// from the previous vertex, LEB128-packed — ~72% smaller than the float-text
 /// JSON, and lossless, so the golden lookups are unchanged. [fromBinary] decodes
@@ -73,7 +73,7 @@ class TownBoundaries {
   }
 
   /// Builds from the bundled compact binary (`gzip` → delta-varint; see the
-  /// class doc and `tool/build_town_boundaries.dart`). The bounding box is
+  /// class doc and `tool/gen/town_boundaries.dart`). The bounding box is
   /// recomputed from the vertices rather than stored.
   factory TownBoundaries.fromBinary(Uint8List bytes) =>
       TownBoundaries.fromDecoded(_decodeTable(bytes));

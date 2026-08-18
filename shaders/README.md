@@ -87,7 +87,7 @@ than animation frames. A procedural fbm field reads as marble and cannot
 reproduce them; that was the first attempt at this and it failed.
 
 DPIP generates its own sprites in the same two-part layout
-(`tool/gen_cloud_sprites.py`, an offline volumetric raymarch), so the *shading*
+(`tool/gen/cloud_sprites.py`, an offline volumetric raymarch), so the *shading*
 is a faithful port while the artwork is original:
 
 ```
@@ -121,9 +121,9 @@ which is why the clouds agree with the sky at every hour with no palette.
 ## Regenerating
 
 ```
-tool/gen_cloud_sprites.py      # cloud sprites   -> assets/weather/clouds/
-tool/gen_particle_sprites.py   # rain/snow/drop  -> assets/weather/particles/
-tool/gen_sky_textures.py       # starmap, flare  -> assets/weather/sky/
+tool/gen/cloud_sprites.py      # cloud sprites   -> assets/weather/clouds/
+tool/gen/particle_sprites.py   # rain/snow/drop  -> assets/weather/particles/
+tool/gen/sky_textures.py       # starmap, flare  -> assets/weather/sky/
 ```
 
 Preview renders: `flutter test --run-skipped --tags preview

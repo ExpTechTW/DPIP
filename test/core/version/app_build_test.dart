@@ -10,7 +10,7 @@ void main() {
     // The case this exists for: `flutter run` never goes through CI, so there
     // is no --dart-define and the pubspec placeholder would have it report
     // `26.1.0 (1)` — a version that exists nowhere. The git hooks write the
-    // same values tool/version.sh gives CI.
+    // same values tool/release/version.sh gives CI.
     await AppBuild.ensureLoaded();
     expect(AppBuild.label, kBuildLabel);
     expect(AppBuild.code, kBuildCode);

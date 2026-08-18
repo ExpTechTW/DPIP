@@ -125,8 +125,8 @@ const bool _launchedByTool = String.fromEnvironment('DPIP_RUN_SH') != '';
 /// so the app builds against a different SDK than CI with nothing to show for
 /// it. `mise exec -- flutter run` fixes the SDK and still leaves the log
 /// unreadable, because colour has to be added by the pipe (see
-/// tool/colorize_logs.sh). A warning written into a log nobody can read yet is
-/// not much of a warning.
+/// tool/internal/colorize_logs.sh). A warning written into a log nobody can
+/// read yet is not much of a warning.
 ///
 /// The instructions name every shell: this runs on the *device*, so it cannot
 /// see which machine launched it.

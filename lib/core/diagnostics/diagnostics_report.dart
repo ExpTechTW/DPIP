@@ -243,8 +243,8 @@ class DiagnosticsCollector {
     final execution = await BackgroundExecutionService().status();
     final unusedApp = await UnusedAppRestrictionsService().status();
     // Track the build by the git commit it was built from (kGitCommit is kept
-    // current by the .githooks generator — see tool/setup.sh), falling back to
-    // the platform build number outside a repo.
+    // current by the .githooks generator — see tool/dev/setup.sh), falling
+    // back to the platform build number outside a repo.
     final buildRef = kGitCommit == 'unknown' ? info.buildNumber : kGitCommit;
     // Show the platform's own push token: FCM on Android, APNs on iOS.
     final fcmToken = Platform.isAndroid
