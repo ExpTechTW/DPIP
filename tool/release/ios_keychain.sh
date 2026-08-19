@@ -75,7 +75,35 @@ keychain="$RUNNER_TEMP/dpip-signing.keychain-db"
 keychain_password="$(uuidgen)"
 p12="$RUNNER_TEMP/dpip-ios-dev.p12"
 
-printf '%s\n' "$APPLE_DEV_CERT_BASE64" | base64 --decode > "$p12"
+# Whitespace out first. A value that travelled through a browser text field
+# can arrive with a trailing newline or a wrapped line, and neither is part of
+# the payload — but `base64 --decode` on macOS is not uniformly forgiving about
+# them across versions, and this is not a thing to leave to the runner image.
+#
+# The failure being caught here is not exotic; it is the one that happened. The
+# secret held a *path* rather than the file's contents, and all `base64` said
+# was "stdin: (null): error decoding base64 input stream" — a message that
+# names neither the secret nor the mistake, in a step whose entire job is to
+# stop a signing problem from being cryptic.
+if ! printf '%s' "$APPLE_DEV_CERT_BASE64" | tr -d '[:space:]' |
+  base64 --decode > "$p12" 2>/dev/null; then
+  printf '::error::APPLE_DEV_CERT_BASE64 is not base64.\n'
+  printf 'It usually means the path was pasted instead of the contents. '
+  printf 'Rebuild it with: base64 -i <the .p12> | pbcopy\n'
+  exit 1
+fi
+
+# And check it is a PKCS#12 rather than merely *some* bytes. DER starts with a
+# SEQUENCE tag, 0x30 — a .cer, a PEM, or a truncated paste all fail here, and
+# all of them would otherwise reach `security import` and be reported as
+# "Unknown format in import", which says nothing about which secret is wrong.
+if [[ ! -s $p12 ]] || [[ $(head -c 1 "$p12" | od -An -tx1 | tr -d ' ') != 30 ]]; then
+  printf '::error::APPLE_DEV_CERT_BASE64 decoded to %s bytes that are not a ' \
+    "$(wc -c < "$p12" | tr -d ' ')"
+  printf 'PKCS#12 file. Export the identity from Keychain Access -> '
+  printf 'My Certificates -> Export as .p12, then base64 that file.\n'
+  exit 1
+fi
 
 security create-keychain -p "$keychain_password" "$keychain"
 # `-t 21600` is the inactivity timeout. `-l` locks on sleep as well — it is a
