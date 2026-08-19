@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  Export options for the TestFlight build (.github/workflows/release-internal.yml).
+  Export options for the TestFlight build (.github/workflows/release.yml).
 
   Committed rather than generated because CI does its own archive/export instead
   of `flutter build ipa`: Flutter passes `-allowProvisioningUpdates` but never
@@ -10,11 +10,20 @@
   workflow calls xcodebuild directly with `-authenticationKeyPath` and friends,
   and that path needs a plist of its own.
 
-  `signingStyle: automatic` is what makes the API key do the work — Xcode
-  creates or fetches the distribution certificate and the App Store profile for
-  this team. That is why the key has to be an Admin key: Certificates,
-  Identifiers & Profiles is a separate permission area that App Manager cannot
-  reach.
+  `signingStyle: automatic` is what makes the API key do the work for THIS half
+  of the job — Xcode fetches the cloud-managed *distribution* certificate and
+  the App Store profile for this team. That is why the key has to be an Admin
+  key: Certificates, Identifiers & Profiles is a separate permission area that
+  App Manager cannot reach.
+
+  It does not cover the other half, and assuming it did is what let a bug hide
+  here for months. Cloud-managed certificates are a distribution feature —
+  Apple's page on them never mentions development — so the archive step this
+  exports had no identity of its own on an empty runner keychain and
+  `-allowProvisioningUpdates` created one on every single run. The runner is
+  handed a development identity by tool/release/ios_keychain.sh instead. Read
+  that file before changing anything here: the two are one mechanism, written
+  down in two places.
 
   `method: app-store-connect` is the Xcode 15.4+ spelling of the old
   `app-store`. GitHub's macOS runners are well past that; on anything older
