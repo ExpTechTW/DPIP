@@ -174,6 +174,31 @@ jobs:
           printf '%s' "${{ secrets.APPSTORE_API_PRIVATE_KEY }}" \
             > "$RUNNER_TEMP/private_keys/AuthKey_${{ secrets.APPSTORE_API_KEY_ID }}.p8"
 
+      # Without this the archive below creates a brand-new Apple Development
+      # certificate, every run. The runner's keychain is empty, the archive
+      # signs for development, Apple's cloud signing covers distribution only,
+      # and `-allowProvisioningUpdates` creates whatever it cannot find. Each
+      # one is dead on arrival — its private key never leaves the runner — and
+      # they pile up in the account until the team hits Apple's cap, at which
+      # point every iOS release fails at once until a human revokes by hand.
+      #
+      # tool/release/ios_keychain.sh has the full mechanism, including why
+      # dropping the flag is not the fix and why the certificate cannot simply
+      # be downloaded.
+      #
+      # No teardown step. The keychain lives under $RUNNER_TEMP on a VM GitHub
+      # destroys, which is the same reason `Remove the API key` further down is
+      # about the repository checkout rather than the machine.
+      - name: Install the iOS signing identity
+        if: matrix.platform == 'ios'
+        env:
+          # Through the environment rather than `${{ }}` inside the script
+          # body: a secret spliced into a shell by string substitution is one
+          # quote away from being read as shell.
+          APPLE_DEV_CERT_BASE64: ${{ secrets.APPLE_DEV_CERT_BASE64 }}
+          APPLE_DEV_CERT_PASSWORD: ${{ secrets.APPLE_DEV_CERT_PASSWORD }}
+        run: bash tool/release/ios_keychain.sh
+
       # `--build-name` is what reaches `CFBundleShortVersionString`, so it is
       # the *train*: Apple rejects anything that is not one to three integers
       # (ERROR ITMS-90060), at upload, TestFlight included. Android takes its

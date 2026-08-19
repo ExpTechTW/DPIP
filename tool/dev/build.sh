@@ -10,9 +10,14 @@
 # one therefore run the same command — the alternative is a build that only
 # fails on a tag.
 #
-# iOS is always `--no-codesign` here. Signing on a developer's machine and
-# signing in the release workflow are different problems, and the workflow
-# drives xcodebuild itself for the second one (see .github/workflows/release.yml).
+# iOS is always `--no-codesign` here, so this script cannot create a
+# certificate: the pinned SDK adds `-allowProvisioningUpdates` only when
+# codesigning is on, and otherwise forces CODE_SIGNING_ALLOWED=NO.
+#
+# Signing on a developer's machine and signing in the release workflow are
+# different problems, and the workflow drives xcodebuild itself for the second
+# one — see .github/workflows/release.yml, and tool/release/ios_keychain.sh for
+# why the runner has to be handed a development identity before it starts.
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 cd "$(repo_root)"
 
