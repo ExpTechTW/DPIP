@@ -69,7 +69,11 @@ permissions:
 jobs:
   code-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # A backstop, not the cap. The review itself is capped at 15 minutes on its
+    # own step, where a timeout can be swallowed; a job-level timeout cannot be,
+    # and would fail the check. This only catches something wedging outside the
+    # review step, which should never happen and should be loud if it does.
+    timeout-minutes: 20
     # Run on PR events, or on human-authored comments starting with trigger
     # keywords. Bot comments are excluded as a safety net: GITHUB_TOKEN already
     # suppresses events from bot-posted comments, but a PAT/App token would not.
@@ -110,14 +114,35 @@ jobs:
             core.setOutput('base_ref', pullRequest.base.ref);
             core.setOutput('head_sha', pullRequest.head.sha);
 
+      # Advisory, and therefore never a reason a pull request cannot merge.
+      #
+      # `continue-on-error` is what makes that true. A required check has three
+      # outcomes and only one of them lets a merge through: a skipped job
+      # reports Success, but a FAILED one blocks — and this step can fail for
+      # reasons that have nothing to do with the code under review. The LLM
+      # endpoint is down, the token expired, the quota ran out, the diff was too
+      # large, the model returned something unparseable. None of those are a
+      # statement about the pull request, and none of them should hold it.
+      #
+      # `timeout-minutes` here rather than on the job for the same reason: a
+      # job-level timeout fails the job and there is nothing downstream that can
+      # swallow it, whereas a step-level one is an error like any other and
+      # `continue-on-error` absorbs it. 15 minutes is well past how long a review
+      # of a normal diff takes, so hitting it means something is wedged.
+      #
+      # This makes the check green when the review did not happen, which is a
+      # real cost — so the step below says so out loud. Green and silent would
+      # be the version of this that goes unnoticed for months.
       - name: Run OpenCodeReview
+        id: review
+        continue-on-error: true
+        timeout-minutes: 15
         uses: alibaba/open-code-review@main
         with:
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ secrets.OCR_LLM_MODEL }}
           llm_use_anthropic: false
-          with:
           language: 中文
           background: |
             一律使用台灣繁體中文撰寫所有 review 評論與摘要。
@@ -126,3 +151,16 @@ jobs:
           # pull_request_target the action resolves them from the event.
           base_ref: ${{ steps.pr-context.outputs.base_ref }}
           head_sha: ${{ steps.pr-context.outputs.head_sha }}
+
+      # `outcome` is the step's real result; `conclusion` is what
+      # continue-on-error rewrote it to. Reading the first is the only way to
+      # tell "reviewed and found nothing" from "never reviewed anything", which
+      # otherwise look identical from outside: one green check either way.
+      - name: Say so if the review did not run
+        if: steps.review.outcome != 'success'
+        run: |
+          printf '::warning::the code review did not complete (%s). ' \
+            "${{ steps.review.outcome }}"
+          printf 'This check is advisory and stays green on purpose, so nothing '
+          printf 'is blocked — but this pull request has not been reviewed. '
+          printf 'Comment /open-code-review to try again.\n'
