@@ -37,12 +37,12 @@ class TemperatureMapLayer
 
   @override
   List<(double, String)> get colorStops => [
-    (-5, '#4575B4'.vision),
-    (5, '#74ADD1'.vision),
-    (15, '#ABD9E9'.vision),
-    (22, '#FFFFBF'.vision),
-    (28, '#FDAE61'.vision),
-    (34, '#F46D43'.vision),
-    (40, '#D73027'.vision),
+    (-20, '#4d4e51'.vision),
+    (-10, '#0000ff'.vision),
+    (0, '#308fff'.vision),
+    (10, '#6fc1b2'.vision),
+    (20, '#f6e78f'.vision),
+    (30, '#ff4500'.vision),
+    (40, '#81249D'.vision),
   ];
 }
