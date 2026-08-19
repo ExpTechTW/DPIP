@@ -37,10 +37,10 @@ class PressureMapLayer
 
   @override
   List<(double, String)> get colorStops => [
-    (980, '#4575B4'.vision),
-    (1000, '#ABD9E9'.vision),
-    (1013, '#FFFFBF'.vision),
-    (1025, '#FDAE61'.vision),
+    (640, '#4575B4'.vision),
+    (740, '#ABD9E9'.vision),
+    (840, '#FFFFBF'.vision),
+    (940, '#FDAE61'.vision),
     (1040, '#D73027'.vision),
   ];
 }
