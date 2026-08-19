@@ -129,6 +129,11 @@ void main() {
       expect(find.text(label), findsOneWidget, reason: label);
     }
     // The distance is a grouped number of kilometres, never a bare double.
-    expect(find.textContaining(RegExp(r'^3\d\d,\d\d\d km$')), findsOneWidget);
+    //
+    // Six digits, not "starts with a 3". The Moon's distance runs from about
+    // 356,500 km at perigee to about 406,700 km at apogee, so a leading 3 is
+    // true for most of a lunar month and false near apogee — which is a test
+    // that passes for three weeks and fails in the fourth, on nobody's change.
+    expect(find.textContaining(RegExp(r'^\d\d\d,\d\d\d km$')), findsOneWidget);
   });
 }
