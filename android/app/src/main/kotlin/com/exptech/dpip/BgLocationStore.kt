@@ -146,7 +146,7 @@ object BgLocationStore {
             // running while the app's own SSE connections were live, -1 was
             // everything the app could say, and it fits UnknownHostException,
             // a timeout, a TLS failure and a Doze network block equally well.
-            noteWake(context, "report failed: ${e.javaClass.simpleName}")
+            note(context, "report failed: ${e.javaClass.simpleName}")
         }
         stamp(prefs, code)
     }
