@@ -17,11 +17,17 @@ void main() {
 
   late Database db;
   late LogStore store;
+  // Pinned, and handed to the store, because `flush` prunes anything older
+  // than [logRetention] in the same transaction as the insert. With the real
+  // clock, a row stamped with a fixed date is inserted and then immediately
+  // deleted the moment that date falls out of the window — so this suite
+  // passed on 2026-08-18 and started failing on the 19th, on nobody's change.
+  final clock = DateTime.utc(2026, 8, 18, 12);
 
   setUp(() async {
     db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
     await LogStore.createSchema(db);
-    store = LogStore(db);
+    store = LogStore(db, now: () => clock);
     Log.store = store;
     Log.talker.cleanHistory();
   });
@@ -32,13 +38,7 @@ void main() {
   });
 
   test('clearing the screen empties the stored log too', () async {
-    store.add(
-      StoredLog(
-        time: DateTime.utc(2026, 8, 18),
-        level: 'info',
-        message: 'before',
-      ),
-    );
+    store.add(StoredLog(time: clock, level: 'info', message: 'before'));
     await store.flush();
     expect((await store.recent()).length, 1);
 
