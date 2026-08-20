@@ -414,6 +414,36 @@ void main() {
     expect(readiness.resident, 0);
   });
 
+  test('frame warming covers native display and prefetch zooms', () async {
+    await cache.install();
+    final repository = _TestFrameRepository(
+      MapTileWarmer(cache, settleDelay: Duration.zero),
+    );
+    nativeCalls.clear();
+
+    await repository.warmFrameTiles(
+      frames: const ['frame'],
+      south: 22,
+      west: 120,
+      north: 25,
+      east: 122,
+      zoom: 6,
+      immediate: true,
+    );
+
+    final probe = nativeCalls.firstWhere(
+      (call) => call.method == 'filterMissing',
+    );
+    final urls = ((probe.arguments as Map)['urls'] as List).cast<String>();
+    final zooms = {
+      for (final url in urls)
+        int.parse(
+          RegExp(r'/frame/(\d+)/').firstMatch(Uri.parse(url).path)!.group(1)!,
+        ),
+    };
+    expect(zooms, {7, 6, 5, 3});
+  });
+
   test('a newer working set evicts stale L1 URLs before filling', () async {
     await cache.install(memoryBytes: 1024);
     final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);

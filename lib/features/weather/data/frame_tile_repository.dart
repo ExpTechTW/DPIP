@@ -74,9 +74,10 @@ abstract base class FrameTileRepository implements RasterFrameSource {
         // Frame order is preserved, so a fill warm injects nearest-the-finger
         // frames' tiles first and only the most distant stay cold when the
         // mirror fills. Within each frame the native display zoom comes first,
-        // followed by its fallback levels. Warming only cameraZoom.floor()
-        // missed the z+1 requests MapLibre makes for 256 px tiles on Retina
-        // displays, which made an apparently full L1 useless during scrubs.
+        // followed by its fallback and prefetch levels. Warming only
+        // cameraZoom.floor() missed the z+1 requests MapLibre makes for 256 px
+        // tiles on Retina displays, which made an apparently full L1 useless
+        // during scrubs.
         for (final frame in frames)
           for (final group in groups)
             for (final tile in group) _urlFor(frame, tile),
@@ -143,13 +144,16 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     final idealZoom = math.min(zoom.floor(), maxZoom);
     final groups = <List<XyzTile>>[];
     // Native may pick one level above the nominal camera zoom on a Retina
-    // display, while retaining a parent as fallback. The device trace at zoom
-    // 6.00 requested z7 and z5 as well as z6. Preserve that priority for both
-    // the background warm and the reveal gate.
+    // display, retain a parent as fallback, and prefetch four source levels
+    // below the display level for a later camera animation. The device trace at
+    // zoom 6.00 requested z7, z6, z5 and z3. Preserve that priority for both the
+    // background warm and the reveal gate; otherwise every L1-ready scrub mount
+    // still performs one avoidable SQLite lookup for its z3 prefetch tile.
     for (final z in <int>{
       math.min(maxZoom, idealZoom + 1),
       idealZoom,
       math.max(0, idealZoom - 1),
+      math.max(0, idealZoom - 3),
     }) {
       final tiles = viewportTiles(
         south: south,

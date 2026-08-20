@@ -26,8 +26,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 ///
 /// ## Three tiers
 /// - **The ring** — frames within [ringRadius] are mounted **visible**, only
-///   the current one at full [opacity] and its neighbours at zero. MapLibre can
-///   load them ahead of demand; a frame replaces the current timestamp only
+///   the current one at full [opacity] and its neighbours at zero. During a
+///   drag, an L1-complete frame may join this set on demand; [maxResident]
+///   bounds the extra sources. A frame replaces the current timestamp only
 ///   after [RasterFrameSource.frameTileReadiness] proves that one complete
 ///   viewport zoom is in L1.
 /// - **The warm window** — frames within [warmRadius] were included in the last
@@ -35,12 +36,12 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 ///   remain cold and are never mislabeled as display-ready.
 /// - **Cold** — anything further out. Revealing it mounts and loads normally.
 ///
-/// A drag flips only complete frames already mounted in the ring. Crossing the
-/// ring edge updates the timeline label but deliberately leaves the last
-/// complete raster on screen: mounting every cold timestamp crossed by a fast
-/// finger starts a viewport of native tile work for each one, even when the
-/// network is fully cached. Finger-up mounts exactly one final ring. This keeps
-/// the platform channel, SQLite and MapLibre's source scheduler bounded.
+/// A drag flips complete ring members immediately. Beyond the ring it first
+/// performs an L1-only probe: a complete frame is mounted and shown, preserving
+/// the timeline's GIF-like preview, while a cold frame leaves the last complete
+/// raster on screen. Finger-up is the only Dart path allowed to warm from L2 or
+/// load a cold target. This keeps SQLite, HTTP and MapLibre's source scheduler
+/// bounded without making a warm drag look frozen.
 ///
 /// ## Settling
 /// A settle mounts the target and neighbours first, keeps the previous frame
@@ -237,8 +238,8 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// Frames with a source + layer on the map.
   final Set<String> _resident = <String>{};
 
-  /// The preload ring: residents currently `visibility: visible`. A scrub onto
-  /// any of these is an opacity flip.
+  /// Residents currently `visibility: visible`: the settled preload ring plus
+  /// any L1-complete frames revealed during the active scrub.
   final Set<String> _ring = <String>{};
 
   /// Least-recently-shown first, for [maxResident] eviction.
@@ -420,20 +421,13 @@ abstract class RasterTimelineLayer implements MapLayer {
       return;
     }
 
-    if (!_ring.contains(frameId)) {
-      // Do not mount a cold source for an intermediate scroll sample. Each
-      // source makes MapLibre schedule a viewport at several zoom levels; a
-      // fast fling can cross dozens before any of them is useful. The settle
-      // path below mounts only the final target and its fixed neighbour ring.
-      MapTileCache.trace(
-        'timeline=$id scrub-hold frame=$frameId reason=outside-ring '
-        'shown=$_shownFrameId',
-      );
-      return;
-    }
-    _touch(frameId);
-    if (!_isCurrent(frameId, generation)) return;
+    final inRing = _ring.contains(frameId);
+    if (inRing) _touch(frameId);
     if (_readyFrames.contains(frameId)) {
+      if (!inRing) {
+        await _stageScrubFrame(controller, frameId);
+        if (!_isCurrent(frameId, generation)) return;
+      }
       await _flip(controller, frameId);
       return;
     }
@@ -446,7 +440,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
   }
 
-  /// Scrub hot path — never mounts, never cancels, rarely touches `visibility`.
+  /// Scrub hot path — never cancels and rarely touches `visibility`.
   ///
   /// The two writes go out **together**. Awaiting the hide before sending the
   /// show cost two serial platform round-trips per frame, which is the budget
@@ -565,6 +559,14 @@ abstract class RasterTimelineLayer implements MapLayer {
       'dt=${elapsed.elapsedMilliseconds}ms',
     );
     if (readiness.ready) {
+      if (!settling && !_ring.contains(frameId)) {
+        // Readiness was an L1-only probe. Mounting after it succeeds lets
+        // MapLibre satisfy the display tiles entirely from memory; doing this
+        // in the opposite order would start native tile requests for every
+        // cold tick crossed by a fast finger.
+        await _stageScrubFrame(controller, frameId);
+        if (!_isCurrent(frameId, generation)) return;
+      }
       // L1 residency means native owns the encoded bytes, not that MapLibre has
       // decoded and painted them. Even a ring member may have mounted only one
       // input event ago, so give every frame's *first* reveal two render turns;
@@ -602,6 +604,25 @@ abstract class RasterTimelineLayer implements MapLayer {
         settling: settling,
       ),
     );
+  }
+
+  /// Makes an L1-complete scrub target drawable without letting a long gesture
+  /// accumulate an unbounded number of MapLibre sources.
+  ///
+  /// A newer input may arrive while the platform is adding this source. The
+  /// now-stale frame remains transparent and resident, then normal LRU eviction
+  /// or the final settle retires it; removing it immediately would add another
+  /// pair of platform calls to the input hot path.
+  Future<void> _stageScrubFrame(
+    MapLibreMapController controller,
+    String frameId,
+  ) async {
+    await _mount(controller, frameId, 0);
+    _ring.add(frameId);
+    final keep = <String>{frameId};
+    final shown = _shownFrameId;
+    if (shown != null) keep.add(shown);
+    await _evictOverflow(controller, keep: keep);
   }
 
   Future<void> _pollReadyReveal(
@@ -727,8 +748,8 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// Mounts [id] if cold, then draws it at [value]. Always leaves it `visible`,
   /// so MapLibre keeps its tiles loaded.
   ///
-  /// Ring membership is the caller's call. Only settle mounts a cold window;
-  /// the scrub path never reaches this method for an unmounted frame.
+  /// Ring membership is the caller's call. A settle mounts its cold window;
+  /// scrubbing reaches this only after an L1-only readiness probe succeeds.
   Future<void> _mount(
     MapLibreMapController controller,
     String id,
@@ -823,8 +844,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
   }
 
-  /// Hides every ring member that fell outside [keep] and abandons their tile
-  /// HTTP — the scrub swept past them and those bytes will never be drawn.
+  /// Hides every ring member that fell outside [keep] and abandons any remaining
+  /// tile HTTP. The source stays resident for a cheap nearby reversal until the
+  /// LRU ceiling removes it.
   Future<void> _retireOutside(
     MapLibreMapController controller,
     Set<String> keep,

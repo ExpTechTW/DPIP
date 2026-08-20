@@ -57,6 +57,7 @@ class _ControlledReadinessRadarRepository extends _FakeRadarRepository {
     bool warm = false,
   }) async {
     probes++;
+    readinessProbes.add((frame: frame, warm: warm));
     return (ready: ready, resident: ready ? 6 : 2, required: 6);
   }
 }
@@ -189,23 +190,37 @@ void main() {
     );
   });
 
-  test('dragging past the ring does no source or cache work', () async {
-    final source = _FakeRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source);
-    final frames = (await layer.frames()).valueOrNull!;
-    final controller = RecordingMapController();
+  test(
+    'a cached scrub target past the ring mounts and flips from L1',
+    () async {
+      final source = _FakeRadarRepository(_ids(9));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
 
-    await layer.prepare(controller, frames);
-    await layer.show(controller, frames[4]); // ring 2..6
-    controller.calls.clear();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]); // ring 2..6
+      await pumpEventQueue();
+      controller.calls.clear();
+      source.warmed.clear();
 
-    await layer.show(controller, frames[0], scrubbing: true);
+      await layer.show(controller, frames[0], scrubbing: true);
 
-    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
-    expect(controller.calls, isEmpty);
-    expect(source.readinessProbes, isEmpty);
-    expect(source.warmCancels, 1);
-  });
+      expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.0');
+      expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
+      expect(controller.calls, [
+        'addSource:radar-src-${frames[0].id}',
+        'addRasterLayer:radar-lyr-${frames[0].id}',
+        'set:radar-lyr-${frames[4].id}:0.0',
+        'set:radar-lyr-${frames[0].id}:0.85',
+      ]);
+      expect(source.readinessProbes, [
+        (frame: frames[0].id, warm: false),
+      ], reason: 'drag preview may probe L1 but must not consult L2');
+      expect(source.warmed, isEmpty);
+      expect(source.warmCancels, 1);
+    },
+  );
 
   test(
     'one gesture cancels warm once and restarts it after settling',
@@ -235,18 +250,61 @@ void main() {
     },
   );
 
-  test('finger-up mounts only the final ring after a fast scrub', () async {
-    final source = _FakeRadarRepository(_ids(12));
+  test('a long cached scrub keeps the resident source set bounded', () async {
+    final source = _FakeRadarRepository(_ids(40));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[20]);
+    await pumpEventQueue();
+    source.warmed.clear();
+    source.readinessProbes.clear();
+
+    for (final frame in frames) {
+      await layer.show(controller, frame, scrubbing: true);
+    }
+
+    final added = controller.calls
+        .where((call) => call.startsWith('addSource:radar-src-'))
+        .length;
+    final removed = controller.calls
+        .where((call) => call.startsWith('removeSource:radar-src-'))
+        .length;
+    expect(added - removed, lessThanOrEqualTo(32));
+    expect(
+      source.warmed,
+      isEmpty,
+      reason: 'scrubbing must never launch an L2 warm',
+    );
+    expect(
+      source.readinessProbes,
+      everyElement(
+        isA<({String frame, bool warm})>().having(
+          (probe) => probe.warm,
+          'warm',
+          isFalse,
+        ),
+      ),
+      reason: 'every off-ring decision is an L1-only probe',
+    );
+  });
+
+  test('a cold fast scrub mounts only the final ring on finger-up', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(12));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]); // ring 2..6
+    source.ready = false;
     await layer.show(controller, frames[0], scrubbing: true);
     await layer.show(controller, frames[11], scrubbing: true);
     controller.calls.clear();
     source.readinessProbes.clear();
+    source.ready = true;
 
     await layer.show(controller, frames[11]);
 
@@ -284,17 +342,19 @@ void main() {
   });
 
   test('finger-up settles the cold frame held during scrubbing', () async {
-    final source = _FakeRadarRepository(_ids(9));
+    final source = _ControlledReadinessRadarRepository(_ids(9));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]); // ring 2..6
+    source.ready = false;
     await layer.show(controller, frames[8], scrubbing: true); // held on frame 4
 
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
     // Finger-up is the only cold mount and moves the ring directly to 6..8.
+    source.ready = true;
     await layer.show(controller, frames[8]); // ring 6..8
 
     for (final i in [2, 3, 4, 5]) {
@@ -337,22 +397,22 @@ void main() {
     await pumpEventQueue();
     source.warmed.clear();
 
-    // Still inside the ±4 guaranteed band: revealing must not re-warm (or
-    // re-fetch the visible region) — the band already covers this mount.
+    // Revealing an L1-complete frame may mount its source, but must not re-warm
+    // or re-fetch it from the store — the previous fill already injected it.
     await layer.show(controller, frames[16], scrubbing: true);
     await pumpEventQueue();
     expect(
       source.warmed,
       isEmpty,
       reason:
-          'every scrub frame inside the warmed band costs one mount and no '
-          'store re-read, so the warm does not chase the finger frame by frame',
+          'a cached scrub frame costs one mount and no store re-read, so the '
+          'warm does not chase the finger frame by frame',
     );
 
-    // Even after crossing the old warm-band edge, the active five-frame ring is
-    // the prefetcher. The device trace showed the old scan probing 1,300–1,780
-    // cold SQLite keys every 120 ms with zero L2 hits while competing with the
-    // source mounts that actually drive network loading.
+    // Even after crossing the old warm-band edge, scrubbing remains an L1-only
+    // operation. The device trace showed the old scan probing 1,300–1,780 cold
+    // SQLite keys every 120 ms with zero L2 hits while competing with the source
+    // mounts that actually drive network loading.
     await layer.show(controller, frames[20], scrubbing: true);
     await pumpEventQueue();
     await layer.show(controller, frames[4], scrubbing: true);
@@ -378,16 +438,18 @@ void main() {
     expect(controller.calls, isEmpty);
     expect(
       source.probes,
-      0,
-      reason: 'a cold scrub target does not touch L1/L2',
+      1,
+      reason: 'a cold scrub target is checked in L1 without touching L2',
     );
+    expect(source.readinessProbes, [(frame: frames[0].id, warm: false)]);
 
     source.ready = true;
     await Future<void>.delayed(const Duration(milliseconds: 120));
 
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
     await layer.show(controller, frames[0]);
-    expect(source.probes, 1);
+    expect(source.probes, 2);
+    expect(source.readinessProbes.last, (frame: frames[0].id, warm: true));
     expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
   });
 
