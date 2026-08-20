@@ -12,6 +12,7 @@ import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_interaction_tracker.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
@@ -88,6 +89,7 @@ class MapScaffold extends StatefulWidget {
 class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
+  late final MapInteractionTracker _mapInteraction;
 
   /// The shell's visible-tab notifier — same contract as [BaseMap]: null
   /// (full-screen routes, previews) means always visible.
@@ -190,6 +192,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _mapInteraction = MapInteractionTracker(
+      onStart: () => _active.onMapGestureStart(),
+      onEnd: () => _active.onMapGestureEnd(),
+    );
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -454,7 +460,27 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   /// Feeds the compass needle — camera heading, ° clockwise from north.
   void _onCameraMove(CameraPosition position) {
+    // Pointer events cover direct pan/pinch gestures. Camera motion also covers
+    // wheel, accessibility, double-tap, and programmatic zooms, so every route
+    // keeps screen-space overlays hidden until the matching idle callback.
+    _mapInteraction.cameraMoved();
     _bearing.value = position.bearing;
+  }
+
+  void _onMapPointerDown(PointerDownEvent event) {
+    _mapInteraction.pointerDown(event.pointer);
+  }
+
+  void _onMapPointerEnded(PointerEvent event) {
+    final cameraMoving = _controller?.isCameraMoving ?? false;
+    if (_mapInteraction.pointerEnded(
+      event.pointer,
+      cameraMoving: cameraMoving,
+    )) {
+      // A tap does not produce another camera-idle event, but static overlays
+      // may still react to it, so retain the old tap-settle rebuild.
+      _cameraEpoch.value++;
+    }
   }
 
   /// Re-points the camera north, keeping centre / zoom — the native compass's
@@ -848,19 +874,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         Positioned.fill(
           child: Listener(
             behavior: HitTestBehavior.translucent,
-            onPointerDown: (_) => _active.onMapGestureStart(),
-            onPointerUp: (_) {
-              // Tap with no pan: camera idle won't re-fire — restore overlays.
-              final c = _controller;
-              if (c == null || !c.isCameraMoving) {
-                _active.onMapGestureEnd();
-                _cameraEpoch.value++;
-              }
-            },
-            onPointerCancel: (_) {
-              _active.onMapGestureEnd();
-              _cameraEpoch.value++;
-            },
+            onPointerDown: _onMapPointerDown,
+            onPointerUp: _onMapPointerEnded,
+            onPointerCancel: _onMapPointerEnded,
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
               maxZoomPreference: _active.mapMaxZoom,
@@ -872,13 +888,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
               onMapClick: (_, latLng) => _onMapClick(latLng),
               onCameraMove: _onCameraMove,
               onCameraIdle: () {
-                _active.onMapGestureEnd();
+                _mapInteraction.cameraIdle();
                 final controller = _controller;
                 if (controller != null) {
                   unawaited(_active.onCameraIdle(controller));
                   unawaited(_warmBasemap(controller));
                 }
-                _cameraEpoch.value++;
+                // An idle callback can arrive while a finger is still held
+                // stationary. Keep overlays hidden until the last pointer is
+                // released, then rebuild once against the final camera.
+                if (!_mapInteraction.hasPointers) _cameraEpoch.value++;
               },
               // The native compass lives inside the platform view, so any
               // Flutter overlay paints over it — MapScaffold draws its own

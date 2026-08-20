@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dpip/core/error/result.dart';
@@ -43,6 +44,47 @@ class _FakeWindRepository extends FakeRasterFrameSource
     ),
   );
 }
+
+class _ControlledWindRepository extends FakeRasterFrameSource
+    implements WindForecastRepository {
+  _ControlledWindRepository(super.frames);
+
+  final List<String> requested = [];
+  final Map<String, Completer<Result<WindField>>> _pending = {};
+
+  @override
+  String tileUrl(String frame) =>
+      'https://host/api/v2/tiles/wind/$frame/{z}/{x}/{y}.webp';
+
+  @override
+  Future<Result<WindField>> fetchWindField(String frame) {
+    requested.add(frame);
+    final pending = Completer<Result<WindField>>();
+    _pending[frame] = pending;
+    return pending.future;
+  }
+
+  void complete(String frame, String marker) {
+    _pending.remove(frame)!.complete(Ok(_windField(marker)));
+  }
+}
+
+WindField _windField(String marker) => WindField(
+  width: 2,
+  height: 2,
+  lat0: 90,
+  lon0: 0,
+  dLat: -0.25,
+  dLon: 0.25,
+  uMin: -1,
+  uMax: 1,
+  vMin: -1,
+  vMax: 1,
+  timeMs: 0,
+  model: marker,
+  u: Uint8List.fromList([127, 127, 127, 127]),
+  v: Uint8List.fromList([127, 127, 127, 127]),
+);
 
 void main() {
   test('frames chronological', () async {
@@ -194,6 +236,7 @@ void main() {
     expect(layer.field.value, isNull);
 
     await layer.show(controller, frames[0]);
+    await pumpEventQueue();
     expect(layer.field.value, isNotNull);
     expect(layer.field.value!.model, 'gfs');
 
@@ -201,6 +244,59 @@ void main() {
     // rather than the previous layer's stale one.
     await layer.clear(controller);
     expect(layer.field.value, isNull);
+  });
+
+  test(
+    'scrubbing clears particles and fetches only the settled frame',
+    () async {
+      final source = _ControlledWindRepository(_ids(3));
+      final layer = WindForecastMapLayer(source, model: WindForecastModel.gfs);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[0]);
+      source.complete(frames[0].id, 'initial');
+      await pumpEventQueue();
+      expect(layer.field.value?.model, 'initial');
+
+      await layer.show(controller, frames[1], scrubbing: true);
+      expect(layer.field.value, isNull);
+      expect(source.requested, [
+        frames[0].id,
+      ], reason: 'crossed frames must not download a WND1 grid');
+
+      // The raster already shows frame 1, but finger-up must still settle its
+      // ring and start exactly one binary request for that final frame.
+      await layer.show(controller, frames[1]);
+      expect(source.requested, [frames[0].id, frames[1].id]);
+      source.complete(frames[1].id, 'settled');
+      await pumpEventQueue();
+      expect(layer.field.value?.model, 'settled');
+    },
+  );
+
+  test('a late old WND1 response cannot overwrite the latest frame', () async {
+    final source = _ControlledWindRepository(_ids(3));
+    final layer = WindForecastMapLayer(source, model: WindForecastModel.gfs);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[0]);
+    await layer.show(controller, frames[1]);
+
+    source.complete(frames[1].id, 'new');
+    await pumpEventQueue();
+    expect(layer.field.value?.model, 'new');
+
+    source.complete(frames[0].id, 'old');
+    await pumpEventQueue();
+    expect(
+      layer.field.value?.model,
+      'new',
+      reason: 'the superseded request completed last and must be discarded',
+    );
   });
 
   testWidgets('the overlay slot hosts the particle animation', (tester) async {
