@@ -62,6 +62,31 @@ class _ControlledReadinessRadarRepository extends _FakeRadarRepository {
   }
 }
 
+class _BlockedNeighbourRadarRepository extends _FakeRadarRepository {
+  _BlockedNeighbourRadarRepository(super.frames);
+
+  late String blockedFrame;
+  final Completer<void> blockedProbe = Completer<void>();
+
+  @override
+  Future<FrameTileReadiness> frameTileReadiness({
+    required String frame,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+    bool warm = false,
+  }) async {
+    readinessProbes.add((frame: frame, warm: warm));
+    if (frame != blockedFrame) {
+      return (ready: true, resident: 1, required: 1);
+    }
+    if (!blockedProbe.isCompleted) blockedProbe.complete();
+    return (ready: false, resident: 0, required: 1);
+  }
+}
+
 void main() {
   test('frames chronological', () async {
     final layer = RadarMapLayer(
@@ -190,37 +215,117 @@ void main() {
     );
   });
 
+  test('an idle-preloaded scrub target restores and flips from L1', () async {
+    final source = _FakeRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
+    await pumpEventQueue();
+    controller.calls.clear();
+    source.warmed.clear();
+    source.readinessProbes.clear();
+
+    await layer.show(controller, frames[0], scrubbing: true);
+
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.0');
+    expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
+    expect(controller.calls, [
+      'set:radar-lyr-${frames[0].id}:0.0',
+      'set:radar-lyr-${frames[4].id}:0.0',
+      'set:radar-lyr-${frames[0].id}:0.85',
+    ]);
+    expect(
+      source.readinessProbes,
+      isEmpty,
+      reason: 'the completed idle preload is already an L1 readiness proof',
+    );
+    expect(source.warmed, isEmpty);
+    expect(source.warmCancels, 1);
+  });
+
   test(
-    'a cached scrub target past the ring mounts and flips from L1',
+    'idle settle fills the resident ceiling without extra draw passes',
     () async {
-      final source = _FakeRadarRepository(_ids(9));
+      final source = _FakeRadarRepository(_ids(40));
       final layer = RadarMapLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
       await layer.prepare(controller, frames);
-      await layer.show(controller, frames[4]); // ring 2..6
+      await layer.show(controller, frames[20]);
       await pumpEventQueue();
-      controller.calls.clear();
-      source.warmed.clear();
 
-      await layer.show(controller, frames[0], scrubbing: true);
-
-      expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.0');
-      expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
-      expect(controller.calls, [
-        'addSource:radar-src-${frames[0].id}',
-        'addRasterLayer:radar-lyr-${frames[0].id}',
-        'set:radar-lyr-${frames[4].id}:0.0',
-        'set:radar-lyr-${frames[0].id}:0.85',
-      ]);
-      expect(source.readinessProbes, [
-        (frame: frames[0].id, warm: false),
-      ], reason: 'drag preview may probe L1 but must not consult L2');
-      expect(source.warmed, isEmpty);
-      expect(source.warmCancels, 1);
+      expect(
+        controller.calls.where(
+          (call) => call.startsWith('addSource:radar-src-'),
+        ),
+        hasLength(32),
+        reason: 'idle preload uses every source slot but never exceeds the cap',
+      );
+      final visible = [
+        for (final frame in frames)
+          if (controller.visibilityOf('radar-lyr-${frame.id}') == 'visible')
+            frame.id,
+      ];
+      final hidden = [
+        for (final frame in frames)
+          if (controller.visibilityOf('radar-lyr-${frame.id}') == 'none')
+            frame.id,
+      ];
+      expect(visible, frames.sublist(18, 23).map((frame) => frame.id));
+      expect(
+        hidden,
+        hasLength(27),
+        reason: 'prepared neighbours stay resident without raster draw passes',
+      );
+      expect(
+        source.readinessProbes,
+        hasLength(27),
+        reason: 'one completion probe per neighbour, never parallel fan-out',
+      );
+      expect(
+        source.readinessProbes,
+        everyElement(
+          isA<({String frame, bool warm})>().having(
+            (probe) => probe.warm,
+            'warm',
+            isFalse,
+          ),
+        ),
+      );
     },
   );
+
+  test('a gesture stops idle expansion at its one in-flight frame', () async {
+    final ids = _ids(40);
+    final source = _BlockedNeighbourRadarRepository(ids);
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    source.blockedFrame = frames[23].id;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[20]);
+    await source.blockedProbe.future.timeout(const Duration(seconds: 1));
+
+    await layer.show(controller, frames[21], scrubbing: true);
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+
+    expect(source.warmCancels, 1);
+    expect(
+      controller.calls.where((call) => call.startsWith('addSource:radar-src-')),
+      hasLength(6),
+      reason: 'the five-frame core plus only one cold neighbour may be active',
+    );
+    expect(
+      source.readinessProbes.where((probe) => probe.frame == frames[17].id),
+      isEmpty,
+      reason: 'the next neighbour must not mount after the gesture starts',
+    );
+  });
 
   test(
     'one gesture cancels warm once and restarts it after settling',
@@ -383,6 +488,26 @@ void main() {
       reason:
           'the spread walks outward ±1, ±2, … so fill warm injects the '
           'nearest frames first and only the most distant stay cold',
+    );
+  });
+
+  test('a settled fill uses the full frame budget at a series edge', () async {
+    final source = _FakeRadarRepository(_ids(700));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames.last);
+    await pumpEventQueue();
+
+    final warmed = source.warmed.single;
+    expect(warmed, hasLength(512));
+    expect(warmed.first, frames.last.id);
+    expect(
+      warmed.last,
+      frames[frames.length - 512].id,
+      reason: 'the missing future side is reassigned to older cached frames',
     );
   });
 

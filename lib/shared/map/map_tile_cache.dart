@@ -87,15 +87,22 @@ class MapTileCache {
   /// large and the mirror quietly becomes the real cache, leaving
   /// [EtagCacheStore] doing nothing but the cold start.
   ///
-  /// 48 MB holds a full ±64-frame scrub band of webp tiles *plus* the basemap
-  /// viewport, so a fast timeline drag stays on memory hits even while the map
-  /// itself downloads. [warm]'s fill mode ([warm]) tops it up outward from the
-  /// current frame until it is near this cap, then stops — the mirror trims
-  /// LRU beyond it, dropping the frames a scrub swept past.
+  /// 48 MB holds hundreds of frame viewports plus the basemap. [warm]'s fill
+  /// mode tops it up outward from the current frame until it is near this cap,
+  /// then stops — the mirror trims LRU beyond it, dropping the frames a scrub
+  /// swept past.
   static const int defaultMemoryBytes = 48 * 1024 * 1024;
 
   /// Tiles per `injectTiles` message — roughly one frame's viewport.
   static const int _injectChunk = 24;
+
+  /// L2 URLs read at once while filling L1 — 16 typical frame viewports.
+  ///
+  /// The candidate window is deliberately much wider than memory. Reading its
+  /// every body before injection briefly doubled tens of MiB in Dart, even
+  /// though fill mode stopped once native reached its cap. This stays aligned
+  /// to both [_injectChunk] and SQLite's 400-variable query chunk.
+  static const int _fillReadChunk = _injectChunk * 16;
 
   /// The cap [install] sized the mirror with — remembered so a fill warm can
   /// estimate how much it may inject without overshooting into a trim.
@@ -246,6 +253,28 @@ class MapTileCache {
           },
         );
       }
+      if (fillUntil > 0) {
+        final fill = await _injectFillFromStore(
+          missing,
+          fillUntil,
+          shouldContinue: shouldContinue,
+          traceId: traceId,
+        );
+        trace(
+          'warm#$traceId l2-hit=${fill.hits} '
+          'l2-miss=${fill.scanned - fill.hits} '
+          'bytes=${_bytes(fill.bytes)} '
+          'scanned=${fill.scanned}/${missing.length} '
+          'dt=${elapsed.elapsedMilliseconds}ms',
+        );
+        final resident = await _residentSubset(wanted);
+        trace(
+          'warm#$traceId done injected=${fill.injected} '
+          'resident=${resident.length}/${wanted.length} '
+          'dt=${elapsed.elapsedMilliseconds}ms',
+        );
+        return (injected: fill.injected, resident: resident);
+      }
       // Don't bump last-used for a speculative warm: a frame the user scrubbed
       // past must not outrank one they actually looked at.
       final hits = await _store.readBytesBatch(missing, touch: false);
@@ -277,18 +306,11 @@ class MapTileCache {
               etag: entry.etag,
             ),
       ];
-      final injected = fillUntil > 0
-          ? await _injectFill(
-              tiles,
-              fillUntil,
-              shouldContinue: shouldContinue,
-              traceId: traceId,
-            )
-          : await _injectAll(
-              tiles,
-              shouldContinue: shouldContinue,
-              traceId: traceId,
-            );
+      final injected = await _injectAll(
+        tiles,
+        shouldContinue: shouldContinue,
+        traceId: traceId,
+      );
       final resident = await _residentSubset(wanted);
       trace(
         'warm#$traceId done injected=$injected '
@@ -356,67 +378,86 @@ class MapTileCache {
     return injected;
   }
 
-  /// Injects [tiles] (ordered most-wanted first) until the mirror is estimated
-  /// to hold `fillUntil × cap` bytes, then stops.
+  /// Reads L2 and injects it in priority order until the mirror is estimated to
+  /// hold `fillUntil × cap` bytes, then stops without reading the cold tail.
   ///
   /// The estimate is the last `injectTiles` echo plus the bytes this side is
   /// about to send. Overshooting native's cap invokes its LRU while the fill is
   /// still running, which can evict an earlier, higher-priority frame to make
   /// room for a later one. When a chunk straddles the goal it is split and only
   /// the fitting prefix is sent.
-  Future<int> _injectFill(
-    List<MapLibreTile> tiles,
+  Future<({int injected, int hits, int scanned, int bytes})>
+  _injectFillFromStore(
+    List<String> missing,
     double fillUntil, {
     bool Function()? shouldContinue,
     required int traceId,
   }) async {
     var cap = (_memoryLimit * fillUntil).floor();
-    if (cap <= 0) return 0;
+    if (cap <= 0) return (injected: 0, hits: 0, scanned: 0, bytes: 0);
     var used = 0; // No pre-inject usage query — start at the optimistic 0.
     var injected = 0;
-    for (var i = 0; i < tiles.length; i += _injectChunk) {
+    var l2Hits = 0;
+    var scanned = 0;
+    var l2Bytes = 0;
+
+    outer:
+    for (var readAt = 0; readAt < missing.length; readAt += _fillReadChunk) {
       if (shouldContinue?.call() == false || used >= cap) break;
-      final end = math.min(i + _injectChunk, tiles.length);
-      var chunkBytes = 0;
-      for (var j = i; j < end; j++) {
-        chunkBytes += tiles[j].data.length;
-      }
-      if (used + chunkBytes > cap) {
-        // Split the chunk at the goal — send only the tiles that fit.
-        final fits = <MapLibreTile>[];
-        var size = 0;
-        for (var j = i; j < end; j++) {
-          if (used + size + tiles[j].data.length > cap) break;
-          fits.add(tiles[j]);
-          size += tiles[j].data.length;
+      final readEnd = math.min(readAt + _fillReadChunk, missing.length);
+      final urls = missing.sublist(readAt, readEnd);
+      final hits = await _store.readBytesBatch(urls, touch: false);
+      scanned += urls.length;
+      l2Hits += hits.length;
+      l2Bytes += _binaryBytes(hits.values);
+      if (shouldContinue?.call() == false) break;
+
+      // SQLite does not preserve IN-query order. Rebuild this bounded batch
+      // from [urls], keeping centre-out frame priority intact.
+      final tiles = [
+        for (final url in urls)
+          if (hits[url] case final entry?)
+            MapLibreTile(
+              url: url,
+              data: entry.bytes,
+              contentType: entry.contentType,
+              etag: entry.etag,
+            ),
+      ];
+      for (var tileAt = 0; tileAt < tiles.length; tileAt += _injectChunk) {
+        if (shouldContinue?.call() == false || used >= cap) break outer;
+        final tileEnd = math.min(tileAt + _injectChunk, tiles.length);
+        var chunk = tiles.sublist(tileAt, tileEnd);
+        var chunkBytes = _tileBytes(chunk);
+        var reachedTarget = false;
+        if (used + chunkBytes > cap) {
+          final fits = <MapLibreTile>[];
+          var size = 0;
+          for (final tile in chunk) {
+            if (used + size + tile.data.length > cap) break;
+            fits.add(tile);
+            size += tile.data.length;
+          }
+          if (fits.isEmpty) break outer;
+          chunk = fits;
+          chunkBytes = size;
+          reachedTarget = true;
         }
-        if (fits.isEmpty) break;
-        final usage = await injectMapLibreTiles(fits);
-        used = usage?.used ?? used + size;
+        final usage = await injectMapLibreTiles(chunk);
+        used = usage?.used ?? used + chunkBytes;
         if (usage != null && usage.limit > 0) {
           cap = (usage.limit * fillUntil).floor();
         }
-        injected += fits.length;
+        injected += chunk.length;
         trace(
-          'warm#$traceId inject count=${fits.length} '
-          'bytes=${_bytes(size)} ${_formatUsage(usage)} target=${_bytes(cap)}',
+          'warm#$traceId inject count=${chunk.length} '
+          'bytes=${_bytes(chunkBytes)} ${_formatUsage(usage)} '
+          'target=${_bytes(cap)}',
         );
-        break;
+        if (reachedTarget) break outer;
       }
-      final chunk = tiles.sublist(i, end);
-      final usage = await injectMapLibreTiles(chunk);
-      used = usage?.used ?? used + chunkBytes;
-      if (usage != null && usage.limit > 0) {
-        cap = (usage.limit * fillUntil).floor();
-      }
-      injected += end - i;
-      trace(
-        'warm#$traceId inject count=${chunk.length} '
-        'bytes=${_bytes(chunkBytes)} ${_formatUsage(usage)} '
-        'target=${_bytes(cap)}',
-      );
     }
-    return injected;
+    return (injected: injected, hits: l2Hits, scanned: scanned, bytes: l2Bytes);
   }
 
   /// Stores [bytes] for [url] directly (a body the app fetched itself).

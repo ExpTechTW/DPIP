@@ -305,6 +305,39 @@ void main() {
     expect([for (final row in entries) row['url']], [first, second]);
   });
 
+  test('a fill stops reading L2 once native reaches its target', () async {
+    MapTileCache.traceEnabled = true;
+    addTearDown(() => MapTileCache.traceEnabled = false);
+    await cache.install(memoryBytes: 100);
+    final urls = [
+      for (var i = 0; i < 800; i++)
+        'https://static.exptech.dev/api/v2/tiles/radar/frame-$i/2/3/4.webp',
+    ];
+    await store.writeBytesBatch([
+      for (final url in urls)
+        (
+          url: url,
+          etag: url,
+          bytes: Uint8List(10),
+          contentType: 'image/webp',
+          size: 10,
+        ),
+    ]);
+    final baseline = Log.talker.history.length;
+
+    await cache.warm(urls, fillUntil: 0.9);
+
+    expect(injectedUrls, urls.take(9));
+    final lines = Log.talker.history
+        .skip(baseline)
+        .map((entry) => entry.generateTextMessage());
+    expect(
+      lines,
+      contains(contains('scanned=384/800')),
+      reason: 'the remaining 416 bodies must stay on disk once L1 reaches 90%',
+    );
+  });
+
   test('trace separates L1, L2, injection, and demand fallback', () async {
     MapTileCache.traceEnabled = true;
     addTearDown(() => MapTileCache.traceEnabled = false);
