@@ -9,14 +9,25 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const repo = ReleaseHighlightRepositoryImpl();
 
+  const shippedLocaleTags = {
+    'zh_Hant',
+    'zh_Hans',
+    'en',
+    'ja',
+    'ko',
+    'th',
+    'vi',
+    'id',
+    'fil',
+  };
+
   for (final kind in HighlightKind.values) {
     final name = kind.name;
     group('$name deck', () {
       final deck = repo.load(kind);
 
       test('has a title and subtitle in every shipped locale', () {
-        final tags = {'zh_Hant', 'en'};
-        for (final t in tags) {
+        for (final t in shippedLocaleTags) {
           expect(deck.title[t], isNotNull, reason: 'title[$t]');
           expect(deck.subtitle[t], isNotNull, reason: 'subtitle[$t]');
         }
@@ -43,4 +54,33 @@ void main() {
       });
     });
   }
+
+  test('ships only implementation-backed user highlights', () {
+    final deck = repo.load(HighlightKind.normal);
+
+    expect(
+      deck.cards.map((card) => card.id),
+      orderedEquals(['speed', 'data', 'map', 'time', 'privacy']),
+    );
+  });
+
+  test('ships only implementation-backed technical highlights', () {
+    final deck = repo.load(HighlightKind.advanced);
+
+    expect(
+      deck.cards.map((card) => card.id),
+      orderedEquals([
+        'etag_core',
+        'region_failover',
+        'sse_stream',
+        'dual_db',
+        'map_engine',
+        'app_time',
+        'logging',
+      ]),
+    );
+
+    final appTime = deck.cards.singleWhere((card) => card.id == 'app_time');
+    expect(appTime.body!['en'], contains('core/realtime/ntp_time_source.dart'));
+  });
 }
