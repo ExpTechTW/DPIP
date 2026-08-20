@@ -24,8 +24,10 @@ import 'package:dpip/shared/map/xyz_tiles.dart';
 /// nobody.
 ///
 /// Scrubs and pans schedule work constantly, so a warm is **debounced**
-/// ([settleDelay]) and **generation-guarded**: a superseded request is dropped
-/// before it reads anything, and [cancel] abandons whatever is in flight.
+/// ([settleDelay]), **generation-guarded**, and serial per consumer. A newer
+/// request stops an older one at its next injection chunk, then replaces that
+/// working set: URLs outside the new viewport/frame band are evicted from L1
+/// before the new priority order fills the reclaimed bytes.
 class MapTileWarmer {
   MapTileWarmer(
     this._cache, {
@@ -43,10 +45,18 @@ class MapTileWarmer {
   /// How long a schedule waits for the camera / finger to settle.
   final Duration settleDelay;
 
-  int _generation = 0;
+  int _cancelEpoch = 0;
+  final Map<String, int> _generations = {};
+  final Map<String, Set<String>> _workingSets = {};
+  Future<void> _serial = Future<void>.value();
+
+  static const String _defaultWorkingSet = 'default';
 
   /// Abandons any scheduled or in-flight warm.
-  void cancel() => _generation++;
+  void cancel() {
+    _cancelEpoch++;
+    MapTileCache.trace('warmer cancel epoch=$_cancelEpoch');
+  }
 
   /// Aborts native tile HTTP for URLs starting with any of [urlPrefixes].
   ///
@@ -54,6 +64,9 @@ class MapTileWarmer {
   /// downloading, but the basemap and the frame the user landed on must not.
   Future<void> abandon(List<String> urlPrefixes) async {
     if (urlPrefixes.isEmpty) return;
+    MapTileCache.trace(
+      'warmer abandon frames=${urlPrefixes.length} epoch=$_cancelEpoch',
+    );
     await _cache?.cancelFetches(urlContains: urlPrefixes);
   }
 
@@ -62,10 +75,33 @@ class MapTileWarmer {
   /// still a warm, not a download.
   Future<void> release(List<String> urlPrefixes) async {
     cancel();
-    final cache = _cache;
-    if (cache == null || urlPrefixes.isEmpty) return;
-    await cache.cancelFetches(urlContains: urlPrefixes);
-    await cache.evict(urlPrefixes);
+    MapTileCache.trace(
+      'warmer release sets=${_workingSets.length} '
+      'prefixes=${urlPrefixes.length}',
+    );
+    await _enqueue(() async {
+      _workingSets.clear();
+      final cache = _cache;
+      if (cache == null || urlPrefixes.isEmpty) return;
+      await cache.cancelFetches(urlContains: urlPrefixes);
+      await cache.evict(urlPrefixes);
+    });
+  }
+
+  /// Drops one named working set from L1 without touching other consumers.
+  ///
+  /// Basemap and terrain share a scheduler but own different sets; turning
+  /// terrain off should reclaim DEM bytes without flushing the basemap.
+  Future<void> discardWorkingSet(String workingSet) async {
+    _generations[workingSet] = (_generations[workingSet] ?? 0) + 1;
+    await _enqueue(() async {
+      final stale = _workingSets.remove(workingSet);
+      if (stale == null || stale.isEmpty) return;
+      MapTileCache.trace(
+        'warmer discard set=$workingSet resident=${stale.length}',
+      );
+      await _cache?.evict(stale.toList(growable: false));
+    });
   }
 
   /// Warms absolute tile [urls] (already resolved, e.g. from a layer's
@@ -78,18 +114,111 @@ class MapTileWarmer {
     Iterable<String> urls, {
     String? logLabel,
     double fillUntil = 0,
+    String workingSet = _defaultWorkingSet,
+    bool immediate = false,
   }) async {
     final cache = _cache;
     if (cache == null) return;
-    final list = urls.toList(growable: false);
+    final list = <String>{...urls}.toList(growable: false);
     if (list.isEmpty) return;
-    final gen = ++_generation;
-    await Future<void>.delayed(settleDelay);
-    if (gen != _generation) return;
-    final injected = await cache.warm(list, fillUntil: fillUntil);
-    if (gen == _generation && logLabel != null && injected > 0) {
-      Log.debug('MapTileWarmer $logLabel injected=$injected/${list.length}');
+    final epoch = _cancelEpoch;
+    final gen = (_generations[workingSet] ?? 0) + 1;
+    _generations[workingSet] = gen;
+    final label = logLabel ?? workingSet;
+    MapTileCache.trace(
+      'warmer schedule label=$label set=$workingSet gen=$gen '
+      'wanted=${list.length} fill=${fillUntil.toStringAsFixed(2)} '
+      'delay=${immediate ? 0 : settleDelay.inMilliseconds}ms',
+    );
+    if (!immediate && settleDelay > Duration.zero) {
+      await Future<void>.delayed(settleDelay);
     }
+    if (!_isCurrent(workingSet, epoch, gen)) {
+      MapTileCache.trace(
+        'warmer superseded label=$label set=$workingSet gen=$gen before-queue',
+      );
+      return;
+    }
+
+    await _enqueue(() async {
+      if (!_isCurrent(workingSet, epoch, gen)) {
+        MapTileCache.trace(
+          'warmer superseded label=$label set=$workingSet gen=$gen in-queue',
+        );
+        return;
+      }
+      final wanted = list.toSet();
+      final previous = _workingSets[workingSet] ?? const <String>{};
+      final stale = previous.difference(wanted);
+      MapTileCache.trace(
+        'warmer start label=$label set=$workingSet gen=$gen '
+        'previous=${previous.length} evict=${stale.length}',
+      );
+      if (stale.isNotEmpty) {
+        await cache.evict(stale.toList(growable: false));
+      }
+
+      final result = await cache.warm(
+        list,
+        fillUntil: fillUntil,
+        shouldContinue: () => _isCurrent(workingSet, epoch, gen),
+      );
+      // Record what native really retained even when a newer generation arrived
+      // mid-injection. Its queued replacement then knows exactly what to evict.
+      _workingSets[workingSet] = result.resident;
+      MapTileCache.trace(
+        'warmer done label=$label set=$workingSet gen=$gen '
+        'current=${_isCurrent(workingSet, epoch, gen)} '
+        'injected=${result.injected} resident=${result.resident.length}/'
+        '${list.length}',
+      );
+      if (_isCurrent(workingSet, epoch, gen) &&
+          logLabel != null &&
+          result.injected > 0) {
+        Log.debug(
+          'MapTileWarmer $logLabel '
+          'injected=${result.injected}/${list.length} '
+          'resident=${result.resident.length}',
+        );
+      }
+    });
+  }
+
+  /// Immediately prepares a small, display-critical URL set.
+  ///
+  /// Unlike [warmUrls], this does not replace a speculative working set or wait
+  /// behind its debounce. It does pre-empt that set's scheduled/in-flight fill:
+  /// a thousand-row background SQLite scan must never outrank the handful of
+  /// current-viewport tiles that gate a raster timestamp cutover. The partial
+  /// resident set is still recorded by [warmUrls], so the next settled fill can
+  /// evict or reuse it normally.
+  Future<TileWarmResult> prepareUrls(Iterable<String> urls) {
+    final list = <String>{...urls}.toList(growable: false);
+    final cache = _cache;
+    if (cache == null || list.isEmpty) {
+      return Future<TileWarmResult>.value((injected: 0, resident: <String>{}));
+    }
+    _generations[_defaultWorkingSet] =
+        (_generations[_defaultWorkingSet] ?? 0) + 1;
+    return cache.warm(list);
+  }
+
+  /// Probes L1 without touching SQLite or changing a speculative working set.
+  Future<Set<String>> residentUrls(Iterable<String> urls) {
+    final cache = _cache;
+    if (cache == null) return Future<Set<String>>.value(<String>{});
+    return cache.residentUrls(urls);
+  }
+
+  bool _isCurrent(String workingSet, int epoch, int generation) =>
+      epoch == _cancelEpoch && _generations[workingSet] == generation;
+
+  Future<void> _enqueue(Future<void> Function() operation) {
+    final next = _serial.then((_) => operation());
+    _serial = next.catchError((Object error, StackTrace stackTrace) {
+      Log.handle(error, stackTrace, 'MapTileWarmer operation');
+    });
+    return next;
   }
 
   /// Warms the viewport for a region-pinned path template.
@@ -109,6 +238,8 @@ class MapTileWarmer {
     int maxZoom = 16,
     int pad = 1,
     String? logLabel,
+    String workingSet = _defaultWorkingSet,
+    bool immediate = false,
   }) {
     final hosts = client.hostsFor(tier);
     if (hosts.isEmpty) return Future<void>.value();
@@ -123,6 +254,8 @@ class MapTileWarmer {
       maxZoom: maxZoom,
       pad: pad,
       logLabel: logLabel,
+      workingSet: workingSet,
+      immediate: immediate,
     );
   }
 
@@ -137,6 +270,8 @@ class MapTileWarmer {
     int maxZoom = 12,
     int pad = 1,
     String? logLabel,
+    String workingSet = _defaultWorkingSet,
+    bool immediate = false,
   }) {
     final tiles = viewportTiles(
       south: south,
@@ -149,9 +284,12 @@ class MapTileWarmer {
       maxTiles: maxTiles,
     );
     if (tiles.isEmpty) return Future<void>.value();
-    return warmUrls([
-      for (final tile in tiles) urlFor(tile.z, tile.x, tile.y),
-    ], logLabel: logLabel ?? 'xyz z=${tiles.first.z}');
+    return warmUrls(
+      [for (final tile in tiles) urlFor(tile.z, tile.x, tile.y)],
+      logLabel: logLabel ?? 'xyz z=${tiles.first.z}',
+      workingSet: workingSet,
+      immediate: immediate,
+    );
   }
 }
 

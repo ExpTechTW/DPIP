@@ -40,7 +40,19 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
     required double east,
     required double zoom,
     bool fill = false,
+    bool immediate = false,
   }) async => warmed.add(List<String>.of(frames));
+
+  @override
+  Future<FrameTileReadiness> frameTileReadiness({
+    required String frame,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+    bool warm = false,
+  }) async => (ready: true, resident: 1, required: 1);
 
   @override
   Future<void> abandonFrames(List<String> frames) async =>
@@ -85,8 +97,20 @@ class RecordingMapController implements MapLibreMapController {
     calls.add('addSource:$sourceId');
   }
 
+  @override
+  Future<void> addGeoJsonSource(
+    String sourceId,
+    Map<String, dynamic> geojson, {
+    String? promoteId,
+  }) async {
+    calls.add('addSource:$sourceId');
+  }
+
   /// `raster-opacity-transition` each layer was mounted with, by layer id.
   final Map<String, Object?> mountTransitions = {};
+
+  /// `raster-fade-duration` each layer was mounted with, by layer id.
+  final Map<String, Object?> mountTileFades = {};
 
   @override
   Future<void> addHillshadeLayer(
@@ -118,6 +142,7 @@ class RecordingMapController implements MapLibreMapController {
     below[layerId] = belowLayerId;
     mountTransitions[layerId] = properties
         .toJson()['raster-opacity-transition'];
+    mountTileFades[layerId] = properties.toJson()['raster-fade-duration'];
     _record(layerId, properties);
   }
 

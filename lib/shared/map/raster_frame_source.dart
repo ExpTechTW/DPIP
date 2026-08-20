@@ -3,6 +3,13 @@ library;
 
 import 'package:dpip/core/error/result.dart';
 
+/// How much of one frame's current viewport is already in MapLibre's L1.
+///
+/// [ready] is computed by the repository from complete display-resolution
+/// coverage, not from a raw percentage: every viewport tile at the native
+/// display level must be resident before a timeline may replace the frame.
+typedef FrameTileReadiness = ({bool ready, int resident, int required});
+
 /// The tile-side contract behind a scrubbable raster overlay (radar echo,
 /// satellite IR, …).
 ///
@@ -34,6 +41,23 @@ abstract interface class RasterFrameSource {
     required double east,
     required double zoom,
     bool fill = false,
+    bool immediate = false,
+  });
+
+  /// Probes the tiles needed to reveal one [frame] in the current viewport.
+  ///
+  /// With [warm] true, cached L2 bodies are first pushed into L1. This never
+  /// starts HTTP itself; mounting the frame's transparent raster layer is what
+  /// lets MapLibre fetch a genuinely cold tile. Callers can then poll with
+  /// [warm] false until the complete native display level is resident.
+  Future<FrameTileReadiness> frameTileReadiness({
+    required String frame,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+    bool warm = false,
   });
 
   /// Aborts in-flight tile HTTP for [frames] — a scrub swept past them and

@@ -1007,6 +1007,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           north: args.north,
           east: args.east,
           zoom: args.zoom,
+          immediate: true,
         );
       } else {
         await satellite.warmFrameTiles(
@@ -1016,6 +1017,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
           north: args.north,
           east: args.east,
           zoom: args.zoom,
+          immediate: true,
         );
       }
     } catch (_) {}

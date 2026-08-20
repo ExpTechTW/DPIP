@@ -1,13 +1,37 @@
+import 'dart:async';
+
+import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/map_tile_warmer.dart';
+import 'package:dpip/features/weather/data/frame_tile_repository.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const terrainUrl =
     'https://static.lb.exptech.dev/api/v1/map/terrain/7/107/55.png';
+
+final class _TestFrameRepository extends FrameTileRepository {
+  _TestFrameRepository(super.warmer);
+
+  @override
+  int get maxZoom => 11;
+
+  @override
+  String get tilePathPrefix => '/api/v2/tiles/radar/';
+
+  @override
+  Future<Result<List<String>>> frames() async => const Ok(['frame']);
+
+  @override
+  String tileUrl(String frame) =>
+      'https://static.exptech.dev/api/v2/tiles/radar/'
+      '$frame/{z}/{x}/{y}.webp';
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +45,11 @@ void main() {
   late EtagCacheStore store;
   late MapTileCache cache;
   late List<MethodCall> nativeCalls;
+  late Map<String, Uint8List> nativeMemory;
+  late int nativeLimit;
+  late List<String> injectedUrls;
+  Completer<void>? blockedInject;
+  Completer<void>? injectStarted;
 
   setUpAll(sqfliteFfiInit);
 
@@ -31,11 +60,51 @@ void main() {
     store = EtagCacheStore(db);
     cache = MapTileCache(store);
     nativeCalls = [];
+    nativeMemory = {};
+    nativeLimit = 2 * 1024 * 1024;
+    injectedUrls = [];
+    blockedInject = null;
+    injectStarted = null;
     messenger.setMockMethodCallHandler(channel, (call) async {
       nativeCalls.add(call);
-      // filterMissing: pretend native holds nothing.
-      if (call.method == 'filterMissing') {
-        return (call.arguments as Map)['urls'];
+      final arguments =
+          call.arguments as Map<Object?, Object?>? ??
+          const <Object?, Object?>{};
+      switch (call.method) {
+        case 'filterMissing':
+          return [
+            for (final url in (arguments['urls'] as List).cast<String>())
+              if (!nativeMemory.containsKey(url)) url,
+          ];
+        case 'injectTiles':
+          final gate = blockedInject;
+          if (gate != null) {
+            blockedInject = null;
+            injectStarted?.complete();
+            await gate.future;
+          }
+          for (final row
+              in (arguments['entries'] as List).cast<Map<Object?, Object?>>()) {
+            final url = row['url'] as String;
+            injectedUrls.add(url);
+            nativeMemory[url] = row['data'] as Uint8List;
+          }
+          return {
+            'used': nativeMemory.values.fold<int>(
+              0,
+              (sum, bytes) => sum + bytes.length,
+            ),
+            'limit': nativeLimit,
+          };
+        case 'evictTiles':
+          final needles = (arguments['contains'] as List).cast<String>();
+          if (needles.isEmpty) {
+            nativeMemory.clear();
+          } else {
+            nativeMemory.removeWhere((url, _) => needles.any(url.contains));
+          }
+        case 'setMemoryLimit':
+          nativeLimit = arguments['bytes'] as int;
       }
       return null;
     });
@@ -87,6 +156,19 @@ void main() {
           'without an answer here native matches no URL at all, and the store '
           'is silently bypassed rather than merely slow',
     );
+  });
+
+  test('a live map re-applies the L1 byte cap after channel attach', () async {
+    await cache.install(memoryBytes: 48 * 1024 * 1024);
+    // Reproduce native attaching after bootstrap: it starts from its 2 MB
+    // fallback because the first Dart-to-native message no longer exists.
+    nativeLimit = 2 * 1024 * 1024;
+    nativeCalls.clear();
+
+    await cache.syncNativeConfiguration();
+
+    expect(nativeLimit, 48 * 1024 * 1024);
+    expect(nativeCalls.single.method, 'setMemoryLimit');
   });
 
   test('glyphs are cached by the app store, not just by MapLibre', () async {
@@ -191,5 +273,224 @@ void main() {
       'urls': [terrainUrl],
     }) as Map;
     expect((served[terrainUrl] as Map)['data'], bytes);
+  });
+
+  test('a fill warm preserves caller priority over SQLite row order', () async {
+    await cache.install(memoryBytes: 1024);
+    const first =
+        'https://static.exptech.dev/api/v2/tiles/radar/priority-z/2/3/4.webp';
+    const second =
+        'https://static.exptech.dev/api/v2/tiles/radar/priority-a/2/3/4.webp';
+    // Insert in the opposite order. SQL IN queries do not promise to return
+    // rows in argument order, but fill mode must inject nearest-frame URLs
+    // first because it may stop before reaching the tail.
+    await store.writeBytes(
+      second,
+      etag: 'second',
+      bytes: Uint8List.fromList([2]),
+    );
+    await store.writeBytes(
+      first,
+      etag: 'first',
+      bytes: Uint8List.fromList([1]),
+    );
+    nativeCalls.clear();
+
+    await cache.warm([first, second], fillUntil: 0.9);
+
+    final inject = nativeCalls.firstWhere((c) => c.method == 'injectTiles');
+    final entries =
+        ((inject.arguments as Map<Object?, Object?>)['entries'] as List)
+            .cast<Map<Object?, Object?>>();
+    expect([for (final row in entries) row['url']], [first, second]);
+  });
+
+  test('trace separates L1, L2, injection, and demand fallback', () async {
+    await cache.install(memoryBytes: 1024);
+    const hot = 'https://static.exptech.dev/api/v2/tiles/radar/hot/2/3/4.webp';
+    const cold =
+        'https://static.exptech.dev/api/v2/tiles/radar/cold/2/3/4.webp';
+    const absent =
+        'https://static.exptech.dev/api/v2/tiles/radar/absent/2/3/4.webp';
+    nativeMemory[hot] = Uint8List.fromList([1]);
+    await store.writeBytes(
+      cold,
+      etag: 'cold',
+      bytes: Uint8List.fromList([2, 3]),
+    );
+    final baseline = Log.talker.history.length;
+
+    await cache.warm([hot, cold], fillUntil: 0.9);
+    await fromNative('getBatch', {
+      'urls': [absent],
+    });
+
+    final lines = Log.talker.history
+        .skip(baseline)
+        .map((entry) => entry.generateTextMessage())
+        .where((line) => line.contains('TILE TRACE'))
+        .toList();
+    expect(lines, contains(contains('probe l1-hit=1 l1-miss=1')));
+    expect(lines, contains(contains('l2-hit=1 l2-miss=0 bytes=2B')));
+    expect(lines, contains(contains('inject count=1 bytes=2B')));
+    expect(lines, contains(contains('done injected=1 resident=2/2')));
+    expect(lines, contains(contains('demand l1-miss=1 l2-hit=0 l2-miss=1')));
+  });
+
+  test('frame readiness requires the native display zoom', () async {
+    await cache.install();
+    final repository = _TestFrameRepository(
+      MapTileWarmer(cache, settleDelay: Duration.zero),
+    );
+    final display = viewportTiles(
+      south: 22,
+      west: 120,
+      north: 25,
+      east: 122,
+      zoom: 7,
+      maxZoom: 11,
+      pad: 0,
+    );
+    for (final tile in display) {
+      nativeMemory[repository
+          .tileUrl('frame')
+          .replaceFirst('{z}', '${tile.z}')
+          .replaceFirst('{x}', '${tile.x}')
+          .replaceFirst('{y}', '${tile.y}')] = Uint8List.fromList([
+        1,
+      ]);
+    }
+
+    final readiness = await repository.frameTileReadiness(
+      frame: 'frame',
+      south: 22,
+      west: 120,
+      north: 25,
+      east: 122,
+      zoom: 6,
+    );
+
+    expect(readiness.ready, isTrue);
+    expect(readiness.resident, display.length);
+    expect(readiness.required, display.length);
+  });
+
+  test('a complete parent alone is not display-ready', () async {
+    await cache.install();
+    final repository = _TestFrameRepository(
+      MapTileWarmer(cache, settleDelay: Duration.zero),
+    );
+    final parent = viewportTiles(
+      south: 22,
+      west: 120,
+      north: 25,
+      east: 122,
+      zoom: 5,
+      maxZoom: 11,
+      pad: 0,
+    );
+    for (final tile in parent) {
+      nativeMemory[repository
+          .tileUrl('frame')
+          .replaceFirst('{z}', '${tile.z}')
+          .replaceFirst('{x}', '${tile.x}')
+          .replaceFirst('{y}', '${tile.y}')] = Uint8List.fromList([
+        1,
+      ]);
+    }
+
+    final readiness = await repository.frameTileReadiness(
+      frame: 'frame',
+      south: 22,
+      west: 120,
+      north: 25,
+      east: 122,
+      zoom: 6,
+    );
+
+    expect(readiness.ready, isFalse);
+    expect(readiness.resident, 0);
+  });
+
+  test('a newer working set evicts stale L1 URLs before filling', () async {
+    await cache.install(memoryBytes: 1024);
+    final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+    const old = 'https://static.exptech.dev/api/v2/tiles/radar/old/2/3/4.webp';
+    const keep =
+        'https://static.exptech.dev/api/v2/tiles/radar/keep/2/3/4.webp';
+    const fresh =
+        'https://static.exptech.dev/api/v2/tiles/radar/fresh/2/3/4.webp';
+    for (final (url, value) in [(old, 1), (keep, 2), (fresh, 3)]) {
+      await store.writeBytes(
+        url,
+        etag: '$value',
+        bytes: Uint8List.fromList([value]),
+      );
+    }
+    await warmer.warmUrls([old, keep], immediate: true);
+    nativeCalls.clear();
+
+    await warmer.warmUrls([keep, fresh], immediate: true);
+
+    final evict = nativeCalls.firstWhere((c) => c.method == 'evictTiles');
+    expect((evict.arguments as Map)['contains'], [old]);
+    expect(nativeMemory.keys, unorderedEquals([keep, fresh]));
+  });
+
+  test('named working sets do not evict each other', () async {
+    await cache.install(memoryBytes: 1024);
+    final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+    const baseOld = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/1/1.pbf';
+    const baseNew = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/1/2.pbf';
+    const terrain =
+        'https://static.lb.exptech.dev/api/v1/map/terrain/7/1/1.png';
+    for (final (url, value) in [(baseOld, 1), (baseNew, 2), (terrain, 3)]) {
+      await store.writeBytes(
+        url,
+        etag: '$value',
+        bytes: Uint8List.fromList([value]),
+      );
+    }
+    await warmer.warmUrls([baseOld], workingSet: 'basemap', immediate: true);
+    await warmer.warmUrls([terrain], workingSet: 'terrain', immediate: true);
+
+    await warmer.warmUrls([baseNew], workingSet: 'basemap', immediate: true);
+
+    expect(nativeMemory.keys, unorderedEquals([baseNew, terrain]));
+
+    await warmer.discardWorkingSet('terrain');
+    expect(nativeMemory.keys, [baseNew]);
+  });
+
+  test('a superseded fill stops before its next injection chunk', () async {
+    await cache.install(memoryBytes: 1024);
+    final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+    final old = [
+      for (var i = 0; i < 30; i++)
+        'https://static.exptech.dev/api/v2/tiles/radar/old/$i/3/4.webp',
+    ];
+    const fresh =
+        'https://static.exptech.dev/api/v2/tiles/radar/fresh/99/3/4.webp';
+    for (final url in [...old, fresh]) {
+      await store.writeBytes(url, etag: url, bytes: Uint8List.fromList([1]));
+    }
+    final gate = Completer<void>();
+    blockedInject = gate;
+    injectStarted = Completer<void>();
+
+    final oldWarm = warmer.warmUrls(old, fillUntil: 0.9, immediate: true);
+    await injectStarted!.future;
+    final freshWarm = warmer.warmUrls([fresh], fillUntil: 0.9, immediate: true);
+    gate.complete();
+    await Future.wait([oldWarm, freshWarm]);
+
+    final oldSet = old.toSet();
+    expect(
+      injectedUrls.where(oldSet.contains),
+      hasLength(24),
+      reason:
+          'the final six stale bodies must never cross the platform channel',
+    );
+    expect(nativeMemory.keys, [fresh]);
   });
 }
