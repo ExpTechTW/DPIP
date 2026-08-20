@@ -65,6 +65,8 @@ class HomeSheetHeader extends StatelessWidget {
   /// but opposite ends of the ink decision.
   final Color? sky;
 
+  static final DateFormat _clockFormat = DateFormat('HH:mm');
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -81,7 +83,9 @@ class HomeSheetHeader extends StatelessWidget {
     );
 
     final directory = context.read<TownDirectory>();
-    final area = context.watch<RegionStore>().selected;
+    final area = context.select<RegionStore, HomeArea>(
+      (store) => store.selected,
+    );
     final areaName = switch (area) {
       NationwideArea() => l10n.regionNationwide,
       CurrentArea(:final code) =>
@@ -89,12 +93,22 @@ class HomeSheetHeader extends StatelessWidget {
       SavedArea(:final code) => directory.byCode(code)?.fullName ?? '',
     };
 
-    final controller = context.watch<HomeWeatherController>();
+    final weatherState = context
+        .select<
+          HomeWeatherController,
+          ({String? areaCode, String? weatherCode, WeatherRealtime? weather})
+        >(
+          (controller) => (
+            areaCode: controller.areaCode,
+            weatherCode: controller.weatherCode,
+            weather: controller.weather,
+          ),
+        );
     // A reading from a previous area is held while the new one loads (never
     // blanking the sheet), but it must not be shown as the new area's — only
     // data belonging to the currently selected township passes through here.
-    final realtime = controller.weatherCode == controller.areaCode
-        ? controller.weather
+    final realtime = weatherState.weatherCode == weatherState.areaCode
+        ? weatherState.weather
         : null;
     final data = realtime?.data;
     final temp = data?.temperature;
@@ -158,7 +172,7 @@ class HomeSheetHeader extends StatelessWidget {
             Text(
               l10n.weatherDataTime(
                 current.station.name,
-                DateFormat('HH:mm').format(
+                _clockFormat.format(
                   AppTime.taipei(
                     DateTime.fromMillisecondsSinceEpoch(
                       current.time * 1000,

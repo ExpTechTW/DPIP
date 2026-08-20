@@ -48,6 +48,9 @@ class RainOnGlass extends StatefulWidget {
 class _RainOnGlassState extends State<RainOnGlass>
     with SingleTickerProviderStateMixin {
   static const String _asset = 'shaders/weather/rain_on_glass.frag';
+  static final ui.ImageFilter _identityFilter = ui.ImageFilter.matrix(
+    Matrix4.identity().storage,
+  );
 
   final Stopwatch _clock = Stopwatch();
   late final AnimationController _ticker = AnimationController(
@@ -64,7 +67,6 @@ class _RainOnGlassState extends State<RainOnGlass>
   @override
   void initState() {
     super.initState();
-    _syncRunning();
     _load();
   }
 
@@ -73,13 +75,19 @@ class _RainOnGlassState extends State<RainOnGlass>
       final program = await ui.FragmentProgram.fromAsset(_asset);
       if (!mounted) return;
       setState(() => _shader = program.fragmentShader());
+      _syncRunning();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'Failed to load shader $_asset');
     }
   }
 
   void _syncRunning() {
-    if (widget.active && widget.intensity > 0.01) {
+    // No shader means there can be no visible frame. This also permanently
+    // stops the vsync loop on Skia after the filter capability check fails.
+    if (widget.active &&
+        widget.intensity > 0.01 &&
+        _shader != null &&
+        !_filterUnsupported) {
       if (!_clock.isRunning) _clock.start();
       _ticker.repeat();
     } else {
@@ -143,7 +151,9 @@ class _RainOnGlassState extends State<RainOnGlass>
         'ImageFilter.shader unavailable; rain-on-glass disabled',
       );
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() => _filterUnsupported = true);
+        if (!mounted || _filterUnsupported) return;
+        setState(() => _filterUnsupported = true);
+        _syncRunning();
       });
       return null;
     }
@@ -169,8 +179,7 @@ class _RainOnGlassState extends State<RainOnGlass>
         return ImageFiltered(
           // A no-op filter keeps the widget — and so the element tree —
           // present even when the effect is off.
-          imageFilter:
-              filter ?? ui.ImageFilter.matrix(Matrix4.identity().storage),
+          imageFilter: filter ?? _identityFilter,
           enabled: filter != null,
           child: child,
         );

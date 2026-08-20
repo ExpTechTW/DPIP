@@ -159,7 +159,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   @override
   void initState() {
     super.initState();
-    _syncRunning();
     _init();
   }
 
@@ -205,9 +204,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       ('assets/weather/particles/snow_flake.webp', false),
     ]) {
       try {
-        final data = await rootBundle.load(entry.$1);
-        final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-        final image = (await codec.getNextFrame()).image;
+        final image = await _decodeAsset(entry.$1);
         if (entry.$2) {
           rainAtlas = image;
         } else {
@@ -229,9 +226,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       'assets/weather/sky/annulus.webp',
     ]) {
       try {
-        final data = await rootBundle.load(path);
-        final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-        sunTex.add((await codec.getNextFrame()).image);
+        sunTex.add(await _decodeAsset(path));
       } catch (error, stackTrace) {
         Log.handle(error, stackTrace, 'Failed to load sun texture $path');
       }
@@ -241,9 +236,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     for (var i = 0; i < _spriteCount; i++) {
       final path = 'assets/weather/clouds/${i.toString().padLeft(2, '0')}.webp';
       try {
-        final data = await rootBundle.load(path);
-        final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-        sprites.add((await codec.getNextFrame()).image);
+        sprites.add(await _decodeAsset(path));
       } catch (error, stackTrace) {
         Log.handle(error, stackTrace, 'Failed to load cloud sprite $path');
       }
@@ -303,6 +296,17 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
               seed: 11,
             );
     });
+    _syncRunning();
+  }
+
+  static Future<ui.Image> _decodeAsset(String path) async {
+    final data = await rootBundle.load(path);
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    try {
+      return (await codec.getNextFrame()).image;
+    } finally {
+      codec.dispose();
+    }
   }
 
   void _disposeResources() {
@@ -327,7 +331,8 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   }
 
   void _syncRunning() {
-    if (widget.active) {
+    final ready = _lutCache != null && _shaders.length >= _layerAssets.length;
+    if (widget.active && ready) {
       if (!_clock.isRunning) _clock.start();
       _ticker.repeat();
     } else {
