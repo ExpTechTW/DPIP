@@ -16,6 +16,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+enum _IdlePreloadOutcome { ready, timeout, cancelled }
+
 /// A time-scrubbable raster overlay driven by a [RasterFrameSource].
 ///
 /// ## The problem this solves
@@ -276,6 +278,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   static const Duration _readyPoll = Duration(milliseconds: 40);
   static const Duration _decodeGrace = Duration(milliseconds: 32);
   static const Duration _readyTimeout = Duration(seconds: 2);
+  static const int _idlePreloadConcurrency = 3;
+  static const Duration _idleReadyPoll = Duration(milliseconds: 80);
+  static const Duration _idleReadyTimeout = Duration(seconds: 8);
 
   /// Whether [frameSeamLayerId] is currently on the map.
   bool _seamMounted = false;
@@ -756,13 +761,13 @@ abstract class RasterTimelineLayer implements MapLayer {
   }
 
   /// Uses otherwise-idle time to prepare the largest source window the
-  /// resident ceiling permits, one cold frame at a time.
+  /// resident ceiling permits with a small, fixed worker pool.
   ///
   /// The immediate ±[ringRadius] ring remains visible. Extra sources are
-  /// mounted only long enough for MapLibre to fetch/decode their viewport,
-  /// then hidden: their encoded tiles stay in L1 and the source stays resident,
-  /// but transparent rasters do not keep consuming draw passes. A later scrub
-  /// restores one with [_stageScrubFrame].
+  /// At most [_idlePreloadConcurrency] cold frames can issue viewport requests
+  /// together. Each is hidden once complete: its encoded tiles stay in L1 and
+  /// the source stays resident, but transparent rasters do not keep consuming
+  /// draw passes. A later scrub restores one with [_stageScrubFrame].
   Future<void> _preloadSettledNeighbours(
     MapLibreMapController controller,
     int index,
@@ -773,78 +778,155 @@ abstract class RasterTimelineLayer implements MapLayer {
     final preload = _nearestFrames(index, maxResident);
     final preloadSet = preload.toSet();
     final core = _ringAt(index).$3;
+    final candidates = [
+      for (final candidate in preload)
+        if (!core.contains(candidate)) candidate,
+    ];
+    if (candidates.isEmpty) return;
     final bounds = await controller.getVisibleRegion();
     final zoom = controller.cameraPosition?.zoom ?? 8;
     final elapsed = Stopwatch()..start();
+    final workers = candidates.length < _idlePreloadConcurrency
+        ? candidates.length
+        : _idlePreloadConcurrency;
+    var next = 0;
     var complete = 0;
+    var timedOut = 0;
     MapTileCache.trace(
       'timeline=$id idle-preload start frame=$frameId '
-      'candidates=${preload.length - core.length} resident=${_resident.length}',
+      'candidates=${candidates.length} workers=$workers '
+      'resident=${_resident.length}',
     );
 
-    for (final candidate in preload) {
-      if (core.contains(candidate)) continue;
-      if (_warmSuspended || !_isCurrent(frameId, generation)) return;
-
-      await _enqueueMutation(() async {
-        if (_warmSuspended || !_isCurrent(frameId, generation)) return;
-        await _mount(controller, candidate, 0);
-        _ring.add(candidate);
-        await _evictOverflow(controller, keep: preloadSet);
-      });
-      if (_warmSuspended || !_isCurrent(frameId, generation)) return;
-
-      var readiness = await source.frameTileReadiness(
-        frame: candidate,
-        south: bounds.southwest.latitude,
-        west: bounds.southwest.longitude,
-        north: bounds.northeast.latitude,
-        east: bounds.northeast.longitude,
-        zoom: zoom,
-      );
-      final waiting = Stopwatch()..start();
-      while (!readiness.ready &&
-          waiting.elapsed < _readyTimeout &&
-          !_warmSuspended &&
-          _isCurrent(frameId, generation)) {
-        await Future<void>.delayed(_readyPoll);
-        if (_warmSuspended || !_isCurrent(frameId, generation)) return;
-        readiness = await source.frameTileReadiness(
-          frame: candidate,
+    Future<void> runWorker() async {
+      while (!_warmSuspended && _isCurrent(frameId, generation)) {
+        if (next >= candidates.length) return;
+        final candidate = candidates[next++];
+        final outcome = await _preloadSettledFrame(
+          controller,
+          candidate,
+          preloadSet,
+          frameId,
+          generation,
           south: bounds.southwest.latitude,
           west: bounds.southwest.longitude,
           north: bounds.northeast.latitude,
           east: bounds.northeast.longitude,
           zoom: zoom,
         );
+        switch (outcome) {
+          case _IdlePreloadOutcome.ready:
+            complete++;
+          case _IdlePreloadOutcome.timeout:
+            timedOut++;
+          case _IdlePreloadOutcome.cancelled:
+            return;
+        }
       }
-      if (_warmSuspended || !_isCurrent(frameId, generation)) return;
-      if (!readiness.ready) {
-        MapTileCache.trace(
-          'timeline=$id idle-preload stop frame=$candidate reason=timeout '
-          'resident=${readiness.resident}/${readiness.required}',
-        );
-        return;
-      }
-
-      await _enqueueMutation(() async {
-        if (_warmSuspended || !_isCurrent(frameId, generation)) return;
-        _readyFrames.add(candidate);
-        _ring.remove(candidate);
-        await controller.setLayerProperties(
-          _layerId(candidate),
-          _hidden,
-          skipNulls: true,
-        );
-      });
-      complete++;
     }
+
+    await Future.wait([for (var i = 0; i < workers; i++) runWorker()]);
     MapTileCache.trace(
       'timeline=$id idle-preload done frame=$frameId complete=$complete '
+      'timeout=$timedOut '
       'resident=${_resident.length}/$maxResident '
       'dt=${elapsed.elapsedMilliseconds}ms',
     );
   }
+
+  Future<_IdlePreloadOutcome> _preloadSettledFrame(
+    MapLibreMapController controller,
+    String candidate,
+    Set<String> preloadSet,
+    String frameId,
+    int generation, {
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+  }) async {
+    bool current() => !_warmSuspended && _isCurrent(frameId, generation);
+
+    await _enqueueMutation(() async {
+      if (!current()) return;
+      await _mount(controller, candidate, 0);
+      _ring.add(candidate);
+      await _evictOverflow(controller, keep: preloadSet);
+    });
+    if (!current()) {
+      await _discardIdleFrame(controller, candidate);
+      return _IdlePreloadOutcome.cancelled;
+    }
+
+    var readiness = await source.frameTileReadiness(
+      frame: candidate,
+      south: south,
+      west: west,
+      north: north,
+      east: east,
+      zoom: zoom,
+    );
+    final waiting = Stopwatch()..start();
+    while (!readiness.ready &&
+        waiting.elapsed < _idleReadyTimeout &&
+        current()) {
+      await Future<void>.delayed(_idleReadyPoll);
+      if (!current()) break;
+      readiness = await source.frameTileReadiness(
+        frame: candidate,
+        south: south,
+        west: west,
+        north: north,
+        east: east,
+        zoom: zoom,
+      );
+    }
+    if (!current()) {
+      await _discardIdleFrame(controller, candidate);
+      return _IdlePreloadOutcome.cancelled;
+    }
+    if (!readiness.ready) {
+      MapTileCache.trace(
+        'timeline=$id idle-preload frame=$candidate reason=timeout '
+        'resident=${readiness.resident}/${readiness.required}',
+      );
+      await _discardIdleFrame(controller, candidate);
+      return _IdlePreloadOutcome.timeout;
+    }
+
+    await _enqueueMutation(() async {
+      if (!current()) return;
+      _readyFrames.add(candidate);
+      _ring.remove(candidate);
+      await controller.setLayerProperties(
+        _layerId(candidate),
+        _hidden,
+        skipNulls: true,
+      );
+    });
+    if (!current()) {
+      await _discardIdleFrame(controller, candidate);
+      return _IdlePreloadOutcome.cancelled;
+    }
+    return _IdlePreloadOutcome.ready;
+  }
+
+  /// Drops a speculative source that did not become display-ready. A frame the
+  /// gesture has already adopted is left alone; removing the last complete
+  /// timestamp while its replacement is cold would blank the map.
+  Future<void> _discardIdleFrame(
+    MapLibreMapController controller,
+    String candidate,
+  ) => _enqueueMutation(() async {
+    if (candidate == _requestedFrameId || candidate == _shownFrameId) return;
+    await source.abandonFrames([candidate]);
+    _ring.remove(candidate);
+    _resident.remove(candidate);
+    _readyFrames.remove(candidate);
+    _lru.remove(candidate);
+    await _removeFrame(controller, candidate);
+  });
 
   void _suspendWarm() {
     if (_warmSuspended) return;

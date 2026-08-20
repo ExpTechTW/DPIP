@@ -62,11 +62,12 @@ class _ControlledReadinessRadarRepository extends _FakeRadarRepository {
   }
 }
 
-class _BlockedNeighbourRadarRepository extends _FakeRadarRepository {
-  _BlockedNeighbourRadarRepository(super.frames);
+class _BlockedNeighboursRadarRepository extends _FakeRadarRepository {
+  _BlockedNeighboursRadarRepository(super.frames);
 
-  late String blockedFrame;
-  final Completer<void> blockedProbe = Completer<void>();
+  late Set<String> blockedFrames;
+  final Set<String> probedBlockedFrames = {};
+  final Completer<void> blockedProbes = Completer<void>();
 
   @override
   Future<FrameTileReadiness> frameTileReadiness({
@@ -79,10 +80,14 @@ class _BlockedNeighbourRadarRepository extends _FakeRadarRepository {
     bool warm = false,
   }) async {
     readinessProbes.add((frame: frame, warm: warm));
-    if (frame != blockedFrame) {
+    if (!blockedFrames.contains(frame)) {
       return (ready: true, resident: 1, required: 1);
     }
-    if (!blockedProbe.isCompleted) blockedProbe.complete();
+    probedBlockedFrames.add(frame);
+    if (!blockedProbes.isCompleted &&
+        probedBlockedFrames.containsAll(blockedFrames)) {
+      blockedProbes.complete();
+    }
     return (ready: false, resident: 0, required: 1);
   }
 }
@@ -284,7 +289,8 @@ void main() {
       expect(
         source.readinessProbes,
         hasLength(27),
-        reason: 'one completion probe per neighbour, never parallel fan-out',
+        reason:
+            'every already-hot neighbour needs exactly one completion probe',
       );
       expect(
         source.readinessProbes,
@@ -299,33 +305,45 @@ void main() {
     },
   );
 
-  test('a gesture stops idle expansion at its one in-flight frame', () async {
-    final ids = _ids(40);
-    final source = _BlockedNeighbourRadarRepository(ids);
-    final layer = RadarMapLayer(source);
-    final frames = (await layer.frames()).valueOrNull!;
-    source.blockedFrame = frames[23].id;
-    final controller = RecordingMapController();
+  test(
+    'idle downloads use three lanes and a gesture cancels all three',
+    () async {
+      final ids = _ids(40);
+      final source = _BlockedNeighboursRadarRepository(ids);
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      source.blockedFrames = {frames[23].id, frames[17].id, frames[24].id};
+      final controller = RecordingMapController();
 
-    await layer.prepare(controller, frames);
-    await layer.show(controller, frames[20]);
-    await source.blockedProbe.future.timeout(const Duration(seconds: 1));
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[20]);
+      await source.blockedProbes.future.timeout(const Duration(seconds: 1));
 
-    await layer.show(controller, frames[21], scrubbing: true);
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+      expect(source.probedBlockedFrames, source.blockedFrames);
+      expect(
+        source.readinessProbes.where((probe) => probe.frame == frames[16].id),
+        isEmpty,
+        reason: 'a fourth cold neighbour must wait for one of three lanes',
+      );
 
-    expect(source.warmCancels, 1);
-    expect(
-      controller.calls.where((call) => call.startsWith('addSource:radar-src-')),
-      hasLength(6),
-      reason: 'the five-frame core plus only one cold neighbour may be active',
-    );
-    expect(
-      source.readinessProbes.where((probe) => probe.frame == frames[17].id),
-      isEmpty,
-      reason: 'the next neighbour must not mount after the gesture starts',
-    );
-  });
+      await layer.show(controller, frames[21], scrubbing: true);
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      expect(source.warmCancels, 1);
+      final added = controller.calls
+          .where((call) => call.startsWith('addSource:radar-src-'))
+          .length;
+      final removed = controller.calls
+          .where((call) => call.startsWith('removeSource:radar-src-'))
+          .length;
+      expect(
+        added - removed,
+        5,
+        reason: 'all three speculative sources are removed after cancellation',
+      );
+      expect(source.abandoned.toSet(), source.blockedFrames);
+    },
+  );
 
   test(
     'one gesture cancels warm once and restarts it after settling',
