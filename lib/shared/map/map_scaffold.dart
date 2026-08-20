@@ -222,6 +222,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _visibleTab = visibleTab;
     visibleTab?.addListener(_onTabChanged);
     _wasVisible = _isVisible;
+    // An IndexedStack branch may be created before it is ever selected. Give
+    // the layer its initial visibility too; waiting for the first notifier edge
+    // would let an off-screen first style load start a full timeline warm.
+    _active.onSurfaceVisibility(_wasVisible);
   }
 
   /// Whether this surface is on screen — its branch selected and nothing pushed
@@ -296,11 +300,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       // can see the map, and flush once on the way back.
       _onTabChanged();
     }
-    if (state != AppLifecycleState.resumed || !_isVisible) return;
-    // Coming back from the background is the same event as re-entering the
-    // tab: what is on screen has been sitting there unattended. A radar frame
-    // every 10 minutes means a half-hour away is three frames missed.
-    if (_active.usesTimeline) unawaited(_loadActive());
+    // The false → true edge above already reloads a visible timeline. Doing it
+    // again here queued the same prepare/show pair twice on every foreground
+    // return. `inactive → resumed` has never hidden the map, so it needs neither
+    // a render resume nor a timeline refetch.
   }
 
   /// A framing request arrived (map re-opened from Home / the nav bar) — apply it

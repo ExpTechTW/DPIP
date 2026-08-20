@@ -373,6 +373,104 @@ void main() {
     },
   );
 
+  test(
+    'hiding the map cancels background warm without rebuilding on return',
+    () async {
+      final source = _BlockingWarmRadarRepository(_ids(12));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+      expect(source.warmed, hasLength(1));
+
+      layer.onSurfaceVisibility(false);
+      expect(source.warmCancels, 1);
+
+      layer.onSurfaceVisibility(true);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+      expect(
+        source.warmed,
+        hasLength(1),
+        reason:
+            'the already-settled timestamp stays mounted; returning must not '
+            'restart its whole-history L1 fill',
+      );
+
+      source.warmGate.complete();
+      await pumpEventQueue();
+    },
+  );
+
+  test(
+    'a timeline born off-screen does no warm work before first reveal',
+    () async {
+      final source = _FakeRadarRepository(_ids(12));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      layer.onSurfaceVisibility(false);
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+
+      expect(source.warmed, isEmpty);
+      expect(
+        controller.calls.where(
+          (call) => call.startsWith('addSource:radar-src-'),
+        ),
+        isEmpty,
+        reason: 'an unselected IndexedStack branch must remain fully idle',
+      );
+
+      layer.onSurfaceVisibility(true);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+
+      expect(source.warmed, hasLength(1));
+      expect(
+        controller.calls.where(
+          (call) => call.startsWith('addSource:radar-src-'),
+        ),
+        hasLength(12),
+      );
+    },
+  );
+
+  test('hiding the map cancels all in-flight idle preload lanes', () async {
+    final ids = _ids(40);
+    final source = _BlockedNeighboursRadarRepository(ids);
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    source.blockedFrames = {frames[23].id, frames[17].id, frames[24].id};
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[20]);
+    await source.blockedProbes.future.timeout(const Duration(seconds: 1));
+
+    layer.onSurfaceVisibility(false);
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+
+    expect(source.warmCancels, 1);
+    expect(source.abandoned.toSet(), source.blockedFrames);
+    final added = controller.calls
+        .where((call) => call.startsWith('addSource:radar-src-'))
+        .length;
+    final removed = controller.calls
+        .where((call) => call.startsWith('removeSource:radar-src-'))
+        .length;
+    expect(
+      added - removed,
+      5,
+      reason: 'only the visible settled ring remains mounted while hidden',
+    );
+  });
+
   test('a long cached scrub keeps the resident source set bounded', () async {
     final source = _FakeRadarRepository(_ids(40));
     final layer = RadarMapLayer(source);

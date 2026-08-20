@@ -328,6 +328,18 @@ void main() {
     await cache.warm(urls, fillUntil: 0.9);
 
     expect(injectedUrls, urls.take(9));
+    final probeSizes = nativeCalls
+        .where((call) => call.method == 'filterMissing')
+        .map(
+          (call) => (((call.arguments as Map)['urls'] as List<Object?>).length),
+        )
+        .toList();
+    expect(probeSizes, [384, 384, 32, 384, 384, 32]);
+    expect(
+      probeSizes,
+      everyElement(lessThanOrEqualTo(384)),
+      reason: '12k-frame probes must never become one platform-thread task',
+    );
     final lines = Log.talker.history
         .skip(baseline)
         .map((entry) => entry.generateTextMessage());
@@ -502,45 +514,73 @@ void main() {
     expect(nativeMemory.keys, unorderedEquals([keep, fresh]));
   });
 
-  test('fully stale raster frames use one eviction prefix per frame', () async {
+  test(
+    'a viewport change evicts one raster family, never every stale URL',
+    () async {
+      await cache.install(memoryBytes: 1024);
+      final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+      const retiredFrame =
+          'https://static.exptech.dev/api/v2/tiles/radar/1787236800';
+      const retainedFrame =
+          'https://static.exptech.dev/api/v2/tiles/radar/1787237400';
+      const retiredA = '$retiredFrame/7/106/55.webp?style=jma';
+      const retiredB = '$retiredFrame/7/107/55.webp?style=jma';
+      const staleInRetained = '$retainedFrame/7/106/55.webp?style=jma';
+      const keep = '$retainedFrame/7/107/55.webp?style=jma';
+      for (final (url, value) in [
+        (retiredA, 1),
+        (retiredB, 2),
+        (staleInRetained, 3),
+        (keep, 4),
+      ]) {
+        await store.writeBytes(
+          url,
+          etag: '$value',
+          bytes: Uint8List.fromList([value]),
+        );
+      }
+      await warmer.warmUrls([
+        retiredA,
+        retiredB,
+        staleInRetained,
+        keep,
+      ], immediate: true);
+      nativeCalls.clear();
+
+      await warmer.warmUrls([keep], immediate: true);
+
+      final evict = nativeCalls.firstWhere((c) => c.method == 'evictTiles');
+      expect((evict.arguments as Map)['contains'], [
+        'https://static.exptech.dev/api/v2/tiles/radar/',
+      ]);
+      expect(nativeMemory.keys, [keep]);
+    },
+  );
+
+  test('many retired raster frames collapse to one family eviction', () async {
     await cache.install(memoryBytes: 1024);
     final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
-    const retiredFrame =
-        'https://static.exptech.dev/api/v2/tiles/radar/1787236800';
-    const retainedFrame =
-        'https://static.exptech.dev/api/v2/tiles/radar/1787237400';
-    const retiredA = '$retiredFrame/7/106/55.webp?style=jma';
-    const retiredB = '$retiredFrame/7/107/55.webp?style=jma';
-    const staleInRetained = '$retainedFrame/7/106/55.webp?style=jma';
-    const keep = '$retainedFrame/7/107/55.webp?style=jma';
-    for (final (url, value) in [
-      (retiredA, 1),
-      (retiredB, 2),
-      (staleInRetained, 3),
-      (keep, 4),
-    ]) {
-      await store.writeBytes(
-        url,
-        etag: '$value',
-        bytes: Uint8List.fromList([value]),
-      );
+    final old = [
+      for (var i = 0; i < 12; i++)
+        'https://static.exptech.dev/api/v2/tiles/radar/'
+            '${1700000000 + i * 600}/7/106/55.webp',
+    ];
+    const fresh =
+        'https://static.exptech.dev/api/v2/tiles/radar/'
+        '1800000000/7/106/55.webp';
+    for (final url in [...old, fresh]) {
+      await store.writeBytes(url, etag: url, bytes: Uint8List.fromList([1]));
     }
-    await warmer.warmUrls([
-      retiredA,
-      retiredB,
-      staleInRetained,
-      keep,
-    ], immediate: true);
+    await warmer.warmUrls(old, immediate: true);
     nativeCalls.clear();
 
-    await warmer.warmUrls([keep], immediate: true);
+    await warmer.warmUrls([fresh], immediate: true);
 
-    final evict = nativeCalls.firstWhere((c) => c.method == 'evictTiles');
+    final evict = nativeCalls.firstWhere((call) => call.method == 'evictTiles');
     expect((evict.arguments as Map)['contains'], [
-      '$retiredFrame/',
-      staleInRetained,
+      'https://static.exptech.dev/api/v2/tiles/radar/',
     ]);
-    expect(nativeMemory.keys, [keep]);
+    expect(nativeMemory.keys, [fresh]);
   });
 
   test('named working sets do not evict each other', () async {
