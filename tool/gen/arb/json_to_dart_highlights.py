@@ -8,21 +8,21 @@ archival, human-writable format — and compiled into Dart source at
 imports (`package:dpip_release_highlights/<version>/...`). Each version keeps
 its own Dart; the app imports only the current one.
 
-Usage:  python3 tool/json_to_dart_highlights.py [VERSION ...]
+Usage:  python3 tool/gen/arb/json_to_dart_highlights.py [VERSION ...]
         (default: every version directory under release_highlights/assets/)
 """
 import json
 import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parents[3]
 CONTENT = ROOT / "release_highlights"
 ASSETS = CONTENT / "assets"
 KINDS = ("normal", "advanced")
 
 HEADER = """// Version-highlight card content for DPIP {version} ({kind}).
 //
-// GENERATED from `{archived}` by `tool/json_to_dart_highlights.py` — edit the
+// GENERATED from `{archived}` by `tool/gen/arb/json_to_dart_highlights.py` — edit the
 // JSON, not this file. Rendering lives in `lib/features/release_highlights`;
 // this package carries only data.
 library;
@@ -103,6 +103,7 @@ def convert(version: str, kind: str) -> None:
         cards=",\n".join(render_card(c) for c in data["cards"]),
         archived=str(archived.relative_to(ROOT)),
     )
+    body = "\n".join(line.rstrip() for line in body.splitlines()) + "\n"
 
     out_dir = CONTENT / "lib" / version
     out_dir.mkdir(parents=True, exist_ok=True)

@@ -1,14 +1,11 @@
-/// Version-highlights page: the deck renders with a hero header and cards.
-///
-/// The page is stateless over two data decks — the widget test checks that
-/// both tabs decode and lay out (an empty deck or an exception on one tab
-/// would otherwise announce itself only on the day a reader opened it), and
-/// that the two chrome actions still navigate where asked.
+/// Release-highlights presentation: the redesigned deck remains usable on a
+/// narrow phone and both audience tabs expose their content.
 library;
 
 import 'package:dpip/features/release_highlights/data/release_highlight_repository.dart';
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
 import 'package:dpip/features/release_highlights/presentation/pages/release_highlights_page.dart';
+import 'package:dpip/features/release_highlights/presentation/widgets/highlight_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -16,72 +13,76 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-GoRouter _router(List<String> visited) => GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (_, _) => const ReleaseHighlightsPage(),
-      routes: [
-        GoRoute(
-          path: AppRoutes.versionNotesPath,
-          name: AppRoutes.versionNotes,
-          builder: (_, _) {
-            visited.add(AppRoutes.versionNotes);
-            return const SizedBox.shrink();
-          },
-        ),
-      ],
-    ),
-  ],
-);
-
-Future<void> _pump(WidgetTester tester, GoRouter router) async {
-  tester.view.physicalSize = const Size(1200, 2400);
+Future<void> _pumpPage(WidgetTester tester) async {
+  tester.view.physicalSize = const Size(320, 700);
   tester.view.devicePixelRatio = 1;
+  tester.platformDispatcher.textScaleFactorTestValue = 1.4;
   addTearDown(tester.view.reset);
+  addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+  final router = GoRouter(
+    routes: [
+      GoRoute(path: '/', builder: (_, _) => const ReleaseHighlightsPage()),
+      GoRoute(
+        path: AppRoutes.versionNotesPath,
+        name: AppRoutes.versionNotes,
+        builder: (_, _) => const SizedBox.shrink(),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
+
   await tester.pumpWidget(
-    Provider<ReleaseHighlightRepository>(
-      create: (_) => const ReleaseHighlightRepositoryImpl(),
+    Provider<ReleaseHighlightRepository>.value(
+      value: const ReleaseHighlightRepositoryImpl(),
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        theme: ThemeData(useMaterial3: true),
         routerConfig: router,
       ),
     ),
   );
-  await tester.pump();
+  await tester.pumpAndSettle();
 }
 
 void main() {
-  testWidgets('each tab lays out its deck header and cards', (tester) async {
-    final visited = <String>[];
-    await _pump(tester, _router(visited));
-    final l10n = AppLocalizations.of(
-      tester.element(find.byType(DefaultTabController)),
-    );
-
-    final repo = const ReleaseHighlightRepositoryImpl();
-    final deck = repo.load(HighlightKind.normal);
-    // The hero header opens with the deck's own localized title. The test
-    // harness runs under en_US, so the rendered copy is the English one.
-    expect(find.text(localized(deck.title, 'en')), findsOneWidget);
-
-    await tester.tap(find.text(l10n.releaseHighlightsTabAdvanced));
-    await tester.pumpAndSettle();
-    final advanced = repo.load(HighlightKind.advanced);
-    expect(find.text(localized(advanced.title, 'en')), findsOneWidget);
-    // Advanced cards carry their technical badge above their facts.
-    expect(find.text(l10n.highlightCardTechnical), findsWidgets);
-  });
-
-  testWidgets('the notes action navigates to the version notes route', (
+  testWidgets('renders both decks without overflow on a narrow phone', (
     tester,
   ) async {
-    final visited = <String>[];
-    await _pump(tester, _router(visited));
-    await tester.tap(find.byIcon(Icons.article_outlined));
+    await _pumpPage(tester);
+
+    expect(find.text('For users'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.drag(find.byType(ListView).first, const Offset(0, -500));
     await tester.pumpAndSettle();
-    expect(visited, [AppRoutes.versionNotes]);
+    expect(find.byType(ReleaseHighlightGroup), findsOneWidget);
+    final userTile = find.byKey(
+      const PageStorageKey('release-highlight-speed'),
+    );
+    await tester.ensureVisible(userTile);
+    await tester.tap(userTile);
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('The app used to ask the server'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.text('Deep dive'));
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(ListView).last, const Offset(0, -500));
+    await tester.pumpAndSettle();
+    expect(find.byType(ExpansionTile), findsWidgets);
+    expect(find.byType(TechnicalHighlightGroup), findsOneWidget);
+    final technicalTile = find.byKey(
+      const PageStorageKey('technical-highlight-etag_core'),
+    );
+    await tester.ensureVisible(technicalTile);
+    await tester.tap(technicalTile);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('350 MiB'), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 }
