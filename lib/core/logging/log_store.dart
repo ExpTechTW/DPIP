@@ -88,6 +88,22 @@ class LogStore {
 
   final _pending = <StoredLog>[];
   Timer? _timer;
+  Future<void> _databaseTail = Future<void>.value();
+
+  /// Preserves the order in which persistence operations were requested.
+  ///
+  /// `Talker.cleanHistory()` is synchronous, so its database delete is fired
+  /// without an await. Without this lane, a log written immediately after the
+  /// clear can flush first and then be erased by the older delete. SQLite
+  /// serialises statements, but not in Dart call order when two futures race.
+  Future<void> _enqueueDatabase(Future<void> Function() operation) {
+    final next = _databaseTail.then((_) => operation());
+    _databaseTail = next.catchError((Object _) {
+      // Persistence methods already swallow database errors. Keep the lane
+      // usable if an unexpected asynchronous failure still escapes one.
+    });
+    return next;
+  }
 
   /// Creates the table. Safe on every open.
   static Future<void> createSchema(Database db) async {
@@ -130,24 +146,26 @@ class LogStore {
   /// table kept yesterday for as long as the process lived. This is what the
   /// hourly sweep calls; never throws, for the same reason [flush] does not.
   Future<void> prune() async {
-    try {
-      await _db.delete(
-        logTable,
-        where: 'time < ?',
-        whereArgs: [
-          _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
-        ],
-      );
-      // See [logMaxRows]: the newest lines survive whatever the clock says.
-      await _db.rawDelete(
-        'DELETE FROM $logTable WHERE id NOT IN ('
-        'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
-        [logMaxRows],
-      );
-    } on Object {
-      // Reporting a logging failure through the logger is how a write loop
-      // starts.
-    }
+    await _enqueueDatabase(() async {
+      try {
+        await _db.delete(
+          logTable,
+          where: 'time < ?',
+          whereArgs: [
+            _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
+          ],
+        );
+        // See [logMaxRows]: the newest lines survive whatever the clock says.
+        await _db.rawDelete(
+          'DELETE FROM $logTable WHERE id NOT IN ('
+          'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
+          [logMaxRows],
+        );
+      } on Object {
+        // Reporting a logging failure through the logger is how a write loop
+        // starts.
+      }
+    });
   }
 
   /// Writes everything queued and drops anything past the retention window.
@@ -157,47 +175,51 @@ class LogStore {
   Future<void> flush() async {
     _timer?.cancel();
     _timer = null;
-    if (_pending.isEmpty) return;
+    if (_pending.isEmpty) return _databaseTail;
     final batch = List<StoredLog>.of(_pending);
     _pending.clear();
-    try {
-      await _db.transaction((txn) async {
-        final insert = txn.batch();
-        for (final entry in batch) {
-          insert.insert(logTable, {
-            'time': entry.time.toUtc().millisecondsSinceEpoch,
-            'level': entry.level,
-            'message': entry.message,
-            'error': entry.error,
-            'stack': entry.stackTrace,
-          });
-        }
-        await insert.commit(noResult: true);
-        await txn.delete(
-          logTable,
-          where: 'time < ?',
-          whereArgs: [
-            _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
-          ],
-        );
-        // The count ceiling in the same transaction as the insert, so a burst
-        // cannot outrun it. `id` rather than `time` because it is the primary
-        // key and monotonic: a clock that steps backwards would otherwise make
-        // the newest rows look like the oldest and delete them.
-        await txn.rawDelete(
-          'DELETE FROM $logTable WHERE id NOT IN ('
-          'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
-          [logMaxRows],
-        );
-      });
-    } on Object {
-      // Deliberately silent: reporting a logging failure through the logger
-      // is how a write loop starts.
-    }
+    await _enqueueDatabase(() async {
+      try {
+        await _db.transaction((txn) async {
+          final insert = txn.batch();
+          for (final entry in batch) {
+            insert.insert(logTable, {
+              'time': entry.time.toUtc().millisecondsSinceEpoch,
+              'level': entry.level,
+              'message': entry.message,
+              'error': entry.error,
+              'stack': entry.stackTrace,
+            });
+          }
+          await insert.commit(noResult: true);
+          await txn.delete(
+            logTable,
+            where: 'time < ?',
+            whereArgs: [
+              _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
+            ],
+          );
+          // The count ceiling in the same transaction as the insert, so a
+          // burst cannot outrun it. `id` rather than `time` because it is the
+          // primary key and monotonic: a clock that steps backwards would
+          // otherwise make the newest rows look like the oldest and delete
+          // them.
+          await txn.rawDelete(
+            'DELETE FROM $logTable WHERE id NOT IN ('
+            'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
+            [logMaxRows],
+          );
+        });
+      } on Object {
+        // Deliberately silent: reporting a logging failure through the logger
+        // is how a write loop starts.
+      }
+    });
   }
 
   /// The most recent lines, newest first.
   Future<List<StoredLog>> recent({int limit = 500, String? level}) async {
+    await _databaseTail;
     try {
       final rows = await _db.query(
         logTable,
@@ -227,6 +249,7 @@ class LogStore {
   /// How many lines are stored — the log screen shows it, and it is the cheap
   /// way to see that persistence is actually working.
   Future<int> count() async {
+    await _databaseTail;
     try {
       final rows = await _db.rawQuery('SELECT COUNT(*) AS n FROM $logTable');
       return (rows.firstOrNull?['n'] as int?) ?? 0;
@@ -238,11 +261,13 @@ class LogStore {
   /// Empties the table — the log screen's "clear" action.
   Future<void> clear() async {
     _pending.clear();
-    try {
-      await _db.delete(logTable);
-    } on Object {
-      // Nothing useful to say, and nowhere safe to say it.
-    }
+    await _enqueueDatabase(() async {
+      try {
+        await _db.delete(logTable);
+      } on Object {
+        // Nothing useful to say, and nowhere safe to say it.
+      }
+    });
   }
 
   /// Stops the timer and writes what is left.
