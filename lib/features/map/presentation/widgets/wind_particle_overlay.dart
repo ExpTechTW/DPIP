@@ -84,7 +84,6 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     // another one throws.
     _adoptField();
     _probeTier();
-    _watchdog = Timer.periodic(_watchdogPeriod, (_) => _checkAlive());
   }
 
   /// Device class decides how long the streaks are, which is now what this
@@ -144,6 +143,14 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
       _ticker.start();
     } else if (!shouldRun && _ticker.isActive) {
       _ticker.stop();
+    }
+    if (shouldRun) {
+      _watchdog ??= Timer.periodic(_watchdogPeriod, (_) => _checkAlive());
+    } else {
+      _watchdog?.cancel();
+      _watchdog = null;
+      _quietChecks = 0;
+      _stallLogged = false;
     }
   }
 
@@ -292,14 +299,23 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     final size = context.size;
     if (size == null || size.isEmpty) return _stall('no size');
 
-    final camera = WindCamera(
-      centerLat: position.target.latitude,
-      centerLng: position.target.longitude,
-      zoom: position.zoom,
-      bearing: position.bearing,
-    );
     final previous = _lastCamera;
-    if (previous != null && previous != camera) {
+    final target = position.target;
+    final unchanged =
+        previous != null &&
+        previous.centerLat == target.latitude &&
+        previous.centerLng == target.longitude &&
+        previous.zoom == position.zoom &&
+        previous.bearing == position.bearing;
+    final camera = unchanged
+        ? previous
+        : WindCamera(
+            centerLat: target.latitude,
+            centerLng: target.longitude,
+            zoom: position.zoom,
+            bearing: position.bearing,
+          );
+    if (previous != null && !unchanged) {
       _trails.clear();
     }
     _lastCamera = camera;
@@ -371,6 +387,25 @@ class _TrailBuffer {
   /// (~0.95 a frame) stayed visible for roughly this long before it sank into
   /// the background, so the streaks read about the same length.
   static const int historyFrames = 14;
+  static const int _speedBuckets = 16;
+  static const int _bucketCapacity = 6400 * 2;
+
+  static final List<Color> _headColors = List.generate(_speedBuckets, (i) {
+    final t = (i + 0.5) / _speedBuckets;
+    return Color.fromRGBO(255, 255, 255, 0.35 + 0.55 * t);
+  }, growable: false);
+
+  static final List<List<Color>> _tailColors = List.generate(
+    historyFrames + 1,
+    (tail) => List.generate(tail, (index) {
+      final age = index + 1;
+      final t = 1.0 - (age - 1) / tail;
+      return Color.fromRGBO(255, 255, 255, 0.5 * t * t);
+    }, growable: false),
+    growable: false,
+  );
+
+  final Paint _paint = Paint()..strokeCap = StrokeCap.round;
 
   /// Speed buckets for the newest frame, reused across frames. Each bucket is
   /// an interleaved `x,y` [Float32List] for [Canvas.drawRawPoints], so the
@@ -378,7 +413,7 @@ class _TrailBuffer {
   /// [Offset] per visible particle (up to 6400 of them) for the collector to
   /// chase on the hottest path in the app.
   final List<Float32List> _buckets = List.generate(
-    16,
+    _speedBuckets,
     (_) => Float32List(_bucketCapacity),
     growable: false,
   );
@@ -389,7 +424,7 @@ class _TrailBuffer {
   /// under strong wind, and an 8-bit counter wraps at 255 — the bucket then
   /// draws the wrong point count (or none at all, when the count wraps to 0),
   /// which reads as particles vanishing.
-  final Uint16List _counts = Uint16List(16);
+  final Uint16List _counts = Uint16List(_speedBuckets);
 
   /// The tail: a ring of past frames, each a flat `x,y` list of the positions
   /// that were visible then. Positions, not particles — a particle that
@@ -402,9 +437,6 @@ class _TrailBuffer {
   final Uint16List _historyCounts = Uint16List(historyFrames);
   int _head = 0;
   int _filled = 0;
-
-  /// Floats per frame: the largest population (6400 at z3) as x,y pairs.
-  static const int _bucketCapacity = 6400 * 2;
 
   /// Live camera zoom, written by the ticker: the painter needs it at paint
   /// time and it is not known at build time — the widget does not rebuild when
@@ -428,10 +460,7 @@ class _TrailBuffer {
 
   /// Draws the tail then the head, oldest first so newer dots sit on top.
   void paint(Canvas canvas, Iterable<WindParticle> particles) {
-    final width = pointSizeFor(zoom);
-    final paint = Paint()
-      ..strokeWidth = width
-      ..strokeCap = StrokeCap.round;
+    final paint = _paint..strokeWidth = pointSizeFor(zoom);
 
     // The tail, uniform white, fading with age. Oldest first.
     final tail = math.min(_filled, tailFrames);
@@ -440,11 +469,9 @@ class _TrailBuffer {
       final index = slot < 0 ? slot + historyFrames : slot;
       final count = _historyCounts[index];
       if (count == 0) continue;
-      // Linear ramp rather than the old geometric fade: over a bounded number
-      // of frames the two are indistinguishable, and this one reaches zero at
-      // the end of the tail instead of leaving a visible cut.
-      final t = 1.0 - (age - 1) / tail;
-      paint.color = Color.fromRGBO(255, 255, 255, 0.5 * t * t);
+      // The same linear alpha ramp as before, cached because it depends only
+      // on the bounded tail length rather than any frame data.
+      paint.color = _tailColors[tail][age - 1];
       canvas.drawRawPoints(
         ui.PointMode.points,
         Float32List.sublistView(_history[index], 0, count * 2),
@@ -469,10 +496,9 @@ class _TrailBuffer {
     Iterable<WindParticle> particles,
     Paint paint,
   ) {
-    const buckets = 16;
     final points = _buckets;
     final counts = _counts;
-    counts.fillRange(0, buckets, 0);
+    counts.fillRange(0, _speedBuckets, 0);
     final slot = _history[_head];
     var recorded = 0;
     // Reciprocal once; a divide per particle per frame is the kind of cost
@@ -480,8 +506,13 @@ class _TrailBuffer {
     const invScale = 1 / kWindSpeedScale;
     for (final p in particles) {
       if (!p.visible) continue;
-      final t = (p.speed * invScale).clamp(0.0, 1.0);
-      final bi = math.min(buckets - 1, (t * buckets).floor());
+      // [speed] is a square root and therefore non-negative. Saturating with
+      // one branch is equivalent to clamp + min without two generic helpers
+      // for every visible particle.
+      final scaledSpeed = p.speed * invScale;
+      final bi = scaledSpeed >= 1 || scaledSpeed.isNaN
+          ? _speedBuckets - 1
+          : (scaledSpeed * _speedBuckets).floor();
       final i = counts[bi];
       if (i * 2 + 1 < _bucketCapacity) {
         counts[bi] = i + 1;
@@ -499,12 +530,12 @@ class _TrailBuffer {
     _head = (_head + 1) % historyFrames;
     if (_filled < historyFrames) _filled++;
 
-    for (var i = 0; i < buckets; i++) {
+    for (var i = 0; i < _speedBuckets; i++) {
       final count = counts[i];
       if (count == 0) continue;
-      // The bucket's midpoint, on the web's ramp: brighter where it is faster.
-      final t = (i + 0.5) / buckets;
-      paint.color = Color.fromRGBO(255, 255, 255, 0.35 + 0.55 * t);
+      // The bucket's midpoint on the web ramp, prebuilt once rather than
+      // allocating sixteen colours on every frame.
+      paint.color = _headColors[i];
       canvas.drawRawPoints(
         ui.PointMode.points,
         Float32List.sublistView(points[i], 0, count * 2),

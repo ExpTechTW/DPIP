@@ -25,12 +25,14 @@ class LatLng {
     const earthRadius = 6378137.0;
     final dLat = degToRad(other.latitude - latitude);
     final dLng = degToRad(other.longitude - longitude);
+    final sinHalfLat = math.sin(dLat / 2);
+    final sinHalfLng = math.sin(dLng / 2);
     final a =
-        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        sinHalfLat * sinHalfLat +
         math.cos(degToRad(latitude)) *
             math.cos(degToRad(other.latitude)) *
-            math.sin(dLng / 2) *
-            math.sin(dLng / 2);
+            sinHalfLng *
+            sinHalfLng;
     final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
     return earthRadius * c;
   }
@@ -46,16 +48,19 @@ class LatLng {
     final theta = degToRad(bearing);
     final lat1 = degToRad(latitude);
     final lon1 = degToRad(longitude);
+    final sinLat1 = math.sin(lat1);
+    final cosLat1 = math.cos(lat1);
+    final sinDelta = math.sin(delta);
+    final cosDelta = math.cos(delta);
 
     final lat2 = math.asin(
-      math.sin(lat1) * math.cos(delta) +
-          math.cos(lat1) * math.sin(delta) * math.cos(theta),
+      sinLat1 * cosDelta + cosLat1 * sinDelta * math.cos(theta),
     );
     final lon2 =
         lon1 +
         math.atan2(
-          math.sin(theta) * math.sin(delta) * math.cos(lat1),
-          math.cos(delta) - math.sin(lat1) * math.sin(lat2),
+          math.sin(theta) * sinDelta * cosLat1,
+          cosDelta - sinLat1 * math.sin(lat2),
         );
 
     return LatLng(_toDegrees(lat2), _toDegrees(lon2));

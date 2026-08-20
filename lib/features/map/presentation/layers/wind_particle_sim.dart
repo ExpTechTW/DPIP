@@ -278,6 +278,8 @@ class WindParticleSim {
   /// at z3 down to 1024 at z7 and a fixed number matches neither end.
   WindParticleSim(this.field, {int count = 6400, math.Random? random})
     : _random = random ?? math.Random(),
+      _uScale = (field.uMax - field.uMin) / 255,
+      _vScale = (field.vMax - field.vMin) / 255,
       _mercY = _buildMercY(field),
       _secLat = _buildSecLat(field),
       particles = [for (var i = 0; i < count; i++) WindParticle(0, 0)];
@@ -285,6 +287,12 @@ class WindParticleSim {
   final WindField field;
   final math.Random _random;
   final List<WindParticle> particles;
+
+  /// Quantised byte → component scales. A field never changes during a
+  /// simulation, so computing these inside every bilinear sample spent two
+  /// divisions per particle per frame on constants.
+  final double _uScale;
+  final double _vScale;
 
   /// Field-space y → mercator-y lookup, so the projection per particle per
   /// frame is two array reads instead of a `log` + `tan`.
@@ -304,6 +312,7 @@ class WindParticleSim {
   static const int _mercYEntries = 1024;
 
   bool _seeded = false;
+  _StepGeometry? _geometry;
 
   /// Moves every particle one frame: sample the wind, step, work out where
   /// that lands on screen, and recycle the ones that have left.
@@ -313,33 +322,30 @@ class WindParticleSim {
   /// [projectLatLng] does per point — six thousand `sin`/`cos` calls a frame
   /// become two.
   void step(WindCamera cam, Size size) {
-    final vp = viewportBounds(cam, size);
-    final fieldSpace = _fieldRect(vp);
-    final fieldStep = fieldStepFor(cam.zoom);
+    final geometry = _geometryFor(cam, size);
+    final fieldSpace = geometry.fieldSpace;
     if (!_seeded) {
       _seedIn(fieldSpace);
       _seeded = true;
     }
-    _resize(particleCountFor(cam.zoom), fieldSpace);
+    _resize(geometry.particleCount, fieldSpace);
 
-    final world = _worldSize(cam.zoom);
-    final cx = (cam.centerLng + 180) / 360 * world;
-    final cy = mercatorY(cam.centerLat) * world;
-    // Minus the bearing — see [projectLatLng]; this loop inlines that same
-    // projection, so it has to turn the same way.
-    final r = -cam.bearing * math.pi / 180;
-    final cosR = math.cos(r);
-    final sinR = math.sin(r);
-    final halfWidth = size.width / 2;
-    final halfHeight = size.height / 2;
-    // In-view margins, hoisted: these four products are invariant across the
-    // population, and the loop below runs 6400 times a frame.
-    final xLo = -0.1 * size.width;
-    final xHi = 1.1 * size.width;
-    final yLo = -0.1 * size.height;
-    final yHi = 1.1 * size.height;
-    // `lon0 + x·360` folds into a per-frame constant plus one multiply.
-    final xOffset = (field.lon0 + 180) / 360 * world;
+    // Local copies keep the particle loop on stack values while the cache
+    // avoids rebuilding the same viewport projection on every stationary
+    // frame.
+    final fieldStep = geometry.fieldStep;
+    final world = geometry.world;
+    final cx = geometry.cx;
+    final cy = geometry.cy;
+    final cosR = geometry.cosR;
+    final sinR = geometry.sinR;
+    final halfWidth = geometry.halfWidth;
+    final halfHeight = geometry.halfHeight;
+    final xLo = geometry.xLo;
+    final xHi = geometry.xHi;
+    final yLo = geometry.yLo;
+    final yHi = geometry.yHi;
+    final xOffset = geometry.xOffset;
     final mercY = _mercY;
     final secLat = _secLat;
 
@@ -373,6 +379,41 @@ class WindParticleSim {
         _respawn(p, fieldSpace);
       }
     }
+  }
+
+  /// Projection values shared by every particle and unchanged while the map
+  /// camera and viewport size stay still. In the common stationary case this
+  /// removes `pow`, `log`, `tan`, `exp`, `atan`, `sin`, `cos`, four-corner
+  /// bounds work, and two short-lived objects from every animation frame.
+  _StepGeometry _geometryFor(WindCamera cam, Size size) {
+    final cached = _geometry;
+    if (cached != null && cached.camera == cam && cached.size == size) {
+      return cached;
+    }
+
+    final world = _worldSize(cam.zoom);
+    final r = -cam.bearing * math.pi / 180;
+    final geometry = _StepGeometry(
+      camera: cam,
+      size: size,
+      fieldSpace: _fieldRect(viewportBounds(cam, size)),
+      particleCount: particleCountFor(cam.zoom),
+      fieldStep: fieldStepFor(cam.zoom),
+      world: world,
+      cx: (cam.centerLng + 180) / 360 * world,
+      cy: mercatorY(cam.centerLat) * world,
+      cosR: math.cos(r),
+      sinR: math.sin(r),
+      halfWidth: size.width / 2,
+      halfHeight: size.height / 2,
+      xLo: -0.1 * size.width,
+      xHi: 1.1 * size.width,
+      yLo: -0.1 * size.height,
+      yHi: 1.1 * size.height,
+      xOffset: (field.lon0 + 180) / 360 * world,
+    );
+    _geometry = geometry;
+    return geometry;
   }
 
   /// Grows or shrinks the population to [count], seeding anything new into the
@@ -506,8 +547,8 @@ class WindParticleSim {
     final row0 = j0 * field.width;
     final row1 = j1 * field.width;
     return (
-      _lerpPlane(field.u, row0, row1, i0, i1, tx, ty, field.uMin, field.uMax),
-      _lerpPlane(field.v, row0, row1, i0, i1, tx, ty, field.vMin, field.vMax),
+      _lerpPlane(field.u, row0, row1, i0, i1, tx, ty, field.uMin, _uScale),
+      _lerpPlane(field.v, row0, row1, i0, i1, tx, ty, field.vMin, _vScale),
     );
   }
 
@@ -521,7 +562,7 @@ class WindParticleSim {
     double tx,
     double ty,
     double lo,
-    double hi,
+    double scale,
   ) {
     final a = plane[row0 + i0];
     final b = plane[row0 + i1];
@@ -529,14 +570,50 @@ class WindParticleSim {
     final d = plane[row1 + i1];
     final top = a + (b - a) * tx;
     final bottom = c + (d - c) * tx;
-    return lo + (top + (bottom - top) * ty) * _unitScale(hi - lo);
+    return lo + (top + (bottom - top) * ty) * scale;
   }
 
-  /// Precomputed `(span) / 255` — the per-call division was one per plane per
-  /// particle per frame.
-  static double _unitScale(double span) => span / 255;
-
   double _lerp(double a, double b, double t) => a + (b - a) * t;
+}
+
+class _StepGeometry {
+  const _StepGeometry({
+    required this.camera,
+    required this.size,
+    required this.fieldSpace,
+    required this.particleCount,
+    required this.fieldStep,
+    required this.world,
+    required this.cx,
+    required this.cy,
+    required this.cosR,
+    required this.sinR,
+    required this.halfWidth,
+    required this.halfHeight,
+    required this.xLo,
+    required this.xHi,
+    required this.yLo,
+    required this.yHi,
+    required this.xOffset,
+  });
+
+  final WindCamera camera;
+  final Size size;
+  final _FieldRect fieldSpace;
+  final int particleCount;
+  final double fieldStep;
+  final double world;
+  final double cx;
+  final double cy;
+  final double cosR;
+  final double sinR;
+  final double halfWidth;
+  final double halfHeight;
+  final double xLo;
+  final double xHi;
+  final double yLo;
+  final double yHi;
+  final double xOffset;
 }
 
 class _FieldRect {
