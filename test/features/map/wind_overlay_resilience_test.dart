@@ -62,6 +62,7 @@ class _FlakyController extends RecordingMapController {
 
   /// Drives rotation — the gesture that used to break the streaks.
   double bearing = 0;
+  double zoom = 5;
 
   /// How many times the tick asked for the camera — the proof it is still
   /// running.
@@ -74,7 +75,7 @@ class _FlakyController extends RecordingMapController {
     if (cameraMissing) return null;
     return CameraPosition(
       target: const LatLng(23.5, 121),
-      zoom: 5,
+      zoom: zoom,
       bearing: bearing,
     );
   }
@@ -314,7 +315,10 @@ void main() {
     );
     expect(await litPixels(), 0);
 
-    // Release, and it comes back.
+    // Pinch to a new final zoom while the field is absent, then release. The
+    // recreated simulation must seed against this settled camera rather than
+    // resize the old population throughout the pinch.
+    controller.zoom = 7;
     layer.onMapGestureEnd();
     await tester.pump();
     for (var i = 0; i < 30; i++) {

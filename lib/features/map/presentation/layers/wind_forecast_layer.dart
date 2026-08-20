@@ -42,9 +42,9 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
 
   final WindForecastModel model;
 
-  /// The wind grid backing the overlay's particles, reloaded on every shown
-  /// frame. Null until the first frame's field arrives; the overlay starts its
-  /// animation only once this is set.
+  /// The wind grid backing the overlay's particles, loaded for the settled
+  /// frame. It stays null while the timeline is moving and until that frame's
+  /// field arrives; the overlay starts its animation only once this is set.
   final ValueNotifier<WindField?> field = ValueNotifier(null);
 
   /// Whether a finger is currently on the map.
@@ -65,6 +65,8 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   void onMapGestureEnd() => interacting.value = false;
 
   String? _loadedFieldFrame;
+  String? _requestedFieldFrame;
+  int _fieldGeneration = 0;
 
   /// The live map controller — shared with the particle overlay, which reads
   /// the camera from it every frame.
@@ -76,8 +78,26 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
     MapFrame frame, {
     bool scrubbing = false,
   }) async {
+    if (scrubbing) {
+      // A megabyte-scale WND1 grid per crossed frame cannot keep up with a
+      // finger. More importantly, displaying the previous grid under a new
+      // raster lies about which forecast is driving the particles. Keep them
+      // absent for the drag and load only the frame the user finally settles on.
+      _invalidateField();
+      await super.show(controller, frame, scrubbing: true);
+      return;
+    }
+
+    final fieldMatches = _loadedFieldFrame == frame.id;
+    final requestMatches = _requestedFieldFrame == frame.id;
+    if (!fieldMatches && !requestMatches) _invalidateField();
     await super.show(controller, frame, scrubbing: scrubbing);
-    await _loadField(frame.id);
+    if (_loadedFieldFrame != frame.id && _requestedFieldFrame != frame.id) {
+      // Raster ordering stays on MapScaffold's serial lane; the large binary
+      // fetch does not. A generation check below prevents its late response
+      // from publishing after the user has moved elsewhere.
+      unawaited(_loadField(frame.id));
+    }
   }
 
   /// This layer's wind repository — [RasterTimelineLayer] only knows it as a
@@ -86,15 +106,22 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   WindForecastRepository get _wind => source as WindForecastRepository;
 
   /// Fetches the WND1 grid for [frameId] and publishes it to [field]. A failed
-  /// fetch keeps the previous field — scrubbing through a gap shows the last
-  /// known wind rather than a blank — and rolls the guard back so the next
-  /// show of this frame retries instead of skipping it forever.
+  /// fetch leaves particles absent and rolls the guard back so showing this
+  /// frame again retries instead of skipping it forever.
   Future<void> _loadField(String frameId) async {
-    if (frameId == _loadedFieldFrame) return;
-    _loadedFieldFrame = frameId;
+    if (frameId == _loadedFieldFrame || frameId == _requestedFieldFrame) return;
+    final generation = ++_fieldGeneration;
+    _requestedFieldFrame = frameId;
     final result = await _wind.fetchWindField(frameId);
+    if (generation != _fieldGeneration || _requestedFieldFrame != frameId) {
+      return;
+    }
+    _requestedFieldFrame = null;
     result.when(
-      ok: (windField) => field.value = windField,
+      ok: (windField) {
+        _loadedFieldFrame = frameId;
+        field.value = windField;
+      },
       err: (failure) {
         Log.warning('Wind field for $frameId failed: ${failure.message}');
         _loadedFieldFrame = null;
@@ -102,13 +129,24 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
     );
   }
 
+  void _invalidateField() {
+    if (_requestedFieldFrame == null &&
+        _loadedFieldFrame == null &&
+        field.value == null) {
+      return;
+    }
+    _fieldGeneration++;
+    _requestedFieldFrame = null;
+    _loadedFieldFrame = null;
+    if (field.value != null) field.value = null;
+  }
+
   @override
   Future<void> onDetached(MapLibreMapController controller) async {
     await super.onDetached(controller);
     // The overlay is gone with the layer; stop advertising a field so a
     // re-attach starts clean rather than animating yesterday's grid.
-    field.value = null;
-    _loadedFieldFrame = null;
+    _invalidateField();
   }
 
   @override
