@@ -24,16 +24,19 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// frame issued a fresh viewport of tile requests for every frame the finger
 /// swept past, and abandoned them a moment later.
 ///
-/// ## Three tiers
+/// ## Four tiers
 /// - **The ring** — frames within [ringRadius] are mounted **visible**, only
 ///   the current one at full [opacity] and its neighbours at zero. During a
 ///   drag, an L1-complete frame may join this set on demand; [maxResident]
 ///   bounds the extra sources. A frame replaces the current timestamp only
 ///   after [RasterFrameSource.frameTileReadiness] proves that one complete
 ///   viewport zoom is in L1.
-/// - **The warm window** — frames within [warmRadius] were included in the last
-///   local-cache attempt. L2 hits are pushed into MapLibre memory; L2 misses
-///   remain cold and are never mislabeled as display-ready.
+/// - **Ready residents** — after settle, complete neighbours expand outward to
+///   [maxResident], then hide. Their sources and tiles stay ready without an
+///   ongoing raster draw pass.
+/// - **The warm window** — up to [warmFrameBudget] centre-out candidates were
+///   included in the last local-cache fill. L2 hits are pushed into MapLibre
+///   memory; L2 misses remain cold and are never mislabeled as display-ready.
 /// - **Cold** — anything further out. Revealing it mounts and loads normally.
 ///
 /// A drag flips complete ring members immediately. Beyond the ring it first
@@ -86,14 +89,16 @@ abstract class RasterTimelineLayer implements MapLayer {
   @protected
   int get warmRadius => 4;
 
-  /// Farthest a fill warm reaches from the current frame, in either direction.
+  /// Maximum frame candidates considered by one settled fill.
   ///
-  /// A cap on the spread, not a target: a fill warm injects centre → ±1 → ±2 …
-  /// and stops at the native mirror's cap ([MapTileCache.defaultMemoryBytes]),
-  /// so beyond this only the most distant cached frames are considered. A cold
-  /// database is not scanned during a scrub; this wider fill runs on settle.
+  /// 512 candidates are intentionally wider than the 48 MiB mirror can usually
+  /// hold. The fill reads them centre-out in bounded batches and stops at 90%
+  /// of the real native cap, so this maximises the useful L1 range without
+  /// loading every candidate body into Dart or allowing a slow device to turn
+  /// one settle into an unbounded whole-history scan. Near a series edge the
+  /// unused side is given to the other side instead of wasting half the budget.
   @protected
-  int get maxWarmRadius => 64;
+  int get warmFrameBudget => 512;
 
   /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
   /// removed outright — `visibility: none` keeps GPU textures for a fast
@@ -377,7 +382,9 @@ abstract class RasterTimelineLayer implements MapLayer {
           // A tap/short drag can finish on the same timestamp. Its first move
           // still cancelled the old fill, so restart one debounced fill here.
           _warmCentre = null;
-          unawaited(_warmBand(controller, index));
+          unawaited(
+            _warmThenPreload(controller, index, frame.id, _revealGeneration),
+          );
         }
         return Future<void>.value();
       }
@@ -426,6 +433,11 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (_readyFrames.contains(frameId)) {
       if (!inRing) {
         await _stageScrubFrame(controller, frameId);
+        if (!_isCurrent(frameId, generation)) return;
+        // Idle-preloaded sources are hidden to avoid permanent draw passes.
+        // Restoring one is an L1 hit, but MapLibre still needs render turns to
+        // decode/paint it before the opacity cutover.
+        await Future<void>.delayed(_decodeGrace);
         if (!_isCurrent(frameId, generation)) return;
       }
       await _flip(controller, frameId);
@@ -722,8 +734,116 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
     // Use the warmer's debounce. A new gesture cancels this before its SQLite
     // batch starts; an immediate fill here was the dominant high-speed scrub
-    // stall when users reversed direction just after finger-up.
-    unawaited(_warmBand(controller, index));
+    // stall when users reversed direction just after finger-up. Once the local
+    // fill finishes, idle time expands the real source preload one frame at a
+    // time — never a second burst of parallel viewport requests.
+    unawaited(_warmThenPreload(controller, index, frameId, generation));
+  }
+
+  Future<void> _warmThenPreload(
+    MapLibreMapController controller,
+    int index,
+    String frameId,
+    int generation,
+  ) async {
+    await _warmBand(controller, index);
+    if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+    try {
+      await _preloadSettledNeighbours(controller, index, frameId, generation);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, '$id idle timeline preload');
+    }
+  }
+
+  /// Uses otherwise-idle time to prepare the largest source window the
+  /// resident ceiling permits, one cold frame at a time.
+  ///
+  /// The immediate ±[ringRadius] ring remains visible. Extra sources are
+  /// mounted only long enough for MapLibre to fetch/decode their viewport,
+  /// then hidden: their encoded tiles stay in L1 and the source stays resident,
+  /// but transparent rasters do not keep consuming draw passes. A later scrub
+  /// restores one with [_stageScrubFrame].
+  Future<void> _preloadSettledNeighbours(
+    MapLibreMapController controller,
+    int index,
+    String frameId,
+    int generation,
+  ) async {
+    if (_orderedIds.isEmpty || maxResident <= 0) return;
+    final preload = _nearestFrames(index, maxResident);
+    final preloadSet = preload.toSet();
+    final core = _ringAt(index).$3;
+    final bounds = await controller.getVisibleRegion();
+    final zoom = controller.cameraPosition?.zoom ?? 8;
+    final elapsed = Stopwatch()..start();
+    var complete = 0;
+    MapTileCache.trace(
+      'timeline=$id idle-preload start frame=$frameId '
+      'candidates=${preload.length - core.length} resident=${_resident.length}',
+    );
+
+    for (final candidate in preload) {
+      if (core.contains(candidate)) continue;
+      if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+
+      await _enqueueMutation(() async {
+        if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+        await _mount(controller, candidate, 0);
+        _ring.add(candidate);
+        await _evictOverflow(controller, keep: preloadSet);
+      });
+      if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+
+      var readiness = await source.frameTileReadiness(
+        frame: candidate,
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: zoom,
+      );
+      final waiting = Stopwatch()..start();
+      while (!readiness.ready &&
+          waiting.elapsed < _readyTimeout &&
+          !_warmSuspended &&
+          _isCurrent(frameId, generation)) {
+        await Future<void>.delayed(_readyPoll);
+        if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+        readiness = await source.frameTileReadiness(
+          frame: candidate,
+          south: bounds.southwest.latitude,
+          west: bounds.southwest.longitude,
+          north: bounds.northeast.latitude,
+          east: bounds.northeast.longitude,
+          zoom: zoom,
+        );
+      }
+      if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+      if (!readiness.ready) {
+        MapTileCache.trace(
+          'timeline=$id idle-preload stop frame=$candidate reason=timeout '
+          'resident=${readiness.resident}/${readiness.required}',
+        );
+        return;
+      }
+
+      await _enqueueMutation(() async {
+        if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+        _readyFrames.add(candidate);
+        _ring.remove(candidate);
+        await controller.setLayerProperties(
+          _layerId(candidate),
+          _hidden,
+          skipNulls: true,
+        );
+      });
+      complete++;
+    }
+    MapTileCache.trace(
+      'timeline=$id idle-preload done frame=$frameId complete=$complete '
+      'resident=${_resident.length}/$maxResident '
+      'dt=${elapsed.elapsedMilliseconds}ms',
+    );
   }
 
   void _suspendWarm() {
@@ -926,18 +1046,24 @@ abstract class RasterTimelineLayer implements MapLayer {
   }
 
   /// Frame ids ordered nearest-the-finger first: the centre, then ±1, ±2, …
-  /// out to [maxWarmRadius] (or the series edge). Fill warm injects in this
-  /// order and stops at the mirror cap, so when memory is tight the most
+  /// until [warmFrameBudget] candidates (or the series edge). Fill warm injects
+  /// in this order and stops at the mirror cap, so when memory is tight the most
   /// distant frames are exactly the ones that stay cold.
-  List<String> _spreadFrames(int centre, {required int direction}) {
+  List<String> _spreadFrames(int centre, {required int direction}) =>
+      _nearestFrames(centre, warmFrameBudget, direction: direction);
+
+  List<String> _nearestFrames(int centre, int budget, {int direction = 1}) {
     final n = _orderedIds.length;
+    final limit = budget < n ? budget : n;
     final result = <String>[];
     void add(int i) {
-      if (i >= 0 && i < n) result.add(_orderedIds[i]);
+      if (result.length < limit && i >= 0 && i < n) {
+        result.add(_orderedIds[i]);
+      }
     }
 
     add(centre);
-    for (var r = 1; r <= maxWarmRadius; r++) {
+    for (var r = 1; result.length < limit && r < n; r++) {
       // The direction the finger last moved gets each distance's first slot.
       // Under a tight cap this keeps the likely next frame, not the equally
       // distant frame behind the gesture.
