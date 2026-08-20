@@ -3222,6 +3222,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => '工作人员';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '所在地預估震度，$intensity。';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '預估最大震度，$intensity。';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6441,6 +6451,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get bugTrackerStaff => '工作人员';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '所在地预估烈度，$intensity。';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '预估最大烈度，$intensity。';
+  }
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -9660,6 +9680,16 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get bugTrackerStaff => '工作人員';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '所在地預估震度，$intensity。';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '預估最大震度，$intensity。';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12879,4 +12909,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get bugTrackerStaff => '工作人員';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '所在地預估震度，$intensity。';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '預估最大震度，$intensity。';
+  }
 }

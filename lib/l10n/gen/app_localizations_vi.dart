@@ -3301,4 +3301,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => 'Nhân sự';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return 'Cường độ dự kiến tại vị trí của bạn: $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return 'Cường độ tối đa dự kiến: $intensity.';
+  }
 }

@@ -1982,5 +1982,7 @@
   "bugTrackerJoinDiscussion": "Ikuti diskusi di Discord",
   "bugTrackerSortLast": "Aktivitas terbaru",
   "bugTrackerSortMostDiscussed": "Paling banyak dibahas",
-  "bugTrackerStaff": "Staf"
+  "bugTrackerStaff": "Staf",
+  "eewSpokenLocalIntensity": "Perkiraan intensitas di lokasi Anda: {intensity}.",
+  "eewSpokenMaxIntensity": "Perkiraan intensitas maksimum: {intensity}."
 }

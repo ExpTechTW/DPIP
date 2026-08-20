@@ -1982,5 +1982,7 @@
   "bugTrackerJoinDiscussion": "Tham gia thảo luận trên Discord",
   "bugTrackerSortLast": "Hoạt động mới nhất",
   "bugTrackerSortMostDiscussed": "Nhiều thảo luận nhất",
-  "bugTrackerStaff": "Nhân sự"
+  "bugTrackerStaff": "Nhân sự",
+  "eewSpokenLocalIntensity": "Cường độ dự kiến tại vị trí của bạn: {intensity}.",
+  "eewSpokenMaxIntensity": "Cường độ tối đa dự kiến: {intensity}."
 }

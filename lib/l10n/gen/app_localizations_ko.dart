@@ -3239,4 +3239,14 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => '스태프';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '현재 위치 예상 진도, $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '예상 최대 진도, $intensity.';
+  }
 }

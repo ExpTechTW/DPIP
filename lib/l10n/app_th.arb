@@ -1982,5 +1982,7 @@
   "bugTrackerJoinDiscussion": "ร่วมพูดคุยที่ Discord",
   "bugTrackerSortLast": "ล่าสุด",
   "bugTrackerSortMostDiscussed": "พูดคุยมากที่สุด",
-  "bugTrackerStaff": "ทีมงาน"
+  "bugTrackerStaff": "ทีมงาน",
+  "eewSpokenLocalIntensity": "คาดการณ์ความรุนแรง ณ ตำแหน่งของคุณ: {intensity}",
+  "eewSpokenMaxIntensity": "คาดการณ์ความรุนแรงสูงสุด: {intensity}"
 }

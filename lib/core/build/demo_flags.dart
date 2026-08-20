@@ -18,6 +18,9 @@ const String _monitorDemoSevereRaw = String.fromEnvironment(
 const String _startupEewDemoRaw = String.fromEnvironment(
   'DPIP_DEMO_STARTUP_EEW',
 );
+const String _monitorDemoSoundRaw = String.fromEnvironment(
+  'DPIP_DEMO_MONITOR_SOUND',
+);
 
 /// Whether the 強震監視器 demo feeds are on: debug builds launched with
 /// `--dart-define=DPIP_DEMO_MONITOR=true` (or `=1`). The flag is forced off
@@ -47,4 +50,12 @@ const bool kStartupEewDemoEnabled =
 /// earthquake to be the newest catalogue row.
 const bool kMonitorDemoSevereEnabled =
     (_monitorDemoSevereRaw == 'true' || _monitorDemoSevereRaw == '1') &&
+    kDebugMode;
+
+/// Whether the monitor demo submits one foreground notification through the
+/// real EEW announcement gate. Kept separate because the original alarm sound
+/// is deliberately disruptive. It is inert outside a debug monitor demo.
+const bool kMonitorDemoSoundEnabled =
+    kMonitorDemoEnabled &&
+    (_monitorDemoSoundRaw == 'true' || _monitorDemoSoundRaw == '1') &&
     kDebugMode;

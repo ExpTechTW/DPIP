@@ -8,6 +8,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
+import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/notifications/notification_samples.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/notifications/plain_channels.dart';
@@ -34,9 +35,30 @@ const String _fallbackChannelKey = 'announcement-general-v2';
 /// [NotificationTaps]. A `notification`-payload message is displayed by the OS
 /// directly (its tap arrives via `onMessageOpenedApp`).
 class NotificationService {
-  NotificationService(this._settings);
+  NotificationService(
+    this._settings, {
+    ForegroundEewAnnouncementGate? foregroundEewGate,
+  }) : foregroundEewGate =
+           foregroundEewGate ?? ForegroundEewAnnouncementGate() {
+    _foregroundEewGate = this.foregroundEewGate;
+  }
 
   final SettingsStore _settings;
+
+  /// Sequences foreground EEW speech before the notification channel sound.
+  /// Background and terminated delivery bypass this object entirely.
+  final ForegroundEewAnnouncementGate foregroundEewGate;
+
+  /// The same gate, reachable from [onFcmSilentData].
+  ///
+  /// That function is a top-level entry point — awesome_notifications_fcm
+  /// calls it with no service instance to reach — so the gate the visible
+  /// monitor speaks through has to be published somewhere it can see. It stays
+  /// null on the background isolate, which never runs this constructor and
+  /// where nothing is speaking; the foreground branch there displays
+  /// immediately when it is null, so a missing instance can only ever mean the
+  /// warning arrives sooner, never later.
+  static ForegroundEewAnnouncementGate? _foregroundEewGate;
 
   /// The last push token, or null before registration.
   String? get token => _settings.getString(SettingKeys.pushToken);
@@ -441,6 +463,38 @@ class NotificationService {
     );
   }
 
+  /// Submits a debug monitor warning through the same foreground EEW gate as
+  /// an FCM message. The caller is compile-time gated by the demo sound flag;
+  /// this guard also makes an accidental release call inert.
+  Future<void> showDebugEewWarning({
+    required String title,
+    required String body,
+  }) async {
+    if (!kDebugMode) return;
+    await foregroundEewGate.submit(() async {
+      final created = await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 570057,
+          channelKey: 'eew_alert-important-v2',
+          title: title,
+          body: body,
+          wakeUpScreen: true,
+          category: NotificationCategory.Alarm,
+          payload: const {
+            'channel': 'eew_alert-important-v2',
+            'id': 'demo-monitor-sound',
+          },
+        ),
+      );
+      if (!created) {
+        Log.warning(
+          'monitor demo warning was rejected — notification permission or '
+          'channel settings may be disabled',
+        );
+      }
+    });
+  }
+
   /// Fetches the push token and persists it as [SettingKeys.pushToken] —
   /// the identifier every backend registration call (`/v2/location`,
   /// `/v2/notify`) keys on.
@@ -723,5 +777,20 @@ Future<void> onFcmSilentData(FcmSilentData silentData) async {
 
   final content = contentFromData(data.cast<String, dynamic>());
   if (content == null) return;
-  await AwesomeNotifications().createNotification(content: content);
+
+  Future<void> display() =>
+      AwesomeNotifications().createNotification(content: content);
+
+  // A foreground EEW is the one case that waits: the visible monitor may be
+  // speaking the estimated intensity, and the channel's warning sound must not
+  // talk over it. Every other lifecycle and every other channel displays
+  // straight away, and the gate's own timeout bounds this one.
+  final gate = NotificationService._foregroundEewGate;
+  if (gate != null &&
+      silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
+      (content.channelKey?.startsWith('eew') ?? false)) {
+    await gate.submit(display);
+    return;
+  }
+  await display();
 }

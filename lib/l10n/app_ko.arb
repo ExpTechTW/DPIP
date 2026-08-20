@@ -1982,5 +1982,7 @@
   "bugTrackerJoinDiscussion": "Discord에서 논의에 참여하기",
   "bugTrackerSortLast": "최근 활동",
   "bugTrackerSortMostDiscussed": "답글 많은 순",
-  "bugTrackerStaff": "스태프"
+  "bugTrackerStaff": "스태프",
+  "eewSpokenLocalIntensity": "현재 위치 예상 진도, {intensity}.",
+  "eewSpokenMaxIntensity": "예상 최대 진도, {intensity}."
 }

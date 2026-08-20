@@ -35,6 +35,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/core/speech/speech_service.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -78,6 +79,10 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<PermissionHealth>.value(value: deps.permissionHealth),
   Provider<RealtimeService>.value(value: deps.realtimeService),
   Provider<NotificationService>.value(value: deps.notificationService),
+  Provider<SpeechService>(
+    create: (_) => SystemSpeechService(),
+    dispose: (_, speech) => speech.dispose(),
+  ),
   Provider<MeshtasticService>.value(value: deps.meshtastic),
   ChangeNotifierProvider<MeshLink>.value(value: deps.meshLink),
   ChangeNotifierProvider<MeshAlerts>.value(value: deps.meshAlerts),

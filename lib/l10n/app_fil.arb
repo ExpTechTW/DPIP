@@ -1982,5 +1982,7 @@
   "bugTrackerJoinDiscussion": "Makilahok sa talakayan sa Discord",
   "bugTrackerSortLast": "Pinakabagong aktibidad",
   "bugTrackerSortMostDiscussed": "Pinakamaraming talakayan",
-  "bugTrackerStaff": "Kawani"
+  "bugTrackerStaff": "Kawani",
+  "eewSpokenLocalIntensity": "Tinatayang intensidad sa iyong lokasyon: {intensity}.",
+  "eewSpokenMaxIntensity": "Tinatayang pinakamataas na intensidad: {intensity}."
 }
