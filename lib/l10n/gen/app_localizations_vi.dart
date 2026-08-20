@@ -3199,4 +3199,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => 'Không có';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return 'Cường độ dự kiến tại vị trí của bạn: $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return 'Cường độ tối đa dự kiến: $intensity.';
+  }
 }

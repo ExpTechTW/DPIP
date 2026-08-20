@@ -3157,4 +3157,14 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => '미지원';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '현재 위치 예상 진도, $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '예상 최대 진도, $intensity.';
+  }
 }

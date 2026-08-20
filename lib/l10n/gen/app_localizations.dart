@@ -6092,6 +6092,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not offered'**
   String get statusLegendUnsupported;
+
+  /// Short foreground TTS phrase before an EEW warning sound
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated intensity at your location: {intensity}.'**
+  String eewSpokenLocalIntensity(String intensity);
+
+  /// TTS fallback when the device location is unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated maximum intensity: {intensity}.'**
+  String eewSpokenMaxIntensity(String intensity);
 }
 
 class _AppLocalizationsDelegate

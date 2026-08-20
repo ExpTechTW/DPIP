@@ -1950,5 +1950,7 @@
   "dumpCopyAgain": "再複製一次",
   "dumpUploadFailed": "上傳失敗，請稍後再試",
   "statusLegendUnprobed": "未探測",
-  "statusLegendUnsupported": "不支援"
+  "statusLegendUnsupported": "不支援",
+  "eewSpokenLocalIntensity": "所在地預估震度，{intensity}。",
+  "eewSpokenMaxIntensity": "預估最大震度，{intensity}。"
 }
