@@ -439,6 +439,47 @@ void main() {
     expect(nativeMemory.keys, unorderedEquals([keep, fresh]));
   });
 
+  test('fully stale raster frames use one eviction prefix per frame', () async {
+    await cache.install(memoryBytes: 1024);
+    final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+    const retiredFrame =
+        'https://static.exptech.dev/api/v2/tiles/radar/1787236800';
+    const retainedFrame =
+        'https://static.exptech.dev/api/v2/tiles/radar/1787237400';
+    const retiredA = '$retiredFrame/7/106/55.webp?style=jma';
+    const retiredB = '$retiredFrame/7/107/55.webp?style=jma';
+    const staleInRetained = '$retainedFrame/7/106/55.webp?style=jma';
+    const keep = '$retainedFrame/7/107/55.webp?style=jma';
+    for (final (url, value) in [
+      (retiredA, 1),
+      (retiredB, 2),
+      (staleInRetained, 3),
+      (keep, 4),
+    ]) {
+      await store.writeBytes(
+        url,
+        etag: '$value',
+        bytes: Uint8List.fromList([value]),
+      );
+    }
+    await warmer.warmUrls([
+      retiredA,
+      retiredB,
+      staleInRetained,
+      keep,
+    ], immediate: true);
+    nativeCalls.clear();
+
+    await warmer.warmUrls([keep], immediate: true);
+
+    final evict = nativeCalls.firstWhere((c) => c.method == 'evictTiles');
+    expect((evict.arguments as Map)['contains'], [
+      '$retiredFrame/',
+      staleInRetained,
+    ]);
+    expect(nativeMemory.keys, [keep]);
+  });
+
   test('named working sets do not evict each other', () async {
     await cache.install(memoryBytes: 1024);
     final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);

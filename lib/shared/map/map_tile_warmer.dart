@@ -52,6 +52,14 @@ class MapTileWarmer {
 
   static const String _defaultWorkingSet = 'default';
 
+  // A frame tile always ends in <timestamp>/<z>/<x>/<y>.<ext>. Compressing
+  // URLs outside this exact v2 shape could turn a precise basemap/terrain
+  // eviction into a much wider one, so those consumers deliberately keep
+  // their original URL-per-tile patterns.
+  static final RegExp _frameTilePath = RegExp(
+    r'^(.*/api/v2/tiles/[^/]+/(?:\d{10}|\d{13})/)\d+/\d+/\d+\.[^/]+$',
+  );
+
   /// Abandons any scheduled or in-flight warm.
   void cancel() {
     _cancelEpoch++;
@@ -100,7 +108,7 @@ class MapTileWarmer {
       MapTileCache.trace(
         'warmer discard set=$workingSet resident=${stale.length}',
       );
-      await _cache?.evict(stale.toList(growable: false));
+      await _cache?.evict(_evictionPatterns(stale, const <String>{}));
     });
   }
 
@@ -150,12 +158,14 @@ class MapTileWarmer {
       final wanted = list.toSet();
       final previous = _workingSets[workingSet] ?? const <String>{};
       final stale = previous.difference(wanted);
+      final evictionPatterns = _evictionPatterns(stale, wanted);
       MapTileCache.trace(
         'warmer start label=$label set=$workingSet gen=$gen '
-        'previous=${previous.length} evict=${stale.length}',
+        'previous=${previous.length} evict=${stale.length} '
+        'patterns=${evictionPatterns.length}',
       );
-      if (stale.isNotEmpty) {
-        await cache.evict(stale.toList(growable: false));
+      if (evictionPatterns.isNotEmpty) {
+        await cache.evict(evictionPatterns);
       }
 
       final result = await cache.warm(
@@ -219,6 +229,41 @@ class MapTileWarmer {
       Log.handle(error, stackTrace, 'MapTileWarmer operation');
     });
     return next;
+  }
+
+  /// Collapses fully stale raster frames to one native substring match each.
+  ///
+  /// Native eviction scans every resident URL against every supplied pattern
+  /// while holding its memory-store lock. A timeline hop can retire hundreds
+  /// of tiles at once, so sending every complete URL makes one platform call
+  /// quadratic enough to block the UI thread. A frame prefix is equivalent
+  /// only when the new working set retains no URL from that frame; otherwise
+  /// the stale tiles stay precise so current-viewport tiles cannot be removed.
+  static List<String> _evictionPatterns(Set<String> stale, Set<String> wanted) {
+    if (stale.isEmpty) return const [];
+    final wantedFrames = <String>{};
+    for (final url in wanted) {
+      final prefix = _framePrefix(url);
+      if (prefix != null) wantedFrames.add(prefix);
+    }
+
+    final patterns = <String>{};
+    for (final url in stale) {
+      final prefix = _framePrefix(url);
+      patterns.add(
+        prefix != null && !wantedFrames.contains(prefix) ? prefix : url,
+      );
+    }
+    return patterns.toList(growable: false);
+  }
+
+  static String? _framePrefix(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasScheme || uri.host.isEmpty) return null;
+    final match = _frameTilePath.firstMatch(uri.path);
+    final path = match?.group(1);
+    if (path == null) return null;
+    return '${uri.origin}$path';
   }
 
   /// Warms the viewport for a region-pinned path template.

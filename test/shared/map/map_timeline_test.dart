@@ -16,6 +16,7 @@ Widget _wrap({
   required List<MapFrame> frames,
   required int selectedIndex,
   required ValueChanged<int> onSelected,
+  ValueChanged<bool>? onScrubbing,
   Duration? framePeriod,
   DateTime? dataTime,
 }) => MaterialApp(
@@ -30,6 +31,7 @@ Widget _wrap({
           frames: frames,
           selectedIndex: selectedIndex,
           onSelected: onSelected,
+          onScrubbing: onScrubbing,
           framePeriod: framePeriod,
           dataTime: dataTime,
         ),
@@ -165,6 +167,67 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('a release waits for an input-quiet window before settling', (
+    tester,
+  ) async {
+    final states = <bool>[];
+    await tester.pumpWidget(
+      _wrap(
+        frames: _frames(40),
+        selectedIndex: 20,
+        onSelected: (_) {},
+        onScrubbing: states.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(ListView)),
+    );
+    await gesture.moveBy(const Offset(41, 0));
+    await gesture.up();
+    await tester.pump(const Duration(milliseconds: 119));
+
+    expect(states, [
+      true,
+    ], reason: 'finger-up and the alignment snap are not a cold-load boundary');
+
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(states, [true, false]);
+  });
+
+  testWidgets('rapid consecutive drags report only the final settle', (
+    tester,
+  ) async {
+    final states = <bool>[];
+    await tester.pumpWidget(
+      _wrap(
+        frames: _frames(80),
+        selectedIndex: 40,
+        onSelected: (_) {},
+        onScrubbing: states.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final centre = tester.getCenter(find.byType(ListView));
+    for (var i = 0; i < 20; i++) {
+      final gesture = await tester.startGesture(centre);
+      await gesture.moveBy(Offset(i.isEven ? 84 : -84, 0));
+      await gesture.up();
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+
+    expect(
+      states.where((state) => !state),
+      isEmpty,
+      reason: 'each new touch must cancel the preceding settle timer',
+    );
+
+    await tester.pumpAndSettle();
+    expect(states, [true, false]);
+  });
 
   testWidgets(
     'a frame period renders the big label as a range, ticks stay start times',

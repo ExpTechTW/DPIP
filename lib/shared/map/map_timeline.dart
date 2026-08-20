@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
@@ -86,6 +88,12 @@ class _MapTimelineState extends State<MapTimeline> {
 
   static const double _rulerHeight = 48;
 
+  /// A finger can land, start the 150 ms tick-alignment snap, and touch down
+  /// again immediately. Reporting every intervening `ScrollEnd` as settled
+  /// makes the map mount a new raster ring for each short stroke. Wait for a
+  /// brief input-quiet window so a burst has one final cold load.
+  static const Duration _settleQuietPeriod = Duration(milliseconds: 120);
+
   /// Formatted labels per frame, built once per frame set.
   ///
   /// A scrub rebuilds this widget for every frame the finger crosses, and each
@@ -140,11 +148,25 @@ class _MapTimelineState extends State<MapTimeline> {
   late int _liveIndex = widget.selectedIndex;
   bool _snapping = false;
   bool _scrubbing = false;
+  int _snapGeneration = 0;
+  Timer? _settleTimer;
 
   void _setScrubbing(bool value) {
+    if (value) {
+      _settleTimer?.cancel();
+      _settleTimer = null;
+    }
     if (_scrubbing == value) return;
     _scrubbing = value;
     widget.onScrubbing?.call(value);
+  }
+
+  void _scheduleSettled() {
+    _settleTimer?.cancel();
+    _settleTimer = Timer(_settleQuietPeriod, () {
+      _settleTimer = null;
+      if (mounted) _setScrubbing(false);
+    });
   }
 
   @override
@@ -164,6 +186,8 @@ class _MapTimelineState extends State<MapTimeline> {
 
   @override
   void dispose() {
+    _settleTimer?.cancel();
+    _snapGeneration++;
     _scroll.dispose();
     super.dispose();
   }
@@ -181,13 +205,16 @@ class _MapTimelineState extends State<MapTimeline> {
     );
     if ((_scroll.offset - target).abs() < 0.5) return;
     if (animate) {
+      final generation = ++_snapGeneration;
       _snapping = true;
       _scroll
           .animateTo(target, duration: AppMotion.fast, curve: Curves.easeOut)
           .whenComplete(() {
-            if (mounted) _snapping = false;
+            if (mounted && generation == _snapGeneration) _snapping = false;
           });
     } else {
+      _snapGeneration++;
+      _snapping = false;
       _scroll.jumpTo(target);
     }
   }
@@ -196,9 +223,19 @@ class _MapTimelineState extends State<MapTimeline> {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
     if (notification is ScrollStartNotification) {
-      _setScrubbing(true);
+      if (notification.dragDetails != null) {
+        // A real finger interrupts any driven snap. Its completion future may
+        // still run, so invalidate that generation as well as the flag.
+        _snapGeneration++;
+        _snapping = false;
+        _setScrubbing(true);
+      } else if (!_snapping) {
+        // Ballistic motion belongs to the gesture; a driven alignment snap
+        // does not restart or cancel its quiet-period timer.
+        _setScrubbing(true);
+      }
     } else if (notification is ScrollUpdateNotification) {
-      _setScrubbing(true);
+      if (!_snapping) _setScrubbing(true);
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
         // Compare against [_liveIndex] (before the update), never
@@ -213,7 +250,7 @@ class _MapTimelineState extends State<MapTimeline> {
         widget.onSelected(centred);
       }
       _centreOn(centred, animate: true);
-      _setScrubbing(false);
+      _scheduleSettled();
     }
     return false;
   }
