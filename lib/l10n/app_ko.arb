@@ -8,6 +8,7 @@
   "rainInterval24h": "24시간",
   "homeRainTrendHeavyStopping": "{minutes}분 후에 강한 비가 그칠 것으로 예상돼요",
   "mapTimelineObserved": "관측",
+  "mapTimelineScrubPaused": "너무 빠르게 이동하여 프레임 업데이트가 일시 중지되었습니다. 속도를 늦추면 다시 시작됩니다.",
   "regionSelectTitle": "지역 선택",
   "skyTimeNoon": "정오",
   "radarCountyOutlineSubtitle": "레이더 에코 아래에서도 경계가 보이도록 합니다.",

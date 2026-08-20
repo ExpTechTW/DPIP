@@ -8,6 +8,7 @@
   "rainInterval24h": "24 ชม.",
   "homeRainTrendHeavyStopping": "คาดว่าฝนตกหนักจะหยุดในอีก {minutes} นาที",
   "mapTimelineObserved": "เวลาตรวจวัด",
+  "mapTimelineScrubPaused": "ลากเร็วเกินไป การอัปเดตเฟรมจึงหยุดชั่วคราว ลดความเร็วเพื่อทำงานต่อ",
   "regionSelectTitle": "เลือกพื้นที่",
   "skyTimeNoon": "เที่ยงวัน",
   "radarCountyOutlineSubtitle": "ทำให้เส้นแบ่งเขตยังอ่านออกใต้ภาพเอคโคเรดาร์",

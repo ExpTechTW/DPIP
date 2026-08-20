@@ -30,6 +30,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTimelineObserved => 'เวลาตรวจวัด';
 
   @override
+  String get mapTimelineScrubPaused =>
+      'ลากเร็วเกินไป การอัปเดตเฟรมจึงหยุดชั่วคราว ลดความเร็วเพื่อทำงานต่อ';
+
+  @override
   String get regionSelectTitle => 'เลือกพื้นที่';
 
   @override

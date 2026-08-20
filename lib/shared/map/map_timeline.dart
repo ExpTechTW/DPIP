@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:dpip/app/theme/app_motion.dart';
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -77,6 +79,110 @@ class MapTimeline extends StatefulWidget {
 
   @override
   State<MapTimeline> createState() => _MapTimelineState();
+}
+
+/// Visible feedback for the timeline's bounded latest-wins render queue.
+///
+/// [reportDroppedFrame] is called only when a scrub sample is coalesced because
+/// the map already has one update waiting. Repeated drops keep the signal on;
+/// once input becomes slow enough for the queue to keep up, it clears after a
+/// short quiet window. Finger-up calls [resume] immediately.
+final class TimelineScrubBackpressure extends ValueNotifier<bool> {
+  TimelineScrubBackpressure({
+    this.resumeDelay = const Duration(milliseconds: 300),
+  }) : super(false);
+
+  final Duration resumeDelay;
+  Timer? _resumeTimer;
+
+  void reportDroppedFrame() {
+    if (!value) value = true;
+    _resumeTimer?.cancel();
+    _resumeTimer = Timer(resumeDelay, resume);
+  }
+
+  void resume() {
+    _resumeTimer?.cancel();
+    _resumeTimer = null;
+    if (value) value = false;
+  }
+
+  @override
+  void dispose() {
+    _resumeTimer?.cancel();
+    super.dispose();
+  }
+}
+
+/// A compact warning for placement immediately above and outside the timeline
+/// surface. It does not block input and announces the pause as a live region.
+class MapTimelineScrubPauseNotice extends StatelessWidget {
+  const MapTimelineScrubPauseNotice({super.key, required this.paused});
+
+  final ValueListenable<bool> paused;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textStyle = Theme.of(context).textTheme.bodySmall?.copyWith(
+      color: colors.onTertiaryContainer,
+      fontWeight: FontWeight.w600,
+    );
+
+    return ValueListenableBuilder<bool>(
+      valueListenable: paused,
+      builder: (context, paused, _) => AnimatedSwitcher(
+        duration: AppMotion.fast,
+        reverseDuration: AppMotion.fast,
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        transitionBuilder: (child, animation) => FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.98, end: 1).animate(animation),
+            child: child,
+          ),
+        ),
+        child: paused
+            ? Semantics(
+                key: const ValueKey('timeline-scrub-paused'),
+                liveRegion: true,
+                child: Material(
+                  color: colors.tertiaryContainer,
+                  elevation: 3,
+                  borderRadius: AppRadius.medium,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          size: 18,
+                          color: colors.onTertiaryContainer,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Flexible(
+                          child: Text(
+                            AppLocalizations.of(context).mapTimelineScrubPaused,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: textStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(key: ValueKey('timeline-scrub-running')),
+      ),
+    );
+  }
 }
 
 class _MapTimelineState extends State<MapTimeline> {

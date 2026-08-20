@@ -30,6 +30,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapTimelineObserved => 'Naobserbahan';
 
   @override
+  String get mapTimelineScrubPaused =>
+      'Masyadong mabilis ang pag-drag kaya naka-pause ang frame updates. Bagalan upang magpatuloy.';
+
+  @override
   String get regionSelectTitle => 'Pumili ng rehiyon';
 
   @override

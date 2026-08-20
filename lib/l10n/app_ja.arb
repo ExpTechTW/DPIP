@@ -8,6 +8,7 @@
   "rainInterval24h": "24時間",
   "homeRainTrendHeavyStopping": "{minutes}分後に大雨が止む見込みです",
   "mapTimelineObserved": "観測",
+  "mapTimelineScrubPaused": "操作が速すぎるため、フレーム更新を一時停止しました。速度を落とすと再開します。",
   "regionSelectTitle": "地域を選択",
   "skyTimeNoon": "正午",
   "radarCountyOutlineSubtitle": "レーダーエコーの下でも県市境界が見えるようにします。",

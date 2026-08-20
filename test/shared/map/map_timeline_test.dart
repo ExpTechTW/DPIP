@@ -55,6 +55,53 @@ List<MapFrame> _forecastFrames() {
 }
 
 void main() {
+  testWidgets('backpressure warning stays visible until rapid samples stop', (
+    tester,
+  ) async {
+    final paused = TimelineScrubBackpressure(
+      resumeDelay: const Duration(milliseconds: 100),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 300,
+              child: MapTimelineScrubPauseNotice(paused: paused),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.textContaining('scrubbing too fast'), findsNothing);
+    paused.reportDroppedFrame();
+    await tester.pump();
+    expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    expect(find.textContaining('scrubbing too fast'), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 99));
+    paused.reportDroppedFrame();
+    await tester.pump(const Duration(milliseconds: 99));
+    expect(paused.value, isTrue, reason: 'another dropped sample resets quiet');
+
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(paused.value, isFalse);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('scrubbing too fast'), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    paused.reportDroppedFrame();
+    paused.resume();
+    expect(paused.value, isFalse, reason: 'finger-up resumes immediately');
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    paused.dispose();
+  });
+
   testWidgets('a forecast labels the present, not its furthest step', (
     tester,
   ) async {

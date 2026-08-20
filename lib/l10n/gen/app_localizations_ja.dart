@@ -30,6 +30,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTimelineObserved => '観測';
 
   @override
+  String get mapTimelineScrubPaused =>
+      '操作が速すぎるため、フレーム更新を一時停止しました。速度を落とすと再開します。';
+
+  @override
   String get regionSelectTitle => '地域を選択';
 
   @override

@@ -30,6 +30,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapTimelineObserved => '觀測';
 
   @override
+  String get mapTimelineScrubPaused => '拖動過快，影格更新已暫停；放慢速度即可恢復。';
+
+  @override
   String get regionSelectTitle => '選擇地區';
 
   @override
@@ -3160,6 +3163,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapTimelineObserved => '观测';
+
+  @override
+  String get mapTimelineScrubPaused => '拖动过快，帧更新已暂停；放慢速度即可恢复。';
 
   @override
   String get regionSelectTitle => '选择地区';
@@ -6294,6 +6300,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapTimelineObserved => '觀測';
 
   @override
+  String get mapTimelineScrubPaused => '拖動過快，影格更新已暫停；放慢速度即可恢復。';
+
+  @override
   String get regionSelectTitle => '選擇地區';
 
   @override
@@ -9424,6 +9433,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapTimelineObserved => '觀測';
+
+  @override
+  String get mapTimelineScrubPaused => '拖動過快，影格更新已暫停；放慢速度即可恢復。';
 
   @override
   String get regionSelectTitle => '選擇地區';

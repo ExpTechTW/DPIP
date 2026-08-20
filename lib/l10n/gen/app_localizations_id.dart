@@ -30,6 +30,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTimelineObserved => 'Diamati';
 
   @override
+  String get mapTimelineScrubPaused =>
+      'Geseran terlalu cepat sehingga pembaruan bingkai dijeda. Perlambat untuk melanjutkan.';
+
+  @override
   String get regionSelectTitle => 'Pilih wilayah';
 
   @override

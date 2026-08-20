@@ -16,6 +16,10 @@
   },
   "homeRainTrendHeavyStopping": "Heavy rain likely to stop in {minutes} minutes",
   "mapTimelineObserved": "Observed",
+  "mapTimelineScrubPaused": "Frame updates paused because you're scrubbing too fast. Slow down to resume.",
+  "@mapTimelineScrubPaused": {
+    "description": "Warning above the map timeline when rapid scrubbing outruns its bounded render queue"
+  },
   "regionSelectTitle": "Select a region",
   "skyTimeNoon": "Noon",
   "radarCountyOutlineSubtitle": "Keeps county borders legible under the radar echo.",

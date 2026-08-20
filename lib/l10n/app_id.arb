@@ -8,6 +8,7 @@
   "rainInterval24h": "24 jam",
   "homeRainTrendHeavyStopping": "Hujan deras diperkirakan berhenti dalam {minutes} menit",
   "mapTimelineObserved": "Diamati",
+  "mapTimelineScrubPaused": "Geseran terlalu cepat sehingga pembaruan bingkai dijeda. Perlambat untuk melanjutkan.",
   "regionSelectTitle": "Pilih wilayah",
   "skyTimeNoon": "Siang",
   "radarCountyOutlineSubtitle": "Menjaga batas wilayah tetap terbaca di bawah gema radar.",
