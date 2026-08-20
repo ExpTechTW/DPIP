@@ -35,5 +35,6 @@ class DpmTilePrefetcher {
     zoom: zoom,
     maxZoom: 16,
     logLabel: 'dpm-$layer',
+    workingSet: 'dpm-$layer',
   );
 }

@@ -90,6 +90,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
   late final MapInteractionTracker _mapInteraction;
+  Future<void> _tileCacheReady = Future<void>.value();
 
   /// The shell's visible-tab notifier — same contract as [BaseMap]: null
   /// (full-screen routes, previews) means always visible.
@@ -145,9 +146,6 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   /// Finger down / fling in flight — raster layers skip cold mounts.
   bool _scrubbing = false;
-
-  /// Whether a scrub reveal is running (see [_pumpScrub]).
-  bool _scrubInFlight = false;
 
   /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
@@ -454,7 +452,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
-    _basemapWarmer ??= MapTileWarmer(context.read<MapTileCache?>());
+    final tileCache = context.read<MapTileCache?>();
+    _basemapWarmer ??= MapTileWarmer(tileCache);
+    // Bootstrap can configure the cache before the platform-view plugin owns
+    // this channel. Re-send the byte cap now so native L1 is actually 48 MB,
+    // not its 2 MB pre-attach fallback.
+    _tileCacheReady =
+        tileCache?.syncNativeConfiguration() ?? Future<void>.value();
     unawaited(const MapCache().setMaximumSize());
   }
 
@@ -518,6 +522,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   void _setShowTerrain(bool value) {
     if (_showTerrain.value == value) return;
     _showTerrain.value = value;
+    if (!value) {
+      unawaited(_basemapWarmer?.discardWorkingSet('terrain'));
+    }
     _syncTerrain();
   }
 
@@ -590,6 +597,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   Future<void> _warmBasemap(MapLibreMapController controller) async {
+    await _tileCacheReady;
     final warmer = _basemapWarmer;
     if (warmer == null) return;
     try {
@@ -607,6 +615,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         zoom: zoom,
         maxZoom: 12,
         logLabel: 'basemap',
+        workingSet: 'basemap',
+        immediate: true,
       );
       // DEM tiles too — the relief renders at every zoom, so warm them the
       // same way as the basemap. Native downloads a hillshade viewport as one
@@ -631,6 +641,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           zoom: zoom,
           maxZoom: 12,
           logLabel: 'terrain',
+          workingSet: 'terrain',
+          immediate: true,
         );
       }
     } catch (error, stackTrace) {
@@ -687,6 +699,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// Renders the active layer: a sheet layer draws its static overlay; a
   /// timeline layer fetches its frames and reveals the newest.
   Future<void> _loadActive() async {
+    await _tileCacheReady;
     if (_controller == null || !_styleLoaded) return;
     final gen = ++_generation;
     setState(() => _error = null);
@@ -771,37 +784,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // never rebuilds the (expensive) platform-view map. The timeline drives its
     // own display; _selectedIndex is just the source of truth for show().
     _selectedIndex = index;
-    if (_scrubbing) {
-      _pumpScrub();
-      return;
-    }
+    // Scrub and settle share the same serial latest-wins lane. Letting scrub
+    // call show() directly allowed the finger-up settle to mutate the same
+    // MapLibre layers concurrently with an older in-flight reveal.
     _showSelected();
-  }
-
-  /// Drives scrub reveals **latest-wins**: at most one in flight, and whatever
-  /// index the finger has reached by the time it finishes is what runs next.
-  ///
-  /// A fling crosses frames faster than a reveal completes. Firing one
-  /// unawaited `show` per crossed frame piled up platform calls for frames
-  /// already scrolled past — the map fell behind the finger and kept working
-  /// after it stopped. Intermediate frames are *meant* to be dropped here; the
-  /// settle ([_onScrubbing]) always renders the final position.
-  void _pumpScrub() {
-    if (_scrubInFlight) return;
-    final controller = _controller;
-    if (controller == null || _frames.isEmpty) return;
-    _scrubInFlight = true;
-    final index = _selectedIndex;
-    _active
-        .show(controller, _frames[index], scrubbing: true)
-        .catchError((Object e, StackTrace st) {
-          Log.handle(e, st, 'Map scrub reveal (${_active.id})');
-        })
-        .whenComplete(() {
-          _scrubInFlight = false;
-          // The finger moved on while that ran — chase it.
-          if (_scrubbing && _selectedIndex != index) _pumpScrub();
-        });
   }
 
   void _onLayerSelected(MapLayer layer) {

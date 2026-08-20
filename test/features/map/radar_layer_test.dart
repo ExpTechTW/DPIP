@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show outlineLayerId, townLabelLayerId;
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
+import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -14,6 +17,48 @@ class _FakeRadarRepository extends FakeRasterFrameSource
   @override
   String tileUrl(String frame) =>
       'https://host/api/v2/tiles/radar/$frame/{z}/{x}/{y}.webp';
+}
+
+class _BlockingWarmRadarRepository extends _FakeRadarRepository {
+  _BlockingWarmRadarRepository(super.frames);
+
+  final Completer<void> warmGate = Completer<void>();
+
+  @override
+  Future<void> warmFrameTiles({
+    required List<String> frames,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+    bool fill = false,
+    bool immediate = false,
+  }) {
+    warmed.add(List<String>.of(frames));
+    return warmGate.future;
+  }
+}
+
+class _ControlledReadinessRadarRepository extends _FakeRadarRepository {
+  _ControlledReadinessRadarRepository(super.frames);
+
+  bool ready = true;
+  int probes = 0;
+
+  @override
+  Future<FrameTileReadiness> frameTileReadiness({
+    required String frame,
+    required double south,
+    required double west,
+    required double north,
+    required double east,
+    required double zoom,
+    bool warm = false,
+  }) async {
+    probes++;
+    return (ready: ready, resident: ready ? 6 : 2, required: 6);
+  }
 }
 
 void main() {
@@ -42,6 +87,11 @@ void main() {
       5,
       reason: 'the ring is current ±2; the overlays add sources of their own',
     );
+    expect(
+      controller.calls.where((c) => c == 'addSource:radar-frame-seam-src'),
+      hasLength(1),
+      reason: 'parallel cold mounts must share one in-flight seam creation',
+    );
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
     for (final i in [2, 3, 5, 6]) {
       expect(
@@ -51,6 +101,34 @@ void main() {
       );
       expect(controller.opacityOf('radar-lyr-${frames[i].id}'), '0.0');
     }
+  });
+
+  test('a blocked warm cannot leave two timestamps at full opacity', () async {
+    final source = _BlockingWarmRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[1]);
+    await pumpEventQueue();
+    expect(source.warmed, isNotEmpty);
+
+    // Jump far enough to force a settle rather than an in-ring flip. The warm
+    // future never completes during these assertions; display correctness must
+    // therefore be independent of cache injection.
+    await layer.show(controller, frames[7]);
+
+    expect(controller.opacityOf('radar-lyr-${frames[7].id}'), '0.85');
+    expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0');
+    expect(
+      controller.visibilityOf('radar-lyr-${frames[1].id}'),
+      'none',
+      reason: 'the old timestamp must stop drawing before warming finishes',
+    );
+
+    source.warmGate.complete();
+    await pumpEventQueue();
   });
 
   test(
@@ -82,7 +160,7 @@ void main() {
     },
   );
 
-  test('frames mount with no opacity transition', () async {
+  test('frames mount without opacity or per-tile fades', () async {
     final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -97,6 +175,13 @@ void main() {
       reason:
           "raster-opacity's style-spec default is a 300 ms cross-fade, which "
           'makes every scrub step lag the finger and blend two frames',
+    );
+    expect(
+      controller.mountTileFades.values,
+      everyElement(0),
+      reason:
+          "raster-fade-duration's separate 300 ms default makes an L1 hit "
+          'flash transparent whenever its source is mounted again',
     );
   });
 
@@ -121,7 +206,7 @@ void main() {
     expect(controller.calls, contains('addSource:radar-src-${frames[0].id}'));
   });
 
-  test('a mid-drag reveal does not widen the ring', () async {
+  test('crossing the ring slides it and preloads the next neighbours', () async {
     final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -129,17 +214,20 @@ void main() {
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]); // ring 2..6
     await layer.show(controller, frames[0], scrubbing: true);
+
+    // The ring is now 0..2: target 0 plus the next two frames are live, while
+    // the old far side retired. The next two scrub steps need no source mount.
+    expect(controller.visibilityOf('radar-lyr-${frames[0].id}'), 'visible');
+    expect(controller.visibilityOf('radar-lyr-${frames[1].id}'), 'visible');
+    expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0.0');
+    expect(controller.visibilityOf('radar-lyr-${frames[6].id}'), 'none');
+
     controller.calls.clear();
-
-    await layer.show(controller, frames[8], scrubbing: true);
-
-    // frames[0] joined nothing: it stops drawing and loading outright, so a
-    // long drag can't leave a trail of live sources behind it.
-    expect(controller.visibilityOf('radar-lyr-${frames[0].id}'), 'none');
+    await layer.show(controller, frames[1], scrubbing: true);
     expect(
-      controller.visibilityOf('radar-lyr-${frames[3].id}'),
-      'visible',
-      reason: 'a real ring member only fades out, keeping its tiles',
+      controller.calls.where((call) => call.startsWith('addSource:')),
+      isEmpty,
+      reason: 'the slid ring turns the next frame into an opacity-only flip',
     );
   });
 
@@ -150,7 +238,7 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]); // ring 2..6
-    // Drag past the ring, then bounce back into it — a fast fling's shape.
+    // Drag past the ring, then bounce forward again — a fast fling's shape.
     await layer.show(controller, frames[0], scrubbing: true);
     await layer.show(controller, frames[5], scrubbing: true);
 
@@ -158,9 +246,8 @@ void main() {
       controller.visibilityOf('radar-lyr-${frames[0].id}'),
       'none',
       reason:
-          'the cold frame was never part of the ring, so the flip back into '
-          'it must hide it outright — an opacity-0 fade leaves it at full '
-          'strength ghosting behind the ring while the drag bounces around',
+          'sliding to 5 retires frame 0, so it cannot ghost behind the new '
+          'ring while the drag changes direction',
     );
     expect(controller.opacityOf('radar-lyr-${frames[5].id}'), '0.85');
   });
@@ -183,6 +270,27 @@ void main() {
     );
   });
 
+  test('finger-up settles a frame already revealed outside the ring', () async {
+    final source = _FakeRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]); // ring 2..6
+    await layer.show(controller, frames[8], scrubbing: true); // ring 6..8
+
+    // Finger-up reports the same id that the drag already revealed. It is not
+    // redundant: the layer still records the settled frame and starts its
+    // immediate warm, even though the scrub ring is already centred there.
+    await layer.show(controller, frames[8]); // ring 6..8
+
+    for (final i in [2, 3, 4, 5]) {
+      expect(controller.visibilityOf('radar-lyr-${frames[i].id}'), 'none');
+    }
+    expect(controller.opacityOf('radar-lyr-${frames[8].id}'), '0.85');
+  });
+
   test('a settle warms outward from the frame, far beyond the ring', () async {
     // 25 frames so the ±4 ring is a strict subset of the warm spread.
     final source = _FakeRadarRepository(_ids(25));
@@ -192,6 +300,7 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[12]);
+    await pumpEventQueue();
 
     final warmed = source.warmed.last;
     expect(warmed, hasLength(25), reason: 'the fill warm spreads to the edge');
@@ -205,7 +314,7 @@ void main() {
     );
   });
 
-  test('a scrub reveal past the warm band re-warms around the finger', () async {
+  test('scrubbing never launches a whole-history warm scan', () async {
     final source = _FakeRadarRepository(_ids(25));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
@@ -213,6 +322,7 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[12]); // settle → warm 12, ±1, ±2 …
+    await pumpEventQueue();
     source.warmed.clear();
 
     // Still inside the ±4 guaranteed band: revealing must not re-warm (or
@@ -227,21 +337,61 @@ void main() {
           'store re-read, so the warm does not chase the finger frame by frame',
     );
 
-    // Crossed the guaranteed band edge: the warm re-centres on the finger and
-    // spreads outward again, so the rest of a long drag stays on memory hits
-    // instead of store reads.
+    // Even after crossing the old warm-band edge, the active five-frame ring is
+    // the prefetcher. The device trace showed the old scan probing 1,300–1,780
+    // cold SQLite keys every 120 ms with zero L2 hits while competing with the
+    // source mounts that actually drive network loading.
     await layer.show(controller, frames[20], scrubbing: true);
     await pumpEventQueue();
-    final reWarmed = source.warmed.last;
-    expect(reWarmed.first, frames[20].id, reason: 're-warms around the finger');
-    expect(
-      [reWarmed[1], reWarmed[2]],
-      unorderedEquals([frames[21].id, frames[19].id]),
-      reason:
-          'revealing a frame the last-warmed band did not cover re-warms '
-          'around it, so a drag never lands past a warmed mount',
-    );
+    await layer.show(controller, frames[4], scrubbing: true);
+    await pumpEventQueue();
+    expect(source.warmed, isEmpty);
   });
+
+  test('a cold scrub target cannot replace the complete frame', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]);
+    source.ready = false;
+
+    await layer.show(controller, frames[0], scrubbing: true);
+
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
+    expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.0');
+    expect(source.probes, greaterThan(0));
+
+    source.ready = true;
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0');
+    expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
+  });
+
+  test(
+    'an older readiness completion cannot overwrite a newer target',
+    () async {
+      final source = _ControlledReadinessRadarRepository(_ids(12));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[5]);
+      source.ready = false;
+      await layer.show(controller, frames[0], scrubbing: true);
+
+      source.ready = true;
+      await layer.show(controller, frames[10], scrubbing: true);
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+
+      expect(controller.opacityOf('radar-lyr-${frames[10].id}'), '0.85');
+      expect(controller.opacityOf('radar-lyr-${frames[0].id}'), isNot('0.85'));
+    },
+  );
 
   test('clear releases tiles and removes every mounted frame', () async {
     final source = _FakeRadarRepository(_ids(5));
