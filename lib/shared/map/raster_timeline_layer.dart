@@ -234,8 +234,28 @@ abstract class RasterTimelineLayer implements MapLayer {
   @override
   void onMapGestureEnd() {}
 
+  /// Whether the native map is actually being drawn.
+  ///
+  /// The shell keeps this layer mounted while another tab or route covers it.
+  /// A wide settled warm must stop on that hidden edge: otherwise thousands of
+  /// cached tile bodies can keep crossing the platform channel off-screen, then
+  /// collide with MapLibre's queued decode work when rendering resumes.
+  bool _surfaceVisible = true;
+
   @override
-  void onSurfaceVisibility(bool visible) {}
+  void onSurfaceVisibility(bool visible) {
+    if (_surfaceVisible == visible) return;
+    _surfaceVisible = visible;
+    if (visible) return;
+
+    // Invalidate readiness polls and idle-preload workers immediately. Keep the
+    // mounted/current frame intact so returning is a cheap render resume rather
+    // than a clear + rebuild; MapScaffold will call show() if the server has a
+    // genuinely newer current frame.
+    _revealGeneration++;
+    source.cancelTileWarm();
+    MapTileCache.trace('timeline=$id surface-hidden cancel-background-work');
+  }
 
   // --- Frame bookkeeping -----------------------------------------------------
 
@@ -751,8 +771,13 @@ abstract class RasterTimelineLayer implements MapLayer {
     String frameId,
     int generation,
   ) async {
+    if (!_surfaceVisible || !_isCurrent(frameId, generation)) return;
     await _warmBand(controller, index);
-    if (_warmSuspended || !_isCurrent(frameId, generation)) return;
+    if (!_surfaceVisible ||
+        _warmSuspended ||
+        !_isCurrent(frameId, generation)) {
+      return;
+    }
     try {
       await _preloadSettledNeighbours(controller, index, frameId, generation);
     } catch (error, stackTrace) {
@@ -846,7 +871,8 @@ abstract class RasterTimelineLayer implements MapLayer {
     required double east,
     required double zoom,
   }) async {
-    bool current() => !_warmSuspended && _isCurrent(frameId, generation);
+    bool current() =>
+        _surfaceVisible && !_warmSuspended && _isCurrent(frameId, generation);
 
     await _enqueueMutation(() async {
       if (!current()) return;
@@ -937,7 +963,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   }
 
   bool _isCurrent(String frameId, int generation) =>
-      generation == _revealGeneration && _requestedFrameId == frameId;
+      _surfaceVisible &&
+      generation == _revealGeneration &&
+      _requestedFrameId == frameId;
 
   Future<void> _enqueueMutation(Future<void> Function() operation) {
     final next = _mutationTail.then((_) => operation());
@@ -1090,7 +1118,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     int centre, {
     bool immediate = false,
   }) async {
-    if (_orderedIds.isEmpty) return;
+    if (!_surfaceVisible || _orderedIds.isEmpty) return;
     // Adopt the new centre before the first await: concurrent scrub reveals
     // that cross the old band edge coalesce onto this one re-warm instead of
     // each firing its own visible-region round-trip.
@@ -1108,6 +1136,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
     try {
       final bounds = await controller.getVisibleRegion();
+      // Visibility can change while the platform answers the camera query. Do
+      // not start a fresh warmer generation after the hidden-edge cancellation.
+      if (!_surfaceVisible || _warmCentre != centre) return;
       await source.warmFrameTiles(
         frames: frames,
         south: bounds.southwest.latitude,
@@ -1184,7 +1215,7 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   @override
   Future<void> onCameraIdle(MapLibreMapController controller) async {
-    if (_warmSuspended) return;
+    if (!_surfaceVisible || _warmSuspended) return;
     final centre = _shownIndex;
     if (centre == null) return;
     _readyFrames.clear();
@@ -1197,6 +1228,7 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   @override
   Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {
+    if (!_surfaceVisible) return;
     final centre = _shownIndex;
     if (centre == null) return;
     _warmCentre = null;

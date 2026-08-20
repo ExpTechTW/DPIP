@@ -104,6 +104,20 @@ class MapTileCache {
   /// to both [_injectChunk] and SQLite's 400-variable query chunk.
   static const int _fillReadChunk = _injectChunk * 16;
 
+  /// URLs per native L1-presence probe.
+  ///
+  /// A settled radar fill can name 12k+ tiles. Sending that as one platform
+  /// message makes iOS decode a huge string array and perform every lookup on
+  /// the platform thread before it can draw again. Bounded probes preserve the
+  /// same answer while giving the event loop regular scheduling points.
+  static const int _probeChunk = _fillReadChunk;
+
+  /// Large fills are intentionally exhaustive, but not urgent. Briefly yield
+  /// after this many native messages so pointer/lifecycle/render work can run
+  /// while L1 is filled in the background.
+  static const int _messagesPerSlice = 4;
+  static const Duration _cooperativePause = Duration(milliseconds: 2);
+
   /// The cap [install] sized the mirror with — remembered so a fill warm can
   /// estimate how much it may inject without overshooting into a trim.
   int _memoryLimit = defaultMemoryBytes;
@@ -230,7 +244,10 @@ class MapTileCache {
       'sample=${_urls(wanted)}',
     );
     try {
-      final missing = await mapLibreTilesMissing(wanted);
+      final missing = await _missingFromL1(
+        wanted,
+        shouldContinue: shouldContinue,
+      );
       trace(
         'warm#$traceId probe l1-hit=${wanted.length - missing.length} '
         'l1-miss=${missing.length} dt=${elapsed.elapsedMilliseconds}ms',
@@ -331,11 +348,38 @@ class MapTileCache {
   }
 
   Future<Set<String>> _residentSubset(List<String> wanted) async {
-    final missing = (await mapLibreTilesMissing(wanted)).toSet();
+    final missing = (await _missingFromL1(wanted)).toSet();
     return {
       for (final url in wanted)
         if (!missing.contains(url)) url,
     };
+  }
+
+  /// Probes a potentially huge candidate set without monopolising the native
+  /// platform thread. Ordering is retained because fill mode uses it as its
+  /// centre-out priority.
+  Future<List<String>> _missingFromL1(
+    List<String> wanted, {
+    bool Function()? shouldContinue,
+  }) async {
+    final missing = <String>[];
+    var messages = 0;
+    for (var i = 0; i < wanted.length; i += _probeChunk) {
+      final end = math.min(i + _probeChunk, wanted.length);
+      missing.addAll(await mapLibreTilesMissing(wanted.sublist(i, end)));
+      if (shouldContinue?.call() == false) {
+        // Unprobed URLs are conservatively unknown/missing. That keeps the
+        // returned resident set truthful while letting a hidden surface stop
+        // before another multi-thousand-URL platform pass.
+        missing.addAll(wanted.sublist(end));
+        break;
+      }
+      messages++;
+      if (end < wanted.length && messages % _messagesPerSlice == 0) {
+        await Future<void>.delayed(_cooperativePause);
+      }
+    }
+    return missing;
   }
 
   /// The requested URLs native currently holds in its in-process mirror.
@@ -363,6 +407,7 @@ class MapTileCache {
     required int traceId,
   }) async {
     var injected = 0;
+    var messages = 0;
     for (var i = 0; i < tiles.length; i += _injectChunk) {
       if (shouldContinue?.call() == false) break;
       final end = math.min(i + _injectChunk, tiles.length);
@@ -374,6 +419,10 @@ class MapTileCache {
         'bytes=${_bytes(_tileBytes(chunk))} '
         '${_formatUsage(usage)}',
       );
+      messages++;
+      if (end < tiles.length && messages % _messagesPerSlice == 0) {
+        await Future<void>.delayed(_cooperativePause);
+      }
     }
     return injected;
   }
@@ -400,6 +449,7 @@ class MapTileCache {
     var l2Hits = 0;
     var scanned = 0;
     var l2Bytes = 0;
+    var messages = 0;
 
     outer:
     for (var readAt = 0; readAt < missing.length; readAt += _fillReadChunk) {
@@ -454,6 +504,10 @@ class MapTileCache {
           'bytes=${_bytes(chunkBytes)} ${_formatUsage(usage)} '
           'target=${_bytes(cap)}',
         );
+        messages++;
+        if (messages % _messagesPerSlice == 0) {
+          await Future<void>.delayed(_cooperativePause);
+        }
         if (reachedTarget) break outer;
       }
     }

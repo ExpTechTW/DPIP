@@ -60,6 +60,11 @@ class MapTileWarmer {
     r'^(.*/api/v2/tiles/[^/]+/(?:\d{10}|\d{13})/)\d+/\d+/\d+\.[^/]+$',
   );
 
+  /// Maximum native substring scans one raster-family eviction may request.
+  /// Above this, one family prefix is cheaper and deterministic; the following
+  /// centre-out warm immediately restores the useful entries.
+  static const int _maxFrameEvictionPatterns = 8;
+
   /// Abandons any scheduled or in-flight warm.
   void cancel() {
     _cancelEpoch++;
@@ -231,14 +236,21 @@ class MapTileWarmer {
     return next;
   }
 
-  /// Collapses fully stale raster frames to one native substring match each.
+  /// Bounds native substring eviction to a tiny number of patterns.
   ///
-  /// Native eviction scans every resident URL against every supplied pattern
-  /// while holding its memory-store lock. A timeline hop can retire hundreds
-  /// of tiles at once, so sending every complete URL makes one platform call
-  /// quadratic enough to block the UI thread. A frame prefix is equivalent
-  /// only when the new working set retains no URL from that frame; otherwise
-  /// the stale tiles stay precise so current-viewport tiles cannot be removed.
+  /// Native checks every resident URL against every supplied substring while
+  /// holding its memory-store lock on the iOS main thread. A viewport change
+  /// produced 5,375 precise stale URLs against a 7k-entry L1: tens of millions
+  /// of Unicode searches that pinned the process at 100% CPU. Exact eviction is
+  /// therefore never used for raster tiles:
+  ///
+  /// - a few wholly retired frames use one prefix each;
+  /// - many retired frames collapse to their common raster-family prefix;
+  /// - stale coordinates inside a retained frame mean the viewport changed, so
+  ///   the whole family is dropped and the next centre-out fill rebuilds it.
+  ///
+  /// L1 is only a bounded mirror of SQLite, so dropping extra raster entries is
+  /// safe. Keeping thousands of precise needles is not.
   static List<String> _evictionPatterns(Set<String> stale, Set<String> wanted) {
     if (stale.isEmpty) return const [];
     final wantedFrames = <String>{};
@@ -247,11 +259,38 @@ class MapTileWarmer {
       if (prefix != null) wantedFrames.add(prefix);
     }
 
-    final patterns = <String>{};
+    final direct = <String>{};
+    final framesByFamily = <String, Set<String>>{};
+    final flushFamilies = <String>{};
     for (final url in stale) {
       final prefix = _framePrefix(url);
-      patterns.add(
-        prefix != null && !wantedFrames.contains(prefix) ? prefix : url,
+      final family = _frameFamilyPrefix(url);
+      if (prefix == null || family == null) {
+        direct.add(url);
+      } else if (wantedFrames.contains(prefix)) {
+        flushFamilies.add(family);
+      } else {
+        (framesByFamily[family] ??= <String>{}).add(prefix);
+      }
+    }
+
+    final patterns = <String>{...direct};
+    for (final entry in framesByFamily.entries) {
+      final family = entry.key;
+      final frames = entry.value;
+      if (flushFamilies.contains(family) ||
+          frames.length > _maxFrameEvictionPatterns) {
+        patterns.add(family);
+      } else {
+        patterns.addAll(frames);
+      }
+    }
+    // A retained frame can be the only stale member of its family, so it may
+    // not have created a framesByFamily entry above.
+    patterns.addAll(flushFamilies);
+    for (final family in flushFamilies) {
+      patterns.removeWhere(
+        (pattern) => pattern != family && pattern.startsWith(family),
       );
     }
     return patterns.toList(growable: false);
@@ -264,6 +303,14 @@ class MapTileWarmer {
     final path = match?.group(1);
     if (path == null) return null;
     return '${uri.origin}$path';
+  }
+
+  static String? _frameFamilyPrefix(String url) {
+    final frame = _framePrefix(url);
+    if (frame == null) return null;
+    final slash = frame.lastIndexOf('/', frame.length - 2);
+    if (slash < 0) return null;
+    return frame.substring(0, slash + 1);
   }
 
   /// Warms the viewport for a region-pinned path template.
