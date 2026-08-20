@@ -34,6 +34,7 @@ class HomeRainTrendSection extends StatelessWidget {
     super.key,
     this.reveal = 0,
     this.trend,
+    this.summary,
     this.rain = 0,
     this.sky,
     this.weatherMode = WeatherMode.auto,
@@ -44,6 +45,10 @@ class HomeRainTrendSection extends StatelessWidget {
 
   /// Live trend override (widget tests); null → the controller's own data.
   final RainHourTrend? trend;
+
+  /// Precomputed reading for the resolved trend, supplied by [HomeContent] so
+  /// the immutable 60-minute series is not reduced again on every scroll frame.
+  final RainHourTrendSummary? summary;
 
   /// The sky colour the card tints itself from — `SkyLutCache.panelAmbient`, or
   /// null when no backdrop is running. The reference's card is a 20 % pane of the sky,
@@ -77,15 +82,26 @@ class HomeRainTrendSection extends StatelessWidget {
     );
     final cardColor = glassSurface(colors, reveal, sky: sky);
 
-    final controller = context.watch<HomeWeatherController>();
-    final data = trend ?? controller.hourTrend;
+    final controller = context.read<HomeWeatherController>();
+    final controllerTrend = context
+        .select<HomeWeatherController, RainHourTrend?>(
+          (value) => value.hourTrend,
+        );
+    final loading = context.select<HomeWeatherController, bool>(
+      (value) => value.loading,
+    );
+    final failure = context.select<HomeWeatherController, Failure?>(
+      (value) => value.hourTrendFailure,
+    );
+    final data = trend ?? controllerTrend;
+    final resolvedSummary = summary ?? data?.summary;
 
     // An empty `[]` response (or an all-zero series) means no rain this hour —
     // the card has nothing to chart, so it disappears. The hero block's bottom
     // card slot is taken over by the compact 24h forecast instead (see
     // `HomeContent`); this guard keeps the section a no-op wherever else it is
     // placed with a dry trend.
-    if (data?.isDry ?? false) {
+    if (resolvedSummary?.grade == RainHourTrendGrade.none) {
       return const SizedBox.shrink();
     }
 
@@ -93,14 +109,14 @@ class HomeRainTrendSection extends StatelessWidget {
     if (data != null) {
       body = _Chart(
         data: data,
-        now: AppTime.utc,
+        elapsedMinutes: AppTime.utc.difference(data.startUtc).inMinutes,
         barColor: colors.primary,
         secondary: secondary,
       );
     } else {
       body = _NoData(
-        loading: controller.loading,
-        failure: controller.hourTrendFailure,
+        loading: loading,
+        failure: failure,
         secondary: secondary,
         onRetry: controller.refresh,
       );
@@ -110,7 +126,7 @@ class HomeRainTrendSection extends StatelessWidget {
     // keeps up through the hour. Nothing for an all-dry hour.
     String? subtitle;
     if (data != null) {
-      final s = data.summary;
+      final s = resolvedSummary!;
       subtitle = switch (s.grade) {
         RainHourTrendGrade.none => null,
         RainHourTrendGrade.scattered => l10n.homeRainTrendScattered,
@@ -194,8 +210,10 @@ class HomeRainTrendSection extends StatelessWidget {
   /// data's own moment, so it stays honest even if the fetch was a while ago.
   static String _updatedClock(RainHourTrend data) {
     final taipei = AppTime.taipei(data.startUtc);
-    return DateFormat('HH:mm').format(taipei);
+    return _clockFormat.format(taipei);
   }
+
+  static final DateFormat _clockFormat = DateFormat('HH:mm');
 }
 
 /// Grey pane replacing the chart while no trend data is available: the same
@@ -270,7 +288,7 @@ class _NoData extends StatelessWidget {
 class _Chart extends StatefulWidget {
   const _Chart({
     required this.data,
-    required this.now,
+    required this.elapsedMinutes,
     required this.barColor,
     required this.secondary,
   });
@@ -309,10 +327,10 @@ class _Chart extends StatefulWidget {
 
   final RainHourTrend data;
 
-  /// Corrected "now" (UTC). The chart is anchored to it: bar i is the minute
-  /// `now + i`, so the data window [data.startUtc, +60 m) lands partway in and
-  /// minutes past its end carry no forecast (full-height grey rods).
-  final DateTime now;
+  /// Whole-minute offset from [RainHourTrend.startUtc]. Every chart decision
+  /// uses this integer; retaining the sub-minute instant only defeated the
+  /// chart cache while producing the exact same bars.
+  final int elapsedMinutes;
 
   final Color barColor;
   final Color secondary;
@@ -328,7 +346,7 @@ class _ChartState extends State<_Chart> {
   void didUpdateWidget(covariant _Chart oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.data != widget.data ||
-        !oldWidget.now.isAtSameMomentAs(widget.now) ||
+        oldWidget.elapsedMinutes != widget.elapsedMinutes ||
         oldWidget.barColor != widget.barColor ||
         oldWidget.secondary != widget.secondary) {
       _chart = _build();
@@ -340,7 +358,6 @@ class _ChartState extends State<_Chart> {
 
   Widget _build() {
     final data = widget.data;
-    final now = widget.now;
     final barColor = widget.barColor;
     final secondary = widget.secondary;
     final context = this.context;
@@ -349,7 +366,7 @@ class _ChartState extends State<_Chart> {
     // Minutes outside that window have no forecast — [headEnd] bars before the
     // data begins (a fetch newer than its stamp) and everything from
     // [tailStart] on (the usual case: the hour ran out ahead of the clock).
-    final elapsed = now.difference(data.startUtc).inMinutes;
+    final elapsed = widget.elapsedMinutes;
     final headEnd = math.min(math.max(0, -elapsed), data.mm.length);
     final tailStart = math.min(
       math.max(data.mm.length - elapsed, 0),

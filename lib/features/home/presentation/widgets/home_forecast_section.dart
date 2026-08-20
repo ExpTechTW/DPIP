@@ -1,13 +1,13 @@
 /// Home-sheet 24h township forecast — redesign of the legacy strip.
 library;
 
-import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
@@ -16,7 +16,6 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.d
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -68,6 +67,10 @@ class HomeForecastSection extends StatefulWidget {
 
 class _HomeForecastSectionState extends State<HomeForecastSection> {
   int _selected = 0;
+  WeatherForecast? _seriesForecast;
+  _ForecastTemperatureSeries? _series;
+  int _sunMinute = -1;
+  ({double sunrise, double sunset})? _sunlight;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +78,19 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final expansion = widget.expansion.clamp(0.0, 1.0);
-    final controller = context.watch<HomeWeatherController>();
+    final controller = context.read<HomeWeatherController>();
+    final code = context.select<HomeWeatherController, String?>(
+      (value) => value.areaCode,
+    );
+    final forecast = context.select<HomeWeatherController, WeatherForecast?>(
+      (value) => value.forecast,
+    );
+    final loading = context.select<HomeWeatherController, bool>(
+      (value) => value.loading,
+    );
+    final forecastFailure = context.select<HomeWeatherController, Failure?>(
+      (value) => value.forecastFailure,
+    );
     final reveal = widget.reveal;
     final skyIsLight = skyIsLightFrom(widget.sky, widget.weatherMode);
     final foreground = glassOnSurface(
@@ -90,8 +105,6 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     );
     final cardColor = glassSurface(colors, reveal, sky: widget.sky);
 
-    final code = controller.areaCode;
-
     if (code == null) {
       return _Shell(
         color: cardColor,
@@ -102,9 +115,8 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
       );
     }
 
-    final forecast = controller.forecast;
     if (forecast == null) {
-      if (controller.loading) {
+      if (loading) {
         return _Shell(
           color: cardColor,
           child: SizedBox(
@@ -113,7 +125,7 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
           ),
         );
       }
-      if (controller.forecastFailure != null) {
+      if (forecastFailure != null) {
         return _Shell(
           color: cardColor,
           child: Row(
@@ -147,9 +159,11 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     }
 
     final selected = _selected.clamp(0, points.length - 1);
-    final temps = points.map((p) => p.temperature).toList(growable: false);
-    final minTemp = temps.reduce(math.min);
-    final maxTemp = temps.reduce(math.max);
+    final series = _temperatureSeries(forecast);
+    final sunlight = _sunTimesFor(AppTime.utc);
+    final temps = series.temps;
+    final minTemp = series.min;
+    final maxTemp = series.max;
     final point = points[selected];
 
     return _Shell(
@@ -196,6 +210,8 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
                   child: CustomPaint(
                     painter: _TempSparklinePainter(
                       temps: temps,
+                      min: minTemp,
+                      max: maxTemp,
                       selected: selected,
                       line: colors.primary,
                       fill: colors.primary.withValues(alpha: 0.18),
@@ -216,20 +232,18 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
               separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
               itemBuilder: (context, index) {
                 final p = points[index];
+                final hour = _hourNumber(p.time);
                 final (icon, accent) = weatherVisual(
                   p.weather,
                   p.weatherCode,
                   colors,
                   // Per hour, not per row: a clear 02:00 chip must show a moon
                   // while the 14:00 chip beside it shows a sun.
-                  isNight: isNightHour(
-                    _hourNumber(p.time).toDouble(),
-                    utcDay: AppTime.utc,
-                  ),
+                  isNight: hour < sunlight.sunrise || hour >= sunlight.sunset,
                 );
                 final isSelected = index == selected;
                 return _HourChip(
-                  time: l10n.chartHourLabel(_hourNumber(p.time)),
+                  time: l10n.chartHourLabel(hour),
                   icon: icon,
                   iconColor: accent ?? secondary,
                   temp: '${p.temperature.round()}°',
@@ -280,6 +294,47 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     final raw = colon <= 0 ? time : time.substring(0, colon);
     return int.tryParse(raw) ?? 0;
   }
+
+  _ForecastTemperatureSeries _temperatureSeries(WeatherForecast forecast) {
+    final cached = _series;
+    if (identical(_seriesForecast, forecast) && cached != null) return cached;
+
+    final points = forecast.forecast;
+    final temps = List<double>.filled(points.length, 0, growable: false);
+    var min = points.first.temperature;
+    var max = min;
+    for (var i = 0; i < points.length; i++) {
+      final temperature = points[i].temperature;
+      temps[i] = temperature;
+      if (temperature < min) min = temperature;
+      if (temperature > max) max = temperature;
+    }
+    final series = _ForecastTemperatureSeries(temps, min, max);
+    _seriesForecast = forecast;
+    _series = series;
+    return series;
+  }
+
+  /// The hour glyphs all share one sunrise/sunset pair. Cache it to the minute
+  /// because the sheet rebuilds this section at frame rate while dragging,
+  /// whereas the solar result moves by far less than a minute per minute.
+  ({double sunrise, double sunset}) _sunTimesFor(DateTime utc) {
+    final minute = utc.millisecondsSinceEpoch ~/ Duration.millisecondsPerMinute;
+    final cached = _sunlight;
+    if (minute == _sunMinute && cached != null) return cached;
+    final sunlight = sunTimes(utc);
+    _sunMinute = minute;
+    _sunlight = sunlight;
+    return sunlight;
+  }
+}
+
+class _ForecastTemperatureSeries {
+  const _ForecastTemperatureSeries(this.temps, this.min, this.max);
+
+  final List<double> temps;
+  final double min;
+  final double max;
 }
 
 class _Shell extends StatelessWidget {
@@ -464,6 +519,8 @@ class _Meta extends StatelessWidget {
 class _TempSparklinePainter extends CustomPainter {
   _TempSparklinePainter({
     required this.temps,
+    required this.min,
+    required this.max,
     required this.selected,
     required this.line,
     required this.fill,
@@ -471,6 +528,8 @@ class _TempSparklinePainter extends CustomPainter {
   });
 
   final List<double> temps;
+  final double min;
+  final double max;
   final int selected;
   final Color line;
   final Color fill;
@@ -479,13 +538,11 @@ class _TempSparklinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (temps.isEmpty) return;
-    final minT = temps.reduce(math.min);
-    final maxT = temps.reduce(math.max);
-    final span = (maxT - minT).abs() < 0.01 ? 1.0 : maxT - minT;
+    final span = (max - min).abs() < 0.01 ? 1.0 : max - min;
     final n = temps.length;
     Offset at(int i) {
       final x = n == 1 ? size.width / 2 : size.width * i / (n - 1);
-      final y = size.height * (1 - ((temps[i] - minT) / span).clamp(0.0, 1.0));
+      final y = size.height * (1 - ((temps[i] - min) / span).clamp(0.0, 1.0));
       return Offset(x, y);
     }
 
@@ -512,16 +569,16 @@ class _TempSparklinePainter extends CustomPainter {
     canvas.drawCircle(markAt, 2, Paint()..color = line);
   }
 
-  /// Value comparison, not identity — [temps] arrives as a fresh
-  /// `points.map((p) => p.temperature).toList(growable: false)` on every
-  /// build, so `old.temps != temps` was unconditionally true and the card's
-  /// layer re-rasterised on every scroll frame for 24 numbers that had not
-  /// moved. Scalars first so the cheap checks short-circuit the list walk.
+  /// The state owns one series per immutable forecast, so identity means the
+  /// values are unchanged and avoids a 24-element comparison on every scroll
+  /// frame.
   @override
   bool shouldRepaint(covariant _TempSparklinePainter old) =>
       old.selected != selected ||
       old.line != line ||
       old.fill != fill ||
       old.mark != mark ||
-      !listEquals(old.temps, temps);
+      old.min != min ||
+      old.max != max ||
+      !identical(old.temps, temps);
 }

@@ -60,4 +60,21 @@ void main() {
 
     expect(taps, 1, reason: 'tap did not reach the button');
   });
+
+  testWidgets('an unsupported shader filter stops scheduling frames', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RainOnGlass(intensity: 0.8, child: SizedBox.expand()),
+      ),
+    );
+
+    // Widget tests use Skia, where ImageFilter.shader is unsupported. Once
+    // that capability check fails, there is no drawable effect and therefore
+    // no reason to keep a 60 fps ticker alive.
+    await tester.pumpAndSettle(const Duration(milliseconds: 16));
+
+    expect(tester.binding.transientCallbackCount, 0);
+  });
 }

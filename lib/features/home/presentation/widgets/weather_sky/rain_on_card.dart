@@ -143,8 +143,6 @@ class _RainOnCardState extends State<RainOnCard>
   void initState() {
     super.initState();
     _load();
-    _syncRunning();
-    _scheduleCapture();
   }
 
   /// Queues a rasterise-and-rebuild-the-surface pass for the end of the
@@ -154,7 +152,12 @@ class _RainOnCardState extends State<RainOnCard>
   /// without it, a sheet-drag animation rebuilding this widget every frame
   /// would queue a GPU readback every frame right along with it.
   void _scheduleCapture() {
-    if (!widget.silhouette || _captureScheduled) return;
+    if (!widget.silhouette ||
+        widget.intensity <= 0.001 ||
+        _shader == null ||
+        _captureScheduled) {
+      return;
+    }
     _captureScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) => _capture());
   }
@@ -195,6 +198,8 @@ class _RainOnCardState extends State<RainOnCard>
       final program = await ui.FragmentProgram.fromAsset(_asset);
       if (!mounted) return;
       setState(() => _shader = program.fragmentShader());
+      _syncRunning();
+      _scheduleCapture();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'Failed to load shader $_asset');
     }
@@ -243,9 +248,11 @@ class _RainOnCardState extends State<RainOnCard>
   static Future<ui.Image> _decodeAsset(String key) async {
     final data = await rootBundle.load(key);
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-    final frame = await codec.getNextFrame();
-    codec.dispose();
-    return frame.image;
+    try {
+      return (await codec.getNextFrame()).image;
+    } finally {
+      codec.dispose();
+    }
   }
 
   /// Set while a gate-resume check is queued, so scroll ticks (which rebuild
@@ -303,6 +310,7 @@ class _RainOnCardState extends State<RainOnCard>
     // weaker test than the stop it is undoing is how the ticker came back to
     // life on an invisible card.
     if (_gateOpen &&
+        _shader != null &&
         widget.active &&
         widget.intensity > 0.001 &&
         widget.opacity > 0.004) {
@@ -314,7 +322,10 @@ class _RainOnCardState extends State<RainOnCard>
   void _syncRunning() {
     final draining = _primary.liveCount > 0 || _secondary.liveCount > 0;
     final visible = widget.opacity > 0.004;
-    if (widget.active && visible && (widget.intensity > 0.001 || draining)) {
+    if (_shader != null &&
+        widget.active &&
+        visible &&
+        (widget.intensity > 0.001 || draining)) {
       if (!_ticker.isActive) {
         _last = Duration.zero;
         _ticker.start();

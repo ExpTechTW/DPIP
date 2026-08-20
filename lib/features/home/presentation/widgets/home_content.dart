@@ -140,7 +140,8 @@ class HomeContent extends StatelessWidget {
     // rain-trend card entirely; the hero block's bottom slot is taken over by
     // a compact 24h forecast so the sheet still has a weather card to read at
     // rest. Null (still loading / failed) keeps the trend card's own pane.
-    final dryTrend = hourTrend?.summary.grade == RainHourTrendGrade.none;
+    final trendSummary = hourTrend?.summary;
+    final dryTrend = trendSummary?.grade == RainHourTrendGrade.none;
     // The hero block needs the sheet's own live pixel height, which only a
     // LayoutBuilder can give — MediaQuery reports the *screen*, not the
     // sheet's current size mid-expand. Null outside the hero layout
@@ -280,6 +281,7 @@ class HomeContent extends StatelessWidget {
                                 else
                                   HomeRainTrendSection(
                                     key: ValueKey('rain-$areaIndex'),
+                                    summary: trendSummary,
                                     reveal: reveal,
                                     sky: sky,
                                     weatherMode: weatherMode,
