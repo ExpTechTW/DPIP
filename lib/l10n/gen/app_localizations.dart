@@ -147,6 +147,12 @@ abstract class AppLocalizations {
   /// **'Observed'**
   String get mapTimelineObserved;
 
+  /// Warning above the map timeline when rapid scrubbing outruns its bounded render queue
+  ///
+  /// In en, this message translates to:
+  /// **'Frame updates paused because you\'re scrubbing too fast. Slow down to resume.'**
+  String get mapTimelineScrubPaused;
+
   /// Title of the region picker (city list) page
   ///
   /// In en, this message translates to:

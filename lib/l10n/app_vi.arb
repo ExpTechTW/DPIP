@@ -8,6 +8,7 @@
   "rainInterval24h": "24 giờ",
   "homeRainTrendHeavyStopping": "Mưa lớn có thể tạnh trong {minutes} phút nữa",
   "mapTimelineObserved": "Quan trắc",
+  "mapTimelineScrubPaused": "Bạn kéo quá nhanh nên khung hình đã tạm dừng cập nhật. Kéo chậm lại để tiếp tục.",
   "regionSelectTitle": "Chọn khu vực",
   "skyTimeNoon": "Buổi trưa",
   "radarCountyOutlineSubtitle": "Giữ ranh giới rõ ràng dưới lớp phản hồi radar.",

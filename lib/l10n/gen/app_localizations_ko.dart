@@ -30,6 +30,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTimelineObserved => '관측';
 
   @override
+  String get mapTimelineScrubPaused =>
+      '너무 빠르게 이동하여 프레임 업데이트가 일시 중지되었습니다. 속도를 늦추면 다시 시작됩니다.';
+
+  @override
   String get regionSelectTitle => '지역 선택';
 
   @override

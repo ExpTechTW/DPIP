@@ -8,6 +8,7 @@
   "rainInterval24h": "24 時",
   "homeRainTrendHeavyStopping": "預計 {minutes} 分鐘後停止下大雨",
   "mapTimelineObserved": "觀測",
+  "mapTimelineScrubPaused": "拖動過快，影格更新已暫停；放慢速度即可恢復。",
   "regionSelectTitle": "選擇地區",
   "skyTimeNoon": "正午",
   "radarCountyOutlineSubtitle": "讓縣市界線在雷達回波下仍然清楚。",

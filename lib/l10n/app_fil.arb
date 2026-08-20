@@ -8,6 +8,7 @@
   "rainInterval24h": "24 oras",
   "homeRainTrendHeavyStopping": "Baka huminto ang malakas na ulan sa loob ng {minutes} minuto",
   "mapTimelineObserved": "Naobserbahan",
+  "mapTimelineScrubPaused": "Masyadong mabilis ang pag-drag kaya naka-pause ang frame updates. Bagalan upang magpatuloy.",
   "regionSelectTitle": "Pumili ng rehiyon",
   "skyTimeNoon": "Tanghali",
   "radarCountyOutlineSubtitle": "Nananatiling mababasa ang mga hangganan sa ilalim ng radar echo.",

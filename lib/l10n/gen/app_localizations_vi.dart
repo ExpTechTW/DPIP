@@ -30,6 +30,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapTimelineObserved => 'Quan trắc';
 
   @override
+  String get mapTimelineScrubPaused =>
+      'Bạn kéo quá nhanh nên khung hình đã tạm dừng cập nhật. Kéo chậm lại để tiếp tục.';
+
+  @override
   String get regionSelectTitle => 'Chọn khu vực';
 
   @override

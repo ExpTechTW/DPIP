@@ -147,6 +147,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// Finger down / fling in flight — raster layers skip cold mounts.
   bool _scrubbing = false;
 
+  /// Turns on only when timeline samples outrun the bounded map-operation
+  /// queue. It is a notifier so the warning can appear without rebuilding the
+  /// platform-view map underneath it.
+  final TimelineScrubBackpressure _scrubBackpressure =
+      TimelineScrubBackpressure();
+
   /// The map view's own size, captured at layout — see [_applyFraming].
   Size? _mapViewSize;
 
@@ -246,6 +252,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _bearing.dispose();
     _cameraEpoch.dispose();
+    _scrubBackpressure.dispose();
     _showTownLabels.dispose();
     _showTerrain.dispose();
     _basemapWarmer?.cancel();
@@ -751,7 +758,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final layer = _active;
     // Already queued: that op will pick up this newer selection when it runs, so
     // don't stack another one (see [_showQueued]).
-    if (_showQueued) return;
+    if (_showQueued) {
+      if (_scrubbing) _scrubBackpressure.reportDroppedFrame();
+      return;
+    }
     _showQueued = true;
     _queue(() {
       // Cleared as the op *starts*, not when it finishes: a selection arriving
@@ -774,6 +784,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   void _onScrubbing(bool scrubbing) {
     final was = _scrubbing;
     _scrubbing = scrubbing;
+    if (!scrubbing) _scrubBackpressure.resume();
     // Finger up: force a settle mount for the current index (may be cold).
     if (was && !scrubbing) _showSelected();
   }
@@ -990,11 +1001,33 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             child: SafeArea(
               key: _timelineKey,
               top: false,
-              child: _frames.isNotEmpty
-                  ? _timelinePanel(context)
-                  : _error != null
-                  ? _errorPanel(context)
-                  : const SizedBox.shrink(),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  _frames.isNotEmpty
+                      ? _timelinePanel(context)
+                      : _error != null
+                      ? _errorPanel(context)
+                      : const SizedBox.shrink(),
+                  if (_frames.isNotEmpty)
+                    Positioned(
+                      top: 0,
+                      left: AppSpacing.lg,
+                      right: AppSpacing.lg,
+                      child: IgnorePointer(
+                        child: Transform.translate(
+                          offset: const Offset(0, -AppSpacing.sm),
+                          child: FractionalTranslation(
+                            translation: const Offset(0, -1),
+                            child: MapTimelineScrubPauseNotice(
+                              paused: _scrubBackpressure,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         // Compass on top of *everything* — a screen-space callout (typhoon

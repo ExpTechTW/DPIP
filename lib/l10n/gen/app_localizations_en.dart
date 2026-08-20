@@ -30,6 +30,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapTimelineObserved => 'Observed';
 
   @override
+  String get mapTimelineScrubPaused =>
+      'Frame updates paused because you\'re scrubbing too fast. Slow down to resume.';
+
+  @override
   String get regionSelectTitle => 'Select a region';
 
   @override
