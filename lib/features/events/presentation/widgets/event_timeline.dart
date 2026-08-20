@@ -62,6 +62,8 @@ class _EventTile extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
 
+  static final DateFormat _clockFormat = DateFormat('HH:mm');
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -83,7 +85,7 @@ class _EventTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    DateFormat('HH:mm').format(event.time),
+                    _clockFormat.format(event.time),
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
