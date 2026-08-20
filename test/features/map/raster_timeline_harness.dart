@@ -28,6 +28,12 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
   /// How many times [releaseTiles] was called.
   int released = 0;
 
+  /// How many scrub gestures pre-empted a speculative warm.
+  int warmCancels = 0;
+
+  /// Readiness checks, including whether they were allowed to touch L2.
+  final List<({String frame, bool warm})> readinessProbes = [];
+
   @override
   Future<Result<List<String>>> frames() async => Ok(_frames);
 
@@ -52,7 +58,13 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
     required double east,
     required double zoom,
     bool warm = false,
-  }) async => (ready: true, resident: 1, required: 1);
+  }) async {
+    readinessProbes.add((frame: frame, warm: warm));
+    return (ready: true, resident: 1, required: 1);
+  }
+
+  @override
+  void cancelTileWarm() => warmCancels++;
 
   @override
   Future<void> abandonFrames(List<String> frames) async =>

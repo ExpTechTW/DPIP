@@ -173,6 +173,9 @@ abstract base class FrameTileRepository implements RasterFrameSource {
           .replaceFirst('{y}', '${tile.y}');
 
   @override
+  void cancelTileWarm() => warmer.cancel();
+
+  @override
   Future<void> abandonFrames(List<String> frames) =>
       warmer.abandon([for (final frame in frames) _framePrefix(frame)]);
 

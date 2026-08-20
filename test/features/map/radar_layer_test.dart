@@ -134,7 +134,8 @@ void main() {
   test(
     'scrubbing inside the ring is two opacity writes, nothing else',
     () async {
-      final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+      final source = _FakeRadarRepository(_ids(9));
+      final layer = RadarMapLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -157,6 +158,9 @@ void main() {
             'raster properties the layer type has — only the opacity and the '
             'zero cross-fade that keeps a scrub a loop instead of a smear',
       );
+      expect(source.readinessProbes, [
+        (frame: frames[5].id, warm: false),
+      ], reason: 'scrubbing may probe L1 but must never read or inject L2');
     },
   );
 
@@ -185,8 +189,9 @@ void main() {
     );
   });
 
-  test('dragging past the ring still reveals the frame', () async {
-    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+  test('dragging past the ring does no source or cache work', () async {
+    final source = _FakeRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -196,60 +201,68 @@ void main() {
 
     await layer.show(controller, frames[0], scrubbing: true);
 
-    expect(
-      controller.opacityOf('radar-lyr-${frames[0].id}'),
-      '0.85',
-      reason:
-          'skipping this froze the map on the old frame until the finger '
-          'came up — the whole drag showed nothing',
-    );
-    expect(controller.calls, contains('addSource:radar-src-${frames[0].id}'));
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
+    expect(controller.calls, isEmpty);
+    expect(source.readinessProbes, isEmpty);
+    expect(source.warmCancels, 1);
   });
 
-  test('crossing the ring slides it and preloads the next neighbours', () async {
-    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
+  test(
+    'one gesture cancels warm once and restarts it after settling',
+    () async {
+      final source = _FakeRadarRepository(_ids(12));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+      source.warmed.clear();
+
+      await layer.show(controller, frames[0], scrubbing: true);
+      await layer.show(controller, frames[11], scrubbing: true);
+      await layer.show(controller, frames[4], scrubbing: true);
+
+      expect(source.warmCancels, 1, reason: 'one gesture has one cancellation');
+      expect(source.warmed, isEmpty);
+
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+
+      expect(source.warmed, hasLength(1));
+      expect(source.warmed.single.first, frames[4].id);
+    },
+  );
+
+  test('finger-up mounts only the final ring after a fast scrub', () async {
+    final source = _FakeRadarRepository(_ids(12));
+    final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]); // ring 2..6
     await layer.show(controller, frames[0], scrubbing: true);
-
-    // The ring is now 0..2: target 0 plus the next two frames are live, while
-    // the old far side retired. The next two scrub steps need no source mount.
-    expect(controller.visibilityOf('radar-lyr-${frames[0].id}'), 'visible');
-    expect(controller.visibilityOf('radar-lyr-${frames[1].id}'), 'visible');
-    expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0.0');
-    expect(controller.visibilityOf('radar-lyr-${frames[6].id}'), 'none');
-
+    await layer.show(controller, frames[11], scrubbing: true);
     controller.calls.clear();
-    await layer.show(controller, frames[1], scrubbing: true);
-    expect(
-      controller.calls.where((call) => call.startsWith('addSource:')),
-      isEmpty,
-      reason: 'the slid ring turns the next frame into an opacity-only flip',
-    );
-  });
+    source.readinessProbes.clear();
 
-  test('flipping back over a mid-drag-revealed frame hides it', () async {
-    final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
-    final frames = (await layer.frames()).valueOrNull!;
-    final controller = RecordingMapController();
-
-    await layer.prepare(controller, frames);
-    await layer.show(controller, frames[4]); // ring 2..6
-    // Drag past the ring, then bounce forward again — a fast fling's shape.
-    await layer.show(controller, frames[0], scrubbing: true);
-    await layer.show(controller, frames[5], scrubbing: true);
+    await layer.show(controller, frames[11]);
 
     expect(
-      controller.visibilityOf('radar-lyr-${frames[0].id}'),
-      'none',
-      reason:
-          'sliding to 5 retires frame 0, so it cannot ghost behind the new '
-          'ring while the drag changes direction',
+      controller.calls.where((call) => call.startsWith('addSource:radar-src-')),
+      [
+        'addSource:radar-src-${frames[9].id}',
+        'addSource:radar-src-${frames[10].id}',
+        'addSource:radar-src-${frames[11].id}',
+      ],
+      reason: 'no source from either intermediate scrub position may leak in',
     );
-    expect(controller.opacityOf('radar-lyr-${frames[5].id}'), '0.85');
+    expect(controller.opacityOf('radar-lyr-${frames[11].id}'), '0.85');
+    expect(source.readinessProbes, [
+      (frame: frames[11].id, warm: true),
+    ], reason: 'only the settled target may reach L2');
   });
 
   test('a settle abandons the frames the scrub swept past', () async {
@@ -270,7 +283,7 @@ void main() {
     );
   });
 
-  test('finger-up settles a frame already revealed outside the ring', () async {
+  test('finger-up settles the cold frame held during scrubbing', () async {
     final source = _FakeRadarRepository(_ids(9));
     final layer = RadarMapLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
@@ -278,11 +291,10 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]); // ring 2..6
-    await layer.show(controller, frames[8], scrubbing: true); // ring 6..8
+    await layer.show(controller, frames[8], scrubbing: true); // held on frame 4
 
-    // Finger-up reports the same id that the drag already revealed. It is not
-    // redundant: the layer still records the settled frame and starts its
-    // immediate warm, even though the scrub ring is already centred there.
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
+    // Finger-up is the only cold mount and moves the ring directly to 6..8.
     await layer.show(controller, frames[8]); // ring 6..8
 
     for (final i in [2, 3, 4, 5]) {
@@ -357,17 +369,25 @@ void main() {
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[4]);
     source.ready = false;
+    source.probes = 0;
+    controller.calls.clear();
 
     await layer.show(controller, frames[0], scrubbing: true);
 
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
-    expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.0');
-    expect(source.probes, greaterThan(0));
+    expect(controller.calls, isEmpty);
+    expect(
+      source.probes,
+      0,
+      reason: 'a cold scrub target does not touch L1/L2',
+    );
 
     source.ready = true;
     await Future<void>.delayed(const Duration(milliseconds: 120));
 
-    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0');
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
+    await layer.show(controller, frames[0]);
+    expect(source.probes, 1);
     expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
   });
 
@@ -382,10 +402,10 @@ void main() {
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[5]);
       source.ready = false;
-      await layer.show(controller, frames[0], scrubbing: true);
+      await layer.show(controller, frames[0]);
 
       source.ready = true;
-      await layer.show(controller, frames[10], scrubbing: true);
+      await layer.show(controller, frames[10]);
       await Future<void>.delayed(const Duration(milliseconds: 120));
 
       expect(controller.opacityOf('radar-lyr-${frames[10].id}'), '0.85');

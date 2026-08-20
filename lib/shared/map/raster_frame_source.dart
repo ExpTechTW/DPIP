@@ -60,6 +60,14 @@ abstract interface class RasterFrameSource {
     bool warm = false,
   });
 
+  /// Cancels a pending or in-flight speculative L1 warm without evicting the
+  /// bytes already resident there.
+  ///
+  /// Timeline scrubbing calls this as soon as the finger moves to a new frame:
+  /// the final destination is not known yet, so a large SQLite read centred on
+  /// the previous settle must yield before it reaches the injection bridge.
+  void cancelTileWarm();
+
   /// Aborts in-flight tile HTTP for [frames] — a scrub swept past them and
   /// their tiles will never be drawn.
   ///
