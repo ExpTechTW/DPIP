@@ -35,12 +35,12 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 ///   remain cold and are never mislabeled as display-ready.
 /// - **Cold** — anything further out. Revealing it mounts and loads normally.
 ///
-/// A drag stages whichever tier the frame is in without stalling input.
-/// Crossing the ring edge slides the same fixed-size window around the finger,
-/// so the next neighbours start loading without accumulating a trail of live
-/// layers. The last complete frame remains opaque until the latest target is
-/// ready; this prevents a cold source from exposing the basemap or a mosaic of
-/// two timestamps. Frames outside the ring sit at `visibility: none`.
+/// A drag flips only complete frames already mounted in the ring. Crossing the
+/// ring edge updates the timeline label but deliberately leaves the last
+/// complete raster on screen: mounting every cold timestamp crossed by a fast
+/// finger starts a viewport of native tile work for each one, even when the
+/// network is fully cached. Finger-up mounts exactly one final ring. This keeps
+/// the platform channel, SQLite and MapLibre's source scheduler bounded.
 ///
 /// ## Settling
 /// A settle mounts the target and neighbours first, keeps the previous frame
@@ -252,6 +252,11 @@ abstract class RasterTimelineLayer implements MapLayer {
   String? _settledFrameId;
   int _revealGeneration = 0;
 
+  /// A timeline gesture has pre-empted the previous settle's speculative warm.
+  /// It is cleared only by finger-up, which schedules one replacement around
+  /// the final frame.
+  bool _warmSuspended = false;
+
   /// Frames proven complete for the current viewport while their source stays
   /// resident. Camera movement invalidates this set.
   final Set<String> _readyFrames = <String>{};
@@ -361,12 +366,22 @@ abstract class RasterTimelineLayer implements MapLayer {
   }) {
     final index = _indexById[frame.id];
     if (index == null) return Future<void>.value();
-    if (scrubbing && _requestedFrameId == frame.id) {
-      return Future<void>.value();
+    if (scrubbing) {
+      _suspendWarm();
+    } else {
+      final resumeWarm = _warmSuspended;
+      _warmSuspended = false;
+      if (_shownFrameId == frame.id && _settledFrameId == frame.id) {
+        if (resumeWarm) {
+          // A tap/short drag can finish on the same timestamp. Its first move
+          // still cancelled the old fill, so restart one debounced fill here.
+          _warmCentre = null;
+          unawaited(_warmBand(controller, index));
+        }
+        return Future<void>.value();
+      }
     }
-    if (!scrubbing &&
-        _shownFrameId == frame.id &&
-        _settledFrameId == frame.id) {
+    if (scrubbing && _requestedFrameId == frame.id) {
       return Future<void>.value();
     }
     _requestedFrameId = frame.id;
@@ -405,12 +420,18 @@ abstract class RasterTimelineLayer implements MapLayer {
       return;
     }
 
-    final wasActive = _ring.contains(frameId);
-    if (!wasActive) {
-      await _slideRing(controller, index, frameId);
-    } else {
-      _touch(frameId);
+    if (!_ring.contains(frameId)) {
+      // Do not mount a cold source for an intermediate scroll sample. Each
+      // source makes MapLibre schedule a viewport at several zoom levels; a
+      // fast fling can cross dozens before any of them is useful. The settle
+      // path below mounts only the final target and its fixed neighbour ring.
+      MapTileCache.trace(
+        'timeline=$id scrub-hold frame=$frameId reason=outside-ring '
+        'shown=$_shownFrameId',
+      );
+      return;
     }
+    _touch(frameId);
     if (!_isCurrent(frameId, generation)) return;
     if (_readyFrames.contains(frameId)) {
       await _flip(controller, frameId);
@@ -422,50 +443,6 @@ abstract class RasterTimelineLayer implements MapLayer {
       frameId,
       generation,
       settling: false,
-    );
-  }
-
-  /// Stages a frame the preload ring does not cover and recentres it mid-drag.
-  ///
-  /// Dragging past the ring used to do **nothing** until the finger came up:
-  /// mounting costs two platform calls plus a tile pass, and back when the
-  /// scaffold fired one unawaited reveal per frame crossed, doing that mid-drag
-  /// meant a request storm. It no longer does — stages are driven latest-wins
-  /// with a single style mutation in flight, and only a ready target is
-  /// revealed. Whole-band SQLite warming is deliberately suspended while the
-  /// finger moves; the mounted ring is the useful network prefetcher then.
-  Future<void> _slideRing(
-    MapLibreMapController controller,
-    int index,
-    String frameId,
-  ) async {
-    final elapsed = Stopwatch()..start();
-    final previous = _shownFrameId;
-    final (low, high, nextRing) = _ringAt(index);
-    final retired = _ring.difference(nextRing);
-
-    await Future.wait([
-      for (final id in nextRing)
-        if (id != previous) _mount(controller, id, 0),
-    ]);
-
-    // The previous complete frame is deliberately excluded from retirement.
-    // It is the visual backstop until [frameId]'s complete viewport reaches L1.
-    _ring
-      ..removeAll(retired)
-      ..addAll(nextRing);
-    await Future.wait([
-      for (final id in retired)
-        if (id != previous)
-          controller.setLayerProperties(_layerId(id), _hidden, skipNulls: true),
-    ]);
-    final keep = <String>{...nextRing};
-    if (previous != null) keep.add(previous);
-    await _evictOverflow(controller, keep: keep);
-    MapTileCache.trace(
-      'timeline=$id stage frame=$frameId path=slide ring=$low..$high '
-      'retired=${retired.length} previous=$previous '
-      'dt=${elapsed.elapsedMilliseconds}ms',
     );
   }
 
@@ -575,7 +552,10 @@ abstract class RasterTimelineLayer implements MapLayer {
       north: bounds.northeast.latitude,
       east: bounds.northeast.longitude,
       zoom: zoom,
-      warm: true,
+      // A scrub is an L1-only probe. SQLite and injection are reserved for the
+      // final settle; otherwise every crossed tick starts an I/O batch even in
+      // a region whose visible frame is already cached.
+      warm: settling,
     );
     if (!_isCurrent(frameId, generation)) return;
     MapTileCache.trace(
@@ -597,6 +577,14 @@ abstract class RasterTimelineLayer implements MapLayer {
         frameId,
         generation,
         settling: settling,
+      );
+      return;
+    }
+    if (!settling) {
+      MapTileCache.trace(
+        'timeline=$id readiness frame=$frameId phase=l1-hold '
+        'resident=${readiness.resident}/${readiness.required} '
+        'dt=${elapsed.elapsedMilliseconds}ms',
       );
       return;
     }
@@ -711,7 +699,18 @@ abstract class RasterTimelineLayer implements MapLayer {
       'timeline=$id settle complete frame=$frameId mounted=${ring.length} '
       'schedule-warm=true',
     );
-    unawaited(_warmBand(controller, index, immediate: true));
+    // Use the warmer's debounce. A new gesture cancels this before its SQLite
+    // batch starts; an immediate fill here was the dominant high-speed scrub
+    // stall when users reversed direction just after finger-up.
+    unawaited(_warmBand(controller, index));
+  }
+
+  void _suspendWarm() {
+    if (_warmSuspended) return;
+    _warmSuspended = true;
+    _warmCentre = null;
+    source.cancelTileWarm();
+    MapTileCache.trace('timeline=$id warm-suspend');
   }
 
   bool _isCurrent(String frameId, int generation) =>
@@ -728,8 +727,8 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// Mounts [id] if cold, then draws it at [value]. Always leaves it `visible`,
   /// so MapLibre keeps its tiles loaded.
   ///
-  /// Ring membership is the caller's call. Both settle and scrub-edge paths
-  /// mount a fixed window; neither lets a long drag accumulate live sources.
+  /// Ring membership is the caller's call. Only settle mounts a cold window;
+  /// the scrub path never reaches this method for an unmounted frame.
   Future<void> _mount(
     MapLibreMapController controller,
     String id,
@@ -955,6 +954,7 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   @override
   Future<void> onCameraIdle(MapLibreMapController controller) async {
+    if (_warmSuspended) return;
     final centre = _shownIndex;
     if (centre == null) return;
     _readyFrames.clear();
@@ -1010,6 +1010,7 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   void _reset() {
     _revealGeneration++;
+    _warmSuspended = false;
     _resident.clear();
     _ring.clear();
     _readyFrames.clear();

@@ -50,7 +50,7 @@ class MapTileCache {
   /// reproducing a raster flicker, then search the app log for `TILE TRACE`.
   /// [kDebugMode] below is a second hard gate, so changing this cannot make a
   /// release build persist tile URLs or pay the diagnostic overhead.
-  static bool traceEnabled = true;
+  static bool traceEnabled = false;
 
   static int _traceSequence = 0;
 

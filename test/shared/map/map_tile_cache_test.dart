@@ -306,6 +306,8 @@ void main() {
   });
 
   test('trace separates L1, L2, injection, and demand fallback', () async {
+    MapTileCache.traceEnabled = true;
+    addTearDown(() => MapTileCache.traceEnabled = false);
     await cache.install(memoryBytes: 1024);
     const hot = 'https://static.exptech.dev/api/v2/tiles/radar/hot/2/3/4.webp';
     const cold =
@@ -493,4 +495,37 @@ void main() {
     );
     expect(nativeMemory.keys, [fresh]);
   });
+
+  test(
+    'cancelling during debounce performs no native or SQLite warm',
+    () async {
+      await cache.install(memoryBytes: 1024);
+      final warmer = MapTileWarmer(
+        cache,
+        settleDelay: const Duration(milliseconds: 20),
+      );
+      const url =
+          'https://static.exptech.dev/api/v2/tiles/radar/settled/2/3/4.webp';
+      await store.writeBytes(
+        url,
+        etag: 'settled',
+        bytes: Uint8List.fromList([1]),
+      );
+      nativeCalls.clear();
+
+      final scheduled = warmer.warmUrls([url]);
+      warmer.cancel();
+      await scheduled;
+
+      expect(
+        nativeCalls.where(
+          (call) =>
+              call.method == 'filterMissing' || call.method == 'injectTiles',
+        ),
+        isEmpty,
+        reason: 'the cancelled settle must stop before L1 probing or L2 reads',
+      );
+      expect(nativeMemory, isEmpty);
+    },
+  );
 }
