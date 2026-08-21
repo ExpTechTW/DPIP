@@ -26,7 +26,6 @@
   "@meshtasticRegionLabel": {
     "description": "LoRa region"
   },
-  "dpmFilterSectionRestroomType": "Toilet types",
   "mapLayerSatelliteB03": "Himawari Red (B03)",
   "@typhoonLegendCurrent": {
     "description": "Typhoon map legend: current storm centre"
@@ -101,12 +100,6 @@
   "@mapLayerSatelliteCloudProbablyClear": {
     "description": "Cloud-mask category: probably clear"
   },
-  "@dpmAddress": {
-    "description": "Address row label in the disaster-map restroom / shelter detail sheet"
-  },
-  "@moonSubtitle": {
-    "description": "Moon entry card subtitle in the data catalogue"
-  },
   "@moonDays": {
     "description": "Day unit for the moon age"
   },
@@ -132,13 +125,11 @@
     "description": "Theme option: always light"
   },
   "moreSectionRegion": "Region",
-  "dpmDisasterEarthquake": "Earthquake",
   "mapLayerSatellite": "Himawari Infrared (B13)",
   "@meshtasticTapNode": {
     "description": "Resting state of the map node sheet"
   },
   "aedHoursSaturday": "Saturday hours",
-  "dpmDisasterSlope": "Slope hazard",
   "moonPhaseNew": "New moon",
   "notifySectionEew": "Earthquake early warning",
   "mapResetNorth": "Reset north",
@@ -190,11 +181,9 @@
   "@weatherRankingMergeCounty": {
     "description": "Chip to keep one extreme station per county"
   },
-  "typhoonHistoryTitle": "Dataset time",
   "mapAppDefault": "{app} (default)",
   "trendRange24h": "24h",
   "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
-  "weatherRankingRecordedAt": "Recorded at {time}",
   "mapLayerRain": "Rainfall",
   "@typhoonPickerNamed": {
     "description": "Sheet picker: named typhoon (CWA name + TY tyNo)",
@@ -219,7 +208,6 @@
   },
   "mapOverlaySectionMap": "Map",
   "mapTerrainRelief": "Terrain relief",
-  "eewMaxIntensity": "Max intensity",
   "mapLegendCollapse": "Hide legend",
   "@typhoonOverlayMenuTooltip": {
     "description": "Tooltip for the typhoon overlay-toggle chip beside the layer switcher"
@@ -262,7 +250,6 @@
   "@navData": {
     "description": "Bottom-nav label and page title for the Data hub tab"
   },
-  "mapMyLocation": "My location",
   "@notifySectionEarthquake": {
     "description": "Notify page section header"
   },
@@ -338,14 +325,6 @@
   "typhoonValueLon": "{lon}°E",
   "skyTime": "Sky time",
   "weatherModeCloudy": "Cloudy",
-  "@weatherRankingAnalysisLow": {
-    "description": "Daily low fragment; value may include clock time",
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "skyTimeDusk": "Dusk",
   "@meshtasticExcludeMqttSubtitle": {
     "description": "What an MQTT node is"
@@ -395,30 +374,9 @@
   "@mapLayerCategoryLife": {
     "description": "Section title in map overlay lists: everyday-life facility overlays"
   },
-  "@typhoonStormRadii": {
-    "description": "Per-quadrant storm-wind radii (km) for a typhoon circle",
-    "placeholders": {
-      "ne": {
-        "type": "String"
-      },
-      "se": {
-        "type": "String"
-      },
-      "sw": {
-        "type": "String"
-      },
-      "nw": {
-        "type": "String"
-      }
-    }
-  },
   "meshtasticSilent": "Silent",
   "mapLayerCategoryEarthquake": "Earthquake",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
-  "typhoonLegendPast": "Observed track",
-  "@reportFilterLocation": {
-    "description": "Label for the location keyword filter field"
-  },
   "restroomCategoryOther": "Other",
   "@typhoonLegendWarningAreas": {
     "description": "Typhoon UI: typhoonLegendWarningAreas"
@@ -484,9 +442,6 @@
   },
   "meshtasticNodeId": "Node ID",
   "reportDetailNumbered": "No. {number} Significant Earthquake",
-  "@dataWeatherRankingSubtitle": {
-    "description": "Subtitle under weather ranking tiles on the Data hub"
-  },
   "typhoonOverlayStormBandSubtitle": "With average circle",
   "@onboardingNext": {
     "description": "Onboarding next-step button"
@@ -535,9 +490,6 @@
   "@reportDetailLocalFelt": {
     "description": "Eyebrow label on the detail header for a …000 (unnumbered) report"
   },
-  "@typhoonHistoryTitle": {
-    "description": "Typhoon UI: typhoonHistoryTitle"
-  },
   "@mapLayerSatelliteCloudmask": {
     "description": "Himawari cloud-mask (Level-2 retrieval) layer name"
   },
@@ -581,17 +533,6 @@
     }
   },
   "meshtasticScanning": "Scanning…",
-  "@weatherRankingAnalysisHigh": {
-    "description": "Daily high fragment; value may include clock time",
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
-  "@dpmDisasterFlood": {
-    "description": "Shelter disaster-type filter chip: flood"
-  },
   "@meshtasticDevice": {
     "description": "Section: device identity"
   },
@@ -695,7 +636,6 @@
   "@mapLayerMonitor": {
     "description": "Map layer switcher label for the real-time seismic monitor (RTS)"
   },
-  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
   "@meshtasticNotConnected": {
     "description": "Empty message log while not connected"
   },
@@ -738,9 +678,6 @@
   },
   "restroomCategoryCultural": "Cultural",
   "typhoonLabelWind": "Max. sustained wind near centre",
-  "@reportFilterLocationHint": {
-    "description": "Hint for the location keyword filter field"
-  },
   "radarGlobalOutlineHint": "Every country's outer frame",
   "notifyEvacuation": "Disaster information",
   "typhoonLegendCircle15": "Gale circle (L7)",
@@ -775,9 +712,6 @@
   },
   "mapTimelineNow": "Now",
   "reportFilterRange": "{start} – {end}",
-  "@reportListLocalFelt": {
-    "description": "Label for …000 serial reports (small-area felt quake, no CWA number)"
-  },
   "reportDetailOpenReport": "Report page",
   "@weatherModeAuto": {
     "description": "Weather animation follows real conditions"
@@ -825,7 +759,6 @@
   "@mapLayerStyleGrayTooltip": {
     "description": "Explains the JMA grayscale band rendering"
   },
-  "shelterAddressLabel": "Address",
   "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
   "@meshtasticHardware": {
     "description": "Board model"
@@ -841,13 +774,7 @@
     "description": "Himawari split-window brightness-temperature-difference layer name"
   },
   "aedRegion": "Region",
-  "@dpmFilterSectionRestroom": {
-    "description": "Filter section title in the disaster-map sheet: restroom venue categories"
-  },
   "homeRainTrendLightStopping": "Light rain likely to stop in {minutes} minutes",
-  "@navMap": {
-    "description": "Bottom-nav label and page title for the Map tab"
-  },
   "reportDetailInfo": "Details",
   "mapNavWind": "Wind",
   "@meshtasticReceived": {
@@ -873,10 +800,6 @@
   },
   "@onboardingStart": {
     "description": "Onboarding finish button"
-  },
-  "dataWeatherRankingSubtitle": "Live station rankings",
-  "@mapPlaceholderDisabled": {
-    "description": "Placeholder shown in place of the map while MapLibre is disabled"
   },
   "homeRainTrendMinute": "{minute} min",
   "rainInterval6h": "6 h",
@@ -960,17 +883,6 @@
   "restroomCategoryReligious": "Religious",
   "meshtasticRole": "Role",
   "mapLayerSatelliteCloudCloudy": "Cloudy",
-  "@typhoonTimeChip": {
-    "description": "Compact typhoon time chip / map label shape (day + hour, no month)",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "hour": {
-        "type": "String"
-      }
-    }
-  },
   "skyTimeSunrise": "Sunrise",
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
@@ -1000,9 +912,6 @@
     "description": "Notify option label"
   },
   "moreGooglePlay": "Google Play",
-  "@reportListDepthUnit": {
-    "description": "Depth unit label beside the depth value on a report list row"
-  },
   "@onboardingPermsTitle": {
     "description": "Onboarding permissions page title"
   },
@@ -1027,7 +936,6 @@
   },
   "typhoonLabelSw": "SW",
   "typhoonForecastLead": "Forecast +{hours} h",
-  "dpmDisasterTsunami": "Tsunami",
   "@regionNationwide": {
     "description": "Region bar label for the whole-country view"
   },
@@ -1079,7 +987,6 @@
     "description": "Name of the composite radar reflectivity layer in the layer picker"
   },
   "mapLayerSatelliteB02": "Himawari Green (B02)",
-  "reportListLocalFelt": "Local felt",
   "weatherRankingEmpty": "No observations to rank",
   "@mapLayerSatelliteNightmicrophysics": {
     "description": "Himawari Night Microphysics RGB composite layer name"
@@ -1108,7 +1015,6 @@
   },
   "mapLayerCategoryLife": "Daily life",
   "reportFilterSortIntensity": "Intensity",
-  "typhoonMotion": "Moving",
   "meshtasticStateDisconnected": "Disconnected",
   "@regionEdit": {
     "description": "Edit action on a saved-region bottom sheet"
@@ -1121,9 +1027,6 @@
     "description": "Notify channel title"
   },
   "mapLayerOrderTitle": "Reorder layers",
-  "@dpmFilterSectionRestroomType": {
-    "description": "Filter section title in the disaster-map sheet: restroom toilet-kind categories"
-  },
   "@onboardingPermBackgroundDesc": {
     "description": "Permission row description: background location"
   },
@@ -1139,9 +1042,6 @@
   "@meshtasticShortName": {
     "description": "The radio's short name"
   },
-  "@typhoonHistoryLive": {
-    "description": "Typhoon UI: typhoonHistoryLive"
-  },
   "dpmYes": "Yes",
   "meshtasticNoHistory": "Not enough history yet",
   "@mapLegendUnit": {
@@ -1152,15 +1052,11 @@
       }
     }
   },
-  "@dpmFilterSectionShelter": {
-    "description": "Filter section title in the disaster-map sheet: shelter disaster types"
-  },
   "reportDetailLocalIntensityUnavailable": "No intensity data",
   "@mapLayerStyleBd": {
     "description": "Colour-style option: Dvorak BD curve stepped grayscale"
   },
   "mapLayerWindForecastGfs": "GFS",
-  "reportListDepthUnit": "km",
   "reportFilterDepth": "Depth",
   "@eewLocalIntensity": {
     "description": "Label for the estimated felt intensity at the user's location"
@@ -1185,7 +1081,6 @@
   "@meshtasticVoltage": {
     "description": "Battery voltage"
   },
-  "navMap": "Map",
   "notifyAdvisory": "Weather advisories",
   "@meshtasticNoMessages": {
     "description": "Empty message log while connected"
@@ -1236,10 +1131,6 @@
   "moonPhaseWaningGibbous": "Waning gibbous",
   "@feedOffline": {
     "description": "Banner/headline when a realtime feed has gone offline"
-  },
-  "weatherDynamicStateSubtitle": "Override the home backdrop weather",
-  "@dpmDisasterTsunami": {
-    "description": "Shelter disaster-type filter chip: tsunami"
   },
   "reportFilterIntensityInfoModernTitle": "Current (from 2020)",
   "@mapAppGoogleMaps": {
@@ -1310,7 +1201,6 @@
   },
   "notifyUnavailable": "Push notifications aren't ready yet — try again shortly.",
   "mapLayerOrderReset": "Reset order",
-  "dpmAddress": "Address",
   "weatherRankingMergeCounty": "County",
   "@disasterMapOverlayShelterTooltip": {
     "description": "Tooltip for the shelter toggle in the disaster-map overlay menu"
@@ -1372,25 +1262,6 @@
   "@skyTimeDusk": {
     "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
   },
-  "@weatherRankingRecordedAt": {
-    "description": "Occurrence time for a gust or daily extreme",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "@reportListMeta": {
-    "description": "Magnitude and depth line on a report list row",
-    "placeholders": {
-      "magnitude": {
-        "type": "String"
-      },
-      "depth": {
-        "type": "String"
-      }
-    }
-  },
   "@regionEmpty": {
     "description": "Empty state on the saved-regions manage page"
   },
@@ -1425,9 +1296,6 @@
   "@mapNavPressure": {
     "description": "Short Map-tab bottom-nav / default-layer picker label for pressure"
   },
-  "@changelogVersionDetails": {
-    "description": "App bar title on a single release's detail page"
-  },
   "notifyThunderstorm": "Thunderstorm alerts",
   "skyTimeGolden": "Golden hour",
   "@typhoonTdNo": {
@@ -1446,7 +1314,6 @@
   "@changelogBodyEmpty": {
     "description": "Placeholder when a GitHub release has an empty markdown body"
   },
-  "weatherRankingAnalysisCurrent": "Now {value}°C",
   "@mapLayerSatelliteDust": {
     "description": "Himawari Dust RGB composite layer name"
   },
@@ -1495,7 +1362,6 @@
   },
   "meshtasticHardware": "Hardware",
   "languageSettings": "Language",
-  "dpmDisasterNuclear": "Nuclear accident",
   "@typhoonWarningAreas": {
     "description": "List of counties under a typhoon warning",
     "placeholders": {
@@ -1569,7 +1435,6 @@
   "@aedHoursSunday": {
     "description": "AED Sunday opening hours row label"
   },
-  "typhoonGust": "Gust",
   "restroomGradeAverage": "Average",
   "@meshtasticNodes": {
     "description": "Mesh nodes section header"
@@ -1579,9 +1444,6 @@
   "mapTimelineForecast": "Forecast",
   "restroomTypeLabel": "Type",
   "navEarthquake": "Earthquake",
-  "@shelterAddressLabel": {
-    "description": "Shelter detail address row label"
-  },
   "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
   "moonPhaseWaxingGibbous": "Waxing gibbous",
   "reportDetailTitle": "Earthquake Report",
@@ -1607,7 +1469,6 @@
     "description": "Chip to rank by recorded daily minimum temperature"
   },
   "radarCountyOutline": "County borders",
-  "onboardingGranted": "Granted",
   "@restroomCategoryPark": {
     "description": "Restroom venue category: park"
   },
@@ -1657,14 +1518,6 @@
   },
   "@mapLayerSatelliteTransparentReflectance": {
     "description": "Satellite legend note: on the reflectance bands a dark or night pixel is transparent so the basemap shows"
-  },
-  "@weatherRankingAnalysisRange": {
-    "description": "Diurnal range fragment in an extremes analysis line",
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
   },
   "notifyOptWeatherLocal": "Current location only",
   "@reportDetailTitle": {
@@ -1744,9 +1597,6 @@
   "@reportFilterDateStartNote": {
     "description": "Explains that startTime covers from midnight on that calendar day"
   },
-  "@dpmDisasterLandslide": {
-    "description": "Shelter disaster-type filter chip: landslide"
-  },
   "meshtasticLastSent": "Last sent",
   "meshtasticName": "Name",
   "meshtasticScan": "Scan",
@@ -1769,9 +1619,6 @@
   },
   "typhoonValueHpa": "{n} hPa",
   "weatherPrecipitation": "Precipitation",
-  "@typhoonSatelliteTitle": {
-    "description": "Typhoon UI: typhoonSatelliteTitle"
-  },
   "moonNextFullMoon": "Next full moon",
   "dpmSheetEmpty": "Tap a marker on the map for details",
   "@mapLayerOrderReset": {
@@ -1798,7 +1645,6 @@
     "description": "Subtitle: weather tile matches typhoon report time"
   },
   "onboardingSkipLeave": "Skip anyway",
-  "onboardingBack": "Back",
   "aedPlaceDesc": "Placement",
   "@weatherModeOvercast": {
     "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
@@ -1839,13 +1685,11 @@
   "@radarCountyOutlineSubtitle": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
-  "typhoonPressure": "Pressure",
   "@meshtasticCopied": {
     "description": "Toast shown after copying a message"
   },
   "onboardingPermBattery": "Battery exemption",
   "typhoonLabelNw": "NW",
-  "dpmDisasterFlood": "Flood",
   "moonPhaseWaxingCrescent": "Waxing crescent",
   "@locationBannerFix": {
     "description": "Action on the location banner to open system settings"
@@ -1872,9 +1716,6 @@
   },
   "@onboardingPermsBody": {
     "description": "Onboarding permissions page intro"
-  },
-  "@onboardingGranted": {
-    "description": "Permission granted label"
   },
   "meshtasticChannels": "Channels",
   "@notifySectionEew": {
@@ -1934,7 +1775,6 @@
   "@weatherRankingTempExtremes": {
     "description": "Ranking tab for recorded daily high/low/range (not current temp)"
   },
-  "dpmDisasterLandslide": "Landslide",
   "notifyMonitor": "Strong-motion monitor",
   "onboardingStart": "Get started",
   "@trendRange24h": {
@@ -1975,9 +1815,6 @@
     "description": "Snackbar shown when the store can't be reached to restore"
   },
   "notifyOptOff": "Off",
-  "@reportListSearch": {
-    "description": "Fetches the report list with the current draft filters"
-  },
   "reportFilterSortTime": "Time",
   "mapLayerSatelliteCloudProbablyClear": "Probably clear",
   "weatherModeThunderstorm": "Thunderstorm",
@@ -2037,7 +1874,6 @@
   "@meshtasticUndecoded": {
     "description": "Packets the radio could not decrypt"
   },
-  "dpmFilterSectionShelter": "Shelter disaster types",
   "@commonCancel": {
     "description": "Dismisses a dialog without acting"
   },
@@ -2077,9 +1913,6 @@
   "changelogBodyEmpty": "No notes for this release.",
   "changelogOpenOnGitHub": "View on GitHub",
   "radarGlobalOutline": "National borders",
-  "@mapMyLocation": {
-    "description": "Map control that centers the camera on the device GPS fix"
-  },
   "@weatherDataTime": {
     "description": "Nearest-station name and observation time shown as small text under the home weather header name",
     "placeholders": {
@@ -2104,7 +1937,6 @@
   "@mapLayerHumidity": {
     "description": "Map layer switcher label for the humidity layer"
   },
-  "dpmFilterSectionRestroom": "Venue types",
   "meshtasticNotConnected": "Not connected to a radio",
   "weatherModeSnow": "Snow",
   "mapLayerMeshtastic": "Meshtastic nodes",
@@ -2219,7 +2051,6 @@
     "description": "Connection state label"
   },
   "typhoonIntensityModerate": "Moderate typhoon",
-  "typhoonWind": "Wind",
   "@weatherRankingTitle": {
     "description": "App bar title for the weather station ranking page"
   },
@@ -2228,7 +2059,6 @@
     "description": "Restroom venue category: other"
   },
   "rainInterval3h": "3 h",
-  "reportListSearch": "Search",
   "@onboardingPermLocationDesc": {
     "description": "Permission row description: location"
   },
@@ -2246,7 +2076,6 @@
   "@meshtasticNotifyNodes": {
     "description": "Toggle: local notification when a new node is heard"
   },
-  "reportFilterLocation": "Location",
   "@mapNavLightning": {
     "description": "Short Map-tab bottom-nav / default-layer picker label for lightning"
   },
@@ -2276,22 +2105,11 @@
   },
   "onboardingPermBatteryDesc": "Allow DPIP to keep running in the background so alerts aren't delayed or missed.",
   "mapNavDisaster": "Disaster",
-  "@dpmDisasterNuclear": {
-    "description": "Shelter disaster-type filter chip: nuclear accident"
-  },
   "radarScanRangeSubtitle": "Outlines the area the four radars actually observe.",
   "aedHoursSunday": "Sunday hours",
   "reportDetailOriginTime": "Origin time",
   "trendNoData": "No trend data",
   "onboardingPermLocation": "Location",
-  "sponsorCalloutBody": "No ads — your support keeps the servers running.",
-  "@sponsorCalloutBody": {
-    "description": "One-line subtitle on the More tab's support call to action"
-  },
-  "moreDiscordCalloutBody": "Join the community and talk to the team.",
-  "@moreDiscordCalloutBody": {
-    "description": "One-line subtitle on the More tab's Discord call to action"
-  },
   "moreDiscord": "Discord community",
   "@typhoonOverlayStormBandSubtitle": {
     "description": "Subtitle under each storm-band option (fill + dashed avg)"
@@ -2330,9 +2148,6 @@
   "@mapLayerSatelliteB13": {
     "description": "Himawari clean-infrared window channel (B13, 10.4 µm) layer name"
   },
-  "@dpmDisasterSlope": {
-    "description": "Shelter disaster-type filter chip: slope hazard"
-  },
   "@@locale": "en",
   "regionSelectCount": "{count}/{max} selected",
   "@meshtasticRegionMismatch": {
@@ -2346,14 +2161,6 @@
   "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
   "@restroomCategoryCultural": {
     "description": "Restroom venue category: cultural / leisure activity venue"
-  },
-  "@weatherRankingAnalysisCurrent": {
-    "description": "Current temperature fragment in an extremes analysis line",
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
   },
   "meshtasticStateError": "Error",
   "weatherModeOvercast": "Overcast",
@@ -2381,9 +2188,6 @@
     "description": "Shelter detail applicable-disaster categories row label"
   },
   "reportDetailDepth": "Depth",
-  "@typhoonTrackDetail": {
-    "description": "Typhoon UI: typhoonTrackDetail"
-  },
   "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
   "reportFilterDatePick": "Pick dates",
   "onboardingSkipStay": "Go back",
@@ -2477,7 +2281,6 @@
     "description": "Himawari lower-level water-vapour channel (B10, 7.3 µm) layer name"
   },
   "notifyIntensity": "Intensity report",
-  "typhoonTimeChip": "{day}日{hour}時",
   "rainIntervalMenu": "Accumulation window",
   "@mapLayerSatelliteB06": {
     "description": "Himawari near-infrared channel (B06, 2.3 µm) layer name"
@@ -2549,7 +2352,6 @@
   "@moonPhaseFirstQuarter": {
     "description": "Phase: first quarter"
   },
-  "typhoonSatelliteTitle": "Satellite",
   "@typhoonValueLat": {
     "placeholders": {
       "lat": {
@@ -2570,9 +2372,6 @@
     "description": "Language picker option: follow the system language"
   },
   "sponsorRecommended": "Recommended",
-  "@eewMaxIntensity": {
-    "description": "Label for an EEW alert's maximum felt intensity badge"
-  },
   "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
   "weatherRankingWind": "Wind speed",
   "feedStale": "Data may be out of date",
@@ -2607,7 +2406,6 @@
   },
   "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
   "moonTimelineCaption": "Phase",
-  "reportListMeta": "M{magnitude} · {depth} km",
   "@reportDetailEpicenter": {
     "description": "Row label for the epicenter's latitude/longitude"
   },
@@ -2665,7 +2463,6 @@
   "@mapLayerSatelliteBtdSo2": {
     "description": "Himawari SO₂ / cloud-phase brightness-temperature-difference layer name"
   },
-  "weatherRankingAnalysisRange": "Range {value}°C",
   "weatherRankingExtremeHigh": "Daily high",
   "@aedPlaceDesc": {
     "description": "AED placement description row label"
@@ -2676,7 +2473,6 @@
   "@rainIntervalSection": {
     "description": "Section title in the rainfall menu: the accumulation-interval choices"
   },
-  "changelogVersionDetails": "Release details",
   "@typhoonOverlayProbabilityHint": {
     "description": "Short hint under the strike-probability toggle"
   },
@@ -2782,7 +2578,6 @@
   "endpointStateDegraded": "Unstable",
   "endpointStateDown": "Failing",
   "endpointStateUnknown": "Unknown",
-  "endpointLastSuccessNever": "never succeeded",
   "endpointServiceEew": "EEW",
   "endpointServiceRts": "RTS",
   "endpointServiceRadar": "Radar",
@@ -2833,8 +2628,6 @@
   "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
   "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
   "restroomCategoryTransport": "Transport",
-  "reportFilterLocationHint": "e.g. Hualien, offshore",
-  "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
   "meshtasticDistance": "Distance",
   "meshtasticSnrTrend": "Signal trend (SNR)",
@@ -2865,7 +2658,6 @@
   "releaseHighlightsTabAdvanced": "Deep dive",
   "releaseHighlightsEmpty": "Nothing here yet.",
   "releaseHighlightsSeeNotes": "Full release notes",
-  "highlightCardTechnical": "Technical",
   "moreVersionNotesEmpty": "No changelog for this build",
   "moreVersionSnapshot": "Snapshot",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
@@ -2881,9 +2673,6 @@
   "mapLayerAed": "AED",
   "changelogTypePrerelease": "Beta",
   "reportFilterIntensityInfoModernBody": "Levels 0–4, 5−, 5+, 6−, 6+, and 7. The filter slider uses this scale; older events still show legacy labels in the list.",
-  "@typhoonLegendPast": {
-    "description": "Typhoon map legend: past/observed path"
-  },
   "@aedHoursWeekday": {
     "description": "AED weekday opening hours row label"
   },
@@ -2935,7 +2724,6 @@
   "onboardingPermsTitle": "Permissions",
   "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
   "rainInterval10m": "10 min",
-  "weatherRankingAnalysisLow": "Low {value}",
   "@mapNavTemperature": {
     "description": "Short Map-tab bottom-nav / default-layer picker label for temperature"
   },
@@ -2945,9 +2733,6 @@
   },
   "reportListDayCount": "{count}",
   "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
-  "@onboardingBack": {
-    "description": "Onboarding back button"
-  },
   "@restroomCategoryReligious": {
     "description": "Restroom venue category: religious / ceremonial venue"
   },
@@ -2958,9 +2743,6 @@
   },
   "@reportFilterSort": {
     "description": "Section title for report list sort field + order"
-  },
-  "@weatherDynamicStateSubtitle": {
-    "description": "Subtitle explaining the weather animation setting"
   },
   "mapLayerShelter": "Shelters",
   "@weatherModeClear": {
@@ -3004,20 +2786,15 @@
   "@mapLayerSatelliteB07": {
     "description": "Himawari shortwave-infrared channel (B07, 3.9 µm) layer name"
   },
-  "@dpmDisasterEarthquake": {
-    "description": "Shelter disaster-type filter chip: earthquake"
-  },
   "@mapLayerSatelliteTransparentNight": {
     "description": "Satellite legend note: the daytime RGB recipes fade out across the terminator and are transparent at night"
   },
   "@meshtasticPreset": {
     "description": "LoRa modem preset"
   },
-  "typhoonTrackDetail": "Track detail",
   "dataSectionWeather": "Weather",
   "aedHoursWeekday": "Weekday hours",
   "homeActiveEventsTitle": "Active events",
-  "weatherRankingAnalysisHigh": "High {value}",
   "@homeRainTrendNoData": {
     "description": "Label on the home rain trend chart for minutes beyond the forecast window, and the empty-card hint"
   },
@@ -3025,7 +2802,6 @@
     "description": "Notify channel title"
   },
   "faq": "FAQ",
-  "typhoonHistoryLive": "Live",
   "@radarTownOutline": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
   },
@@ -3097,7 +2873,6 @@
   "@notifyOptLocalIntensity1": {
     "description": "Notify option label"
   },
-  "mapPlaceholderDisabled": "Map (temporarily disabled)",
   "moonNow": "Now",
   "@moonNow": {
     "description": "Returns the moon page to the present moment"
@@ -3153,10 +2928,6 @@
   "sunTitle": "Sun",
   "@sunTitle": {
     "description": "Sun page title"
-  },
-  "sunSubtitle": "Sunrise, twilight and the solar terms",
-  "@sunSubtitle": {
-    "description": "Sun page one-line summary on the data hub"
   },
   "sunSectionDaylight": "Daylight",
   "@sunSectionDaylight": {
@@ -3233,10 +3004,6 @@
   "planetsTitle": "Planets",
   "@planetsTitle": {
     "description": "Planets page title"
-  },
-  "planetsSubtitle": "Where they are tonight, and how bright",
-  "@planetsSubtitle": {
-    "description": "Planets page one-line summary on the data hub"
   },
   "planetsSectionTonight": "Right now",
   "@planetsSectionTonight": {
@@ -3414,10 +3181,6 @@
   "@tonightTitle": {
     "description": "Tonight page title"
   },
-  "tonightSubtitle": "What is observable, and when",
-  "@tonightSubtitle": {
-    "description": "Tonight page summary on the data hub"
-  },
   "tonightSectionDark": "Observing window",
   "@tonightSectionDark": {
     "description": "Section header: the observing window"
@@ -3550,10 +3313,6 @@
   "@almanacTitle": {
     "description": "Almanac page title"
   },
-  "almanacSubtitle": "The lunisolar date and the eclipses ahead",
-  "@almanacSubtitle": {
-    "description": "Almanac page summary on the data hub"
-  },
   "almanacSectionToday": "Today",
   "@almanacSectionToday": {
     "description": "Section header: today's date in both calendars"
@@ -3666,10 +3425,6 @@
   "@tideTitle": {
     "description": "Tide page title"
   },
-  "tideSubtitle": "Spring, neap and the pull of the Moon",
-  "@tideSubtitle": {
-    "description": "Tide page summary on the data hub"
-  },
   "tideDisclaimer": "Astronomical forcing only — not a harbour tide table. For water levels use the CWA's published tables.",
   "@tideDisclaimer": {
     "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
@@ -3725,10 +3480,6 @@
   "skyChartTitle": "Sky chart",
   "@skyChartTitle": {
     "description": "Sky chart page title"
-  },
-  "skyChartSubtitle": "The naked-eye sky above you",
-  "@skyChartSubtitle": {
-    "description": "Sky chart page summary on the data hub"
   },
   "skyChartNorth": "N",
   "@skyChartNorth": {

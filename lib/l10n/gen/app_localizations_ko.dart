@@ -43,9 +43,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get radarCountyOutlineSubtitle => '레이더 에코 아래에서도 경계가 보이도록 합니다.';
 
   @override
-  String get dpmFilterSectionRestroomType => '화장실 유형';
-
-  @override
   String get mapLayerSatelliteB03 => '히마와리 가시 적색(B03)';
 
   @override
@@ -107,16 +104,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreSectionRegion => '지역';
 
   @override
-  String get dpmDisasterEarthquake => '지진';
-
-  @override
   String get mapLayerSatellite => '히마와리 적외(B13)';
 
   @override
   String get aedHoursSaturday => '토요일 운영시간';
-
-  @override
-  String get dpmDisasterSlope => '사면 재해';
 
   @override
   String get moonPhaseNew => 'New moon';
@@ -165,9 +156,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifySettingsMenu => '알림 설정';
 
   @override
-  String get typhoonHistoryTitle => '자료 시각';
-
-  @override
   String mapAppDefault(String app) {
     return '$app (기본)';
   }
@@ -177,11 +165,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerStyleJmaTooltip => '그레이스케일 바탕에 −40 °C 이하를 채색, 운정 고도 강조';
-
-  @override
-  String weatherRankingRecordedAt(String time) {
-    return '기록 시각 $time';
-  }
 
   @override
   String get mapLayerRain => '강수량';
@@ -194,9 +177,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapTerrainRelief => '지형 입체감';
-
-  @override
-  String get eewMaxIntensity => '최대 진도';
 
   @override
   String get mapLegendCollapse => '범례 숨기기';
@@ -248,9 +228,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get radarOverlayMenuTooltip => '레이더 레이어 옵션';
-
-  @override
-  String get mapMyLocation => '내 위치';
 
   @override
   String get meshtasticNodes => 'Nodes';
@@ -328,9 +305,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB12 => '히마와리 오존(B12)';
-
-  @override
-  String get typhoonLegendPast => '실황 경로';
 
   @override
   String get restroomCategoryOther => '기타';
@@ -504,11 +478,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteB05 => '히마와리 근적외(B05)';
 
   @override
-  String typhoonStormRadii(String ne, String se, String sw, String nw) {
-    return 'NE $ne · SE $se · SW $sw · NW $nw km';
-  }
-
-  @override
   String get typhoonLabelNe => 'NE';
 
   @override
@@ -601,9 +570,6 @@ class AppLocalizationsKo extends AppLocalizations {
       'DPIP는 실시간 재난 예방 정보를 제공하는 데 전념하며, 광고나 다른 수익 모델이 없습니다. 여러분의 후원은 서버 운영과 지속적인 개발에 도움이 됩니다.';
 
   @override
-  String get shelterAddressLabel => '주소';
-
-  @override
   String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
 
   @override
@@ -625,9 +591,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get windForecastOverlayMenuTooltip => '바람 예보 레이어 옵션';
-
-  @override
-  String get dataWeatherRankingSubtitle => '실시간 관측 순위';
 
   @override
   String homeRainTrendMinute(int minute) {
@@ -756,9 +719,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get dpmDisasterTsunami => '쓰나미';
-
-  @override
   String get changelogTypeStable => '정식';
 
   @override
@@ -769,9 +729,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB02 => '히마와리 가시 녹색(B02)';
-
-  @override
-  String get reportListLocalFelt => '소규모 유감';
 
   @override
   String get weatherRankingEmpty => '정렬할 관측이 없습니다';
@@ -806,9 +763,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterSortIntensity => '진도';
 
   @override
-  String get typhoonMotion => '이동';
-
-  @override
   String get meshtasticStateDisconnected => 'Disconnected';
 
   @override
@@ -830,9 +784,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerWindForecastGfs => 'GFS';
 
   @override
-  String get reportListDepthUnit => 'km';
-
-  @override
   String get reportFilterDepth => '깊이';
 
   @override
@@ -840,9 +791,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapNavQpesums => '예보';
-
-  @override
-  String get navMap => '지도';
 
   @override
   String get notifyAdvisory => '기상 특보';
@@ -866,9 +814,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
-
-  @override
-  String get weatherDynamicStateSubtitle => '홈 배경 날씨를 재정의합니다';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '신제(2020년 이후)';
@@ -942,9 +887,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapLayerOrderReset => '기본 순서로 재설정';
-
-  @override
-  String get dpmAddress => '주소';
 
   @override
   String get weatherRankingMergeCounty => '현시';
@@ -1031,11 +973,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticRadioSettings => 'LoRa';
 
   @override
-  String weatherRankingAnalysisCurrent(String value) {
-    return '현재 $value°C';
-  }
-
-  @override
   String get moreGithub => 'ExpTech GitHub';
 
   @override
@@ -1049,9 +986,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get languageSettings => '언어';
-
-  @override
-  String get dpmDisasterNuclear => '핵 사고';
 
   @override
   String get language => '언어';
@@ -1102,9 +1036,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapNavEarthquake => '지진';
 
   @override
-  String get typhoonGust => '순간최대풍속';
-
-  @override
   String get restroomGradeAverage => '보통';
 
   @override
@@ -1149,9 +1080,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get radarCountyOutline => '시·군 경계';
-
-  @override
-  String get onboardingGranted => '허용됨';
 
   @override
   String get commonClose => '닫기';
@@ -1280,9 +1208,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingSkipLeave => '그래도 건너뛰기';
 
   @override
-  String get onboardingBack => '이전';
-
-  @override
   String get aedPlaceDesc => '설치 위치';
 
   @override
@@ -1297,16 +1222,10 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get typhoonPressure => '기압';
-
-  @override
   String get onboardingPermBattery => '배터리 최적화 제외';
 
   @override
   String get typhoonLabelNw => 'NW';
-
-  @override
-  String get dpmDisasterFlood => '홍수';
 
   @override
   String get moonPhaseWaxingCrescent => 'Waxing crescent';
@@ -1355,9 +1274,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String reportListMagnitude(String magnitude) {
     return 'M$magnitude';
   }
-
-  @override
-  String get dpmDisasterLandslide => '산사태';
 
   @override
   String get notifyMonitor => '강진 감시기';
@@ -1442,9 +1358,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreAppStore => 'App Store';
 
   @override
-  String get dpmFilterSectionShelter => '대피소 재해 유형';
-
-  @override
   String get moreServerStatus => '서버 상태';
 
   @override
@@ -1476,9 +1389,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get regionCurrent => '현재 위치';
-
-  @override
-  String get dpmFilterSectionRestroom => '시설 유형';
 
   @override
   String get meshtasticNotConnected => 'Not connected to a radio';
@@ -1565,25 +1475,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonIntensityModerate => 'Moderate typhoon';
 
   @override
-  String get typhoonWind => '풍속';
-
-  @override
   String get mapLayerSatelliteAsh => '히마와리 화산재';
 
   @override
   String get rainInterval3h => '3시간';
 
   @override
-  String get reportListSearch => '조회';
-
-  @override
   String get mapLayerCategorySatellite => '위성';
 
   @override
   String get meshtasticChannelReady => 'DPIP channel ready';
-
-  @override
-  String get reportFilterLocation => '위치';
 
   @override
   String get mapLayerSatelliteNightmicrophysics => '히마와리 야간 미세물리';
@@ -1626,12 +1527,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get onboardingPermLocation => '위치';
-
-  @override
-  String get sponsorCalloutBody => '광고 없이 운영됩니다. 후원이 서버를 지탱합니다.';
-
-  @override
-  String get moreDiscordCalloutBody => '커뮤니티에 참여해 개발팀과 이야기해 보세요.';
 
   @override
   String get moreDiscord => 'Discord 커뮤니티';
@@ -1762,11 +1657,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifyIntensity => '진도 속보';
 
   @override
-  String typhoonTimeChip(String day, String hour) {
-    return '$day日$hour時';
-  }
-
-  @override
   String get rainIntervalMenu => '누적 구간';
 
   @override
@@ -1830,9 +1720,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherModeSand => '황사';
 
   @override
-  String get typhoonSatelliteTitle => '위성';
-
-  @override
   String get notifyReport => '지진 보고';
 
   @override
@@ -1871,11 +1758,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moonTimelineCaption => 'Phase';
 
   @override
-  String reportListMeta(String magnitude, String depth) {
-    return 'M$magnitude · $depth km';
-  }
-
-  @override
   String get openSourceLicenses => '오픈소스 라이선스';
 
   @override
@@ -1896,15 +1778,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticHopLimit => 'Hop limit';
 
   @override
-  String weatherRankingAnalysisRange(String value) {
-    return '일교차 $value°C';
-  }
-
-  @override
   String get weatherRankingExtremeHigh => '오늘 최고';
-
-  @override
-  String get changelogVersionDetails => '릴리스 상세';
 
   @override
   String get sponsorPrivacy => '개인정보 처리방침';
@@ -2099,9 +1973,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get endpointStateUnknown => '알 수 없음';
 
   @override
-  String get endpointLastSuccessNever => '미성공';
-
-  @override
   String get endpointServiceEew => 'EEW';
 
   @override
@@ -2183,12 +2054,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restroomCategoryTransport => '교통';
 
   @override
-  String get reportFilterLocationHint => '예: 화롄, 해역';
-
-  @override
-  String get moonSubtitle => 'Lunar phase and illumination — computed locally';
-
-  @override
   String get meshtasticBattery => 'Battery';
 
   @override
@@ -2254,9 +2119,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get releaseHighlightsSeeNotes => '전체 릴리스 노트';
-
-  @override
-  String get highlightCardTechnical => '기술 세부';
 
   @override
   String get moreVersionNotesEmpty => '이 빌드의 업데이트 내역을 찾을 수 없습니다';
@@ -2333,11 +2195,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get rainInterval10m => '10분';
 
   @override
-  String weatherRankingAnalysisLow(String value) {
-    return '최저 $value';
-  }
-
-  @override
   String get meshtasticConnectAnyway => 'Connect anyway';
 
   @override
@@ -2389,9 +2246,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteAirmass => '히마와리 에어매스';
 
   @override
-  String get typhoonTrackDetail => '경로 상세';
-
-  @override
   String get dataSectionWeather => '기상';
 
   @override
@@ -2401,15 +2255,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeActiveEventsTitle => '발효 중 이벤트';
 
   @override
-  String weatherRankingAnalysisHigh(String value) {
-    return '최고 $value';
-  }
-
-  @override
   String get faq => '자주 묻는 질문';
-
-  @override
-  String get typhoonHistoryLive => '실시간';
 
   @override
   String eewSerial(int serial) {
@@ -2478,9 +2324,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherDynamicState => '날씨 애니메이션';
 
   @override
-  String get mapPlaceholderDisabled => '지도 (일시 사용 중지)';
-
-  @override
   String get moonNow => '지금';
 
   @override
@@ -2521,9 +2364,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sunTitle => '태양';
-
-  @override
-  String get sunSubtitle => '일출·박명·절기';
 
   @override
   String get sunSectionDaylight => '일조';
@@ -2581,9 +2421,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get planetsTitle => '행성';
-
-  @override
-  String get planetsSubtitle => '오늘 밤 위치와 밝기';
 
   @override
   String get planetsSectionTonight => '현재';
@@ -2718,9 +2555,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tonightTitle => '오늘 밤';
 
   @override
-  String get tonightSubtitle => '무엇을 언제 볼 수 있는가';
-
-  @override
   String get tonightSectionDark => '관측 가능 시간';
 
   @override
@@ -2820,9 +2654,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get almanacTitle => '역법';
 
   @override
-  String get almanacSubtitle => '음력과 앞으로의 일식·월식';
-
-  @override
   String get almanacSectionToday => '오늘';
 
   @override
@@ -2907,9 +2738,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tideTitle => '조석';
 
   @override
-  String get tideSubtitle => '사리·조금과 달의 인력';
-
-  @override
   String get tideDisclaimer => '천문 기조력만이며 항만 조석표가 아닙니다. 수위는 기상청 발표를 참고하세요.';
 
   @override
@@ -2950,9 +2778,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get skyChartTitle => '성도';
-
-  @override
-  String get skyChartSubtitle => '머리 위 맨눈으로 보이는 하늘';
 
   @override
   String get skyChartNorth => '북';

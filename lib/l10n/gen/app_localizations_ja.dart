@@ -43,9 +43,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get radarCountyOutlineSubtitle => 'レーダーエコーの下でも県市境界が見えるようにします。';
 
   @override
-  String get dpmFilterSectionRestroomType => 'トイレの種類';
-
-  @override
   String get mapLayerSatelliteB03 => 'ひまわり 可視赤(B03)';
 
   @override
@@ -107,16 +104,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreSectionRegion => '地域';
 
   @override
-  String get dpmDisasterEarthquake => '震災';
-
-  @override
   String get mapLayerSatellite => 'ひまわり 赤外線(B13)';
 
   @override
   String get aedHoursSaturday => '土曜の開館時間';
-
-  @override
-  String get dpmDisasterSlope => '斜面災害';
 
   @override
   String get moonPhaseNew => 'New moon';
@@ -165,9 +156,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifySettingsMenu => '通知設定';
 
   @override
-  String get typhoonHistoryTitle => '資料時刻';
-
-  @override
   String mapAppDefault(String app) {
     return '$app（デフォルト）';
   }
@@ -177,11 +165,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLayerStyleJmaTooltip => 'グレースケールをベースに −40 °C 以下を着色し、雲頂高度を強調';
-
-  @override
-  String weatherRankingRecordedAt(String time) {
-    return '記録時刻 $time';
-  }
 
   @override
   String get mapLayerRain => '降水量';
@@ -194,9 +177,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapTerrainRelief => '地形の立体感';
-
-  @override
-  String get eewMaxIntensity => '最大震度';
 
   @override
   String get mapLegendCollapse => '凡例を閉じる';
@@ -248,9 +228,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get radarOverlayMenuTooltip => 'レーダーレイヤー設定';
-
-  @override
-  String get mapMyLocation => '現在地';
 
   @override
   String get meshtasticNodes => 'Nodes';
@@ -327,9 +304,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり オゾン(B12)';
-
-  @override
-  String get typhoonLegendPast => '実況経路';
 
   @override
   String get restroomCategoryOther => 'その他';
@@ -503,11 +477,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteB05 => 'ひまわり 近赤外(B05)';
 
   @override
-  String typhoonStormRadii(String ne, String se, String sw, String nw) {
-    return 'NE $ne · SE $se · SW $sw · NW $nw km';
-  }
-
-  @override
   String get typhoonLabelNe => '北東';
 
   @override
@@ -600,9 +569,6 @@ class AppLocalizationsJa extends AppLocalizations {
       'DPIP はリアルタイムの防災情報の提供に取り組んでおり、広告やその他の収益モデルはありません。皆さまのご支援はサーバーの運用と継続的な開発に役立ちます。';
 
   @override
-  String get shelterAddressLabel => '住所';
-
-  @override
   String get typhoonLabelStormAvg => '暴風域の平均半径';
 
   @override
@@ -624,9 +590,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get windForecastOverlayMenuTooltip => '風予報レイヤー設定';
-
-  @override
-  String get dataWeatherRankingSubtitle => '即時観測ランキング';
 
   @override
   String homeRainTrendMinute(int minute) {
@@ -754,9 +717,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get dpmDisasterTsunami => '津波';
-
-  @override
   String get changelogTypeStable => '正式';
 
   @override
@@ -767,9 +727,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB02 => 'ひまわり 可視緑(B02)';
-
-  @override
-  String get reportListLocalFelt => '局地有感';
 
   @override
   String get weatherRankingEmpty => '並べ替え可能な観測がありません';
@@ -804,9 +761,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterSortIntensity => '震度';
 
   @override
-  String get typhoonMotion => '進行';
-
-  @override
   String get meshtasticStateDisconnected => 'Disconnected';
 
   @override
@@ -828,9 +782,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerWindForecastGfs => 'GFS';
 
   @override
-  String get reportListDepthUnit => 'km';
-
-  @override
   String get reportFilterDepth => '深さ';
 
   @override
@@ -838,9 +789,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapNavQpesums => '予報';
-
-  @override
-  String get navMap => '地図';
 
   @override
   String get notifyAdvisory => '気象警報・注意報';
@@ -864,9 +812,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
-
-  @override
-  String get weatherDynamicStateSubtitle => 'ホーム背景の天気を上書きします';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 年以降）';
@@ -939,9 +884,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapLayerOrderReset => '既定の順序に戻す';
-
-  @override
-  String get dpmAddress => '住所';
 
   @override
   String get weatherRankingMergeCounty => '県市';
@@ -1028,11 +970,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get meshtasticRadioSettings => 'LoRa';
 
   @override
-  String weatherRankingAnalysisCurrent(String value) {
-    return '現在 $value°C';
-  }
-
-  @override
   String get moreGithub => 'ExpTech GitHub';
 
   @override
@@ -1046,9 +983,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get languageSettings => '言語設定';
-
-  @override
-  String get dpmDisasterNuclear => '原子力事故';
 
   @override
   String get language => '言語';
@@ -1099,9 +1033,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapNavEarthquake => '地震';
 
   @override
-  String get typhoonGust => '最大瞬間風速';
-
-  @override
   String get restroomGradeAverage => '普通';
 
   @override
@@ -1145,9 +1076,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get radarCountyOutline => '県市境界';
-
-  @override
-  String get onboardingGranted => '許可済み';
 
   @override
   String get commonClose => '閉じる';
@@ -1275,9 +1203,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingSkipLeave => 'このままスキップ';
 
   @override
-  String get onboardingBack => '戻る';
-
-  @override
   String get aedPlaceDesc => '設置場所';
 
   @override
@@ -1292,16 +1217,10 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get typhoonPressure => '気圧';
-
-  @override
   String get onboardingPermBattery => 'バッテリー最適化の除外';
 
   @override
   String get typhoonLabelNw => '北西';
-
-  @override
-  String get dpmDisasterFlood => '洪水';
 
   @override
   String get moonPhaseWaxingCrescent => 'Waxing crescent';
@@ -1350,9 +1269,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String reportListMagnitude(String magnitude) {
     return 'M$magnitude';
   }
-
-  @override
-  String get dpmDisasterLandslide => '土石流';
 
   @override
   String get notifyMonitor => '強震モニタ';
@@ -1437,9 +1353,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreAppStore => 'App Store';
 
   @override
-  String get dpmFilterSectionShelter => '避難所の災害種別';
-
-  @override
   String get moreServerStatus => 'サーバー状態';
 
   @override
@@ -1471,9 +1384,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get regionCurrent => '現在地';
-
-  @override
-  String get dpmFilterSectionRestroom => '施設の種類';
 
   @override
   String get meshtasticNotConnected => 'Not connected to a radio';
@@ -1560,25 +1470,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonIntensityModerate => '並の台風';
 
   @override
-  String get typhoonWind => '風速';
-
-  @override
   String get mapLayerSatelliteAsh => 'ひまわり 火山灰';
 
   @override
   String get rainInterval3h => '3時間';
 
   @override
-  String get reportListSearch => '検索';
-
-  @override
   String get mapLayerCategorySatellite => '衛星';
 
   @override
   String get meshtasticChannelReady => 'DPIP channel ready';
-
-  @override
-  String get reportFilterLocation => '場所';
 
   @override
   String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
@@ -1621,12 +1522,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get onboardingPermLocation => '位置情報';
-
-  @override
-  String get sponsorCalloutBody => '広告なし。あなたの支援がサーバーを支えています。';
-
-  @override
-  String get moreDiscordCalloutBody => 'コミュニティに参加して開発チームと話せます。';
 
   @override
   String get moreDiscord => 'Discord コミュニティ';
@@ -1755,11 +1650,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifyIntensity => '震度速報';
 
   @override
-  String typhoonTimeChip(String day, String hour) {
-    return '$day日$hour時';
-  }
-
-  @override
   String get rainIntervalMenu => '累積期間';
 
   @override
@@ -1823,9 +1713,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherModeSand => '砂じん';
 
   @override
-  String get typhoonSatelliteTitle => '衛星';
-
-  @override
   String get notifyReport => '地震報告';
 
   @override
@@ -1864,11 +1751,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moonTimelineCaption => 'Phase';
 
   @override
-  String reportListMeta(String magnitude, String depth) {
-    return 'M$magnitude · $depth km';
-  }
-
-  @override
   String get openSourceLicenses => 'オープンソースライセンス';
 
   @override
@@ -1889,15 +1771,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get meshtasticHopLimit => 'Hop limit';
 
   @override
-  String weatherRankingAnalysisRange(String value) {
-    return '較差 $value°C';
-  }
-
-  @override
   String get weatherRankingExtremeHigh => '今日の最高';
-
-  @override
-  String get changelogVersionDetails => 'リリース詳細';
 
   @override
   String get sponsorPrivacy => 'プライバシーポリシー';
@@ -2091,9 +1965,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get endpointStateUnknown => '不明';
 
   @override
-  String get endpointLastSuccessNever => '未成功';
-
-  @override
   String get endpointServiceEew => 'EEW';
 
   @override
@@ -2175,12 +2046,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restroomCategoryTransport => '交通';
 
   @override
-  String get reportFilterLocationHint => '例：花蓮、海域';
-
-  @override
-  String get moonSubtitle => 'Lunar phase and illumination — computed locally';
-
-  @override
   String get meshtasticBattery => 'Battery';
 
   @override
@@ -2246,9 +2111,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get releaseHighlightsSeeNotes => '完全なリリースノート';
-
-  @override
-  String get highlightCardTechnical => '技術詳細';
 
   @override
   String get moreVersionNotesEmpty => 'このビルドの更新履歴が見つかりません';
@@ -2325,11 +2187,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get rainInterval10m => '10分';
 
   @override
-  String weatherRankingAnalysisLow(String value) {
-    return '最低 $value';
-  }
-
-  @override
   String get meshtasticConnectAnyway => 'Connect anyway';
 
   @override
@@ -2379,9 +2236,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteAirmass => 'ひまわり エアマス';
 
   @override
-  String get typhoonTrackDetail => '経路詳細';
-
-  @override
   String get dataSectionWeather => '気象';
 
   @override
@@ -2391,15 +2245,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeActiveEventsTitle => '発生中の事象';
 
   @override
-  String weatherRankingAnalysisHigh(String value) {
-    return '最高 $value';
-  }
-
-  @override
   String get faq => 'よくある質問';
-
-  @override
-  String get typhoonHistoryLive => '最新';
 
   @override
   String eewSerial(int serial) {
@@ -2468,9 +2314,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherDynamicState => '天気アニメーション';
 
   @override
-  String get mapPlaceholderDisabled => '地図(一時的に無効)';
-
-  @override
   String get moonNow => '現在';
 
   @override
@@ -2511,9 +2354,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get sunTitle => '太陽';
-
-  @override
-  String get sunSubtitle => '日の出・薄明・二十四節気';
 
   @override
   String get sunSectionDaylight => '日照';
@@ -2571,9 +2411,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get planetsTitle => '惑星';
-
-  @override
-  String get planetsSubtitle => '今夜の位置と明るさ';
 
   @override
   String get planetsSectionTonight => '現在';
@@ -2708,9 +2545,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tonightTitle => '今夜';
 
   @override
-  String get tonightSubtitle => '何が見えるか、いつ見えるか';
-
-  @override
   String get tonightSectionDark => '観測ウィンドウ';
 
   @override
@@ -2810,9 +2644,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get almanacTitle => '暦';
 
   @override
-  String get almanacSubtitle => '旧暦と今後の日食・月食';
-
-  @override
   String get almanacSectionToday => '今日';
 
   @override
@@ -2897,9 +2728,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tideTitle => '潮汐';
 
   @override
-  String get tideSubtitle => '大潮・小潮と月の引力';
-
-  @override
   String get tideDisclaimer => '天文起潮力のみで、港湾の潮汐表ではありません。潮位は気象庁の公表値をご覧ください。';
 
   @override
@@ -2940,9 +2768,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get skyChartTitle => '星図';
-
-  @override
-  String get skyChartSubtitle => '頭上の肉眼で見える空';
 
   @override
   String get skyChartNorth => '北';

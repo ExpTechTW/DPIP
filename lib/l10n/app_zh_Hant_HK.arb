@@ -15,16 +15,12 @@
   "@meshtasticRegionLabel": {
     "description": "LoRa region"
   },
-  "dpmFilterSectionRestroomType": "廁所類型",
   "mapLayerSatelliteB03": "ひまわり 可見光-紅(B03)",
   "reportFilterIntensity": "震度",
   "mapLayerLightning": "閃電",
   "restroomTypeMale": "男廁所",
   "meshtasticLastReceived": "最近接收",
   "reportDetailSortByCounty": "依縣市排序",
-  "@moonSubtitle": {
-    "description": "Moon entry card subtitle in the data catalogue"
-  },
   "@moonDays": {
     "description": "Day unit for the moon age"
   },
@@ -35,13 +31,11 @@
   "mapTerrainReliefHint": "在底圖上顯示立體地形陰影",
   "meshtasticEmptyMessage": "（空白訊息）",
   "moreSectionRegion": "地區",
-  "dpmDisasterEarthquake": "震災",
   "mapLayerSatellite": "ひまわり 紅外線(B13)",
   "@meshtasticTapNode": {
     "description": "Resting state of the map node sheet"
   },
   "aedHoursSaturday": "週六開放時間",
-  "dpmDisasterSlope": "坡地災害",
   "moonPhaseNew": "新月",
   "notifySectionEew": "地震速報",
   "mapResetNorth": "回到北方",
@@ -63,11 +57,9 @@
   "permissionsAttention": "權限需要處理",
   "permissionsBody": "DPIP 需要這些權限才能即時通知你。收不到警報時，通常就是其中一項尚未開啟。",
   "notifySettingsMenu": "通知設定",
-  "typhoonHistoryTitle": "資料時間",
   "mapAppDefault": "{app}（預設）",
   "trendRange24h": "24 小時",
   "mapLayerStyleJmaTooltip": "灰階為底，−40 °C 以下上色，凸顯雲頂高度",
-  "weatherRankingRecordedAt": "記錄於 {time}",
   "mapLayerRain": "雨量",
   "mapLayerQpesums": "未來 1 小時降水預報",
   "@weatherModeSnow": {
@@ -78,7 +70,6 @@
   },
   "mapOverlaySectionMap": "地圖",
   "mapTerrainRelief": "地形立體感",
-  "eewMaxIntensity": "最大震度",
   "mapLegendCollapse": "收合圖例",
   "updateAvailableTitle": "有新版本",
   "updateAvailableBody": "新版本 {version} 已發佈。",
@@ -95,7 +86,6 @@
   "reportFilterIntensityInfoTitle": "震度新制與舊制",
   "mapLayerTyphoon": "颱風",
   "radarOverlayMenuTooltip": "雷達圖層選項",
-  "mapMyLocation": "我的位置",
   "@meshtasticChannelUse": {
     "description": "Share of airtime seen busy"
   },
@@ -129,7 +119,6 @@
   "reportFilterSortMagnitude": "規模",
   "mapLayerCategoryEarthquake": "地震",
   "mapLayerSatelliteB12": "ひまわり 臭氧(B12)",
-  "typhoonLegendPast": "實際路徑",
   "restroomCategoryOther": "其他",
   "@meshtasticRegionConfirm": {
     "description": "Confirmation before rebooting the radio"
@@ -219,7 +208,6 @@
     "description": "Phase: waning crescent"
   },
   "mapLayerSatelliteB05": "ひまわり 近紅外(B05)",
-  "typhoonStormRadii": "東北 {ne} · 東南 {se} · 西南 {sw} · 西北 {nw} km",
   "@meshtasticNotConnected": {
     "description": "Empty message log while not connected"
   },
@@ -267,7 +255,6 @@
   "restroomCategoryLabel": "類別",
   "sponsorRestoring": "正在恢復購買…",
   "sponsorIntro": "DPIP 致力於提供即時防災資訊，沒有廣告或其他營利模式。您的支援能幫助我們維持伺服器運作並持續開發。",
-  "shelterAddressLabel": "地址",
   "typhoonLabelStormAvg": "十級風平均暴風半徑",
   "@meshtasticHardware": {
     "description": "Board model"
@@ -284,7 +271,6 @@
     "description": "Packets received this session"
   },
   "windForecastOverlayMenuTooltip": "風場預報圖層選項",
-  "dataWeatherRankingSubtitle": "即時觀測排行",
   "rainInterval6h": "6 時",
   "homeRainTrendMinute": "{minute}分",
   "restroomTypeUnspecified": "未設定",
@@ -343,7 +329,6 @@
   },
   "typhoonLabelSw": "西南側",
   "typhoonForecastLead": "預測 +{hours} 小時",
-  "dpmDisasterTsunami": "海嘯",
   "@mapAppOpenFailed": {},
   "changelogTypeStable": "正式版",
   "mapLayerSatelliteTransparentClear": "晴空 = 透明,顯示底圖",
@@ -358,7 +343,6 @@
   },
   "mapOverlaySectionReference": "參考圖層",
   "mapLayerSatelliteB02": "ひまわり 可見光-綠(B02)",
-  "reportListLocalFelt": "小區域有感",
   "weatherRankingEmpty": "目前沒有可排序的觀測",
   "notifySectionOther": "其他",
   "weatherRankingMeta": "資料時間：{time}\n共 {count} 觀測點",
@@ -369,7 +353,6 @@
   "meshtasticNoDevices": "找不到 Meshtastic 裝置",
   "mapLayerCategoryLife": "生活",
   "reportFilterSortIntensity": "震度",
-  "typhoonMotion": "移動",
   "meshtasticStateDisconnected": "未連線",
   "typhoonIntensityIntense": "強烈颱風",
   "@meshtasticSend": {
@@ -386,7 +369,6 @@
   "meshtasticNoHistory": "歷史紀錄還不夠",
   "reportDetailLocalIntensityUnavailable": "沒有震度訊息",
   "mapLayerWindForecastGfs": "GFS",
-  "reportListDepthUnit": "公里",
   "reportFilterDepth": "深度",
   "@meshtasticNoHistory": {
     "description": "Chart placeholder before two samples exist"
@@ -402,7 +384,6 @@
   "@meshtasticVoltage": {
     "description": "Battery voltage"
   },
-  "navMap": "地圖",
   "notifyAdvisory": "天氣警告及特報",
   "@meshtasticNoMessages": {
     "description": "Empty message log while connected"
@@ -419,7 +400,6 @@
     "description": "Hint under the national-border toggle in the radar overlay menu."
   },
   "moonPhaseWaningGibbous": "虧凸月",
-  "weatherDynamicStateSubtitle": "覆寫主頁背景天氣",
   "reportFilterIntensityInfoModernTitle": "新制（2020 起）",
   "@mapAppGoogleMaps": {},
   "typhoonDataTime": "資料時間\n{time}",
@@ -450,7 +430,6 @@
   },
   "notifyUnavailable": "推送尚未就緒,請稍後再試。",
   "mapLayerOrderReset": "回復預設順序",
-  "dpmAddress": "地址",
   "weatherRankingMergeCounty": "縣市",
   "moreSectionApp": "取得 App",
   "moreSectionBeta": "測試版",
@@ -489,7 +468,6 @@
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
   "meshtasticRadioSettings": "LoRa",
-  "weatherRankingAnalysisCurrent": "當下 {value}°C",
   "@meshtasticNotifyMessages": {
     "description": "Toggle: local notification for an incoming mesh message"
   },
@@ -498,7 +476,6 @@
   "mapLayers": "圖層",
   "meshtasticHardware": "硬體",
   "languageSettings": "語言設定",
-  "dpmDisasterNuclear": "核子事故",
   "@moonNextFullMoon": {
     "description": "Next full moon date label"
   },
@@ -520,7 +497,6 @@
   "mapAppCopyCoordinates": "複製座標",
   "reportFilterIntensityInfoIntro": "中央氣象署自 2020 年 1 月 1 日（臺北時間）起改用新制震度。",
   "mapNavEarthquake": "地震",
-  "typhoonGust": "陣風",
   "restroomGradeAverage": "普通級",
   "@meshtasticNodes": {
     "description": "Mesh nodes section header"
@@ -538,7 +514,6 @@
   "meshtasticNoNodes": "尚未聽到任何節點",
   "meshtasticViaMqtt": "經 MQTT（網際網路）",
   "radarCountyOutline": "縣市界線",
-  "onboardingGranted": "已授權",
   "@mapAppCopyCoordinates": {},
   "commonClose": "關閉",
   "restroomGradeLabel": "等級",
@@ -592,7 +567,6 @@
   "moonNextFullMoon": "下次滿月",
   "dpmSheetEmpty": "點選地圖上的標記查看詳情",
   "onboardingSkipLeave": "仍要略過",
-  "onboardingBack": "上一步",
   "aedPlaceDesc": "放置位置說明",
   "@weatherModeOvercast": {
     "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
@@ -603,13 +577,11 @@
   "@radarCountyOutlineSubtitle": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
-  "typhoonPressure": "氣壓",
   "@meshtasticCopied": {
     "description": "Toast shown after copying a message"
   },
   "onboardingPermBattery": "省電白名單",
   "typhoonLabelNw": "西北側",
-  "dpmDisasterFlood": "水災",
   "moonPhaseWaxingCrescent": "眉月",
   "restroomCategoryLeisure": "休閒娛樂場所",
   "mapLayerTemperature": "溫度",
@@ -637,7 +609,6 @@
   "reportDetailAreaIntensity": "各地震度",
   "rainInterval12h": "12 時",
   "reportListMagnitude": "M{magnitude}",
-  "dpmDisasterLandslide": "土石流",
   "notifyMonitor": "強震監視器",
   "onboardingStart": "開始使用",
   "@meshtasticExternalPower": {
@@ -685,7 +656,6 @@
   "@meshtasticUndecoded": {
     "description": "Packets the radio could not decrypt"
   },
-  "dpmFilterSectionShelter": "避難所災害類型",
   "@commonCancel": {
     "description": "Dismisses a dialog without acting"
   },
@@ -700,7 +670,6 @@
   "regionNationwide": "全國",
   "moreNotifyLog": "DPIP 通知發送記錄",
   "regionCurrent": "所在地",
-  "dpmFilterSectionRestroom": "場所類型",
   "meshtasticNotConnected": "尚未連線至裝置",
   "weatherModeSnow": "下雪",
   "mapLayerMeshtastic": "Meshtastic 節點",
@@ -747,16 +716,13 @@
     "description": "Connection state label"
   },
   "typhoonIntensityModerate": "中度颱風",
-  "typhoonWind": "風速",
   "mapLayerSatelliteAsh": "ひまわり 火山灰",
   "rainInterval3h": "3 時",
-  "reportListSearch": "查詢",
   "meshtasticChannelReady": "DPIP 頻道已就緒",
   "@meshtasticNotifyNodes": {
     "description": "Toggle: local notification when a new node is heard"
   },
   "mapLayerCategorySatellite": "衛星",
-  "reportFilterLocation": "地點",
   "mapLayerSatelliteNightmicrophysics": "ひまわり 夜間微物理",
   "typhoonIntensityTd": "熱帶性低氣壓",
   "reportFilterDate": "日期",
@@ -782,8 +748,6 @@
   "reportDetailOriginTime": "發震時間",
   "trendNoData": "沒有趨勢資料",
   "onboardingPermLocation": "定位",
-  "sponsorCalloutBody": "沒有廣告，你的支援讓伺服器持續運作。",
-  "moreDiscordCalloutBody": "加入社群，直接和開發團隊交流。",
   "moreDiscord": "Discord 社群",
   "mapNavPressure": "氣壓",
   "mapLayerSatelliteB13": "ひまわり 紅外線(B13)",
@@ -863,7 +827,6 @@
   "reportFilterAny": "不限",
   "weatherRankingMergeTo": "合併至",
   "notifyIntensity": "震度速報",
-  "typhoonTimeChip": "{day}日{hour}時",
   "rainIntervalMenu": "累積時段",
   "reportDetailLocalFelt": "小區域有感地震",
   "meshtasticDevice": "裝置",
@@ -896,7 +859,6 @@
   "@moonPhaseFirstQuarter": {
     "description": "Phase: first quarter"
   },
-  "typhoonSatelliteTitle": "衛星雲圖",
   "@dpmOpenInMaps": {},
   "notifyReport": "地震報告",
   "mapAppCoordinatesCopied": "已複製座標",
@@ -910,7 +872,6 @@
   "meshtasticRegionLabel": "地區",
   "mapLayerSatelliteCloudtop": "ひまわり 雲頂溫度",
   "moonTimelineCaption": "月相",
-  "reportListMeta": "M{magnitude} · {depth} 公里",
   "@meshtasticChannelNoSlot": {
     "description": "Every secondary channel slot is taken"
   },
@@ -929,12 +890,10 @@
   "@meshtasticUptime": {
     "description": "Time since the radio booted"
   },
-  "weatherRankingAnalysisRange": "溫差 {value}°C",
   "weatherRankingExtremeHigh": "今日最高",
   "@meshtasticUtilization": {
     "description": "Section title for the 24h airtime chart"
   },
-  "changelogVersionDetails": "版本資訊",
   "sponsorPrivacy": "私隱權政策",
   "reportDetailLocalIntensity": "所在地的震度",
   "mapLayerSatelliteNaturalcolor": "ひまわり 自然色",
@@ -1005,7 +964,6 @@
   "endpointStateDegraded": "不穩",
   "endpointStateDown": "異常",
   "endpointStateUnknown": "未知",
-  "endpointLastSuccessNever": "尚未成功",
   "endpointServiceEew": "地震速報",
   "endpointServiceRts": "強震即時警報",
   "endpointServiceRadar": "雷達",
@@ -1034,8 +992,6 @@
   "meshtasticBusyBody": "請先在另一個 Meshtastic App 中斷線。兩個 App 同時連同一台裝置會互相搶走訊息，導致部分訊息遺失。",
   "meshtasticChannelNoSlot": "沒有可用的頻道空位 — 請先在裝置上空出一個",
   "restroomCategoryTransport": "交通",
-  "reportFilterLocationHint": "例如：花蓮、東部海域",
-  "moonSubtitle": "月相與亮度 — 完全本地計算",
   "meshtasticBattery": "電量",
   "meshtasticDistance": "距離",
   "meshtasticSnrTrend": "訊號趨勢 (SNR)",
@@ -1057,7 +1013,6 @@
   "releaseHighlightsTabNormal": "做了哪些改變",
   "releaseHighlightsTabAdvanced": "深入技術",
   "releaseHighlightsEmpty": "目前沒有內容。",
-  "highlightCardTechnical": "技術細節",
   "moreVersionNotesEmpty": "找不到目前版本的更新日誌",
   "moreVersionSnapshot": "測試版",
   "mapLayerSatelliteTransparentNoData": "無資料(陸地) = 透明",
@@ -1097,7 +1052,6 @@
   "onboardingPermsTitle": "權限授權",
   "mapLayerStyleJma": "雲頂強調（JMA）",
   "rainInterval10m": "10 分",
-  "weatherRankingAnalysisLow": "最低 {value}",
   "meshtasticConnectAnyway": "仍要連線",
   "reportListDayCount": "{count}",
   "mapLayerSatelliteB06": "ひまわり 近紅外(B06)",
@@ -1122,13 +1076,10 @@
   "@meshtasticPreset": {
     "description": "LoRa modem preset"
   },
-  "typhoonTrackDetail": "路徑詳情",
   "dataSectionWeather": "氣象",
   "aedHoursWeekday": "平日開放時間",
   "homeActiveEventsTitle": "生效中事件",
-  "weatherRankingAnalysisHigh": "最高 {value}",
   "faq": "常見問題",
-  "typhoonHistoryLive": "即時",
   "eewSerial": "第 {serial} 報",
   "@radarTownOutline": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
@@ -1167,7 +1118,6 @@
   "mapAppAppleMaps": "Apple Maps",
   "regionEdit": "修改",
   "weatherDynamicState": "天氣動態狀態",
-  "mapPlaceholderDisabled": "地圖(暫時停用)",
   "moonNow": "現在",
   "@moonNow": {
     "description": "Returns the moon page to the present moment"
@@ -1223,10 +1173,6 @@
   "sunTitle": "太陽",
   "@sunTitle": {
     "description": "Sun page title"
-  },
-  "sunSubtitle": "日出日沒、曙暮光與節氣",
-  "@sunSubtitle": {
-    "description": "Sun page one-line summary on the data hub"
   },
   "sunSectionDaylight": "日照",
   "@sunSectionDaylight": {
@@ -1303,10 +1249,6 @@
   "planetsTitle": "行星",
   "@planetsTitle": {
     "description": "Planets page title"
-  },
-  "planetsSubtitle": "今晚在哪、有多亮",
-  "@planetsSubtitle": {
-    "description": "Planets page one-line summary on the data hub"
   },
   "planetsSectionTonight": "此刻",
   "@planetsSectionTonight": {
@@ -1484,10 +1426,6 @@
   "@tonightTitle": {
     "description": "Tonight page title"
   },
-  "tonightSubtitle": "現在看得到什麼、什麼時候",
-  "@tonightSubtitle": {
-    "description": "Tonight page summary on the data hub"
-  },
   "tonightSectionDark": "觀測窗口",
   "@tonightSectionDark": {
     "description": "Section header: the observing window"
@@ -1620,10 +1558,6 @@
   "@almanacTitle": {
     "description": "Almanac page title"
   },
-  "almanacSubtitle": "農曆日期與未來的日月食",
-  "@almanacSubtitle": {
-    "description": "Almanac page summary on the data hub"
-  },
   "almanacSectionToday": "今日",
   "@almanacSectionToday": {
     "description": "Section header: today's date in both calendars"
@@ -1736,10 +1670,6 @@
   "@tideTitle": {
     "description": "Tide page title"
   },
-  "tideSubtitle": "大潮、小潮與月球引力",
-  "@tideSubtitle": {
-    "description": "Tide page summary on the data hub"
-  },
   "tideDisclaimer": "僅為天文引潮力，非港口潮汐表。水位請參考氣象署公布之潮汐預報。",
   "@tideDisclaimer": {
     "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
@@ -1795,10 +1725,6 @@
   "skyChartTitle": "星圖",
   "@skyChartTitle": {
     "description": "Sky chart page title"
-  },
-  "skyChartSubtitle": "頭頂上肉眼可見的天空",
-  "@skyChartSubtitle": {
-    "description": "Sky chart page summary on the data hub"
   },
   "skyChartNorth": "北",
   "@skyChartNorth": {

@@ -44,9 +44,6 @@ class AppLocalizationsTh extends AppLocalizations {
       'ทำให้เส้นแบ่งเขตยังอ่านออกใต้ภาพเอคโคเรดาร์';
 
   @override
-  String get dpmFilterSectionRestroomType => 'ประเภทห้องน้ำ';
-
-  @override
   String get mapLayerSatelliteB03 => 'Himawari Red (B03)';
 
   @override
@@ -108,16 +105,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreSectionRegion => 'พื้นที่';
 
   @override
-  String get dpmDisasterEarthquake => 'แผ่นดินไหว';
-
-  @override
   String get mapLayerSatellite => 'Himawari Infrared (B13)';
 
   @override
   String get aedHoursSaturday => 'เวลาวันเสาร์';
-
-  @override
-  String get dpmDisasterSlope => 'ภัยพิบัติลาดชัน';
 
   @override
   String get moonPhaseNew => 'New moon';
@@ -166,9 +157,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifySettingsMenu => 'การตั้งค่าการแจ้งเตือน';
 
   @override
-  String get typhoonHistoryTitle => 'เวลาข้อมูล';
-
-  @override
   String mapAppDefault(String app) {
     return '$app (ค่าเริ่มต้น)';
   }
@@ -181,11 +169,6 @@ class AppLocalizationsTh extends AppLocalizations {
       'Grayscale base, tinted below −40 °C to highlight cloud-top height';
 
   @override
-  String weatherRankingRecordedAt(String time) {
-    return 'บันทึกเมื่อ $time';
-  }
-
-  @override
   String get mapLayerRain => 'ปริมาณฝน';
 
   @override
@@ -196,9 +179,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapTerrainRelief => 'ความนูนของภูมิประเทศ';
-
-  @override
-  String get eewMaxIntensity => 'ความรุนแรงสูงสุด';
 
   @override
   String get mapLegendCollapse => 'ซ่อนคำอธิบาย';
@@ -250,9 +230,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get radarOverlayMenuTooltip => 'ตัวเลือกชั้นเรดาร์';
-
-  @override
-  String get mapMyLocation => 'ตำแหน่งของฉัน';
 
   @override
   String get meshtasticNodes => 'Nodes';
@@ -330,9 +307,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
-
-  @override
-  String get typhoonLegendPast => 'เส้นทางจริง';
 
   @override
   String get restroomCategoryOther => 'อื่น ๆ';
@@ -508,11 +482,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteB05 => 'Himawari Near-Infrared (B05)';
 
   @override
-  String typhoonStormRadii(String ne, String se, String sw, String nw) {
-    return 'NE $ne · SE $se · SW $sw · NW $nw km';
-  }
-
-  @override
   String get typhoonLabelNe => 'NE';
 
   @override
@@ -606,9 +575,6 @@ class AppLocalizationsTh extends AppLocalizations {
       'DPIP มุ่งมั่นให้ข้อมูลการป้องกันภัยพิบัติแบบเรียลไทม์ โดยไม่มีโฆษณาหรือรูปแบบหารายได้อื่น การสนับสนุนของคุณช่วยให้เรารักษาเซิร์ฟเวอร์และพัฒนาต่อไปได้';
 
   @override
-  String get shelterAddressLabel => 'ที่อยู่';
-
-  @override
   String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
 
   @override
@@ -630,9 +596,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get windForecastOverlayMenuTooltip => 'ตัวเลือกชั้นพยากรณ์ลม';
-
-  @override
-  String get dataWeatherRankingSubtitle => 'อันดับสถานีแบบเรียลไทม์';
 
   @override
   String homeRainTrendMinute(int minute) {
@@ -762,9 +725,6 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get dpmDisasterTsunami => 'สึนามิ';
-
-  @override
   String get changelogTypeStable => 'ทางการ';
 
   @override
@@ -776,9 +736,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB02 => 'Himawari Green (B02)';
-
-  @override
-  String get reportListLocalFelt => 'รู้สึกในพื้นที่';
 
   @override
   String get weatherRankingEmpty => 'ไม่มีข้อมูลให้จัดอันดับ';
@@ -815,9 +772,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterSortIntensity => 'ความเข้ม';
 
   @override
-  String get typhoonMotion => 'เคลื่อนที่';
-
-  @override
   String get meshtasticStateDisconnected => 'Disconnected';
 
   @override
@@ -839,9 +793,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerWindForecastGfs => 'GFS';
 
   @override
-  String get reportListDepthUnit => 'km';
-
-  @override
   String get reportFilterDepth => 'ความลึก';
 
   @override
@@ -849,9 +800,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapNavQpesums => 'พยากรณ์';
-
-  @override
-  String get navMap => 'แผนที่';
 
   @override
   String get notifyAdvisory => 'การแจ้งเตือนและประกาศสภาพอากาศ';
@@ -875,9 +823,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
-
-  @override
-  String get weatherDynamicStateSubtitle => 'แทนที่สภาพอากาศพื้นหลังหน้าแรก';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'แบบใหม่ (ตั้งแต่ 2020)';
@@ -954,9 +899,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerOrderReset => 'รีเซ็ตลำดับ';
-
-  @override
-  String get dpmAddress => 'ที่อยู่';
 
   @override
   String get weatherRankingMergeCounty => 'อำเภอ/เมือง';
@@ -1043,11 +985,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticRadioSettings => 'LoRa';
 
   @override
-  String weatherRankingAnalysisCurrent(String value) {
-    return 'ปัจจุบัน $value°C';
-  }
-
-  @override
   String get moreGithub => 'ExpTech GitHub';
 
   @override
@@ -1061,9 +998,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get languageSettings => 'ภาษา';
-
-  @override
-  String get dpmDisasterNuclear => 'อุบัติเหตุนิวเคลียร์';
 
   @override
   String get language => 'ภาษา';
@@ -1114,9 +1048,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapNavEarthquake => 'แผ่นดินไหว';
 
   @override
-  String get typhoonGust => 'ลมกระโชก';
-
-  @override
   String get restroomGradeAverage => 'ปานกลาง';
 
   @override
@@ -1161,9 +1092,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get radarCountyOutline => 'เส้นแบ่งเขตจังหวัด';
-
-  @override
-  String get onboardingGranted => 'อนุญาตแล้ว';
 
   @override
   String get commonClose => 'ปิด';
@@ -1292,9 +1220,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingSkipLeave => 'ข้ามไปก่อน';
 
   @override
-  String get onboardingBack => 'ย้อนกลับ';
-
-  @override
   String get aedPlaceDesc => 'ตำแหน่งติดตั้ง';
 
   @override
@@ -1309,16 +1234,10 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get typhoonPressure => 'ความกดอากาศ';
-
-  @override
   String get onboardingPermBattery => 'ยกเว้นการประหยัดแบตเตอรี่';
 
   @override
   String get typhoonLabelNw => 'NW';
-
-  @override
-  String get dpmDisasterFlood => 'น้ำท่วม';
 
   @override
   String get moonPhaseWaxingCrescent => 'Waxing crescent';
@@ -1367,9 +1286,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String reportListMagnitude(String magnitude) {
     return 'M$magnitude';
   }
-
-  @override
-  String get dpmDisasterLandslide => 'ดินถล่ม';
 
   @override
   String get notifyMonitor => 'เครื่องเฝ้าระวังการสั่นสะเทือนรุนแรง';
@@ -1456,9 +1372,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreAppStore => 'App Store';
 
   @override
-  String get dpmFilterSectionShelter => 'ประเภทภัยพิบัติของศูนย์อพยพ';
-
-  @override
   String get moreServerStatus => 'สถานะเซิร์ฟเวอร์';
 
   @override
@@ -1490,9 +1403,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get regionCurrent => 'ตำแหน่งปัจจุบัน';
-
-  @override
-  String get dpmFilterSectionRestroom => 'ประเภทสถานที่';
 
   @override
   String get meshtasticNotConnected => 'Not connected to a radio';
@@ -1580,25 +1490,16 @@ class AppLocalizationsTh extends AppLocalizations {
   String get typhoonIntensityModerate => 'Moderate typhoon';
 
   @override
-  String get typhoonWind => 'ความเร็วลม';
-
-  @override
   String get mapLayerSatelliteAsh => 'Himawari Ash';
 
   @override
   String get rainInterval3h => '3 ชม.';
 
   @override
-  String get reportListSearch => 'ค้นหา';
-
-  @override
   String get mapLayerCategorySatellite => 'ดาวเทียม';
 
   @override
   String get meshtasticChannelReady => 'DPIP channel ready';
-
-  @override
-  String get reportFilterLocation => 'สถานที่';
 
   @override
   String get mapLayerSatelliteNightmicrophysics =>
@@ -1644,13 +1545,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get onboardingPermLocation => 'ตำแหน่งที่ตั้ง';
-
-  @override
-  String get sponsorCalloutBody =>
-      'ไม่มีโฆษณา การสนับสนุนของคุณช่วยให้เซิร์ฟเวอร์ทำงานต่อไป';
-
-  @override
-  String get moreDiscordCalloutBody => 'เข้าร่วมชุมชนและพูดคุยกับทีมพัฒนา';
 
   @override
   String get moreDiscord => 'ชุมชน Discord';
@@ -1782,11 +1676,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifyIntensity => 'รายงานความรุนแรงแผ่นดินไหว';
 
   @override
-  String typhoonTimeChip(String day, String hour) {
-    return '$day日$hour時';
-  }
-
-  @override
   String get rainIntervalMenu => 'ช่วงสะสม';
 
   @override
@@ -1850,9 +1739,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherModeSand => 'ฝุ่นทราย';
 
   @override
-  String get typhoonSatelliteTitle => 'ดาวเทียม';
-
-  @override
   String get notifyReport => 'รายงานแผ่นดินไหว';
 
   @override
@@ -1891,11 +1777,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moonTimelineCaption => 'Phase';
 
   @override
-  String reportListMeta(String magnitude, String depth) {
-    return 'M$magnitude · $depth km';
-  }
-
-  @override
   String get openSourceLicenses => 'ใบอนุญาตโอเพนซอร์ส';
 
   @override
@@ -1916,15 +1797,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticHopLimit => 'Hop limit';
 
   @override
-  String weatherRankingAnalysisRange(String value) {
-    return 'ช่วง $value°C';
-  }
-
-  @override
   String get weatherRankingExtremeHigh => 'สูงสุดวันนี้';
-
-  @override
-  String get changelogVersionDetails => 'รายละเอียดเวอร์ชัน';
 
   @override
   String get sponsorPrivacy => 'นโยบายความเป็นส่วนตัว';
@@ -2122,9 +1995,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get endpointStateUnknown => 'ไม่ทราบ';
 
   @override
-  String get endpointLastSuccessNever => 'ยังไม่สำเร็จ';
-
-  @override
   String get endpointServiceEew => 'EEW';
 
   @override
@@ -2207,12 +2077,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get restroomCategoryTransport => 'การคมนาคม';
 
   @override
-  String get reportFilterLocationHint => 'เช่น ฮวาเหลียน';
-
-  @override
-  String get moonSubtitle => 'Lunar phase and illumination — computed locally';
-
-  @override
   String get meshtasticBattery => 'Battery';
 
   @override
@@ -2278,9 +2142,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get releaseHighlightsSeeNotes => 'ดูบันทึกทั้งหมด';
-
-  @override
-  String get highlightCardTechnical => 'เทคนิค';
 
   @override
   String get moreVersionNotesEmpty => 'ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้';
@@ -2359,11 +2220,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get rainInterval10m => '10 นาที';
 
   @override
-  String weatherRankingAnalysisLow(String value) {
-    return 'ต่ำ $value';
-  }
-
-  @override
   String get meshtasticConnectAnyway => 'Connect anyway';
 
   @override
@@ -2415,9 +2271,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteAirmass => 'Himawari Airmass';
 
   @override
-  String get typhoonTrackDetail => 'รายละเอียดเส้นทาง';
-
-  @override
   String get dataSectionWeather => 'อากาศ';
 
   @override
@@ -2427,15 +2280,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeActiveEventsTitle => 'เหตุการณ์ที่ยังมีผล';
 
   @override
-  String weatherRankingAnalysisHigh(String value) {
-    return 'สูง $value';
-  }
-
-  @override
   String get faq => 'คำถามที่พบบ่อย';
-
-  @override
-  String get typhoonHistoryLive => 'สด';
 
   @override
   String eewSerial(int serial) {
@@ -2504,9 +2349,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherDynamicState => 'แอนิเมชันสภาพอากาศ';
 
   @override
-  String get mapPlaceholderDisabled => 'แผนที่ (ปิดใช้งานชั่วคราว)';
-
-  @override
   String get moonNow => 'ตอนนี้';
 
   @override
@@ -2547,9 +2389,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get sunTitle => 'ดวงอาทิตย์';
-
-  @override
-  String get sunSubtitle => 'พระอาทิตย์ขึ้น สนธยา และปักษ์';
 
   @override
   String get sunSectionDaylight => 'แสงกลางวัน';
@@ -2607,9 +2446,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get planetsTitle => 'ดาวเคราะห์';
-
-  @override
-  String get planetsSubtitle => 'คืนนี้อยู่ไหน สว่างแค่ไหน';
 
   @override
   String get planetsSectionTonight => 'ขณะนี้';
@@ -2744,9 +2580,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get tonightTitle => 'คืนนี้';
 
   @override
-  String get tonightSubtitle => 'มีอะไรให้ดู และเมื่อไร';
-
-  @override
   String get tonightSectionDark => 'ช่วงสังเกตการณ์';
 
   @override
@@ -2846,9 +2679,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get almanacTitle => 'ปฏิทิน';
 
   @override
-  String get almanacSubtitle => 'ปฏิทินจันทรคติและอุปราคาข้างหน้า';
-
-  @override
   String get almanacSectionToday => 'วันนี้';
 
   @override
@@ -2933,9 +2763,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get tideTitle => 'น้ำขึ้นน้ำลง';
 
   @override
-  String get tideSubtitle => 'น้ำเกิด น้ำตาย และแรงดึงดูดของดวงจันทร์';
-
-  @override
   String get tideDisclaimer =>
       'แรงดาราศาสตร์เท่านั้น ไม่ใช่ตารางน้ำท่า ระดับน้ำโปรดดูตารางที่กรมอุตุนิยมวิทยาเผยแพร่';
 
@@ -2977,9 +2804,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get skyChartTitle => 'แผนที่ดาว';
-
-  @override
-  String get skyChartSubtitle => 'ท้องฟ้าที่ตาเปล่ามองเห็น';
 
   @override
   String get skyChartNorth => 'N';

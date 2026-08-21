@@ -15,16 +15,12 @@
   "@meshtasticRegionLabel": {
     "description": "LoRa region"
   },
-  "dpmFilterSectionRestroomType": "ประเภทห้องน้ำ",
   "mapLayerSatelliteB03": "Himawari Red (B03)",
   "reportFilterIntensity": "ความเข้ม",
   "mapLayerLightning": "ฟ้าผ่า",
   "restroomTypeMale": "ห้องน้ำชาย",
   "meshtasticLastReceived": "Last received",
   "reportDetailSortByCounty": "เรียงตามพื้นที่",
-  "@moonSubtitle": {
-    "description": "Moon entry card subtitle in the data catalogue"
-  },
   "@moonDays": {
     "description": "Day unit for the moon age"
   },
@@ -35,13 +31,11 @@
   "mapTerrainReliefHint": "แสดงความนูนของภูมิประเทศบนแผนที่ฐาน",
   "meshtasticEmptyMessage": "(empty message)",
   "moreSectionRegion": "พื้นที่",
-  "dpmDisasterEarthquake": "แผ่นดินไหว",
   "mapLayerSatellite": "Himawari Infrared (B13)",
   "@meshtasticTapNode": {
     "description": "Resting state of the map node sheet"
   },
   "aedHoursSaturday": "เวลาวันเสาร์",
-  "dpmDisasterSlope": "ภัยพิบัติลาดชัน",
   "moonPhaseNew": "New moon",
   "notifySectionEew": "การเตือนแผ่นดินไหวล่วงหน้า",
   "mapResetNorth": "กลับไปทางเหนือ",
@@ -63,11 +57,9 @@
   "permissionsAttention": "สิทธิ์ต้องได้รับการแก้ไข",
   "permissionsBody": "DPIP ต้องใช้สิทธิ์เหล่านี้เพื่อแจ้งเตือนคุณได้ทันเวลา หากไม่ได้รับการแจ้งเตือน มักเป็นเพราะยังไม่ได้เปิดสิทธิ์ข้อใดข้อหนึ่ง",
   "notifySettingsMenu": "การตั้งค่าการแจ้งเตือน",
-  "typhoonHistoryTitle": "เวลาข้อมูล",
   "mapAppDefault": "{app} (ค่าเริ่มต้น)",
   "trendRange24h": "24 ชม.",
   "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
-  "weatherRankingRecordedAt": "บันทึกเมื่อ {time}",
   "mapLayerRain": "ปริมาณฝน",
   "mapLayerQpesums": "พยากรณ์ฝน 1 ชั่วโมงข้างหน้า",
   "@weatherModeSnow": {
@@ -78,7 +70,6 @@
   },
   "mapOverlaySectionMap": "แผนที่",
   "mapTerrainRelief": "ความนูนของภูมิประเทศ",
-  "eewMaxIntensity": "ความรุนแรงสูงสุด",
   "mapLegendCollapse": "ซ่อนคำอธิบาย",
   "updateAvailableTitle": "มีเวอร์ชันใหม่",
   "updateAvailableBody": "เวอร์ชัน {version} พร้อมใช้งานแล้ว",
@@ -95,7 +86,6 @@
   "reportFilterIntensityInfoTitle": "มาตรวัดความรุนแรงแบบใหม่/เก่า",
   "mapLayerTyphoon": "ไต้ฝุ่น",
   "radarOverlayMenuTooltip": "ตัวเลือกชั้นเรดาร์",
-  "mapMyLocation": "ตำแหน่งของฉัน",
   "@meshtasticChannelUse": {
     "description": "Share of airtime seen busy"
   },
@@ -129,7 +119,6 @@
   "reportFilterSortMagnitude": "ขนาด",
   "mapLayerCategoryEarthquake": "แผ่นดินไหว",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
-  "typhoonLegendPast": "เส้นทางจริง",
   "restroomCategoryOther": "อื่น ๆ",
   "@meshtasticRegionConfirm": {
     "description": "Confirmation before rebooting the radio"
@@ -219,7 +208,6 @@
     "description": "Phase: waning crescent"
   },
   "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
-  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
   "@meshtasticNotConnected": {
     "description": "Empty message log while not connected"
   },
@@ -267,7 +255,6 @@
   "restroomCategoryLabel": "หมวดหมู่",
   "sponsorRestoring": "กำลังกู้คืนการซื้อ…",
   "sponsorIntro": "DPIP มุ่งมั่นให้ข้อมูลการป้องกันภัยพิบัติแบบเรียลไทม์ โดยไม่มีโฆษณาหรือรูปแบบหารายได้อื่น การสนับสนุนของคุณช่วยให้เรารักษาเซิร์ฟเวอร์และพัฒนาต่อไปได้",
-  "shelterAddressLabel": "ที่อยู่",
   "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
   "@meshtasticHardware": {
     "description": "Board model"
@@ -284,7 +271,6 @@
     "description": "Packets received this session"
   },
   "windForecastOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์ลม",
-  "dataWeatherRankingSubtitle": "อันดับสถานีแบบเรียลไทม์",
   "rainInterval6h": "6 ชม.",
   "homeRainTrendMinute": "{minute} นาที",
   "restroomTypeUnspecified": "ไม่ระบุ",
@@ -343,7 +329,6 @@
   },
   "typhoonLabelSw": "SW",
   "typhoonForecastLead": "Forecast +{hours} h",
-  "dpmDisasterTsunami": "สึนามิ",
   "@mapAppOpenFailed": {},
   "changelogTypeStable": "ทางการ",
   "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
@@ -358,7 +343,6 @@
   },
   "mapOverlaySectionReference": "เลเยอร์อ้างอิง",
   "mapLayerSatelliteB02": "Himawari Green (B02)",
-  "reportListLocalFelt": "รู้สึกในพื้นที่",
   "weatherRankingEmpty": "ไม่มีข้อมูลให้จัดอันดับ",
   "notifySectionOther": "อื่น ๆ",
   "weatherRankingMeta": "เวลาข้อมูล: {time}\n{count} สถานี",
@@ -369,7 +353,6 @@
   "meshtasticNoDevices": "No Meshtastic devices found",
   "mapLayerCategoryLife": "ชีวิตประจำวัน",
   "reportFilterSortIntensity": "ความเข้ม",
-  "typhoonMotion": "เคลื่อนที่",
   "meshtasticStateDisconnected": "Disconnected",
   "typhoonIntensityIntense": "Intense typhoon",
   "@meshtasticSend": {
@@ -386,7 +369,6 @@
   "meshtasticNoHistory": "Not enough history yet",
   "reportDetailLocalIntensityUnavailable": "ไม่มีข้อมูลความเข้ม",
   "mapLayerWindForecastGfs": "GFS",
-  "reportListDepthUnit": "km",
   "reportFilterDepth": "ความลึก",
   "@meshtasticNoHistory": {
     "description": "Chart placeholder before two samples exist"
@@ -402,7 +384,6 @@
   "@meshtasticVoltage": {
     "description": "Battery voltage"
   },
-  "navMap": "แผนที่",
   "notifyAdvisory": "การแจ้งเตือนและประกาศสภาพอากาศ",
   "@meshtasticNoMessages": {
     "description": "Empty message log while connected"
@@ -419,7 +400,6 @@
     "description": "Hint under the national-border toggle in the radar overlay menu."
   },
   "moonPhaseWaningGibbous": "Waning gibbous",
-  "weatherDynamicStateSubtitle": "แทนที่สภาพอากาศพื้นหลังหน้าแรก",
   "reportFilterIntensityInfoModernTitle": "แบบใหม่ (ตั้งแต่ 2020)",
   "@mapAppGoogleMaps": {},
   "typhoonDataTime": "Data time\n{time}",
@@ -450,7 +430,6 @@
   },
   "notifyUnavailable": "การแจ้งเตือนแบบพุชยังไม่พร้อม — โปรดลองอีกครั้งในภายหลัง",
   "mapLayerOrderReset": "รีเซ็ตลำดับ",
-  "dpmAddress": "ที่อยู่",
   "weatherRankingMergeCounty": "อำเภอ/เมือง",
   "moreSectionApp": "ดาวน์โหลดแอป",
   "moreSectionBeta": "เวอร์ชันทดสอบ",
@@ -489,7 +468,6 @@
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
   "meshtasticRadioSettings": "LoRa",
-  "weatherRankingAnalysisCurrent": "ปัจจุบัน {value}°C",
   "@meshtasticNotifyMessages": {
     "description": "Toggle: local notification for an incoming mesh message"
   },
@@ -498,7 +476,6 @@
   "mapLayers": "ชั้นข้อมูล",
   "meshtasticHardware": "Hardware",
   "languageSettings": "ภาษา",
-  "dpmDisasterNuclear": "อุบัติเหตุนิวเคลียร์",
   "@moonNextFullMoon": {
     "description": "Next full moon date label"
   },
@@ -520,7 +497,6 @@
   "mapAppCopyCoordinates": "คัดลอกพิกัด",
   "reportFilterIntensityInfoIntro": "CWA เปลี่ยนมาตรวัดเมื่อ 1 ม.ค. 2020 (เวลาไทเป)",
   "mapNavEarthquake": "แผ่นดินไหว",
-  "typhoonGust": "ลมกระโชก",
   "restroomGradeAverage": "ปานกลาง",
   "@meshtasticNodes": {
     "description": "Mesh nodes section header"
@@ -538,7 +514,6 @@
   "meshtasticNoNodes": "No nodes heard yet",
   "meshtasticViaMqtt": "Via MQTT (internet)",
   "radarCountyOutline": "เส้นแบ่งเขตจังหวัด",
-  "onboardingGranted": "อนุญาตแล้ว",
   "@mapAppCopyCoordinates": {},
   "commonClose": "ปิด",
   "restroomGradeLabel": "ระดับ",
@@ -592,7 +567,6 @@
   "moonNextFullMoon": "Next full moon",
   "dpmSheetEmpty": "แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด",
   "onboardingSkipLeave": "ข้ามไปก่อน",
-  "onboardingBack": "ย้อนกลับ",
   "aedPlaceDesc": "ตำแหน่งติดตั้ง",
   "@weatherModeOvercast": {
     "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
@@ -603,13 +577,11 @@
   "@radarCountyOutlineSubtitle": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
-  "typhoonPressure": "ความกดอากาศ",
   "@meshtasticCopied": {
     "description": "Toast shown after copying a message"
   },
   "onboardingPermBattery": "ยกเว้นการประหยัดแบตเตอรี่",
   "typhoonLabelNw": "NW",
-  "dpmDisasterFlood": "น้ำท่วม",
   "moonPhaseWaxingCrescent": "Waxing crescent",
   "restroomCategoryLeisure": "สถานที่พักผ่อนหย่อนใจ",
   "mapLayerTemperature": "อุณหภูมิ",
@@ -637,7 +609,6 @@
   "reportDetailAreaIntensity": "ความเข้มแยกตามพื้นที่",
   "rainInterval12h": "12 ชม.",
   "reportListMagnitude": "M{magnitude}",
-  "dpmDisasterLandslide": "ดินถล่ม",
   "notifyMonitor": "เครื่องเฝ้าระวังการสั่นสะเทือนรุนแรง",
   "onboardingStart": "เริ่มใช้งาน",
   "@meshtasticExternalPower": {
@@ -685,7 +656,6 @@
   "@meshtasticUndecoded": {
     "description": "Packets the radio could not decrypt"
   },
-  "dpmFilterSectionShelter": "ประเภทภัยพิบัติของศูนย์อพยพ",
   "@commonCancel": {
     "description": "Dismisses a dialog without acting"
   },
@@ -700,7 +670,6 @@
   "regionNationwide": "ทั่วประเทศ",
   "moreNotifyLog": "บันทึกการส่งการแจ้งเตือนของ DPIP",
   "regionCurrent": "ตำแหน่งปัจจุบัน",
-  "dpmFilterSectionRestroom": "ประเภทสถานที่",
   "meshtasticNotConnected": "Not connected to a radio",
   "weatherModeSnow": "หิมะตก",
   "mapLayerMeshtastic": "Meshtastic nodes",
@@ -747,16 +716,13 @@
     "description": "Connection state label"
   },
   "typhoonIntensityModerate": "Moderate typhoon",
-  "typhoonWind": "ความเร็วลม",
   "mapLayerSatelliteAsh": "Himawari Ash",
   "rainInterval3h": "3 ชม.",
-  "reportListSearch": "ค้นหา",
   "meshtasticChannelReady": "DPIP channel ready",
   "@meshtasticNotifyNodes": {
     "description": "Toggle: local notification when a new node is heard"
   },
   "mapLayerCategorySatellite": "ดาวเทียม",
-  "reportFilterLocation": "สถานที่",
   "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
   "typhoonIntensityTd": "Tropical depression",
   "reportFilterDate": "วันที่",
@@ -782,8 +748,6 @@
   "reportDetailOriginTime": "เวลาเกิดเหตุ",
   "trendNoData": "ไม่มีข้อมูลแนวโน้ม",
   "onboardingPermLocation": "ตำแหน่งที่ตั้ง",
-  "sponsorCalloutBody": "ไม่มีโฆษณา การสนับสนุนของคุณช่วยให้เซิร์ฟเวอร์ทำงานต่อไป",
-  "moreDiscordCalloutBody": "เข้าร่วมชุมชนและพูดคุยกับทีมพัฒนา",
   "moreDiscord": "ชุมชน Discord",
   "mapNavPressure": "ความกดอากาศ",
   "mapLayerSatelliteB13": "Himawari Infrared (B13)",
@@ -863,7 +827,6 @@
   "reportFilterAny": "ทั้งหมด",
   "weatherRankingMergeTo": "รวม",
   "notifyIntensity": "รายงานความรุนแรงแผ่นดินไหว",
-  "typhoonTimeChip": "{day}日{hour}時",
   "rainIntervalMenu": "ช่วงสะสม",
   "reportDetailLocalFelt": "แผ่นดินไหวรู้สึกได้เฉพาะพื้นที่",
   "meshtasticDevice": "Device",
@@ -896,7 +859,6 @@
   "@moonPhaseFirstQuarter": {
     "description": "Phase: first quarter"
   },
-  "typhoonSatelliteTitle": "ดาวเทียม",
   "@dpmOpenInMaps": {},
   "notifyReport": "รายงานแผ่นดินไหว",
   "mapAppCoordinatesCopied": "คัดลอกพิกัดแล้ว",
@@ -910,7 +872,6 @@
   "meshtasticRegionLabel": "Region",
   "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
   "moonTimelineCaption": "Phase",
-  "reportListMeta": "M{magnitude} · {depth} km",
   "@meshtasticChannelNoSlot": {
     "description": "Every secondary channel slot is taken"
   },
@@ -929,12 +890,10 @@
   "@meshtasticUptime": {
     "description": "Time since the radio booted"
   },
-  "weatherRankingAnalysisRange": "ช่วง {value}°C",
   "weatherRankingExtremeHigh": "สูงสุดวันนี้",
   "@meshtasticUtilization": {
     "description": "Section title for the 24h airtime chart"
   },
-  "changelogVersionDetails": "รายละเอียดเวอร์ชัน",
   "sponsorPrivacy": "นโยบายความเป็นส่วนตัว",
   "reportDetailLocalIntensity": "ความเข้มที่ตำแหน่งของคุณ",
   "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
@@ -1005,7 +964,6 @@
   "endpointStateDegraded": "ไม่เสถียร",
   "endpointStateDown": "ผิดปกติ",
   "endpointStateUnknown": "ไม่ทราบ",
-  "endpointLastSuccessNever": "ยังไม่สำเร็จ",
   "endpointServiceEew": "EEW",
   "endpointServiceRts": "RTS",
   "endpointServiceRadar": "Radar",
@@ -1034,8 +992,6 @@
   "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
   "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
   "restroomCategoryTransport": "การคมนาคม",
-  "reportFilterLocationHint": "เช่น ฮวาเหลียน",
-  "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
   "meshtasticDistance": "ระยะทาง",
   "meshtasticSnrTrend": "แนวโน้มสัญญาณ (SNR)",
@@ -1057,7 +1013,6 @@
   "releaseHighlightsTabNormal": "สำหรับผู้ใช้",
   "releaseHighlightsTabAdvanced": "เจาะลึก",
   "releaseHighlightsEmpty": "ยังไม่มีเนื้อหา",
-  "highlightCardTechnical": "เทคนิค",
   "moreVersionNotesEmpty": "ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้",
   "moreVersionSnapshot": "เวอร์ชันทดสอบ",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
@@ -1097,7 +1052,6 @@
   "onboardingPermsTitle": "การอนุญาตสิทธิ์",
   "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
   "rainInterval10m": "10 นาที",
-  "weatherRankingAnalysisLow": "ต่ำ {value}",
   "meshtasticConnectAnyway": "Connect anyway",
   "reportListDayCount": "{count}",
   "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
@@ -1122,13 +1076,10 @@
   "@meshtasticPreset": {
     "description": "LoRa modem preset"
   },
-  "typhoonTrackDetail": "รายละเอียดเส้นทาง",
   "dataSectionWeather": "อากาศ",
   "aedHoursWeekday": "เวลาวันธรรมดา",
   "homeActiveEventsTitle": "เหตุการณ์ที่ยังมีผล",
-  "weatherRankingAnalysisHigh": "สูง {value}",
   "faq": "คำถามที่พบบ่อย",
-  "typhoonHistoryLive": "สด",
   "eewSerial": "รายงาน {serial}",
   "@radarTownOutline": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
@@ -1167,7 +1118,6 @@
   "mapAppAppleMaps": "Apple Maps",
   "regionEdit": "แก้ไข",
   "weatherDynamicState": "แอนิเมชันสภาพอากาศ",
-  "mapPlaceholderDisabled": "แผนที่ (ปิดใช้งานชั่วคราว)",
   "moonNow": "ตอนนี้",
   "@moonNow": {
     "description": "Returns the moon page to the present moment"
@@ -1223,10 +1173,6 @@
   "sunTitle": "ดวงอาทิตย์",
   "@sunTitle": {
     "description": "Sun page title"
-  },
-  "sunSubtitle": "พระอาทิตย์ขึ้น สนธยา และปักษ์",
-  "@sunSubtitle": {
-    "description": "Sun page one-line summary on the data hub"
   },
   "sunSectionDaylight": "แสงกลางวัน",
   "@sunSectionDaylight": {
@@ -1303,10 +1249,6 @@
   "planetsTitle": "ดาวเคราะห์",
   "@planetsTitle": {
     "description": "Planets page title"
-  },
-  "planetsSubtitle": "คืนนี้อยู่ไหน สว่างแค่ไหน",
-  "@planetsSubtitle": {
-    "description": "Planets page one-line summary on the data hub"
   },
   "planetsSectionTonight": "ขณะนี้",
   "@planetsSectionTonight": {
@@ -1484,10 +1426,6 @@
   "@tonightTitle": {
     "description": "Tonight page title"
   },
-  "tonightSubtitle": "มีอะไรให้ดู และเมื่อไร",
-  "@tonightSubtitle": {
-    "description": "Tonight page summary on the data hub"
-  },
   "tonightSectionDark": "ช่วงสังเกตการณ์",
   "@tonightSectionDark": {
     "description": "Section header: the observing window"
@@ -1620,10 +1558,6 @@
   "@almanacTitle": {
     "description": "Almanac page title"
   },
-  "almanacSubtitle": "ปฏิทินจันทรคติและอุปราคาข้างหน้า",
-  "@almanacSubtitle": {
-    "description": "Almanac page summary on the data hub"
-  },
   "almanacSectionToday": "วันนี้",
   "@almanacSectionToday": {
     "description": "Section header: today's date in both calendars"
@@ -1736,10 +1670,6 @@
   "@tideTitle": {
     "description": "Tide page title"
   },
-  "tideSubtitle": "น้ำเกิด น้ำตาย และแรงดึงดูดของดวงจันทร์",
-  "@tideSubtitle": {
-    "description": "Tide page summary on the data hub"
-  },
   "tideDisclaimer": "แรงดาราศาสตร์เท่านั้น ไม่ใช่ตารางน้ำท่า ระดับน้ำโปรดดูตารางที่กรมอุตุนิยมวิทยาเผยแพร่",
   "@tideDisclaimer": {
     "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
@@ -1795,10 +1725,6 @@
   "skyChartTitle": "แผนที่ดาว",
   "@skyChartTitle": {
     "description": "Sky chart page title"
-  },
-  "skyChartSubtitle": "ท้องฟ้าที่ตาเปล่ามองเห็น",
-  "@skyChartSubtitle": {
-    "description": "Sky chart page summary on the data hub"
   },
   "skyChartNorth": "N",
   "@skyChartNorth": {
