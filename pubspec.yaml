@@ -42,7 +42,7 @@ dependencies:
   # `package:logging` records into the app Log.
   logging: ^1.3.0
   # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix
-  # + setRenderPaused (pause native render loop for hidden tabs).
+  # + render lifecycle, batched layer updates, and compact tile-cache messages.
   # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
   # https://github.com/ExpTechTW/flutter-maplibre-gl
   # Pin a commit (not floating `main`) so CI/`pub get` can't rewrite
@@ -58,13 +58,13 @@ dependencies:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: 37e4eb9d826b7ab14be29e6e61717a6d43377c20
+      ref: 56bb6951af9e4ff8fe1548ec689dbd5078961cbb
   # Direct (not just override) so tests can import the platform interface.
   maplibre_gl_platform_interface:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_platform_interface
-      ref: 37e4eb9d826b7ab14be29e6e61717a6d43377c20
+      ref: 56bb6951af9e4ff8fe1548ec689dbd5078961cbb
   # LoRa mesh (Meshtastic) over BLE — off-grid emergency messaging. Requires
   # Bluetooth + location permissions (Android manifest / iOS Info.plist below).
   # Vendored (third_party/) with two upstream fixes: requestMtu is skipped off
@@ -116,12 +116,12 @@ dependency_overrides:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_platform_interface
-      ref: 37e4eb9d826b7ab14be29e6e61717a6d43377c20
+      ref: 56bb6951af9e4ff8fe1548ec689dbd5078961cbb
   maplibre_gl_web:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_web
-      ref: 37e4eb9d826b7ab14be29e6e61717a6d43377c20
+      ref: 56bb6951af9e4ff8fe1548ec689dbd5078961cbb
 
 flutter:
   config:
