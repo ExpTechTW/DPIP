@@ -68,7 +68,7 @@ class MapTileWarmer {
   /// Abandons any scheduled or in-flight warm.
   void cancel() {
     _cancelEpoch++;
-    MapTileCache.trace('warmer cancel epoch=$_cancelEpoch');
+    MapTileCache.trace(() => 'warmer cancel epoch=$_cancelEpoch');
   }
 
   /// Aborts native tile HTTP for URLs starting with any of [urlPrefixes].
@@ -78,7 +78,7 @@ class MapTileWarmer {
   Future<void> abandon(List<String> urlPrefixes) async {
     if (urlPrefixes.isEmpty) return;
     MapTileCache.trace(
-      'warmer abandon frames=${urlPrefixes.length} epoch=$_cancelEpoch',
+      () => 'warmer abandon frames=${urlPrefixes.length} epoch=$_cancelEpoch',
     );
     await _cache?.cancelFetches(urlContains: urlPrefixes);
   }
@@ -89,8 +89,9 @@ class MapTileWarmer {
   Future<void> release(List<String> urlPrefixes) async {
     cancel();
     MapTileCache.trace(
-      'warmer release sets=${_workingSets.length} '
-      'prefixes=${urlPrefixes.length}',
+      () =>
+          'warmer release sets=${_workingSets.length} '
+          'prefixes=${urlPrefixes.length}',
     );
     await _enqueue(() async {
       _workingSets.clear();
@@ -111,7 +112,7 @@ class MapTileWarmer {
       final stale = _workingSets.remove(workingSet);
       if (stale == null || stale.isEmpty) return;
       MapTileCache.trace(
-        'warmer discard set=$workingSet resident=${stale.length}',
+        () => 'warmer discard set=$workingSet resident=${stale.length}',
       );
       await _cache?.evict(_evictionPatterns(stale, const <String>{}));
     });
@@ -133,24 +134,30 @@ class MapTileWarmer {
   }) async {
     final cache = _cache;
     if (cache == null) return;
-    final list = <String>{...urls}.toList(growable: false);
+    // Insertion-ordered, so priority survives the dedupe. Kept as both a set
+    // and a list: the working-set diff below needs the set, and rebuilding it
+    // from the list re-hashed every URL of a twelve-thousand-tile fill.
+    final wanted = <String>{...urls};
+    final list = wanted.toList(growable: false);
     if (list.isEmpty) return;
     final epoch = _cancelEpoch;
     final gen = (_generations[workingSet] ?? 0) + 1;
     _generations[workingSet] = gen;
     final label = logLabel ?? workingSet;
     MapTileCache.trace(
-      'warmer schedule label=$label set=$workingSet gen=$gen '
-      'wanted=${list.length} fill=${fillUntil.toStringAsFixed(2)} '
-      'refresh=$refreshResident '
-      'delay=${immediate ? 0 : settleDelay.inMilliseconds}ms',
+      () =>
+          'warmer schedule label=$label set=$workingSet gen=$gen '
+          'wanted=${list.length} fill=${fillUntil.toStringAsFixed(2)} '
+          'refresh=$refreshResident '
+          'delay=${immediate ? 0 : settleDelay.inMilliseconds}ms',
     );
     if (!immediate && settleDelay > Duration.zero) {
       await Future<void>.delayed(settleDelay);
     }
     if (!_isCurrent(workingSet, epoch, gen)) {
       MapTileCache.trace(
-        'warmer superseded label=$label set=$workingSet gen=$gen before-queue',
+        () =>
+            'warmer superseded label=$label set=$workingSet gen=$gen before-queue',
       );
       return;
     }
@@ -158,18 +165,19 @@ class MapTileWarmer {
     await _enqueue(() async {
       if (!_isCurrent(workingSet, epoch, gen)) {
         MapTileCache.trace(
-          'warmer superseded label=$label set=$workingSet gen=$gen in-queue',
+          () =>
+              'warmer superseded label=$label set=$workingSet gen=$gen in-queue',
         );
         return;
       }
-      final wanted = list.toSet();
       final previous = _workingSets[workingSet] ?? const <String>{};
       final stale = previous.difference(wanted);
       final evictionPatterns = _evictionPatterns(stale, wanted);
       MapTileCache.trace(
-        'warmer start label=$label set=$workingSet gen=$gen '
-        'previous=${previous.length} evict=${stale.length} '
-        'patterns=${evictionPatterns.length}',
+        () =>
+            'warmer start label=$label set=$workingSet gen=$gen '
+            'previous=${previous.length} evict=${stale.length} '
+            'patterns=${evictionPatterns.length}',
       );
       if (evictionPatterns.isNotEmpty) {
         await cache.evict(evictionPatterns);
@@ -185,10 +193,11 @@ class MapTileWarmer {
       // mid-injection. Its queued replacement then knows exactly what to evict.
       _workingSets[workingSet] = result.resident;
       MapTileCache.trace(
-        'warmer done label=$label set=$workingSet gen=$gen '
-        'current=${_isCurrent(workingSet, epoch, gen)} '
-        'injected=${result.injected} resident=${result.resident.length}/'
-        '${list.length}',
+        () =>
+            'warmer done label=$label set=$workingSet gen=$gen '
+            'current=${_isCurrent(workingSet, epoch, gen)} '
+            'injected=${result.injected} resident=${result.resident.length}/'
+            '${list.length}',
       );
       if (_isCurrent(workingSet, epoch, gen) &&
           logLabel != null &&

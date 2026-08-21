@@ -16,7 +16,10 @@ int nextMapTraceId() => ++_nextTraceId;
 String mapTraceObject(Object? object) =>
     object == null ? 'none' : identityHashCode(object).toRadixString(16);
 
-void mapTrace(String scope, String message) {
+/// Emits one trace line. [message] is a callback so that a build with the flag
+/// off never pays to compose text nobody reads — an eager argument is evaluated
+/// before this function can decline it.
+void mapTrace(String scope, String Function() message) {
   if (!kDebugMode || !mapTraceEnabled) return;
-  Log.debug('MAP TRACE #${++_nextTraceLine} $scope $message');
+  Log.debug('MAP TRACE #${++_nextTraceLine} $scope ${message()}');
 }
