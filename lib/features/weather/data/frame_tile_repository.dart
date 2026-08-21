@@ -59,6 +59,7 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     required double zoom,
     bool fill = false,
     bool immediate = false,
+    bool refreshResident = false,
   }) {
     if (frames.isEmpty || !zoom.isFinite) return Future<void>.value();
     final groups = _viewportTileGroups(
@@ -85,6 +86,7 @@ abstract base class FrameTileRepository implements RasterFrameSource {
       logLabel: '$tilePathPrefix×${frames.length}',
       fillUntil: fill ? _fillTarget : 0,
       immediate: immediate,
+      refreshResident: refreshResident,
     );
   }
 

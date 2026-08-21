@@ -22,6 +22,9 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
   /// One entry per [warmFrameTiles] call: the frames it was asked to warm.
   final List<List<String>> warmed = [];
 
+  /// Whether each corresponding warm was allowed to overwrite L1 hits.
+  final List<bool> warmRefreshes = [];
+
   /// Every frame id passed to [abandonFrames], flattened.
   final List<String> abandoned = [];
 
@@ -47,7 +50,11 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
     required double zoom,
     bool fill = false,
     bool immediate = false,
-  }) async => warmed.add(List<String>.of(frames));
+    bool refreshResident = false,
+  }) async {
+    warmed.add(List<String>.of(frames));
+    warmRefreshes.add(refreshResident);
+  }
 
   @override
   Future<FrameTileReadiness> frameTileReadiness({

@@ -11,6 +11,7 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -102,11 +103,23 @@ abstract class RasterTimelineLayer implements MapLayer {
   @protected
   int get warmFrameBudget => 512;
 
-  /// Mounted-source ceiling. Beyond this the least-recently-shown frame is
-  /// removed outright — `visibility: none` keeps GPU textures for a fast
-  /// reveal, so `removeSource` is the actual memory release.
+  /// Mounted-source ceiling. This is deliberately much smaller than
+  /// [warmFrameBudget]: L1 holds compressed response bodies, while a mounted
+  /// MapLibre raster source can retain a decoded 512 px texture for every tile
+  /// in the viewport. Keeping 32 frames mounted pushed an iOS simulator above
+  /// 800 MiB even though the byte cache itself was capped at 48 MiB.
+  ///
+  /// Five slots are the visible +/-[ringRadius] ring; seven more are decoded
+  /// ahead through the bounded idle worker pool. Eight made even an ordinary
+  /// two-hour radar preview cross the expensive source-mount path repeatedly;
+  /// twelve keeps that common GIF-like gesture local while remaining far below
+  /// the old 32-source / 800 MiB failure mode. Frames outside this window still
+  /// come from the much wider L1 fill, so mounting one during a scrub is local
+  /// without retaining a whole timeline of decoded textures.
+  /// Beyond this ceiling the least-recently-shown source is removed outright —
+  /// `visibility: none` alone does not release its native tile textures.
   @protected
-  int get maxResident => 32;
+  int get maxResident => 12;
 
   /// Hook for extra style work once this layer's first frame is on the map
   /// (e.g. an outline layer that only makes sense over this overlay).
@@ -242,6 +255,25 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// collide with MapLibre's queued decode work when rendering resumes.
   bool _surfaceVisible = true;
 
+  /// Hidden surfaces cancel speculative work, but a return to the same settled
+  /// timestamp must rebuild it. Without this hand-off the cancellation left
+  /// only the five-frame core mounted forever; the wider ready-resident set
+  /// that makes a drag look like a GIF was never restored.
+  bool _resumeBackgroundWork = false;
+
+  /// The next native map must receive the repaired SQLite bodies before its
+  /// first raster sources are mounted. The iOS platform view is destroyed on
+  /// tab return, but its process-wide L1 survives and can still contain the
+  /// malformed empty GIF that arrived from the network before Dart normalised
+  /// it. Re-injecting the small visible ring prevents one source from decoding
+  /// stale L1 bytes while its neighbours resolve to the repaired PNG in L2.
+  bool _refreshResidentOnNextSettle = false;
+
+  /// Controller belonging to this layer's one map surface. Retained only so a
+  /// hidden-tab edge can remove decoded speculative sources; tile bytes stay in
+  /// L1/L2 and the visible ring remains mounted for a cheap return.
+  MapLibreMapController? _mapController;
+
   @override
   void onSurfaceVisibility(bool visible) {
     if (_surfaceVisible == visible) return;
@@ -252,9 +284,41 @@ abstract class RasterTimelineLayer implements MapLayer {
     // mounted/current frame intact so returning is a cheap render resume rather
     // than a clear + rebuild; MapScaffold will call show() if the server has a
     // genuinely newer current frame.
+    _resumeBackgroundWork = _settledFrameId != null;
     _revealGeneration++;
     source.cancelTileWarm();
+    final controller = _mapController;
+    if (controller != null) unawaited(_trimHiddenResidents(controller));
+    mapTrace(
+      'timeline/$id',
+      'surface-hidden resident=${_resident.length} ring=${_ring.length} '
+          'trim-scheduled=${controller != null}',
+    );
     MapTileCache.trace('timeline=$id surface-hidden cancel-background-work');
+  }
+
+  /// Stops all work tied to a platform view immediately before it is replaced.
+  ///
+  /// Unlike [onSurfaceVisibility], this must not remove layers through the old
+  /// controller: the native map is already being torn down. The style reset
+  /// clears bookkeeping, while [_refreshResidentOnNextSettle] deliberately
+  /// survives it so the replacement view repairs its L1 before mounting.
+  void onControllerInvalidated() {
+    final hadFrame =
+        _settledFrameId != null ||
+        _shownFrameId != null ||
+        _requestedFrameId != null;
+    _refreshResidentOnNextSettle |= hadFrame;
+    _surfaceVisible = false;
+    _resumeBackgroundWork = false;
+    _warmCentre = null;
+    _revealGeneration++;
+    source.cancelTileWarm();
+    _mapController = null;
+    mapTrace(
+      'timeline/$id',
+      'controller-invalidated refresh=$_refreshResidentOnNextSettle',
+    );
   }
 
   // --- Frame bookkeeping -----------------------------------------------------
@@ -385,6 +449,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapLibreMapController controller,
     List<MapFrame> frames,
   ) async {
+    _mapController = controller;
     _orderedIds = [for (final frame in frames) frame.id];
     _indexById = {for (var i = 0; i < frames.length; i++) frames[i].id: i};
   }
@@ -395,20 +460,31 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapFrame frame, {
     bool scrubbing = false,
   }) {
+    _mapController = controller;
     final index = _indexById[frame.id];
     if (index == null) return Future<void>.value();
     if (scrubbing) {
       _suspendWarm();
     } else {
       final resumeWarm = _warmSuspended;
+      final resumeBackgroundWork = _surfaceVisible && _resumeBackgroundWork;
+      if (_surfaceVisible) _resumeBackgroundWork = false;
       _warmSuspended = false;
       if (_shownFrameId == frame.id && _settledFrameId == frame.id) {
-        if (resumeWarm) {
-          // A tap/short drag can finish on the same timestamp. Its first move
-          // still cancelled the old fill, so restart one debounced fill here.
+        if (resumeWarm || resumeBackgroundWork) {
+          // A tap/short drag or a hidden surface can finish on the same
+          // timestamp. Both cancelled the old fill, so restart the wide L1
+          // fill and ready-resident preload instead of leaving only the core
+          // ring available to the next scrub.
           _warmCentre = null;
           unawaited(
-            _warmThenPreload(controller, index, frame.id, _revealGeneration),
+            _warmThenPreload(
+              controller,
+              index,
+              frame.id,
+              _revealGeneration,
+              refreshResident: resumeBackgroundWork,
+            ),
           );
         }
         return Future<void>.value();
@@ -527,6 +603,17 @@ abstract class RasterTimelineLayer implements MapLayer {
       'ring=$low..$high shown=$_shownFrameId',
     );
 
+    if (_refreshResidentOnNextSettle) {
+      _refreshResidentOnNextSettle = false;
+      await _refreshRingTileBytes(controller, frameId, ring);
+      if (!_isCurrent(frameId, generation)) {
+        // A newer selection or another lifecycle edge won while the viewport
+        // query/injection was in flight. Its settle now owns the one refresh.
+        _refreshResidentOnNextSettle = true;
+        return;
+      }
+    }
+
     final hadPrevious = _shownFrameId != null;
     // Mount the target and its neighbours transparent first. `visibility`
     // stays on, so MapLibre starts the cold requests while the last complete
@@ -560,6 +647,42 @@ abstract class RasterTimelineLayer implements MapLayer {
       generation,
       settling: true,
     );
+  }
+
+  /// Overwrites the replacement map's visible L1 ring from the repaired L2.
+  /// This is bounded to the frames MapLibre is about to mount; the wide
+  /// centre-out fill resumes after reveal and can remain cooperative.
+  Future<void> _refreshRingTileBytes(
+    MapLibreMapController controller,
+    String frameId,
+    Set<String> ring,
+  ) async {
+    final elapsed = Stopwatch()..start();
+    try {
+      final bounds = await controller.getVisibleRegion();
+      await source.warmFrameTiles(
+        frames: [
+          frameId,
+          for (final id in ring)
+            if (id != frameId) id,
+        ],
+        south: bounds.southwest.latitude,
+        west: bounds.southwest.longitude,
+        north: bounds.northeast.latitude,
+        east: bounds.northeast.longitude,
+        zoom: controller.cameraPosition?.zoom ?? 8,
+        immediate: true,
+        refreshResident: true,
+      );
+      MapTileCache.trace(
+        'timeline=$id recreate-refresh frame=$frameId ring=${ring.length} '
+        'dt=${elapsed.elapsedMilliseconds}ms',
+      );
+    } catch (error, stackTrace) {
+      // Mounting may still succeed from MapLibre's own cache. Keep the map
+      // usable and let the later readiness/warm paths retry individual tiles.
+      Log.handle(error, stackTrace, '$id recreate tile refresh');
+    }
   }
 
   /// Starts one exact-viewport L1 check. A cold result is polled outside the
@@ -769,10 +892,11 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapLibreMapController controller,
     int index,
     String frameId,
-    int generation,
-  ) async {
+    int generation, {
+    bool refreshResident = false,
+  }) async {
     if (!_surfaceVisible || !_isCurrent(frameId, generation)) return;
-    await _warmBand(controller, index);
+    await _warmBand(controller, index, refreshResident: refreshResident);
     if (!_surfaceVisible ||
         _warmSuspended ||
         !_isCurrent(frameId, generation)) {
@@ -822,6 +946,11 @@ abstract class RasterTimelineLayer implements MapLayer {
       'candidates=${candidates.length} workers=$workers '
       'resident=${_resident.length}',
     );
+    mapTrace(
+      'timeline/$id',
+      'idle-preload start candidates=${candidates.length} workers=$workers '
+          'resident=${_resident.length}/$maxResident',
+    );
 
     Future<void> runWorker() async {
       while (!_warmSuspended && _isCurrent(frameId, generation)) {
@@ -856,6 +985,12 @@ abstract class RasterTimelineLayer implements MapLayer {
       'timeout=$timedOut '
       'resident=${_resident.length}/$maxResident '
       'dt=${elapsed.elapsedMilliseconds}ms',
+    );
+    mapTrace(
+      'timeline/$id',
+      'idle-preload done complete=$complete timeout=$timedOut '
+          'resident=${_resident.length}/$maxResident '
+          'dt=${elapsed.elapsedMilliseconds}ms',
     );
   }
 
@@ -945,6 +1080,10 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapLibreMapController controller,
     String candidate,
   ) => _enqueueMutation(() async {
+    // A hidden-surface trim may have removed this candidate while its
+    // readiness worker was between polls. Do not issue duplicate native
+    // removeLayer/removeSource calls when that worker observes cancellation.
+    if (!_resident.contains(candidate)) return;
     if (candidate == _requestedFrameId || candidate == _shownFrameId) return;
     await source.abandonFrames([candidate]);
     _ring.remove(candidate);
@@ -952,6 +1091,38 @@ abstract class RasterTimelineLayer implements MapLayer {
     _readyFrames.remove(candidate);
     _lru.remove(candidate);
     await _removeFrame(controller, candidate);
+  });
+
+  /// Releases decoded speculative sources once this retained tab is hidden.
+  ///
+  /// The settled ring stays mounted, so returning does not blank or rebuild the
+  /// displayed timestamp. Only the extra ready-resident sources are removed;
+  /// their compressed tile bodies remain in the native L1 and SQLite L2 caches
+  /// and are rebuilt by the idle pool after the surface is visible again.
+  Future<void> _trimHiddenResidents(
+    MapLibreMapController controller,
+  ) => _enqueueMutation(() async {
+    if (_surfaceVisible || _resident.isEmpty) return;
+    final shown = _shownIndex;
+    final keep = shown == null ? <String>{?_shownFrameId} : _ringAt(shown).$3;
+    final stale = [
+      for (final candidate in _resident)
+        if (!keep.contains(candidate)) candidate,
+    ];
+    if (stale.isEmpty) return;
+    mapTrace(
+      'timeline/$id',
+      'hidden-trim start remove=${stale.length} keep=${keep.length}',
+    );
+    await source.abandonFrames(stale);
+    for (final candidate in stale) {
+      _resident.remove(candidate);
+      _ring.remove(candidate);
+      _readyFrames.remove(candidate);
+      _lru.remove(candidate);
+      await _removeFrame(controller, candidate);
+    }
+    mapTrace('timeline/$id', 'hidden-trim done resident=${_resident.length}');
   });
 
   void _suspendWarm() {
@@ -1117,6 +1288,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapLibreMapController controller,
     int centre, {
     bool immediate = false,
+    bool refreshResident = false,
   }) async {
     if (!_surfaceVisible || _orderedIds.isEmpty) return;
     // Adopt the new centre before the first await: concurrent scrub reveals
@@ -1132,7 +1304,8 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapTileCache.trace(
       'timeline=$id warm-band start centre=$centre previous=$previous '
       'direction=${delta < 0 ? 'backward' : 'forward'} '
-      'frames=${frames.length} immediate=$immediate',
+      'frames=${frames.length} immediate=$immediate '
+      'refresh=$refreshResident',
     );
     try {
       final bounds = await controller.getVisibleRegion();
@@ -1148,6 +1321,7 @@ abstract class RasterTimelineLayer implements MapLayer {
         zoom: controller.cameraPosition?.zoom ?? 8,
         fill: true,
         immediate: immediate,
+        refreshResident: refreshResident,
       );
       MapTileCache.trace(
         'timeline=$id warm-band done centre=$centre frames=${frames.length} '
@@ -1244,6 +1418,7 @@ abstract class RasterTimelineLayer implements MapLayer {
   Future<void> clear(MapLibreMapController controller) async {
     _requestedFrameId = null;
     _revealGeneration++;
+    _refreshResidentOnNextSettle = false;
     await _mutationTail;
     await source.releaseTiles();
     for (final id in List<String>.of(_resident)) {
@@ -1252,6 +1427,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (_attached) await onDetached(controller);
     await _removeSeam(controller);
     _reset();
+    _mapController = null;
   }
 
   Future<void> _removeFrame(MapLibreMapController controller, String id) async {
@@ -1273,6 +1449,7 @@ abstract class RasterTimelineLayer implements MapLayer {
   void _reset() {
     _revealGeneration++;
     _warmSuspended = false;
+    _resumeBackgroundWork = false;
     _resident.clear();
     _ring.clear();
     _readyFrames.clear();
@@ -1287,6 +1464,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     // A style reload drops every runtime layer, the seam included.
     _seamMounted = false;
     _seamMounting = null;
+    _mapController = null;
   }
 }
 

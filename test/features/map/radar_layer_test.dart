@@ -34,8 +34,10 @@ class _BlockingWarmRadarRepository extends _FakeRadarRepository {
     required double zoom,
     bool fill = false,
     bool immediate = false,
+    bool refreshResident = false,
   }) {
     warmed.add(List<String>.of(frames));
+    warmRefreshes.add(refreshResident);
     return warmGate.future;
   }
 }
@@ -233,14 +235,14 @@ void main() {
     source.warmed.clear();
     source.readinessProbes.clear();
 
-    await layer.show(controller, frames[0], scrubbing: true);
+    await layer.show(controller, frames[1], scrubbing: true);
 
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.0');
-    expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
+    expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0.85');
     expect(controller.calls, [
-      'set:radar-lyr-${frames[0].id}:0.0',
+      'set:radar-lyr-${frames[1].id}:0.0',
       'set:radar-lyr-${frames[4].id}:0.0',
-      'set:radar-lyr-${frames[0].id}:0.85',
+      'set:radar-lyr-${frames[1].id}:0.85',
     ]);
     expect(
       source.readinessProbes,
@@ -267,7 +269,7 @@ void main() {
         controller.calls.where(
           (call) => call.startsWith('addSource:radar-src-'),
         ),
-        hasLength(32),
+        hasLength(12),
         reason: 'idle preload uses every source slot but never exceeds the cap',
       );
       final visible = [
@@ -283,12 +285,12 @@ void main() {
       expect(visible, frames.sublist(18, 23).map((frame) => frame.id));
       expect(
         hidden,
-        hasLength(27),
+        hasLength(7),
         reason: 'prepared neighbours stay resident without raster draw passes',
       );
       expect(
         source.readinessProbes,
-        hasLength(27),
+        hasLength(7),
         reason:
             'every already-hot neighbour needs exactly one completion probe',
       );
@@ -345,6 +347,79 @@ void main() {
     },
   );
 
+  test('hiding a settled map releases decoded preload sources', () async {
+    final source = _FakeRadarRepository(_ids(40));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[20]);
+    await pumpEventQueue();
+
+    var added = controller.calls
+        .where((call) => call.startsWith('addSource:radar-src-'))
+        .length;
+    var removed = controller.calls
+        .where((call) => call.startsWith('removeSource:radar-src-'))
+        .length;
+    expect(added - removed, 12);
+
+    layer.onSurfaceVisibility(false);
+    await pumpEventQueue();
+
+    added = controller.calls
+        .where((call) => call.startsWith('addSource:radar-src-'))
+        .length;
+    removed = controller.calls
+        .where((call) => call.startsWith('removeSource:radar-src-'))
+        .length;
+    expect(
+      added - removed,
+      5,
+      reason:
+          'the visible ring stays mounted, but hidden decoded neighbours must '
+          'not retain native textures while another tab is on screen',
+    );
+  });
+
+  test(
+    'a replacement map refreshes repaired L1 before mounting tiles',
+    () async {
+      final source = _FakeRadarRepository(_ids(5));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final oldController = RecordingMapController();
+
+      await layer.prepare(oldController, frames);
+      await layer.show(oldController, frames[2]);
+      await pumpEventQueue();
+      source.warmed.clear();
+      source.warmRefreshes.clear();
+      final cancels = source.warmCancels;
+
+      layer.onControllerInvalidated();
+      layer.onStyleReset();
+      layer.onSurfaceVisibility(true);
+
+      final replacement = RecordingMapController();
+      await layer.prepare(replacement, frames);
+      await layer.show(replacement, frames[2]);
+
+      expect(source.warmCancels, cancels + 1);
+      expect(source.warmed, isNotEmpty);
+      expect(source.warmed.first.first, frames[2].id);
+      expect(source.warmRefreshes.first, isTrue);
+      expect(
+        replacement.calls.indexWhere(
+          (call) => call.startsWith('addSource:radar-src-'),
+        ),
+        greaterThanOrEqualTo(0),
+        reason: 'the replacement source still mounts after the L1 refresh',
+      );
+    },
+  );
+
   test(
     'one gesture cancels warm once and restarts it after settling',
     () async {
@@ -374,7 +449,7 @@ void main() {
   );
 
   test(
-    'hiding the map cancels background warm without rebuilding on return',
+    'returning to the map restores the cancelled GIF preload window',
     () async {
       final source = _BlockingWarmRadarRepository(_ids(12));
       final layer = RadarMapLayer(source);
@@ -394,14 +469,22 @@ void main() {
       await pumpEventQueue();
       expect(
         source.warmed,
-        hasLength(1),
+        hasLength(2),
         reason:
-            'the already-settled timestamp stays mounted; returning must not '
-            'restart its whole-history L1 fill',
+            'returning on the same timestamp must restart the cancelled L1 '
+            'fill and neighbour preload used by live scrubbing',
       );
+      expect(source.warmRefreshes, [isFalse, isTrue]);
 
       source.warmGate.complete();
       await pumpEventQueue();
+      expect(
+        controller.calls.where(
+          (call) => call.startsWith('addSource:radar-src-'),
+        ),
+        hasLength(12),
+        reason: 'the ready-resident window is rebuilt after the fill resumes',
+      );
     },
   );
 
@@ -493,7 +576,7 @@ void main() {
     final removed = controller.calls
         .where((call) => call.startsWith('removeSource:radar-src-'))
         .length;
-    expect(added - removed, lessThanOrEqualTo(32));
+    expect(added - removed, lessThanOrEqualTo(12));
     expect(
       source.warmed,
       isEmpty,

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/error/result.dart';
@@ -14,6 +16,26 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const terrainUrl =
     'https://static.lb.exptech.dev/api/v1/map/terrain/7/107/55.png';
+
+Uint8List malformedEmptyRadarGif() =>
+    base64Decode('R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBADs=');
+
+Uint8List opaqueBlackPlaceholderPng() => base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+'
+  'A8AAQUBAScY42YAAAAASUVORK5CYII=',
+);
+
+const pngSignature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+
+Future<int> decodedAlpha(Uint8List bytes) async {
+  final codec = await ui.instantiateImageCodec(bytes);
+  final frame = await codec.getNextFrame();
+  final rgba = await frame.image.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final alpha = rgba!.getUint8(3);
+  frame.image.dispose();
+  codec.dispose();
+  return alpha;
+}
 
 final class _TestFrameRepository extends FrameTileRepository {
   _TestFrameRepository(super.warmer);
@@ -200,6 +222,108 @@ void main() {
     expect((served! as Map)[url], isNotNull);
     expect(((served as Map)[url] as Map)['data'], bytes);
   });
+
+  test('the malformed empty radar GIF is persisted as a valid PNG', () async {
+    await cache.install();
+    const url = 'https://static.exptech.dev/api/v2/tiles/radar/1/2/3/4.webp';
+    // Native inserts a live response into L1 before its delayed putBatch tells
+    // Dart about it. Reproduce that ordering, not an initially empty mirror.
+    nativeMemory[url] = malformedEmptyRadarGif();
+
+    await fromNative('putBatch', {
+      'entries': [
+        {
+          'url': url,
+          'data': malformedEmptyRadarGif(),
+          'contentType': 'image/webp',
+        },
+      ],
+    });
+
+    final stored = await store.readBytes(url);
+    expect(stored, isNotNull);
+    expect(stored!.bytes.take(pngSignature.length), pngSignature);
+    expect(stored.contentType, 'image/png');
+    expect(
+      await decodedAlpha(stored.bytes),
+      0,
+      reason: 'a decodable but opaque black pixel becomes a full black tile',
+    );
+    expect(
+      stored.size,
+      malformedEmptyRadarGif().length,
+      reason: 'replacement bytes must not inflate downloaded traffic',
+    );
+    expect(
+      nativeMemory[url]!.take(pngSignature.length),
+      pngSignature,
+      reason: 'the repaired L2 body must also overwrite the raw live L1 body',
+    );
+    final repair = nativeCalls.lastWhere(
+      (call) => call.method == 'injectTiles',
+    );
+    expect(
+      ((((repair.arguments as Map)['entries'] as List).single as Map)['data']
+              as Uint8List)
+          .take(pngSignature.length),
+      pngSignature,
+    );
+
+    final served = await fromNative('getBatch', {
+      'urls': [url],
+    }) as Map;
+    final entry = served[url] as Map;
+    expect(
+      (entry['data'] as Uint8List).take(pngSignature.length),
+      pngSignature,
+    );
+    expect(entry['contentType'], 'image/png');
+  });
+
+  test('a warm repairs malformed empty radar GIFs already in L2', () async {
+    await cache.install();
+    const url = 'https://static.exptech.dev/api/v2/tiles/radar/old/2/3/4.webp';
+    await store.writeBytes(
+      url,
+      etag: 'old',
+      bytes: malformedEmptyRadarGif(),
+      contentType: 'image/webp',
+    );
+    nativeMemory[url] = malformedEmptyRadarGif();
+
+    await cache.warm([url], refreshResident: true);
+
+    expect(nativeMemory[url], isNotNull);
+    expect(nativeMemory[url]!.take(pngSignature.length), pngSignature);
+    final inject = nativeCalls.lastWhere(
+      (call) => call.method == 'injectTiles',
+    );
+    final entry =
+        (((inject.arguments as Map)['entries'] as List).single as Map);
+    expect(entry['contentType'], 'image/png');
+    expect(await decodedAlpha(entry['data'] as Uint8List), 0);
+  });
+
+  test(
+    'a warm upgrades the old opaque black L2 placeholder before L1',
+    () async {
+      await cache.install();
+      const url =
+          'https://static.exptech.dev/api/v2/tiles/radar/old-black/2/3/4.webp';
+      await store.writeBytes(
+        url,
+        etag: 'old-black',
+        bytes: opaqueBlackPlaceholderPng(),
+        contentType: 'image/png',
+      );
+      nativeMemory[url] = opaqueBlackPlaceholderPng();
+
+      await cache.warm([url], refreshResident: true);
+
+      expect(nativeMemory[url], isNotNull);
+      expect(await decodedAlpha(nativeMemory[url]!), 0);
+    },
+  );
 
   test('clearing drops the store and the native mirror together', () async {
     await cache.install();

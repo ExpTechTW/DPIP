@@ -26,6 +26,9 @@ class MapCameraHandoff extends ChangeNotifier {
   LatLngBounds? _pending;
   String? _pendingLayerId;
 
+  /// Whether a request is waiting to be consumed by a ready map.
+  bool get hasPending => _pending != null;
+
   /// Requests the map open framed on the home backdrop's current view. No-op if
   /// the backdrop hasn't framed anything yet.
   void requestHomeView({String? layerId}) {

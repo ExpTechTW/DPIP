@@ -2,6 +2,7 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
@@ -161,12 +162,7 @@ class MapTileCache {
     final hits = await _store.readBytesBatch(wanted);
     final served = <String, MapLibreTile>{};
     for (final entry in hits.entries) {
-      served[entry.key] = MapLibreTile(
-        url: entry.key,
-        data: entry.value.bytes,
-        contentType: entry.value.contentType,
-        etag: entry.value.etag,
-      );
+      served[entry.key] = _tileFromCache(entry.key, entry.value);
     }
     trace(
       'demand l1-miss=${wanted.length} '
@@ -181,6 +177,7 @@ class MapTileCache {
   /// Native downloaded tiles — persist and meter them.
   Future<void> _onPutBatch(List<MapLibreTile> tiles) async {
     final writes = <BinaryWrite>[];
+    final repaired = <MapLibreTile>[];
     var downloaded = 0;
     for (final tile in tiles) {
       final uri = Uri.tryParse(tile.url);
@@ -190,25 +187,60 @@ class MapTileCache {
       // else — a glyph range that momentarily failed, say — persisting
       // emptiness would serve a blank asset for the next seven days.
       if (tile.data.isEmpty && !EtagInterceptor.isBasemapPbf(uri)) continue;
-      final bytes = tile.data;
+      downloaded += tile.data.length;
+      final payload = _safeRasterPayload(tile.data, tile.contentType);
+      if (!identical(payload.bytes, tile.data)) {
+        repaired.add(
+          MapLibreTile(
+            url: tile.url,
+            data: payload.bytes,
+            contentType: payload.contentType,
+            etag: tile.etag,
+          ),
+        );
+      }
       writes.add((
         url: tile.url,
         // The URL is content-addressed, so the synthetic tag is the right key —
         // a new frame is a new URL, never a revalidation of this one.
         etag: EtagInterceptor.etagFromUrl(uri),
-        bytes: bytes,
-        contentType: tile.contentType,
-        size: bytes.length,
+        bytes: payload.bytes,
+        contentType: payload.contentType,
+        // Traffic accounting is wire-sized even when the stored payload was
+        // repaired into a slightly larger, decodable image.
+        size: tile.data.length,
       ));
-      downloaded += bytes.length;
     }
     if (writes.isEmpty) return;
     await _store.writeBytesBatch(writes);
+    // Native necessarily saw the live response before it could report the
+    // batch to Dart, and put that raw body in L1 immediately. Rewriting only
+    // SQLite therefore left the malformed 35-byte empty GIF under the same L1
+    // key: one request decoded garbage while a later L2 hit decoded the fixed
+    // PNG, producing a patchwork raster. Overwrite only bodies that actually
+    // changed; normal tiles already occupy L1 and need no platform transfer.
+    await _injectNetworkRepairs(repaired);
     trace(
       'network-fill count=${writes.length} bytes=${_bytes(downloaded)} '
+      '${repaired.isEmpty ? '' : 'placeholder-normalized=${repaired.length} '}'
       'sample=${_urls([for (final write in writes) write.url])}',
     );
     unawaited(_usage?.record(down: downloaded, hit: false, saved: 0));
+  }
+
+  Future<void> _injectNetworkRepairs(List<MapLibreTile> repaired) async {
+    if (repaired.isEmpty) return;
+    try {
+      for (var i = 0; i < repaired.length; i += _injectChunk) {
+        final end = math.min(i + _injectChunk, repaired.length);
+        await injectMapLibreTiles(repaired.sublist(i, end));
+      }
+      trace('network-repair injected=${repaired.length}');
+    } catch (error, stackTrace) {
+      // Persistence is still useful when no map channel is attached. A later
+      // demand read or warm will inject the already-repaired L2 body.
+      Log.handle(error, stackTrace, 'MapTileCache network repair');
+    }
   }
 
   /// Pushes the cached bodies for [urls] into native memory, skipping whatever
@@ -224,9 +256,14 @@ class MapTileCache {
   /// timeline can top the mirror up outward from the current frame until it is
   /// nearly full and then stop, instead of over-filling into a native LRU trim
   /// (which would evict the very frames just injected).
+  ///
+  /// [refreshResident] is reserved for a hidden → visible edge. It treats the
+  /// named URLs as candidates even when native reports them present, allowing
+  /// a repaired L2 image to overwrite an undecodable body under the same key.
   Future<TileWarmResult> warm(
     List<String> urls, {
     double fillUntil = 0,
+    bool refreshResident = false,
     bool Function()? shouldContinue,
   }) async {
     // A set preserves insertion order: priority survives while duplicate URLs
@@ -241,17 +278,22 @@ class MapTileCache {
     trace(
       'warm#$traceId start wanted=${wanted.length} '
       'fill=${fillUntil > 0 ? fillUntil.toStringAsFixed(2) : 'all'} '
+      'refresh=$refreshResident '
       'sample=${_urls(wanted)}',
     );
     try {
-      final missing = await _missingFromL1(
-        wanted,
-        shouldContinue: shouldContinue,
-      );
-      trace(
-        'warm#$traceId probe l1-hit=${wanted.length - missing.length} '
-        'l1-miss=${missing.length} dt=${elapsed.elapsedMilliseconds}ms',
-      );
+      // A hidden native surface can retain bytes which ImageIO already proved
+      // undecodable. On its one return-edge refresh, L1 presence is therefore
+      // not proof of a usable hit: read the same URLs from L2 and overwrite
+      // them after [_tileFromCache] repairs the server's empty placeholder.
+      final missing = refreshResident
+          ? wanted
+          : await _missingFromL1(wanted, shouldContinue: shouldContinue);
+      final probe = refreshResident
+          ? 'refresh=${missing.length}'
+          : 'l1-hit=${wanted.length - missing.length} '
+                'l1-miss=${missing.length}';
+      trace('warm#$traceId probe $probe dt=${elapsed.elapsedMilliseconds}ms');
       if (missing.isEmpty) {
         trace(
           'warm#$traceId done injected=0 resident=${wanted.length}/'
@@ -315,13 +357,7 @@ class MapTileCache {
       // centre frame even though the caller supplied the correct priority.
       final tiles = [
         for (final url in missing)
-          if (hits[url] case final entry?)
-            MapLibreTile(
-              url: url,
-              data: entry.bytes,
-              contentType: entry.contentType,
-              etag: entry.etag,
-            ),
+          if (hits[url] case final entry?) _tileFromCache(url, entry),
       ];
       final injected = await _injectAll(
         tiles,
@@ -466,13 +502,7 @@ class MapTileCache {
       // from [urls], keeping centre-out frame priority intact.
       final tiles = [
         for (final url in urls)
-          if (hits[url] case final entry?)
-            MapLibreTile(
-              url: url,
-              data: entry.bytes,
-              contentType: entry.contentType,
-              etag: entry.etag,
-            ),
+          if (hits[url] case final entry?) _tileFromCache(url, entry),
       ];
       for (var tileAt = 0; tileAt < tiles.length; tileAt += _injectChunk) {
         if (shouldContinue?.call() == false || used >= cap) break outer;
@@ -518,12 +548,13 @@ class MapTileCache {
   Future<void> put(String url, Uint8List bytes, {String? contentType}) async {
     final uri = Uri.tryParse(url);
     if (uri == null || !EtagInterceptor.isImmutableTile(uri)) return;
+    final payload = _safeRasterPayload(bytes, contentType);
     await _store.writeBytesBatch([
       (
         url: url,
         etag: EtagInterceptor.etagFromUrl(uri),
-        bytes: bytes,
-        contentType: contentType,
+        bytes: payload.bytes,
+        contentType: payload.contentType,
         size: bytes.length,
       ),
     ]);
@@ -557,6 +588,77 @@ class MapTileCache {
 
   static int _binaryBytes(Iterable<CachedBytes> entries) =>
       entries.fold(0, (sum, entry) => sum + entry.bytes.length);
+
+  static MapLibreTile _tileFromCache(String url, CachedBytes entry) {
+    final payload = _safeRasterPayload(entry.bytes, entry.contentType);
+    return MapLibreTile(
+      url: url,
+      data: payload.bytes,
+      contentType: payload.contentType,
+      etag: entry.etag,
+    );
+  }
+
+  /// The radar endpoint uses this exact 35-byte body as an empty tile while
+  /// declaring it `image/webp`. It resembles a 1x1 GIF but has no colour
+  /// table, so Apple's ImageIO rejects it. A wide L1 warm can otherwise feed
+  /// thousands of identical failures into MapLibre's decode workers when the
+  /// map surface returns, starving rendering without a Dart exception.
+  ///
+  /// Match the whole body, not merely the GIF header: valid GIF tiles must
+  /// remain byte-for-byte untouched. The second exact match upgrades the
+  /// accidentally shipped opaque-black placeholder from the first repair.
+  /// Existing L2 rows are repaired when read, while new network/app writes
+  /// persist the transparent replacement.
+  static ({Uint8List bytes, String? contentType}) _safeRasterPayload(
+    Uint8List bytes,
+    String? contentType,
+  ) {
+    if (!_bytesEqual(bytes, _malformedEmptyGif) &&
+        !_bytesEqual(bytes, _opaqueBlackPlaceholderPng)) {
+      return (bytes: bytes, contentType: contentType);
+    }
+    return (bytes: _transparentPng, contentType: 'image/png');
+  }
+
+  static bool _bytesEqual(Uint8List bytes, Uint8List expected) {
+    if (bytes.length != expected.length) return false;
+    for (var i = 0; i < bytes.length; i++) {
+      if (bytes[i] != expected[i]) return false;
+    }
+    return true;
+  }
+
+  static final Uint8List _malformedEmptyGif = base64Decode(
+    'R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAIBADs=',
+  );
+
+  /// The previous placeholder was valid PNG but its grayscale-alpha pixel was
+  /// `(black, 255)`: fully opaque. MapLibre correctly stretched that one pixel
+  /// across a whole tile, producing the large black rectangles seen on-map.
+  static final Uint8List _opaqueBlackPlaceholderPng = base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+'
+    'A8AAQUBAScY42YAAAAASUVORK5CYII=',
+  );
+
+  /// Valid 1x1 RGBA PNG whose pixel is `(0, 0, 0, 0)`.
+  ///
+  /// Keep the source string as the cache version. Dart hot reload preserves
+  /// static field values, so comparing it before returning the decoded bytes
+  /// also replaces the old placeholder without requiring a process restart.
+  static const String _transparentPngBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUA'
+      'AXpeqz8AAAAASUVORK5CYII=';
+  static String? _transparentPngVersion;
+  static Uint8List? _transparentPngBytes;
+
+  static Uint8List get _transparentPng {
+    if (_transparentPngVersion != _transparentPngBase64) {
+      _transparentPngBytes = base64Decode(_transparentPngBase64);
+      _transparentPngVersion = _transparentPngBase64;
+    }
+    return _transparentPngBytes!;
+  }
 
   static String _bytes(int value) => value < 1024
       ? '${value}B'
