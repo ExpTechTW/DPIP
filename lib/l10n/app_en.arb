@@ -4018,5 +4018,15 @@
     "description": "Shown when a debug dump could not be uploaded"
   },
   "statusLegendUnprobed": "Not yet probed",
-  "statusLegendUnsupported": "Not offered"
+  "statusLegendUnsupported": "Not offered",
+  "eewSpokenLocalIntensity": "Estimated intensity at your location: {intensity}.",
+  "@eewSpokenLocalIntensity": {
+    "description": "Short foreground TTS phrase before an EEW warning sound",
+    "placeholders": {"intensity": {"type": "String"}}
+  },
+  "eewSpokenMaxIntensity": "Estimated maximum intensity: {intensity}.",
+  "@eewSpokenMaxIntensity": {
+    "description": "TTS fallback when the device location is unavailable",
+    "placeholders": {"intensity": {"type": "String"}}
+  }
 }

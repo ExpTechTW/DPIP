@@ -3216,4 +3216,14 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => 'Hindi suportado';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return 'Tinatayang intensidad sa iyong lokasyon: $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return 'Tinatayang pinakamataas na intensidad: $intensity.';
+  }
 }

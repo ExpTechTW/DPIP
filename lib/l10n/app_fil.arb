@@ -1951,5 +1951,7 @@
   "dumpCopyAgain": "Kopyahin ulit",
   "dumpUploadFailed": "Nabigong mag-upload",
   "statusLegendUnprobed": "Hindi pa nasuri",
-  "statusLegendUnsupported": "Hindi suportado"
+  "statusLegendUnsupported": "Hindi suportado",
+  "eewSpokenLocalIntensity": "Tinatayang intensidad sa iyong lokasyon: {intensity}.",
+  "eewSpokenMaxIntensity": "Tinatayang pinakamataas na intensidad: {intensity}."
 }

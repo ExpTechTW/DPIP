@@ -6,6 +6,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
+import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -31,9 +32,16 @@ const String _fallbackChannelKey = 'announcement-general-v2';
 /// [NotificationTaps]. A `notification`-payload message is displayed by the OS
 /// directly (its tap arrives via `onMessageOpenedApp`).
 class NotificationService {
-  NotificationService(this._settings);
+  NotificationService(
+    this._settings, {
+    ForegroundEewAnnouncementGate? foregroundEewGate,
+  }) : foregroundEewGate = foregroundEewGate ?? ForegroundEewAnnouncementGate();
 
   final SettingsStore _settings;
+
+  /// Sequences foreground EEW speech before the notification channel sound.
+  /// Background and terminated delivery bypass this object entirely.
+  final ForegroundEewAnnouncementGate foregroundEewGate;
 
   /// The last push token, or null before registration.
   String? get token => _settings.getString(SettingKeys.pushToken);
@@ -311,12 +319,9 @@ class NotificationService {
     final messaging = FirebaseMessaging.instance;
 
     FirebaseMessaging.onBackgroundMessage(onBackgroundMessage);
-    FirebaseMessaging.onMessage.listen((message) {
-      final content = contentFromMessage(message);
-      if (content != null) {
-        AwesomeNotifications().createNotification(content: content);
-      }
-    });
+    FirebaseMessaging.onMessage.listen(
+      (message) => unawaited(_showForegroundMessage(message)),
+    );
     FirebaseMessaging.onMessageOpenedApp.listen((m) => _routeTap(m.data));
 
     final initial = await messaging.getInitialMessage();
@@ -339,6 +344,51 @@ class NotificationService {
     // Fire-and-forget: this can wait seconds for the iOS APNs token, and
     // `init()` is awaited at launch, so it must not block start-up.
     unawaited(_fetchToken());
+  }
+
+  Future<void> _showForegroundMessage(RemoteMessage message) async {
+    final content = contentFromMessage(message);
+    if (content == null) return;
+
+    Future<void> display() =>
+        AwesomeNotifications().createNotification(content: content);
+    if (content.channelKey?.startsWith('eew') ?? false) {
+      await foregroundEewGate.submit(display);
+    } else {
+      await display();
+    }
+  }
+
+  /// Submits a debug monitor warning through the same foreground EEW gate as
+  /// an FCM message. The caller is compile-time gated by the demo sound flag;
+  /// this guard also makes an accidental release call inert.
+  Future<void> showDebugEewWarning({
+    required String title,
+    required String body,
+  }) async {
+    if (!kDebugMode) return;
+    await foregroundEewGate.submit(() async {
+      final created = await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 570057,
+          channelKey: 'eew_alert-important-v2',
+          title: title,
+          body: body,
+          wakeUpScreen: true,
+          category: NotificationCategory.Alarm,
+          payload: const {
+            'channel': 'eew_alert-important-v2',
+            'id': 'demo-monitor-sound',
+          },
+        ),
+      );
+      if (!created) {
+        Log.warning(
+          'monitor demo warning was rejected — notification permission or '
+          'channel settings may be disabled',
+        );
+      }
+    });
   }
 
   /// Fetches the push token and persists it as [SettingKeys.pushToken] —

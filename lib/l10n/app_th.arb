@@ -1951,5 +1951,7 @@
   "dumpCopyAgain": "คัดลอกอีกครั้ง",
   "dumpUploadFailed": "อัปโหลดไม่สำเร็จ",
   "statusLegendUnprobed": "ยังไม่ตรวจ",
-  "statusLegendUnsupported": "ไม่รองรับ"
+  "statusLegendUnsupported": "ไม่รองรับ",
+  "eewSpokenLocalIntensity": "คาดการณ์ความรุนแรง ณ ตำแหน่งของคุณ: {intensity}",
+  "eewSpokenMaxIntensity": "คาดการณ์ความรุนแรงสูงสุด: {intensity}"
 }

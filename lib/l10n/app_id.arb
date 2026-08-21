@@ -1951,5 +1951,7 @@
   "dumpCopyAgain": "Salin lagi",
   "dumpUploadFailed": "Gagal mengunggah",
   "statusLegendUnprobed": "Belum diperiksa",
-  "statusLegendUnsupported": "Tidak tersedia"
+  "statusLegendUnsupported": "Tidak tersedia",
+  "eewSpokenLocalIntensity": "Perkiraan intensitas di lokasi Anda: {intensity}.",
+  "eewSpokenMaxIntensity": "Perkiraan intensitas maksimum: {intensity}."
 }

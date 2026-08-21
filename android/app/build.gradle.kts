@@ -86,6 +86,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            // defaultConfig keeps release artifacts arm64-only, but Android
+            // emulators on Intel/AMD hosts need Flutter's x86_64 engine.
+            ndk {
+                abiFilters.add("x86_64")
+            }
+        }
         release {
             signingConfig =
                 if (keystorePropertiesFile.exists()) {

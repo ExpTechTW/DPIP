@@ -5,21 +5,32 @@
 /// [MapLayer.buildLegend].
 library;
 
+import 'dart:async';
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
+import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/models/lat_lng.dart';
+import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/speech/speech_service.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/features/map/presentation/monitor_eew_announcement_controller.dart';
 import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/alert_cycle_chip.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 /// The RTS layer's overlay, laid over the full map (via the scaffold's
 /// `buildSheet` slot): the active EEW alert card above a freshness strip at
@@ -54,7 +65,8 @@ class RtsMonitorPanel extends StatefulWidget {
   State<RtsMonitorPanel> createState() => _RtsMonitorPanelState();
 }
 
-class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
+class _RtsMonitorPanelState extends State<RtsMonitorPanel>
+    with WidgetsBindingObserver {
   /// Whether the map tab is the shell's visible one. The RTS feed keeps
   /// notifying at ~1 Hz behind other tabs (the polling itself must continue —
   /// it is a safety feed), but rebuilding a hidden panel for every poll is
@@ -62,14 +74,22 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
   /// up in one build on return.
   bool _visible = true;
   VisibleTab? _visibleTab;
+  MonitorEewAnnouncementController? _announcement;
+  AppLocalizations? _l10n;
+  String _languageTag = 'zh-TW';
+  AppLifecycleState? _lifecycleState;
+  bool _demoWarningSubmitted = false;
 
   void _onData() {
+    _syncAnnouncement();
     if (_visible && mounted) setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _lifecycleState = WidgetsBinding.instance.lifecycleState;
     widget.feed.addListener(_onData);
     widget.eew.addListener(_onData);
     widget.eewIndex.addListener(_onData);
@@ -90,25 +110,117 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
       oldWidget.eewIndex.removeListener(_onData);
       widget.eewIndex.addListener(_onData);
     }
+    _syncAnnouncement();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _l10n = AppLocalizations.of(context);
+    _languageTag = Localizations.localeOf(context).toLanguageTag();
+    _announcement ??= _createAnnouncementController();
     final visibleTab = VisibleTabScope.of(context);
-    if (identical(visibleTab, _visibleTab)) return;
-    _visibleTab?.removeListener(_syncVisibility);
-    _visibleTab = visibleTab;
-    visibleTab?.addListener(_syncVisibility);
-    _syncVisibility();
+    if (!identical(visibleTab, _visibleTab)) {
+      _visibleTab?.removeListener(_syncVisibility);
+      _visibleTab = visibleTab;
+      visibleTab?.addListener(_syncVisibility);
+      _syncVisibility();
+    }
+    _syncAnnouncement();
+  }
+
+  MonitorEewAnnouncementController? _createAnnouncementController() {
+    // Nullable reads keep this leaf widget independently testable; the app's
+    // core provider list always supplies both services.
+    final speech = context.read<SpeechService?>();
+    final notifications = context.read<NotificationService?>();
+    if (speech == null || notifications == null) return null;
+    final location = context.read<LocationService>();
+    return MonitorEewAnnouncementController(
+      speech,
+      notifications.foregroundEewGate,
+      (alert) async {
+        // A warning cannot wait on a live GPS timeout. Use the OS's recent
+        // cached fix; when none is fresh enough, announce the EEW max instead.
+        final fix = await location.lastKnownFix();
+        if (fix == null) {
+          return (scale: alert.info.max.clamp(0, 9), isLocal: false);
+        }
+        final estimate = estimateLocalShaking(alert, LatLng(fix.lat, fix.lng));
+        return (scale: estimate.scale, isLocal: true);
+      },
+    );
   }
 
   void _syncVisibility() {
     final visible = _visibleTab?.isOnScreen(MapPage.tabIndex) ?? true;
     if (visible == _visible) return;
     _visible = visible;
+    _syncAnnouncement();
     // Coming back: one build to catch up on everything missed while hidden.
     if (visible && mounted) setState(() {});
+  }
+
+  /// Sound must use a stricter visibility check than rendering. This widget
+  /// can be mounted before the shell installs [VisibleTabScope], and treating
+  /// that transient state as visible would announce an alert from a map branch
+  /// the user has not opened yet.
+  bool get _isMonitorOnScreen =>
+      _visibleTab?.isOnScreen(MapPage.tabIndex) ?? false;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _lifecycleState = state;
+    _syncAnnouncement();
+  }
+
+  void _syncAnnouncement() {
+    final controller = _announcement;
+    final l10n = _l10n;
+    if (controller == null || l10n == null) return;
+    final foreground =
+        _lifecycleState == null || _lifecycleState == AppLifecycleState.resumed;
+    controller.setActive(_isMonitorOnScreen && foreground);
+    controller.update(
+      widget.eew.state,
+      languageTag: _languageTag,
+      format: (estimate) {
+        final intensity = spokenIntensityLabel(estimate.scale, _languageTag);
+        return estimate.isLocal
+            ? l10n.eewSpokenLocalIntensity(intensity)
+            : l10n.eewSpokenMaxIntensity(intensity);
+      },
+    );
+    _submitDemoWarning(l10n);
+  }
+
+  void _submitDemoWarning(AppLocalizations l10n) {
+    final foreground =
+        _lifecycleState == null || _lifecycleState == AppLifecycleState.resumed;
+    if (!kMonitorDemoSoundEnabled ||
+        _demoWarningSubmitted ||
+        !_isMonitorOnScreen ||
+        !foreground) {
+      return;
+    }
+    final state = widget.eew.state;
+    final alerts = state.data;
+    if (state.status != RealtimeStatus.live ||
+        alerts == null ||
+        alerts.isEmpty) {
+      return;
+    }
+    _demoWarningSubmitted = true;
+    final intensity = spokenIntensityLabel(
+      alerts.first.info.max.clamp(0, 9),
+      _languageTag,
+    );
+    unawaited(
+      context.read<NotificationService>().showDebugEewWarning(
+        title: l10n.mapLayerMonitor,
+        body: l10n.eewSpokenMaxIntensity(intensity),
+      ),
+    );
   }
 
   @override
@@ -117,6 +229,8 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel> {
     widget.eew.removeListener(_onData);
     widget.eewIndex.removeListener(_onData);
     _visibleTab?.removeListener(_syncVisibility);
+    WidgetsBinding.instance.removeObserver(this);
+    _announcement?.dispose();
     super.dispose();
   }
 

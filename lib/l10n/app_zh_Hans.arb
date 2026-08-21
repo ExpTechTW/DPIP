@@ -1951,5 +1951,7 @@
   "dumpCopyAgain": "再复制一次",
   "dumpUploadFailed": "上传失败，请稍后再试",
   "statusLegendUnprobed": "未探测",
-  "statusLegendUnsupported": "不支持"
+  "statusLegendUnsupported": "不支持",
+  "eewSpokenLocalIntensity": "所在地预估烈度，{intensity}。",
+  "eewSpokenMaxIntensity": "预估最大烈度，{intensity}。"
 }

@@ -3151,4 +3151,14 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => '非対応';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '現在地の予想震度、$intensity。';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '予想最大震度、$intensity。';
+  }
 }

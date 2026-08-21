@@ -27,6 +27,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_markdown_plus: ^1.0.5
+  flutter_tts: ^4.2.5
   # Direct because a MarkdownElementBuilder's signature takes an md.Element
   # and flutter_markdown_plus does not re-export the package that defines it.
   markdown: ^7.3.1

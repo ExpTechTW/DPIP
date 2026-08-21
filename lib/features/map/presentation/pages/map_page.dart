@@ -1,10 +1,8 @@
 /// Full-screen map tab — assembles overlay layers for [MapScaffold].
 library;
 
-import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
-import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
@@ -110,10 +108,9 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    // In demo mode the monitor is what there is to see — open straight on it.
-    final initial = kMonitorDemoEnabled
-        ? DefaultMapLayer.monitor
-        : context.watch<DefaultMapLayerController>().layer;
+    // Demo data must not silently change the user's active layer: speech and
+    // its warning sound are scoped to a monitor the user is actually viewing.
+    final initial = context.watch<DefaultMapLayerController>().layer;
     return MapScaffold(
       key: ValueKey(initial.id),
       layers: _layers,

@@ -1951,5 +1951,7 @@
   "dumpCopyAgain": "다시 복사",
   "dumpUploadFailed": "업로드하지 못했습니다",
   "statusLegendUnprobed": "탐지 안 됨",
-  "statusLegendUnsupported": "미지원"
+  "statusLegendUnsupported": "미지원",
+  "eewSpokenLocalIntensity": "현재 위치 예상 진도, {intensity}.",
+  "eewSpokenMaxIntensity": "예상 최대 진도, {intensity}."
 }
