@@ -7,6 +7,7 @@ import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/map_trace.dart';
 import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -83,44 +84,67 @@ class MapTimeline extends StatefulWidget {
 
 /// Visible feedback for the timeline's bounded latest-wins render queue.
 ///
-/// [reportDroppedFrame] is called only when a scrub sample is coalesced because
-/// the map already has one update waiting. One slow native call is not proof
-/// that input is too fast: only a short run of repeated drops enters the paused
-/// state. While paused, [reportScrubSample] keeps extending the pause; once
+/// Two different things stop map output from following the finger, and neither
+/// is proof on its own. [reportDroppedFrame] means a scrub sample was coalesced
+/// because an update was already waiting — that is one slow native call, not a
+/// verdict on the input rate. [reportBlockedFrame] means the layer refused to
+/// reveal the selected frame because its tiles were not resident: stronger
+/// evidence, but the first cold frame of a scrub is ordinary, and pausing on it
+/// told the user to slow down when the real cause was an unwarmed tile band.
+///
+/// So both feed one evidence counter — a refused reveal counting double — and
+/// only [pauseThreshold] points inside a single [overloadWindow] pause output.
+/// While paused, [reportScrubSample] keeps extending the pause; once
 /// crossed-frame samples become sparse enough, the quiet timer resumes output.
 /// Finger-up calls [resume] immediately.
 final class TimelineScrubBackpressure extends ValueNotifier<bool> {
   TimelineScrubBackpressure({
-    this.pauseAfterDrops = 3,
+    this.pauseThreshold = 3,
     this.overloadWindow = const Duration(milliseconds: 160),
     this.resumeDelay = const Duration(milliseconds: 120),
   }) : super(false);
 
-  /// Consecutive coalesced samples required before frame submission pauses.
-  final int pauseAfterDrops;
+  /// Stall evidence, in points, required before frame submission pauses.
+  final int pauseThreshold;
 
-  /// A gap this long means earlier drops were isolated, not sustained load.
+  /// A gap this long means the earlier evidence was isolated, not sustained
+  /// load, so the counter starts again from zero.
   final Duration overloadWindow;
 
   /// No crossed frame for this long means the finger has slowed enough.
   final Duration resumeDelay;
 
-  int _dropStreak = 0;
+  /// What one coalesced queue sample is worth against [pauseThreshold].
+  static const int _dropPoints = 1;
+
+  /// What one unrevealable frame is worth. A refused reveal is direct proof
+  /// that the map stopped following, so two of them pause where three drops
+  /// are needed — but one alone, which is just a cold frame, does not.
+  static const int _blockPoints = 2;
+
+  int _stallPoints = 0;
   Timer? _overloadTimer;
   Timer? _resumeTimer;
 
-  void reportDroppedFrame() {
+  /// A scrub sample was coalesced because an update was already queued.
+  void reportDroppedFrame() => _reportStall(_dropPoints);
+
+  /// The selected raster frame could not be revealed — its viewport tiles were
+  /// not resident, so the previous timestamp is still what the map draws.
+  void reportBlockedFrame() => _reportStall(_blockPoints);
+
+  void _reportStall(int points) {
     if (value) {
       reportScrubSample();
       return;
     }
 
-    _dropStreak++;
+    _stallPoints += points;
     _overloadTimer?.cancel();
-    _overloadTimer = Timer(overloadWindow, _clearDropStreak);
-    if (_dropStreak < pauseAfterDrops) return;
+    _overloadTimer = Timer(overloadWindow, _clearStall);
+    if (_stallPoints < pauseThreshold) return;
 
-    _clearDropStreak();
+    _clearStall();
     value = true;
     _armResume();
   }
@@ -135,14 +159,14 @@ final class TimelineScrubBackpressure extends ValueNotifier<bool> {
     _resumeTimer = Timer(resumeDelay, resume);
   }
 
-  void _clearDropStreak() {
+  void _clearStall() {
     _overloadTimer?.cancel();
     _overloadTimer = null;
-    _dropStreak = 0;
+    _stallPoints = 0;
   }
 
   void resume() {
-    _clearDropStreak();
+    _clearStall();
     _resumeTimer?.cancel();
     _resumeTimer = null;
     if (value) value = false;
@@ -371,6 +395,12 @@ class _MapTimelineState extends State<MapTimeline> {
     if (!_scroll.hasClients) return false;
     final centred = _centredIndex;
     if (notification is ScrollStartNotification) {
+      mapTrace(
+        'timeline-widget',
+        () =>
+            'scroll-start drag=${notification.dragDetails != null} '
+            'offset=${_scroll.offset.toStringAsFixed(1)} index=$centred',
+      );
       if (notification.dragDetails != null) {
         // A real finger interrupts any driven snap. Its completion future may
         // still run, so invalidate that generation as well as the flag.
@@ -385,6 +415,12 @@ class _MapTimelineState extends State<MapTimeline> {
     } else if (notification is ScrollUpdateNotification) {
       if (!_snapping) _setScrubbing(true);
       if (centred != _liveIndex) {
+        mapTrace(
+          'timeline-widget',
+          () =>
+              'scroll-select from=$_liveIndex to=$centred '
+              'offset=${_scroll.offset.toStringAsFixed(1)}',
+        );
         setState(() => _liveIndex = centred);
         // Compare against [_liveIndex] (before the update), never
         // [widget.selectedIndex]: the parent keeps that prop stale on purpose
@@ -393,6 +429,12 @@ class _MapTimelineState extends State<MapTimeline> {
         widget.onSelected(centred);
       }
     } else if (notification is ScrollEndNotification && !_snapping) {
+      mapTrace(
+        'timeline-widget',
+        () =>
+            'scroll-end offset=${_scroll.offset.toStringAsFixed(1)} '
+            'index=$centred live=$_liveIndex',
+      );
       if (centred != _liveIndex) {
         setState(() => _liveIndex = centred);
         widget.onSelected(centred);

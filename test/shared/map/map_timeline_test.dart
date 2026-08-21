@@ -59,7 +59,7 @@ void main() {
     tester,
   ) async {
     final paused = TimelineScrubBackpressure(
-      pauseAfterDrops: 3,
+      pauseThreshold: 3,
       overloadWindow: const Duration(milliseconds: 80),
       resumeDelay: const Duration(milliseconds: 100),
     );
@@ -106,6 +106,25 @@ void main() {
     expect(find.textContaining('scrubbing too fast'), findsNothing);
     expect(tester.takeException(), isNull);
 
+    paused.reportBlockedFrame();
+    await tester.pump();
+    expect(
+      find.textContaining('scrubbing too fast'),
+      findsNothing,
+      reason: 'one cold frame is an unwarmed tile band, not a fast finger',
+    );
+
+    paused.reportBlockedFrame();
+    await tester.pump();
+    expect(
+      find.textContaining('scrubbing too fast'),
+      findsOneWidget,
+      reason: 'a held frame counts double, so two warn without three drops',
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(paused.value, isFalse);
+    await tester.pumpAndSettle();
+
     paused.reportDroppedFrame();
     paused.reportDroppedFrame();
     paused.reportDroppedFrame();
@@ -118,7 +137,7 @@ void main() {
 
   testWidgets('spaced queue drops never pause timeline output', (tester) async {
     final paused = TimelineScrubBackpressure(
-      pauseAfterDrops: 3,
+      pauseThreshold: 3,
       overloadWindow: const Duration(milliseconds: 50),
       resumeDelay: const Duration(milliseconds: 100),
     );
@@ -129,6 +148,24 @@ void main() {
     }
 
     expect(paused.value, isFalse);
+    paused.dispose();
+  });
+
+  testWidgets('a held frame and a queue drop together reach the threshold', (
+    tester,
+  ) async {
+    final paused = TimelineScrubBackpressure(
+      pauseThreshold: 3,
+      overloadWindow: const Duration(milliseconds: 50),
+      resumeDelay: const Duration(milliseconds: 100),
+    );
+
+    paused.reportBlockedFrame();
+    expect(paused.value, isFalse, reason: 'two points is not yet three');
+    paused.reportDroppedFrame();
+    expect(paused.value, isTrue);
+
+    paused.resume();
     paused.dispose();
   });
 
