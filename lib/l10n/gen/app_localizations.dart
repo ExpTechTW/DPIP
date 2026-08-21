@@ -171,12 +171,6 @@ abstract class AppLocalizations {
   /// **'Keeps county borders legible under the radar echo.'**
   String get radarCountyOutlineSubtitle;
 
-  /// Filter section title in the disaster-map sheet: restroom toilet-kind categories
-  ///
-  /// In en, this message translates to:
-  /// **'Toilet types'**
-  String get dpmFilterSectionRestroomType;
-
   /// Himawari visible-red channel (B03, 0.64 µm) layer name
   ///
   /// In en, this message translates to:
@@ -291,12 +285,6 @@ abstract class AppLocalizations {
   /// **'Region'**
   String get moreSectionRegion;
 
-  /// Shelter disaster-type filter chip: earthquake
-  ///
-  /// In en, this message translates to:
-  /// **'Earthquake'**
-  String get dpmDisasterEarthquake;
-
   /// Name of the Himawari infrared layer in the layer picker
   ///
   /// In en, this message translates to:
@@ -308,12 +296,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saturday hours'**
   String get aedHoursSaturday;
-
-  /// Shelter disaster-type filter chip: slope hazard
-  ///
-  /// In en, this message translates to:
-  /// **'Slope hazard'**
-  String get dpmDisasterSlope;
 
   /// Phase: new moon
   ///
@@ -405,12 +387,6 @@ abstract class AppLocalizations {
   /// **'Notification settings'**
   String get notifySettingsMenu;
 
-  /// Typhoon UI: typhoonHistoryTitle
-  ///
-  /// In en, this message translates to:
-  /// **'Dataset time'**
-  String get typhoonHistoryTitle;
-
   /// Choice-sheet label suffix marking the platform home map app, with the app name
   ///
   /// In en, this message translates to:
@@ -428,12 +404,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Grayscale base, tinted below −40 °C to highlight cloud-top height'**
   String get mapLayerStyleJmaTooltip;
-
-  /// Occurrence time for a gust or daily extreme
-  ///
-  /// In en, this message translates to:
-  /// **'Recorded at {time}'**
-  String weatherRankingRecordedAt(String time);
 
   /// Map layer switcher label for the rainfall station layer
   ///
@@ -458,12 +428,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Terrain relief'**
   String get mapTerrainRelief;
-
-  /// Label for an EEW alert's maximum felt intensity badge
-  ///
-  /// In en, this message translates to:
-  /// **'Max intensity'**
-  String get eewMaxIntensity;
 
   /// Tooltip on the control that collapses the map legend
   ///
@@ -560,12 +524,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Radar overlay options'**
   String get radarOverlayMenuTooltip;
-
-  /// Map control that centers the camera on the device GPS fix
-  ///
-  /// In en, this message translates to:
-  /// **'My location'**
-  String get mapMyLocation;
 
   /// Mesh nodes section header
   ///
@@ -710,12 +668,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Himawari Ozone (B12)'**
   String get mapLayerSatelliteB12;
-
-  /// Typhoon map legend: past/observed path
-  ///
-  /// In en, this message translates to:
-  /// **'Observed track'**
-  String get typhoonLegendPast;
 
   /// Restroom venue category: other
   ///
@@ -1035,12 +987,6 @@ abstract class AppLocalizations {
   /// **'Himawari Near-Infrared (B05)'**
   String get mapLayerSatelliteB05;
 
-  /// Per-quadrant storm-wind radii (km) for a typhoon circle
-  ///
-  /// In en, this message translates to:
-  /// **'NE {ne} · SE {se} · SW {sw} · NW {nw} km'**
-  String typhoonStormRadii(String ne, String se, String sw, String nw);
-
   /// No description provided for @typhoonLabelNe.
   ///
   /// In en, this message translates to:
@@ -1215,12 +1161,6 @@ abstract class AppLocalizations {
   /// **'DPIP is dedicated to real-time disaster-prevention information, with no ads or other revenue model. Your support helps us keep the servers running and keep developing.'**
   String get sponsorIntro;
 
-  /// Shelter detail address row label
-  ///
-  /// In en, this message translates to:
-  /// **'Address'**
-  String get shelterAddressLabel;
-
   /// Bulletin table row label
   ///
   /// In en, this message translates to:
@@ -1262,12 +1202,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wind forecast overlay options'**
   String get windForecastOverlayMenuTooltip;
-
-  /// Subtitle under weather ranking tiles on the Data hub
-  ///
-  /// In en, this message translates to:
-  /// **'Live station rankings'**
-  String get dataWeatherRankingSubtitle;
 
   /// X-axis tick label on the home rain trend chart, minutes from now
   ///
@@ -1509,12 +1443,6 @@ abstract class AppLocalizations {
   /// **'Forecast +{hours} h'**
   String typhoonForecastLead(String hours);
 
-  /// Shelter disaster-type filter chip: tsunami
-  ///
-  /// In en, this message translates to:
-  /// **'Tsunami'**
-  String get dpmDisasterTsunami;
-
   /// Chip label for a stable release
   ///
   /// In en, this message translates to:
@@ -1538,12 +1466,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Himawari Green (B02)'**
   String get mapLayerSatelliteB02;
-
-  /// Label for …000 serial reports (small-area felt quake, no CWA number)
-  ///
-  /// In en, this message translates to:
-  /// **'Local felt'**
-  String get reportListLocalFelt;
 
   /// Empty state when a ranking list has no rows after filters
   ///
@@ -1605,12 +1527,6 @@ abstract class AppLocalizations {
   /// **'Intensity'**
   String get reportFilterSortIntensity;
 
-  /// No description provided for @typhoonMotion.
-  ///
-  /// In en, this message translates to:
-  /// **'Moving'**
-  String get typhoonMotion;
-
   /// Connection state label
   ///
   /// In en, this message translates to:
@@ -1653,12 +1569,6 @@ abstract class AppLocalizations {
   /// **'GFS'**
   String get mapLayerWindForecastGfs;
 
-  /// Depth unit label beside the depth value on a report list row
-  ///
-  /// In en, this message translates to:
-  /// **'km'**
-  String get reportListDepthUnit;
-
   /// Label for the hypocentral-depth range filter
   ///
   /// In en, this message translates to:
@@ -1676,12 +1586,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Forecast'**
   String get mapNavQpesums;
-
-  /// Bottom-nav label and page title for the Map tab
-  ///
-  /// In en, this message translates to:
-  /// **'Map'**
-  String get navMap;
 
   /// Notify channel title
   ///
@@ -1724,12 +1628,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waning gibbous'**
   String get moonPhaseWaningGibbous;
-
-  /// Subtitle explaining the weather animation setting
-  ///
-  /// In en, this message translates to:
-  /// **'Override the home backdrop weather'**
-  String get weatherDynamicStateSubtitle;
 
   /// No description provided for @reportFilterIntensityInfoModernTitle.
   ///
@@ -1868,12 +1766,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset order'**
   String get mapLayerOrderReset;
-
-  /// Address row label in the disaster-map restroom / shelter detail sheet
-  ///
-  /// In en, this message translates to:
-  /// **'Address'**
-  String get dpmAddress;
 
   /// Chip to keep one extreme station per county
   ///
@@ -2031,12 +1923,6 @@ abstract class AppLocalizations {
   /// **'LoRa'**
   String get meshtasticRadioSettings;
 
-  /// Current temperature fragment in an extremes analysis line
-  ///
-  /// In en, this message translates to:
-  /// **'Now {value}°C'**
-  String weatherRankingAnalysisCurrent(String value);
-
   /// More-menu link to the ExpTech GitHub organisation
   ///
   /// In en, this message translates to:
@@ -2066,12 +1952,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get languageSettings;
-
-  /// Shelter disaster-type filter chip: nuclear accident
-  ///
-  /// In en, this message translates to:
-  /// **'Nuclear accident'**
-  String get dpmDisasterNuclear;
 
   /// Language picker tooltip / label
   ///
@@ -2163,12 +2043,6 @@ abstract class AppLocalizations {
   /// **'Earthquake'**
   String get mapNavEarthquake;
 
-  /// No description provided for @typhoonGust.
-  ///
-  /// In en, this message translates to:
-  /// **'Gust'**
-  String get typhoonGust;
-
   /// Restroom cleanliness grade: average
   ///
   /// In en, this message translates to:
@@ -2252,12 +2126,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'County borders'**
   String get radarCountyOutline;
-
-  /// Permission granted label
-  ///
-  /// In en, this message translates to:
-  /// **'Granted'**
-  String get onboardingGranted;
 
   /// Generic close button / action label
   ///
@@ -2499,12 +2367,6 @@ abstract class AppLocalizations {
   /// **'Skip anyway'**
   String get onboardingSkipLeave;
 
-  /// Onboarding back button
-  ///
-  /// In en, this message translates to:
-  /// **'Back'**
-  String get onboardingBack;
-
   /// AED placement description row label
   ///
   /// In en, this message translates to:
@@ -2529,12 +2391,6 @@ abstract class AppLocalizations {
   /// **'{n} km'**
   String typhoonValueKm(String n);
 
-  /// No description provided for @typhoonPressure.
-  ///
-  /// In en, this message translates to:
-  /// **'Pressure'**
-  String get typhoonPressure;
-
   /// Permission row: battery optimization (Android)
   ///
   /// In en, this message translates to:
@@ -2546,12 +2402,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'NW'**
   String get typhoonLabelNw;
-
-  /// Shelter disaster-type filter chip: flood
-  ///
-  /// In en, this message translates to:
-  /// **'Flood'**
-  String get dpmDisasterFlood;
 
   /// Phase: waxing crescent
   ///
@@ -2642,12 +2492,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'M{magnitude}'**
   String reportListMagnitude(String magnitude);
-
-  /// Shelter disaster-type filter chip: landslide
-  ///
-  /// In en, this message translates to:
-  /// **'Landslide'**
-  String get dpmDisasterLandslide;
 
   /// Notify channel title
   ///
@@ -2805,12 +2649,6 @@ abstract class AppLocalizations {
   /// **'App Store'**
   String get moreAppStore;
 
-  /// Filter section title in the disaster-map sheet: shelter disaster types
-  ///
-  /// In en, this message translates to:
-  /// **'Shelter disaster types'**
-  String get dpmFilterSectionShelter;
-
   /// More-menu link to the ExpTech server status website
   ///
   /// In en, this message translates to:
@@ -2876,12 +2714,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current location'**
   String get regionCurrent;
-
-  /// Filter section title in the disaster-map sheet: restroom venue categories
-  ///
-  /// In en, this message translates to:
-  /// **'Venue types'**
-  String get dpmFilterSectionRestroom;
 
   /// Empty message log while not connected
   ///
@@ -3045,12 +2877,6 @@ abstract class AppLocalizations {
   /// **'Moderate typhoon'**
   String get typhoonIntensityModerate;
 
-  /// No description provided for @typhoonWind.
-  ///
-  /// In en, this message translates to:
-  /// **'Wind'**
-  String get typhoonWind;
-
   /// Himawari Ash RGB composite layer name
   ///
   /// In en, this message translates to:
@@ -3063,12 +2889,6 @@ abstract class AppLocalizations {
   /// **'3 h'**
   String get rainInterval3h;
 
-  /// Fetches the report list with the current draft filters
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get reportListSearch;
-
   /// Section title in map overlay lists: satellite-imagery overlays
   ///
   /// In en, this message translates to:
@@ -3080,12 +2900,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'DPIP channel ready'**
   String get meshtasticChannelReady;
-
-  /// Label for the location keyword filter field
-  ///
-  /// In en, this message translates to:
-  /// **'Location'**
-  String get reportFilterLocation;
 
   /// Himawari Night Microphysics RGB composite layer name
   ///
@@ -3164,18 +2978,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location'**
   String get onboardingPermLocation;
-
-  /// One-line subtitle on the More tab's support call to action
-  ///
-  /// In en, this message translates to:
-  /// **'No ads — your support keeps the servers running.'**
-  String get sponsorCalloutBody;
-
-  /// One-line subtitle on the More tab's Discord call to action
-  ///
-  /// In en, this message translates to:
-  /// **'Join the community and talk to the team.'**
-  String get moreDiscordCalloutBody;
 
   /// More-menu link to the ExpTech Discord community
   ///
@@ -3417,12 +3219,6 @@ abstract class AppLocalizations {
   /// **'Intensity report'**
   String get notifyIntensity;
 
-  /// Compact typhoon time chip / map label shape (day + hour, no month)
-  ///
-  /// In en, this message translates to:
-  /// **'{day}日{hour}時'**
-  String typhoonTimeChip(String day, String hour);
-
   /// Tooltip for the rainfall accumulation-interval menu
   ///
   /// In en, this message translates to:
@@ -3543,12 +3339,6 @@ abstract class AppLocalizations {
   /// **'Dust'**
   String get weatherModeSand;
 
-  /// Typhoon UI: typhoonSatelliteTitle
-  ///
-  /// In en, this message translates to:
-  /// **'Satellite'**
-  String get typhoonSatelliteTitle;
-
   /// Notify channel title
   ///
   /// In en, this message translates to:
@@ -3621,12 +3411,6 @@ abstract class AppLocalizations {
   /// **'Phase'**
   String get moonTimelineCaption;
 
-  /// Magnitude and depth line on a report list row
-  ///
-  /// In en, this message translates to:
-  /// **'M{magnitude} · {depth} km'**
-  String reportListMeta(String magnitude, String depth);
-
   /// More-menu entry that opens the bundled open-source license list
   ///
   /// In en, this message translates to:
@@ -3663,23 +3447,11 @@ abstract class AppLocalizations {
   /// **'Hop limit'**
   String get meshtasticHopLimit;
 
-  /// Diurnal range fragment in an extremes analysis line
-  ///
-  /// In en, this message translates to:
-  /// **'Range {value}°C'**
-  String weatherRankingAnalysisRange(String value);
-
   /// Chip to rank by recorded daily maximum temperature
   ///
   /// In en, this message translates to:
   /// **'Daily high'**
   String get weatherRankingExtremeHigh;
-
-  /// App bar title on a single release's detail page
-  ///
-  /// In en, this message translates to:
-  /// **'Release details'**
-  String get changelogVersionDetails;
 
   /// Footer link to the Privacy Policy
   ///
@@ -4041,12 +3813,6 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get endpointStateUnknown;
 
-  /// No description provided for @endpointLastSuccessNever.
-  ///
-  /// In en, this message translates to:
-  /// **'never succeeded'**
-  String get endpointLastSuccessNever;
-
   /// No description provided for @endpointServiceEew.
   ///
   /// In en, this message translates to:
@@ -4197,18 +3963,6 @@ abstract class AppLocalizations {
   /// **'Transport'**
   String get restroomCategoryTransport;
 
-  /// Hint for the location keyword filter field
-  ///
-  /// In en, this message translates to:
-  /// **'e.g. Hualien, offshore'**
-  String get reportFilterLocationHint;
-
-  /// Moon entry card subtitle in the data catalogue
-  ///
-  /// In en, this message translates to:
-  /// **'Lunar phase and illumination — computed locally'**
-  String get moonSubtitle;
-
   /// Battery charge
   ///
   /// In en, this message translates to:
@@ -4334,12 +4088,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full release notes'**
   String get releaseHighlightsSeeNotes;
-
-  /// No description provided for @highlightCardTechnical.
-  ///
-  /// In en, this message translates to:
-  /// **'Technical'**
-  String get highlightCardTechnical;
 
   /// No description provided for @moreVersionNotesEmpty.
   ///
@@ -4485,12 +4233,6 @@ abstract class AppLocalizations {
   /// **'10 min'**
   String get rainInterval10m;
 
-  /// Daily low fragment; value may include clock time
-  ///
-  /// In en, this message translates to:
-  /// **'Low {value}'**
-  String weatherRankingAnalysisLow(String value);
-
   /// Connect despite the other app
   ///
   /// In en, this message translates to:
@@ -4581,12 +4323,6 @@ abstract class AppLocalizations {
   /// **'Himawari Airmass'**
   String get mapLayerSatelliteAirmass;
 
-  /// Typhoon UI: typhoonTrackDetail
-  ///
-  /// In en, this message translates to:
-  /// **'Track detail'**
-  String get typhoonTrackDetail;
-
   /// Section header on the Data hub for weather observation rankings
   ///
   /// In en, this message translates to:
@@ -4605,23 +4341,11 @@ abstract class AppLocalizations {
   /// **'Active events'**
   String get homeActiveEventsTitle;
 
-  /// Daily high fragment; value may include clock time
-  ///
-  /// In en, this message translates to:
-  /// **'High {value}'**
-  String weatherRankingAnalysisHigh(String value);
-
   /// More-menu link title for the FAQ / help page
   ///
   /// In en, this message translates to:
   /// **'FAQ'**
   String get faq;
-
-  /// Typhoon UI: typhoonHistoryLive
-  ///
-  /// In en, this message translates to:
-  /// **'Live'**
-  String get typhoonHistoryLive;
 
   /// The serial (report number) of an EEW alert
   ///
@@ -4749,12 +4473,6 @@ abstract class AppLocalizations {
   /// **'Weather animation'**
   String get weatherDynamicState;
 
-  /// Placeholder shown in place of the map while MapLibre is disabled
-  ///
-  /// In en, this message translates to:
-  /// **'Map (temporarily disabled)'**
-  String get mapPlaceholderDisabled;
-
   /// Returns the moon page to the present moment
   ///
   /// In en, this message translates to:
@@ -4838,12 +4556,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sun'**
   String get sunTitle;
-
-  /// Sun page one-line summary on the data hub
-  ///
-  /// In en, this message translates to:
-  /// **'Sunrise, twilight and the solar terms'**
-  String get sunSubtitle;
 
   /// Section header: sunrise, noon, sunset, day length
   ///
@@ -4958,12 +4670,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Planets'**
   String get planetsTitle;
-
-  /// Planets page one-line summary on the data hub
-  ///
-  /// In en, this message translates to:
-  /// **'Where they are tonight, and how bright'**
-  String get planetsSubtitle;
 
   /// Section header: the planets right now
   ///
@@ -5229,12 +4935,6 @@ abstract class AppLocalizations {
   /// **'Tonight'**
   String get tonightTitle;
 
-  /// Tonight page summary on the data hub
-  ///
-  /// In en, this message translates to:
-  /// **'What is observable, and when'**
-  String get tonightSubtitle;
-
   /// Section header: the observing window
   ///
   /// In en, this message translates to:
@@ -5433,12 +5133,6 @@ abstract class AppLocalizations {
   /// **'Almanac'**
   String get almanacTitle;
 
-  /// Almanac page summary on the data hub
-  ///
-  /// In en, this message translates to:
-  /// **'The lunisolar date and the eclipses ahead'**
-  String get almanacSubtitle;
-
   /// Section header: today's date in both calendars
   ///
   /// In en, this message translates to:
@@ -5607,12 +5301,6 @@ abstract class AppLocalizations {
   /// **'Tide'**
   String get tideTitle;
 
-  /// Tide page summary on the data hub
-  ///
-  /// In en, this message translates to:
-  /// **'Spring, neap and the pull of the Moon'**
-  String get tideSubtitle;
-
   /// Says plainly that this is the astronomical forcing, not a harbour tide table
   ///
   /// In en, this message translates to:
@@ -5696,12 +5384,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sky chart'**
   String get skyChartTitle;
-
-  /// Sky chart page summary on the data hub
-  ///
-  /// In en, this message translates to:
-  /// **'The naked-eye sky above you'**
-  String get skyChartSubtitle;
 
   /// Compass point on the sky chart
   ///

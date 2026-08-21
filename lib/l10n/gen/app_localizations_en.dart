@@ -44,9 +44,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keeps county borders legible under the radar echo.';
 
   @override
-  String get dpmFilterSectionRestroomType => 'Toilet types';
-
-  @override
   String get mapLayerSatelliteB03 => 'Himawari Red (B03)';
 
   @override
@@ -109,16 +106,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreSectionRegion => 'Region';
 
   @override
-  String get dpmDisasterEarthquake => 'Earthquake';
-
-  @override
   String get mapLayerSatellite => 'Himawari Infrared (B13)';
 
   @override
   String get aedHoursSaturday => 'Saturday hours';
-
-  @override
-  String get dpmDisasterSlope => 'Slope hazard';
 
   @override
   String get moonPhaseNew => 'New moon';
@@ -167,9 +158,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifySettingsMenu => 'Notification settings';
 
   @override
-  String get typhoonHistoryTitle => 'Dataset time';
-
-  @override
   String mapAppDefault(String app) {
     return '$app (default)';
   }
@@ -182,11 +170,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Grayscale base, tinted below −40 °C to highlight cloud-top height';
 
   @override
-  String weatherRankingRecordedAt(String time) {
-    return 'Recorded at $time';
-  }
-
-  @override
   String get mapLayerRain => 'Rainfall';
 
   @override
@@ -197,9 +180,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapTerrainRelief => 'Terrain relief';
-
-  @override
-  String get eewMaxIntensity => 'Max intensity';
 
   @override
   String get mapLegendCollapse => 'Hide legend';
@@ -251,9 +231,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radarOverlayMenuTooltip => 'Radar overlay options';
-
-  @override
-  String get mapMyLocation => 'My location';
 
   @override
   String get meshtasticNodes => 'Nodes';
@@ -331,9 +308,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
-
-  @override
-  String get typhoonLegendPast => 'Observed track';
 
   @override
   String get restroomCategoryOther => 'Other';
@@ -510,11 +484,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerSatelliteB05 => 'Himawari Near-Infrared (B05)';
 
   @override
-  String typhoonStormRadii(String ne, String se, String sw, String nw) {
-    return 'NE $ne · SE $se · SW $sw · NW $nw km';
-  }
-
-  @override
   String get typhoonLabelNe => 'NE';
 
   @override
@@ -608,9 +577,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'DPIP is dedicated to real-time disaster-prevention information, with no ads or other revenue model. Your support helps us keep the servers running and keep developing.';
 
   @override
-  String get shelterAddressLabel => 'Address';
-
-  @override
   String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
 
   @override
@@ -632,9 +598,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get windForecastOverlayMenuTooltip => 'Wind forecast overlay options';
-
-  @override
-  String get dataWeatherRankingSubtitle => 'Live station rankings';
 
   @override
   String homeRainTrendMinute(int minute) {
@@ -764,9 +727,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get dpmDisasterTsunami => 'Tsunami';
-
-  @override
   String get changelogTypeStable => 'Stable';
 
   @override
@@ -778,9 +738,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB02 => 'Himawari Green (B02)';
-
-  @override
-  String get reportListLocalFelt => 'Local felt';
 
   @override
   String get weatherRankingEmpty => 'No observations to rank';
@@ -817,9 +774,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportFilterSortIntensity => 'Intensity';
 
   @override
-  String get typhoonMotion => 'Moving';
-
-  @override
   String get meshtasticStateDisconnected => 'Disconnected';
 
   @override
@@ -841,9 +795,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerWindForecastGfs => 'GFS';
 
   @override
-  String get reportListDepthUnit => 'km';
-
-  @override
   String get reportFilterDepth => 'Depth';
 
   @override
@@ -851,9 +802,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapNavQpesums => 'Forecast';
-
-  @override
-  String get navMap => 'Map';
 
   @override
   String get notifyAdvisory => 'Weather advisories';
@@ -877,10 +825,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
-
-  @override
-  String get weatherDynamicStateSubtitle =>
-      'Override the home backdrop weather';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'Current (from 2020)';
@@ -957,9 +901,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLayerOrderReset => 'Reset order';
-
-  @override
-  String get dpmAddress => 'Address';
 
   @override
   String get weatherRankingMergeCounty => 'County';
@@ -1046,11 +987,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get meshtasticRadioSettings => 'LoRa';
 
   @override
-  String weatherRankingAnalysisCurrent(String value) {
-    return 'Now $value°C';
-  }
-
-  @override
   String get moreGithub => 'ExpTech GitHub';
 
   @override
@@ -1064,9 +1000,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageSettings => 'Language';
-
-  @override
-  String get dpmDisasterNuclear => 'Nuclear accident';
 
   @override
   String get language => 'Language';
@@ -1117,9 +1050,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapNavEarthquake => 'Earthquake';
 
   @override
-  String get typhoonGust => 'Gust';
-
-  @override
   String get restroomGradeAverage => 'Average';
 
   @override
@@ -1164,9 +1094,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get radarCountyOutline => 'County borders';
-
-  @override
-  String get onboardingGranted => 'Granted';
 
   @override
   String get commonClose => 'Close';
@@ -1295,9 +1222,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingSkipLeave => 'Skip anyway';
 
   @override
-  String get onboardingBack => 'Back';
-
-  @override
   String get aedPlaceDesc => 'Placement';
 
   @override
@@ -1312,16 +1236,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get typhoonPressure => 'Pressure';
-
-  @override
   String get onboardingPermBattery => 'Battery exemption';
 
   @override
   String get typhoonLabelNw => 'NW';
-
-  @override
-  String get dpmDisasterFlood => 'Flood';
 
   @override
   String get moonPhaseWaxingCrescent => 'Waxing crescent';
@@ -1370,9 +1288,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String reportListMagnitude(String magnitude) {
     return 'M$magnitude';
   }
-
-  @override
-  String get dpmDisasterLandslide => 'Landslide';
 
   @override
   String get notifyMonitor => 'Strong-motion monitor';
@@ -1459,9 +1374,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreAppStore => 'App Store';
 
   @override
-  String get dpmFilterSectionShelter => 'Shelter disaster types';
-
-  @override
   String get moreServerStatus => 'Server status';
 
   @override
@@ -1493,9 +1405,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regionCurrent => 'Current location';
-
-  @override
-  String get dpmFilterSectionRestroom => 'Venue types';
 
   @override
   String get meshtasticNotConnected => 'Not connected to a radio';
@@ -1583,25 +1492,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get typhoonIntensityModerate => 'Moderate typhoon';
 
   @override
-  String get typhoonWind => 'Wind';
-
-  @override
   String get mapLayerSatelliteAsh => 'Himawari Ash';
 
   @override
   String get rainInterval3h => '3 h';
 
   @override
-  String get reportListSearch => 'Search';
-
-  @override
   String get mapLayerCategorySatellite => 'Satellite';
 
   @override
   String get meshtasticChannelReady => 'DPIP channel ready';
-
-  @override
-  String get reportFilterLocation => 'Location';
 
   @override
   String get mapLayerSatelliteNightmicrophysics =>
@@ -1647,14 +1547,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingPermLocation => 'Location';
-
-  @override
-  String get sponsorCalloutBody =>
-      'No ads — your support keeps the servers running.';
-
-  @override
-  String get moreDiscordCalloutBody =>
-      'Join the community and talk to the team.';
 
   @override
   String get moreDiscord => 'Discord community';
@@ -1786,11 +1678,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifyIntensity => 'Intensity report';
 
   @override
-  String typhoonTimeChip(String day, String hour) {
-    return '$day日$hour時';
-  }
-
-  @override
   String get rainIntervalMenu => 'Accumulation window';
 
   @override
@@ -1855,9 +1742,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherModeSand => 'Dust';
 
   @override
-  String get typhoonSatelliteTitle => 'Satellite';
-
-  @override
   String get notifyReport => 'Earthquake report';
 
   @override
@@ -1896,11 +1780,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moonTimelineCaption => 'Phase';
 
   @override
-  String reportListMeta(String magnitude, String depth) {
-    return 'M$magnitude · $depth km';
-  }
-
-  @override
   String get openSourceLicenses => 'Open-source licenses';
 
   @override
@@ -1921,15 +1800,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get meshtasticHopLimit => 'Hop limit';
 
   @override
-  String weatherRankingAnalysisRange(String value) {
-    return 'Range $value°C';
-  }
-
-  @override
   String get weatherRankingExtremeHigh => 'Daily high';
-
-  @override
-  String get changelogVersionDetails => 'Release details';
 
   @override
   String get sponsorPrivacy => 'Privacy Policy';
@@ -2127,9 +1998,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endpointStateUnknown => 'Unknown';
 
   @override
-  String get endpointLastSuccessNever => 'never succeeded';
-
-  @override
   String get endpointServiceEew => 'EEW';
 
   @override
@@ -2212,12 +2080,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restroomCategoryTransport => 'Transport';
 
   @override
-  String get reportFilterLocationHint => 'e.g. Hualien, offshore';
-
-  @override
-  String get moonSubtitle => 'Lunar phase and illumination — computed locally';
-
-  @override
   String get meshtasticBattery => 'Battery';
 
   @override
@@ -2283,9 +2145,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get releaseHighlightsSeeNotes => 'Full release notes';
-
-  @override
-  String get highlightCardTechnical => 'Technical';
 
   @override
   String get moreVersionNotesEmpty => 'No changelog for this build';
@@ -2363,11 +2222,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rainInterval10m => '10 min';
 
   @override
-  String weatherRankingAnalysisLow(String value) {
-    return 'Low $value';
-  }
-
-  @override
   String get meshtasticConnectAnyway => 'Connect anyway';
 
   @override
@@ -2419,9 +2273,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerSatelliteAirmass => 'Himawari Airmass';
 
   @override
-  String get typhoonTrackDetail => 'Track detail';
-
-  @override
   String get dataSectionWeather => 'Weather';
 
   @override
@@ -2431,15 +2282,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeActiveEventsTitle => 'Active events';
 
   @override
-  String weatherRankingAnalysisHigh(String value) {
-    return 'High $value';
-  }
-
-  @override
   String get faq => 'FAQ';
-
-  @override
-  String get typhoonHistoryLive => 'Live';
 
   @override
   String eewSerial(int serial) {
@@ -2508,9 +2351,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherDynamicState => 'Weather animation';
 
   @override
-  String get mapPlaceholderDisabled => 'Map (temporarily disabled)';
-
-  @override
   String get moonNow => 'Now';
 
   @override
@@ -2551,9 +2391,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sunTitle => 'Sun';
-
-  @override
-  String get sunSubtitle => 'Sunrise, twilight and the solar terms';
 
   @override
   String get sunSectionDaylight => 'Daylight';
@@ -2611,9 +2448,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planetsTitle => 'Planets';
-
-  @override
-  String get planetsSubtitle => 'Where they are tonight, and how bright';
 
   @override
   String get planetsSectionTonight => 'Right now';
@@ -2748,9 +2582,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tonightTitle => 'Tonight';
 
   @override
-  String get tonightSubtitle => 'What is observable, and when';
-
-  @override
   String get tonightSectionDark => 'Observing window';
 
   @override
@@ -2850,9 +2681,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get almanacTitle => 'Almanac';
 
   @override
-  String get almanacSubtitle => 'The lunisolar date and the eclipses ahead';
-
-  @override
   String get almanacSectionToday => 'Today';
 
   @override
@@ -2937,9 +2765,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tideTitle => 'Tide';
 
   @override
-  String get tideSubtitle => 'Spring, neap and the pull of the Moon';
-
-  @override
   String get tideDisclaimer =>
       'Astronomical forcing only — not a harbour tide table. For water levels use the CWA\'s published tables.';
 
@@ -2981,9 +2806,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skyChartTitle => 'Sky chart';
-
-  @override
-  String get skyChartSubtitle => 'The naked-eye sky above you';
 
   @override
   String get skyChartNorth => 'N';

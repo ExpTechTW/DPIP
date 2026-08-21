@@ -15,16 +15,12 @@
   "@meshtasticRegionLabel": {
     "description": "LoRa region"
   },
-  "dpmFilterSectionRestroomType": "Jenis toilet",
   "mapLayerSatelliteB03": "Himawari Red (B03)",
   "reportFilterIntensity": "Intensitas",
   "mapLayerLightning": "Petir",
   "restroomTypeMale": "Toilet pria",
   "meshtasticLastReceived": "Last received",
   "reportDetailSortByCounty": "Urutkan menurut wilayah",
-  "@moonSubtitle": {
-    "description": "Moon entry card subtitle in the data catalogue"
-  },
   "@moonDays": {
     "description": "Day unit for the moon age"
   },
@@ -35,13 +31,11 @@
   "mapTerrainReliefHint": "Tampilkan relief terrain di peta dasar",
   "meshtasticEmptyMessage": "(empty message)",
   "moreSectionRegion": "Wilayah",
-  "dpmDisasterEarthquake": "Gempa",
   "mapLayerSatellite": "Himawari Infrared (B13)",
   "@meshtasticTapNode": {
     "description": "Resting state of the map node sheet"
   },
   "aedHoursSaturday": "Jam Sabtu",
-  "dpmDisasterSlope": "Bencana lereng",
   "moonPhaseNew": "New moon",
   "notifySectionEew": "Peringatan dini gempa",
   "mapResetNorth": "Kembali ke utara",
@@ -63,11 +57,9 @@
   "permissionsAttention": "Izin perlu ditangani",
   "permissionsBody": "DPIP memerlukan izin ini untuk memberi peringatan tepat waktu. Peringatan yang tidak muncul biasanya karena salah satunya belum diberikan.",
   "notifySettingsMenu": "Pengaturan notifikasi",
-  "typhoonHistoryTitle": "Waktu data",
   "mapAppDefault": "{app} (bawaan)",
   "trendRange24h": "24 jam",
   "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
-  "weatherRankingRecordedAt": "Tercatat pukul {time}",
   "mapLayerRain": "Curah hujan",
   "mapLayerQpesums": "Prakiraan hujan 1 jam ke depan",
   "@weatherModeSnow": {
@@ -78,7 +70,6 @@
   },
   "mapOverlaySectionMap": "Peta",
   "mapTerrainRelief": "Relief terrain",
-  "eewMaxIntensity": "Intensitas maks",
   "mapLegendCollapse": "Sembunyikan legenda",
   "updateAvailableTitle": "Versi baru tersedia",
   "updateAvailableBody": "Versi {version} sudah dirilis.",
@@ -95,7 +86,6 @@
   "reportFilterIntensityInfoTitle": "Skala intensitas baru & lama",
   "mapLayerTyphoon": "Topan",
   "radarOverlayMenuTooltip": "Opsi lapisan radar",
-  "mapMyLocation": "Lokasi saya",
   "@meshtasticChannelUse": {
     "description": "Share of airtime seen busy"
   },
@@ -129,7 +119,6 @@
   "reportFilterSortMagnitude": "Magnitudo",
   "mapLayerCategoryEarthquake": "Gempa",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
-  "typhoonLegendPast": "Jalur aktual",
   "restroomCategoryOther": "Lainnya",
   "@meshtasticRegionConfirm": {
     "description": "Confirmation before rebooting the radio"
@@ -219,7 +208,6 @@
     "description": "Phase: waning crescent"
   },
   "mapLayerSatelliteB05": "Himawari Near-Infrared (B05)",
-  "typhoonStormRadii": "NE {ne} · SE {se} · SW {sw} · NW {nw} km",
   "@meshtasticNotConnected": {
     "description": "Empty message log while not connected"
   },
@@ -267,7 +255,6 @@
   "restroomCategoryLabel": "Kategori",
   "sponsorRestoring": "Memulihkan pembelian…",
   "sponsorIntro": "DPIP berdedikasi menyediakan informasi mitigasi bencana secara real-time, tanpa iklan atau model bisnis lainnya. Dukungan Anda membantu kami menjaga server tetap berjalan dan terus mengembangkan aplikasi.",
-  "shelterAddressLabel": "Alamat",
   "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
   "@meshtasticHardware": {
     "description": "Board model"
@@ -284,7 +271,6 @@
     "description": "Packets received this session"
   },
   "windForecastOverlayMenuTooltip": "Opsi lapisan prakiraan angin",
-  "dataWeatherRankingSubtitle": "Peringkat stasiun langsung",
   "rainInterval6h": "6 jam",
   "homeRainTrendMinute": "{minute} mnt",
   "restroomTypeUnspecified": "Tidak ditentukan",
@@ -343,7 +329,6 @@
   },
   "typhoonLabelSw": "SW",
   "typhoonForecastLead": "Forecast +{hours} h",
-  "dpmDisasterTsunami": "Tsunami",
   "@mapAppOpenFailed": {},
   "changelogTypeStable": "Stabil",
   "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
@@ -358,7 +343,6 @@
   },
   "mapOverlaySectionReference": "Lapisan referensi",
   "mapLayerSatelliteB02": "Himawari Green (B02)",
-  "reportListLocalFelt": "Terasa lokal",
   "weatherRankingEmpty": "Tidak ada observasi untuk diurutkan",
   "notifySectionOther": "Lainnya",
   "weatherRankingMeta": "Waktu data: {time}\n{count} stasiun",
@@ -369,7 +353,6 @@
   "meshtasticNoDevices": "No Meshtastic devices found",
   "mapLayerCategoryLife": "Kehidupan sehari-hari",
   "reportFilterSortIntensity": "Intensitas",
-  "typhoonMotion": "Bergerak",
   "meshtasticStateDisconnected": "Disconnected",
   "typhoonIntensityIntense": "Intense typhoon",
   "@meshtasticSend": {
@@ -386,7 +369,6 @@
   "meshtasticNoHistory": "Not enough history yet",
   "reportDetailLocalIntensityUnavailable": "Tidak ada data intensitas",
   "mapLayerWindForecastGfs": "GFS",
-  "reportListDepthUnit": "km",
   "reportFilterDepth": "Kedalaman",
   "@meshtasticNoHistory": {
     "description": "Chart placeholder before two samples exist"
@@ -402,7 +384,6 @@
   "@meshtasticVoltage": {
     "description": "Battery voltage"
   },
-  "navMap": "Peta",
   "notifyAdvisory": "Imbauan cuaca",
   "@meshtasticNoMessages": {
     "description": "Empty message log while connected"
@@ -419,7 +400,6 @@
     "description": "Hint under the national-border toggle in the radar overlay menu."
   },
   "moonPhaseWaningGibbous": "Waning gibbous",
-  "weatherDynamicStateSubtitle": "Ganti cuaca latar beranda",
   "reportFilterIntensityInfoModernTitle": "Baru (sejak 2020)",
   "@mapAppGoogleMaps": {},
   "typhoonDataTime": "Data time\n{time}",
@@ -450,7 +430,6 @@
   },
   "notifyUnavailable": "Notifikasi push belum siap — coba lagi sebentar lagi.",
   "mapLayerOrderReset": "Atur ulang urutan",
-  "dpmAddress": "Alamat",
   "weatherRankingMergeCounty": "Kabupaten",
   "moreSectionApp": "Dapatkan aplikasi",
   "moreSectionBeta": "Versi uji",
@@ -489,7 +468,6 @@
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
   "meshtasticRadioSettings": "LoRa",
-  "weatherRankingAnalysisCurrent": "Sekarang {value}°C",
   "@meshtasticNotifyMessages": {
     "description": "Toggle: local notification for an incoming mesh message"
   },
@@ -498,7 +476,6 @@
   "mapLayers": "Lapisan",
   "meshtasticHardware": "Hardware",
   "languageSettings": "Bahasa",
-  "dpmDisasterNuclear": "Kecelakaan nuklir",
   "@moonNextFullMoon": {
     "description": "Next full moon date label"
   },
@@ -520,7 +497,6 @@
   "mapAppCopyCoordinates": "Salin koordinat",
   "reportFilterIntensityInfoIntro": "CWA mengganti skala intensitas pada 1 Jan 2020 (waktu Taipei).",
   "mapNavEarthquake": "Gempa",
-  "typhoonGust": "Embusan",
   "restroomGradeAverage": "Sedang",
   "@meshtasticNodes": {
     "description": "Mesh nodes section header"
@@ -538,7 +514,6 @@
   "meshtasticNoNodes": "No nodes heard yet",
   "meshtasticViaMqtt": "Via MQTT (internet)",
   "radarCountyOutline": "Batas kabupaten/kota",
-  "onboardingGranted": "Diberikan",
   "@mapAppCopyCoordinates": {},
   "commonClose": "Tutup",
   "restroomGradeLabel": "Nilai",
@@ -592,7 +567,6 @@
   "moonNextFullMoon": "Next full moon",
   "dpmSheetEmpty": "Ketuk penanda di peta untuk detail",
   "onboardingSkipLeave": "Tetap lewati",
-  "onboardingBack": "Kembali",
   "aedPlaceDesc": "Lokasi peletakan",
   "@weatherModeOvercast": {
     "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
@@ -603,13 +577,11 @@
   "@radarCountyOutlineSubtitle": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
-  "typhoonPressure": "Tekanan",
   "@meshtasticCopied": {
     "description": "Toast shown after copying a message"
   },
   "onboardingPermBattery": "Pengecualian baterai",
   "typhoonLabelNw": "NW",
-  "dpmDisasterFlood": "Banjir",
   "moonPhaseWaxingCrescent": "Waxing crescent",
   "restroomCategoryLeisure": "Tempat rekreasi",
   "mapLayerTemperature": "Suhu",
@@ -637,7 +609,6 @@
   "reportDetailAreaIntensity": "Intensitas per wilayah",
   "rainInterval12h": "12 jam",
   "reportListMagnitude": "M{magnitude}",
-  "dpmDisasterLandslide": "Tanah longsor",
   "notifyMonitor": "Pemantau getaran kuat",
   "onboardingStart": "Mulai",
   "@meshtasticExternalPower": {
@@ -685,7 +656,6 @@
   "@meshtasticUndecoded": {
     "description": "Packets the radio could not decrypt"
   },
-  "dpmFilterSectionShelter": "Jenis bencana tempat berlindung",
   "@commonCancel": {
     "description": "Dismisses a dialog without acting"
   },
@@ -700,7 +670,6 @@
   "regionNationwide": "Seluruh negeri",
   "moreNotifyLog": "Log notifikasi DPIP",
   "regionCurrent": "Lokasi saat ini",
-  "dpmFilterSectionRestroom": "Jenis tempat",
   "meshtasticNotConnected": "Not connected to a radio",
   "weatherModeSnow": "Salju",
   "mapLayerMeshtastic": "Meshtastic nodes",
@@ -747,16 +716,13 @@
     "description": "Connection state label"
   },
   "typhoonIntensityModerate": "Moderate typhoon",
-  "typhoonWind": "Angin",
   "mapLayerSatelliteAsh": "Himawari Ash",
   "rainInterval3h": "3 jam",
-  "reportListSearch": "Cari",
   "meshtasticChannelReady": "DPIP channel ready",
   "@meshtasticNotifyNodes": {
     "description": "Toggle: local notification when a new node is heard"
   },
   "mapLayerCategorySatellite": "Satelit",
-  "reportFilterLocation": "Lokasi",
   "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
   "typhoonIntensityTd": "Tropical depression",
   "reportFilterDate": "Tanggal",
@@ -782,8 +748,6 @@
   "reportDetailOriginTime": "Waktu kejadian",
   "trendNoData": "Tidak ada data tren",
   "onboardingPermLocation": "Lokasi",
-  "sponsorCalloutBody": "Tanpa iklan — dukunganmu menjaga server tetap berjalan.",
-  "moreDiscordCalloutBody": "Gabung komunitas dan mengobrol dengan tim.",
   "moreDiscord": "Komunitas Discord",
   "mapNavPressure": "Tekanan",
   "mapLayerSatelliteB13": "Himawari Infrared (B13)",
@@ -863,7 +827,6 @@
   "reportFilterAny": "Semua",
   "weatherRankingMergeTo": "Gabung",
   "notifyIntensity": "Laporan intensitas",
-  "typhoonTimeChip": "{day}日{hour}時",
   "rainIntervalMenu": "Jendela akumulasi",
   "reportDetailLocalFelt": "Gempa Dirasakan Lokal",
   "meshtasticDevice": "Device",
@@ -896,7 +859,6 @@
   "@moonPhaseFirstQuarter": {
     "description": "Phase: first quarter"
   },
-  "typhoonSatelliteTitle": "Satelit",
   "@dpmOpenInMaps": {},
   "notifyReport": "Laporan gempa",
   "mapAppCoordinatesCopied": "Koordinat disalin",
@@ -910,7 +872,6 @@
   "meshtasticRegionLabel": "Region",
   "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
   "moonTimelineCaption": "Phase",
-  "reportListMeta": "M{magnitude} · {depth} km",
   "@meshtasticChannelNoSlot": {
     "description": "Every secondary channel slot is taken"
   },
@@ -929,12 +890,10 @@
   "@meshtasticUptime": {
     "description": "Time since the radio booted"
   },
-  "weatherRankingAnalysisRange": "Rentang {value}°C",
   "weatherRankingExtremeHigh": "Maksimum hari ini",
   "@meshtasticUtilization": {
     "description": "Section title for the 24h airtime chart"
   },
-  "changelogVersionDetails": "Detail rilis",
   "sponsorPrivacy": "Kebijakan Privasi",
   "reportDetailLocalIntensity": "Intensitas di lokasi Anda",
   "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
@@ -1005,7 +964,6 @@
   "endpointStateDegraded": "Tidak stabil",
   "endpointStateDown": "Bermasalah",
   "endpointStateUnknown": "Tidak diketahui",
-  "endpointLastSuccessNever": "belum berhasil",
   "endpointServiceEew": "EEW",
   "endpointServiceRts": "RTS",
   "endpointServiceRadar": "Radar",
@@ -1034,8 +992,6 @@
   "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
   "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
   "restroomCategoryTransport": "Transportasi",
-  "reportFilterLocationHint": "mis. Hualien, lepas pantai",
-  "moonSubtitle": "Lunar phase and illumination — computed locally",
   "meshtasticBattery": "Battery",
   "meshtasticDistance": "Jarak",
   "meshtasticSnrTrend": "Tren sinyal (SNR)",
@@ -1057,7 +1013,6 @@
   "releaseHighlightsTabNormal": "Untuk pengguna",
   "releaseHighlightsTabAdvanced": "Mendalam",
   "releaseHighlightsEmpty": "Belum ada konten.",
-  "highlightCardTechnical": "Teknis",
   "moreVersionNotesEmpty": "Tidak ada changelog untuk build ini",
   "moreVersionSnapshot": "Versi uji",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
@@ -1097,7 +1052,6 @@
   "onboardingPermsTitle": "Izin",
   "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
   "rainInterval10m": "10 mnt",
-  "weatherRankingAnalysisLow": "Min {value}",
   "meshtasticConnectAnyway": "Connect anyway",
   "reportListDayCount": "{count}",
   "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
@@ -1122,13 +1076,10 @@
   "@meshtasticPreset": {
     "description": "LoRa modem preset"
   },
-  "typhoonTrackDetail": "Detail jalur",
   "dataSectionWeather": "Cuaca",
   "aedHoursWeekday": "Jam hari kerja",
   "homeActiveEventsTitle": "Peristiwa aktif",
-  "weatherRankingAnalysisHigh": "Maks {value}",
   "faq": "FAQ",
-  "typhoonHistoryLive": "Langsung",
   "eewSerial": "Laporan {serial}",
   "@radarTownOutline": {
     "description": "Township-border overlay toggle in the map's radar overlay menu."
@@ -1167,7 +1118,6 @@
   "mapAppAppleMaps": "Apple Maps",
   "regionEdit": "Ubah",
   "weatherDynamicState": "Animasi cuaca",
-  "mapPlaceholderDisabled": "Peta (dinonaktifkan sementara)",
   "moonNow": "Sekarang",
   "@moonNow": {
     "description": "Returns the moon page to the present moment"
@@ -1223,10 +1173,6 @@
   "sunTitle": "Matahari",
   "@sunTitle": {
     "description": "Sun page title"
-  },
-  "sunSubtitle": "Matahari terbit, senja, dan istilah surya",
-  "@sunSubtitle": {
-    "description": "Sun page one-line summary on the data hub"
   },
   "sunSectionDaylight": "Cahaya siang",
   "@sunSectionDaylight": {
@@ -1303,10 +1249,6 @@
   "planetsTitle": "Planet",
   "@planetsTitle": {
     "description": "Planets page title"
-  },
-  "planetsSubtitle": "Di mana malam ini, dan seberapa terang",
-  "@planetsSubtitle": {
-    "description": "Planets page one-line summary on the data hub"
   },
   "planetsSectionTonight": "Saat ini",
   "@planetsSectionTonight": {
@@ -1484,10 +1426,6 @@
   "@tonightTitle": {
     "description": "Tonight page title"
   },
-  "tonightSubtitle": "Apa yang terlihat, dan kapan",
-  "@tonightSubtitle": {
-    "description": "Tonight page summary on the data hub"
-  },
   "tonightSectionDark": "Jendela pengamatan",
   "@tonightSectionDark": {
     "description": "Section header: the observing window"
@@ -1620,10 +1558,6 @@
   "@almanacTitle": {
     "description": "Almanac page title"
   },
-  "almanacSubtitle": "Tanggal lunisolar dan gerhana mendatang",
-  "@almanacSubtitle": {
-    "description": "Almanac page summary on the data hub"
-  },
   "almanacSectionToday": "Hari ini",
   "@almanacSectionToday": {
     "description": "Section header: today's date in both calendars"
@@ -1736,10 +1670,6 @@
   "@tideTitle": {
     "description": "Tide page title"
   },
-  "tideSubtitle": "Purnama, perbani, dan tarikan Bulan",
-  "@tideSubtitle": {
-    "description": "Tide page summary on the data hub"
-  },
   "tideDisclaimer": "Hanya gaya astronomis — bukan tabel pasang surut pelabuhan. Untuk tinggi muka air gunakan tabel CWA.",
   "@tideDisclaimer": {
     "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
@@ -1795,10 +1725,6 @@
   "skyChartTitle": "Peta langit",
   "@skyChartTitle": {
     "description": "Sky chart page title"
-  },
-  "skyChartSubtitle": "Langit yang terlihat mata telanjang",
-  "@skyChartSubtitle": {
-    "description": "Sky chart page summary on the data hub"
   },
   "skyChartNorth": "U",
   "@skyChartNorth": {

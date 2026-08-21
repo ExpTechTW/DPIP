@@ -44,9 +44,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Giữ ranh giới rõ ràng dưới lớp phản hồi radar.';
 
   @override
-  String get dpmFilterSectionRestroomType => 'Loại nhà vệ sinh';
-
-  @override
   String get mapLayerSatelliteB03 => 'Himawari Red (B03)';
 
   @override
@@ -108,16 +105,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreSectionRegion => 'Khu vực';
 
   @override
-  String get dpmDisasterEarthquake => 'Động đất';
-
-  @override
   String get mapLayerSatellite => 'Himawari Infrared (B13)';
 
   @override
   String get aedHoursSaturday => 'Giờ thứ Bảy';
-
-  @override
-  String get dpmDisasterSlope => 'Thiên tai sườn dốc';
 
   @override
   String get moonPhaseNew => 'New moon';
@@ -166,9 +157,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notifySettingsMenu => 'Cài đặt thông báo';
 
   @override
-  String get typhoonHistoryTitle => 'Thời điểm dữ liệu';
-
-  @override
   String mapAppDefault(String app) {
     return '$app (mặc định)';
   }
@@ -181,11 +169,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Grayscale base, tinted below −40 °C to highlight cloud-top height';
 
   @override
-  String weatherRankingRecordedAt(String time) {
-    return 'Ghi nhận lúc $time';
-  }
-
-  @override
   String get mapLayerRain => 'Lượng mưa';
 
   @override
@@ -196,9 +179,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapTerrainRelief => 'Độ nổi địa hình';
-
-  @override
-  String get eewMaxIntensity => 'Cường độ tối đa';
 
   @override
   String get mapLegendCollapse => 'Ẩn chú giải';
@@ -250,9 +230,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get radarOverlayMenuTooltip => 'Tùy chọn lớp radar';
-
-  @override
-  String get mapMyLocation => 'Vị trí của tôi';
 
   @override
   String get meshtasticNodes => 'Nodes';
@@ -330,9 +307,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
-
-  @override
-  String get typhoonLegendPast => 'Quỹ đạo thực tế';
 
   @override
   String get restroomCategoryOther => 'Khác';
@@ -509,11 +483,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerSatelliteB05 => 'Himawari Near-Infrared (B05)';
 
   @override
-  String typhoonStormRadii(String ne, String se, String sw, String nw) {
-    return 'NE $ne · SE $se · SW $sw · NW $nw km';
-  }
-
-  @override
   String get typhoonLabelNe => 'NE';
 
   @override
@@ -606,9 +575,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'DPIP cam kết cung cấp thông tin phòng chống thiên tai theo thời gian thực, không có quảng cáo hay mô hình lợi nhuận nào khác. Sự ủng hộ của bạn giúp chúng tôi duy trì máy chủ và tiếp tục phát triển.';
 
   @override
-  String get shelterAddressLabel => 'Địa chỉ';
-
-  @override
   String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
 
   @override
@@ -630,9 +596,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get windForecastOverlayMenuTooltip => 'Tùy chọn lớp dự báo gió';
-
-  @override
-  String get dataWeatherRankingSubtitle => 'Xếp hạng trạm trực tiếp';
 
   @override
   String homeRainTrendMinute(int minute) {
@@ -763,9 +726,6 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get dpmDisasterTsunami => 'Sóng thần';
-
-  @override
   String get changelogTypeStable => 'Chính thức';
 
   @override
@@ -777,9 +737,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteB02 => 'Himawari Green (B02)';
-
-  @override
-  String get reportListLocalFelt => 'Cảm nhận cục bộ';
 
   @override
   String get weatherRankingEmpty => 'Không có quan trắc để xếp hạng';
@@ -816,9 +773,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportFilterSortIntensity => 'Cường độ';
 
   @override
-  String get typhoonMotion => 'Di chuyển';
-
-  @override
   String get meshtasticStateDisconnected => 'Disconnected';
 
   @override
@@ -841,9 +795,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerWindForecastGfs => 'GFS';
 
   @override
-  String get reportListDepthUnit => 'km';
-
-  @override
   String get reportFilterDepth => 'Độ sâu';
 
   @override
@@ -851,9 +802,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapNavQpesums => 'Dự báo';
-
-  @override
-  String get navMap => 'Bản đồ';
 
   @override
   String get notifyAdvisory => 'Tin cảnh báo thời tiết';
@@ -877,10 +825,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
-
-  @override
-  String get weatherDynamicStateSubtitle =>
-      'Ghi đè thời tiết nền của trang chủ';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'Mới (từ 2020)';
@@ -957,9 +901,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get mapLayerOrderReset => 'Đặt lại thứ tự mặc định';
-
-  @override
-  String get dpmAddress => 'Địa chỉ';
 
   @override
   String get weatherRankingMergeCounty => 'Huyện/thành';
@@ -1046,11 +987,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get meshtasticRadioSettings => 'LoRa';
 
   @override
-  String weatherRankingAnalysisCurrent(String value) {
-    return 'Hiện tại $value°C';
-  }
-
-  @override
   String get moreGithub => 'ExpTech GitHub';
 
   @override
@@ -1064,9 +1000,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get languageSettings => 'Ngôn ngữ';
-
-  @override
-  String get dpmDisasterNuclear => 'Sự cố hạt nhân';
 
   @override
   String get language => 'Ngôn ngữ';
@@ -1117,9 +1050,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapNavEarthquake => 'Động đất';
 
   @override
-  String get typhoonGust => 'Gió giật';
-
-  @override
   String get restroomGradeAverage => 'Trung bình';
 
   @override
@@ -1164,9 +1094,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get radarCountyOutline => 'Ranh giới huyện thị';
-
-  @override
-  String get onboardingGranted => 'Đã cấp';
 
   @override
   String get commonClose => 'Đóng';
@@ -1296,9 +1223,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingSkipLeave => 'Vẫn bỏ qua';
 
   @override
-  String get onboardingBack => 'Quay lại';
-
-  @override
   String get aedPlaceDesc => 'Vị trí đặt';
 
   @override
@@ -1313,16 +1237,10 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get typhoonPressure => 'Áp suất';
-
-  @override
   String get onboardingPermBattery => 'Miễn trừ tối ưu hóa pin';
 
   @override
   String get typhoonLabelNw => 'NW';
-
-  @override
-  String get dpmDisasterFlood => 'Lũ lụt';
 
   @override
   String get moonPhaseWaxingCrescent => 'Waxing crescent';
@@ -1371,9 +1289,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String reportListMagnitude(String magnitude) {
     return 'M$magnitude';
   }
-
-  @override
-  String get dpmDisasterLandslide => 'Sạt lở đất';
 
   @override
   String get notifyMonitor => 'Giám sát rung chấn mạnh';
@@ -1460,9 +1375,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreAppStore => 'App Store';
 
   @override
-  String get dpmFilterSectionShelter => 'Loại thiên tai nơi trú ẩn';
-
-  @override
   String get moreServerStatus => 'Trạng thái máy chủ';
 
   @override
@@ -1494,9 +1406,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get regionCurrent => 'Vị trí hiện tại';
-
-  @override
-  String get dpmFilterSectionRestroom => 'Loại địa điểm';
 
   @override
   String get meshtasticNotConnected => 'Not connected to a radio';
@@ -1584,25 +1493,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get typhoonIntensityModerate => 'Moderate typhoon';
 
   @override
-  String get typhoonWind => 'Sức gió';
-
-  @override
   String get mapLayerSatelliteAsh => 'Himawari Ash';
 
   @override
   String get rainInterval3h => '3 giờ';
 
   @override
-  String get reportListSearch => 'Tìm';
-
-  @override
   String get mapLayerCategorySatellite => 'Vệ tinh';
 
   @override
   String get meshtasticChannelReady => 'DPIP channel ready';
-
-  @override
-  String get reportFilterLocation => 'Địa điểm';
 
   @override
   String get mapLayerSatelliteNightmicrophysics =>
@@ -1648,14 +1548,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboardingPermLocation => 'Vị trí';
-
-  @override
-  String get sponsorCalloutBody =>
-      'Không quảng cáo — hỗ trợ của bạn giúp máy chủ tiếp tục chạy.';
-
-  @override
-  String get moreDiscordCalloutBody =>
-      'Tham gia cộng đồng và trò chuyện với nhóm phát triển.';
 
   @override
   String get moreDiscord => 'Cộng đồng Discord';
@@ -1787,11 +1679,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notifyIntensity => 'Báo cáo cường độ chấn động';
 
   @override
-  String typhoonTimeChip(String day, String hour) {
-    return '$day日$hour時';
-  }
-
-  @override
   String get rainIntervalMenu => 'Khung tích lũy';
 
   @override
@@ -1855,9 +1742,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherModeSand => 'Bụi cát';
 
   @override
-  String get typhoonSatelliteTitle => 'Vệ tinh';
-
-  @override
   String get notifyReport => 'Báo cáo động đất';
 
   @override
@@ -1896,11 +1780,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moonTimelineCaption => 'Phase';
 
   @override
-  String reportListMeta(String magnitude, String depth) {
-    return 'M$magnitude · $depth km';
-  }
-
-  @override
   String get openSourceLicenses => 'Giấy phép mã nguồn mở';
 
   @override
@@ -1921,15 +1800,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get meshtasticHopLimit => 'Hop limit';
 
   @override
-  String weatherRankingAnalysisRange(String value) {
-    return 'Biên độ $value°C';
-  }
-
-  @override
   String get weatherRankingExtremeHigh => 'Cao nhất ngày';
-
-  @override
-  String get changelogVersionDetails => 'Chi tiết phiên bản';
 
   @override
   String get sponsorPrivacy => 'Chính sách quyền riêng tư';
@@ -2127,9 +1998,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get endpointStateUnknown => 'Không rõ';
 
   @override
-  String get endpointLastSuccessNever => 'chưa thành công';
-
-  @override
   String get endpointServiceEew => 'EEW';
 
   @override
@@ -2212,12 +2080,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get restroomCategoryTransport => 'Giao thông';
 
   @override
-  String get reportFilterLocationHint => 'vd: Hoa Liên, ngoài khơi';
-
-  @override
-  String get moonSubtitle => 'Lunar phase and illumination — computed locally';
-
-  @override
   String get meshtasticBattery => 'Battery';
 
   @override
@@ -2283,9 +2145,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get releaseHighlightsSeeNotes => 'Xem ghi chú đầy đủ';
-
-  @override
-  String get highlightCardTechnical => 'Kỹ thuật';
 
   @override
   String get moreVersionNotesEmpty =>
@@ -2364,11 +2223,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get rainInterval10m => '10 phút';
 
   @override
-  String weatherRankingAnalysisLow(String value) {
-    return 'Thấp $value';
-  }
-
-  @override
   String get meshtasticConnectAnyway => 'Connect anyway';
 
   @override
@@ -2420,9 +2274,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerSatelliteAirmass => 'Himawari Airmass';
 
   @override
-  String get typhoonTrackDetail => 'Chi tiết quỹ đạo';
-
-  @override
   String get dataSectionWeather => 'Thời tiết';
 
   @override
@@ -2432,15 +2283,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeActiveEventsTitle => 'Sự kiện đang hiệu lực';
 
   @override
-  String weatherRankingAnalysisHigh(String value) {
-    return 'Cao $value';
-  }
-
-  @override
   String get faq => 'Câu hỏi thường gặp';
-
-  @override
-  String get typhoonHistoryLive => 'Trực tiếp';
 
   @override
   String eewSerial(int serial) {
@@ -2509,9 +2352,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherDynamicState => 'Hoạt ảnh thời tiết';
 
   @override
-  String get mapPlaceholderDisabled => 'Bản đồ (tạm thời vô hiệu hóa)';
-
-  @override
   String get moonNow => 'Bây giờ';
 
   @override
@@ -2552,9 +2392,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get sunTitle => 'Mặt Trời';
-
-  @override
-  String get sunSubtitle => 'Bình minh, hoàng hôn và tiết khí';
 
   @override
   String get sunSectionDaylight => 'Ánh sáng ban ngày';
@@ -2612,9 +2449,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get planetsTitle => 'Hành tinh';
-
-  @override
-  String get planetsSubtitle => 'Đêm nay ở đâu, sáng bao nhiêu';
 
   @override
   String get planetsSectionTonight => 'Hiện tại';
@@ -2749,9 +2583,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get tonightTitle => 'Đêm nay';
 
   @override
-  String get tonightSubtitle => 'Có thể quan sát gì, và khi nào';
-
-  @override
   String get tonightSectionDark => 'Cửa sổ quan sát';
 
   @override
@@ -2851,10 +2682,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get almanacTitle => 'Lịch pháp';
 
   @override
-  String get almanacSubtitle =>
-      'Ngày âm lịch và nhật thực, nguyệt thực sắp tới';
-
-  @override
   String get almanacSectionToday => 'Hôm nay';
 
   @override
@@ -2939,9 +2766,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get tideTitle => 'Thủy triều';
 
   @override
-  String get tideSubtitle => 'Triều cường, triều kém và lực hút của Mặt Trăng';
-
-  @override
   String get tideDisclaimer =>
       'Chỉ là lực triều thiên văn, không phải bảng thủy triều cảng. Mực nước xin xem bảng do CWA công bố.';
 
@@ -2983,9 +2807,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get skyChartTitle => 'Bản đồ sao';
-
-  @override
-  String get skyChartSubtitle => 'Bầu trời nhìn bằng mắt thường';
 
   @override
   String get skyChartNorth => 'B';
