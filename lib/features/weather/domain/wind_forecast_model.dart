@@ -2,8 +2,8 @@
 /// ECMWF or GFS — rendered as a wind-field overlay from the `wind` tile
 /// endpoints.
 ///
-/// [key] is the `?model=` value the wind tile endpoints accept. [subtitle] is
-/// the layer picker's secondary line — the model's grid and time step in the
+/// [key] is the model path segment the wind tile endpoints accept. [subtitle]
+/// is the layer picker's secondary line — the model's grid and time step in the
 /// service's own notation (`0.25° · 1 h`). It is pure data (not display prose),
 /// so it stays out of the ARB files and reads the same in every locale.
 ///
@@ -16,7 +16,7 @@ enum WindForecastModel {
 
   const WindForecastModel(this.key, this.subtitle);
 
-  /// The `?model=` value naming this model on the wind tile endpoints.
+  /// The path segment naming this model on the wind tile endpoints.
   final String key;
 
   /// Picker subtitle — the model's grid resolution and time step.

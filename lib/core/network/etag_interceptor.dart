@@ -17,8 +17,9 @@ import 'package:dpip/core/network/network_usage_store.dart';
 /// - **Response 200 + ETag:** stores the body keyed by URL (JSON gzip-1;
 ///   binary gzip-1 when it shrinks — PBF/MVT yes, WebP no).
 ///
-/// **Immutable tiles** (basemap PBF / radar / satellite / DPM — frame or z/x/y
-/// in the path) are **URL-addressed**: local hit → serve, no `If-None-Match`.
+/// **Immutable tiles** (basemap PBF / radar / satellite / cycle-pinned wind /
+/// DPM — frame or z/x/y in the path) are **URL-addressed**: local hit → serve,
+/// no `If-None-Match`.
 /// A `200` is always stored under a synthetic [etagFromUrl] (server ETag is
 /// ignored — the URL already pins the content). Basemap `404` is negatively
 /// cached (empty + [negativeTileEtag]); radar/sat/DPM 404s are not.

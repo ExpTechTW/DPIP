@@ -174,11 +174,11 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// selected frame as a range instead of a bare instant.
   Duration? get framePeriod => null;
 
-  /// Whether [frames] are all one forecast-model run — the API serves only the
-  /// latest run, so the oldest frame is that run's issue time (資料時間).
+  /// Whether [frames] are all one forecast-model run — when true, the oldest
+  /// valid frame is that run's issue time (資料時間).
   ///
-  /// Observed layers (radar, satellite) leave this false; a wind-forecast
-  /// layer opts in so the timeline can name when the model was run.
+  /// Observed layers leave this false; a forecast may opt in only when every
+  /// returned valid time is guaranteed to come from the same cycle.
   @protected
   bool get framesAreOneRun => false;
 
@@ -1578,9 +1578,9 @@ abstract class RasterTimelineLayer implements MapLayer {
 /// Decodes a frame id into its instant.
 ///
 /// Ids are Unix seconds (or milliseconds — both are in use across endpoints);
-/// an ISO-8601 string is accepted as a fallback. Memoised per id: the ids are
-/// globally unique (timestamps), so a re-parse — every time a layer reloads
-/// its frames — is pure waste.
+/// an ISO-8601 string is accepted as a fallback. A versioned id may append
+/// `@revision`: the timestamp before it remains the instant while the complete
+/// string remains the cache identity. Memoised per complete id.
 @visibleForTesting
 DateTime parseFrameTime(String id) =>
     _frameTimeCache.putIfAbsent(id, () => _parse(id));
@@ -1588,11 +1588,13 @@ DateTime parseFrameTime(String id) =>
 final Map<String, DateTime> _frameTimeCache = {};
 
 DateTime _parse(String id) {
-  final epoch = int.tryParse(id);
+  final separator = id.indexOf('@');
+  final timeId = separator < 0 ? id : id.substring(0, separator);
+  final epoch = int.tryParse(timeId);
   if (epoch != null) {
     final ms = epoch >= 1000000000000 ? epoch : epoch * 1000;
     return DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true).toLocal();
   }
-  return DateTime.tryParse(id)?.toLocal() ??
+  return DateTime.tryParse(timeId)?.toLocal() ??
       DateTime.fromMillisecondsSinceEpoch(0);
 }

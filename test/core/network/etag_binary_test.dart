@@ -136,34 +136,38 @@ void main() {
     expect(second.data, payload);
   });
 
-  test('immutable wind tile stores under URL-hash even without server ETag', () async {
-    final payload = Uint8List.fromList([0x57, 0x49, 0x4e, 0x44]);
-    final adapter = _BinaryAdapter(bytes: payload); // no etag
-    final dio = createDio(etagCache: store)..httpClientAdapter = adapter;
-    const url =
-        'https://static.core-tnn1.exptech.dev/api/v2/tiles/wind/1786384800/5/26/14.webp?model=ecmwf';
-    final expectedEtag = EtagInterceptor.etagFromUrl(Uri.parse(url));
+  test(
+    'immutable wind tile stores under URL-hash even without server ETag',
+    () async {
+      final payload = Uint8List.fromList([0x57, 0x49, 0x4e, 0x44]);
+      final adapter = _BinaryAdapter(bytes: payload); // no etag
+      final dio = createDio(etagCache: store)..httpClientAdapter = adapter;
+      const url =
+          'https://static.core-tnn1.exptech.dev/api/v2/tiles/wind/ecmwf/'
+          '1786363200/1786384800/5/26/14.webp';
+      final expectedEtag = EtagInterceptor.etagFromUrl(Uri.parse(url));
 
-    await dio.get<List<int>>(
-      url,
-      options: Options(responseType: ResponseType.bytes),
-    );
-    CachedBytes? entry;
-    for (var i = 0; i < 50 && entry == null; i++) {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      entry = await store.readBytes(url);
-    }
-    expect(entry, isNotNull);
-    expect(entry!.etag, expectedEtag);
-    expect(entry.bytes, payload);
+      await dio.get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      CachedBytes? entry;
+      for (var i = 0; i < 50 && entry == null; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        entry = await store.readBytes(url);
+      }
+      expect(entry, isNotNull);
+      expect(entry!.etag, expectedEtag);
+      expect(entry.bytes, payload);
 
-    final second = await dio.get<List<int>>(
-      url,
-      options: Options(responseType: ResponseType.bytes),
-    );
-    expect(adapter.calls, 1, reason: 'local URL hit, no revalidation');
-    expect(second.data, payload);
-  });
+      final second = await dio.get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      expect(adapter.calls, 1, reason: 'local URL hit, no revalidation');
+      expect(second.data, payload);
+    },
+  );
 
   test('basemap PBF uses URL-hash ETag and hits locally on repeat', () async {
     final payload = Uint8List.fromList([0x1a, 0x2b, 0x3c]);

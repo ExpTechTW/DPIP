@@ -1,4 +1,5 @@
 import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final _now = DateTime(2026, 8, 11, 11, 0);
@@ -14,6 +15,12 @@ List<MapFrame> _span(int fromHours, int toHours, {int stepHours = 1}) => [
 ];
 
 void main() {
+  test('a versioned frame id keeps its valid time', () {
+    final plain = parseFrameTime('1783360200');
+    final versioned = parseFrameTime('1783360200@1783339200');
+    expect(versioned, plain);
+  });
+
   test('observed frames: the present is the newest one', () {
     // Radar and satellite stop at the present, so nothing changes for them.
     final frames = _span(-24, 0, stepHours: 1);

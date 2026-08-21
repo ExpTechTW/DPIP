@@ -1,5 +1,5 @@
 /// Shared tile plumbing for the frame-keyed raster overlays (radar, satellite,
-/// QPESUMS).
+/// QPESUMS, wind).
 library;
 
 import 'dart:math' as math;
@@ -20,10 +20,10 @@ import 'package:flutter/foundation.dart';
 
 /// Implements the tile half of [RasterFrameSource] once.
 ///
-/// Radar, satellite, and QPESUMS differ only in endpoint and zoom ceiling:
-/// all serve `…/<frame>/{z}/{x}/{y}.webp`, so warming, abandoning, and
-/// releasing are identical. Subclasses supply [frames], [tileUrl], and the two
-/// constants.
+/// Endpoint paths and frame ids differ, but each API supplies one complete URL
+/// template. Warming, abandoning and releasing therefore stay identical and
+/// never need to understand whether the identity is a timestamp, channel or
+/// forecast cycle.
 ///
 /// Every URL here is built from [tileUrl] itself rather than reassembled from
 /// parts — a warmed key that differs from what MapLibre requests by so much as

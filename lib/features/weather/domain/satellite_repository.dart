@@ -9,8 +9,8 @@ import 'package:dpip/shared/map/raster_frame_source.dart';
 /// a home.
 abstract interface class SatelliteRepository implements RasterFrameSource {
   /// Switches the colour rendering of **single-band** channels to [style] (a
-  /// `?style=` value — `gray` / `jma` / `bd`); `null` restores the server
-  /// default. Named-product channels carry their own palette and ignore this.
+  /// style path segment — `normal` / `jma` / `bd`); `null` restores `normal`.
+  /// Named-product channels carry their own palette and ignore this.
   ///
   /// Live only — it changes the URL of subsequently fetched tiles; the caller
   /// decides whether to re-mount the layer (reload) so the map reflects it.

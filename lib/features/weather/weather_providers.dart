@@ -48,7 +48,7 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       ),
     ),
     // One repository per channel the satellite layer picker offers — each needs
-    // its own `?channel=` on both the frame list and every tile URL, and its
+    // its own channel path on both the frame list and every tile URL, and its
     // own warmer so switching channels never abandons another channel's warm.
     Provider<Map<SatelliteChannel, SatelliteRepository>>.value(
       value: {
@@ -59,7 +59,7 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
           ),
       },
     ),
-    // One repository per wind forecast model — each needs its own `?model=` on
+    // One repository per wind forecast model — each needs its own model path on
     // both the frame list and every tile URL, and its own warmer. The 0.25°
     // grids stop publishing at z7.
     Provider<Map<WindForecastModel, WindForecastRepository>>.value(

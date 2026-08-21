@@ -9,16 +9,14 @@ import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/meteor_decode.dart';
 
-/// Tile endpoints for one v2 raster overlay — radar / satellite / QPESUMS /
-/// wind all share the same shape, differing only in the URL path segment
-/// ([path]).
+/// Tile endpoints for one v2 raster overlay.
 ///
-/// Everything is keyed by a Unix timestamp (seconds for radar/satellite,
-/// milliseconds for QPESUMS); a frame id *is* the timestamp. The frame list is
-/// delta-encoded (`[base, Δ, Δ, …]`) and served from `api.core-tnn1` with
-/// ETag/304. Tiles are WebP on `static.core-tnn1`
-/// ([ApiTier.coreStaticExclusive]); [tileUrl] feeds MapLibre. Prefetch warms
-/// SQLite + ambient under the same origin URL. Caching is **ETag-only**.
+/// Radar and QPESUMS use a timestamp directly. Satellite puts its channel and
+/// style in the path. Wind is the exceptional mutable forecast: its public
+/// frame id combines valid time and model cycle (`valid@cycle`) so a newer run
+/// is a different identity all the way through the timeline, MapLibre L1 and
+/// SQLite L2. [tileUrl] turns that opaque id into the server's `cycle/valid`
+/// path.
 class FrameTileApi {
   FrameTileApi(this._client, this.path, {this.channel, this.style, this.model});
 
@@ -28,20 +26,17 @@ class FrameTileApi {
   /// `wind`.
   final String path;
 
-  /// Optional `?channel=` for the satellite overlay — selects which band or
-  /// derived product a frame renders. Null keeps the server default (B13) and
-  /// the URL channel-free; radar / qpesums never set it.
+  /// Satellite path segment selecting a band or derived product. Null means
+  /// the service's B13 default; radar / QPESUMS never set it.
   final String? channel;
 
-  /// Optional `?style=` for a **single-band** satellite channel — which colour
-  /// rendering to use (`gray` / `jma` / `bd`). Mutable because the map's style
-  /// menu switches it live (via `SatelliteRepository.setStyle`); named-product
-  /// channels ignore it.
+  /// Satellite style path segment (`normal` / `jma` / `bd`). Mutable because
+  /// the map's style menu switches it live. Named products always use
+  /// `normal`, as their palette is intrinsic to the product.
   String? style;
 
-  /// Optional `?model=` for the wind forecast overlay — which numerical
-  /// weather prediction model (`gfs` / `ecmwf`) a frame renders. Null keeps the
-  /// URL model-free; radar / satellite / qpesums never set it.
+  /// Wind model path segment (`gfs` / `ecmwf`). Required when [path] is wind;
+  /// radar / satellite / QPESUMS never set it.
   final String? model;
 
   /// The v2 frame list lives on `api.core-tnn1` (no region failover).
@@ -50,32 +45,43 @@ class FrameTileApi {
   /// v2 tiles live on `static.core-tnn1` (no region failover).
   static const ApiTier _tileTier = ApiTier.coreStaticExclusive;
 
-  /// Available frame timestamps, **newest first**.
-  ///
-  /// `https://api.core-tnn1.exptech.dev/api/v2/tiles/<path>/list[?channel=…]`
-  Future<List<String>> getFrames() async => framesFromList(
-    await _client.get(_listTier, '${ApiPaths.tiles}/$path/list$_query') as List,
-  );
-
-  /// XYZ WebP raster tile URL template for a [frame] (a Unix timestamp).
-  ///
-  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/<path>/<ts>/{z}/{x}/{y}.webp[?channel=…][&style=…]`
-  String tileUrl(String frame) =>
-      '${_client.hostsFor(_tileTier).first}'
-      '${ApiPaths.tiles}/$path/$frame/{z}/{x}/{y}.webp$_query';
-
-  String get _query {
-    final channel = this.channel;
-    final style = this.style;
-    final model = this.model;
-    if (channel == null && style == null && model == null) return '';
-    final parts = <String>[
-      if (channel != null) 'channel=$channel',
-      if (style != null) 'style=$style',
-      if (model != null) 'model=$model',
-    ];
-    return '?${parts.join('&')}';
+  /// Available opaque frame ids, **newest valid time first**.
+  Future<List<String>> getFrames() async {
+    final body = await _client.get(_listTier, _listPath) as List;
+    return path == 'wind' ? windFramesFromList(body) : framesFromList(body);
   }
+
+  String get _listPath => switch (path) {
+    'satellite' => '${ApiPaths.tiles}/satellite/${channel ?? '13'}/list',
+    'wind' => '${ApiPaths.tiles}/wind/$_windModel/list',
+    _ => '${ApiPaths.tiles}/$path/list',
+  };
+
+  /// XYZ WebP raster tile URL template for [frame].
+  String tileUrl(String frame) {
+    final host = _client.hostsFor(_tileTier).first;
+    if (path == 'satellite') {
+      return '$host${ApiPaths.tiles}/satellite/'
+          '${channel ?? '13'}/$_satelliteStyle/'
+          '$frame/{z}/{x}/{y}.webp';
+    }
+    if (path == 'wind') {
+      final parts = windFrameParts(frame);
+      return '$host${ApiPaths.tiles}/wind/$_windModel/'
+          '${parts.cycle}/${parts.validTime}/{z}/{x}/{y}.webp';
+    }
+    return '$host${ApiPaths.tiles}/$path/$frame/{z}/{x}/{y}.webp';
+  }
+
+  String get _satelliteStyle {
+    final selected = channel ?? '13';
+    if (int.tryParse(selected) == null) return 'normal';
+    final selectedStyle = style ?? 'normal';
+    return selectedStyle == 'gray' ? 'normal' : selectedStyle;
+  }
+
+  String get _windModel =>
+      model ?? (throw StateError('A wind FrameTileApi requires a model'));
 
   /// Restores the delta-encoded list `[base, Δ, Δ, …]` to absolute timestamps
   /// and returns them **newest first** as strings (the frame id used by
@@ -84,11 +90,45 @@ class FrameTileApi {
     for (final v in MeteorDecode.deltaSeconds(deltas).reversed) v.toString(),
   ];
 
-  /// The raw WND1 wind-field bytes for [frame] — the v1 endpoint parallels the
-  /// v2 tiles (`/api/v1/wind/<model>/<frame>.bin` on the same static host),
-  /// keyed by the model [tileUrl] renders.
-  Future<Uint8List> fetchWindBin(String frame) async => (await _client.getBytes(
-    _tileTier,
-    '${ApiPaths.windV1}/$model/$frame.bin',
-  )).bytes;
+  /// Converts the wind list's `{t: validTime, c: cycle}` rows into stable,
+  /// opaque frame ids. Valid time comes first so the shared timeline can read
+  /// it without knowing weather API details; cycle remains part of identity so
+  /// two model runs can never share a native or SQLite cache key.
+  static List<String> windFramesFromList(List<dynamic> rows) {
+    final frames = <({int validTime, int cycle})>[];
+    for (final row in rows) {
+      if (row is! Map || row['t'] is! int || row['c'] is! int) {
+        throw const FormatException('invalid wind frame list');
+      }
+      frames.add((validTime: row['t'] as int, cycle: row['c'] as int));
+    }
+    frames.sort((a, b) => b.validTime.compareTo(a.validTime));
+    return [for (final frame in frames) '${frame.validTime}@${frame.cycle}'];
+  }
+
+  /// Decodes the app's opaque `valid@cycle` wind frame id.
+  static ({String validTime, String cycle}) windFrameParts(String frame) {
+    final separator = frame.indexOf('@');
+    if (separator <= 0 ||
+        separator != frame.lastIndexOf('@') ||
+        separator == frame.length - 1) {
+      throw FormatException('invalid wind frame id: $frame');
+    }
+    final validTime = frame.substring(0, separator);
+    final cycle = frame.substring(separator + 1);
+    if (int.tryParse(validTime) == null || int.tryParse(cycle) == null) {
+      throw FormatException('invalid wind frame id: $frame');
+    }
+    return (validTime: validTime, cycle: cycle);
+  }
+
+  /// The raw WND1 field for the exact model cycle used by [tileUrl].
+  Future<Uint8List> fetchWindBin(String frame) async {
+    final parts = windFrameParts(frame);
+    return (await _client.getBytes(
+      _tileTier,
+      '${ApiPaths.windV1}/$_windModel/'
+      '${parts.cycle}/${parts.validTime}.bin',
+    )).bytes;
+  }
 }
