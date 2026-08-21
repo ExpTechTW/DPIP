@@ -2,7 +2,7 @@
 /// or a derived product (True Color, overshooting top, cloud-top temperature,
 /// …) the tile service can render.
 ///
-/// [key] is the `?channel=` value the satellite tile endpoints accept: a raw
+/// [key] is the channel path segment the satellite tile endpoints accept: a raw
 /// band's decimal number, or a named product. Bands and products are the same
 /// kind of choice from a client's point of view — which imagery do I want — so
 /// they share the one enum; the wire only differs in whether [key] is numeric.
@@ -55,7 +55,7 @@ enum SatelliteChannel {
 
   const SatelliteChannel(this.key, this.subtitle);
 
-  /// The `?channel=` value naming this view on the tile endpoints.
+  /// The path segment naming this view on the tile endpoints.
   final String key;
 
   /// Picker subtitle — the band's wavelength, or the product's composition /
@@ -63,7 +63,7 @@ enum SatelliteChannel {
   final String subtitle;
 
   /// Whether this is a raw single band. Only bands accept a colour [style];
-  /// named products carry their own palette (`?style=` is ignored for them).
+  /// named products carry their own palette (their path uses `normal`).
   bool get isBand => int.tryParse(key) != null;
 
   /// Whether this band is **thermal infrared** (B07–B16).
@@ -79,17 +79,17 @@ enum SatelliteChannel {
   }
 }
 
-/// One colour rendering of a raw band (`?style=` on the tile endpoints).
+/// One colour rendering of a raw band (the style path segment).
 ///
-/// Only [SatelliteChannel.isBand] channels honour this; the backend defaults to
-/// [gray] when the parameter is absent, so the default needs no wire value.
+/// Only [SatelliteChannel.isBand] channels honour this. The UI calls the
+/// default grayscale while the canonical wire spelling is `normal`.
 enum SatelliteStyle {
-  gray('gray'),
+  gray('normal'),
   jma('jma'),
   bd('bd');
 
   const SatelliteStyle(this.key);
 
-  /// The `?style=` value naming this rendering.
+  /// The path segment naming this rendering.
   final String key;
 }

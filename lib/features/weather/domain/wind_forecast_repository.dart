@@ -11,7 +11,7 @@ import 'package:dpip/shared/map/raster_frame_source.dart';
 /// Named separately so call sites read as "the ECMWF/GFS wind repository" and
 /// so forecast-specific additions have a home.
 abstract interface class WindForecastRepository implements RasterFrameSource {
-  /// The WND1 wind grid for [frame] (a Unix-second timestamp, the same id the
-  /// tiles are keyed by) — the velocity field the overlay's particles ride on.
+  /// The WND1 wind grid for [frame] (an opaque valid-time + cycle id, the same
+  /// identity the tiles use) — the velocity field the particles ride on.
   Future<Result<WindField>> fetchWindField(String frame);
 }

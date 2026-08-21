@@ -76,7 +76,7 @@ class _MapPageState extends State<MapPage> {
         model: model,
       ),
     // One layer per satellite channel — each fetches its own frame list and
-    // serves its own `?channel=` tiles.
+    // serves its own channel-scoped tile path.
     for (final channel in SatelliteChannel.values)
       SatelliteMapLayer(
         context.read<Map<SatelliteChannel, SatelliteRepository>>()[channel]!,

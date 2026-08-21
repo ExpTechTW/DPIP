@@ -13,11 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The satellite cloud (衛星雲圖) raster overlay for one [SatelliteChannel] —
-/// a raw AHI band or a derived product, keyed by the channel's `?channel=`.
+/// a raw AHI band or a derived product, keyed by its channel path segment.
 ///
 /// Scrubbing behaviour is [RasterTimelineLayer]'s; what is specific here is the
 /// bright-yellow boundary outline and — for raw bands — a live colour [style]
-/// switch (`?style=`), re-mounted through the scaffold's reload when it changes.
+/// switch (the style path segment), re-mounted through the scaffold's reload.
 class SatelliteMapLayer extends RasterTimelineLayer {
   SatelliteMapLayer(
     SatelliteRepository super.repository, {
@@ -25,7 +25,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   });
 
   /// Which view of Himawari this layer renders — sets both the tile URL's
-  /// `?channel=` and the picker label.
+  /// channel path and the picker label.
   final SatelliteChannel channel;
 
   /// Colour rendering of a raw band (JMA grayscale default); ignored for named
@@ -83,7 +83,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   }
 
   /// Switches [style] and re-mounts the layer so the map picks up the new
-  /// `?style=` tiles. The reload is the scaffold's job ([onReloadActive]); a
+  /// style path. The reload is the scaffold's job ([onReloadActive]); a
   /// no-op for named-product channels, and for bands whose only rendering is
   /// grayscale ([SatelliteChannel.isThermal] bands alone take the temperature
   /// styles).
