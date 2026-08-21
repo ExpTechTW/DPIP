@@ -176,9 +176,15 @@ void main() {
       await layer.show(controller, frames[4]);
       controller.calls.clear();
       controller.sentKeys.clear();
+      controller.propertyBatches = 0;
 
       await layer.show(controller, frames[5], scrubbing: true);
 
+      expect(
+        controller.propertyBatches,
+        1,
+        reason: 'one scrub frame must cross the platform channel only once',
+      );
       expect(controller.calls, [
         'set:radar-lyr-${frames[4].id}:0.0',
         'set:radar-lyr-${frames[5].id}:0.85',
@@ -196,6 +202,129 @@ void main() {
       ], reason: 'scrubbing may probe L1 but must never read or inject L2');
     },
   );
+
+  test('timeline touch cancels preload before the first frame event', () async {
+    final source = _FakeRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]);
+    await pumpEventQueue();
+
+    layer.onTimelineScrubStart();
+    expect(source.warmCancels, 1);
+
+    await layer.show(controller, frames[5], scrubbing: true);
+    expect(
+      source.warmCancels,
+      1,
+      reason: 'the first frame event must not cancel the same gesture twice',
+    );
+  });
+
+  test('native idle makes an ambient-cache ring scrub-ready', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(5))..ready = false;
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    source.readinessProbes.clear();
+
+    // Android MapLibre can render these tiles from its ambient cache without
+    // passing the bodies through the app-owned L1 mirror.
+    layer.onMapIdle();
+    await layer.show(controller, frames[3], scrubbing: true);
+
+    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
+    expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
+    expect(
+      source.readinessProbes,
+      isEmpty,
+      reason: 'native render readiness must not be overruled by an empty L1',
+    );
+  });
+
+  test('a late native idle completes a settle after an L1 miss', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(5))..ready = false;
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    await layer.show(controller, frames[3]);
+    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.85');
+
+    layer.onMapIdle();
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+
+    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
+    expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
+  });
+
+  test('a scrub derives the visible region once, not once per frame', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(9))..ready = false;
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]);
+    controller.visibleRegionQueries = 0;
+
+    for (var i = 5; i < 9; i++) {
+      await layer.show(controller, frames[i], scrubbing: true);
+    }
+
+    expect(
+      controller.visibleRegionQueries,
+      0,
+      reason:
+          'the camera cannot move while the finger is on the ruler, so every '
+          'crossed frame reuses the rectangle the settle already read — this '
+          'was one platform round-trip per frame',
+    );
+
+    // A pan makes the cached rectangle wrong, and camera-idle is where that is
+    // reported — the same event that already invalidates native readiness.
+    controller.reportCamera(lat: 24.5, lng: 120.5, zoom: 9);
+    await layer.onCameraIdle(controller);
+    controller.visibleRegionQueries = 0;
+
+    await layer.show(controller, frames[3], scrubbing: true);
+
+    expect(
+      controller.visibleRegionQueries,
+      1,
+      reason:
+          'a moved camera must re-read the rectangle, not reuse the old one',
+    );
+  });
+
+  test('camera movement invalidates native readiness during a scrub', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(5));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    layer.onMapIdle();
+    await layer.show(controller, frames[2], scrubbing: true);
+    await layer.onCameraIdle(controller);
+    source
+      ..ready = false
+      ..readinessProbes.clear();
+
+    await layer.show(controller, frames[3], scrubbing: true);
+
+    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.85');
+    expect(source.readinessProbes, [(frame: frames[3].id, warm: false)]);
+  });
 
   test('frames mount without opacity or per-tile fades', () async {
     final layer = RadarMapLayer(_FakeRadarRepository(_ids(9)));
@@ -758,6 +887,7 @@ void main() {
 
     await layer.show(controller, frames[0], scrubbing: true);
 
+    expect(layer.isShowingFrame(frames[0].id), isFalse);
     expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.85');
     expect(controller.calls, isEmpty);
     expect(
@@ -775,6 +905,30 @@ void main() {
     expect(source.probes, 2);
     expect(source.readinessProbes.last, (frame: frames[0].id, warm: true));
     expect(controller.opacityOf('radar-lyr-${frames[0].id}'), '0.85');
+  });
+
+  test('a held scrub frame can retry after backpressure quiet', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(9));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[4]);
+    source.ready = false;
+
+    await layer.show(controller, frames[0], scrubbing: true);
+    expect(layer.isShowingFrame(frames[0].id), isFalse);
+
+    source.ready = true;
+    await layer.show(controller, frames[0], scrubbing: true);
+
+    expect(layer.isShowingFrame(frames[0].id), isTrue);
+    expect(
+      source.readinessProbes.where((probe) => probe.frame == frames[0].id),
+      hasLength(2),
+      reason: 'the quiet retry must probe again instead of no-oping forever',
+    );
   });
 
   test(

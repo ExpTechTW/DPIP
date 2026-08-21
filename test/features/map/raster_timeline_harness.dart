@@ -93,6 +93,14 @@ class RecordingMapController implements MapLibreMapController {
   /// went over the platform channel.
   final List<Set<String>> sentKeys = [];
 
+  /// Number of native property batches, regardless of updates per batch.
+  int propertyBatches = 0;
+
+  /// How many times the visible region was asked for. It is a platform
+  /// round-trip, so a scrub that re-derives a rectangle the camera never moved
+  /// is paying for it once per crossed frame.
+  int visibleRegionQueries = 0;
+
   final Map<String, ({String? visibility, String? opacity})> _state = {};
 
   String? visibilityOf(String layerId) => _state[layerId]?.visibility;
@@ -304,6 +312,20 @@ class RecordingMapController implements MapLibreMapController {
     _record(layerId, properties);
   }
 
+  @override
+  Future<void> setLayerPropertiesBatch(
+    List<({String layerId, LayerProperties properties})> updates, {
+    bool skipNulls = false,
+  }) async {
+    propertyBatches++;
+    for (final update in updates) {
+      final json = update.properties.toJson(skipNulls: skipNulls);
+      calls.add('set:${update.layerId}:${json['raster-opacity']}');
+      sentKeys.add(json.keys.toSet());
+      _record(update.layerId, update.properties);
+    }
+  }
+
   /// Merges into the layer's state: the layer keeps whatever a call omits,
   /// which is exactly what `skipNulls` means on the wire.
   void _record(String layerId, LayerProperties properties) {
@@ -326,20 +348,28 @@ class RecordingMapController implements MapLibreMapController {
   }
 
   @override
-  Future<LatLngBounds> getVisibleRegion() async => LatLngBounds(
-    southwest: const LatLng(22, 120),
-    northeast: const LatLng(25, 122),
-  );
+  Future<LatLngBounds> getVisibleRegion() async {
+    visibleRegionQueries++;
+    return LatLngBounds(
+      southwest: const LatLng(22, 120),
+      northeast: const LatLng(25, 122),
+    );
+  }
 
   @override
   Future<List<Point<num>>> toScreenLocationBatch(
     Iterable<LatLng> coords,
   ) async => [for (final c in coords) Point(c.longitude, c.latitude)];
 
+  /// Moves the reported camera, as a real pan or zoom would. Primitive
+  /// arguments so a test need not import the map package for one line.
+  void reportCamera({double lat = 23.5, double lng = 121, double zoom = 7}) =>
+      _camera = CameraPosition(target: LatLng(lat, lng), zoom: zoom);
+
   /// Camera the [cameraPosition] getter reports — a wind-overlay test can
   /// zoom out to put more of the field in view (the default z7 viewport holds
   /// only a handful of particles, too few to assert anything about).
-  final CameraPosition _camera;
+  CameraPosition _camera;
 
   @override
   CameraPosition? get cameraPosition => _camera;

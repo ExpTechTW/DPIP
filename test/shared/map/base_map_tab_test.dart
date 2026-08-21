@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 class _FakePlatform extends MapLibrePlatform {
   final paused = <bool>[];
   int buildCount = 0;
+  bool failResume = false;
 
   @override
   Future<void> initPlatform(int id) async {}
@@ -33,6 +34,9 @@ class _FakePlatform extends MapLibrePlatform {
   @override
   Future<void> setRenderPaused(bool paused) async {
     this.paused.add(paused);
+    if (!paused && failResume) {
+      throw StateError('native renderer did not resume');
+    }
   }
 
   @override
@@ -96,7 +100,7 @@ void main() {
     expect(platform.paused, [true, false]);
   });
 
-  testWidgets('iOS leaves the retained native render loop under MapLibre', (
+  testWidgets('iOS pauses and resumes the retained native view in place', (
     tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
@@ -115,19 +119,22 @@ void main() {
       visibleTab.value = 2;
       await tester.pump();
 
-      expect(platform.paused, isEmpty);
+      expect(platform.paused, [true, false]);
       expect(platform.buildCount, 1);
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
   });
 
-  testWidgets('iOS opt-in recreates the native view on return', (tester) async {
+  testWidgets('iOS recreates only after verified native resume failure', (
+    tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     try {
       final visibleTab = VisibleTab(2);
       final created = <MapLibreMapController>[];
       final invalidated = <MapLibreMapController>[];
+      platform.failResume = true;
       await pump(
         tester,
         VisibleTabScope(
@@ -149,7 +156,7 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(platform.paused, isEmpty);
+      expect(platform.paused, [true, false]);
       expect(platform.buildCount, 2);
       expect(created, hasLength(2));
       expect(invalidated, [created.first]);
@@ -216,6 +223,15 @@ void main() {
   ) async {
     await pump(tester, const BaseMap(tabIndex: 2));
     expect(platform.paused, isEmpty);
+  });
+
+  testWidgets('forwards native map idle', (tester) async {
+    var idleCount = 0;
+    await pump(tester, BaseMap(onMapIdle: () => idleCount++));
+
+    platform.onMapIdlePlatform(null);
+
+    expect(idleCount, 1);
   });
 
   testWidgets('a page pushed over the shell pauses the visible tab', (

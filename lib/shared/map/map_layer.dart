@@ -182,6 +182,20 @@ abstract interface class MapLayer {
   /// Camera settled after pan/zoom — sheet layers may prefetch viewport tiles.
   Future<void> onCameraIdle(MapLibreMapController controller);
 
+  /// MapLibre's native renderer has fully loaded the current visible sources.
+  ///
+  /// This is stronger than [onCameraIdle] for raster timelines: Android's
+  /// ambient cache can satisfy a source without passing its bytes through the
+  /// app-owned L1 mirror, so native render readiness is the authoritative
+  /// signal that a transparent frame can be revealed without a blank flash.
+  void onMapIdle();
+
+  /// A timeline drag started, before its first selected frame is dispatched.
+  ///
+  /// Raster layers use this edge to cancel speculative cache work immediately
+  /// instead of letting it compete with the first interactive frame update.
+  void onTimelineScrubStart();
+
   /// Ambient cache was wiped (e.g. after radar scrub + background). Layers that
   /// pin tiles via app HTTP should rehydrate from their ETag store.
   Future<void> onAmbientCacheCleared(MapLibreMapController controller);
@@ -291,6 +305,12 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   Future<void> onCameraIdle(MapLibreMapController controller) async {}
+
+  @override
+  void onMapIdle() {}
+
+  @override
+  void onTimelineScrubStart() {}
 
   @override
   Future<void> onAmbientCacheCleared(MapLibreMapController controller) async {}
