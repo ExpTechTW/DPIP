@@ -46,8 +46,9 @@ dependencies:
   # Requires MapLibre Native 6.27.0 (ios/vendor/maplibre).
   # https://github.com/ExpTechTW/flutter-maplibre-gl
   # Pin a commit (not floating `main`) so CI/`pub get` can't rewrite
-  # pubspec.lock. Local path override stays in gitignored
-  # `pubspec_overrides.yaml` — after `pub get` with it, discard lock churn.
+  # pubspec.lock. Copy `pubspec_overrides.example.yaml` for a local fork; the
+  # resulting `pubspec_overrides.yaml` stays gitignored, and any lockfile churn
+  # from using it must be discarded.
   # The fork's controller.dart calls `setRenderPaused`, which exists only in
   # the fork's interface/web packages — pub.dev's 0.26.2 lacks it. The
   # overrides below force those two siblings (declared hosted ^0.26.2 inside

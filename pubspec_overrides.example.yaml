@@ -1,0 +1,20 @@
+# Optional local MapLibre development override.
+#
+# Copy this file to `pubspec_overrides.yaml`. The paths below assume DPIP and
+# flutter-maplibre-gl are sibling checkouts:
+#
+#   GitHub/
+#     DPIP/
+#     flutter-maplibre-gl/
+#
+# Override all three packages together. Mixing the local controller with the
+# remotely pinned platform interface or web implementation can compile against
+# different APIs. `pubspec_overrides.yaml` is gitignored; do not commit the
+# path-based changes it temporarily writes to `pubspec.lock`.
+dependency_overrides:
+  maplibre_gl:
+    path: ../flutter-maplibre-gl/maplibre_gl
+  maplibre_gl_platform_interface:
+    path: ../flutter-maplibre-gl/maplibre_gl_platform_interface
+  maplibre_gl_web:
+    path: ../flutter-maplibre-gl/maplibre_gl_web
