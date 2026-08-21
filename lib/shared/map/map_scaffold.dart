@@ -20,11 +20,13 @@ import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
+import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart'
     show VisibleTab, VisibleTabScope;
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -87,8 +89,23 @@ class MapScaffold extends StatefulWidget {
 }
 
 class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
+  final int _traceId = nextMapTraceId();
+  final Stopwatch _traceClock = Stopwatch()..start();
+  Timer? _traceHeartbeat;
+  int _lastHeartbeatMs = 0;
+  int _loadSequence = 0;
+  int _mapOpSequence = 0;
+  int _pendingMapOps = 0;
+  int _controllerEpoch = 0;
+
+  String get _traceScope => 'scaffold#$_traceId/tab=${widget.tabIndex}';
+
+  void _trace(String message) => mapTrace(_traceScope, message);
+
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
+  CameraPosition? _cameraBeforeRecreate;
+  bool _restoreSurfaceAfterRecreate = false;
   late final MapInteractionTracker _mapInteraction;
   Future<void> _tileCacheReady = Future<void>.value();
 
@@ -196,6 +213,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _trace('init active=${_active.id} timeline=${_active.usesTimeline}');
+    _scrubBackpressure.addListener(_onScrubBackpressureChanged);
     _mapInteraction = MapInteractionTracker(
       onStart: () => _active.onMapGestureStart(),
       onEnd: () => _active.onMapGestureEnd(),
@@ -226,6 +245,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // the layer its initial visibility too; waiting for the first notifier edge
     // would let an off-screen first style load start a full timeline warm.
     _active.onSurfaceVisibility(_wasVisible);
+    _trace(
+      'visible-scope attached scope=${mapTraceObject(visibleTab)} '
+      'selected=${visibleTab?.value} shellOnTop=${visibleTab?.shellOnTop} '
+      'visible=$_wasVisible',
+    );
+    _syncTraceHeartbeat(_wasVisible);
   }
 
   /// Whether this surface is on screen — its branch selected and nothing pushed
@@ -250,12 +275,46 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// then again on the way back.
   bool _wasVisible = true;
 
+  void _syncTraceHeartbeat(bool visible) {
+    if (!mapTraceEnabled) return;
+    if (!visible) {
+      if (_traceHeartbeat != null) _trace('watchdog stop hidden');
+      _traceHeartbeat?.cancel();
+      _traceHeartbeat = null;
+      return;
+    }
+    if (_traceHeartbeat != null) return;
+    _lastHeartbeatMs = _traceClock.elapsedMilliseconds;
+    _trace(
+      'watchdog start controller=${mapTraceObject(_controller)} '
+      'style=$_styleLoaded',
+    );
+    _traceHeartbeat = Timer.periodic(const Duration(seconds: 3), (_) {
+      final now = _traceClock.elapsedMilliseconds;
+      final gap = now - _lastHeartbeatMs;
+      _lastHeartbeatMs = now;
+      _trace(
+        'heartbeat gap=${gap}ms controller=${mapTraceObject(_controller)} '
+        'style=$_styleLoaded active=${_active.id} gen=$_generation '
+        'frames=${_frames.length} selected=$_selectedIndex '
+        'pendingOps=$_pendingMapOps showQueued=$_showQueued '
+        'scrubbing=$_scrubbing',
+      );
+    });
+  }
+
   @override
   void dispose() {
+    _trace(
+      'dispose controller=${mapTraceObject(_controller)} '
+      'pendingOps=$_pendingMapOps',
+    );
+    _traceHeartbeat?.cancel();
     _visibleTab?.removeListener(_onTabChanged);
     WidgetsBinding.instance.removeObserver(this);
     _bearing.dispose();
     _cameraEpoch.dispose();
+    _scrubBackpressure.removeListener(_onScrubBackpressureChanged);
     _scrubBackpressure.dispose();
     _showTownLabels.dispose();
     _showTerrain.dispose();
@@ -277,12 +336,31 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final visible = _isVisible;
     final changed = visible != _wasVisible;
     final returned = visible && !_wasVisible;
+    _trace(
+      'visible-notify selected=${_visibleTab?.value} '
+      'shellOnTop=${_visibleTab?.shellOnTop} visible=$visible '
+      'changed=$changed returned=$returned active=${_active.id} '
+      'style=$_styleLoaded controller=${mapTraceObject(_controller)}',
+    );
     _wasVisible = visible;
     // Both edges, before the timeline reload: a realtime layer skips its
     // platform uploads while hidden and flushes once on return.
     if (changed) _active.onSurfaceVisibility(visible);
+    _syncTraceHeartbeat(visible);
     if (!returned) return;
-    if (_active.usesTimeline) unawaited(_loadActive());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _trace(
+        'return-post-frame size=$_mapViewSize '
+        'controller=${mapTraceObject(_controller)} style=$_styleLoaded',
+      );
+    });
+    // BaseMap replaces the retained iOS UiKitView on this edge. Its fresh style
+    // load performs the one authoritative reload; starting one against the old
+    // controller here would race teardown and can strand the serial op lane.
+    if (_active.usesTimeline && defaultTargetPlatform != TargetPlatform.iOS) {
+      unawaited(_loadActive(trigger: 'tab-return'));
+    }
   }
 
   @override
@@ -293,6 +371,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       AppLifecycleState.detached => false,
       AppLifecycleState.resumed || AppLifecycleState.inactive => true,
     };
+    _trace('app-lifecycle state=$state foreground=$foreground');
     if (foreground != _appForeground) {
       _appForeground = foreground;
       // Backgrounding is the same edge as leaving the tab: realtime layers
@@ -332,8 +411,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   /// Applies a pending camera (+ optional layer) hand-off from Home / nav.
   Future<void> _applyCameraHandoff() async {
+    // A nav request can schedule this callback one frame before BaseMap
+    // invalidates its retained iOS view. Do not consume the one-shot request
+    // until its replacement controller and style are ready.
+    if (!mounted || !_styleLoaded || _controller == null) return;
     final pending = _handoff?.takePending();
-    if (pending == null || !mounted) return;
+    if (pending == null) return;
     await _switchToLayerId(pending.layerId);
     if (!mounted) return;
     _frameBounds(pending.bounds, northUp: true);
@@ -462,14 +545,52 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
+    _trace('map-created controller=${mapTraceObject(controller)}');
     final tileCache = context.read<MapTileCache?>();
     _basemapWarmer ??= MapTileWarmer(tileCache);
     // Bootstrap can configure the cache before the platform-view plugin owns
     // this channel. Re-send the byte cap now so native L1 is actually 48 MB,
     // not its 2 MB pre-attach fallback.
+    final cacheSync = Stopwatch()..start();
+    _trace('tile-cache-sync start cache=${mapTraceObject(tileCache)}');
     _tileCacheReady =
-        tileCache?.syncNativeConfiguration() ?? Future<void>.value();
+        (tileCache?.syncNativeConfiguration() ?? Future<void>.value()).then(
+          (_) {
+            _trace(
+              'tile-cache-sync done dt=${cacheSync.elapsedMilliseconds}ms',
+            );
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            _trace(
+              'tile-cache-sync error dt=${cacheSync.elapsedMilliseconds}ms '
+              'error=$error',
+            );
+            return Future<void>.error(error, stackTrace);
+          },
+        );
     unawaited(const MapCache().setMaximumSize());
+  }
+
+  /// Detaches every style-bound owner from an iOS platform view immediately
+  /// before BaseMap replaces it. The tile stores remain intact, so the new map
+  /// rehydrates from L1/L2 instead of downloading the timeline again.
+  void _onMapInvalidated(MapLibreMapController controller) {
+    _cameraBeforeRecreate = controller.cameraPosition;
+    _trace(
+      'map-invalidated controller=${mapTraceObject(controller)} '
+      'camera=$_cameraBeforeRecreate pendingOps=$_pendingMapOps',
+    );
+    _generation++;
+    _controllerEpoch++;
+    _showQueued = false;
+    _styleLoaded = false;
+    _terrainOnMap = false;
+    _controller = null;
+    _basemapWarmer?.cancel();
+    _restoreSurfaceAfterRecreate = true;
+    if (_active case final RasterTimelineLayer timeline) {
+      timeline.onControllerInvalidated();
+    }
   }
 
   /// Feeds the compass needle — camera heading, ° clockwise from north.
@@ -563,21 +684,26 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // it, so the last tap always wins.
     var dirty = true;
     while (dirty) {
+      if (!identical(controller, _controller)) return;
       dirty = false;
       final show = _showTerrain.value;
       try {
         if (show && !_terrainOnMap) {
           await controller.addSource(terrainSourceId, _terrainSourceProps);
+          if (!identical(controller, _controller)) return;
           await controller.addHillshadeLayer(
             terrainSourceId,
             terrainHillshadeLayerId,
             _terrainLayerProps,
             belowLayerId: townOutlineLayerId,
           );
+          if (!identical(controller, _controller)) return;
           _terrainOnMap = true;
         } else if (!show && _terrainOnMap) {
           await controller.removeLayer(terrainHillshadeLayerId);
+          if (!identical(controller, _controller)) return;
           await controller.removeSource(terrainSourceId);
+          if (!identical(controller, _controller)) return;
           _terrainOnMap = false;
         }
       } catch (error, stackTrace) {
@@ -662,11 +788,25 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   void _onStyleLoaded() {
     _styleLoaded = true;
+    final cameraBeforeRecreate = _cameraBeforeRecreate;
+    _cameraBeforeRecreate = null;
+    _trace(
+      'style-loaded controller=${mapTraceObject(_controller)} '
+      'framed=$_framed active=${_active.id}',
+    );
     // Fires on the first load and again on every base-style reload (a theme /
     // dark-mode change), which wipes all runtime layers. Tell each layer to
     // forget its on-map state so the re-render re-adds instead of no-oping.
     for (final layer in widget.layers) {
       layer.onStyleReset();
+    }
+    if (_restoreSurfaceAfterRecreate) {
+      _restoreSurfaceAfterRecreate = false;
+      // Invalidation forced the active timeline hidden without sending native
+      // cleanup to a controller that was already being destroyed. Reveal it
+      // only after the replacement style exists, then its first settle can
+      // refresh repaired tile bytes before mounting raster sources.
+      _active.onSurfaceVisibility(_wasVisible);
     }
     // Frame once on first load — the view handed off by whoever opened the map
     // (Home's current view, or the nationwide default from the nav bar), else
@@ -684,8 +824,19 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         }
       }
       _frameBounds(pending?.bounds ?? BaseMap.taiwanBounds);
+    } else if (!(_handoff?.hasPending ?? false) &&
+        cameraBeforeRecreate != null) {
+      // A platform-view replacement starts at BaseMap's placeholder camera.
+      // Restore the exact prior centre/zoom/bearing unless this return carries
+      // a deliberate Home/nav framing request, which must win instead.
+      unawaited(
+        _controller?.moveCamera(
+          CameraUpdate.newCameraPosition(cameraBeforeRecreate),
+        ),
+      );
+      _trace('camera-restored after native recreate');
     }
-    _loadActive();
+    unawaited(_loadActive(trigger: 'style-loaded'));
     // Ranking may have queued a station focus before the style was ready.
     unawaited(_applyStationHandoff());
     // Home/nav camera handoff that arrived before the style was ready.
@@ -708,22 +859,51 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   /// Renders the active layer: a sheet layer draws its static overlay; a
   /// timeline layer fetches its frames and reveals the newest.
-  Future<void> _loadActive() async {
+  Future<void> _loadActive({String trigger = 'direct'}) async {
+    final loadId = ++_loadSequence;
+    final elapsed = Stopwatch()..start();
+    _trace(
+      'load#$loadId start trigger=$trigger active=${_active.id} '
+      'timeline=${_active.usesTimeline} cache-await',
+    );
     await _tileCacheReady;
-    if (_controller == null || !_styleLoaded) return;
+    _trace(
+      'load#$loadId cache-ready dt=${elapsed.elapsedMilliseconds}ms '
+      'controller=${mapTraceObject(_controller)} style=$_styleLoaded',
+    );
+    if (_controller == null || !_styleLoaded) {
+      _trace('load#$loadId skip not-ready');
+      return;
+    }
     final gen = ++_generation;
     setState(() => _error = null);
     if (!_active.usesTimeline) {
       final controller = _controller!;
       final layer = _active;
       setState(() => _frames = const []);
-      _queue(() => layer.render(controller));
+      _queue(
+        () => layer.render(controller),
+        label: 'load#$loadId ${layer.id}.render',
+      );
+      _trace('load#$loadId queued render gen=$gen');
       return;
     }
+    _trace('load#$loadId frames start gen=$gen');
     final result = await _active.frames();
-    if (!mounted || gen != _generation) return;
+    _trace(
+      'load#$loadId frames done dt=${elapsed.elapsedMilliseconds}ms '
+      'mounted=$mounted gen=$gen currentGen=$_generation',
+    );
+    if (!mounted || gen != _generation) {
+      _trace('load#$loadId discard stale');
+      return;
+    }
     result.when(
       ok: (frames) {
+        _trace(
+          'load#$loadId frames ok count=${frames.length} '
+          'dt=${elapsed.elapsedMilliseconds}ms',
+        );
         setState(() {
           _frames = frames;
           // The calibrated clock, not device time: the frames are server
@@ -739,11 +919,18 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           // opens on the newest already-due step, future steps to the right.
           final controller = _controller!;
           final layer = _active;
-          _queue(() => layer.prepare(controller, frames));
+          _queue(
+            () => layer.prepare(controller, frames),
+            label: 'load#$loadId ${layer.id}.prepare',
+          );
           _showSelected();
         }
       },
       err: (failure) {
+        _trace(
+          'load#$loadId frames error dt=${elapsed.elapsedMilliseconds}ms '
+          'message=${failure.message}',
+        );
         Log.warning(
           'Map layer ${_active.id} frames failed: ${failure.message}',
         );
@@ -759,6 +946,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final controller = _controller;
     if (controller == null) return;
     final layer = _active;
+    // Once sustained input has genuinely outrun the render lane, stop feeding
+    // it more work. The timeline label still follows the finger; the latest
+    // selected index is submitted once its crossed-frame rate becomes safe.
+    if (_scrubbing && _scrubBackpressure.value) {
+      _scrubBackpressure.reportScrubSample();
+      return;
+    }
     // Already queued: that op will pick up this newer selection when it runs, so
     // don't stack another one (see [_showQueued]).
     if (_showQueued) {
@@ -781,7 +975,20 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         _frames[_selectedIndex],
         scrubbing: _scrubbing,
       );
-    });
+    }, label: '${layer.id}.show');
+  }
+
+  void _onScrubBackpressureChanged() {
+    final paused = _scrubBackpressure.value;
+    _trace(
+      'scrub-backpressure ${paused ? 'paused' : 'resumed'} '
+      'selected=$_selectedIndex pending=$_pendingMapOps '
+      'showQueued=$_showQueued scrubbing=$_scrubbing',
+    );
+    // A quiet interval while the finger is still down is the promised
+    // "slow down to resume" path. Submit the latest position once; if a
+    // waiting show already exists it reads that same index when it starts.
+    if (!paused && _scrubbing && !_showQueued) _showSelected();
   }
 
   void _onScrubbing(bool scrubbing) {
@@ -818,7 +1025,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       // layer re-measures in build, a sheet layer declares its own share).
       _timelineHeight = 0;
     });
-    if (controller != null) _queue(() => previous.clear(controller));
+    if (controller != null) {
+      _queue(
+        () => previous.clear(controller),
+        label: '${previous.id}.clear-for-switch',
+      );
+    }
     // A bare switch is never a deliberate framing — the camera stays exactly as
     // the user left it, and the [_reframeOnMeasure] deferred re-fit must not
     // fire off it either (the height will change as the new layer's frames
@@ -827,7 +1039,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // Keep the camera exactly as the user left it — switching overlays must not
     // zoom, re-centre, or rotate the map. Only a deliberate framing entry (the
     // nav bar / Home hand-off, or a ranking station focus) moves the camera.
-    _loadActive();
+    unawaited(_loadActive(trigger: 'layer-selected'));
   }
 
   /// Re-loads the active layer from scratch: clear its on-map state (sources
@@ -840,15 +1052,55 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final layer = _active;
     // Clear first — the queued re-mount ops below land after it on the serial
     // chain, so the map never shows new-style tiles over old ones.
-    _queue(() => layer.clear(controller));
-    await _loadActive();
+    _queue(
+      () => layer.clear(controller),
+      label: '${layer.id}.clear-for-reload',
+    );
+    await _loadActive(trigger: 'reload');
   }
 
   /// Appends [op] to the serial controller-op chain, logging any failure — a
   /// failed overlay op degrades the map, it never throws into the tree.
-  void _queue(Future<void> Function() op) {
-    _mapOps = _mapOps.then((_) => op()).catchError((Object e, StackTrace st) {
-      Log.handle(e, st, 'Map layer op failed (${_active.id})');
+  void _queue(Future<void> Function() op, {String label = 'layer-op'}) {
+    final opId = ++_mapOpSequence;
+    final controllerEpoch = _controllerEpoch;
+    _pendingMapOps++;
+    _trace('op#$opId queued label=$label pending=$_pendingMapOps');
+    _mapOps = _mapOps.then((_) async {
+      final elapsed = Stopwatch()..start();
+      if (controllerEpoch != _controllerEpoch) {
+        _pendingMapOps--;
+        _trace(
+          'op#$opId skip stale-controller label=$label '
+          'epoch=$controllerEpoch current=$_controllerEpoch '
+          'pending=$_pendingMapOps',
+        );
+        return;
+      }
+      _trace('op#$opId start label=$label pending=$_pendingMapOps');
+      try {
+        await op();
+        _trace(
+          'op#$opId done label=$label dt=${elapsed.elapsedMilliseconds}ms',
+        );
+      } catch (error, stackTrace) {
+        _trace(
+          'op#$opId error label=$label dt=${elapsed.elapsedMilliseconds}ms '
+          'error=$error',
+        );
+        Log.handle(error, stackTrace, 'Map layer op failed (${_active.id})');
+      } finally {
+        // If the controller was replaced while this operation awaited native
+        // code, it may have updated the layer's "mounted" bookkeeping after
+        // the new style reset it. New-controller operations are serialised
+        // behind this one, so reset once more here before they start.
+        if (controllerEpoch != _controllerEpoch) {
+          for (final layer in widget.layers) {
+            layer.onStyleReset();
+          }
+        }
+        _pendingMapOps--;
+      }
     });
   }
 
@@ -883,6 +1135,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
               // The map tab owns this surface — pause native rendering when the
               // user is on another tab (indexedStack keeps it mounted).
               tabIndex: widget.tabIndex,
+              recreateOnReturn: true,
+              onMapInvalidated: _onMapInvalidated,
               onMapCreated: _onMapCreated,
               onStyleLoaded: _onStyleLoaded,
               onMapClick: (_, latLng) => _onMapClick(latLng),

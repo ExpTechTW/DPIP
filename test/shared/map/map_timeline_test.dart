@@ -55,10 +55,12 @@ List<MapFrame> _forecastFrames() {
 }
 
 void main() {
-  testWidgets('backpressure warning stays visible until rapid samples stop', (
+  testWidgets('backpressure warns only while output is actually suspended', (
     tester,
   ) async {
     final paused = TimelineScrubBackpressure(
+      pauseAfterDrops: 3,
+      overloadWindow: const Duration(milliseconds: 80),
       resumeDelay: const Duration(milliseconds: 100),
     );
     await tester.pumpWidget(
@@ -80,13 +82,23 @@ void main() {
     expect(find.textContaining('scrubbing too fast'), findsNothing);
     paused.reportDroppedFrame();
     await tester.pump();
+    paused.reportDroppedFrame();
+    await tester.pump();
+    expect(
+      find.textContaining('scrubbing too fast'),
+      findsNothing,
+      reason: 'isolated queue coalescing is not a user-visible pause',
+    );
+
+    paused.reportDroppedFrame();
+    await tester.pump();
     expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
     expect(find.textContaining('scrubbing too fast'), findsOneWidget);
 
     await tester.pump(const Duration(milliseconds: 99));
-    paused.reportDroppedFrame();
+    paused.reportScrubSample();
     await tester.pump(const Duration(milliseconds: 99));
-    expect(paused.value, isTrue, reason: 'another dropped sample resets quiet');
+    expect(paused.value, isTrue, reason: 'continued motion resets quiet');
 
     await tester.pump(const Duration(milliseconds: 1));
     expect(paused.value, isFalse);
@@ -95,10 +107,28 @@ void main() {
     expect(tester.takeException(), isNull);
 
     paused.reportDroppedFrame();
+    paused.reportDroppedFrame();
+    paused.reportDroppedFrame();
     paused.resume();
     expect(paused.value, isFalse, reason: 'finger-up resumes immediately');
 
     await tester.pumpWidget(const SizedBox.shrink());
+    paused.dispose();
+  });
+
+  testWidgets('spaced queue drops never pause timeline output', (tester) async {
+    final paused = TimelineScrubBackpressure(
+      pauseAfterDrops: 3,
+      overloadWindow: const Duration(milliseconds: 50),
+      resumeDelay: const Duration(milliseconds: 100),
+    );
+
+    for (var i = 0; i < 3; i++) {
+      paused.reportDroppedFrame();
+      await tester.pump(const Duration(milliseconds: 51));
+    }
+
+    expect(paused.value, isFalse);
     paused.dispose();
   });
 

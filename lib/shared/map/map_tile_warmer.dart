@@ -129,6 +129,7 @@ class MapTileWarmer {
     double fillUntil = 0,
     String workingSet = _defaultWorkingSet,
     bool immediate = false,
+    bool refreshResident = false,
   }) async {
     final cache = _cache;
     if (cache == null) return;
@@ -141,6 +142,7 @@ class MapTileWarmer {
     MapTileCache.trace(
       'warmer schedule label=$label set=$workingSet gen=$gen '
       'wanted=${list.length} fill=${fillUntil.toStringAsFixed(2)} '
+      'refresh=$refreshResident '
       'delay=${immediate ? 0 : settleDelay.inMilliseconds}ms',
     );
     if (!immediate && settleDelay > Duration.zero) {
@@ -176,6 +178,7 @@ class MapTileWarmer {
       final result = await cache.warm(
         list,
         fillUntil: fillUntil,
+        refreshResident: refreshResident,
         shouldContinue: () => _isCurrent(workingSet, epoch, gen),
       );
       // Record what native really retained even when a newer generation arrived

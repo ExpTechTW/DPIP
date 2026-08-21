@@ -33,6 +33,9 @@ abstract interface class RasterFrameSource {
   /// the implementation tops the native mirror up until it is nearly full,
   /// skipping nothing it holds already — so a timeline can warm far past its
   /// mounted ring and only the most distant frames stay cold.
+  /// [refreshResident] overwrites matching L1 entries from L2 once after a
+  /// hidden map returns; native presence alone cannot distinguish a decodable
+  /// image from a failed placeholder retained under the same URL.
   Future<void> warmFrameTiles({
     required List<String> frames,
     required double south,
@@ -42,6 +45,7 @@ abstract interface class RasterFrameSource {
     required double zoom,
     bool fill = false,
     bool immediate = false,
+    bool refreshResident = false,
   });
 
   /// Probes the tiles needed to reveal one [frame] in the current viewport.

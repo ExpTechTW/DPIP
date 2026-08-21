@@ -84,24 +84,65 @@ class MapTimeline extends StatefulWidget {
 /// Visible feedback for the timeline's bounded latest-wins render queue.
 ///
 /// [reportDroppedFrame] is called only when a scrub sample is coalesced because
-/// the map already has one update waiting. Repeated drops keep the signal on;
-/// once input becomes slow enough for the queue to keep up, it clears after a
-/// short quiet window. Finger-up calls [resume] immediately.
+/// the map already has one update waiting. One slow native call is not proof
+/// that input is too fast: only a short run of repeated drops enters the paused
+/// state. While paused, [reportScrubSample] keeps extending the pause; once
+/// crossed-frame samples become sparse enough, the quiet timer resumes output.
+/// Finger-up calls [resume] immediately.
 final class TimelineScrubBackpressure extends ValueNotifier<bool> {
   TimelineScrubBackpressure({
-    this.resumeDelay = const Duration(milliseconds: 300),
+    this.pauseAfterDrops = 3,
+    this.overloadWindow = const Duration(milliseconds: 160),
+    this.resumeDelay = const Duration(milliseconds: 120),
   }) : super(false);
 
+  /// Consecutive coalesced samples required before frame submission pauses.
+  final int pauseAfterDrops;
+
+  /// A gap this long means earlier drops were isolated, not sustained load.
+  final Duration overloadWindow;
+
+  /// No crossed frame for this long means the finger has slowed enough.
   final Duration resumeDelay;
+
+  int _dropStreak = 0;
+  Timer? _overloadTimer;
   Timer? _resumeTimer;
 
   void reportDroppedFrame() {
-    if (!value) value = true;
+    if (value) {
+      reportScrubSample();
+      return;
+    }
+
+    _dropStreak++;
+    _overloadTimer?.cancel();
+    _overloadTimer = Timer(overloadWindow, _clearDropStreak);
+    if (_dropStreak < pauseAfterDrops) return;
+
+    _clearDropStreak();
+    value = true;
+    _armResume();
+  }
+
+  /// Records timeline motion while output is actually suspended.
+  void reportScrubSample() {
+    if (value) _armResume();
+  }
+
+  void _armResume() {
     _resumeTimer?.cancel();
     _resumeTimer = Timer(resumeDelay, resume);
   }
 
+  void _clearDropStreak() {
+    _overloadTimer?.cancel();
+    _overloadTimer = null;
+    _dropStreak = 0;
+  }
+
   void resume() {
+    _clearDropStreak();
     _resumeTimer?.cancel();
     _resumeTimer = null;
     if (value) value = false;
@@ -109,6 +150,7 @@ final class TimelineScrubBackpressure extends ValueNotifier<bool> {
 
   @override
   void dispose() {
+    _overloadTimer?.cancel();
     _resumeTimer?.cancel();
     super.dispose();
   }

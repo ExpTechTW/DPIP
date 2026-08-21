@@ -6,7 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:maplibre_gl_platform_interface/maplibre_gl_platform_interface.dart';
 import 'package:provider/provider.dart';
 
 /// A fake platform that completes the map lifecycle (`buildView` →
@@ -16,6 +15,7 @@ import 'package:provider/provider.dart';
 /// visibility↔render state machine.
 class _FakePlatform extends MapLibrePlatform {
   final paused = <bool>[];
+  int buildCount = 0;
 
   @override
   Future<void> initPlatform(int id) async {}
@@ -26,7 +26,7 @@ class _FakePlatform extends MapLibrePlatform {
     OnPlatformViewCreatedCallback onPlatformViewCreated,
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
   ) {
-    onPlatformViewCreated(0);
+    onPlatformViewCreated(buildCount++);
     return const SizedBox.shrink();
   }
 
@@ -93,6 +93,90 @@ void main() {
     );
     visibleTab.value = 2;
     await tester.pump();
+    expect(platform.paused, [true, false]);
+  });
+
+  testWidgets('iOS leaves the retained native render loop under MapLibre', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final visibleTab = VisibleTab(2);
+      await pump(
+        tester,
+        VisibleTabScope(
+          visibleTab: visibleTab,
+          child: const BaseMap(tabIndex: 2),
+        ),
+      );
+
+      visibleTab.value = 0;
+      await tester.pump();
+      visibleTab.value = 2;
+      await tester.pump();
+
+      expect(platform.paused, isEmpty);
+      expect(platform.buildCount, 1);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
+  testWidgets('iOS opt-in recreates the native view on return', (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final visibleTab = VisibleTab(2);
+      final created = <MapLibreMapController>[];
+      final invalidated = <MapLibreMapController>[];
+      await pump(
+        tester,
+        VisibleTabScope(
+          visibleTab: visibleTab,
+          child: BaseMap(
+            tabIndex: 2,
+            recreateOnReturn: true,
+            onMapCreated: created.add,
+            onMapInvalidated: invalidated.add,
+          ),
+        ),
+      );
+
+      visibleTab.value = 0;
+      await tester.pump();
+      expect(platform.buildCount, 1, reason: 'hiding retains the current view');
+
+      visibleTab.value = 2;
+      await tester.pump();
+      await tester.pump();
+
+      expect(platform.paused, isEmpty);
+      expect(platform.buildCount, 2);
+      expect(created, hasLength(2));
+      expect(invalidated, [created.first]);
+      expect(created.last, isNot(same(created.first)));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
+  testWidgets('Android keeps pause-resume when recreation is requested', (
+    tester,
+  ) async {
+    final visibleTab = VisibleTab(2);
+    await pump(
+      tester,
+      VisibleTabScope(
+        visibleTab: visibleTab,
+        child: const BaseMap(tabIndex: 2, recreateOnReturn: true),
+      ),
+    );
+
+    visibleTab.value = 0;
+    await tester.pump();
+    visibleTab.value = 2;
+    await tester.pump();
+
+    expect(platform.buildCount, 1);
     expect(platform.paused, [true, false]);
   });
 

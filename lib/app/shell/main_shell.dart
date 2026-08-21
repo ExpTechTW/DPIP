@@ -10,6 +10,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/permission_banners.dart';
@@ -37,6 +38,12 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> with RouteAware {
+  final int _traceId = nextMapTraceId();
+
+  String get _traceScope => 'shell#$_traceId';
+
+  void _trace(String message) => mapTrace(_traceScope, message);
+
   /// Index of the data branch (see the destinations in [build]) — the only
   /// branch with nested routes, so leaving it while a replay is on screen
   /// needs the replay closed (see [_closeReplayOnBranchLeave]).
@@ -54,6 +61,12 @@ class _MainShellState extends State<MainShell> with RouteAware {
   ModalRoute<void>? _shellRoute;
 
   @override
+  void initState() {
+    super.initState();
+    _trace('init current=${widget.navigationShell.currentIndex}');
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // The shell is built by StatefulShellRoute, so this is the shell's route on
@@ -63,6 +76,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _shellRoute = route;
     if (route != null) shellRouteObserver.subscribe(this, route);
+    _trace('route-subscribe route=${route?.settings.name}');
   }
 
   @override
@@ -79,13 +93,17 @@ class _MainShellState extends State<MainShell> with RouteAware {
   /// listening to this call `setState` on the edge.
   void _setShellOnTop(bool value) {
     if (_visibleTab.shellOnTop == value) return;
+    _trace('shell-on-top schedule value=$value');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _visibleTab.shellOnTop = value;
+      if (!mounted) return;
+      _visibleTab.shellOnTop = value;
+      _trace('shell-on-top applied value=$value');
     });
   }
 
   @override
   void dispose() {
+    _trace('dispose');
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _visibleTab.dispose();
     super.dispose();
@@ -95,6 +113,12 @@ class _MainShellState extends State<MainShell> with RouteAware {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final index = widget.navigationShell.currentIndex;
+    if (_lastIndex != index) {
+      _trace(
+        'build branch=${_lastIndex ?? 'none'}->$index '
+        'visibleNotifier=${_visibleTab.value}',
+      );
+    }
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
     // `select`, not `watch`: the whole shell (every mounted tab with it) must
     // not rebuild because an unrelated permission field moved.
@@ -129,7 +153,9 @@ class _MainShellState extends State<MainShell> with RouteAware {
     // a notify during build would land mid-build for them.
     if (_visibleTab.value != index) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _visibleTab.value = index;
+        if (!mounted) return;
+        _visibleTab.value = index;
+        _trace('visible-tab applied value=$index');
       });
     }
 
@@ -221,6 +247,8 @@ class _MainShellState extends State<MainShell> with RouteAware {
   }
 
   void _onDestinationSelected(int index) {
+    final from = widget.navigationShell.currentIndex;
+    _trace('destination tap from=$from to=$index');
     // Re-entering Home (including re-tapping it while active) snaps its sheet
     // back to rest; the build-time guard above covers programmatic entry.
     if (index == 0) context.read<HomeResetSignal>().fire();
@@ -234,7 +262,6 @@ class _MainShellState extends State<MainShell> with RouteAware {
         layerId: layerId,
       );
     }
-    final from = widget.navigationShell.currentIndex;
     // Leaving the data branch while its replay page is on top closes it first.
     // The industry-recognised way to clear a StatefulShellBranch's child
     // routes is to operate the branch's own navigator via its navigatorKey
@@ -254,10 +281,12 @@ class _MainShellState extends State<MainShell> with RouteAware {
           ?.pop();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
+        _trace('go-branch deferred from=$from to=$index');
         widget.navigationShell.goBranch(index);
       });
       return;
     }
+    _trace('go-branch from=$from to=$index initial=${index == from}');
     widget.navigationShell.goBranch(
       index,
       // Tapping the active tab returns it to its initial route.
