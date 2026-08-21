@@ -25,6 +25,17 @@ Uint8List opaqueBlackPlaceholderPng() => base64Decode(
   'A8AAQUBAScY42YAAAAASUVORK5CYII=',
 );
 
+Uint8List transparentPlaceholderPng() => base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUA'
+  'AXpeqz8AAAAASUVORK5CYII=',
+);
+
+Uint8List wireTileData(Object? raw) => switch (raw) {
+  1 => transparentPlaceholderPng(),
+  Uint8List data => data,
+  _ => throw StateError('unexpected tile wire data: $raw'),
+};
+
 const pngSignature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
 Future<int> decodedAlpha(Uint8List bytes) async {
@@ -69,6 +80,7 @@ void main() {
   late List<MethodCall> nativeCalls;
   late Map<String, Uint8List> nativeMemory;
   late int nativeLimit;
+  late bool nativeSupportsTileToken;
   late List<String> injectedUrls;
   Completer<void>? blockedInject;
   Completer<void>? injectStarted;
@@ -84,6 +96,7 @@ void main() {
     nativeCalls = [];
     nativeMemory = {};
     nativeLimit = 2 * 1024 * 1024;
+    nativeSupportsTileToken = true;
     injectedUrls = [];
     blockedInject = null;
     injectStarted = null;
@@ -109,7 +122,7 @@ void main() {
               in (arguments['entries'] as List).cast<Map<Object?, Object?>>()) {
             final url = row['url'] as String;
             injectedUrls.add(url);
-            nativeMemory[url] = row['data'] as Uint8List;
+            nativeMemory[url] = wireTileData(row['data']);
           }
           return {
             'used': nativeMemory.values.fold<int>(
@@ -127,6 +140,12 @@ void main() {
           }
         case 'setMemoryLimit':
           nativeLimit = arguments['bytes'] as int;
+          if (nativeSupportsTileToken) {
+            return {
+              'wireTokens': [1],
+            };
+          }
+          return null;
       }
       return null;
     });
@@ -263,10 +282,9 @@ void main() {
       (call) => call.method == 'injectTiles',
     );
     expect(
-      ((((repair.arguments as Map)['entries'] as List).single as Map)['data']
-              as Uint8List)
-          .take(pngSignature.length),
-      pngSignature,
+      (((repair.arguments as Map)['entries'] as List).single as Map)['data'],
+      1,
+      reason: 'the repeated transparent PNG crosses the channel as a token',
     );
 
     final served = await fromNative('getBatch', {
@@ -274,10 +292,60 @@ void main() {
     }) as Map;
     final entry = served[url] as Map;
     expect(
-      (entry['data'] as Uint8List).take(pngSignature.length),
-      pngSignature,
+      entry['data'],
+      1,
+      reason: 'L2 lookup also avoids re-sending the shared PNG bytes',
     );
     expect(entry['contentType'], 'image/png');
+  });
+
+  test('a native transparent-raster token retains its source size', () async {
+    await cache.install();
+    const url =
+        'https://static.exptech.dev/api/v2/tiles/radar/native/2/3/4.webp';
+
+    await fromNative('putBatch', {
+      'entries': [
+        {'url': url, 'data': 1, 'contentType': 'image/png', 'sourceSize': 35},
+      ],
+    });
+
+    final stored = await store.readBytes(url);
+    expect(stored, isNotNull);
+    expect(await decodedAlpha(stored!.bytes), 0);
+    expect(stored.size, 35);
+    expect(
+      nativeCalls.where((call) => call.method == 'injectTiles'),
+      isEmpty,
+      reason: 'native already canonicalised L1; Dart must not inject it again',
+    );
+  });
+
+  test('an older native bridge receives transparent PNG bytes', () async {
+    nativeSupportsTileToken = false;
+    await cache.install();
+    const url =
+        'https://static.exptech.dev/api/v2/tiles/radar/legacy-native/2/3/4.webp';
+    await store.writeBytes(
+      url,
+      etag: 'legacy-native',
+      bytes: transparentPlaceholderPng(),
+      contentType: 'image/png',
+    );
+
+    await cache.warm([url], refreshResident: true);
+
+    final inject = nativeCalls.lastWhere(
+      (call) => call.method == 'injectTiles',
+    );
+    final data =
+        (((inject.arguments as Map)['entries'] as List).single as Map)['data'];
+    expect(
+      data,
+      isA<Uint8List>(),
+      reason: 'data: 1 would be silently ignored by the old Android bridge',
+    );
+    expect(await decodedAlpha(data as Uint8List), 0);
   });
 
   test('a warm repairs malformed empty radar GIFs already in L2', () async {
@@ -301,7 +369,8 @@ void main() {
     final entry =
         (((inject.arguments as Map)['entries'] as List).single as Map);
     expect(entry['contentType'], 'image/png');
-    expect(await decodedAlpha(entry['data'] as Uint8List), 0);
+    expect(entry['data'], 1);
+    expect(await decodedAlpha(wireTileData(entry['data'])), 0);
   });
 
   test(

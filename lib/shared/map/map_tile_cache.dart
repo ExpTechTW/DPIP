@@ -56,9 +56,16 @@ class MapTileCache {
   static int _traceSequence = 0;
 
   /// Emits one line in a stable format shared by cache, warmer and timeline.
-  static void trace(String message) {
+  ///
+  /// The message is a callback, not a string. These calls sit on the demand and
+  /// warm paths — several per crossed frame, one per injection chunk — and an
+  /// eager argument is built before the call can decline it: a release build
+  /// interpolated every line, summed the bytes of every tile in the chunk to do
+  /// it, and then threw the result away. [kDebugMode] is a compile-time
+  /// constant, so with a callback the whole thing folds out of a release build.
+  static void trace(String Function() message) {
     if (!kDebugMode || !traceEnabled) return;
-    Log.debug('TILE TRACE $message');
+    Log.debug('TILE TRACE ${message()}');
   }
 
   /// [usage] meters tiles native downloaded. Cache *hits* are metered inside
@@ -136,7 +143,7 @@ class MapTileCache {
       putBatch: _onPutBatch,
     );
     await setMapLibreTileMemoryLimit(memoryBytes);
-    trace('config install limit=${_bytes(memoryBytes)}');
+    trace(() => 'config install limit=${_bytes(memoryBytes)}');
   }
 
   /// Re-applies settings that can be sent before MapLibre's channel exists.
@@ -148,7 +155,7 @@ class MapTileCache {
   /// configured 48 MB instead of native's 2 MB bootstrap default.
   Future<void> syncNativeConfiguration() async {
     await setMapLibreTileMemoryLimit(_memoryLimit);
-    trace('config live-sync limit=${_bytes(_memoryLimit)}');
+    trace(() => 'config live-sync limit=${_bytes(_memoryLimit)}');
   }
 
   /// Native asked for tile bodies — answer the ones we hold; a store miss
@@ -165,11 +172,12 @@ class MapTileCache {
       served[entry.key] = _tileFromCache(entry.key, entry.value);
     }
     trace(
-      'demand l1-miss=${wanted.length} '
-      'l2-hit=${served.length} l2-miss=${wanted.length - served.length} '
-      'bytes=${_bytes(_tileBytes(served.values))} '
-      'dt=${elapsed.elapsedMilliseconds}ms '
-      'sample=${_urls(wanted)}',
+      () =>
+          'demand l1-miss=${wanted.length} '
+          'l2-hit=${served.length} l2-miss=${wanted.length - served.length} '
+          'bytes=${_bytes(_tileBytes(served.values))} '
+          'dt=${elapsed.elapsedMilliseconds}ms '
+          'sample=${_urls(wanted)}',
     );
     return served.values.toList();
   }
@@ -187,7 +195,8 @@ class MapTileCache {
       // else — a glyph range that momentarily failed, say — persisting
       // emptiness would serve a blank asset for the next seven days.
       if (tile.data.isEmpty && !EtagInterceptor.isBasemapPbf(uri)) continue;
-      downloaded += tile.data.length;
+      final sourceSize = tile.sourceSize ?? tile.data.length;
+      downloaded += sourceSize;
       final payload = _safeRasterPayload(tile.data, tile.contentType);
       if (!identical(payload.bytes, tile.data)) {
         repaired.add(
@@ -196,6 +205,7 @@ class MapTileCache {
             data: payload.bytes,
             contentType: payload.contentType,
             etag: tile.etag,
+            sourceSize: tile.sourceSize,
           ),
         );
       }
@@ -208,7 +218,7 @@ class MapTileCache {
         contentType: payload.contentType,
         // Traffic accounting is wire-sized even when the stored payload was
         // repaired into a slightly larger, decodable image.
-        size: tile.data.length,
+        size: sourceSize,
       ));
     }
     if (writes.isEmpty) return;
@@ -221,9 +231,10 @@ class MapTileCache {
     // changed; normal tiles already occupy L1 and need no platform transfer.
     await _injectNetworkRepairs(repaired);
     trace(
-      'network-fill count=${writes.length} bytes=${_bytes(downloaded)} '
-      '${repaired.isEmpty ? '' : 'placeholder-normalized=${repaired.length} '}'
-      'sample=${_urls([for (final write in writes) write.url])}',
+      () =>
+          'network-fill count=${writes.length} bytes=${_bytes(downloaded)} '
+          '${repaired.isEmpty ? '' : 'placeholder-normalized=${repaired.length} '}'
+          'sample=${_urls([for (final write in writes) write.url])}',
     );
     unawaited(_usage?.record(down: downloaded, hit: false, saved: 0));
   }
@@ -235,7 +246,7 @@ class MapTileCache {
         final end = math.min(i + _injectChunk, repaired.length);
         await injectMapLibreTiles(repaired.sublist(i, end));
       }
-      trace('network-repair injected=${repaired.length}');
+      trace(() => 'network-repair injected=${repaired.length}');
     } catch (error, stackTrace) {
       // Persistence is still useful when no map channel is attached. A later
       // demand read or warm will inject the already-repaired L2 body.
@@ -276,10 +287,11 @@ class MapTileCache {
     final traceId = ++_traceSequence;
     final elapsed = Stopwatch()..start();
     trace(
-      'warm#$traceId start wanted=${wanted.length} '
-      'fill=${fillUntil > 0 ? fillUntil.toStringAsFixed(2) : 'all'} '
-      'refresh=$refreshResident '
-      'sample=${_urls(wanted)}',
+      () =>
+          'warm#$traceId start wanted=${wanted.length} '
+          'fill=${fillUntil > 0 ? fillUntil.toStringAsFixed(2) : 'all'} '
+          'refresh=$refreshResident '
+          'sample=${_urls(wanted)}',
     );
     try {
       // A hidden native surface can retain bytes which ImageIO already proved
@@ -293,17 +305,20 @@ class MapTileCache {
           ? 'refresh=${missing.length}'
           : 'l1-hit=${wanted.length - missing.length} '
                 'l1-miss=${missing.length}';
-      trace('warm#$traceId probe $probe dt=${elapsed.elapsedMilliseconds}ms');
+      trace(
+        () => 'warm#$traceId probe $probe dt=${elapsed.elapsedMilliseconds}ms',
+      );
       if (missing.isEmpty) {
         trace(
-          'warm#$traceId done injected=0 resident=${wanted.length}/'
-          '${wanted.length} dt=${elapsed.elapsedMilliseconds}ms',
+          () =>
+              'warm#$traceId done injected=0 resident=${wanted.length}/'
+              '${wanted.length} dt=${elapsed.elapsedMilliseconds}ms',
         );
         return (injected: 0, resident: wanted.toSet());
       }
       if (shouldContinue?.call() == false) {
         final absent = missing.toSet();
-        trace('warm#$traceId cancelled before-l2');
+        trace(() => 'warm#$traceId cancelled before-l2');
         return (
           injected: 0,
           resident: {
@@ -320,17 +335,25 @@ class MapTileCache {
           traceId: traceId,
         );
         trace(
-          'warm#$traceId l2-hit=${fill.hits} '
-          'l2-miss=${fill.scanned - fill.hits} '
-          'bytes=${_bytes(fill.bytes)} '
-          'scanned=${fill.scanned}/${missing.length} '
-          'dt=${elapsed.elapsedMilliseconds}ms',
+          () =>
+              'warm#$traceId l2-hit=${fill.hits} '
+              'l2-miss=${fill.scanned - fill.hits} '
+              'bytes=${_bytes(fill.bytes)} '
+              'scanned=${fill.scanned}/${missing.length} '
+              'dt=${elapsed.elapsedMilliseconds}ms',
         );
+        // Probed, never inferred. A URL this fill never read can still have
+        // become resident: MapLibre downloads the mounted frames' tiles itself
+        // and those bodies enter L1 behind this loop's back. Narrowing the
+        // probe to what the fill touched under-reports the working set, and the
+        // next warm then computes its eviction from a set that is missing
+        // exactly the tiles native just fetched.
         final resident = await _residentSubset(wanted);
         trace(
-          'warm#$traceId done injected=${fill.injected} '
-          'resident=${resident.length}/${wanted.length} '
-          'dt=${elapsed.elapsedMilliseconds}ms',
+          () =>
+              'warm#$traceId done injected=${fill.injected} '
+              'resident=${resident.length}/${wanted.length} '
+              'dt=${elapsed.elapsedMilliseconds}ms',
         );
         return (injected: fill.injected, resident: resident);
       }
@@ -338,17 +361,19 @@ class MapTileCache {
       // past must not outrank one they actually looked at.
       final hits = await _store.readBytesBatch(missing, touch: false);
       trace(
-        'warm#$traceId l2-hit=${hits.length} '
-        'l2-miss=${missing.length - hits.length} '
-        'bytes=${_bytes(_binaryBytes(hits.values))} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'warm#$traceId l2-hit=${hits.length} '
+            'l2-miss=${missing.length - hits.length} '
+            'bytes=${_bytes(_binaryBytes(hits.values))} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
       if (shouldContinue?.call() == false || hits.isEmpty) {
         final resident = await _residentSubset(wanted);
         trace(
-          'warm#$traceId ${hits.isEmpty ? 'cold' : 'cancelled'} '
-          'resident=${resident.length}/${wanted.length} '
-          'dt=${elapsed.elapsedMilliseconds}ms',
+          () =>
+              'warm#$traceId ${hits.isEmpty ? 'cold' : 'cancelled'} '
+              'resident=${resident.length}/${wanted.length} '
+              'dt=${elapsed.elapsedMilliseconds}ms',
         );
         return (injected: 0, resident: resident);
       }
@@ -366,18 +391,20 @@ class MapTileCache {
       );
       final resident = await _residentSubset(wanted);
       trace(
-        'warm#$traceId done injected=$injected '
-        'resident=${resident.length}/${wanted.length} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'warm#$traceId done injected=$injected '
+            'resident=${resident.length}/${wanted.length} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
       return (injected: injected, resident: resident);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'MapTileCache.warm');
       final resident = await _residentSubset(wanted);
       trace(
-        'warm#$traceId error=${error.runtimeType} '
-        'resident=${resident.length}/${wanted.length} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'warm#$traceId error=${error.runtimeType} '
+            'resident=${resident.length}/${wanted.length} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
       return (injected: 0, resident: resident);
     }
@@ -451,9 +478,10 @@ class MapTileCache {
       final usage = await injectMapLibreTiles(chunk);
       injected += end - i;
       trace(
-        'warm#$traceId inject count=${chunk.length} '
-        'bytes=${_bytes(_tileBytes(chunk))} '
-        '${_formatUsage(usage)}',
+        () =>
+            'warm#$traceId inject count=${chunk.length} '
+            'bytes=${_bytes(_tileBytes(chunk))} '
+            '${_formatUsage(usage)}',
       );
       messages++;
       if (end < tiles.length && messages % _messagesPerSlice == 0) {
@@ -530,9 +558,10 @@ class MapTileCache {
         }
         injected += chunk.length;
         trace(
-          'warm#$traceId inject count=${chunk.length} '
-          'bytes=${_bytes(chunkBytes)} ${_formatUsage(usage)} '
-          'target=${_bytes(cap)}',
+          () =>
+              'warm#$traceId inject count=${chunk.length} '
+              'bytes=${_bytes(chunkBytes)} ${_formatUsage(usage)} '
+              'target=${_bytes(cap)}',
         );
         messages++;
         if (messages % _messagesPerSlice == 0) {
@@ -567,8 +596,9 @@ class MapTileCache {
   /// as a stall rather than a speed-up.
   Future<void> cancelFetches({List<String> urlContains = const []}) async {
     trace(
-      'cancel-fetch patterns=${urlContains.length} '
-      'sample=${_urls(urlContains)}',
+      () =>
+          'cancel-fetch patterns=${urlContains.length} '
+          'sample=${_urls(urlContains)}',
     );
     await cancelMapLibreTileFetches(urlContains: urlContains);
   }
@@ -577,8 +607,9 @@ class MapTileCache {
   /// SQLite — this only reclaims memory).
   Future<void> evict(List<String> urlContains) async {
     trace(
-      'evict patterns=${urlContains.length} '
-      'scope=${urlContains.isEmpty ? 'all' : _urls(urlContains)}',
+      () =>
+          'evict patterns=${urlContains.length} '
+          'scope=${urlContains.isEmpty ? 'all' : _urls(urlContains)}',
     );
     await evictMapLibreTiles(urlContains);
   }

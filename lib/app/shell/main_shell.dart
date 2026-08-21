@@ -42,7 +42,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
 
   String get _traceScope => 'shell#$_traceId';
 
-  void _trace(String message) => mapTrace(_traceScope, message);
+  void _trace(String Function() message) => mapTrace(_traceScope, message);
 
   /// Index of the data branch (see the destinations in [build]) — the only
   /// branch with nested routes, so leaving it while a replay is on screen
@@ -63,7 +63,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
   @override
   void initState() {
     super.initState();
-    _trace('init current=${widget.navigationShell.currentIndex}');
+    _trace(() => 'init current=${widget.navigationShell.currentIndex}');
   }
 
   @override
@@ -76,7 +76,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _shellRoute = route;
     if (route != null) shellRouteObserver.subscribe(this, route);
-    _trace('route-subscribe route=${route?.settings.name}');
+    _trace(() => 'route-subscribe route=${route?.settings.name}');
   }
 
   @override
@@ -93,17 +93,17 @@ class _MainShellState extends State<MainShell> with RouteAware {
   /// listening to this call `setState` on the edge.
   void _setShellOnTop(bool value) {
     if (_visibleTab.shellOnTop == value) return;
-    _trace('shell-on-top schedule value=$value');
+    _trace(() => 'shell-on-top schedule value=$value');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _visibleTab.shellOnTop = value;
-      _trace('shell-on-top applied value=$value');
+      _trace(() => 'shell-on-top applied value=$value');
     });
   }
 
   @override
   void dispose() {
-    _trace('dispose');
+    _trace(() => 'dispose');
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _visibleTab.dispose();
     super.dispose();
@@ -115,8 +115,9 @@ class _MainShellState extends State<MainShell> with RouteAware {
     final index = widget.navigationShell.currentIndex;
     if (_lastIndex != index) {
       _trace(
-        'build branch=${_lastIndex ?? 'none'}->$index '
-        'visibleNotifier=${_visibleTab.value}',
+        () =>
+            'build branch=${_lastIndex ?? 'none'}->$index '
+            'visibleNotifier=${_visibleTab.value}',
       );
     }
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
@@ -155,7 +156,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         _visibleTab.value = index;
-        _trace('visible-tab applied value=$index');
+        _trace(() => 'visible-tab applied value=$index');
       });
     }
 
@@ -248,7 +249,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
 
   void _onDestinationSelected(int index) {
     final from = widget.navigationShell.currentIndex;
-    _trace('destination tap from=$from to=$index');
+    _trace(() => 'destination tap from=$from to=$index');
     // Re-entering Home (including re-tapping it while active) snaps its sheet
     // back to rest; the build-time guard above covers programmatic entry.
     if (index == 0) context.read<HomeResetSignal>().fire();
@@ -281,12 +282,12 @@ class _MainShellState extends State<MainShell> with RouteAware {
           ?.pop();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        _trace('go-branch deferred from=$from to=$index');
+        _trace(() => 'go-branch deferred from=$from to=$index');
         widget.navigationShell.goBranch(index);
       });
       return;
     }
-    _trace('go-branch from=$from to=$index initial=${index == from}');
+    _trace(() => 'go-branch from=$from to=$index initial=${index == from}');
     widget.navigationShell.goBranch(
       index,
       // Tapping the active tab returns it to its initial route.
