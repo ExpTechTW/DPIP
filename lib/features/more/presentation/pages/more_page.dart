@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
@@ -10,6 +13,8 @@ import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/version/app_build.dart';
+import 'package:dpip/features/changelog/domain/changelog_repository.dart';
+import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
@@ -665,11 +670,12 @@ class _HeroCards extends StatelessWidget {
 
   /// Height of the left version card — it leads the block, so it gets to
   /// declare its own height (its column uses a Spacer, which needs a bounded
-  /// height) while the small cards beside it are shorter by design.
-  static const double _versionHeight = 176;
+  /// height) while the small cards beside it are shorter by design. It spans
+  /// the right column's four small cards plus the three gaps between them, so
+  /// its bottom edge lands exactly on the support card's.
+  static const double _versionHeight = 4 * _smallCardHeight + 3 * AppSpacing.xs;
 
-  /// Height of a small card (Discord, announcement, status) and, matching it,
-  /// the full-width support card below.
+  /// Height of a small card (Discord, announcement, status, support).
   static const double _smallCardHeight = 56;
 
   @override
@@ -681,40 +687,29 @@ class _HeroCards extends StatelessWidget {
         AppSpacing.lg,
         AppSpacing.md,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: _versionHeight,
-                  child: const _VersionCard(),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  children: const [
-                    SizedBox(
-                      height: _smallCardHeight,
-                      child: _DiscordCallout(),
-                    ),
-                    SizedBox(height: AppSpacing.xs),
-                    SizedBox(
-                      height: _smallCardHeight,
-                      child: _AnnouncementCard(),
-                    ),
-                    SizedBox(height: AppSpacing.xs),
-                    SizedBox(height: _smallCardHeight, child: _StatusCard()),
-                  ],
-                ),
-              ),
-            ],
+          Expanded(
+            child: SizedBox(
+              height: _versionHeight,
+              child: const _VersionCard(),
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          SizedBox(height: _smallCardHeight, child: const _SupportCallout()),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              children: const [
+                SizedBox(height: _smallCardHeight, child: _DiscordCallout()),
+                SizedBox(height: AppSpacing.xs),
+                SizedBox(height: _smallCardHeight, child: _AnnouncementCard()),
+                SizedBox(height: AppSpacing.xs),
+                SizedBox(height: _smallCardHeight, child: _StatusCard()),
+                SizedBox(height: AppSpacing.xs),
+                SizedBox(height: _smallCardHeight, child: _SupportCallout()),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -734,8 +729,32 @@ class _HeroCards extends StatelessWidget {
 /// ranking is carried by the gold alone, rendered flat: a warm champagne
 /// fill, a hairline along the edge, and a filled badge holding the most
 /// saturated step.
-class _SupportCallout extends StatelessWidget {
+class _SupportCallout extends StatefulWidget {
   const _SupportCallout();
+
+  @override
+  State<_SupportCallout> createState() => _SupportCalloutState();
+}
+
+class _SupportCalloutState extends State<_SupportCallout>
+    with SingleTickerProviderStateMixin {
+  /// The border's breathing pulse — a slow sine that keeps the gold border
+  /// gently swelling, so the card draws the eye without any of the strobing
+  /// an opacity blink would. Repeats forever, but costs nothing when the card
+  /// is off screen (the ticker pauses) and the test suite treats it as a
+  /// plain animation.
+  late final AnimationController _breath = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1800),
+    lowerBound: 0.55,
+    upperBound: 1.0,
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _breath.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -746,7 +765,7 @@ class _SupportCallout extends StatelessWidget {
       decoration: BoxDecoration(
         color: gold.fill,
         borderRadius: AppRadius.large,
-        border: Border.all(color: gold.edge),
+        border: Border.all(color: gold.edge.withValues(alpha: _breath.value)),
         // No gradient: the card sits on the same tonal plane as its two
         // neighbours, and the ranking is carried by the gold colour alone —
         // the badge is what reads as paid, not the sheen.
@@ -1017,9 +1036,14 @@ class _StatusCard extends StatelessWidget {
 /// surface like the three cards across from it, and carries no gradient of its
 /// own: the only colour beyond text and badge is the [ShaderMask] gradient the
 /// number is painted in.
-class _VersionCard extends StatelessWidget {
+class _VersionCard extends StatefulWidget {
   const _VersionCard();
 
+  @override
+  State<_VersionCard> createState() => _VersionCardState();
+}
+
+class _VersionCardState extends State<_VersionCard> {
   /// A release label is a plain `major.minor`; every other shape (`26w33b`,
   /// `dev`, a local build) is a snapshot.
   static final RegExp _releaseLabel = RegExp(r'^\d+\.\d+$');
@@ -1029,6 +1053,47 @@ class _VersionCard extends StatelessWidget {
   /// agree without any logic in between.
   static const Color _stableColor = Color(0xFF2E7D32);
   static const Color _snapshotColor = Color(0xFFEF6C00);
+
+  /// The contributors of the release this build answers for, parsed from the
+  /// note's body; empty until the fetch resolves (or when it fails — avatars
+  /// are decoration, so a failure only hides them).
+  List<ReleaseContributor> _contributors = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadContributors();
+  }
+
+  Future<void> _loadContributors() async {
+    final result = await context.read<ChangelogRepository>().releases(page: 1);
+    if (!mounted) return;
+    setState(() {
+      _contributors = switch (result) {
+        Ok(:final value) => _contributorsFor(value, AppBuild.label),
+        Err() => const [],
+      };
+    });
+  }
+
+  List<ReleaseContributor> _contributorsFor(
+    List<ReleaseNote> notes,
+    String label,
+  ) {
+    for (final note in notes) {
+      if (_isCurrent(note, label)) return contributorsFromBody(note.body);
+    }
+    return const [];
+  }
+
+  /// Whether a release answers for the running [label]. Mirrors the version
+  /// notes page's match (tag or name, `v` stripped) so both pages agree on
+  /// which entry is "current" without sharing state.
+  static bool _isCurrent(ReleaseNote note, String label) {
+    final tag = note.tagName.replaceFirst(RegExp(r'^v'), '');
+    final name = note.name.replaceFirst(RegExp(r'^v'), '');
+    return tag == label || name == label;
+  }
 
   /// The number's gradient, derived from the version string itself so every
   /// build wears its own colours — 26w34a is one pair, 26w34b another — and
@@ -1184,18 +1249,200 @@ class _VersionCard extends StatelessWidget {
                   ),
                   if (AppBuild.buildDate.isNotEmpty) ...[
                     const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      AppBuild.buildDate,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
+                    // A snapshot's date can outgrow the narrow card, so the
+                    // stamp yields rather than overflow the row.
+                    Flexible(
+                      child: Text(
+                        AppBuild.buildDate,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
                 ],
               ),
+              if (_contributors.isNotEmpty) ...[
+                // Try to keep a silhouette of the strip against the card:
+                // enough of a gap to read as a separate zone, then a hairline
+                // that separates the avatars from the build stamp above.
+                const SizedBox(height: AppSpacing.sm),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: colors.outlineVariant.withValues(alpha: 0.5),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                _ContributorStack(contributors: _contributors),
+              ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A width-adaptive stack of contributor avatars for the version card.
+///
+/// Allocates as many avatars as the card's width offers — as the card is
+/// narrow, the stack fits ~5 or 6 before the rest fold into a `+N` chip. Every
+/// avatar loads its bytes through [ChangelogRepository.avatarBytes], so the
+/// picture round-trips the app's ETag store just like the changelog's strip.
+class _ContributorStack extends StatelessWidget {
+  const _ContributorStack({required this.contributors});
+
+  final List<ReleaseContributor> contributors;
+
+  /// How much of each avatar the next one covers.
+  static const double _overlap = 14;
+
+  /// Avatar circle diameter, including the border.
+  static const double _size = 24;
+
+  @override
+  Widget build(BuildContext context) {
+    if (contributors.isEmpty) return const SizedBox.shrink();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // +N chip keeps its own width, counted after every full avatar.
+        final chipWidth = _size - 4 + AppSpacing.xs;
+        var shown = 1;
+        // First avatar takes _size; each further one adds (size - overlap).
+        var used = _size;
+        final extra = _size - _overlap;
+        while (shown < contributors.length &&
+            used + extra + chipWidth <= constraints.maxWidth) {
+          used += extra;
+          shown++;
+        }
+        final hidden = contributors.length - shown;
+        return SizedBox(
+          width: used + (hidden > 0 ? chipWidth : 0),
+          height: _size,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              for (var i = 0; i < shown; i++)
+                Positioned(
+                  left: i * extra,
+                  child: _VersionAvatar(contributor: contributors[i]),
+                ),
+              if (hidden > 0)
+                Positioned(
+                  left: used + AppSpacing.xs,
+                  child: _MoreChip(count: hidden),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// One avatar circle on the version card — loads its bytes via the shared
+/// changelog repository, then paints them; until then, the login's initial.
+class _VersionAvatar extends StatefulWidget {
+  const _VersionAvatar({required this.contributor});
+
+  final ReleaseContributor contributor;
+
+  @override
+  State<_VersionAvatar> createState() => _VersionAvatarState();
+}
+
+class _VersionAvatarState extends State<_VersionAvatar> {
+  Uint8List? _bytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final bytes = await context.read<ChangelogRepository>().avatarBytes(
+      widget.contributor.login,
+    );
+    if (!mounted) return;
+    setState(() {
+      _bytes = switch (bytes) {
+        Ok(:final value) => value,
+        Err() => null,
+      };
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: widget.contributor.login,
+      child: GestureDetector(
+        onTap: () async {
+          final uri = Uri.tryParse(widget.contributor.htmlUrl);
+          if (uri == null) return;
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        },
+        child: Container(
+          width: _ContributorStack._size,
+          height: _ContributorStack._size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: colors.surfaceContainerHighest,
+            border: Border.all(color: colors.surfaceContainer, width: 2),
+          ),
+          child: CircleAvatar(
+            radius: _ContributorStack._size / 2 - 2,
+            backgroundColor: colors.surfaceContainerHighest,
+            foregroundImage: _bytes == null ? null : MemoryImage(_bytes!),
+            child: _bytes == null
+                ? Text(
+                    widget.contributor.login.isEmpty
+                        ? '?'
+                        : widget.contributor.login[0].toUpperCase(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontSize: 9,
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
+                : null,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The `+N` tail for avatars the card's width could not hold.
+class _MoreChip extends StatelessWidget {
+  const _MoreChip({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      width: _ContributorStack._size - 4,
+      height: _ContributorStack._size - 4,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colors.surfaceContainerHighest,
+        border: Border.all(color: colors.surfaceContainer, width: 2),
+      ),
+      child: Text(
+        '+$count',
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          fontSize: 8,
+          color: colors.onSurfaceVariant,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

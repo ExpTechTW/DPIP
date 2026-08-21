@@ -7,7 +7,11 @@
 /// is a failure that only shows up on the day it matters.
 library;
 
+import 'dart:typed_data';
+
 import 'package:dpip/app/theme/app_gold.dart';
+import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
@@ -20,6 +24,8 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/version/app_build.dart';
+import 'package:dpip/features/changelog/domain/changelog_repository.dart';
+import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -27,6 +33,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+/// A changelog repository whose releases call resolves with no notes: the
+/// version card's contributor fetch then settles (to an empty strip) without
+/// touching a network.
+class _EmptyChangelogRepository implements ChangelogRepository {
+  @override
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
+      const Ok([]);
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
+      const Err(UnexpectedFailure('no network'));
+}
 
 /// The in-app destinations the menu must offer, with their English labels.
 const _tiles = <(String, String)>[
@@ -109,6 +128,10 @@ Future<void> _pump(
             notifications: NotificationService(settings),
           ),
         ),
+        // The version card's contributor strip reads the changelog.
+        Provider<ChangelogRepository>(
+          create: (_) => _EmptyChangelogRepository(),
+        ),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -177,30 +200,34 @@ void main() {
       final visited = <String>[];
       await _pump(tester, _router(visited));
       await tester.tap(find.widgetWithText(ListTile, label));
-      await tester.pumpAndSettle();
+      // pumpAndSettle would time out: the support card's border breathes
+      // forever. A fixed pump covers the navigation transition.
+      await tester.pump(const Duration(milliseconds: 600));
       expect(visited, [route]);
     });
   }
 
-  testWidgets('the three entries lead the page, support full-width last', (
-    tester,
-  ) async {
-    await _pump(tester, _router([]));
-    final discord = tester.getTopLeft(find.text('Discord community')).dy;
-    final announcements = tester.getTopLeft(find.text('Announcements')).dy;
-    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
-    // The right column stacks Discord above announcements; the full-width
-    // support card sits on its own line beneath both.
-    expect(announcements, greaterThan(discord));
-    expect(support, greaterThan(announcements));
-    // …and all three above every menu group.
-    expect(
-      tester
-          .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
-          .dy,
-      greaterThan(support),
-    );
-  });
+  testWidgets(
+    'the support callout sits under server status, sharing its width',
+    (tester) async {
+      await _pump(tester, _router([]));
+      final status = tester.getTopLeft(find.text('Server status')).dy;
+      final support = tester.getTopLeft(find.text('Support DPIP')).dy;
+      // Support now lives in the right column, directly under server status.
+      expect(support, greaterThan(status));
+      // And the two share the same left edge.
+      final statusLeft = tester.getTopLeft(find.text('Server status')).dx;
+      final supportLeft = tester.getTopLeft(find.text('Support DPIP')).dx;
+      expect(supportLeft, statusLeft);
+      // …and all of them sit above every menu group.
+      expect(
+        tester
+            .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
+            .dy,
+        greaterThan(support),
+      );
+    },
+  );
 
   testWidgets('the notification log sits with the notification settings', (
     tester,
@@ -256,7 +283,7 @@ void main() {
     tester,
   ) async {
     await _pump(tester, _router([]));
-    // Discord, the announcement and the status card stack in the right
+    // Discord, the announcement, server status and support stack in the right
     // column; their icon circles and labels must start at the same left edge
     // for the stack to read as aligned rows (vertical position differs by
     // design).
@@ -264,6 +291,7 @@ void main() {
       tester.getCenter(find.byIcon(Icons.discord)).dx,
       tester.getCenter(find.byIcon(Icons.campaign_outlined)).dx,
       tester.getCenter(find.byIcon(Icons.dns_outlined)).dx,
+      tester.getCenter(find.byIcon(Icons.favorite)).dx,
     ];
     expect(iconXs.toSet(), hasLength(1));
 
@@ -271,6 +299,7 @@ void main() {
       tester.getTopLeft(find.text('Discord community')).dx,
       tester.getTopLeft(find.text('Announcements')).dx,
       tester.getTopLeft(find.text('Server status')).dx,
+      tester.getTopLeft(find.text('Support DPIP')).dx,
     ];
     expect(textXs.toSet(), hasLength(1));
   });
@@ -334,7 +363,9 @@ void main() {
     await _pump(tester, _router(visited));
     // The card is the DPIP row with the chevron — tap its label.
     await tester.tap(find.text('DPIP').first);
-    await tester.pumpAndSettle();
+    // pumpAndSettle would time out: the support card's border breathes
+    // forever. A fixed pump covers the navigation transition.
+    await tester.pump(const Duration(milliseconds: 600));
     expect(visited, [AppRoutes.releaseHighlights]);
   });
 }
