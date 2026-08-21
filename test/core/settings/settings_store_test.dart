@@ -70,6 +70,23 @@ void main() {
     expect(store.getStringList(SettingKeys.savedRegionCodes), isNull);
   });
 
+  test('one malformed row does not discard onboarding completion', () async {
+    final db = await _db();
+    await db.insert(settingsTable, {
+      'key': SettingKeys.locale.name,
+      'value': '{not json',
+    });
+    await db.insert(settingsTable, {
+      'key': SettingKeys.onboardingComplete.name,
+      'value': 'true',
+    });
+
+    final store = await SettingsStore.open(db);
+
+    expect(store.getString(SettingKeys.locale), isNull);
+    expect(store.getBool(SettingKeys.onboardingComplete), isTrue);
+  });
+
   test('remove clears both memory and the table', () async {
     final db = await _db();
     final store = await SettingsStore.open(db);
