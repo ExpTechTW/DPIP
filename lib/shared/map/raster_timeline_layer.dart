@@ -291,10 +291,13 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (controller != null) unawaited(_trimHiddenResidents(controller));
     mapTrace(
       'timeline/$id',
-      'surface-hidden resident=${_resident.length} ring=${_ring.length} '
+      () =>
+          'surface-hidden resident=${_resident.length} ring=${_ring.length} '
           'trim-scheduled=${controller != null}',
     );
-    MapTileCache.trace('timeline=$id surface-hidden cancel-background-work');
+    MapTileCache.trace(
+      () => 'timeline=$id surface-hidden cancel-background-work',
+    );
   }
 
   /// Stops all work tied to a platform view immediately before it is replaced.
@@ -315,9 +318,13 @@ abstract class RasterTimelineLayer implements MapLayer {
     _revealGeneration++;
     source.cancelTileWarm();
     _mapController = null;
+    // The rectangle belonged to the view being replaced. The camera is restored
+    // onto the new one, so it would otherwise compare equal and be reused.
+    _viewportCache = null;
+    _viewportCamera = null;
     mapTrace(
       'timeline/$id',
-      'controller-invalidated refresh=$_refreshResidentOnNextSettle',
+      () => 'controller-invalidated refresh=$_refreshResidentOnNextSettle',
     );
   }
 
@@ -352,6 +359,17 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// Frames proven complete for the current viewport while their source stays
   /// resident. Camera movement invalidates this set.
   final Set<String> _readyFrames = <String>{};
+
+  /// The last answer from [_viewport], with the camera it was read at.
+  ///
+  /// Every readiness probe and every warm needs the visible rectangle, and
+  /// `getVisibleRegion` is a platform round-trip. A timeline scrub asked for
+  /// one per crossed frame while the camera was, by construction, standing
+  /// still — the finger is on the ruler, not on the map — so a fast drag spent
+  /// a round-trip per tick re-deriving a rectangle that had not moved, on the
+  /// same platform thread the tile bytes have to come back through.
+  ({LatLngBounds bounds, double zoom})? _viewportCache;
+  CameraPosition? _viewportCamera;
 
   /// Polling finishes outside MapScaffold's serial reveal lane. Its final style
   /// mutation rejoins this queue so a newly requested frame and an older tile
@@ -490,7 +508,9 @@ abstract class RasterTimelineLayer implements MapLayer {
         return Future<void>.value();
       }
     }
-    if (scrubbing && _requestedFrameId == frame.id) {
+    if (scrubbing &&
+        _requestedFrameId == frame.id &&
+        _shownFrameId == frame.id) {
       return Future<void>.value();
     }
     _requestedFrameId = frame.id;
@@ -506,6 +526,14 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
   }
 
+  /// Whether [frameId] is the complete timestamp currently being drawn.
+  ///
+  /// During a fast scrub the requested frame can be newer than this value: an
+  /// L1-incomplete target deliberately leaves the previous frame opaque. The
+  /// scaffold uses that distinction to show its backpressure notice only when
+  /// output has actually stopped following the timeline.
+  bool isShowingFrame(String frameId) => _shownFrameId == frameId;
+
   Future<void> _showRequested(
     MapLibreMapController controller,
     int index,
@@ -520,8 +548,9 @@ abstract class RasterTimelineLayer implements MapLayer {
         ? 'warm-window'
         : 'cold';
     MapTileCache.trace(
-      'timeline=$id show frame=$frameId index=$index '
-      'scrubbing=$scrubbing tier=$tier previous=$_shownFrameId',
+      () =>
+          'timeline=$id show frame=$frameId index=$index '
+          'scrubbing=$scrubbing tier=$tier previous=$_shownFrameId',
     );
 
     if (!scrubbing) {
@@ -555,10 +584,11 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   /// Scrub hot path — never cancels and rarely touches `visibility`.
   ///
-  /// The two writes go out **together**. Awaiting the hide before sending the
-  /// show cost two serial platform round-trips per frame, which is the budget
-  /// for the whole frame; pipelined they cost one, and MapLibre applies them in
-  /// order within a single render pass, so no in-between state is ever drawn.
+  /// The two writes cross the platform boundary as one native batch. Two
+  /// separate MethodChannel calls still serialize on Android's platform thread
+  /// even when their Dart futures start together, consuming most of a frame.
+  /// One batch also prevents the renderer from observing the old frame hidden
+  /// before the new frame is visible.
   ///
   /// The previous ring member only fades to zero — dropping it to `none` would
   /// evict its tiles and make a nearby reversal reload. The non-ring branch is
@@ -570,22 +600,18 @@ abstract class RasterTimelineLayer implements MapLayer {
     _shownFrameId = frameId;
     _touch(frameId);
 
-    await Future.wait([
+    await controller.setLayerPropertiesBatch([
       if (previous != null && previous != frameId)
-        controller.setLayerProperties(
-          _layerId(previous),
-          _ring.contains(previous) ? _opacity(0) : _hidden,
-          skipNulls: true,
+        (
+          layerId: _layerId(previous),
+          properties: _ring.contains(previous) ? _opacity(0) : _hidden,
         ),
-      controller.setLayerProperties(
-        _layerId(frameId),
-        _opacity(opacity),
-        skipNulls: true,
-      ),
-    ]);
+      (layerId: _layerId(frameId), properties: _opacity(opacity)),
+    ], skipNulls: true);
     MapTileCache.trace(
-      'timeline=$id reveal frame=$frameId path=flip previous=$previous '
-      'dt=${elapsed.elapsedMilliseconds}ms',
+      () =>
+          'timeline=$id reveal frame=$frameId path=flip previous=$previous '
+          'dt=${elapsed.elapsedMilliseconds}ms',
     );
   }
 
@@ -599,8 +625,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     final elapsed = Stopwatch()..start();
     final (low, high, ring) = _ringAt(index);
     MapTileCache.trace(
-      'timeline=$id settle start frame=$frameId index=$index '
-      'ring=$low..$high shown=$_shownFrameId',
+      () =>
+          'timeline=$id settle start frame=$frameId index=$index '
+          'ring=$low..$high shown=$_shownFrameId',
     );
 
     if (_refreshResidentOnNextSettle) {
@@ -624,8 +651,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     ]);
     _ring.addAll(ring);
     MapTileCache.trace(
-      'timeline=$id settle staged frame=$frameId mounted=${ring.length} '
-      'previous=$_shownFrameId dt=${elapsed.elapsedMilliseconds}ms',
+      () =>
+          'timeline=$id settle staged frame=$frameId mounted=${ring.length} '
+          'previous=$_shownFrameId dt=${elapsed.elapsedMilliseconds}ms',
     );
 
     // There is no older raster to preserve on first attach. Show the initial
@@ -659,24 +687,25 @@ abstract class RasterTimelineLayer implements MapLayer {
   ) async {
     final elapsed = Stopwatch()..start();
     try {
-      final bounds = await controller.getVisibleRegion();
+      final viewport = await _viewport(controller);
       await source.warmFrameTiles(
         frames: [
           frameId,
           for (final id in ring)
             if (id != frameId) id,
         ],
-        south: bounds.southwest.latitude,
-        west: bounds.southwest.longitude,
-        north: bounds.northeast.latitude,
-        east: bounds.northeast.longitude,
-        zoom: controller.cameraPosition?.zoom ?? 8,
+        south: viewport.bounds.southwest.latitude,
+        west: viewport.bounds.southwest.longitude,
+        north: viewport.bounds.northeast.latitude,
+        east: viewport.bounds.northeast.longitude,
+        zoom: viewport.zoom,
         immediate: true,
         refreshResident: true,
       );
       MapTileCache.trace(
-        'timeline=$id recreate-refresh frame=$frameId ring=${ring.length} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'timeline=$id recreate-refresh frame=$frameId ring=${ring.length} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
     } catch (error, stackTrace) {
       // Mounting may still succeed from MapLibre's own cache. Keep the map
@@ -695,9 +724,10 @@ abstract class RasterTimelineLayer implements MapLayer {
     required bool settling,
   }) async {
     if (!_isCurrent(frameId, generation)) return;
-    final bounds = await controller.getVisibleRegion();
+    final viewport = await _viewport(controller);
     if (!_isCurrent(frameId, generation)) return;
-    final zoom = controller.cameraPosition?.zoom ?? 8;
+    final bounds = viewport.bounds;
+    final zoom = viewport.zoom;
     final elapsed = Stopwatch()..start();
     final readiness = await source.frameTileReadiness(
       frame: frameId,
@@ -712,13 +742,16 @@ abstract class RasterTimelineLayer implements MapLayer {
       warm: settling,
     );
     if (!_isCurrent(frameId, generation)) return;
+    final nativeReady = _readyFrames.contains(frameId);
     MapTileCache.trace(
-      'timeline=$id readiness frame=$frameId phase=initial '
-      'ready=${readiness.ready} resident=${readiness.resident}/'
-      '${readiness.required} zoom=${zoom.toStringAsFixed(2)} '
-      'dt=${elapsed.elapsedMilliseconds}ms',
+      () =>
+          'timeline=$id readiness frame=$frameId phase=initial '
+          'ready=${readiness.ready} resident=${readiness.resident}/'
+          '${readiness.required} native=$nativeReady '
+          'zoom=${zoom.toStringAsFixed(2)} '
+          'dt=${elapsed.elapsedMilliseconds}ms',
     );
-    if (readiness.ready) {
+    if (readiness.ready || nativeReady) {
       if (!settling && !_ring.contains(frameId)) {
         // Readiness was an L1-only probe. Mounting after it succeeds lets
         // MapLibre satisfy the display tiles entirely from memory; doing this
@@ -727,12 +760,13 @@ abstract class RasterTimelineLayer implements MapLayer {
         await _stageScrubFrame(controller, frameId);
         if (!_isCurrent(frameId, generation)) return;
       }
-      // L1 residency means native owns the encoded bytes, not that MapLibre has
-      // decoded and painted them. Even a ring member may have mounted only one
-      // input event ago, so give every frame's *first* reveal two render turns;
-      // later reversals use _readyFrames and stay immediate.
-      await Future<void>.delayed(_decodeGrace);
-      if (!_isCurrent(frameId, generation)) return;
+      if (!nativeReady) {
+        // L1 residency means native owns the encoded bytes, not that MapLibre
+        // has decoded and painted them. Give the frame two render turns unless
+        // the native renderer has already reported the whole ring idle.
+        await Future<void>.delayed(_decodeGrace);
+        if (!_isCurrent(frameId, generation)) return;
+      }
       await _commitReveal(
         controller,
         index,
@@ -744,9 +778,10 @@ abstract class RasterTimelineLayer implements MapLayer {
     }
     if (!settling) {
       MapTileCache.trace(
-        'timeline=$id readiness frame=$frameId phase=l1-hold '
-        'resident=${readiness.resident}/${readiness.required} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'timeline=$id readiness frame=$frameId phase=l1-hold '
+            'resident=${readiness.resident}/${readiness.required} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
       return;
     }
@@ -799,7 +834,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   }) async {
     final elapsed = Stopwatch()..start();
     FrameTileReadiness readiness = (ready: false, resident: 0, required: 0);
-    while (elapsed.elapsed < _readyTimeout && _isCurrent(frameId, generation)) {
+    while (!_readyFrames.contains(frameId) &&
+        elapsed.elapsed < _readyTimeout &&
+        _isCurrent(frameId, generation)) {
       await Future<void>.delayed(_readyPoll);
       if (!_isCurrent(frameId, generation)) return;
       readiness = await source.frameTileReadiness(
@@ -810,21 +847,25 @@ abstract class RasterTimelineLayer implements MapLayer {
         east: east,
         zoom: zoom,
       );
-      if (readiness.ready) break;
+      if (readiness.ready || _readyFrames.contains(frameId)) break;
     }
     if (!_isCurrent(frameId, generation)) return;
-    if (!readiness.ready) {
+    final nativeReady = _readyFrames.contains(frameId);
+    if (!readiness.ready && !nativeReady) {
       MapTileCache.trace(
-        'timeline=$id readiness frame=$frameId phase=timeout hold=$_shownFrameId '
-        'resident=${readiness.resident}/${readiness.required} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'timeline=$id readiness frame=$frameId phase=timeout hold=$_shownFrameId '
+            'resident=${readiness.resident}/${readiness.required} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
       return;
     }
-    // Network bytes enter L1 before MapLibre finishes decoding them. Keep the
-    // complete previous frame for two render intervals, then cut over once.
-    await Future<void>.delayed(_decodeGrace);
-    if (!_isCurrent(frameId, generation)) return;
+    if (!nativeReady) {
+      // Network bytes enter L1 before MapLibre finishes decoding them. Keep the
+      // complete previous frame for two render intervals, then cut over once.
+      await Future<void>.delayed(_decodeGrace);
+      if (!_isCurrent(frameId, generation)) return;
+    }
     await _enqueueMutation(
       () => _commitReveal(
         controller,
@@ -835,9 +876,11 @@ abstract class RasterTimelineLayer implements MapLayer {
       ),
     );
     MapTileCache.trace(
-      'timeline=$id readiness frame=$frameId phase=ready '
-      'resident=${readiness.resident}/${readiness.required} '
-      'dt=${elapsed.elapsedMilliseconds}ms',
+      () =>
+          'timeline=$id readiness frame=$frameId phase=ready '
+          'resident=${readiness.resident}/${readiness.required} '
+          'native=$nativeReady '
+          'dt=${elapsed.elapsedMilliseconds}ms',
     );
   }
 
@@ -877,8 +920,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (!_isCurrent(frameId, generation)) return;
     _settledFrameId = frameId;
     MapTileCache.trace(
-      'timeline=$id settle complete frame=$frameId mounted=${ring.length} '
-      'schedule-warm=true',
+      () =>
+          'timeline=$id settle complete frame=$frameId mounted=${ring.length} '
+          'schedule-warm=true',
     );
     // Use the warmer's debounce. A new gesture cancels this before its SQLite
     // batch starts; an immediate fill here was the dominant high-speed scrub
@@ -932,8 +976,9 @@ abstract class RasterTimelineLayer implements MapLayer {
         if (!core.contains(candidate)) candidate,
     ];
     if (candidates.isEmpty) return;
-    final bounds = await controller.getVisibleRegion();
-    final zoom = controller.cameraPosition?.zoom ?? 8;
+    final viewport = await _viewport(controller);
+    final bounds = viewport.bounds;
+    final zoom = viewport.zoom;
     final elapsed = Stopwatch()..start();
     final workers = candidates.length < _idlePreloadConcurrency
         ? candidates.length
@@ -942,13 +987,15 @@ abstract class RasterTimelineLayer implements MapLayer {
     var complete = 0;
     var timedOut = 0;
     MapTileCache.trace(
-      'timeline=$id idle-preload start frame=$frameId '
-      'candidates=${candidates.length} workers=$workers '
-      'resident=${_resident.length}',
+      () =>
+          'timeline=$id idle-preload start frame=$frameId '
+          'candidates=${candidates.length} workers=$workers '
+          'resident=${_resident.length}',
     );
     mapTrace(
       'timeline/$id',
-      'idle-preload start candidates=${candidates.length} workers=$workers '
+      () =>
+          'idle-preload start candidates=${candidates.length} workers=$workers '
           'resident=${_resident.length}/$maxResident',
     );
 
@@ -981,14 +1028,16 @@ abstract class RasterTimelineLayer implements MapLayer {
 
     await Future.wait([for (var i = 0; i < workers; i++) runWorker()]);
     MapTileCache.trace(
-      'timeline=$id idle-preload done frame=$frameId complete=$complete '
-      'timeout=$timedOut '
-      'resident=${_resident.length}/$maxResident '
-      'dt=${elapsed.elapsedMilliseconds}ms',
+      () =>
+          'timeline=$id idle-preload done frame=$frameId complete=$complete '
+          'timeout=$timedOut '
+          'resident=${_resident.length}/$maxResident '
+          'dt=${elapsed.elapsedMilliseconds}ms',
     );
     mapTrace(
       'timeline/$id',
-      'idle-preload done complete=$complete timeout=$timedOut '
+      () =>
+          'idle-preload done complete=$complete timeout=$timedOut '
           'resident=${_resident.length}/$maxResident '
           'dt=${elapsed.elapsedMilliseconds}ms',
     );
@@ -1030,6 +1079,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
     final waiting = Stopwatch()..start();
     while (!readiness.ready &&
+        !_readyFrames.contains(candidate) &&
         waiting.elapsed < _idleReadyTimeout &&
         current()) {
       await Future<void>.delayed(_idleReadyPoll);
@@ -1047,10 +1097,11 @@ abstract class RasterTimelineLayer implements MapLayer {
       await _discardIdleFrame(controller, candidate);
       return _IdlePreloadOutcome.cancelled;
     }
-    if (!readiness.ready) {
+    if (!readiness.ready && !_readyFrames.contains(candidate)) {
       MapTileCache.trace(
-        'timeline=$id idle-preload frame=$candidate reason=timeout '
-        'resident=${readiness.resident}/${readiness.required}',
+        () =>
+            'timeline=$id idle-preload frame=$candidate reason=timeout '
+            'resident=${readiness.resident}/${readiness.required}',
       );
       await _discardIdleFrame(controller, candidate);
       return _IdlePreloadOutcome.timeout;
@@ -1099,38 +1150,42 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// displayed timestamp. Only the extra ready-resident sources are removed;
   /// their compressed tile bodies remain in the native L1 and SQLite L2 caches
   /// and are rebuilt by the idle pool after the surface is visible again.
-  Future<void> _trimHiddenResidents(
-    MapLibreMapController controller,
-  ) => _enqueueMutation(() async {
-    if (_surfaceVisible || _resident.isEmpty) return;
-    final shown = _shownIndex;
-    final keep = shown == null ? <String>{?_shownFrameId} : _ringAt(shown).$3;
-    final stale = [
-      for (final candidate in _resident)
-        if (!keep.contains(candidate)) candidate,
-    ];
-    if (stale.isEmpty) return;
-    mapTrace(
-      'timeline/$id',
-      'hidden-trim start remove=${stale.length} keep=${keep.length}',
-    );
-    await source.abandonFrames(stale);
-    for (final candidate in stale) {
-      _resident.remove(candidate);
-      _ring.remove(candidate);
-      _readyFrames.remove(candidate);
-      _lru.remove(candidate);
-      await _removeFrame(controller, candidate);
-    }
-    mapTrace('timeline/$id', 'hidden-trim done resident=${_resident.length}');
-  });
+  Future<void> _trimHiddenResidents(MapLibreMapController controller) =>
+      _enqueueMutation(() async {
+        if (_surfaceVisible || _resident.isEmpty) return;
+        final shown = _shownIndex;
+        final keep = shown == null
+            ? <String>{?_shownFrameId}
+            : _ringAt(shown).$3;
+        final stale = [
+          for (final candidate in _resident)
+            if (!keep.contains(candidate)) candidate,
+        ];
+        if (stale.isEmpty) return;
+        mapTrace(
+          'timeline/$id',
+          () => 'hidden-trim start remove=${stale.length} keep=${keep.length}',
+        );
+        await source.abandonFrames(stale);
+        for (final candidate in stale) {
+          _resident.remove(candidate);
+          _ring.remove(candidate);
+          _readyFrames.remove(candidate);
+          _lru.remove(candidate);
+          await _removeFrame(controller, candidate);
+        }
+        mapTrace(
+          'timeline/$id',
+          () => 'hidden-trim done resident=${_resident.length}',
+        );
+      });
 
   void _suspendWarm() {
     if (_warmSuspended) return;
     _warmSuspended = true;
     _warmCentre = null;
     source.cancelTileWarm();
-    MapTileCache.trace('timeline=$id warm-suspend');
+    MapTileCache.trace(() => 'timeline=$id warm-suspend');
   }
 
   bool _isCurrent(String frameId, int generation) =>
@@ -1171,7 +1226,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       return;
     }
     MapTileCache.trace(
-      'timeline=${this.id} mount frame=$id opacity=$value source=new',
+      () => 'timeline=${this.id} mount frame=$id opacity=$value source=new',
     );
     await _ensureSeam(controller);
     await controller.addSource(
@@ -1258,11 +1313,34 @@ abstract class RasterTimelineLayer implements MapLayer {
     ];
     if (retired.isEmpty) return;
     _ring.removeAll(retired);
-    await Future.wait([
-      for (final id in retired)
-        controller.setLayerProperties(_layerId(id), _hidden, skipNulls: true),
-    ]);
+    await controller.setLayerPropertiesBatch([
+      for (final id in retired) (layerId: _layerId(id), properties: _hidden),
+    ], skipNulls: true);
     await source.abandonFrames(retired);
+  }
+
+  /// The camera's visible region and zoom, re-read only when the camera moved.
+  ///
+  /// [CameraPosition] has value equality and is maintained on the Dart side
+  /// from the camera-move stream, so the check is free and exact: any pan,
+  /// zoom, rotation or tilt misses. The position compared is the one observed
+  /// *before* the platform answered, so a camera that moved while the query was
+  /// in flight invalidates the entry instead of serving a rectangle that never
+  /// existed. [onCameraIdle] clears it too, which covers a surface resize —
+  /// the same event already invalidates [_readyFrames] for the same reason.
+  Future<({LatLngBounds bounds, double zoom})> _viewport(
+    MapLibreMapController controller,
+  ) async {
+    final camera = controller.cameraPosition;
+    final cached = _viewportCache;
+    if (cached != null && _viewportCamera == camera) return cached;
+    final viewport = (
+      bounds: await controller.getVisibleRegion(),
+      zoom: camera?.zoom ?? 8,
+    );
+    _viewportCamera = camera;
+    _viewportCache = viewport;
+    return viewport;
   }
 
   /// Whether [index] falls inside the band last warmed around [_warmCentre].
@@ -1302,30 +1380,32 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (frames.length <= 1) return;
     final elapsed = Stopwatch()..start();
     MapTileCache.trace(
-      'timeline=$id warm-band start centre=$centre previous=$previous '
-      'direction=${delta < 0 ? 'backward' : 'forward'} '
-      'frames=${frames.length} immediate=$immediate '
-      'refresh=$refreshResident',
+      () =>
+          'timeline=$id warm-band start centre=$centre previous=$previous '
+          'direction=${delta < 0 ? 'backward' : 'forward'} '
+          'frames=${frames.length} immediate=$immediate '
+          'refresh=$refreshResident',
     );
     try {
-      final bounds = await controller.getVisibleRegion();
+      final viewport = await _viewport(controller);
       // Visibility can change while the platform answers the camera query. Do
       // not start a fresh warmer generation after the hidden-edge cancellation.
       if (!_surfaceVisible || _warmCentre != centre) return;
       await source.warmFrameTiles(
         frames: frames,
-        south: bounds.southwest.latitude,
-        west: bounds.southwest.longitude,
-        north: bounds.northeast.latitude,
-        east: bounds.northeast.longitude,
-        zoom: controller.cameraPosition?.zoom ?? 8,
+        south: viewport.bounds.southwest.latitude,
+        west: viewport.bounds.southwest.longitude,
+        north: viewport.bounds.northeast.latitude,
+        east: viewport.bounds.northeast.longitude,
+        zoom: viewport.zoom,
         fill: true,
         immediate: immediate,
         refreshResident: refreshResident,
       );
       MapTileCache.trace(
-        'timeline=$id warm-band done centre=$centre frames=${frames.length} '
-        'dt=${elapsed.elapsedMilliseconds}ms',
+        () =>
+            'timeline=$id warm-band done centre=$centre frames=${frames.length} '
+            'dt=${elapsed.elapsedMilliseconds}ms',
       );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, '$id band warm');
@@ -1376,8 +1456,9 @@ abstract class RasterTimelineLayer implements MapLayer {
       _readyFrames.remove(evict);
       await _removeFrame(controller, evict);
       MapTileCache.trace(
-        'timeline=$id source-evict frame=$evict '
-        'resident=${_resident.length}/$maxResident',
+        () =>
+            'timeline=$id source-evict frame=$evict '
+            'resident=${_resident.length}/$maxResident',
       );
     }
   }
@@ -1388,15 +1469,39 @@ abstract class RasterTimelineLayer implements MapLayer {
   }
 
   @override
+  void onMapIdle() {
+    if (!_surfaceVisible || _ring.isEmpty) return;
+    final newlyReady = _ring.difference(_readyFrames);
+    if (newlyReady.isEmpty) return;
+    _readyFrames.addAll(newlyReady);
+    MapTileCache.trace(
+      () =>
+          'timeline=$id native-idle ready=${newlyReady.length} '
+          'ring=${_ring.length}',
+    );
+  }
+
+  @override
+  void onTimelineScrubStart() => _suspendWarm();
+
+  @override
   Future<void> onCameraIdle(MapLibreMapController controller) async {
-    if (!_surfaceVisible || _warmSuspended) return;
+    if (!_surfaceVisible) return;
+    // Native readiness is viewport-specific. Invalidate it even while a
+    // timeline gesture has suspended warming; the next map-idle event will
+    // prove the newly visible tiles instead of reusing the old viewport. The
+    // cached rectangle goes with it: a resize keeps the camera and moves the
+    // rectangle, and this is the event that reports it.
+    _readyFrames.clear();
+    _viewportCache = null;
+    _viewportCamera = null;
+    if (_warmSuspended) return;
     final centre = _shownIndex;
     if (centre == null) return;
-    _readyFrames.clear();
     _warmCentre = null;
     // The viewport moved, so the warmed tiles are the wrong ones — re-warm for
     // where the camera actually is.
-    MapTileCache.trace('timeline=$id camera-idle centre=$centre');
+    MapTileCache.trace(() => 'timeline=$id camera-idle centre=$centre');
     unawaited(_warmBand(controller, centre, immediate: true));
   }
 
@@ -1453,6 +1558,8 @@ abstract class RasterTimelineLayer implements MapLayer {
     _resident.clear();
     _ring.clear();
     _readyFrames.clear();
+    _viewportCache = null;
+    _viewportCamera = null;
     _lru.clear();
     _orderedIds = const [];
     _indexById = const {};

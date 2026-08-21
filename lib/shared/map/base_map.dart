@@ -44,6 +44,7 @@ class BaseMap extends StatefulWidget {
     this.onMapCreated,
     this.onStyleLoaded,
     this.onMapClick,
+    this.onMapIdle,
     this.onCameraIdle,
     this.onCameraMove,
     this.interactive = true,
@@ -104,6 +105,11 @@ class BaseMap extends StatefulWidget {
   /// layers (e.g. selecting the nearest weather station).
   final OnMapClickCallback? onMapClick;
 
+  /// Fires when MapLibre's native renderer has fully loaded the visible
+  /// sources and has no pending repaint. Unlike [onCameraIdle], this also
+  /// covers source/tile changes made while the camera stays still.
+  final OnMapIdleCallback? onMapIdle;
+
   /// Fires when the camera stops moving — for screen-space Flutter overlays
   /// that need a fresh `toScreenLocation` projection.
   final OnCameraIdleCallback? onCameraIdle;
@@ -143,26 +149,24 @@ class BaseMap extends StatefulWidget {
   /// Per-surface zoom ceiling (DPM AED may go to 16).
   final double maxZoomPreference;
 
-  /// Shell tab that owns this surface, if any. Android pauses the native render
-  /// loop while that retained `IndexedStack` branch is hidden; iOS leaves its
-  /// platform view under MLNMapView's lifecycle (see [_BaseMapState._syncRender])
-  /// because retiming its display link can strand the renderer on return.
+  /// Shell tab that owns this surface, if any. Its native render loop pauses
+  /// while that retained `IndexedStack` branch is hidden and resumes when the
+  /// branch becomes visible again.
   /// `null` belongs to no branch (a full-screen route or external preview).
   final int? tabIndex;
 
-  /// Recreates the iOS platform view when this retained surface comes back on
-  /// screen.
+  /// Recreates the iOS platform view if its native resume cannot render a frame.
   ///
   /// Flutter keeps an `IndexedStack` branch (and therefore its `UiKitView`)
-  /// mounted while another tab is selected. Some MLNMapView instances stop
-  /// presenting after that hidden interval even though their Dart controller
-  /// and native render workers remain responsive. Rebuilding the surrounding
-  /// Flutter widget is insufficient because it preserves the same platform
-  /// view; changing the map key gives UIKit a fresh native view.
+  /// mounted while another tab is selected. The plugin first resumes the same
+  /// MLNMapView and completes only after `didFinishRenderingFrame`; a timeout
+  /// reaches this fallback. Rebuilding the surrounding Flutter widget is
+  /// insufficient because it preserves the same platform view, so changing the
+  /// map key gives UIKit a fresh native view.
   ///
   /// This is opt-in because a display-only backdrop or a full-screen map route
-  /// does not have the retained-tab failure mode. Android keeps its cheaper
-  /// pause/resume path regardless of this value.
+  /// does not have the retained-tab failure mode. Android and a healthy iOS map
+  /// keep their cheaper pause/resume path regardless of this value.
   final bool recreateOnReturn;
 
   /// Called immediately before [recreateOnReturn] discards a live controller.
@@ -179,7 +183,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
 
   String get _traceScope => 'base#$_traceId/tab=${widget.tabIndex}';
 
-  void _trace(String message) => mapTrace(_traceScope, message);
+  void _trace(String Function() message) => mapTrace(_traceScope, message);
 
   /// Set once the platform view reports in — the readiness gate for the retry.
   MapLibreMapController? _controller;
@@ -209,7 +213,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _trace('init platform=$defaultTargetPlatform');
+    _trace(() => 'init platform=$defaultTargetPlatform');
     WidgetsBinding.instance.addObserver(this);
     _scheduleReadinessRetry();
   }
@@ -230,7 +234,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
       AppLifecycleState.detached => false,
       AppLifecycleState.resumed || AppLifecycleState.inactive => true,
     };
-    _trace('app-lifecycle state=$state foreground=$foreground');
+    _trace(() => 'app-lifecycle state=$state foreground=$foreground');
     if (foreground == _foreground) return;
     _foreground = foreground;
     _syncVisibility(trigger: 'app-lifecycle');
@@ -245,8 +249,9 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     _visibleTab = visibleTab;
     visibleTab?.addListener(_onTabChanged);
     _trace(
-      'visible-scope attached scope=${mapTraceObject(visibleTab)} '
-      'selected=${visibleTab?.value} shellOnTop=${visibleTab?.shellOnTop}',
+      () =>
+          'visible-scope attached scope=${mapTraceObject(visibleTab)} '
+          'selected=${visibleTab?.value} shellOnTop=${visibleTab?.shellOnTop}',
     );
     _wasOnScreen = _isOnScreen;
     _syncRender();
@@ -256,20 +261,23 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   void didUpdateWidget(BaseMap oldWidget) {
     super.didUpdateWidget(oldWidget);
     _trace(
-      'widget-update tab=${oldWidget.tabIndex}->${widget.tabIndex} '
-      'interactive=${oldWidget.interactive}->${widget.interactive}',
+      () =>
+          'widget-update tab=${oldWidget.tabIndex}->${widget.tabIndex} '
+          'interactive=${oldWidget.interactive}->${widget.interactive}',
     );
   }
 
   @override
   void reassemble() {
-    _trace('hot-reload reassemble controller=${mapTraceObject(_controller)}');
+    _trace(
+      () => 'hot-reload reassemble controller=${mapTraceObject(_controller)}',
+    );
     super.reassemble();
   }
 
   @override
   void dispose() {
-    _trace('dispose controller=${mapTraceObject(_controller)}');
+    _trace(() => 'dispose controller=${mapTraceObject(_controller)}');
     _visibleTab?.removeListener(_onTabChanged);
     WidgetsBinding.instance.removeObserver(this);
     _readinessTimer?.cancel();
@@ -287,24 +295,15 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   /// states that actually reached the platform.
   void _syncRender() {
     final onScreen = _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
-    // MLNMapView owns a CADisplayLink. Retiming that link while its UiKitView is
-    // retained offstage can leave the iOS renderer dormant after the tab is
-    // selected again: Flutter keeps compositing the old native framebuffer,
-    // while MapLibre's workers and display link are idle. A hot reload appears
-    // to fix it only because it recomposites the platform view. Similar
-    // multi-tab/resume failures are tracked upstream (maplibre-native#3202,
-    // flutter-maplibre-gl#355). Keep the iOS link under MLNMapView's lifecycle;
-    // MapScaffold still stops hidden timeline work and overlay tickers, and the
-    // plugin already handles UIApplication background notifications itself.
-    final canPauseFromDart = defaultTargetPlatform != TargetPlatform.iOS;
-    final pause = canPauseFromDart && !(_foreground && onScreen);
+    final pause = !(_foreground && onScreen);
     final controller = _controller;
     _trace(
-      'render-sync selected=${_visibleTab?.value} '
-      'shellOnTop=${_visibleTab?.shellOnTop} onScreen=$onScreen '
-      'foreground=$_foreground supported=$canPauseFromDart '
-      'desiredPause=$pause appliedPause=$_renderPaused '
-      'controller=${mapTraceObject(controller)}',
+      () =>
+          'render-sync selected=${_visibleTab?.value} '
+          'shellOnTop=${_visibleTab?.shellOnTop} onScreen=$onScreen '
+          'foreground=$_foreground '
+          'desiredPause=$pause appliedPause=$_renderPaused '
+          'controller=${mapTraceObject(controller)}',
     );
     if (controller == null || pause == _renderPaused) return;
     _renderPaused = pause;
@@ -314,24 +313,36 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
           .setRenderPaused(pause)
           .then(
             (_) => _trace(
-              'render-sync native-complete pause=$pause '
-              'dt=${started.elapsedMilliseconds}ms',
+              () =>
+                  'render-sync native-complete pause=$pause '
+                  'dt=${started.elapsedMilliseconds}ms',
             ),
           )
           .catchError((Object error, StackTrace stackTrace) {
             _trace(
-              'render-sync native-error pause=$pause '
-              'dt=${started.elapsedMilliseconds}ms error=$error',
+              () =>
+                  'render-sync native-error pause=$pause '
+                  'dt=${started.elapsedMilliseconds}ms error=$error',
             );
             Log.handle(error, stackTrace, 'map render pause');
+            if (!pause &&
+                mounted &&
+                identical(controller, _controller) &&
+                _isOnScreen &&
+                widget.recreateOnReturn &&
+                defaultTargetPlatform == TargetPlatform.iOS) {
+              _trace(() => 'native-resume failed; recreating native view');
+              _recreateNativeView(trigger: 'native-resume-failed');
+            }
           }),
     );
   }
 
   void _onTabChanged() {
     _trace(
-      'visible-notify selected=${_visibleTab?.value} '
-      'shellOnTop=${_visibleTab?.shellOnTop}',
+      () =>
+          'visible-notify selected=${_visibleTab?.value} '
+          'shellOnTop=${_visibleTab?.shellOnTop}',
     );
     _syncVisibility(trigger: 'shell');
   }
@@ -339,19 +350,13 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   bool get _isOnScreen =>
       _foreground && (_visibleTab?.isOnScreen(widget.tabIndex) ?? true);
 
-  /// Applies the ordinary render lifecycle, or replaces an iOS native view
-  /// that has spent time retained offstage.
+  /// Applies the ordinary render lifecycle. A failed verified iOS resume falls
+  /// back to [_recreateNativeView] from [_syncRender].
   void _syncVisibility({required String trigger}) {
     final onScreen = _isOnScreen;
     final returned = onScreen && !_wasOnScreen;
     _wasOnScreen = onScreen;
-    if (returned &&
-        widget.recreateOnReturn &&
-        defaultTargetPlatform == TargetPlatform.iOS &&
-        _controller != null) {
-      _recreateNativeView(trigger: trigger);
-      return;
-    }
+    _trace(() => 'visibility-sync trigger=$trigger returned=$returned');
     _syncRender();
   }
 
@@ -359,8 +364,9 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     final controller = _controller;
     if (controller == null) return;
     _trace(
-      'native-recreate start trigger=$trigger '
-      'attempt=${_mountAttempt + 1} controller=${mapTraceObject(controller)}',
+      () =>
+          'native-recreate start trigger=$trigger '
+          'attempt=${_mountAttempt + 1} controller=${mapTraceObject(controller)}',
     );
     widget.onMapInvalidated?.call(controller);
     _controller = null;
@@ -375,14 +381,15 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   void _onMapCreated(int mountAttempt, MapLibreMapController controller) {
     if (mountAttempt != _mountAttempt) {
       _trace(
-        'map-created stale attempt=$mountAttempt current=$_mountAttempt '
-        'controller=${mapTraceObject(controller)}',
+        () =>
+            'map-created stale attempt=$mountAttempt current=$_mountAttempt '
+            'controller=${mapTraceObject(controller)}',
       );
       return;
     }
     _controller = controller;
     _readinessRetries = 0;
-    _trace('map-created controller=${mapTraceObject(controller)}');
+    _trace(() => 'map-created controller=${mapTraceObject(controller)}');
     _readinessTimer?.cancel();
     // A remount (retry) may have superseded this element — never hand a stale
     // controller, whose native view is being torn down, to the caller.
@@ -393,10 +400,12 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
 
   void _onStyleLoaded(int mountAttempt) {
     if (mountAttempt != _mountAttempt) {
-      _trace('style-loaded stale attempt=$mountAttempt current=$_mountAttempt');
+      _trace(
+        () => 'style-loaded stale attempt=$mountAttempt current=$_mountAttempt',
+      );
       return;
     }
-    _trace('style-loaded controller=${mapTraceObject(_controller)}');
+    _trace(() => 'style-loaded controller=${mapTraceObject(_controller)}');
     widget.onStyleLoaded?.call();
   }
 
@@ -415,14 +424,15 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
       if (_readinessRetries < 2) {
         _readinessRetries++;
         _trace(
-          'readiness-timeout retry=$_readinessRetries '
-          'remount=${_mountAttempt + 1}',
+          () =>
+              'readiness-timeout retry=$_readinessRetries '
+              'remount=${_mountAttempt + 1}',
         );
         setState(() => _mountAttempt++);
         _scheduleReadinessRetry();
         return;
       }
-      _trace('readiness-failed retries=$_readinessRetries');
+      _trace(() => 'readiness-failed retries=$_readinessRetries');
       Log.warning('Map platform view never became ready after remounts');
     });
   }
@@ -505,6 +515,13 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
             },
       onMapCreated: (controller) => _onMapCreated(mountAttempt, controller),
       onStyleLoadedCallback: () => _onStyleLoaded(mountAttempt),
+      onMapIdle: widget.onMapIdle == null
+          ? null
+          : () {
+              if (mountAttempt == _mountAttempt) {
+                widget.onMapIdle?.call();
+              }
+            },
       onCameraMove: widget.onCameraMove == null
           ? null
           : (position) {
