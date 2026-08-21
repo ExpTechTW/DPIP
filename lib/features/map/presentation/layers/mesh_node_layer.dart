@@ -529,44 +529,49 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
     }
   }
 
-  Map<String, dynamic> _geoJson() => {
-    'type': 'FeatureCollection',
-    'features': [
-      for (final node in _store.positioned)
-        {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Point',
-            'coordinates': [node.longitude, node.latitude],
-          },
-          'properties': {
-            'num': node.num,
-            'name': _shortLabel(node),
-            // Precomposed rather than concatenated in the style: an empty
-            // detail would otherwise leave a trailing blank line under the
-            // name.
-            'label': _twoLineLabel(node),
-            'online': _store.isOnline(node) ? 1 : 0,
-            'mqtt': node.viaMqtt ? 1 : 0,
-            // Direct neighbour — a node this radio hears itself, rather than
-            // through someone. Binary on purpose: at a 4.5–9 px dot, three
-            // grades of ring are indistinguishable, and the meaningful line is
-            // between "I can hear this" and "someone relays it for me".
-            // Unknown reads the same as not-direct, because that is the
-            // conservative claim.
-            'direct': node.hopsAway == 0 ? 1 : 0,
-            'selected': node.num == _selected.value ? 1 : 0,
-          },
+  Map<String, dynamic> _geoJson() {
+    final features = <Map<String, dynamic>>[];
+    for (final node in _store.positioned) {
+      // Bound once: `_twoLineLabel` starts from the same stub, and walking a
+      // CJK name's grapheme clusters twice per node per push is the most
+      // expensive thing in this loop.
+      final name = _shortLabel(node);
+      features.add({
+        'type': 'Feature',
+        'geometry': {
+          'type': 'Point',
+          'coordinates': [node.longitude, node.latitude],
         },
-    ],
-  };
+        'properties': {
+          'num': node.num,
+          'name': name,
+          // Precomposed rather than concatenated in the style: an empty
+          // detail would otherwise leave a trailing blank line under the
+          // name.
+          'label': _twoLineLabel(node, name),
+          'online': _store.isOnline(node) ? 1 : 0,
+          'mqtt': node.viaMqtt ? 1 : 0,
+          // Direct neighbour — a node this radio hears itself, rather than
+          // through someone. Binary on purpose: at a 4.5–9 px dot, three
+          // grades of ring are indistinguishable, and the meaningful line is
+          // between "I can hear this" and "someone relays it for me".
+          // Unknown reads the same as not-direct, because that is the
+          // conservative claim.
+          'direct': node.hopsAway == 0 ? 1 : 0,
+          'selected': node.num == _selected.value ? 1 : 0,
+        },
+      });
+    }
+    return {'type': 'FeatureCollection', 'features': features};
+  }
 
   /// Node names run long (`故宮南院 東側山線 (Heltec V3)`); the map shows a
   /// readable stub and the mesh page has the full list.
   String _shortLabel(MeshNode node) {
     final name = node.displayName.trim();
     if (name.isEmpty) return '0x${node.num.toRadixString(16)}';
-    return name.characters.length <= 12 ? name : '${name.characters.take(12)}…';
+    final chars = name.characters;
+    return chars.length <= 12 ? name : '${chars.take(12)}…';
   }
 
   /// Name over its readings, for the close-in zooms.
@@ -579,8 +584,7 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   /// already separates heard-recently from silent, and the sheet carries a
   /// live "last heard" because it rebuilds.
   // l10n-ignore: numeric readouts
-  String _twoLineLabel(MeshNode node) {
-    final name = _shortLabel(node);
+  String _twoLineLabel(MeshNode node, String name) {
     final parts = <String>[
       if (node.batteryLevel != null)
         node.batteryLevel! > 100 ? 'DC' : '${node.batteryLevel}%',
