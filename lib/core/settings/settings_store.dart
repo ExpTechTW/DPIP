@@ -32,6 +32,8 @@ const String settingsTable = 'settings';
 final class SettingsStore {
   SettingsStore._(this._db, this._values);
 
+  static const int _loadAttempts = 3;
+
   /// The database, or null when it could not be opened — the app then runs
   /// with settings that live only for this session rather than not at all.
   final Database? _db;
@@ -48,20 +50,46 @@ final class SettingsStore {
 
   /// Loads every row into memory.
   static Future<SettingsStore> open(Database? db) async {
-    final values = <String, Object?>{};
-    if (db != null) {
+    if (db == null) return SettingsStore._(null, {});
+
+    Object? lastError;
+    StackTrace? lastStackTrace;
+    for (var attempt = 1; attempt <= _loadAttempts; attempt++) {
       try {
+        final values = <String, Object?>{};
         for (final row in await db.query(settingsTable)) {
           final key = row['key'] as String?;
           final value = row['value'] as String?;
           if (key == null || value == null) continue;
-          values[key] = jsonDecode(value);
+          try {
+            values[key] = jsonDecode(value);
+          } catch (error, stackTrace) {
+            // One damaged setting must not discard every row that follows it.
+            // In particular, losing `onboarding.complete` turns a returning
+            // installation into an apparent first launch.
+            Log.handle(error, stackTrace, 'loading setting $key');
+          }
         }
+        if (attempt > 1) {
+          Log.info(
+            'settings recovered on read attempt $attempt/$_loadAttempts',
+          );
+        }
+        return SettingsStore._(db, values);
       } catch (error, stackTrace) {
-        Log.handle(error, stackTrace, 'loading settings');
+        lastError = error;
+        lastStackTrace = stackTrace;
+        if (attempt < _loadAttempts) {
+          Log.warning(
+            'settings read attempt $attempt/$_loadAttempts failed; retrying',
+          );
+          await Future<void>.delayed(Duration(milliseconds: 75 * attempt));
+        }
       }
     }
-    return SettingsStore._(db, values);
+
+    Log.handle(lastError!, lastStackTrace, 'loading settings');
+    return SettingsStore._(db, {});
   }
 
   /// An in-memory store with no database behind it — for tests, and for a

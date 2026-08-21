@@ -45,6 +45,7 @@ import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/astro/tle_store.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/storage/retention.dart';
@@ -182,12 +183,16 @@ Future<void> bootstrap() async {
   final appVersionFuture = AppBuild.ensureLoaded().then((_) => AppBuild.label);
 
   final durable = await durableFuture;
+  final settings = await SettingsStore.open(durable);
+  Log.info(
+    'settings ready durable=${durable != null} keys=${settings.keys.length} '
+    'onboarding=${settings.getBool(SettingKeys.onboardingComplete)}',
+  );
   // Persist the log as early as the database allows: everything after this
   // point survives a crash or a background kill, which is exactly the window
   // the in-memory history used to lose.
   final logStore = durable == null ? null : LogStore(durable);
   if (logStore != null) Log.persistTo(logStore);
-  final settings = await SettingsStore.open(durable);
   final regions = RegionSelection(settings);
   final experimental = ExperimentalSettings(settings);
   final onboarding = OnboardingStore(settings);
@@ -437,25 +442,52 @@ _openCache() async {
 /// cache is a separate file for exactly that reason, which is also what makes
 /// "clear cache" unable to reach any of this. See `core/storage/app_database.dart`.
 ///
-/// Best-effort like the cache: a failure means settings live only for this
-/// session rather than the app refusing to launch. Every schema statement is
-/// `IF NOT EXISTS` and runs on every open, so a database created by an older
-/// build picks up tables added later without a version bump.
+/// Best-effort like the cache: transient launch races get three bounded retries;
+/// a persistent failure means settings live only for this session rather than
+/// the app refusing to launch. Every schema statement is `IF NOT EXISTS` and
+/// runs on every open, so a database created by an older build picks up tables
+/// added later without a version bump.
 Future<Database?> _openDurable() async {
-  try {
-    final base = await getApplicationSupportDirectory();
-    final db = await openDatabase(
-      '${base.path}/dpip.db',
-      version: appDatabaseVersion,
-      onConfigure: (db) => _configureJournal(db, durable: true),
-      onCreate: (db, _) => _createDurableSchema(db),
-    );
-    await _createDurableSchema(db);
-    return db;
-  } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'durable database unavailable');
-    return null;
+  const attempts = 3;
+  Object? lastError;
+  StackTrace? lastStackTrace;
+  for (var attempt = 1; attempt <= attempts; attempt++) {
+    Database? db;
+    try {
+      final base = await getApplicationSupportDirectory();
+      db = await openDatabase(
+        '${base.path}/dpip.db',
+        version: appDatabaseVersion,
+        onConfigure: (db) => _configureJournal(db, durable: true),
+        onCreate: (db, _) => _createDurableSchema(db),
+      );
+      await _createDurableSchema(db);
+      if (attempt > 1) {
+        Log.info('durable database recovered on attempt $attempt/$attempts');
+      }
+      return db;
+    } catch (error, stackTrace) {
+      lastError = error;
+      lastStackTrace = stackTrace;
+      if (db != null) {
+        try {
+          await db.close();
+        } on Object {
+          // The open/schema error is the useful failure; closing a partial
+          // handle must not replace it or prevent the next recovery attempt.
+        }
+      }
+      if (attempt < attempts) {
+        Log.warning(
+          'durable database attempt $attempt/$attempts failed; retrying',
+        );
+        await Future<void>.delayed(Duration(milliseconds: 100 * attempt));
+      }
+    }
   }
+
+  Log.handle(lastError!, lastStackTrace, 'durable database unavailable');
+  return null;
 }
 
 /// Puts a database into **WAL**, so a commit is an append rather than a
