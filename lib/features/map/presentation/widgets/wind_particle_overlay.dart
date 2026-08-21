@@ -45,7 +45,7 @@ class WindParticleOverlay extends StatefulWidget {
 }
 
 class _WindParticleOverlayState extends State<WindParticleOverlay>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   /// Marks the painter for redraw each frame without rebuilding the widget
   /// tree — the per-frame path of this overlay.
   final _OverlayRepaint _repaint = _OverlayRepaint();
@@ -58,6 +58,11 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
 
   /// Whether the map is actually in front of the user — see [_syncVisibility].
   bool _visible = true;
+
+  /// Timers keep running while Android has stopped scheduling Flutter frames.
+  /// Track the app edge separately so the watchdog cannot mistake a backgrounded
+  /// ticker for a wedged foreground animation and restart it into a dead state.
+  bool _appForeground = true;
 
   /// The shell's visible-tab notifier; `null` outside the shell means the
   /// overlay is always visible.
@@ -78,6 +83,8 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _appForeground = _isForeground(WidgetsBinding.instance.lifecycleState);
     widget.layer.field.addListener(_onField);
     widget.layer.interacting.addListener(_onInteracting);
     // Straight assignment: this runs inside the first build, where asking for
@@ -132,9 +139,23 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
     _updateTicker();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final foreground = _isForeground(state);
+    if (foreground == _appForeground) return;
+    _appForeground = foreground;
+    _updateTicker();
+  }
+
+  static bool _isForeground(AppLifecycleState? state) =>
+      state == null ||
+      state == AppLifecycleState.resumed ||
+      state == AppLifecycleState.inactive;
+
   /// Whether the animation should be running at all: there is a field, the map
   /// tab is on screen, and no gesture is in progress.
-  bool get _shouldAnimate => _sim != null && _visible && !_interacting;
+  bool get _shouldAnimate =>
+      _sim != null && _visible && _appForeground && !_interacting;
 
   /// Runs the ticker only while [_shouldAnimate].
   void _updateTicker() {
@@ -354,6 +375,7 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   @override
   void dispose() {
     _watchdog?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _visibleTab?.removeListener(_syncVisibility);
     widget.layer.interacting.removeListener(_onInteracting);
     widget.layer.field.removeListener(_onField);

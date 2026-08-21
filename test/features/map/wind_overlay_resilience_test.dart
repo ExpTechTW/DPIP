@@ -208,6 +208,47 @@ void main() {
     expect(find.byType(WindParticleOverlay), findsOneWidget);
   });
 
+  testWidgets('backgrounding stops the watchdog and resume restarts frames', (
+    tester,
+  ) async {
+    Log.talker.history.clear();
+    final (_, controller) = await _mount(tester);
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(
+      controller.reads,
+      greaterThan(0),
+      reason: 'not ticking before pause',
+    );
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    addTearDown(() {
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    });
+    await tester.pump();
+    final pausedAt = controller.reads;
+    await tester.pump(const Duration(seconds: 3));
+
+    expect(controller.reads, pausedAt, reason: 'ticker ran in the background');
+    expect(
+      Log.talker.history
+          .map((event) => event.message ?? '')
+          .where((message) => message.contains('wind particles stalled')),
+      isEmpty,
+      reason: 'the watchdog treated an app pause as an animation failure',
+    );
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    for (var i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(
+      controller.reads,
+      greaterThan(pausedAt),
+      reason: 'frames did not restart after returning to the app',
+    );
+  });
+
   test('the particle overlay is not rebuilt on every camera settle', () {
     // The scaffold keys the overlay subtree by the camera epoch so a
     // screen-space callout reprojects. This overlay reads the live camera on
