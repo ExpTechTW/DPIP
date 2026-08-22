@@ -12,6 +12,7 @@ import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -46,9 +47,9 @@ class MapTownLabelsRow extends StatelessWidget {
   }
 }
 
-/// All settings that belong to the base map rather than the active data layer.
-/// Keeping this as one block prevents individual overlay menus from drifting
-/// when a new base option is added.
+/// The always-first map section shared by every data-layer settings list.
+/// Keeping its title, ordering, and rows together prevents individual menus
+/// from burying commonly-used map controls or drifting when one is added.
 class MapBasemapControlRows extends StatelessWidget {
   const MapBasemapControlRows({
     super.key,
@@ -64,22 +65,26 @@ class MapBasemapControlRows extends StatelessWidget {
   final ValueChanged<bool> onShowTerrainChanged;
 
   @override
-  Widget build(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MapTownLabelsRow(
-        showTownLabels: showTownLabels,
-        onShowTownLabelsChanged: onShowTownLabelsChanged,
-      ),
-      const MapMenuDivider(),
-      MapTerrainRow(
-        showTerrain: showTerrain,
-        onShowTerrainChanged: onShowTerrainChanged,
-      ),
-      const MapMenuDivider(),
-      const MapGsiOverlayControls(),
-    ],
-  );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SectionHeader(l10n.mapOverlaySectionMap),
+        const MapGsiOverlayControls(),
+        const MapMenuDivider(),
+        MapTerrainRow(
+          showTerrain: showTerrain,
+          onShowTerrainChanged: onShowTerrainChanged,
+        ),
+        const MapMenuDivider(),
+        MapTownLabelsRow(
+          showTownLabels: showTownLabels,
+          onShowTownLabelsChanged: onShowTownLabelsChanged,
+        ),
+      ],
+    );
+  }
 }
 
 /// Standalone base-map dropdown for layers that ship no other chrome — same

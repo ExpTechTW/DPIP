@@ -55,7 +55,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restroomTypeMale => '남자 화장실';
 
   @override
-  String get meshtasticLastReceived => 'Last received';
+  String get meshtasticLastReceived => '마지막 수신';
 
   @override
   String get reportDetailSortByCounty => '지역순 정렬';
@@ -86,7 +86,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeRainTrendScattered => '약한 비가 올 수 있어요';
 
   @override
-  String get meshtasticUptime => 'Uptime';
+  String get meshtasticUptime => '가동 시간';
 
   @override
   String get weatherRankingTempExtremes => '기온 극값';
@@ -98,7 +98,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTerrainReliefHint => '기본 지도에 지형 음영 표시';
 
   @override
-  String get meshtasticEmptyMessage => '(empty message)';
+  String get meshtasticEmptyMessage => '(빈 메시지)';
 
   @override
   String get moreSectionRegion => '지역';
@@ -110,7 +110,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aedHoursSaturday => '토요일 운영시간';
 
   @override
-  String get moonPhaseNew => 'New moon';
+  String get moonPhaseNew => '신월';
 
   @override
   String get notifySectionEew => '지진 조기경보';
@@ -125,7 +125,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTownLabelsHint => '확대하면 읍면동 이름 표시';
 
   @override
-  String get commonCancel => 'Cancel';
+  String get commonCancel => '취소';
 
   @override
   String get notifyOptTsunamiWarning => '지진해일 경보만';
@@ -217,8 +217,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterOrderDesc => '내림차순';
 
   @override
-  String get meshtasticExcludeMqttSubtitle =>
-      'Nodes bridged over the internet, not heard by radio';
+  String get meshtasticExcludeMqttSubtitle => '인터넷으로 연결된 노드(무선으로는 수신되지 않음)';
 
   @override
   String get reportFilterIntensityInfoTitle => '진도 신제·구제';
@@ -230,14 +229,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get radarOverlayMenuTooltip => '레이더 레이어 옵션';
 
   @override
-  String get meshtasticNodes => 'Nodes';
+  String get meshtasticNodes => '노드';
 
   @override
-  String get meshtasticSend => 'Send';
+  String get meshtasticSend => '보내기';
 
   @override
-  String get typhoonOverlayStormL7Tooltip =>
-      'Level-7 wind field + average circle (purple)';
+  String get typhoonOverlayStormL7Tooltip => '레벨 7 바람장 + 평균 반경(보라색)';
 
   @override
   String get aedType => '유형';
@@ -289,7 +287,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get skyTimeDusk => '땅거미';
 
   @override
-  String get meshtasticFirmware => 'Firmware';
+  String get meshtasticFirmware => '펌웨어';
 
   @override
   String get reportFilterDateEndNote => '종료일: 당일 24:00（타이베이）';
@@ -298,7 +296,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterSortMagnitude => '규모';
 
   @override
-  String get meshtasticSilent => 'Silent';
+  String get meshtasticSilent => '무음';
 
   @override
   String get mapLayerCategoryEarthquake => '지진';
@@ -332,7 +330,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifyOptTsunamiAll => '지진해일 주의보 및 경보';
 
   @override
-  String get meshtasticLayerOptions => 'Node options';
+  String get meshtasticLayerOptions => '노드 옵션';
 
   @override
   String get onboardingAgreeContinue => '동의하고 계속';
@@ -341,7 +339,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get commonRetry => '다시 시도';
 
   @override
-  String get meshtasticNodeId => 'Node ID';
+  String get meshtasticNodeId => '노드 ID';
 
   @override
   String reportDetailNumbered(String number) {
@@ -349,7 +347,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+  String get typhoonOverlayStormBandSubtitle => '평균 반경 포함';
 
   @override
   String get disasterMapOverlayRestroomTooltip => '공중화장실 표시';
@@ -376,13 +374,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sponsorRestore => '구매 복원';
 
   @override
-  String get meshtasticChannelWorking => 'Setting up the DPIP channel…';
+  String get meshtasticChannelWorking => 'DPIP 채널 설정 중…';
 
   @override
-  String get meshtasticRegionSwitch => 'Switch to TW';
+  String get meshtasticRegionSwitch => 'TW 지역으로 전환';
 
   @override
-  String get meshtasticTraffic => 'Traffic';
+  String get meshtasticTraffic => '트래픽';
 
   @override
   String get mapLayerStyleBdTooltip => 'Dvorak BD 커브——열대저기압 강도 분석용 계단 그레이스케일';
@@ -397,7 +395,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteTransparentNight => '야간 = 투명,배경 지도 표시';
 
   @override
-  String get meshtasticScanning => 'Scanning…';
+  String get meshtasticScanning => '스캔 중…';
 
   @override
   String regionSelectFull(int max) {
@@ -469,7 +467,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navMore => '더보기';
 
   @override
-  String get meshtasticDpipChannel => 'DPIP channel';
+  String get meshtasticDpipChannel => 'DPIP 채널';
 
   @override
   String get disasterMapOverlaySectionLayers => '레이어';
@@ -481,7 +479,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonLabelNe => 'NE';
 
   @override
-  String get meshtasticCopied => 'Message copied';
+  String get meshtasticCopied => '메시지를 복사했습니다';
 
   @override
   String get reportListEmpty => '지진 보고서가 없습니다';
@@ -493,19 +491,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteTruecolor => '히마와리 트루컬러';
 
   @override
-  String get typhoonOverlaySectionExtra => 'Overlays';
+  String get typhoonOverlaySectionExtra => '오버레이';
 
   @override
   String get eewSWave => 'S파';
 
   @override
-  String get meshtasticBusyTitle => 'Another app is using this radio';
+  String get meshtasticBusyTitle => '다른 앱이 이 무전기를 사용 중입니다';
 
   @override
   String get restroomCategoryCultural => '문화·여가 시설';
 
   @override
-  String get typhoonLabelWind => 'Max. sustained wind near centre';
+  String get typhoonLabelWind => '중심 부근 최대 지속 풍속';
 
   @override
   String get radarGlobalOutlineHint => '각국 국경선';
@@ -517,7 +515,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonLegendCircle15 => '강풍권 (7급)';
 
   @override
-  String get dataSectionAstronomy => 'Astronomy';
+  String get dataSectionAstronomy => '천문';
 
   @override
   String get homeRainTrendLightSustained => '앞으로 1시간 동안 약한 비가 이어질 거예요';
@@ -526,10 +524,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get commonError => '문제가 발생했습니다';
 
   @override
-  String get moonPhaseWaningCrescent => 'Waning crescent';
+  String get moonPhaseWaningCrescent => '그믐달';
 
   @override
-  String get meshtasticPower => 'Power';
+  String get meshtasticPower => '전원';
 
   @override
   String get mapTimelineNow => '현재';
@@ -557,7 +555,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifyTitle => '알림';
 
   @override
-  String get meshtasticTxPower => 'TX power';
+  String get meshtasticTxPower => 'TX 전력';
 
   @override
   String get restroomCategoryLabel => '구분';
@@ -570,7 +568,7 @@ class AppLocalizationsKo extends AppLocalizations {
       'DPIP는 실시간 재난 예방 정보를 제공하는 데 전념하며, 광고나 다른 수익 모델이 없습니다. 여러분의 후원은 서버 운영과 지속적인 개발에 도움이 됩니다.';
 
   @override
-  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+  String get typhoonLabelStormAvg => '보퍼트 10 풍속 평균 반경';
 
   @override
   String get restroomCategoryCommercial => '상업·영업 시설';
@@ -604,7 +602,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restroomTypeUnspecified => '미설정';
 
   @override
-  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+  String get typhoonOverlayProbabilityHint => '예상 이동 경로를 숨깁니다';
 
   @override
   String get mapLayerSatelliteGlobalOutline => '국경선';
@@ -641,8 +639,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aedDescription => '비고';
 
   @override
-  String get typhoonOverlayWeatherRadarTooltip =>
-      'Radar echo closest to the typhoon bulletin time';
+  String get typhoonOverlayWeatherRadarTooltip => '태풍 정보 시간과 가장 가까운 레이더 에코';
 
   @override
   String get onboardingPermLocationDesc => '현재 위치에 맞춰 경보를 전달합니다.';
@@ -654,13 +651,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeActiveEventsEmpty => '발효 중인 이벤트가 없습니다';
 
   @override
-  String get typhoonLabelPosition => 'Centre location';
+  String get typhoonLabelPosition => '중심 위치';
 
   @override
   String get weatherRankingBy => '정렬';
 
   @override
-  String get typhoonIntensityMild => 'Mild typhoon';
+  String get typhoonIntensityMild => '약한 태풍';
 
   @override
   String get windForecastGlobalOutlineHint => '각국 국경선';
@@ -678,7 +675,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restroomCategoryReligious => '종교·의례 시설';
 
   @override
-  String get meshtasticRole => 'Role';
+  String get meshtasticRole => '역할';
 
   @override
   String get mapLayerSatelliteCloudCloudy => '구름';
@@ -690,7 +687,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticJumpToLatest => '최신으로 이동';
 
   @override
-  String get meshtasticNoMessages => 'No messages yet';
+  String get meshtasticNoMessages => '아직 메시지가 없습니다';
 
   @override
   String get onboardingPermNotifyDesc => '지진, 날씨, 재해가 발생하는 즉시 경보를 전달합니다.';
@@ -708,7 +705,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreGooglePlay => 'Google Play';
 
   @override
-  String get meshtasticOnline => 'Heard recently';
+  String get meshtasticOnline => '최근 수신됨';
 
   @override
   String get typhoonLabelSw => 'SW';
@@ -754,7 +751,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get eewArrived => '도달';
 
   @override
-  String get meshtasticNoDevices => 'No Meshtastic devices found';
+  String get meshtasticNoDevices => 'Meshtastic 기기를 찾을 수 없습니다';
 
   @override
   String get mapLayerCategoryLife => '생활';
@@ -763,10 +760,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterSortIntensity => '진도';
 
   @override
-  String get meshtasticStateDisconnected => 'Disconnected';
+  String get meshtasticStateDisconnected => '연결 해제됨';
 
   @override
-  String get typhoonIntensityIntense => 'Intense typhoon';
+  String get typhoonIntensityIntense => '강한 태풍';
 
   @override
   String get mapLayerOrderTitle => '레이어 순서';
@@ -775,7 +772,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dpmYes => '예';
 
   @override
-  String get meshtasticNoHistory => 'Not enough history yet';
+  String get meshtasticNoHistory => '아직 기록이 부족합니다';
 
   @override
   String get reportDetailLocalIntensityUnavailable => '진도 정보 없음';
@@ -802,10 +799,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteMndwi => '히마와리 MNDWI';
 
   @override
-  String get typhoonOverlaySectionStorm => 'Storm wind';
+  String get typhoonOverlaySectionStorm => '폭풍 바람';
 
   @override
-  String get moonPhaseFull => 'Full moon';
+  String get moonPhaseFull => '보름달';
 
   @override
   String meshtasticBinaryPayload(String size) {
@@ -813,14 +810,14 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get moonPhaseWaningGibbous => 'Waning gibbous';
+  String get moonPhaseWaningGibbous => '하현망월';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '신제(2020년 이후)';
 
   @override
   String typhoonDataTime(String time) {
-    return 'Data time\n$time';
+    return '자료 시간\n$time';
   }
 
   @override
@@ -830,7 +827,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreSectionAbout => '정보';
 
   @override
-  String get meshtasticSelectDevice => 'Select a radio';
+  String get meshtasticSelectDevice => '무전기 선택';
 
   @override
   String get onboardingIntroBody =>
@@ -843,19 +840,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailImage => '지진 보고서 이미지';
 
   @override
-  String get meshtasticStateConfiguring => 'Configuring…';
+  String get meshtasticStateConfiguring => '구성 중…';
 
   @override
-  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+  String get typhoonLabelGaleAvg => '보퍼트 7 풍속 평균 반경';
 
   @override
   String get onboardingPermNotify => '알림';
 
   @override
-  String get meshtasticClearMessages => 'Clear messages';
+  String get meshtasticClearMessages => '메시지 지우기';
 
   @override
-  String get meshtasticNotifyMessages => 'Notify on new messages';
+  String get meshtasticNotifyMessages => '새 메시지 알림';
 
   @override
   String get defaultMapLayerSettings => '지도 기본 레이어';
@@ -930,7 +927,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTimelineFuture => '미래';
 
   @override
-  String get typhoonLegendCircleAvg => 'Average circle';
+  String get typhoonLegendCircleAvg => '평균 반경';
 
   @override
   String reportFilterDepthKm(String depth) {
@@ -949,7 +946,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get typhoonLabelGust => 'Peak gust';
+  String get typhoonLabelGust => '최대 돌풍';
 
   @override
   String get mapAppGoogleMaps => 'Google Maps';
@@ -967,7 +964,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get skyTimeGolden => '골든아워';
 
   @override
-  String get moonAge => 'Age';
+  String get moonAge => '월령';
 
   @override
   String get meshtasticRadioSettings => 'LoRa';
@@ -982,7 +979,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayers => '레이어';
 
   @override
-  String get meshtasticHardware => 'Hardware';
+  String get meshtasticHardware => '하드웨어';
 
   @override
   String get languageSettings => '언어';
@@ -996,7 +993,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+  String get typhoonOverlayWeatherHint => '정보 시간에 맞춤';
 
   @override
   String get skyTimeDawn => '여명';
@@ -1005,7 +1002,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get skyTimeAfternoon => '오후';
 
   @override
-  String get meshtasticLastHeard => 'Last heard';
+  String get meshtasticLastHeard => '마지막 수신';
 
   @override
   String get typhoonWarningTitle => '태풍 경보';
@@ -1055,11 +1052,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navEarthquake => '지진';
 
   @override
-  String get typhoonOverlayStormL10Tooltip =>
-      'Level-10 wind field + average circle (yellow)';
+  String get typhoonOverlayStormL10Tooltip => '레벨 10 바람장 + 평균 반경(노란색)';
 
   @override
-  String get moonPhaseWaxingGibbous => 'Waxing gibbous';
+  String get moonPhaseWaxingGibbous => '상현망월';
 
   @override
   String get reportDetailTitle => '지진 보고서';
@@ -1073,10 +1069,10 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get meshtasticNoNodes => 'No nodes heard yet';
+  String get meshtasticNoNodes => '아직 노드가 감지되지 않았습니다';
 
   @override
-  String get meshtasticViaMqtt => 'Via MQTT (internet)';
+  String get meshtasticViaMqtt => 'MQTT 경유(인터넷)';
 
   @override
   String get radarCountyOutline => '시·군 경계';
@@ -1094,11 +1090,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changelogCurrentVersion => '현재';
 
   @override
-  String get typhoonLabelPressure => 'Central pressure';
+  String get typhoonLabelPressure => '중심 기압';
 
   @override
-  String get typhoonOverlayForecastCalloutsTooltip =>
-      'Show forecast-point detail cards when zoomed in';
+  String get typhoonOverlayForecastCalloutsTooltip => '확대 시 예상 지점 상세 카드 표시';
 
   @override
   String get aedOpenRemark => '운영시간 비고';
@@ -1108,7 +1103,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '재해가 발생하는 즉시 알려드릴 수 있도록 다음 권한을 허용해 주세요. 시스템 설정에서 언제든지 변경할 수 있습니다.';
 
   @override
-  String get typhoonOverlaySectionWeather => 'Weather underlay';
+  String get typhoonOverlaySectionWeather => '날씨 배경';
 
   @override
   String get notifyOptWeatherLocal => '현재 위치만';
@@ -1117,7 +1112,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapNavRain => '강우';
 
   @override
-  String get moonDays => 'days';
+  String get moonDays => '일';
 
   @override
   String mapLegendUnit(String unit) {
@@ -1128,7 +1123,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherModeClear => '맑음';
 
   @override
-  String get meshtasticRadio => 'Radio';
+  String get meshtasticRadio => '무전기';
 
   @override
   String get commonEmpty => '표시할 내용이 없습니다';
@@ -1137,10 +1132,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteB01 => '히마와리 가시 청색(B01)';
 
   @override
-  String get meshtasticExternalPower => 'External power';
+  String get meshtasticExternalPower => '외부 전원';
 
   @override
-  String get moonPhaseLastQuarter => 'Last quarter';
+  String get moonPhaseLastQuarter => '하현';
 
   @override
   String get reportFilterOrderAsc => '오름차순';
@@ -1167,19 +1162,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get restroomGradeExcellent => '최우수';
 
   @override
-  String get meshtasticLastSent => 'Last sent';
+  String get meshtasticLastSent => '마지막 전송';
 
   @override
-  String get meshtasticName => 'Name';
+  String get meshtasticName => '이름';
 
   @override
-  String get meshtasticScan => 'Scan';
+  String get meshtasticScan => '스캔';
 
   @override
   String get mapLayerCategoryForecast => '수치 예보';
 
   @override
-  String get meshtasticChannelFailed => 'Couldn\'t set up the DPIP channel';
+  String get meshtasticChannelFailed => 'DPIP 채널을 설정하지 못했습니다';
 
   @override
   String get themeSystem => '시스템';
@@ -1199,7 +1194,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherPrecipitation => '강수량';
 
   @override
-  String get moonNextFullMoon => 'Next full moon';
+  String get moonNextFullMoon => '다음 보름달';
 
   @override
   String get dpmSheetEmpty => '지도에서 마커를 눌러 상세 보기';
@@ -1228,7 +1223,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get typhoonLabelNw => 'NW';
 
   @override
-  String get moonPhaseWaxingCrescent => 'Waxing crescent';
+  String get moonPhaseWaxingCrescent => '초승달';
 
   @override
   String get restroomCategoryLeisure => '휴양·오락 시설';
@@ -1240,23 +1235,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get aedCategory => '분류';
 
   @override
-  String get meshtasticChannels => 'Channels';
+  String get meshtasticChannels => '채널';
 
   @override
   String get monitorWaiting => '데이터 대기 중…';
 
   @override
-  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+  String get typhoonOverlayForecastCallouts => '예상 도구 설명';
 
   @override
   String get reportDetailEpicenter => '진앙 좌표';
 
   @override
-  String get meshtasticVoltage => 'Voltage';
+  String get meshtasticVoltage => '전압';
 
   @override
-  String get mapLayerMeshtasticSubtitle =>
-      'LoRa mesh nodes heard by your radio';
+  String get mapLayerMeshtasticSubtitle => '무전기로 들은 LoRa 메시 노드';
 
   @override
   String get mapLayerWind => '바람';
@@ -1317,7 +1311,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportFilterIntensityInfoLegacyTitle => '구제(2020년 이전)';
 
   @override
-  String get typhoonLabelSpeed => 'Past movement speed';
+  String get typhoonLabelSpeed => '이동 속도';
 
   @override
   String mapAppOpenFailed(String app) {
@@ -1328,7 +1322,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteRgbComposite => 'RGB 합성(JMA 레시피)';
 
   @override
-  String get meshtasticReceived => 'Received';
+  String get meshtasticReceived => '수신';
 
   @override
   String get weatherRankingExtremeLow => '오늘 최저';
@@ -1346,10 +1340,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shelterCategoryLabel => '적용 재해';
 
   @override
-  String get meshtasticStateConnecting => 'Connecting…';
+  String get meshtasticStateConnecting => '연결 중…';
 
   @override
-  String get moonTitle => 'Moon';
+  String get moonTitle => '달';
 
   @override
   String get weatherRankingGust => '돌풍';
@@ -1364,7 +1358,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifySectionWeather => '날씨';
 
   @override
-  String get meshtasticPreset => 'Modem preset';
+  String get meshtasticPreset => '모뎀 프리셋';
 
   @override
   String get dataSectionSeismic => '지진';
@@ -1391,13 +1385,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get regionCurrent => '현재 위치';
 
   @override
-  String get meshtasticNotConnected => 'Not connected to a radio';
+  String get meshtasticNotConnected => '무전기에 연결되지 않음';
 
   @override
   String get weatherModeSnow => '눈';
 
   @override
-  String get mapLayerMeshtastic => 'Meshtastic nodes';
+  String get mapLayerMeshtastic => 'Meshtastic 노드';
 
   @override
   String get moreDeveloper => '디버그 정보';
@@ -1406,7 +1400,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteB14 => '히마와리 장파 적외(B14)';
 
   @override
-  String get meshtasticChannelUse => 'Channel use';
+  String get meshtasticChannelUse => '채널 사용률';
 
   @override
   String get mapNavLightning => '번개';
@@ -1430,7 +1424,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dpmOpenInMaps => '지도에서 열기';
 
   @override
-  String get meshtasticNotifyNodes => 'Notify on new nodes';
+  String get meshtasticNotifyNodes => '새 노드 알림';
 
   @override
   String get onboardingPermCriticalDesc =>
@@ -1440,7 +1434,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteTransparentWarm => '맑음(고온부) = 투명,배경 지도 표시';
 
   @override
-  String get meshtasticSent => 'Sent';
+  String get meshtasticSent => '전송됨';
 
   @override
   String get homeForecastTitle => '24시간 예보';
@@ -1450,7 +1444,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String meshtasticExcludeMqttHidden(int count) {
-    return '$count hidden';
+    return '$count개 숨김';
   }
 
   @override
@@ -1466,13 +1460,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportListToday => '오늘';
 
   @override
-  String get meshtasticTapNode => 'Tap a node for details';
+  String get meshtasticTapNode => '노드를 탭하여 자세히 보기';
 
   @override
   String get commonLoading => '불러오는 중…';
 
   @override
-  String get typhoonIntensityModerate => 'Moderate typhoon';
+  String get typhoonIntensityModerate => '중간 강도 태풍';
 
   @override
   String get mapLayerSatelliteAsh => '히마와리 화산재';
@@ -1484,13 +1478,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerCategorySatellite => '위성';
 
   @override
-  String get meshtasticChannelReady => 'DPIP channel ready';
+  String get meshtasticChannelReady => 'DPIP 채널 준비 완료';
 
   @override
   String get mapLayerSatelliteNightmicrophysics => '히마와리 야간 미세물리';
 
   @override
-  String get typhoonIntensityTd => 'Tropical depression';
+  String get typhoonIntensityTd => '열대 저기압';
 
   @override
   String get reportFilterDate => '날짜';
@@ -1563,7 +1557,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteBtdSo2 => '히마와리 이산화황/구름상';
 
   @override
-  String get meshtasticStateError => 'Error';
+  String get meshtasticStateError => '오류';
 
   @override
   String get weatherModeOvercast => '흐림';
@@ -1572,8 +1566,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailDepth => '진원 깊이';
 
   @override
-  String get typhoonOverlayWarningTooltip =>
-      'Highlight counties under a typhoon warning';
+  String get typhoonOverlayWarningTooltip => '태풍 경보 지역 강조';
 
   @override
   String get reportFilterDatePick => '날짜 선택';
@@ -1588,7 +1581,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shelterOutdoorLabel => '실외 수용';
 
   @override
-  String get meshtasticStateConnected => 'Connected';
+  String get meshtasticStateConnected => '연결됨';
 
   @override
   String get mapNavRadar => '레이더';
@@ -1605,8 +1598,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get locationBannerPermission => '위치 권한이 꺼져 있어 지역 맞춤 경보를 받을 수 없습니다.';
 
   @override
-  String get typhoonOverlayWeatherNoneTooltip =>
-      'No radar or infrared underlay';
+  String get typhoonOverlayWeatherNoneTooltip => '레이더 또는 적외선 배경 없음';
 
   @override
   String get radarCountyOutlineHint => '에코 위에 표시';
@@ -1618,13 +1610,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homeRainTrendTitle => '향후 1시간 강수';
 
   @override
-  String get moonPhaseFirstQuarter => 'First quarter';
+  String get moonPhaseFirstQuarter => '상현';
 
   @override
   String get mapLayerCategoryTyphoon => '태풍';
 
   @override
-  String get meshtasticUtilization => 'Airtime (24h)';
+  String get meshtasticUtilization => '에어타임(24시간)';
 
   @override
   String get restroomTypeMixed => '남녀 공용 화장실';
@@ -1642,7 +1634,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteBtdWvirw => '히마와리 오버슈팅 탑';
 
   @override
-  String get meshtasticReadingAge => 'Reading taken';
+  String get meshtasticReadingAge => '측정 시각';
 
   @override
   String get mapAppCallFailed => '이 기기에서는 전화를 걸 수 없습니다';
@@ -1663,7 +1655,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailLocalFelt => '국지적 유감지진';
 
   @override
-  String get meshtasticDevice => 'Device';
+  String get meshtasticDevice => '기기';
 
   @override
   String get onboardingGrant => '허용';
@@ -1711,7 +1703,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportListEmptyFiltered => '조건에 맞는 지진 보고서가 없습니다';
 
   @override
-  String get meshtasticExcludeMqtt => 'Hide MQTT nodes';
+  String get meshtasticExcludeMqtt => 'MQTT 노드 숨기기';
 
   @override
   String get mapNavTyphoon => '태풍';
@@ -1749,13 +1741,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navHome => '홈';
 
   @override
-  String get meshtasticRegionLabel => 'Region';
+  String get meshtasticRegionLabel => '지역';
 
   @override
   String get mapLayerSatelliteCloudtop => '히마와리 운정 온도';
 
   @override
-  String get moonTimelineCaption => 'Phase';
+  String get moonTimelineCaption => '위상';
 
   @override
   String get openSourceLicenses => '오픈소스 라이선스';
@@ -1775,7 +1767,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get radarScanRange => '스캔 범위 표시';
 
   @override
-  String get meshtasticHopLimit => 'Hop limit';
+  String get meshtasticHopLimit => '홉 제한';
 
   @override
   String get weatherRankingExtremeHigh => '오늘 최고';
@@ -1790,7 +1782,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteNaturalcolor => '히마와리 내추럴컬러';
 
   @override
-  String get meshtasticAirtime => 'Air time (TX)';
+  String get meshtasticAirtime => '에어타임(TX)';
 
   @override
   String shelterCapacityValue(int n) {
@@ -1803,7 +1795,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get meshtasticSendHint => 'Message to broadcast';
+  String get meshtasticSendHint => '브로드캐스트할 메시지';
 
   @override
   String monitorDelay(String value) {
@@ -1817,21 +1809,20 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteB08 => '히마와리 상층 수증기(B08)';
 
   @override
-  String get meshtasticReconnecting => 'Reconnecting…';
+  String get meshtasticReconnecting => '다시 연결 중…';
 
   @override
   String get radarTownOutlineSubtitle => '레이더 에코 아래에서도 읍·면·동 경계가 보이도록 합니다.';
 
   @override
-  String get typhoonOverlayWeatherSatelliteTooltip =>
-      'Infrared closest to the typhoon bulletin time';
+  String get typhoonOverlayWeatherSatelliteTooltip => '태풍 정보 시간과 가장 가까운 적외선';
 
   @override
   String get radarScanRangeHint => '범위 밖 공백은 미관측';
 
   @override
   String typhoonPickerTd(String no) {
-    return 'Tropical depression TD $no';
+    return '열대 저기압 TD $no';
   }
 
   @override
@@ -1979,49 +1970,49 @@ class AppLocalizationsKo extends AppLocalizations {
   String get endpointServiceRts => 'RTS';
 
   @override
-  String get endpointServiceRadar => 'Radar';
+  String get endpointServiceRadar => '레이더';
 
   @override
-  String get endpointServiceSatellite => 'Satellite';
+  String get endpointServiceSatellite => '위성';
 
   @override
   String get endpointServiceQpesums => 'QPE';
 
   @override
-  String get endpointServiceWind => 'Wind';
+  String get endpointServiceWind => '바람';
 
   @override
-  String get endpointServiceDpm => 'Disaster points';
+  String get endpointServiceDpm => '재해 지점';
 
   @override
-  String get endpointServiceWeather => 'Weather';
+  String get endpointServiceWeather => '날씨';
 
   @override
-  String get endpointServiceRain => 'Rain';
+  String get endpointServiceRain => '비';
 
   @override
-  String get endpointServiceLightning => 'Lightning';
+  String get endpointServiceLightning => '번개';
 
   @override
-  String get endpointServiceTyphoon => 'Typhoon';
+  String get endpointServiceTyphoon => '태풍';
 
   @override
-  String get endpointServiceReport => 'EQ reports';
+  String get endpointServiceReport => '지진 보고';
 
   @override
-  String get endpointServiceTremStation => 'Tremor station';
+  String get endpointServiceTremStation => '진도 관측소';
 
   @override
-  String get endpointServiceEvent => 'Events';
+  String get endpointServiceEvent => '이벤트';
 
   @override
-  String get endpointServiceLocation => 'Location';
+  String get endpointServiceLocation => '위치';
 
   @override
-  String get endpointServiceNotify => 'Notifications';
+  String get endpointServiceNotify => '알림';
 
   @override
-  String get endpointServiceOther => 'Other';
+  String get endpointServiceOther => '기타';
 
   @override
   String get feedConnecting => '연결 중…';
@@ -2044,17 +2035,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get meshtasticBusyBody =>
-      'Disconnect it in the other Meshtastic app first. Two apps on one radio take each other\'s messages, so some will go missing.';
+      '먼저 다른 Meshtastic 앱에서 무전기를 연결 해제하세요. 무전기 하나를 두 앱이 함께 쓰면 서로의 메시지를 가로채 일부가 유실됩니다.';
 
   @override
-  String get meshtasticChannelNoSlot =>
-      'No free channel slot — free one on the radio';
+  String get meshtasticChannelNoSlot => '빈 채널 슬롯이 없습니다 — 무전기에서 하나를 비우세요';
 
   @override
   String get restroomCategoryTransport => '교통';
 
   @override
-  String get meshtasticBattery => 'Battery';
+  String get meshtasticBattery => '배터리';
 
   @override
   String get meshtasticDistance => '거리';
@@ -2066,14 +2056,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticBatteryTrend => '배터리 추이';
 
   @override
-  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+  String get typhoonOverlayMenuTooltip => '태풍 오버레이 옵션';
 
   @override
   String get mapLayerSatelliteBtdOzone => '히마와리 대류권계면';
 
   @override
   String meshtasticRegionMismatch(String region) {
-    return 'Radio region is $region — DPIP needs TW';
+    return '무전기 지역은 $region입니다 — DPIP는 TW가 필요합니다';
   }
 
   @override
@@ -2154,7 +2144,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '진도는 0–4, 5약, 5강, 6약, 6강, 7입니다. 필터는 신제를 따르며, 이전 지진은 목록에서 구제 표기로 표시됩니다.';
 
   @override
-  String get typhoonOverlayWeatherNone => 'None';
+  String get typhoonOverlayWeatherNone => '없음';
 
   @override
   String get mapLayerStyleGray => '그레이스케일（JMA）';
@@ -2163,7 +2153,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherModeAuto => '자동';
 
   @override
-  String get typhoonLabelProbCircle => '70% probability circle';
+  String get typhoonLabelProbCircle => '70% 확률 원';
 
   @override
   String get notifyOptAll => '전체 수신';
@@ -2175,7 +2165,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerSatelliteB07 => '히마와리 단파 적외(B07)';
 
   @override
-  String get typhoonLabelDirection => 'Past movement direction';
+  String get typhoonLabelDirection => '이동 방향';
 
   @override
   String get regionManageTitle => '저장한 지역';
@@ -2200,7 +2190,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get rainInterval10m => '10분';
 
   @override
-  String get meshtasticConnectAnyway => 'Connect anyway';
+  String get meshtasticConnectAnyway => '그래도 연결';
 
   @override
   String reportListDayCount(int count) {
@@ -2223,8 +2213,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerShelter => '대피소';
 
   @override
-  String get typhoonOverlayProbabilityTooltip =>
-      'Show strike probability (hides the forecast cone)';
+  String get typhoonOverlayProbabilityTooltip => '강타 확률 표시(예상 이동 경로 숨김)';
 
   @override
   String get mapLayerSatelliteNdwi => '히마와리 NDWI';
@@ -2245,7 +2234,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerCategoryRadar => '레이더';
 
   @override
-  String get meshtasticShortName => 'Short name';
+  String get meshtasticShortName => '짧은 이름';
 
   @override
   String get mapLayerSatelliteAirmass => '히마와리 에어매스';
@@ -2272,7 +2261,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get meshtasticRegionConfirm =>
-      'Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.';
+      '이 무전기를 TW 지역으로 전환할까요? 잠시 재시작되고 연결이 끊기며, 다른 모든 채널도 이동합니다.';
 
   @override
   String get dataEarthquakeSubtitle => '지진 보고서';
@@ -2290,69 +2279,111 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingTermsTitle => '서비스 약관';
 
   @override
-  String get mapGsiOverlay => '상세 지도(GSI)';
+  String get mapOsmOverlay => '상세 지도';
 
   @override
-  String get mapGsiOverlayHint => '일본 GSI의 고해상도 지형도를 추가';
+  String get mapOsmOverlayHint => '도로, 건물 및 지명을 더 자세히 표시';
 
   @override
-  String get mapGsiDetails => '레이어 세부 정보';
+  String get mapOsmDetails => '상세 지도 레이어';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => '데이터 출처';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '$enabled / $total개 레이어 사용 중';
   }
 
   @override
-  String get mapGsiSurface => '지표면';
+  String get mapOsmSurface => '지표면';
 
   @override
-  String get mapGsiParks => '공원';
+  String get mapOsmParks => '공원';
 
   @override
-  String get mapGsiLandUse => '토지 이용';
+  String get mapOsmLandUse => '토지 이용';
 
   @override
-  String get mapGsiAirportAreas => '공항 지역';
+  String get mapOsmAirportAreas => '공항 지역';
 
   @override
-  String get mapGsiWater => '수역';
+  String get mapOsmWater => '수역';
 
   @override
-  String get mapGsiRivers => '하천';
+  String get mapOsmRivers => '하천';
 
   @override
-  String get mapGsiBoundaries => '경계';
+  String get mapOsmBoundaries => '경계';
 
   @override
-  String get mapGsiBuildings => '건물';
+  String get mapOsmBuildings => '건물';
 
   @override
-  String get mapGsiRoads => '도로';
+  String get mapOsmRoads => '도로';
 
   @override
-  String get mapGsiRoadNames => '도로명';
+  String get mapOsmRoadNames => '도로명';
 
   @override
-  String get mapGsiWaterNames => '수역 이름';
+  String get mapOsmWaterNames => '수역 이름';
 
   @override
-  String get mapGsiPeaks => '봉우리';
+  String get mapOsmPeaks => '봉우리';
 
   @override
-  String get mapGsiAirportNames => '공항 이름';
+  String get mapOsmAirportNames => '공항 이름';
 
   @override
-  String get mapGsiPlaceNames => '지명';
+  String get mapOsmPlaceNames => '지명';
 
   @override
-  String get mapGsiPoi => '관심 지점';
+  String get mapOsmPoi => '관심 지점';
 
   @override
-  String get mapGsiHouseNumbers => '건물 번호';
+  String get mapOsmHouseNumbers => '건물 번호';
 
   @override
-  String get mapGsiRestoreAll => '모두 복원';
+  String get mapOsmRestoreAll => '모두 복원';
+
+  @override
+  String get mapOsmSectionNatural => '자연 지형';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => '도로 및 건물';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => '레이블 및 장소';
 
   @override
   String get mapTownLabels => '읍면동 이름';
@@ -2361,10 +2392,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifySetFailed => '설정을 저장하지 못했습니다. 다시 시도해 주세요.';
 
   @override
-  String get meshtasticDisconnect => 'Disconnect';
+  String get meshtasticDisconnect => '연결 해제';
 
   @override
-  String get meshtasticUndecoded => 'Not decrypted';
+  String get meshtasticUndecoded => '복호화되지 않음';
 
   @override
   String get notifyAnnouncement => '공지사항';
@@ -3082,6 +3113,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moreDumpDiagnosticsHint => '업로드한 뒤 링크를 복사합니다';
+
+  @override
+  String get dumpIncludeSensitive => '정확한 위치 포함';
+
+  @override
+  String get dumpIncludeSensitiveHint =>
+      '로그 및 백그라운드 위치의 좌표를 포함합니다. 선택하지 않으면 null로 대체됩니다';
+
+  @override
+  String get dumpUpload => '업로드';
 
   @override
   String get dumpUploaded => '업로드됨';

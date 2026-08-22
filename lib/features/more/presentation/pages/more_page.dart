@@ -304,8 +304,78 @@ class MorePage extends StatelessWidget {
                 ),
               ],
             ),
+            const _DataSourceAttributions(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DataSourceAttributions extends StatelessWidget {
+  const _DataSourceAttributions();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.62);
+    final sources = [
+      l10n.dataSourceTremNet,
+      l10n.dataSourceCwa,
+      l10n.dataSourceJma,
+      l10n.dataSourceNcdr,
+      l10n.dataSourceEcmwf,
+      l10n.dataSourceNoaaGfs,
+      l10n.dataSourceGovernmentOpenData,
+      l10n.dataSourceOpenStreetMap,
+      l10n.dataSourceNasaMoon,
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xs,
+        AppSpacing.lg,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.moreDataSources,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.78),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          for (final source in sources)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 3),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const SizedBox.square(dimension: 3),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(
+                    child: Text(
+                      source,
+                      style: theme.textTheme.labelSmall?.copyWith(color: color),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

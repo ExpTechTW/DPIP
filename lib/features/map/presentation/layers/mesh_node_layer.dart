@@ -843,6 +843,16 @@ class _MeshNodeMenu extends StatelessWidget {
           menuChildren: [
             MapMenuScrollView(
               children: [
+                // The shared map section stays first in every settings list;
+                // OSM is the common action and should never be buried below a
+                // layer-specific filter.
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.meshtasticNodes),
                 MapMenuToggleRow(
                   selected: excludeMqtt,
@@ -853,16 +863,6 @@ class _MeshNodeMenu extends StatelessWidget {
                       : l10n.meshtasticExcludeMqttSubtitle,
                   tooltip: l10n.meshtasticExcludeMqttSubtitle,
                   onTap: () => onExcludeMqttChanged(!excludeMqtt),
-                ),
-                const MapMenuDivider(),
-                // The shared base-map rows, not copies of them: this menu
-                // replaces the standalone base-map chip, so the toggles have
-                // to be the same ones the user finds on every other layer.
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

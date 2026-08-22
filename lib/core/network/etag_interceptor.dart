@@ -74,7 +74,7 @@ class EtagInterceptor extends Interceptor {
   static bool isBasemapPbf(Uri uri) =>
       uri.host == 'static.lb.exptech.dev' &&
       (uri.path.contains(ApiPaths.mapTilesV1) ||
-          uri.path.contains(ApiPaths.mapGsiV1)) &&
+          uri.path.contains(ApiPaths.mapOsmV1)) &&
       uri.path.endsWith('.pbf');
 
   /// URL fragments marking a **content-addressed** asset: the URL fully
@@ -92,7 +92,7 @@ class EtagInterceptor extends Interceptor {
   /// app's usage accounting.
   static const List<String> immutableAssetMarkers = [
     ApiPaths.mapTilesV1, // basemap vector tiles
-    ApiPaths.mapGsiV1, // detailed Taiwan street/building vector tiles
+    ApiPaths.mapOsmV1, // detailed Taiwan street/building vector tiles
     ApiPaths.mapTerrainV1, // terrain vector tiles
     '${ApiPaths.tiles}/radar/',
     '${ApiPaths.tiles}/satellite/',

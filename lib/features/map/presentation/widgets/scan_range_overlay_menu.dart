@@ -79,6 +79,13 @@ class ScanRangeOverlayMenu extends StatelessWidget {
           menuChildren: [
             MapMenuScrollView(
               children: [
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionReference),
                 MapMenuToggleRow(
                   selected: showGlobal,
@@ -111,14 +118,6 @@ class ScanRangeOverlayMenu extends StatelessWidget {
                   subtitle: l10n.radarTownOutlineHint,
                   tooltip: l10n.radarTownOutlineSubtitle,
                   onTap: () => layer.setShowTownOutline(!showTown),
-                ),
-                const MapMenuDivider(),
-                SectionHeader(l10n.mapOverlaySectionMap),
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

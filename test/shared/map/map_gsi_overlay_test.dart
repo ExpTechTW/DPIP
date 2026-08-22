@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../features/map/raster_timeline_harness.dart';
 
 void main() {
-  test('GSI source follows the documented endpoint and zoom contract', () {
-    expect(gsiOriginTileUrl, contains(ApiPaths.mapGsiV1));
+  test('OSM source follows the documented endpoint and zoom contract', () {
+    expect(gsiOriginTileUrl, contains(ApiPaths.mapOsmV1));
     expect(gsiSourceProperties.tiles, [gsiOriginTileUrl]);
     expect(gsiSourceProperties.maxzoom, gsiSourceMaxZoom);
     expect(gsiDisplayMaxZoom, greaterThan(gsiSourceMaxZoom));
@@ -38,6 +38,14 @@ void main() {
     );
   });
 
+  test('every OSM setting appears once in a named section', () {
+    final grouped = gsiLayerGroupsBySection.values.expand((groups) => groups);
+
+    expect(gsiLayerGroupsBySection.keys, GsiLayerSection.values);
+    expect(grouped, hasLength(GsiLayerGroup.values.length));
+    expect(grouped.toSet(), GsiLayerGroup.values.toSet());
+  });
+
   test('styles preserve the documented visual safeguards', () {
     final layers = {
       for (final layer in gsiStyleLayers(Brightness.dark)) layer.id: layer,
@@ -61,6 +69,21 @@ void main() {
     expect(layers['gsi-building']!.minZoom, 13);
     expect(layers['gsi-poi']!.minZoom, 14);
     expect(layers['gsi-housenumber']!.minZoom, 16);
+
+    for (final layer in layers.values.where(
+      (layer) => layer.kind == GsiLayerKind.line,
+    )) {
+      final dash = layer.properties.toJson()['line-dasharray'];
+      if (dash != null) {
+        expect(
+          dash,
+          everyElement(isA<num>()),
+          reason:
+              '${layer.id}: iOS MapLibre Native aborts on a data-driven '
+              'line-dasharray expression',
+        );
+      }
+    }
   });
 
   test('controller starts cold and retains per-group choices', () {
@@ -68,7 +91,12 @@ void main() {
     addTearDown(controller.dispose);
 
     expect(controller.enabled, isFalse);
-    expect(controller.enabledGroupCount, GsiLayerGroup.values.length);
+    expect(
+      controller.enabledGroupCount,
+      GsiLayerGroup.values.length - gsiDefaultDisabledGroups.length,
+    );
+    expect(controller.groupEnabled(GsiLayerGroup.parks), isFalse);
+    expect(controller.groupEnabled(GsiLayerGroup.boundaries), isFalse);
     expect(controller.revision, 0);
 
     controller.setGroupEnabled(GsiLayerGroup.buildings, false);
@@ -76,12 +104,40 @@ void main() {
 
     expect(controller.enabled, isTrue);
     expect(controller.groupEnabled(GsiLayerGroup.buildings), isFalse);
-    expect(controller.enabledGroupCount, GsiLayerGroup.values.length - 1);
+    expect(
+      controller.enabledGroupCount,
+      GsiLayerGroup.values.length - gsiDefaultDisabledGroups.length - 1,
+    );
     expect(controller.revision, 2);
 
     controller.restoreAll();
     expect(controller.enabledGroupCount, GsiLayerGroup.values.length);
     expect(controller.revision, 3);
+  });
+
+  test('enabling OSM synchronously turns mutually-exclusive terrain off', () {
+    final terrain = ValueNotifier<bool>(true);
+    final controller = GsiOverlayController(mutuallyExclusiveTerrain: terrain);
+    addTearDown(terrain.dispose);
+    addTearDown(controller.dispose);
+
+    controller.setEnabled(true);
+
+    expect(controller.enabled, isTrue);
+    expect(terrain.value, isFalse);
+  });
+
+  test('an OSM-first surface starts enabled with terrain off', () {
+    final terrain = ValueNotifier<bool>(true);
+    final controller = GsiOverlayController(
+      mutuallyExclusiveTerrain: terrain,
+      initiallyEnabled: true,
+    );
+    addTearDown(terrain.dispose);
+    addTearDown(controller.dispose);
+
+    expect(controller.enabled, isTrue);
+    expect(terrain.value, isFalse);
   });
 
   test('native add, grouped visibility, and removal stay coherent', () async {
@@ -123,13 +179,13 @@ void main() {
     );
   });
 
-  test('GSI PBFs share the immutable map-tile cache path', () {
+  test('OSM PBFs share the immutable map-tile cache path', () {
     final uri = Uri.parse(
       'https://static.lb.exptech.dev/api/v1/map/gsi/14/13703/7034.pbf',
     );
 
     expect(EtagInterceptor.isBasemapPbf(uri), isTrue);
     expect(EtagInterceptor.isImmutableTile(uri), isTrue);
-    expect(EtagInterceptor.immutableAssetMarkers, contains(ApiPaths.mapGsiV1));
+    expect(EtagInterceptor.immutableAssetMarkers, contains(ApiPaths.mapOsmV1));
   });
 }

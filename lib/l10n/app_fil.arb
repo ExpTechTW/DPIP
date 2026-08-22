@@ -16,38 +16,38 @@
     "description": "LoRa region"
   },
   "mapLayerSatelliteB03": "Himawari Red (B03)",
-  "reportFilterIntensity": "Intensity",
+  "reportFilterIntensity": "Lakas",
   "mapLayerLightning": "Kidlat",
   "restroomTypeMale": "Palikuran ng lalaki",
-  "meshtasticLastReceived": "Last received",
+  "meshtasticLastReceived": "Huling natanggap",
   "reportDetailSortByCounty": "Ayusin ayon sa lalawigan",
   "@moonDays": {
     "description": "Day unit for the moon age"
   },
   "homeRainTrendScattered": "Posibleng mahinang ulan",
-  "meshtasticUptime": "Uptime",
+  "meshtasticUptime": "Oras ng pagtakbo",
   "weatherRankingTempExtremes": "Mga sukdulan ng temperatura",
   "themeLight": "Maliwanag",
   "mapTerrainReliefHint": "Ipakita ang anino ng terrain sa base map",
-  "meshtasticEmptyMessage": "(empty message)",
+  "meshtasticEmptyMessage": "(walang laman na mensahe)",
   "moreSectionRegion": "Rehiyon",
   "mapLayerSatellite": "Himawari Infrared (B13)",
   "@meshtasticTapNode": {
     "description": "Resting state of the map node sheet"
   },
   "aedHoursSaturday": "Oras sa Sabado",
-  "moonPhaseNew": "New moon",
+  "moonPhaseNew": "Bagong buwan",
   "notifySectionEew": "Maagang babala sa lindol",
   "mapResetNorth": "Bumalik sa hilaga",
   "rainInterval2d": "2 araw",
   "mapTownLabelsHint": "Ipakita ang mga pangalan ng bayan kapag naka-zoom",
-  "commonCancel": "Cancel",
+  "commonCancel": "Kanselahin",
   "notifyOptTsunamiWarning": "Mga babala sa tsunami lamang",
   "mapLayerSatelliteBtdFog": "Himawari Night Fog",
   "@meshtasticSelectDevice": {
     "description": "Device picker sheet title"
   },
-  "moreSectionAdvanced": "Advanced",
+  "moreSectionAdvanced": "Mas advanced",
   "moreSectionMesh": "Mesh network",
   "@meshtasticLastHeard": {
     "description": "When a node last transmitted"
@@ -59,7 +59,7 @@
   "notifySettingsMenu": "Mga setting ng notipikasyon",
   "mapAppDefault": "{app} (default)",
   "trendRange24h": "24 oras",
-  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "mapLayerStyleJmaTooltip": "Grayscale na base, may kulay sa ibaba ng −40 °C para i-highlight ang taas ng ulap",
   "mapLayerRain": "Ulan",
   "mapLayerQpesums": "Pagtaya ng ulan sa susunod na 1 oras",
   "@weatherModeSnow": {
@@ -82,16 +82,16 @@
   "changelogShowSnapshots": "Ipakita ang snapshot",
   "changelogTitle": "Changelog",
   "reportFilterOrderDesc": "Pababa",
-  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
+  "meshtasticExcludeMqttSubtitle": "Mga node na konektado sa internet, hindi naririnig sa radyo",
   "reportFilterIntensityInfoTitle": "Bagong at lumang intensity scale",
   "mapLayerTyphoon": "Bagyo",
   "radarOverlayMenuTooltip": "Mga opsyon sa layer ng radar",
   "@meshtasticChannelUse": {
     "description": "Share of airtime seen busy"
   },
-  "meshtasticNodes": "Nodes",
-  "meshtasticSend": "Send",
-  "typhoonOverlayStormL7Tooltip": "Level-7 wind field + average circle (purple)",
+  "meshtasticNodes": "Mga node",
+  "meshtasticSend": "Ipadala",
+  "typhoonOverlayStormL7Tooltip": "Larangan ng hangin sa antas 7 + average circle (lila)",
   "aedType": "Uri",
   "termsOfService": "Mga Tuntunin ng Serbisyo",
   "typhoonLegendCircle25": "Storm circle (L10)",
@@ -115,7 +115,7 @@
     "description": "Map layer name: mesh nodes"
   },
   "reportFilterDateEndNote": "End day: through 24:00（Taipei）",
-  "meshtasticSilent": "Silent",
+  "meshtasticSilent": "Tahimik",
   "reportFilterSortMagnitude": "Magnitude",
   "mapLayerCategoryEarthquake": "Lindol",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
@@ -144,12 +144,12 @@
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
   },
-  "meshtasticLayerOptions": "Node options",
+  "meshtasticLayerOptions": "Mga opsyon sa node",
   "onboardingAgreeContinue": "Sumang-ayon at magpatuloy",
   "meshtasticNodeId": "Node ID",
   "commonRetry": "Subukan Muli",
   "reportDetailNumbered": "Blg. {number} Makabuluhang Naramdamang Lindol",
-  "typhoonOverlayStormBandSubtitle": "With average circle",
+  "typhoonOverlayStormBandSubtitle": "May average circle",
   "disasterMapOverlayRestroomTooltip": "Ipakita ang mga pampublikong palikuran",
   "weatherRankingTitle": "Mga ranggo ng obserbasyon",
   "homeRainTrendHeavySustained": "Tuloy-tuloy na malakas na ulan sa susunod na oras",
@@ -161,23 +161,23 @@
   "@meshtasticSilent": {
     "description": "Legend: node known but not heard recently"
   },
-  "meshtasticChannelWorking": "Setting up the DPIP channel…",
-  "meshtasticRegionSwitch": "Switch to TW",
+  "meshtasticChannelWorking": "Ini-set up ang DPIP channel…",
+  "meshtasticRegionSwitch": "Lumipat sa TW",
   "@meshtasticLastReceived": {
     "description": "Age of the last received packet"
   },
-  "meshtasticTraffic": "Traffic",
+  "meshtasticTraffic": "Trapiko",
   "@meshtasticDpipChannel": {
     "description": "Which channel DPIP payloads use"
   },
-  "mapLayerStyleBdTooltip": "Dvorak BD curve — the stepped grayscale for tropical-cyclone intensity analysis",
-  "disasterMapOverlayAedTooltip": "Show AED locations",
+  "mapLayerStyleBdTooltip": "Dvorak BD curve — ang stepped grayscale para sa pagsusuri ng lakas ng bagyo",
+  "disasterMapOverlayAedTooltip": "Ipakita ang mga lokasyon ng AED",
   "@moonTitle": {
     "description": "Moon page title"
   },
   "mapLayerHumidity": "Halumigmig",
-  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
-  "meshtasticScanning": "Scanning…",
+  "mapLayerSatelliteTransparentNight": "Gabing transparent, makikita ang basemap",
+  "meshtasticScanning": "Nag-scan…",
   "@meshtasticDevice": {
     "description": "Section: device identity"
   },
@@ -203,7 +203,7 @@
   "meshtasticTitle": "Meshtastic",
   "navMore": "Higit Pa",
   "meshtasticDpipChannel": "DPIP channel",
-  "disasterMapOverlaySectionLayers": "Layers",
+  "disasterMapOverlaySectionLayers": "Mga layer",
   "@moonPhaseWaningCrescent": {
     "description": "Phase: waning crescent"
   },
@@ -215,15 +215,15 @@
     "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
   },
   "typhoonLabelNe": "NE",
-  "meshtasticCopied": "Message copied",
+  "meshtasticCopied": "Nakopya ang mensahe",
   "reportListEmpty": "Walang ulat ng lindol",
   "reportListEnd": "Dulo ng listahan",
   "mapLayerSatelliteTruecolor": "Himawari True Color",
-  "typhoonOverlaySectionExtra": "Overlays",
+  "typhoonOverlaySectionExtra": "Mga overlay",
   "eewSWave": "S wave",
-  "meshtasticBusyTitle": "Another app is using this radio",
+  "meshtasticBusyTitle": "May ibang app na gumagamit ng radyong ito",
   "restroomCategoryCultural": "Pook na pangkultura",
-  "typhoonLabelWind": "Max. sustained wind near centre",
+  "typhoonLabelWind": "Max. sustained wind malapit sa gitna",
   "radarGlobalOutlineHint": "Panlabas na balangkas ng bawat bansa",
   "notifyEvacuation": "Impormasyon sa sakuna",
   "typhoonLegendCircle15": "Gale circle (L7)",
@@ -233,11 +233,11 @@
   "@meshtasticRadioSettings": {
     "description": "Section: LoRa settings"
   },
-  "dataSectionAstronomy": "Astronomy",
+  "dataSectionAstronomy": "Astronomiya",
   "homeRainTrendLightSustained": "Tuloy-tuloy na mahinang ulan sa susunod na oras",
   "commonError": "May Nangyaring Mali",
-  "moonPhaseWaningCrescent": "Waning crescent",
-  "meshtasticPower": "Power",
+  "moonPhaseWaningCrescent": "Lumiit na gasuklay",
+  "meshtasticPower": "Kuryente",
   "@meshtasticChannelWorking": {
     "description": "Creating/verifying the DPIP channel"
   },
@@ -245,7 +245,7 @@
   "reportFilterRange": "{start} – {end}",
   "reportDetailOpenReport": "Pahina ng Ulat",
   "trendRange7d": "7 araw",
-  "typhoonWarningAreas": "Areas: {areas}",
+  "typhoonWarningAreas": "Mga lugar: {areas}",
   "rainIntervalSection": "Window ng oras",
   "notifyTitle": "Mga Notipikasyon",
   "meshtasticTxPower": "TX power",
@@ -255,7 +255,7 @@
   "restroomCategoryLabel": "Kategorya",
   "sponsorRestoring": "Ibinabalik ang mga pagbili…",
   "sponsorIntro": "Nakatuon ang DPIP sa pagbibigay ng real-time na impormasyon sa pag-iwas sa sakuna, nang walang ad o iba pang modelo ng kita. Tumutulong ang inyong suporta na mapanatili ang mga server at magpatuloy sa pagbuo.",
-  "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
+  "typhoonLabelStormAvg": "Avg. radius ng Beaufort 10 na hangin",
   "@meshtasticHardware": {
     "description": "Board model"
   },
@@ -274,8 +274,8 @@
   "rainInterval6h": "6 oras",
   "homeRainTrendMinute": "{minute} min",
   "restroomTypeUnspecified": "Hindi natukoy",
-  "typhoonOverlayProbabilityHint": "Hides the forecast cone",
-  "mapLayerSatelliteGlobalOutline": "Country border",
+  "typhoonOverlayProbabilityHint": "Itinatago ang forecast cone",
+  "mapLayerSatelliteGlobalOutline": "Border ng bansa",
   "mapNavTemperature": "Temperatura",
   "typhoonLegendForecastPoint": "Punto ng forecast",
   "@meshtasticBattery": {
@@ -289,16 +289,16 @@
   "rainInterval3d": "3 araw",
   "defaultMapLayerSubtitle": "Bubukas ang tab ng Mapa sa layer na ito. Susunod ang icon at label ng bottom navigation.",
   "aedDescription": "Tala",
-  "typhoonOverlayWeatherRadarTooltip": "Radar echo closest to the typhoon bulletin time",
+  "typhoonOverlayWeatherRadarTooltip": "Radar echo na pinakamalapit sa oras ng bulletin ng bagyo",
   "onboardingPermLocationDesc": "Itutok ang mga alerto sa kinaroroonan mo.",
   "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
   "@meshtasticClearMessages": {
     "description": "Menu action clearing the message log"
   },
   "homeActiveEventsEmpty": "Walang aktibong event",
-  "typhoonLabelPosition": "Centre location",
+  "typhoonLabelPosition": "Lokasyon ng gitna",
   "weatherRankingBy": "Ayon sa",
-  "typhoonIntensityMild": "Mild typhoon",
+  "typhoonIntensityMild": "Mahinang bagyo",
   "windForecastGlobalOutlineHint": "Panlabas na balangkas ng bawat bansa",
   "rainInterval1h": "1 oras",
   "eewLocalIntensity": "Tantiya sa lokasyon",
@@ -308,22 +308,22 @@
   },
   "restroomCategoryReligious": "Relihiyosong lugar",
   "meshtasticRole": "Role",
-  "mapLayerSatelliteCloudCloudy": "Cloudy",
-  "skyTimeSunrise": "Pagsikat ng araw",
+  "mapLayerSatelliteCloudCloudy": "Maulap",
+  "skyTimeSunrise": "Paosmkat ng araw",
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
   "meshtasticJumpToLatest": "Pumunta sa pinakabago",
-  "meshtasticNoMessages": "No messages yet",
+  "meshtasticNoMessages": "Wala pang mensahe",
   "onboardingPermNotifyDesc": "Ihatid ang mga alerto sa lindol, panahon, at sakuna sa sandaling maganap ang mga ito.",
   "radarTownOutline": "Mga hangganan ng bayan",
-  "mapLayerStyleSection": "Colour style",
+  "mapLayerStyleSection": "Estilo ng kulay",
   "@moonPhaseNew": {
     "description": "Phase: new moon"
   },
-  "disasterMapOverlayMenuTooltip": "Disaster map layers",
+  "disasterMapOverlayMenuTooltip": "Mga layer ng disaster map",
   "moreGooglePlay": "Google Play",
-  "meshtasticOnline": "Heard recently",
+  "meshtasticOnline": "Kamakailang narinig",
   "@meshtasticSendHint": {
     "description": "Message input hint"
   },
@@ -331,7 +331,7 @@
   "typhoonForecastLead": "Forecast +{hours} h",
   "@mapAppOpenFailed": {},
   "changelogTypeStable": "Stable",
-  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentClear": "Maaliwalas = transparent, makikita ang basemap",
   "@skyTimeAuto": {
     "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
   },
@@ -347,14 +347,14 @@
   "notifySectionOther": "Iba pa",
   "weatherRankingMeta": "Oras ng datos: {time}\n{count} istasyon",
   "onboardingTermsAgree": "Nabasa ko na at sumasang-ayon ako sa Mga Tuntunin ng Serbisyo",
-  "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
+  "mapLayerSatelliteTransparentNoVegetation": "Sa ibaba ng 0.1 = transparent (walang vegetation)",
   "notifyOptLocalIntensity4": "Lokal na intensidad 4 pataas",
   "eewArrived": "Dumating",
-  "meshtasticNoDevices": "No Meshtastic devices found",
+  "meshtasticNoDevices": "Walang nahanap na Meshtastic device",
   "mapLayerCategoryLife": "Pang-araw-araw na buhay",
-  "reportFilterSortIntensity": "Intensity",
-  "meshtasticStateDisconnected": "Disconnected",
-  "typhoonIntensityIntense": "Intense typhoon",
+  "reportFilterSortIntensity": "Lakas",
+  "meshtasticStateDisconnected": "Naka-disconnect",
+  "typhoonIntensityIntense": "Malakas na bagyo",
   "@meshtasticSend": {
     "description": "Send message button"
   },
@@ -366,10 +366,10 @@
     "description": "The radio's short name"
   },
   "dpmYes": "Oo",
-  "meshtasticNoHistory": "Not enough history yet",
+  "meshtasticNoHistory": "Kulang pa sa history",
   "reportDetailLocalIntensityUnavailable": "Walang datos ng intensity",
   "mapLayerWindForecastGfs": "GFS",
-  "reportFilterDepth": "Depth",
+  "reportFilterDepth": "Lalim",
   "@meshtasticNoHistory": {
     "description": "Chart placeholder before two samples exist"
   },
@@ -390,8 +390,8 @@
   },
   "reportFilterReset": "I-reset",
   "mapLayerSatelliteMndwi": "Himawari MNDWI",
-  "typhoonOverlaySectionStorm": "Storm wind",
-  "moonPhaseFull": "Full moon",
+  "typhoonOverlaySectionStorm": "Hanging bagyo",
+  "moonPhaseFull": "Kabilugan ng buwan",
   "@meshtasticEmptyMessage": {
     "description": "Placeholder for a text packet with no body"
   },
@@ -399,24 +399,24 @@
   "@radarGlobalOutlineHint": {
     "description": "Hint under the national-border toggle in the radar overlay menu."
   },
-  "moonPhaseWaningGibbous": "Waning gibbous",
+  "moonPhaseWaningGibbous": "Humihinang bilog",
   "reportFilterIntensityInfoModernTitle": "Bago (mula 2020)",
   "@mapAppGoogleMaps": {},
-  "typhoonDataTime": "Data time\n{time}",
+  "typhoonDataTime": "Oras ng datos",
   "restroomTypeAccessible": "Palikurang may accessibility",
   "moreSectionAbout": "Tungkol",
-  "meshtasticSelectDevice": "Select a radio",
+  "meshtasticSelectDevice": "Pumili ng radyo",
   "onboardingIntroBody": "Ang DPIP ang iyong kasama sa pag-iwas sa sakuna. Pinagsasama-sama nito ang mga maagang babala sa lindol, ulat ng lindol, panahon, at impormasyon sa panganib, at inaalertuhan ka sa sandaling mahalaga ito.\n\n• Mga lindol: mga maagang babala, ulat ng intensidad, at detalyadong ulat\n• Panahon: real-time na mensahe ng kulog at kidlat at mga advisory sa panahon\n• Impormasyon sa tsunami at sakuna\n\nSusunod, hihilingin naming basahin mo ang Mga Tuntunin ng Serbisyo at magbigay ng ilang pahintulot para maprotektahan ka ng DPIP nang real time.",
   "shelterCapacityLabel": "Kapasidad",
   "reportDetailImage": "Larawan ng Ulat",
-  "meshtasticStateConfiguring": "Configuring…",
+  "meshtasticStateConfiguring": "Kino-configure…",
   "@moonPhaseLastQuarter": {
     "description": "Phase: last quarter"
   },
-  "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
+  "typhoonLabelGaleAvg": "Avg. radius ng Beaufort 7 na hangin",
   "onboardingPermNotify": "Mga Notipikasyon",
-  "meshtasticClearMessages": "Clear messages",
-  "meshtasticNotifyMessages": "Notify on new messages",
+  "meshtasticClearMessages": "I-clear ang mga mensahe",
+  "meshtasticNotifyMessages": "Mag-notify sa mga bagong mensahe",
   "defaultMapLayerSettings": "Default na layer ng mapa",
   "eewSourceSettings": "Pinagmulan ng EEW",
   "eewSourceSubtitle": "Piliin kung aling mga ahensya ang ipapakitang paunang babala sa lindol.",
@@ -454,7 +454,7 @@
   "@meshtasticDisconnect": {
     "description": "Disconnect from the radio"
   },
-  "typhoonLabelGust": "Peak gust",
+  "typhoonLabelGust": "Pinakamalakas na bugso",
   "mapAppGoogleMaps": "Google Maps",
   "sponsorTerms": "Mga Tuntunin ng Paggamit",
   "restroomTypeGenderNeutral": "Palikurang neutral sa kasarian",
@@ -463,7 +463,7 @@
   },
   "notifyThunderstorm": "Mga alerto sa kulog at kidlat",
   "skyTimeGolden": "Gintong oras",
-  "moonAge": "Age",
+  "moonAge": "Edad ng buwan",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
@@ -481,14 +481,14 @@
   },
   "language": "Wika",
   "homeForecastFeelsLike": "Pakiramdam {temp}°",
-  "typhoonOverlayWeatherHint": "Aligned to bulletin time",
+  "typhoonOverlayWeatherHint": "Naka-align sa oras ng bulletin",
   "@meshtasticHopLimit": {
     "description": "How many hops a packet may take"
   },
   "skyTimeDawn": "Bukang-liwayway",
   "skyTimeAfternoon": "Hapon",
-  "meshtasticLastHeard": "Last heard",
-  "typhoonWarningTitle": "Typhoon warning",
+  "meshtasticLastHeard": "Huling narinig",
+  "typhoonWarningTitle": "Babala ng bagyo",
   "moreSourceCode": "Source code",
   "mapLayerCategoryWeather": "Obserbasyon sa panahon",
   "mapLayerSatelliteB09": "Himawari Mid Water Vapour (B09)",
@@ -506,20 +506,20 @@
   "mapTimelineForecast": "Pagtaya",
   "restroomTypeLabel": "Uri",
   "navEarthquake": "Lindol",
-  "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
-  "moonPhaseWaxingGibbous": "Waxing gibbous",
+  "typhoonOverlayStormL10Tooltip": "Larangan ng hangin sa antas 10 + average circle (dilaw)",
+  "moonPhaseWaxingGibbous": "Lumalaking bilog",
   "reportDetailTitle": "Ulat ng Lindol",
   "moreTremReport": "Ulat ng pagtukoy ng TREM",
   "weatherDataTime": "{station} · Oras ng datos {time}",
-  "meshtasticNoNodes": "No nodes heard yet",
-  "meshtasticViaMqtt": "Via MQTT (internet)",
+  "meshtasticNoNodes": "Wala pang narinig na node",
+  "meshtasticViaMqtt": "Sa pamamagitan ng MQTT (internet)",
   "radarCountyOutline": "Mga hangganan ng lalawigan",
   "@mapAppCopyCoordinates": {},
   "commonClose": "Isara",
   "restroomGradeLabel": "Baitang",
   "rainIntervalNow": "Ngayon",
   "changelogCurrentVersion": "Kasalukuyan",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
+  "typhoonOverlayForecastCalloutsTooltip": "Ipakita ang mga detalye ng forecast point kapag naka-zoom",
   "typhoonLabelPressure": "Central pressure",
   "aedOpenRemark": "Tala sa oras",
   "onboardingPermsBody": "Para maalertuhan ka ng DPIP sa sandaling maganap ang sakuna, mangyaring ibigay ang mga sumusunod. Maaari mo itong baguhin anumang oras sa mga setting ng system.",
@@ -529,14 +529,14 @@
   },
   "notifyOptWeatherLocal": "Kasalukuyang lokasyon lamang",
   "mapNavRain": "Ulan",
-  "moonDays": "days",
+  "moonDays": "araw",
   "mapLegendUnit": "Yunit: {unit}",
   "weatherModeClear": "Maaliwalas",
-  "meshtasticRadio": "Radio",
+  "meshtasticRadio": "Radyo",
   "commonEmpty": "Walang Maipakita",
   "mapLayerSatelliteB01": "Himawari Blue (B01)",
-  "meshtasticExternalPower": "External power",
-  "moonPhaseLastQuarter": "Last quarter",
+  "meshtasticExternalPower": "Panlabas na kuryente",
+  "moonPhaseLastQuarter": "Huling sangkapat",
   "@meshtasticName": {
     "description": "The radio's long name"
   },
@@ -551,20 +551,20 @@
   "mapLayerRestroom": "Pampublikong Palikuran",
   "restroomCategoryWelfare": "Institusyon ng kapakanan",
   "restroomGradeExcellent": "Napakahusay",
-  "meshtasticLastSent": "Last sent",
-  "meshtasticName": "Name",
-  "meshtasticScan": "Scan",
+  "meshtasticLastSent": "Huling ipinadala",
+  "meshtasticName": "Pangalan",
+  "meshtasticScan": "I-scan",
   "@radarOverlayMenuTooltip": {
     "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
   },
   "mapLayerCategoryForecast": "Numerical forecast",
-  "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
+  "meshtasticChannelFailed": "Hindi ma-set up ang DPIP channel",
   "themeSystem": "Sistema",
   "mapLayerSatelliteNdvi": "Himawari NDVI",
   "typhoonLegendForecast": "Tinatayang landas",
   "typhoonValueHpa": "{n} hPa",
   "weatherPrecipitation": "Pag-ulan",
-  "moonNextFullMoon": "Next full moon",
+  "moonNextFullMoon": "Susunod na kabilugan",
   "dpmSheetEmpty": "I-tap ang marker sa mapa para sa detalye",
   "onboardingSkipLeave": "Laktawan pa rin",
   "aedPlaceDesc": "Lokasyon ng paglagay",
@@ -582,22 +582,22 @@
   },
   "onboardingPermBattery": "Exemption sa baterya",
   "typhoonLabelNw": "NW",
-  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "moonPhaseWaxingCrescent": "Lumalaking gasuklay",
   "restroomCategoryLeisure": "Lugar ng libangan",
   "mapLayerTemperature": "Temperatura",
   "aedCategory": "Kategorya",
   "@moonTimelineCaption": {
     "description": "Moon phase timeline caption"
   },
-  "meshtasticChannels": "Channels",
+  "meshtasticChannels": "Mga channel",
   "monitorWaiting": "Naghihintay ng data…",
   "typhoonOverlayForecastCallouts": "Forecast tooltips",
   "@meshtasticTitle": {
     "description": "Meshtastic test page title"
   },
   "reportDetailEpicenter": "Coordinates ng Epicenter",
-  "meshtasticVoltage": "Voltage",
-  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
+  "meshtasticVoltage": "Boltahe",
+  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes na narinig ng radyo mo",
   "@meshtasticSent": {
     "description": "Packets sent this session"
   },
@@ -610,7 +610,7 @@
   "rainInterval12h": "12 oras",
   "reportListMagnitude": "M{magnitude}",
   "notifyMonitor": "Monitor ng malakas na paggalaw",
-  "onboardingStart": "Magsimula",
+  "onboardingStart": "Maosmmula",
   "@meshtasticExternalPower": {
     "description": "Battery value when mains powered"
   },
@@ -623,15 +623,15 @@
     "description": "Township-border overlay toggle in the map's radar overlay menu."
   },
   "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
-  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (walang signal)",
   "shelterIndoorLabel": "Silungan sa loob",
   "notifyOptOff": "Naka-off",
   "reportFilterSortTime": "Oras",
-  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "mapLayerSatelliteCloudProbablyClear": "Malamang maaliwalas",
   "weatherModeThunderstorm": "Kulog at Kidlat",
   "homeViewOnMap": "Tingnan sa mapa",
   "reportFilterIntensityInfoLegacyTitle": "Luma (bago ang 2020)",
-  "typhoonLabelSpeed": "Past movement speed",
+  "typhoonLabelSpeed": "Bilis ng paggalaw",
   "@meshtasticReconnecting": {
     "description": "The link dropped and is being re-established"
   },
@@ -640,17 +640,17 @@
   "@meshtasticStateDisconnected": {
     "description": "Connection state label"
   },
-  "meshtasticReceived": "Received",
+  "meshtasticReceived": "Natanggap",
   "weatherRankingExtremeLow": "Pinakamababa ngayong araw",
   "@meshtasticRegionSwitch": {
     "description": "Button applying the DPIP LoRa region"
   },
   "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
-  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "mapLayerSatelliteCloudProbablyCloudy": "Malamang maulap",
   "shelterCategoryLabel": "Mga uri ng kalamidad",
-  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
-  "meshtasticStateConnecting": "Connecting…",
-  "moonTitle": "Moon",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (walang tubig)",
+  "meshtasticStateConnecting": "Kumokonekta…",
+  "moonTitle": "Buwan",
   "weatherRankingGust": "Bugso",
   "moreAppStore": "App Store",
   "@meshtasticUndecoded": {
@@ -670,7 +670,7 @@
   "regionNationwide": "Buong bansa",
   "moreNotifyLog": "Log ng notipikasyon ng DPIP",
   "regionCurrent": "Kasalukuyang lokasyon",
-  "meshtasticNotConnected": "Not connected to a radio",
+  "meshtasticNotConnected": "Hindi konektado sa radyo",
   "weatherModeSnow": "Niyebe",
   "mapLayerMeshtastic": "Meshtastic nodes",
   "moreDeveloper": "Impormasyon sa debug",
@@ -678,7 +678,7 @@
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   },
   "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
-  "meshtasticChannelUse": "Channel use",
+  "meshtasticChannelUse": "Paggamit ng channel",
   "mapNavLightning": "Kidlat",
   "homeForecastEmpty": "Walang forecast",
   "sponsorOneTime": "Isang beses",
@@ -686,7 +686,7 @@
   "onboardingPermBackground": "Lokasyon sa background",
   "aedEmergencyPhone": "Emergency phone",
   "dpmOpenInMaps": "Buksan sa mapa",
-  "meshtasticNotifyNodes": "Notify on new nodes",
+  "meshtasticNotifyNodes": "Mag-notify sa mga bagong node",
   "onboardingPermCriticalDesc": "Hayaang tumunog ang mga nakamamatay na babala sa lindol kahit sa silent mode o Do Not Disturb.",
   "@mapAppDefault": {
     "placeholders": {
@@ -695,11 +695,11 @@
       }
     }
   },
-  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
-  "meshtasticSent": "Sent",
+  "mapLayerSatelliteTransparentWarm": "Maaliwalas (mainit) = transparent, makikita ang basemap",
+  "meshtasticSent": "Ipinadala",
   "homeForecastTitle": "24-oras na forecast",
-  "typhoonLegendWarningAreas": "Warning areas",
-  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "typhoonLegendWarningAreas": "Mga lugar ng babala",
+  "meshtasticExcludeMqttHidden": "{count} nakatago",
   "notifyOptLocalIntensity1": "Lokal na intensidad 1 pataas",
   "@skyTimeGolden": {
     "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
@@ -710,15 +710,15 @@
   "mapTimelinePast": "Nakaraan",
   "restroomTypeFemale": "Palikuran ng babae",
   "reportListToday": "Ngayon",
-  "meshtasticTapNode": "Tap a node for details",
+  "meshtasticTapNode": "I-tap ang node para sa detalye",
   "commonLoading": "Naglo-load…",
   "@meshtasticStateConnecting": {
     "description": "Connection state label"
   },
-  "typhoonIntensityModerate": "Moderate typhoon",
+  "typhoonIntensityModerate": "Katamtamang bagyo",
   "mapLayerSatelliteAsh": "Himawari Ash",
   "rainInterval3h": "3 oras",
-  "meshtasticChannelReady": "DPIP channel ready",
+  "meshtasticChannelReady": "Handa na ang DPIP channel",
   "@meshtasticNotifyNodes": {
     "description": "Toggle: local notification when a new node is heard"
   },
@@ -779,7 +779,7 @@
     "description": "Start scanning for Meshtastic radios"
   },
   "reportDetailDepth": "Lalim ng Hypocenter",
-  "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
+  "typhoonOverlayWarningTooltip": "I-highlight ang mga county sa ilalim ng babala ng bagyo",
   "reportFilterDatePick": "Pumili ng petsa",
   "onboardingSkipStay": "Bumalik",
   "@moonPhaseWaxingCrescent": {
@@ -793,16 +793,16 @@
     "description": "Transmit power"
   },
   "shelterOutdoorLabel": "Silungan sa labas",
-  "meshtasticStateConnected": "Connected",
+  "meshtasticStateConnected": "Nakakonekta",
   "mapNavRadar": "Radar",
-  "mapLayerSatelliteCloudClear": "Clear",
+  "mapLayerSatelliteCloudClear": "Maaliwalas",
   "eewSummary": "M{magnitude} · lalim {depth} km",
   "locationBannerPermission": "Naka-off ang pahintulot sa lokasyon — hindi matutukoy ng mga lokal na alerto ang iyong lugar.",
-  "typhoonOverlayWeatherNoneTooltip": "No radar or infrared underlay",
+  "typhoonOverlayWeatherNoneTooltip": "Walang radar o infrared underlay",
   "radarCountyOutlineHint": "Iginuguhit sa ibabaw ng echo",
   "windForecastCountyOutlineHint": "Iginuhit sa itaas ng patlang ng hangin",
   "homeRainTrendTitle": "Ulan sa susunod na oras",
-  "moonPhaseFirstQuarter": "First quarter",
+  "moonPhaseFirstQuarter": "Unang sangkapat",
   "mapLayerCategoryTyphoon": "Bagyo",
   "@windForecastOverlayMenuTooltip": {
     "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
@@ -816,7 +816,7 @@
   "notifyTsunami": "Impormasyon sa tsunami",
   "navData": "Datos",
   "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
-  "meshtasticReadingAge": "Reading taken",
+  "meshtasticReadingAge": "Oras ng pagsukat",
   "@moonPhaseWaningGibbous": {
     "description": "Phase: waning gibbous"
   },
@@ -853,7 +853,7 @@
   "trendCumulativeTotal": "Kabuuang {total} mm",
   "languageName": "Filipino",
   "reportListEmptyFiltered": "Walang ulat na tumutugma sa mga filter",
-  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "meshtasticExcludeMqtt": "Itago ang mga MQTT node",
   "mapNavTyphoon": "Bagyo",
   "weatherModeSand": "Alikabok",
   "@moonPhaseFirstQuarter": {
@@ -867,11 +867,11 @@
   "mapLayerSatelliteB15": "Himawari Longwave Infrared (B15)",
   "weatherRankingWind": "Bilis ng hangin",
   "feedStale": "Maaaring luma na ang datos",
-  "homeForecastWind": "{direction} · Force {level}",
+  "homeForecastWind": "{direction} · Lakas {level}",
   "navHome": "Tahanan",
-  "meshtasticRegionLabel": "Region",
+  "meshtasticRegionLabel": "Rehiyon",
   "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
-  "moonTimelineCaption": "Phase",
+  "moonTimelineCaption": "Porsyento",
   "@meshtasticChannelNoSlot": {
     "description": "Every secondary channel slot is taken"
   },
@@ -900,14 +900,14 @@
   "meshtasticAirtime": "Air time (TX)",
   "shelterCapacityValue": "{n} katao",
   "lightningLegendCc": "Ulap–ulap · {minutes} min",
-  "meshtasticSendHint": "Message to broadcast",
+  "meshtasticSendHint": "Mensaheng ipapadala",
   "monitorDelay": "Pagkaantala {value} s",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },
   "dpmNo": "Hindi",
   "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
-  "meshtasticReconnecting": "Reconnecting…",
+  "meshtasticReconnecting": "Kumokonekta ulit…",
   "@mapAppAppleMaps": {},
   "@meshtasticReadingAge": {
     "description": "How old the battery/airtime numbers are"
@@ -916,7 +916,7 @@
   "@moonPhaseWaxingGibbous": {
     "description": "Phase: waxing gibbous"
   },
-  "typhoonOverlayWeatherSatelliteTooltip": "Infrared closest to the typhoon bulletin time",
+  "typhoonOverlayWeatherSatelliteTooltip": "Infrared na pinakamalapit sa oras ng bulletin ng bagyo",
   "radarScanRangeHint": "Sa labas: hindi naoobserbahan",
   "typhoonPickerTd": "Tropical depression TD {no}",
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
@@ -925,7 +925,7 @@
   "restroomGradePoor": "Mas mababa sa pamantayan",
   "restroomCategoryTourist": "Lugar para sa turista",
   "locationBannerServiceOff": "Naka-off ang mga serbisyo ng lokasyon — hindi matutukoy ng mga lokal na alerto ang iyong lugar.",
-  "mapLayerStyleTooltip": "Colour style",
+  "mapLayerStyleTooltip": "Estilo ng kulay",
   "lightningLegendCg": "Ulap–lupa · {minutes} min",
   "skyTimeAuto": "Awtomatiko",
   "appLogs": "Mga log ng app",
@@ -969,18 +969,18 @@
   "endpointServiceRadar": "Radar",
   "endpointServiceSatellite": "Satellite",
   "endpointServiceQpesums": "QPE",
-  "endpointServiceWind": "Wind",
+  "endpointServiceWind": "Hangin",
   "endpointServiceDpm": "Disaster points",
-  "endpointServiceWeather": "Weather",
-  "endpointServiceRain": "Rain",
-  "endpointServiceLightning": "Lightning",
-  "endpointServiceTyphoon": "Typhoon",
-  "endpointServiceReport": "EQ reports",
+  "endpointServiceWeather": "Panahon",
+  "endpointServiceRain": "Ulan",
+  "endpointServiceLightning": "Kidlat",
+  "endpointServiceTyphoon": "Bagyo",
+  "endpointServiceReport": "Mga ulat ng lindol",
   "endpointServiceTremStation": "Tremor station",
-  "endpointServiceEvent": "Events",
-  "endpointServiceLocation": "Location",
-  "endpointServiceNotify": "Notifications",
-  "endpointServiceOther": "Other",
+  "endpointServiceEvent": "Mga event",
+  "endpointServiceLocation": "Lokasyon",
+  "endpointServiceNotify": "Mga notipikasyon",
+  "endpointServiceOther": "Iba pa",
   "feedConnecting": "Kumokonekta…",
   "notifyBannerDisabled": "Naka-off ang mga notification — hindi ka makakatanggap ng mga alerto sa sakuna.",
   "@meshtasticNoNodes": {
@@ -989,21 +989,21 @@
   "weatherHumidity": "Halumigmig",
   "typhoonValueMs": "{n} m/s",
   "homeForecastHumidity": "Halumigmig {value}%",
-  "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
-  "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
+  "meshtasticBusyBody": "I-disconnect muna ito sa ibang Meshtastic app. Dalawang app sa isang radyo ang nag-aagawan sa mensahe, kaya may mawawala.",
+  "meshtasticChannelNoSlot": "Walang libreng channel slot — magbakante sa radyo",
   "restroomCategoryTransport": "Transportasyon",
-  "meshtasticBattery": "Battery",
+  "meshtasticBattery": "Baterya",
   "meshtasticDistance": "Distansya",
   "meshtasticSnrTrend": "Trend ng signal (SNR)",
   "meshtasticBatteryTrend": "Trend ng baterya",
-  "typhoonOverlayMenuTooltip": "Typhoon overlay options",
+  "typhoonOverlayMenuTooltip": "Mga opsyon sa typhoon overlay",
   "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
-  "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
+  "meshtasticRegionMismatch": "Ang region ng radyo ay {region} — kailangan ng DPIP ang TW",
   "notifySectionEarthquake": "Lindol",
   "mapLayerDisasterMap": "Disaster Map",
   "weatherModeFog": "Makapal na Hamog",
   "typhoonPickerNamed": "{name} TY {no}",
-  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "mapLayerStyleGrayTooltip": "JMA grayscale — mas malamig ay mas puti",
   "moreAnnouncements": "Mga Anunsyo",
   "moreTagline": "Platform para sa Integral na Impormasyon sa Kalamidad",
   "moreVersionStable": "Pormal na bersyon",
@@ -1016,7 +1016,7 @@
   "releaseHighlightsEmpty": "Wala pang laman.",
   "moreVersionNotesEmpty": "Walang changelog para sa build na ito",
   "moreVersionSnapshot": "Bersyon ng pagsubok",
-  "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
+  "mapLayerSatelliteTransparentNoData": "Walang data (lupa) = transparent",
   "@meshtasticScanning": {
     "description": "Scan in progress"
   },
@@ -1026,7 +1026,7 @@
   "mapLayerAed": "AED",
   "changelogTypePrerelease": "Beta",
   "reportFilterIntensityInfoModernBody": "Antas 0–4, 5−, 5+, 6−, 6+, 7. Gamit ng filter ang bagong scale; ang mga lumang event ay may legacy label sa listahan.",
-  "typhoonOverlayWeatherNone": "None",
+  "typhoonOverlayWeatherNone": "Wala",
   "mapLayerStyleGray": "Grayscale (JMA)",
   "weatherModeAuto": "Awtomatiko",
   "typhoonLabelProbCircle": "70% probability circle",
@@ -1039,7 +1039,7 @@
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
   },
-  "typhoonLabelDirection": "Past movement direction",
+  "typhoonLabelDirection": "Direksyon ng paggalaw",
   "@meshtasticLastSent": {
     "description": "Age of the last sent packet"
   },
@@ -1053,13 +1053,13 @@
   "onboardingPermsTitle": "Mga Pahintulot",
   "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
   "rainInterval10m": "10 min",
-  "meshtasticConnectAnyway": "Connect anyway",
+  "meshtasticConnectAnyway": "Kumonekta pa rin",
   "reportListDayCount": "{count}",
   "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
-  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentReflectance": "Mababang reflectance / gabi = transparent, makikita ang basemap",
   "chartHourLabel": "{hour}h",
   "mapLayerShelter": "Silungan",
-  "typhoonOverlayProbabilityTooltip": "Show strike probability (hides the forecast cone)",
+  "typhoonOverlayProbabilityTooltip": "Ipakita ang strike probability (itinatago ang forecast cone)",
   "mapLayerSatelliteNdwi": "Himawari NDWI",
   "disasterMapOverlayShelterTooltip": "Ipakita ang mga silungan",
   "mapNavHumidity": "Halumigmig",
@@ -1069,7 +1069,7 @@
   "reportDetailSortByIntensity": "Ayusin ayon sa intensity",
   "homeRainTrendNoData": "Walang data",
   "mapLayerCategoryRadar": "Radar",
-  "meshtasticShortName": "Short name",
+  "meshtasticShortName": "Maikling pangalan",
   "@meshtasticStateConfiguring": {
     "description": "Connection state label"
   },
@@ -1089,7 +1089,7 @@
   "@skyTimeMorning": {
     "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
   },
-  "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
+  "meshtasticRegionConfirm": "Lumipat ba ang radyong ito sa TW region? Magre-restart at magdi-disconnect saglit, at lilipat din ang lahat ng ibang channel.",
   "dataEarthquakeSubtitle": "Mga ulat ng lindol",
   "typhoonNoActive": "Walang aktibong bagyo",
   "@meshtasticExcludeMqttHidden": {
@@ -1106,12 +1106,22 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
-  "mapGsiOverlay": "Detalyadong mapa (GSI)",
-  "mapGsiOverlayHint": "Magdagdag ng high-resolution na terrain mula sa GSI ng Japan",
-  "mapGsiDetails": "Mga detalye ng layer",
-  "mapGsiDetailsHint": "{enabled} sa {total} na layer ang naka-enable",
-  "@mapGsiDetailsHint": {
-    "description": "How many of the GSI layers are enabled",
+  "mapOsmOverlay": "Detalyadong mapa",
+  "mapOsmOverlayHint": "Ipakita ang mas kumpletong mga kalsada, gusali, at pangalan ng lugar",
+  "mapOsmDetails": "Mga detalye ng layer",
+  "moreDataSources": "Mga pinagmulan ng data",
+  "dataSourceTremNet": "探索智慧科技有限公司 — TREM-Net",
+  "dataSourceCwa": "交通部中央氣象署 (CWA)",
+  "dataSourceJma": "気象庁 (JMA)",
+  "dataSourceNcdr": "國家災害防救科技中心 (NCDR)",
+  "dataSourceEcmwf": "European Centre for Medium-Range Weather Forecasts (ECMWF)",
+  "dataSourceNoaaGfs": "National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)",
+  "dataSourceGovernmentOpenData": "政府資料開放平臺",
+  "dataSourceOpenStreetMap": "© OpenStreetMap contributors",
+  "dataSourceNasaMoon": "National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)",
+  "mapOsmDetailsHint": "{enabled} sa {total} na layer ang naka-enable",
+  "@mapOsmDetailsHint": {
+    "description": "How many of the OSM layers are enabled",
     "placeholders": {
       "enabled": {
         "type": "int"
@@ -1121,27 +1131,30 @@
       }
     }
   },
-  "mapGsiSurface": "Ibabaw",
-  "mapGsiParks": "Mga parke",
-  "mapGsiLandUse": "Paggamit ng lupa",
-  "mapGsiAirportAreas": "Mga lugar ng paliparan",
-  "mapGsiWater": "Tubig",
-  "mapGsiRivers": "Mga ilog",
-  "mapGsiBoundaries": "Mga hangganan",
-  "mapGsiBuildings": "Mga gusali",
-  "mapGsiRoads": "Mga kalsada",
-  "mapGsiRoadNames": "Pangalan ng kalsada",
-  "mapGsiWaterNames": "Pangalan ng tubig",
-  "mapGsiPeaks": "Mga taluktok",
-  "mapGsiAirportNames": "Pangalan ng paliparan",
-  "mapGsiPlaceNames": "Pangalan ng lugar",
-  "mapGsiPoi": "Mga lugar ng interes",
-  "mapGsiHouseNumbers": "Mga numero ng bahay",
-  "mapGsiRestoreAll": "Ibalik lahat",
+  "mapOsmSurface": "Ibabaw",
+  "mapOsmParks": "Mga parke",
+  "mapOsmLandUse": "Paggamit ng lupa",
+  "mapOsmAirportAreas": "Mga lugar ng paliparan",
+  "mapOsmWater": "Tubig",
+  "mapOsmRivers": "Mga ilog",
+  "mapOsmBoundaries": "Mga hangganan",
+  "mapOsmBuildings": "Mga gusali",
+  "mapOsmRoads": "Mga kalsada",
+  "mapOsmRoadNames": "Pangalan ng kalsada",
+  "mapOsmWaterNames": "Pangalan ng tubig",
+  "mapOsmPeaks": "Mga taluktok",
+  "mapOsmAirportNames": "Pangalan ng paliparan",
+  "mapOsmPlaceNames": "Pangalan ng lugar",
+  "mapOsmPoi": "Mga lugar ng interes",
+  "mapOsmHouseNumbers": "Mga numero ng bahay",
+  "mapOsmRestoreAll": "Ibalik lahat",
+  "mapOsmSectionNatural": "Mga likas na anyo",
+  "mapOsmSectionRoadsAndBuildings": "Mga kalsada at gusali",
+  "mapOsmSectionLabelsAndPlaces": "Mga label at lugar",
   "mapTownLabels": "Mga pangalan ng bayan",
   "notifySetFailed": "Hindi ma-save ang setting. Pakisubukan muli.",
-  "meshtasticDisconnect": "Disconnect",
-  "meshtasticUndecoded": "Not decrypted",
+  "meshtasticDisconnect": "I-disconnect",
+  "meshtasticUndecoded": "Hindi nade-decrypt",
   "notifyAnnouncement": "Mga Anunsyo",
   "onboardingIntroTitle": "Maligayang pagdating sa DPIP",
   "regionCurrentUnavailable": "Hindi makuha ang kasalukuyang lokasyon",
@@ -1159,7 +1172,7 @@
   "@moonSectionAppearance": {
     "description": "Section header: how the Moon looks at the chosen moment"
   },
-  "moonSectionRiseSet": "Pagsikat at paglubog",
+  "moonSectionRiseSet": "Paosmkat at paglubog",
   "@moonSectionRiseSet": {
     "description": "Section header: moonrise and moonset for the user's township"
   },
@@ -1183,7 +1196,7 @@
   "@moonApparentSize": {
     "description": "The Moon's apparent angular diameter"
   },
-  "moonRise": "Pagsikat ng buwan",
+  "moonRise": "Paosmkat ng buwan",
   "@moonRise": {
     "description": "Time the Moon rises"
   },
@@ -1227,7 +1240,7 @@
   "@sunSectionTerms": {
     "description": "Section header: the year's twenty-four solar terms"
   },
-  "sunRise": "Pagsikat ng araw",
+  "sunRise": "Paosmkat ng araw",
   "@sunRise": {
     "description": "Time the Sun rises"
   },
@@ -1443,7 +1456,7 @@
   "@solarTermMajorCold": {
     "description": "One of the twenty-four solar terms"
   },
-  "solarTermStartOfSpring": "Simula ng Tagsibol",
+  "solarTermStartOfSpring": "Simula ng Taosmbol",
   "@solarTermStartOfSpring": {
     "description": "One of the twenty-four solar terms"
   },
@@ -1929,6 +1942,9 @@
   },
   "moreDumpDiagnostics": "I-upload ang debug info at mga log",
   "moreDumpDiagnosticsHint": "Iuupload at kokopyahin ang link para ilakip sa ulat",
+  "dumpIncludeSensitive": "Isama ang eksaktong lokasyon",
+  "dumpIncludeSensitiveHint": "Isinasama ang mga coordinate mula sa log at lokasyon sa background; kapag hindi pinili, papalitan ng null",
+  "dumpUpload": "I-upload",
   "dumpUploaded": "Na-upload",
   "dumpLinkCopied": "Nakopya ang link sa clipboard",
   "dumpCopyAgain": "Kopyahin ulit",

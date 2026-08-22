@@ -2267,69 +2267,111 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingTermsTitle => '服務條款';
 
   @override
-  String get mapGsiOverlay => '詳細地圖（國土交通省地理院）';
+  String get mapOsmOverlay => '詳細地圖';
 
   @override
-  String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
+  String get mapOsmOverlayHint => '顯示更完整的道路、建物與地名';
 
   @override
-  String get mapGsiDetails => '詳細設定';
+  String get mapOsmDetails => '詳細設定';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => '資料來源';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '已啟用 $enabled / 共 $total 個圖層';
   }
 
   @override
-  String get mapGsiSurface => '地表';
+  String get mapOsmSurface => '地表';
 
   @override
-  String get mapGsiParks => '公園';
+  String get mapOsmParks => '公園';
 
   @override
-  String get mapGsiLandUse => '土地利用';
+  String get mapOsmLandUse => '土地利用';
 
   @override
-  String get mapGsiAirportAreas => '機場區域';
+  String get mapOsmAirportAreas => '機場區域';
 
   @override
-  String get mapGsiWater => '水域';
+  String get mapOsmWater => '水域';
 
   @override
-  String get mapGsiRivers => '河川';
+  String get mapOsmRivers => '河川';
 
   @override
-  String get mapGsiBoundaries => '邊界';
+  String get mapOsmBoundaries => '邊界';
 
   @override
-  String get mapGsiBuildings => '建物';
+  String get mapOsmBuildings => '建物';
 
   @override
-  String get mapGsiRoads => '道路';
+  String get mapOsmRoads => '道路';
 
   @override
-  String get mapGsiRoadNames => '道路名稱';
+  String get mapOsmRoadNames => '道路名稱';
 
   @override
-  String get mapGsiWaterNames => '水域名稱';
+  String get mapOsmWaterNames => '水域名稱';
 
   @override
-  String get mapGsiPeaks => '山峰';
+  String get mapOsmPeaks => '山峰';
 
   @override
-  String get mapGsiAirportNames => '機場名稱';
+  String get mapOsmAirportNames => '機場名稱';
 
   @override
-  String get mapGsiPlaceNames => '地名';
+  String get mapOsmPlaceNames => '地名';
 
   @override
-  String get mapGsiPoi => '地標';
+  String get mapOsmPoi => '地標';
 
   @override
-  String get mapGsiHouseNumbers => '門牌號碼';
+  String get mapOsmHouseNumbers => '門牌號碼';
 
   @override
-  String get mapGsiRestoreAll => '全部恢復';
+  String get mapOsmRestoreAll => '全部恢復';
+
+  @override
+  String get mapOsmSectionNatural => '地表與自然';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => '道路與建物';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => '地名與標示';
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
@@ -3057,6 +3099,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moreDumpDiagnosticsHint => '上傳後複製連結';
+
+  @override
+  String get dumpIncludeSensitive => '包含精確位置';
+
+  @override
+  String get dumpIncludeSensitiveHint => '包含日誌與背景定位中的座標；未勾選時會以 null 取代';
+
+  @override
+  String get dumpUpload => '上傳';
 
   @override
   String get dumpUploaded => '已上傳';
@@ -5339,69 +5390,111 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get onboardingTermsTitle => '服务条款';
 
   @override
-  String get mapGsiOverlay => '详细地图（地理院瓦片）';
+  String get mapOsmOverlay => '详细地图';
 
   @override
-  String get mapGsiOverlayHint => '加入日本地理院的高分辨率地形图';
+  String get mapOsmOverlayHint => '显示更完整的道路、建筑和地名';
 
   @override
-  String get mapGsiDetails => '详细设置';
+  String get mapOsmDetails => '详细设置';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => '数据来源';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '已启用 $enabled / 共 $total 个图层';
   }
 
   @override
-  String get mapGsiSurface => '地表';
+  String get mapOsmSurface => '地表';
 
   @override
-  String get mapGsiParks => '公园';
+  String get mapOsmParks => '公园';
 
   @override
-  String get mapGsiLandUse => '土地利用';
+  String get mapOsmLandUse => '土地利用';
 
   @override
-  String get mapGsiAirportAreas => '机场区域';
+  String get mapOsmAirportAreas => '机场区域';
 
   @override
-  String get mapGsiWater => '水域';
+  String get mapOsmWater => '水域';
 
   @override
-  String get mapGsiRivers => '河川';
+  String get mapOsmRivers => '河川';
 
   @override
-  String get mapGsiBoundaries => '边界';
+  String get mapOsmBoundaries => '边界';
 
   @override
-  String get mapGsiBuildings => '建筑物';
+  String get mapOsmBuildings => '建筑物';
 
   @override
-  String get mapGsiRoads => '道路';
+  String get mapOsmRoads => '道路';
 
   @override
-  String get mapGsiRoadNames => '道路名称';
+  String get mapOsmRoadNames => '道路名称';
 
   @override
-  String get mapGsiWaterNames => '水域名称';
+  String get mapOsmWaterNames => '水域名称';
 
   @override
-  String get mapGsiPeaks => '山峰';
+  String get mapOsmPeaks => '山峰';
 
   @override
-  String get mapGsiAirportNames => '机场名称';
+  String get mapOsmAirportNames => '机场名称';
 
   @override
-  String get mapGsiPlaceNames => '地名';
+  String get mapOsmPlaceNames => '地名';
 
   @override
-  String get mapGsiPoi => '地标';
+  String get mapOsmPoi => '地标';
 
   @override
-  String get mapGsiHouseNumbers => '门牌号码';
+  String get mapOsmHouseNumbers => '门牌号码';
 
   @override
-  String get mapGsiRestoreAll => '全部恢复';
+  String get mapOsmRestoreAll => '全部恢复';
+
+  @override
+  String get mapOsmSectionNatural => '地表与自然';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => '道路与建筑';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => '地名与标注';
 
   @override
   String get mapTownLabels => '乡镇名称';
@@ -6129,6 +6222,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreDumpDiagnosticsHint => '上传后复制链接，附在反馈里就不用贴一整页';
+
+  @override
+  String get dumpIncludeSensitive => '包含精确位置';
+
+  @override
+  String get dumpIncludeSensitiveHint => '包含日志和后台定位中的坐标；未勾选时将以 null 替代';
+
+  @override
+  String get dumpUpload => '上传';
 
   @override
   String get dumpUploaded => '已上传';
@@ -8411,69 +8513,111 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingTermsTitle => '服務條款';
 
   @override
-  String get mapGsiOverlay => '詳細地圖（國土交通省地理院）';
+  String get mapOsmOverlay => '詳細地圖';
 
   @override
-  String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
+  String get mapOsmOverlayHint => '顯示更完整的道路、建物與地名';
 
   @override
-  String get mapGsiDetails => '詳細設定';
+  String get mapOsmDetails => '詳細設定';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => '資料來源';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '已啟用 $enabled / 共 $total 個圖層';
   }
 
   @override
-  String get mapGsiSurface => '地表';
+  String get mapOsmSurface => '地表';
 
   @override
-  String get mapGsiParks => '公園';
+  String get mapOsmParks => '公園';
 
   @override
-  String get mapGsiLandUse => '土地利用';
+  String get mapOsmLandUse => '土地利用';
 
   @override
-  String get mapGsiAirportAreas => '機場區域';
+  String get mapOsmAirportAreas => '機場區域';
 
   @override
-  String get mapGsiWater => '水域';
+  String get mapOsmWater => '水域';
 
   @override
-  String get mapGsiRivers => '河川';
+  String get mapOsmRivers => '河川';
 
   @override
-  String get mapGsiBoundaries => '邊界';
+  String get mapOsmBoundaries => '邊界';
 
   @override
-  String get mapGsiBuildings => '建物';
+  String get mapOsmBuildings => '建物';
 
   @override
-  String get mapGsiRoads => '道路';
+  String get mapOsmRoads => '道路';
 
   @override
-  String get mapGsiRoadNames => '道路名稱';
+  String get mapOsmRoadNames => '道路名稱';
 
   @override
-  String get mapGsiWaterNames => '水域名稱';
+  String get mapOsmWaterNames => '水域名稱';
 
   @override
-  String get mapGsiPeaks => '山峰';
+  String get mapOsmPeaks => '山峰';
 
   @override
-  String get mapGsiAirportNames => '機場名稱';
+  String get mapOsmAirportNames => '機場名稱';
 
   @override
-  String get mapGsiPlaceNames => '地名';
+  String get mapOsmPlaceNames => '地名';
 
   @override
-  String get mapGsiPoi => '地標';
+  String get mapOsmPoi => '地標';
 
   @override
-  String get mapGsiHouseNumbers => '門牌號碼';
+  String get mapOsmHouseNumbers => '門牌號碼';
 
   @override
-  String get mapGsiRestoreAll => '全部恢復';
+  String get mapOsmRestoreAll => '全部恢復';
+
+  @override
+  String get mapOsmSectionNatural => '地表與自然';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => '道路與建物';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => '地名與標示';
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
@@ -9201,6 +9345,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moreDumpDiagnosticsHint => '上載後複製連結';
+
+  @override
+  String get dumpIncludeSensitive => '包含精確位置';
+
+  @override
+  String get dumpIncludeSensitiveHint => '包含日誌及背景定位中的座標；未勾選時會以 null 取代';
+
+  @override
+  String get dumpUpload => '上載';
 
   @override
   String get dumpUploaded => '已上載';
@@ -11483,69 +11636,111 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get onboardingTermsTitle => '服務條款';
 
   @override
-  String get mapGsiOverlay => '詳細地圖（國土交通省地理院）';
+  String get mapOsmOverlay => '詳細地圖';
 
   @override
-  String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
+  String get mapOsmOverlayHint => '顯示更完整的道路、建物與地名';
 
   @override
-  String get mapGsiDetails => '詳細設定';
+  String get mapOsmDetails => '詳細設定';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => '資料來源';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '已啟用 $enabled / 共 $total 個圖層';
   }
 
   @override
-  String get mapGsiSurface => '地表';
+  String get mapOsmSurface => '地表';
 
   @override
-  String get mapGsiParks => '公園';
+  String get mapOsmParks => '公園';
 
   @override
-  String get mapGsiLandUse => '土地利用';
+  String get mapOsmLandUse => '土地利用';
 
   @override
-  String get mapGsiAirportAreas => '機場區域';
+  String get mapOsmAirportAreas => '機場區域';
 
   @override
-  String get mapGsiWater => '水域';
+  String get mapOsmWater => '水域';
 
   @override
-  String get mapGsiRivers => '河川';
+  String get mapOsmRivers => '河川';
 
   @override
-  String get mapGsiBoundaries => '邊界';
+  String get mapOsmBoundaries => '邊界';
 
   @override
-  String get mapGsiBuildings => '建物';
+  String get mapOsmBuildings => '建物';
 
   @override
-  String get mapGsiRoads => '道路';
+  String get mapOsmRoads => '道路';
 
   @override
-  String get mapGsiRoadNames => '道路名稱';
+  String get mapOsmRoadNames => '道路名稱';
 
   @override
-  String get mapGsiWaterNames => '水域名稱';
+  String get mapOsmWaterNames => '水域名稱';
 
   @override
-  String get mapGsiPeaks => '山峰';
+  String get mapOsmPeaks => '山峰';
 
   @override
-  String get mapGsiAirportNames => '機場名稱';
+  String get mapOsmAirportNames => '機場名稱';
 
   @override
-  String get mapGsiPlaceNames => '地名';
+  String get mapOsmPlaceNames => '地名';
 
   @override
-  String get mapGsiPoi => '地標';
+  String get mapOsmPoi => '地標';
 
   @override
-  String get mapGsiHouseNumbers => '門牌號碼';
+  String get mapOsmHouseNumbers => '門牌號碼';
 
   @override
-  String get mapGsiRestoreAll => '全部恢復';
+  String get mapOsmRestoreAll => '全部恢復';
+
+  @override
+  String get mapOsmSectionNatural => '地表與自然';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => '道路與建物';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => '地名與標示';
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
@@ -12273,6 +12468,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreDumpDiagnosticsHint => '上傳後複製連結';
+
+  @override
+  String get dumpIncludeSensitive => '包含精確位置';
+
+  @override
+  String get dumpIncludeSensitiveHint => '包含日誌與背景定位中的座標；未勾選時會以 null 取代';
+
+  @override
+  String get dumpUpload => '上傳';
 
   @override
   String get dumpUploaded => '已上傳';

@@ -2276,7 +2276,37 @@ class AppLocalizationsYue extends AppLocalizations {
   String get mapOsmDetails => '詳細設定';
 
   @override
-  String get mapDataAttribution => '© OpenStreetMap contributors';
+  String get moreDataSources => '資料來源';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
 
   @override
   String mapOsmDetailsHint(int enabled, int total) {
@@ -3071,10 +3101,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get moreDumpDiagnosticsHint => '上載後複製連結';
 
   @override
-  String get dumpIncludeSensitive => '包含較敏感嘅個人資料';
+  String get dumpIncludeSensitive => '包含精確位置';
 
   @override
-  String get dumpIncludeSensitiveHint => '可能包含精確位置、裝置識別碼同推播權杖；唔勾選就會以 null 取代';
+  String get dumpIncludeSensitiveHint => '包含日誌同背景定位入面嘅座標；唔勾選就會以 null 取代';
 
   @override
   String get dumpUpload => '上載';

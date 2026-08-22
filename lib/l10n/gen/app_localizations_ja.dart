@@ -55,7 +55,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restroomTypeMale => '男性用トイレ';
 
   @override
-  String get meshtasticLastReceived => 'Last received';
+  String get meshtasticLastReceived => '最終受信';
 
   @override
   String get reportDetailSortByCounty => '地域順に並べ替え';
@@ -86,7 +86,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeRainTrendScattered => 'にわか雨の可能性があります';
 
   @override
-  String get meshtasticUptime => 'Uptime';
+  String get meshtasticUptime => '稼働時間';
 
   @override
   String get weatherRankingTempExtremes => '気温極値';
@@ -98,7 +98,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTerrainReliefHint => 'ベースマップに地形の陰影を表示';
 
   @override
-  String get meshtasticEmptyMessage => '(empty message)';
+  String get meshtasticEmptyMessage => '(空メッセージ)';
 
   @override
   String get moreSectionRegion => '地域';
@@ -110,7 +110,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aedHoursSaturday => '土曜の開館時間';
 
   @override
-  String get moonPhaseNew => 'New moon';
+  String get moonPhaseNew => '新月';
 
   @override
   String get notifySectionEew => '緊急地震速報';
@@ -125,7 +125,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTownLabelsHint => '拡大すると郷鎮名を表示';
 
   @override
-  String get commonCancel => 'Cancel';
+  String get commonCancel => 'キャンセル';
 
   @override
   String get notifyOptTsunamiWarning => '津波警報のみ';
@@ -218,7 +218,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get meshtasticExcludeMqttSubtitle =>
-      'Nodes bridged over the internet, not heard by radio';
+      'インターネット経由で橋渡しされたノード(無線では受信していません)';
 
   @override
   String get reportFilterIntensityInfoTitle => '震度の新制と旧制';
@@ -230,10 +230,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get radarOverlayMenuTooltip => 'レーダーレイヤー設定';
 
   @override
-  String get meshtasticNodes => 'Nodes';
+  String get meshtasticNodes => 'ノード';
 
   @override
-  String get meshtasticSend => 'Send';
+  String get meshtasticSend => '送信';
 
   @override
   String get typhoonOverlayStormL7Tooltip => '強風域 + 平均円（紫）';
@@ -288,7 +288,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get skyTimeDusk => '薄暮';
 
   @override
-  String get meshtasticFirmware => 'Firmware';
+  String get meshtasticFirmware => 'ファームウェア';
 
   @override
   String get reportFilterDateEndNote => '終了日：当日 24:00（台北時間）';
@@ -297,7 +297,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterSortMagnitude => '規模';
 
   @override
-  String get meshtasticSilent => 'Silent';
+  String get meshtasticSilent => 'サイレント';
 
   @override
   String get mapLayerCategoryEarthquake => '地震';
@@ -331,7 +331,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifyOptTsunamiAll => '津波情報・津波警報';
 
   @override
-  String get meshtasticLayerOptions => 'Node options';
+  String get meshtasticLayerOptions => 'ノードオプション';
 
   @override
   String get onboardingAgreeContinue => '同意して続行';
@@ -340,7 +340,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonRetry => '再試行';
 
   @override
-  String get meshtasticNodeId => 'Node ID';
+  String get meshtasticNodeId => 'ノード ID';
 
   @override
   String reportDetailNumbered(String number) {
@@ -375,13 +375,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sponsorRestore => '購入を復元';
 
   @override
-  String get meshtasticChannelWorking => 'Setting up the DPIP channel…';
+  String get meshtasticChannelWorking => 'DPIP チャンネルを設定中…';
 
   @override
-  String get meshtasticRegionSwitch => 'Switch to TW';
+  String get meshtasticRegionSwitch => 'TW 地域に切り替え';
 
   @override
-  String get meshtasticTraffic => 'Traffic';
+  String get meshtasticTraffic => 'トラフィック';
 
   @override
   String get mapLayerStyleBdTooltip => 'Dvorak BD カーブ——熱帯低気圧の強度解析に使う階段グレースケール';
@@ -396,7 +396,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteTransparentNight => '夜間 = 透明、地図が透ける';
 
   @override
-  String get meshtasticScanning => 'Scanning…';
+  String get meshtasticScanning => 'スキャン中…';
 
   @override
   String regionSelectFull(int max) {
@@ -468,7 +468,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navMore => 'その他';
 
   @override
-  String get meshtasticDpipChannel => 'DPIP channel';
+  String get meshtasticDpipChannel => 'DPIP チャンネル';
 
   @override
   String get disasterMapOverlaySectionLayers => 'レイヤー';
@@ -480,7 +480,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonLabelNe => '北東';
 
   @override
-  String get meshtasticCopied => 'Message copied';
+  String get meshtasticCopied => 'メッセージをコピーしました';
 
   @override
   String get reportListEmpty => '地震報告はありません';
@@ -498,7 +498,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get eewSWave => 'S波';
 
   @override
-  String get meshtasticBusyTitle => 'Another app is using this radio';
+  String get meshtasticBusyTitle => '別のアプリがこの無線機を使用中です';
 
   @override
   String get restroomCategoryCultural => '文化・娯楽施設';
@@ -516,7 +516,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonLegendCircle15 => '強風域（30kt）';
 
   @override
-  String get dataSectionAstronomy => 'Astronomy';
+  String get dataSectionAstronomy => '天文';
 
   @override
   String get homeRainTrendLightSustained => '今後1時間は小雨が続きます';
@@ -525,10 +525,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonError => '問題が発生しました';
 
   @override
-  String get moonPhaseWaningCrescent => 'Waning crescent';
+  String get moonPhaseWaningCrescent => '下弦の月';
 
   @override
-  String get meshtasticPower => 'Power';
+  String get meshtasticPower => '電源';
 
   @override
   String get mapTimelineNow => '現在';
@@ -556,7 +556,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifyTitle => '通知';
 
   @override
-  String get meshtasticTxPower => 'TX power';
+  String get meshtasticTxPower => 'TX 出力';
 
   @override
   String get restroomCategoryLabel => '区分';
@@ -676,7 +676,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restroomCategoryReligious => '宗教・礼拝施設';
 
   @override
-  String get meshtasticRole => 'Role';
+  String get meshtasticRole => 'ロール';
 
   @override
   String get mapLayerSatelliteCloudCloudy => '雲';
@@ -688,7 +688,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get meshtasticJumpToLatest => '最新へ移動';
 
   @override
-  String get meshtasticNoMessages => 'No messages yet';
+  String get meshtasticNoMessages => 'まだメッセージがありません';
 
   @override
   String get onboardingPermNotifyDesc => '地震、天気、災害の発生時に、警報をすぐお届けします。';
@@ -706,7 +706,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreGooglePlay => 'Google Play';
 
   @override
-  String get meshtasticOnline => 'Heard recently';
+  String get meshtasticOnline => '最近受信あり';
 
   @override
   String get typhoonLabelSw => '南西';
@@ -752,7 +752,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get eewArrived => '到達';
 
   @override
-  String get meshtasticNoDevices => 'No Meshtastic devices found';
+  String get meshtasticNoDevices => 'Meshtastic デバイスが見つかりません';
 
   @override
   String get mapLayerCategoryLife => '生活';
@@ -761,7 +761,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportFilterSortIntensity => '震度';
 
   @override
-  String get meshtasticStateDisconnected => 'Disconnected';
+  String get meshtasticStateDisconnected => '切断済み';
 
   @override
   String get typhoonIntensityIntense => '強い台風';
@@ -773,7 +773,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dpmYes => 'はい';
 
   @override
-  String get meshtasticNoHistory => 'Not enough history yet';
+  String get meshtasticNoHistory => '履歴がまだ足りません';
 
   @override
   String get reportDetailLocalIntensityUnavailable => '震度情報なし';
@@ -803,7 +803,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonOverlaySectionStorm => '暴風域';
 
   @override
-  String get moonPhaseFull => 'Full moon';
+  String get moonPhaseFull => '満月';
 
   @override
   String meshtasticBinaryPayload(String size) {
@@ -811,7 +811,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get moonPhaseWaningGibbous => 'Waning gibbous';
+  String get moonPhaseWaningGibbous => '下弦の月(虧)';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 年以降）';
@@ -828,7 +828,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreSectionAbout => '情報';
 
   @override
-  String get meshtasticSelectDevice => 'Select a radio';
+  String get meshtasticSelectDevice => '無線機を選択';
 
   @override
   String get onboardingIntroBody =>
@@ -841,7 +841,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailImage => '地震レポート画像';
 
   @override
-  String get meshtasticStateConfiguring => 'Configuring…';
+  String get meshtasticStateConfiguring => '設定中…';
 
   @override
   String get typhoonLabelGaleAvg => '強風域の平均半径';
@@ -850,10 +850,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingPermNotify => '通知';
 
   @override
-  String get meshtasticClearMessages => 'Clear messages';
+  String get meshtasticClearMessages => 'メッセージを消去';
 
   @override
-  String get meshtasticNotifyMessages => 'Notify on new messages';
+  String get meshtasticNotifyMessages => '新しいメッセージで通知';
 
   @override
   String get defaultMapLayerSettings => '地図の初期レイヤー';
@@ -964,7 +964,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get skyTimeGolden => 'ゴールデンアワー';
 
   @override
-  String get moonAge => 'Age';
+  String get moonAge => '月齢';
 
   @override
   String get meshtasticRadioSettings => 'LoRa';
@@ -979,7 +979,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayers => 'レイヤー';
 
   @override
-  String get meshtasticHardware => 'Hardware';
+  String get meshtasticHardware => 'ハードウェア';
 
   @override
   String get languageSettings => '言語設定';
@@ -1002,7 +1002,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get skyTimeAfternoon => '午後';
 
   @override
-  String get meshtasticLastHeard => 'Last heard';
+  String get meshtasticLastHeard => '最終受信';
 
   @override
   String get typhoonWarningTitle => '台風警報';
@@ -1055,7 +1055,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonOverlayStormL10Tooltip => '暴風域 + 平均円（黄）';
 
   @override
-  String get moonPhaseWaxingGibbous => 'Waxing gibbous';
+  String get moonPhaseWaxingGibbous => '上弦の月(盈)';
 
   @override
   String get reportDetailTitle => '地震レポート';
@@ -1069,10 +1069,10 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get meshtasticNoNodes => 'No nodes heard yet';
+  String get meshtasticNoNodes => 'まだノードを検出していません';
 
   @override
-  String get meshtasticViaMqtt => 'Via MQTT (internet)';
+  String get meshtasticViaMqtt => 'MQTT 経由(インターネット)';
 
   @override
   String get radarCountyOutline => '県市境界';
@@ -1112,7 +1112,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapNavRain => '雨量';
 
   @override
-  String get moonDays => 'days';
+  String get moonDays => '日';
 
   @override
   String mapLegendUnit(String unit) {
@@ -1123,7 +1123,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherModeClear => '晴れ';
 
   @override
-  String get meshtasticRadio => 'Radio';
+  String get meshtasticRadio => '無線機';
 
   @override
   String get commonEmpty => '表示する項目がありません';
@@ -1132,10 +1132,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteB01 => 'ひまわり 可視青(B01)';
 
   @override
-  String get meshtasticExternalPower => 'External power';
+  String get meshtasticExternalPower => '外部電源';
 
   @override
-  String get moonPhaseLastQuarter => 'Last quarter';
+  String get moonPhaseLastQuarter => '下弦';
 
   @override
   String get reportFilterOrderAsc => '昇順';
@@ -1162,19 +1162,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restroomGradeExcellent => '最上級';
 
   @override
-  String get meshtasticLastSent => 'Last sent';
+  String get meshtasticLastSent => '最終送信';
 
   @override
-  String get meshtasticName => 'Name';
+  String get meshtasticName => '名前';
 
   @override
-  String get meshtasticScan => 'Scan';
+  String get meshtasticScan => 'スキャン';
 
   @override
   String get mapLayerCategoryForecast => '数値予報';
 
   @override
-  String get meshtasticChannelFailed => 'Couldn\'t set up the DPIP channel';
+  String get meshtasticChannelFailed => 'DPIP チャンネルの設定に失敗しました';
 
   @override
   String get themeSystem => 'システム';
@@ -1194,7 +1194,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherPrecipitation => '降水量';
 
   @override
-  String get moonNextFullMoon => 'Next full moon';
+  String get moonNextFullMoon => '次の満月';
 
   @override
   String get dpmSheetEmpty => '地図上のマーカーをタップして詳細を表示';
@@ -1223,7 +1223,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get typhoonLabelNw => '北西';
 
   @override
-  String get moonPhaseWaxingCrescent => 'Waxing crescent';
+  String get moonPhaseWaxingCrescent => '上弦';
 
   @override
   String get restroomCategoryLeisure => 'レジャー・娯楽施設';
@@ -1235,7 +1235,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get aedCategory => '分類';
 
   @override
-  String get meshtasticChannels => 'Channels';
+  String get meshtasticChannels => 'チャンネル';
 
   @override
   String get monitorWaiting => 'データ待機中…';
@@ -1247,11 +1247,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailEpicenter => '震央座標';
 
   @override
-  String get meshtasticVoltage => 'Voltage';
+  String get meshtasticVoltage => '電圧';
 
   @override
-  String get mapLayerMeshtasticSubtitle =>
-      'LoRa mesh nodes heard by your radio';
+  String get mapLayerMeshtasticSubtitle => '無線機で受信した LoRa メッシュノード';
 
   @override
   String get mapLayerWind => '風向';
@@ -1323,7 +1322,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteRgbComposite => 'RGB 合成(JMA レシピ)';
 
   @override
-  String get meshtasticReceived => 'Received';
+  String get meshtasticReceived => '受信';
 
   @override
   String get weatherRankingExtremeLow => '今日の最低';
@@ -1341,10 +1340,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get shelterCategoryLabel => '対象災害';
 
   @override
-  String get meshtasticStateConnecting => 'Connecting…';
+  String get meshtasticStateConnecting => '接続中…';
 
   @override
-  String get moonTitle => 'Moon';
+  String get moonTitle => '月';
 
   @override
   String get weatherRankingGust => '突風';
@@ -1359,7 +1358,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifySectionWeather => '天気';
 
   @override
-  String get meshtasticPreset => 'Modem preset';
+  String get meshtasticPreset => 'モデムプリセット';
 
   @override
   String get dataSectionSeismic => '地震';
@@ -1386,13 +1385,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get regionCurrent => '現在地';
 
   @override
-  String get meshtasticNotConnected => 'Not connected to a radio';
+  String get meshtasticNotConnected => '無線機に接続されていません';
 
   @override
   String get weatherModeSnow => '雪';
 
   @override
-  String get mapLayerMeshtastic => 'Meshtastic nodes';
+  String get mapLayerMeshtastic => 'Meshtastic ノード';
 
   @override
   String get moreDeveloper => 'デバッグ情報';
@@ -1401,7 +1400,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteB14 => 'ひまわり 長波長赤外線(B14)';
 
   @override
-  String get meshtasticChannelUse => 'Channel use';
+  String get meshtasticChannelUse => 'チャンネル使用率';
 
   @override
   String get mapNavLightning => '稲妻';
@@ -1425,7 +1424,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dpmOpenInMaps => '地図アプリで開く';
 
   @override
-  String get meshtasticNotifyNodes => 'Notify on new nodes';
+  String get meshtasticNotifyNodes => '新しいノードで通知';
 
   @override
   String get onboardingPermCriticalDesc =>
@@ -1435,7 +1434,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteTransparentWarm => '晴れ(暖域) = 透明、地図が透ける';
 
   @override
-  String get meshtasticSent => 'Sent';
+  String get meshtasticSent => '送信済み';
 
   @override
   String get homeForecastTitle => '24時間予報';
@@ -1445,7 +1444,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String meshtasticExcludeMqttHidden(int count) {
-    return '$count hidden';
+    return '$count 件を非表示';
   }
 
   @override
@@ -1461,7 +1460,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportListToday => '今日';
 
   @override
-  String get meshtasticTapNode => 'Tap a node for details';
+  String get meshtasticTapNode => 'ノードをタップして詳細を表示';
 
   @override
   String get commonLoading => '読み込み中…';
@@ -1479,7 +1478,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerCategorySatellite => '衛星';
 
   @override
-  String get meshtasticChannelReady => 'DPIP channel ready';
+  String get meshtasticChannelReady => 'DPIP チャンネルの準備ができました';
 
   @override
   String get mapLayerSatelliteNightmicrophysics => 'ひまわり 夜間微物理';
@@ -1558,7 +1557,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteBtdSo2 => 'ひまわり 二酸化硫黄/雲相';
 
   @override
-  String get meshtasticStateError => 'Error';
+  String get meshtasticStateError => 'エラー';
 
   @override
   String get weatherModeOvercast => '本曇り';
@@ -1582,7 +1581,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get shelterOutdoorLabel => '屋外収容';
 
   @override
-  String get meshtasticStateConnected => 'Connected';
+  String get meshtasticStateConnected => '接続済み';
 
   @override
   String get mapNavRadar => 'レーダー';
@@ -1611,13 +1610,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeRainTrendTitle => '今後1時間の雨';
 
   @override
-  String get moonPhaseFirstQuarter => 'First quarter';
+  String get moonPhaseFirstQuarter => '上弦の月';
 
   @override
   String get mapLayerCategoryTyphoon => '台風';
 
   @override
-  String get meshtasticUtilization => 'Airtime (24h)';
+  String get meshtasticUtilization => 'エアタイム(24h)';
 
   @override
   String get restroomTypeMixed => '男女共用トイレ';
@@ -1635,7 +1634,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteBtdWvirw => 'ひまわり オーバーシューティングトップ';
 
   @override
-  String get meshtasticReadingAge => 'Reading taken';
+  String get meshtasticReadingAge => '計測時刻';
 
   @override
   String get mapAppCallFailed => 'この端末では通話できません';
@@ -1656,7 +1655,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailLocalFelt => '局地的な有感地震';
 
   @override
-  String get meshtasticDevice => 'Device';
+  String get meshtasticDevice => 'デバイス';
 
   @override
   String get onboardingGrant => '許可';
@@ -1704,7 +1703,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportListEmptyFiltered => '条件に一致する地震報告はありません';
 
   @override
-  String get meshtasticExcludeMqtt => 'Hide MQTT nodes';
+  String get meshtasticExcludeMqtt => 'MQTT ノードを隠す';
 
   @override
   String get mapNavTyphoon => '台風';
@@ -1742,13 +1741,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get navHome => 'ホーム';
 
   @override
-  String get meshtasticRegionLabel => 'Region';
+  String get meshtasticRegionLabel => '地域';
 
   @override
   String get mapLayerSatelliteCloudtop => 'ひまわり 雲頂温度';
 
   @override
-  String get moonTimelineCaption => 'Phase';
+  String get moonTimelineCaption => '月相';
 
   @override
   String get openSourceLicenses => 'オープンソースライセンス';
@@ -1768,7 +1767,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get radarScanRange => '走査範囲を表示';
 
   @override
-  String get meshtasticHopLimit => 'Hop limit';
+  String get meshtasticHopLimit => 'ホップ数上限';
 
   @override
   String get weatherRankingExtremeHigh => '今日の最高';
@@ -1783,7 +1782,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteNaturalcolor => 'ひまわり ナチュラルカラー';
 
   @override
-  String get meshtasticAirtime => 'Air time (TX)';
+  String get meshtasticAirtime => 'エアタイム(TX)';
 
   @override
   String shelterCapacityValue(int n) {
@@ -1796,7 +1795,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get meshtasticSendHint => 'Message to broadcast';
+  String get meshtasticSendHint => '送信するメッセージ';
 
   @override
   String monitorDelay(String value) {
@@ -1810,7 +1809,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerSatelliteB08 => 'ひまわり 上層水蒸気(B08)';
 
   @override
-  String get meshtasticReconnecting => 'Reconnecting…';
+  String get meshtasticReconnecting => '再接続中…';
 
   @override
   String get radarTownOutlineSubtitle => 'レーダーエコーの下でも市町村境界が見えるようにします。';
@@ -1971,49 +1970,49 @@ class AppLocalizationsJa extends AppLocalizations {
   String get endpointServiceRts => 'RTS';
 
   @override
-  String get endpointServiceRadar => 'Radar';
+  String get endpointServiceRadar => 'レーダー';
 
   @override
-  String get endpointServiceSatellite => 'Satellite';
+  String get endpointServiceSatellite => '衛星画像';
 
   @override
   String get endpointServiceQpesums => 'QPE';
 
   @override
-  String get endpointServiceWind => 'Wind';
+  String get endpointServiceWind => '風';
 
   @override
-  String get endpointServiceDpm => 'Disaster points';
+  String get endpointServiceDpm => '災害地点';
 
   @override
-  String get endpointServiceWeather => 'Weather';
+  String get endpointServiceWeather => '天気';
 
   @override
-  String get endpointServiceRain => 'Rain';
+  String get endpointServiceRain => '雨';
 
   @override
-  String get endpointServiceLightning => 'Lightning';
+  String get endpointServiceLightning => '雷';
 
   @override
-  String get endpointServiceTyphoon => 'Typhoon';
+  String get endpointServiceTyphoon => '台風';
 
   @override
-  String get endpointServiceReport => 'EQ reports';
+  String get endpointServiceReport => '地震報告';
 
   @override
-  String get endpointServiceTremStation => 'Tremor station';
+  String get endpointServiceTremStation => '震度計';
 
   @override
-  String get endpointServiceEvent => 'Events';
+  String get endpointServiceEvent => 'イベント';
 
   @override
-  String get endpointServiceLocation => 'Location';
+  String get endpointServiceLocation => '位置情報';
 
   @override
-  String get endpointServiceNotify => 'Notifications';
+  String get endpointServiceNotify => '通知';
 
   @override
-  String get endpointServiceOther => 'Other';
+  String get endpointServiceOther => 'その他';
 
   @override
   String get feedConnecting => '接続中…';
@@ -2036,17 +2035,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get meshtasticBusyBody =>
-      'Disconnect it in the other Meshtastic app first. Two apps on one radio take each other\'s messages, so some will go missing.';
+      '先に別の Meshtastic アプリで無線機を切断してください。1 台の無線機を 2 つのアプリで使うと互いのメッセージを奪い合い、一部が失われます。';
 
   @override
-  String get meshtasticChannelNoSlot =>
-      'No free channel slot — free one on the radio';
+  String get meshtasticChannelNoSlot => '空きチャンネルがありません — 無線機で1つ空けてください';
 
   @override
   String get restroomCategoryTransport => '交通';
 
   @override
-  String get meshtasticBattery => 'Battery';
+  String get meshtasticBattery => 'バッテリー';
 
   @override
   String get meshtasticDistance => '距離';
@@ -2065,7 +2063,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String meshtasticRegionMismatch(String region) {
-    return 'Radio region is $region — DPIP needs TW';
+    return '無線機の地域は $region です — DPIP は TW が必要です';
   }
 
   @override
@@ -2192,7 +2190,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get rainInterval10m => '10分';
 
   @override
-  String get meshtasticConnectAnyway => 'Connect anyway';
+  String get meshtasticConnectAnyway => '接続する';
 
   @override
   String reportListDayCount(int count) {
@@ -2235,7 +2233,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerCategoryRadar => 'レーダー';
 
   @override
-  String get meshtasticShortName => 'Short name';
+  String get meshtasticShortName => '短縮名';
 
   @override
   String get mapLayerSatelliteAirmass => 'ひまわり エアマス';
@@ -2262,7 +2260,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get meshtasticRegionConfirm =>
-      'Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.';
+      'この無線機を TW 地域に切り替えますか?再起動して一時的に切断され、他のチャンネルも移動します。';
 
   @override
   String get dataEarthquakeSubtitle => '地震報告';
@@ -2280,69 +2278,111 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingTermsTitle => 'サービス利用規約';
 
   @override
-  String get mapGsiOverlay => '詳細地図（地理院タイル）';
+  String get mapOsmOverlay => '詳細地図';
 
   @override
-  String get mapGsiOverlayHint => '国土地理院の高解像度地形図を追加';
+  String get mapOsmOverlayHint => '道路、建物、地名をより詳しく表示';
 
   @override
-  String get mapGsiDetails => 'レイヤー詳細';
+  String get mapOsmDetails => '詳細地図のレイヤー';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => 'データ提供元';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '$enabled / $total レイヤーを有効化';
   }
 
   @override
-  String get mapGsiSurface => '地表';
+  String get mapOsmSurface => '地表';
 
   @override
-  String get mapGsiParks => '公園';
+  String get mapOsmParks => '公園';
 
   @override
-  String get mapGsiLandUse => '土地利用';
+  String get mapOsmLandUse => '土地利用';
 
   @override
-  String get mapGsiAirportAreas => '空港エリア';
+  String get mapOsmAirportAreas => '空港エリア';
 
   @override
-  String get mapGsiWater => '水域';
+  String get mapOsmWater => '水域';
 
   @override
-  String get mapGsiRivers => '河川';
+  String get mapOsmRivers => '河川';
 
   @override
-  String get mapGsiBoundaries => '境界';
+  String get mapOsmBoundaries => '境界';
 
   @override
-  String get mapGsiBuildings => '建物';
+  String get mapOsmBuildings => '建物';
 
   @override
-  String get mapGsiRoads => '道路';
+  String get mapOsmRoads => '道路';
 
   @override
-  String get mapGsiRoadNames => '道路名';
+  String get mapOsmRoadNames => '道路名';
 
   @override
-  String get mapGsiWaterNames => '水域名';
+  String get mapOsmWaterNames => '水域名';
 
   @override
-  String get mapGsiPeaks => '山頂';
+  String get mapOsmPeaks => '山頂';
 
   @override
-  String get mapGsiAirportNames => '空港名';
+  String get mapOsmAirportNames => '空港名';
 
   @override
-  String get mapGsiPlaceNames => '地名';
+  String get mapOsmPlaceNames => '地名';
 
   @override
-  String get mapGsiPoi => '注目施設';
+  String get mapOsmPoi => '注目施設';
 
   @override
-  String get mapGsiHouseNumbers => '住居表示';
+  String get mapOsmHouseNumbers => '住居表示';
 
   @override
-  String get mapGsiRestoreAll => 'すべて復元';
+  String get mapOsmRestoreAll => 'すべて復元';
+
+  @override
+  String get mapOsmSectionNatural => '自然地物';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => '道路と建物';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => 'ラベルと場所';
 
   @override
   String get mapTownLabels => '郷鎮名';
@@ -2351,10 +2391,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifySetFailed => '設定を保存できませんでした。もう一度お試しください。';
 
   @override
-  String get meshtasticDisconnect => 'Disconnect';
+  String get meshtasticDisconnect => '切断';
 
   @override
-  String get meshtasticUndecoded => 'Not decrypted';
+  String get meshtasticUndecoded => '復号されていません';
 
   @override
   String get notifyAnnouncement => 'お知らせ';
@@ -3073,6 +3113,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get moreDumpDiagnosticsHint => 'アップロードしてリンクをコピーします';
+
+  @override
+  String get dumpIncludeSensitive => '正確な位置情報を含める';
+
+  @override
+  String get dumpIncludeSensitiveHint =>
+      'ログとバックグラウンド位置情報の座標を含めます。未選択の場合は null に置き換えます';
+
+  @override
+  String get dumpUpload => 'アップロード';
 
   @override
   String get dumpUploaded => 'アップロードしました';

@@ -198,6 +198,44 @@ void main() {
     }
   });
 
+  testWidgets('lists formal data sources quietly under About', (tester) async {
+    await _pump(tester, _router([]));
+    await tester.fling(find.byType(ListView), const Offset(0, -5000), 5000);
+    // The support card breathes forever; a fixed pump completes the fling.
+    await tester.pump(const Duration(milliseconds: 600));
+    const sources = [
+      '探索智慧科技有限公司 — TREM-Net',
+      '交通部中央氣象署 (CWA)',
+      '気象庁 (JMA)',
+      '國家災害防救科技中心 (NCDR)',
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)',
+      'National Oceanic and Atmospheric Administration / National Centers '
+          'for Environmental Prediction — Global Forecast System '
+          '(NOAA/NCEP GFS)',
+      '政府資料開放平臺',
+      '© OpenStreetMap contributors',
+      'National Aeronautics and Space Administration / Goddard Space Flight '
+          'Center Scientific Visualization Studio — CGI Moon Kit '
+          '(NASA/GSFC SVS)',
+    ];
+
+    expect(find.text('Data sources'), findsOneWidget);
+    for (final source in sources) {
+      expect(find.text(source), findsOneWidget, reason: '$source missing');
+    }
+    expect(
+      tester.getTopLeft(find.text(sources.first)).dy,
+      lessThan(tester.getTopLeft(find.text(sources[1])).dy),
+    );
+    expect(
+      tester.widget<Text>(find.text(sources.first)).style?.fontSize,
+      Theme.of(tester.element(find.text(sources.first)))
+          .textTheme
+          .labelSmall
+          ?.fontSize,
+    );
+  });
+
   testWidgets('the beta and partners groups sit under 取得 App', (tester) async {
     await _pump(tester, _router([]));
     final l10n = AppLocalizations.of(tester.element(find.byType(MorePage)));

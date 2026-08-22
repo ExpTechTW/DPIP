@@ -12,6 +12,7 @@ import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/dump_link_dialog.dart';
+import 'package:dpip/shared/widgets/dump_upload_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,8 @@ import 'package:talker_flutter/talker_flutter.dart';
 Future<bool> runDiagnosticsDump(BuildContext context) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
+  final includeSensitive = await showDumpUploadDialog(context);
+  if (includeSensitive == null || !context.mounted) return false;
   final uploader = context.read<DumpUploader>();
   final collector = DiagnosticsCollector(
     notifications: context.read<NotificationService>(),
@@ -55,14 +58,15 @@ Future<bool> runDiagnosticsDump(BuildContext context) async {
           message: entry.displayMessage,
         ),
     ];
-    final url = await uploader.upload(
-      buildDump(
-        diagnostics: diagnosticsText(
-          report.sections,
-          redacted: diagnosticsRedactedLabels,
-        ),
-        logLines: lines,
+    final dump = buildDump(
+      diagnostics: diagnosticsText(
+        report.sections,
+        nulled: includeSensitive ? const {} : diagnosticsSensitiveLabels,
       ),
+      logLines: lines,
+    );
+    final url = await uploader.upload(
+      includeSensitive ? dump : redactSensitiveDump(dump),
     );
     if (url == null) {
       fail();

@@ -164,6 +164,13 @@ class RainMapLayer
           menuChildren: [
             MapMenuScrollView(
               children: [
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.rainIntervalSection),
                 for (final option in RainInterval.values)
                   MenuItemButton(
@@ -173,14 +180,6 @@ class RainMapLayer
                         : null,
                     child: Text(option.label(l10n)),
                   ),
-                const MapMenuDivider(),
-                SectionHeader(l10n.mapOverlaySectionMap),
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
-                ),
               ],
             ),
           ],

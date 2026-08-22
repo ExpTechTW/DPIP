@@ -2318,70 +2318,112 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingTermsTitle => 'Terms of Service';
 
   @override
-  String get mapGsiOverlay => 'Detailed map (GSI)';
+  String get mapOsmOverlay => 'Detailed map';
 
   @override
-  String get mapGsiOverlayHint =>
-      'Add high-resolution terrain from Japan\'s GSI';
+  String get mapOsmOverlayHint =>
+      'Show more complete roads, buildings, and place labels';
 
   @override
-  String get mapGsiDetails => 'Layer details';
+  String get mapOsmDetails => 'Detailed map layers';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => 'Data sources';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '$enabled of $total layers enabled';
   }
 
   @override
-  String get mapGsiSurface => 'Surface';
+  String get mapOsmSurface => 'Surface';
 
   @override
-  String get mapGsiParks => 'Parks';
+  String get mapOsmParks => 'Parks';
 
   @override
-  String get mapGsiLandUse => 'Land use';
+  String get mapOsmLandUse => 'Land use';
 
   @override
-  String get mapGsiAirportAreas => 'Airport areas';
+  String get mapOsmAirportAreas => 'Airport areas';
 
   @override
-  String get mapGsiWater => 'Water';
+  String get mapOsmWater => 'Water';
 
   @override
-  String get mapGsiRivers => 'Rivers';
+  String get mapOsmRivers => 'Rivers';
 
   @override
-  String get mapGsiBoundaries => 'Boundaries';
+  String get mapOsmBoundaries => 'Boundaries';
 
   @override
-  String get mapGsiBuildings => 'Buildings';
+  String get mapOsmBuildings => 'Buildings';
 
   @override
-  String get mapGsiRoads => 'Roads';
+  String get mapOsmRoads => 'Roads';
 
   @override
-  String get mapGsiRoadNames => 'Road names';
+  String get mapOsmRoadNames => 'Road names';
 
   @override
-  String get mapGsiWaterNames => 'Water names';
+  String get mapOsmWaterNames => 'Water names';
 
   @override
-  String get mapGsiPeaks => 'Peaks';
+  String get mapOsmPeaks => 'Peaks';
 
   @override
-  String get mapGsiAirportNames => 'Airport names';
+  String get mapOsmAirportNames => 'Airport names';
 
   @override
-  String get mapGsiPlaceNames => 'Place names';
+  String get mapOsmPlaceNames => 'Place names';
 
   @override
-  String get mapGsiPoi => 'Points of interest';
+  String get mapOsmPoi => 'Points of interest';
 
   @override
-  String get mapGsiHouseNumbers => 'House numbers';
+  String get mapOsmHouseNumbers => 'House numbers';
 
   @override
-  String get mapGsiRestoreAll => 'Restore all';
+  String get mapOsmRestoreAll => 'Restore all';
+
+  @override
+  String get mapOsmSectionNatural => 'Natural features';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => 'Roads & buildings';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => 'Labels & places';
 
   @override
   String get mapTownLabels => 'Township names';
@@ -3126,6 +3168,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get moreDumpDiagnosticsHint =>
       'Uploads them and copies a link to paste into a report';
+
+  @override
+  String get dumpIncludeSensitive => 'Include precise location';
+
+  @override
+  String get dumpIncludeSensitiveHint =>
+      'Includes coordinates from logs and background location; otherwise they are replaced with null';
+
+  @override
+  String get dumpUpload => 'Upload';
 
   @override
   String get dumpUploaded => 'Uploaded';
