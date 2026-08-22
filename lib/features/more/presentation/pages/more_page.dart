@@ -15,6 +15,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
+import 'package:dpip/features/more/domain/developer_note.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
@@ -52,6 +53,10 @@ class MorePage extends StatelessWidget {
             // half of the line, support takes the top half of the right column,
             // and Discord and announcements split the bottom half of it.
             const _HeroCards(),
+            // Straight under the support callout: the developers' current
+            // word, tracked in Dart rather than ARB because it moves faster
+            // than a release cycle.
+            const _DeveloperNoteCard(),
             SectionHeader(l10n.moreSectionRegion),
             _MoreGroup(
               children: [
@@ -715,6 +720,80 @@ class _HeroCards extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The developers' current word, right under the support callout.
+///
+/// A quiet flat card, one step below the hero column: it asks nothing and it
+/// is not an entry point, so it carries the same neutral surface as the
+/// announcement card but none of its link affordance. The copy lives in
+/// [developerNoteFor] — Dart, not ARB, because a note about a live incident
+/// is outdated by the time an ARB change reaches a store build.
+class _DeveloperNoteCard extends StatelessWidget {
+  const _DeveloperNoteCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final note = developerNoteFor(Localizations.localeOf(context).toString());
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: colors.surfaceContainerHigh,
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.surfaceContainerHighest,
+                    ),
+                    child: Icon(
+                      Icons.chat_bubble_outline,
+                      color: colors.onSurfaceVariant,
+                      size: 19,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      note.title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colors.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                note.body,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

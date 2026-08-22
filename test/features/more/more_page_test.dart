@@ -26,6 +26,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
+import 'package:dpip/features/more/domain/developer_note.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -268,6 +269,17 @@ void main() {
       );
     },
   );
+
+  testWidgets('the developer note sits under Support DPIP', (tester) async {
+    await _pump(tester, _router([]));
+    // The default test locale is en-US, so the card serves the English note.
+    final note = developerNoteFor('en');
+    expect(find.text(note.title), findsOneWidget);
+    expect(find.text(note.body), findsOneWidget);
+    final support = tester.getTopLeft(find.text('Support DPIP')).dy;
+    final noteTop = tester.getTopLeft(find.text(note.title)).dy;
+    expect(noteTop, greaterThan(support));
+  });
 
   testWidgets('the notification log sits with the notification settings', (
     tester,
