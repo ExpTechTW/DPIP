@@ -1106,7 +1106,7 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
-  "mapGsiOverlay": "詳細地圖（地理院タイル）",
+  "mapGsiOverlay": "詳細地圖（國土交通省地理院）",
   "mapGsiOverlayHint": "加入日本地理院的高解析度地形圖",
   "mapGsiDetails": "詳細設定",
   "mapGsiDetailsHint": "已啟用 {enabled} / 共 {total} 個圖層",
