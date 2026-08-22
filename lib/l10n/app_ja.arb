@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "お知らせ",
   "moreTagline": "防災情報統合プラットフォーム",
   "moreVersionStable": "正式版",
-  "moreVersionNotes": "現在のバージョン",
+  "moreVersionNotes": "今回の更新",
+  "moreVersionNotesHighlightsSubtitle": "このバージョンでの変更点",
   "releaseHighlightsSeeNotes": "完全なリリースノート",
-  "releaseHighlightsTitle": "今回の更新",
+  "releaseHighlightsTitle": "{train} まとめ",
   "releaseHighlightsTabNormal": "変更点",
   "releaseHighlightsTabAdvanced": "技術詳細",
   "releaseHighlightsEmpty": "まだコンテンツがありません。",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "詳細地図（地理院タイル）",
+  "mapGsiOverlayHint": "国土地理院の高解像度地形図を追加",
+  "mapGsiDetails": "レイヤー詳細",
+  "mapGsiDetailsHint": "{enabled} / {total} レイヤーを有効化",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "地表",
+  "mapGsiParks": "公園",
+  "mapGsiLandUse": "土地利用",
+  "mapGsiAirportAreas": "空港エリア",
+  "mapGsiWater": "水域",
+  "mapGsiRivers": "河川",
+  "mapGsiBoundaries": "境界",
+  "mapGsiBuildings": "建物",
+  "mapGsiRoads": "道路",
+  "mapGsiRoadNames": "道路名",
+  "mapGsiWaterNames": "水域名",
+  "mapGsiPeaks": "山頂",
+  "mapGsiAirportNames": "空港名",
+  "mapGsiPlaceNames": "地名",
+  "mapGsiPoi": "注目施設",
+  "mapGsiHouseNumbers": "住居表示",
+  "mapGsiRestoreAll": "すべて復元",
   "mapTownLabels": "郷鎮名",
   "notifySetFailed": "設定を保存できませんでした。もう一度お試しください。",
   "meshtasticDisconnect": "Disconnect",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "「{what}」は拒否されており、システムは再度確認しません。設定から許可してください。",
+  "permissionGuideNotification": "システム設定から通知を許可してください。",
+  "permissionGuideForegroundLocation": "システム設定から正確な位置情報を許可してください。",
+  "permissionGuideBackgroundLocation": "「{option}」で「常に許可」を選択してください。",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "システム設定でバックグラウンド実行を許可し、通知が停止されないようにしてください。",
+  "permissionGuideUnusedPause": "アプリが「未使用」と表示される場合は、システム設定で「許可」を選択してください。",
+  "permissionGuideUnusedFreeSpace": "ストレージ不足で一時停止された場合は、キャッシュを削除して再度開いてください。",
+  "permissionGuideUnusedRevoke": "アプリの権限が取り消された場合は、システム設定で再度許可してください。",
+  "permissionGuideUnusedPlayProtect": "Play プロテクトが一時停止した場合は、Google Play でアプリの状態を確認してください。",
+  "permissionGuideVendorPower": "「{vendor}」の省電力設定で、このアプリを「制限なし」に設定してください。",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "まだ必要です。設定から有効にしてください。",
+  "permissionVerifyManually": "システム設定でこの権限が有効かどうか手動で確認してください。",
+  "permissionBackgroundLocationOption": "「常に許可」",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

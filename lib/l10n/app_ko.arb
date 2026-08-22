@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "공지사항",
   "moreTagline": "재해 정보 통합 플랫폼",
   "moreVersionStable": "정식 버전",
-  "moreVersionNotes": "현재 버전",
+  "moreVersionNotes": "이번 업데이트",
+  "moreVersionNotesHighlightsSubtitle": "이번 버전의 변경 사항",
   "releaseHighlightsSeeNotes": "전체 릴리스 노트",
-  "releaseHighlightsTitle": "이번 업데이트",
+  "releaseHighlightsTitle": "{train} 주요 내용",
   "releaseHighlightsTabNormal": "변경된 점",
   "releaseHighlightsTabAdvanced": "기술 세부",
   "releaseHighlightsEmpty": "아직 내용이 없습니다.",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "상세 지도(GSI)",
+  "mapGsiOverlayHint": "일본 GSI의 고해상도 지형도를 추가",
+  "mapGsiDetails": "레이어 세부 정보",
+  "mapGsiDetailsHint": "{enabled} / {total}개 레이어 사용 중",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "지표면",
+  "mapGsiParks": "공원",
+  "mapGsiLandUse": "토지 이용",
+  "mapGsiAirportAreas": "공항 지역",
+  "mapGsiWater": "수역",
+  "mapGsiRivers": "하천",
+  "mapGsiBoundaries": "경계",
+  "mapGsiBuildings": "건물",
+  "mapGsiRoads": "도로",
+  "mapGsiRoadNames": "도로명",
+  "mapGsiWaterNames": "수역 이름",
+  "mapGsiPeaks": "봉우리",
+  "mapGsiAirportNames": "공항 이름",
+  "mapGsiPlaceNames": "지명",
+  "mapGsiPoi": "관심 지점",
+  "mapGsiHouseNumbers": "건물 번호",
+  "mapGsiRestoreAll": "모두 복원",
   "mapTownLabels": "읍면동 이름",
   "notifySetFailed": "설정을 저장하지 못했습니다. 다시 시도해 주세요.",
   "meshtasticDisconnect": "Disconnect",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "「{what}」이(가) 거부되어 시스템이 다시 묻지 않습니다. 설정에서 허용해 주세요.",
+  "permissionGuideNotification": "시스템 설정에서 알림을 허용해 주세요.",
+  "permissionGuideForegroundLocation": "시스템 설정에서 정확한 위치를 허용해 주세요.",
+  "permissionGuideBackgroundLocation": "「{option}」에서 「항상 허용」을 선택하세요.",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "시스템 설정에서 백그라운드 실행을 허용하여 알림이 중지되지 않게 하세요.",
+  "permissionGuideUnusedPause": "앱이 「사용 안 함」으로 표시되면 시스템 설정에서 「허용」을 선택하세요.",
+  "permissionGuideUnusedFreeSpace": "저장 공간 부족으로 일시중지된 경우 캐시를 지우고 다시 여세요.",
+  "permissionGuideUnusedRevoke": "앱 권한이 취소된 경우 시스템 설정에서 다시 허용하세요.",
+  "permissionGuideUnusedPlayProtect": "Play 프로텍트가 앱을 일시중지한 경우 Google Play에서 상태를 확인하세요.",
+  "permissionGuideVendorPower": "「{vendor}」의 절전 설정에서 이 앱을 「제한 없음」으로 설정하세요.",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "아직 필요합니다. 설정에서 활성화하세요.",
+  "permissionVerifyManually": "시스템 설정에서 이 권한이 활성화되어 있는지 직접 확인하세요.",
+  "permissionBackgroundLocationOption": "「항상 허용」",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "ประกาศ",
   "moreTagline": "แพลตฟอร์มรวมข้อมูลป้องกันภัยพิบัติ",
   "moreVersionStable": "เวอร์ชันเต็ม",
-  "moreVersionNotes": "เวอร์ชันปัจจุบัน",
+  "moreVersionNotes": "อัปเดตนี้",
+  "moreVersionNotesHighlightsSubtitle": "สิ่งที่เปลี่ยนไปในเวอร์ชันนี้",
   "releaseHighlightsSeeNotes": "ดูบันทึกทั้งหมด",
-  "releaseHighlightsTitle": "สิ่งที่เปลี่ยนแปลง",
+  "releaseHighlightsTitle": "{train} สรุปสำคัญ",
   "releaseHighlightsTabNormal": "สำหรับผู้ใช้",
   "releaseHighlightsTabAdvanced": "เจาะลึก",
   "releaseHighlightsEmpty": "ยังไม่มีเนื้อหา",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "แผนที่รายละเอียด (GSI)",
+  "mapGsiOverlayHint": "เพิ่มภูมิประเทศความละเอียดสูงจาก GSI ของญี่ปุ่น",
+  "mapGsiDetails": "รายละเอียดเลเยอร์",
+  "mapGsiDetailsHint": "เปิดใช้งาน {enabled} จากทั้งหมด {total} เลเยอร์",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "พื้นผิว",
+  "mapGsiParks": "สวนสาธารณะ",
+  "mapGsiLandUse": "การใช้ที่ดิน",
+  "mapGsiAirportAreas": "พื้นที่สนามบิน",
+  "mapGsiWater": "พื้นที่น้ำ",
+  "mapGsiRivers": "แม่น้ำ",
+  "mapGsiBoundaries": "ขอบเขต",
+  "mapGsiBuildings": "อาคาร",
+  "mapGsiRoads": "ถนน",
+  "mapGsiRoadNames": "ชื่อถนน",
+  "mapGsiWaterNames": "ชื่อพื้นที่น้ำ",
+  "mapGsiPeaks": "ยอดเขา",
+  "mapGsiAirportNames": "ชื่อสนามบิน",
+  "mapGsiPlaceNames": "ชื่อสถานที่",
+  "mapGsiPoi": "จุดน่าสนใจ",
+  "mapGsiHouseNumbers": "เลขที่บ้าน",
+  "mapGsiRestoreAll": "คืนค่าทั้งหมด",
   "mapTownLabels": "ชื่อตำบล",
   "notifySetFailed": "ไม่สามารถบันทึกการตั้งค่าได้ โปรดลองอีกครั้ง",
   "meshtasticDisconnect": "Disconnect",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "“{what}” ถูกปฏิเสธไว้ และระบบจะไม่ถามอีก โปรดเปิดในการตั้งค่า",
+  "permissionGuideNotification": "เปิดการตั้งค่าระบบเพื่ออนุญาตการแจ้งเตือน",
+  "permissionGuideForegroundLocation": "เปิดการตั้งค่าระบบเพื่ออนุญาตตำแหน่งที่แม่นยำ",
+  "permissionGuideBackgroundLocation": "ใน “{option}” ให้เลือก “อนุญาตตลอดเวลา”",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "อนุญาตการทำงานเบื้องหลังในการตั้งค่าระบบเพื่อไม่ให้หยุดการแจ้งเตือน",
+  "permissionGuideUnusedPause": "หากแอปถูกทำเครื่องหมายเป็น “ไม่ได้ใช้” ให้เลือก “อนุญาต” ในการตั้งค่าระบบ",
+  "permissionGuideUnusedFreeSpace": "หากแอปถูกหยุดชั่วคราวเพราะพื้นที่จัดเก็บ ให้ล้างแคชแล้วเปิดใหม่",
+  "permissionGuideUnusedRevoke": "หากสิทธิ์ของแอปถูกเพิกถอน ให้อนุญาตอีกครั้งในการตั้งค่าระบบ",
+  "permissionGuideUnusedPlayProtect": "หาก Play Protect หยุดแอปชั่วคราว ให้ตรวจสอบสถานะใน Google Play",
+  "permissionGuideVendorPower": "ในการตั้งค่าประหยัดพลังงานของ “{vendor}” ให้ตั้งค่าแอปนี้เป็น “ไม่จำกัด”",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "ยังจำเป็น — เปิดการตั้งค่าเพื่อเปิดใช้งาน",
+  "permissionVerifyManually": "โปรดตรวจสอบด้วยตนเองว่าสิทธิ์นี้เปิดใช้งานในการตั้งค่าระบบ",
+  "permissionBackgroundLocationOption": "“อนุญาตตลอดเวลา”",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

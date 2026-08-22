@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "公告",
   "moreTagline": "防灾信息整合平台",
   "moreVersionStable": "正式版",
-  "moreVersionNotes": "当前版本",
+  "moreVersionNotes": "本次更新",
+  "moreVersionNotesHighlightsSubtitle": "这个版本做了哪些改变",
   "releaseHighlightsSeeNotes": "查看完整更新日志",
-  "releaseHighlightsTitle": "本次更新",
+  "releaseHighlightsTitle": "{train} 重点整理",
   "releaseHighlightsTabNormal": "做了哪些改变",
   "releaseHighlightsTabAdvanced": "深入技术",
   "releaseHighlightsEmpty": "目前没有内容。",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "详细地图（地理院瓦片）",
+  "mapGsiOverlayHint": "加入日本地理院的高分辨率地形图",
+  "mapGsiDetails": "详细设置",
+  "mapGsiDetailsHint": "已启用 {enabled} / 共 {total} 个图层",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "地表",
+  "mapGsiParks": "公园",
+  "mapGsiLandUse": "土地利用",
+  "mapGsiAirportAreas": "机场区域",
+  "mapGsiWater": "水域",
+  "mapGsiRivers": "河川",
+  "mapGsiBoundaries": "边界",
+  "mapGsiBuildings": "建筑物",
+  "mapGsiRoads": "道路",
+  "mapGsiRoadNames": "道路名称",
+  "mapGsiWaterNames": "水域名称",
+  "mapGsiPeaks": "山峰",
+  "mapGsiAirportNames": "机场名称",
+  "mapGsiPlaceNames": "地名",
+  "mapGsiPoi": "地标",
+  "mapGsiHouseNumbers": "门牌号码",
+  "mapGsiRestoreAll": "全部恢复",
   "mapTownLabels": "乡镇名称",
   "notifySetFailed": "设置失败，请稍后再试。",
   "meshtasticDisconnect": "斷線",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "「{what}」已被拒绝，系统不会再询问。请到设置中开启。",
+  "permissionGuideNotification": "请到系统设置中开启通知权限。",
+  "permissionGuideForegroundLocation": "请到系统设置中开启精确位置权限。",
+  "permissionGuideBackgroundLocation": "请在「{option}」中改为「允许所有时间」。",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "请到系统设置中允许后台执行,避免收到通知时被系统暂停。",
+  "permissionGuideUnusedPause": "若应用被标记为「未使用」,请在系统设置中改为「允许」。",
+  "permissionGuideUnusedFreeSpace": "若应用因缓存空间不足被暂停,请清除缓存后重新打开。",
+  "permissionGuideUnusedRevoke": "若应用权限被撤销,请在系统设置中重新授予。",
+  "permissionGuideUnusedPlayProtect": "若被 Play 保护机制暂停,请到 Google Play 中检查应用状态。",
+  "permissionGuideVendorPower": "请到「{vendor}」的省电设置中,将本应用设为「不限制」。",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "仍然需要此权限,请到设置中打开。",
+  "permissionVerifyManually": "请手动确认此权限已在系统设置中打开。",
+  "permissionBackgroundLocationOption": "「允许所有时间」",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

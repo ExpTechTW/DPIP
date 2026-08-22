@@ -2652,8 +2652,9 @@
   "moreAnnouncements": "Announcements",
   "moreTagline": "Disaster Prevention Information Platform",
   "moreVersionStable": "Release",
-  "moreVersionNotes": "This version",
-  "releaseHighlightsTitle": "What changed in this release",
+  "moreVersionNotes": "This update",
+  "moreVersionNotesHighlightsSubtitle": "What changed in this release",
+  "releaseHighlightsTitle": "{train} key highlights",
   "releaseHighlightsTabNormal": "For users",
   "releaseHighlightsTabAdvanced": "Deep dive",
   "releaseHighlightsEmpty": "Nothing here yet.",
@@ -2830,6 +2831,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "Detailed map (GSI)",
+  "mapGsiOverlayHint": "Add high-resolution terrain from Japan's GSI",
+  "mapGsiDetails": "Layer details",
+  "mapGsiDetailsHint": "{enabled} of {total} layers enabled",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "Surface",
+  "mapGsiParks": "Parks",
+  "mapGsiLandUse": "Land use",
+  "mapGsiAirportAreas": "Airport areas",
+  "mapGsiWater": "Water",
+  "mapGsiRivers": "Rivers",
+  "mapGsiBoundaries": "Boundaries",
+  "mapGsiBuildings": "Buildings",
+  "mapGsiRoads": "Roads",
+  "mapGsiRoadNames": "Road names",
+  "mapGsiWaterNames": "Water names",
+  "mapGsiPeaks": "Peaks",
+  "mapGsiAirportNames": "Airport names",
+  "mapGsiPlaceNames": "Place names",
+  "mapGsiPoi": "Points of interest",
+  "mapGsiHouseNumbers": "House numbers",
+  "mapGsiRestoreAll": "Restore all",
   "mapTownLabels": "Township names",
   "@typhoonOverlayWarningTooltip": {
     "description": "Tooltip for the warning-areas overlay toggle"
@@ -3554,6 +3587,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "“{what}” was declined, and the system will not ask again. Turn it on in Settings.",
+  "permissionGuideNotification": "Open System Settings to allow notifications.",
+  "permissionGuideForegroundLocation": "Open System Settings to allow precise location.",
+  "permissionGuideBackgroundLocation": "In “{option}”, choose “Allow all the time”.",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "Allow background execution in System Settings so notifications are not paused.",
+  "permissionGuideUnusedPause": "If the app is marked “unused”, choose “Allow” in System Settings.",
+  "permissionGuideUnusedFreeSpace": "If the app was paused for storage, clear cache and reopen it.",
+  "permissionGuideUnusedRevoke": "If the app's permissions were revoked, grant them again in System Settings.",
+  "permissionGuideUnusedPlayProtect": "If Play Protect paused the app, check its status in Google Play.",
+  "permissionGuideVendorPower": "In “{vendor}” power-saving settings, set this app to “Unrestricted”.",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "Still needs attention. Check the highlighted option in Settings.",
+  "permissionVerifyManually": "Please verify this permission is enabled in System Settings.",
+  "permissionBackgroundLocationOption": "“Allow all the time”",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

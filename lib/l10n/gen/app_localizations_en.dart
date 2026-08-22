@@ -2129,10 +2129,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreVersionStable => 'Release';
 
   @override
-  String get moreVersionNotes => 'This version';
+  String get moreVersionNotes => 'This update';
 
   @override
-  String get releaseHighlightsTitle => 'What changed in this release';
+  String get moreVersionNotesHighlightsSubtitle =>
+      'What changed in this release';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train key highlights';
+  }
 
   @override
   String get releaseHighlightsTabNormal => 'For users';
@@ -2310,6 +2316,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => 'Terms of Service';
+
+  @override
+  String get mapGsiOverlay => 'Detailed map (GSI)';
+
+  @override
+  String get mapGsiOverlayHint =>
+      'Add high-resolution terrain from Japan\'s GSI';
+
+  @override
+  String get mapGsiDetails => 'Layer details';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '$enabled of $total layers enabled';
+  }
+
+  @override
+  String get mapGsiSurface => 'Surface';
+
+  @override
+  String get mapGsiParks => 'Parks';
+
+  @override
+  String get mapGsiLandUse => 'Land use';
+
+  @override
+  String get mapGsiAirportAreas => 'Airport areas';
+
+  @override
+  String get mapGsiWater => 'Water';
+
+  @override
+  String get mapGsiRivers => 'Rivers';
+
+  @override
+  String get mapGsiBoundaries => 'Boundaries';
+
+  @override
+  String get mapGsiBuildings => 'Buildings';
+
+  @override
+  String get mapGsiRoads => 'Roads';
+
+  @override
+  String get mapGsiRoadNames => 'Road names';
+
+  @override
+  String get mapGsiWaterNames => 'Water names';
+
+  @override
+  String get mapGsiPeaks => 'Peaks';
+
+  @override
+  String get mapGsiAirportNames => 'Airport names';
+
+  @override
+  String get mapGsiPlaceNames => 'Place names';
+
+  @override
+  String get mapGsiPoi => 'Points of interest';
+
+  @override
+  String get mapGsiHouseNumbers => 'House numbers';
+
+  @override
+  String get mapGsiRestoreAll => 'Restore all';
 
   @override
   String get mapTownLabels => 'Township names';
@@ -2858,6 +2930,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” was declined, and the system will not ask again. Turn it on in Settings.';
   }
+
+  @override
+  String get permissionGuideNotification =>
+      'Open System Settings to allow notifications.';
+
+  @override
+  String get permissionGuideForegroundLocation =>
+      'Open System Settings to allow precise location.';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return 'In “$option”, choose “Allow all the time”.';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      'Allow background execution in System Settings so notifications are not paused.';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      'If the app is marked “unused”, choose “Allow” in System Settings.';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      'If the app was paused for storage, clear cache and reopen it.';
+
+  @override
+  String get permissionGuideUnusedRevoke =>
+      'If the app\'s permissions were revoked, grant them again in System Settings.';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'If Play Protect paused the app, check its status in Google Play.';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return 'In “$vendor” power-saving settings, set this app to “Unrestricted”.';
+  }
+
+  @override
+  String get permissionStillRequired =>
+      'Still needs attention. Check the highlighted option in Settings.';
+
+  @override
+  String get permissionVerifyManually =>
+      'Please verify this permission is enabled in System Settings.';
+
+  @override
+  String get permissionBackgroundLocationOption => '“Allow all the time”';
 
   @override
   String get displayTextSize => 'Text size';

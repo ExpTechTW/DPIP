@@ -4056,14 +4056,20 @@ abstract class AppLocalizations {
   /// No description provided for @moreVersionNotes.
   ///
   /// In en, this message translates to:
-  /// **'This version'**
+  /// **'This update'**
   String get moreVersionNotes;
+
+  /// No description provided for @moreVersionNotesHighlightsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What changed in this release'**
+  String get moreVersionNotesHighlightsSubtitle;
 
   /// No description provided for @releaseHighlightsTitle.
   ///
   /// In en, this message translates to:
-  /// **'What changed in this release'**
-  String get releaseHighlightsTitle;
+  /// **'{train} key highlights'**
+  String releaseHighlightsTitle(Object train);
 
   /// No description provided for @releaseHighlightsTabNormal.
   ///
@@ -4394,6 +4400,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Terms of Service'**
   String get onboardingTermsTitle;
+
+  /// No description provided for @mapGsiOverlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed map (GSI)'**
+  String get mapGsiOverlay;
+
+  /// No description provided for @mapGsiOverlayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add high-resolution terrain from Japan\'s GSI'**
+  String get mapGsiOverlayHint;
+
+  /// No description provided for @mapGsiDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Layer details'**
+  String get mapGsiDetails;
+
+  /// How many of the GSI layers are enabled
+  ///
+  /// In en, this message translates to:
+  /// **'{enabled} of {total} layers enabled'**
+  String mapGsiDetailsHint(int enabled, int total);
+
+  /// No description provided for @mapGsiSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface'**
+  String get mapGsiSurface;
+
+  /// No description provided for @mapGsiParks.
+  ///
+  /// In en, this message translates to:
+  /// **'Parks'**
+  String get mapGsiParks;
+
+  /// No description provided for @mapGsiLandUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Land use'**
+  String get mapGsiLandUse;
+
+  /// No description provided for @mapGsiAirportAreas.
+  ///
+  /// In en, this message translates to:
+  /// **'Airport areas'**
+  String get mapGsiAirportAreas;
+
+  /// No description provided for @mapGsiWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Water'**
+  String get mapGsiWater;
+
+  /// No description provided for @mapGsiRivers.
+  ///
+  /// In en, this message translates to:
+  /// **'Rivers'**
+  String get mapGsiRivers;
+
+  /// No description provided for @mapGsiBoundaries.
+  ///
+  /// In en, this message translates to:
+  /// **'Boundaries'**
+  String get mapGsiBoundaries;
+
+  /// No description provided for @mapGsiBuildings.
+  ///
+  /// In en, this message translates to:
+  /// **'Buildings'**
+  String get mapGsiBuildings;
+
+  /// No description provided for @mapGsiRoads.
+  ///
+  /// In en, this message translates to:
+  /// **'Roads'**
+  String get mapGsiRoads;
+
+  /// No description provided for @mapGsiRoadNames.
+  ///
+  /// In en, this message translates to:
+  /// **'Road names'**
+  String get mapGsiRoadNames;
+
+  /// No description provided for @mapGsiWaterNames.
+  ///
+  /// In en, this message translates to:
+  /// **'Water names'**
+  String get mapGsiWaterNames;
+
+  /// No description provided for @mapGsiPeaks.
+  ///
+  /// In en, this message translates to:
+  /// **'Peaks'**
+  String get mapGsiPeaks;
+
+  /// No description provided for @mapGsiAirportNames.
+  ///
+  /// In en, this message translates to:
+  /// **'Airport names'**
+  String get mapGsiAirportNames;
+
+  /// No description provided for @mapGsiPlaceNames.
+  ///
+  /// In en, this message translates to:
+  /// **'Place names'**
+  String get mapGsiPlaceNames;
+
+  /// No description provided for @mapGsiPoi.
+  ///
+  /// In en, this message translates to:
+  /// **'Points of interest'**
+  String get mapGsiPoi;
+
+  /// No description provided for @mapGsiHouseNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'House numbers'**
+  String get mapGsiHouseNumbers;
+
+  /// No description provided for @mapGsiRestoreAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore all'**
+  String get mapGsiRestoreAll;
 
   /// Map setting: show township-name labels when the map is zoomed in
   ///
@@ -5474,6 +5606,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'“{what}” was declined, and the system will not ask again. Turn it on in Settings.'**
   String permissionSettingsMessage(String what);
+
+  /// No description provided for @permissionGuideNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Open System Settings to allow notifications.'**
+  String get permissionGuideNotification;
+
+  /// No description provided for @permissionGuideForegroundLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Open System Settings to allow precise location.'**
+  String get permissionGuideForegroundLocation;
+
+  /// Instruction for background location
+  ///
+  /// In en, this message translates to:
+  /// **'In “{option}”, choose “Allow all the time”.'**
+  String permissionGuideBackgroundLocation(Object option);
+
+  /// No description provided for @permissionGuideBackgroundExecution.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow background execution in System Settings so notifications are not paused.'**
+  String get permissionGuideBackgroundExecution;
+
+  /// No description provided for @permissionGuideUnusedPause.
+  ///
+  /// In en, this message translates to:
+  /// **'If the app is marked “unused”, choose “Allow” in System Settings.'**
+  String get permissionGuideUnusedPause;
+
+  /// No description provided for @permissionGuideUnusedFreeSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'If the app was paused for storage, clear cache and reopen it.'**
+  String get permissionGuideUnusedFreeSpace;
+
+  /// No description provided for @permissionGuideUnusedRevoke.
+  ///
+  /// In en, this message translates to:
+  /// **'If the app\'s permissions were revoked, grant them again in System Settings.'**
+  String get permissionGuideUnusedRevoke;
+
+  /// No description provided for @permissionGuideUnusedPlayProtect.
+  ///
+  /// In en, this message translates to:
+  /// **'If Play Protect paused the app, check its status in Google Play.'**
+  String get permissionGuideUnusedPlayProtect;
+
+  /// Instruction for vendor power saving
+  ///
+  /// In en, this message translates to:
+  /// **'In “{vendor}” power-saving settings, set this app to “Unrestricted”.'**
+  String permissionGuideVendorPower(Object vendor);
+
+  /// No description provided for @permissionStillRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Still needs attention. Check the highlighted option in Settings.'**
+  String get permissionStillRequired;
+
+  /// No description provided for @permissionVerifyManually.
+  ///
+  /// In en, this message translates to:
+  /// **'Please verify this permission is enabled in System Settings.'**
+  String get permissionVerifyManually;
+
+  /// No description provided for @permissionBackgroundLocationOption.
+  ///
+  /// In en, this message translates to:
+  /// **'“Allow all the time”'**
+  String get permissionBackgroundLocationOption;
 
   /// Display settings: text size section header
   ///

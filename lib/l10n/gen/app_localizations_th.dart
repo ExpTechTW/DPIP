@@ -2126,10 +2126,16 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreVersionStable => 'เวอร์ชันเต็ม';
 
   @override
-  String get moreVersionNotes => 'เวอร์ชันปัจจุบัน';
+  String get moreVersionNotes => 'อัปเดตนี้';
 
   @override
-  String get releaseHighlightsTitle => 'สิ่งที่เปลี่ยนแปลง';
+  String get moreVersionNotesHighlightsSubtitle =>
+      'สิ่งที่เปลี่ยนไปในเวอร์ชันนี้';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train สรุปสำคัญ';
+  }
 
   @override
   String get releaseHighlightsTabNormal => 'สำหรับผู้ใช้';
@@ -2308,6 +2314,72 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => 'ข้อกำหนดการให้บริการ';
+
+  @override
+  String get mapGsiOverlay => 'แผนที่รายละเอียด (GSI)';
+
+  @override
+  String get mapGsiOverlayHint =>
+      'เพิ่มภูมิประเทศความละเอียดสูงจาก GSI ของญี่ปุ่น';
+
+  @override
+  String get mapGsiDetails => 'รายละเอียดเลเยอร์';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return 'เปิดใช้งาน $enabled จากทั้งหมด $total เลเยอร์';
+  }
+
+  @override
+  String get mapGsiSurface => 'พื้นผิว';
+
+  @override
+  String get mapGsiParks => 'สวนสาธารณะ';
+
+  @override
+  String get mapGsiLandUse => 'การใช้ที่ดิน';
+
+  @override
+  String get mapGsiAirportAreas => 'พื้นที่สนามบิน';
+
+  @override
+  String get mapGsiWater => 'พื้นที่น้ำ';
+
+  @override
+  String get mapGsiRivers => 'แม่น้ำ';
+
+  @override
+  String get mapGsiBoundaries => 'ขอบเขต';
+
+  @override
+  String get mapGsiBuildings => 'อาคาร';
+
+  @override
+  String get mapGsiRoads => 'ถนน';
+
+  @override
+  String get mapGsiRoadNames => 'ชื่อถนน';
+
+  @override
+  String get mapGsiWaterNames => 'ชื่อพื้นที่น้ำ';
+
+  @override
+  String get mapGsiPeaks => 'ยอดเขา';
+
+  @override
+  String get mapGsiAirportNames => 'ชื่อสนามบิน';
+
+  @override
+  String get mapGsiPlaceNames => 'ชื่อสถานที่';
+
+  @override
+  String get mapGsiPoi => 'จุดน่าสนใจ';
+
+  @override
+  String get mapGsiHouseNumbers => 'เลขที่บ้าน';
+
+  @override
+  String get mapGsiRestoreAll => 'คืนค่าทั้งหมด';
 
   @override
   String get mapTownLabels => 'ชื่อตำบล';
@@ -2855,6 +2927,55 @@ class AppLocalizationsTh extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” ถูกปฏิเสธไว้ และระบบจะไม่ถามอีก โปรดเปิดในการตั้งค่า';
   }
+
+  @override
+  String get permissionGuideNotification =>
+      'เปิดการตั้งค่าระบบเพื่ออนุญาตการแจ้งเตือน';
+
+  @override
+  String get permissionGuideForegroundLocation =>
+      'เปิดการตั้งค่าระบบเพื่ออนุญาตตำแหน่งที่แม่นยำ';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return 'ใน “$option” ให้เลือก “อนุญาตตลอดเวลา”';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      'อนุญาตการทำงานเบื้องหลังในการตั้งค่าระบบเพื่อไม่ให้หยุดการแจ้งเตือน';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      'หากแอปถูกทำเครื่องหมายเป็น “ไม่ได้ใช้” ให้เลือก “อนุญาต” ในการตั้งค่าระบบ';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      'หากแอปถูกหยุดชั่วคราวเพราะพื้นที่จัดเก็บ ให้ล้างแคชแล้วเปิดใหม่';
+
+  @override
+  String get permissionGuideUnusedRevoke =>
+      'หากสิทธิ์ของแอปถูกเพิกถอน ให้อนุญาตอีกครั้งในการตั้งค่าระบบ';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'หาก Play Protect หยุดแอปชั่วคราว ให้ตรวจสอบสถานะใน Google Play';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return 'ในการตั้งค่าประหยัดพลังงานของ “$vendor” ให้ตั้งค่าแอปนี้เป็น “ไม่จำกัด”';
+  }
+
+  @override
+  String get permissionStillRequired =>
+      'ยังจำเป็น — เปิดการตั้งค่าเพื่อเปิดใช้งาน';
+
+  @override
+  String get permissionVerifyManually =>
+      'โปรดตรวจสอบด้วยตนเองว่าสิทธิ์นี้เปิดใช้งานในการตั้งค่าระบบ';
+
+  @override
+  String get permissionBackgroundLocationOption => '“อนุญาตตลอดเวลา”';
 
   @override
   String get displayTextSize => 'ขนาดตัวอักษร';

@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "公告",
   "moreTagline": "防災資訊整合平台",
   "moreVersionStable": "正式版",
-  "moreVersionNotes": "目前版本",
+  "moreVersionNotes": "本次更新",
+  "moreVersionNotesHighlightsSubtitle": "這個版本做了哪些改變",
   "releaseHighlightsSeeNotes": "查看完整更新日誌",
-  "releaseHighlightsTitle": "本次更新",
+  "releaseHighlightsTitle": "{train} 重點整理",
   "releaseHighlightsTabNormal": "做了哪些改變",
   "releaseHighlightsTabAdvanced": "深入技術",
   "releaseHighlightsEmpty": "目前沒有內容。",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "詳細地圖（地理院タイル）",
+  "mapGsiOverlayHint": "加入日本地理院的高解析度地形圖",
+  "mapGsiDetails": "詳細設定",
+  "mapGsiDetailsHint": "已啟用 {enabled} / 共 {total} 個圖層",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "地表",
+  "mapGsiParks": "公園",
+  "mapGsiLandUse": "土地利用",
+  "mapGsiAirportAreas": "機場區域",
+  "mapGsiWater": "水域",
+  "mapGsiRivers": "河川",
+  "mapGsiBoundaries": "邊界",
+  "mapGsiBuildings": "建物",
+  "mapGsiRoads": "道路",
+  "mapGsiRoadNames": "道路名稱",
+  "mapGsiWaterNames": "水域名稱",
+  "mapGsiPeaks": "山峰",
+  "mapGsiAirportNames": "機場名稱",
+  "mapGsiPlaceNames": "地名",
+  "mapGsiPoi": "地標",
+  "mapGsiHouseNumbers": "門牌號碼",
+  "mapGsiRestoreAll": "全部恢復",
   "mapTownLabels": "鄉鎮名稱",
   "notifySetFailed": "設定失敗,請稍後再試。",
   "meshtasticDisconnect": "斷線",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "「{what}」已被拒絕，系統不會再詢問。請到設定中開啟。",
+  "permissionGuideNotification": "請到系統設定中開啟通知權限。",
+  "permissionGuideForegroundLocation": "請到系統設定中開啟精確位置權限。",
+  "permissionGuideBackgroundLocation": "請在「{option}」中改為「允許所有時間」。",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "請到系統設定中允許背景執行,避免收到通知時被系統暫停。",
+  "permissionGuideUnusedPause": "若應用程式被標記為「未使用」,請在系統設定中改為「允許」。",
+  "permissionGuideUnusedFreeSpace": "若應用程式因暫存空間不足被暫停,請清除暫存後重新開啟。",
+  "permissionGuideUnusedRevoke": "若應用程式權限被撤銷,請在系統設定中重新授予。",
+  "permissionGuideUnusedPlayProtect": "若被 Play 保護機制暫停,請到 Google Play 中檢查應用程式狀態。",
+  "permissionGuideVendorPower": "請到「{vendor}」的省電設定中,將本應用程式設為「不限制」。",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "仍然需要此權限,請到設定中開啟。",
+  "permissionVerifyManually": "請手動確認此權限已在系統設定中開啟。",
+  "permissionBackgroundLocationOption": "「允許所有時間」",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {
