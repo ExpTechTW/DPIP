@@ -80,10 +80,10 @@ void main() {
     // chrome first, then the base-map settings.
     expect(find.text(l10n.mapOverlaySectionReference), findsOneWidget);
     expect(find.text(l10n.mapOverlaySectionMap), findsOneWidget);
-    // Reference chrome (scan range, county, town), the name toggle, and the
-    // relief toggle ship on; the national border ships off.
-    expect(find.byIcon(Icons.check_box), findsNWidgets(5));
-    expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+    // Reference chrome (scan range, county, town, 國界) and the name and
+    // relief toggles all ship on; nothing ships off.
+    expect(find.byIcon(Icons.check_box), findsNWidgets(6));
+    expect(find.byIcon(Icons.check_box_outline_blank), findsNothing);
   });
 
   testWidgets('tapping the terrain-relief row reports the flip upward', (
@@ -107,19 +107,19 @@ void main() {
     expect(flipped, [false]);
   });
 
-  testWidgets('tapping the national-border row turns it on', (tester) async {
+  testWidgets('tapping the national-border row turns it off', (tester) async {
     _useTallSurface(tester);
     final layer = RadarMapLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
-    expect(layer.showGlobalOutline.value, isFalse);
+    expect(layer.showGlobalOutline.value, isTrue);
     await tester.tap(find.byType(MapChipButton));
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.radarGlobalOutline));
     await tester.pumpAndSettle();
 
-    expect(layer.showGlobalOutline.value, isTrue);
+    expect(layer.showGlobalOutline.value, isFalse);
     // Independent controls: one must not drag the others with it.
     expect(layer.showCountyOutline.value, isTrue);
     expect(layer.showTownOutline.value, isTrue);

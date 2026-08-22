@@ -64,12 +64,12 @@ class ScanRangeOverlayMenu extends StatelessWidget {
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.tune,
             tooltip: tooltip,
-            // The dot marks "not the defaults". The reference toggles ship on
-            // and 國界 ships off, so it lights up when one has moved from its
-            // default.
+            // The dot marks "not the defaults". The reference toggles (scan
+            // range, county, town, 國界) ship on and labels/relief follow the
+            // scaffold, so it lights up when one has moved from its default.
             active:
                 !showRange ||
-                showGlobal ||
+                !showGlobal ||
                 !showCounty ||
                 !showTown ||
                 !showLabels ||

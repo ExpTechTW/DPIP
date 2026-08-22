@@ -30,9 +30,11 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 mixin AdminOutlineChrome on RasterTimelineLayer {
   /// Whether 國界 (world country borders) are redrawn above the raster.
   ///
-  /// Off by default: on a Taiwan-focused surface the neighbours' outlines are
-  /// usually noise, and a reader who wants them can ask.
-  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(false);
+  /// On by default: the base style's own borders are covered by the raster
+  /// everywhere the weather shows, and the world frame is the reference a
+  /// reader keeps when the map zooms past a county mesh — so every weather
+  /// layer ships with it, and a reader who finds it noise can turn it off.
+  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(true);
 
   /// Whether 縣市 borders are redrawn above the raster.
   final ValueNotifier<bool> showCountyOutline = ValueNotifier(true);
