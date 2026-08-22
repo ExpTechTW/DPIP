@@ -2103,10 +2103,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreVersionStable => '정식 버전';
 
   @override
-  String get moreVersionNotes => '현재 버전';
+  String get moreVersionNotes => '이번 업데이트';
 
   @override
-  String get releaseHighlightsTitle => '이번 업데이트';
+  String get moreVersionNotesHighlightsSubtitle => '이번 버전의 변경 사항';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train 주요 내용';
+  }
 
   @override
   String get releaseHighlightsTabNormal => '변경된 점';
@@ -2283,6 +2288,71 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => '서비스 약관';
+
+  @override
+  String get mapGsiOverlay => '상세 지도(GSI)';
+
+  @override
+  String get mapGsiOverlayHint => '일본 GSI의 고해상도 지형도를 추가';
+
+  @override
+  String get mapGsiDetails => '레이어 세부 정보';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '$enabled / $total개 레이어 사용 중';
+  }
+
+  @override
+  String get mapGsiSurface => '지표면';
+
+  @override
+  String get mapGsiParks => '공원';
+
+  @override
+  String get mapGsiLandUse => '토지 이용';
+
+  @override
+  String get mapGsiAirportAreas => '공항 지역';
+
+  @override
+  String get mapGsiWater => '수역';
+
+  @override
+  String get mapGsiRivers => '하천';
+
+  @override
+  String get mapGsiBoundaries => '경계';
+
+  @override
+  String get mapGsiBuildings => '건물';
+
+  @override
+  String get mapGsiRoads => '도로';
+
+  @override
+  String get mapGsiRoadNames => '도로명';
+
+  @override
+  String get mapGsiWaterNames => '수역 이름';
+
+  @override
+  String get mapGsiPeaks => '봉우리';
+
+  @override
+  String get mapGsiAirportNames => '공항 이름';
+
+  @override
+  String get mapGsiPlaceNames => '지명';
+
+  @override
+  String get mapGsiPoi => '관심 지점';
+
+  @override
+  String get mapGsiHouseNumbers => '건물 번호';
+
+  @override
+  String get mapGsiRestoreAll => '모두 복원';
 
   @override
   String get mapTownLabels => '읍면동 이름';
@@ -2829,6 +2899,50 @@ class AppLocalizationsKo extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '「$what」이(가) 거부되어 시스템이 다시 묻지 않습니다. 설정에서 허용해 주세요.';
   }
+
+  @override
+  String get permissionGuideNotification => '시스템 설정에서 알림을 허용해 주세요.';
+
+  @override
+  String get permissionGuideForegroundLocation => '시스템 설정에서 정확한 위치를 허용해 주세요.';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return '「$option」에서 「항상 허용」을 선택하세요.';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      '시스템 설정에서 백그라운드 실행을 허용하여 알림이 중지되지 않게 하세요.';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      '앱이 「사용 안 함」으로 표시되면 시스템 설정에서 「허용」을 선택하세요.';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      '저장 공간 부족으로 일시중지된 경우 캐시를 지우고 다시 여세요.';
+
+  @override
+  String get permissionGuideUnusedRevoke => '앱 권한이 취소된 경우 시스템 설정에서 다시 허용하세요.';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'Play 프로텍트가 앱을 일시중지한 경우 Google Play에서 상태를 확인하세요.';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return '「$vendor」의 절전 설정에서 이 앱을 「제한 없음」으로 설정하세요.';
+  }
+
+  @override
+  String get permissionStillRequired => '아직 필요합니다. 설정에서 활성화하세요.';
+
+  @override
+  String get permissionVerifyManually => '시스템 설정에서 이 권한이 활성화되어 있는지 직접 확인하세요.';
+
+  @override
+  String get permissionBackgroundLocationOption => '「항상 허용」';
 
   @override
   String get displayTextSize => '글자 크기';

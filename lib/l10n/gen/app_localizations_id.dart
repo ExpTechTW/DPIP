@@ -2133,10 +2133,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreVersionStable => 'Versi resmi';
 
   @override
-  String get moreVersionNotes => 'Versi saat ini';
+  String get moreVersionNotes => 'Pembaruan ini';
 
   @override
-  String get releaseHighlightsTitle => 'Yang berubah';
+  String get moreVersionNotesHighlightsSubtitle =>
+      'Apa yang berubah di versi ini';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train rangkuman';
+  }
 
   @override
   String get releaseHighlightsTabNormal => 'Untuk pengguna';
@@ -2314,6 +2320,72 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => 'Ketentuan Layanan';
+
+  @override
+  String get mapGsiOverlay => 'Peta detail (GSI)';
+
+  @override
+  String get mapGsiOverlayHint =>
+      'Tambahkan medan resolusi tinggi dari GSI Jepang';
+
+  @override
+  String get mapGsiDetails => 'Detail lapisan';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '$enabled dari $total lapisan aktif';
+  }
+
+  @override
+  String get mapGsiSurface => 'Permukaan';
+
+  @override
+  String get mapGsiParks => 'Taman';
+
+  @override
+  String get mapGsiLandUse => 'Penggunaan lahan';
+
+  @override
+  String get mapGsiAirportAreas => 'Area bandara';
+
+  @override
+  String get mapGsiWater => 'Perairan';
+
+  @override
+  String get mapGsiRivers => 'Sungai';
+
+  @override
+  String get mapGsiBoundaries => 'Batas';
+
+  @override
+  String get mapGsiBuildings => 'Bangunan';
+
+  @override
+  String get mapGsiRoads => 'Jalan';
+
+  @override
+  String get mapGsiRoadNames => 'Nama jalan';
+
+  @override
+  String get mapGsiWaterNames => 'Nama perairan';
+
+  @override
+  String get mapGsiPeaks => 'Puncak';
+
+  @override
+  String get mapGsiAirportNames => 'Nama bandara';
+
+  @override
+  String get mapGsiPlaceNames => 'Nama tempat';
+
+  @override
+  String get mapGsiPoi => 'Tempat menarik';
+
+  @override
+  String get mapGsiHouseNumbers => 'Nomor rumah';
+
+  @override
+  String get mapGsiRestoreAll => 'Pulihkan semua';
 
   @override
   String get mapTownLabels => 'Nama kecamatan';
@@ -2864,6 +2936,55 @@ class AppLocalizationsId extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” ditolak dan sistem tidak akan bertanya lagi. Aktifkan di Pengaturan.';
   }
+
+  @override
+  String get permissionGuideNotification =>
+      'Buka Pengaturan Sistem untuk mengizinkan notifikasi.';
+
+  @override
+  String get permissionGuideForegroundLocation =>
+      'Buka Pengaturan Sistem untuk mengizinkan lokasi presisi.';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return 'Di “$option”, pilih “Izinkan sepanjang waktu”.';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      'Izinkan eksekusi latar belakang di Pengaturan Sistem agar notifikasi tidak dijeda.';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      'Jika aplikasi ditandai “tidak digunakan”, pilih “Izinkan” di Pengaturan Sistem.';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      'Jika aplikasi dijeda karena penyimpanan, bersihkan cache dan buka kembali.';
+
+  @override
+  String get permissionGuideUnusedRevoke =>
+      'Jika izin aplikasi dicabut, berikan lagi di Pengaturan Sistem.';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'Jika Play Protect menjeda aplikasi, periksa statusnya di Google Play.';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return 'Di pengaturan hemat daya “$vendor”, atur aplikasi ini ke “Tanpa batas”.';
+  }
+
+  @override
+  String get permissionStillRequired =>
+      'Masih diperlukan — buka Pengaturan untuk mengaktifkannya.';
+
+  @override
+  String get permissionVerifyManually =>
+      'Periksa secara manual bahwa izin ini diaktifkan di Pengaturan Sistem.';
+
+  @override
+  String get permissionBackgroundLocationOption => '“Izinkan sepanjang waktu”';
 
   @override
   String get displayTextSize => 'Ukuran teks';

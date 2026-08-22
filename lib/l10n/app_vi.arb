@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "Thông báo",
   "moreTagline": "Nền tảng tích hợp thông tin phòng chống thiên tai",
   "moreVersionStable": "Bản chính thức",
-  "moreVersionNotes": "Phiên bản hiện tại",
+  "moreVersionNotes": "Bản cập nhật này",
+  "moreVersionNotesHighlightsSubtitle": "Những thay đổi trong phiên bản này",
   "releaseHighlightsSeeNotes": "Xem ghi chú đầy đủ",
-  "releaseHighlightsTitle": "Thay đổi trong bản này",
+  "releaseHighlightsTitle": "{train} tóm tắt chính",
   "releaseHighlightsTabNormal": "Cho người dùng",
   "releaseHighlightsTabAdvanced": "Đi sâu",
   "releaseHighlightsEmpty": "Chưa có nội dung.",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "Bản đồ chi tiết (GSI)",
+  "mapGsiOverlayHint": "Thêm địa hình độ phân giải cao từ GSI Nhật Bản",
+  "mapGsiDetails": "Chi tiết lớp",
+  "mapGsiDetailsHint": "Đã bật {enabled} / {total} lớp",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "Bề mặt",
+  "mapGsiParks": "Công viên",
+  "mapGsiLandUse": "Sử dụng đất",
+  "mapGsiAirportAreas": "Khu vực sân bay",
+  "mapGsiWater": "Vùng nước",
+  "mapGsiRivers": "Sông ngòi",
+  "mapGsiBoundaries": "Ranh giới",
+  "mapGsiBuildings": "Tòa nhà",
+  "mapGsiRoads": "Đường bộ",
+  "mapGsiRoadNames": "Tên đường",
+  "mapGsiWaterNames": "Tên vùng nước",
+  "mapGsiPeaks": "Đỉnh núi",
+  "mapGsiAirportNames": "Tên sân bay",
+  "mapGsiPlaceNames": "Tên địa danh",
+  "mapGsiPoi": "Địa điểm quan tâm",
+  "mapGsiHouseNumbers": "Số nhà",
+  "mapGsiRestoreAll": "Khôi phục tất cả",
   "mapTownLabels": "Tên hương trấn",
   "notifySetFailed": "Không thể lưu cài đặt. Vui lòng thử lại.",
   "meshtasticDisconnect": "Disconnect",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "“{what}” đã bị từ chối và hệ thống sẽ không hỏi lại. Hãy bật trong Cài đặt.",
+  "permissionGuideNotification": "Mở Cài đặt Hệ thống để cho phép thông báo.",
+  "permissionGuideForegroundLocation": "Mở Cài đặt Hệ thống để cho phép vị trí chính xác.",
+  "permissionGuideBackgroundLocation": "Trong “{option}”, chọn “Cho phép mọi lúc”.",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "Cho phép chạy nền trong Cài đặt Hệ thống để thông báo không bị tạm dừng.",
+  "permissionGuideUnusedPause": "Nếu ứng dụng bị đánh dấu “không sử dụng”, hãy chọn “Cho phép” trong Cài đặt Hệ thống.",
+  "permissionGuideUnusedFreeSpace": "Nếu ứng dụng bị tạm dừng vì bộ nhớ, hãy xóa bộ nhớ đệm và mở lại.",
+  "permissionGuideUnusedRevoke": "Nếu quyền của ứng dụng bị thu hồi, hãy cấp lại trong Cài đặt Hệ thống.",
+  "permissionGuideUnusedPlayProtect": "Nếu Play Protect tạm dừng ứng dụng, hãy kiểm tra trạng thái trong Google Play.",
+  "permissionGuideVendorPower": "Trong cài đặt tiết kiệm pin của “{vendor}”, đặt ứng dụng này thành “Không giới hạn”.",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "Vẫn cần thiết — mở Cài đặt để bật.",
+  "permissionVerifyManually": "Vui lòng xác minh thủ công rằng quyền này đã được bật trong Cài đặt Hệ thống.",
+  "permissionBackgroundLocationOption": "“Cho phép mọi lúc”",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

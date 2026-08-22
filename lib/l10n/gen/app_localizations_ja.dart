@@ -2095,10 +2095,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreVersionStable => '正式版';
 
   @override
-  String get moreVersionNotes => '現在のバージョン';
+  String get moreVersionNotes => '今回の更新';
 
   @override
-  String get releaseHighlightsTitle => '今回の更新';
+  String get moreVersionNotesHighlightsSubtitle => 'このバージョンでの変更点';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train まとめ';
+  }
 
   @override
   String get releaseHighlightsTabNormal => '変更点';
@@ -2273,6 +2278,71 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => 'サービス利用規約';
+
+  @override
+  String get mapGsiOverlay => '詳細地図（地理院タイル）';
+
+  @override
+  String get mapGsiOverlayHint => '国土地理院の高解像度地形図を追加';
+
+  @override
+  String get mapGsiDetails => 'レイヤー詳細';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '$enabled / $total レイヤーを有効化';
+  }
+
+  @override
+  String get mapGsiSurface => '地表';
+
+  @override
+  String get mapGsiParks => '公園';
+
+  @override
+  String get mapGsiLandUse => '土地利用';
+
+  @override
+  String get mapGsiAirportAreas => '空港エリア';
+
+  @override
+  String get mapGsiWater => '水域';
+
+  @override
+  String get mapGsiRivers => '河川';
+
+  @override
+  String get mapGsiBoundaries => '境界';
+
+  @override
+  String get mapGsiBuildings => '建物';
+
+  @override
+  String get mapGsiRoads => '道路';
+
+  @override
+  String get mapGsiRoadNames => '道路名';
+
+  @override
+  String get mapGsiWaterNames => '水域名';
+
+  @override
+  String get mapGsiPeaks => '山頂';
+
+  @override
+  String get mapGsiAirportNames => '空港名';
+
+  @override
+  String get mapGsiPlaceNames => '地名';
+
+  @override
+  String get mapGsiPoi => '注目施設';
+
+  @override
+  String get mapGsiHouseNumbers => '住居表示';
+
+  @override
+  String get mapGsiRestoreAll => 'すべて復元';
 
   @override
   String get mapTownLabels => '郷鎮名';
@@ -2819,6 +2889,51 @@ class AppLocalizationsJa extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '「$what」は拒否されており、システムは再度確認しません。設定から許可してください。';
   }
+
+  @override
+  String get permissionGuideNotification => 'システム設定から通知を許可してください。';
+
+  @override
+  String get permissionGuideForegroundLocation => 'システム設定から正確な位置情報を許可してください。';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return '「$option」で「常に許可」を選択してください。';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      'システム設定でバックグラウンド実行を許可し、通知が停止されないようにしてください。';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      'アプリが「未使用」と表示される場合は、システム設定で「許可」を選択してください。';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      'ストレージ不足で一時停止された場合は、キャッシュを削除して再度開いてください。';
+
+  @override
+  String get permissionGuideUnusedRevoke =>
+      'アプリの権限が取り消された場合は、システム設定で再度許可してください。';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'Play プロテクトが一時停止した場合は、Google Play でアプリの状態を確認してください。';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return '「$vendor」の省電力設定で、このアプリを「制限なし」に設定してください。';
+  }
+
+  @override
+  String get permissionStillRequired => 'まだ必要です。設定から有効にしてください。';
+
+  @override
+  String get permissionVerifyManually => 'システム設定でこの権限が有効かどうか手動で確認してください。';
+
+  @override
+  String get permissionBackgroundLocationOption => '「常に許可」';
 
   @override
   String get displayTextSize => '文字サイズ';

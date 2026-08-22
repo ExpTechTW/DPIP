@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "Pengumuman",
   "moreTagline": "Platform Integrasi Informasi Bencana",
   "moreVersionStable": "Versi resmi",
-  "moreVersionNotes": "Versi saat ini",
+  "moreVersionNotes": "Pembaruan ini",
+  "moreVersionNotesHighlightsSubtitle": "Apa yang berubah di versi ini",
   "releaseHighlightsSeeNotes": "Catatan rilis lengkap",
-  "releaseHighlightsTitle": "Yang berubah",
+  "releaseHighlightsTitle": "{train} rangkuman",
   "releaseHighlightsTabNormal": "Untuk pengguna",
   "releaseHighlightsTabAdvanced": "Mendalam",
   "releaseHighlightsEmpty": "Belum ada konten.",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "Peta detail (GSI)",
+  "mapGsiOverlayHint": "Tambahkan medan resolusi tinggi dari GSI Jepang",
+  "mapGsiDetails": "Detail lapisan",
+  "mapGsiDetailsHint": "{enabled} dari {total} lapisan aktif",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "Permukaan",
+  "mapGsiParks": "Taman",
+  "mapGsiLandUse": "Penggunaan lahan",
+  "mapGsiAirportAreas": "Area bandara",
+  "mapGsiWater": "Perairan",
+  "mapGsiRivers": "Sungai",
+  "mapGsiBoundaries": "Batas",
+  "mapGsiBuildings": "Bangunan",
+  "mapGsiRoads": "Jalan",
+  "mapGsiRoadNames": "Nama jalan",
+  "mapGsiWaterNames": "Nama perairan",
+  "mapGsiPeaks": "Puncak",
+  "mapGsiAirportNames": "Nama bandara",
+  "mapGsiPlaceNames": "Nama tempat",
+  "mapGsiPoi": "Tempat menarik",
+  "mapGsiHouseNumbers": "Nomor rumah",
+  "mapGsiRestoreAll": "Pulihkan semua",
   "mapTownLabels": "Nama kecamatan",
   "notifySetFailed": "Tidak dapat menyimpan pengaturan. Silakan coba lagi.",
   "meshtasticDisconnect": "Disconnect",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "“{what}” ditolak dan sistem tidak akan bertanya lagi. Aktifkan di Pengaturan.",
+  "permissionGuideNotification": "Buka Pengaturan Sistem untuk mengizinkan notifikasi.",
+  "permissionGuideForegroundLocation": "Buka Pengaturan Sistem untuk mengizinkan lokasi presisi.",
+  "permissionGuideBackgroundLocation": "Di “{option}”, pilih “Izinkan sepanjang waktu”.",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "Izinkan eksekusi latar belakang di Pengaturan Sistem agar notifikasi tidak dijeda.",
+  "permissionGuideUnusedPause": "Jika aplikasi ditandai “tidak digunakan”, pilih “Izinkan” di Pengaturan Sistem.",
+  "permissionGuideUnusedFreeSpace": "Jika aplikasi dijeda karena penyimpanan, bersihkan cache dan buka kembali.",
+  "permissionGuideUnusedRevoke": "Jika izin aplikasi dicabut, berikan lagi di Pengaturan Sistem.",
+  "permissionGuideUnusedPlayProtect": "Jika Play Protect menjeda aplikasi, periksa statusnya di Google Play.",
+  "permissionGuideVendorPower": "Di pengaturan hemat daya “{vendor}”, atur aplikasi ini ke “Tanpa batas”.",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "Masih diperlukan — buka Pengaturan untuk mengaktifkannya.",
+  "permissionVerifyManually": "Periksa secara manual bahwa izin ini diaktifkan di Pengaturan Sistem.",
+  "permissionBackgroundLocationOption": "“Izinkan sepanjang waktu”",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

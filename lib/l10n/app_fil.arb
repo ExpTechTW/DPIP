@@ -1007,9 +1007,10 @@
   "moreAnnouncements": "Mga Anunsyo",
   "moreTagline": "Platform para sa Integral na Impormasyon sa Kalamidad",
   "moreVersionStable": "Pormal na bersyon",
-  "moreVersionNotes": "Kasalukuyang bersyon",
+  "moreVersionNotes": "Update na ito",
+  "moreVersionNotesHighlightsSubtitle": "Ano ang nagbago sa bersyon na ito",
   "releaseHighlightsSeeNotes": "Buong tala ng release",
-  "releaseHighlightsTitle": "Ano ang nagbago",
+  "releaseHighlightsTitle": "{train} buod",
   "releaseHighlightsTabNormal": "Para sa mga user",
   "releaseHighlightsTabAdvanced": "Mas malalim",
   "releaseHighlightsEmpty": "Wala pang laman.",
@@ -1105,6 +1106,38 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
+  "mapGsiOverlay": "Detalyadong mapa (GSI)",
+  "mapGsiOverlayHint": "Magdagdag ng high-resolution na terrain mula sa GSI ng Japan",
+  "mapGsiDetails": "Mga detalye ng layer",
+  "mapGsiDetailsHint": "{enabled} sa {total} na layer ang naka-enable",
+  "@mapGsiDetailsHint": {
+    "description": "How many of the GSI layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapGsiSurface": "Ibabaw",
+  "mapGsiParks": "Mga parke",
+  "mapGsiLandUse": "Paggamit ng lupa",
+  "mapGsiAirportAreas": "Mga lugar ng paliparan",
+  "mapGsiWater": "Tubig",
+  "mapGsiRivers": "Mga ilog",
+  "mapGsiBoundaries": "Mga hangganan",
+  "mapGsiBuildings": "Mga gusali",
+  "mapGsiRoads": "Mga kalsada",
+  "mapGsiRoadNames": "Pangalan ng kalsada",
+  "mapGsiWaterNames": "Pangalan ng tubig",
+  "mapGsiPeaks": "Mga taluktok",
+  "mapGsiAirportNames": "Pangalan ng paliparan",
+  "mapGsiPlaceNames": "Pangalan ng lugar",
+  "mapGsiPoi": "Mga lugar ng interes",
+  "mapGsiHouseNumbers": "Mga numero ng bahay",
+  "mapGsiRestoreAll": "Ibalik lahat",
   "mapTownLabels": "Mga pangalan ng bayan",
   "notifySetFailed": "Hindi ma-save ang setting. Pakisubukan muli.",
   "meshtasticDisconnect": "Disconnect",
@@ -1799,6 +1832,30 @@
     "description": "Button that opens the system settings page"
   },
   "permissionSettingsMessage": "Tinanggihan ang “{what}” at hindi na magtatanong ang sistema. I-on ito sa Settings.",
+  "permissionGuideNotification": "Buksan ang System Settings upang payagan ang mga notipikasyon.",
+  "permissionGuideForegroundLocation": "Buksan ang System Settings upang payagan ang tumpak na lokasyon.",
+  "permissionGuideBackgroundLocation": "Sa “{option}”, piliin ang “Payagan sa lahat ng oras”.",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "Payagan ang background execution sa System Settings upang hindi i-pause ang mga notipikasyon.",
+  "permissionGuideUnusedPause": "Kung minarkahan ang app na “hindi ginagamit”, piliin ang “Payagan” sa System Settings.",
+  "permissionGuideUnusedFreeSpace": "Kung na-pause ang app dahil sa storage, i-clear ang cache at buksan muli.",
+  "permissionGuideUnusedRevoke": "Kung binawi ang mga pahintulot ng app, ibigay muli sa System Settings.",
+  "permissionGuideUnusedPlayProtect": "Kung i-pause ng Play Protect ang app, tingnan ang katayuan nito sa Google Play.",
+  "permissionGuideVendorPower": "Sa mga setting ng pagtitipid ng kuryente ng “{vendor}”, itakda ang app na ito sa “Walang limitasyon”.",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "Kailangan pa rin — buksan ang Settings para paganahin.",
+  "permissionVerifyManually": "Mangyaring i-verify nang manu-mano na naka-enable ang pahintulot na ito sa System Settings.",
+  "permissionBackgroundLocationOption": "“Payagan sa lahat ng oras”",
   "@permissionSettingsMessage": {
     "description": "Explains that the system will not ask again for this permission",
     "placeholders": {

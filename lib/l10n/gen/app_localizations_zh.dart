@@ -2082,10 +2082,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreVersionStable => '正式版';
 
   @override
-  String get moreVersionNotes => '目前版本';
+  String get moreVersionNotes => '本次更新';
 
   @override
-  String get releaseHighlightsTitle => '本次更新';
+  String get moreVersionNotesHighlightsSubtitle => '這個版本做了哪些改變';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train 重點整理';
+  }
 
   @override
   String get releaseHighlightsTabNormal => '做了哪些改變';
@@ -2260,6 +2265,71 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => '服務條款';
+
+  @override
+  String get mapGsiOverlay => '詳細地圖（地理院タイル）';
+
+  @override
+  String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
+
+  @override
+  String get mapGsiDetails => '詳細設定';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '已啟用 $enabled / 共 $total 個圖層';
+  }
+
+  @override
+  String get mapGsiSurface => '地表';
+
+  @override
+  String get mapGsiParks => '公園';
+
+  @override
+  String get mapGsiLandUse => '土地利用';
+
+  @override
+  String get mapGsiAirportAreas => '機場區域';
+
+  @override
+  String get mapGsiWater => '水域';
+
+  @override
+  String get mapGsiRivers => '河川';
+
+  @override
+  String get mapGsiBoundaries => '邊界';
+
+  @override
+  String get mapGsiBuildings => '建物';
+
+  @override
+  String get mapGsiRoads => '道路';
+
+  @override
+  String get mapGsiRoadNames => '道路名稱';
+
+  @override
+  String get mapGsiWaterNames => '水域名稱';
+
+  @override
+  String get mapGsiPeaks => '山峰';
+
+  @override
+  String get mapGsiAirportNames => '機場名稱';
+
+  @override
+  String get mapGsiPlaceNames => '地名';
+
+  @override
+  String get mapGsiPoi => '地標';
+
+  @override
+  String get mapGsiHouseNumbers => '門牌號碼';
+
+  @override
+  String get mapGsiRestoreAll => '全部恢復';
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
@@ -2806,6 +2876,48 @@ class AppLocalizationsZh extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
   }
+
+  @override
+  String get permissionGuideNotification => '請到系統設定中開啟通知權限。';
+
+  @override
+  String get permissionGuideForegroundLocation => '請到系統設定中開啟精確位置權限。';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return '請在「$option」中改為「允許所有時間」。';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      '請到系統設定中允許背景執行,避免收到通知時被系統暫停。';
+
+  @override
+  String get permissionGuideUnusedPause => '若應用程式被標記為「未使用」,請在系統設定中改為「允許」。';
+
+  @override
+  String get permissionGuideUnusedFreeSpace => '若應用程式因暫存空間不足被暫停,請清除暫存後重新開啟。';
+
+  @override
+  String get permissionGuideUnusedRevoke => '若應用程式權限被撤銷,請在系統設定中重新授予。';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      '若被 Play 保護機制暫停,請到 Google Play 中檢查應用程式狀態。';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return '請到「$vendor」的省電設定中,將本應用程式設為「不限制」。';
+  }
+
+  @override
+  String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';
+
+  @override
+  String get permissionVerifyManually => '請手動確認此權限已在系統設定中開啟。';
+
+  @override
+  String get permissionBackgroundLocationOption => '「允許所有時間」';
 
   @override
   String get displayTextSize => '文字大小';
@@ -5042,10 +5154,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get moreVersionStable => '正式版';
 
   @override
-  String get moreVersionNotes => '当前版本';
+  String get moreVersionNotes => '本次更新';
 
   @override
-  String get releaseHighlightsTitle => '本次更新';
+  String get moreVersionNotesHighlightsSubtitle => '这个版本做了哪些改变';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train 重点整理';
+  }
 
   @override
   String get releaseHighlightsTabNormal => '做了哪些改变';
@@ -5220,6 +5337,71 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get onboardingTermsTitle => '服务条款';
+
+  @override
+  String get mapGsiOverlay => '详细地图（地理院瓦片）';
+
+  @override
+  String get mapGsiOverlayHint => '加入日本地理院的高分辨率地形图';
+
+  @override
+  String get mapGsiDetails => '详细设置';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '已启用 $enabled / 共 $total 个图层';
+  }
+
+  @override
+  String get mapGsiSurface => '地表';
+
+  @override
+  String get mapGsiParks => '公园';
+
+  @override
+  String get mapGsiLandUse => '土地利用';
+
+  @override
+  String get mapGsiAirportAreas => '机场区域';
+
+  @override
+  String get mapGsiWater => '水域';
+
+  @override
+  String get mapGsiRivers => '河川';
+
+  @override
+  String get mapGsiBoundaries => '边界';
+
+  @override
+  String get mapGsiBuildings => '建筑物';
+
+  @override
+  String get mapGsiRoads => '道路';
+
+  @override
+  String get mapGsiRoadNames => '道路名称';
+
+  @override
+  String get mapGsiWaterNames => '水域名称';
+
+  @override
+  String get mapGsiPeaks => '山峰';
+
+  @override
+  String get mapGsiAirportNames => '机场名称';
+
+  @override
+  String get mapGsiPlaceNames => '地名';
+
+  @override
+  String get mapGsiPoi => '地标';
+
+  @override
+  String get mapGsiHouseNumbers => '门牌号码';
+
+  @override
+  String get mapGsiRestoreAll => '全部恢复';
 
   @override
   String get mapTownLabels => '乡镇名称';
@@ -5766,6 +5948,48 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒绝，系统不会再询问。请到设置中开启。';
   }
+
+  @override
+  String get permissionGuideNotification => '请到系统设置中开启通知权限。';
+
+  @override
+  String get permissionGuideForegroundLocation => '请到系统设置中开启精确位置权限。';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return '请在「$option」中改为「允许所有时间」。';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      '请到系统设置中允许后台执行,避免收到通知时被系统暂停。';
+
+  @override
+  String get permissionGuideUnusedPause => '若应用被标记为「未使用」,请在系统设置中改为「允许」。';
+
+  @override
+  String get permissionGuideUnusedFreeSpace => '若应用因缓存空间不足被暂停,请清除缓存后重新打开。';
+
+  @override
+  String get permissionGuideUnusedRevoke => '若应用权限被撤销,请在系统设置中重新授予。';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      '若被 Play 保护机制暂停,请到 Google Play 中检查应用状态。';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return '请到「$vendor」的省电设置中,将本应用设为「不限制」。';
+  }
+
+  @override
+  String get permissionStillRequired => '仍然需要此权限,请到设置中打开。';
+
+  @override
+  String get permissionVerifyManually => '请手动确认此权限已在系统设置中打开。';
+
+  @override
+  String get permissionBackgroundLocationOption => '「允许所有时间」';
 
   @override
   String get displayTextSize => '文字大小';
@@ -8002,10 +8226,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreVersionStable => '正式版';
 
   @override
-  String get moreVersionNotes => '目前版本';
+  String get moreVersionNotes => '本次更新';
 
   @override
-  String get releaseHighlightsTitle => '本次更新';
+  String get moreVersionNotesHighlightsSubtitle => '這個版本做了哪些改變';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train 重點整理';
+  }
 
   @override
   String get releaseHighlightsTabNormal => '做了哪些改變';
@@ -8180,6 +8409,71 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get onboardingTermsTitle => '服務條款';
+
+  @override
+  String get mapGsiOverlay => '詳細地圖（地理院タイル）';
+
+  @override
+  String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
+
+  @override
+  String get mapGsiDetails => '詳細設定';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '已啟用 $enabled / 共 $total 個圖層';
+  }
+
+  @override
+  String get mapGsiSurface => '地表';
+
+  @override
+  String get mapGsiParks => '公園';
+
+  @override
+  String get mapGsiLandUse => '土地利用';
+
+  @override
+  String get mapGsiAirportAreas => '機場區域';
+
+  @override
+  String get mapGsiWater => '水域';
+
+  @override
+  String get mapGsiRivers => '河川';
+
+  @override
+  String get mapGsiBoundaries => '邊界';
+
+  @override
+  String get mapGsiBuildings => '建物';
+
+  @override
+  String get mapGsiRoads => '道路';
+
+  @override
+  String get mapGsiRoadNames => '道路名稱';
+
+  @override
+  String get mapGsiWaterNames => '水域名稱';
+
+  @override
+  String get mapGsiPeaks => '山峰';
+
+  @override
+  String get mapGsiAirportNames => '機場名稱';
+
+  @override
+  String get mapGsiPlaceNames => '地名';
+
+  @override
+  String get mapGsiPoi => '地標';
+
+  @override
+  String get mapGsiHouseNumbers => '門牌號碼';
+
+  @override
+  String get mapGsiRestoreAll => '全部恢復';
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
@@ -8726,6 +9020,48 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
   }
+
+  @override
+  String get permissionGuideNotification => '請到系統設定中開啟通知權限。';
+
+  @override
+  String get permissionGuideForegroundLocation => '請到系統設定中開啟精確位置權限。';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return '請在「$option」中改為「允許所有時間」。';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      '請到系統設定中允許背景執行,避免收到通知時被系統暫停。';
+
+  @override
+  String get permissionGuideUnusedPause => '若應用程式被標記為「未使用」,請在系統設定中改為「允許」。';
+
+  @override
+  String get permissionGuideUnusedFreeSpace => '若應用程式因暫存空間不足被暫停,請清除暫存後重新開啟。';
+
+  @override
+  String get permissionGuideUnusedRevoke => '若應用程式權限被撤銷,請在系統設定中重新授予。';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      '若被 Play 保護機制暫停,請到 Google Play 中檢查應用程式狀態。';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return '請到「$vendor」的省電設定中,將本應用程式設為「不限制」。';
+  }
+
+  @override
+  String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';
+
+  @override
+  String get permissionVerifyManually => '請手動確認此權限已在系統設定中開啟。';
+
+  @override
+  String get permissionBackgroundLocationOption => '「允許所有時間」';
 
   @override
   String get displayTextSize => '文字大小';
@@ -10962,10 +11298,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get moreVersionStable => '正式版';
 
   @override
-  String get moreVersionNotes => '目前版本';
+  String get moreVersionNotes => '本次更新';
 
   @override
-  String get releaseHighlightsTitle => '本次更新';
+  String get moreVersionNotesHighlightsSubtitle => '這個版本做了哪些改變';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train 重點整理';
+  }
 
   @override
   String get releaseHighlightsTabNormal => '做了哪些改變';
@@ -11140,6 +11481,71 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingTermsTitle => '服務條款';
+
+  @override
+  String get mapGsiOverlay => '詳細地圖（地理院タイル）';
+
+  @override
+  String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
+
+  @override
+  String get mapGsiDetails => '詳細設定';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '已啟用 $enabled / 共 $total 個圖層';
+  }
+
+  @override
+  String get mapGsiSurface => '地表';
+
+  @override
+  String get mapGsiParks => '公園';
+
+  @override
+  String get mapGsiLandUse => '土地利用';
+
+  @override
+  String get mapGsiAirportAreas => '機場區域';
+
+  @override
+  String get mapGsiWater => '水域';
+
+  @override
+  String get mapGsiRivers => '河川';
+
+  @override
+  String get mapGsiBoundaries => '邊界';
+
+  @override
+  String get mapGsiBuildings => '建物';
+
+  @override
+  String get mapGsiRoads => '道路';
+
+  @override
+  String get mapGsiRoadNames => '道路名稱';
+
+  @override
+  String get mapGsiWaterNames => '水域名稱';
+
+  @override
+  String get mapGsiPeaks => '山峰';
+
+  @override
+  String get mapGsiAirportNames => '機場名稱';
+
+  @override
+  String get mapGsiPlaceNames => '地名';
+
+  @override
+  String get mapGsiPoi => '地標';
+
+  @override
+  String get mapGsiHouseNumbers => '門牌號碼';
+
+  @override
+  String get mapGsiRestoreAll => '全部恢復';
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
@@ -11686,6 +12092,48 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String permissionSettingsMessage(String what) {
     return '「$what」已被拒絕，系統不會再詢問。請到設定中開啟。';
   }
+
+  @override
+  String get permissionGuideNotification => '請到系統設定中開啟通知權限。';
+
+  @override
+  String get permissionGuideForegroundLocation => '請到系統設定中開啟精確位置權限。';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return '請在「$option」中改為「允許所有時間」。';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      '請到系統設定中允許背景執行,避免收到通知時被系統暫停。';
+
+  @override
+  String get permissionGuideUnusedPause => '若應用程式被標記為「未使用」,請在系統設定中改為「允許」。';
+
+  @override
+  String get permissionGuideUnusedFreeSpace => '若應用程式因暫存空間不足被暫停,請清除暫存後重新開啟。';
+
+  @override
+  String get permissionGuideUnusedRevoke => '若應用程式權限被撤銷,請在系統設定中重新授予。';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      '若被 Play 保護機制暫停,請到 Google Play 中檢查應用程式狀態。';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return '請到「$vendor」的省電設定中,將本應用程式設為「不限制」。';
+  }
+
+  @override
+  String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';
+
+  @override
+  String get permissionVerifyManually => '請手動確認此權限已在系統設定中開啟。';
+
+  @override
+  String get permissionBackgroundLocationOption => '「允許所有時間」';
 
   @override
   String get displayTextSize => '文字大小';

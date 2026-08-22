@@ -2142,10 +2142,16 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreVersionStable => 'Pormal na bersyon';
 
   @override
-  String get moreVersionNotes => 'Kasalukuyang bersyon';
+  String get moreVersionNotes => 'Update na ito';
 
   @override
-  String get releaseHighlightsTitle => 'Ano ang nagbago';
+  String get moreVersionNotesHighlightsSubtitle =>
+      'Ano ang nagbago sa bersyon na ito';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train buod';
+  }
 
   @override
   String get releaseHighlightsTabNormal => 'Para sa mga user';
@@ -2323,6 +2329,72 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => 'Mga Tuntunin ng Serbisyo';
+
+  @override
+  String get mapGsiOverlay => 'Detalyadong mapa (GSI)';
+
+  @override
+  String get mapGsiOverlayHint =>
+      'Magdagdag ng high-resolution na terrain mula sa GSI ng Japan';
+
+  @override
+  String get mapGsiDetails => 'Mga detalye ng layer';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return '$enabled sa $total na layer ang naka-enable';
+  }
+
+  @override
+  String get mapGsiSurface => 'Ibabaw';
+
+  @override
+  String get mapGsiParks => 'Mga parke';
+
+  @override
+  String get mapGsiLandUse => 'Paggamit ng lupa';
+
+  @override
+  String get mapGsiAirportAreas => 'Mga lugar ng paliparan';
+
+  @override
+  String get mapGsiWater => 'Tubig';
+
+  @override
+  String get mapGsiRivers => 'Mga ilog';
+
+  @override
+  String get mapGsiBoundaries => 'Mga hangganan';
+
+  @override
+  String get mapGsiBuildings => 'Mga gusali';
+
+  @override
+  String get mapGsiRoads => 'Mga kalsada';
+
+  @override
+  String get mapGsiRoadNames => 'Pangalan ng kalsada';
+
+  @override
+  String get mapGsiWaterNames => 'Pangalan ng tubig';
+
+  @override
+  String get mapGsiPeaks => 'Mga taluktok';
+
+  @override
+  String get mapGsiAirportNames => 'Pangalan ng paliparan';
+
+  @override
+  String get mapGsiPlaceNames => 'Pangalan ng lugar';
+
+  @override
+  String get mapGsiPoi => 'Mga lugar ng interes';
+
+  @override
+  String get mapGsiHouseNumbers => 'Mga numero ng bahay';
+
+  @override
+  String get mapGsiRestoreAll => 'Ibalik lahat';
 
   @override
   String get mapTownLabels => 'Mga pangalan ng bayan';
@@ -2871,6 +2943,55 @@ class AppLocalizationsFil extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return 'Tinanggihan ang “$what” at hindi na magtatanong ang sistema. I-on ito sa Settings.';
   }
+
+  @override
+  String get permissionGuideNotification =>
+      'Buksan ang System Settings upang payagan ang mga notipikasyon.';
+
+  @override
+  String get permissionGuideForegroundLocation =>
+      'Buksan ang System Settings upang payagan ang tumpak na lokasyon.';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return 'Sa “$option”, piliin ang “Payagan sa lahat ng oras”.';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      'Payagan ang background execution sa System Settings upang hindi i-pause ang mga notipikasyon.';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      'Kung minarkahan ang app na “hindi ginagamit”, piliin ang “Payagan” sa System Settings.';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      'Kung na-pause ang app dahil sa storage, i-clear ang cache at buksan muli.';
+
+  @override
+  String get permissionGuideUnusedRevoke =>
+      'Kung binawi ang mga pahintulot ng app, ibigay muli sa System Settings.';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'Kung i-pause ng Play Protect ang app, tingnan ang katayuan nito sa Google Play.';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return 'Sa mga setting ng pagtitipid ng kuryente ng “$vendor”, itakda ang app na ito sa “Walang limitasyon”.';
+  }
+
+  @override
+  String get permissionStillRequired =>
+      'Kailangan pa rin — buksan ang Settings para paganahin.';
+
+  @override
+  String get permissionVerifyManually =>
+      'Mangyaring i-verify nang manu-mano na naka-enable ang pahintulot na ito sa System Settings.';
+
+  @override
+  String get permissionBackgroundLocationOption => '“Payagan sa lahat ng oras”';
 
   @override
   String get displayTextSize => 'Laki ng teksto';

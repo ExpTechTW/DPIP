@@ -2129,10 +2129,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreVersionStable => 'Bản chính thức';
 
   @override
-  String get moreVersionNotes => 'Phiên bản hiện tại';
+  String get moreVersionNotes => 'Bản cập nhật này';
 
   @override
-  String get releaseHighlightsTitle => 'Thay đổi trong bản này';
+  String get moreVersionNotesHighlightsSubtitle =>
+      'Những thay đổi trong phiên bản này';
+
+  @override
+  String releaseHighlightsTitle(Object train) {
+    return '$train tóm tắt chính';
+  }
 
   @override
   String get releaseHighlightsTabNormal => 'Cho người dùng';
@@ -2311,6 +2317,72 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboardingTermsTitle => 'Điều khoản Dịch vụ';
+
+  @override
+  String get mapGsiOverlay => 'Bản đồ chi tiết (GSI)';
+
+  @override
+  String get mapGsiOverlayHint =>
+      'Thêm địa hình độ phân giải cao từ GSI Nhật Bản';
+
+  @override
+  String get mapGsiDetails => 'Chi tiết lớp';
+
+  @override
+  String mapGsiDetailsHint(int enabled, int total) {
+    return 'Đã bật $enabled / $total lớp';
+  }
+
+  @override
+  String get mapGsiSurface => 'Bề mặt';
+
+  @override
+  String get mapGsiParks => 'Công viên';
+
+  @override
+  String get mapGsiLandUse => 'Sử dụng đất';
+
+  @override
+  String get mapGsiAirportAreas => 'Khu vực sân bay';
+
+  @override
+  String get mapGsiWater => 'Vùng nước';
+
+  @override
+  String get mapGsiRivers => 'Sông ngòi';
+
+  @override
+  String get mapGsiBoundaries => 'Ranh giới';
+
+  @override
+  String get mapGsiBuildings => 'Tòa nhà';
+
+  @override
+  String get mapGsiRoads => 'Đường bộ';
+
+  @override
+  String get mapGsiRoadNames => 'Tên đường';
+
+  @override
+  String get mapGsiWaterNames => 'Tên vùng nước';
+
+  @override
+  String get mapGsiPeaks => 'Đỉnh núi';
+
+  @override
+  String get mapGsiAirportNames => 'Tên sân bay';
+
+  @override
+  String get mapGsiPlaceNames => 'Tên địa danh';
+
+  @override
+  String get mapGsiPoi => 'Địa điểm quan tâm';
+
+  @override
+  String get mapGsiHouseNumbers => 'Số nhà';
+
+  @override
+  String get mapGsiRestoreAll => 'Khôi phục tất cả';
 
   @override
   String get mapTownLabels => 'Tên hương trấn';
@@ -2859,6 +2931,54 @@ class AppLocalizationsVi extends AppLocalizations {
   String permissionSettingsMessage(String what) {
     return '“$what” đã bị từ chối và hệ thống sẽ không hỏi lại. Hãy bật trong Cài đặt.';
   }
+
+  @override
+  String get permissionGuideNotification =>
+      'Mở Cài đặt Hệ thống để cho phép thông báo.';
+
+  @override
+  String get permissionGuideForegroundLocation =>
+      'Mở Cài đặt Hệ thống để cho phép vị trí chính xác.';
+
+  @override
+  String permissionGuideBackgroundLocation(Object option) {
+    return 'Trong “$option”, chọn “Cho phép mọi lúc”.';
+  }
+
+  @override
+  String get permissionGuideBackgroundExecution =>
+      'Cho phép chạy nền trong Cài đặt Hệ thống để thông báo không bị tạm dừng.';
+
+  @override
+  String get permissionGuideUnusedPause =>
+      'Nếu ứng dụng bị đánh dấu “không sử dụng”, hãy chọn “Cho phép” trong Cài đặt Hệ thống.';
+
+  @override
+  String get permissionGuideUnusedFreeSpace =>
+      'Nếu ứng dụng bị tạm dừng vì bộ nhớ, hãy xóa bộ nhớ đệm và mở lại.';
+
+  @override
+  String get permissionGuideUnusedRevoke =>
+      'Nếu quyền của ứng dụng bị thu hồi, hãy cấp lại trong Cài đặt Hệ thống.';
+
+  @override
+  String get permissionGuideUnusedPlayProtect =>
+      'Nếu Play Protect tạm dừng ứng dụng, hãy kiểm tra trạng thái trong Google Play.';
+
+  @override
+  String permissionGuideVendorPower(Object vendor) {
+    return 'Trong cài đặt tiết kiệm pin của “$vendor”, đặt ứng dụng này thành “Không giới hạn”.';
+  }
+
+  @override
+  String get permissionStillRequired => 'Vẫn cần thiết — mở Cài đặt để bật.';
+
+  @override
+  String get permissionVerifyManually =>
+      'Vui lòng xác minh thủ công rằng quyền này đã được bật trong Cài đặt Hệ thống.';
+
+  @override
+  String get permissionBackgroundLocationOption => '“Cho phép mọi lúc”';
 
   @override
   String get displayTextSize => 'Cỡ chữ';
