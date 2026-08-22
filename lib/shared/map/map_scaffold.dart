@@ -1415,6 +1415,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           caption: caption,
           framePeriod: framePeriod,
           dataTime: dataTime,
+          readyFrameId: isRaster ? active.readyVisibleFrameId : null,
         ),
       ),
     );

@@ -8,6 +8,7 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_trace.dart';
+import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,7 @@ class MapTimeline extends StatefulWidget {
     this.caption,
     this.framePeriod,
     this.dataTime,
+    this.readyFrameId,
     this.timeFormat,
     this.itemExtent = _defaultSlotWidth,
   });
@@ -77,6 +79,12 @@ class MapTimeline extends StatefulWidget {
   /// run's issue time (資料時間), distinct from the valid times the ruler
   /// scrubs. `null` hides the data-time line.
   final DateTime? dataTime;
+
+  /// The raster frame whose visible tiles are fully rendered. When provided,
+  /// the selected era/time stays neutral and shows a spinner until this id
+  /// catches up with the frame under the scrubber. Non-raster timelines omit
+  /// it and keep their normal colours.
+  final ValueListenable<String?>? readyFrameId;
 
   @override
   State<MapTimeline> createState() => _MapTimelineState();
@@ -445,6 +453,79 @@ class _MapTimelineState extends State<MapTimeline> {
     return false;
   }
 
+  Widget _buildEraTime(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colors,
+    TimelineEra era,
+  ) {
+    Widget buildFor(String? readyFrameId) {
+      final loading =
+          widget.readyFrameId != null &&
+          readyFrameId != widget.frames[_liveIndex].id;
+      final color = loading
+          ? colors.onSurfaceVariant
+          : _eraColor(era, theme.brightness);
+
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(switch (era) {
+                TimelineEra.past => AppLocalizations.of(
+                  context,
+                ).mapTimelinePast,
+                TimelineEra.now => AppLocalizations.of(context).mapTimelineNow,
+                TimelineEra.future => AppLocalizations.of(
+                  context,
+                ).mapTimelineFuture,
+              }, style: theme.textTheme.titleMedium?.copyWith(color: color)),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                _bigLabel,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: color,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          SizedBox.square(
+            dimension: 16,
+            child: AnimatedOpacity(
+              key: const ValueKey('timeline-frame-loading'),
+              duration: AppMotion.fast,
+              opacity: loading ? 1 : 0,
+              child: TickerMode(
+                enabled: loading,
+                child: ExcludeSemantics(
+                  excluding: !loading,
+                  child: Semantics(
+                    label: AppLocalizations.of(context).commonLoading,
+                    liveRegion: true,
+                    child: InlineLoading(size: 16, color: color),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    final readiness = widget.readyFrameId;
+    if (readiness == null) return buildFor(null);
+    return ValueListenableBuilder<String?>(
+      valueListenable: readiness,
+      builder: (context, readyFrameId, _) => buildFor(readyFrameId),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -498,31 +579,7 @@ class _MapTimelineState extends State<MapTimeline> {
                 ],
               ),
               const SizedBox(width: AppSpacing.md),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    switch (era) {
-                      TimelineEra.past => l10n.mapTimelinePast,
-                      TimelineEra.now => l10n.mapTimelineNow,
-                      TimelineEra.future => l10n.mapTimelineFuture,
-                    },
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: _eraColor(era, theme.brightness),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    _bigLabel,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: _eraColor(era, theme.brightness),
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                ],
-              ),
+              _buildEraTime(context, theme, colors, era),
             ],
           ),
         ),
