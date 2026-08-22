@@ -38,9 +38,41 @@ import 'package:provider/provider.dart';
 /// version card's contributor fetch then settles (to an empty strip) without
 /// touching a network.
 class _EmptyChangelogRepository implements ChangelogRepository {
+  const _EmptyChangelogRepository();
+
   @override
   Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
       const Ok([]);
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
+      const Err(UnexpectedFailure('no network'));
+}
+
+/// A changelog repository whose releases call always fails — the avatar
+/// skeleton must stay put rather than collapse the slot.
+class _FailingChangelogRepository implements ChangelogRepository {
+  const _FailingChangelogRepository();
+
+  @override
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
+      const Err(UnexpectedFailure('no network'));
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
+      const Err(UnexpectedFailure('no network'));
+}
+
+/// A changelog repository that answers a fixed page of notes. [ChangelogApi]
+/// sorts newest first by publish time, so the first note is the newest.
+class _NotesChangelogRepository implements ChangelogRepository {
+  _NotesChangelogRepository(this.notes);
+
+  final List<ReleaseNote> notes;
+
+  @override
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async =>
+      Ok(List.of(notes));
 
   @override
   Future<Result<Uint8List>> avatarBytes(String login) async =>
@@ -71,7 +103,16 @@ GoRouter _router(List<String> visited) => GoRouter(
               return const SizedBox.shrink();
             },
           ),
-        // The version card opens the highlights — which links onward to notes.
+        // The version card opens the changelog, which leads onward to the
+        // highlights page (本次更新) and then to the notes.
+        GoRoute(
+          path: AppRoutes.changelogPath,
+          name: AppRoutes.changelog,
+          builder: (_, _) {
+            visited.add(AppRoutes.changelog);
+            return const SizedBox.shrink();
+          },
+        ),
         GoRoute(
           path: AppRoutes.releaseHighlightsPath,
           name: AppRoutes.releaseHighlights,
@@ -97,6 +138,7 @@ Future<void> _pump(
   WidgetTester tester,
   GoRouter router, {
   MeshUnread? unread,
+  ChangelogRepository changelog = const _EmptyChangelogRepository(),
 }) async {
   // Tall enough that every group lays out and hit-tests inside the viewport —
   // a row past the bottom edge takes taps that silently miss.
@@ -129,9 +171,7 @@ Future<void> _pump(
           ),
         ),
         // The version card's contributor strip reads the changelog.
-        Provider<ChangelogRepository>(
-          create: (_) => _EmptyChangelogRepository(),
-        ),
+        Provider<ChangelogRepository>(create: (_) => changelog),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -356,9 +396,7 @@ void main() {
     }
   });
 
-  testWidgets('the version card opens this version\x27s highlights', (
-    tester,
-  ) async {
+  testWidgets('the version card opens this update\'s notes', (tester) async {
     final visited = <String>[];
     await _pump(tester, _router(visited));
     // The card is the DPIP row with the chevron — tap its label.
@@ -366,6 +404,67 @@ void main() {
     // pumpAndSettle would time out: the support card's border breathes
     // forever. A fixed pump covers the navigation transition.
     await tester.pump(const Duration(milliseconds: 600));
-    expect(visited, [AppRoutes.releaseHighlights]);
+    expect(visited, [AppRoutes.versionNotes]);
+  });
+
+  testWidgets(
+    'the version card falls back to the newest note\x27s contributors',
+    (tester) async {
+      // A build no published release names — a local/dev label newer than
+      // anything GitHub holds — must still show the newest note's avatars
+      // rather than an empty strip.
+      AppBuild.debugSet(label: '26w99x', code: 999999);
+      addTearDown(() => AppBuild.debugSet(label: 'dev', code: 0));
+
+      final notes = [
+        ReleaseNote(
+          tagName: '26w34j',
+          name: '26w34j',
+          prerelease: true,
+          publishedAt: DateTime.utc(2026, 8, 22),
+          body: '- something — @whes1015\n- other — @ExptechTW',
+        ),
+        ReleaseNote(
+          tagName: '26w34i',
+          name: '26w34i',
+          prerelease: true,
+          publishedAt: DateTime.utc(2026, 8, 21),
+          body: '- older — @someone',
+        ),
+      ];
+      await _pump(
+        tester,
+        _router([]),
+        changelog: _NotesChangelogRepository(notes),
+      );
+      // Avatar bytes fail in this harness, so each circle falls back to the
+      // login's initial — the strip still renders per contributor.
+      expect(find.text('W'), findsOneWidget);
+      expect(find.text('E'), findsOneWidget);
+      // The older note's sole contributor must not leak in.
+      expect(find.text('S'), findsNothing);
+    },
+  );
+
+  testWidgets('a failed fetch keeps the avatar skeleton in place', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      _router([]),
+      changelog: const _FailingChangelogRepository(),
+    );
+    // The fetch failed, but the slot must not collapse — the three dim
+    // circles of the skeleton (26×26, the 30px avatar minus its 4px border)
+    // stay where the avatars would land, so the badge row below never jumps
+    // and the card does not look broken.
+    final skeleton = find.byWidgetPredicate(
+      (w) =>
+          w is Container &&
+          w.constraints?.maxWidth == 26 &&
+          w.constraints?.maxHeight == 26 &&
+          (w.decoration as BoxDecoration?)?.shape == BoxShape.circle,
+    );
+    expect(skeleton, findsNWidgets(3));
   });
 }
