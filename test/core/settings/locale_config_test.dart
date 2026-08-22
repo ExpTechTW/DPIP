@@ -1,5 +1,5 @@
 import 'package:dpip/core/settings/locale_config.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -13,6 +13,7 @@ void main() {
       countryCode: 'HK',
     ),
     Locale('ja'),
+    Locale('yue'),
   ];
 
   test('null / empty → Taiwan', () {
@@ -63,5 +64,29 @@ void main() {
 
   test('unrelated language falls back to Taiwan', () {
     expect(resolveAppLocale(const [Locale('de')], supported), kHomeLocale);
+  });
+
+  test('yue maps to itself', () {
+    expect(
+      resolveAppLocale(const [Locale('yue')], supported),
+      const Locale('yue'),
+    );
+  });
+
+  testWidgets('app delegates serve Cantonese without crashing', (tester) async {
+    // flutter_localizations ships no yue; the fallback delegates must serve
+    // zh_TW widgets strings so a yue MaterialApp builds instead of asserting
+    // "a Cupertino/Material delegate that supports the yue locale was not
+    // found" at startup.
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('yue'),
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: supported,
+        home: const Scaffold(body: Text('hi')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('hi'), findsOneWidget);
   });
 }

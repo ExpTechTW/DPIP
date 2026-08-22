@@ -2,7 +2,9 @@
 library;
 
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// The app's home locale: Traditional Chinese for Taiwan (`zh_TW`).
 ///
@@ -27,6 +29,69 @@ List<Locale> get appSupportedLocales => [
     (l) => l != kHomeLocale && !_isBareChinese(l),
   ),
 ];
+
+/// The app's localization delegates, with a widgets-layer fallback for
+/// locales [flutter_localizations] does not ship (yue): Cantonese strings
+/// come from our own ARB, but Material/Cupertino built-in widget strings
+/// (date pickers, dialogs, …) fall back to Traditional Chinese — the closest
+/// written form the framework ships — instead of asserting.
+///
+/// [flutter_localizations] has no `yue`; a `MaterialApp` whose supported
+/// locales include it crashes at startup with "a Cupertino/Material delegate
+/// that supports the yue locale was not found". These fallback delegates
+/// pre-empt the framework's own `Global*` ones for exactly those locales.
+List<LocalizationsDelegate<dynamic>> get appLocalizationsDelegates => [
+  ...AppLocalizations.localizationsDelegates,
+  const _WidgetsFallbackDelegate<MaterialLocalizations>(
+    loadWith: _loadMaterial,
+    unsupported: [Locale('yue')],
+    replacement: kHomeLocale,
+  ),
+  const _WidgetsFallbackDelegate<CupertinoLocalizations>(
+    loadWith: _loadCupertino,
+    unsupported: [Locale('yue')],
+    replacement: kHomeLocale,
+  ),
+];
+
+Future<MaterialLocalizations> _loadMaterial(Locale locale) =>
+    GlobalMaterialLocalizations.delegate.load(locale);
+
+Future<CupertinoLocalizations> _loadCupertino(Locale locale) =>
+    GlobalCupertinoLocalizations.delegate.load(locale);
+
+/// Forwards a widgets delegate for locales it cannot serve to a
+/// [replacement], and passes every other locale through to the underlying
+/// `Global*` delegate untouched.
+///
+/// A delegate that answers "not supported" gets skipped entirely by
+/// [Localizations], so the fallback has to pre-empt the framework's own
+/// `Global*` delegates: it claims support for exactly [unsupported] and
+/// serves [replacement] in their place.
+class _WidgetsFallbackDelegate<T> extends LocalizationsDelegate<T> {
+  const _WidgetsFallbackDelegate({
+    required this.loadWith,
+    required this.unsupported,
+    required this.replacement,
+  });
+
+  final Future<T> Function(Locale locale) loadWith;
+  final List<Locale> unsupported;
+  final Locale replacement;
+
+  @override
+  bool isSupported(Locale locale) => unsupported.contains(locale);
+
+  @override
+  Future<T> load(Locale locale) => loadWith(replacement);
+
+  @override
+  bool shouldReload(_WidgetsFallbackDelegate<T> old) =>
+      old.unsupported != unsupported || old.replacement != replacement;
+
+  @override
+  String toString() => 'WidgetsFallbackDelegate($unsupported → $replacement)';
+}
 
 bool _isBareChinese(Locale locale) =>
     locale.languageCode == 'zh' &&

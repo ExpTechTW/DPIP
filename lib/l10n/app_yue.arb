@@ -1,0 +1,1945 @@
+{
+  "@@locale": "yue",
+  "languageName": "粵語",
+  "typhoonValueLat": "北緯 {lat} 度",
+  "onboardingSkipBody": "未授權定位同通知,DPIP 將冇辦法即時通知你所在地嘅地震同災害。你仍可稍後喺設定中開啟。",
+  "@mapAppCoordinatesCopied": {},
+  "@meshtasticLayerOptions": {
+    "description": "Tooltip for the mesh layer's options chip"
+  },
+  "rainInterval24h": "24 時",
+  "homeRainTrendHeavyStopping": "預計 {minutes} 分鐘後停止下大雨",
+  "mapTimelineObserved": "觀測",
+  "mapTimelineScrubPaused": "拖動過快，影格更新已暫停；放慢速度即可恢復。",
+  "regionSelectTitle": "選擇地區",
+  "skyTimeNoon": "正午",
+  "radarCountyOutlineSubtitle": "讓縣市界線在雷達回波下仍然清楚。",
+  "@meshtasticRegionLabel": {
+    "description": "LoRa region"
+  },
+  "mapLayerSatelliteB03": "ひまわり 可見光-紅(B03)",
+  "reportFilterIntensity": "震度",
+  "mapLayerLightning": "閃電",
+  "restroomTypeMale": "男廁所",
+  "meshtasticLastReceived": "最近接收",
+  "reportDetailSortByCounty": "依縣市排序",
+  "@moonDays": {
+    "description": "Day unit for the moon age"
+  },
+  "homeRainTrendScattered": "可能會有零星降雨",
+  "meshtasticUptime": "運行時間",
+  "weatherRankingTempExtremes": "溫度極值",
+  "themeLight": "淺色",
+  "mapTerrainReliefHint": "喺底圖上顯示立體地形陰影",
+  "meshtasticEmptyMessage": "（空白訊息）",
+  "moreSectionRegion": "地區",
+  "mapLayerSatellite": "ひまわり 紅外線(B13)",
+  "@meshtasticTapNode": {
+    "description": "Resting state of the map node sheet"
+  },
+  "aedHoursSaturday": "週六開放時間",
+  "moonPhaseNew": "新月",
+  "notifySectionEew": "地震速報",
+  "mapResetNorth": "回到北方",
+  "rainInterval2d": "2 日",
+  "mapTownLabelsHint": "放大時顯示鄉鎮名稱",
+  "commonCancel": "取消",
+  "notifyOptTsunamiWarning": "只接收海嘯警報",
+  "mapLayerSatelliteBtdFog": "ひまわり 夜間霧",
+  "@meshtasticSelectDevice": {
+    "description": "Device picker sheet title"
+  },
+  "moreSectionAdvanced": "進階",
+  "moreSectionMesh": "Mesh 網絡",
+  "@meshtasticLastHeard": {
+    "description": "When a node last transmitted"
+  },
+  "weatherRankingExtremeRange": "日溫差",
+  "permissionsTitle": "權限檢查",
+  "permissionsAttention": "權限需要處理",
+  "permissionsBody": "DPIP 需要呢些權限才能即時通知你。收唔到警報時，通常就係其中一項尚未開啟。",
+  "notifySettingsMenu": "通知設定",
+  "mapAppDefault": "{app}（預設）",
+  "trendRange24h": "24 小時",
+  "mapLayerStyleJmaTooltip": "灰階為底，−40 °C 以下上色，凸顯雲頂高度",
+  "mapLayerRain": "雨量",
+  "mapLayerQpesums": "未來 1 小時降水預報",
+  "@weatherModeSnow": {
+    "description": "Label for the weatherModeSnow option in the experimental backdrop settings."
+  },
+  "@dataSectionAstronomy": {
+    "description": "Astronomy section header in the data catalogue"
+  },
+  "mapOverlaySectionMap": "地圖",
+  "mapTerrainRelief": "地形立體感",
+  "mapLegendCollapse": "收合圖例",
+  "updateAvailableTitle": "有新版本",
+  "updateAvailableBody": "新版本 {version} 已發佈。",
+  "updateSkip": "略過此次",
+  "updateViewChangelog": "前往查看",
+  "updateOpenAppStore": "App Store",
+  "updateOpenTestFlight": "TestFlight",
+  "updateOpenPlayStore": "Play 商店",
+  "updateDownload": "下載更新",
+  "changelogShowSnapshots": "顯示測試版",
+  "changelogTitle": "更新日誌",
+  "reportFilterOrderDesc": "降序",
+  "meshtasticExcludeMqttSubtitle": "經網際網路橋接、並非無線電聽到嘅節點",
+  "reportFilterIntensityInfoTitle": "震度新制同舊制",
+  "mapLayerTyphoon": "颱風",
+  "radarOverlayMenuTooltip": "雷達圖層選項",
+  "@meshtasticChannelUse": {
+    "description": "Share of airtime seen busy"
+  },
+  "meshtasticNodes": "節點",
+  "meshtasticSend": "傳送",
+  "typhoonOverlayStormL7Tooltip": "七級暴風圈＋平均圓（紫色）",
+  "aedType": "場所類型",
+  "termsOfService": "服務條款",
+  "typhoonLegendCircle25": "十級風暴風圈",
+  "sponsorTitle": "支援 DPIP",
+  "mapNavSatellite": "衛星",
+  "homeRainTrendUpdated": "更新 {time}",
+  "onboardingNext": "下一步",
+  "weatherRankingMergeTown": "鄉鎮",
+  "mapLayerMonitor": "強震監視器",
+  "moreYoutube": "YouTube",
+  "sponsorSubscriptions": "訂閱制",
+  "typhoonValueLon": "東經 {lon} 度",
+  "skyTime": "天空時間",
+  "weatherModeCloudy": "多雲",
+  "skyTimeDusk": "暮色",
+  "@meshtasticExcludeMqttSubtitle": {
+    "description": "What an MQTT node is"
+  },
+  "meshtasticFirmware": "韌體",
+  "@mapLayerMeshtastic": {
+    "description": "Map layer name: mesh nodes"
+  },
+  "reportFilterDateEndNote": "結束日：當日 24:00（台北時間）",
+  "meshtasticSilent": "已靜默",
+  "reportFilterSortMagnitude": "規模",
+  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerSatelliteB12": "ひまわり 臭氧(B12)",
+  "restroomCategoryOther": "其他",
+  "@meshtasticRegionConfirm": {
+    "description": "Confirmation before rebooting the radio"
+  },
+  "@skyTimeSunset": {
+    "description": "Label for the skyTimeSunset option in the experimental backdrop settings."
+  },
+  "homeForecastHighLow": "高 {high}° · 低 {low}°",
+  "@meshtasticChannelFailed": {
+    "description": "The radio rejected the channel write"
+  },
+  "locationBannerFix": "開啟設定",
+  "mapLegendExpand": "圖例",
+  "eewNone": "而家冇地震速報",
+  "typhoonTyNo": "TY {no}",
+  "notifyOptTsunamiAll": "海嘯消息、海嘯警報",
+  "@windForecastGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the wind-forecast overlay menu."
+  },
+  "@skyTimeNight": {
+    "description": "Label for the skyTimeNight option in the experimental backdrop settings."
+  },
+  "@radarCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the radar overlay menu."
+  },
+  "meshtasticLayerOptions": "節點選項",
+  "onboardingAgreeContinue": "同意並繼續",
+  "meshtasticNodeId": "節點 ID",
+  "commonRetry": "重試",
+  "reportDetailNumbered": "編號 {number} 顯著有感地震",
+  "typhoonOverlayStormBandSubtitle": "含平均圓",
+  "disasterMapOverlayRestroomTooltip": "顯示公廁",
+  "weatherRankingTitle": "觀測排行",
+  "homeRainTrendHeavySustained": "未來 1 小時會有持續大雨",
+  "notifySectionTsunami": "海嘯",
+  "restroomCategoryPark": "公園",
+  "moreLinkOpenFailed": "冇辦法開啟連結",
+  "themeDark": "深色",
+  "sponsorRestore": "恢復購買",
+  "@meshtasticSilent": {
+    "description": "Legend: node known but not heard recently"
+  },
+  "meshtasticChannelWorking": "正在設定 DPIP 頻道…",
+  "meshtasticRegionSwitch": "切換為 TW",
+  "@meshtasticLastReceived": {
+    "description": "Age of the last received packet"
+  },
+  "meshtasticTraffic": "流量",
+  "@meshtasticDpipChannel": {
+    "description": "Which channel DPIP payloads use"
+  },
+  "mapLayerStyleBdTooltip": "Dvorak BD 曲線——熱帶氣旋強度分析嘅階梯灰階",
+  "disasterMapOverlayAedTooltip": "顯示 AED 位置",
+  "@moonTitle": {
+    "description": "Moon page title"
+  },
+  "mapLayerHumidity": "濕度",
+  "mapLayerSatelliteTransparentNight": "夜間 = 透明,顯示底圖",
+  "meshtasticScanning": "掃描中…",
+  "@meshtasticDevice": {
+    "description": "Section: device identity"
+  },
+  "regionSelectFull": "最多只能選擇 {max} 個地區",
+  "meshtasticNewMessages": "新訊息",
+  "meshtasticBatteryHistory": "電量歷史",
+  "meshtasticStatAvg": "平均",
+  "meshtasticStatPeak": "峰值",
+  "meshtasticStatDrain": "掉電",
+  "meshtasticStatEta": "預估可用",
+  "meshtasticStatFull": "充滿",
+  "meshtasticStatTrend": "趨勢",
+  "meshtasticStatCharging": "充電中",
+  "meshtasticStatStable": "穩定",
+  "meshtasticNodesTotal": "已知",
+  "meshtasticNodesOnline": "在線",
+  "meshtasticRx": "接收",
+  "meshtasticTx": "發送",
+  "meshtasticNodesHistory": "節點數歷史",
+  "meshtasticTrafficHistory": "流量歷史",
+  "meshtasticEtaHours": "約 {n} 小時",
+  "meshtasticEtaDays": "約 {n} 天",
+  "meshtasticTitle": "Meshtastic",
+  "navMore": "更多",
+  "meshtasticDpipChannel": "DPIP 頻道",
+  "disasterMapOverlaySectionLayers": "圖層",
+  "@moonPhaseWaningCrescent": {
+    "description": "Phase: waning crescent"
+  },
+  "mapLayerSatelliteB05": "ひまわり 近紅外(B05)",
+  "@meshtasticNotConnected": {
+    "description": "Empty message log while not connected"
+  },
+  "@weatherModeCloudy": {
+    "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
+  },
+  "typhoonLabelNe": "東北側",
+  "meshtasticCopied": "已複製訊息",
+  "reportListEmpty": "而家冇地震報告",
+  "reportListEnd": "已到最後一頁",
+  "mapLayerSatelliteTruecolor": "ひまわり 真彩色",
+  "typhoonOverlaySectionExtra": "覆蓋層",
+  "eewSWave": "震波",
+  "meshtasticBusyTitle": "另一個 App 正在使用呢台裝置",
+  "restroomCategoryCultural": "文化育樂活動場所",
+  "typhoonLabelWind": "近中心最大風速",
+  "radarGlobalOutlineHint": "各國國界外框",
+  "notifyEvacuation": "防災資訊",
+  "typhoonLegendCircle15": "七級風暴風圈",
+  "@radarGlobalOutline": {
+    "description": "World-country-border overlay toggle in the map's reference-layer overlay menus."
+  },
+  "@meshtasticRadioSettings": {
+    "description": "Section: LoRa settings"
+  },
+  "dataSectionAstronomy": "天文",
+  "homeRainTrendLightSustained": "未來 1 小時會有持續小雨",
+  "commonError": "發生錯誤",
+  "moonPhaseWaningCrescent": "殘月",
+  "meshtasticPower": "電力",
+  "@meshtasticChannelWorking": {
+    "description": "Creating/verifying the DPIP channel"
+  },
+  "mapTimelineNow": "而家",
+  "reportFilterRange": "{start} – {end}",
+  "reportDetailOpenReport": "報告頁面",
+  "trendRange7d": "7 天",
+  "typhoonWarningAreas": "警戒區域：{areas}",
+  "rainIntervalSection": "統計時間",
+  "notifyTitle": "通知",
+  "meshtasticTxPower": "發射功率",
+  "@radarTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the radar overlay menu."
+  },
+  "restroomCategoryLabel": "類別",
+  "sponsorRestoring": "正在恢復購買…",
+  "sponsorIntro": "DPIP 致力於提供即時防災資訊，冇廣告或其他營利模式。你嘅支援能幫助我哋維持伺服器運作並持續開發。",
+  "typhoonLabelStormAvg": "十級風平均暴風半徑",
+  "@meshtasticHardware": {
+    "description": "Board model"
+  },
+  "restroomCategoryCommercial": "商業營業場所",
+  "@meshtasticAirtime": {
+    "description": "Share of airtime this radio transmitted"
+  },
+  "aedRegion": "縣市區域",
+  "homeRainTrendLightStopping": "預計 {minutes} 分鐘後停止下小雨",
+  "reportDetailInfo": "詳細資訊",
+  "mapNavWind": "風向",
+  "@meshtasticReceived": {
+    "description": "Packets received this session"
+  },
+  "windForecastOverlayMenuTooltip": "風場預報圖層選項",
+  "rainInterval6h": "6 時",
+  "homeRainTrendMinute": "{minute}分",
+  "restroomTypeUnspecified": "未設定",
+  "typhoonOverlayProbabilityHint": "會隱藏預測圓錐",
+  "mapLayerSatelliteGlobalOutline": "國界",
+  "mapNavTemperature": "溫度",
+  "typhoonLegendForecastPoint": "預測點",
+  "@meshtasticBattery": {
+    "description": "Battery charge"
+  },
+  "reportListYesterday": "昨天",
+  "moreSectionLinks": "相關連結",
+  "feedOffline": "連接中斷",
+  "mapLayerStyleBd": "Dvorak BD",
+  "moreSectionDisplay": "顯示",
+  "rainInterval3d": "3 日",
+  "defaultMapLayerSubtitle": "開啟地圖分頁時顯示此圖層，底部導覽列圖示同文字會一併更新。",
+  "aedDescription": "備註",
+  "typhoonOverlayWeatherRadarTooltip": "雷達回波（對齊颱風報文時間）",
+  "onboardingPermLocationDesc": "依你所在位置推送本地警報。",
+  "mapLayerSatelliteB16": "ひまわり 二氧化碳(B16)",
+  "@meshtasticClearMessages": {
+    "description": "Menu action clearing the message log"
+  },
+  "homeActiveEventsEmpty": "而家冇生效中嘅事件",
+  "typhoonLabelPosition": "中心位置",
+  "weatherRankingBy": "依",
+  "typhoonIntensityMild": "輕度颱風",
+  "windForecastGlobalOutlineHint": "各國國界外框",
+  "rainInterval1h": "1 時",
+  "eewLocalIntensity": "所在地預估",
+  "mapLayerRadar": "雷達合成回波圖",
+  "@radarScanRange": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "restroomCategoryReligious": "宗教禮儀場所",
+  "meshtasticRole": "角色",
+  "mapLayerSatelliteCloudCloudy": "有雲",
+  "skyTimeSunrise": "日出",
+  "@mapLayerMeshtasticSubtitle": {
+    "description": "Map layer switcher subtitle"
+  },
+  "meshtasticJumpToLatest": "跳到最新",
+  "meshtasticNoMessages": "尚無訊息",
+  "onboardingPermNotifyDesc": "在地震、天氣同災害發生時,即時傳遞警報通知。",
+  "radarTownOutline": "鄉鎮界線",
+  "mapLayerStyleSection": "顯示樣式",
+  "@moonPhaseNew": {
+    "description": "Phase: new moon"
+  },
+  "disasterMapOverlayMenuTooltip": "防災地圖圖層",
+  "moreGooglePlay": "Google Play",
+  "meshtasticOnline": "近期聽到",
+  "@meshtasticSendHint": {
+    "description": "Message input hint"
+  },
+  "typhoonLabelSw": "西南側",
+  "typhoonForecastLead": "預測 +{hours} 小時",
+  "@mapAppOpenFailed": {},
+  "changelogTypeStable": "正式版",
+  "mapLayerSatelliteTransparentClear": "晴空 = 透明,顯示底圖",
+  "@skyTimeAuto": {
+    "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
+  },
+  "@meshtasticBusyTitle": {
+    "description": "Another app holds the BLE link"
+  },
+  "@windForecastCountyOutlineHint": {
+    "description": "Hint under the county-border toggle in the wind-forecast overlay menu."
+  },
+  "mapOverlaySectionReference": "參考圖層",
+  "mapLayerSatelliteB02": "ひまわり 可見光-綠(B02)",
+  "weatherRankingEmpty": "而家冇可排序嘅觀測",
+  "notifySectionOther": "其他",
+  "weatherRankingMeta": "資料時間：{time}\n共 {count} 觀測點",
+  "onboardingTermsAgree": "我已閱讀並同意服務條款",
+  "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(無植被)",
+  "notifyOptLocalIntensity4": "所在地震度4以上",
+  "eewArrived": "已抵達",
+  "meshtasticNoDevices": "找唔到 Meshtastic 裝置",
+  "mapLayerCategoryLife": "生活",
+  "reportFilterSortIntensity": "震度",
+  "meshtasticStateDisconnected": "未連線",
+  "typhoonIntensityIntense": "強烈颱風",
+  "@meshtasticSend": {
+    "description": "Send message button"
+  },
+  "mapLayerOrderTitle": "調整圖層順序",
+  "@skyTimeNoon": {
+    "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
+  },
+  "@meshtasticShortName": {
+    "description": "The radio's short name"
+  },
+  "dpmYes": "係",
+  "meshtasticNoHistory": "歷史紀錄還唔夠",
+  "reportDetailLocalIntensityUnavailable": "冇震度訊息",
+  "mapLayerWindForecastGfs": "GFS",
+  "reportFilterDepth": "深度",
+  "@meshtasticNoHistory": {
+    "description": "Chart placeholder before two samples exist"
+  },
+  "onboardingScrollHint": "向下捲動以繼續",
+  "@meshtasticRadio": {
+    "description": "Radio diagnostics sheet title"
+  },
+  "mapNavQpesums": "預報",
+  "@meshtasticStateError": {
+    "description": "Connection state label"
+  },
+  "@meshtasticVoltage": {
+    "description": "Battery voltage"
+  },
+  "notifyAdvisory": "天氣警告及特報",
+  "@meshtasticNoMessages": {
+    "description": "Empty message log while connected"
+  },
+  "reportFilterReset": "重設",
+  "mapLayerSatelliteMndwi": "ひまわり 改良水體指數",
+  "typhoonOverlaySectionStorm": "暴風圈",
+  "moonPhaseFull": "滿月",
+  "@meshtasticEmptyMessage": {
+    "description": "Placeholder for a text packet with no body"
+  },
+  "meshtasticBinaryPayload": "二進位內容 · {size}",
+  "@radarGlobalOutlineHint": {
+    "description": "Hint under the national-border toggle in the radar overlay menu."
+  },
+  "moonPhaseWaningGibbous": "虧凸月",
+  "reportFilterIntensityInfoModernTitle": "新制（2020 起）",
+  "@mapAppGoogleMaps": {},
+  "typhoonDataTime": "資料時間\n{time}",
+  "restroomTypeAccessible": "無障礙廁所",
+  "moreSectionAbout": "關於",
+  "meshtasticSelectDevice": "選擇裝置",
+  "onboardingIntroBody": "DPIP 係同你並肩嘅防災夥伴,整合強震即時警報、地震報告、天氣同各類災害資訊,喺關鍵時刻即時通知你。\n\n• 地震:強震即時警報、震度速報同地震報告\n• 天氣:雷暴即時訊息、天氣警告及特報\n• 海嘯同防災資訊\n\n接下來,我哋會請你閱讀服務條款,並授權幾項讓 DPIP 能即時守護你嘅權限。",
+  "shelterCapacityLabel": "收容人數",
+  "reportDetailImage": "地震報告圖",
+  "meshtasticStateConfiguring": "設定中…",
+  "@moonPhaseLastQuarter": {
+    "description": "Phase: last quarter"
+  },
+  "typhoonLabelGaleAvg": "七級風平均暴風半徑",
+  "onboardingPermNotify": "通知",
+  "meshtasticClearMessages": "清除訊息",
+  "meshtasticNotifyMessages": "新訊息通知",
+  "defaultMapLayerSettings": "地圖預設圖層",
+  "eewSourceSettings": "地震速報來源",
+  "eewSourceSubtitle": "選擇要顯示哪些機構發布嘅地震速報。",
+  "eewSourceAll": "所有來源",
+  "eewSourceAllDescription": "顯示所有機構發布嘅地震速報。",
+  "eewSourceCwaOnly": "僅中央氣象署",
+  "eewSourceCwaOnlyDescription": "只顯示中央氣象署發布嘅地震速報。",
+  "moreSectionNotify": "通知",
+  "@moonPhaseFull": {
+    "description": "Phase: full moon"
+  },
+  "notifyUnavailable": "推送尚未就緒,請稍後再試。",
+  "mapLayerOrderReset": "回復預設順序",
+  "weatherRankingMergeCounty": "縣市",
+  "moreSectionApp": "取得 App",
+  "moreSectionBeta": "測試版",
+  "moreAndroidBeta": "Android 測試版",
+  "moreTestFlight": "iOS 測試版（TestFlight）",
+  "moreSectionPartners": "合作夥伴",
+  "morePartnersNote": "依合作時間先後排列。感謝呢些個人同公司對防災嘅貢獻，佢哋讓 DPIP 成為可能。",
+  "morePartnerGeoscience": "巨科資訊有限公司",
+  "morePartnerTwds": "台灣數位串流有限公司",
+  "reportFilterIntensityInfoLegacyBody": "震度僅 0–7，冇 5弱／5強／6弱／6強。",
+  "mapLayerSatelliteSst": "ひまわり 海表溫度",
+  "qpesumsOverlayMenuTooltip": "定量降水預報圖層選項",
+  "@skyTimeAfternoon": {
+    "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
+  },
+  "mapTimelineFuture": "未來",
+  "typhoonLegendCircleAvg": "平均圓",
+  "reportFilterDepthKm": "{depth} 公里",
+  "typhoonLabelSe": "東南側",
+  "radarTownOutlineHint": "較細嘅分區",
+  "eewCountdown": "{seconds} 秒",
+  "@meshtasticDisconnect": {
+    "description": "Disconnect from the radio"
+  },
+  "typhoonLabelGust": "瞬間最大陣風",
+  "mapAppGoogleMaps": "Google Maps",
+  "sponsorTerms": "使用條款",
+  "restroomTypeGenderNeutral": "性別友善廁所",
+  "@skyTimeDusk": {
+    "description": "Label for the skyTimeDusk option in the experimental backdrop settings."
+  },
+  "notifyThunderstorm": "雷暴即時訊息",
+  "skyTimeGolden": "黃金時刻",
+  "moonAge": "月齡",
+  "@windForecastTownOutlineHint": {
+    "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
+  },
+  "meshtasticRadioSettings": "LoRa",
+  "@meshtasticNotifyMessages": {
+    "description": "Toggle: local notification for an incoming mesh message"
+  },
+  "moreGithub": "ExpTech GitHub",
+  "homeForecastUnavailable": "選擇地區後可查看預報",
+  "mapLayers": "圖層",
+  "meshtasticHardware": "硬體",
+  "languageSettings": "語言設定",
+  "@moonNextFullMoon": {
+    "description": "Next full moon date label"
+  },
+  "language": "語言",
+  "homeForecastFeelsLike": "體感 {temp}°",
+  "typhoonOverlayWeatherHint": "對齊報文時間",
+  "@meshtasticHopLimit": {
+    "description": "How many hops a packet may take"
+  },
+  "skyTimeDawn": "黎明",
+  "skyTimeAfternoon": "下午",
+  "meshtasticLastHeard": "最後聽到",
+  "typhoonWarningTitle": "颱風警報",
+  "moreSourceCode": "原始碼",
+  "mapLayerCategoryWeather": "氣象觀測",
+  "mapLayerSatelliteB09": "ひまわり 中層水氣(B09)",
+  "windForecastTownOutlineHint": "更細嘅網格",
+  "mapLayerSatelliteCloudmask": "ひまわり 雲遮罩",
+  "mapAppCopyCoordinates": "複製座標",
+  "reportFilterIntensityInfoIntro": "中央氣象署自 2020 年 1 月 1 日（臺北時間）起改用新制震度。",
+  "mapNavEarthquake": "地震",
+  "restroomGradeAverage": "普通級",
+  "@meshtasticNodes": {
+    "description": "Mesh nodes section header"
+  },
+  "mapLayerSatelliteBtdCo2": "ひまわり 卷雲/雲高",
+  "onboardingPermBackgroundDesc": "選擇「一律允許」,關閉 App 都能推送本地警報。",
+  "mapTimelineForecast": "預報",
+  "restroomTypeLabel": "廁所類型",
+  "navEarthquake": "地震",
+  "typhoonOverlayStormL10Tooltip": "十級暴風圈＋平均圓（黃色）",
+  "moonPhaseWaxingGibbous": "盈凸月",
+  "reportDetailTitle": "地震報告",
+  "moreTremReport": "TREM 偵測報告",
+  "weatherDataTime": "{station} ∙ 資料時間 {time}",
+  "meshtasticNoNodes": "尚未聽到任何節點",
+  "meshtasticViaMqtt": "經 MQTT（網際網路）",
+  "radarCountyOutline": "縣市界線",
+  "@mapAppCopyCoordinates": {},
+  "commonClose": "關閉",
+  "restroomGradeLabel": "等級",
+  "rainIntervalNow": "今日",
+  "changelogCurrentVersion": "而家版本",
+  "typhoonOverlayForecastCalloutsTooltip": "放大時顯示預測點詳細卡片",
+  "typhoonLabelPressure": "中心氣壓",
+  "aedOpenRemark": "開放時間備註",
+  "onboardingPermsBody": "為咗喺災害發生嘅第一時間通知你,請授權以下權限。你隨時可以喺系統設定中更改。",
+  "typhoonOverlaySectionWeather": "天氣底圖",
+  "@meshtasticStateConnected": {
+    "description": "Connection state label"
+  },
+  "notifyOptWeatherLocal": "接收所在地",
+  "mapNavRain": "雨量",
+  "moonDays": "天",
+  "mapLegendUnit": "單位：{unit}",
+  "weatherModeClear": "晴天",
+  "meshtasticRadio": "電台",
+  "commonEmpty": "冇資料",
+  "mapLayerSatelliteB01": "ひまわり 可見光-藍(B01)",
+  "meshtasticExternalPower": "外部供電",
+  "moonPhaseLastQuarter": "下弦月",
+  "@meshtasticName": {
+    "description": "The radio's long name"
+  },
+  "reportFilterOrderAsc": "升序",
+  "reportFilterApply": "套用",
+  "reportDetailImageUnavailable": "報告圖尚未提供",
+  "@weatherModeSand": {
+    "description": "Label for the weatherModeSand option in the experimental backdrop settings."
+  },
+  "weatherRankingHighest": "最高",
+  "reportDetailReplay": "重播",
+  "mapLayerRestroom": "公廁",
+  "restroomCategoryWelfare": "社福機構、集會場所",
+  "restroomGradeExcellent": "特優級",
+  "meshtasticLastSent": "最近送出",
+  "meshtasticName": "名稱",
+  "meshtasticScan": "掃描",
+  "@radarOverlayMenuTooltip": {
+    "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
+  },
+  "mapLayerCategoryForecast": "數值預報",
+  "meshtasticChannelFailed": "冇辦法設定 DPIP 頻道",
+  "themeSystem": "跟隨系統",
+  "mapLayerSatelliteNdvi": "ひまわり 植生指數",
+  "typhoonLegendForecast": "預測路徑",
+  "typhoonValueHpa": "{n} 百帕",
+  "weatherPrecipitation": "降水量",
+  "moonNextFullMoon": "下次滿月",
+  "dpmSheetEmpty": "點選地圖上嘅標記查看詳情",
+  "onboardingSkipLeave": "仍要略過",
+  "aedPlaceDesc": "放置位置講明",
+  "@weatherModeOvercast": {
+    "description": "Label for the weatherModeOvercast option in the experimental backdrop settings."
+  },
+  "onboardingSkipTitle": "尚未完成授權",
+  "restroomTypeFamily": "親子廁所",
+  "typhoonValueKm": "{n} 公里",
+  "@radarCountyOutlineSubtitle": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "@meshtasticCopied": {
+    "description": "Toast shown after copying a message"
+  },
+  "onboardingPermBattery": "省電白名單",
+  "typhoonLabelNw": "西北側",
+  "moonPhaseWaxingCrescent": "眉月",
+  "restroomCategoryLeisure": "休閒娛樂場所",
+  "mapLayerTemperature": "溫度",
+  "aedCategory": "場所分類",
+  "@moonTimelineCaption": {
+    "description": "Moon phase timeline caption"
+  },
+  "meshtasticChannels": "頻道",
+  "monitorWaiting": "等待資料…",
+  "typhoonOverlayForecastCallouts": "預測點資訊",
+  "@meshtasticTitle": {
+    "description": "Meshtastic test page title"
+  },
+  "reportDetailEpicenter": "震央座標",
+  "meshtasticVoltage": "電壓",
+  "mapLayerMeshtasticSubtitle": "電台聽到過嘅 LoRa 網狀網路節點",
+  "@meshtasticSent": {
+    "description": "Packets sent this session"
+  },
+  "mapLayerWind": "風向",
+  "reportDetailMagnitude": "地震規模",
+  "@meshtasticRole": {
+    "description": "Device role (client, router...)"
+  },
+  "reportDetailAreaIntensity": "各地震度",
+  "rainInterval12h": "12 時",
+  "reportListMagnitude": "M{magnitude}",
+  "notifyMonitor": "強震監視器",
+  "onboardingStart": "開始使用",
+  "@meshtasticExternalPower": {
+    "description": "Battery value when mains powered"
+  },
+  "@skyTime": {
+    "description": "Label for the experimental sky time-of-day override."
+  },
+  "sponsorPerMonth": "{price} / 月",
+  "mapLayerPressure": "氣壓",
+  "@radarTownOutlineSubtitle": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "mapLayerSatelliteB04": "ひまわり 近紅外(B04)",
+  "mapLayerSatelliteTransparentZero": "零差值 = 透明(無訊號)",
+  "shelterIndoorLabel": "室內收容",
+  "notifyOptOff": "關閉",
+  "reportFilterSortTime": "時間",
+  "mapLayerSatelliteCloudProbablyClear": "可能晴空",
+  "weatherModeThunderstorm": "雷暴",
+  "homeViewOnMap": "前往地圖查看",
+  "reportFilterIntensityInfoLegacyTitle": "舊制（2020 以前）",
+  "typhoonLabelSpeed": "過去移動時速",
+  "@meshtasticReconnecting": {
+    "description": "The link dropped and is being re-established"
+  },
+  "mapAppOpenFailed": "冇辦法開啟 {app}",
+  "mapLayerSatelliteRgbComposite": "RGB 合成(JMA 配方)",
+  "@meshtasticStateDisconnected": {
+    "description": "Connection state label"
+  },
+  "meshtasticReceived": "已接收",
+  "weatherRankingExtremeLow": "今日最低",
+  "@meshtasticRegionSwitch": {
+    "description": "Button applying the DPIP LoRa region"
+  },
+  "mapLayerSatelliteB10": "ひまわり 低層水氣(B10)",
+  "mapLayerSatelliteCloudProbablyCloudy": "可能有雲",
+  "shelterCategoryLabel": "適用災害",
+  "mapLayerSatelliteTransparentNoWater": "≤ 0 = 透明(無水體)",
+  "meshtasticStateConnecting": "連線中…",
+  "moonTitle": "月亮",
+  "weatherRankingGust": "陣風",
+  "moreAppStore": "App Store",
+  "@meshtasticUndecoded": {
+    "description": "Packets the radio could not decrypt"
+  },
+  "@commonCancel": {
+    "description": "Dismisses a dialog without acting"
+  },
+  "moreServerStatus": "伺服器狀態",
+  "notifySectionWeather": "天氣",
+  "meshtasticPreset": "調變預設",
+  "dataSectionSeismic": "地震",
+  "changelogBodyEmpty": "此版本冇講明。",
+  "changelogOpenOnGitHub": "喺 GitHub 查看",
+  "radarGlobalOutline": "國界",
+  "notifyEew": "緊急地震速報",
+  "regionNationwide": "全國",
+  "moreNotifyLog": "DPIP 通知發送記錄",
+  "regionCurrent": "所在地",
+  "meshtasticNotConnected": "尚未連線至裝置",
+  "weatherModeSnow": "下雪",
+  "mapLayerMeshtastic": "Meshtastic 節點",
+  "moreDeveloper": "偵錯資訊",
+  "@qpesumsOverlayMenuTooltip": {
+    "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
+  },
+  "mapLayerSatelliteB14": "ひまわり 長波紅外線(B14)",
+  "meshtasticChannelUse": "頻道使用率",
+  "mapNavLightning": "閃電",
+  "homeForecastEmpty": "而家冇預報資料",
+  "sponsorOneTime": "單次支援",
+  "mapLayerSatelliteBtdSplit": "ひまわり 分割視窗",
+  "onboardingPermBackground": "背景定位",
+  "aedEmergencyPhone": "緊急聯絡電話",
+  "dpmOpenInMaps": "開啟地圖",
+  "meshtasticNotifyNodes": "新節點通知",
+  "onboardingPermCriticalDesc": "讓危及生命嘅強震即時警報,即使喺靜音或勿擾模式下都能發出聲響。",
+  "@mapAppDefault": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "mapLayerSatelliteTransparentWarm": "晴空(暖端) = 透明,顯示底圖",
+  "meshtasticSent": "已送出",
+  "homeForecastTitle": "24小時預報",
+  "typhoonLegendWarningAreas": "警報區域",
+  "meshtasticExcludeMqttHidden": "已隱藏 {count} 個",
+  "notifyOptLocalIntensity1": "所在地震度1以上",
+  "@skyTimeGolden": {
+    "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
+  },
+  "@meshtasticChannelReady": {
+    "description": "The DPIP channel exists on the radio"
+  },
+  "mapTimelinePast": "歷史",
+  "restroomTypeFemale": "女廁所",
+  "reportListToday": "今天",
+  "meshtasticTapNode": "點選節點查看詳細資訊",
+  "commonLoading": "載入中…",
+  "@meshtasticStateConnecting": {
+    "description": "Connection state label"
+  },
+  "typhoonIntensityModerate": "中度颱風",
+  "mapLayerSatelliteAsh": "ひまわり 火山灰",
+  "rainInterval3h": "3 時",
+  "meshtasticChannelReady": "DPIP 頻道已就緒",
+  "@meshtasticNotifyNodes": {
+    "description": "Toggle: local notification when a new node is heard"
+  },
+  "mapLayerCategorySatellite": "衛星",
+  "mapLayerSatelliteNightmicrophysics": "ひまわり 夜間微物理",
+  "typhoonIntensityTd": "熱帶性低氣壓",
+  "reportFilterDate": "日期",
+  "sponsorRestoreUnavailable": "冇辦法連線至商店，請稍後再試",
+  "homeForecastPop": "{pop}%",
+  "regionEmpty": "尚未新增常用地區",
+  "@radarScanRangeSubtitle": {
+    "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
+  },
+  "@moonAge": {
+    "description": "Moon age label"
+  },
+  "onboardingPermBatteryDesc": "允許 DPIP 喺背景持續運作,避免警報延遲或漏收。",
+  "onboardingPermUnusedApp": "保持 App 啟用",
+  "onboardingPermUnusedAppDesc": "Android 會暫停你長期未開啟嘅 App 並撤銷佢哋嘅權限，噉會令災害警報冇辦法送到你所在地。",
+  "onboardingPermBackgroundExec": "背景執行",
+  "onboardingPermBackgroundExecDesc": "關閉時，App 唔會被喚醒回報你嘅位置。",
+  "onboardingPermVendorPower": "手機廠商省電設定",
+  "onboardingPermVendorPowerDesc": "{brand} 會停止你最近冇開過嘅 App 嘅背景作業。App 冇辦法偵測或變更，請手動允許。",
+  "mapNavDisaster": "防災",
+  "radarScanRangeSubtitle": "標示四座雷達實際觀測到嘅範圍。",
+  "aedHoursSunday": "週日開放時間",
+  "reportDetailOriginTime": "發震時間",
+  "trendNoData": "冇趨勢資料",
+  "onboardingPermLocation": "定位",
+  "moreDiscord": "Discord 社群",
+  "mapNavPressure": "氣壓",
+  "mapLayerSatelliteB13": "ひまわり 紅外線(B13)",
+  "typhoonTdNo": "TD {no}",
+  "changelogEmpty": "而家冇更新日誌",
+  "@skyTimeDawn": {
+    "description": "Label for the skyTimeDawn option in the experimental backdrop settings."
+  },
+  "@meshtasticViaMqtt": {
+    "description": "Legend: node reported over an MQTT bridge"
+  },
+  "reportFilterDateStartNote": "開始日：當日 00:00（台北時間）",
+  "eewTitle": "地震速報",
+  "mapLayerWindForecastEcmwf": "ECMWF",
+  "regionSelectCount": "已選 {count}/{max}",
+  "@meshtasticRegionMismatch": {
+    "description": "Radio is on another LoRa region than DPIP needs",
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "mapLayerSatelliteBtdSo2": "ひまわり 二氧化硫/雲相",
+  "meshtasticStateError": "錯誤",
+  "weatherModeOvercast": "陰天",
+  "@meshtasticScan": {
+    "description": "Start scanning for Meshtastic radios"
+  },
+  "reportDetailDepth": "震源深度",
+  "typhoonOverlayWarningTooltip": "標示警報區域縣市",
+  "reportFilterDatePick": "選擇日期",
+  "onboardingSkipStay": "返回授權",
+  "@moonPhaseWaxingCrescent": {
+    "description": "Phase: waxing crescent"
+  },
+  "@meshtasticOnline": {
+    "description": "Legend: node heard within the online window"
+  },
+  "commonFetchFailed": "冇辦法獲取資料,請稍後重試",
+  "@meshtasticTxPower": {
+    "description": "Transmit power"
+  },
+  "shelterOutdoorLabel": "室外收容",
+  "meshtasticStateConnected": "已連線",
+  "mapNavRadar": "雷達",
+  "mapLayerSatelliteCloudClear": "晴空",
+  "eewSummary": "規模 {magnitude}・深度 {depth} 公里",
+  "locationBannerPermission": "尚未授權定位,冇辦法針對你嘅所在地推送警報。",
+  "typhoonOverlayWeatherNoneTooltip": "唔疊雷達或紅外線",
+  "radarCountyOutlineHint": "畫喺回波上面",
+  "windForecastCountyOutlineHint": "繪製喺風場上面",
+  "homeRainTrendTitle": "近 1 小時降水趨勢",
+  "moonPhaseFirstQuarter": "上弦月",
+  "mapLayerCategoryTyphoon": "颱風",
+  "@windForecastOverlayMenuTooltip": {
+    "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
+  },
+  "@meshtasticNodeId": {
+    "description": "The radio's node number"
+  },
+  "meshtasticUtilization": "空中工時（24 小時）",
+  "restroomTypeMixed": "混合廁所",
+  "restroomGradeGood": "優等級",
+  "notifyTsunami": "海嘯資訊",
+  "navData": "資料",
+  "mapLayerSatelliteBtdWvirw": "ひまわり 過衝雲頂",
+  "meshtasticReadingAge": "數值時間",
+  "@moonPhaseWaningGibbous": {
+    "description": "Phase: waning gibbous"
+  },
+  "mapAppCallFailed": "此裝置冇辦法撥打電話",
+  "@meshtasticPower": {
+    "description": "Section: battery and uptime"
+  },
+  "reportFilterAny": "唔限",
+  "weatherRankingMergeTo": "合併至",
+  "notifyIntensity": "震度速報",
+  "rainIntervalMenu": "累積時段",
+  "reportDetailLocalFelt": "小區域有感地震",
+  "meshtasticDevice": "裝置",
+  "onboardingGrant": "授權",
+  "weatherModeRain": "雨天",
+  "shelterVulnerableOkLabel": "適合避難弱者安置",
+  "stationSheetEmpty": "點選任一測站查看觀測值",
+  "typhoonLegendProbability": "侵襲機率",
+  "@meshtasticExcludeMqtt": {
+    "description": "Toggle hiding internet-bridged nodes"
+  },
+  "@radarScanRangeHint": {
+    "description": "Hint under the radar scan-range toggle in the radar overlay menu."
+  },
+  "reportFilterMagnitude": "規模",
+  "skyTimeMorning": "上午",
+  "@meshtasticNoDevices": {
+    "description": "Empty scan result"
+  },
+  "experimentalFeatures": "實驗性功能",
+  "onboardingTermsBody": "使用 DPIP 前,請詳閱以下注意事項:\n\n• 任何資訊應以中央氣象署發布嘅內容為準。\n\n• 根據網絡狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等,有收唔到資訊嘅可能性,我哋會盡力避免此類情況,但唔保證一定唔會發生。\n\n• 強烈搖晃有機會早過通知到達用戶所在地。\n\n• 地震速報係快速計算嘅結果,可能存在較大誤差,應該理解並謹慎使用。\n\n• 任何唔受官方認可嘅行為均有可能承擔法律風險,請務必遵守相關規範。\n\n此外,為提供本地化警報,本服務會喺前景及背景收集並上傳你嘅概略位置同裝置推送識別碼,僅用嚟決定應向你推送嘅警報。\n\n㩒下方「同意並繼續」就表示你已閱讀、理解並同意上述事項。",
+  "reportFilterTitle": "篩選",
+  "onboardingPermCritical": "重大通知",
+  "trendCumulativeTotal": "累計 {total} mm",
+  "reportListEmptyFiltered": "冇符合條件嘅地震報告",
+  "meshtasticExcludeMqtt": "隱藏 MQTT 節點",
+  "mapNavTyphoon": "颱風",
+  "weatherModeSand": "沙塵",
+  "@moonPhaseFirstQuarter": {
+    "description": "Phase: first quarter"
+  },
+  "@dpmOpenInMaps": {},
+  "notifyReport": "地震報告",
+  "mapAppCoordinatesCopied": "已複製座標",
+  "skyTimeNight": "夜晚",
+  "sponsorRecommended": "推薦",
+  "mapLayerSatelliteB15": "ひまわり 長波紅外線(B15)",
+  "weatherRankingWind": "風速",
+  "feedStale": "資料可能已過期",
+  "homeForecastWind": "{direction} · {level} 級",
+  "navHome": "主頁",
+  "meshtasticRegionLabel": "地區",
+  "mapLayerSatelliteCloudtop": "ひまわり 雲頂溫度",
+  "moonTimelineCaption": "月相",
+  "@meshtasticChannelNoSlot": {
+    "description": "Every secondary channel slot is taken"
+  },
+  "@meshtasticBusyBody": {
+    "description": "Why two clients on one radio is a problem"
+  },
+  "openSourceLicenses": "引用套件",
+  "weatherRankingLowest": "最低",
+  "@meshtasticConnectAnyway": {
+    "description": "Connect despite the other app"
+  },
+  "reportFilterSortDepth": "深度",
+  "mapTimelineDataTime": "資料時間 {time}",
+  "radarScanRange": "顯示掃描範圍",
+  "meshtasticHopLimit": "跳數上限",
+  "@meshtasticUptime": {
+    "description": "Time since the radio booted"
+  },
+  "weatherRankingExtremeHigh": "今日最高",
+  "@meshtasticUtilization": {
+    "description": "Section title for the 24h airtime chart"
+  },
+  "sponsorPrivacy": "私隱權政策",
+  "reportDetailLocalIntensity": "所在地嘅震度",
+  "mapLayerSatelliteNaturalcolor": "ひまわり 自然色",
+  "meshtasticAirtime": "發射佔空比",
+  "shelterCapacityValue": "{n} 人",
+  "lightningLegendCc": "雲間 · {minutes} 分內",
+  "meshtasticSendHint": "要廣播嘅訊息",
+  "monitorDelay": "延遲 {value} s",
+  "@meshtasticFirmware": {
+    "description": "Firmware version"
+  },
+  "dpmNo": "否",
+  "mapLayerSatelliteB08": "ひまわり 上層水氣(B08)",
+  "meshtasticReconnecting": "重新連線中…",
+  "@mapAppAppleMaps": {},
+  "@meshtasticReadingAge": {
+    "description": "How old the battery/airtime numbers are"
+  },
+  "radarTownOutlineSubtitle": "讓鄉鎮界線在雷達回波下仍然清楚。",
+  "@moonPhaseWaxingGibbous": {
+    "description": "Phase: waxing gibbous"
+  },
+  "typhoonOverlayWeatherSatelliteTooltip": "紅外線（對齊颱風報文時間）",
+  "radarScanRangeHint": "框外空白代表未觀測",
+  "typhoonPickerTd": "熱帶性低氣壓 TD {no}",
+  "mapLayerSatelliteWatervapor": "ひまわり 水氣",
+  "regionAddButton": "新增地區",
+  "displaySettings": "顯示設定",
+  "restroomGradePoor": "唔合格",
+  "restroomCategoryTourist": "觀光地區及風景區",
+  "locationBannerServiceOff": "定位服務已關閉,冇辦法針對你嘅所在地推送警報。",
+  "mapLayerStyleTooltip": "顯示樣式",
+  "lightningLegendCg": "對地 · {minutes} 分內",
+  "skyTimeAuto": "自動",
+  "appLogs": "App 日誌",
+  "serverStatusLocal": "本機狀態",
+  "serverStatusLocalBody": "伺服器指標來自控制台。下方係本機對多活端點（LB / Core 各區）嘅實際連線判斷：APP 只被動記錄本機實際播送嘅流量，若該端點從未被本機觸發，就會顯示未探測。",
+  "serverStatusAllUp": "所有服務正常",
+  "serverStatusDegraded": "服務效能下降",
+  "serverStatusDown": "服務異常",
+  "serverStatusErrorRate": "5xx 錯誤率",
+  "serverStatusLatency": "平均延遲",
+  "serverStatusUpdated": "更新於",
+  "serverStatusWeb": "伺服器狀態",
+  "serverStatusWebUrl": "status.exptech.dev",
+  "serverStatusExpTech": "ExpTech 狀態",
+  "serverStatusCloudflare": "Cloudflare 狀態",
+  "serverStatusCloudflareAllOperational": "所有區域正常",
+  "serverStatusCloudflareOutage": "Cloudflare 部分區域異常",
+  "serverStatusCloudflareNone": "而家冇可顯示嘅區域。",
+  "serverStatusCloudflareOperational": "正常",
+  "serverStatusCloudflareDegraded": "效能下降",
+  "serverStatusCloudflarePartial": "部分中斷",
+  "serverStatusCloudflareMajor": "大規模中斷",
+  "serverStatusCloudflareUnknown": "未知",
+  "endpointTierLbApi": "LB API",
+  "endpointTierLbStatic": "LB Static",
+  "endpointTierCoreApi": "Core API",
+  "endpointTierCoreStatic": "Core Static",
+  "endpointTierCoreExclusiveApi": "Core 專屬 API（雷達 / 氣象 / 風場）",
+  "endpointTierCoreStaticExclusive": "Core 專屬靜態資源",
+  "endpointTierLegacyApi": "舊版 API（api-1）",
+  "endpointHealthOk": "本機連線正常",
+  "endpointHealthDegraded": "有端點連線唔穩",
+  "endpointHealthDown": "本機連線異常",
+  "endpointHealthUnknown": "尚無觀測資料",
+  "endpointStateOk": "正常",
+  "endpointStateDegraded": "唔穩",
+  "endpointStateDown": "異常",
+  "endpointStateUnknown": "未知",
+  "endpointServiceEew": "地震速報",
+  "endpointServiceRts": "強震即時警報",
+  "endpointServiceRadar": "雷達",
+  "endpointServiceSatellite": "衛星",
+  "endpointServiceQpesums": "定量降水",
+  "endpointServiceWind": "風場",
+  "endpointServiceDpm": "災害點位",
+  "endpointServiceWeather": "天氣",
+  "endpointServiceRain": "降雨",
+  "endpointServiceLightning": "閃電",
+  "endpointServiceTyphoon": "颱風",
+  "endpointServiceReport": "地震報告",
+  "endpointServiceTremStation": "震度站",
+  "endpointServiceEvent": "事件",
+  "endpointServiceLocation": "定位",
+  "endpointServiceNotify": "通知",
+  "endpointServiceOther": "其他",
+  "feedConnecting": "連接中…",
+  "notifyBannerDisabled": "通知已關閉,將收唔到災害警報。",
+  "@meshtasticNoNodes": {
+    "description": "Empty node list"
+  },
+  "weatherHumidity": "濕度",
+  "typhoonValueMs": "每秒 {n} 公尺",
+  "homeForecastHumidity": "濕度 {value}%",
+  "meshtasticBusyBody": "請先喺另一個 Meshtastic App 中斷線。兩個 App 同時連同一台裝置會互相搶走訊息，導致部分訊息遺失。",
+  "meshtasticChannelNoSlot": "冇可用嘅頻道空位 — 請先喺裝置上空出一個",
+  "restroomCategoryTransport": "交通",
+  "meshtasticBattery": "電量",
+  "meshtasticDistance": "距離",
+  "meshtasticSnrTrend": "訊號趨勢 (SNR)",
+  "meshtasticBatteryTrend": "電量趨勢",
+  "typhoonOverlayMenuTooltip": "颱風圖層選項",
+  "mapLayerSatelliteBtdOzone": "ひまわり 對流層頂",
+  "meshtasticRegionMismatch": "裝置地區為 {region} — DPIP 需要 TW",
+  "notifySectionEarthquake": "地震",
+  "mapLayerDisasterMap": "防災地圖",
+  "weatherModeFog": "大霧",
+  "typhoonPickerNamed": "{name} TY {no}",
+  "mapLayerStyleGrayTooltip": "氣象廳灰階慣例：溫度越低越白",
+  "moreAnnouncements": "公告",
+  "moreTagline": "防災資訊整合平台",
+  "moreVersionStable": "正式版",
+  "moreVersionNotes": "本次更新",
+  "moreVersionNotesHighlightsSubtitle": "呢個版本做咗哪些改變",
+  "releaseHighlightsSeeNotes": "查看完整更新日誌",
+  "releaseHighlightsTitle": "{train} 重點整理",
+  "releaseHighlightsTabNormal": "做咗哪些改變",
+  "releaseHighlightsTabAdvanced": "深入技術",
+  "releaseHighlightsEmpty": "而家冇內容。",
+  "moreVersionNotesEmpty": "找唔到而家版本嘅更新日誌",
+  "moreVersionSnapshot": "測試版",
+  "mapLayerSatelliteTransparentNoData": "無資料(陸地) = 透明",
+  "@meshtasticScanning": {
+    "description": "Scan in progress"
+  },
+  "restroomCategoryGovernment": "民眾洽公場所",
+  "typhoonLegendCurrent": "而家中心",
+  "aedAddress": "地址",
+  "mapLayerAed": "AED",
+  "changelogTypePrerelease": "測試版",
+  "reportFilterIntensityInfoModernBody": "震度為 0–4、5弱、5強、6弱、6強、7。篩選滑桿依新制；列表中較早嘅地震會以舊制標示顯示。",
+  "typhoonOverlayWeatherNone": "無",
+  "mapLayerStyleGray": "灰階（JMA）",
+  "weatherModeAuto": "自動",
+  "typhoonLabelProbCircle": "70%機率圓",
+  "@radarCountyOutline": {
+    "description": "County-border overlay toggle in the map's radar overlay menu."
+  },
+  "notifyOptAll": "接收全部",
+  "displayTheme": "主題",
+  "mapLayerSatelliteB07": "ひまわり 短波紅外(B07)",
+  "@skyTimeSunrise": {
+    "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
+  },
+  "typhoonLabelDirection": "過去移動方向",
+  "@meshtasticLastSent": {
+    "description": "Age of the last sent packet"
+  },
+  "regionManageTitle": "常用地區",
+  "regionSaveNote": "通知係以 GPS 所在地位置發送嘅，設定常用地區唔會改變或影響通知發送，常用地區只係用於首頁快速查看唔同區域狀態，所以務必授予 GPS 定位權限，否則通知冇辦法運作",
+  "@regionSaveNote": {
+    "description": "常用地區與通知發送機制的說明"
+  },
+  "typhoonLegendCone": "預測圓錐",
+  "moreCwaEew": "中央氣象署強震即時警報",
+  "onboardingPermsTitle": "權限授權",
+  "mapLayerStyleJma": "雲頂強調（JMA）",
+  "rainInterval10m": "10 分",
+  "meshtasticConnectAnyway": "仍要連線",
+  "reportListDayCount": "{count}",
+  "mapLayerSatelliteB06": "ひまわり 近紅外(B06)",
+  "mapLayerSatelliteTransparentReflectance": "低反射率/夜間 = 透明,顯示底圖",
+  "chartHourLabel": "{hour}時",
+  "mapLayerShelter": "避難收容場所",
+  "typhoonOverlayProbabilityTooltip": "顯示侵襲機率（會隱藏預測圓錐）",
+  "mapLayerSatelliteNdwi": "ひまわり 水體指數",
+  "disasterMapOverlayShelterTooltip": "顯示避難收容場所",
+  "mapNavHumidity": "濕度",
+  "@meshtasticTraffic": {
+    "description": "Section: packet counters"
+  },
+  "reportDetailSortByIntensity": "依震度排序",
+  "homeRainTrendNoData": "無資料",
+  "mapLayerCategoryRadar": "雷達",
+  "meshtasticShortName": "簡稱",
+  "@meshtasticStateConfiguring": {
+    "description": "Connection state label"
+  },
+  "mapLayerSatelliteAirmass": "ひまわり 氣團",
+  "@meshtasticPreset": {
+    "description": "LoRa modem preset"
+  },
+  "dataSectionWeather": "氣象",
+  "aedHoursWeekday": "平日開放時間",
+  "homeActiveEventsTitle": "生效中事件",
+  "faq": "常見問題",
+  "eewSerial": "第 {serial} 報",
+  "@radarTownOutline": {
+    "description": "Township-border overlay toggle in the map's radar overlay menu."
+  },
+  "reportFilterSort": "排序方式",
+  "@skyTimeMorning": {
+    "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
+  },
+  "meshtasticRegionConfirm": "要將呢台裝置切換為 TW 地區嗎？裝置會重新啟動並短暫斷線，上面嘅其他頻道都會一齊改變。",
+  "dataEarthquakeSubtitle": "地震報告",
+  "typhoonNoActive": "而家無颱風",
+  "@meshtasticExcludeMqttHidden": {
+    "description": "How many nodes the filter is hiding",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapLayerSatelliteB11": "ひまわり 二氧化硫/雲相(B11)",
+  "navEvents": "事件",
+  "onboardingTermsTitle": "服務條款",
+  "@meshtasticChannels": {
+    "description": "Section: the radio's channel table"
+  },
+  "mapOsmOverlay": "詳細地圖",
+  "mapOsmOverlayHint": "顯示更完整嘅道路、建物同地名",
+  "mapOsmDetails": "詳細設定",
+  "mapDataAttribution": "© OpenStreetMap contributors",
+  "mapOsmDetailsHint": "已啟用 {enabled} / 共 {total} 個圖層",
+  "@mapOsmDetailsHint": {
+    "description": "How many of the OSM layers are enabled",
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapOsmSurface": "地表",
+  "mapOsmParks": "公園",
+  "mapOsmLandUse": "土地利用",
+  "mapOsmAirportAreas": "機場區域",
+  "mapOsmWater": "水域",
+  "mapOsmRivers": "河川",
+  "mapOsmBoundaries": "邊界",
+  "mapOsmBuildings": "建物",
+  "mapOsmRoads": "道路",
+  "mapOsmRoadNames": "道路名稱",
+  "mapOsmWaterNames": "水域名稱",
+  "mapOsmPeaks": "山峰",
+  "mapOsmAirportNames": "機場名稱",
+  "mapOsmPlaceNames": "地名",
+  "mapOsmPoi": "地標",
+  "mapOsmHouseNumbers": "門牌號碼",
+  "mapOsmRestoreAll": "全部恢復",
+  "mapOsmSectionNatural": "地表同自然",
+  "mapOsmSectionRoadsAndBuildings": "道路同建物",
+  "mapOsmSectionLabelsAndPlaces": "地名同標示",
+  "mapTownLabels": "鄉鎮名稱",
+  "notifySetFailed": "設定失敗,請稍後再試。",
+  "meshtasticDisconnect": "斷線",
+  "meshtasticUndecoded": "冇辦法解密",
+  "notifyAnnouncement": "公告",
+  "onboardingIntroTitle": "歡迎使用 DPIP",
+  "regionCurrentUnavailable": "冇辦法取得所在地位置資訊",
+  "languageSystem": "系統預設",
+  "skyTimeSunset": "日落",
+  "mapLayerSatelliteDust": "ひまわり 沙塵",
+  "mapAppAppleMaps": "Apple Maps",
+  "regionEdit": "修改",
+  "weatherDynamicState": "天氣動態狀態",
+  "moonNow": "而家",
+  "@moonNow": {
+    "description": "Returns the moon page to the present moment"
+  },
+  "moonSectionAppearance": "外觀",
+  "@moonSectionAppearance": {
+    "description": "Section header: how the Moon looks at the chosen moment"
+  },
+  "moonSectionRiseSet": "月出月落",
+  "@moonSectionRiseSet": {
+    "description": "Section header: moonrise and moonset for the user's township"
+  },
+  "moonSectionUpcoming": "接下來",
+  "@moonSectionUpcoming": {
+    "description": "Section header: the next full and new moons"
+  },
+  "moonSectionCalendar": "月曆",
+  "@moonSectionCalendar": {
+    "description": "Section header: the month-at-a-glance phase calendar"
+  },
+  "moonDistance": "距離",
+  "@moonDistance": {
+    "description": "Earth-Moon centre-to-centre distance"
+  },
+  "moonKilometres": "公里",
+  "@moonKilometres": {
+    "description": "Unit suffix for the lunar distance"
+  },
+  "moonApparentSize": "視直徑",
+  "@moonApparentSize": {
+    "description": "The Moon's apparent angular diameter"
+  },
+  "moonRise": "月出",
+  "@moonRise": {
+    "description": "Time the Moon rises"
+  },
+  "moonSet": "月落",
+  "@moonSet": {
+    "description": "Time the Moon sets"
+  },
+  "moonNextNewMoon": "下次新月",
+  "@moonNextNewMoon": {
+    "description": "Date and time of the next new moon"
+  },
+  "moonAlwaysUp": "整日在地平線上",
+  "@moonAlwaysUp": {
+    "description": "Shown when the Moon neither rises nor sets and stays above the horizon"
+  },
+  "moonNoEvent": "當日無",
+  "@moonNoEvent": {
+    "description": "Shown when a calendar day has no moonrise or no moonset"
+  },
+  "sunTitle": "太陽",
+  "@sunTitle": {
+    "description": "Sun page title"
+  },
+  "sunSectionDaylight": "日照",
+  "@sunSectionDaylight": {
+    "description": "Section header: sunrise, noon, sunset, day length"
+  },
+  "sunSectionTwilight": "曙暮光",
+  "@sunSectionTwilight": {
+    "description": "Section header: the three twilight bands"
+  },
+  "sunSectionLight": "光線",
+  "@sunSectionLight": {
+    "description": "Section header: golden and blue hour"
+  },
+  "sunSectionSundial": "日晷",
+  "@sunSectionSundial": {
+    "description": "Section header: equation of time and the next solar term"
+  },
+  "sunSectionTerms": "節氣",
+  "@sunSectionTerms": {
+    "description": "Section header: the year's twenty-four solar terms"
+  },
+  "sunRise": "日出",
+  "@sunRise": {
+    "description": "Time the Sun rises"
+  },
+  "sunSet": "日冇",
+  "@sunSet": {
+    "description": "Time the Sun sets"
+  },
+  "sunNoon": "正午",
+  "@sunNoon": {
+    "description": "Solar noon, the Sun's upper transit"
+  },
+  "sunDayLength": "白晝長度",
+  "@sunDayLength": {
+    "description": "How long the Sun is above the horizon, as hours:minutes"
+  },
+  "sunTwilightCivil": "民用",
+  "@sunTwilightCivil": {
+    "description": "Civil twilight, the Sun 6 degrees below the horizon"
+  },
+  "sunTwilightNautical": "航海",
+  "@sunTwilightNautical": {
+    "description": "Nautical twilight, 12 degrees below"
+  },
+  "sunTwilightAstronomical": "天文",
+  "@sunTwilightAstronomical": {
+    "description": "Astronomical twilight, 18 degrees below"
+  },
+  "sunGoldenHourMorning": "晨間黃金時刻",
+  "@sunGoldenHourMorning": {
+    "description": "Morning golden hour span"
+  },
+  "sunGoldenHourEvening": "昏間黃金時刻",
+  "@sunGoldenHourEvening": {
+    "description": "Evening golden hour span"
+  },
+  "sunBlueHour": "藍調時刻",
+  "@sunBlueHour": {
+    "description": "Blue hour span after sunset"
+  },
+  "sunEquationOfTime": "均時差",
+  "@sunEquationOfTime": {
+    "description": "Apparent solar time minus mean solar time"
+  },
+  "sunMinutes": "分",
+  "@sunMinutes": {
+    "description": "Unit suffix for the equation of time"
+  },
+  "solarTermNext": "下一個節氣",
+  "@solarTermNext": {
+    "description": "The next of the twenty-four solar terms"
+  },
+  "planetsTitle": "行星",
+  "@planetsTitle": {
+    "description": "Planets page title"
+  },
+  "planetsSectionTonight": "此刻",
+  "@planetsSectionTonight": {
+    "description": "Section header: the planets right now"
+  },
+  "planetUp": "地平線上",
+  "@planetUp": {
+    "description": "Badge: the planet is above the horizon"
+  },
+  "planetDown": "地平線下",
+  "@planetDown": {
+    "description": "Badge: the planet is below the horizon"
+  },
+  "planetInGlare": "太近太陽",
+  "@planetInGlare": {
+    "description": "Badge: too close to the Sun to be seen"
+  },
+  "planetMagnitude": "亮度",
+  "@planetMagnitude": {
+    "description": "Apparent visual magnitude"
+  },
+  "planetElongation": "距日距角",
+  "@planetElongation": {
+    "description": "Angular distance from the Sun"
+  },
+  "planetSky": "時段",
+  "@planetSky": {
+    "description": "Label for whether the planet is an evening or morning object"
+  },
+  "planetEvening": "昏星",
+  "@planetEvening": {
+    "description": "Sets after the Sun, so visible in the evening"
+  },
+  "planetMorning": "晨星",
+  "@planetMorning": {
+    "description": "Rises before the Sun, so visible before dawn"
+  },
+  "planetDistance": "距離",
+  "@planetDistance": {
+    "description": "Distance from the Earth"
+  },
+  "planetAu": "天文單位",
+  "@planetAu": {
+    "description": "Unit suffix: astronomical units"
+  },
+  "planetAltitude": "仰角",
+  "@planetAltitude": {
+    "description": "Height above the horizon right now"
+  },
+  "planetMercury": "水星",
+  "@planetMercury": {
+    "description": "Planet name"
+  },
+  "planetVenus": "金星",
+  "@planetVenus": {
+    "description": "Planet name"
+  },
+  "planetMars": "火星",
+  "@planetMars": {
+    "description": "Planet name"
+  },
+  "planetJupiter": "木星",
+  "@planetJupiter": {
+    "description": "Planet name"
+  },
+  "planetSaturn": "土星",
+  "@planetSaturn": {
+    "description": "Planet name"
+  },
+  "planetUranus": "天王星",
+  "@planetUranus": {
+    "description": "Planet name"
+  },
+  "planetNeptune": "海王星",
+  "@planetNeptune": {
+    "description": "Planet name"
+  },
+  "solarTermVernalEquinox": "春分",
+  "@solarTermVernalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermPureBrightness": "清明",
+  "@solarTermPureBrightness": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainRain": "穀雨",
+  "@solarTermGrainRain": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSummer": "立夏",
+  "@solarTermStartOfSummer": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainFull": "小滿",
+  "@solarTermGrainFull": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermGrainInEar": "芒種",
+  "@solarTermGrainInEar": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermSummerSolstice": "夏至",
+  "@solarTermSummerSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorHeat": "小暑",
+  "@solarTermMinorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorHeat": "大暑",
+  "@solarTermMajorHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfAutumn": "立秋",
+  "@solarTermStartOfAutumn": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermEndOfHeat": "處暑",
+  "@solarTermEndOfHeat": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWhiteDew": "白露",
+  "@solarTermWhiteDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAutumnalEquinox": "秋分",
+  "@solarTermAutumnalEquinox": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermColdDew": "寒露",
+  "@solarTermColdDew": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermFrostDescent": "霜降",
+  "@solarTermFrostDescent": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfWinter": "立冬",
+  "@solarTermStartOfWinter": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorSnow": "小雪",
+  "@solarTermMinorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorSnow": "大雪",
+  "@solarTermMajorSnow": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermWinterSolstice": "冬至",
+  "@solarTermWinterSolstice": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMinorCold": "小寒",
+  "@solarTermMinorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermMajorCold": "大寒",
+  "@solarTermMajorCold": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermStartOfSpring": "立春",
+  "@solarTermStartOfSpring": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermRainWater": "雨水",
+  "@solarTermRainWater": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "solarTermAwakeningOfInsects": "驚蟄",
+  "@solarTermAwakeningOfInsects": {
+    "description": "One of the twenty-four solar terms"
+  },
+  "tonightTitle": "今夜",
+  "@tonightTitle": {
+    "description": "Tonight page title"
+  },
+  "tonightSectionDark": "觀測窗口",
+  "@tonightSectionDark": {
+    "description": "Section header: the observing window"
+  },
+  "tonightAstronomicalNight": "天文夜",
+  "@tonightAstronomicalNight": {
+    "description": "Dusk to dawn with the Sun 18 degrees down"
+  },
+  "tonightNeverDark": "整夜唔全暗",
+  "@tonightNeverDark": {
+    "description": "Shown when the Sun never gets 18 degrees below the horizon"
+  },
+  "tonightDarkWindow": "暗窗",
+  "@tonightDarkWindow": {
+    "description": "The longest stretch with no Sun and no Moon"
+  },
+  "tonightMoonAllNight": "月亮整夜喺天上",
+  "@tonightMoonAllNight": {
+    "description": "Shown when the Moon is up for the whole night"
+  },
+  "tonightDarkTotal": "總暗時",
+  "@tonightDarkTotal": {
+    "description": "Total dark time, hours:minutes"
+  },
+  "tonightMoonlight": "月光",
+  "@tonightMoonlight": {
+    "description": "The Moon's illuminated fraction tonight"
+  },
+  "tonightSectionShowers": "流星雨",
+  "@tonightSectionShowers": {
+    "description": "Section header: meteor showers running now"
+  },
+  "tonightRadiantDown": "輻射點唔升起",
+  "@tonightRadiantDown": {
+    "description": "The shower's radiant never rises here"
+  },
+  "tonightPerHour": "顆/時",
+  "@tonightPerHour": {
+    "description": "Unit: meteors per hour"
+  },
+  "tonightSectionSatellites": "衛星過境",
+  "@tonightSectionSatellites": {
+    "description": "Section header: visible satellite passes"
+  },
+  "tonightSectionTargets": "此刻可觀測目標",
+  "@tonightSectionTargets": {
+    "description": "Section header: deep-sky objects high enough to observe"
+  },
+  "showerQuadrantids": "象限儀座",
+  "@showerQuadrantids": {
+    "description": "Meteor shower name"
+  },
+  "showerLyrids": "天琴座",
+  "@showerLyrids": {
+    "description": "Meteor shower name"
+  },
+  "showerEtaAquariids": "寶瓶座η",
+  "@showerEtaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerDeltaAquariids": "寶瓶座δ",
+  "@showerDeltaAquariids": {
+    "description": "Meteor shower name"
+  },
+  "showerPerseids": "英仙座",
+  "@showerPerseids": {
+    "description": "Meteor shower name"
+  },
+  "showerOrionids": "獵戶座",
+  "@showerOrionids": {
+    "description": "Meteor shower name"
+  },
+  "showerSouthernTaurids": "金牛座南",
+  "@showerSouthernTaurids": {
+    "description": "Meteor shower name"
+  },
+  "showerLeonids": "獅子座",
+  "@showerLeonids": {
+    "description": "Meteor shower name"
+  },
+  "showerGeminids": "雙子座",
+  "@showerGeminids": {
+    "description": "Meteor shower name"
+  },
+  "showerUrsids": "小熊座",
+  "@showerUrsids": {
+    "description": "Meteor shower name"
+  },
+  "deepSkyOpenCluster": "疏散星團",
+  "@deepSkyOpenCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyGlobularCluster": "球狀星團",
+  "@deepSkyGlobularCluster": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySpiralGalaxy": "螺旋星系",
+  "@deepSkySpiralGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEllipticalGalaxy": "橢圓星系",
+  "@deepSkyEllipticalGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyIrregularGalaxy": "唔規則星系",
+  "@deepSkyIrregularGalaxy": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyPlanetaryNebula": "行星狀星雲",
+  "@deepSkyPlanetaryNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkySupernovaRemnant": "超新星遺跡",
+  "@deepSkySupernovaRemnant": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyEmissionNebula": "發射星雲",
+  "@deepSkyEmissionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyReflectionNebula": "反射星雲",
+  "@deepSkyReflectionNebula": {
+    "description": "Deep-sky object type"
+  },
+  "deepSkyAsterism": "星群",
+  "@deepSkyAsterism": {
+    "description": "Deep-sky object type: a star pattern, not a single object"
+  },
+  "almanacTitle": "曆法",
+  "@almanacTitle": {
+    "description": "Almanac page title"
+  },
+  "almanacSectionToday": "今日",
+  "@almanacSectionToday": {
+    "description": "Section header: today's date in both calendars"
+  },
+  "almanacGregorian": "西曆",
+  "@almanacGregorian": {
+    "description": "The Gregorian date"
+  },
+  "almanacLunar": "農曆",
+  "@almanacLunar": {
+    "description": "The lunisolar date"
+  },
+  "almanacYear": "歲次",
+  "@almanacYear": {
+    "description": "The sexagenary year and its zodiac animal"
+  },
+  "almanacMonthLength": "月大小",
+  "@almanacMonthLength": {
+    "description": "Whether this lunar month has 29 or 30 days"
+  },
+  "almanacLongMonth": "三十日",
+  "@almanacLongMonth": {
+    "description": "A 30-day lunar month"
+  },
+  "almanacShortMonth": "二十九日",
+  "@almanacShortMonth": {
+    "description": "A 29-day lunar month"
+  },
+  "almanacLeapPrefix": "閏",
+  "@almanacLeapPrefix": {
+    "description": "Prefix marking an intercalary lunar month"
+  },
+  "almanacSectionLunarEclipses": "月食",
+  "@almanacSectionLunarEclipses": {
+    "description": "Section header: upcoming lunar eclipses"
+  },
+  "almanacSectionSolarEclipses": "日食",
+  "@almanacSectionSolarEclipses": {
+    "description": "Section header: solar eclipses visible from here"
+  },
+  "almanacNoSolarEclipse": "範圍內無",
+  "@almanacNoSolarEclipse": {
+    "description": "No solar eclipse is visible from here in the search window"
+  },
+  "eclipseTotal": "全食",
+  "@eclipseTotal": {
+    "description": "Eclipse type"
+  },
+  "eclipsePartial": "偏食",
+  "@eclipsePartial": {
+    "description": "Eclipse type"
+  },
+  "eclipseAnnular": "環食",
+  "@eclipseAnnular": {
+    "description": "Eclipse type: a ring of Sun remains"
+  },
+  "eclipsePenumbral": "半影食",
+  "@eclipsePenumbral": {
+    "description": "Eclipse type: the Moon only enters the outer shadow"
+  },
+  "zodiacRat": "鼠",
+  "@zodiacRat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacOx": "牛",
+  "@zodiacOx": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacTiger": "虎",
+  "@zodiacTiger": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRabbit": "兔",
+  "@zodiacRabbit": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDragon": "龍",
+  "@zodiacDragon": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacSnake": "蛇",
+  "@zodiacSnake": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacHorse": "馬",
+  "@zodiacHorse": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacGoat": "羊",
+  "@zodiacGoat": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacMonkey": "猴",
+  "@zodiacMonkey": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacRooster": "雞",
+  "@zodiacRooster": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacDog": "狗",
+  "@zodiacDog": {
+    "description": "Chinese zodiac animal"
+  },
+  "zodiacPig": "豬",
+  "@zodiacPig": {
+    "description": "Chinese zodiac animal"
+  },
+  "tideTitle": "潮汐",
+  "@tideTitle": {
+    "description": "Tide page title"
+  },
+  "tideDisclaimer": "僅為天文引潮力，非港口潮汐表。水位請參考氣象署公布嘅潮汐預報。",
+  "@tideDisclaimer": {
+    "description": "Says plainly that this is the astronomical forcing, not a harbour tide table"
+  },
+  "tideSectionNow": "此刻",
+  "@tideSectionNow": {
+    "description": "Section header: the tide-raising force right now"
+  },
+  "tidePhase": "週期",
+  "@tidePhase": {
+    "description": "Where in the spring-neap cycle the tide sits"
+  },
+  "tideSpring": "大潮",
+  "@tideSpring": {
+    "description": "Spring tide: Sun and Moon aligned"
+  },
+  "tideNeap": "小潮",
+  "@tideNeap": {
+    "description": "Neap tide: Sun and Moon at right angles"
+  },
+  "tideMiddling": "中潮",
+  "@tideMiddling": {
+    "description": "Between spring and neap"
+  },
+  "tideLunarDistanceFactor": "月球引力",
+  "@tideLunarDistanceFactor": {
+    "description": "How much stronger the Moon's pull is than at mean distance"
+  },
+  "tideEquilibrium": "平衡潮高",
+  "@tideEquilibrium": {
+    "description": "The equilibrium tide height"
+  },
+  "tideMetres": "公尺",
+  "@tideMetres": {
+    "description": "Unit: metres"
+  },
+  "tidePerigeanSpring": "下次近地點大潮",
+  "@tidePerigeanSpring": {
+    "description": "The next spring tide at lunar perigee - the highest water"
+  },
+  "tideSectionTurningPoints": "轉折點",
+  "@tideSectionTurningPoints": {
+    "description": "Section header: when the forcing peaks and troughs"
+  },
+  "tideHigh": "高",
+  "@tideHigh": {
+    "description": "A high point of the tidal forcing"
+  },
+  "tideLow": "低",
+  "@tideLow": {
+    "description": "A low point of the tidal forcing"
+  },
+  "skyChartTitle": "星圖",
+  "@skyChartTitle": {
+    "description": "Sky chart page title"
+  },
+  "skyChartNorth": "北",
+  "@skyChartNorth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartEast": "東",
+  "@skyChartEast": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartSouth": "南",
+  "@skyChartSouth": {
+    "description": "Compass point on the sky chart"
+  },
+  "skyChartWest": "西",
+  "@skyChartWest": {
+    "description": "Compass point on the sky chart"
+  },
+  "tonightElementAge": "軌道資料 {days} 天前",
+  "@tonightElementAge": {
+    "description": "How old the bundled satellite element set is, in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "almanacLunarDate": "{leap}{month} 月 {day} 日",
+  "@almanacLunarDate": {
+    "description": "A lunisolar date: an optional leap marker, the month and the day",
+    "placeholders": {
+      "leap": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "tonightNoShowers": "而家無流星雨",
+  "@tonightNoShowers": {
+    "description": "Shown when no meteor shower is running today"
+  },
+  "tonightNoPasses": "48 小時內無可見過境",
+  "@tonightNoPasses": {
+    "description": "Shown when no satellite pass is visible in the next two days"
+  },
+  "tonightSatellitesUnavailable": "冇辦法讀取軌道資料",
+  "@tonightSatellitesUnavailable": {
+    "description": "Shown when the bundled element set could not be read"
+  },
+  "tonightNoTargets": "無足夠高度嘅目標",
+  "@tonightNoTargets": {
+    "description": "Shown when nothing in the catalogue is high enough tonight"
+  },
+  "skyChartUnavailable": "冇辦法讀取星表",
+  "@skyChartUnavailable": {
+    "description": "Shown when the bundled star catalogue could not be read"
+  },
+  "permissionSettingsTitle": "請到系統設定開啟",
+  "@permissionSettingsTitle": {
+    "description": "Dialog title: the permission must be granted in system settings"
+  },
+  "permissionSettingsHint": "返回 App 後會自動重新檢查。",
+  "@permissionSettingsHint": {
+    "description": "Reassures the user they can come back and that the app re-checks on return"
+  },
+  "permissionOpenSettings": "前往設定",
+  "@permissionOpenSettings": {
+    "description": "Button that opens the system settings page"
+  },
+  "permissionSettingsMessage": "「{what}」已被拒絕，系統唔會再詢問。請到設定中開啟。",
+  "permissionGuideNotification": "請到系統設定中開啟通知權限。",
+  "permissionGuideForegroundLocation": "請到系統設定中開啟精確位置權限。",
+  "permissionGuideBackgroundLocation": "請喺「{option}」中改為「允許所有時間」。",
+  "@permissionGuideBackgroundLocation": {
+    "description": "Instruction for background location",
+    "placeholders": {
+      "option": {}
+    }
+  },
+  "permissionGuideBackgroundExecution": "請到系統設定中允許背景執行,避免收到通知時被系統暫停。",
+  "permissionGuideUnusedPause": "若應用程式被標記為「未使用」,請喺系統設定中改為「允許」。",
+  "permissionGuideUnusedFreeSpace": "若應用程式因暫存空間唔夠被暫停,請清除暫存後重新開啟。",
+  "permissionGuideUnusedRevoke": "若應用程式權限被撤銷,請喺系統設定中重新授予。",
+  "permissionGuideUnusedPlayProtect": "若被 Play 保護機制暫停,請到 Google Play 中檢查應用程式狀態。",
+  "permissionGuideVendorPower": "請到「{vendor}」嘅省電設定中,將本應用程式設為「唔限制」。",
+  "@permissionGuideVendorPower": {
+    "description": "Instruction for vendor power saving",
+    "placeholders": {
+      "vendor": {}
+    }
+  },
+  "permissionStillRequired": "仍然需要此權限,請到設定中開啟。",
+  "permissionVerifyManually": "請手動確認此權限已喺系統設定中開啟。",
+  "permissionBackgroundLocationOption": "「允許所有時間」",
+  "@permissionSettingsMessage": {
+    "description": "Explains that the system will not ask again for this permission",
+    "placeholders": {
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "displayTextSize": "文字大小",
+  "displayTextSizeDesc": "只調整 App 介面嘅文字，地圖上嘅文字維持原本大小。",
+  "displayTextWeight": "文字粗細",
+  "displayTextWeightDesc": "文字較粗時可能更容易閱讀。",
+  "displayContrast": "對比度",
+  "displayContrastDesc": "對比越高，文字同背景越分明。",
+  "displayColorVision": "色覺調整",
+  "displayColorVisionDesc": "整個 App 嘅顏色都會一併調整，包括地圖。",
+  "displayColorVisionNone": "標準",
+  "displayColorVisionProtan": "紅色弱",
+  "displayColorVisionDeutan": "綠色弱",
+  "displayColorVisionTritan": "藍黃色弱",
+  "displayPreviewSample": "地震報告範例",
+  "displayScaleSmall": "小",
+  "displayScaleDefault": "預設",
+  "displayScaleLarge": "大",
+  "displayScaleHuge": "特大",
+  "displayWeightNormal": "一般",
+  "displayWeightMedium": "中等",
+  "displayWeightBold": "粗體",
+  "displayContrastStandard": "標準",
+  "displayContrastMedium": "中等",
+  "displayContrastHigh": "高",
+  "meshtasticDirect": "直連",
+  "meshtasticHopsAway": "{n} 跳",
+  "meshtasticStatRelayShare": "為他人轉發",
+  "meshtasticStatRelayShareHint": "佔本機發送量嘅比例",
+  "meshtasticStatRelayValue": "轉發成功率",
+  "meshtasticStatRelaySolePath": "經常係唯一路徑 — 網絡依賴此節點",
+  "meshtasticStatRelayRedundant": "其他節點都覆蓋同樣路徑",
+  "meshtasticStatRedundancy": "重複接收",
+  "meshtasticStatThinEdge": "備援路徑少 — 一個中繼失效就可能斷線",
+  "meshtasticStatWellCovered": "有多條路徑可達",
+  "meshtasticStatErrorRate": "接收錯誤率",
+  "meshtasticStatErrorRateHint": "空中時間唔變卻升高 = 干擾",
+  "meshtasticTraceRoute": "追蹤路由",
+  "@meshtasticTraceRoute": {
+    "description": "Sheet action: ask the mesh how this node is reached"
+  },
+  "meshtasticTracing": "追蹤中…",
+  "@meshtasticTracing": {
+    "description": "Sheet button while a traceroute probe is in flight"
+  },
+  "meshtasticTraceUnreadable": "冇辦法解讀嘅回覆",
+  "meshtasticTraceOffline": "未連線至電台",
+  "meshtasticTraceCooldown": "電台限制每 30 秒一次",
+  "meshtasticTraceNoReply": "冇回應 — 超出範圍或金鑰唔同",
+  "@meshtasticTraceNoReply": {
+    "description": "Traceroute outcome when the destination never answers"
+  },
+  "meshtasticTraceDirect": "直達 — 中間無中繼",
+  "@meshtasticTraceDirect": {
+    "description": "Traceroute outcome for a one-hop route"
+  },
+  "meshtasticTraceHops": "{n} 跳",
+  "@meshtasticTraceHops": {
+    "description": "Traceroute outcome hop count",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "moreDumpDiagnostics": "傾印除錯資訊及日誌",
+  "moreDumpDiagnosticsHint": "上載後複製連結",
+  "dumpIncludeSensitive": "包含較敏感嘅個人資料",
+  "dumpIncludeSensitiveHint": "可能包含精確位置、裝置識別碼同推播權杖；唔勾選就會以 null 取代",
+  "dumpUpload": "上載",
+  "dumpUploaded": "已上載",
+  "dumpLinkCopied": "連結已複製到剪貼簿",
+  "dumpCopyAgain": "再複製一次",
+  "dumpUploadFailed": "上載失敗，請稍後再試",
+  "statusLegendUnprobed": "未探測",
+  "statusLegendUnsupported": "唔支援"
+}

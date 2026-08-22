@@ -21,7 +21,6 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
-import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -95,8 +94,7 @@ class DpipApp extends StatelessWidget {
                     themeMode: themeController.mode,
                     locale: localeController.locale,
                     localeListResolutionCallback: resolveAppLocale,
-                    localizationsDelegates:
-                        AppLocalizations.localizationsDelegates,
+                    localizationsDelegates: appLocalizationsDelegates,
                     // Home locale first, so an unmatched device language falls back to
                     // Traditional Chinese (Taiwan), not the English template.
                     supportedLocales: appSupportedLocales,
