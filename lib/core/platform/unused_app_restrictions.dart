@@ -23,6 +23,9 @@ enum UnusedAppRestrictions {
   unavailable,
 }
 
+/// The Android-version-specific control the official intent opens near.
+enum UnusedAppSettingsGuide { pause, freeSpace, revoke, playProtect }
+
 /// Reports and opens Android's unused-app-restrictions setting.
 ///
 /// This is the failure mode that hits exactly the users background reporting
@@ -64,16 +67,35 @@ class UnusedAppRestrictionsService {
     }
   }
 
+  Future<UnusedAppSettingsGuide> guide() async {
+    if (!Platform.isAndroid) return UnusedAppSettingsGuide.pause;
+    try {
+      return switch (await _channel.invokeMethod<String>('guide')) {
+        'freeSpace' => UnusedAppSettingsGuide.freeSpace,
+        'revoke' => UnusedAppSettingsGuide.revoke,
+        'playProtect' => UnusedAppSettingsGuide.playProtect,
+        _ => UnusedAppSettingsGuide.pause,
+      };
+    } on PlatformException catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'unused app restrictions guide');
+      return UnusedAppSettingsGuide.pause;
+    } on MissingPluginException {
+      return UnusedAppSettingsGuide.pause;
+    }
+  }
+
   /// Opens the system page where the exemption lives. Re-check [status] on
   /// resume — the user acts in a settings screen we can't await.
-  Future<void> openSettings() async {
-    if (!Platform.isAndroid) return;
+  Future<bool> openSettings() async {
+    if (!Platform.isAndroid) return false;
     try {
-      await _channel.invokeMethod<void>('openSettings');
+      return await _channel.invokeMethod<bool>('openSettings') ?? false;
     } on PlatformException catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'unused app restrictions openSettings');
+      return false;
     } on MissingPluginException {
       // Unsupported platform / test harness — nothing to open.
+      return false;
     }
   }
 }

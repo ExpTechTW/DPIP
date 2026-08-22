@@ -205,12 +205,12 @@ class NotificationService {
 
   /// Opens the OS notification settings for this app — the fallback when a
   /// permission cannot be granted from inside the app any more.
-  Future<void> openSystemSettings() async {
+  Future<bool> openSystemSettings() async {
     Log.info('permission: opening notification settings');
     // Not awesome's `showNotificationConfigPage` — on iOS that returned
     // without navigating anywhere and without an error, which is how the
     // "Open Settings" button became the next thing that did nothing.
-    await openAppSettingsPage();
+    return openNotificationSettingsPage();
   }
 
   Future<void> _initChannels() async {

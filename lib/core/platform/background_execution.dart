@@ -89,17 +89,22 @@ class BackgroundExecutionService {
     }
   }
 
-  /// Opens the vendor's battery screen where one exists, else the app's own
-  /// system settings page. Returns what it managed to open (`vendor`,
-  /// `appDetails`, `none`) so the caller can say where the user landed instead
-  /// of assuming — the vendor screens are several menus from where any generic
-  /// instruction would put them.
-  Future<String> openSettings() async {
+  /// Opens the page for the platform's own background-execution switch.
+  ///
+  /// iOS already exposes that page through the older `openOemSettings` method;
+  /// keep using it so an Android-only routing refinement cannot strand iOS.
+  Future<String> openSystemSettings() =>
+      _open(Platform.isIOS ? 'openOemSettings' : 'openSystemSettings');
+
+  /// Opens the vendor's battery screen where one exists, else app details.
+  Future<String> openOemSettings() => _open('openOemSettings');
+
+  Future<String> _open(String method) async {
     if (!Platform.isAndroid && !Platform.isIOS) return 'none';
     try {
-      return await _channel.invokeMethod<String>('openOemSettings') ?? 'none';
+      return await _channel.invokeMethod<String>(method) ?? 'none';
     } on PlatformException catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'background execution openSettings');
+      Log.handle(error, stackTrace, 'background execution $method');
       return 'none';
     } on MissingPluginException {
       return 'none';

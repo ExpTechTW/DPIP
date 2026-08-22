@@ -1,7 +1,9 @@
 package com.exptech.dpip
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.content.PackageManagerCompat
@@ -37,24 +39,28 @@ import io.flutter.plugin.common.MethodChannel
  * state on a days-not-months timescale and are not reachable through this API;
  * they need the user to exempt the app in the vendor's own battery UI.
  */
-class UnusedAppRestrictionsChannel(private val context: Context) :
+class UnusedAppRestrictionsChannel(private val activity: Activity) :
     MethodChannel.MethodCallHandler {
 
     companion object {
         const val NAME = "com.exptech.dpip/unused_app_restrictions"
+        private const val REQUEST_CODE = 4102
     }
+
+    private val context: Context get() = activity.applicationContext
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "status" -> status(result)
+            "guide" -> result.success(guide())
 
             "openSettings" -> {
                 try {
                     val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(
                         context, context.packageName,
-                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(intent)
-                    result.success(null)
+                    )
+                    openForResult(intent)
+                    result.success(true)
                 } catch (e: Exception) {
                     result.error("unused_app_restrictions_failed", e.message, null)
                 }
@@ -62,6 +68,24 @@ class UnusedAppRestrictionsChannel(private val context: Context) :
 
             else -> result.notImplemented()
         }
+    }
+
+    /** The Settings label/path Android documents for each platform generation. */
+    private fun guide(): String {
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> "pause"
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> "freeSpace"
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> "revoke"
+            else -> "playProtect"
+        }
+    }
+
+    // IntentCompat explicitly requires the result-based launch even though the
+    // result code itself carries no useful state; the current exemption is
+    // re-read when Flutter resumes.
+    @Suppress("DEPRECATION")
+    private fun openForResult(intent: Intent) {
+        activity.startActivityForResult(intent, REQUEST_CODE)
     }
 
     /**
