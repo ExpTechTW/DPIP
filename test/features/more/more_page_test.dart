@@ -438,9 +438,9 @@ void main() {
       find.descendant(of: find.byType(InkWell), matching: find.text('DPIP')),
       findsWidgets,
     );
-    expect(find.text('Snapshot'), findsOneWidget);
+    expect(find.text(stable ? 'Release' : 'Snapshot'), findsOneWidget);
     // The badge carries the day the build was cut — what the card's own
-    // stamp says, so a tester can tell which snapshot they are running.
+    // stamp says, so a tester can tell which build they are running.
     if (AppBuild.buildDate.isNotEmpty) {
       expect(find.text(AppBuild.buildDate), findsOneWidget);
     }
