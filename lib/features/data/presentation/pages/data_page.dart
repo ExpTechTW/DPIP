@@ -50,128 +50,130 @@ class DataPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navData)),
-      body: ListView(
-        padding: EdgeInsets.only(
-          top: AppSpacing.sm,
-          bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
-        ),
-        children: [
-          SectionHeader(l10n.dataSectionSeismic),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.sm,
-            ),
-            child: _SeismicCard(
-              icon: Icons.monitor_heart_outlined,
-              title: l10n.dataEarthquakeSubtitle,
-              onTap: () => context.pushNamed(AppRoutes.earthquake),
-            ),
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: EdgeInsets.only(
+            top: AppSpacing.sm,
+            bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
           ),
-          SectionHeader(l10n.dataSectionWeather),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.sm,
+          children: [
+            SectionHeader(l10n.dataSectionSeismic),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              child: _SeismicCard(
+                icon: Icons.monitor_heart_outlined,
+                title: l10n.dataEarthquakeSubtitle,
+                onTap: () => context.pushNamed(AppRoutes.earthquake),
+              ),
             ),
-            crossAxisSpacing: AppSpacing.sm,
-            mainAxisSpacing: AppSpacing.sm,
-            // Wide and short: icon left, label right, one glance per tile.
-            childAspectRatio: 2.4,
-            children: [
-              for (final (tab, icon) in _weatherRankingEntries)
-                _RankingGridTile(
-                  icon: icon,
-                  title: _weatherRankingLabel(l10n, tab),
-                  accent: switch (tab) {
-                    'rain' => colors.primary,
-                    'temperature' => colors.tertiary,
-                    _ => colors.secondary,
-                  },
-                  onTap: () => context.pushNamed(
-                    AppRoutes.weatherRanking,
-                    queryParameters: {'tab': tab},
+            SectionHeader(l10n.dataSectionWeather),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: AppSpacing.sm,
+              // Wide and short: icon left, label right, one glance per tile.
+              childAspectRatio: 2.4,
+              children: [
+                for (final (tab, icon) in _weatherRankingEntries)
+                  _RankingGridTile(
+                    icon: icon,
+                    title: _weatherRankingLabel(l10n, tab),
+                    accent: switch (tab) {
+                      'rain' => colors.primary,
+                      'temperature' => colors.tertiary,
+                      _ => colors.secondary,
+                    },
+                    onTap: () => context.pushNamed(
+                      AppRoutes.weatherRanking,
+                      queryParameters: {'tab': tab},
+                    ),
                   ),
-                ),
-            ],
-          ),
-          SectionHeader(l10n.dataSectionAstronomy),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.sm,
+              ],
             ),
-            crossAxisSpacing: AppSpacing.sm,
-            mainAxisSpacing: AppSpacing.sm,
-            childAspectRatio: 2.4,
-            children: [
-              for (final (route, icon, label, accent)
-                  in <(String, IconData, String, Color)>[
-                    (
-                      AppRoutes.moon,
-                      Icons.nightlight_outlined,
-                      l10n.moonTitle,
-                      colors.tertiary,
-                    ),
-                    (
-                      AppRoutes.sun,
-                      Icons.wb_sunny_outlined,
-                      l10n.sunTitle,
-                      colors.primary,
-                    ),
-                    (
-                      AppRoutes.planets,
-                      Icons.blur_circular_outlined,
-                      l10n.planetsTitle,
-                      colors.secondary,
-                    ),
-                    (
-                      AppRoutes.tonight,
-                      Icons.dark_mode_outlined,
-                      l10n.tonightTitle,
-                      colors.primary,
-                    ),
-                    (
-                      AppRoutes.skyChart,
-                      Icons.auto_awesome_outlined,
-                      l10n.skyChartTitle,
-                      colors.tertiary,
-                    ),
-                    (
-                      AppRoutes.almanac,
-                      Icons.calendar_month_outlined,
-                      l10n.almanacTitle,
-                      colors.secondary,
-                    ),
-                    (
-                      AppRoutes.tide,
-                      Icons.waves_outlined,
-                      l10n.tideTitle,
-                      colors.primary,
-                    ),
-                  ])
-                _RankingGridTile(
-                  icon: icon,
-                  title: label,
-                  accent: accent,
-                  onTap: () => context.pushNamed(route),
-                ),
-            ],
-          ),
-        ],
+            SectionHeader(l10n.dataSectionAstronomy),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: AppSpacing.sm,
+              childAspectRatio: 2.4,
+              children: [
+                for (final (route, icon, label, accent)
+                    in <(String, IconData, String, Color)>[
+                      (
+                        AppRoutes.moon,
+                        Icons.nightlight_outlined,
+                        l10n.moonTitle,
+                        colors.tertiary,
+                      ),
+                      (
+                        AppRoutes.sun,
+                        Icons.wb_sunny_outlined,
+                        l10n.sunTitle,
+                        colors.primary,
+                      ),
+                      (
+                        AppRoutes.planets,
+                        Icons.blur_circular_outlined,
+                        l10n.planetsTitle,
+                        colors.secondary,
+                      ),
+                      (
+                        AppRoutes.tonight,
+                        Icons.dark_mode_outlined,
+                        l10n.tonightTitle,
+                        colors.primary,
+                      ),
+                      (
+                        AppRoutes.skyChart,
+                        Icons.auto_awesome_outlined,
+                        l10n.skyChartTitle,
+                        colors.tertiary,
+                      ),
+                      (
+                        AppRoutes.almanac,
+                        Icons.calendar_month_outlined,
+                        l10n.almanacTitle,
+                        colors.secondary,
+                      ),
+                      (
+                        AppRoutes.tide,
+                        Icons.waves_outlined,
+                        l10n.tideTitle,
+                        colors.primary,
+                      ),
+                    ])
+                  _RankingGridTile(
+                    icon: icon,
+                    title: label,
+                    accent: accent,
+                    onTap: () => context.pushNamed(route),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
