@@ -19,29 +19,29 @@
   "reportFilterIntensity": "Cường độ",
   "mapLayerLightning": "Sét",
   "restroomTypeMale": "Nhà vệ sinh nam",
-  "meshtasticLastReceived": "Last received",
+  "meshtasticLastReceived": "Nhận lần cuối",
   "reportDetailSortByCounty": "Sắp xếp theo khu vực",
   "@moonDays": {
     "description": "Day unit for the moon age"
   },
   "homeRainTrendScattered": "Có thể có mưa rào nhẹ",
-  "meshtasticUptime": "Uptime",
+  "meshtasticUptime": "Thời gian hoạt động",
   "weatherRankingTempExtremes": "Cực trị nhiệt độ",
   "themeLight": "Sáng",
   "mapTerrainReliefHint": "Hiển thị địa hình nổi trên bản đồ nền",
-  "meshtasticEmptyMessage": "(empty message)",
+  "meshtasticEmptyMessage": "(tin nhắn trống)",
   "moreSectionRegion": "Khu vực",
   "mapLayerSatellite": "Himawari Infrared (B13)",
   "@meshtasticTapNode": {
     "description": "Resting state of the map node sheet"
   },
   "aedHoursSaturday": "Giờ thứ Bảy",
-  "moonPhaseNew": "New moon",
+  "moonPhaseNew": "Trăng mới",
   "notifySectionEew": "Cảnh báo sớm động đất",
   "mapResetNorth": "Về hướng bắc",
   "rainInterval2d": "2 ngày",
   "mapTownLabelsHint": "Hiển thị tên hương trấn khi phóng to",
-  "commonCancel": "Cancel",
+  "commonCancel": "Hủy",
   "notifyOptTsunamiWarning": "Chỉ cảnh báo sóng thần",
   "mapLayerSatelliteBtdFog": "Himawari Night Fog",
   "@meshtasticSelectDevice": {
@@ -59,7 +59,7 @@
   "notifySettingsMenu": "Cài đặt thông báo",
   "mapAppDefault": "{app} (mặc định)",
   "trendRange24h": "24 giờ",
-  "mapLayerStyleJmaTooltip": "Grayscale base, tinted below −40 °C to highlight cloud-top height",
+  "mapLayerStyleJmaTooltip": "Nền grayscale, tô màu dưới −40 °C để làm nổi bật độ cao đỉnh mây",
   "mapLayerRain": "Lượng mưa",
   "mapLayerQpesums": "Dự báo mưa 1 giờ tới",
   "@weatherModeSnow": {
@@ -82,16 +82,16 @@
   "changelogShowSnapshots": "Hiện bản thử nghiệm",
   "changelogTitle": "Nhật ký cập nhật",
   "reportFilterOrderDesc": "Giảm dần",
-  "meshtasticExcludeMqttSubtitle": "Nodes bridged over the internet, not heard by radio",
+  "meshtasticExcludeMqttSubtitle": "Các nút kết nối qua Internet, không nghe qua sóng radio",
   "reportFilterIntensityInfoTitle": "Thang cường độ mới và cũ",
   "mapLayerTyphoon": "Bão",
   "radarOverlayMenuTooltip": "Tùy chọn lớp radar",
   "@meshtasticChannelUse": {
     "description": "Share of airtime seen busy"
   },
-  "meshtasticNodes": "Nodes",
-  "meshtasticSend": "Send",
-  "typhoonOverlayStormL7Tooltip": "Level-7 wind field + average circle (purple)",
+  "meshtasticNodes": "Nút",
+  "meshtasticSend": "Gửi",
+  "typhoonOverlayStormL7Tooltip": "Trường gió cấp 7 + bán kính trung bình (tím)",
   "aedType": "Loại",
   "termsOfService": "Điều khoản dịch vụ",
   "typhoonLegendCircle25": "Vòng bão",
@@ -110,12 +110,12 @@
   "@meshtasticExcludeMqttSubtitle": {
     "description": "What an MQTT node is"
   },
-  "meshtasticFirmware": "Firmware",
+  "meshtasticFirmware": "Phần mềm cơ sở",
   "@mapLayerMeshtastic": {
     "description": "Map layer name: mesh nodes"
   },
   "reportFilterDateEndNote": "Ngày kết thúc: đến 24:00（Đài Bắc）",
-  "meshtasticSilent": "Silent",
+  "meshtasticSilent": "Im lặng",
   "reportFilterSortMagnitude": "Độ lớn",
   "mapLayerCategoryEarthquake": "Động đất",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
@@ -144,12 +144,12 @@
   "@radarCountyOutlineHint": {
     "description": "Hint under the county-border toggle in the radar overlay menu."
   },
-  "meshtasticLayerOptions": "Node options",
+  "meshtasticLayerOptions": "Tùy chọn nút",
   "onboardingAgreeContinue": "Đồng ý và tiếp tục",
-  "meshtasticNodeId": "Node ID",
+  "meshtasticNodeId": "ID nút",
   "commonRetry": "Thử lại",
   "reportDetailNumbered": "Động đất có cảm nhận đáng kể số {number}",
-  "typhoonOverlayStormBandSubtitle": "With average circle",
+  "typhoonOverlayStormBandSubtitle": "Kèm bán kính trung bình",
   "disasterMapOverlayRestroomTooltip": "Hiển thị nhà vệ sinh công cộng",
   "weatherRankingTitle": "Xếp hạng quan trắc",
   "homeRainTrendHeavySustained": "Mưa lớn tiếp diễn trong 1 giờ tới",
@@ -161,12 +161,12 @@
   "@meshtasticSilent": {
     "description": "Legend: node known but not heard recently"
   },
-  "meshtasticChannelWorking": "Setting up the DPIP channel…",
-  "meshtasticRegionSwitch": "Switch to TW",
+  "meshtasticChannelWorking": "Đang thiết lập kênh DPIP…",
+  "meshtasticRegionSwitch": "Chuyển sang vùng TW",
   "@meshtasticLastReceived": {
     "description": "Age of the last received packet"
   },
-  "meshtasticTraffic": "Traffic",
+  "meshtasticTraffic": "Lưu lượng",
   "@meshtasticDpipChannel": {
     "description": "Which channel DPIP payloads use"
   },
@@ -176,8 +176,8 @@
     "description": "Moon page title"
   },
   "mapLayerHumidity": "Độ ẩm",
-  "mapLayerSatelliteTransparentNight": "Night = transparent, the basemap shows",
-  "meshtasticScanning": "Scanning…",
+  "mapLayerSatelliteTransparentNight": "Ban đêm = trong suốt, thấy bản đồ nền",
+  "meshtasticScanning": "Đang quét…",
   "@meshtasticDevice": {
     "description": "Section: device identity"
   },
@@ -202,7 +202,7 @@
   "meshtasticEtaDays": "~{n} ngày",
   "meshtasticTitle": "Meshtastic",
   "navMore": "Thêm",
-  "meshtasticDpipChannel": "DPIP channel",
+  "meshtasticDpipChannel": "Kênh DPIP",
   "disasterMapOverlaySectionLayers": "Lớp",
   "@moonPhaseWaningCrescent": {
     "description": "Phase: waning crescent"
@@ -215,15 +215,15 @@
     "description": "Label for the weatherModeCloudy option in the experimental backdrop settings."
   },
   "typhoonLabelNe": "NE",
-  "meshtasticCopied": "Message copied",
+  "meshtasticCopied": "Đã sao chép tin nhắn",
   "reportListEmpty": "Không có báo cáo động đất",
   "reportListEnd": "Hết danh sách",
   "mapLayerSatelliteTruecolor": "Himawari True Color",
-  "typhoonOverlaySectionExtra": "Overlays",
+  "typhoonOverlaySectionExtra": "Lớp phủ",
   "eewSWave": "Sóng S",
-  "meshtasticBusyTitle": "Another app is using this radio",
+  "meshtasticBusyTitle": "Ứng dụng khác đang dùng radio này",
   "restroomCategoryCultural": "Địa điểm văn hóa giải trí",
-  "typhoonLabelWind": "Max. sustained wind near centre",
+  "typhoonLabelWind": "Gió duy trì tối đa gần tâm",
   "radarGlobalOutlineHint": "Khung ngoài của mỗi quốc gia",
   "notifyEvacuation": "Thông tin thảm họa",
   "typhoonLegendCircle15": "Vòng gió mạnh",
@@ -233,11 +233,11 @@
   "@meshtasticRadioSettings": {
     "description": "Section: LoRa settings"
   },
-  "dataSectionAstronomy": "Astronomy",
+  "dataSectionAstronomy": "Thiên văn",
   "homeRainTrendLightSustained": "Mưa nhỏ tiếp diễn trong 1 giờ tới",
   "commonError": "Đã xảy ra lỗi",
-  "moonPhaseWaningCrescent": "Waning crescent",
-  "meshtasticPower": "Power",
+  "moonPhaseWaningCrescent": "Trăng lưỡi liềm khuyết",
+  "meshtasticPower": "Nguồn",
   "@meshtasticChannelWorking": {
     "description": "Creating/verifying the DPIP channel"
   },
@@ -248,14 +248,14 @@
   "typhoonWarningAreas": "Khu vực: {areas}",
   "rainIntervalSection": "Khoảng thời gian",
   "notifyTitle": "Thông báo",
-  "meshtasticTxPower": "TX power",
+  "meshtasticTxPower": "Công suất TX",
   "@radarTownOutlineHint": {
     "description": "Hint under the township-border toggle in the radar overlay menu."
   },
   "restroomCategoryLabel": "Hạng mục",
   "sponsorRestoring": "Đang khôi phục giao dịch…",
   "sponsorIntro": "DPIP cam kết cung cấp thông tin phòng chống thiên tai theo thời gian thực, không có quảng cáo hay mô hình lợi nhuận nào khác. Sự ủng hộ của bạn giúp chúng tôi duy trì máy chủ và tiếp tục phát triển.",
-  "typhoonLabelStormAvg": "Avg. radius of Beaufort 10 winds",
+  "typhoonLabelStormAvg": "Bán kính trung bình gió Beaufort 10",
   "@meshtasticHardware": {
     "description": "Board model"
   },
@@ -274,8 +274,8 @@
   "rainInterval6h": "6 giờ",
   "homeRainTrendMinute": "{minute} phút",
   "restroomTypeUnspecified": "Không xác định",
-  "typhoonOverlayProbabilityHint": "Hides the forecast cone",
-  "mapLayerSatelliteGlobalOutline": "Country border",
+  "typhoonOverlayProbabilityHint": "Ẩn vùng dự kiến",
+  "mapLayerSatelliteGlobalOutline": "Đường biên giới",
   "mapNavTemperature": "Nhiệt độ",
   "typhoonLegendForecastPoint": "Điểm dự báo",
   "@meshtasticBattery": {
@@ -289,16 +289,16 @@
   "rainInterval3d": "3 ngày",
   "defaultMapLayerSubtitle": "Tab Bản đồ mở lớp này. Biểu tượng và nhãn thanh điều hướng dưới cũng theo lựa chọn.",
   "aedDescription": "Ghi chú",
-  "typhoonOverlayWeatherRadarTooltip": "Radar echo closest to the typhoon bulletin time",
+  "typhoonOverlayWeatherRadarTooltip": "Ảnh radar gần thời điểm bản tin bão nhất",
   "onboardingPermLocationDesc": "Gửi cảnh báo phù hợp với nơi bạn đang ở.",
   "mapLayerSatelliteB16": "Himawari CO₂ (B16)",
   "@meshtasticClearMessages": {
     "description": "Menu action clearing the message log"
   },
   "homeActiveEventsEmpty": "Không có sự kiện đang hiệu lực",
-  "typhoonLabelPosition": "Centre location",
+  "typhoonLabelPosition": "Vị trí tâm",
   "weatherRankingBy": "Theo",
-  "typhoonIntensityMild": "Mild typhoon",
+  "typhoonIntensityMild": "Bão yếu",
   "windForecastGlobalOutlineHint": "Khung ngoài của mỗi quốc gia",
   "rainInterval1h": "1 giờ",
   "eewLocalIntensity": "Ước tính tại vị trí",
@@ -307,23 +307,23 @@
     "description": "Radar scan-range overlay toggle in the map's radar overlay menu."
   },
   "restroomCategoryReligious": "Nơi tôn giáo",
-  "meshtasticRole": "Role",
-  "mapLayerSatelliteCloudCloudy": "Cloudy",
+  "meshtasticRole": "Vai trò",
+  "mapLayerSatelliteCloudCloudy": "Nhiều mây",
   "skyTimeSunrise": "Bình minh",
   "@mapLayerMeshtasticSubtitle": {
     "description": "Map layer switcher subtitle"
   },
   "meshtasticJumpToLatest": "Tới mới nhất",
-  "meshtasticNoMessages": "No messages yet",
+  "meshtasticNoMessages": "Chưa có tin nhắn",
   "onboardingPermNotifyDesc": "Gửi cảnh báo động đất, thời tiết và thảm họa ngay khi chúng xảy ra.",
   "radarTownOutline": "Ranh giới xã phường",
-  "mapLayerStyleSection": "Colour style",
+  "mapLayerStyleSection": "Kiểu màu",
   "@moonPhaseNew": {
     "description": "Phase: new moon"
   },
   "disasterMapOverlayMenuTooltip": "Lớp bản đồ phòng chống",
   "moreGooglePlay": "Google Play",
-  "meshtasticOnline": "Heard recently",
+  "meshtasticOnline": "Nghe thấy gần đây",
   "@meshtasticSendHint": {
     "description": "Message input hint"
   },
@@ -331,7 +331,7 @@
   "typhoonForecastLead": "Forecast +{hours} h",
   "@mapAppOpenFailed": {},
   "changelogTypeStable": "Chính thức",
-  "mapLayerSatelliteTransparentClear": "Clear sky = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentClear": "Trời quang = trong suốt, thấy bản đồ nền",
   "@skyTimeAuto": {
     "description": "Label for the skyTimeAuto option in the experimental backdrop settings."
   },
@@ -350,11 +350,11 @@
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
   "notifyOptLocalIntensity4": "Cường độ tại chỗ từ 4 trở lên",
   "eewArrived": "Đã đến",
-  "meshtasticNoDevices": "No Meshtastic devices found",
+  "meshtasticNoDevices": "Không tìm thấy thiết bị Meshtastic",
   "mapLayerCategoryLife": "Đời sống",
   "reportFilterSortIntensity": "Cường độ",
-  "meshtasticStateDisconnected": "Disconnected",
-  "typhoonIntensityIntense": "Intense typhoon",
+  "meshtasticStateDisconnected": "Đã ngắt kết nối",
+  "typhoonIntensityIntense": "Bão mạnh",
   "@meshtasticSend": {
     "description": "Send message button"
   },
@@ -366,7 +366,7 @@
     "description": "The radio's short name"
   },
   "dpmYes": "Có",
-  "meshtasticNoHistory": "Not enough history yet",
+  "meshtasticNoHistory": "Lịch sử chưa đủ",
   "reportDetailLocalIntensityUnavailable": "Không có dữ liệu cường độ",
   "mapLayerWindForecastGfs": "GFS",
   "reportFilterDepth": "Độ sâu",
@@ -390,8 +390,8 @@
   },
   "reportFilterReset": "Đặt lại",
   "mapLayerSatelliteMndwi": "Himawari MNDWI",
-  "typhoonOverlaySectionStorm": "Storm wind",
-  "moonPhaseFull": "Full moon",
+  "typhoonOverlaySectionStorm": "Gió bão",
+  "moonPhaseFull": "Trăng tròn",
   "@meshtasticEmptyMessage": {
     "description": "Placeholder for a text packet with no body"
   },
@@ -399,24 +399,24 @@
   "@radarGlobalOutlineHint": {
     "description": "Hint under the national-border toggle in the radar overlay menu."
   },
-  "moonPhaseWaningGibbous": "Waning gibbous",
+  "moonPhaseWaningGibbous": "Trăng khuyết lồi",
   "reportFilterIntensityInfoModernTitle": "Mới (từ 2020)",
   "@mapAppGoogleMaps": {},
-  "typhoonDataTime": "Data time\n{time}",
+  "typhoonDataTime": "Giờ dữ liệu\n{time}",
   "restroomTypeAccessible": "Nhà vệ sinh tiếp cận được",
   "moreSectionAbout": "Giới thiệu",
-  "meshtasticSelectDevice": "Select a radio",
+  "meshtasticSelectDevice": "Chọn radio",
   "onboardingIntroBody": "DPIP là người bạn đồng hành phòng chống thiên tai của bạn. Ứng dụng tích hợp cảnh báo sớm động đất, báo cáo động đất, thời tiết và thông tin về hiểm họa, đồng thời cảnh báo bạn ngay tại thời điểm quan trọng.\n\n• Động đất: cảnh báo sớm, báo cáo cường độ và báo cáo chi tiết\n• Thời tiết: tin nhắn mưa dông theo thời gian thực và cảnh báo thời tiết\n• Thông tin sóng thần và thảm họa\n\nTiếp theo, chúng tôi sẽ mời bạn xem lại Điều khoản Dịch vụ và cấp một vài quyền để DPIP có thể bảo vệ bạn theo thời gian thực.",
   "shelterCapacityLabel": "Sức chứa",
   "reportDetailImage": "Hình ảnh báo cáo",
-  "meshtasticStateConfiguring": "Configuring…",
+  "meshtasticStateConfiguring": "Đang cấu hình…",
   "@moonPhaseLastQuarter": {
     "description": "Phase: last quarter"
   },
-  "typhoonLabelGaleAvg": "Avg. radius of Beaufort 7 winds",
+  "typhoonLabelGaleAvg": "Bán kính trung bình gió Beaufort 7",
   "onboardingPermNotify": "Thông báo",
-  "meshtasticClearMessages": "Clear messages",
-  "meshtasticNotifyMessages": "Notify on new messages",
+  "meshtasticClearMessages": "Xóa tin nhắn",
+  "meshtasticNotifyMessages": "Thông báo tin nhắn mới",
   "defaultMapLayerSettings": "Lớp bản đồ mặc định",
   "eewSourceSettings": "Nguồn cảnh báo sớm động đất",
   "eewSourceSubtitle": "Chọn cơ quan phát hành cảnh báo sớm động đất muốn hiển thị.",
@@ -446,7 +446,7 @@
     "description": "Label for the skyTimeAfternoon option in the experimental backdrop settings."
   },
   "mapTimelineFuture": "Tương lai",
-  "typhoonLegendCircleAvg": "Average circle",
+  "typhoonLegendCircleAvg": "Bán kính trung bình",
   "reportFilterDepthKm": "{depth} km",
   "typhoonLabelSe": "SE",
   "radarTownOutlineHint": "Lưới chi tiết hơn",
@@ -454,7 +454,7 @@
   "@meshtasticDisconnect": {
     "description": "Disconnect from the radio"
   },
-  "typhoonLabelGust": "Peak gust",
+  "typhoonLabelGust": "Gió giật đỉnh",
   "mapAppGoogleMaps": "Google Maps",
   "sponsorTerms": "Điều khoản sử dụng",
   "restroomTypeGenderNeutral": "Nhà vệ sinh trung tính giới",
@@ -463,7 +463,7 @@
   },
   "notifyThunderstorm": "Cảnh báo mưa dông",
   "skyTimeGolden": "Giờ vàng",
-  "moonAge": "Age",
+  "moonAge": "Tuổi trăng",
   "@windForecastTownOutlineHint": {
     "description": "Hint under the township-border toggle in the wind-forecast overlay menu."
   },
@@ -474,20 +474,20 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "Chọn khu vực để xem dự báo",
   "mapLayers": "Lớp bản đồ",
-  "meshtasticHardware": "Hardware",
+  "meshtasticHardware": "Phần cứng",
   "languageSettings": "Ngôn ngữ",
   "@moonNextFullMoon": {
     "description": "Next full moon date label"
   },
   "language": "Ngôn ngữ",
   "homeForecastFeelsLike": "Cảm giác {temp}°",
-  "typhoonOverlayWeatherHint": "Aligned to bulletin time",
+  "typhoonOverlayWeatherHint": "Khớp với thời điểm bản tin",
   "@meshtasticHopLimit": {
     "description": "How many hops a packet may take"
   },
   "skyTimeDawn": "Rạng đông",
   "skyTimeAfternoon": "Buổi chiều",
-  "meshtasticLastHeard": "Last heard",
+  "meshtasticLastHeard": "Nghe thấy lần cuối",
   "typhoonWarningTitle": "Cảnh báo bão",
   "moreSourceCode": "Mã nguồn",
   "mapLayerCategoryWeather": "Quan sát thời tiết",
@@ -506,37 +506,37 @@
   "mapTimelineForecast": "Dự báo",
   "restroomTypeLabel": "Loại",
   "navEarthquake": "Động đất",
-  "typhoonOverlayStormL10Tooltip": "Level-10 wind field + average circle (yellow)",
-  "moonPhaseWaxingGibbous": "Waxing gibbous",
+  "typhoonOverlayStormL10Tooltip": "Trường gió cấp 10 + bán kính trung bình (vàng)",
+  "moonPhaseWaxingGibbous": "Trăng khuyết lồi đầu tháng",
   "reportDetailTitle": "Báo cáo động đất",
   "moreTremReport": "Báo cáo phát hiện TREM",
   "weatherDataTime": "{station} · Thời gian dữ liệu {time}",
-  "meshtasticNoNodes": "No nodes heard yet",
-  "meshtasticViaMqtt": "Via MQTT (internet)",
+  "meshtasticNoNodes": "Chưa phát hiện nút nào",
+  "meshtasticViaMqtt": "Qua MQTT (Internet)",
   "radarCountyOutline": "Ranh giới huyện thị",
   "@mapAppCopyCoordinates": {},
   "commonClose": "Đóng",
   "restroomGradeLabel": "Hạng",
   "rainIntervalNow": "Hôm nay",
   "changelogCurrentVersion": "Hiện tại",
-  "typhoonOverlayForecastCalloutsTooltip": "Show forecast-point detail cards when zoomed in",
-  "typhoonLabelPressure": "Central pressure",
+  "typhoonOverlayForecastCalloutsTooltip": "Hiển thị thẻ chi tiết điểm dự báo khi phóng to",
+  "typhoonLabelPressure": "Áp suất trung tâm",
   "aedOpenRemark": "Ghi chú giờ mở",
   "onboardingPermsBody": "Để DPIP có thể cảnh báo bạn ngay khi thảm họa xảy ra, vui lòng cấp các quyền sau. Bạn có thể thay đổi chúng bất cứ lúc nào trong cài đặt hệ thống.",
-  "typhoonOverlaySectionWeather": "Weather underlay",
+  "typhoonOverlaySectionWeather": "Lớp nền thời tiết",
   "@meshtasticStateConnected": {
     "description": "Connection state label"
   },
   "notifyOptWeatherLocal": "Chỉ vị trí hiện tại",
   "mapNavRain": "Mưa",
-  "moonDays": "days",
+  "moonDays": "ngày",
   "mapLegendUnit": "Đơn vị: {unit}",
   "weatherModeClear": "Trời quang",
-  "meshtasticRadio": "Radio",
+  "meshtasticRadio": "Bộ đàm",
   "commonEmpty": "Không có dữ liệu",
   "mapLayerSatelliteB01": "Himawari Blue (B01)",
-  "meshtasticExternalPower": "External power",
-  "moonPhaseLastQuarter": "Last quarter",
+  "meshtasticExternalPower": "Nguồn ngoài",
+  "moonPhaseLastQuarter": "Trăng bán nguyệt cuối tháng",
   "@meshtasticName": {
     "description": "The radio's long name"
   },
@@ -551,20 +551,20 @@
   "mapLayerRestroom": "Nhà vệ sinh công cộng",
   "restroomCategoryWelfare": "Cơ sở phúc lợi",
   "restroomGradeExcellent": "Xuất sắc",
-  "meshtasticLastSent": "Last sent",
-  "meshtasticName": "Name",
-  "meshtasticScan": "Scan",
+  "meshtasticLastSent": "Gửi lần cuối",
+  "meshtasticName": "Tên",
+  "meshtasticScan": "Quét",
   "@radarOverlayMenuTooltip": {
     "description": "Tooltip for the radar overlay-options chip beside the layer switcher"
   },
   "mapLayerCategoryForecast": "Dự báo số",
-  "meshtasticChannelFailed": "Couldn't set up the DPIP channel",
+  "meshtasticChannelFailed": "Không thiết lập được kênh DPIP",
   "themeSystem": "Hệ thống",
   "mapLayerSatelliteNdvi": "Himawari NDVI",
   "typhoonLegendForecast": "Quỹ đạo dự báo",
   "typhoonValueHpa": "{n} hPa",
   "weatherPrecipitation": "Lượng mưa",
-  "moonNextFullMoon": "Next full moon",
+  "moonNextFullMoon": "Trăng tròn kế tiếp",
   "dpmSheetEmpty": "Chạm vào điểm đánh dấu trên bản đồ để xem chi tiết",
   "onboardingSkipLeave": "Vẫn bỏ qua",
   "aedPlaceDesc": "Vị trí đặt",
@@ -582,22 +582,22 @@
   },
   "onboardingPermBattery": "Miễn trừ tối ưu hóa pin",
   "typhoonLabelNw": "NW",
-  "moonPhaseWaxingCrescent": "Waxing crescent",
+  "moonPhaseWaxingCrescent": "Trăng lưỡi liềm đầu tháng",
   "restroomCategoryLeisure": "Địa điểm vui chơi giải trí",
   "mapLayerTemperature": "Nhiệt độ",
   "aedCategory": "Phân loại",
   "@moonTimelineCaption": {
     "description": "Moon phase timeline caption"
   },
-  "meshtasticChannels": "Channels",
+  "meshtasticChannels": "Kênh",
   "monitorWaiting": "Đang chờ dữ liệu…",
-  "typhoonOverlayForecastCallouts": "Forecast tooltips",
+  "typhoonOverlayForecastCallouts": "Chú thích điểm dự báo",
   "@meshtasticTitle": {
     "description": "Meshtastic test page title"
   },
   "reportDetailEpicenter": "Tọa độ tâm chấn",
-  "meshtasticVoltage": "Voltage",
-  "mapLayerMeshtasticSubtitle": "LoRa mesh nodes heard by your radio",
+  "meshtasticVoltage": "Điện áp",
+  "mapLayerMeshtasticSubtitle": "Nút lưới LoRa radio của bạn nghe thấy",
   "@meshtasticSent": {
     "description": "Packets sent this session"
   },
@@ -623,34 +623,34 @@
     "description": "Township-border overlay toggle in the map's radar overlay menu."
   },
   "mapLayerSatelliteB04": "Himawari Near-Infrared (B04)",
-  "mapLayerSatelliteTransparentZero": "Zero difference = transparent (no signal)",
+  "mapLayerSatelliteTransparentZero": "Chênh lệch bằng 0 = trong suốt (không có tín hiệu)",
   "shelterIndoorLabel": "Trú ẩn trong nhà",
   "notifyOptOff": "Tắt",
   "reportFilterSortTime": "Thời gian",
-  "mapLayerSatelliteCloudProbablyClear": "Probably clear",
+  "mapLayerSatelliteCloudProbablyClear": "Có thể quang mây",
   "weatherModeThunderstorm": "Mưa dông",
   "homeViewOnMap": "Xem trên bản đồ",
   "reportFilterIntensityInfoLegacyTitle": "Cũ (trước 2020)",
-  "typhoonLabelSpeed": "Past movement speed",
+  "typhoonLabelSpeed": "Tốc độ di chuyển",
   "@meshtasticReconnecting": {
     "description": "The link dropped and is being re-established"
   },
   "mapAppOpenFailed": "Không thể mở {app}",
-  "mapLayerSatelliteRgbComposite": "RGB composite (JMA recipe)",
+  "mapLayerSatelliteRgbComposite": "RGB tổng hợp (công thức JMA)",
   "@meshtasticStateDisconnected": {
     "description": "Connection state label"
   },
-  "meshtasticReceived": "Received",
+  "meshtasticReceived": "Đã nhận",
   "weatherRankingExtremeLow": "Thấp nhất ngày",
   "@meshtasticRegionSwitch": {
     "description": "Button applying the DPIP LoRa region"
   },
   "mapLayerSatelliteB10": "Himawari Lower Water Vapour (B10)",
-  "mapLayerSatelliteCloudProbablyCloudy": "Probably cloudy",
+  "mapLayerSatelliteCloudProbablyCloudy": "Có thể nhiều mây",
   "shelterCategoryLabel": "Loại thảm họa",
   "mapLayerSatelliteTransparentNoWater": "≤ 0 = transparent (no water)",
-  "meshtasticStateConnecting": "Connecting…",
-  "moonTitle": "Moon",
+  "meshtasticStateConnecting": "Đang kết nối…",
+  "moonTitle": "Mặt Trăng",
   "weatherRankingGust": "Gió giật",
   "moreAppStore": "App Store",
   "@meshtasticUndecoded": {
@@ -661,7 +661,7 @@
   },
   "moreServerStatus": "Trạng thái máy chủ",
   "notifySectionWeather": "Thời tiết",
-  "meshtasticPreset": "Modem preset",
+  "meshtasticPreset": "Cấu hình modem",
   "dataSectionSeismic": "Địa chấn",
   "changelogBodyEmpty": "Không có ghi chú cho bản phát hành này.",
   "changelogOpenOnGitHub": "Xem trên GitHub",
@@ -670,15 +670,15 @@
   "regionNationwide": "Toàn quốc",
   "moreNotifyLog": "Nhật ký thông báo DPIP",
   "regionCurrent": "Vị trí hiện tại",
-  "meshtasticNotConnected": "Not connected to a radio",
+  "meshtasticNotConnected": "Chưa kết nối radio",
   "weatherModeSnow": "Tuyết rơi",
-  "mapLayerMeshtastic": "Meshtastic nodes",
+  "mapLayerMeshtastic": "Nút Meshtastic",
   "moreDeveloper": "Thông tin gỡ lỗi",
   "@qpesumsOverlayMenuTooltip": {
     "description": "Tooltip for the QPESUMS forecast overlay-options chip beside the layer switcher."
   },
   "mapLayerSatelliteB14": "Himawari Longwave Infrared (B14)",
-  "meshtasticChannelUse": "Channel use",
+  "meshtasticChannelUse": "Mức dùng kênh",
   "mapNavLightning": "Sét",
   "homeForecastEmpty": "Không có dữ liệu dự báo",
   "sponsorOneTime": "Ủng hộ một lần",
@@ -686,7 +686,7 @@
   "onboardingPermBackground": "Vị trí chạy nền",
   "aedEmergencyPhone": "Điện thoại khẩn cấp",
   "dpmOpenInMaps": "Mở trong bản đồ",
-  "meshtasticNotifyNodes": "Notify on new nodes",
+  "meshtasticNotifyNodes": "Thông báo nút mới",
   "onboardingPermCriticalDesc": "Cho phép các cảnh báo động đất nguy hiểm đến tính mạng phát âm thanh ngay cả khi ở chế độ im lặng hoặc Không làm phiền.",
   "@mapAppDefault": {
     "placeholders": {
@@ -695,11 +695,11 @@
       }
     }
   },
-  "mapLayerSatelliteTransparentWarm": "Clear sky (warm end) = transparent, the basemap shows",
-  "meshtasticSent": "Sent",
+  "mapLayerSatelliteTransparentWarm": "Trời quang (đầu ấm) = trong suốt, thấy bản đồ nền",
+  "meshtasticSent": "Đã gửi",
   "homeForecastTitle": "Dự báo 24 giờ",
   "typhoonLegendWarningAreas": "Vùng cảnh báo",
-  "meshtasticExcludeMqttHidden": "{count} hidden",
+  "meshtasticExcludeMqttHidden": "Ẩn {count} mục",
   "notifyOptLocalIntensity1": "Cường độ tại chỗ từ 1 trở lên",
   "@skyTimeGolden": {
     "description": "Label for the skyTimeGolden option in the experimental backdrop settings."
@@ -710,21 +710,21 @@
   "mapTimelinePast": "Quá khứ",
   "restroomTypeFemale": "Nhà vệ sinh nữ",
   "reportListToday": "Hôm nay",
-  "meshtasticTapNode": "Tap a node for details",
+  "meshtasticTapNode": "Chạm vào nút để xem chi tiết",
   "commonLoading": "Đang tải…",
   "@meshtasticStateConnecting": {
     "description": "Connection state label"
   },
-  "typhoonIntensityModerate": "Moderate typhoon",
+  "typhoonIntensityModerate": "Bão trung bình",
   "mapLayerSatelliteAsh": "Himawari Ash",
   "rainInterval3h": "3 giờ",
-  "meshtasticChannelReady": "DPIP channel ready",
+  "meshtasticChannelReady": "Kênh DPIP đã sẵn sàng",
   "@meshtasticNotifyNodes": {
     "description": "Toggle: local notification when a new node is heard"
   },
   "mapLayerCategorySatellite": "Vệ tinh",
   "mapLayerSatelliteNightmicrophysics": "Himawari Night Microphysics",
-  "typhoonIntensityTd": "Tropical depression",
+  "typhoonIntensityTd": "Áp thấp nhiệt đới",
   "reportFilterDate": "Ngày",
   "sponsorRestoreUnavailable": "Không thể kết nối tới cửa hàng. Vui lòng thử lại sau.",
   "homeForecastPop": "{pop}%",
@@ -773,13 +773,13 @@
     }
   },
   "mapLayerSatelliteBtdSo2": "Himawari SO₂ / Cloud Phase",
-  "meshtasticStateError": "Error",
+  "meshtasticStateError": "Lỗi",
   "weatherModeOvercast": "Trời âm u",
   "@meshtasticScan": {
     "description": "Start scanning for Meshtastic radios"
   },
   "reportDetailDepth": "Độ sâu chấn tiêu",
-  "typhoonOverlayWarningTooltip": "Highlight counties under a typhoon warning",
+  "typhoonOverlayWarningTooltip": "Làm nổi bật các huyện đang có cảnh báo bão",
   "reportFilterDatePick": "Chọn ngày",
   "onboardingSkipStay": "Quay lại",
   "@moonPhaseWaxingCrescent": {
@@ -793,16 +793,16 @@
     "description": "Transmit power"
   },
   "shelterOutdoorLabel": "Trú ẩn ngoài trời",
-  "meshtasticStateConnected": "Connected",
-  "mapNavRadar": "Radar",
-  "mapLayerSatelliteCloudClear": "Clear",
+  "meshtasticStateConnected": "Đã kết nối",
+  "mapNavRadar": "Ra đa",
+  "mapLayerSatelliteCloudClear": "Quang mây",
   "eewSummary": "M{magnitude} · độ sâu {depth} km",
   "locationBannerPermission": "Chưa cấp quyền vị trí — cảnh báo khu vực không thể nhắm đúng vùng của bạn.",
-  "typhoonOverlayWeatherNoneTooltip": "No radar or infrared underlay",
+  "typhoonOverlayWeatherNoneTooltip": "Không có lớp nền radar hoặc hồng ngoại",
   "radarCountyOutlineHint": "Vẽ đè lên tiếng vọng",
   "windForecastCountyOutlineHint": "Vẽ trên trường gió",
   "homeRainTrendTitle": "Mưa 1 giờ tới",
-  "moonPhaseFirstQuarter": "First quarter",
+  "moonPhaseFirstQuarter": "Trăng bán nguyệt đầu tháng",
   "mapLayerCategoryTyphoon": "Bão",
   "@windForecastOverlayMenuTooltip": {
     "description": "Tooltip for the wind-forecast overlay-options chip beside the layer switcher."
@@ -810,13 +810,13 @@
   "@meshtasticNodeId": {
     "description": "The radio's node number"
   },
-  "meshtasticUtilization": "Airtime (24h)",
+  "meshtasticUtilization": "Thời gian phát sóng (24 giờ)",
   "restroomTypeMixed": "Nhà vệ sinh chung",
   "restroomGradeGood": "Tốt",
   "notifyTsunami": "Thông tin sóng thần",
   "navData": "Dữ liệu",
   "mapLayerSatelliteBtdWvirw": "Himawari Overshooting Top",
-  "meshtasticReadingAge": "Reading taken",
+  "meshtasticReadingAge": "Thời điểm đo",
   "@moonPhaseWaningGibbous": {
     "description": "Phase: waning gibbous"
   },
@@ -829,7 +829,7 @@
   "notifyIntensity": "Báo cáo cường độ chấn động",
   "rainIntervalMenu": "Khung tích lũy",
   "reportDetailLocalFelt": "Động đất cảm nhận cục bộ",
-  "meshtasticDevice": "Device",
+  "meshtasticDevice": "Thiết bị",
   "onboardingGrant": "Cấp quyền",
   "weatherModeRain": "Mưa",
   "shelterVulnerableOkLabel": "Phù hợp người yếu thế",
@@ -853,7 +853,7 @@
   "trendCumulativeTotal": "Tổng cộng {total} mm",
   "languageName": "Tiếng Việt",
   "reportListEmptyFiltered": "Không có báo cáo khớp bộ lọc",
-  "meshtasticExcludeMqtt": "Hide MQTT nodes",
+  "meshtasticExcludeMqtt": "Ẩn nút MQTT",
   "mapNavTyphoon": "Bão",
   "weatherModeSand": "Bụi cát",
   "@moonPhaseFirstQuarter": {
@@ -869,9 +869,9 @@
   "feedStale": "Dữ liệu có thể đã lỗi thời",
   "homeForecastWind": "{direction} · Cấp {level}",
   "navHome": "Trang chủ",
-  "meshtasticRegionLabel": "Region",
+  "meshtasticRegionLabel": "Vùng",
   "mapLayerSatelliteCloudtop": "Himawari Cloud Top Temperature",
-  "moonTimelineCaption": "Phase",
+  "moonTimelineCaption": "Pha",
   "@meshtasticChannelNoSlot": {
     "description": "Every secondary channel slot is taken"
   },
@@ -886,7 +886,7 @@
   "reportFilterSortDepth": "Độ sâu",
   "mapTimelineDataTime": "Thời gian dữ liệu {time}",
   "radarScanRange": "Hiện phạm vi quét",
-  "meshtasticHopLimit": "Hop limit",
+  "meshtasticHopLimit": "Giới hạn hop",
   "@meshtasticUptime": {
     "description": "Time since the radio booted"
   },
@@ -897,17 +897,17 @@
   "sponsorPrivacy": "Chính sách quyền riêng tư",
   "reportDetailLocalIntensity": "Cường độ tại vị trí của bạn",
   "mapLayerSatelliteNaturalcolor": "Himawari Natural Color",
-  "meshtasticAirtime": "Air time (TX)",
+  "meshtasticAirtime": "Thời gian phát sóng (TX)",
   "shelterCapacityValue": "{n} người",
   "lightningLegendCc": "Mây–mây · {minutes} phút",
-  "meshtasticSendHint": "Message to broadcast",
+  "meshtasticSendHint": "Tin nhắn để phát",
   "monitorDelay": "Độ trễ {value} s",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },
   "dpmNo": "Không",
   "mapLayerSatelliteB08": "Himawari Upper Water Vapour (B08)",
-  "meshtasticReconnecting": "Reconnecting…",
+  "meshtasticReconnecting": "Đang kết nối lại…",
   "@mapAppAppleMaps": {},
   "@meshtasticReadingAge": {
     "description": "How old the battery/airtime numbers are"
@@ -916,16 +916,16 @@
   "@moonPhaseWaxingGibbous": {
     "description": "Phase: waxing gibbous"
   },
-  "typhoonOverlayWeatherSatelliteTooltip": "Infrared closest to the typhoon bulletin time",
+  "typhoonOverlayWeatherSatelliteTooltip": "Ảnh hồng ngoại gần thời điểm bản tin bão nhất",
   "radarScanRangeHint": "Ngoài khung là chưa quan trắc",
-  "typhoonPickerTd": "Tropical depression TD {no}",
+  "typhoonPickerTd": "Áp thấp nhiệt đới TD {no}",
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "Thêm khu vực",
   "displaySettings": "Hiển thị",
   "restroomGradePoor": "Dưới chuẩn",
   "restroomCategoryTourist": "Khu du lịch thắng cảnh",
   "locationBannerServiceOff": "Dịch vụ vị trí đang tắt — cảnh báo khu vực không thể nhắm đúng vùng của bạn.",
-  "mapLayerStyleTooltip": "Colour style",
+  "mapLayerStyleTooltip": "Kiểu màu",
   "lightningLegendCg": "Mây–đất · {minutes} phút",
   "skyTimeAuto": "Tự động",
   "appLogs": "Nhật ký ứng dụng",
@@ -966,21 +966,21 @@
   "endpointStateUnknown": "Không rõ",
   "endpointServiceEew": "EEW",
   "endpointServiceRts": "RTS",
-  "endpointServiceRadar": "Radar",
-  "endpointServiceSatellite": "Satellite",
+  "endpointServiceRadar": "Ra đa",
+  "endpointServiceSatellite": "Vệ tinh",
   "endpointServiceQpesums": "QPE",
-  "endpointServiceWind": "Wind",
-  "endpointServiceDpm": "Disaster points",
-  "endpointServiceWeather": "Weather",
-  "endpointServiceRain": "Rain",
-  "endpointServiceLightning": "Lightning",
-  "endpointServiceTyphoon": "Typhoon",
-  "endpointServiceReport": "EQ reports",
-  "endpointServiceTremStation": "Tremor station",
-  "endpointServiceEvent": "Events",
-  "endpointServiceLocation": "Location",
-  "endpointServiceNotify": "Notifications",
-  "endpointServiceOther": "Other",
+  "endpointServiceWind": "Gió",
+  "endpointServiceDpm": "Điểm thiên tai",
+  "endpointServiceWeather": "Thời tiết",
+  "endpointServiceRain": "Mưa",
+  "endpointServiceLightning": "Sét",
+  "endpointServiceTyphoon": "Bão",
+  "endpointServiceReport": "Báo cáo động đất",
+  "endpointServiceTremStation": "Trạm đo chấn động",
+  "endpointServiceEvent": "Sự kiện",
+  "endpointServiceLocation": "Vị trí",
+  "endpointServiceNotify": "Thông báo",
+  "endpointServiceOther": "Khác",
   "feedConnecting": "Đang kết nối…",
   "notifyBannerDisabled": "Thông báo đã tắt — bạn sẽ không nhận được cảnh báo thiên tai.",
   "@meshtasticNoNodes": {
@@ -989,21 +989,21 @@
   "weatherHumidity": "Độ ẩm",
   "typhoonValueMs": "{n} m/s",
   "homeForecastHumidity": "Độ ẩm {value}%",
-  "meshtasticBusyBody": "Disconnect it in the other Meshtastic app first. Two apps on one radio take each other's messages, so some will go missing.",
-  "meshtasticChannelNoSlot": "No free channel slot — free one on the radio",
+  "meshtasticBusyBody": "Hãy ngắt kết nối radio trong ứng dụng Meshtastic khác trước. Hai ứng dụng dùng chung một radio sẽ giành tin nhắn của nhau, một số tin sẽ bị mất.",
+  "meshtasticChannelNoSlot": "Không có kênh trống — hãy giải phóng một kênh trên radio",
   "restroomCategoryTransport": "Giao thông",
-  "meshtasticBattery": "Battery",
+  "meshtasticBattery": "Pin",
   "meshtasticDistance": "Khoảng cách",
   "meshtasticSnrTrend": "Xu hướng tín hiệu (SNR)",
   "meshtasticBatteryTrend": "Xu hướng pin",
-  "typhoonOverlayMenuTooltip": "Typhoon overlay options",
+  "typhoonOverlayMenuTooltip": "Tùy chọn lớp phủ bão",
   "mapLayerSatelliteBtdOzone": "Himawari Tropopause",
-  "meshtasticRegionMismatch": "Radio region is {region} — DPIP needs TW",
+  "meshtasticRegionMismatch": "Vùng radio là {region} — DPIP cần TW",
   "notifySectionEarthquake": "Động đất",
   "mapLayerDisasterMap": "Bản đồ phòng chống",
   "weatherModeFog": "Sương mù",
   "typhoonPickerNamed": "{name} TY {no}",
-  "mapLayerStyleGrayTooltip": "JMA grayscale — colder is whiter",
+  "mapLayerStyleGrayTooltip": "JMA grayscale — càng lạnh càng trắng",
   "moreAnnouncements": "Thông báo",
   "moreTagline": "Nền tảng tích hợp thông tin phòng chống thiên tai",
   "moreVersionStable": "Bản chính thức",
@@ -1026,10 +1026,10 @@
   "mapLayerAed": "AED",
   "changelogTypePrerelease": "Thử nghiệm",
   "reportFilterIntensityInfoModernBody": "Các mức 0–4, 5−, 5+, 6−, 6+, 7. Thanh lọc dùng thang mới; sự kiện cũ vẫn hiện nhãn cũ trong danh sách.",
-  "typhoonOverlayWeatherNone": "None",
-  "mapLayerStyleGray": "Grayscale (JMA)",
+  "typhoonOverlayWeatherNone": "Không có",
+  "mapLayerStyleGray": "Thang xám (JMA)",
   "weatherModeAuto": "Tự động",
-  "typhoonLabelProbCircle": "70% probability circle",
+  "typhoonLabelProbCircle": "Vòng tròn xác suất 70%",
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."
   },
@@ -1039,7 +1039,7 @@
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."
   },
-  "typhoonLabelDirection": "Past movement direction",
+  "typhoonLabelDirection": "Hướng di chuyển",
   "@meshtasticLastSent": {
     "description": "Age of the last sent packet"
   },
@@ -1051,15 +1051,15 @@
   "typhoonLegendCone": "Nón dự báo",
   "moreCwaEew": "Cảnh báo sớm động đất của CWA",
   "onboardingPermsTitle": "Quyền truy cập",
-  "mapLayerStyleJma": "Cloud-top enhancement (JMA)",
+  "mapLayerStyleJma": "Tăng tương phản mây (JMA)",
   "rainInterval10m": "10 phút",
-  "meshtasticConnectAnyway": "Connect anyway",
+  "meshtasticConnectAnyway": "Vẫn kết nối",
   "reportListDayCount": "{count}",
   "mapLayerSatelliteB06": "Himawari Near-Infrared (B06)",
-  "mapLayerSatelliteTransparentReflectance": "Low reflectance / night = transparent, the basemap shows",
+  "mapLayerSatelliteTransparentReflectance": "Phản xạ thấp / ban đêm = trong suốt, thấy bản đồ nền",
   "chartHourLabel": "{hour}h",
   "mapLayerShelter": "Nơi trú ẩn",
-  "typhoonOverlayProbabilityTooltip": "Show strike probability (hides the forecast cone)",
+  "typhoonOverlayProbabilityTooltip": "Hiển thị xác suất trúng bão (ẩn vùng dự kiến)",
   "mapLayerSatelliteNdwi": "Himawari NDWI",
   "disasterMapOverlayShelterTooltip": "Hiển thị nơi trú ẩn",
   "mapNavHumidity": "Độ ẩm",
@@ -1069,7 +1069,7 @@
   "reportDetailSortByIntensity": "Sắp xếp theo cường độ",
   "homeRainTrendNoData": "Không có dữ liệu",
   "mapLayerCategoryRadar": "Ra đa",
-  "meshtasticShortName": "Short name",
+  "meshtasticShortName": "Tên ngắn",
   "@meshtasticStateConfiguring": {
     "description": "Connection state label"
   },
@@ -1089,7 +1089,7 @@
   "@skyTimeMorning": {
     "description": "Label for the skyTimeMorning option in the experimental backdrop settings."
   },
-  "meshtasticRegionConfirm": "Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.",
+  "meshtasticRegionConfirm": "Chuyển radio này sang vùng TW? Nó sẽ khởi động lại và ngắt kết nối một lúc, mọi kênh khác cũng được chuyển theo.",
   "dataEarthquakeSubtitle": "Báo cáo động đất",
   "typhoonNoActive": "Không có bão",
   "@meshtasticExcludeMqttHidden": {
@@ -1106,12 +1106,22 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
-  "mapGsiOverlay": "Bản đồ chi tiết (GSI)",
-  "mapGsiOverlayHint": "Thêm địa hình độ phân giải cao từ GSI Nhật Bản",
-  "mapGsiDetails": "Chi tiết lớp",
-  "mapGsiDetailsHint": "Đã bật {enabled} / {total} lớp",
-  "@mapGsiDetailsHint": {
-    "description": "How many of the GSI layers are enabled",
+  "mapOsmOverlay": "Bản đồ chi tiết",
+  "mapOsmOverlayHint": "Hiện đường, tòa nhà và địa danh chi tiết hơn",
+  "mapOsmDetails": "Chi tiết lớp",
+  "moreDataSources": "Nguồn dữ liệu",
+  "dataSourceTremNet": "探索智慧科技有限公司 — TREM-Net",
+  "dataSourceCwa": "交通部中央氣象署 (CWA)",
+  "dataSourceJma": "気象庁 (JMA)",
+  "dataSourceNcdr": "國家災害防救科技中心 (NCDR)",
+  "dataSourceEcmwf": "European Centre for Medium-Range Weather Forecasts (ECMWF)",
+  "dataSourceNoaaGfs": "National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)",
+  "dataSourceGovernmentOpenData": "政府資料開放平臺",
+  "dataSourceOpenStreetMap": "© OpenStreetMap contributors",
+  "dataSourceNasaMoon": "National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)",
+  "mapOsmDetailsHint": "Đã bật {enabled} / {total} lớp",
+  "@mapOsmDetailsHint": {
+    "description": "How many of the OSM layers are enabled",
     "placeholders": {
       "enabled": {
         "type": "int"
@@ -1121,27 +1131,30 @@
       }
     }
   },
-  "mapGsiSurface": "Bề mặt",
-  "mapGsiParks": "Công viên",
-  "mapGsiLandUse": "Sử dụng đất",
-  "mapGsiAirportAreas": "Khu vực sân bay",
-  "mapGsiWater": "Vùng nước",
-  "mapGsiRivers": "Sông ngòi",
-  "mapGsiBoundaries": "Ranh giới",
-  "mapGsiBuildings": "Tòa nhà",
-  "mapGsiRoads": "Đường bộ",
-  "mapGsiRoadNames": "Tên đường",
-  "mapGsiWaterNames": "Tên vùng nước",
-  "mapGsiPeaks": "Đỉnh núi",
-  "mapGsiAirportNames": "Tên sân bay",
-  "mapGsiPlaceNames": "Tên địa danh",
-  "mapGsiPoi": "Địa điểm quan tâm",
-  "mapGsiHouseNumbers": "Số nhà",
-  "mapGsiRestoreAll": "Khôi phục tất cả",
+  "mapOsmSurface": "Bề mặt",
+  "mapOsmParks": "Công viên",
+  "mapOsmLandUse": "Sử dụng đất",
+  "mapOsmAirportAreas": "Khu vực sân bay",
+  "mapOsmWater": "Vùng nước",
+  "mapOsmRivers": "Sông ngòi",
+  "mapOsmBoundaries": "Ranh giới",
+  "mapOsmBuildings": "Tòa nhà",
+  "mapOsmRoads": "Đường bộ",
+  "mapOsmRoadNames": "Tên đường",
+  "mapOsmWaterNames": "Tên vùng nước",
+  "mapOsmPeaks": "Đỉnh núi",
+  "mapOsmAirportNames": "Tên sân bay",
+  "mapOsmPlaceNames": "Tên địa danh",
+  "mapOsmPoi": "Địa điểm quan tâm",
+  "mapOsmHouseNumbers": "Số nhà",
+  "mapOsmRestoreAll": "Khôi phục tất cả",
+  "mapOsmSectionNatural": "Đặc điểm tự nhiên",
+  "mapOsmSectionRoadsAndBuildings": "Đường & tòa nhà",
+  "mapOsmSectionLabelsAndPlaces": "Nhãn & địa điểm",
   "mapTownLabels": "Tên hương trấn",
   "notifySetFailed": "Không thể lưu cài đặt. Vui lòng thử lại.",
-  "meshtasticDisconnect": "Disconnect",
-  "meshtasticUndecoded": "Not decrypted",
+  "meshtasticDisconnect": "Ngắt kết nối",
+  "meshtasticUndecoded": "Chưa giải mã",
   "notifyAnnouncement": "Thông báo",
   "onboardingIntroTitle": "Chào mừng đến với DPIP",
   "regionCurrentUnavailable": "Không thể lấy vị trí hiện tại",
@@ -1929,6 +1942,9 @@
   },
   "moreDumpDiagnostics": "Tải lên thông tin gỡ lỗi và nhật ký",
   "moreDumpDiagnosticsHint": "Tải lên rồi sao chép liên kết để đính kèm vào báo cáo",
+  "dumpIncludeSensitive": "Bao gồm vị trí chính xác",
+  "dumpIncludeSensitiveHint": "Bao gồm tọa độ trong nhật ký và vị trí nền; nếu không chọn, chúng được thay bằng null",
+  "dumpUpload": "Tải lên",
   "dumpUploaded": "Đã tải lên",
   "dumpLinkCopied": "Đã sao chép liên kết vào bảng nhớ tạm",
   "dumpCopyAgain": "Sao chép lại",

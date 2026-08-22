@@ -56,7 +56,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get restroomTypeMale => 'ห้องน้ำชาย';
 
   @override
-  String get meshtasticLastReceived => 'Last received';
+  String get meshtasticLastReceived => 'รับล่าสุด';
 
   @override
   String get reportDetailSortByCounty => 'เรียงตามพื้นที่';
@@ -87,7 +87,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeRainTrendScattered => 'อาจมีฝนตกประปราย';
 
   @override
-  String get meshtasticUptime => 'Uptime';
+  String get meshtasticUptime => 'เวลาทำงาน';
 
   @override
   String get weatherRankingTempExtremes => 'ค่าสุดขั้วอุณหภูมิ';
@@ -99,7 +99,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTerrainReliefHint => 'แสดงความนูนของภูมิประเทศบนแผนที่ฐาน';
 
   @override
-  String get meshtasticEmptyMessage => '(empty message)';
+  String get meshtasticEmptyMessage => '(ข้อความว่าง)';
 
   @override
   String get moreSectionRegion => 'พื้นที่';
@@ -111,7 +111,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get aedHoursSaturday => 'เวลาวันเสาร์';
 
   @override
-  String get moonPhaseNew => 'New moon';
+  String get moonPhaseNew => 'พระจันทร์ใหม่';
 
   @override
   String get notifySectionEew => 'การเตือนแผ่นดินไหวล่วงหน้า';
@@ -126,7 +126,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTownLabelsHint => 'แสดงชื่อตำบลเมื่อขยายแผนที่';
 
   @override
-  String get commonCancel => 'Cancel';
+  String get commonCancel => 'ยกเลิก';
 
   @override
   String get notifyOptTsunamiWarning => 'เฉพาะการเตือนภัยสึนามิ';
@@ -166,7 +166,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerStyleJmaTooltip =>
-      'Grayscale base, tinted below −40 °C to highlight cloud-top height';
+      'ฐานเป็น grayscale แต่งสีต่ำกว่า −40 °C เพื่อเน้นความสูงยอดเมฆ';
 
   @override
   String get mapLayerRain => 'ปริมาณฝน';
@@ -220,7 +220,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get meshtasticExcludeMqttSubtitle =>
-      'Nodes bridged over the internet, not heard by radio';
+      'โหนดที่เชื่อมผ่านอินเทอร์เน็ต ไม่ได้ยินผ่านวิทยุ';
 
   @override
   String get reportFilterIntensityInfoTitle => 'มาตรวัดความรุนแรงแบบใหม่/เก่า';
@@ -232,14 +232,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get radarOverlayMenuTooltip => 'ตัวเลือกชั้นเรดาร์';
 
   @override
-  String get meshtasticNodes => 'Nodes';
+  String get meshtasticNodes => 'โหนด';
 
   @override
-  String get meshtasticSend => 'Send';
+  String get meshtasticSend => 'ส่ง';
 
   @override
   String get typhoonOverlayStormL7Tooltip =>
-      'Level-7 wind field + average circle (purple)';
+      'สนามลมระดับ 7 + รัศมีเฉลี่ย (ม่วง)';
 
   @override
   String get aedType => 'ประเภท';
@@ -291,7 +291,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get skyTimeDusk => 'สนธยา';
 
   @override
-  String get meshtasticFirmware => 'Firmware';
+  String get meshtasticFirmware => 'เฟิร์มแวร์';
 
   @override
   String get reportFilterDateEndNote => 'วันสิ้นสุด: 24:00 ของวันนั้น（ไทเป）';
@@ -300,7 +300,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterSortMagnitude => 'ขนาด';
 
   @override
-  String get meshtasticSilent => 'Silent';
+  String get meshtasticSilent => 'เงียบ';
 
   @override
   String get mapLayerCategoryEarthquake => 'แผ่นดินไหว';
@@ -334,7 +334,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifyOptTsunamiAll => 'ข่าวสารและการเตือนภัยสึนามิ';
 
   @override
-  String get meshtasticLayerOptions => 'Node options';
+  String get meshtasticLayerOptions => 'ตัวเลือกโหนด';
 
   @override
   String get onboardingAgreeContinue => 'ยอมรับและดำเนินการต่อ';
@@ -343,7 +343,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get commonRetry => 'ลองอีกครั้ง';
 
   @override
-  String get meshtasticNodeId => 'Node ID';
+  String get meshtasticNodeId => 'รหัสโหนด';
 
   @override
   String reportDetailNumbered(String number) {
@@ -351,7 +351,7 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+  String get typhoonOverlayStormBandSubtitle => 'พร้อมรัศมีเฉลี่ย';
 
   @override
   String get disasterMapOverlayRestroomTooltip => 'แสดงห้องน้ำสาธารณะ';
@@ -378,13 +378,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get sponsorRestore => 'กู้คืนการซื้อ';
 
   @override
-  String get meshtasticChannelWorking => 'Setting up the DPIP channel…';
+  String get meshtasticChannelWorking => 'กำลังตั้งค่าช่อง DPIP…';
 
   @override
-  String get meshtasticRegionSwitch => 'Switch to TW';
+  String get meshtasticRegionSwitch => 'สลับเป็นภูมิภาค TW';
 
   @override
-  String get meshtasticTraffic => 'Traffic';
+  String get meshtasticTraffic => 'ปริมาณข้อมูล';
 
   @override
   String get mapLayerStyleBdTooltip =>
@@ -398,10 +398,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentNight =>
-      'Night = transparent, the basemap shows';
+      'กลางคืน = โปร่งใส เห็นแผนที่ฐาน';
 
   @override
-  String get meshtasticScanning => 'Scanning…';
+  String get meshtasticScanning => 'กำลังสแกน…';
 
   @override
   String regionSelectFull(int max) {
@@ -473,7 +473,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get navMore => 'เพิ่มเติม';
 
   @override
-  String get meshtasticDpipChannel => 'DPIP channel';
+  String get meshtasticDpipChannel => 'ช่อง DPIP';
 
   @override
   String get disasterMapOverlaySectionLayers => 'ชั้น';
@@ -485,7 +485,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get typhoonLabelNe => 'NE';
 
   @override
-  String get meshtasticCopied => 'Message copied';
+  String get meshtasticCopied => 'คัดลอกข้อความแล้ว';
 
   @override
   String get reportListEmpty => 'ไม่มีรายงานแผ่นดินไหว';
@@ -497,19 +497,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteTruecolor => 'Himawari True Color';
 
   @override
-  String get typhoonOverlaySectionExtra => 'Overlays';
+  String get typhoonOverlaySectionExtra => 'เลเยอร์เสริม';
 
   @override
   String get eewSWave => 'คลื่น S';
 
   @override
-  String get meshtasticBusyTitle => 'Another app is using this radio';
+  String get meshtasticBusyTitle => 'แอปอื่นกำลังใช้วิทยุเครื่องนี้อยู่';
 
   @override
   String get restroomCategoryCultural => 'สถานที่ทางวัฒนธรรม';
 
   @override
-  String get typhoonLabelWind => 'Max. sustained wind near centre';
+  String get typhoonLabelWind => 'ลมแรงสุดต่อเนื่องใกล้ศูนย์กลาง';
 
   @override
   String get radarGlobalOutlineHint => 'กรอบนอกของทุกประเทศ';
@@ -521,7 +521,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get typhoonLegendCircle15 => 'วงพายุ (แรง)';
 
   @override
-  String get dataSectionAstronomy => 'Astronomy';
+  String get dataSectionAstronomy => 'ดาราศาสตร์';
 
   @override
   String get homeRainTrendLightSustained =>
@@ -531,10 +531,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get commonError => 'เกิดข้อผิดพลาด';
 
   @override
-  String get moonPhaseWaningCrescent => 'Waning crescent';
+  String get moonPhaseWaningCrescent => 'จันทร์เสี้ยวข้างแรม';
 
   @override
-  String get meshtasticPower => 'Power';
+  String get meshtasticPower => 'พลังงาน';
 
   @override
   String get mapTimelineNow => 'ตอนนี้';
@@ -562,7 +562,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifyTitle => 'การแจ้งเตือน';
 
   @override
-  String get meshtasticTxPower => 'TX power';
+  String get meshtasticTxPower => 'กำลัง TX';
 
   @override
   String get restroomCategoryLabel => 'หมวดหมู่';
@@ -575,7 +575,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'DPIP มุ่งมั่นให้ข้อมูลการป้องกันภัยพิบัติแบบเรียลไทม์ โดยไม่มีโฆษณาหรือรูปแบบหารายได้อื่น การสนับสนุนของคุณช่วยให้เรารักษาเซิร์ฟเวอร์และพัฒนาต่อไปได้';
 
   @override
-  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+  String get typhoonLabelStormAvg => 'รัศมีเฉลี่ยลมโบฟอร์ต 10';
 
   @override
   String get restroomCategoryCommercial => 'สถานประกอบการพาณิชย์';
@@ -609,10 +609,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get restroomTypeUnspecified => 'ไม่ระบุ';
 
   @override
-  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+  String get typhoonOverlayProbabilityHint => 'ซ่อนกรวยคาดการณ์';
 
   @override
-  String get mapLayerSatelliteGlobalOutline => 'Country border';
+  String get mapLayerSatelliteGlobalOutline => 'เส้นขอบประเทศ';
 
   @override
   String get mapNavTemperature => 'อุณหภูมิ';
@@ -647,7 +647,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get typhoonOverlayWeatherRadarTooltip =>
-      'Radar echo closest to the typhoon bulletin time';
+      'เรดาร์สะท้อนที่ใกล้เวลารายงานพายุไต้ฝุ่นที่สุด';
 
   @override
   String get onboardingPermLocationDesc => 'ส่งการเตือนภัยตามตำแหน่งที่คุณอยู่';
@@ -659,13 +659,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeActiveEventsEmpty => 'ไม่มีเหตุการณ์ที่ยังมีผล';
 
   @override
-  String get typhoonLabelPosition => 'Centre location';
+  String get typhoonLabelPosition => 'ตำแหน่งศูนย์กลาง';
 
   @override
   String get weatherRankingBy => 'เรียง';
 
   @override
-  String get typhoonIntensityMild => 'Mild typhoon';
+  String get typhoonIntensityMild => 'พายุไต้ฝุ่นอ่อน';
 
   @override
   String get windForecastGlobalOutlineHint => 'กรอบนอกของทุกประเทศ';
@@ -683,10 +683,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get restroomCategoryReligious => 'สถานที่ทางศาสนา';
 
   @override
-  String get meshtasticRole => 'Role';
+  String get meshtasticRole => 'บทบาท';
 
   @override
-  String get mapLayerSatelliteCloudCloudy => 'Cloudy';
+  String get mapLayerSatelliteCloudCloudy => 'มีเมฆ';
 
   @override
   String get skyTimeSunrise => 'พระอาทิตย์ขึ้น';
@@ -695,7 +695,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticJumpToLatest => 'ไปที่ล่าสุด';
 
   @override
-  String get meshtasticNoMessages => 'No messages yet';
+  String get meshtasticNoMessages => 'ยังไม่มีข้อความ';
 
   @override
   String get onboardingPermNotifyDesc =>
@@ -705,7 +705,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get radarTownOutline => 'เส้นแบ่งเขตอำเภอ';
 
   @override
-  String get mapLayerStyleSection => 'Colour style';
+  String get mapLayerStyleSection => 'สไตล์สี';
 
   @override
   String get disasterMapOverlayMenuTooltip => 'ชั้นแผนที่ป้องกันภัย';
@@ -714,7 +714,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreGooglePlay => 'Google Play';
 
   @override
-  String get meshtasticOnline => 'Heard recently';
+  String get meshtasticOnline => 'เพิ่งได้ยิน';
 
   @override
   String get typhoonLabelSw => 'SW';
@@ -729,7 +729,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentClear =>
-      'Clear sky = transparent, the basemap shows';
+      'ท้องฟ้าใส = โปร่งใส เห็นแผนที่ฐาน';
 
   @override
   String get mapOverlaySectionReference => 'เลเยอร์อ้างอิง';
@@ -763,7 +763,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get eewArrived => 'มาถึงแล้ว';
 
   @override
-  String get meshtasticNoDevices => 'No Meshtastic devices found';
+  String get meshtasticNoDevices => 'ไม่พบอุปกรณ์ Meshtastic';
 
   @override
   String get mapLayerCategoryLife => 'ชีวิตประจำวัน';
@@ -772,10 +772,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterSortIntensity => 'ความเข้ม';
 
   @override
-  String get meshtasticStateDisconnected => 'Disconnected';
+  String get meshtasticStateDisconnected => 'ตัดการเชื่อมต่อแล้ว';
 
   @override
-  String get typhoonIntensityIntense => 'Intense typhoon';
+  String get typhoonIntensityIntense => 'พายุไต้ฝุ่นรุนแรง';
 
   @override
   String get mapLayerOrderTitle => 'จัดเรียงเลเยอร์';
@@ -784,7 +784,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get dpmYes => 'ใช่';
 
   @override
-  String get meshtasticNoHistory => 'Not enough history yet';
+  String get meshtasticNoHistory => 'ประวัติยังไม่พอ';
 
   @override
   String get reportDetailLocalIntensityUnavailable => 'ไม่มีข้อมูลความเข้ม';
@@ -811,10 +811,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteMndwi => 'Himawari MNDWI';
 
   @override
-  String get typhoonOverlaySectionStorm => 'Storm wind';
+  String get typhoonOverlaySectionStorm => 'ลมพายุ';
 
   @override
-  String get moonPhaseFull => 'Full moon';
+  String get moonPhaseFull => 'พระจันทร์เต็มดวง';
 
   @override
   String meshtasticBinaryPayload(String size) {
@@ -822,14 +822,14 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get moonPhaseWaningGibbous => 'Waning gibbous';
+  String get moonPhaseWaningGibbous => 'จันทร์นูนข้างแรม';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'แบบใหม่ (ตั้งแต่ 2020)';
 
   @override
   String typhoonDataTime(String time) {
-    return 'Data time\n$time';
+    return 'เวลาข้อมูล\n$time';
   }
 
   @override
@@ -839,7 +839,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreSectionAbout => 'เกี่ยวกับ';
 
   @override
-  String get meshtasticSelectDevice => 'Select a radio';
+  String get meshtasticSelectDevice => 'เลือกวิทยุ';
 
   @override
   String get onboardingIntroBody =>
@@ -852,19 +852,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportDetailImage => 'ภาพรายงานแผ่นดินไหว';
 
   @override
-  String get meshtasticStateConfiguring => 'Configuring…';
+  String get meshtasticStateConfiguring => 'กำลังกำหนดค่า…';
 
   @override
-  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+  String get typhoonLabelGaleAvg => 'รัศมีเฉลี่ยลมโบฟอร์ต 7';
 
   @override
   String get onboardingPermNotify => 'การแจ้งเตือน';
 
   @override
-  String get meshtasticClearMessages => 'Clear messages';
+  String get meshtasticClearMessages => 'ล้างข้อความ';
 
   @override
-  String get meshtasticNotifyMessages => 'Notify on new messages';
+  String get meshtasticNotifyMessages => 'แจ้งเตือนข้อความใหม่';
 
   @override
   String get defaultMapLayerSettings => 'ชั้นแผนที่เริ่มต้น';
@@ -942,7 +942,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTimelineFuture => 'อนาคต';
 
   @override
-  String get typhoonLegendCircleAvg => 'Average circle';
+  String get typhoonLegendCircleAvg => 'รัศมีเฉลี่ย';
 
   @override
   String reportFilterDepthKm(String depth) {
@@ -961,7 +961,7 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get typhoonLabelGust => 'Peak gust';
+  String get typhoonLabelGust => 'ลมกระโชกสูงสุด';
 
   @override
   String get mapAppGoogleMaps => 'Google Maps';
@@ -979,7 +979,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get skyTimeGolden => 'ช่วงเวลาทอง';
 
   @override
-  String get moonAge => 'Age';
+  String get moonAge => 'อายุจันทร์';
 
   @override
   String get meshtasticRadioSettings => 'LoRa';
@@ -994,7 +994,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override
-  String get meshtasticHardware => 'Hardware';
+  String get meshtasticHardware => 'ฮาร์ดแวร์';
 
   @override
   String get languageSettings => 'ภาษา';
@@ -1008,7 +1008,7 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+  String get typhoonOverlayWeatherHint => 'จัดให้ตรงเวลารายงาน';
 
   @override
   String get skyTimeDawn => 'รุ่งอรุณ';
@@ -1017,7 +1017,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get skyTimeAfternoon => 'ตอนบ่าย';
 
   @override
-  String get meshtasticLastHeard => 'Last heard';
+  String get meshtasticLastHeard => 'ได้ยินล่าสุด';
 
   @override
   String get typhoonWarningTitle => 'ประกาศเตือนไต้ฝุ่น';
@@ -1068,10 +1068,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get typhoonOverlayStormL10Tooltip =>
-      'Level-10 wind field + average circle (yellow)';
+      'สนามลมระดับ 10 + รัศมีเฉลี่ย (เหลือง)';
 
   @override
-  String get moonPhaseWaxingGibbous => 'Waxing gibbous';
+  String get moonPhaseWaxingGibbous => 'จันทร์นูนข้างขึ้น';
 
   @override
   String get reportDetailTitle => 'รายงานแผ่นดินไหว';
@@ -1085,10 +1085,10 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get meshtasticNoNodes => 'No nodes heard yet';
+  String get meshtasticNoNodes => 'ยังไม่พบโหนด';
 
   @override
-  String get meshtasticViaMqtt => 'Via MQTT (internet)';
+  String get meshtasticViaMqtt => 'ผ่าน MQTT (อินเทอร์เน็ต)';
 
   @override
   String get radarCountyOutline => 'เส้นแบ่งเขตจังหวัด';
@@ -1106,11 +1106,11 @@ class AppLocalizationsTh extends AppLocalizations {
   String get changelogCurrentVersion => 'ปัจจุบัน';
 
   @override
-  String get typhoonLabelPressure => 'Central pressure';
+  String get typhoonLabelPressure => 'ความกดอากาศศูนย์กลาง';
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
-      'Show forecast-point detail cards when zoomed in';
+      'แสดงการ์ดรายละเอียดจุดคาดการณ์เมื่อซูมเข้า';
 
   @override
   String get aedOpenRemark => 'หมายเหตุเวลาเปิด';
@@ -1120,7 +1120,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'เพื่อให้ DPIP แจ้งเตือนคุณได้ในทันทีที่เกิดภัยพิบัติ โปรดอนุญาตสิทธิ์ต่อไปนี้ คุณสามารถเปลี่ยนแปลงได้ทุกเมื่อในการตั้งค่าระบบ';
 
   @override
-  String get typhoonOverlaySectionWeather => 'Weather underlay';
+  String get typhoonOverlaySectionWeather => 'พื้นหลังสภาพอากาศ';
 
   @override
   String get notifyOptWeatherLocal => 'เฉพาะตำแหน่งปัจจุบัน';
@@ -1129,7 +1129,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapNavRain => 'ฝน';
 
   @override
-  String get moonDays => 'days';
+  String get moonDays => 'วัน';
 
   @override
   String mapLegendUnit(String unit) {
@@ -1140,7 +1140,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherModeClear => 'ท้องฟ้าแจ่มใส';
 
   @override
-  String get meshtasticRadio => 'Radio';
+  String get meshtasticRadio => 'วิทยุ';
 
   @override
   String get commonEmpty => 'ไม่มีข้อมูล';
@@ -1149,10 +1149,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteB01 => 'Himawari Blue (B01)';
 
   @override
-  String get meshtasticExternalPower => 'External power';
+  String get meshtasticExternalPower => 'พลังงานภายนอก';
 
   @override
-  String get moonPhaseLastQuarter => 'Last quarter';
+  String get moonPhaseLastQuarter => 'จันทร์กึ่งดวงข้างแรม';
 
   @override
   String get reportFilterOrderAsc => 'น้อย→มาก';
@@ -1179,19 +1179,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get restroomGradeExcellent => 'ดีเยี่ยม';
 
   @override
-  String get meshtasticLastSent => 'Last sent';
+  String get meshtasticLastSent => 'ส่งล่าสุด';
 
   @override
-  String get meshtasticName => 'Name';
+  String get meshtasticName => 'ชื่อ';
 
   @override
-  String get meshtasticScan => 'Scan';
+  String get meshtasticScan => 'สแกน';
 
   @override
   String get mapLayerCategoryForecast => 'การพยากรณ์เชิงตัวเลข';
 
   @override
-  String get meshtasticChannelFailed => 'Couldn\'t set up the DPIP channel';
+  String get meshtasticChannelFailed => 'ตั้งค่าช่อง DPIP ไม่สำเร็จ';
 
   @override
   String get themeSystem => 'ระบบ';
@@ -1211,7 +1211,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherPrecipitation => 'ปริมาณน้ำฝน';
 
   @override
-  String get moonNextFullMoon => 'Next full moon';
+  String get moonNextFullMoon => 'พระจันทร์เต็มดวงครั้งถัดไป';
 
   @override
   String get dpmSheetEmpty => 'แตะเครื่องหมายบนแผนที่เพื่อดูรายละเอียด';
@@ -1240,7 +1240,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get typhoonLabelNw => 'NW';
 
   @override
-  String get moonPhaseWaxingCrescent => 'Waxing crescent';
+  String get moonPhaseWaxingCrescent => 'จันทร์เสี้ยวข้างขึ้น';
 
   @override
   String get restroomCategoryLeisure => 'สถานที่พักผ่อนหย่อนใจ';
@@ -1252,23 +1252,22 @@ class AppLocalizationsTh extends AppLocalizations {
   String get aedCategory => 'หมวดหมู่';
 
   @override
-  String get meshtasticChannels => 'Channels';
+  String get meshtasticChannels => 'ช่อง';
 
   @override
   String get monitorWaiting => 'กำลังรอข้อมูล…';
 
   @override
-  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+  String get typhoonOverlayForecastCallouts => 'คำอธิบายจุดคาดการณ์';
 
   @override
   String get reportDetailEpicenter => 'พิกัดศูนย์กลาง';
 
   @override
-  String get meshtasticVoltage => 'Voltage';
+  String get meshtasticVoltage => 'แรงดันไฟฟ้า';
 
   @override
-  String get mapLayerMeshtasticSubtitle =>
-      'LoRa mesh nodes heard by your radio';
+  String get mapLayerMeshtasticSubtitle => 'โหนดเมช LoRa ที่วิทยุได้ยิน';
 
   @override
   String get mapLayerWind => 'ลม';
@@ -1306,7 +1305,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentZero =>
-      'Zero difference = transparent (no signal)';
+      'ค่าต่างเป็นศูนย์ = โปร่งใส (ไม่มีสัญญาณ)';
 
   @override
   String get shelterIndoorLabel => 'การอพยพในอาคาร';
@@ -1318,7 +1317,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterSortTime => 'เวลา';
 
   @override
-  String get mapLayerSatelliteCloudProbablyClear => 'Probably clear';
+  String get mapLayerSatelliteCloudProbablyClear => 'น่าจะปลอดโปร่ง';
 
   @override
   String get weatherModeThunderstorm => 'พายุฝนฟ้าคะนอง';
@@ -1330,7 +1329,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportFilterIntensityInfoLegacyTitle => 'แบบเก่า (ก่อน 2020)';
 
   @override
-  String get typhoonLabelSpeed => 'Past movement speed';
+  String get typhoonLabelSpeed => 'ความเร็วเคลื่อนที่';
 
   @override
   String mapAppOpenFailed(String app) {
@@ -1338,10 +1337,10 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get mapLayerSatelliteRgbComposite => 'RGB composite (JMA recipe)';
+  String get mapLayerSatelliteRgbComposite => 'RGB composite (สูตร JMA)';
 
   @override
-  String get meshtasticReceived => 'Received';
+  String get meshtasticReceived => 'รับแล้ว';
 
   @override
   String get weatherRankingExtremeLow => 'ต่ำสุดวันนี้';
@@ -1350,7 +1349,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteB10 => 'Himawari Lower Water Vapour (B10)';
 
   @override
-  String get mapLayerSatelliteCloudProbablyCloudy => 'Probably cloudy';
+  String get mapLayerSatelliteCloudProbablyCloudy => 'น่าจะมีเมฆ';
 
   @override
   String get mapLayerSatelliteTransparentNoWater =>
@@ -1360,10 +1359,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get shelterCategoryLabel => 'ประเภทภัยพิบัติ';
 
   @override
-  String get meshtasticStateConnecting => 'Connecting…';
+  String get meshtasticStateConnecting => 'กำลังเชื่อมต่อ…';
 
   @override
-  String get moonTitle => 'Moon';
+  String get moonTitle => 'ดวงจันทร์';
 
   @override
   String get weatherRankingGust => 'ลมกระโชก';
@@ -1378,7 +1377,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifySectionWeather => 'สภาพอากาศ';
 
   @override
-  String get meshtasticPreset => 'Modem preset';
+  String get meshtasticPreset => 'โหมดโมเด็ม';
 
   @override
   String get dataSectionSeismic => 'แผ่นดินไหว';
@@ -1405,13 +1404,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get regionCurrent => 'ตำแหน่งปัจจุบัน';
 
   @override
-  String get meshtasticNotConnected => 'Not connected to a radio';
+  String get meshtasticNotConnected => 'ยังไม่ได้เชื่อมต่อกับวิทยุ';
 
   @override
   String get weatherModeSnow => 'หิมะตก';
 
   @override
-  String get mapLayerMeshtastic => 'Meshtastic nodes';
+  String get mapLayerMeshtastic => 'โหนด Meshtastic';
 
   @override
   String get moreDeveloper => 'ข้อมูลดีบัก';
@@ -1420,7 +1419,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteB14 => 'Himawari Longwave Infrared (B14)';
 
   @override
-  String get meshtasticChannelUse => 'Channel use';
+  String get meshtasticChannelUse => 'การใช้ช่อง';
 
   @override
   String get mapNavLightning => 'ฟ้าผ่า';
@@ -1444,7 +1443,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get dpmOpenInMaps => 'เปิดในแผนที่';
 
   @override
-  String get meshtasticNotifyNodes => 'Notify on new nodes';
+  String get meshtasticNotifyNodes => 'แจ้งเตือนโหนดใหม่';
 
   @override
   String get onboardingPermCriticalDesc =>
@@ -1452,10 +1451,10 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentWarm =>
-      'Clear sky (warm end) = transparent, the basemap shows';
+      'ท้องฟ้าใส (ปลายอุ่น) = โปร่งใส เห็นแผนที่ฐาน';
 
   @override
-  String get meshtasticSent => 'Sent';
+  String get meshtasticSent => 'ส่งแล้ว';
 
   @override
   String get homeForecastTitle => 'พยากรณ์ 24 ชั่วโมง';
@@ -1465,7 +1464,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String meshtasticExcludeMqttHidden(int count) {
-    return '$count hidden';
+    return 'ซ่อน $count รายการ';
   }
 
   @override
@@ -1481,13 +1480,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportListToday => 'วันนี้';
 
   @override
-  String get meshtasticTapNode => 'Tap a node for details';
+  String get meshtasticTapNode => 'แตะโหนดเพื่อดูรายละเอียด';
 
   @override
   String get commonLoading => 'กำลังโหลด…';
 
   @override
-  String get typhoonIntensityModerate => 'Moderate typhoon';
+  String get typhoonIntensityModerate => 'พายุไต้ฝุ่นปานกลาง';
 
   @override
   String get mapLayerSatelliteAsh => 'Himawari Ash';
@@ -1499,14 +1498,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerCategorySatellite => 'ดาวเทียม';
 
   @override
-  String get meshtasticChannelReady => 'DPIP channel ready';
+  String get meshtasticChannelReady => 'ช่อง DPIP พร้อมแล้ว';
 
   @override
   String get mapLayerSatelliteNightmicrophysics =>
       'Himawari Night Microphysics';
 
   @override
-  String get typhoonIntensityTd => 'Tropical depression';
+  String get typhoonIntensityTd => 'ดีเปรสชันเขตร้อน';
 
   @override
   String get reportFilterDate => 'วันที่';
@@ -1581,7 +1580,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteBtdSo2 => 'Himawari SO₂ / Cloud Phase';
 
   @override
-  String get meshtasticStateError => 'Error';
+  String get meshtasticStateError => 'ข้อผิดพลาด';
 
   @override
   String get weatherModeOvercast => 'ฟ้าปิด';
@@ -1591,7 +1590,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get typhoonOverlayWarningTooltip =>
-      'Highlight counties under a typhoon warning';
+      'ไฮไลต์จังหวัดที่อยู่ใต้คำเตือนพายุไต้ฝุ่น';
 
   @override
   String get reportFilterDatePick => 'เลือกวันที่';
@@ -1606,13 +1605,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get shelterOutdoorLabel => 'การอพยพกลางแจ้ง';
 
   @override
-  String get meshtasticStateConnected => 'Connected';
+  String get meshtasticStateConnected => 'เชื่อมต่อแล้ว';
 
   @override
   String get mapNavRadar => 'เรดาร์';
 
   @override
-  String get mapLayerSatelliteCloudClear => 'Clear';
+  String get mapLayerSatelliteCloudClear => 'ปลอดโปร่ง';
 
   @override
   String eewSummary(String magnitude, String depth) {
@@ -1625,7 +1624,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get typhoonOverlayWeatherNoneTooltip =>
-      'No radar or infrared underlay';
+      'ไม่มีพื้นหลังเรดาร์หรืออินฟราเรด';
 
   @override
   String get radarCountyOutlineHint => 'วาดทับภาพเอคโค';
@@ -1637,13 +1636,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get homeRainTrendTitle => 'ฝนชั่วโมงถัดไป';
 
   @override
-  String get moonPhaseFirstQuarter => 'First quarter';
+  String get moonPhaseFirstQuarter => 'จันทร์กึ่งดวงข้างขึ้น';
 
   @override
   String get mapLayerCategoryTyphoon => 'พายุไต้ฝุ่น';
 
   @override
-  String get meshtasticUtilization => 'Airtime (24h)';
+  String get meshtasticUtilization => 'เวลาออกอากาศ (24 ชม.)';
 
   @override
   String get restroomTypeMixed => 'ห้องน้ำรวม';
@@ -1661,7 +1660,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteBtdWvirw => 'Himawari Overshooting Top';
 
   @override
-  String get meshtasticReadingAge => 'Reading taken';
+  String get meshtasticReadingAge => 'เวลาวัดค่า';
 
   @override
   String get mapAppCallFailed => 'อุปกรณ์นี้ไม่สามารถโทรออกได้';
@@ -1682,7 +1681,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportDetailLocalFelt => 'แผ่นดินไหวรู้สึกได้เฉพาะพื้นที่';
 
   @override
-  String get meshtasticDevice => 'Device';
+  String get meshtasticDevice => 'อุปกรณ์';
 
   @override
   String get onboardingGrant => 'อนุญาต';
@@ -1730,7 +1729,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportListEmptyFiltered => 'ไม่มีรายงานที่ตรงกับเงื่อนไข';
 
   @override
-  String get meshtasticExcludeMqtt => 'Hide MQTT nodes';
+  String get meshtasticExcludeMqtt => 'ซ่อนโหนด MQTT';
 
   @override
   String get mapNavTyphoon => 'ไต้ฝุ่น';
@@ -1768,13 +1767,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get navHome => 'หน้าแรก';
 
   @override
-  String get meshtasticRegionLabel => 'Region';
+  String get meshtasticRegionLabel => 'ภูมิภาค';
 
   @override
   String get mapLayerSatelliteCloudtop => 'Himawari Cloud Top Temperature';
 
   @override
-  String get moonTimelineCaption => 'Phase';
+  String get moonTimelineCaption => 'ข้างขึ้นข้างแรม';
 
   @override
   String get openSourceLicenses => 'ใบอนุญาตโอเพนซอร์ส';
@@ -1794,7 +1793,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get radarScanRange => 'แสดงขอบเขตการสแกน';
 
   @override
-  String get meshtasticHopLimit => 'Hop limit';
+  String get meshtasticHopLimit => 'จำนวนฮอปสูงสุด';
 
   @override
   String get weatherRankingExtremeHigh => 'สูงสุดวันนี้';
@@ -1809,7 +1808,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteNaturalcolor => 'Himawari Natural Color';
 
   @override
-  String get meshtasticAirtime => 'Air time (TX)';
+  String get meshtasticAirtime => 'เวลาออกอากาศ (TX)';
 
   @override
   String shelterCapacityValue(int n) {
@@ -1822,7 +1821,7 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get meshtasticSendHint => 'Message to broadcast';
+  String get meshtasticSendHint => 'ข้อความที่จะส่ง';
 
   @override
   String monitorDelay(String value) {
@@ -1836,7 +1835,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteB08 => 'Himawari Upper Water Vapour (B08)';
 
   @override
-  String get meshtasticReconnecting => 'Reconnecting…';
+  String get meshtasticReconnecting => 'กำลังเชื่อมต่อใหม่…';
 
   @override
   String get radarTownOutlineSubtitle =>
@@ -1844,14 +1843,14 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get typhoonOverlayWeatherSatelliteTooltip =>
-      'Infrared closest to the typhoon bulletin time';
+      'อินฟราเรดที่ใกล้เวลารายงานพายุไต้ฝุ่นที่สุด';
 
   @override
   String get radarScanRangeHint => 'นอกกรอบคือไม่ได้ตรวจวัด';
 
   @override
   String typhoonPickerTd(String no) {
-    return 'Tropical depression TD $no';
+    return 'ดีเปรสชันเขตร้อน TD $no';
   }
 
   @override
@@ -1874,7 +1873,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'บริการระบุตำแหน่งถูกปิด — ไม่สามารถส่งการเตือนภัยเฉพาะพื้นที่ของคุณได้';
 
   @override
-  String get mapLayerStyleTooltip => 'Colour style';
+  String get mapLayerStyleTooltip => 'สไตล์สี';
 
   @override
   String lightningLegendCg(int minutes) {
@@ -2001,49 +2000,49 @@ class AppLocalizationsTh extends AppLocalizations {
   String get endpointServiceRts => 'RTS';
 
   @override
-  String get endpointServiceRadar => 'Radar';
+  String get endpointServiceRadar => 'เรดาร์';
 
   @override
-  String get endpointServiceSatellite => 'Satellite';
+  String get endpointServiceSatellite => 'ดาวเทียม';
 
   @override
   String get endpointServiceQpesums => 'QPE';
 
   @override
-  String get endpointServiceWind => 'Wind';
+  String get endpointServiceWind => 'ลม';
 
   @override
-  String get endpointServiceDpm => 'Disaster points';
+  String get endpointServiceDpm => 'จุดภัยพิบัติ';
 
   @override
-  String get endpointServiceWeather => 'Weather';
+  String get endpointServiceWeather => 'สภาพอากาศ';
 
   @override
-  String get endpointServiceRain => 'Rain';
+  String get endpointServiceRain => 'ฝน';
 
   @override
-  String get endpointServiceLightning => 'Lightning';
+  String get endpointServiceLightning => 'ฟ้าผ่า';
 
   @override
-  String get endpointServiceTyphoon => 'Typhoon';
+  String get endpointServiceTyphoon => 'พายุไต้ฝุ่น';
 
   @override
-  String get endpointServiceReport => 'EQ reports';
+  String get endpointServiceReport => 'รายงานแผ่นดินไหว';
 
   @override
-  String get endpointServiceTremStation => 'Tremor station';
+  String get endpointServiceTremStation => 'สถานีวัดแรงสั่นสะเทือน';
 
   @override
-  String get endpointServiceEvent => 'Events';
+  String get endpointServiceEvent => 'เหตุการณ์';
 
   @override
-  String get endpointServiceLocation => 'Location';
+  String get endpointServiceLocation => 'ตำแหน่ง';
 
   @override
-  String get endpointServiceNotify => 'Notifications';
+  String get endpointServiceNotify => 'การแจ้งเตือน';
 
   @override
-  String get endpointServiceOther => 'Other';
+  String get endpointServiceOther => 'อื่น ๆ';
 
   @override
   String get feedConnecting => 'กำลังเชื่อมต่อ…';
@@ -2067,17 +2066,16 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get meshtasticBusyBody =>
-      'Disconnect it in the other Meshtastic app first. Two apps on one radio take each other\'s messages, so some will go missing.';
+      'ตัดการเชื่อมต่อวิทยุในแอป Meshtastic อื่นก่อน วิทยุเครื่องเดียวที่ใช้สองแอปจะแย่งข้อความกัน บางข้อความอาจหายไป';
 
   @override
-  String get meshtasticChannelNoSlot =>
-      'No free channel slot — free one on the radio';
+  String get meshtasticChannelNoSlot => 'ไม่มีช่องว่าง — ปล่อยช่องหนึ่งบนวิทยุ';
 
   @override
   String get restroomCategoryTransport => 'การคมนาคม';
 
   @override
-  String get meshtasticBattery => 'Battery';
+  String get meshtasticBattery => 'แบตเตอรี่';
 
   @override
   String get meshtasticDistance => 'ระยะทาง';
@@ -2089,14 +2087,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticBatteryTrend => 'แนวโน้มแบตเตอรี่';
 
   @override
-  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+  String get typhoonOverlayMenuTooltip => 'ตัวเลือกเลเยอร์พายุไต้ฝุ่น';
 
   @override
   String get mapLayerSatelliteBtdOzone => 'Himawari Tropopause';
 
   @override
   String meshtasticRegionMismatch(String region) {
-    return 'Radio region is $region — DPIP needs TW';
+    return 'ภูมิภาคของวิทยุคือ $region — DPIP ต้องการ TW';
   }
 
   @override
@@ -2114,7 +2112,7 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String get mapLayerStyleGrayTooltip => 'JMA grayscale — colder is whiter';
+  String get mapLayerStyleGrayTooltip => 'JMA grayscale — ยิ่งเย็นยิ่งขาว';
 
   @override
   String get moreAnnouncements => 'ประกาศ';
@@ -2179,16 +2177,16 @@ class AppLocalizationsTh extends AppLocalizations {
       'ระดับ 0–4, 5−, 5+, 6−, 6+, 7 แถบตัวกรองใช้แบบใหม่ เหตุการณ์เก่าในรายการยังแสดงป้ายแบบเก่า';
 
   @override
-  String get typhoonOverlayWeatherNone => 'None';
+  String get typhoonOverlayWeatherNone => 'ไม่มี';
 
   @override
-  String get mapLayerStyleGray => 'Grayscale (JMA)';
+  String get mapLayerStyleGray => 'ระดับสีเทา (JMA)';
 
   @override
   String get weatherModeAuto => 'อัตโนมัติ';
 
   @override
-  String get typhoonLabelProbCircle => '70% probability circle';
+  String get typhoonLabelProbCircle => 'วงกลมความน่าจะเป็น 70%';
 
   @override
   String get notifyOptAll => 'รับทั้งหมด';
@@ -2200,7 +2198,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override
-  String get typhoonLabelDirection => 'Past movement direction';
+  String get typhoonLabelDirection => 'ทิศทางการเคลื่อนที่';
 
   @override
   String get regionManageTitle => 'พื้นที่ที่ใช้บ่อย';
@@ -2220,13 +2218,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingPermsTitle => 'การอนุญาตสิทธิ์';
 
   @override
-  String get mapLayerStyleJma => 'Cloud-top enhancement (JMA)';
+  String get mapLayerStyleJma => 'การเพิ่มคอนทราสต์กลุ่มเมฆ (JMA)';
 
   @override
   String get rainInterval10m => '10 นาที';
 
   @override
-  String get meshtasticConnectAnyway => 'Connect anyway';
+  String get meshtasticConnectAnyway => 'เชื่อมต่อต่อไป';
 
   @override
   String reportListDayCount(int count) {
@@ -2238,7 +2236,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentReflectance =>
-      'Low reflectance / night = transparent, the basemap shows';
+      'สะท้อนต่ำ / กลางคืน = โปร่งใส เห็นแผนที่ฐาน';
 
   @override
   String chartHourLabel(int hour) {
@@ -2250,7 +2248,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get typhoonOverlayProbabilityTooltip =>
-      'Show strike probability (hides the forecast cone)';
+      'แสดงความน่าจะเป็นถูกพายุโจมตี (ซ่อนกรวยคาดการณ์)';
 
   @override
   String get mapLayerSatelliteNdwi => 'Himawari NDWI';
@@ -2271,7 +2269,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerCategoryRadar => 'เรดาร์';
 
   @override
-  String get meshtasticShortName => 'Short name';
+  String get meshtasticShortName => 'ชื่อสั้น';
 
   @override
   String get mapLayerSatelliteAirmass => 'Himawari Airmass';
@@ -2298,7 +2296,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get meshtasticRegionConfirm =>
-      'Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.';
+      'สลับวิทยุนี้เป็นภูมิภาค TW หรือไม่ วิทยุจะรีสตาร์ทและตัดการเชื่อมต่อชั่วครู่ และทุกช่องอื่นจะย้ายไปด้วย';
 
   @override
   String get dataEarthquakeSubtitle => 'รายงานแผ่นดินไหว';
@@ -2316,70 +2314,111 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingTermsTitle => 'ข้อกำหนดการให้บริการ';
 
   @override
-  String get mapGsiOverlay => 'แผนที่รายละเอียด (GSI)';
+  String get mapOsmOverlay => 'แผนที่แบบละเอียด';
 
   @override
-  String get mapGsiOverlayHint =>
-      'เพิ่มภูมิประเทศความละเอียดสูงจาก GSI ของญี่ปุ่น';
+  String get mapOsmOverlayHint => 'แสดงถนน อาคาร และชื่อสถานที่อย่างละเอียด';
 
   @override
-  String get mapGsiDetails => 'รายละเอียดเลเยอร์';
+  String get mapOsmDetails => 'รายละเอียดเลเยอร์';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => 'แหล่งข้อมูล';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return 'เปิดใช้งาน $enabled จากทั้งหมด $total เลเยอร์';
   }
 
   @override
-  String get mapGsiSurface => 'พื้นผิว';
+  String get mapOsmSurface => 'พื้นผิว';
 
   @override
-  String get mapGsiParks => 'สวนสาธารณะ';
+  String get mapOsmParks => 'สวนสาธารณะ';
 
   @override
-  String get mapGsiLandUse => 'การใช้ที่ดิน';
+  String get mapOsmLandUse => 'การใช้ที่ดิน';
 
   @override
-  String get mapGsiAirportAreas => 'พื้นที่สนามบิน';
+  String get mapOsmAirportAreas => 'พื้นที่สนามบิน';
 
   @override
-  String get mapGsiWater => 'พื้นที่น้ำ';
+  String get mapOsmWater => 'พื้นที่น้ำ';
 
   @override
-  String get mapGsiRivers => 'แม่น้ำ';
+  String get mapOsmRivers => 'แม่น้ำ';
 
   @override
-  String get mapGsiBoundaries => 'ขอบเขต';
+  String get mapOsmBoundaries => 'ขอบเขต';
 
   @override
-  String get mapGsiBuildings => 'อาคาร';
+  String get mapOsmBuildings => 'อาคาร';
 
   @override
-  String get mapGsiRoads => 'ถนน';
+  String get mapOsmRoads => 'ถนน';
 
   @override
-  String get mapGsiRoadNames => 'ชื่อถนน';
+  String get mapOsmRoadNames => 'ชื่อถนน';
 
   @override
-  String get mapGsiWaterNames => 'ชื่อพื้นที่น้ำ';
+  String get mapOsmWaterNames => 'ชื่อพื้นที่น้ำ';
 
   @override
-  String get mapGsiPeaks => 'ยอดเขา';
+  String get mapOsmPeaks => 'ยอดเขา';
 
   @override
-  String get mapGsiAirportNames => 'ชื่อสนามบิน';
+  String get mapOsmAirportNames => 'ชื่อสนามบิน';
 
   @override
-  String get mapGsiPlaceNames => 'ชื่อสถานที่';
+  String get mapOsmPlaceNames => 'ชื่อสถานที่';
 
   @override
-  String get mapGsiPoi => 'จุดน่าสนใจ';
+  String get mapOsmPoi => 'จุดน่าสนใจ';
 
   @override
-  String get mapGsiHouseNumbers => 'เลขที่บ้าน';
+  String get mapOsmHouseNumbers => 'เลขที่บ้าน';
 
   @override
-  String get mapGsiRestoreAll => 'คืนค่าทั้งหมด';
+  String get mapOsmRestoreAll => 'คืนค่าทั้งหมด';
+
+  @override
+  String get mapOsmSectionNatural => 'ลักษณะธรรมชาติ';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => 'ถนนและอาคาร';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => 'ป้ายชื่อและสถานที่';
 
   @override
   String get mapTownLabels => 'ชื่อตำบล';
@@ -2388,10 +2427,10 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifySetFailed => 'ไม่สามารถบันทึกการตั้งค่าได้ โปรดลองอีกครั้ง';
 
   @override
-  String get meshtasticDisconnect => 'Disconnect';
+  String get meshtasticDisconnect => 'ตัดการเชื่อมต่อ';
 
   @override
-  String get meshtasticUndecoded => 'Not decrypted';
+  String get meshtasticUndecoded => 'ไม่ได้ถอดรหัส';
 
   @override
   String get notifyAnnouncement => 'ประกาศ';
@@ -3122,6 +3161,16 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get moreDumpDiagnosticsHint =>
       'อัปโหลดแล้วคัดลอกลิงก์เพื่อแนบในรายงาน';
+
+  @override
+  String get dumpIncludeSensitive => 'รวมตำแหน่งที่แม่นยำ';
+
+  @override
+  String get dumpIncludeSensitiveHint =>
+      'รวมพิกัดจากบันทึกและตำแหน่งเบื้องหลัง หากไม่เลือกจะแทนค่าด้วย null';
+
+  @override
+  String get dumpUpload => 'อัปโหลด';
 
   @override
   String get dumpUploaded => 'อัปโหลดแล้ว';

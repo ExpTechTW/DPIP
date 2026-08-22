@@ -69,6 +69,7 @@ class MapScaffold extends StatefulWidget {
     super.key,
     required this.layers,
     this.initialLayerId,
+    this.initialOsmEnabled = false,
     this.tabIndex,
   }) : assert(layers.length > 0, 'MapScaffold needs at least one layer');
 
@@ -79,6 +80,11 @@ class MapScaffold extends StatefulWidget {
   /// Preferred overlay id (`MapLayer.id`) when the surface mounts. Unknown /
   /// missing → [layers].first.
   final String? initialLayerId;
+
+  /// Whether this surface starts on the detailed OSM base instead of terrain.
+  /// This is an initial preference only; the shared map menu remains in charge
+  /// after mount. The disaster-prevention map page opts in.
+  final bool initialOsmEnabled;
 
   /// Shell tab owning this surface — forwarded to [BaseMap] so the map pauses
   /// its native render loop while the tab is hidden. `null` never pauses.
@@ -183,25 +189,24 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   final ValueNotifier<bool> _showTownLabels = ValueNotifier(true);
 
   /// Whether the base map's terrain-relief (hillshade) is shown. Also a
-  /// base-map property, so it lives beside [_showTownLabels]. Defaults on —
-  /// the relief is the terrain feature's whole point.
+  /// base-map property, so it lives beside [_showTownLabels]. It normally
+  /// starts on; the disaster-prevention surface starts on OSM instead.
   final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
 
   /// Optional Taiwan street/building detail drawn over the ordinary base map.
-  /// Unlike terrain, this source is absent by default so it performs no native
-  /// tile work until the user enables it.
-  final GsiOverlayController _gsi = GsiOverlayController();
+  /// It is absent by default except on an OSM-first surface such as the
+  /// disaster-prevention map.
+  late final GsiOverlayController _gsi;
 
   /// Whether the terrain source + hillshade layer are actually on the map.
   ///
   /// This mirrors the native state so the toggle can add/remove instead of
-  /// flipping visibility (see [_syncTerrain]). A style reload re-bakes both,
-  /// so [_onStyleLoaded] sets it back to true and re-syncs.
+  /// flipping visibility (see [_syncBasemapOverlays]). A regular style reload
+  /// re-bakes both terrain pieces; an OSM-first style omits them entirely.
   bool _terrainOnMap = false;
 
   bool _gsiOnMap = false;
   int _gsiAppliedRevision = -1;
-  MapLibreMapController? _gsiSyncController;
   bool _gsiZoomEnabled = false;
 
   /// The geography the map is framed on, kept across layer switches so each
@@ -225,6 +230,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     super.initState();
     _trace(() => 'init active=${_active.id} timeline=${_active.usesTimeline}');
     _scrubBackpressure.addListener(_onScrubBackpressureChanged);
+    if (widget.initialOsmEnabled) _showTerrain.value = false;
+    _gsi = GsiOverlayController(
+      mutuallyExclusiveTerrain: _showTerrain,
+      initiallyEnabled: widget.initialOsmEnabled,
+    );
+    _gsiZoomEnabled = _gsi.enabled;
     _gsi.addListener(_onGsiChanged);
     _mapInteraction = MapInteractionTracker(
       onStart: () => _active.onMapGestureStart(),
@@ -675,15 +686,25 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   }
 
   void _setShowTerrain(bool value) {
+    // These are alternative base surfaces, not two independent overlays.
+    // Disable OSM before publishing terrain=true so listeners never observe a
+    // stable state in which both sources are selected.
+    if (value && _gsi.enabled) _gsi.setEnabled(false);
     if (_showTerrain.value == value) return;
     _showTerrain.value = value;
     if (!value) {
       unawaited(_basemapWarmer?.discardWorkingSet('terrain'));
     }
-    _syncTerrain();
+    _syncBasemapOverlays();
   }
 
   void _onGsiChanged() {
+    // GsiOverlayController performs this edge synchronously for menu taps;
+    // retain the guard for any controller restored by future persistence code.
+    if (_gsi.enabled && _showTerrain.value) {
+      _showTerrain.value = false;
+      unawaited(_basemapWarmer?.discardWorkingSet('terrain'));
+    }
     if (_gsiZoomEnabled != _gsi.enabled) {
       _gsiZoomEnabled = _gsi.enabled;
       if (mounted) setState(() {});
@@ -696,103 +717,50 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       // the native source is being attached, instead of waiting for a pan.
       unawaited(_warmGsi(controller));
     }
-    _syncGsi();
+    _syncBasemapOverlays();
   }
 
-  /// Adds/removes the GSI source itself, not just its visibility. This keeps an
-  /// off overlay at zero network/decode/memory cost and makes rapid toggle
-  /// changes converge on the latest selection.
-  void _syncGsi() {
+  /// Reconciles the two mutually-exclusive detailed base surfaces in one map
+  /// operation. Removing the old source always happens before adding the new
+  /// one, so their native tile/decode work cannot overlap during a switch.
+  void _syncBasemapOverlays() {
     final controller = _controller;
-    if (!mounted ||
-        controller == null ||
-        !_styleLoaded ||
-        identical(_gsiSyncController, controller)) {
-      return;
-    }
-    _gsiSyncController = controller;
+    if (!mounted || controller == null || !_styleLoaded) return;
     final brightness = Theme.of(context).brightness;
-    unawaited(
-      _syncGsiLoop(controller, brightness).whenComplete(() {
-        // A replacement platform view may already own a newer sync. Never let
-        // the stale controller clear that worker's guard or mutate its state.
-        if (!identical(_gsiSyncController, controller)) return;
-        _gsiSyncController = null;
-        if (!mounted || !identical(controller, _controller)) return;
-        final dirty =
-            _gsi.enabled != _gsiOnMap ||
-            (_gsiOnMap && _gsi.revision != _gsiAppliedRevision);
-        if (dirty) _syncGsi();
-      }),
+    _queue(
+      () => _syncBasemapOverlayLoop(controller, brightness),
+      label: 'basemap-overlays',
     );
   }
 
-  Future<void> _syncGsiLoop(
+  Future<void> _syncBasemapOverlayLoop(
     MapLibreMapController controller,
     Brightness brightness,
   ) async {
     while (mounted && identical(controller, _controller) && _styleLoaded) {
-      final enabled = _gsi.enabled;
+      // OSM wins only as a defensive fallback. Normal interactions enforce
+      // this invariant synchronously in the two setters above.
+      final showGsi = _gsi.enabled;
+      final showTerrain = _showTerrain.value && !showGsi;
       final revision = _gsi.revision;
       try {
-        if (enabled && !_gsiOnMap) {
-          await addGsiOverlay(
-            controller,
-            brightness: brightness,
-            selection: _gsi,
-            belowLayerId: townOutlineLayerId,
-          );
+        // Unmount everything no longer selected before mounting its
+        // replacement. This prevents simultaneous OSM PBF and DEM tile bursts.
+        if (!showTerrain && _terrainOnMap) {
+          await controller.removeLayer(terrainHillshadeLayerId);
           if (!identical(controller, _controller)) return;
-          _gsiOnMap = true;
-          _gsiAppliedRevision = revision;
-        } else if (!enabled && _gsiOnMap) {
+          await controller.removeSource(terrainSourceId);
+          if (!identical(controller, _controller)) return;
+          _terrainOnMap = false;
+        }
+        if (!showGsi && _gsiOnMap) {
           await removeGsiOverlay(controller);
           if (!identical(controller, _controller)) return;
           _gsiOnMap = false;
           _gsiAppliedRevision = revision;
-        } else if (enabled && _gsiAppliedRevision != revision) {
-          await applyGsiLayerVisibility(controller, _gsi, brightness);
-          if (!identical(controller, _controller)) return;
-          _gsiAppliedRevision = revision;
         }
-      } catch (error, stackTrace) {
-        Log.handle(error, stackTrace, 'GSI overlay sync');
-        return;
-      }
-      if (_gsi.enabled == enabled && _gsi.revision == revision) return;
-    }
-  }
 
-  /// Pushes the terrain-relief setting onto a live map — by **adding and
-  /// removing**, not by flipping `visibility`.
-  ///
-  /// MapLibre only stops loading a source's tiles when no layer references it:
-  /// `visibility: none` merely stops rendering, so the DEM kept downloading,
-  /// decoding and holding memory (roughly 1 MB of texture plus 1 MB of float
-  /// mesh per 512px tile, ~49 tiles for a hillshade viewport) with the switch
-  /// off. So off means removeLayer + removeSource — tiles, memory and network
-  /// all released — and on re-adds both with the same id, source and paint the
-  /// baked style used (see [_terrainSourceProps] / [_terrainLayerProps]).
-  ///
-  /// Style reloads re-bake both from the style string, so [_onStyleLoaded]
-  /// re-asserts the user's choice here.
-  void _syncTerrain() {
-    final controller = _controller;
-    if (controller == null) return;
-    unawaited(_syncTerrainLoop(controller));
-  }
-
-  Future<void> _syncTerrainLoop(MapLibreMapController controller) async {
-    // Loop until the map matches the setting: a rapid double-tap flips the
-    // notifier while an add/remove is mid-flight, and each iteration re-reads
-    // it, so the last tap always wins.
-    var dirty = true;
-    while (dirty) {
-      if (!identical(controller, _controller)) return;
-      dirty = false;
-      final show = _showTerrain.value;
-      try {
-        if (show && !_terrainOnMap) {
+        if (showTerrain && !_terrainOnMap) {
           await controller.addSource(terrainSourceId, _terrainSourceProps);
           if (!identical(controller, _controller)) return;
           await controller.addHillshadeLayer(
@@ -803,21 +771,30 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           );
           if (!identical(controller, _controller)) return;
           _terrainOnMap = true;
-        } else if (!show && _terrainOnMap) {
-          await controller.removeLayer(terrainHillshadeLayerId);
+        } else if (showGsi && !_gsiOnMap) {
+          await addGsiOverlay(
+            controller,
+            brightness: brightness,
+            selection: _gsi,
+            belowLayerId: townOutlineLayerId,
+          );
           if (!identical(controller, _controller)) return;
-          await controller.removeSource(terrainSourceId);
+          _gsiOnMap = true;
+          _gsiAppliedRevision = revision;
+        } else if (showGsi && _gsiAppliedRevision != revision) {
+          await applyGsiLayerVisibility(controller, _gsi, brightness);
           if (!identical(controller, _controller)) return;
-          _terrainOnMap = false;
+          _gsiAppliedRevision = revision;
         }
       } catch (error, stackTrace) {
-        // A style that never baked the terrain has nothing to remove, and a
-        // mid-reload call can race the native side. Log and stop; the next
-        // toggle or style load re-syncs.
-        Log.handle(error, stackTrace, 'terrain sync');
+        Log.handle(error, stackTrace, 'base-map overlay sync');
         return;
       }
-      if (_showTerrain.value != show) dirty = true;
+      if (_gsi.enabled == showGsi &&
+          _showTerrain.value == showTerrain &&
+          _gsi.revision == revision) {
+        return;
+      }
     }
   }
 
@@ -910,7 +887,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         controller.cameraPosition?.zoom ?? 8,
       );
     } catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'GSI viewport warm');
+      Log.handle(error, stackTrace, 'OSM viewport warm');
     }
   }
 
@@ -992,13 +969,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     unawaited(_applyCameraHandoff());
     // A reload resets the base style's township-label layer to visible.
     _applyTownLabelVisibility();
-    // …and re-bakes the terrain source + hillshade layer, so re-assert the
-    // user's choice — which removes both when the relief is off.
-    _terrainOnMap = true;
-    _syncTerrain();
+    // A regular surface bakes terrain into the base style. OSM-first surfaces
+    // omit it, so their native mirror must start false before reconciliation.
+    _terrainOnMap = !widget.initialOsmEnabled;
     _gsiOnMap = false;
     _gsiAppliedRevision = -1;
-    _syncGsi();
+    _syncBasemapOverlays();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -1212,6 +1188,10 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         label: '${previous.id}.clear-for-switch',
       );
     }
+    // The disaster-prevention points need streets, buildings, and place names
+    // as context. Its stable wire id is `dpm`, so entering it adopts OSM as the
+    // layer's default; the menu can still switch back to terrain afterwards.
+    if (layer.id == 'dpm' && !_gsi.enabled) _gsi.setEnabled(true);
     // A bare switch is never a deliberate framing — the camera stays exactly as
     // the user left it, and the [_reframeOnMeasure] deferred re-fit must not
     // fire off it either (the height will change as the new layer's frames
@@ -1317,6 +1297,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             onPointerUp: _onMapPointerEnded,
             onPointerCancel: _onMapPointerEnded,
             child: BaseMap(
+              includeTerrainInStyle: !widget.initialOsmEnabled,
               minZoomPreference: _active.mapMinZoom,
               maxZoomPreference: _gsi.enabled
                   ? gsiDisplayMaxZoom

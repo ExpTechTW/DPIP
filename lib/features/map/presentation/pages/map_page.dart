@@ -118,6 +118,7 @@ class _MapPageState extends State<MapPage> {
       key: ValueKey(initial.id),
       layers: _layers,
       initialLayerId: initial.id,
+      initialOsmEnabled: initial == DefaultMapLayer.dpm,
       tabIndex: MapPage.tabIndex,
     );
   }

@@ -1,15 +1,12 @@
-/// The pasted half of a dump. Two things here are worth a test rather than a
-/// reading: that the redaction list is actually applied (a push token in a
-/// pasted dump lets anyone notify that device), and that a section whose every
-/// field was redacted does not leave its heading behind — an empty `[Push]`
-/// block reads as "this device has no token", which is a different bug report.
+/// The pasted half of a dump. Precise location needs consent; support lookup
+/// identifiers and push tokens remain useful and cannot be acted on by a user.
 library;
 
 import 'package:dpip/core/diagnostics/diagnostics_report.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('redacted labels do not appear, by label or by value', () {
+  test('only precise location is redacted', () {
     final text = diagnosticsText([
       (
         title: 'Device',
@@ -19,20 +16,28 @@ void main() {
         ],
       ),
       (title: 'Push', fields: [(label: 'APNs token', value: 'SECRET-TOKEN')]),
-    ], redacted: diagnosticsRedactedLabels);
+      (
+        title: 'Location',
+        fields: [(label: 'Centred on', value: '25.0478, 121.5319')],
+      ),
+    ], redacted: diagnosticsSensitiveLabels);
 
     expect(text, contains('iPhone17,1'));
-    expect(text, isNot(contains('D4E7-PRIVATE')));
-    expect(text, isNot(contains('SECRET-TOKEN')));
-    expect(text, isNot(contains('Identifier')));
+    expect(text, contains('D4E7-PRIVATE'));
+    expect(text, contains('SECRET-TOKEN'));
+    expect(text, isNot(contains('25.0478')));
+    expect(text, isNot(contains('Centred on')));
   });
 
   test('a section left with nothing to say is dropped whole', () {
     final text = diagnosticsText([
-      (title: 'Push', fields: [(label: 'FCM token', value: 'SECRET')]),
-    ], redacted: diagnosticsRedactedLabels);
+      (
+        title: 'Location',
+        fields: [(label: 'Centred on', value: '25.0478, 121.5319')],
+      ),
+    ], redacted: diagnosticsSensitiveLabels);
 
-    expect(text, isNot(contains('[Push]')));
+    expect(text, isNot(contains('[Location]')));
   });
 
   test('a field the platform could not answer reads as a dash, not blank', () {
@@ -53,5 +58,21 @@ void main() {
     // The redaction is the caller's decision: the Developer page shows these
     // rows on screen and only strips them on the way out.
     expect(text, contains('VISIBLE'));
+  });
+
+  test('sensitive fields can remain visible with null values', () {
+    final text = diagnosticsText([
+      (
+        title: 'Private',
+        fields: [
+          (label: 'Identifier', value: 'PRIVATE-ID'),
+          (label: 'Centred on', value: '25.0478, 121.5319'),
+        ],
+      ),
+    ], nulled: diagnosticsSensitiveLabels);
+
+    expect(text, contains('Identifier: PRIVATE-ID'));
+    expect(text, contains('Centred on: null'));
+    expect(text, isNot(contains('25.0478')));
   });
 }

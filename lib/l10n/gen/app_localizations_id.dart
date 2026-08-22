@@ -56,7 +56,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get restroomTypeMale => 'Toilet pria';
 
   @override
-  String get meshtasticLastReceived => 'Last received';
+  String get meshtasticLastReceived => 'Terakhir diterima';
 
   @override
   String get reportDetailSortByCounty => 'Urutkan menurut wilayah';
@@ -87,7 +87,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeRainTrendScattered => 'Kemungkinan hujan ringan';
 
   @override
-  String get meshtasticUptime => 'Uptime';
+  String get meshtasticUptime => 'Waktu aktif';
 
   @override
   String get weatherRankingTempExtremes => 'Ekstrem suhu';
@@ -99,7 +99,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTerrainReliefHint => 'Tampilkan relief terrain di peta dasar';
 
   @override
-  String get meshtasticEmptyMessage => '(empty message)';
+  String get meshtasticEmptyMessage => '(pesan kosong)';
 
   @override
   String get moreSectionRegion => 'Wilayah';
@@ -111,7 +111,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get aedHoursSaturday => 'Jam Sabtu';
 
   @override
-  String get moonPhaseNew => 'New moon';
+  String get moonPhaseNew => 'Bulan baru';
 
   @override
   String get notifySectionEew => 'Peringatan dini gempa';
@@ -126,7 +126,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTownLabelsHint => 'Tampilkan nama kecamatan saat diperbesar';
 
   @override
-  String get commonCancel => 'Cancel';
+  String get commonCancel => 'Batal';
 
   @override
   String get notifyOptTsunamiWarning => 'Hanya peringatan tsunami';
@@ -166,7 +166,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerStyleJmaTooltip =>
-      'Grayscale base, tinted below −40 °C to highlight cloud-top height';
+      'Basis grayscale, diwarnai di bawah −40 °C untuk menyorot tinggi puncak awan';
 
   @override
   String get mapLayerRain => 'Curah hujan';
@@ -220,7 +220,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get meshtasticExcludeMqttSubtitle =>
-      'Nodes bridged over the internet, not heard by radio';
+      'Node yang terhubung lewat internet, tidak terdengar lewat radio';
 
   @override
   String get reportFilterIntensityInfoTitle => 'Skala intensitas baru & lama';
@@ -232,14 +232,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get radarOverlayMenuTooltip => 'Opsi lapisan radar';
 
   @override
-  String get meshtasticNodes => 'Nodes';
+  String get meshtasticNodes => 'Node';
 
   @override
-  String get meshtasticSend => 'Send';
+  String get meshtasticSend => 'Kirim';
 
   @override
   String get typhoonOverlayStormL7Tooltip =>
-      'Level-7 wind field + average circle (purple)';
+      'Medan angin level 7 + lingkaran rata-rata (ungu)';
 
   @override
   String get aedType => 'Jenis';
@@ -300,7 +300,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterSortMagnitude => 'Magnitudo';
 
   @override
-  String get meshtasticSilent => 'Silent';
+  String get meshtasticSilent => 'Senyap';
 
   @override
   String get mapLayerCategoryEarthquake => 'Gempa';
@@ -334,7 +334,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifyOptTsunamiAll => 'Imbauan dan peringatan tsunami';
 
   @override
-  String get meshtasticLayerOptions => 'Node options';
+  String get meshtasticLayerOptions => 'Opsi node';
 
   @override
   String get onboardingAgreeContinue => 'Setuju dan lanjutkan';
@@ -343,7 +343,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get commonRetry => 'Coba lagi';
 
   @override
-  String get meshtasticNodeId => 'Node ID';
+  String get meshtasticNodeId => 'ID Node';
 
   @override
   String reportDetailNumbered(String number) {
@@ -351,7 +351,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get typhoonOverlayStormBandSubtitle => 'With average circle';
+  String get typhoonOverlayStormBandSubtitle => 'Dengan lingkaran rata-rata';
 
   @override
   String get disasterMapOverlayRestroomTooltip => 'Tampilkan toilet umum';
@@ -379,13 +379,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get sponsorRestore => 'Pulihkan pembelian';
 
   @override
-  String get meshtasticChannelWorking => 'Setting up the DPIP channel…';
+  String get meshtasticChannelWorking => 'Menyiapkan kanal DPIP…';
 
   @override
-  String get meshtasticRegionSwitch => 'Switch to TW';
+  String get meshtasticRegionSwitch => 'Beralih ke TW';
 
   @override
-  String get meshtasticTraffic => 'Traffic';
+  String get meshtasticTraffic => 'Lalu lintas';
 
   @override
   String get mapLayerStyleBdTooltip =>
@@ -399,10 +399,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentNight =>
-      'Night = transparent, the basemap shows';
+      'Malam = transparan, peta dasar terlihat';
 
   @override
-  String get meshtasticScanning => 'Scanning…';
+  String get meshtasticScanning => 'Memindai…';
 
   @override
   String regionSelectFull(int max) {
@@ -474,7 +474,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get navMore => 'Lainnya';
 
   @override
-  String get meshtasticDpipChannel => 'DPIP channel';
+  String get meshtasticDpipChannel => 'Kanal DPIP';
 
   @override
   String get disasterMapOverlaySectionLayers => 'Lapisan';
@@ -486,7 +486,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get typhoonLabelNe => 'NE';
 
   @override
-  String get meshtasticCopied => 'Message copied';
+  String get meshtasticCopied => 'Pesan disalin';
 
   @override
   String get reportListEmpty => 'Tidak ada laporan gempa';
@@ -498,19 +498,20 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteTruecolor => 'Himawari True Color';
 
   @override
-  String get typhoonOverlaySectionExtra => 'Overlays';
+  String get typhoonOverlaySectionExtra => 'Lapisan tambahan';
 
   @override
   String get eewSWave => 'Gelombang S';
 
   @override
-  String get meshtasticBusyTitle => 'Another app is using this radio';
+  String get meshtasticBusyTitle =>
+      'Aplikasi lain sedang menggunakan radio ini';
 
   @override
   String get restroomCategoryCultural => 'Tempat budaya';
 
   @override
-  String get typhoonLabelWind => 'Max. sustained wind near centre';
+  String get typhoonLabelWind => 'Angin bertahan maks. dekat pusat';
 
   @override
   String get radarGlobalOutlineHint => 'Bingkai luar setiap negara';
@@ -522,7 +523,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get typhoonLegendCircle15 => 'Lingkar angin kencang';
 
   @override
-  String get dataSectionAstronomy => 'Astronomy';
+  String get dataSectionAstronomy => 'Astronomi';
 
   @override
   String get homeRainTrendLightSustained =>
@@ -532,10 +533,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get commonError => 'Terjadi kesalahan';
 
   @override
-  String get moonPhaseWaningCrescent => 'Waning crescent';
+  String get moonPhaseWaningCrescent => 'Bulan sabit memudar';
 
   @override
-  String get meshtasticPower => 'Power';
+  String get meshtasticPower => 'Daya';
 
   @override
   String get mapTimelineNow => 'Sekarang';
@@ -563,7 +564,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifyTitle => 'Notifikasi';
 
   @override
-  String get meshtasticTxPower => 'TX power';
+  String get meshtasticTxPower => 'Daya TX';
 
   @override
   String get restroomCategoryLabel => 'Kategori';
@@ -576,7 +577,7 @@ class AppLocalizationsId extends AppLocalizations {
       'DPIP berdedikasi menyediakan informasi mitigasi bencana secara real-time, tanpa iklan atau model bisnis lainnya. Dukungan Anda membantu kami menjaga server tetap berjalan dan terus mengembangkan aplikasi.';
 
   @override
-  String get typhoonLabelStormAvg => 'Avg. radius of Beaufort 10 winds';
+  String get typhoonLabelStormAvg => 'Jari-jari rata-rata angin Beaufort 10';
 
   @override
   String get restroomCategoryCommercial => 'Tempat komersial';
@@ -610,10 +611,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get restroomTypeUnspecified => 'Tidak ditentukan';
 
   @override
-  String get typhoonOverlayProbabilityHint => 'Hides the forecast cone';
+  String get typhoonOverlayProbabilityHint =>
+      'Menyembunyikan kerucut prakiraan';
 
   @override
-  String get mapLayerSatelliteGlobalOutline => 'Country border';
+  String get mapLayerSatelliteGlobalOutline => 'Batas negara';
 
   @override
   String get mapNavTemperature => 'Suhu';
@@ -648,7 +650,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get typhoonOverlayWeatherRadarTooltip =>
-      'Radar echo closest to the typhoon bulletin time';
+      'Gema radar terdekat dengan waktu buletin topan';
 
   @override
   String get onboardingPermLocationDesc =>
@@ -661,13 +663,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeActiveEventsEmpty => 'Tidak ada peristiwa aktif';
 
   @override
-  String get typhoonLabelPosition => 'Centre location';
+  String get typhoonLabelPosition => 'Lokasi pusat';
 
   @override
   String get weatherRankingBy => 'Urut';
 
   @override
-  String get typhoonIntensityMild => 'Mild typhoon';
+  String get typhoonIntensityMild => 'Topan lemah';
 
   @override
   String get windForecastGlobalOutlineHint => 'Bingkai luar setiap negara';
@@ -685,7 +687,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get restroomCategoryReligious => 'Tempat ibadah';
 
   @override
-  String get meshtasticRole => 'Role';
+  String get meshtasticRole => 'Peran';
 
   @override
   String get mapLayerSatelliteCloudCloudy => 'Cloudy';
@@ -697,7 +699,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get meshtasticJumpToLatest => 'Ke yang terbaru';
 
   @override
-  String get meshtasticNoMessages => 'No messages yet';
+  String get meshtasticNoMessages => 'Belum ada pesan';
 
   @override
   String get onboardingPermNotifyDesc =>
@@ -707,7 +709,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get radarTownOutline => 'Batas kecamatan';
 
   @override
-  String get mapLayerStyleSection => 'Colour style';
+  String get mapLayerStyleSection => 'Gaya warna';
 
   @override
   String get disasterMapOverlayMenuTooltip => 'Lapisan peta bencana';
@@ -716,14 +718,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreGooglePlay => 'Google Play';
 
   @override
-  String get meshtasticOnline => 'Heard recently';
+  String get meshtasticOnline => 'Baru terdengar';
 
   @override
   String get typhoonLabelSw => 'SW';
 
   @override
   String typhoonForecastLead(String hours) {
-    return 'Forecast +$hours h';
+    return 'Prakiraan +$hours jam';
   }
 
   @override
@@ -731,7 +733,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentClear =>
-      'Clear sky = transparent, the basemap shows';
+      'Langit cerah = transparan, peta dasar terlihat';
 
   @override
   String get mapOverlaySectionReference => 'Lapisan referensi';
@@ -765,7 +767,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get eewArrived => 'Tiba';
 
   @override
-  String get meshtasticNoDevices => 'No Meshtastic devices found';
+  String get meshtasticNoDevices => 'Tidak menemukan perangkat Meshtastic';
 
   @override
   String get mapLayerCategoryLife => 'Kehidupan sehari-hari';
@@ -774,10 +776,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterSortIntensity => 'Intensitas';
 
   @override
-  String get meshtasticStateDisconnected => 'Disconnected';
+  String get meshtasticStateDisconnected => 'Terputus';
 
   @override
-  String get typhoonIntensityIntense => 'Intense typhoon';
+  String get typhoonIntensityIntense => 'Topan kuat';
 
   @override
   String get mapLayerOrderTitle => 'Urutkan lapisan';
@@ -786,7 +788,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get dpmYes => 'Ya';
 
   @override
-  String get meshtasticNoHistory => 'Not enough history yet';
+  String get meshtasticNoHistory => 'Riwayat belum cukup';
 
   @override
   String get reportDetailLocalIntensityUnavailable =>
@@ -808,16 +810,16 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifyAdvisory => 'Imbauan cuaca';
 
   @override
-  String get reportFilterReset => 'Reset';
+  String get reportFilterReset => 'Atur ulang';
 
   @override
   String get mapLayerSatelliteMndwi => 'Himawari MNDWI';
 
   @override
-  String get typhoonOverlaySectionStorm => 'Storm wind';
+  String get typhoonOverlaySectionStorm => 'Angin badai';
 
   @override
-  String get moonPhaseFull => 'Full moon';
+  String get moonPhaseFull => 'Bulan purnama';
 
   @override
   String meshtasticBinaryPayload(String size) {
@@ -825,14 +827,14 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get moonPhaseWaningGibbous => 'Waning gibbous';
+  String get moonPhaseWaningGibbous => 'Bulan cembung memudar';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'Baru (sejak 2020)';
 
   @override
   String typhoonDataTime(String time) {
-    return 'Data time\n$time';
+    return 'Waktu data';
   }
 
   @override
@@ -842,7 +844,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreSectionAbout => 'Tentang';
 
   @override
-  String get meshtasticSelectDevice => 'Select a radio';
+  String get meshtasticSelectDevice => 'Pilih radio';
 
   @override
   String get onboardingIntroBody =>
@@ -855,19 +857,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportDetailImage => 'Gambar laporan';
 
   @override
-  String get meshtasticStateConfiguring => 'Configuring…';
+  String get meshtasticStateConfiguring => 'Mengonfigurasi…';
 
   @override
-  String get typhoonLabelGaleAvg => 'Avg. radius of Beaufort 7 winds';
+  String get typhoonLabelGaleAvg => 'Jari-jari rata-rata angin Beaufort 7';
 
   @override
   String get onboardingPermNotify => 'Notifikasi';
 
   @override
-  String get meshtasticClearMessages => 'Clear messages';
+  String get meshtasticClearMessages => 'Hapus pesan';
 
   @override
-  String get meshtasticNotifyMessages => 'Notify on new messages';
+  String get meshtasticNotifyMessages => 'Beri tahu saat pesan baru';
 
   @override
   String get defaultMapLayerSettings => 'Lapisan peta bawaan';
@@ -945,7 +947,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTimelineFuture => 'Mendatang';
 
   @override
-  String get typhoonLegendCircleAvg => 'Average circle';
+  String get typhoonLegendCircleAvg => 'Lingkaran rata-rata';
 
   @override
   String reportFilterDepthKm(String depth) {
@@ -964,7 +966,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get typhoonLabelGust => 'Peak gust';
+  String get typhoonLabelGust => 'Embusan puncak';
 
   @override
   String get mapAppGoogleMaps => 'Google Maps';
@@ -982,7 +984,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get skyTimeGolden => 'Jam emas';
 
   @override
-  String get moonAge => 'Age';
+  String get moonAge => 'Umur bulan';
 
   @override
   String get meshtasticRadioSettings => 'LoRa';
@@ -997,7 +999,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayers => 'Lapisan';
 
   @override
-  String get meshtasticHardware => 'Hardware';
+  String get meshtasticHardware => 'Perangkat keras';
 
   @override
   String get languageSettings => 'Bahasa';
@@ -1011,7 +1013,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get typhoonOverlayWeatherHint => 'Aligned to bulletin time';
+  String get typhoonOverlayWeatherHint => 'Diselaraskan dengan waktu buletin';
 
   @override
   String get skyTimeDawn => 'Fajar';
@@ -1020,7 +1022,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get skyTimeAfternoon => 'Sore';
 
   @override
-  String get meshtasticLastHeard => 'Last heard';
+  String get meshtasticLastHeard => 'Terakhir terdengar';
 
   @override
   String get typhoonWarningTitle => 'Peringatan topan';
@@ -1071,10 +1073,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get typhoonOverlayStormL10Tooltip =>
-      'Level-10 wind field + average circle (yellow)';
+      'Medan angin level 10 + lingkaran rata-rata (kuning)';
 
   @override
-  String get moonPhaseWaxingGibbous => 'Waxing gibbous';
+  String get moonPhaseWaxingGibbous => 'Bulan cembung membesar';
 
   @override
   String get reportDetailTitle => 'Laporan Gempa';
@@ -1088,10 +1090,10 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get meshtasticNoNodes => 'No nodes heard yet';
+  String get meshtasticNoNodes => 'Belum ada node yang terdengar';
 
   @override
-  String get meshtasticViaMqtt => 'Via MQTT (internet)';
+  String get meshtasticViaMqtt => 'Lewat MQTT (internet)';
 
   @override
   String get radarCountyOutline => 'Batas kabupaten/kota';
@@ -1109,11 +1111,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get changelogCurrentVersion => 'Saat ini';
 
   @override
-  String get typhoonLabelPressure => 'Central pressure';
+  String get typhoonLabelPressure => 'Tekanan pusat';
 
   @override
   String get typhoonOverlayForecastCalloutsTooltip =>
-      'Show forecast-point detail cards when zoomed in';
+      'Tampilkan kartu detail titik prakiraan saat diperbesar';
 
   @override
   String get aedOpenRemark => 'Catatan jam buka';
@@ -1123,7 +1125,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Agar DPIP dapat memperingatkan Anda saat bencana terjadi, harap berikan izin berikut. Anda dapat mengubahnya kapan saja di pengaturan sistem.';
 
   @override
-  String get typhoonOverlaySectionWeather => 'Weather underlay';
+  String get typhoonOverlaySectionWeather => 'Lapisan bawah cuaca';
 
   @override
   String get notifyOptWeatherLocal => 'Hanya lokasi saat ini';
@@ -1132,7 +1134,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapNavRain => 'Hujan';
 
   @override
-  String get moonDays => 'days';
+  String get moonDays => 'hari';
 
   @override
   String mapLegendUnit(String unit) {
@@ -1152,10 +1154,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteB01 => 'Himawari Blue (B01)';
 
   @override
-  String get meshtasticExternalPower => 'External power';
+  String get meshtasticExternalPower => 'Daya eksternal';
 
   @override
-  String get moonPhaseLastQuarter => 'Last quarter';
+  String get moonPhaseLastQuarter => 'Kuartal akhir';
 
   @override
   String get reportFilterOrderAsc => 'Menaik';
@@ -1182,19 +1184,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get restroomGradeExcellent => 'Sangat baik';
 
   @override
-  String get meshtasticLastSent => 'Last sent';
+  String get meshtasticLastSent => 'Terakhir dikirim';
 
   @override
-  String get meshtasticName => 'Name';
+  String get meshtasticName => 'Nama';
 
   @override
-  String get meshtasticScan => 'Scan';
+  String get meshtasticScan => 'Pindai';
 
   @override
   String get mapLayerCategoryForecast => 'Prakiraan numerik';
 
   @override
-  String get meshtasticChannelFailed => 'Couldn\'t set up the DPIP channel';
+  String get meshtasticChannelFailed => 'Gagal menyiapkan kanal DPIP';
 
   @override
   String get themeSystem => 'Sistem';
@@ -1214,7 +1216,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherPrecipitation => 'Curah hujan';
 
   @override
-  String get moonNextFullMoon => 'Next full moon';
+  String get moonNextFullMoon => 'Purnama berikutnya';
 
   @override
   String get dpmSheetEmpty => 'Ketuk penanda di peta untuk detail';
@@ -1243,7 +1245,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get typhoonLabelNw => 'NW';
 
   @override
-  String get moonPhaseWaxingCrescent => 'Waxing crescent';
+  String get moonPhaseWaxingCrescent => 'Bulan sabit membesar';
 
   @override
   String get restroomCategoryLeisure => 'Tempat rekreasi';
@@ -1255,23 +1257,23 @@ class AppLocalizationsId extends AppLocalizations {
   String get aedCategory => 'Kategori';
 
   @override
-  String get meshtasticChannels => 'Channels';
+  String get meshtasticChannels => 'Kanal';
 
   @override
   String get monitorWaiting => 'Menunggu data…';
 
   @override
-  String get typhoonOverlayForecastCallouts => 'Forecast tooltips';
+  String get typhoonOverlayForecastCallouts => 'Tooltip prakiraan';
 
   @override
   String get reportDetailEpicenter => 'Koordinat episentrum';
 
   @override
-  String get meshtasticVoltage => 'Voltage';
+  String get meshtasticVoltage => 'Tegangan';
 
   @override
   String get mapLayerMeshtasticSubtitle =>
-      'LoRa mesh nodes heard by your radio';
+      'Node mesh LoRa yang terdengar radio Anda';
 
   @override
   String get mapLayerWind => 'Angin';
@@ -1309,7 +1311,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentZero =>
-      'Zero difference = transparent (no signal)';
+      'Selisih nol = transparan (tanpa sinyal)';
 
   @override
   String get shelterIndoorLabel => 'Penampungan dalam ruangan';
@@ -1321,7 +1323,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterSortTime => 'Waktu';
 
   @override
-  String get mapLayerSatelliteCloudProbablyClear => 'Probably clear';
+  String get mapLayerSatelliteCloudProbablyClear => 'Mungkin cerah';
 
   @override
   String get weatherModeThunderstorm => 'Badai petir';
@@ -1333,7 +1335,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportFilterIntensityInfoLegacyTitle => 'Lama (sebelum 2020)';
 
   @override
-  String get typhoonLabelSpeed => 'Past movement speed';
+  String get typhoonLabelSpeed => 'Kecepatan gerak';
 
   @override
   String mapAppOpenFailed(String app) {
@@ -1341,10 +1343,10 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get mapLayerSatelliteRgbComposite => 'RGB composite (JMA recipe)';
+  String get mapLayerSatelliteRgbComposite => 'Komposit RGB (resep JMA)';
 
   @override
-  String get meshtasticReceived => 'Received';
+  String get meshtasticReceived => 'Diterima';
 
   @override
   String get weatherRankingExtremeLow => 'Minimum hari ini';
@@ -1353,7 +1355,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteB10 => 'Himawari Lower Water Vapour (B10)';
 
   @override
-  String get mapLayerSatelliteCloudProbablyCloudy => 'Probably cloudy';
+  String get mapLayerSatelliteCloudProbablyCloudy => 'Mungkin berawan';
 
   @override
   String get mapLayerSatelliteTransparentNoWater =>
@@ -1363,10 +1365,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get shelterCategoryLabel => 'Jenis bencana';
 
   @override
-  String get meshtasticStateConnecting => 'Connecting…';
+  String get meshtasticStateConnecting => 'Menghubungkan…';
 
   @override
-  String get moonTitle => 'Moon';
+  String get moonTitle => 'Bulan';
 
   @override
   String get weatherRankingGust => 'Hembusan';
@@ -1381,7 +1383,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifySectionWeather => 'Cuaca';
 
   @override
-  String get meshtasticPreset => 'Modem preset';
+  String get meshtasticPreset => 'Preset modem';
 
   @override
   String get dataSectionSeismic => 'Seismik';
@@ -1408,13 +1410,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get regionCurrent => 'Lokasi saat ini';
 
   @override
-  String get meshtasticNotConnected => 'Not connected to a radio';
+  String get meshtasticNotConnected => 'Belum terhubung ke radio';
 
   @override
   String get weatherModeSnow => 'Salju';
 
   @override
-  String get mapLayerMeshtastic => 'Meshtastic nodes';
+  String get mapLayerMeshtastic => 'Node Meshtastic';
 
   @override
   String get moreDeveloper => 'Info debug';
@@ -1423,7 +1425,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteB14 => 'Himawari Longwave Infrared (B14)';
 
   @override
-  String get meshtasticChannelUse => 'Channel use';
+  String get meshtasticChannelUse => 'Penggunaan kanal';
 
   @override
   String get mapNavLightning => 'Petir';
@@ -1447,7 +1449,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get dpmOpenInMaps => 'Buka di peta';
 
   @override
-  String get meshtasticNotifyNodes => 'Notify on new nodes';
+  String get meshtasticNotifyNodes => 'Beri tahu saat node baru';
 
   @override
   String get onboardingPermCriticalDesc =>
@@ -1455,10 +1457,10 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentWarm =>
-      'Clear sky (warm end) = transparent, the basemap shows';
+      'Langit cerah (ujung hangat) = transparan, peta dasar terlihat';
 
   @override
-  String get meshtasticSent => 'Sent';
+  String get meshtasticSent => 'Terkirim';
 
   @override
   String get homeForecastTitle => 'Prakiraan 24 jam';
@@ -1468,7 +1470,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String meshtasticExcludeMqttHidden(int count) {
-    return '$count hidden';
+    return '$count disembunyikan';
   }
 
   @override
@@ -1484,13 +1486,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportListToday => 'Hari ini';
 
   @override
-  String get meshtasticTapNode => 'Tap a node for details';
+  String get meshtasticTapNode => 'Ketuk node untuk detail';
 
   @override
   String get commonLoading => 'Memuat…';
 
   @override
-  String get typhoonIntensityModerate => 'Moderate typhoon';
+  String get typhoonIntensityModerate => 'Topan sedang';
 
   @override
   String get mapLayerSatelliteAsh => 'Himawari Ash';
@@ -1502,14 +1504,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerCategorySatellite => 'Satelit';
 
   @override
-  String get meshtasticChannelReady => 'DPIP channel ready';
+  String get meshtasticChannelReady => 'Kanal DPIP siap';
 
   @override
   String get mapLayerSatelliteNightmicrophysics =>
       'Himawari Night Microphysics';
 
   @override
-  String get typhoonIntensityTd => 'Tropical depression';
+  String get typhoonIntensityTd => 'Depresi tropis';
 
   @override
   String get reportFilterDate => 'Tanggal';
@@ -1584,7 +1586,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteBtdSo2 => 'Himawari SO₂ / Cloud Phase';
 
   @override
-  String get meshtasticStateError => 'Error';
+  String get meshtasticStateError => 'Kesalahan';
 
   @override
   String get weatherModeOvercast => 'Mendung';
@@ -1594,7 +1596,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get typhoonOverlayWarningTooltip =>
-      'Highlight counties under a typhoon warning';
+      'Sorot kabupaten dalam peringatan topan';
 
   @override
   String get reportFilterDatePick => 'Pilih tanggal';
@@ -1609,7 +1611,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get shelterOutdoorLabel => 'Penampungan luar ruangan';
 
   @override
-  String get meshtasticStateConnected => 'Connected';
+  String get meshtasticStateConnected => 'Terhubung';
 
   @override
   String get mapNavRadar => 'Radar';
@@ -1628,7 +1630,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get typhoonOverlayWeatherNoneTooltip =>
-      'No radar or infrared underlay';
+      'Tanpa lapisan bawah radar atau inframerah';
 
   @override
   String get radarCountyOutlineHint => 'Digambar di atas gema';
@@ -1640,13 +1642,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get homeRainTrendTitle => 'Hujan 1 jam ke depan';
 
   @override
-  String get moonPhaseFirstQuarter => 'First quarter';
+  String get moonPhaseFirstQuarter => 'Kuartal pertama';
 
   @override
   String get mapLayerCategoryTyphoon => 'Topan';
 
   @override
-  String get meshtasticUtilization => 'Airtime (24h)';
+  String get meshtasticUtilization => 'Waktu udara (24 jam)';
 
   @override
   String get restroomTypeMixed => 'Toilet campuran';
@@ -1664,7 +1666,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteBtdWvirw => 'Himawari Overshooting Top';
 
   @override
-  String get meshtasticReadingAge => 'Reading taken';
+  String get meshtasticReadingAge => 'Waktu pengukuran';
 
   @override
   String get mapAppCallFailed =>
@@ -1686,7 +1688,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportDetailLocalFelt => 'Gempa Dirasakan Lokal';
 
   @override
-  String get meshtasticDevice => 'Device';
+  String get meshtasticDevice => 'Perangkat';
 
   @override
   String get onboardingGrant => 'Berikan';
@@ -1735,7 +1737,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Tidak ada laporan yang cocok dengan filter';
 
   @override
-  String get meshtasticExcludeMqtt => 'Hide MQTT nodes';
+  String get meshtasticExcludeMqtt => 'Sembunyikan node MQTT';
 
   @override
   String get mapNavTyphoon => 'Topan';
@@ -1773,13 +1775,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get navHome => 'Beranda';
 
   @override
-  String get meshtasticRegionLabel => 'Region';
+  String get meshtasticRegionLabel => 'Wilayah';
 
   @override
   String get mapLayerSatelliteCloudtop => 'Himawari Cloud Top Temperature';
 
   @override
-  String get moonTimelineCaption => 'Phase';
+  String get moonTimelineCaption => 'Fase';
 
   @override
   String get openSourceLicenses => 'Lisensi sumber terbuka';
@@ -1799,7 +1801,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get radarScanRange => 'Tampilkan jangkauan pindai';
 
   @override
-  String get meshtasticHopLimit => 'Hop limit';
+  String get meshtasticHopLimit => 'Batas lompatan';
 
   @override
   String get weatherRankingExtremeHigh => 'Maksimum hari ini';
@@ -1814,7 +1816,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteNaturalcolor => 'Himawari Natural Color';
 
   @override
-  String get meshtasticAirtime => 'Air time (TX)';
+  String get meshtasticAirtime => 'Waktu udara (TX)';
 
   @override
   String shelterCapacityValue(int n) {
@@ -1827,7 +1829,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get meshtasticSendHint => 'Message to broadcast';
+  String get meshtasticSendHint => 'Pesan untuk disiarkan';
 
   @override
   String monitorDelay(String value) {
@@ -1841,7 +1843,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteB08 => 'Himawari Upper Water Vapour (B08)';
 
   @override
-  String get meshtasticReconnecting => 'Reconnecting…';
+  String get meshtasticReconnecting => 'Menghubungkan ulang…';
 
   @override
   String get radarTownOutlineSubtitle =>
@@ -1849,14 +1851,14 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get typhoonOverlayWeatherSatelliteTooltip =>
-      'Infrared closest to the typhoon bulletin time';
+      'Inframerah terdekat dengan waktu buletin topan';
 
   @override
   String get radarScanRangeHint => 'Di luar kotak berarti tak terpantau';
 
   @override
   String typhoonPickerTd(String no) {
-    return 'Tropical depression TD $no';
+    return 'Depresi tropis TD $no';
   }
 
   @override
@@ -1879,7 +1881,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Layanan lokasi mati — peringatan lokal tidak dapat menargetkan wilayah Anda.';
 
   @override
-  String get mapLayerStyleTooltip => 'Colour style';
+  String get mapLayerStyleTooltip => 'Gaya warna';
 
   @override
   String lightningLegendCg(int minutes) {
@@ -2020,7 +2022,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get endpointServiceWind => 'Wind';
 
   @override
-  String get endpointServiceDpm => 'Disaster points';
+  String get endpointServiceDpm => 'Titik bencana';
 
   @override
   String get endpointServiceWeather => 'Weather';
@@ -2038,7 +2040,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get endpointServiceReport => 'EQ reports';
 
   @override
-  String get endpointServiceTremStation => 'Tremor station';
+  String get endpointServiceTremStation => 'Stasiun getaran';
 
   @override
   String get endpointServiceEvent => 'Events';
@@ -2074,17 +2076,17 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get meshtasticBusyBody =>
-      'Disconnect it in the other Meshtastic app first. Two apps on one radio take each other\'s messages, so some will go missing.';
+      'Putuskan koneksinya dulu di aplikasi Meshtastic lain. Dua aplikasi pada satu radio saling mengambil pesan, jadi sebagian akan hilang.';
 
   @override
   String get meshtasticChannelNoSlot =>
-      'No free channel slot — free one on the radio';
+      'Tidak ada slot kanal kosong — kosongkan satu di radio';
 
   @override
   String get restroomCategoryTransport => 'Transportasi';
 
   @override
-  String get meshtasticBattery => 'Battery';
+  String get meshtasticBattery => 'Baterai';
 
   @override
   String get meshtasticDistance => 'Jarak';
@@ -2096,14 +2098,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get meshtasticBatteryTrend => 'Tren baterai';
 
   @override
-  String get typhoonOverlayMenuTooltip => 'Typhoon overlay options';
+  String get typhoonOverlayMenuTooltip => 'Opsi lapisan topan';
 
   @override
   String get mapLayerSatelliteBtdOzone => 'Himawari Tropopause';
 
   @override
   String meshtasticRegionMismatch(String region) {
-    return 'Radio region is $region — DPIP needs TW';
+    return 'Wilayah radio adalah $region — DPIP membutuhkan TW';
   }
 
   @override
@@ -2195,7 +2197,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherModeAuto => 'Otomatis';
 
   @override
-  String get typhoonLabelProbCircle => '70% probability circle';
+  String get typhoonLabelProbCircle => 'Lingkaran probabilitas 70%';
 
   @override
   String get notifyOptAll => 'Terima semua';
@@ -2207,14 +2209,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override
-  String get typhoonLabelDirection => 'Past movement direction';
+  String get typhoonLabelDirection => 'Arah gerak';
 
   @override
   String get regionManageTitle => 'Wilayah tersimpan';
 
   @override
   String get regionSaveNote =>
-      'Notifikasi dikirim berdasarkan lokasi GPS Anda. Menyimpan wilayah sering dipakai tidak mengubah tempat pengiriman peringatan — wilayah sering dipakai hanya agar status tiap wilayah terlihat cepat di beranda. Izinkan akses lokasi, jika tidak notifikasi tidak berfungsi.';
+      'Notifikasi dikirim berdasarkan lokasi GPS Anda. Menyimpan wilayah sering dipakai tidak mengubah tempat pengiriman peringatan — wilayah sering dipakai hanya agar status tiap wilayah terlihat cepat di beranda. Izinkan akses lokasi, jika tidak notifikasi tidak berfunosm.';
 
   @override
   String get typhoonLegendCone => 'Kerucut prakiraan';
@@ -2226,13 +2228,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingPermsTitle => 'Izin';
 
   @override
-  String get mapLayerStyleJma => 'Cloud-top enhancement (JMA)';
+  String get mapLayerStyleJma => 'Peningkatan puncak awan (JMA)';
 
   @override
   String get rainInterval10m => '10 mnt';
 
   @override
-  String get meshtasticConnectAnyway => 'Connect anyway';
+  String get meshtasticConnectAnyway => 'Tetap hubungkan';
 
   @override
   String reportListDayCount(int count) {
@@ -2244,7 +2246,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get mapLayerSatelliteTransparentReflectance =>
-      'Low reflectance / night = transparent, the basemap shows';
+      'Reflektansi rendah / malam = transparan, peta dasar terlihat';
 
   @override
   String chartHourLabel(int hour) {
@@ -2256,7 +2258,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get typhoonOverlayProbabilityTooltip =>
-      'Show strike probability (hides the forecast cone)';
+      'Tampilkan probabilitas hantaman (menyembunyikan kerucut prakiraan)';
 
   @override
   String get mapLayerSatelliteNdwi => 'Himawari NDWI';
@@ -2277,7 +2279,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerCategoryRadar => 'Radar';
 
   @override
-  String get meshtasticShortName => 'Short name';
+  String get meshtasticShortName => 'Nama pendek';
 
   @override
   String get mapLayerSatelliteAirmass => 'Himawari Airmass';
@@ -2304,7 +2306,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get meshtasticRegionConfirm =>
-      'Switch this radio to the TW region? It restarts and disconnects for a moment, and every other channel on it moves too.';
+      'Beralihkan radio ini ke wilayah TW? Radio akan mulai ulang dan terputus sesaat, dan semua kanal lain ikut pindah.';
 
   @override
   String get dataEarthquakeSubtitle => 'Laporan gempa';
@@ -2322,70 +2324,112 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingTermsTitle => 'Ketentuan Layanan';
 
   @override
-  String get mapGsiOverlay => 'Peta detail (GSI)';
+  String get mapOsmOverlay => 'Peta detail';
 
   @override
-  String get mapGsiOverlayHint =>
-      'Tambahkan medan resolusi tinggi dari GSI Jepang';
+  String get mapOsmOverlayHint =>
+      'Tampilkan jalan, bangunan, dan nama tempat yang lebih lengkap';
 
   @override
-  String get mapGsiDetails => 'Detail lapisan';
+  String get mapOsmDetails => 'Detail lapisan';
 
   @override
-  String mapGsiDetailsHint(int enabled, int total) {
+  String get moreDataSources => 'Sumber data';
+
+  @override
+  String get dataSourceTremNet => '探索智慧科技有限公司 — TREM-Net';
+
+  @override
+  String get dataSourceCwa => '交通部中央氣象署 (CWA)';
+
+  @override
+  String get dataSourceJma => '気象庁 (JMA)';
+
+  @override
+  String get dataSourceNcdr => '國家災害防救科技中心 (NCDR)';
+
+  @override
+  String get dataSourceEcmwf =>
+      'European Centre for Medium-Range Weather Forecasts (ECMWF)';
+
+  @override
+  String get dataSourceNoaaGfs =>
+      'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)';
+
+  @override
+  String get dataSourceGovernmentOpenData => '政府資料開放平臺';
+
+  @override
+  String get dataSourceOpenStreetMap => '© OpenStreetMap contributors';
+
+  @override
+  String get dataSourceNasaMoon =>
+      'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)';
+
+  @override
+  String mapOsmDetailsHint(int enabled, int total) {
     return '$enabled dari $total lapisan aktif';
   }
 
   @override
-  String get mapGsiSurface => 'Permukaan';
+  String get mapOsmSurface => 'Permukaan';
 
   @override
-  String get mapGsiParks => 'Taman';
+  String get mapOsmParks => 'Taman';
 
   @override
-  String get mapGsiLandUse => 'Penggunaan lahan';
+  String get mapOsmLandUse => 'Penggunaan lahan';
 
   @override
-  String get mapGsiAirportAreas => 'Area bandara';
+  String get mapOsmAirportAreas => 'Area bandara';
 
   @override
-  String get mapGsiWater => 'Perairan';
+  String get mapOsmWater => 'Perairan';
 
   @override
-  String get mapGsiRivers => 'Sungai';
+  String get mapOsmRivers => 'Sungai';
 
   @override
-  String get mapGsiBoundaries => 'Batas';
+  String get mapOsmBoundaries => 'Batas';
 
   @override
-  String get mapGsiBuildings => 'Bangunan';
+  String get mapOsmBuildings => 'Bangunan';
 
   @override
-  String get mapGsiRoads => 'Jalan';
+  String get mapOsmRoads => 'Jalan';
 
   @override
-  String get mapGsiRoadNames => 'Nama jalan';
+  String get mapOsmRoadNames => 'Nama jalan';
 
   @override
-  String get mapGsiWaterNames => 'Nama perairan';
+  String get mapOsmWaterNames => 'Nama perairan';
 
   @override
-  String get mapGsiPeaks => 'Puncak';
+  String get mapOsmPeaks => 'Puncak';
 
   @override
-  String get mapGsiAirportNames => 'Nama bandara';
+  String get mapOsmAirportNames => 'Nama bandara';
 
   @override
-  String get mapGsiPlaceNames => 'Nama tempat';
+  String get mapOsmPlaceNames => 'Nama tempat';
 
   @override
-  String get mapGsiPoi => 'Tempat menarik';
+  String get mapOsmPoi => 'Tempat menarik';
 
   @override
-  String get mapGsiHouseNumbers => 'Nomor rumah';
+  String get mapOsmHouseNumbers => 'Nomor rumah';
 
   @override
-  String get mapGsiRestoreAll => 'Pulihkan semua';
+  String get mapOsmRestoreAll => 'Pulihkan semua';
+
+  @override
+  String get mapOsmSectionNatural => 'Fitur alam';
+
+  @override
+  String get mapOsmSectionRoadsAndBuildings => 'Jalan & bangunan';
+
+  @override
+  String get mapOsmSectionLabelsAndPlaces => 'Label & tempat';
 
   @override
   String get mapTownLabels => 'Nama kecamatan';
@@ -2395,10 +2439,10 @@ class AppLocalizationsId extends AppLocalizations {
       'Tidak dapat menyimpan pengaturan. Silakan coba lagi.';
 
   @override
-  String get meshtasticDisconnect => 'Disconnect';
+  String get meshtasticDisconnect => 'Putuskan';
 
   @override
-  String get meshtasticUndecoded => 'Not decrypted';
+  String get meshtasticUndecoded => 'Belum didekripsi';
 
   @override
   String get notifyAnnouncement => 'Pengumuman';
@@ -2513,7 +2557,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get sunGoldenHourEvening => 'Golden hour sore';
 
   @override
-  String get sunBlueHour => 'Blue hour';
+  String get sunBlueHour => 'Jam biru';
 
   @override
   String get sunEquationOfTime => 'Persamaan waktu';
@@ -3134,6 +3178,16 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get moreDumpDiagnosticsHint =>
       'Mengunggah lalu menyalin tautan untuk dilampirkan ke laporan';
+
+  @override
+  String get dumpIncludeSensitive => 'Sertakan lokasi presisi';
+
+  @override
+  String get dumpIncludeSensitiveHint =>
+      'Menyertakan koordinat dari log dan lokasi latar belakang; jika tidak dipilih, diganti dengan null';
+
+  @override
+  String get dumpUpload => 'Unggah';
 
   @override
   String get dumpUploaded => 'Terunggah';

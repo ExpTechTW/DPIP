@@ -50,6 +50,7 @@ class BaseMap extends StatefulWidget {
     this.interactive = true,
     this.compassEnabled = true,
     this.showUserLocation = true,
+    this.includeTerrainInStyle = true,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
     this.tabIndex,
@@ -141,6 +142,11 @@ class BaseMap extends StatefulWidget {
   /// denied. Styling is whatever the platform provides — the plugin exposes no
   /// hook for colours.
   final bool showUserLocation;
+
+  /// Whether the initial native style contains the terrain DEM and hillshade.
+  /// Runtime owners can still add terrain later. Omitting it here prevents an
+  /// OSM-first surface from fetching and briefly painting an unused DEM.
+  final bool includeTerrainInStyle;
 
   /// Per-surface zoom floor (typhoon may go lower so the whole basin fits).
   /// Other layers keep [defaultMinZoom].
@@ -438,22 +444,25 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   }
 
   /// Style string memoised per palette — all other inputs are const, and
-  /// Every [build] used to re-interpolate the full style JSON — the string
-  /// only varies by palette and by the town-label directory, so it is memoised
-  /// on that pair.
-  static final Map<(MapPalette, String), String> _styleCache = {};
+  /// Every [build] used to re-interpolate the full style JSON — the string only
+  /// varies by palette, town-label directory, and terrain presence, so it is
+  /// memoised on that tuple.
+  static final Map<(MapPalette, String, bool), String> _styleCache = {};
 
-  static String _styleString(MapPalette palette, String townLabelData) =>
-      _styleCache.putIfAbsent(
-        (palette, townLabelData),
-        () => exptechVectorStyle(
-          palette,
-          basemapTileUrl: basemapOriginTileUrl,
-          glyphsUrl: glyphsOriginUrl,
-          terrainTileUrl: terrainOriginTileUrl,
-          townLabelData: townLabelData,
-        ),
-      );
+  static String _styleString(
+    MapPalette palette,
+    String townLabelData,
+    bool includeTerrain,
+  ) => _styleCache.putIfAbsent(
+    (palette, townLabelData, includeTerrain),
+    () => exptechVectorStyle(
+      palette,
+      basemapTileUrl: basemapOriginTileUrl,
+      glyphsUrl: glyphsOriginUrl,
+      terrainTileUrl: includeTerrain ? terrainOriginTileUrl : null,
+      townLabelData: townLabelData,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -486,6 +495,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
       styleString: _styleString(
         palette,
         townLabelGeoJson(context.read<TownDirectory>()),
+        widget.includeTerrainInStyle,
       ),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).

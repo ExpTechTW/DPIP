@@ -4403,131 +4403,209 @@ abstract class AppLocalizations {
   /// **'Terms of Service'**
   String get onboardingTermsTitle;
 
-  /// No description provided for @mapGsiOverlay.
+  /// No description provided for @mapOsmOverlay.
   ///
   /// In en, this message translates to:
-  /// **'Detailed map (GSI)'**
-  String get mapGsiOverlay;
+  /// **'Detailed map'**
+  String get mapOsmOverlay;
 
-  /// No description provided for @mapGsiOverlayHint.
+  /// No description provided for @mapOsmOverlayHint.
   ///
   /// In en, this message translates to:
-  /// **'Add high-resolution terrain from Japan\'s GSI'**
-  String get mapGsiOverlayHint;
+  /// **'Show more complete roads, buildings, and place labels'**
+  String get mapOsmOverlayHint;
 
-  /// No description provided for @mapGsiDetails.
+  /// No description provided for @mapOsmDetails.
   ///
   /// In en, this message translates to:
-  /// **'Layer details'**
-  String get mapGsiDetails;
+  /// **'Detailed map layers'**
+  String get mapOsmDetails;
 
-  /// How many of the GSI layers are enabled
+  /// Heading above the subtle source-attribution list at the bottom of About
+  ///
+  /// In en, this message translates to:
+  /// **'Data sources'**
+  String get moreDataSources;
+
+  /// No description provided for @dataSourceTremNet.
+  ///
+  /// In en, this message translates to:
+  /// **'探索智慧科技有限公司 — TREM-Net'**
+  String get dataSourceTremNet;
+
+  /// No description provided for @dataSourceCwa.
+  ///
+  /// In en, this message translates to:
+  /// **'交通部中央氣象署 (CWA)'**
+  String get dataSourceCwa;
+
+  /// No description provided for @dataSourceJma.
+  ///
+  /// In en, this message translates to:
+  /// **'気象庁 (JMA)'**
+  String get dataSourceJma;
+
+  /// No description provided for @dataSourceNcdr.
+  ///
+  /// In en, this message translates to:
+  /// **'國家災害防救科技中心 (NCDR)'**
+  String get dataSourceNcdr;
+
+  /// No description provided for @dataSourceEcmwf.
+  ///
+  /// In en, this message translates to:
+  /// **'European Centre for Medium-Range Weather Forecasts (ECMWF)'**
+  String get dataSourceEcmwf;
+
+  /// No description provided for @dataSourceNoaaGfs.
+  ///
+  /// In en, this message translates to:
+  /// **'National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)'**
+  String get dataSourceNoaaGfs;
+
+  /// No description provided for @dataSourceGovernmentOpenData.
+  ///
+  /// In en, this message translates to:
+  /// **'政府資料開放平臺'**
+  String get dataSourceGovernmentOpenData;
+
+  /// No description provided for @dataSourceOpenStreetMap.
+  ///
+  /// In en, this message translates to:
+  /// **'© OpenStreetMap contributors'**
+  String get dataSourceOpenStreetMap;
+
+  /// No description provided for @dataSourceNasaMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)'**
+  String get dataSourceNasaMoon;
+
+  /// How many of the OSM layers are enabled
   ///
   /// In en, this message translates to:
   /// **'{enabled} of {total} layers enabled'**
-  String mapGsiDetailsHint(int enabled, int total);
+  String mapOsmDetailsHint(int enabled, int total);
 
-  /// No description provided for @mapGsiSurface.
+  /// No description provided for @mapOsmSurface.
   ///
   /// In en, this message translates to:
   /// **'Surface'**
-  String get mapGsiSurface;
+  String get mapOsmSurface;
 
-  /// No description provided for @mapGsiParks.
+  /// No description provided for @mapOsmParks.
   ///
   /// In en, this message translates to:
   /// **'Parks'**
-  String get mapGsiParks;
+  String get mapOsmParks;
 
-  /// No description provided for @mapGsiLandUse.
+  /// No description provided for @mapOsmLandUse.
   ///
   /// In en, this message translates to:
   /// **'Land use'**
-  String get mapGsiLandUse;
+  String get mapOsmLandUse;
 
-  /// No description provided for @mapGsiAirportAreas.
+  /// No description provided for @mapOsmAirportAreas.
   ///
   /// In en, this message translates to:
   /// **'Airport areas'**
-  String get mapGsiAirportAreas;
+  String get mapOsmAirportAreas;
 
-  /// No description provided for @mapGsiWater.
+  /// No description provided for @mapOsmWater.
   ///
   /// In en, this message translates to:
   /// **'Water'**
-  String get mapGsiWater;
+  String get mapOsmWater;
 
-  /// No description provided for @mapGsiRivers.
+  /// No description provided for @mapOsmRivers.
   ///
   /// In en, this message translates to:
   /// **'Rivers'**
-  String get mapGsiRivers;
+  String get mapOsmRivers;
 
-  /// No description provided for @mapGsiBoundaries.
+  /// No description provided for @mapOsmBoundaries.
   ///
   /// In en, this message translates to:
   /// **'Boundaries'**
-  String get mapGsiBoundaries;
+  String get mapOsmBoundaries;
 
-  /// No description provided for @mapGsiBuildings.
+  /// No description provided for @mapOsmBuildings.
   ///
   /// In en, this message translates to:
   /// **'Buildings'**
-  String get mapGsiBuildings;
+  String get mapOsmBuildings;
 
-  /// No description provided for @mapGsiRoads.
+  /// No description provided for @mapOsmRoads.
   ///
   /// In en, this message translates to:
   /// **'Roads'**
-  String get mapGsiRoads;
+  String get mapOsmRoads;
 
-  /// No description provided for @mapGsiRoadNames.
+  /// No description provided for @mapOsmRoadNames.
   ///
   /// In en, this message translates to:
   /// **'Road names'**
-  String get mapGsiRoadNames;
+  String get mapOsmRoadNames;
 
-  /// No description provided for @mapGsiWaterNames.
+  /// No description provided for @mapOsmWaterNames.
   ///
   /// In en, this message translates to:
   /// **'Water names'**
-  String get mapGsiWaterNames;
+  String get mapOsmWaterNames;
 
-  /// No description provided for @mapGsiPeaks.
+  /// No description provided for @mapOsmPeaks.
   ///
   /// In en, this message translates to:
   /// **'Peaks'**
-  String get mapGsiPeaks;
+  String get mapOsmPeaks;
 
-  /// No description provided for @mapGsiAirportNames.
+  /// No description provided for @mapOsmAirportNames.
   ///
   /// In en, this message translates to:
   /// **'Airport names'**
-  String get mapGsiAirportNames;
+  String get mapOsmAirportNames;
 
-  /// No description provided for @mapGsiPlaceNames.
+  /// No description provided for @mapOsmPlaceNames.
   ///
   /// In en, this message translates to:
   /// **'Place names'**
-  String get mapGsiPlaceNames;
+  String get mapOsmPlaceNames;
 
-  /// No description provided for @mapGsiPoi.
+  /// No description provided for @mapOsmPoi.
   ///
   /// In en, this message translates to:
   /// **'Points of interest'**
-  String get mapGsiPoi;
+  String get mapOsmPoi;
 
-  /// No description provided for @mapGsiHouseNumbers.
+  /// No description provided for @mapOsmHouseNumbers.
   ///
   /// In en, this message translates to:
   /// **'House numbers'**
-  String get mapGsiHouseNumbers;
+  String get mapOsmHouseNumbers;
 
-  /// No description provided for @mapGsiRestoreAll.
+  /// No description provided for @mapOsmRestoreAll.
   ///
   /// In en, this message translates to:
   /// **'Restore all'**
-  String get mapGsiRestoreAll;
+  String get mapOsmRestoreAll;
+
+  /// No description provided for @mapOsmSectionNatural.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural features'**
+  String get mapOsmSectionNatural;
+
+  /// No description provided for @mapOsmSectionRoadsAndBuildings.
+  ///
+  /// In en, this message translates to:
+  /// **'Roads & buildings'**
+  String get mapOsmSectionRoadsAndBuildings;
+
+  /// No description provided for @mapOsmSectionLabelsAndPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels & places'**
+  String get mapOsmSectionLabelsAndPlaces;
 
   /// Map setting: show township-name labels when the map is zoomed in
   ///
@@ -5950,6 +6028,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uploads them and copies a link to paste into a report'**
   String get moreDumpDiagnosticsHint;
+
+  /// Unchecked-by-default consent for private diagnostics
+  ///
+  /// In en, this message translates to:
+  /// **'Include precise location'**
+  String get dumpIncludeSensitive;
+
+  /// Explains which diagnostics require explicit consent
+  ///
+  /// In en, this message translates to:
+  /// **'Includes coordinates from logs and background location; otherwise they are replaced with null'**
+  String get dumpIncludeSensitiveHint;
+
+  /// Button that confirms a diagnostics upload
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get dumpUpload;
 
   /// Title of the dialog shown after a debug dump uploads
   ///

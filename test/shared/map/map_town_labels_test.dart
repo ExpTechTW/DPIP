@@ -61,9 +61,25 @@ void main() {
 
     expect(find.text(l10n.mapTownLabels), findsOneWidget);
     expect(find.text(l10n.mapTerrainRelief), findsOneWidget);
-    expect(find.text(l10n.mapGsiOverlay), findsOneWidget);
+    expect(find.text(l10n.mapOsmOverlay), findsOneWidget);
     // Both ship on by default: two ticked boxes.
     expect(find.byIcon(Icons.check_box), findsNWidgets(2));
+  });
+
+  testWidgets('the common OSM control is the first setting in the list', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(ValueNotifier(true)));
+
+    final l10n = await _l10n();
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+
+    final gsiY = tester.getTopLeft(find.text(l10n.mapOsmOverlay)).dy;
+    final terrainY = tester.getTopLeft(find.text(l10n.mapTerrainRelief)).dy;
+    final labelsY = tester.getTopLeft(find.text(l10n.mapTownLabels)).dy;
+    expect(gsiY, lessThan(terrainY));
+    expect(terrainY, lessThan(labelsY));
   });
 
   testWidgets('tapping the row flips the shared setting', (tester) async {
@@ -73,6 +89,8 @@ void main() {
 
     final l10n = await _l10n();
     await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text(l10n.mapTownLabels));
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.mapTownLabels));
     await tester.pumpAndSettle();
@@ -138,25 +156,46 @@ void main() {
     final l10n = await _l10n();
     await tester.tap(find.byType(MapChipButton));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(l10n.mapGsiOverlay));
+    await tester.tap(find.text(l10n.mapOsmOverlay));
     await tester.pumpAndSettle();
 
     expect(gsi.enabled, isTrue);
-    expect(find.text(l10n.mapGsiDetails), findsOneWidget);
-    expect(find.text(l10n.mapGsiDetailsHint(16, 16)), findsOneWidget);
+    expect(find.text(l10n.mapOsmDetails), findsOneWidget);
+    expect(
+      find.text(
+        l10n.mapOsmDetailsHint(
+          GsiLayerGroup.values.length - gsiDefaultDisabledGroups.length,
+          GsiLayerGroup.values.length,
+        ),
+      ),
+      findsOneWidget,
+    );
 
-    await tester.ensureVisible(find.text(l10n.mapGsiDetails));
+    await tester.ensureVisible(find.text(l10n.mapOsmDetails));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(l10n.mapGsiDetails));
+    await tester.tap(find.text(l10n.mapOsmDetails));
     await tester.pumpAndSettle();
 
     expect(find.byType(SwitchListTile), findsWidgets);
-    expect(find.text(l10n.mapGsiSurface), findsOneWidget);
+    expect(find.text(l10n.mapOsmSectionNatural), findsOneWidget);
+    expect(find.text(l10n.mapOsmSurface), findsOneWidget);
     await tester.scrollUntilVisible(
-      find.text(l10n.mapGsiHouseNumbers),
+      find.text(l10n.mapOsmSectionRoadsAndBuildings),
       300,
       scrollable: find.byType(Scrollable).last,
     );
-    expect(find.text(l10n.mapGsiHouseNumbers), findsOneWidget);
+    expect(find.text(l10n.mapOsmSectionRoadsAndBuildings), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(l10n.mapOsmHouseNumbers),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.text(l10n.mapOsmHouseNumbers), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(l10n.mapOsmSectionLabelsAndPlaces),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.text(l10n.mapOsmSectionLabelsAndPlaces), findsOneWidget);
   });
 }

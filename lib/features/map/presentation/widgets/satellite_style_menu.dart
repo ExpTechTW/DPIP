@@ -77,6 +77,13 @@ class SatelliteStyleMenu extends StatelessWidget {
           menuChildren: [
             MapMenuScrollView(
               children: [
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.mapLayerStyleSection),
                 _StyleRow(
                   selected: style == SatelliteStyle.gray,
@@ -117,14 +124,6 @@ class SatelliteStyleMenu extends StatelessWidget {
                   subtitle: l10n.radarGlobalOutlineHint,
                   tooltip: l10n.radarGlobalOutlineHint,
                   onTap: () => layer.setShowGlobalOutline(!showGlobal),
-                ),
-                const MapMenuDivider(),
-                SectionHeader(l10n.mapOverlaySectionMap),
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),
@@ -185,6 +184,13 @@ class SatelliteReferenceMenu extends StatelessWidget {
           menuChildren: [
             MapMenuScrollView(
               children: [
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionReference),
                 MapMenuToggleRow(
                   selected: showGlobal,
@@ -193,14 +199,6 @@ class SatelliteReferenceMenu extends StatelessWidget {
                   subtitle: l10n.radarGlobalOutlineHint,
                   tooltip: l10n.radarGlobalOutlineHint,
                   onTap: () => layer.setShowGlobalOutline(!showGlobal),
-                ),
-                const MapMenuDivider(),
-                SectionHeader(l10n.mapOverlaySectionMap),
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

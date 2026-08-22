@@ -79,4 +79,37 @@ void main() {
     expect(out, isNot(contains('a line')));
     expect(out.length, lessThanOrEqualTo(head.length + 10));
   });
+
+  test('privacy filter nulls structured and free-form location values', () {
+    const privateToken = 'PRIVATE-PUSH-TOKEN';
+    const privateId = 'PRIVATE-DEVICE-ID';
+    const text =
+        '''
+Identifier: $privateId
+FCM token: $privateToken
+payload={"latitude":25.0478,"lng":121.5319}
+position 24.1477, 120.6736
+GET /api/v2/location/1/$privateToken/26w34c/23.0001,120.0002
+GET /api/v2/notify/$privateToken/eew/1
+tile z=14 x=13703 y=7034
+''';
+
+    final out = redactSensitiveDump(text);
+
+    expect(out, contains(privateToken));
+    expect(out, contains(privateId));
+    expect(out, isNot(contains('25.0478')));
+    expect(out, isNot(contains('121.5319')));
+    expect(out, isNot(contains('24.1477')));
+    expect(out, contains('"latitude":null'));
+    expect(out, contains('"lng":null'));
+    expect(out, contains('position null,null'));
+    expect(out, contains('/api/v2/location/1/$privateToken/26w34c/null,null'));
+    expect(out, contains('/api/v2/notify/$privateToken/eew/1'));
+    expect(out, contains('tile z=14 x=13703 y=7034'));
+    // The filter returns a separate upload payload. The source log text stays
+    // byte-for-byte intact for the in-app log viewer and later dumps.
+    expect(text, contains('/api/v2/notify/$privateToken/eew/1'));
+    expect(text, contains('position 24.1477, 120.6736'));
+  });
 }

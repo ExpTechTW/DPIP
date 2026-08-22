@@ -95,6 +95,13 @@ class TyphoonOverlayMenu extends StatelessWidget {
           menuChildren: [
             MapMenuScrollView(
               children: [
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.typhoonOverlaySectionStorm),
                 _StormBandRow(
                   selected: band == TyphoonStormBand.level7,
@@ -193,14 +200,6 @@ class TyphoonOverlayMenu extends StatelessWidget {
                   title: l10n.typhoonLegendWarningAreas,
                   tooltip: l10n.typhoonOverlayWarningTooltip,
                   onTap: () => layer.setShowWarningAreas(!showWarn),
-                ),
-                const MapMenuDivider(),
-                SectionHeader(l10n.mapOverlaySectionMap),
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
                 ),
               ],
             ),

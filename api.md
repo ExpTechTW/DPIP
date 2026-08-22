@@ -52,16 +52,16 @@
 
 ## 沒多活備援 (single host, no failover)
 
-### Basemap / GSI / Terrain（全域 static LB，無區域）
+### Basemap / OSM / Terrain（全域 static LB，無區域）
 
-Basemap、GSI 詳細街道建築與 terrain 都由 MapLibre 直接抓（app 的 tile bridge
-會以 URL 為鍵快取），不經 `ApiClient` 的區域 failover。GSI 是可選疊圖，只覆蓋
+Basemap、OSM 詳細街道建築與 terrain 都由 MapLibre 直接抓（app 的 tile bridge
+會以 URL 為鍵快取），不經 `ApiClient` 的區域 failover。OSM 是可選疊圖，只覆蓋
 臺灣資料範圍；一般 basemap 始終保留，因此資料範圍外不會變成空白。
 
 | 用途 | 路徑 | 主機 |
 |---|---|---|
 | basemap | `/api/v1/map/tiles/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
-| GSI 詳細圖資 | `/api/v1/map/gsi/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
+| OSM 詳細圖資 | `/api/v1/map/gsi/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
 | terrain | `/api/v1/map/terrain/{z}/{x}/{y}.png` | `static.lb.exptech.dev` |
 
 > **Terrain 是 Mapbox terrain-RGB，MapLibre 原生讀得懂。** 每個像素編碼

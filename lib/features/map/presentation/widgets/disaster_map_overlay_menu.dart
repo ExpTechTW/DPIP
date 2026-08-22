@@ -65,6 +65,13 @@ class DisasterMapOverlayMenu extends StatelessWidget {
           menuChildren: [
             MapMenuScrollView(
               children: [
+                MapBasemapControlRows(
+                  showTownLabels: showTownLabels,
+                  onShowTownLabelsChanged: onShowTownLabelsChanged,
+                  showTerrain: showTerrain,
+                  onShowTerrainChanged: onShowTerrainChanged,
+                ),
+                const MapMenuDivider(),
                 SectionHeader(l10n.disasterMapOverlaySectionLayers),
                 for (final sub in layer.subLayers)
                   _ToggleRow(
@@ -76,14 +83,6 @@ class DisasterMapOverlayMenu extends StatelessWidget {
                     onTap: () =>
                         layer.setSubLayerVisible(sub, !sub.visible.value),
                   ),
-                const MapMenuDivider(),
-                SectionHeader(l10n.mapOverlaySectionMap),
-                MapBasemapControlRows(
-                  showTownLabels: showTownLabels,
-                  onShowTownLabelsChanged: onShowTownLabelsChanged,
-                  showTerrain: showTerrain,
-                  onShowTerrainChanged: onShowTerrainChanged,
-                ),
               ],
             ),
           ],

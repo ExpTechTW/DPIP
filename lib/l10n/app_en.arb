@@ -2831,12 +2831,25 @@
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
   },
-  "mapGsiOverlay": "Detailed map (GSI)",
-  "mapGsiOverlayHint": "Add high-resolution terrain from Japan's GSI",
-  "mapGsiDetails": "Layer details",
-  "mapGsiDetailsHint": "{enabled} of {total} layers enabled",
-  "@mapGsiDetailsHint": {
-    "description": "How many of the GSI layers are enabled",
+  "mapOsmOverlay": "Detailed map",
+  "mapOsmOverlayHint": "Show more complete roads, buildings, and place labels",
+  "mapOsmDetails": "Detailed map layers",
+  "moreDataSources": "Data sources",
+  "@moreDataSources": {
+    "description": "Heading above the subtle source-attribution list at the bottom of About"
+  },
+  "dataSourceTremNet": "探索智慧科技有限公司 — TREM-Net",
+  "dataSourceCwa": "交通部中央氣象署 (CWA)",
+  "dataSourceJma": "気象庁 (JMA)",
+  "dataSourceNcdr": "國家災害防救科技中心 (NCDR)",
+  "dataSourceEcmwf": "European Centre for Medium-Range Weather Forecasts (ECMWF)",
+  "dataSourceNoaaGfs": "National Oceanic and Atmospheric Administration / National Centers for Environmental Prediction — Global Forecast System (NOAA/NCEP GFS)",
+  "dataSourceGovernmentOpenData": "政府資料開放平臺",
+  "dataSourceOpenStreetMap": "© OpenStreetMap contributors",
+  "dataSourceNasaMoon": "National Aeronautics and Space Administration / Goddard Space Flight Center Scientific Visualization Studio — CGI Moon Kit (NASA/GSFC SVS)",
+  "mapOsmDetailsHint": "{enabled} of {total} layers enabled",
+  "@mapOsmDetailsHint": {
+    "description": "How many of the OSM layers are enabled",
     "placeholders": {
       "enabled": {
         "type": "int"
@@ -2846,23 +2859,26 @@
       }
     }
   },
-  "mapGsiSurface": "Surface",
-  "mapGsiParks": "Parks",
-  "mapGsiLandUse": "Land use",
-  "mapGsiAirportAreas": "Airport areas",
-  "mapGsiWater": "Water",
-  "mapGsiRivers": "Rivers",
-  "mapGsiBoundaries": "Boundaries",
-  "mapGsiBuildings": "Buildings",
-  "mapGsiRoads": "Roads",
-  "mapGsiRoadNames": "Road names",
-  "mapGsiWaterNames": "Water names",
-  "mapGsiPeaks": "Peaks",
-  "mapGsiAirportNames": "Airport names",
-  "mapGsiPlaceNames": "Place names",
-  "mapGsiPoi": "Points of interest",
-  "mapGsiHouseNumbers": "House numbers",
-  "mapGsiRestoreAll": "Restore all",
+  "mapOsmSurface": "Surface",
+  "mapOsmParks": "Parks",
+  "mapOsmLandUse": "Land use",
+  "mapOsmAirportAreas": "Airport areas",
+  "mapOsmWater": "Water",
+  "mapOsmRivers": "Rivers",
+  "mapOsmBoundaries": "Boundaries",
+  "mapOsmBuildings": "Buildings",
+  "mapOsmRoads": "Roads",
+  "mapOsmRoadNames": "Road names",
+  "mapOsmWaterNames": "Water names",
+  "mapOsmPeaks": "Peaks",
+  "mapOsmAirportNames": "Airport names",
+  "mapOsmPlaceNames": "Place names",
+  "mapOsmPoi": "Points of interest",
+  "mapOsmHouseNumbers": "House numbers",
+  "mapOsmRestoreAll": "Restore all",
+  "mapOsmSectionNatural": "Natural features",
+  "mapOsmSectionRoadsAndBuildings": "Roads & buildings",
+  "mapOsmSectionLabelsAndPlaces": "Labels & places",
   "mapTownLabels": "Township names",
   "@typhoonOverlayWarningTooltip": {
     "description": "Tooltip for the warning-areas overlay toggle"
@@ -3808,6 +3824,18 @@
   "moreDumpDiagnosticsHint": "Uploads them and copies a link to paste into a report",
   "@moreDumpDiagnosticsHint": {
     "description": "Subtitle of the debug-dump row"
+  },
+  "dumpIncludeSensitive": "Include precise location",
+  "@dumpIncludeSensitive": {
+    "description": "Unchecked-by-default consent for private diagnostics"
+  },
+  "dumpIncludeSensitiveHint": "Includes coordinates from logs and background location; otherwise they are replaced with null",
+  "@dumpIncludeSensitiveHint": {
+    "description": "Explains which diagnostics require explicit consent"
+  },
+  "dumpUpload": "Upload",
+  "@dumpUpload": {
+    "description": "Button that confirms a diagnostics upload"
   },
   "dumpUploaded": "Uploaded",
   "@dumpUploaded": {

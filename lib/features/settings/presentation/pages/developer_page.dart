@@ -228,7 +228,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
   String? _diagnosticsText() {
     final sections = _sections;
     if (sections == null) return null;
-    return diagnosticsText(sections, redacted: diagnosticsRedactedLabels);
+    return diagnosticsText(sections, redacted: diagnosticsSensitiveLabels);
   }
 
   @override

@@ -1,9 +1,10 @@
 /// Taiwan street/building detail drawn over the ordinary base map.
 ///
-/// The source is the clipped `gsi.mbtiles` OpenMapTiles dataset documented in
-/// `map-layers-control.md`. It is deliberately a base-map option rather than a
-/// [MapLayer]: radar, satellite, wind, and every other weather product remain
-/// the active overlay while these streets sit underneath them.
+/// The source is a clipped OpenMapTiles dataset built from OpenStreetMap. It is
+/// deliberately a base-map option rather than a [MapLayer]: radar, satellite,
+/// wind, and every other weather product remain active above these streets.
+/// `gsi` remains only in internal IDs to stay compatible with the already
+/// shipped native style and backend route; all user-facing naming is OSM.
 library;
 
 import 'dart:async';
@@ -15,12 +16,13 @@ import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 const String gsiSourceId = 'gsi';
 const String gsiOriginTileUrl =
-    'https://static.lb.exptech.dev${ApiPaths.mapGsiV1}{z}/{x}/{y}.pbf';
+    'https://static.lb.exptech.dev${ApiPaths.mapOsmV1}{z}/{x}/{y}.pbf';
 const double gsiSourceMaxZoom = 14;
 const double gsiDisplayMaxZoom = 18;
 const List<double> gsiBounds = [114.28579, 10.32677, 122.3283, 26.43722];
@@ -55,10 +57,56 @@ enum GsiLayerGroup {
   houseNumbers,
 }
 
+/// Optional details that start hidden. They remain available in the sheet and
+/// [GsiOverlayController.restoreAll] deliberately turns them back on.
+const Set<GsiLayerGroup> gsiDefaultDisabledGroups = {
+  GsiLayerGroup.parks,
+  GsiLayerGroup.boundaries,
+};
+
+/// Small, scannable groups for the detailed OSM layer sheet. Every native
+/// layer belongs to exactly one user-facing group below, and every group here
+/// belongs to exactly one section.
+enum GsiLayerSection { naturalFeatures, roadsAndBuildings, labelsAndPlaces }
+
+const Map<GsiLayerSection, List<GsiLayerGroup>> gsiLayerGroupsBySection = {
+  GsiLayerSection.naturalFeatures: [
+    GsiLayerGroup.surface,
+    GsiLayerGroup.parks,
+    GsiLayerGroup.landUse,
+    GsiLayerGroup.water,
+    GsiLayerGroup.rivers,
+    GsiLayerGroup.peaks,
+  ],
+  GsiLayerSection.roadsAndBuildings: [
+    GsiLayerGroup.roads,
+    GsiLayerGroup.airportAreas,
+    GsiLayerGroup.buildings,
+    GsiLayerGroup.houseNumbers,
+  ],
+  GsiLayerSection.labelsAndPlaces: [
+    GsiLayerGroup.boundaries,
+    GsiLayerGroup.roadNames,
+    GsiLayerGroup.waterNames,
+    GsiLayerGroup.airportNames,
+    GsiLayerGroup.placeNames,
+    GsiLayerGroup.poi,
+  ],
+};
+
 /// State shared by the base-map menu and the native style owner.
 class GsiOverlayController extends ChangeNotifier {
-  bool _enabled = false;
-  final Set<GsiLayerGroup> _groups = {...GsiLayerGroup.values};
+  GsiOverlayController({
+    this.mutuallyExclusiveTerrain,
+    bool initiallyEnabled = false,
+  }) : _enabled = initiallyEnabled {
+    if (initiallyEnabled) mutuallyExclusiveTerrain?.value = false;
+  }
+
+  final ValueNotifier<bool>? mutuallyExclusiveTerrain;
+  bool _enabled;
+  final Set<GsiLayerGroup> _groups = {...GsiLayerGroup.values}
+    ..removeAll(gsiDefaultDisabledGroups);
   int _revision = 0;
 
   bool get enabled => _enabled;
@@ -68,6 +116,11 @@ class GsiOverlayController extends ChangeNotifier {
   bool groupEnabled(GsiLayerGroup group) => _groups.contains(group);
 
   void setEnabled(bool value) {
+    // The vector overlay already supplies its own land / road surface. Drawing
+    // hillshade below it both wastes a DEM viewport and muddies that surface,
+    // so selecting OSM turns terrain off in the same synchronous UI update.
+    // The scaffold performs the inverse edge (terrain on -> OSM off).
+    if (value) mutuallyExclusiveTerrain?.value = false;
     if (_enabled == value) return;
     _enabled = value;
     _revision++;
@@ -136,7 +189,7 @@ class GsiStyleLayer {
       final SymbolLayerProperties value => value.copyWith(
         SymbolLayerProperties(visibility: visibility),
       ),
-      _ => throw StateError('Unsupported GSI layer properties for $id'),
+      _ => throw StateError('Unsupported OSM layer properties for $id'),
     };
   }
 }
@@ -265,7 +318,7 @@ List<GsiStyleLayer> gsiStyleLayers(Brightness brightness) {
       kind: GsiLayerKind.fill,
       sourceLayer: 'water',
       // Transparent by design: the ExpTech base map supplies the sea colour,
-      // avoiding a hard rectangle at the GSI dataset bounds.
+      // avoiding a hard rectangle at the OSM dataset bounds.
       properties: FillLayerProperties(fillColor: 'rgba(0, 0, 0, 0)'),
     ),
     GsiStyleLayer(
@@ -448,19 +501,10 @@ List<GsiStyleLayer> gsiStyleLayers(Brightness brightness) {
             ],
           ],
         ],
-        lineDasharray: const [
-          'match',
-          ['get', 'class'],
-          'rail',
-          [
-            'literal',
-            [2, 2],
-          ],
-          [
-            'literal',
-            [1, 0],
-          ],
-        ],
+        // MapLibre Native on iOS accepts a constant dash pattern but aborts
+        // inside MLNLineStyleLayer when this property is data-driven. Keep the
+        // shared road layer solid; a native Objective-C exception cannot be
+        // recovered by Dart's try/catch.
       ),
     ),
     GsiStyleLayer(
@@ -720,9 +764,9 @@ class MapGsiOverlayControls extends StatelessWidget {
           MapMenuToggleRow(
             selected: controller.enabled,
             icon: Icons.apartment_outlined,
-            title: l10n.mapGsiOverlay,
-            subtitle: l10n.mapGsiOverlayHint,
-            tooltip: l10n.mapGsiOverlayHint,
+            title: l10n.mapOsmOverlay,
+            subtitle: l10n.mapOsmOverlayHint,
+            tooltip: l10n.mapOsmOverlayHint,
             closeOnActivate: false,
             onTap: () => controller.setEnabled(!controller.enabled),
           ),
@@ -782,9 +826,9 @@ class _GsiDetailsRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.mapGsiDetails),
+                    Text(l10n.mapOsmDetails),
                     Text(
-                      l10n.mapGsiDetailsHint(enabled, total),
+                      l10n.mapOsmDetailsHint(enabled, total),
                       style: Theme.of(context).textTheme.labelSmall
                           ?.copyWith(color: colors.onSurfaceVariant),
                     ),
@@ -827,7 +871,7 @@ class _GsiDetailsSheet extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      l10n.mapGsiDetails,
+                      l10n.mapOsmDetails,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -835,7 +879,7 @@ class _GsiDetailsSheet extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: controller.restoreAll,
-                    child: Text(l10n.mapGsiRestoreAll),
+                    child: Text(l10n.mapOsmRestoreAll),
                   ),
                 ],
               ),
@@ -843,31 +887,20 @@ class _GsiDetailsSheet extends StatelessWidget {
             Expanded(
               child: ListenableBuilder(
                 listenable: controller,
-                builder: (context, _) => ListView.builder(
+                builder: (context, _) => ListView(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.md,
                     0,
                     AppSpacing.md,
                     AppSpacing.lg,
                   ),
-                  itemCount: GsiLayerGroup.values.length,
-                  itemBuilder: (context, index) {
-                    final group = GsiLayerGroup.values[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                      child: Material(
-                        color: theme.colorScheme.surfaceContainer,
-                        borderRadius: AppRadius.medium,
-                        child: SwitchListTile(
-                          secondary: Icon(_groupIcon(group)),
-                          title: Text(_groupLabel(l10n, group)),
-                          value: controller.groupEnabled(group),
-                          onChanged: (value) =>
-                              controller.setGroupEnabled(group, value),
-                        ),
-                      ),
-                    );
-                  },
+                  children: [
+                    for (final section in GsiLayerSection.values) ...[
+                      SectionHeader(_sectionLabel(l10n, section)),
+                      for (final group in gsiLayerGroupsBySection[section]!)
+                        _GsiGroupTile(controller: controller, group: group),
+                    ],
+                  ],
                 ),
               ),
             ),
@@ -878,24 +911,57 @@ class _GsiDetailsSheet extends StatelessWidget {
   }
 }
 
+class _GsiGroupTile extends StatelessWidget {
+  const _GsiGroupTile({required this.controller, required this.group});
+
+  final GsiOverlayController controller;
+  final GsiLayerGroup group;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Material(
+        color: colors.surfaceContainer,
+        borderRadius: AppRadius.medium,
+        child: SwitchListTile(
+          secondary: Icon(_groupIcon(group)),
+          title: Text(_groupLabel(l10n, group)),
+          value: controller.groupEnabled(group),
+          onChanged: (value) => controller.setGroupEnabled(group, value),
+        ),
+      ),
+    );
+  }
+}
+
+String _sectionLabel(AppLocalizations l10n, GsiLayerSection section) =>
+    switch (section) {
+      GsiLayerSection.naturalFeatures => l10n.mapOsmSectionNatural,
+      GsiLayerSection.roadsAndBuildings => l10n.mapOsmSectionRoadsAndBuildings,
+      GsiLayerSection.labelsAndPlaces => l10n.mapOsmSectionLabelsAndPlaces,
+    };
+
 String _groupLabel(AppLocalizations l10n, GsiLayerGroup group) =>
     switch (group) {
-      GsiLayerGroup.surface => l10n.mapGsiSurface,
-      GsiLayerGroup.parks => l10n.mapGsiParks,
-      GsiLayerGroup.landUse => l10n.mapGsiLandUse,
-      GsiLayerGroup.airportAreas => l10n.mapGsiAirportAreas,
-      GsiLayerGroup.water => l10n.mapGsiWater,
-      GsiLayerGroup.rivers => l10n.mapGsiRivers,
-      GsiLayerGroup.boundaries => l10n.mapGsiBoundaries,
-      GsiLayerGroup.buildings => l10n.mapGsiBuildings,
-      GsiLayerGroup.roads => l10n.mapGsiRoads,
-      GsiLayerGroup.roadNames => l10n.mapGsiRoadNames,
-      GsiLayerGroup.waterNames => l10n.mapGsiWaterNames,
-      GsiLayerGroup.peaks => l10n.mapGsiPeaks,
-      GsiLayerGroup.airportNames => l10n.mapGsiAirportNames,
-      GsiLayerGroup.placeNames => l10n.mapGsiPlaceNames,
-      GsiLayerGroup.poi => l10n.mapGsiPoi,
-      GsiLayerGroup.houseNumbers => l10n.mapGsiHouseNumbers,
+      GsiLayerGroup.surface => l10n.mapOsmSurface,
+      GsiLayerGroup.parks => l10n.mapOsmParks,
+      GsiLayerGroup.landUse => l10n.mapOsmLandUse,
+      GsiLayerGroup.airportAreas => l10n.mapOsmAirportAreas,
+      GsiLayerGroup.water => l10n.mapOsmWater,
+      GsiLayerGroup.rivers => l10n.mapOsmRivers,
+      GsiLayerGroup.boundaries => l10n.mapOsmBoundaries,
+      GsiLayerGroup.buildings => l10n.mapOsmBuildings,
+      GsiLayerGroup.roads => l10n.mapOsmRoads,
+      GsiLayerGroup.roadNames => l10n.mapOsmRoadNames,
+      GsiLayerGroup.waterNames => l10n.mapOsmWaterNames,
+      GsiLayerGroup.peaks => l10n.mapOsmPeaks,
+      GsiLayerGroup.airportNames => l10n.mapOsmAirportNames,
+      GsiLayerGroup.placeNames => l10n.mapOsmPlaceNames,
+      GsiLayerGroup.poi => l10n.mapOsmPoi,
+      GsiLayerGroup.houseNumbers => l10n.mapOsmHouseNumbers,
     };
 
 IconData _groupIcon(GsiLayerGroup group) => switch (group) {

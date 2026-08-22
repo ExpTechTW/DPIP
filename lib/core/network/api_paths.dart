@@ -19,8 +19,9 @@ abstract final class ApiPaths {
   static const String mapTilesV1 = '/api/v1/map/tiles/';
 
   /// Detailed Taiwan street/building vector tiles
-  /// (`/api/v1/map/gsi/{z}/{x}/{y}.pbf`).
-  static const String mapGsiV1 = '/api/v1/map/gsi/';
+  /// (`/api/v1/map/gsi/{z}/{x}/{y}.pbf`). The route name is legacy; the
+  /// payload is OpenMapTiles data sourced from OpenStreetMap, not Japan GSI.
+  static const String mapOsmV1 = '/api/v1/map/gsi/';
 
   /// v1 terrain vector tiles (`/api/v1/map/terrain/…`) — the static CDN's
   /// elevation mesh, same XYZ shape as [mapTilesV1].

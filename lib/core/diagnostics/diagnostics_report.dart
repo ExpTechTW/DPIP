@@ -50,26 +50,22 @@ typedef DiagnosticsReport = ({
   List<TableStat> tables,
 });
 
-/// Labels that never leave the device.
+/// Values that require explicit consent before a diagnostics upload.
 ///
-/// Dropped rather than starred out: these are the values in the dump that
-/// identify a person or authorise a push to them, and a dump is pasted into
-/// places its author does not control. One list, because a second copy is a
-/// list that drifts — and the copy that drifts is the one that leaks.
-const Set<String> diagnosticsRedactedLabels = {
-  'Identifier',
-  'FCM token',
-  'APNs token',
-};
+/// One list owns the policy so the confirmation copy and the upload path cannot
+/// drift. Without consent these labels stay visible but their values become the
+/// literal `null`, making the omission unambiguous to whoever reads the dump.
+const Set<String> diagnosticsSensitiveLabels = {'Centred on'};
 
 /// The sections as the text that gets pasted.
 ///
-/// Labels in [redacted] are dropped entirely rather than starred out: a device
-/// identifier and a push token are the two values in here that identify a
-/// person, and a dump is pasted into places its author does not control.
+/// Labels in [redacted] are dropped entirely. Labels in [nulled] remain in the
+/// report with the literal value `null`, so support can distinguish a privacy
+/// choice from a platform that failed to answer the diagnostic.
 String diagnosticsText(
   List<DiagnosticsSection> sections, {
   Set<String> redacted = const {},
+  Set<String> nulled = const {},
 }) {
   final buffer = StringBuffer('DPIP diagnostics');
   for (final section in sections) {
@@ -80,7 +76,8 @@ String diagnosticsText(
     if (fields.isEmpty) continue;
     buffer.writeln('\n[${section.title}]');
     for (final field in fields) {
-      buffer.writeln('${field.label}: ${field.value ?? '—'}');
+      final value = nulled.contains(field.label) ? 'null' : field.value ?? '—';
+      buffer.writeln('${field.label}: $value');
     }
   }
   return buffer.toString().trim();
