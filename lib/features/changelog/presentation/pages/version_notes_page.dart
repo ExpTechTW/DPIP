@@ -93,6 +93,12 @@ class VersionNotesPage extends StatelessWidget {
                 AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
               ),
               children: [
+                // The version's own story, one level further in: the train's
+                // key highlights, named for the release (e.g. 26.1 重點整理)
+                // rather than this build. Sits right under the app bar so the
+                // reader finds the summary first, before this build's note.
+                _HighlightsEntry(train: AppBuild.train),
+                const SizedBox(height: AppSpacing.md),
                 _Header(note: note, isStable: stable),
                 const SizedBox(height: AppSpacing.md),
                 _Body(
@@ -104,11 +110,6 @@ class VersionNotesPage extends StatelessWidget {
                         ),
                   accent: typeColor,
                 ),
-                // The version's own story, one level further in: the train's
-                // key highlights, named for the release (e.g. 26.1 重點整理)
-                // rather than this build.
-                const SizedBox(height: AppSpacing.lg),
-                _HighlightsEntry(train: AppBuild.train),
               ],
             ),
           );
@@ -141,31 +142,51 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Chip(
-          avatar: Icon(
-            isStable ? Icons.verified_outlined : Icons.science_outlined,
-            size: 18,
-            color: Colors.white,
-          ),
-          label: Text(
-            isStable ? l10n.changelogTypeStable : l10n.changelogTypePrerelease,
-          ),
-          backgroundColor: typeColor,
-          labelStyle: theme.textTheme.labelMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
-          side: const BorderSide(color: Colors.transparent),
-          visualDensity: VisualDensity.compact,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          title,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            color: colors.onSurface,
-            letterSpacing: -0.3,
-          ),
+        // Same pairing as the changelog card: the name and its type badge sit
+        // together on one line, badge hugging the text — a tinted wash with a
+        // hairline of the same hue, not a solid fill.
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            // The same type icon the changelog card leads with: a flask for a
+            // snapshot, a verified badge for a release.
+            Icon(
+              isStable ? Icons.verified_outlined : Icons.science_outlined,
+              size: 22,
+              color: typeColor,
+            ),
+            Text(
+              title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: colors.onSurface,
+                letterSpacing: -0.3,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: typeColor.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(color: typeColor.withValues(alpha: 0.45)),
+              ),
+              child: Text(
+                isStable
+                    ? l10n.changelogTypeStable
+                    : l10n.changelogTypePrerelease,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: typeColor,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(

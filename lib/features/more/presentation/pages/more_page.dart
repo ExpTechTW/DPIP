@@ -37,266 +37,270 @@ class MorePage extends StatelessWidget {
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
     final eewCwaOnly = context.watch<EewCwaOnlySettings>().enabled;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navMore)),
-      body: ListView(
-        // The shell uses extendBody, so the list runs behind the bottom nav bar;
-        // pad the bottom by the obscured height (reported via MediaQuery) so the
-        // last rows can scroll clear of it.
-        padding: EdgeInsets.only(
-          top: AppSpacing.sm,
-          bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
-        ),
-        children: [
-          // The four cards above the menu, one block: version fills the left
-          // half of the line, support takes the top half of the right column,
-          // and Discord and announcements split the bottom half of it.
-          const _HeroCards(),
-          SectionHeader(l10n.moreSectionRegion),
-          _MoreGroup(
-            children: [
-              const _SavedRegionsTile(),
-              _SaveNote(l10n: l10n),
-            ],
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          // The shell uses extendBody, so the list runs behind the bottom nav bar;
+          // pad the bottom by the obscured height (reported via MediaQuery) so the
+          // last rows can scroll clear of it.
+          padding: EdgeInsets.only(
+            top: AppSpacing.sm,
+            bottom: AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
           ),
-          SectionHeader(l10n.moreSectionNotify),
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.notifications_outlined,
-                title: l10n.notifySettingsMenu,
-                onTap: () => context.pushNamed(AppRoutes.notifySettings),
-              ),
-              // Kept beside the notification settings: when an alert does not
-              // arrive, the grant is the first thing to check.
-              _MoreTile(
-                icon: Icons.verified_user_outlined,
-                title: l10n.permissionsTitle,
-                // The same dot the More tab carries, on the row it leads to —
-                // otherwise the tab says something is wrong and the page the
-                // user opens looks no different from every other row.
-                alert: context.select<PermissionHealth, bool>(
-                  (health) => health.needsAttention,
-                ),
-                onTap: () => context.pushNamed(AppRoutes.permissions),
-              ),
-              // What the system says actually went out — a status page, kept
-              // in the notification group because that is where you look when
-              // an alert did not arrive.
-              _MoreLinkTile(
-                icon: Icons.notifications_active_outlined,
-                title: l10n.moreNotifyLog,
-                host: 'status.exptech.com.tw',
-                url: 'https://status.exptech.com.tw/notify',
-              ),
-            ],
-          ),
-          SectionHeader(l10n.moreSectionDisplay),
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.translate_outlined,
-                title: l10n.languageSettings,
-                onTap: () => context.pushNamed(AppRoutes.language),
-              ),
-              _MoreTile(
-                icon: Icons.brightness_6_outlined,
-                title: l10n.displaySettings,
-                onTap: () => context.pushNamed(AppRoutes.display),
-              ),
-              _MoreTile(
-                icon: mapLayer.icon,
-                title: l10n.defaultMapLayerSettings,
-                subtitle: mapLayer.label(l10n),
-                onTap: () => context.pushNamed(AppRoutes.defaultMapLayer),
-              ),
-              _MoreTile(
-                icon: Icons.filter_alt_outlined,
-                title: l10n.eewSourceSettings,
-                subtitle: eewCwaOnly
-                    ? l10n.eewSourceCwaOnly
-                    : l10n.eewSourceAll,
-                onTap: () => context.pushNamed(AppRoutes.eewSource),
-              ),
-            ],
-          ),
-          // Its own section rather than a row under 進階: the LoRa mesh is the
-          // app's off-grid reception path, not a developer curiosity, and the
-          // radio it pairs with is a physical thing the user owns and manages.
-          SectionHeader(l10n.moreSectionMesh),
-          _MoreGroup(
-            children: [
-              _MoreTile(
-                icon: Icons.router_outlined,
-                title: l10n.meshtasticTitle,
-                // A message arrived in a conversation the user has not read —
-                // the same state as the chat page's unread pills, selected
-                // down to one boolean so only this tile rebuilds.
-                alert: context.select<MeshUnread, bool>((u) => u.hasUnread),
-                onTap: () => context.pushNamed(AppRoutes.meshtastic),
-              ),
-            ],
-          ),
-          SectionHeader(l10n.moreSectionAdvanced),
-          _MoreGroup(
-            children: [
-              // Hidden until ten taps on the Developer page's version row
-              // (ExperimentalSettings.unlocked).
-              if (context.watch<ExperimentalSettings>().unlocked)
+          children: [
+            // The four cards above the menu, one block: version fills the left
+            // half of the line, support takes the top half of the right column,
+            // and Discord and announcements split the bottom half of it.
+            const _HeroCards(),
+            SectionHeader(l10n.moreSectionRegion),
+            _MoreGroup(
+              children: [
+                const _SavedRegionsTile(),
+                _SaveNote(l10n: l10n),
+              ],
+            ),
+            SectionHeader(l10n.moreSectionNotify),
+            _MoreGroup(
+              children: [
                 _MoreTile(
-                  icon: Icons.science_outlined,
-                  title: l10n.experimentalFeatures,
-                  onTap: () => context.pushNamed(AppRoutes.experimental),
+                  icon: Icons.notifications_outlined,
+                  title: l10n.notifySettingsMenu,
+                  onTap: () => context.pushNamed(AppRoutes.notifySettings),
                 ),
-              _MoreTile(
-                icon: Icons.history_outlined,
-                title: l10n.changelogTitle,
-                onTap: () => context.pushNamed(AppRoutes.changelog),
-              ),
-              _MoreTile(
-                icon: Icons.article_outlined,
-                title: l10n.appLogs,
-                onTap: () => context.pushNamed(AppRoutes.log),
-              ),
-              _MoreTile(
-                icon: Icons.developer_mode_outlined,
-                title: l10n.moreDeveloper,
-                onTap: () => context.pushNamed(AppRoutes.developer),
-              ),
-              // Directly under the page it dumps. Everything a report needs
-              // is on that page already, and it was still being retyped row by
-              // row — this sends the whole thing, plus the log that explains
-              // it, and hands back one link.
-              const _DumpTile(),
-            ],
-          ),
-          SectionHeader(l10n.moreSectionLinks),
-          _MoreGroup(
-            children: [
-              _MoreLinkTile(
-                icon: Icons.crisis_alert_outlined,
-                title: l10n.moreCwaEew,
-                host: 'eew.exptech.dev',
-                url: 'https://eew.exptech.dev/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.sensors_outlined,
-                title: l10n.moreTremReport,
-                host: 'report.exptech.dev',
-                url: 'https://report.exptech.dev/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.smart_display_outlined,
-                title: l10n.moreYoutube,
-                host: 'youtube.com/@exptechtw',
-                url: 'https://www.youtube.com/@exptechtw',
-              ),
-              _MoreLinkTile(
-                icon: Icons.groups_outlined,
-                title: l10n.moreGithub,
-                host: 'github.com/ExpTechTW',
-                url: 'https://github.com/ExpTechTW',
-              ),
-              _MoreLinkTile(
-                icon: Icons.code_outlined,
-                title: l10n.moreSourceCode,
-                host: 'github.com/ExpTechTW/DPIP',
-                url: 'https://github.com/ExpTechTW/DPIP',
-              ),
-            ],
-          ),
-          // Both stores shown side by side — DPIP is cross-platform.
-          SectionHeader(l10n.moreSectionApp),
-          _MoreGroup(
-            children: [
-              _MoreLinkTile(
-                icon: Icons.android,
-                title: l10n.moreGooglePlay,
-                host: 'play.google.com',
-                url: 'https://play.google.com/store/apps/details?id=com.exptech.dpip',
-              ),
-              _MoreLinkTile(
-                icon: Icons.apple,
-                title: l10n.moreAppStore,
-                host: 'apps.apple.com',
-                url: 'https://apps.apple.com/tw/app/dpip/id6468026362',
-              ),
-            ],
-          ),
-          // The bleeding-edge builds, one per store, each with its own opt-in.
-          SectionHeader(l10n.moreSectionBeta),
-          _MoreGroup(
-            children: [
-              _MoreLinkTile(
-                icon: Icons.android,
-                title: l10n.moreAndroidBeta,
-                host: 'play.google.com',
-                url: 'https://play.google.com/apps/testing/com.exptech.dpip',
-              ),
-              _MoreLinkTile(
-                icon: Icons.apple,
-                title: l10n.moreTestFlight,
-                host: 'testflight.apple.com',
-                url: 'https://testflight.apple.com/join/8aPWtOxk',
-              ),
-            ],
-          ),
-          // The people who make DPIP run — the same list as the README.
-          SectionHeader(l10n.moreSectionPartners),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.sm,
+                // Kept beside the notification settings: when an alert does not
+                // arrive, the grant is the first thing to check.
+                _MoreTile(
+                  icon: Icons.verified_user_outlined,
+                  title: l10n.permissionsTitle,
+                  // The same dot the More tab carries, on the row it leads to —
+                  // otherwise the tab says something is wrong and the page the
+                  // user opens looks no different from every other row.
+                  alert: context.select<PermissionHealth, bool>(
+                    (health) => health.needsAttention,
+                  ),
+                  onTap: () => context.pushNamed(AppRoutes.permissions),
+                ),
+                // What the system says actually went out — a status page, kept
+                // in the notification group because that is where you look when
+                // an alert did not arrive.
+                _MoreLinkTile(
+                  icon: Icons.notifications_active_outlined,
+                  title: l10n.moreNotifyLog,
+                  host: 'status.exptech.com.tw',
+                  url: 'https://status.exptech.com.tw/notify',
+                ),
+              ],
             ),
-            child: Text(
-              l10n.morePartnersNote,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+            SectionHeader(l10n.moreSectionDisplay),
+            _MoreGroup(
+              children: [
+                _MoreTile(
+                  icon: Icons.translate_outlined,
+                  title: l10n.languageSettings,
+                  onTap: () => context.pushNamed(AppRoutes.language),
+                ),
+                _MoreTile(
+                  icon: Icons.brightness_6_outlined,
+                  title: l10n.displaySettings,
+                  onTap: () => context.pushNamed(AppRoutes.display),
+                ),
+                _MoreTile(
+                  icon: mapLayer.icon,
+                  title: l10n.defaultMapLayerSettings,
+                  subtitle: mapLayer.label(l10n),
+                  onTap: () => context.pushNamed(AppRoutes.defaultMapLayer),
+                ),
+                _MoreTile(
+                  icon: Icons.filter_alt_outlined,
+                  title: l10n.eewSourceSettings,
+                  subtitle: eewCwaOnly
+                      ? l10n.eewSourceCwaOnly
+                      : l10n.eewSourceAll,
+                  onTap: () => context.pushNamed(AppRoutes.eewSource),
+                ),
+              ],
+            ),
+            // Its own section rather than a row under 進階: the LoRa mesh is the
+            // app's off-grid reception path, not a developer curiosity, and the
+            // radio it pairs with is a physical thing the user owns and manages.
+            SectionHeader(l10n.moreSectionMesh),
+            _MoreGroup(
+              children: [
+                _MoreTile(
+                  icon: Icons.router_outlined,
+                  title: l10n.meshtasticTitle,
+                  // A message arrived in a conversation the user has not read —
+                  // the same state as the chat page's unread pills, selected
+                  // down to one boolean so only this tile rebuilds.
+                  alert: context.select<MeshUnread, bool>((u) => u.hasUnread),
+                  onTap: () => context.pushNamed(AppRoutes.meshtastic),
+                ),
+              ],
+            ),
+            SectionHeader(l10n.moreSectionAdvanced),
+            _MoreGroup(
+              children: [
+                // Hidden until ten taps on the Developer page's version row
+                // (ExperimentalSettings.unlocked).
+                if (context.watch<ExperimentalSettings>().unlocked)
+                  _MoreTile(
+                    icon: Icons.science_outlined,
+                    title: l10n.experimentalFeatures,
+                    onTap: () => context.pushNamed(AppRoutes.experimental),
+                  ),
+                _MoreTile(
+                  icon: Icons.history_outlined,
+                  title: l10n.changelogTitle,
+                  onTap: () => context.pushNamed(AppRoutes.changelog),
+                ),
+                _MoreTile(
+                  icon: Icons.article_outlined,
+                  title: l10n.appLogs,
+                  onTap: () => context.pushNamed(AppRoutes.log),
+                ),
+                _MoreTile(
+                  icon: Icons.developer_mode_outlined,
+                  title: l10n.moreDeveloper,
+                  onTap: () => context.pushNamed(AppRoutes.developer),
+                ),
+                // Directly under the page it dumps. Everything a report needs
+                // is on that page already, and it was still being retyped row by
+                // row — this sends the whole thing, plus the log that explains
+                // it, and hands back one link.
+                const _DumpTile(),
+              ],
+            ),
+            SectionHeader(l10n.moreSectionLinks),
+            _MoreGroup(
+              children: [
+                _MoreLinkTile(
+                  icon: Icons.crisis_alert_outlined,
+                  title: l10n.moreCwaEew,
+                  host: 'eew.exptech.dev',
+                  url: 'https://eew.exptech.dev/',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.sensors_outlined,
+                  title: l10n.moreTremReport,
+                  host: 'report.exptech.dev',
+                  url: 'https://report.exptech.dev/',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.smart_display_outlined,
+                  title: l10n.moreYoutube,
+                  host: 'youtube.com/@exptechtw',
+                  url: 'https://www.youtube.com/@exptechtw',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.groups_outlined,
+                  title: l10n.moreGithub,
+                  host: 'github.com/ExpTechTW',
+                  url: 'https://github.com/ExpTechTW',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.code_outlined,
+                  title: l10n.moreSourceCode,
+                  host: 'github.com/ExpTechTW/DPIP',
+                  url: 'https://github.com/ExpTechTW/DPIP',
+                ),
+              ],
+            ),
+            // Both stores shown side by side — DPIP is cross-platform.
+            SectionHeader(l10n.moreSectionApp),
+            _MoreGroup(
+              children: [
+                _MoreLinkTile(
+                  icon: Icons.android,
+                  title: l10n.moreGooglePlay,
+                  host: 'play.google.com',
+                  url: 'https://play.google.com/store/apps/details?id=com.exptech.dpip',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.apple,
+                  title: l10n.moreAppStore,
+                  host: 'apps.apple.com',
+                  url: 'https://apps.apple.com/tw/app/dpip/id6468026362',
+                ),
+              ],
+            ),
+            // The bleeding-edge builds, one per store, each with its own opt-in.
+            SectionHeader(l10n.moreSectionBeta),
+            _MoreGroup(
+              children: [
+                _MoreLinkTile(
+                  icon: Icons.android,
+                  title: l10n.moreAndroidBeta,
+                  host: 'play.google.com',
+                  url: 'https://play.google.com/apps/testing/com.exptech.dpip',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.apple,
+                  title: l10n.moreTestFlight,
+                  host: 'testflight.apple.com',
+                  url: 'https://testflight.apple.com/join/8aPWtOxk',
+                ),
+              ],
+            ),
+            // The people who make DPIP run — the same list as the README.
+            SectionHeader(l10n.moreSectionPartners),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              child: Text(
+                l10n.morePartnersNote,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
-          ),
-          _MoreGroup(
-            children: [
-              _MoreLinkTile(
-                icon: Icons.business_outlined,
-                title: l10n.morePartnerGeoscience,
-                host: 'geoscience.com.tw',
-                url: 'https://www.geoscience.com.tw/',
-              ),
-              _MoreLinkTile(
-                icon: Icons.cloud_outlined,
-                title: l10n.morePartnerTwds,
-                host: 'twds.com.tw',
-                url: 'https://www.twds.com.tw/',
-              ),
-            ],
-          ),
-          SectionHeader(l10n.moreSectionAbout),
-          _MoreGroup(
-            children: [
-              _MoreLinkTile(
-                icon: Icons.gavel_outlined,
-                title: l10n.termsOfService,
-                host: 'exptech.com.tw',
-                url: 'https://exptech.com.tw/tos',
-              ),
-              _MoreTile(
-                icon: Icons.inventory_2_outlined,
-                title: l10n.openSourceLicenses,
-                // Flutter's built-in license viewer — no third-party package.
-                onTap: () =>
-                    showLicensePage(context: context, applicationName: 'DPIP'),
-              ),
-              _MoreLinkTile(
-                icon: Icons.help_outline,
-                title: l10n.faq,
-                host: 'exptech.com.tw',
-                url: 'https://exptech.com.tw',
-              ),
-            ],
-          ),
-        ],
+            _MoreGroup(
+              children: [
+                _MoreLinkTile(
+                  icon: Icons.business_outlined,
+                  title: l10n.morePartnerGeoscience,
+                  host: 'geoscience.com.tw',
+                  url: 'https://www.geoscience.com.tw/',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.cloud_outlined,
+                  title: l10n.morePartnerTwds,
+                  host: 'twds.com.tw',
+                  url: 'https://www.twds.com.tw/',
+                ),
+              ],
+            ),
+            SectionHeader(l10n.moreSectionAbout),
+            _MoreGroup(
+              children: [
+                _MoreLinkTile(
+                  icon: Icons.gavel_outlined,
+                  title: l10n.termsOfService,
+                  host: 'exptech.com.tw',
+                  url: 'https://exptech.com.tw/tos',
+                ),
+                _MoreTile(
+                  icon: Icons.inventory_2_outlined,
+                  title: l10n.openSourceLicenses,
+                  // Flutter's built-in license viewer — no third-party package.
+                  onTap: () => showLicensePage(
+                    context: context,
+                    applicationName: 'DPIP',
+                  ),
+                ),
+                _MoreLinkTile(
+                  icon: Icons.help_outline,
+                  title: l10n.faq,
+                  host: 'exptech.com.tw',
+                  url: 'https://exptech.com.tw',
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
