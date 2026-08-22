@@ -44,6 +44,9 @@ void main() {
 
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[4]);
+      // The attach's admin-chrome sync drains after `show` returns; this test
+      // pins the scrub's write set exactly, so flush it before clearing.
+      await pumpEventQueue();
       controller.calls.clear();
       controller.sentKeys.clear();
 
@@ -117,6 +120,12 @@ void main() {
       final controller = RecordingMapController();
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[1]);
+      // Drain the mutation queue past the settle's attach: the admin chrome
+      // sync runs inside it, so a cold frame's reveal can still be in flight
+      // when `show` returns.
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
       return (layer, controller);
     }
 

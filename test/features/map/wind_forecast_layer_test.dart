@@ -136,15 +136,11 @@ void main() {
         containsAll([
           'addLineLayer:admin-county-outline',
           'addLineLayer:admin-town-outline',
+          'addLineLayer:admin-global-outline',
         ]),
         reason:
             'the wind field covers the base style\'s borders, so its own '
-            'county and township frame is drawn over it on attach',
-      );
-      expect(
-        controller.calls,
-        isNot(contains('addLineLayer:admin-global-outline')),
-        reason: 'the national border ships off and must not appear on attach',
+            'county, township and national frame is drawn over it on attach',
       );
 
       controller.calls.clear();
@@ -154,12 +150,13 @@ void main() {
         containsAll([
           'removeLayer:admin-county-outline',
           'removeLayer:admin-town-outline',
+          'removeLayer:admin-global-outline',
         ]),
       );
     },
   );
 
-  test('turning the global borders on draws them over a live map', () async {
+  test('turning the global borders off removes them from a live map', () async {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(_ids(5)),
       model: WindForecastModel.ecmwf,
@@ -169,13 +166,11 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[2]);
-    controller.calls.clear();
-
-    layer.setShowGlobalOutline(true);
-    for (var i = 0; i < 5; i++) {
-      await Future<void>.delayed(Duration.zero);
-    }
-    expect(controller.calls, contains('addLineLayer:admin-global-outline'));
+    expect(
+      controller.calls,
+      contains('addLineLayer:admin-global-outline'),
+      reason: 'the national border ships on by default',
+    );
 
     controller.calls.clear();
     layer.setShowGlobalOutline(false);
