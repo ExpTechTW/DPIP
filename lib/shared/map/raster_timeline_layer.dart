@@ -1300,9 +1300,14 @@ abstract class RasterTimelineLayer implements MapLayer {
     );
   }
 
-  /// Hides every ring member that fell outside [keep] and abandons any remaining
-  /// tile HTTP. The source stays resident for a cheap nearby reversal until the
-  /// LRU ceiling removes it.
+  /// Retires every ring member that fell outside [keep].
+  ///
+  /// A complete source stays resident and hidden for a cheap nearby reversal.
+  /// An incomplete source is removed before its HTTP is cancelled. Android
+  /// reports OkHttp `Call.cancel()` to MapLibre as a permanent resource error;
+  /// retaining that source left its tile state poisoned, and restoring only
+  /// opacity/visibility did not issue a fresh request. Removing it makes the
+  /// next [_mount] create a new source and therefore a new resource request.
   Future<void> _retireOutside(
     MapLibreMapController controller,
     Set<String> keep,
@@ -1313,10 +1318,31 @@ abstract class RasterTimelineLayer implements MapLayer {
     ];
     if (retired.isEmpty) return;
     _ring.removeAll(retired);
-    await controller.setLayerPropertiesBatch([
-      for (final id in retired) (layerId: _layerId(id), properties: _hidden),
-    ], skipNulls: true);
-    await source.abandonFrames(retired);
+    final reusable = [
+      for (final id in retired)
+        if (_readyFrames.contains(id)) id,
+    ];
+    final incomplete = [
+      for (final id in retired)
+        if (!_readyFrames.contains(id)) id,
+    ];
+    MapTileCache.trace(
+      () =>
+          'timeline=$id retire reusable=${reusable.length} '
+          'recreate=${incomplete.length}',
+    );
+    if (reusable.isNotEmpty) {
+      await controller.setLayerPropertiesBatch([
+        for (final id in reusable) (layerId: _layerId(id), properties: _hidden),
+      ], skipNulls: true);
+    }
+    for (final id in incomplete) {
+      _resident.remove(id);
+      _readyFrames.remove(id);
+      _lru.remove(id);
+      await _removeFrame(controller, id);
+    }
+    if (incomplete.isNotEmpty) await source.abandonFrames(incomplete);
   }
 
   /// The camera's visible region and zoom, re-read only when the camera moved.

@@ -136,6 +136,59 @@ void main() {
     }
   });
 
+  test('a cancelled incomplete frame is recreated before reuse', () async {
+    final source = _FakeRadarRepository(_ids(15));
+    final layer = RadarMapLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+    final oldFrame = frames[2].id;
+    final oldSource = 'radar-src-$oldFrame';
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    layer.onTimelineScrubStart();
+    await layer.show(controller, frames[10]);
+
+    expect(source.abandoned, contains(oldFrame));
+    expect(controller.calls, contains('removeSource:$oldSource'));
+
+    layer.onTimelineScrubStart();
+    await layer.show(controller, frames[2]);
+    expect(
+      controller.calls.where((call) => call == 'addSource:$oldSource'),
+      hasLength(2),
+      reason:
+          'a source that received Android permanent Canceled must be rebuilt, '
+          'not merely made visible again',
+    );
+  });
+
+  test(
+    'a complete retired frame remains reusable without cancellation',
+    () async {
+      final source = _FakeRadarRepository(_ids(15));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+      final oldFrame = frames[2].id;
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[2]);
+      layer.onMapIdle();
+      source.abandoned.clear();
+      controller.calls.clear();
+
+      await layer.show(controller, frames[10]);
+
+      expect(source.abandoned, isNot(contains(oldFrame)));
+      expect(
+        controller.calls,
+        isNot(contains('removeSource:radar-src-$oldFrame')),
+      );
+      expect(controller.visibilityOf('radar-lyr-$oldFrame'), 'none');
+    },
+  );
+
   test('a blocked warm cannot leave two timestamps at full opacity', () async {
     final source = _BlockingWarmRadarRepository(_ids(9));
     final layer = RadarMapLayer(source);
@@ -153,11 +206,12 @@ void main() {
     await layer.show(controller, frames[7]);
 
     expect(controller.opacityOf('radar-lyr-${frames[7].id}'), '0.85');
-    expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0');
     expect(
-      controller.visibilityOf('radar-lyr-${frames[1].id}'),
-      'none',
-      reason: 'the old timestamp must stop drawing before warming finishes',
+      controller.calls,
+      contains('removeSource:radar-src-${frames[1].id}'),
+      reason:
+          'an incomplete old timestamp must be removed before its requests '
+          'are cancelled, so Android cannot retain a poisoned source',
     );
 
     source.warmGate.complete();
@@ -805,7 +859,10 @@ void main() {
     await layer.show(controller, frames[8]); // ring 6..8
 
     for (final i in [2, 3, 4, 5]) {
-      expect(controller.visibilityOf('radar-lyr-${frames[i].id}'), 'none');
+      expect(
+        controller.calls,
+        contains('removeSource:radar-src-${frames[i].id}'),
+      );
     }
     expect(controller.opacityOf('radar-lyr-${frames[8].id}'), '0.85');
   });
