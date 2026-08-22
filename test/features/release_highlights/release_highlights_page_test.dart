@@ -2,6 +2,7 @@
 /// narrow phone and both audience tabs expose their content.
 library;
 
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/release_highlights/data/release_highlight_repository.dart';
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
 import 'package:dpip/features/release_highlights/presentation/pages/release_highlights_page.dart';
@@ -46,6 +47,18 @@ Future<void> _pumpPage(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets("the app bar names the train's highlights", (tester) async {
+    AppBuild.debugSet(label: '26w35a', code: 42, train: '26.1');
+    addTearDown(() => AppBuild.debugSet(label: 'dev', code: 0));
+    await _pumpPage(tester);
+
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(ReleaseHighlightsPage)),
+    );
+    // The page's own name stays in the app bar… plus the train number.
+    expect(find.text(l10n.releaseHighlightsTitle('26.1')), findsOneWidget);
+  });
+
   testWidgets('renders both decks without overflow on a narrow phone', (
     tester,
   ) async {

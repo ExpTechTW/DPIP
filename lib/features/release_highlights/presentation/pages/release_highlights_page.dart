@@ -3,15 +3,15 @@
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
 import 'package:dpip/features/release_highlights/presentation/widgets/highlight_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-/// The page behind the version card's chevron.
+/// The page behind the version card's chevron — the train's key highlights
+/// and technical notes.
 class ReleaseHighlightsPage extends StatelessWidget {
   const ReleaseHighlightsPage({super.key});
 
@@ -22,14 +22,7 @@ class ReleaseHighlightsPage extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.releaseHighlightsTitle),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.article_outlined),
-              tooltip: l10n.releaseHighlightsSeeNotes,
-              onPressed: () => context.pushNamed(AppRoutes.versionNotes),
-            ),
-          ],
+          title: Text(l10n.releaseHighlightsTitle(AppBuild.train)),
           bottom: TabBar(
             tabs: [
               Tab(text: l10n.releaseHighlightsTabNormal),

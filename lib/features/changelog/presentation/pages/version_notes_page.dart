@@ -19,11 +19,13 @@ import 'package:dpip/features/changelog/domain/update_check.dart';
 import 'package:dpip/features/changelog/presentation/widgets/release_contributors.dart';
 import 'package:dpip/features/changelog/presentation/widgets/release_note_markdown.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -63,7 +65,17 @@ class VersionNotesPage extends StatelessWidget {
           message: l10n.moreVersionNotesEmpty,
         ),
         builder: (context, notes) {
-          final note = notes.where((n) => _isCurrent(n, label)).firstOrNull;
+          // A build no published release names (a local/dev label, or a
+          // snapshot newer than the fetched page) falls back to the newest
+          // note — same rule the version card's avatars use, so the page is
+          // never bare once any note has been fetched.
+          final note =
+              notes.where((n) => _isCurrent(n, label)).firstOrNull ??
+              (notes.isEmpty
+                  ? null
+                  : notes.reduce(
+                      (a, b) => a.publishedAt.isAfter(b.publishedAt) ? a : b,
+                    ));
           if (note == null) {
             return EmptyView(
               icon: Icons.question_mark_outlined,
@@ -92,6 +104,11 @@ class VersionNotesPage extends StatelessWidget {
                         ),
                   accent: typeColor,
                 ),
+                // The version's own story, one level further in: the train's
+                // key highlights, named for the release (e.g. 26.1 重點整理)
+                // rather than this build.
+                const SizedBox(height: AppSpacing.lg),
+                _HighlightsEntry(train: AppBuild.train),
               ],
             ),
           );
@@ -158,6 +175,82 @@ class _Header extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Entry card to the train's key-highlights deck (release highlights), one
+/// level further in from this build's own note. Label carries the train
+/// number so the reader sees where the note they just read fits.
+class _HighlightsEntry extends StatelessWidget {
+  const _HighlightsEntry({required this.train});
+
+  final String train;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Material(
+      color: colors.primaryContainer.withValues(alpha: 0.35),
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.medium,
+        side: BorderSide(color: colors.primary.withValues(alpha: 0.35)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.pushNamed(AppRoutes.releaseHighlights),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.md,
+            AppSpacing.md,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colors.primary.withValues(alpha: 0.14),
+                ),
+                child: Icon(
+                  Icons.auto_awesome,
+                  size: 22,
+                  color: colors.primary,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.releaseHighlightsTitle(train),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.moreVersionNotesHighlightsSubtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

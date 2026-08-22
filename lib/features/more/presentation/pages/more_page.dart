@@ -4,8 +4,8 @@ import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
-import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -1054,10 +1054,19 @@ class _VersionCardState extends State<_VersionCard> {
   static const Color _stableColor = Color(0xFF2E7D32);
   static const Color _snapshotColor = Color(0xFFEF6C00);
 
-  /// The contributors of the release this build answers for, parsed from the
-  /// note's body; empty until the fetch resolves (or when it fails — avatars
-  /// are decoration, so a failure only hides them).
+  /// The contributors of the release this build answers for. A build that no
+  /// published release names yet (a local/dev build, or a snapshot newer than
+  /// the fetched page) falls back to the newest note's contributors — the
+  /// closest published record — so the card is never bare once any note has
+  /// been fetched. Empty only when the fetch itself fails.
   List<ReleaseContributor> _contributors = const [];
+
+  /// Whether the avatar slot shows a skeleton. True from the first frame and
+  /// **stays true when the fetch fails**: a failed request is indistinguishable
+  /// from a slow one to the reader, and collapsing the slot would move the
+  /// badge row and make the card feel broken — so the placeholder persists
+  /// until real data replaces it.
+  bool _loading = true;
 
   @override
   void initState() {
@@ -1069,10 +1078,18 @@ class _VersionCardState extends State<_VersionCard> {
     final result = await context.read<ChangelogRepository>().releases(page: 1);
     if (!mounted) return;
     setState(() {
-      _contributors = switch (result) {
-        Ok(:final value) => _contributorsFor(value, AppBuild.label),
-        Err() => const [],
-      };
+      // Failure keeps the skeleton: `_loading` stays true, and the strip
+      // below renders the placeholder instead of collapsing.
+      switch (result) {
+        case Ok(:final value):
+          _loading = false;
+          _contributors = _contributorsFor(value, AppBuild.label);
+        case Err():
+          Log.debug(
+            'version card contributors: fetch failed: '
+            '${result.failureOrNull}',
+          );
+      }
     });
   }
 
@@ -1083,7 +1100,15 @@ class _VersionCardState extends State<_VersionCard> {
     for (final note in notes) {
       if (_isCurrent(note, label)) return contributorsFromBody(note.body);
     }
-    return const [];
+    if (notes.isEmpty) return const [];
+    // No released note names this build (a dev/local label, or a snapshot
+    // newer than this page) — fall back to the newest note's record. Newest
+    // by publish time, not list position: a page's order is the API's to
+    // promise, and the card must not depend on it.
+    final newest = notes.reduce(
+      (a, b) => a.publishedAt.isAfter(b.publishedAt) ? a : b,
+    );
+    return contributorsFromBody(newest.body);
   }
 
   /// Whether a release answers for the running [label]. Mirrors the version
@@ -1134,7 +1159,7 @@ class _VersionCardState extends State<_VersionCard> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: AppRadius.large,
-        onTap: () => context.pushNamed(AppRoutes.releaseHighlights),
+        onTap: () => context.pushNamed(AppRoutes.versionNotes),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
@@ -1218,6 +1243,16 @@ class _VersionCardState extends State<_VersionCard> {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
+              if (_loading || _contributors.isNotEmpty) ...[
+                // The strip sits between the fine-print version and the
+                // type badge — a band of faces under the number. While the
+                // fetch is in flight the slot is reserved by a skeleton, so
+                // the badge row below never jumps when the avatars land.
+                _loading
+                    ? const _AvatarSkeleton()
+                    : _ContributorStack(contributors: _contributors),
+                const SizedBox(height: AppSpacing.sm),
+              ],
               // Same treatment as the changelog's type chip: tinted wash,
               // hairline of the same hue, coloured label — not a solid fill,
               // which is the one marker the changelog never uses. The badge
@@ -1265,22 +1300,44 @@ class _VersionCardState extends State<_VersionCard> {
                   ],
                 ],
               ),
-              if (_contributors.isNotEmpty) ...[
-                // Try to keep a silhouette of the strip against the card:
-                // enough of a gap to read as a separate zone, then a hairline
-                // that separates the avatars from the build stamp above.
-                const SizedBox(height: AppSpacing.sm),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: colors.outlineVariant.withValues(alpha: 0.5),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                _ContributorStack(contributors: _contributors),
-              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The skeleton that reserves the contributor slot while the changelog fetch
+/// is in flight — three dim circles at the stack's natural footprint, so the
+/// card keeps its height from the first frame and the swap to real avatars
+/// moves nothing below it.
+class _AvatarSkeleton extends StatelessWidget {
+  const _AvatarSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final fill = colors.surfaceContainerHighest.withValues(alpha: 0.45);
+    return SizedBox(
+      width: 3 * _ContributorStack._extra + _ContributorStack._size,
+      height: _ContributorStack._size,
+      child: Stack(
+        children: [
+          for (var i = 0; i < 3; i++)
+            Positioned(
+              left: i * _ContributorStack._extra,
+              child: Container(
+                width: _ContributorStack._size - 4,
+                height: _ContributorStack._size - 4,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: fill,
+                  border: Border.all(color: colors.surfaceContainer, width: 2),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -1301,7 +1358,11 @@ class _ContributorStack extends StatelessWidget {
   static const double _overlap = 14;
 
   /// Avatar circle diameter, including the border.
-  static const double _size = 24;
+  static const double _size = 30;
+
+  /// Horizontal advance per avatar — size minus the overlap, so the far edge
+  /// of each circle sits exactly under the previous one's border.
+  static const double _extra = _size - _overlap;
 
   @override
   Widget build(BuildContext context) {
@@ -1313,10 +1374,9 @@ class _ContributorStack extends StatelessWidget {
         var shown = 1;
         // First avatar takes _size; each further one adds (size - overlap).
         var used = _size;
-        final extra = _size - _overlap;
         while (shown < contributors.length &&
-            used + extra + chipWidth <= constraints.maxWidth) {
-          used += extra;
+            used + _extra + chipWidth <= constraints.maxWidth) {
+          used += _extra;
           shown++;
         }
         final hidden = contributors.length - shown;
@@ -1328,7 +1388,7 @@ class _ContributorStack extends StatelessWidget {
             children: [
               for (var i = 0; i < shown; i++)
                 Positioned(
-                  left: i * extra,
+                  left: i * _extra,
                   child: _VersionAvatar(contributor: contributors[i]),
                 ),
               if (hidden > 0)
@@ -1406,7 +1466,7 @@ class _VersionAvatarState extends State<_VersionAvatar> {
                         ? '?'
                         : widget.contributor.login[0].toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontSize: 9,
+                      fontSize: 11,
                       color: colors.onSurfaceVariant,
                       fontWeight: FontWeight.w700,
                     ),
@@ -1440,7 +1500,7 @@ class _MoreChip extends StatelessWidget {
       child: Text(
         '+$count',
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          fontSize: 8,
+          fontSize: 10,
           color: colors.onSurfaceVariant,
           fontWeight: FontWeight.w700,
         ),
