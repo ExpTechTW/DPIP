@@ -12,6 +12,7 @@ import 'app_localizations_ja.dart';
 import 'app_localizations_ko.dart';
 import 'app_localizations_th.dart';
 import 'app_localizations_vi.dart';
+import 'app_localizations_yue.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -107,6 +108,7 @@ abstract class AppLocalizations {
     Locale('ko'),
     Locale('th'),
     Locale('vi'),
+    Locale('yue'),
     Locale('zh'),
     Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
     Locale.fromSubtags(
@@ -6004,6 +6006,7 @@ class _AppLocalizationsDelegate
     'ko',
     'th',
     'vi',
+    'yue',
     'zh',
   ].contains(locale.languageCode);
 
@@ -6058,6 +6061,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsTh();
     case 'vi':
       return AppLocalizationsVi();
+    case 'yue':
+      return AppLocalizationsYue();
     case 'zh':
       return AppLocalizationsZh();
   }
