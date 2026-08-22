@@ -28,13 +28,14 @@ class OnboardingScaffold extends StatefulWidget {
 class _OnboardingScaffoldState extends State<OnboardingScaffold> {
   final ScrollController _controller = ScrollController();
   bool _atEnd = false;
+  bool _checkScheduled = false;
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(_check);
     // Content that fits without scrolling counts as already "at end".
-    WidgetsBinding.instance.addPostFrameCallback((_) => _check());
+    _scheduleCheck();
   }
 
   @override
@@ -45,7 +46,16 @@ class _OnboardingScaffoldState extends State<OnboardingScaffold> {
     // re-evaluate "at end" after the new content lays out; otherwise a
     // scroll-gated step (the terms) would stay locked with an un-scrollable
     // "scroll to continue" hint.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _check());
+    _scheduleCheck();
+  }
+
+  void _scheduleCheck() {
+    if (_checkScheduled) return;
+    _checkScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkScheduled = false;
+      if (mounted) _check();
+    });
   }
 
   void _check() {
@@ -70,12 +80,24 @@ class _OnboardingScaffoldState extends State<OnboardingScaffold> {
     return Column(
       children: [
         Expanded(
-          child: Scrollbar(
-            controller: _controller,
-            child: SingleChildScrollView(
+          // A ScrollController reports pixel motion, not changes to its
+          // viewport or content dimensions. Android may settle display DPI or
+          // system insets after the first layout; if that makes the whole body
+          // fit, there is then no scroll gesture capable of re-running _check.
+          // Listen to metrics as well so an unscrollable page cannot stay
+          // locked behind "scroll down to continue".
+          child: NotificationListener<ScrollMetricsNotification>(
+            onNotification: (_) {
+              _scheduleCheck();
+              return false;
+            },
+            child: Scrollbar(
               controller: _controller,
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: widget.child,
+              child: SingleChildScrollView(
+                controller: _controller,
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: widget.child,
+              ),
             ),
           ),
         ),

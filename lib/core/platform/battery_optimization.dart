@@ -32,14 +32,17 @@ class BatteryOptimization {
 
   /// Opens the system exemption prompt. Re-check [isIgnoring] afterwards (e.g. on
   /// app resume) — the user acts in a system dialog we can't await.
-  Future<void> request() async {
-    if (!Platform.isAndroid) return;
+  Future<bool> request() async {
+    if (!Platform.isAndroid) return false;
     try {
       await _channel.invokeMethod<void>('request');
+      return true;
     } on PlatformException catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'battery request');
+      return false;
     } on MissingPluginException {
       // Unsupported platform / test harness — nothing to do.
+      return false;
     }
   }
 }

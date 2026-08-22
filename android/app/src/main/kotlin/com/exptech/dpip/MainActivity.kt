@@ -44,8 +44,11 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, BatteryOptimizationChannel.NAME)
             .setMethodCallHandler(BatteryOptimizationChannel(applicationContext))
 
+        MethodChannel(messenger, PermissionSettingsChannel.NAME)
+            .setMethodCallHandler(PermissionSettingsChannel(applicationContext))
+
         MethodChannel(messenger, UnusedAppRestrictionsChannel.NAME)
-            .setMethodCallHandler(UnusedAppRestrictionsChannel(applicationContext))
+            .setMethodCallHandler(UnusedAppRestrictionsChannel(this))
 
         MethodChannel(messenger, BackgroundExecutionChannel.NAME)
             .setMethodCallHandler(BackgroundExecutionChannel(applicationContext))

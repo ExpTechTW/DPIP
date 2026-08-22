@@ -93,4 +93,43 @@ void main() {
       reason: 'content that now fits must unlock without a scroll',
     );
   });
+
+  testWidgets('re-checks when new window metrics make the content fit', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 2;
+    tester.view.physicalSize = const Size(800, 1000);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      _wrap(
+        OnboardingScaffold(
+          child: const SizedBox(height: 700, child: Text('terms')),
+          actionBuilder: (context, atEnd) => FilledButton(
+            onPressed: atEnd ? () {} : null,
+            child: const Text('go'),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
+
+    // Android can update logical window metrics after the first layout when
+    // display size/DPI or system insets settle. This changes scroll extents
+    // without changing the widget, and therefore does not call
+    // didUpdateWidget or the ScrollController's pixel listener.
+    tester.view.devicePixelRatio = 1;
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNotNull,
+      reason: 'an unscrollable body must never remain gated',
+    );
+  });
 }

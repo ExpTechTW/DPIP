@@ -285,6 +285,7 @@ class BackgroundExecutionChannel(private val context: Context) :
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "status" -> result.success(status())
+            "openSystemSettings" -> result.success(openAppDetails())
             "openOemSettings" -> result.success(openOemSettings())
             else -> result.notImplemented()
         }
@@ -368,6 +369,16 @@ class BackgroundExecutionChannel(private val context: Context) :
                 Log.i(TAG, "vendor screen $screen unavailable", e)
             }
         }
+        return openAppDetails()
+    }
+
+    /**
+     * The standard Android restriction and an OEM's auto-start manager are two
+     * different controls. This destination deliberately skips the OEM chain so
+     * a user fixing Android's own "Restricted" state lands on DPIP's app page,
+     * not on (for example) Samsung's sleeping-app list.
+     */
+    private fun openAppDetails(): String {
         return try {
             context.startActivity(
                 Intent(

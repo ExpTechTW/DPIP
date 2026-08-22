@@ -66,9 +66,9 @@ class LocationService {
   /// Opens the system app-settings so the user can grant a permission that can't
   /// be requested in-app (permanently denied, or Android 11+ background
   /// location). Best-effort.
-  Future<void> openSettings() async {
+  Future<bool> openSettings() async {
     Log.info('permission: opening app settings');
-    await openAppSettingsPage();
+    return openAppSettingsPage();
   }
 
   /// Requests **foreground** location permission (call from a screen, after

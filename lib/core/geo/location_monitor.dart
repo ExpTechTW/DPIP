@@ -116,7 +116,7 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
       s == LocationStatus.ready || s == LocationStatus.whileInUseOnly;
 
   /// Sends the user to system settings to fix the permission / services toggle.
-  Future<void> openSettings() => _location.openSettings();
+  Future<bool> openSettings() => _location.openSettings();
 
   @override
   void dispose() {

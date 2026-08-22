@@ -15,6 +15,7 @@ library;
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -22,6 +23,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/platform/background_execution.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
 import 'package:dpip/core/platform/unused_app_restrictions.dart';
@@ -29,6 +31,19 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/permission_settings_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+enum _PermissionItem {
+  notify,
+  critical,
+  location,
+  background,
+  execution,
+  battery,
+  unusedApp,
+  vendor,
+}
+
+enum PermissionRowFeedback { stillNeeded, verifyManually }
 
 /// What the checklist currently sees, so a host can react to it — onboarding
 /// nudges before finishing, the standalone page shows a summary.
@@ -87,6 +102,12 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   BackgroundExecutionStatus _executionStatus =
       const BackgroundExecutionStatus();
 
+  _PermissionItem? _busy;
+  _PermissionItem? _awaitingReturn;
+  _PermissionItem? _feedbackItem;
+  PermissionRowFeedback? _feedback;
+  int _refreshEpoch = 0;
+
   @override
   void initState() {
     super.initState();
@@ -104,10 +125,13 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Every grant that cannot be made in-app is made in system settings, so
     // coming back is the moment to look again.
-    if (state == AppLifecycleState.resumed) _refresh();
+    if (state != AppLifecycleState.resumed) return;
+    final pending = _awaitingReturn;
+    unawaited(_refresh(feedbackFor: pending));
   }
 
-  Future<void> _refresh() async {
+  Future<void> _refresh({_PermissionItem? feedbackFor}) async {
+    final epoch = ++_refreshEpoch;
     Log.debug('permission: refreshing');
     final notifications = context.read<NotificationService>();
     final location = context.read<LocationService>();
@@ -120,7 +144,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
     final unusedApp = await _unusedApp.status();
     final execution = await _execution.status();
-    if (!mounted) return;
+    if (!mounted || epoch != _refreshEpoch) return;
     Log.info(
       'permission state: notify=$notify critical=$critical '
       'location=$locationGranted background=$backgroundGranted '
@@ -132,6 +156,16 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     // so without this the page would show a fresh grant while the dot stayed
     // up — the two surfaces disagreeing about the same fact.
     unawaited(context.read<PermissionHealth>().refresh());
+    final satisfied = _isSatisfied(
+      feedbackFor,
+      notify: notify,
+      critical: critical,
+      location: locationGranted,
+      background: backgroundGranted,
+      execution: execution,
+      battery: batteryOk,
+      unusedApp: unusedApp,
+    );
     setState(() {
       _notify = notify;
       _critical = critical;
@@ -140,6 +174,28 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       _batteryOk = batteryOk;
       _unusedAppStatus = unusedApp;
       _executionStatus = execution;
+      _busy = null;
+      _awaitingReturn = null;
+      if (feedbackFor == _PermissionItem.vendor) {
+        _feedbackItem = feedbackFor;
+        _feedback = PermissionRowFeedback.verifyManually;
+      } else if (feedbackFor != null) {
+        _feedbackItem = satisfied ? null : feedbackFor;
+        _feedback = satisfied ? null : PermissionRowFeedback.stillNeeded;
+      } else if (_feedbackItem != null &&
+          _isSatisfied(
+            _feedbackItem,
+            notify: notify,
+            critical: critical,
+            location: locationGranted,
+            background: backgroundGranted,
+            execution: execution,
+            battery: batteryOk,
+            unusedApp: unusedApp,
+          )) {
+        _feedbackItem = null;
+        _feedback = null;
+      }
     });
     widget.onChanged?.call(
       PermissionState(
@@ -152,12 +208,61 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     );
   }
 
+  bool _isSatisfied(
+    _PermissionItem? item, {
+    required bool notify,
+    required bool critical,
+    required bool location,
+    required bool background,
+    required BackgroundExecutionStatus execution,
+    required bool battery,
+    required UnusedAppRestrictions unusedApp,
+  }) => switch (item) {
+    _PermissionItem.notify => notify,
+    _PermissionItem.critical => critical,
+    _PermissionItem.location => location,
+    _PermissionItem.background => background,
+    _PermissionItem.execution => !execution.restricted,
+    _PermissionItem.battery => battery,
+    _PermissionItem.unusedApp => unusedApp == UnusedAppRestrictions.exempt,
+    _PermissionItem.vendor || null => false,
+  };
+
+  void _begin(_PermissionItem item) {
+    setState(() {
+      _busy = item;
+      if (_feedbackItem == item) {
+        _feedbackItem = null;
+        _feedback = null;
+      }
+    });
+  }
+
+  void _cancel(_PermissionItem item) {
+    if (!mounted || _busy != item) return;
+    setState(() => _busy = null);
+  }
+
+  Future<bool> _leaveForSettings(
+    _PermissionItem item,
+    Future<bool> Function() openSettings,
+  ) async {
+    _awaitingReturn = item;
+    final opened = await openSettings();
+    if (!opened && mounted && _awaitingReturn == item) {
+      _awaitingReturn = null;
+    }
+    return opened;
+  }
+
   /// Asks for a permission, and when the system will not ask again, says so
   /// and offers to open its settings.
   Future<void> _grant(
+    _PermissionItem item,
     Future<PermissionOutcome> Function() request,
-    Future<void> Function() openSettings,
+    Future<bool> Function() openSettings,
     String what,
+    Future<PermissionSettingsGuide> Function() guide,
   ) async {
     // Logged end to end. A permission row that appears to do nothing has
     // several indistinguishable causes — the tap never arrived, the request
@@ -165,6 +270,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     // answered, or something threw and the unawaited future swallowed it — and
     // none of them leave a trace by default.
     Log.info('permission[$what]: tapped');
+    _begin(item);
     try {
       final outcome = await request();
       Log.info('permission[$what]: outcome = ${outcome.name}');
@@ -173,11 +279,27 @@ class _PermissionChecklistState extends State<PermissionChecklist>
         return;
       }
       if (outcome == PermissionOutcome.needsSettings) {
-        await promptForSystemSettings(
+        final settingsGuide = await guide();
+        if (!mounted) return;
+        _begin(item);
+        var attempted = false;
+        final opened = await promptForSystemSettings(
           context,
           what: what,
-          openSettings: openSettings,
+          guide: settingsGuide,
+          openSettings: () {
+            attempted = true;
+            return _leaveForSettings(item, openSettings);
+          },
         );
+        if (!opened) {
+          if (attempted) {
+            await _refresh(feedbackFor: item);
+          } else {
+            _cancel(item);
+          }
+        }
+        return;
       }
     } catch (error, stackTrace) {
       // Nothing awaits this handler, so without catching here an async failure
@@ -189,10 +311,15 @@ class _PermissionChecklistState extends State<PermissionChecklist>
 
   Future<void> _grantNotify() {
     final notifications = context.read<NotificationService>();
+    final l10n = AppLocalizations.of(context);
     return _grant(
+      _PermissionItem.notify,
       notifications.requestPermission,
       notifications.openSystemSettings,
-      AppLocalizations.of(context).onboardingPermNotify,
+      l10n.onboardingPermNotify,
+      () async => PermissionSettingsGuide(
+        instruction: l10n.permissionGuideNotification,
+      ),
     );
   }
 
@@ -205,10 +332,15 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   /// tells the user anything happened.
   Future<void> _grantCritical() {
     final notifications = context.read<NotificationService>();
+    final l10n = AppLocalizations.of(context);
     return _grant(
+      _PermissionItem.critical,
       notifications.requestCritical,
       notifications.openSystemSettings,
-      AppLocalizations.of(context).onboardingPermCritical,
+      l10n.onboardingPermCritical,
+      () async => PermissionSettingsGuide(
+        instruction: l10n.permissionGuideNotification,
+      ),
     );
   }
 
@@ -216,10 +348,15 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   // Android 11+ silently denies both if they're requested in the same gesture.
   Future<void> _grantLocation() {
     final location = context.read<LocationService>();
+    final l10n = AppLocalizations.of(context);
     return _grant(
+      _PermissionItem.location,
       location.requestPermission,
       location.openSettings,
-      AppLocalizations.of(context).onboardingPermLocation,
+      l10n.onboardingPermLocation,
+      () async => PermissionSettingsGuide(
+        instruction: l10n.permissionGuideForegroundLocation,
+      ),
     );
   }
 
@@ -228,20 +365,45 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   // this almost always ends in the dialog rather than a prompt.
   Future<void> _grantBackground() {
     final location = context.read<LocationService>();
+    final l10n = AppLocalizations.of(context);
     return _grant(
+      _PermissionItem.background,
       location.requestBackground,
       location.openSettings,
-      AppLocalizations.of(context).onboardingPermBackground,
+      l10n.onboardingPermBackground,
+      () async {
+        final option =
+            await backgroundLocationOptionLabel() ??
+            l10n.permissionBackgroundLocationOption;
+        return PermissionSettingsGuide(
+          instruction: l10n.permissionGuideBackgroundLocation(option),
+        );
+      },
     );
   }
 
   Future<void> _grantBattery() async {
-    await _battery.request(); // re-checked on resume
+    const item = _PermissionItem.battery;
+    _begin(item);
+    final opened = await _leaveForSettings(item, _battery.request);
+    if (!opened && mounted) await _refresh(feedbackFor: item);
   }
 
   Future<void> _exemptUnusedApp() async {
-    // Not a permission — there is no prompt to await, only a settings page.
-    await _unusedApp.openSettings(); // re-checked on resume
+    final l10n = AppLocalizations.of(context);
+    final instruction = switch (await _unusedApp.guide()) {
+      UnusedAppSettingsGuide.pause => l10n.permissionGuideUnusedPause,
+      UnusedAppSettingsGuide.freeSpace => l10n.permissionGuideUnusedFreeSpace,
+      UnusedAppSettingsGuide.revoke => l10n.permissionGuideUnusedRevoke,
+      UnusedAppSettingsGuide.playProtect =>
+        l10n.permissionGuideUnusedPlayProtect,
+    };
+    await _openGuidedSettings(
+      _PermissionItem.unusedApp,
+      l10n.onboardingPermUnusedApp,
+      PermissionSettingsGuide(instruction: instruction),
+      _unusedApp.openSettings,
+    );
   }
 
   /// The manufacturer as a person would write it. `Build.MANUFACTURER` is not
@@ -261,10 +423,67 @@ class _PermissionChecklistState extends State<PermissionChecklist>
         .join(' ');
   }
 
-  Future<void> _openExecutionSettings() async {
-    final opened = await _execution.openSettings(); // re-checked on resume
-    Log.info('permission[background execution]: opened $opened');
+  Future<void> _openGuidedSettings(
+    _PermissionItem item,
+    String what,
+    PermissionSettingsGuide guide,
+    Future<bool> Function() openSettings,
+  ) async {
+    _begin(item);
+    var attempted = false;
+    final opened = await promptForSystemSettings(
+      context,
+      what: what,
+      guide: guide,
+      openSettings: () {
+        attempted = true;
+        return _leaveForSettings(item, openSettings);
+      },
+    );
+    if (opened || !mounted) return;
+    if (attempted) {
+      await _refresh(feedbackFor: item);
+    } else {
+      _cancel(item);
+    }
   }
+
+  Future<void> _openExecutionSettings() {
+    final l10n = AppLocalizations.of(context);
+    return _openGuidedSettings(
+      _PermissionItem.execution,
+      l10n.onboardingPermBackgroundExec,
+      PermissionSettingsGuide(
+        instruction: l10n.permissionGuideBackgroundExecution,
+      ),
+      () async {
+        final opened = await _execution.openSystemSettings();
+        Log.info('permission[background execution]: opened $opened');
+        return opened != 'none';
+      },
+    );
+  }
+
+  Future<void> _openVendorSettings() {
+    final l10n = AppLocalizations.of(context);
+    return _openGuidedSettings(
+      _PermissionItem.vendor,
+      l10n.onboardingPermVendorPower,
+      PermissionSettingsGuide(
+        instruction: l10n.permissionGuideVendorPower(_vendorName),
+      ),
+      () async {
+        final opened = await _execution.openOemSettings();
+        Log.info('permission[vendor power]: opened $opened');
+        return opened != 'none';
+      },
+    );
+  }
+
+  bool _loading(_PermissionItem item) => _busy == item;
+
+  PermissionRowFeedback? _rowFeedback(_PermissionItem item) =>
+      _feedbackItem == item ? _feedback : null;
 
   @override
   Widget build(BuildContext context) {
@@ -277,6 +496,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
           title: l10n.onboardingPermNotify,
           description: l10n.onboardingPermNotifyDesc,
           granted: _notify,
+          loading: _loading(_PermissionItem.notify),
+          blocked: _busy != null,
+          feedback: _rowFeedback(_PermissionItem.notify),
           onGrant: _grantNotify,
         ),
         if (Platform.isIOS) ...[
@@ -286,6 +508,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             title: l10n.onboardingPermCritical,
             description: l10n.onboardingPermCriticalDesc,
             granted: _critical,
+            loading: _loading(_PermissionItem.critical),
+            blocked: _busy != null,
+            feedback: _rowFeedback(_PermissionItem.critical),
             onGrant: _grantCritical,
           ),
         ],
@@ -295,6 +520,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
           title: l10n.onboardingPermLocation,
           description: l10n.onboardingPermLocationDesc,
           granted: _location,
+          loading: _loading(_PermissionItem.location),
+          blocked: _busy != null,
+          feedback: _rowFeedback(_PermissionItem.location),
           onGrant: _grantLocation,
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -304,6 +532,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
           title: l10n.onboardingPermBackground,
           description: l10n.onboardingPermBackgroundDesc,
           granted: _background,
+          loading: _loading(_PermissionItem.background),
+          blocked: _busy != null,
+          feedback: _rowFeedback(_PermissionItem.background),
           onGrant: _location ? _grantBackground : null,
         ),
         // Not a permission and not optional: the OS can refuse to run this
@@ -320,6 +551,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             title: l10n.onboardingPermBackgroundExec,
             description: l10n.onboardingPermBackgroundExecDesc,
             granted: !_executionStatus.restricted,
+            loading: _loading(_PermissionItem.execution),
+            blocked: _busy != null,
+            feedback: _rowFeedback(_PermissionItem.execution),
+            settingsAction: true,
             onGrant: _openExecutionSettings,
           ),
         ],
@@ -330,6 +565,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             title: l10n.onboardingPermBattery,
             description: l10n.onboardingPermBatteryDesc,
             granted: _batteryOk,
+            loading: _loading(_PermissionItem.battery),
+            blocked: _busy != null,
+            feedback: _rowFeedback(_PermissionItem.battery),
             onGrant: _grantBattery,
           ),
           // Hidden where the platform cannot answer — a device too old for the
@@ -343,6 +581,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
               title: l10n.onboardingPermUnusedApp,
               description: l10n.onboardingPermUnusedAppDesc,
               granted: _unusedAppStatus == UnusedAppRestrictions.exempt,
+              loading: _loading(_PermissionItem.unusedApp),
+              blocked: _busy != null,
+              feedback: _rowFeedback(_PermissionItem.unusedApp),
+              settingsAction: true,
               onGrant: _exemptUnusedApp,
             ),
           ],
@@ -361,7 +603,11 @@ class _PermissionChecklistState extends State<PermissionChecklist>
               description: l10n.onboardingPermVendorPowerDesc(_vendorName),
               granted: false,
               advisory: true,
-              onGrant: _openExecutionSettings,
+              loading: _loading(_PermissionItem.vendor),
+              blocked: _busy != null,
+              feedback: _rowFeedback(_PermissionItem.vendor),
+              settingsAction: true,
+              onGrant: _openVendorSettings,
             ),
           ],
         ],
@@ -379,6 +625,10 @@ class PermissionRow extends StatelessWidget {
     required this.granted,
     required this.onGrant,
     this.advisory = false,
+    this.loading = false,
+    this.blocked = false,
+    this.settingsAction = false,
+    this.feedback,
   });
 
   final IconData icon;
@@ -395,59 +645,124 @@ class PermissionRow extends StatelessWidget {
   /// or a permanent red mark for something that may already be fine. It offers
   /// the settings screen and says so, and [granted] is ignored.
   final bool advisory;
+  final bool loading;
+  final bool blocked;
+  final bool settingsAction;
+  final PermissionRowFeedback? feedback;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return Container(
+    final colors = theme.colorScheme;
+    final feedbackText = switch (feedback) {
+      PermissionRowFeedback.stillNeeded => l10n.permissionStillRequired,
+      PermissionRowFeedback.verifyManually => l10n.permissionVerifyManually,
+      null => null,
+    };
+    final feedbackColor = switch (feedback) {
+      PermissionRowFeedback.stillNeeded => colors.error,
+      PermissionRowFeedback.verifyManually => colors.tertiary,
+      null => null,
+    };
+    final borderColor =
+        feedbackColor ??
+        (loading ? colors.primary : colors.outlineVariant.withValues(alpha: 0));
+    final action = onGrant == null || granted
+        ? null
+        : settingsAction || advisory
+        ? OutlinedButton.icon(
+            onPressed: loading || blocked ? null : () => onGrant!(),
+            icon: const Icon(Icons.open_in_new),
+            label: Text(l10n.permissionOpenSettings),
+          )
+        : FilledButton.tonal(
+            onPressed: loading || blocked ? null : () => onGrant!(),
+            child: Text(l10n.onboardingGrant),
+          );
+    return AnimatedContainer(
+      duration: AppMotion.fast,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
+        color: colors.surfaceContainer,
         borderRadius: AppRadius.medium,
+        border: Border.all(color: borderColor),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            icon,
-            color: advisory
-                ? theme.colorScheme.onSurfaceVariant
-                : theme.colorScheme.primary,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: advisory ? colors.onSurfaceVariant : colors.primary,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                    if (feedbackText != null) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        feedbackText,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: feedbackColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  description,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              AnimatedSwitcher(
+                duration: AppMotion.fast,
+                child: loading
+                    ? SizedBox.square(
+                        key: const ValueKey('loading'),
+                        dimension: 24,
+                        child: Semantics(
+                          label: l10n.commonLoading,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      )
+                    : granted
+                    ? Icon(
+                        Icons.check_circle,
+                        key: const ValueKey('granted'),
+                        color: colors.primary,
+                      )
+                    : feedback == PermissionRowFeedback.stillNeeded
+                    ? Icon(
+                        Icons.error_outline,
+                        key: const ValueKey('stillNeeded'),
+                        color: colors.error,
+                      )
+                    : const SizedBox.shrink(key: ValueKey('idle')),
+              ),
+            ],
           ),
-          const SizedBox(width: AppSpacing.md),
-          if (advisory)
-            OutlinedButton(
-              onPressed: onGrant == null ? null : () => onGrant!(),
-              child: Text(l10n.permissionOpenSettings),
-            )
-          else if (granted)
-            Icon(Icons.check_circle, color: theme.colorScheme.primary)
-          else
-            FilledButton.tonal(
-              onPressed: onGrant == null ? null : () => onGrant!(),
-              child: Text(l10n.onboardingGrant),
-            ),
+          if (action != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Align(alignment: Alignment.centerRight, child: action),
+          ],
         ],
       ),
     );
