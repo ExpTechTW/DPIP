@@ -18,6 +18,10 @@ abstract final class ApiPaths {
   /// v1 basemap vector tiles (`/api/v1/map/tiles/…`).
   static const String mapTilesV1 = '/api/v1/map/tiles/';
 
+  /// Detailed Taiwan street/building vector tiles
+  /// (`/api/v1/map/gsi/{z}/{x}/{y}.pbf`).
+  static const String mapGsiV1 = '/api/v1/map/gsi/';
+
   /// v1 terrain vector tiles (`/api/v1/map/terrain/…`) — the static CDN's
   /// elevation mesh, same XYZ shape as [mapTilesV1].
   static const String mapTerrainV1 = '/api/v1/map/terrain/';

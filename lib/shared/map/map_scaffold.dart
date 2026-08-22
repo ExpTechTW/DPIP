@@ -17,6 +17,7 @@ import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_compass.dart';
+import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
@@ -186,12 +187,22 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// the relief is the terrain feature's whole point.
   final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
 
+  /// Optional Taiwan street/building detail drawn over the ordinary base map.
+  /// Unlike terrain, this source is absent by default so it performs no native
+  /// tile work until the user enables it.
+  final GsiOverlayController _gsi = GsiOverlayController();
+
   /// Whether the terrain source + hillshade layer are actually on the map.
   ///
   /// This mirrors the native state so the toggle can add/remove instead of
   /// flipping visibility (see [_syncTerrain]). A style reload re-bakes both,
   /// so [_onStyleLoaded] sets it back to true and re-syncs.
   bool _terrainOnMap = false;
+
+  bool _gsiOnMap = false;
+  int _gsiAppliedRevision = -1;
+  MapLibreMapController? _gsiSyncController;
+  bool _gsiZoomEnabled = false;
 
   /// The geography the map is framed on, kept across layer switches so each
   /// layer re-frames the *same* place into its own visible band.
@@ -214,6 +225,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     super.initState();
     _trace(() => 'init active=${_active.id} timeline=${_active.usesTimeline}');
     _scrubBackpressure.addListener(_onScrubBackpressureChanged);
+    _gsi.addListener(_onGsiChanged);
     _mapInteraction = MapInteractionTracker(
       onStart: () => _active.onMapGestureStart(),
       onEnd: () => _active.onMapGestureEnd(),
@@ -321,6 +333,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _scrubBackpressure.dispose();
     _showTownLabels.dispose();
     _showTerrain.dispose();
+    _gsi.removeListener(_onGsiChanged);
+    _gsi.dispose();
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
@@ -593,6 +607,8 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _showQueued = false;
     _styleLoaded = false;
     _terrainOnMap = false;
+    _gsiOnMap = false;
+    _gsiAppliedRevision = -1;
     _controller = null;
     _basemapWarmer?.cancel();
     _restoreSurfaceAfterRecreate = true;
@@ -665,6 +681,86 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       unawaited(_basemapWarmer?.discardWorkingSet('terrain'));
     }
     _syncTerrain();
+  }
+
+  void _onGsiChanged() {
+    if (_gsiZoomEnabled != _gsi.enabled) {
+      _gsiZoomEnabled = _gsi.enabled;
+      if (mounted) setState(() {});
+    }
+    if (!_gsi.enabled) {
+      unawaited(_basemapWarmer?.discardWorkingSet(gsiSourceId));
+    } else if (_controller case final controller?) {
+      // Toggling a stationary map produces no camera-idle callback. Warm the
+      // current viewport now so repeat visits can reveal from L2 → L1 while
+      // the native source is being attached, instead of waiting for a pan.
+      unawaited(_warmGsi(controller));
+    }
+    _syncGsi();
+  }
+
+  /// Adds/removes the GSI source itself, not just its visibility. This keeps an
+  /// off overlay at zero network/decode/memory cost and makes rapid toggle
+  /// changes converge on the latest selection.
+  void _syncGsi() {
+    final controller = _controller;
+    if (!mounted ||
+        controller == null ||
+        !_styleLoaded ||
+        identical(_gsiSyncController, controller)) {
+      return;
+    }
+    _gsiSyncController = controller;
+    final brightness = Theme.of(context).brightness;
+    unawaited(
+      _syncGsiLoop(controller, brightness).whenComplete(() {
+        // A replacement platform view may already own a newer sync. Never let
+        // the stale controller clear that worker's guard or mutate its state.
+        if (!identical(_gsiSyncController, controller)) return;
+        _gsiSyncController = null;
+        if (!mounted || !identical(controller, _controller)) return;
+        final dirty =
+            _gsi.enabled != _gsiOnMap ||
+            (_gsiOnMap && _gsi.revision != _gsiAppliedRevision);
+        if (dirty) _syncGsi();
+      }),
+    );
+  }
+
+  Future<void> _syncGsiLoop(
+    MapLibreMapController controller,
+    Brightness brightness,
+  ) async {
+    while (mounted && identical(controller, _controller) && _styleLoaded) {
+      final enabled = _gsi.enabled;
+      final revision = _gsi.revision;
+      try {
+        if (enabled && !_gsiOnMap) {
+          await addGsiOverlay(
+            controller,
+            brightness: brightness,
+            selection: _gsi,
+            belowLayerId: townOutlineLayerId,
+          );
+          if (!identical(controller, _controller)) return;
+          _gsiOnMap = true;
+          _gsiAppliedRevision = revision;
+        } else if (!enabled && _gsiOnMap) {
+          await removeGsiOverlay(controller);
+          if (!identical(controller, _controller)) return;
+          _gsiOnMap = false;
+          _gsiAppliedRevision = revision;
+        } else if (enabled && _gsiAppliedRevision != revision) {
+          await applyGsiLayerVisibility(controller, _gsi, brightness);
+          if (!identical(controller, _controller)) return;
+          _gsiAppliedRevision = revision;
+        }
+      } catch (error, stackTrace) {
+        Log.handle(error, stackTrace, 'GSI overlay sync');
+        return;
+      }
+      if (_gsi.enabled == enabled && _gsi.revision == revision) return;
+    }
   }
 
   /// Pushes the terrain-relief setting onto a live map — by **adding and
@@ -762,6 +858,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         workingSet: 'basemap',
         immediate: true,
       );
+      if (_gsi.enabled) {
+        await _warmGsiViewport(warmer, bounds, zoom);
+      }
       // DEM tiles too — the relief renders at every zoom, so warm them the
       // same way as the basemap. Native downloads a hillshade viewport as one
       // burst of 512px meshes the first time; warming from the store makes a
@@ -793,6 +892,47 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       Log.handle(error, stackTrace, 'basemap viewport warm');
     }
   }
+
+  Future<void> _warmGsi(MapLibreMapController controller) async {
+    await _tileCacheReady;
+    final warmer = _basemapWarmer;
+    if (warmer == null ||
+        !_gsi.enabled ||
+        !identical(controller, _controller)) {
+      return;
+    }
+    try {
+      final bounds = await controller.getVisibleRegion();
+      if (!_gsi.enabled || !identical(controller, _controller)) return;
+      await _warmGsiViewport(
+        warmer,
+        bounds,
+        controller.cameraPosition?.zoom ?? 8,
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'GSI viewport warm');
+    }
+  }
+
+  Future<void> _warmGsiViewport(
+    MapTileWarmer warmer,
+    LatLngBounds bounds,
+    double zoom,
+  ) => warmer.warmViewportAbsolute(
+    urlFor: (z, x, y) => gsiOriginTileUrl
+        .replaceAll('{z}', '$z')
+        .replaceAll('{x}', '$x')
+        .replaceAll('{y}', '$y'),
+    south: bounds.southwest.latitude,
+    west: bounds.southwest.longitude,
+    north: bounds.northeast.latitude,
+    east: bounds.northeast.longitude,
+    zoom: zoom,
+    maxZoom: gsiSourceMaxZoom.toInt(),
+    logLabel: gsiSourceId,
+    workingSet: gsiSourceId,
+    immediate: true,
+  );
 
   void _onStyleLoaded() {
     _styleLoaded = true;
@@ -856,6 +996,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // user's choice — which removes both when the relief is off.
     _terrainOnMap = true;
     _syncTerrain();
+    _gsiOnMap = false;
+    _gsiAppliedRevision = -1;
+    _syncGsi();
   }
 
   /// Forwards a map tap to the active (sheet) layer — it selects the nearest
@@ -1148,12 +1291,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final measured = constraints.biggest;
-          if (measured.isFinite) _mapViewSize = measured;
-          return _body(context);
-        },
+      body: GsiOverlayScope(
+        controller: _gsi,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final measured = constraints.biggest;
+            if (measured.isFinite) _mapViewSize = measured;
+            return _body(context);
+          },
+        ),
       ),
     );
   }
@@ -1172,7 +1318,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             onPointerCancel: _onMapPointerEnded,
             child: BaseMap(
               minZoomPreference: _active.mapMinZoom,
-              maxZoomPreference: _active.mapMaxZoom,
+              maxZoomPreference: _gsi.enabled
+                  ? gsiDisplayMaxZoom
+                  : _active.mapMaxZoom,
               // The map tab owns this surface — pause native rendering when the
               // user is on another tab (indexedStack keeps it mounted).
               tabIndex: widget.tabIndex,

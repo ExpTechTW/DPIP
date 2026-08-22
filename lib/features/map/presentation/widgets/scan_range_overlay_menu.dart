@@ -5,7 +5,6 @@ library;
 
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -115,11 +114,9 @@ class ScanRangeOverlayMenu extends StatelessWidget {
                 ),
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionMap),
-                MapTownLabelsRow(
+                MapBasemapControlRows(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
-                ),
-                MapTerrainRow(
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),

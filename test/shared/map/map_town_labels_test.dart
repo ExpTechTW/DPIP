@@ -1,4 +1,5 @@
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +12,22 @@ Widget _wrap(
   ValueChanged<bool>? onLabelsChanged,
   ValueNotifier<bool>? terrain,
   ValueChanged<bool>? onTerrainChanged,
+  GsiOverlayController? gsi,
 }) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
-  home: Scaffold(
-    body: Align(
-      alignment: Alignment.topRight,
-      child: MapBasemapMenu(
-        showTownLabels: labels,
-        onShowTownLabelsChanged: onLabelsChanged ?? (_) {},
-        showTerrain: terrain ?? ValueNotifier<bool>(true),
-        onShowTerrainChanged: onTerrainChanged ?? (_) {},
+  home: GsiOverlayScope(
+    controller: gsi ?? GsiOverlayController(),
+    child: Scaffold(
+      body: Align(
+        alignment: Alignment.topRight,
+        child: MapBasemapMenu(
+          showTownLabels: labels,
+          onShowTownLabelsChanged: onLabelsChanged ?? (_) {},
+          showTerrain: terrain ?? ValueNotifier<bool>(true),
+          onShowTerrainChanged: onTerrainChanged ?? (_) {},
+        ),
       ),
     ),
   ),
@@ -56,6 +61,7 @@ void main() {
 
     expect(find.text(l10n.mapTownLabels), findsOneWidget);
     expect(find.text(l10n.mapTerrainRelief), findsOneWidget);
+    expect(find.text(l10n.mapGsiOverlay), findsOneWidget);
     // Both ship on by default: two ticked boxes.
     expect(find.byIcon(Icons.check_box), findsNWidgets(2));
   });
@@ -121,5 +127,36 @@ void main() {
       tester.widget<MapChipButton>(find.byType(MapChipButton)).active,
       isTrue,
     );
+  });
+
+  testWidgets('the detailed map exposes all documented layer groups', (
+    tester,
+  ) async {
+    final gsi = GsiOverlayController();
+    await tester.pumpWidget(_wrap(ValueNotifier(true), gsi: gsi));
+
+    final l10n = await _l10n();
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.mapGsiOverlay));
+    await tester.pumpAndSettle();
+
+    expect(gsi.enabled, isTrue);
+    expect(find.text(l10n.mapGsiDetails), findsOneWidget);
+    expect(find.text(l10n.mapGsiDetailsHint(16, 16)), findsOneWidget);
+
+    await tester.ensureVisible(find.text(l10n.mapGsiDetails));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.mapGsiDetails));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SwitchListTile), findsWidgets);
+    expect(find.text(l10n.mapGsiSurface), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(l10n.mapGsiHouseNumbers),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.text(l10n.mapGsiHouseNumbers), findsOneWidget);
   });
 }

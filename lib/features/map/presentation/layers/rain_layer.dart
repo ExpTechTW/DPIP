@@ -8,7 +8,6 @@ import 'package:dpip/features/weather/domain/rain_interval.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -176,11 +175,9 @@ class RainMapLayer
                   ),
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionMap),
-                MapTownLabelsRow(
+                MapBasemapControlRows(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
-                ),
-                MapTerrainRow(
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),
