@@ -21,11 +21,10 @@ import java.util.concurrent.TimeUnit
  * Prefers a recent last-known fix (no sensor spin-up) and only asks the system
  * for a fresh one when that's stale. For a township-level report (~500 m is
  * plenty) it prefers the low-power **network** provider over GPS, and it
- * requires background-location permission on Android 10+ — a headless receiver
- * with only "while in use" can't fix, so this returns null and the receiver
- * backs off rather than spinning sensors for nothing. Runs on the caller's
- * background thread (the alarm receiver's `goAsync` window), blocking briefly on
- * the fresh-fix callback via a latch.
+ * requires background-location permission on Android 10+ — a headless job with
+ * only "while in use" cannot fix, so this returns null and the alarm backs off
+ * rather than spinning sensors for nothing. Runs on the caller's background
+ * thread, blocking briefly on the fresh-fix callback via a latch.
  */
 object LocationFetcher {
     private const val FRESH_MS = 5 * 60 * 1000L

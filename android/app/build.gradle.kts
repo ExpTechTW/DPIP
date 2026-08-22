@@ -130,7 +130,11 @@ dependencies {
     // put it on a consumer's compile classpath, so calling addListener/get needs
     // this explicitly.
     implementation("androidx.concurrent:concurrent-futures:1.2.0")
+    // Durable, queryable watchdog behind the geofence/alarm background-location
+    // path. WorkManager persists its unique periodic work across process death
+    // and reboot; it only repairs an overdue path and never takes a healthy
+    // path's extra location fix.
+    implementation("androidx.work:work-runtime:2.11.2")
     // Backports java.time/etc. for awesome_notifications (see compileOptions).
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
-

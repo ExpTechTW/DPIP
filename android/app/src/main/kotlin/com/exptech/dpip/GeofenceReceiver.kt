@@ -6,117 +6,41 @@ import android.content.Intent
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 
-/**
- * Fires when the device **exits** its current geofence: re-centres the geofence
- * around the fresh triggering point, then reports the township.
- *
- * Because the geofence is monitored by (and this broadcast dispatched through)
- * the Google Play services process, it keeps working after our own app process
- * is killed by an OEM battery manager — the key robustness win over the in-app
- * alarm. The fix + re-register + POST run off the main thread in a `goAsync`
- * window; everything reads from [BgLocationStore] so no Flutter isolate is
- * needed.
- *
- * The geofence is re-centred on `event.triggeringLocation` — the location that
- * caused the exit, which is fresh and by definition *outside* the old fence, so
- * (unlike a possibly-stale last-known fix) the new fence is correctly centred on
- * where the device actually is. Re-centring runs BEFORE the POST so a mid-work
- * process kill can't leave the spine un-armed (the report is retried on the next
- * move). If the platform supplies no triggering location and no fresh fix, or on
- * a geofence error, it re-arms around the last centre — combined with
- * `INITIAL_TRIGGER_EXIT` an already-outside device re-fires immediately, so the
- * spine self-heals instead of dying. Best-effort, not a guarantee, which is
- * what the alarm watchdog behind the fence is for.
- */
+/** Records geofence delivery and hands location, registration, and HTTP to a job. */
 class GeofenceReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val appContext = context.applicationContext
-        // Before the guard: "the OS never woke us" and "we ignored the wake"
-        // used to look identical, and they need different fixes.
-        BgLocationStore.noteWake(appContext, "geofence")
-        if (!BgLocationStore.enabled(appContext)) return
+        val app = context.applicationContext
+        BgLocationStore.noteWake(app, "geofence")
+        if (!BgLocationStore.enabled(app)) return
+
         val event = GeofencingEvent.fromIntent(intent) ?: return
         if (event.hasError()) {
-            // The error code *is* the diagnosis, and it was read and thrown
-            // away. GEOFENCE_NOT_AVAILABLE (1000, usually Google Location
-            // Accuracy off), TOO_MANY_GEOFENCES (1001) and
-            // TOO_MANY_PENDING_INTENTS (1002) are three unrelated bugs with
-            // three unrelated fixes and one identical silent outcome.
-            BgLocationStore.prefs(appContext).edit()
+            BgLocationStore.setArmed(app, false)
+            BgLocationStore.prefs(app).edit()
                 .putInt("last_geofence_error", event.errorCode)
                 .putLong("last_geofence_error_at", System.currentTimeMillis())
                 .apply()
-            BgLocationStore.note(appContext, "geofence error ${event.errorCode}")
-            // Before the re-arm, and unconditionally. An error broadcast is the
-            // strongest evidence there is that the spine is gone, so it must
-            // pull the alarm in to the adaptive interval — never leave it out at
-            // the watchdog hour on the strength of an `armed` flag that this
-            // very broadcast disproves. The re-arm below is asynchronous and
-            // this branch does not hold the broadcast open, so its callback may
-            // never land at all.
-            LocationAlarmScheduler.ensure(appContext)
-            reArm(appContext) // service dropped the fence (e.g. location toggled)
+            BgLocationStore.note(app, "geofence error ${event.errorCode}")
+            LocationAlarmScheduler.ensure(app)
+            BackgroundLocationJobService.enqueue(
+                app,
+                BackgroundLocationJobService.REASON_GEOFENCE_ERROR,
+            )
             return
         }
         if (event.geofenceTransition != Geofence.GEOFENCE_TRANSITION_EXIT) return
-        // The fence just did its job, which is the strongest evidence there is
-        // that it works, so the watchdog's hour starts again from here — before
-        // any of the work below, all of which can fail. A fence firing on
-        // schedule keeps pushing the alarm out ahead of itself and it never
-        // actually runs; an hour of fence silence is what lets it through.
-        //
-        // Deliberately below the error branch. An error broadcast is proof that
-        // Play services can reach us, but it is also proof that the fence is
-        // *gone* — petting the watchdog there would push the alarm out by an
-        // hour at the exact moment the spine broke. That path re-arms instead,
-        // and falls back to the adaptive alarm when the re-arm is refused.
-        LocationAlarmScheduler.resetWatchdog(appContext)
 
-        val pending = goAsync()
-        Thread {
-            try {
-                val location = event.triggeringLocation ?: FusedFix.get(appContext)
-                if (location != null && BgLocationStore.enabled(appContext)) {
-                    // Re-centre first (spine safety), then report (best-effort).
-                    // A refused re-centre leaves this device with no fence and
-                    // no alarm — the exit that got us here already consumed the
-                    // old one — so the fallback catches it.
-                    GeofenceManager.register(
-                        appContext, location.latitude, location.longitude,
-                    ) { armed -> if (!armed) LocationAlarmScheduler.ensure(appContext) }
-                    BgLocationStore.report(appContext, location.latitude, location.longitude)
-                } else if (location == null) {
-                    // No fix at all — re-arm around the last centre so a future
-                    // EXIT can still fire (the current fence is already exited).
-                    reArm(appContext)
-                }
-            } catch (e: Exception) {
-                // Best-effort.
-            } finally {
-                pending.finish()
-            }
-        }.start()
-    }
-
-    /// Re-arms around the last known centre after the platform dropped the
-    /// fence, and falls back to the alarm if it cannot.
-    ///
-    /// This is the path a `GEOFENCE_NOT_AVAILABLE` takes, and the reason the
-    /// fallback matters most here: that error usually means the user just
-    /// turned Location off, so the re-arm attempted in the same breath is
-    /// almost certain to fail. Without the fallback the device is left with no
-    /// fence and — on a Play-services device, where the geofence is the only
-    /// spine — no alarm either, and nothing that will ever notice. Turning
-    /// Location back on does not re-arm anything: Play services does not
-    /// restore removed geofences, and no broadcast brings us back.
-    private fun reArm(context: Context) {
-        if (!BgLocationStore.enabled(context)) return
-        if (!BgLocationStore.hasLast(context)) {
-            LocationAlarmScheduler.ensure(context)
-            return
-        }
-        GeofenceManager.register(
-            context, BgLocationStore.lastLat(context), BgLocationStore.lastLng(context),
-        ) { armed -> if (!armed) LocationAlarmScheduler.ensure(context) }
+        // Registration success is only an accepted request. A delivered EXIT is
+        // the sole proof that the fast path works, and the only event allowed to
+        // defer the independent alarm to its thirty-minute ceiling.
+        BgLocationStore.prefs(app).edit()
+            .putLong("last_geofence_transition_at", System.currentTimeMillis())
+            .apply()
+        LocationAlarmScheduler.onGeofenceTransition(app)
+        BackgroundLocationJobService.enqueue(
+            app,
+            BackgroundLocationJobService.REASON_GEOFENCE_EXIT,
+            event.triggeringLocation,
+        )
     }
 }

@@ -105,14 +105,85 @@ String _yesNo(Object? value) => switch (value) {
 /// are the difference between working and dead, and the failed case is worth
 /// showing rather than hiding — a device that fires and gets a 500 needs a
 /// different fix from one that never fires.
-String _lastReport(Map<String, Object?> d) {
-  final at = d['lastReportAt'];
+String _lastAttempt(Map<String, Object?> d) {
+  final at = d['lastAttemptAt'] ?? d['lastReportAt'];
   if (at is! int) return 'never';
   final when = DateTime.fromMillisecondsSinceEpoch(at);
   final age = DateTime.now().difference(when);
-  final ok = d['lastReportOk'] == true;
-  final code = d['lastReportCode'];
+  final ok = (d['lastAttemptOk'] ?? d['lastReportOk']) == true;
+  final code = d['lastAttemptCode'] ?? d['lastReportCode'];
   return '${_age(age)} ago · ${_outcome(ok, code)}';
+}
+
+/// Last confirmed 2xx result, kept apart from the most recent failed attempt.
+String _lastSuccess(Map<String, Object?> d) {
+  final fallback = d['lastReportOk'] == true ? d['lastReportAt'] : null;
+  final at = d['lastSuccessAt'] ?? fallback;
+  if (at is! int) return 'never';
+  final code = d['lastSuccessCode'] ?? d['lastReportCode'];
+  return '${_age(DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(at)))} '
+      'ago${code is int ? ' · $code' : ''}';
+}
+
+/// Throttle skips are expected control flow, not failed report attempts.
+String _throttled(Map<String, Object?> d) {
+  final count = d['throttledCount'];
+  if (count is! int || count == 0) return 'none';
+  final at = d['lastThrottledAt'];
+  if (at is! int) return '$count';
+  final age = DateTime.now().difference(
+    DateTime.fromMillisecondsSinceEpoch(at),
+  );
+  return '$count · last ${_age(age)} ago';
+}
+
+String _nextAlarm(Map<String, Object?> d) {
+  final at = d['nextAlarmAt'];
+  if (at is! int) return '—';
+  final remaining = DateTime.fromMillisecondsSinceEpoch(at)
+      .difference(DateTime.now());
+  if (remaining.isNegative) return 'due (OS may deliver it late)';
+  return 'in ${_age(remaining)}';
+}
+
+String _relativeTime(Object? value, {required String absent}) {
+  if (value is! int) return absent;
+  final delta = DateTime.fromMillisecondsSinceEpoch(value)
+      .difference(DateTime.now());
+  return delta.isNegative ? '${_age(-delta)} ago' : 'in ${_age(delta)}';
+}
+
+String _watchdog(Map<String, Object?> d) {
+  final state = d['watchdogState'] as String? ?? 'unknown';
+  final health = switch (state) {
+    'query unavailable' => 'health unknown',
+    _ when d['watchdogScheduled'] != true => 'NOT SCHEDULED',
+    _ when d['watchdogOverdue'] == true => 'OVERDUE',
+    _ => 'healthy',
+  };
+  final next = _relativeTime(d['watchdogNextAt'], absent: 'next unknown');
+  return '$state · $health · $next';
+}
+
+String _watchdogRuns(Map<String, Object?> d) {
+  final count = d['watchdogRunCount'];
+  final last = _relativeTime(d['watchdogLastRunAt'], absent: 'never');
+  return '${count is int ? count : 0} · last $last';
+}
+
+String _watchdogRepairs(Map<String, Object?> d) {
+  final count = d['watchdogRepairCount'];
+  final last = _relativeTime(d['watchdogLastRepairAt'], absent: 'never');
+  return '${count is int ? count : 0} · last $last';
+}
+
+String _lastGeofenceTransition(Map<String, Object?> d) {
+  final at = d['lastGeofenceTransitionAt'];
+  if (at is! int) return 'never';
+  final age = DateTime.now().difference(
+    DateTime.fromMillisecondsSinceEpoch(at),
+  );
+  return '${_age(age)} ago';
 }
 
 /// A negative code is a reason the request was never made, not an HTTP status.
@@ -336,7 +407,25 @@ class DiagnosticsCollector {
               label: 'Geofence error',
               value: bgLocation['lastGeofenceError'] as String?,
             ),
-          (label: 'Last report', value: _lastReport(bgLocation)),
+          if (bgLocation.containsKey('lastGeofenceTransitionAt'))
+            (
+              label: 'Last geofence exit',
+              value: _lastGeofenceTransition(bgLocation),
+            ),
+          (label: 'Last attempt', value: _lastAttempt(bgLocation)),
+          (label: 'Last success', value: _lastSuccess(bgLocation)),
+          if (bgLocation.containsKey('throttledCount'))
+            (label: 'Throttle skips', value: _throttled(bgLocation)),
+          if (bgLocation.containsKey('nextAlarmAt'))
+            (label: 'Next alarm', value: _nextAlarm(bgLocation)),
+          if (bgLocation.containsKey('watchdogState')) ...[
+            (label: 'Watchdog', value: _watchdog(bgLocation)),
+            (label: 'Watchdog runs', value: _watchdogRuns(bgLocation)),
+            (
+              label: 'Watchdog repair attempts',
+              value: _watchdogRepairs(bgLocation),
+            ),
+          ],
           (label: 'Centred on', value: _centre(bgLocation)),
           (label: 'Detail', value: bgLocation['detail'] as String?),
           (

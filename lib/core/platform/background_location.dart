@@ -13,8 +13,9 @@ import 'package:flutter/services.dart';
 ///     visit monitoring (survives termination).
 ///   • Android — a low-power **EXIT geofence** via the Fused Location Provider,
 ///     monitored by Google Play services so it survives our process being killed
-///     by an OEM battery manager; a de-Googled device falls back to a
-///     distance-adaptive alarm.
+///     by an OEM battery manager; an independent 10–30 minute alarm repairs
+///     silent geofence loss and covers devices without Play services. A durable
+///     WorkManager watchdog repairs the alarm path only after it goes overdue.
 /// Platform ([platform]: 1 iOS / 0 Android) and app [version] are fixed at
 /// construction; only the push token varies per call.
 ///
@@ -59,9 +60,11 @@ class BackgroundLocationService {
   /// Both platforms answer with the same keys, so one UI renders both:
   /// `enabled` (the app asked for it), `authorization` (always / whenInUse /
   /// denied / restricted / notDetermined), `armed` (something is monitoring
-  /// **now**), `spine` (which mechanism), `hasToken`, `lastReportAt` (epoch ms),
-  /// `lastReportOk`, `lastReportCode`, `centreLat` / `centreLng` (where the
-  /// fence or region sits) and a free-text `detail` line of platform specifics.
+  /// **now**), `spine` (which mechanism), `hasToken`, report-attempt/success
+  /// timestamps and outcomes, `centreLat` / `centreLng` (where the fence or
+  /// region sits) and a free-text `detail` line of platform specifics. Android
+  /// additionally exposes throttle skips, the next alarm, and live WorkManager
+  /// watchdog state.
   ///
   /// `armed` is the one that matters: every other value can look healthy on a
   /// device that is silently reporting nothing.

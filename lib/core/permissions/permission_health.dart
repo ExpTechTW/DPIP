@@ -41,10 +41,9 @@ import 'package:flutter/widgets.dart';
 ///    a *high-priority* FCM message already wakes a dozing device and is handed
 ///    a temporary wakelock and network, so the alert path itself survives Doze
 ///    without any exemption. What the exemption buys is everything that makes
-///    the alert *timely* — `setAndAllowWhileIdle` is throttled to roughly one
-///    fire per nine minutes under Doze, which puts the alarm spine's five-minute
-///    floor out of reach on exactly the devices where that alarm is the only
-///    spine (no Play services, or a geofence that would not arm); a
+///    the alert *timely* — `setAndAllowWhileIdle` may be deferred under Doze,
+///    which stretches the independent alarm fallback on every Android device;
+///    a
 ///    normal-priority message is deferred until Doze lifts; and geofence
 ///    transitions are delayed. On a disaster app the latency *is* the product;
 ///  - **critical alerts** (iOS). They are what makes a life-threatening warning
