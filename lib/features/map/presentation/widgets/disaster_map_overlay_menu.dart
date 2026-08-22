@@ -6,7 +6,6 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -79,11 +78,9 @@ class DisasterMapOverlayMenu extends StatelessWidget {
                   ),
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionMap),
-                MapTownLabelsRow(
+                MapBasemapControlRows(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
-                ),
-                MapTerrainRow(
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),

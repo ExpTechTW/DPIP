@@ -6,7 +6,6 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -121,11 +120,9 @@ class SatelliteStyleMenu extends StatelessWidget {
                 ),
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionMap),
-                MapTownLabelsRow(
+                MapBasemapControlRows(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
-                ),
-                MapTerrainRow(
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),
@@ -199,11 +196,9 @@ class SatelliteReferenceMenu extends StatelessWidget {
                 ),
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionMap),
-                MapTownLabelsRow(
+                MapBasemapControlRows(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
-                ),
-                MapTerrainRow(
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),

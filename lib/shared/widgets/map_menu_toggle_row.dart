@@ -20,6 +20,7 @@ class MapMenuToggleRow extends StatelessWidget {
     required this.tooltip,
     required this.onTap,
     this.subtitle,
+    this.closeOnActivate = true,
   });
 
   /// Whether the overlay is currently on.
@@ -36,6 +37,9 @@ class MapMenuToggleRow extends StatelessWidget {
   final String tooltip;
   final VoidCallback onTap;
 
+  /// Whether activating this row closes its surrounding [MenuAnchor].
+  final bool closeOnActivate;
+
   /// Row width — fixed so a dropdown's rows line up regardless of label length.
   static const double width = 228;
 
@@ -47,6 +51,7 @@ class MapMenuToggleRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
+        closeOnActivate: closeOnActivate,
         style: MapChipButton.rowStyle(
           selected
               ? colors.primaryContainer.withValues(alpha: 0.45)

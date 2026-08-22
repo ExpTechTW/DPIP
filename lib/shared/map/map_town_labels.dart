@@ -7,6 +7,7 @@
 library;
 
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
@@ -45,6 +46,42 @@ class MapTownLabelsRow extends StatelessWidget {
   }
 }
 
+/// All settings that belong to the base map rather than the active data layer.
+/// Keeping this as one block prevents individual overlay menus from drifting
+/// when a new base option is added.
+class MapBasemapControlRows extends StatelessWidget {
+  const MapBasemapControlRows({
+    super.key,
+    required this.showTownLabels,
+    required this.onShowTownLabelsChanged,
+    required this.showTerrain,
+    required this.onShowTerrainChanged,
+  });
+
+  final ValueListenable<bool> showTownLabels;
+  final ValueChanged<bool> onShowTownLabelsChanged;
+  final ValueListenable<bool> showTerrain;
+  final ValueChanged<bool> onShowTerrainChanged;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      MapTownLabelsRow(
+        showTownLabels: showTownLabels,
+        onShowTownLabelsChanged: onShowTownLabelsChanged,
+      ),
+      const MapMenuDivider(),
+      MapTerrainRow(
+        showTerrain: showTerrain,
+        onShowTerrainChanged: onShowTerrainChanged,
+      ),
+      const MapMenuDivider(),
+      const MapGsiOverlayControls(),
+    ],
+  );
+}
+
 /// Standalone base-map dropdown for layers that ship no other chrome — same
 /// chip affordance as the layer menus, so a map without a tune button still
 /// exposes the map's optional settings (township names + terrain relief). The
@@ -67,27 +104,28 @@ class MapBasemapMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final gsi = GsiOverlayScope.maybeOf(context);
     return ListenableBuilder(
-      listenable: Listenable.merge([showTownLabels, showTerrain]),
+      listenable: Listenable.merge([showTownLabels, showTerrain, ?gsi]),
       builder: (context, _) => MenuAnchor(
         alignmentOffset: const Offset(0, 4),
         style: MapChipButton.menuStyle(context),
         builder: (context, controller, _) => MapChipButton(
           icon: Icons.tune,
           tooltip: l10n.mapTownLabels,
-          active: !showTownLabels.value || !showTerrain.value,
+          active:
+              !showTownLabels.value ||
+              !showTerrain.value ||
+              (gsi?.enabled ?? false),
           onTap: () =>
               controller.isOpen ? controller.close() : controller.open(),
         ),
         menuChildren: [
           MapMenuScrollView(
             children: [
-              MapTownLabelsRow(
+              MapBasemapControlRows(
                 showTownLabels: showTownLabels,
                 onShowTownLabelsChanged: onShowTownLabelsChanged,
-              ),
-              const MapMenuDivider(),
-              MapTerrainRow(
                 showTerrain: showTerrain,
                 onShowTerrainChanged: onShowTerrainChanged,
               ),

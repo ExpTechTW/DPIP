@@ -18,7 +18,6 @@ import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/features/map/presentation/widgets/mesh_node_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -859,11 +858,9 @@ class _MeshNodeMenu extends StatelessWidget {
                 // The shared base-map rows, not copies of them: this menu
                 // replaces the standalone base-map chip, so the toggles have
                 // to be the same ones the user finds on every other layer.
-                MapTownLabelsRow(
+                MapBasemapControlRows(
                   showTownLabels: showTownLabels,
                   onShowTownLabelsChanged: onShowTownLabelsChanged,
-                ),
-                MapTerrainRow(
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),
