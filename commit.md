@@ -21,7 +21,7 @@ tool/commit.sh
 | hook | 跑什麼 | 擋什麼 |
 |---|---|---|
 | `pre-commit` | `tool/commit.sh --no-check` | 提交時就該修的：stage 到建置產物、`main` 分支、有 merge commit、現有 commit 訊息不合格 |
-| `pre-push` | `tool/commit.sh --push` | 上面全部，**外加落後 base**，以及 CI 的每一道 gate |
+| `pre-push` | 檢查實際要推送的 refs，再執行 `tool/commit.sh --push` | 上面全部，**外加落後 base**，以及 CI 的每一道 gate；沒有差異時不重跑，tag 不會被誤判成直接推 `main` |
 
 **落後 base 在提交時只是警告、推送時才是 blocker。** 這兩個不是同一個問題：落後擋的是
 *合併*，不是提交。要求每次提交前都先 rebase，等於一個下午 rebase 五次來記錄一份還沒

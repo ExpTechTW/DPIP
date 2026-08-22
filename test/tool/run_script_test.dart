@@ -27,6 +27,25 @@ ProcessResult runWith({required int exitCode, String stdout = ''}) {
 }
 
 String _q(String s) => "'${s.replaceAll("'", r"'\''")}'";
+String _oid(String digit) => List.filled(40, digit).join();
+
+ProcessResult runPrePush(String input) {
+  final root = Directory.systemTemp.createTempSync('prepush');
+  addTearDown(() => root.deleteSync(recursive: true));
+
+  Process.runSync('git', ['init', '-q'], workingDirectory: root.path);
+  final tool = Directory('${root.path}/tool')..createSync();
+  final commit = File('${tool.path}/commit.sh')
+    ..writeAsStringSync('#!/usr/bin/env bash\nprintf "%s\\n" "\$@"\n');
+  Process.runSync('chmod', ['+x', commit.path]);
+
+  final stdin = File('${root.path}/refs')..writeAsStringSync(input);
+  final hook = '${Directory.current.path}/.githooks/pre-push';
+  return Process.runSync('bash', [
+    '-c',
+    '${_q(hook)} origin unused < ${_q(stdin.path)}',
+  ], workingDirectory: root.path);
+}
 
 void main() {
   test('a failed build is not reported as success', () {
@@ -93,6 +112,13 @@ void main() {
     expect(_script(), contains('tool/check/tooling.sh'));
   });
 
+  test('the launcher installs the repository git hooks for a fresh clone', () {
+    final script = _script();
+
+    expect(script, contains('git config --get core.hooksPath'));
+    expect(script, contains('tool/dev/setup.sh'));
+  });
+
   test('the Windows launcher refuses too', () {
     final ps1 = File('${Directory.current.path}/tool/run.ps1')
         .readAsStringSync();
@@ -115,6 +141,38 @@ void main() {
     // because that is the last moment a mistake is still free.
     expect(preCommit, contains('--no-check'));
     expect(prePush, contains('--push'));
+  });
+
+  test('a no-op push does not run the commit gates', () {
+    final oid = _oid('1');
+    final result = runPrePush('refs/heads/main $oid refs/heads/main $oid\n');
+
+    expect(result.exitCode, 0);
+    expect(result.stdout, isEmpty);
+    expect(result.stderr, isEmpty);
+  });
+
+  test('a tag push runs the gates after its refs are checked', () {
+    final result = runPrePush(
+      'refs/tags/v26.1 ${_oid('1')} refs/tags/v26.1 ${_oid('0')}\n',
+    );
+
+    expect(result.exitCode, 0);
+    expect(result.stdout, '--push\n--push-refs-checked\n');
+    expect(result.stderr, isEmpty);
+  });
+
+  test('a direct protected-branch push is rejected before the gates', () {
+    for (final branch in ['main', 'master']) {
+      final result = runPrePush(
+        'refs/heads/$branch ${_oid('1')} '
+        'refs/heads/$branch ${_oid('2')}\n',
+      );
+
+      expect(result.exitCode, 1, reason: branch);
+      expect(result.stdout, isEmpty, reason: branch);
+      expect(result.stderr, contains('refs/heads/$branch'), reason: branch);
+    }
   });
 
   test('pre-commit stands aside mid-rebase and mid-merge', () {

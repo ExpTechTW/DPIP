@@ -12,4 +12,38 @@
 #     git push --no-verify          # the escape hatch, when you mean it
 set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
-exec "$root/tool/commit.sh" --push
+
+# Git tells a pre-push hook exactly which remote refs it is about to change:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+#
+# Ignoring that input made a no-op Push from GitHub Desktop run the entire test
+# suite and then fail merely because the checked-out branch was `main`. It also
+# made a release-tag push look indistinguishable from a direct main push. Judge
+# what leaves the machine, not which branch happens to be checked out.
+changed_refs=0
+protected_ref=''
+while read -r _local_ref local_oid remote_ref remote_oid; do
+  # Defensive only: Git normally omits unchanged refs, but some GUI clients
+  # still invoke the hook while reconciling stale remote-tracking state.
+  [[ $local_oid == "$remote_oid" ]] && continue
+
+  changed_refs=$((changed_refs + 1))
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master) protected_ref="$remote_ref" ;;
+  esac
+done
+
+# Nothing will leave the machine, so there is nothing to validate. In
+# particular, do not spend half a minute running CI gates for a no-op push.
+((changed_refs > 0)) || exit 0
+
+if [[ -n $protected_ref ]]; then
+  printf 'push blocked: %s is protected; push a rebased branch instead\n' \
+    "$protected_ref" >&2
+  exit 1
+fi
+
+# The hook has now verified the actual destination refs. This lets tag and
+# feature-branch pushes run the normal gates even when `main` is checked out.
+exec "$root/tool/commit.sh" --push --push-refs-checked

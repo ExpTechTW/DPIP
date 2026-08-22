@@ -5,6 +5,8 @@
 #     tool/commit.sh --message <file>   # also validate a draft message
 #     tool/commit.sh --no-check         # briefing only, skip the gates
 #     tool/commit.sh --push             # the stricter set, run before pushing
+#     tool/commit.sh --push --push-refs-checked
+#                                           pre-push only: refs were inspected
 #     DPIP_NO_CACHE=1 tool/commit.sh    # re-run the gates, trusting no cache
 #
 # `.githooks/pre-commit` and `.githooks/pre-push` run it for you. Printing a
@@ -57,11 +59,13 @@ msg_file=''
 # an afternoon to record work that is not going anywhere yet — so at commit time
 # it is worth saying and not worth stopping for, and at push time it stops you.
 profile=commit
+push_refs_checked=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-check) run_gates=0; shift ;;
     --check) shift ;;  # kept: it was the old opt-in, and is now the default
     --push) profile=push; shift ;;
+    --push-refs-checked) push_refs_checked=1; shift ;;
     --message) msg_file="${2:?--message needs a file}"; shift 2 ;;
     *)
       printf 'usage: tool/commit.sh [--push] [--no-check] [--message <file>]\n' >&2
@@ -69,6 +73,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if ((push_refs_checked)) && [[ $profile != push ]]; then
+  printf '%s\n' '--push-refs-checked is only valid with --push' >&2
+  exit 2
+fi
 
 # Raises a blocker at push time and a warning at commit time.
 merge_time() { if [[ $profile == push ]]; then block "$@"; else warn "$@"; fi; }
@@ -84,7 +93,8 @@ printf '  branch   %s%s%s\n' "$BLUE" "$branch" "$RESET"
 printf '  HEAD     %s %s\n' "$(git rev-parse --short HEAD)" "$(git log -1 --format=%s)"
 printf '  base     %s (%s)\n' "$base" "$(git rev-parse --short "$base" 2>/dev/null || echo '?')"
 
-if [[ $branch == main || $branch == master ]]; then
+if [[ $branch == main || $branch == master ]] &&
+    ! [[ $profile == push && $push_refs_checked == 1 ]]; then
   block "you are on $branch — branch first, this repo never commits to it directly"
   note 'git switch -c <type>/<what>'
 fi
