@@ -2267,7 +2267,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingTermsTitle => '服務條款';
 
   @override
-  String get mapGsiOverlay => '詳細地圖（地理院タイル）';
+  String get mapGsiOverlay => '詳細地圖（國土交通省地理院）';
 
   @override
   String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
@@ -8411,7 +8411,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingTermsTitle => '服務條款';
 
   @override
-  String get mapGsiOverlay => '詳細地圖（地理院タイル）';
+  String get mapGsiOverlay => '詳細地圖（國土交通省地理院）';
 
   @override
   String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
@@ -11483,7 +11483,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get onboardingTermsTitle => '服務條款';
 
   @override
-  String get mapGsiOverlay => '詳細地圖（地理院タイル）';
+  String get mapGsiOverlay => '詳細地圖（國土交通省地理院）';
 
   @override
   String get mapGsiOverlayHint => '加入日本地理院的高解析度地形圖';
