@@ -1,6 +1,7 @@
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,6 +20,7 @@ Widget _wrap({
   ValueChanged<bool>? onScrubbing,
   Duration? framePeriod,
   DateTime? dataTime,
+  ValueListenable<String?>? readyFrameId,
 }) => MaterialApp(
   localizationsDelegates: AppLocalizations.localizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
@@ -34,6 +36,7 @@ Widget _wrap({
           onScrubbing: onScrubbing,
           framePeriod: framePeriod,
           dataTime: dataTime,
+          readyFrameId: readyFrameId,
         ),
       ),
     ),
@@ -214,6 +217,57 @@ void main() {
     expect(find.text('Future'), findsOneWidget);
     expect(find.text('Past'), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('loading frame mutes era and time until tiles are ready', (
+    tester,
+  ) async {
+    final frames = _frames(10);
+    final readyFrameId = ValueNotifier<String?>(frames.last.id);
+    await tester.pumpWidget(
+      _wrap(
+        frames: frames,
+        selectedIndex: 9,
+        onSelected: (_) {},
+        readyFrameId: readyFrameId,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final readyEraColor = tester.widget<Text>(find.text('Now')).style?.color;
+    final readyTimeColor = tester.widget<Text>(find.text('08:30')).style?.color;
+    final spinner = find.byKey(const ValueKey('timeline-frame-loading'));
+    expect(tester.widget<AnimatedOpacity>(spinner).opacity, 0);
+
+    readyFrameId.value = frames[8].id;
+    // An indeterminate progress indicator deliberately schedules frames for as
+    // long as loading lasts, so pump once rather than waiting for quiescence.
+    await tester.pump();
+
+    final context = tester.element(find.byType(MapTimeline));
+    final loadingColor = Theme.of(context).colorScheme.onSurfaceVariant;
+    expect(tester.widget<Text>(find.text('Now')).style?.color, loadingColor);
+    expect(tester.widget<Text>(find.text('08:30')).style?.color, loadingColor);
+    expect(tester.widget<AnimatedOpacity>(spinner).opacity, 1);
+
+    readyFrameId.value = frames.last.id;
+    await tester.pump(const Duration(milliseconds: 20));
+    readyFrameId.value = frames[8].id;
+    await tester.pump(const Duration(milliseconds: 20));
+    readyFrameId.value = frames.last.id;
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Text>(find.text('Now')).style?.color, readyEraColor);
+    expect(
+      tester.widget<Text>(find.text('08:30')).style?.color,
+      readyTimeColor,
+    );
+    expect(tester.widget<AnimatedOpacity>(spinner).opacity, 0);
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'rapid ready/loading transitions keep one spinner element',
+    );
   });
 
   testWidgets(

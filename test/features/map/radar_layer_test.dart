@@ -300,15 +300,18 @@ void main() {
 
     await layer.prepare(controller, frames);
     await layer.show(controller, frames[2]);
+    expect(layer.readyVisibleFrameId.value, isNull);
     source.readinessProbes.clear();
 
     // Android MapLibre can render these tiles from its ambient cache without
     // passing the bodies through the app-owned L1 mirror.
     layer.onMapIdle();
+    expect(layer.readyVisibleFrameId.value, frames[2].id);
     await layer.show(controller, frames[3], scrubbing: true);
 
     expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
     expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
+    expect(layer.readyVisibleFrameId.value, frames[3].id);
     expect(
       source.readinessProbes,
       isEmpty,

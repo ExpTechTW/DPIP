@@ -360,6 +360,21 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// resident. Camera movement invalidates this set.
   final Set<String> _readyFrames = <String>{};
 
+  /// The frame whose visible viewport has completed native rendering.
+  ///
+  /// The timeline follows the finger ahead of the map on a cold frame. Expose
+  /// the completed frame separately so its title can show that short wait
+  /// instead of colouring a timestamp whose tiles are not on screen yet.
+  final ValueNotifier<String?> _readyVisibleFrameId = ValueNotifier(null);
+
+  ValueListenable<String?> get readyVisibleFrameId => _readyVisibleFrameId;
+
+  void _markVisibleFrameReady(String? frameId) {
+    if (_readyVisibleFrameId.value != frameId) {
+      _readyVisibleFrameId.value = frameId;
+    }
+  }
+
   /// The last answer from [_viewport], with the camera it was read at.
   ///
   /// Every readiness probe and every warm needs the visible rectangle, and
@@ -571,6 +586,7 @@ abstract class RasterTimelineLayer implements MapLayer {
         if (!_isCurrent(frameId, generation)) return;
       }
       await _flip(controller, frameId);
+      _markVisibleFrameReady(frameId);
       return;
     }
     await _beginReadyReveal(
@@ -895,6 +911,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     await _flip(controller, frameId);
     if (!_isCurrent(frameId, generation)) return;
     _readyFrames.add(frameId);
+    _markVisibleFrameReady(frameId);
     if (settling) {
       await _finishSettle(controller, index, frameId, generation);
     }
@@ -1500,6 +1517,10 @@ abstract class RasterTimelineLayer implements MapLayer {
     final newlyReady = _ring.difference(_readyFrames);
     if (newlyReady.isEmpty) return;
     _readyFrames.addAll(newlyReady);
+    final shown = _shownFrameId;
+    if (shown != null && _readyFrames.contains(shown)) {
+      _markVisibleFrameReady(shown);
+    }
     MapTileCache.trace(
       () =>
           'timeline=$id native-idle ready=${newlyReady.length} '
@@ -1519,6 +1540,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     // cached rectangle goes with it: a resize keeps the camera and moves the
     // rectangle, and this is the event that reports it.
     _readyFrames.clear();
+    _markVisibleFrameReady(null);
     _viewportCache = null;
     _viewportCamera = null;
     if (_warmSuspended) return;
@@ -1584,6 +1606,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     _resident.clear();
     _ring.clear();
     _readyFrames.clear();
+    _markVisibleFrameReady(null);
     _viewportCache = null;
     _viewportCamera = null;
     _lru.clear();
