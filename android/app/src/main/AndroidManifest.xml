@@ -10,9 +10,8 @@
     <!-- Location (geolocator): resolve the device's township for local alerts. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <!-- Background reporting: an adaptive-interval alarm updates the device
-         township while the app is backgrounded (LocationAlarmReceiver), instead
-         of a battery-hungry foreground service. -->
+    <!-- Background reporting: geofence/alarm receivers enqueue a JobService
+         instead of doing location and network work inside a broadcast window. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <!-- Onboarding "省電白名單": request Doze exemption so background reporting
          keeps running on aggressive battery managers (safety-app use). -->
@@ -65,16 +64,20 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Background device-location reporting (native-first). Primary spine:
-             a low-power EXIT geofence fires this receiver on real moves. -->
+        <!-- A low-power EXIT geofence fires this receiver on real moves. -->
         <receiver
             android:name=".GeofenceReceiver"
             android:exported="false" />
-        <!-- Fallback spine (de-Googled devices): an adaptive alarm fires this
-             receiver, which reports the fix and reschedules. -->
+        <!-- Independent bounded fallback on every Android device. -->
         <receiver
             android:name=".LocationAlarmReceiver"
             android:exported="false" />
+        <!-- Receivers only enqueue work; this service owns location, geofence
+             registration, and HTTP outside BroadcastReceiver time limits. -->
+        <service
+            android:name=".BackgroundLocationJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <!-- Re-arms the alarm after a reboot (elapsed-realtime alarms clear). -->
         <receiver
             android:name=".LocationBootReceiver"

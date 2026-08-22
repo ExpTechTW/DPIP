@@ -87,10 +87,12 @@ object GeofenceManager {
     /**
      * (Re-)registers the geofence centred on ([lat], [lng]). Adding a geofence
      * with the same id replaces the previous one, so this re-centres in place.
-     * The centre is persisted only once registration actually succeeds, so a
-     * failed (re-)arm can't leave the store believing a dead fence is live.
+     * The centre is persisted only once Play services accepts registration, so
+     * a refused re-arm cannot replace the last usable centre. Acceptance is not
+     * treated as proof that transitions are healthy; only [GeofenceReceiver]
+     * may defer the independent alarm after a real EXIT delivery.
      *
-     * [onArmed] reports whether a fence is actually monitoring afterwards.
+     * [onArmed] reports whether Play services accepted the registration.
      * Registration is asynchronous, so a caller that needs to know — the one
      * deciding whether the alarm fallback can be stood down — cannot infer it
      * from this function returning. It is invoked on the main looper (Play
@@ -108,6 +110,10 @@ object GeofenceManager {
         lng: Double,
         onArmed: ((Boolean) -> Unit)? = null,
     ) {
+        if (!BgLocationStore.enabled(context)) {
+            onArmed?.invoke(false)
+            return
+        }
         if (!hasPermission(context)) {
             Log.w(TAG, "background/fine location not granted — geofence not armed")
             BgLocationStore.setArmed(context, false)
@@ -133,14 +139,22 @@ object GeofenceManager {
             // initial triggers yields enter events only — so adding an ENTER bit
             // here would silently cost the self-heal this line exists for.
             //
-            // Best-effort, not a guarantee, which is what the alarm watchdog
-            // behind the fence is for. See LocationAlarmScheduler.resetWatchdog.
+            // Best-effort, not a guarantee; the independent alarm remains
+            // scheduled even after registration succeeds.
             .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_EXIT)
             .addGeofence(geofence)
             .build()
         LocationServices.getGeofencingClient(context)
             .addGeofences(request, pendingIntent(context))
             .addOnSuccessListener {
+                // stop() can race an in-flight binder request. If it won while
+                // Play services was answering, remove the late registration
+                // instead of resurrecting background work after disable.
+                if (!BgLocationStore.enabled(context)) {
+                    remove(context)
+                    onArmed?.invoke(false)
+                    return@addOnSuccessListener
+                }
                 BgLocationStore.saveLast(context, lat, lng)
                 BgLocationStore.setArmed(context, true)
                 onArmed?.invoke(true)

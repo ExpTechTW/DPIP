@@ -7,8 +7,8 @@ import java.net.URL
 
 /**
  * Shared persistence + reporting for background device-location reporting, used
- * by both the primary geofence spine ([GeofenceManager]/[GeofenceReceiver]) and
- * the Google-Play-services-less alarm fallback ([LocationAlarmScheduler]).
+ * by both the geofence fast path ([GeofenceManager]/[GeofenceReceiver]) and the
+ * independent alarm fallback ([LocationAlarmScheduler]).
  *
  * State lives in prefs so any receiver can run with no Flutter isolate alive.
  */
@@ -21,16 +21,25 @@ object BgLocationStore {
     const val KEY_LAST_LAT = "last_lat"
     const val KEY_LAST_LNG = "last_lng"
     const val KEY_HAS_LAST = "has_last"
-    const val KEY_INTERVAL_MIN = "interval_min" // alarm fallback only
+    const val KEY_INTERVAL_MIN = "interval_min"
+    const val KEY_PERMISSION_READY = "permission_ready"
 
     // Diagnostics. None of this drives behaviour — it exists so the developer
     // page can answer "is background reporting actually working?" from a user's
     // phone. The Geofencing API has no way to ask whether a fence is live, so
     // whether one was ever armed has to be remembered here.
     const val KEY_ARMED = "geofence_armed"
-    const val KEY_LAST_REPORT_AT = "last_report_at"
-    const val KEY_LAST_REPORT_OK = "last_report_ok"
-    const val KEY_LAST_REPORT_CODE = "last_report_code"
+    const val KEY_LAST_ATTEMPT_AT = "last_attempt_at"
+    const val KEY_LAST_ATTEMPT_OK = "last_attempt_ok"
+    const val KEY_LAST_ATTEMPT_CODE = "last_attempt_code"
+    const val KEY_LAST_SUCCESS_AT = "last_success_at"
+    const val KEY_LAST_SUCCESS_CODE = "last_success_code"
+    const val KEY_LAST_THROTTLED_AT = "last_throttled_at"
+
+    // Read-only migration source for builds that predate split diagnostics.
+    const val KEY_LEGACY_LAST_REPORT_AT = "last_report_at"
+    const val KEY_LEGACY_LAST_REPORT_OK = "last_report_ok"
+    const val KEY_LEGACY_LAST_REPORT_CODE = "last_report_code"
 
     /** When a report was last *sent*, which is what the throttle measures. */
     const val KEY_LAST_SENT_AT = "last_sent_at"
@@ -42,6 +51,14 @@ object BgLocationStore {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     fun enabled(context: Context): Boolean = prefs(context).getBoolean(KEY_ENABLED, false)
+
+    fun configMatches(context: Context, token: String, version: String, platform: Int): Boolean {
+        val prefs = prefs(context)
+        return prefs.getBoolean(KEY_ENABLED, false) &&
+            prefs.getString(KEY_TOKEN, null) == token &&
+            prefs.getString(KEY_VERSION, null) == version &&
+            prefs.getInt(KEY_PLATFORM, Int.MIN_VALUE) == platform
+    }
 
     fun saveConfig(context: Context, token: String, version: String, platform: Int) {
         prefs(context).edit()
@@ -56,10 +73,18 @@ object BgLocationStore {
         prefs(context).edit()
             .putBoolean(KEY_ENABLED, false)
             .putBoolean(KEY_ARMED, false)
+            .putBoolean(KEY_PERMISSION_READY, false)
             .apply()
     }
 
-    /** Records whether a geofence is currently monitoring — diagnostics only. */
+    fun permissionReady(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_PERMISSION_READY, false)
+
+    fun setPermissionReady(context: Context, ready: Boolean) {
+        prefs(context).edit().putBoolean(KEY_PERMISSION_READY, ready).apply()
+    }
+
+    /** Records the last accepted geofence registration — diagnostics only. */
     fun setArmed(context: Context, armed: Boolean) {
         prefs(context).edit().putBoolean(KEY_ARMED, armed).apply()
     }
@@ -87,7 +112,9 @@ object BgLocationStore {
      * main thread). Best-effort: a failure is swallowed and retried on the next
      * trigger. coreExclusiveApi is tnn1-only (no failover).
      */
+    @Synchronized
     fun report(context: Context, lat: Double, lng: Double) {
+        if (!enabled(context)) return
         val prefs = prefs(context)
 
         // At most one report a minute, across every trigger.
@@ -99,29 +126,28 @@ object BgLocationStore {
         // looks like it stopped reporting: on the device this was found on,
         // `last_report_code` was 429 with the geofence armed and a fix in hand.
         //
-        // Measured from KEY_LAST_SENT_AT, not KEY_LAST_REPORT_AT: the latter is
-        // stamped on every outcome including this one, so gating on it would
-        // let a burst of triggers push the window ahead of itself and starve
-        // reporting entirely.
+        // A throttled trigger is not a report attempt. Keep it in its own fields
+        // so it cannot overwrite the last HTTP result shown by diagnostics.
         val now = System.currentTimeMillis()
         val sent = prefs.getLong(KEY_LAST_SENT_AT, 0L)
         if (sent > 0L && now - sent < MIN_REPORT_INTERVAL_MS) {
             prefs.edit()
                 .putInt(KEY_THROTTLED_N, prefs.getInt(KEY_THROTTLED_N, 0) + 1)
+                .putLong(KEY_LAST_THROTTLED_AT, now)
                 .apply()
-            stamp(prefs, THROTTLED)
             return
         }
-        // Stamped even on the way out. These two returns sat *above* the stamp,
-        // so a run that never had a token was indistinguishable from one that
-        // never happened — and "never happened" is what the developer page
-        // showed for both, which is the ambiguity that made this bug survive
-        // three attempts. A negative code is a reason, not an HTTP status.
+        // A negative code is a reason no HTTP request could be made.
         val token = prefs.getString(KEY_TOKEN, null)
-            ?: return stamp(prefs, NO_TOKEN)
+            ?: return stampAttempt(prefs, now, NO_TOKEN)
         val version = prefs.getString(KEY_VERSION, null)
-            ?: return stamp(prefs, NO_VERSION)
+            ?: return stampAttempt(prefs, now, NO_VERSION)
         val platform = prefs.getInt(KEY_PLATFORM, 0)
+
+        // Reserve the one-minute slot before opening the connection. Multiple
+        // JobWorkItems and a foreground report can otherwise pass the throttle
+        // together and issue duplicate requests.
+        prefs.edit().putLong(KEY_LAST_SENT_AT, now).apply()
         var code = -1
         try {
             val url = URL(
@@ -135,7 +161,6 @@ object BgLocationStore {
                 code = responseCode // fire the request
                 disconnect()
             }
-            prefs.edit().putLong(KEY_LAST_SENT_AT, now).apply()
         } catch (e: Exception) {
             // Best-effort; the next trigger retries. The outcome is still
             // recorded below — "tried at T and failed" is the diagnostic that
@@ -148,11 +173,14 @@ object BgLocationStore {
             // a timeout, a TLS failure and a Doze network block equally well.
             note(context, "report failed: ${e.javaClass.simpleName}")
         }
-        stamp(prefs, code)
+        stampAttempt(prefs, now, code)
+        if (code in 200..299) {
+            prefs.edit()
+                .putLong(KEY_LAST_SUCCESS_AT, now)
+                .putInt(KEY_LAST_SUCCESS_CODE, code)
+                .apply()
+        }
     }
-
-    /** Dropped by the throttle — a report went out less than a minute ago. */
-    const val THROTTLED = -4
 
     /** The floor between two reports, whichever trigger asks. */
     const val MIN_REPORT_INTERVAL_MS = 60_000L
@@ -163,11 +191,11 @@ object BgLocationStore {
     /** No app version stored, which the endpoint's path needs. */
     const val NO_VERSION = -3
 
-    private fun stamp(prefs: SharedPreferences, code: Int) {
+    private fun stampAttempt(prefs: SharedPreferences, at: Long, code: Int) {
         prefs.edit()
-            .putLong(KEY_LAST_REPORT_AT, System.currentTimeMillis())
-            .putBoolean(KEY_LAST_REPORT_OK, code in 200..299)
-            .putInt(KEY_LAST_REPORT_CODE, code)
+            .putLong(KEY_LAST_ATTEMPT_AT, at)
+            .putBoolean(KEY_LAST_ATTEMPT_OK, code in 200..299)
+            .putInt(KEY_LAST_ATTEMPT_CODE, code)
             .apply()
     }
 
@@ -175,12 +203,10 @@ object BgLocationStore {
      * A bounded ring of what the background path did, drained into the app's
      * own log at the next launch.
      *
-     * Every background wake runs in a `BroadcastReceiver` with no Flutter
-     * isolate, so nothing it does can reach `Log` — and `android.util.Log` is
-     * logcat, which nobody can read from their own phone. The Android
-     * background path was therefore invisible *by construction*, which is why
-     * three attempts at this bug had nothing to go on.
+     * Every background wake begins in a receiver and continues in a native job,
+     * with no Flutter isolate, so nothing it does can reach `Log` as it happens.
      */
+    @Synchronized
     fun note(context: Context, message: String) {
         val prefs = prefs(context)
         val existing = prefs.getString(KEY_BREADCRUMBS, "").orEmpty()
@@ -191,6 +217,7 @@ object BgLocationStore {
     }
 
     /** Reads the ring and clears it, so a line is reported once. */
+    @Synchronized
     fun drainBreadcrumbs(context: Context): List<String> {
         val prefs = prefs(context)
         val all = prefs.getString(KEY_BREADCRUMBS, "").orEmpty()
@@ -208,6 +235,7 @@ object BgLocationStore {
      * trace, so "the OS never called us" and "we ignored the call" looked
      * identical.
      */
+    @Synchronized
     fun noteWake(context: Context, kind: String) {
         val prefs = prefs(context)
         prefs.edit()

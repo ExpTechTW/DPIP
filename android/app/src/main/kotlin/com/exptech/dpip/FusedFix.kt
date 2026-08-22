@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  * township boundary, so it never spins the battery-hungry GPS chip. Accepts a
  * recent cached fix (`maxUpdateAge`) to avoid a fresh acquisition when possible,
  * and falls back to the last known location. Blocks briefly — call off the main
- * thread (the receivers' `goAsync` window).
+ * thread (normally [BackgroundLocationJobService]).
  *
  * Returns null when it cannot get one, which is a real outcome on a device with
  * no Play services, no location permission, or location switched off — and

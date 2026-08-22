@@ -49,6 +49,40 @@ void main() {
     expect(calls.single.method, 'stop');
   });
 
+  test(
+    'diagnostics keeps attempt, success, and throttle evidence separate',
+    () async {
+      messenger.setMockMethodCallHandler(channel, (_) async {
+        return <String, Object?>{
+          'lastAttemptAt': 3000,
+          'lastAttemptOk': false,
+          'lastAttemptCode': 500,
+          'lastSuccessAt': 2000,
+          'lastSuccessCode': 202,
+          'lastThrottledAt': 4000,
+          'throttledCount': 7,
+        };
+      });
+      final service = BackgroundLocationService(
+        platform: 0,
+        version: '1',
+        channel: channel,
+      );
+
+      final diagnostics = await service.diagnostics();
+
+      expect(diagnostics, {
+        'lastAttemptAt': 3000,
+        'lastAttemptOk': false,
+        'lastAttemptCode': 500,
+        'lastSuccessAt': 2000,
+        'lastSuccessCode': 202,
+        'lastThrottledAt': 4000,
+        'throttledCount': 7,
+      });
+    },
+  );
+
   test('a platform failure is swallowed, not thrown', () async {
     messenger.setMockMethodCallHandler(
       channel,
