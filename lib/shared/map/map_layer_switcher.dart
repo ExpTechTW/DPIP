@@ -141,8 +141,17 @@ class MapLayerSwitcher extends StatelessWidget {
                           MapLayerCategory.values,
                           orderController.categoryOrder,
                         );
-                        return ListView(
-                          controller: scrollController,
+                        return _RememberedOffsetList(
+                          // Remembers scroll offset across separate openings
+                          // of this sheet — picking a layer pops the sheet
+                          // immediately (see onTap below), so without this the
+                          // list snapped back to the top every time, forcing a
+                          // re-scroll to reach a nearby, later option. Keyed
+                          // by the layer set so different pickers (radar,
+                          // satellite, …) each keep their own position.
+                          storageKey:
+                              'map-layer-switcher:${layers.map((l) => l.id).join(',')}',
+                          scrollController: scrollController,
                           padding: EdgeInsets.fromLTRB(
                             AppSpacing.md,
                             0,
@@ -190,6 +199,72 @@ class MapLayerSwitcher extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) =>
           _LayerOrderSheet(layers: layers, controller: orderController),
+    );
+  }
+}
+
+/// Last scroll offset per [_RememberedOffsetList.storageKey], kept for the
+/// app's lifetime.
+///
+/// Not [PageStorage]: every [showModalBottomSheet] call pushes a fresh
+/// [ModalRoute], and `ModalRoute` gives its content its own private
+/// [PageStorageBucket] (see `_ModalScopeState.build` in the framework's
+/// `routes.dart`) — thrown away the moment the route pops. A `PageStorageKey`
+/// on the list, as an earlier version of this used, only ever wrote to that
+/// bucket-of-the-moment and had nothing to read back from on the next open.
+/// This map outlives the route instead.
+final Map<String, double> _rememberedListOffset = {};
+
+/// A [ListView] that restores its scroll offset from
+/// [_rememberedListOffset] on first layout and keeps that entry updated as
+/// the user scrolls — see [_rememberedListOffset] for why [PageStorage]
+/// cannot do this for a widget that lives inside a modal bottom sheet.
+class _RememberedOffsetList extends StatefulWidget {
+  const _RememberedOffsetList({
+    required this.storageKey,
+    required this.scrollController,
+    required this.padding,
+    required this.children,
+  });
+
+  final String storageKey;
+  final ScrollController scrollController;
+  final EdgeInsets padding;
+  final List<Widget> children;
+
+  @override
+  State<_RememberedOffsetList> createState() => _RememberedOffsetListState();
+}
+
+class _RememberedOffsetListState extends State<_RememberedOffsetList> {
+  @override
+  void initState() {
+    super.initState();
+    final offset = _rememberedListOffset[widget.storageKey];
+    if (offset == null) return;
+    // The controller isn't attached to a position until the sheet's first
+    // frame lays out the list beneath it — jumping any earlier throws.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !widget.scrollController.hasClients) return;
+      final max = widget.scrollController.position.maxScrollExtent;
+      widget.scrollController.jumpTo(offset.clamp(0.0, max));
+    });
+  }
+
+  bool _onScroll(ScrollNotification notification) {
+    _rememberedListOffset[widget.storageKey] = notification.metrics.pixels;
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: _onScroll,
+      child: ListView(
+        controller: widget.scrollController,
+        padding: widget.padding,
+        children: widget.children,
+      ),
     );
   }
 }
