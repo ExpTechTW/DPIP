@@ -45,6 +45,18 @@ import 'package:provider/provider.dart';
 class HomeEewSection extends StatelessWidget {
   const HomeEewSection({super.key});
 
+  /// Whether this section renders anything right now — the same check
+  /// [build] gates on, exposed so `HomeContent` can decide whether to
+  /// reserve a gap after it without re-deriving (and risking drifting from)
+  /// the same liveness condition.
+  static bool isActive(BuildContext context) {
+    final state = context.watch<RealtimeNotifier<List<Eew>>>().state;
+    final alerts = state.data;
+    return state.status == RealtimeStatus.live &&
+        alerts != null &&
+        alerts.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<RealtimeNotifier<List<Eew>>>();

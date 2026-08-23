@@ -43,17 +43,25 @@ class HomeMonitorBanner extends StatelessWidget {
   /// appear at any moment and the framing must already have room for it.
   static const double height = 44;
 
+  /// Whether an alert is live right now — the same check [build] gates on,
+  /// exposed so a caller that needs to lay out *around* this banner (Home's
+  /// overlap stack with the gold support bar) reads the identical condition
+  /// instead of re-deriving it and risking the two disagreeing.
+  static bool isActive(BuildContext context) {
+    final eew = context.watch<RealtimeNotifier<List<Eew>>>();
+    final alerts = eew.state.data ?? const <Eew>[];
+    return eew.state.status == RealtimeStatus.live && alerts.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    if (!isActive(context)) return const SizedBox.shrink();
+
     final eew = context.watch<RealtimeNotifier<List<Eew>>>();
     final alerts = eew.state.data ?? const <Eew>[];
-    final hasActiveEew =
-        eew.state.status == RealtimeStatus.live && alerts.isNotEmpty;
-    if (!hasActiveEew) return const SizedBox.shrink();
-
     final ink = colors.onErrorContainer;
     final alert = alerts.first;
 
@@ -70,8 +78,12 @@ class HomeMonitorBanner extends StatelessWidget {
             ),
             child: Material(
               color: colors.errorContainer,
-              elevation: 3,
-              shadowColor: Colors.black.withValues(alpha: 0.25),
+              // Higher than the card language elsewhere uses — this one
+              // genuinely overlaps the gold support bar underneath it (see
+              // Home's overlap stack), so the shadow needs to read as real
+              // depth, not just a card outline.
+              elevation: 8,
+              shadowColor: Colors.black.withValues(alpha: 0.35),
               borderRadius: AppRadius.medium,
               clipBehavior: Clip.antiAlias,
               child: InkWell(

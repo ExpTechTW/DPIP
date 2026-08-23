@@ -125,7 +125,14 @@ class HomeSheetHeader extends StatelessWidget {
             isNight: isNightAt(AppTime.utc),
           );
     final conditionIcon = weather?.$1 ?? cloudy;
-    final conditionAccent = weather?.$2 ?? secondary;
+    // Not `weather?.$2` — that accent is a fixed [ColorScheme] role (amber for
+    // clear, grey for cloudy, …), chosen for the icon on its own without
+    // knowing what backdrop it will sit on. This icon sits directly on the
+    // weather sky next to the temperature, so it has to shift with it exactly
+    // as [foreground] does — a fixed dark accent is invisible against a night
+    // sky's white ink, and a fixed light accent is invisible against a clear
+    // noon sky's dark ink, whichever the semantic colour happened to pick.
+    final conditionAccent = foreground;
 
     // 全國 has no township weather — name only. 所在地 without GPS: say so
     // instead of a dashed reading row.

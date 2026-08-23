@@ -13,7 +13,6 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
-import 'package:dpip/shared/widgets/permission_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -204,11 +203,8 @@ class _MainShellState extends State<MainShell> with RouteAware {
     return Scaffold(
       // Let the Home weather backdrop show through behind the bar.
       extendBody: true,
-      // A location "fix it" banner sits above the active tab (zero height when
-      // location is healthy, so Home's full-bleed layout is unaffected).
       body: Column(
         children: [
-          const PermissionBanners(),
           // Renders nothing; checks once after the first frame whether this
           // build's channel has a newer release, and says so once per version.
           const UpdatePrompt(),

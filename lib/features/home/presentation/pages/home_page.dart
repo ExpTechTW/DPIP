@@ -302,24 +302,75 @@ class _HomePageState extends State<HomePage> {
                           blend: HomeChrome.regionBlend(sheetExtent.value),
                           dismiss: HomeChrome.regionDismiss(sheetExtent.value),
                         ),
-                        builder: (context, dials, _) => Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RegionBar(
-                              blend: dials.blend,
-                              dismiss: dials.dismiss,
-                              skyIsLight: skyIsLightFrom(sky, weatherMode),
-                            ),
-                            _GoldSupportBar(
-                              blend: dials.blend,
-                              dismiss: dials.dismiss,
-                            ),
-                            // Quick link to 強震監視器 — same dials as the
-                            // region bar above it, so the two move as one
-                            // piece of chrome as the sheet rises.
-                            HomeMonitorBanner(dismiss: dials.dismiss),
-                          ],
-                        ),
+                        builder: (context, dials, _) {
+                          // Quick link to 強震監視器. The gold support bar's
+                          // top edge always sits flush under the region bar
+                          // — its position never moves. When an alert is
+                          // live, its card is anchored to that same top
+                          // edge and, being the taller of the two, sits
+                          // directly over it: real Z-axis overlap, with the
+                          // card's own elevation shadow falling across the
+                          // bar underneath, not just first-in-a-list order.
+                          // `isActive` is the same check
+                          // HomeMonitorBanner.build gates its own render on,
+                          // shared so this layout math can't drift from it.
+                          final hasActiveEew = HomeMonitorBanner.isActive(
+                            context,
+                          );
+                          final stackHeight = hasActiveEew
+                              ? HomeMonitorBanner.height
+                              : _GoldSupportBar.height;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              RegionBar(
+                                blend: dials.blend,
+                                dismiss: dials.dismiss,
+                                skyIsLight: skyIsLightFrom(sky, weatherMode),
+                              ),
+                              SizedBox(
+                                height: stackHeight,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: _GoldSupportBar(
+                                        blend: dials.blend,
+                                        dismiss: dials.dismiss,
+                                      ),
+                                    ),
+                                    // Always mounted — HomeMonitorBanner
+                                    // renders SizedBox.shrink() internally
+                                    // while calm. Wrapping this in `if
+                                    // (hasActiveEew)` instead (removing the
+                                    // Positioned from the Stack's children
+                                    // entirely on every toggle) is what
+                                    // triggered a real Flutter engine crash
+                                    // here: a semantics assertion
+                                    // (`!child.attached`) when the Material
+                                    // + InkWell subtree underneath is
+                                    // repeatedly unmounted and remounted at
+                                    // this position. Letting the banner's
+                                    // own build() switch its child instead
+                                    // keeps the element permanently in the
+                                    // tree, which does not hit that bug.
+                                    Positioned(
+                                      top: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: HomeMonitorBanner(
+                                        dismiss: dials.dismiss,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                 ),
               ),
@@ -344,6 +395,10 @@ class _GoldSupportBar extends StatelessWidget {
   final double blend;
   final double dismiss;
 
+  /// This bar's own rendered height — used to size the overlap stack that
+  /// lets [HomeMonitorBanner] float over its top edge.
+  static const double height = 30;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -362,7 +417,7 @@ class _GoldSupportBar extends StatelessWidget {
             child: InkWell(
               onTap: () => context.pushNamed(AppRoutes.sponsor),
               child: SizedBox(
-                height: 30,
+                height: height,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
