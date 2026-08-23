@@ -123,9 +123,66 @@ class HomeContent extends StatelessWidget {
   static const double _focusRampExtent = 140;
 
   /// Focus dial for the content, `0` (resting) → `1` (scrolled past the hero).
-  /// See [HomeContent._focusRampExtent].
+  /// See [_focusRampExtent].
   static double _focus(double offset) =>
       (offset / _focusRampExtent).clamp(0.0, 1.0);
+
+  /// Resting-state breathing room between the trend card's own bottom edge
+  /// and the safe area below it, on top of the safe area itself, so the card
+  /// doesn't read as glued to the very edge of the screen.
+  static const double _restBottomGap = AppSpacing.xl;
+
+  /// Scroll distance over which the hero block's *entire* trailing reserve —
+  /// [_restBottomGap] and the safe area alike — collapses to 0. Short on
+  /// purpose, same reasoning as `HomeSheet._ScrollBlurredWeather`'s own ramp:
+  /// both are a resting-state concern, not something to keep paying for once
+  /// the sheet is actually moving.
+  ///
+  /// The safe area has to ramp away too, not just stay as a fixed floor under
+  /// [_restBottomGap] — it exists only because the trend card sits at the
+  /// physical bottom of the screen *at rest*. The moment the list scrolls,
+  /// the card is no longer there and nothing about the device's home
+  /// indicator applies to it anymore; holding that reserve open regardless
+  /// just leaves it as dead space between the trend card and the forecast
+  /// card once scrolled — taller than [AppSpacing.lg], the gap every other
+  /// pair of cards on the second page actually uses, and visibly
+  /// inconsistent with them.
+  static const double _bottomGapRampExtent = 32;
+
+  /// Current size of the hero block's trailing reserve — [_restBottomGap]
+  /// plus [bottomSafeArea] — for the live scroll [offset].
+  static double _heroBottomGap(double offset, double bottomSafeArea) {
+    final rest = _restBottomGap + bottomSafeArea;
+    final t = (offset / _bottomGapRampExtent).clamp(0.0, 1.0);
+    return rest * (1 - t);
+  }
+
+  /// Scroll distance over which the hero's forecast card grows from its
+  /// one-glance summary (title + hour chips) to the full card (sparkline +
+  /// detail band). Independent of the shorter resting-state ramps around it —
+  /// this one is the *point* of the gesture on a dry hour, so it deserves the
+  /// distance.
+  static const double _forecastExpandExtent = 200;
+
+  /// Current growth of the hero forecast card for [offset].
+  static double _forecastExpansion(double offset) =>
+      (offset / _forecastExpandExtent).clamp(0.0, 1.0);
+
+  /// How wet the rain-trend card gets for a given backdrop.
+  ///
+  /// These are positions on the reference's own weather-type ladder, not a free dial.
+  /// Both effects switch whole parameter sets by the weather-type enum,
+  /// and the ladder is counter-intuitive: **lighter rain means smaller, denser
+  /// beads and sparser edge water**. DPIP's plain rain backdrop is the
+  /// light-rain end of that ladder — which is what the shipped light-rain
+  /// capture shows — and only thunderstorm reaches the downpour band. Sitting
+  /// rain in the middle, as an earlier version did, gave it beads the reference keeps
+  /// for a storm and an edge-water band the reference never shows at that grade.
+  static double _cardRain(WeatherMode mode) => switch (mode) {
+    WeatherMode.rain => 0.3,
+    WeatherMode.thunderstorm => 0.85,
+    _ => 0.0,
+  };
 
   Widget _build(
     BuildContext context,
@@ -207,58 +264,69 @@ class HomeContent extends StatelessWidget {
                     key: ValueKey(areaIndex),
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (heroHeight != null)
-                        SizedBox(
-                          height: heroHeight,
-                          // Only the trailing gap depends on scroll offset, so
-                          // that is all this block's Padding re-reads per tick.
-                          child: Padding(
-                            // Deflates the tight SizedBox height so the Expanded
-                            // gap between header and trend card shrinks by exactly
-                            // this much and heroHeight itself — and with it the
-                            // forecast/events fold below — never moves. Collapses
-                            // to 0 as the sheet scrolls — see
-                            // [_bottomGapRampExtent] on why that includes the
-                            // safe area, not just the nicety gap on top of it.
-                            padding: EdgeInsets.only(
-                              bottom: _heroBottomGap(offset, bottomSafeArea),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                RainOnCard(
-                                  // Text and icons, not a solid card face — a
-                                  // flat top-edge collision would pool water in
-                                  // every gap between glyphs. Silhouette
-                                  // rasterises the header itself and catches drops
-                                  // on its actual outline instead.
-                                  //
-                                  // Not gated — see [RainOnCard.gated]. The gate
-                                  // closes once the card has risen [_gateCloseDistance]
-                                  // above where it settled, which is exactly what
-                                  // pulling the sheet up does to this header: it
-                                  // starts most of a screen down (rest detent) and
-                                  // rides up with the drag. Gating it there would
-                                  // cut the header's water off the moment the sheet
-                                  // is dragged, and the low-water mark ([_restTopY])
-                                  // pins it shut afterwards. The surrounding scroll
-                                  // view culls its paint once it truly scrolls out.
-                                  intensity: _cardRain(weatherMode),
-                                  opacity: reveal,
-                                  glass: false,
-                                  silhouette: true,
-                                  gated: false,
-                                  child: HomeSheetHeader(
-                                    reveal: reveal,
-                                    expanded: expanded,
-                                    weatherMode: weatherMode,
-                                    sky: sky,
-                                  ),
+                      // Unconditional shape, only conditional values — see
+                      // the crash note above _HomeContentState. `heroHeight`
+                      // being null just means a null SizedBox height (no
+                      // constraint, shrinks to content) and an empty tail
+                      // after the header instead of the trend/forecast card;
+                      // HomeSheetHeader's own ancestor chain (this
+                      // SizedBox > Padding > Column > RainOnCard) never
+                      // changes shape, so it never needs to be torn down and
+                      // rebuilt when the sheet opens or closes.
+                      SizedBox(
+                        height: heroHeight,
+                        // Only the trailing gap depends on scroll offset, so
+                        // that is all this block's Padding re-reads per tick.
+                        child: Padding(
+                          // Deflates the tight SizedBox height so the Expanded
+                          // gap between header and trend card shrinks by exactly
+                          // this much and heroHeight itself — and with it the
+                          // forecast/events fold below — never moves. Collapses
+                          // to 0 as the sheet scrolls — see
+                          // [_bottomGapRampExtent] on why that includes the
+                          // safe area, not just the nicety gap on top of it.
+                          padding: EdgeInsets.only(
+                            bottom: heroHeight == null
+                                ? 0
+                                : _heroBottomGap(offset, bottomSafeArea),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              RainOnCard(
+                                // Text and icons, not a solid card face — a
+                                // flat top-edge collision would pool water in
+                                // every gap between glyphs. Silhouette
+                                // rasterises the header itself and catches drops
+                                // on its actual outline instead.
+                                //
+                                // Not gated — see [RainOnCard.gated]. The gate
+                                // closes once the card has risen [_gateCloseDistance]
+                                // above where it settled, which is exactly what
+                                // pulling the sheet up does to this header: it
+                                // starts most of a screen down (rest detent) and
+                                // rides up with the drag. Gating it there would
+                                // cut the header's water off the moment the sheet
+                                // is dragged, and the low-water mark ([_restTopY])
+                                // pins it shut afterwards. The surrounding scroll
+                                // view culls its paint once it truly scrolls out.
+                                intensity: _cardRain(weatherMode),
+                                opacity: reveal,
+                                glass: false,
+                                silhouette: true,
+                                gated: false,
+                                child: HomeSheetHeader(
+                                  reveal: reveal,
+                                  expanded: expanded,
+                                  weatherMode: weatherMode,
+                                  sky: sky,
                                 ),
-                                // The gap is the point — open sky between the two
-                                // fixed edges, not a forgotten card. `HomeSheet`
-                                // blurs it back in once the scroll below carries
-                                // the trend card past the top.
+                              ),
+                              if (heroHeight != null) ...[
+                                // The gap is the point — open sky between the
+                                // two fixed edges, not a forgotten card.
+                                // `HomeSheet` blurs it back in once the scroll
+                                // below carries the trend card past the top.
                                 const Expanded(child: SizedBox.shrink()),
                                 if (dryTrend)
                                   // A dry hour has no rain chart, so the forecast
@@ -296,22 +364,22 @@ class HomeContent extends StatelessWidget {
                                     rain: _cardRain(weatherMode),
                                   ),
                               ],
-                            ),
+                            ],
                           ),
-                        )
-                      else
-                        HomeSheetHeader(
-                          reveal: reveal,
-                          expanded: expanded,
-                          weatherMode: weatherMode,
-                          sky: sky,
                         ),
+                      ),
                       const SizedBox(height: AppSpacing.lg),
                       // A live EEW alert rides above every card — it is the one
                       // thing on the dashboard that matters in the seconds it
                       // exists. Nothing renders when calm, so the sheet's
                       // ordinary layout is untouched outside an earthquake.
                       const HomeEewSection(),
+                      // The section renders nothing when calm — only reserve
+                      // the gap below it while an alert is actually showing,
+                      // or a calm dashboard gains an extra empty lg here on
+                      // top of the one already before this section.
+                      if (HomeEewSection.isActive(context))
+                        const SizedBox(height: AppSpacing.lg),
                       // Collapsed, or nothing to anchor a hero to: active events
                       // only. Full-screen township: the hero above, then forecast
                       // → events reached by scrolling past it. 全國: events only
@@ -365,63 +433,6 @@ class HomeContent extends StatelessWidget {
     final height = viewportHeight - topInset;
     return height < 0 ? 0 : height;
   }
-
-  /// Resting-state breathing room between the trend card's own bottom edge
-  /// and the safe area below it, on top of the safe area itself, so the card
-  /// doesn't read as glued to the very edge of the screen.
-  static const double _restBottomGap = AppSpacing.xl;
-
-  /// Scroll distance over which the hero block's *entire* trailing reserve —
-  /// [_restBottomGap] and the safe area alike — collapses to 0. Short on
-  /// purpose, same reasoning as `HomeSheet._ScrollBlurredWeather`'s own ramp:
-  /// both are a resting-state concern, not something to keep paying for once
-  /// the sheet is actually moving.
-  ///
-  /// The safe area has to ramp away too, not just stay as a fixed floor under
-  /// [_restBottomGap] — it exists only because the trend card sits at the
-  /// physical bottom of the screen *at rest*. The moment the list scrolls,
-  /// the card is no longer there and nothing about the device's home
-  /// indicator applies to it anymore; holding that reserve open regardless
-  /// just leaves it as dead space between the trend card and the forecast
-  /// card once scrolled — taller than [AppSpacing.lg], the gap every other
-  /// pair of cards on the second page actually uses, and visibly
-  /// inconsistent with them.
-  static const double _bottomGapRampExtent = 32;
-
-  /// Current size of the hero block's trailing reserve — [_restBottomGap]
-  /// plus [bottomSafeArea] — for the live scroll [offset].
-  static double _heroBottomGap(double offset, double bottomSafeArea) {
-    final rest = _restBottomGap + bottomSafeArea;
-    final t = (offset / _bottomGapRampExtent).clamp(0.0, 1.0);
-    return rest * (1 - t);
-  }
-
-  /// Scroll distance over which the hero's forecast card grows from its
-  /// one-glance summary (title + hour chips) to the full card (sparkline +
-  /// detail band). Independent of the shorter resting-state ramps around it —
-  /// this one is the *point* of the gesture on a dry hour, so it deserves the
-  /// distance.
-  static const double _forecastExpandExtent = 200;
-
-  /// Current growth of the hero forecast card for [offset].
-  static double _forecastExpansion(double offset) =>
-      (offset / _forecastExpandExtent).clamp(0.0, 1.0);
-
-  /// How wet the rain-trend card gets for a given backdrop.
-  ///
-  /// These are positions on the reference's own weather-type ladder, not a free dial.
-  /// Both effects switch whole parameter sets by the weather-type enum,
-  /// and the ladder is counter-intuitive: **lighter rain means smaller, denser
-  /// beads and sparser edge water**. DPIP's plain rain backdrop is the
-  /// light-rain end of that ladder — which is what the shipped light-rain
-  /// capture shows — and only thunderstorm reaches the downpour band. Sitting
-  /// rain in the middle, as an earlier version did, gave it beads the reference keeps
-  /// for a storm and an edge-water band the reference never shows at that grade.
-  static double _cardRain(WeatherMode mode) => switch (mode) {
-    WeatherMode.rain => 0.3,
-    WeatherMode.thunderstorm => 0.85,
-    _ => 0.0,
-  };
 }
 
 /// Slides its [child] in from the side when the area [index] changes, so a

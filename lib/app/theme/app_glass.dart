@@ -46,43 +46,60 @@ const double glassRevealedAlpha = 0.20;
 
 /// The translucent card/surface tint: resting
 /// [ColorScheme.surfaceContainerHighest] → the reference's sky-tinted 20 % fill as
-/// [reveal] rises.
+/// [reveal] rises — **dark theme only**. Light theme skips the fade entirely
+/// and stays [ColorScheme.surfaceContainerLow] at every [reveal] — the same
+/// solid fill [Card] itself defaults to (see the Material 3 `_CardDefaultsM3`
+/// this mirrors), so a light-theme card here reads exactly as crisp as the
+/// plain [Card] the EEW alert uses, not merely "less translucent." Any partial
+/// alpha over a busy backdrop, even 90-odd percent, still reads as hazy next
+/// to that fully opaque comparison.
 ///
 /// Without a [sky] colour (no backdrop running, or before the first LUT bake)
-/// it falls back to a near-opaque theme surface, because 20 % of nothing is an
-/// unreadable card.
-Color glassSurface(
-  ColorScheme colors,
-  double reveal, {
-  Color? sky,
-  int? hour,
-}) => Color.lerp(
-  colors.surfaceContainerHighest.withValues(alpha: 0.55),
-  sky == null
+/// dark theme falls back to a near-opaque theme surface, because 20 % of
+/// nothing is an unreadable card.
+Color glassSurface(ColorScheme colors, double reveal, {Color? sky, int? hour}) {
+  if (colors.brightness == Brightness.light) return colors.surfaceContainerLow;
+  final revealed = sky == null
       ? colors.surface.withValues(alpha: 0.92)
-      : skyCardTint(sky, hour: hour ?? AppTime.utc8.hour),
-  reveal,
-)!;
+      : skyCardTint(sky, hour: hour ?? AppTime.utc8.hour);
+  return Color.lerp(
+    colors.surfaceContainerHighest.withValues(alpha: 0.55),
+    revealed,
+    reveal,
+  )!;
+}
 
 /// Ink for content **inside** a [glassSurface] card.
 ///
-/// At rest the card is its own plate and the theme's on-surface roles are
-/// right. Once [reveal] dissolves it to the 20 % fill above, the card is no
-/// longer a plate — it is a pane of the sky — so its ink has to follow the sky
-/// exactly the way [inkOverWeather] does. Leaving it on [ColorScheme.onSurface]
-/// puts near-black text on a rain sky in a light theme.
+/// Dark theme: at rest the card is its own plate and the theme's on-surface
+/// roles are right. Once [reveal] dissolves it to the 20 % fill above, the
+/// card is no longer a plate — it is a pane of the sky — so its ink has to
+/// follow the sky exactly the way [inkOverWeather] does. Leaving it on
+/// [ColorScheme.onSurface] puts near-black text on a rain sky.
+///
+/// Light theme: [glassSurface] stays an opaque plate at every [reveal], so
+/// this stays [ColorScheme.onSurface] unconditionally — shifting it toward
+/// white for a dark [skyIsLight] would put pale text on that still-opaque,
+/// still-light plate.
 Color glassOnSurface(
   ColorScheme colors, {
   double reveal = 0,
   bool skyIsLight = false,
-}) => inkOverWeather(colors, reveal, skyIsLight: skyIsLight);
+}) {
+  if (colors.brightness == Brightness.light) return colors.onSurface;
+  return inkOverWeather(colors, reveal, skyIsLight: skyIsLight);
+}
 
-/// Secondary ink for content inside a [glassSurface] card.
+/// Secondary ink for content inside a [glassSurface] card. See [glassOnSurface]
+/// for why light theme skips the sky-following shift.
 Color glassOnSurfaceVariant(
   ColorScheme colors, {
   double reveal = 0,
   bool skyIsLight = false,
-}) => inkOverWeatherVariant(colors, reveal, skyIsLight: skyIsLight);
+}) {
+  if (colors.brightness == Brightness.light) return colors.onSurfaceVariant;
+  return inkOverWeatherVariant(colors, reveal, skyIsLight: skyIsLight);
+}
 
 /// Whether [mode]'s sky is light enough that dark foregrounds read better than
 /// white once the weather backdrop is showing.
