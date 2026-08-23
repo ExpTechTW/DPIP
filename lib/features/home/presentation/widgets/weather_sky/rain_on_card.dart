@@ -425,6 +425,14 @@ class _RainOnCardState extends State<RainOnCard>
     // skipped the whole simulation and left the edge dry.
     if (dt <= 0 || _size.width <= 0) return;
 
+    // A ticker goes on firing between `deactivate()` and `dispose()`, and that
+    // window is exactly where this card sits when the list scrolls it away or a
+    // tab teardown removes the page. [_syncPositionGate] reads
+    // `context.findRenderObject()`, which throws on an inactive element, and
+    // then calls `setState`, which throws on an unmounted one. Neither is worth
+    // a frame of physics nobody can see.
+    if (!mounted) return;
+
     _syncPositionGate();
 
     // Gate closed means the card is leaving the top of the sheet — cut the
