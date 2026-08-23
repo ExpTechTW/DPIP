@@ -253,11 +253,20 @@ final class FrameTileRepositoryImpl extends FrameTileRepository
 
   final FrameTileApi _api;
 
-  /// Highest zoom this overlay publishes tiles for. Radar / satellite /
-  /// QPESUMS reach 11; the 0.25° wind forecast grids stop at 7 (any deeper is
-  /// upsampled to nothing new).
+  /// Highest zoom this overlay publishes tiles for — measured from the live
+  /// endpoints, not guessed: radar and QPESUMS serve real bytes for z3–12,
+  /// satellite z0–11, wind z0–11, and everything outside those ranges comes
+  /// back as the empty 35-byte GIF placeholder. The caps sit **below** the
+  /// publish range on purpose: tile sizes shrink monotonically past each
+  /// product's resolution peak (radar / QPESUMS peak at z7, Himawari band 13
+  /// is ~2 km/px), so deeper levels are the server resampling — a viewport of
+  /// round trips per zoom crossing for no new detail. Wind was already 7;
+  /// the others carried the publish ceiling 11 and now match their data.
   @override
   final int maxZoom;
+
+  @override
+  int get sourceMaxZoom => maxZoom;
 
   @override
   String get tilePathPrefix => '${ApiPaths.tiles}/${_api.path}/';

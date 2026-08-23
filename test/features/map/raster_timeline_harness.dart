@@ -19,6 +19,11 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
 
   final List<String> _frames;
 
+  /// What mounted sources should carry as their MapLibre `maxzoom` — 22 so a
+  /// fake that never cared behaves exactly like the old uncapped mounts.
+  @override
+  int sourceMaxZoom = 22;
+
   /// One entry per [warmFrameTiles] call: the frames it was asked to warm.
   final List<List<String>> warmed = [];
 
@@ -100,6 +105,9 @@ class RecordingMapController implements MapLibreMapController {
   /// told to draw, rather than merely that it was told something.
   final Map<String, Map<String, dynamic>> sourceData = {};
 
+  /// Full property JSON of every non-GeoJSON source, by source id.
+  final Map<String, Map<String, dynamic>> sourceProperties = {};
+
   /// How many times the visible region was asked for. It is a platform
   /// round-trip, so a scrub that re-derives a rectangle the camera never moved
   /// is paying for it once per crossed frame.
@@ -127,6 +135,11 @@ class RecordingMapController implements MapLibreMapController {
     }
     if (data is Map) sourceData[sourceId] = Map<String, dynamic>.from(data);
     calls.add('addSource:$sourceId');
+    // Raster sources carry no `data`; record the whole property set so tests
+    // can pin the mount contract (tileSize, maxzoom, …) instead of inferring
+    // it from renderer behaviour.
+    final json = properties.toJson();
+    if (data == null) sourceProperties[sourceId] = json;
   }
 
   @override
