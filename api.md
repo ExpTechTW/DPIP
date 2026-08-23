@@ -10,10 +10,15 @@
   `coreExclusiveApi` = 僅 `api.core-tnn1`、`coreStaticExclusive` =
   僅 `static.core-tnn1`、`legacyApi` = 舊 server `api-1`（逐步淘汰中）。
 
-> 這是**端點目錄**，不是程式碼對照表。沒有 `lib/api/` 巨石檔：每個端點在其所屬
-> feature 的 `data/`（基礎設施則在 `core/`）裡，各自建成一個輕薄的 datasource，
-> 並帶著自己的 `ApiTier`（`core/network/api_region.dart`）；路徑字串集中於
+> 沒有 `lib/api/` 巨石檔：每個端點在其所屬 feature 的 `data/`（基礎設施則在
+> `core/`）裡，各自建成一個輕薄的 datasource，並帶著自己的 `ApiTier`
+> （`core/network/api_region.dart`）；路徑字串集中於
 > `core/network/api_paths.dart`（與 `EtagInterceptor` 共用，不會漂移）。
+>
+> **第一欄一律寫成 `類別.方法`。** 只寫方法名的版本曾經整段對不上程式碼 ——
+> `getWeatherStations`、`getRainLatest`、`getTyphoonTrack` 這些名字從來不存在，
+> 真正的呼叫是一個參數化的 `MeteorSnapshotApi` 加上兩個專用類別。帶著類別名，
+> 一次 grep 就能證實或推翻這張表的任何一列。
 >
 > **對時不是 HTTP 端點。** App 的時鐘使用真正的 **SNTP**
 > （`flutter_ntp`，UDP/123），對 `time.exptech.com.tw`（主）/
@@ -23,15 +28,15 @@
 
 ## 多活備援 (multi-active)
 
-| 方法 | 路徑 | 層級 | 主機（容錯順序 = 選定區域優先） |
+| 類別.方法 | 路徑 | 層級 | 主機（容錯順序 = 選定區域優先） |
 |---|---|---|---|
-| `openEewSse` | `/api/v2/eq/eew?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `openRtsSse` | `/api/v2/trem/rts?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `getEewAt` | `/api/v2/eq/eew/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
-| `getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
-| `getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EarthquakeApi.openEewSse` | `/api/v2/eq/eew?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `EarthquakeApi.openRtsSse` | `/api/v2/trem/rts?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `EarthquakeApi.getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `EarthquakeApi.getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `EarthquakeApi.getEewAt` | `/api/v2/eq/eew/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EarthquakeApi.getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EarthquakeApi.getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
 > **地震報告 list（v2）query：** `limit`/`page`、`sort`/`order`
 > （`time`\|`intensity`\|`magnitude`\|`depth` × `asc`\|`desc`）、震度／規模／深度
@@ -83,10 +88,10 @@ max-age=300`）。`{sec}` 就是解出清單後的 10 位數秒，直接使用�
 空白代表「未觀測」而非「無降水」，所以地圖的「顯示掃描範圍」外框畫的是那個聯集，
 幾何與推導在 `radar_scan_range.dart`。
 
-| 方法 | 路徑 | 層級 | 主機 |
+| 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `getFrames` | `/api/v2/tiles/radar/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/radar/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 衛星雲圖（v2）—— `core-tnn1`
 
@@ -94,16 +99,22 @@ Himawari-9 AHI 的 XYZ WebP,預設是 Band-13 IR。時間清單是差量編碼�
 Unix 秒（`[baseSec, Δ, …]`）,在 API 主機上帶 ETag/304;tile 在 **static**
 主機。`{sec}` 就是解出清單後的 10 分鐘秒,直接使用。
 
-`?channel=` 選取渲染的頻道或產品 —— 單一頻道用數字（`13`）、命名產品用名稱
-（`btd_wvirw`、`cloudtop`…,即 `satellite-tiles-go/docs.md` 的產品目錄）。
-帶 channel 時時間清單為該 channel 的交集（產品需要的頻道缺一就不可渲染,
-`list` 只列齊全的時刻）。App 的圖層選擇器為每個 channel 註冊一個獨立圖層
-（`satellite` 保留給 B13,其餘為 `satellite-<channel>`）。
+**`{channel}` 與 `{style}` 是路徑段，不是 query。** `{channel}` 選頻道或產品
+—— 單一頻道用數字（`13`，也是省略時的預設）、命名產品用名稱（`btd_wvirw`、
+`cloudtop`…，即 `satellite-tiles-go/docs.md` 的產品目錄）。清單為該 channel 的
+交集（產品需要的頻道缺一就不可渲染，`list` 只列齊全的時刻）。
 
-| 方法 | 路徑 | 層級 | 主機 |
+`{style}` 只出現在 tile 路徑：數字頻道可選 `normal` / `jma` / `bd`，命名產品一律
+`normal`（調色盤是產品本身的一部分）。`gray` 會摺成 `normal`。推導在
+`FrameTileApi._satelliteStyle`。
+
+App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` 保留給 B13，其餘為
+`satellite-<channel>`）。
+
+| 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `getFrames` | `/api/v2/tiles/satellite/list[?channel=…]` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `tileUrl` | `/api/v2/tiles/satellite/{sec}/{z}/{x}/{y}.webp[?channel=…]` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/satellite/{channel}/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/satellite/{channel}/{style}/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 未來1小時降水預報 QPESUMS（v2）—— `core-tnn1`
 
@@ -118,10 +129,10 @@ QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **毫�
 方形四角（預報有、圓弧無）與圓弧外凸處（圓弧有、方形無）都不一致。「顯示掃描
 範圍」外框因此各畫各的幾何，QPESUMS 的在 `qpesums_scan_range.dart`。
 
-| 方法 | 路徑 | 層級 | 主機 |
+| 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `getFrames` | `/api/v2/tiles/qpesums/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `tileUrl` | `/api/v2/tiles/qpesums/{ms}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/qpesums/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/qpesums/{ms}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 防災地圖 DPM（v2）—— `core-tnn1`
 
@@ -132,24 +143,29 @@ tile 由 MapLibre 直接抓，詳情經 `ApiClient`。Source-layer 名 = `{layer
 （AED 為 `aed`）。單點有 `id`（內部 PK，打詳情用，非 `aed_id`）；低 zoom 的
 cluster 帶 `point_count`。
 
-| 方法 | 路徑 | 層級 | 主機 |
+| 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `DisasterMapApi.tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `DisasterMapApi.getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `DisasterMapApi.getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `DisasterMapApi.getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 風場 Wind（v2 / v1）—— `core-tnn1`
 
 風場 overlay：XYZ WebP 圖層 + 低 zoom 的 **`.bin` 向量風場**（`WND1` 格式，
-`fetchWindBin`）。時間清單／圖層與其他 tiles 家族同形狀；`.bin` 用 `{model}`
-（`gfs` / `ecmwf`）與 `{frame}` 定址。圖層選擇器把 wind 註冊為獨立圖層。
+`fetchWindBin`）。圖層選擇器把 wind 註冊為獨立圖層。
 
-| 方法 | 路徑 | 層級 | 主機 |
+**`{model}` 是路徑段，不是 query，而且一個 frame 定址需要兩個時間。** 預報是
+「哪一次模式跑」加「預報到哪個時刻」，所以 tile 與 `.bin` 都以
+`{cycle}`（模式執行時刻）+ `{validTime}`（預報有效時刻）定址；`getFrames` 回傳的
+不透明 frame id 由 `FrameTileApi.windFrameParts` 拆成這兩段。`{model}` 是
+`gfs` / `ecmwf`。
+
+| 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `getFrames` | `/api/v2/tiles/wind/list[?model=…]` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `tileUrl` | `/api/v2/tiles/wind/{ts}/{z}/{x}/{y}.webp[?model=…]` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `fetchWindBin` | `/api/v1/wind/{model}/{frame}.bin` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/wind/{model}/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/wind/{model}/{cycle}/{validTime}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.fetchWindBin` | `/api/v1/wind/{model}/{cycle}/{validTime}.bin` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 氣象家族（**v5**）—— `core-tnn1`
 
@@ -161,30 +177,30 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 時間軸與數值皆為**差量／哨符編碼**，由 `core/network/meteor_decode.dart` 還原：
 `ts` 是 `[baseSec, Δ, …]`，數值序列中的 `-99` 代表 null（缺值），不是讀數。
 
-| 方法 | 路徑 | 層級 |
+`weather` / `rain` / `lightning` 三家共用同一個參數化的 `MeteorSnapshotApi`
+（建構時傳入 `_base`），所以**方法名只有五個，不是每家一組**。颱風的形狀不同，
+自成 `MeteorTyphoonApi`。
+
+| 類別.方法 | 路徑 | 層級 |
 |---|---|---|
-| `getWeatherStations` | `/api/v5/meteor/weather/station` | `coreExclusiveApi` |
-| `getWeatherLatest` | `/api/v5/meteor/weather` | `coreExclusiveApi` |
-| `getWeatherList` | `/api/v5/meteor/weather/list` | `coreExclusiveApi` |
-| `getWeatherAt` | `/api/v5/meteor/weather/{sec}` | `coreStaticExclusive` |
-| `getWeatherTrend` | `/api/v5/meteor/weather/trend/{id}?range=24h\|7d` | `coreExclusiveApi` |
-| `getWeatherRealtime` | `/api/v5/meteor/weather/realtime/{lat},{lng}` | `coreExclusiveApi` |
-| `getWeatherForecast` | `/api/v5/meteor/weather/forecast/{code}` | `coreExclusiveApi` |
-| `getRainStations` | `/api/v5/meteor/rain/station` | `coreExclusiveApi` |
-| `getRainLatest` | `/api/v5/meteor/rain` | `coreExclusiveApi` |
-| `getRainList` | `/api/v5/meteor/rain/list` | `coreExclusiveApi` |
-| `getRainAt` | `/api/v5/meteor/rain/{sec}` | `coreStaticExclusive` |
-| `getRainTrend` | `/api/v5/meteor/rain/trend/{id}?range=24h\|7d` | `coreExclusiveApi` |
-| `getLightningLatest` | `/api/v5/meteor/lightning` | `coreExclusiveApi` |
-| `getLightningList` | `/api/v5/meteor/lightning/list` | `coreExclusiveApi` |
-| `getLightningAt` | `/api/v5/meteor/lightning/{sec}` | `coreStaticExclusive` |
-| `getTyphoonLatest` | `/api/v5/meteor/typhoon` | `coreExclusiveApi` |
-| `getTyphoonTrack` | `/api/v5/meteor/typhoon/track` | `coreExclusiveApi` |
-| `getTyphoonPotential` | `/api/v5/meteor/typhoon/potential` | `coreExclusiveApi` |
-| `getTyphoonProbability` | `/api/v5/meteor/typhoon/probability` | `coreExclusiveApi` |
-| `getTyphoonWarning` | `/api/v5/meteor/typhoon/warning` | `coreExclusiveApi` |
-| `getTyphoonKindList` | `/api/v5/meteor/typhoon/{kind}/list` | `coreExclusiveApi` |
-| `getTyphoonKindAt` | `/api/v5/meteor/typhoon/{kind}/{sec}` | `coreStaticExclusive` |
+| `MeteorSnapshotApi.getStation` | `/api/v5/meteor/{family}/station` | `coreExclusiveApi` |
+| `MeteorSnapshotApi.getLatest` | `/api/v5/meteor/{family}` | `coreExclusiveApi` |
+| `MeteorSnapshotApi.getList` | `/api/v5/meteor/{family}/list` | `coreExclusiveApi` |
+| `MeteorSnapshotApi.getAt` | `/api/v5/meteor/{family}/{sec}` | `coreStaticExclusive` |
+| `MeteorSnapshotApi.getTrend` | `/api/v5/meteor/{family}/trend/{id}?range=24h\|7d` | `coreExclusiveApi` |
+| `MeteorWeatherApi.getRealtime` | `/api/v5/meteor/weather/realtime/{lat},{lng}` | `coreExclusiveApi` |
+| `MeteorWeatherApi.getForecast` | `/api/v5/meteor/weather/forecast/{code}` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getCyclones` | `/api/v5/meteor/typhoon` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getTrack` | `/api/v5/meteor/typhoon/track` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getPotential` | `/api/v5/meteor/typhoon/potential` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getProbability` | `/api/v5/meteor/typhoon/probability` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getWarning` | `/api/v5/meteor/typhoon/warning` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getList` | `/api/v5/meteor/typhoon/{kind}/list` | `coreExclusiveApi` |
+| `MeteorTyphoonApi.getAt` | `/api/v5/meteor/typhoon/{kind}/{sec}` | `coreStaticExclusive` |
+
+`{family}` = `weather` \| `rain` \| `lightning`（`station` 只有前兩家有；
+lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential` \|
+`probability` \| `warning`（`TyphoonKind.path`，與 enum 名同字）。
 
 > **颱風多颱**：`/`、`/track`、`/potential`、`/probability`、`/warning` 一律
 > `{ updated, cyclones: [...] }`；唯一識別是 **`tdNo`**（CWA `CwaTdNo`，未命名
@@ -198,38 +214,45 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 
 ### 裝置與通知 —— `core-tnn1`
 
-| 方法 | 路徑 | 層級 |
+| 類別.方法 | 路徑 | 層級 |
 |---|---|---|
-| `updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `coreExclusiveApi` |
-| `getNotify` | `/api/v2/notify/{token}` | `coreExclusiveApi` |
-| `setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `coreExclusiveApi` |
+| `LocationApi.updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `coreExclusiveApi` |
+| `NotifyApi.getNotify` | `/api/v2/notify/{token}` | `coreExclusiveApi` |
+| `NotifyApi.setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `coreExclusiveApi` |
 
 ### 舊 server `api-1`（逐步淘汰中）
 
 後端會把端點陸續搬到 `core-tnn1`，這裡會隨之縮減。以下**仍只在 `api-1` 上**，
 且都已在 App 中實際使用：
 
-| 方法 | 路徑 | 層級 | 使用處 |
+| 類別.方法 | 路徑 | 層級 | 使用處 |
 |---|---|---|---|
-| `getStations` | `/api/v1/trem/station` | `legacyApi` | 強震監視器測站 |
-| `getHistoryList` | `/api/v1/dpip/history/list` | `legacyApi` | 事件頁（全國） |
-| `getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | 事件頁（鄉鎮） |
-| `getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | 首頁拖盤收起（全國生效中） |
-| `getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | 首頁拖盤收起（鄉鎮生效中） |
-| `getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` | 強震波形回放（時間軸） |
+| `TremStationRepositoryImpl.stations` | `/api/v1/trem/station` | `legacyApi` | 強震監視器測站 |
+| `EventApi.getHistoryList` | `/api/v1/dpip/history/list` | `legacyApi` | 事件頁（全國） |
+| `EventApi.getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | 事件頁（鄉鎮） |
+| `EventApi.getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | 首頁拖盤收起（全國生效中） |
+| `EventApi.getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | 首頁拖盤收起（鄉鎮生效中） |
+| `EarthquakeApi.getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` | 強震波形回放（時間軸） |
 
-尚未接上、但端點存在於 `api-1`：
-
-| 方法 | 路徑 | 層級 |
-|---|---|---|
-| `getEvent` | `/api/v1/dpip/event/{id}` | `legacyApi` |
+`/api/v1/dpip/event/{id}` 存在於 `api-1`，但 App 裡**沒有任何方法呼叫它** ——
+先前這裡列的 `getEvent` 並不存在於程式碼中。
 
 ## 外部（第三方，無區域）
 
-| 方法 | URL |
+走 `ApiClient.getAbsolute` / `postAbsolute`：沒有 tier、沒有區域容錯，也不參與
+ETag 重新驗證。
+
+| 類別.方法 | URL |
 |---|---|
-| `getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
-| `getRainHourForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
+| `ChangelogApi.getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
+| `ChangelogApi.getAvatarBytes` | `https://avatars.githubusercontent.com/…`（貢獻者頭像，內容定址故長快取） |
+| `RainHourTrendApi.getForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
+| `ServerStatusApi.getStatus` | `https://status.exptech.dev/api/ds/query`（**POST**，Grafana datasource query；伺服器狀態頁） |
+| `CloudflareStatusApi.getComponents` | `https://www.cloudflarestatus.com/api/v2/components.json`（Cloudflare 元件狀態） |
+| `HasteApi.upload` | `https://haste.exptech.dev/api/pastes`（**POST**，上傳 App 日誌；回應的 `key` 組成 `https://haste.exptech.dev/<key>`） |
+
+> **衛星 TLE 目前不打網路。** `TleSource` 有一條遠端更新路徑（`TleFetcher`），
+> 但正式碼沒有接線（`fetch` 為 null），實際只讀打包在 `assets/astro/` 的元素集。
 
 ## curl 可用性（2026-08-02 實測，HTTP 狀態碼）
 
