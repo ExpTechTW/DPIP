@@ -5,15 +5,15 @@ import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
+import '../../core/storage/memory_db.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(sqfliteFfiInit);
 
-  late Database db;
+  late SqliteDatabase db;
 
   MeshMessage message(String text, {int from = 1, int seconds = 0}) =>
       MeshMessage(
@@ -34,14 +34,7 @@ void main() {
     if (reuse != null) {
       store = reuse;
     } else {
-      // `singleInstance: false` matters: sqflite hands back the *same* handle
-      // for a repeated path, and `:memory:` is a path — so without it every
-      // test here shares one database and `tearDown` closes the handle the
-      // next test is about to use ("This database has already been closed").
-      db = await databaseFactoryFfi.openDatabase(
-        inMemoryDatabasePath,
-        options: OpenDatabaseOptions(singleInstance: false),
-      );
+      db = openMemoryDb();
       await MeshStore.createSchema(db);
       store = MeshStore(db);
     }

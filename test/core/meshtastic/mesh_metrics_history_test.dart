@@ -9,13 +9,12 @@ library;
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-Future<Database> _open() async {
-  final db = await databaseFactoryFfi.openDatabase(
-    inMemoryDatabasePath,
-    options: OpenDatabaseOptions(singleInstance: false),
-  );
+import '../storage/memory_db.dart';
+
+Future<SqliteDatabase> _open() async {
+  final db = openMemoryDb();
   await MeshStore.createSchema(db);
   return db;
 }
@@ -25,7 +24,6 @@ DateTime _ago(Duration d) => _now.subtract(d);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(sqfliteFfiInit);
 
   group('the radio', () {
     test('keeps every series it was given', () async {
@@ -62,12 +60,9 @@ void main() {
         // The durable schema is re-applied on every open as CREATE TABLE IF NOT
         // EXISTS, which does nothing for a table that is already there — so a
         // new column has to arrive by ALTER or it never appears at all.
-        final db = await databaseFactoryFfi.openDatabase(
-          inMemoryDatabasePath,
-          options: OpenDatabaseOptions(singleInstance: false),
-        );
+        final db = openMemoryDb();
         addTearDown(db.close);
-        await db.execute('''
+        await db.executeMultiple('''
         CREATE TABLE mesh_metrics (
           ts INTEGER PRIMARY KEY,
           channel_util REAL,

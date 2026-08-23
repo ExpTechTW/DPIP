@@ -4,13 +4,13 @@ import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 import 'fake_mesh_service.dart';
+import '../storage/memory_db.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
 
   var clock = DateTime.utc(2026, 1, 1, 12);
 
@@ -38,18 +38,14 @@ void main() {
 
   /// Nodes now live in the `mesh_nodes` table, so a restart test needs the
   /// *same* database on the second open — hence the explicit handle rather
-  /// than a fresh `:memory:` each time (sqflite would hand back a shared one
-  /// anyway, which is worse: silent cross-test state).
-  Future<Database> memoryDb() => databaseFactoryFfi.openDatabase(
-    inMemoryDatabasePath,
-    options: OpenDatabaseOptions(singleInstance: false),
-  );
+  /// than a fresh `:memory:` each time.
+  SqliteDatabase memoryDb() => openMemoryDb();
 
   late SettingsStore settings;
 
   Future<(MeshNodeStore, FakeMeshService)> makeStore({
     Map<String, Object> initial = const {},
-    Database? db,
+    SqliteDatabase? db,
   }) async {
     clock = DateTime.utc(2026, 1, 1, 12);
     final service = FakeMeshService();
@@ -109,7 +105,7 @@ void main() {
   });
 
   test('survives a restart, with freshness recomputed', () async {
-    final db = await memoryDb();
+    final db = memoryDb();
     final (store, service) = await makeStore(db: db);
     service.nodes.add(
       node(7, name: 'repeater', lat: 23.5, lon: 120.5, heard: clock),
@@ -142,7 +138,7 @@ void main() {
   });
 
   test('drops the least recently heard past the cap', () async {
-    final db = await memoryDb();
+    final db = memoryDb();
     final (store, service) = await makeStore(db: db);
     for (var i = 0; i < MeshNodeStore.maxNodes + 5; i++) {
       service.nodes.add(node(i, heard: clock.subtract(Duration(seconds: i))));
@@ -216,7 +212,7 @@ void main() {
     );
 
     test('the MQTT flag survives a restart', () async {
-      final db = await memoryDb();
+      final db = memoryDb();
       final (store, service) = await makeStore(db: db);
       service.nodes.add(node(2, lat: 35.6, lon: 139.7, viaMqtt: true));
       await flush();
@@ -232,19 +228,22 @@ void main() {
     // whole list to one malformed entry. Columns with NOT NULL make both
     // states unrepresentable — the row is rejected at write time instead of
     // being discovered at read time.
-    final db = await memoryDb();
+    final db = memoryDb();
     await MeshStore.createSchema(db);
     // A node with no name is rejected at write time.
     await expectLater(
-      db.insert('mesh_nodes', {'num': 5, 'snr': 0.0}),
+      db.execute('INSERT INTO mesh_nodes (num, snr) VALUES (5, 0.0)'),
       throwsA(isA<Object>()),
     );
     // A node always has a number: `num INTEGER PRIMARY KEY` is the rowid, so
     // one is assigned even when the caller omits it. There is no such thing
     // as the numberless entry the JSON blob could produce.
-    final id = await db.insert('mesh_nodes', {'name': 'auto', 'snr': 0.0});
-    expect(id, greaterThan(0));
-    await db.delete('mesh_nodes');
+    final id = await db.execute(
+      "INSERT INTO mesh_nodes (name, snr) VALUES ('auto', 0.0) "
+      'RETURNING num',
+    );
+    expect((id.first['num'] as int), greaterThan(0));
+    await db.execute('DELETE FROM mesh_nodes');
     // And a well-formed row round-trips.
     final (store, _) = await makeStore(db: db);
     await MeshStore(db).writeNodes([
@@ -256,7 +255,7 @@ void main() {
   });
 
   test('clear empties the table and its storage', () async {
-    final db = await memoryDb();
+    final db = memoryDb();
     final (store, service) = await makeStore(db: db);
     service.nodes.add(node(1));
     await flush();
@@ -345,7 +344,7 @@ void main() {
 
   group('hop distance', () {
     test('an unknown distance stays null, never 0', () async {
-      final db = await memoryDb();
+      final db = memoryDb();
       addTearDown(db.close);
       await MeshStore.createSchema(db);
       await MeshStore(db).writeNodes([
@@ -386,7 +385,7 @@ void main() {
     );
 
     test('round-trips through the table', () async {
-      final db = await memoryDb();
+      final db = memoryDb();
       addTearDown(db.close);
       final (first, service) = await makeStore(db: db);
       service.nodes.add(node(9, name: 'via two', hops: 2));

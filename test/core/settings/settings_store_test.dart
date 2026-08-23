@@ -11,29 +11,24 @@ library;
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-/// A fresh in-memory database per call.
-///
-/// `singleInstance: false` matters: sqflite hands back the *same* handle for a
-/// repeated path, and `:memory:` is a path — so without it every test in the
-/// file shares one database and the second test starts with the first one's
-/// rows. That is exactly the kind of shared state that makes a suite pass in
-/// isolation and fail as a group.
-Future<Database> _openMemory() => databaseFactoryFfi.openDatabase(
-  inMemoryDatabasePath,
-  options: OpenDatabaseOptions(singleInstance: false),
-);
+import '../storage/memory_db.dart';
 
-Future<Database> _db() async {
-  final db = await _openMemory();
+Future<SqliteDatabase> _db() async {
+  final db = openMemoryDb();
   await SettingsStore.createSchema(db);
   return db;
 }
 
+Future<void> insertRow(SqliteDatabase db, String key, String value) =>
+    db.execute('INSERT INTO $settingsTable (key, value) VALUES (?, ?)', [
+      key,
+      value,
+    ]);
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
 
   test('a value survives a reopen', () async {
     final db = await _db();
@@ -72,14 +67,8 @@ void main() {
 
   test('one malformed row does not discard onboarding completion', () async {
     final db = await _db();
-    await db.insert(settingsTable, {
-      'key': SettingKeys.locale.name,
-      'value': '{not json',
-    });
-    await db.insert(settingsTable, {
-      'key': SettingKeys.onboardingComplete.name,
-      'value': 'true',
-    });
+    await insertRow(db, SettingKeys.locale.name, '{not json');
+    await insertRow(db, SettingKeys.onboardingComplete.name, 'true');
 
     final store = await SettingsStore.open(db);
 

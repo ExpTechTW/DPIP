@@ -10,20 +10,18 @@ library;
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/data/meshtastic_client_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-Future<Database> _open() async {
-  final db = await databaseFactoryFfi.openDatabase(
-    inMemoryDatabasePath,
-    options: OpenDatabaseOptions(singleInstance: false),
-  );
+import '../storage/memory_db.dart';
+
+Future<SqliteDatabase> _open() async {
+  final db = openMemoryDb();
   await MeshStore.createSchema(db);
   return db;
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(sqfliteFfiInit);
 
   final now = DateTime.utc(2026, 8, 16, 12);
 
@@ -76,15 +74,19 @@ void main() {
       addTearDown(db.close);
       // No `received_at`: its true arrival time is unknowable, and deleting on
       // a guess is the failure the column exists to stop.
-      await db.insert('mesh_messages', {
-        'ts': now.subtract(const Duration(days: 365)).millisecondsSinceEpoch,
-        'node': 7,
-        'channel': 0,
-        'text': 'legacy',
-        'outgoing': 0,
-      });
+      await db.execute(
+        'INSERT INTO mesh_messages (ts, node, channel, text, outgoing) '
+        'VALUES (?, ?, ?, ?, ?)',
+        [
+          now.subtract(const Duration(days: 365)).millisecondsSinceEpoch,
+          7,
+          0,
+          'legacy',
+          0,
+        ],
+      );
       await MeshStore(db, now: () => now).prune();
-      expect(await db.query('mesh_messages'), hasLength(1));
+      expect(await db.getAll('SELECT * FROM mesh_messages'), hasLength(1));
     });
   });
 

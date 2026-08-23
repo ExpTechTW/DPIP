@@ -17,7 +17,7 @@ library;
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// One line of the conversation log.
 class MeshStoredMessage {
@@ -159,145 +159,114 @@ class MeshStore {
   /// How long utilization samples are kept — what the chart plots.
   static const Duration metricRetention = Duration(hours: 24);
 
-  final Database _db;
+  final SqliteDatabase _db;
   final DateTime Function() _now;
 
-  static Future<void> createSchema(Database db) async {
+  static Future<void> createSchema(SqliteDatabase db) async {
     // This re-runs on every launch (the IF NOT EXISTS is the migration
-    // mechanism), so every statement is a launch-window platform round trip —
-    // one probe for the ALTER-added columns, then everything else as a single
-    // batch commit, instead of ten serial awaits.
+    // mechanism), so every statement rides one background-isolate round trip:
+    // one probe per table with ALTER-added columns, then everything else in a
+    // single executeMultiple, instead of ten serial awaits.
     // One probe per table that has gained columns since it shipped. An empty
     // set means the table does not exist yet, so the CREATE below makes it
     // without them and every ALTER is needed.
     final existing = <String, Set<String>>{};
     for (final table in _alterColumns.keys) {
       existing[table] = {
-        for (final row in await db.rawQuery('PRAGMA table_info($table)'))
+        for (final row in await db.getAll('PRAGMA table_info($table)'))
           row['name'] as String,
       };
     }
 
-    final batch = db.batch()
-      // The node table the radio hands over on every connect, kept for the
-      // times there is no radio. A row per node, not a JSON blob in a settings
-      // key: 250 nodes re-serialised on every telemetry packet is exactly what
-      // the key-value store was bad at.
-      ..execute(
-        'CREATE TABLE IF NOT EXISTS $_nodes ('
-        'num INTEGER PRIMARY KEY NOT NULL, '
-        'name TEXT NOT NULL, '
-        'battery INTEGER, '
-        'last_heard INTEGER, '
-        'latitude REAL, '
-        'longitude REAL, '
-        'snr REAL NOT NULL DEFAULT 0, '
-        'via_mqtt INTEGER NOT NULL DEFAULT 0)',
-      )
-      ..execute(
-        'CREATE INDEX IF NOT EXISTS ${_nodes}_heard ON $_nodes(last_heard DESC)',
-      )
-      // The channel table, for the times there is no radio to ask.
-      //
-      // A channel's *name* is only known while connected — it arrives in the
-      // config download and lives nowhere else. Without this table the chat
-      // screen fell back to the slot number the moment the radio went away, so
-      // a conversation the user knows as "DPIP" was labelled "CH2" whenever
-      // they opened the page before the radio finished configuring. The stored
-      // log outlives the connection; its labels have to as well.
-      ..execute(
-        'CREATE TABLE IF NOT EXISTS $_channels ('
-        'idx INTEGER PRIMARY KEY NOT NULL, '
-        'name TEXT NOT NULL)',
-      )
-      ..execute('''
+    await db.executeMultiple('''
+      CREATE TABLE IF NOT EXISTS $_nodes (
+        num INTEGER PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        battery INTEGER,
+        last_heard INTEGER,
+        latitude REAL,
+        longitude REAL,
+        snr REAL NOT NULL DEFAULT 0,
+        via_mqtt INTEGER NOT NULL DEFAULT 0);
+      CREATE INDEX IF NOT EXISTS ${_nodes}_heard ON $_nodes(last_heard DESC);
+      -- The channel table, for the times there is no radio to ask.
+      --
+      -- A channel's *name* is only known while connected — it arrives in the
+      -- config download and lives nowhere else. Without this table the chat
+      -- screen fell back to the slot number the moment the radio went away, so
+      -- a conversation the user knows as "DPIP" was labelled "CH2" whenever
+      -- they opened the page before the radio finished configuring. The stored
+      -- log outlives the connection; its labels have to as well.
+      CREATE TABLE IF NOT EXISTS $_channels (
+        idx INTEGER PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS $_messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         ts INTEGER NOT NULL,
         node INTEGER NOT NULL,
         channel INTEGER NOT NULL,
         text TEXT NOT NULL,
-        outgoing INTEGER NOT NULL DEFAULT 0
-      )
-    ''')
-      // Duplicate suppression as a constraint, not a scan: a reconnect replays
-      // packets the log may already hold, and `INSERT OR IGNORE` drops them at
-      // the storage layer.
-      ..execute(
-        'CREATE UNIQUE INDEX IF NOT EXISTS ${_messages}_identity '
-        'ON $_messages (node, channel, ts, text)',
-      )
-      // The read is always "this channel, newest first".
-      ..execute(
-        'CREATE INDEX IF NOT EXISTS ${_messages}_channel_ts '
-        'ON $_messages (channel, ts DESC)',
-      )
-      ..execute('''
+        outgoing INTEGER NOT NULL DEFAULT 0);
+      -- Duplicate suppression as a constraint, not a scan: a reconnect replays
+      -- packets the log may already hold, and `INSERT OR IGNORE` drops them at
+      -- the storage layer.
+      CREATE UNIQUE INDEX IF NOT EXISTS ${_messages}_identity
+        ON $_messages (node, channel, ts, text);
+      -- The read is always "this channel, newest first".
+      CREATE INDEX IF NOT EXISTS ${_messages}_channel_ts
+        ON $_messages (channel, ts DESC);
       CREATE TABLE IF NOT EXISTS $_metrics (
         ts INTEGER PRIMARY KEY,
         channel_util REAL,
         air_util REAL,
-        battery INTEGER
-      )
-    ''')
-      // What the rest of the mesh looked like, one row per node per reading.
-      //
-      // The in-memory ring [MeshNodeStore] keeps is bounded by count, so on a
-      // busy mesh it holds minutes; this holds a day, which is the window in
-      // which "when did that node start failing" is a question anyone asks.
-      // The composite key makes a re-emitted reading an overwrite rather than
-      // a duplicate — the radio repeats a node's telemetry until it changes.
-      ..execute('''
+        battery INTEGER);
+      -- What the rest of the mesh looked like, one row per node per reading.
+      --
+      -- The in-memory ring [MeshNodeStore] keeps is bounded by count, so on a
+      -- busy mesh it holds minutes; this holds a day, which is the window in
+      -- which "when did that node start failing" is a question anyone asks.
+      -- The composite key makes a re-emitted reading an overwrite rather than
+      -- a duplicate — the radio repeats a node's telemetry until it changes.
       CREATE TABLE IF NOT EXISTS $_nodeMetrics (
         ts INTEGER NOT NULL,
         node INTEGER NOT NULL,
         battery INTEGER,
         voltage REAL,
         snr REAL,
-        PRIMARY KEY (ts, node)
-      )
-    ''')
-      // Both reads are "this node, over time" and "everything since T".
-      ..execute(
-        'CREATE INDEX IF NOT EXISTS ${_nodeMetrics}_node_ts '
-        'ON $_nodeMetrics (node, ts)',
-      )
-      // How far into each conversation the user has read — what the unread
-      // dots are computed against. Its own table rather than a column on
-      // [_channels]: that one is replaced wholesale from the radio's table
-      // and only holds named channels, either of which would silently reset
-      // read positions.
-      ..execute(
-        'CREATE TABLE IF NOT EXISTS $_reads ('
-        'channel INTEGER PRIMARY KEY NOT NULL, '
-        'last_read INTEGER NOT NULL)',
-      );
+        PRIMARY KEY (ts, node));
+      -- Both reads are "this node, over time" and "everything since T".
+      CREATE INDEX IF NOT EXISTS ${_nodeMetrics}_node_ts
+        ON $_nodeMetrics (node, ts);
+      -- How far into each conversation the user has read — what the unread
+      -- dots are computed against. Its own table rather than a column on
+      -- [$_channels]: that one is replaced wholesale from the radio's table
+      -- and only holds named channels, either of which would silently reset
+      -- read positions.
+      CREATE TABLE IF NOT EXISTS $_reads (
+        channel INTEGER PRIMARY KEY NOT NULL,
+        last_read INTEGER NOT NULL)
+    ''');
 
     // Columns added after a table shipped arrive by ALTER — IF NOT EXISTS does
     // nothing for a table that already exists. On an installed one the probe
     // names what is present; on a fresh one the set is empty, so the ALTERs run
-    // after the CREATE below.
+    // after the CREATE above.
     for (final entry in _alterColumns.entries) {
       final present = existing[entry.key]!;
       if (present.isEmpty) continue;
       for (final (column, type) in entry.value) {
         if (present.contains(column)) continue;
-        batch.execute('ALTER TABLE ${entry.key} ADD COLUMN $column $type');
+        await db.execute('ALTER TABLE ${entry.key} ADD COLUMN $column $type');
       }
     }
-    await batch.commit(noResult: true);
     // A fresh install: the CREATEs above carry none of the ALTER columns, so
     // add them now that the tables exist.
-    final fresh = db.batch();
-    var any = false;
     for (final entry in _alterColumns.entries) {
       if (existing[entry.key]!.isNotEmpty) continue;
       for (final (column, type) in entry.value) {
-        fresh.execute('ALTER TABLE ${entry.key} ADD COLUMN $column $type');
-        any = true;
+        await db.execute('ALTER TABLE ${entry.key} ADD COLUMN $column $type');
       }
     }
-    if (any) await fresh.commit(noResult: true);
   }
 
   /// Columns added to a table after it shipped — one list per table so the
@@ -349,18 +318,27 @@ class MeshStore {
 
   /// Appends [message], ignoring one the log already holds. Returns whether it
   /// was new — the caller uses that to decide whether to notify or re-render.
+  ///
+  /// `RETURNING` answers "did this insert land" the way sqflite's
+  /// insert-with-ignore rowid once did: the unique identity index suppresses
+  /// reconnect replays, and a suppressed insert contributes no returning row.
   Future<bool> addMessage(MeshStoredMessage message) async {
     try {
-      final id = await _db.insert(_messages, {
-        'ts': message.timestamp.millisecondsSinceEpoch,
-        'received_at': _now().millisecondsSinceEpoch,
-        'node': message.from,
-        'channel': message.channel,
-        'text': message.text,
-        'outgoing': message.outgoing ? 1 : 0,
-        'binary': message.binary ? 1 : 0,
-      }, conflictAlgorithm: ConflictAlgorithm.ignore);
-      return id != 0;
+      final result = await _db.execute(
+        'INSERT OR IGNORE INTO $_messages '
+        '(ts, received_at, node, channel, text, outgoing, binary) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id',
+        [
+          message.timestamp.millisecondsSinceEpoch,
+          _now().millisecondsSinceEpoch,
+          message.from,
+          message.channel,
+          message.text,
+          message.outgoing ? 1 : 0,
+          message.binary ? 1 : 0,
+        ],
+      );
+      return result.isNotEmpty;
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store addMessage');
       return false;
@@ -374,18 +352,24 @@ class MeshStore {
     int limit = 200,
   }) async {
     try {
-      final rows = await _db.query(
-        _messages,
-        where: channel == null ? null : 'channel = ?',
-        whereArgs: channel == null ? null : [channel],
-        // Arrival order, falling back to the radio's stamp for rows written
-        // before the column existed. Ranking incoming (radio clock) and
-        // outgoing (our clock) rows together by `ts` put a reply above the
-        // message it answered — visible only after a restart, because live
-        // inserts land in arrival order anyway.
-        orderBy: 'COALESCE(received_at, ts) DESC, id DESC',
-        limit: limit,
-      );
+      final rows = channel == null
+          ? await _db.getAll(
+              'SELECT id, ts, received_at, node, channel, text, outgoing, binary '
+              'FROM $_messages '
+              // Arrival order, falling back to the radio's stamp for rows
+              // written before the column existed. Ranking incoming (radio
+              // clock) and outgoing (our clock) rows together by `ts` put a
+              // reply above the message it answered — visible only after a
+              // restart, because live inserts land in arrival order anyway.
+              'ORDER BY COALESCE(received_at, ts) DESC, id DESC LIMIT ?',
+              [limit],
+            )
+          : await _db.getAll(
+              'SELECT id, ts, received_at, node, channel, text, outgoing, binary '
+              'FROM $_messages WHERE channel = ? '
+              'ORDER BY COALESCE(received_at, ts) DESC, id DESC LIMIT ?',
+              [channel, limit],
+            );
       return [for (final row in rows) _readMessage(row)];
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store messages');
@@ -397,7 +381,7 @@ class MeshStore {
   /// Channel → when the user last read it (ms). Missing = never read.
   Future<Map<int, int>> readLastReads() async {
     try {
-      final rows = await _db.query(_reads);
+      final rows = await _db.getAll('SELECT channel, last_read FROM $_reads');
       return {
         for (final row in rows)
           row['channel']! as int: row['last_read']! as int,
@@ -411,10 +395,10 @@ class MeshStore {
   /// Marks [channel] read up to [ts] (ms).
   Future<void> writeLastRead(int channel, int ts) async {
     try {
-      await _db.insert(_reads, {
-        'channel': channel,
-        'last_read': ts,
-      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      await _db.execute(
+        'INSERT OR REPLACE INTO $_reads (channel, last_read) VALUES (?, ?)',
+        [channel, ts],
+      );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store writeLastRead');
     }
@@ -428,7 +412,7 @@ class MeshStore {
   /// compare timestamps would be a page-open cost for two integers a channel.
   Future<Map<int, int>> unreadCounts() async {
     try {
-      final rows = await _db.rawQuery(
+      final rows = await _db.getAll(
         'SELECT m.channel AS channel, COUNT(*) AS n '
         'FROM $_messages m '
         'LEFT JOIN $_reads r ON r.channel = m.channel '
@@ -446,7 +430,7 @@ class MeshStore {
   /// advances to when a conversation is opened.
   Future<Map<int, int>> newestIncomingTsByChannel() async {
     try {
-      final rows = await _db.rawQuery(
+      final rows = await _db.getAll(
         'SELECT channel, MAX(ts) AS ts FROM $_messages '
         'WHERE outgoing = 0 GROUP BY channel',
       );
@@ -461,7 +445,7 @@ class MeshStore {
 
   Future<Map<int, int>> messageCountsByChannel() async {
     try {
-      final rows = await _db.rawQuery(
+      final rows = await _db.getAll(
         'SELECT channel, COUNT(*) AS n FROM $_messages GROUP BY channel',
       );
       return {
@@ -479,9 +463,9 @@ class MeshStore {
       // behind, they point past a log that no longer exists — so the first
       // message to arrive after a clear lands *below* a cursor that outlived
       // its conversation and is counted as already read.
-      await _db.transaction((txn) async {
-        await txn.delete(_messages);
-        await txn.delete(_reads);
+      await _db.writeTransaction((tx) async {
+        await tx.execute('DELETE FROM $_messages');
+        await tx.execute('DELETE FROM $_reads');
       });
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store clearMessages');
@@ -492,24 +476,31 @@ class MeshStore {
   /// so the same telemetry can't be stored twice.
   Future<void> addMetric(MeshMetricSample sample) async {
     try {
-      await _db.insert(_metrics, {
-        'ts': sample.at.millisecondsSinceEpoch,
-        'channel_util': sample.channelUtilization,
-        'air_util': sample.airUtilTx,
-        'battery': sample.batteryPercent,
-        'voltage': sample.voltage,
-        'nodes_total': sample.nodesTotal,
-        'nodes_online': sample.nodesOnline,
-        'rx_packets': sample.rxPackets,
-        'tx_packets': sample.txPackets,
-        'ls_rx': sample.lsRx,
-        'ls_rx_bad': sample.lsRxBad,
-        'ls_tx': sample.lsTx,
-        'ls_rx_dupe': sample.lsRxDupe,
-        'ls_tx_relay': sample.lsTxRelay,
-        'ls_tx_relay_cancel': sample.lsTxRelayCancel,
-        'heap_free': sample.heapFree,
-      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      await _db.execute(
+        'INSERT OR REPLACE INTO $_metrics '
+        '(ts, channel_util, air_util, battery, voltage, nodes_total, '
+        'nodes_online, rx_packets, tx_packets, ls_rx, ls_rx_bad, ls_tx, '
+        'ls_rx_dupe, ls_tx_relay, ls_tx_relay_cancel, heap_free) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+          sample.at.millisecondsSinceEpoch,
+          sample.channelUtilization,
+          sample.airUtilTx,
+          sample.batteryPercent,
+          sample.voltage,
+          sample.nodesTotal,
+          sample.nodesOnline,
+          sample.rxPackets,
+          sample.txPackets,
+          sample.lsRx,
+          sample.lsRxBad,
+          sample.lsTx,
+          sample.lsRxDupe,
+          sample.lsTxRelay,
+          sample.lsTxRelayCancel,
+          sample.heapFree,
+        ],
+      );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store addMetric');
     }
@@ -521,8 +512,8 @@ class MeshStore {
   Future<int> _windowStart(String table, Duration window, DateTime now) async {
     final nowMs = now.millisecondsSinceEpoch;
     try {
-      final rows = await _db.rawQuery('SELECT MAX(ts) AS newest FROM $table');
-      final newest = (rows.first['newest'] as num?)?.toInt();
+      final row = await _db.get('SELECT MAX(ts) AS newest FROM $table');
+      final newest = (row['newest'] as num?)?.toInt();
       final anchor = newest != null && newest < nowMs ? newest : nowMs;
       return anchor - window.inMilliseconds;
     } catch (error, stackTrace) {
@@ -535,11 +526,12 @@ class MeshStore {
   Future<List<MeshMetricSample>> metrics() async {
     try {
       final since = await _windowStart(_metrics, metricRetention, _now());
-      final rows = await _db.query(
-        _metrics,
-        where: 'ts >= ?',
-        whereArgs: [since],
-        orderBy: 'ts ASC',
+      final rows = await _db.getAll(
+        'SELECT ts, channel_util, air_util, battery, voltage, nodes_total, '
+        'nodes_online, rx_packets, tx_packets, ls_rx, ls_rx_bad, ls_tx, '
+        'ls_rx_dupe, ls_tx_relay, ls_tx_relay_cancel, heap_free '
+        'FROM $_metrics WHERE ts >= ? ORDER BY ts ASC',
+        [since],
       );
       return [
         for (final row in rows)
@@ -575,18 +567,20 @@ class MeshStore {
   Future<void> addNodeMetrics(List<MeshNodeMetricSample> samples) async {
     if (samples.isEmpty) return;
     try {
-      await _db.transaction((txn) async {
-        final batch = txn.batch();
+      await _db.writeTransaction((tx) async {
         for (final sample in samples) {
-          batch.insert(_nodeMetrics, {
-            'ts': sample.at.millisecondsSinceEpoch,
-            'node': sample.node,
-            'battery': sample.battery,
-            'voltage': sample.voltage,
-            'snr': sample.snr,
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
+          await tx.execute(
+            'INSERT OR REPLACE INTO $_nodeMetrics '
+            '(ts, node, battery, voltage, snr) VALUES (?, ?, ?, ?, ?)',
+            [
+              sample.at.millisecondsSinceEpoch,
+              sample.node,
+              sample.battery,
+              sample.voltage,
+              sample.snr,
+            ],
+          );
         }
-        await batch.commit(noResult: true);
       });
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store addNodeMetrics');
@@ -598,12 +592,17 @@ class MeshStore {
   Future<List<MeshNodeMetricSample>> nodeMetrics({int? node}) async {
     try {
       final since = await _windowStart(_nodeMetrics, metricRetention, _now());
-      final rows = await _db.query(
-        _nodeMetrics,
-        where: node == null ? 'ts >= ?' : 'ts >= ? AND node = ?',
-        whereArgs: node == null ? [since] : [since, node],
-        orderBy: 'ts ASC',
-      );
+      final rows = node == null
+          ? await _db.getAll(
+              'SELECT ts, node, battery, voltage, snr FROM $_nodeMetrics '
+              'WHERE ts >= ? ORDER BY ts ASC',
+              [since],
+            )
+          : await _db.getAll(
+              'SELECT ts, node, battery, voltage, snr FROM $_nodeMetrics '
+              'WHERE ts >= ? AND node = ? ORDER BY ts ASC',
+              [since, node],
+            );
       return [
         for (final row in rows)
           MeshNodeMetricSample(
@@ -628,19 +627,21 @@ class MeshStore {
       // On `received_at`, never on `ts` — see [_alterColumns]. A row with no
       // arrival time survives: it predates the column, and its true age is
       // unknowable.
-      await _db.delete(
-        _messages,
-        where: 'received_at IS NOT NULL AND received_at < ?',
-        whereArgs: [now.subtract(messageRetention).millisecondsSinceEpoch],
+      await _db.execute(
+        'DELETE FROM $_messages '
+        'WHERE received_at IS NOT NULL AND received_at < ?',
+        [now.subtract(messageRetention).millisecondsSinceEpoch],
       );
       // Rows written before the channel-hash guard existed can carry a hash
       // (242, 92, …) where an index belongs; they synthesise phantom "CH242"
       // conversations in the picker. The guard stops new ones — this clears
       // the legacy ones. Slot indices are 0–7, fixed by the firmware.
-      await _db.delete(_messages, where: 'channel > 7 OR channel < 0');
+      await _db.execute(
+        'DELETE FROM $_messages WHERE channel > 7 OR channel < 0',
+      );
       // The same shape guard on the read cursors, which are keyed by the same
       // channel number and had no prune path at all.
-      await _db.delete(_reads, where: 'channel > 7 OR channel < 0');
+      await _db.execute('DELETE FROM $_reads WHERE channel > 7 OR channel < 0');
       // Measured from the newest row when that is *older* than now, not from
       // now alone.
       //
@@ -657,12 +658,10 @@ class MeshStore {
       // accumulate — and every chart windows from *now* regardless, so a stale
       // day is never drawn as current.
       final metricCutoff = await _windowStart(_metrics, metricRetention, now);
-      await _db.delete(_metrics, where: 'ts < ?', whereArgs: [metricCutoff]);
-      await _db.delete(
-        _nodeMetrics,
-        where: 'ts < ?',
-        whereArgs: [await _windowStart(_nodeMetrics, metricRetention, now)],
-      );
+      await _db.execute('DELETE FROM $_metrics WHERE ts < ?', [metricCutoff]);
+      await _db.execute('DELETE FROM $_nodeMetrics WHERE ts < ?', [
+        await _windowStart(_nodeMetrics, metricRetention, now),
+      ]);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'mesh store prune');
     }
@@ -687,7 +686,7 @@ class MeshStore {
   /// arrives later.
   Future<Map<int, String>> readChannels() async {
     try {
-      final rows = await _db.query(_channels);
+      final rows = await _db.getAll('SELECT idx, name FROM $_channels');
       return {
         for (final row in rows) row['idx']! as int: row['name']! as String,
       };
@@ -703,14 +702,15 @@ class MeshStore {
   /// merge would keep the name of a channel the user has since deleted.
   Future<void> writeChannels(Map<int, String> names) async {
     try {
-      await _db.transaction((txn) async {
-        await txn.delete(_channels);
-        final batch = txn.batch();
+      await _db.writeTransaction((tx) async {
+        await tx.execute('DELETE FROM $_channels');
         for (final entry in names.entries) {
           if (entry.value.isEmpty) continue;
-          batch.insert(_channels, {'idx': entry.key, 'name': entry.value});
+          await tx.execute('INSERT INTO $_channels (idx, name) VALUES (?, ?)', [
+            entry.key,
+            entry.value,
+          ]);
         }
-        await batch.commit(noResult: true);
       });
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'writing mesh channels');
@@ -723,7 +723,12 @@ class MeshStore {
   /// passes its own.
   Future<List<Map<String, Object?>>> readNodes({int limit = 5000}) async {
     try {
-      return await _db.query(_nodes, orderBy: 'last_heard DESC', limit: limit);
+      final rows = await _db.getAll(
+        'SELECT num, name, battery, last_heard, latitude, longitude, snr, '
+        'via_mqtt, hops_away FROM $_nodes ORDER BY last_heard DESC LIMIT ?',
+        [limit],
+      );
+      return [for (final row in rows) Map<String, Object?>.of(row)];
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'reading mesh nodes');
       return const [];
@@ -737,13 +742,26 @@ class MeshStore {
   /// one transaction is cheaper than reconciling deletions.
   Future<void> writeNodes(List<Map<String, Object?>> rows) async {
     try {
-      await _db.transaction((txn) async {
-        await txn.delete(_nodes);
-        final batch = txn.batch();
+      await _db.writeTransaction((tx) async {
+        await tx.execute('DELETE FROM $_nodes');
         for (final row in rows) {
-          batch.insert(_nodes, row);
+          await tx.execute(
+            'INSERT INTO $_nodes (num, name, battery, last_heard, latitude, '
+            'longitude, snr, via_mqtt, hops_away) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+              row['num'],
+              row['name'],
+              row['battery'],
+              row['last_heard'],
+              row['latitude'],
+              row['longitude'],
+              row['snr'],
+              row['via_mqtt'],
+              row['hops_away'],
+            ],
+          );
         }
-        await batch.commit(noResult: true);
       });
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'writing mesh nodes');

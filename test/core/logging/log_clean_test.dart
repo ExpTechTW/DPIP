@@ -6,16 +6,17 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/logging/log_store.dart';
 
+import '../storage/memory_db.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
 
-  late Database db;
+  late SqliteDatabase db;
   late LogStore store;
   // Pinned, and handed to the store, because `flush` prunes anything older
   // than [logRetention] in the same transaction as the insert. With the real
@@ -25,7 +26,7 @@ void main() {
   final clock = DateTime.utc(2026, 8, 18, 12);
 
   setUp(() async {
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await LogStore.createSchema(db);
     store = LogStore(db, now: () => clock);
     Log.store = store;

@@ -10,23 +10,17 @@ library;
 
 import 'package:dpip/core/logging/log_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-/// A fresh database per call — sqflite hands back the same handle for a
-/// repeated path, and `:memory:` is a path.
-Future<Database> _openMemory() => databaseFactoryFfi.openDatabase(
-  inMemoryDatabasePath,
-  options: OpenDatabaseOptions(singleInstance: false),
-);
+import '../storage/memory_db.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
 
   var clock = DateTime.utc(2026, 8, 15, 12);
 
-  Future<(LogStore, Database)> makeStore({int flushAt = 64}) async {
-    final db = await _openMemory();
+  Future<(LogStore, SqliteDatabase)> makeStore({int flushAt = 64}) async {
+    final db = openMemoryDb();
     await LogStore.createSchema(db);
     return (LogStore(db, now: () => clock, flushAt: flushAt), db);
   }
@@ -110,8 +104,8 @@ void main() {
       store.add(line('line $i', at: clock.add(Duration(seconds: i))));
     }
     await store.flush();
-    final rows = await db.rawQuery('SELECT COUNT(*) AS n FROM $logTable');
-    expect(rows.single['n'], logMaxRows);
+    final row = await db.get('SELECT COUNT(*) AS n FROM $logTable');
+    expect(row['n'], logMaxRows);
   });
 
   test('the ceiling keeps the newest lines, not the oldest', () async {

@@ -5,7 +5,9 @@ import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+
+import '../storage/memory_db.dart';
 
 /// A Dio adapter that answers `304` when the request carries the matching
 /// `If-None-Match`, else `200` with [body] and (optionally) an ETag — enough to
@@ -54,13 +56,11 @@ class _EvictedStore extends EtagCacheStore {
 }
 
 void main() {
-  late Database db;
+  late SqliteDatabase db;
   late EtagCacheStore store;
 
-  setUpAll(sqfliteFfiInit);
-
   setUp(() async {
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await EtagCacheStore.createSchema(db);
     store = EtagCacheStore(db);
   });

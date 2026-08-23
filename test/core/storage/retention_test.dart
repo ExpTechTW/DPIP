@@ -14,13 +14,12 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/storage/retention.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-Future<Database> _open() async {
-  final db = await databaseFactoryFfi.openDatabase(
-    inMemoryDatabasePath,
-    options: OpenDatabaseOptions(singleInstance: false),
-  );
+import 'memory_db.dart';
+
+Future<SqliteDatabase> _open() async {
+  final db = openMemoryDb();
   await MeshStore.createSchema(db);
   await LogStore.createSchema(db);
   await NetworkUsageStore.createSchema(db);
@@ -41,14 +40,13 @@ RetentionService _service({
   httpCache: httpCache,
 );
 
-Future<int> _count(Database db, String table) async {
-  final rows = await db.rawQuery('SELECT COUNT(*) AS n FROM $table');
-  return rows.first['n']! as int;
+Future<int> _count(SqliteDatabase db, String table) async {
+  final row = await db.get('SELECT COUNT(*) AS n FROM $table');
+  return (row['n'] as num).toInt();
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(sqfliteFfiInit);
 
   test('a sweep drops what is past its window and keeps the rest', () async {
     final db = await _open();
@@ -91,16 +89,22 @@ void main() {
     final db = await _open();
     addTearDown(db.close);
     final now = DateTime.utc(2026, 8, 15, 12);
-    await db.insert(logTable, {
-      'time': now.subtract(const Duration(hours: 30)).millisecondsSinceEpoch,
-      'level': 'info',
-      'message': 'yesterday',
-    });
-    await db.insert(logTable, {
-      'time': now.subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
-      'level': 'info',
-      'message': 'recent',
-    });
+    await db.execute(
+      'INSERT INTO $logTable (time, level, message) VALUES (?, ?, ?)',
+      [
+        now.subtract(const Duration(hours: 30)).millisecondsSinceEpoch,
+        'info',
+        'yesterday',
+      ],
+    );
+    await db.execute(
+      'INSERT INTO $logTable (time, level, message) VALUES (?, ?, ?)',
+      [
+        now.subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
+        'info',
+        'recent',
+      ],
+    );
 
     final logs = LogStore(db, now: () => now);
     await _service(logs: logs).sweep();
@@ -162,13 +166,11 @@ void main() {
     const hourMs = 3600 * 1000;
     final hour = now.millisecondsSinceEpoch ~/ hourMs;
     for (final offset in [1, 24 * 7 + 10]) {
-      await db.insert('net_bucket', {
-        'hour': hour - offset,
-        'down': 1000,
-        'saved': 0,
-        'hits': 0,
-        'misses': 1,
-      });
+      await db.execute(
+        'INSERT INTO net_bucket (hour, down, saved, hits, misses) '
+        'VALUES (?, 1000, 0, 0, 1)',
+        [hour - offset],
+      );
     }
     expect(await _count(db, 'net_bucket'), 2);
 
@@ -185,14 +187,17 @@ void main() {
     final db = await _open();
     addTearDown(db.close);
     for (var i = 0; i < 20; i++) {
-      await db.insert('http_cache', {
-        'key': 'https://example.test/$i',
-        'etag': '"$i"',
-        'kind': EtagCacheStore.kindJson,
-        'body': 'x' * 100,
-        'size': 100,
-        'time': i,
-      });
+      await db.execute(
+        "INSERT INTO http_cache (key, etag, kind, body, size, time) "
+        "VALUES (?, ?, ?, ?, 100, ?)",
+        [
+          'https://example.test/$i',
+          '"$i"',
+          EtagCacheStore.kindJson,
+          'x' * 100,
+          i,
+        ],
+      );
     }
     expect(await _count(db, 'http_cache'), 20);
 
@@ -219,18 +224,19 @@ void main() {
       MeshMetricSample(at: now.subtract(const Duration(days: 3))),
     );
     await mesh.addMetric(MeshMetricSample(at: now));
-    await db.insert(logTable, {
-      'time': now.subtract(const Duration(days: 3)).millisecondsSinceEpoch,
-      'level': 'info',
-      'message': 'old',
-    });
-    await db.insert('net_bucket', {
-      'hour': now.millisecondsSinceEpoch ~/ (3600 * 1000) - (24 * 7 + 10),
-      'down': 1,
-      'saved': 0,
-      'hits': 0,
-      'misses': 1,
-    });
+    await db.execute(
+      'INSERT INTO $logTable (time, level, message) VALUES (?, ?, ?)',
+      [
+        now.subtract(const Duration(days: 3)).millisecondsSinceEpoch,
+        'info',
+        'old',
+      ],
+    );
+    await db.execute(
+      'INSERT INTO net_bucket (hour, down, saved, hits, misses) '
+      'VALUES (?, 1, 0, 0, 1)',
+      [now.millisecondsSinceEpoch ~/ (3600 * 1000) - (24 * 7 + 10)],
+    );
 
     await RetentionService(
       mesh: MeshStore(db, now: () => now),

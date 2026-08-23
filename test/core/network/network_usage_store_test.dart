@@ -1,22 +1,25 @@
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+
+import '../storage/memory_db.dart';
 
 void main() {
-  late Database db;
+  late SqliteDatabase db;
   var now = DateTime.utc(2026, 1, 10, 12);
-
-  setUpAll(sqfliteFfiInit);
 
   setUp(() async {
     now = DateTime.utc(2026, 1, 10, 12);
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await NetworkUsageStore.createSchema(db);
   });
 
   tearDown(() async => db.close());
 
   NetworkUsageStore store() => NetworkUsageStore(db, now: () => now);
+
+  Future<List<Map<String, Object?>>> rows() =>
+      db.getAll('SELECT * FROM net_bucket');
 
   test('empty store reports zeros and a zero hit rate', () async {
     final s = await store().stats();
@@ -122,7 +125,7 @@ void main() {
           'no longer exists',
     );
     expect(
-      await db.query('net_bucket'),
+      await rows(),
       isEmpty,
       reason:
           'the buffered aggregate must go too, or the counters reappear a '
@@ -141,7 +144,7 @@ void main() {
       await s.record(down: 10, hit: true, saved: 5);
     }
     // Still buffered — the table is empty until flush/stats.
-    expect(await db.query('net_bucket'), isEmpty);
+    expect(await rows(), isEmpty);
 
     final stats = await s.stats();
     expect(stats.hits24h, 50);
