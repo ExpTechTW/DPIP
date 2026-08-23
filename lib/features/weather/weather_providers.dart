@@ -33,18 +33,26 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'radar'),
         deps.mapTileWarmer(),
+        // Publishes z3–12, but the composite's resolution peaks at z7; past
+        // z8 the server resamples. 8 keeps the picture and stops a pinch
+        // across z9–11 from costing three viewports of requests per frame.
+        maxZoom: 8,
       ),
     ),
     Provider<QpesumsRepository>.value(
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'qpesums'),
         deps.mapTileWarmer(),
+        // Same shape as radar: publishes z3–12, information ends ~z7.
+        maxZoom: 8,
       ),
     ),
     Provider<SatelliteRepository>.value(
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'satellite'),
         deps.mapTileWarmer(),
+        // Publishes z0–11; band 13 is ~2 km/px so z8 already oversamples.
+        maxZoom: 8,
       ),
     ),
     // One repository per channel the satellite layer picker offers — each needs
@@ -56,12 +64,15 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
           channel: FrameTileRepositoryImpl(
             FrameTileApi(deps.apiClient, 'satellite', channel: channel.key),
             deps.mapTileWarmer(),
+            maxZoom: 8,
           ),
       },
     ),
     // One repository per wind forecast model — each needs its own model path on
     // both the frame list and every tile URL, and its own warmer. The 0.25°
-    // grids stop publishing at z7.
+    // grids stop publishing at z7 — and since that is also where the data ends,
+    // the source cap now matches instead of letting native fetch z8–11 the
+    // warm path never covered.
     Provider<Map<WindForecastModel, WindForecastRepository>>.value(
       value: {
         for (final model in WindForecastModel.values)
