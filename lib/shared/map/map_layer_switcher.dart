@@ -93,6 +93,9 @@ class MapLayerSwitcher extends StatelessWidget {
 
   Future<void> _pick(BuildContext context) async {
     final orderController = context.read<MapLayerOrderController>();
+    // Owns restoring the sheet's own height when a remembered scroll offset
+    // needs one — see `_RememberedOffsetList`'s doc for why.
+    final sheetController = DraggableScrollableController();
     final selected = await showModalBottomSheet<MapLayer>(
       context: context,
       isScrollControlled: true,
@@ -103,6 +106,7 @@ class MapLayerSwitcher extends StatelessWidget {
         final colors = theme.colorScheme;
         final bottomInset = MediaQuery.paddingOf(sheetContext).bottom;
         return DraggableScrollableSheet(
+          controller: sheetController,
           expand: false,
           initialChildSize: _initial,
           minChildSize: _min,
@@ -152,6 +156,7 @@ class MapLayerSwitcher extends StatelessWidget {
                           storageKey:
                               'map-layer-switcher:${layers.map((l) => l.id).join(',')}',
                           scrollController: scrollController,
+                          sheetController: sheetController,
                           padding: EdgeInsets.fromLTRB(
                             AppSpacing.md,
                             0,
@@ -183,6 +188,7 @@ class MapLayerSwitcher extends StatelessWidget {
         );
       },
     );
+    sheetController.dispose();
     if (selected != null && selected.id != active.id) onSelected(selected);
   }
 
@@ -223,12 +229,18 @@ class _RememberedOffsetList extends StatefulWidget {
   const _RememberedOffsetList({
     required this.storageKey,
     required this.scrollController,
+    required this.sheetController,
     required this.padding,
     required this.children,
   });
 
   final String storageKey;
   final ScrollController scrollController;
+
+  /// Resizes the *sheet* itself, separately from [scrollController]'s own
+  /// scroll offset — see [_RememberedOffsetListState.initState] for why
+  /// restoring a remembered offset needs this too.
+  final DraggableScrollableController sheetController;
   final EdgeInsets padding;
   final List<Widget> children;
 
@@ -241,13 +253,33 @@ class _RememberedOffsetListState extends State<_RememberedOffsetList> {
   void initState() {
     super.initState();
     final offset = _rememberedListOffset[widget.storageKey];
-    if (offset == null) return;
+    if (offset == null || offset <= 0) return;
     // The controller isn't attached to a position until the sheet's first
     // frame lays out the list beneath it — jumping any earlier throws.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !widget.scrollController.hasClients) return;
-      final max = widget.scrollController.position.maxScrollExtent;
-      widget.scrollController.jumpTo(offset.clamp(0.0, max));
+      if (!mounted) return;
+      // A nonzero list offset can only have been recorded while the sheet
+      // was already at its max height — `DraggableScrollableSheet` routes a
+      // drag into resizing the sheet, not scrolling the list, for as long as
+      // the list's own `pixels` is 0 (see the framework's
+      // `_DraggableScrollableSheetScrollPosition.listShouldScroll`).
+      // Restoring the list's `pixels` without first restoring that height
+      // left the sheet's own size at its small initial value while `pixels`
+      // read nonzero — which flips `listShouldScroll` permanently true, so
+      // every drag afterwards scrolled the list instead of resizing the
+      // sheet, and the sheet could never reach full height again.
+      widget.sheetController.jumpTo(MapLayerSwitcher._max);
+      // `jumpTo` resizes the sheet by notifying a listener the surrounding
+      // `ValueListenableBuilder` rebuilds from — that rebuild, and the
+      // relayout of this list to the taller viewport it produces, only lands
+      // on the *next* frame, so the scroll offset restore needs one frame of
+      // its own after this to read a `maxScrollExtent` that already accounts
+      // for the full-height list.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !widget.scrollController.hasClients) return;
+        final max = widget.scrollController.position.maxScrollExtent;
+        widget.scrollController.jumpTo(offset.clamp(0.0, max));
+      });
     });
   }
 
