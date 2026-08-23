@@ -15,6 +15,13 @@
 /// memory immediately and reach the database in the background. The trade is
 /// deliberate and stated here rather than hidden inside a plugin.
 ///
+/// A launch where the database would not open degrades to a **session-only**
+/// store: reads answer what memory holds (nothing) and writes stay in memory.
+/// Every such write is recorded in [_pendingWrites] and warned once, so a
+/// degraded session is visible in the log and reversible — [attachDatabase]
+/// replays those writes once a database is opened later in the same session
+/// (see `_recoverDurable` in `bootstrap.dart`).
+///
 /// A write that fails is logged, not thrown: a setting that did not persist is
 /// worth a log line, never a crash in a settings screen.
 library;
@@ -40,6 +47,11 @@ final class SettingsStore {
 
   /// The whole table, in memory.
   final Map<String, Object?> _values;
+
+  /// Writes made while [_db] was null — the degraded-session backlog that
+  /// [attachDatabase] replays. A removal is remembered as a removal (null
+  /// value), so replaying cannot resurrect a deleted key.
+  final Map<String, Object?> _pendingWrites = {};
 
   /// Creates the table. Safe to call on every open.
   static Future<void> createSchema(SqliteDatabase db) => db.execute(
@@ -125,7 +137,10 @@ final class SettingsStore {
   Future<void> remove(SettingKey<Object?> key) async {
     _values.remove(key.name);
     final db = _db;
-    if (db == null) return;
+    if (db == null) {
+      _pendingWrites[key.name] = null;
+      return;
+    }
     try {
       await db.execute('DELETE FROM $settingsTable WHERE key = ?', [key.name]);
     } catch (error, stackTrace) {
@@ -137,10 +152,87 @@ final class SettingsStore {
   /// finished, and by the debug page.
   Iterable<String> get keys => _values.keys;
 
+  /// Whether this session is running without a database — reads still work,
+  /// but nothing written here survives the process.
+  bool get isDegraded => _db == null;
+
+  /// Binds a database to a store that launched without one, and reconciles
+  /// the two directions:
+  ///
+  /// 1. **Session → disk**: writes made while degraded are replayed, removals
+  ///    included, so what the user did this session survives.
+  /// 2. **Disk → session**: rows the session never saw (the whole table, for
+  ///    a launch whose open failed) are adopted into memory — *only* keys
+  ///    memory has no opinion on, never overwriting what the session read or
+  ///    wrote. This is what un-degrades the launch: `onboarding.complete`,
+  ///    saved regions and the push token come back instead of the session
+  ///    spending its whole life looking like a first run.
+  ///
+  /// Returns whether anything moved in either direction. Attaching to an
+  /// already-attached store is a no-op that answers false.
+  Future<bool> attachDatabase(SqliteDatabase db) async {
+    if (_db != null) return false;
+    var moved = false;
+    // Replay first: a session write over the same key must win over the
+    // stale row the database still holds from before the degradation.
+    final pending = Map<String, Object?>.of(_pendingWrites);
+    _pendingWrites.clear();
+    try {
+      for (final MapEntry(key: name, :value) in pending.entries) {
+        if (value == null) {
+          await db.execute('DELETE FROM $settingsTable WHERE key = ?', [name]);
+        } else {
+          await db.execute(
+            'INSERT OR REPLACE INTO $settingsTable (key, value) VALUES (?, ?)',
+            [name, jsonEncode(value)],
+          );
+        }
+        moved = true;
+      }
+      for (final row in await db.getAll(
+        'SELECT key, value FROM $settingsTable',
+      )) {
+        final name = row['key'] as String?;
+        final raw = row['value'] as String?;
+        if (name == null || raw == null || _values.containsKey(name)) continue;
+        try {
+          _values[name] = jsonDecode(raw);
+          moved = true;
+        } catch (_) {
+          // A row unreadable at attach time is no better than one unreadable
+          // at load time — skip it rather than poison the session.
+        }
+      }
+    } catch (error, stackTrace) {
+      // Whatever failed stays pending for another attempt; the memory copy is
+      // already authoritative either way.
+      for (final entry in pending.entries) {
+        if (!_pendingWrites.containsKey(entry.key)) {
+          _pendingWrites[entry.key] = entry.value;
+        }
+      }
+      Log.handle(error, stackTrace, 'attaching durable settings database');
+    }
+    _db = db;
+    return moved;
+  }
+
   Future<void> _put(SettingKey<Object?> key, Object value) async {
     _values[key.name] = value;
     final db = _db;
-    if (db == null) return;
+    if (db == null) {
+      // A degraded session must not look healthy: without this line a launch
+      // whose database never opened runs, accepts every setting, and drops
+      // all of them silently — the "configured install looks like first run"
+      // bug wearing a different hat.
+      if (_pendingWrites.isEmpty) {
+        Log.warning(
+          'settings are session-only: the durable database is not open',
+        );
+      }
+      _pendingWrites[key.name] = value;
+      return;
+    }
     try {
       await db.execute(
         'INSERT OR REPLACE INTO $settingsTable (key, value) VALUES (?, ?)',

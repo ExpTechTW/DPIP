@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kDebugMode, kReleaseMode;
 
 import 'package:dpip/app/app.dart';
+import 'package:dpip/app/router/app_router.dart' show onboardingRefresh;
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
@@ -188,6 +189,12 @@ Future<void> bootstrap() async {
     'settings ready durable=${durable != null} keys=${settings.keys.length} '
     'onboarding=${settings.getBool(SettingKeys.onboardingComplete)}',
   );
+  final onboarding = OnboardingStore(settings);
+  // A launch that could not open the database must not spend the whole session
+  // pretending to be a first run: keep trying, and when the file opens, hand
+  // it to the store so this session's writes persist — then re-announce
+  // onboarding so a redirect held on the welcome page re-runs.
+  if (durable == null) unawaited(_recoverDurable(settings, onboarding));
   // Persist the log as early as the database allows: everything after this
   // point survives a crash or a background kill, which is exactly the window
   // the in-memory history used to lose.
@@ -195,7 +202,6 @@ Future<void> bootstrap() async {
   if (logStore != null) Log.persistTo(logStore);
   final regions = RegionSelection(settings);
   final experimental = ExperimentalSettings(settings);
-  final onboarding = OnboardingStore(settings);
   final locale = LocaleController(settings);
   final theme = ThemeController(settings);
   // Constructed before the first frame: it installs the saved setting into
@@ -445,8 +451,8 @@ _openCache() async {
 /// background isolate with WAL and a built-in lock timeout (30 s default), so
 /// contention waits instead of failing. What remains here is the honest
 /// fallback for an open that still fails (missing parent directory, full disk,
-/// first-unlock encryption state): bounded retries at launch, then the session
-/// runs without persistence. Every schema statement is `IF NOT EXISTS`
+/// first-unlock encryption state): bounded retries, then [_recoverDurable]
+/// keeps trying off the launch path. Every schema statement is `IF NOT EXISTS`
 /// and runs on every open, so a database created by an older build picks up
 /// tables added later without a version bump.
 Future<SqliteDatabase?> _openDurable() async {
@@ -484,6 +490,52 @@ Future<SqliteDatabase?> _openDurable() async {
 
   Log.handle(lastError!, lastStackTrace, 'durable database unavailable');
   return null;
+}
+
+/// Keeps trying to open the durable database after a launch that could not —
+/// a degraded session is recoverable, not terminal.
+///
+/// A slow first unlock or a genuinely wedged file can still cost the open at
+/// launch. Rather than showing a returning user onboarding for the rest of the
+/// session, poll until the file opens (or the budget runs out), then hand it
+/// to [SettingsStore.attachDatabase]: memory stays authoritative, disk catches
+/// up, and everything written in between survives. The onboarding store then
+/// re-announces, so a router redirect held on the welcome page re-runs and
+/// releases the user the moment the flag is back.
+Future<void> _recoverDurable(
+  SettingsStore settings,
+  OnboardingStore onboarding,
+) async {
+  const attempts = 10;
+  const interval = Duration(seconds: 3);
+  for (var attempt = 1; attempt <= attempts; attempt++) {
+    await Future<void>.delayed(interval);
+    try {
+      final base = await getApplicationSupportDirectory();
+      final db = SqliteDatabase(
+        path: '${base.path}/dpip.db',
+        options: const SqliteOptions(synchronous: SqliteSynchronous.full),
+      );
+      await _createDurableSchema(db);
+      final moved = await settings.attachDatabase(db);
+      Log.info(
+        'durable database attached in the background'
+        '${moved ? '; reconciled session-only writes' : ''}',
+      );
+      // Rows adopted from disk (onboarding.complete among them) only matter
+      // once listeners re-read them: OnboardingStore's listeners re-read the
+      // store, and the router's redirect re-runs on the refresh signal.
+      onboarding.reload();
+      onboardingRefresh.fire();
+      return;
+    } catch (error) {
+      Log.warning('durable recovery attempt $attempt/$attempts failed: $error');
+    }
+  }
+  Log.error(
+    'durable database never opened this session; '
+    'settings will not persist until the next launch',
+  );
 }
 
 Future<void> _createDurableSchema(SqliteDatabase db) async {
