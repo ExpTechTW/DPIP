@@ -23,7 +23,7 @@ import 'dart:convert';
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// The table this store owns. Named here so `app_database.dart` can document
 /// the layout and the storage gate can check nothing else writes it.
@@ -36,20 +36,20 @@ final class SettingsStore {
 
   /// The database, or null when it could not be opened — the app then runs
   /// with settings that live only for this session rather than not at all.
-  final Database? _db;
+  SqliteDatabase? _db;
 
   /// The whole table, in memory.
   final Map<String, Object?> _values;
 
   /// Creates the table. Safe to call on every open.
-  static Future<void> createSchema(Database db) => db.execute(
+  static Future<void> createSchema(SqliteDatabase db) => db.execute(
     'CREATE TABLE IF NOT EXISTS $settingsTable ('
     'key TEXT PRIMARY KEY NOT NULL, '
     'value TEXT NOT NULL)',
   );
 
   /// Loads every row into memory.
-  static Future<SettingsStore> open(Database? db) async {
+  static Future<SettingsStore> open(SqliteDatabase? db) async {
     if (db == null) return SettingsStore._(null, {});
 
     Object? lastError;
@@ -57,7 +57,9 @@ final class SettingsStore {
     for (var attempt = 1; attempt <= _loadAttempts; attempt++) {
       try {
         final values = <String, Object?>{};
-        for (final row in await db.query(settingsTable)) {
+        for (final row in await db.getAll(
+          'SELECT key, value FROM $settingsTable',
+        )) {
           final key = row['key'] as String?;
           final value = row['value'] as String?;
           if (key == null || value == null) continue;
@@ -125,7 +127,7 @@ final class SettingsStore {
     final db = _db;
     if (db == null) return;
     try {
-      await db.delete(settingsTable, where: 'key = ?', whereArgs: [key.name]);
+      await db.execute('DELETE FROM $settingsTable WHERE key = ?', [key.name]);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'removing setting ${key.name}');
     }
@@ -140,10 +142,10 @@ final class SettingsStore {
     final db = _db;
     if (db == null) return;
     try {
-      await db.insert(settingsTable, {
-        'key': key.name,
-        'value': jsonEncode(value),
-      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      await db.execute(
+        'INSERT OR REPLACE INTO $settingsTable (key, value) VALUES (?, ?)',
+        [key.name, jsonEncode(value)],
+      );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'writing setting ${key.name}');
     }

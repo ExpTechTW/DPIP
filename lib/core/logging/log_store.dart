@@ -21,7 +21,7 @@ library;
 
 import 'dart:async';
 
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// The table this store owns.
 const String logTable = 'logs';
@@ -78,7 +78,7 @@ class LogStore {
        _flushInterval = flushInterval,
        _flushAt = flushAt;
 
-  final Database _db;
+  final SqliteDatabase _db;
   final DateTime Function() _now;
   final Duration _flushInterval;
 
@@ -106,25 +106,21 @@ class LogStore {
   }
 
   /// Creates the table. Safe on every open.
-  static Future<void> createSchema(Database db) async {
-    // One batch: this re-runs on every launch (the IF NOT EXISTS is the
-    // migration mechanism), so every statement here is a launch-window
-    // platform round trip.
-    final batch = db.batch()
-      ..execute(
-        'CREATE TABLE IF NOT EXISTS $logTable ('
-        'id INTEGER PRIMARY KEY AUTOINCREMENT, '
-        'time INTEGER NOT NULL, '
-        'level TEXT NOT NULL, '
-        'message TEXT NOT NULL, '
-        'error TEXT, '
-        'stack TEXT)',
-      )
+  static Future<void> createSchema(SqliteDatabase db) async {
+    // One call: this re-runs on every launch (the IF NOT EXISTS is the
+    // migration mechanism), so both statements ride one background-isolate
+    // round trip instead of two serial awaits.
+    await db.executeMultiple(
+      'CREATE TABLE IF NOT EXISTS $logTable ('
+      'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+      'time INTEGER NOT NULL, '
+      'level TEXT NOT NULL, '
+      'message TEXT NOT NULL, '
+      'error TEXT, '
+      'stack TEXT);'
       // Both the retention delete and every read are ordered by time.
-      ..execute(
-        'CREATE INDEX IF NOT EXISTS ${logTable}_time ON $logTable(time)',
-      );
-    await batch.commit(noResult: true);
+      'CREATE INDEX IF NOT EXISTS ${logTable}_time ON $logTable(time)',
+    );
   }
 
   /// Queues a line. Returns immediately — never touches the database.
@@ -148,19 +144,17 @@ class LogStore {
   Future<void> prune() async {
     await _enqueueDatabase(() async {
       try {
-        await _db.delete(
-          logTable,
-          where: 'time < ?',
-          whereArgs: [
+        await _db.writeTransaction((tx) async {
+          await tx.execute('DELETE FROM $logTable WHERE time < ?', [
             _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
-          ],
-        );
-        // See [logMaxRows]: the newest lines survive whatever the clock says.
-        await _db.rawDelete(
-          'DELETE FROM $logTable WHERE id NOT IN ('
-          'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
-          [logMaxRows],
-        );
+          ]);
+          // See [logMaxRows]: the newest lines survive whatever the clock says.
+          await tx.execute(
+            'DELETE FROM $logTable WHERE id NOT IN ('
+            'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
+            [logMaxRows],
+          );
+        });
       } on Object {
         // Reporting a logging failure through the logger is how a write loop
         // starts.
@@ -180,31 +174,29 @@ class LogStore {
     _pending.clear();
     await _enqueueDatabase(() async {
       try {
-        await _db.transaction((txn) async {
-          final insert = txn.batch();
+        await _db.writeTransaction((tx) async {
           for (final entry in batch) {
-            insert.insert(logTable, {
-              'time': entry.time.toUtc().millisecondsSinceEpoch,
-              'level': entry.level,
-              'message': entry.message,
-              'error': entry.error,
-              'stack': entry.stackTrace,
-            });
+            await tx.execute(
+              'INSERT INTO $logTable (time, level, message, error, stack) '
+              'VALUES (?, ?, ?, ?, ?)',
+              [
+                entry.time.toUtc().millisecondsSinceEpoch,
+                entry.level,
+                entry.message,
+                entry.error,
+                entry.stackTrace,
+              ],
+            );
           }
-          await insert.commit(noResult: true);
-          await txn.delete(
-            logTable,
-            where: 'time < ?',
-            whereArgs: [
-              _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
-            ],
-          );
+          await tx.execute('DELETE FROM $logTable WHERE time < ?', [
+            _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
+          ]);
           // The count ceiling in the same transaction as the insert, so a
           // burst cannot outrun it. `id` rather than `time` because it is the
           // primary key and monotonic: a clock that steps backwards would
           // otherwise make the newest rows look like the oldest and delete
           // them.
-          await txn.rawDelete(
+          await tx.execute(
             'DELETE FROM $logTable WHERE id NOT IN ('
             'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
             [logMaxRows],
@@ -221,13 +213,17 @@ class LogStore {
   Future<List<StoredLog>> recent({int limit = 500, String? level}) async {
     await _databaseTail;
     try {
-      final rows = await _db.query(
-        logTable,
-        where: level == null ? null : 'level = ?',
-        whereArgs: level == null ? null : [level],
-        orderBy: 'time DESC, id DESC',
-        limit: limit,
-      );
+      final rows = level == null
+          ? await _db.getAll(
+              'SELECT time, level, message, error, stack FROM $logTable '
+              'ORDER BY time DESC, id DESC LIMIT ?',
+              [limit],
+            )
+          : await _db.getAll(
+              'SELECT time, level, message, error, stack FROM $logTable '
+              'WHERE level = ? ORDER BY time DESC, id DESC LIMIT ?',
+              [level, limit],
+            );
       return [
         for (final row in rows)
           StoredLog(
@@ -251,8 +247,8 @@ class LogStore {
   Future<int> count() async {
     await _databaseTail;
     try {
-      final rows = await _db.rawQuery('SELECT COUNT(*) AS n FROM $logTable');
-      return (rows.firstOrNull?['n'] as int?) ?? 0;
+      final row = await _db.get('SELECT COUNT(*) AS n FROM $logTable');
+      return (row['n'] as num).toInt();
     } on Object {
       return 0;
     }
@@ -263,7 +259,7 @@ class LogStore {
     _pending.clear();
     await _enqueueDatabase(() async {
       try {
-        await _db.delete(logTable);
+        await _db.execute('DELETE FROM $logTable');
       } on Object {
         // Nothing useful to say, and nowhere safe to say it.
       }

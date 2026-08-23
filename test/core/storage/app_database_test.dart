@@ -20,37 +20,27 @@ import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
-/// A fresh in-memory database per call.
-///
-/// `singleInstance: false` matters: sqflite hands back the *same* handle for a
-/// repeated path, and `:memory:` is a path — so without it every test in the
-/// file shares one database and the second test starts with the first one's
-/// rows. That is exactly the kind of shared state that makes a suite pass in
-/// isolation and fail as a group.
-Future<Database> _openMemory() => databaseFactoryFfi.openDatabase(
-  inMemoryDatabasePath,
-  options: OpenDatabaseOptions(singleInstance: false),
-);
+import 'memory_db.dart';
 
-Future<Database> _durable() async {
-  final db = await _openMemory();
+Future<SqliteDatabase> _durable() async {
+  final db = openMemoryDb();
   await SettingsStore.createSchema(db);
   await TleStore.createSchema(db);
   await MeshStore.createSchema(db);
   return db;
 }
 
-Future<Database> _cache() async {
-  final db = await _openMemory();
+Future<SqliteDatabase> _cache() async {
+  final db = openMemoryDb();
   await EtagCacheStore.createSchema(db);
   await NetworkUsageStore.createSchema(db);
   return db;
 }
 
-Future<Set<String>> _tables(Database db) async {
-  final rows = await db.rawQuery(
+Future<Set<String>> _tables(SqliteDatabase db) async {
+  final rows = await db.getAll(
     "SELECT name FROM sqlite_master WHERE type = 'table' "
     "AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'android_%'",
   );
@@ -59,7 +49,6 @@ Future<Set<String>> _tables(Database db) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
 
   test('clearing the cache leaves every other category intact', () async {
     final durable = await _durable();
@@ -84,22 +73,17 @@ void main() {
       {'num': 7, 'name': 'repeater', 'snr': 0.0, 'via_mqtt': 0},
     ]);
     // And something in the cache.
-    await cache.insert('http_cache', {
-      'key': 'https://example.test/a',
-      'etag': 'x',
-      'kind': EtagCacheStore.kindJson,
-      'body': 'hello',
-      'size': 5,
-      'time': 0,
-    });
+    await cache.execute(
+      'INSERT INTO http_cache (key, etag, kind, body, size, time) '
+      "VALUES ('https://example.test/a', 'x', ?, 'hello', 5, 0)",
+      [EtagCacheStore.kindJson],
+    );
 
     expect(await database.clearCache(), greaterThan(0));
 
     // The cache is empty…
-    expect(
-      (await cache.rawQuery('SELECT COUNT(*) AS n FROM http_cache')).first['n'],
-      0,
-    );
+    final count = await cache.get('SELECT COUNT(*) AS n FROM http_cache');
+    expect(count['n'], 0);
     // …and every other category survived.
     final after = await SettingsStore.open(durable);
     expect(after.getBool(SettingKeys.onboardingComplete), isTrue);
@@ -114,14 +98,11 @@ void main() {
       // Constructed with a cache and *no* durable database at all. If clearing
       // ever needed the other file, this would throw rather than quietly work.
       final cache = await _cache();
-      await cache.insert('http_cache', {
-        'key': 'https://example.test/b',
-        'etag': 'y',
-        'kind': EtagCacheStore.kindJson,
-        'body': 'bytes',
-        'size': 5,
-        'time': 0,
-      });
+      await cache.execute(
+        'INSERT INTO http_cache (key, etag, kind, body, size, time) '
+        "VALUES ('https://example.test/b', 'y', ?, 'bytes', 5, 0)",
+        [EtagCacheStore.kindJson],
+      );
       const database = AppDatabase(durable: null, cache: null);
       expect(await database.clearCache(), 0, reason: 'no cache, nothing to do');
 

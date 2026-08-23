@@ -19,13 +19,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
+import '../../core/storage/memory_db.dart';
 
 void main() {
-  setUpAll(sqfliteFfiInit);
-
   MeshStoredMessage stored(String text, int channel, int seconds) =>
       MeshStoredMessage(
         from: 1,
@@ -51,7 +49,7 @@ void main() {
     // and the test simply hangs.
     await tester.runAsync(() async {
       final settings = SettingsStore.inMemory({});
-      final db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+      final db = openMemoryDb();
       addTearDown(db.close);
       await MeshStore.createSchema(db);
       final store = MeshStore(db);

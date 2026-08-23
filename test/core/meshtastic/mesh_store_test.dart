@@ -1,16 +1,16 @@
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+
+import '../storage/memory_db.dart';
 
 void main() {
-  late Database db;
+  late SqliteDatabase db;
   var clock = DateTime.utc(2026, 1, 10, 12);
-
-  setUpAll(sqfliteFfiInit);
 
   setUp(() async {
     clock = DateTime.utc(2026, 1, 10, 12);
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await MeshStore.createSchema(db);
   });
 
@@ -204,7 +204,7 @@ void main() {
       // Simulated by putting the table back into its pre-column shape and
       // re-running createSchema, which is exactly what an upgrade does.
       await db.execute('DROP TABLE mesh_messages');
-      await db.execute('''
+      await db.executeMultiple('''
         CREATE TABLE mesh_messages (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           ts INTEGER NOT NULL,
@@ -214,13 +214,11 @@ void main() {
           outgoing INTEGER NOT NULL DEFAULT 0
         )
       ''');
-      await db.insert('mesh_messages', {
-        'ts': clock.millisecondsSinceEpoch,
-        'node': 1,
-        'channel': 0,
-        'text': 'from before the column',
-        'outgoing': 0,
-      });
+      await db.execute(
+        'INSERT INTO mesh_messages (ts, node, channel, text, outgoing) '
+        'VALUES (?, ?, ?, ?, ?)',
+        [clock.millisecondsSinceEpoch, 1, 0, 'from before the column', 0],
+      );
 
       await MeshStore.createSchema(db);
       final rows = await store().messages(channel: 0);

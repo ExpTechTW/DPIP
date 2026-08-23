@@ -6,7 +6,9 @@ import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+
+import '../storage/memory_db.dart';
 
 /// Answers `304` when `If-None-Match` matches, else `200` with raw [bytes].
 class _BinaryAdapter implements HttpClientAdapter {
@@ -41,13 +43,11 @@ class _BinaryAdapter implements HttpClientAdapter {
 }
 
 void main() {
-  late Database db;
+  late SqliteDatabase db;
   late EtagCacheStore store;
 
-  setUpAll(sqfliteFfiInit);
-
   setUp(() async {
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await EtagCacheStore.createSchema(db);
     store = EtagCacheStore(db);
   });

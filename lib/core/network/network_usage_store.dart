@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// A snapshot of network usage for the Debug page.
 ///
@@ -101,7 +101,7 @@ class NetworkUsageStore {
     this.flushEvery = 64,
   }) : _now = now ?? DateTime.now;
 
-  final Database _db;
+  final SqliteDatabase _db;
 
   /// Injectable clock — the wall time used to bucket and window usage.
   final DateTime Function() _now;
@@ -129,7 +129,7 @@ class NetworkUsageStore {
   /// Creates the usage table (idempotent) — call on database open. Uses
   /// `IF NOT EXISTS` so it also adds the table to a pre-existing cache database
   /// without a version bump, then migrates an older shape in place.
-  static Future<void> createSchema(Database db) async {
+  static Future<void> createSchema(SqliteDatabase db) async {
     final defs = _columns
         .map((c) => '$c INTEGER NOT NULL DEFAULT 0')
         .join(', ');
@@ -143,10 +143,10 @@ class NetworkUsageStore {
   ///
   /// [createSchema] runs on every open with `IF NOT EXISTS`, so an installed
   /// database never picks up new columns on its own.
-  static Future<void> _migrate(Database db) async {
+  static Future<void> _migrate(SqliteDatabase db) async {
     try {
       final existing = {
-        for (final row in await db.rawQuery('PRAGMA table_info($_buckets)'))
+        for (final row in await db.getAll('PRAGMA table_info($_buckets)'))
           row['name'] as String,
       };
       for (final column in _columns) {
@@ -225,15 +225,13 @@ class NetworkUsageStore {
 
     try {
       final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
-      await _db.transaction((txn) async {
+      await _db.writeTransaction((tx) async {
         for (final entry in pending.entries) {
-          await _addToBucket(txn, entry.key, entry.value);
+          await _addToBucket(tx, entry.key, entry.value);
         }
-        await txn.delete(
-          _buckets,
-          where: 'hour < ?',
-          whereArgs: [hour - _windowHours],
-        );
+        await tx.execute('DELETE FROM $_buckets WHERE hour < ?', [
+          hour - _windowHours,
+        ]);
       });
     } catch (_) {
       // Accounting is diagnostic-only; never surface a failure.
@@ -250,11 +248,9 @@ class NetworkUsageStore {
   Future<void> prune() async {
     try {
       final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
-      await _db.delete(
-        _buckets,
-        where: 'hour < ?',
-        whereArgs: [hour - _windowHours],
-      );
+      await _db.execute('DELETE FROM $_buckets WHERE hour < ?', [
+        hour - _windowHours,
+      ]);
     } catch (_) {
       // Accounting is diagnostic-only; never surface a failure.
     }
@@ -271,7 +267,7 @@ class NetworkUsageStore {
     _pendingByHour.clear();
     _pendingEvents = 0;
     try {
-      await _db.delete(_buckets);
+      await _db.execute('DELETE FROM $_buckets');
     } catch (_) {
       // Accounting is diagnostic-only; never surface a failure.
     }
@@ -315,7 +311,7 @@ class NetworkUsageStore {
       final hour = _now().millisecondsSinceEpoch ~/ _hourMs;
       final bucket = hour ~/ bucketHours;
       final count = hours ~/ bucketHours;
-      final rows = await _db.rawQuery(
+      final rows = await _db.getAll(
         'SELECT hour / ? AS bucket, '
         'COALESCE(SUM(down), 0) AS down, '
         'COALESCE(SUM(saved), 0) AS saved, '
@@ -326,7 +322,8 @@ class NetworkUsageStore {
         [bucketHours, (bucket - count + 1) * bucketHours],
       );
       final byBucket = <int, Map<String, Object?>>{
-        for (final row in rows) row['bucket'] as int: row,
+        for (final row in rows)
+          row['bucket'] as int: Map<String, Object?>.of(row),
       };
       return [
         for (var b = bucket - count + 1; b <= bucket; b++)
@@ -346,29 +343,32 @@ class NetworkUsageStore {
   static int _counter(Object? value) => (value as num?)?.toInt() ?? 0;
 
   // Update-then-insert instead of UPSERT, so it works on any bundled SQLite.
-  Future<void> _addToBucket(DatabaseExecutor db, int hour, _Pending add) async {
+  Future<void> _addToBucket(
+    SqliteWriteContext tx,
+    int hour,
+    _Pending add,
+  ) async {
     final sets = _columns.map((c) => '$c = $c + ?').join(', ');
     final values = [add.down, add.saved, add.hits, add.misses];
-    final updated = await db.rawUpdate(
+    final result = await tx.execute(
       'UPDATE $_buckets SET $sets WHERE hour = ?',
       [...values, hour],
     );
-    if (updated == 0) {
-      await db.insert(_buckets, {
-        'hour': hour,
-        for (var i = 0; i < _columns.length; i++) _columns[i]: values[i],
-      });
+    if (result.isEmpty) {
+      await tx.execute(
+        'INSERT INTO $_buckets (hour, ${_columns.join(', ')}) '
+        'VALUES (?, ?, ?, ?, ?)',
+        [hour, ...values],
+      );
     }
   }
 
   /// Sums every counter over one trailing window in a single query.
   Future<_Pending> _sumSince(int sinceHour) async {
     final sums = _columns.map((c) => 'COALESCE(SUM($c), 0) AS $c').join(', ');
-    final rows = await _db.rawQuery(
-      'SELECT $sums FROM $_buckets WHERE hour >= ?',
-      [sinceHour],
-    );
-    final row = rows.first;
+    final row = await _db.get('SELECT $sums FROM $_buckets WHERE hour >= ?', [
+      sinceHour,
+    ]);
     return _Pending()
       ..down = (row['down'] as num).toInt()
       ..saved = (row['saved'] as num).toInt()

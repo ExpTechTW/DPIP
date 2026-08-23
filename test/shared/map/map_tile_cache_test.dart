@@ -12,7 +12,9 @@ import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/features/weather/data/frame_tile_repository.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+
+import '../../core/storage/memory_db.dart';
 
 const terrainUrl =
     'https://static.lb.exptech.dev/api/v1/map/terrain/7/107/55.png';
@@ -74,7 +76,7 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
   const codec = StandardMethodCodec();
 
-  late Database db;
+  late SqliteDatabase db;
   late EtagCacheStore store;
   late MapTileCache cache;
   late List<MethodCall> nativeCalls;
@@ -85,10 +87,8 @@ void main() {
   Completer<void>? blockedInject;
   Completer<void>? injectStarted;
 
-  setUpAll(sqfliteFfiInit);
-
   setUp(() async {
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await EtagCacheStore.createSchema(db);
     await NetworkUsageStore.createSchema(db);
     store = EtagCacheStore(db);

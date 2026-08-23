@@ -4,22 +4,36 @@ import 'dart:typed_data';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+
+import '../storage/memory_db.dart';
 
 void main() {
-  late Database db;
+  late SqliteDatabase db;
   late EtagCacheStore store;
 
-  setUpAll(sqfliteFfiInit);
-
   setUp(() async {
-    db = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
+    db = openMemoryDb();
     await EtagCacheStore.createSchema(db);
     await NetworkUsageStore.createSchema(db);
     store = EtagCacheStore(db);
   });
 
   tearDown(() async => db.close());
+
+  Future<void> setTime(String url, int time) =>
+      db.execute('UPDATE http_cache SET time = ? WHERE key = ?', [time, url]);
+
+  Future<Map<String, Object?>> rowFor(
+    String url, {
+    String columns = '*',
+  }) async {
+    final rows = await db.getAll(
+      'SELECT $columns FROM http_cache WHERE key = ?',
+      [url],
+    );
+    return Map<String, Object?>.of(rows.first);
+  }
 
   test('read on an empty cache is a miss', () async {
     expect(await store.read('https://x/a'), isNull);
@@ -47,20 +61,15 @@ void main() {
     final entry = await store.read('https://x/a');
     expect(entry!.etag, '2');
     expect(entry.body, 'B');
-    final rows = await db.rawQuery('SELECT COUNT(*) AS c FROM http_cache');
-    expect(rows.first['c'], 1, reason: 'replaced, not duplicated');
+    final row = await db.get('SELECT COUNT(*) AS c FROM http_cache');
+    expect(row['c'], 1, reason: 'replaced, not duplicated');
   });
 
   test('JSON bodies are lightly gzip-compressed on disk', () async {
     final body = List.filled(500, 'compressible').join(',');
     await store.write('https://x/big', etag: '1', body: body);
-    final rows = await db.query(
-      'http_cache',
-      columns: ['body'],
-      where: 'key = ?',
-      whereArgs: ['https://x/big'],
-    );
-    final blob = rows.first['body'] as Uint8List;
+    final row = await rowFor('https://x/big', columns: 'body');
+    final blob = row['body'] as Uint8List;
     expect(blob[0], 0x1f, reason: 'gzip magic');
     expect(blob.length, lessThan(body.length));
   });
@@ -79,14 +88,9 @@ void main() {
       bytes: bytes,
       contentType: 'image/webp',
     );
-    final rows = await db.query(
-      'http_cache',
-      columns: ['kind', 'body'],
-      where: 'key = ?',
-      whereArgs: ['https://x/t.webp'],
-    );
-    expect(rows.first['kind'], EtagCacheStore.kindBinary);
-    expect(rows.first['body'], bytes);
+    final row = await rowFor('https://x/t.webp', columns: 'kind, body');
+    expect(row['kind'], EtagCacheStore.kindBinary);
+    expect(row['body'], bytes);
 
     final hit = await store.readBytes('https://x/t.webp');
     expect(hit!.bytes, bytes);
@@ -112,14 +116,9 @@ void main() {
       bytes: mvt,
       contentType: 'application/vnd.mapbox-vector-tile',
     );
-    final mvtRows = await db.query(
-      'http_cache',
-      columns: ['kind', 'body'],
-      where: 'key = ?',
-      whereArgs: ['https://x/a.mvt'],
-    );
-    expect(mvtRows.first['kind'], EtagCacheStore.kindBinaryGzip);
-    expect((mvtRows.first['body'] as Uint8List).length, lessThan(mvt.length));
+    final mvtRow = await rowFor('https://x/a.mvt', columns: 'kind, body');
+    expect(mvtRow['kind'], EtagCacheStore.kindBinaryGzip);
+    expect((mvtRow['body'] as Uint8List).length, lessThan(mvt.length));
 
     // Basemap LB serves application/octet-stream.
     final pbf = Uint8List.fromList([
@@ -133,30 +132,20 @@ void main() {
       0x62,
       ...List.filled(600, 0x41),
     ]);
+    const pbfUrl =
+        'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf';
     await store.writeBytes(
-      'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
+      pbfUrl,
       etag: 'W/"u1"',
       bytes: pbf,
       contentType: 'application/octet-stream',
     );
-    final pbfRows = await db.query(
-      'http_cache',
-      columns: ['kind', 'body'],
-      where: 'key = ?',
-      whereArgs: [
-        'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
-      ],
-    );
-    expect(pbfRows.first['kind'], EtagCacheStore.kindBinaryGzip);
+    final pbfRow = await rowFor(pbfUrl, columns: 'kind');
+    expect(pbfRow['kind'], EtagCacheStore.kindBinaryGzip);
 
     final cold = EtagCacheStore(db);
     expect((await cold.readBytes('https://x/a.mvt'))!.bytes, mvt);
-    expect(
-      (await cold.readBytes(
-        'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf',
-      ))!.bytes,
-      pbf,
-    );
+    expect((await cold.readBytes(pbfUrl))!.bytes, pbf);
   });
 
   test('SVG / text binaries are gzip-1 on disk', () async {
@@ -169,13 +158,8 @@ void main() {
       bytes: svg,
       contentType: 'image/svg+xml',
     );
-    final rows = await db.query(
-      'http_cache',
-      columns: ['kind'],
-      where: 'key = ?',
-      whereArgs: ['https://x/i.svg'],
-    );
-    expect(rows.first['kind'], EtagCacheStore.kindBinaryGzip);
+    final row = await rowFor('https://x/i.svg', columns: 'kind');
+    expect(row['kind'], EtagCacheStore.kindBinaryGzip);
     final cold = EtagCacheStore(db);
     expect((await cold.readBytes('https://x/i.svg'))!.bytes, svg);
   });
@@ -299,12 +283,7 @@ void main() {
     final eightDaysAgo = DateTime.now()
         .subtract(const Duration(days: 8))
         .millisecondsSinceEpoch;
-    await db.update(
-      'http_cache',
-      {'time': eightDaysAgo},
-      where: 'key = ?',
-      whereArgs: ['https://x/old'],
-    );
+    await setTime('https://x/old', eightDaysAgo);
 
     await store.write('https://x/new', etag: '2', body: 'B');
 
@@ -391,18 +370,8 @@ void main() {
     // Pin last-used near "now" so the LRU order is explicit, with b older
     // than a (buffered touch timers can't scramble the order).
     final now = DateTime.now().millisecondsSinceEpoch;
-    await db.update(
-      'http_cache',
-      {'time': now - 2_000},
-      where: 'key = ?',
-      whereArgs: ['https://x/a'],
-    );
-    await db.update(
-      'http_cache',
-      {'time': now - 4_000},
-      where: 'key = ?',
-      whereArgs: ['https://x/b'],
-    );
+    await setTime('https://x/a', now - 2_000);
+    await setTime('https://x/b', now - 4_000);
     await tight.writeBytes(
       'https://x/c',
       etag: '3',
@@ -470,12 +439,7 @@ void main() {
     final eightDaysAgo = DateTime.now()
         .subtract(const Duration(days: 8))
         .millisecondsSinceEpoch;
-    await db.update(
-      'http_cache',
-      {'time': eightDaysAgo},
-      where: 'key = ?',
-      whereArgs: ['https://x/old'],
-    );
+    await setTime('https://x/old', eightDaysAgo);
 
     await tight.writeBytes(
       'https://x/new',
@@ -518,14 +482,18 @@ void main() {
     // The interceptor turns a miss into a retryable reject and the retry
     // fetches a full 200 — a decode throw inside an interceptor would be a
     // failed request instead.
-    await db.insert('http_cache', {
-      'key': 'https://example.test/broken',
-      'etag': '"x"',
-      'kind': EtagCacheStore.kindJson,
-      'body': Uint8List.fromList([0x7b, 0x22]), // truncated '{"'
-      'size': 2,
-      'time': 0,
-    });
+    await db.execute(
+      'INSERT INTO http_cache (key, etag, kind, body, size, time) '
+      'VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        'https://example.test/broken',
+        '"x"',
+        EtagCacheStore.kindJson,
+        Uint8List.fromList([0x7b, 0x22]), // truncated '{"'
+        2,
+        0,
+      ],
+    );
     expect(await store.readJson('https://example.test/broken'), isNull);
   });
 }

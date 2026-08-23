@@ -33,7 +33,7 @@
 library;
 
 import 'package:dpip/core/logging/log.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// Schema version of the durable database.
 const int appDatabaseVersion = 1;
@@ -48,26 +48,37 @@ class AppDatabase {
   const AppDatabase({required this.durable, required this.cache});
 
   /// Settings, orbital elements and mesh history. Survives a cache purge.
-  final Database? durable;
+  final SqliteDatabase? durable;
 
   /// Re-fetchable bytes only.
-  final Database? cache;
+  final SqliteDatabase? cache;
 
   /// Empties every cache table, and nothing else.
   ///
   /// It takes the cache handle and no other, so there is no path from here to
   /// the settings or the mesh log even by accident. Returns the number of rows
   /// dropped, which is what a settings screen wants to show.
+  ///
+  /// One transaction: the per-table counts come from SQLite's `changes()`
+  /// read on the same write connection as the delete — outside one,
+  /// sqlite_async's pooled readers would answer from a different connection
+  /// where nothing had changed.
   Future<int> clearCache() async {
     final database = cache;
     if (database == null) return 0;
     var removed = 0;
-    for (final table in cacheTables) {
-      try {
-        removed += await database.delete(table);
-      } catch (error, stackTrace) {
-        Log.handle(error, stackTrace, 'clearing $table');
-      }
+    try {
+      removed = await database.writeTransaction((tx) async {
+        var dropped = 0;
+        for (final table in cacheTables) {
+          await tx.execute('DELETE FROM $table');
+          final row = await tx.get('SELECT changes() AS n');
+          dropped += ((row['n'] as num?) ?? 0).toInt();
+        }
+        return dropped;
+      });
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'clearing cache tables');
     }
     // Reclaim the file space rather than leaving it as free pages: the point
     // of clearing a 350 MB cache is to get the storage back.
@@ -83,11 +94,11 @@ class AppDatabase {
   Future<int> cacheBytes() async {
     final database = cache;
     if (database == null) return 0;
-    final rows = await database.rawQuery(
+    final row = await database.get(
       'SELECT page_count * page_size AS bytes '
       'FROM pragma_page_count(), pragma_page_size()',
     );
-    return (rows.firstOrNull?['bytes'] as int?) ?? 0;
+    return ((row['bytes'] as num?) ?? 0).toInt();
   }
 
   /// Row count and size of every table in both files, biggest first.
@@ -100,10 +111,13 @@ class AppDatabase {
     ...await _statsFor(cache, 'http_etag_cache.db'),
   ]..sort((a, b) => b.bytes.compareTo(a.bytes));
 
-  static Future<List<TableStat>> _statsFor(Database? db, String file) async {
+  static Future<List<TableStat>> _statsFor(
+    SqliteDatabase? db,
+    String file,
+  ) async {
     if (db == null) return const [];
     try {
-      final names = await db.rawQuery(
+      final names = await db.getAll(
         "SELECT name FROM sqlite_master WHERE type = 'table' "
         "AND name NOT LIKE 'sqlite_%' ORDER BY name",
       );
@@ -130,13 +144,13 @@ class AppDatabase {
   }
 
   /// On-disk bytes per table from `dbstat`, or null where it is unavailable.
-  static Future<Map<String, int>?> _pageSizes(Database db) async {
+  static Future<Map<String, int>?> _pageSizes(SqliteDatabase db) async {
     try {
       // Joined to `sqlite_master` so an index's pages land on the table it
       // belongs to. Grouping by `dbstat.name` alone lists indexes as if they
       // were tables and leaves every table looking smaller than it is — on a
       // message log with two indexes, most of the cost would be invisible.
-      final rows = await db.rawQuery(
+      final rows = await db.getAll(
         'SELECT COALESCE(m.tbl_name, d.name) AS tbl, SUM(d.pgsize) AS bytes '
         'FROM dbstat d LEFT JOIN sqlite_master m ON m.name = d.name '
         'GROUP BY tbl',
@@ -150,9 +164,9 @@ class AppDatabase {
     }
   }
 
-  static Future<int> _countRows(Database db, String table) async {
-    final rows = await db.rawQuery('SELECT COUNT(*) AS n FROM "$table"');
-    return (rows.firstOrNull?['n'] as num?)?.toInt() ?? 0;
+  static Future<int> _countRows(SqliteDatabase db, String table) async {
+    final row = await db.get('SELECT COUNT(*) AS n FROM "$table"');
+    return ((row['n'] as num?) ?? 0).toInt();
   }
 
   /// Stored payload of a table: the length of every value in every row.
@@ -160,18 +174,18 @@ class AppDatabase {
   /// The fallback when `dbstat` is missing. It undercounts — page overhead,
   /// free space and indexes are invisible to it — which is why [TableStat]
   /// carries [TableStat.onDisk] rather than letting the two be confused.
-  static Future<int> _payloadBytes(Database db, String table) async {
-    final columns = await db.rawQuery('PRAGMA table_info("$table")');
+  static Future<int> _payloadBytes(SqliteDatabase db, String table) async {
+    final columns = await db.getAll('PRAGMA table_info("$table")');
     final names = [
       for (final column in columns)
         if (column['name'] case final String name) name,
     ];
     if (names.isEmpty) return 0;
     final sum = names.map((name) => 'COALESCE(LENGTH("$name"), 0)').join(' + ');
-    final rows = await db.rawQuery(
+    final row = await db.get(
       'SELECT COALESCE(SUM($sum), 0) AS bytes FROM "$table"',
     );
-    return (rows.firstOrNull?['bytes'] as num?)?.toInt() ?? 0;
+    return ((row['bytes'] as num?) ?? 0).toInt();
   }
 }
 

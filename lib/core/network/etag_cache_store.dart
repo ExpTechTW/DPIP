@@ -37,7 +37,8 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:dpip/core/network/network_usage_store.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
+import 'package:sqlite_async/native.dart';
 
 /// A cached HTTP response: the server [etag] to revalidate with, the response
 /// [body] (the JSON-encoded payload), its [contentType], and [size] — the wire
@@ -117,16 +118,16 @@ class EtagCacheStore {
     // first write re-establishes it.
     unawaited(
       _db
-          .rawQuery('SELECT MAX(time) AS newest FROM $_table')
-          .then((rows) {
-            final newest = (rows.first['newest'] as num?)?.toInt() ?? 0;
+          .get('SELECT MAX(time) AS newest FROM $_table')
+          .then((row) {
+            final newest = (row['newest'] as num?)?.toInt() ?? 0;
             if (newest > _lastStamp) _lastStamp = newest;
           })
           .catchError((Object _) {}),
     );
   }
 
-  final Database _db;
+  final SqliteDatabase _db;
 
   /// Optional traffic accounting for binary [readBytes] hits. Callers must not
   /// also [NetworkUsageStore.record] those serves — misses / JSON `304`s stay
@@ -191,8 +192,8 @@ class EtagCacheStore {
   int _writesSinceSweep = 0;
 
   /// Creates the v2 cache table (idempotent) — call from `onCreate` / migrate.
-  static Future<void> createSchema(Database db) async {
-    await db.execute(
+  static Future<void> createSchema(SqliteDatabase db) async {
+    await db.executeMultiple(
       'CREATE TABLE IF NOT EXISTS $_table ('
       'key TEXT PRIMARY KEY, '
       'etag TEXT NOT NULL, '
@@ -200,31 +201,33 @@ class EtagCacheStore {
       'kind INTEGER NOT NULL, '
       'body BLOB NOT NULL, '
       'size INTEGER NOT NULL, '
-      'time INTEGER NOT NULL)',
-    );
-    await db.execute(
+      'time INTEGER NOT NULL);'
       'CREATE INDEX IF NOT EXISTS ${_table}_time ON $_table(time)',
     );
   }
 
-  /// Connection-level SQLite knobs for hot tile reads (page cache + mmap).
-  /// Call once after [openDatabase].
-  static Future<void> configureConnection(
-    Database db, {
+  /// Connection-level SQLite knobs for hot tile reads.
+  ///
+  /// sqlite_async opens each pooled connection in its own background isolate,
+  /// so per-connection PRAGMAs ride a [NativeSqliteOpenFactory] subclass whose
+  /// [NativeSqliteOpenFactory.pragmaStatements] runs inside every opened
+  /// connection — not once per database. Call instead of the plain
+  /// [SqliteDatabase] constructor when opening this file.
+  static SqliteDatabase open({
+    required String path,
     int pageCacheKiB = defaultPageCacheKiB,
-  }) async {
-    // PRAGMAs that return a row must use [rawQuery] — on Darwin, [execute]
-    // treats the result as an error ("not an error") and would abort bootstrap
-    // into "ETag cache unavailable".
-    // Negative cache_size = kibibytes reserved for the pager (~25 MiB default).
-    await db.rawQuery('PRAGMA cache_size = -$pageCacheKiB');
-    await db.rawQuery('PRAGMA mmap_size = ${64 * 1024 * 1024}');
-  }
+  }) => SqliteDatabase.withFactory(
+    _CacheOpenFactory(
+      path: path,
+      sqliteOptions: const SqliteOptions(synchronous: SqliteSynchronous.normal),
+      pageCacheKiB: pageCacheKiB,
+    ),
+  );
 
   /// Migrates v1 (single `value` blob envelope) → v2 columnar schema.
   /// Drops the old table (one-time cold miss) — simpler and safer than parsing
   /// every legacy row on the UI isolate.
-  static Future<void> migrateToV2(Database db) async {
+  static Future<void> migrateToV2(SqliteDatabase db) async {
     await db.execute('DROP TABLE IF EXISTS $_table');
     await createSchema(db);
   }
@@ -340,12 +343,11 @@ class EtagCacheStore {
         final chunk = end < urls.length
             ? urls.sublist(i, end)
             : urls.sublist(i);
-        final placeholders = List.filled(chunk.length, '?').join(',');
         rows.addAll(
-          await _db.query(
-            _table,
-            where: 'key IN ($placeholders)',
-            whereArgs: chunk,
+          await _db.getAll(
+            'SELECT key, etag, content_type, kind, body, size FROM $_table '
+            'WHERE key IN (${List.filled(chunk.length, '?').join(',')})',
+            chunk,
           ),
         );
       }
@@ -401,16 +403,13 @@ class EtagCacheStore {
   /// Returns just the cached etag for [url], or null on a miss.
   Future<String?> readEtag(String url) async {
     try {
-      final rows = await _db.query(
-        _table,
-        columns: ['etag'],
-        where: 'key = ?',
-        whereArgs: [url],
-        limit: 1,
+      final row = await _db.getOptional(
+        'SELECT etag FROM $_table WHERE key = ? LIMIT 1',
+        [url],
       );
-      if (rows.isEmpty) return null;
+      if (row == null) return null;
       _scheduleTouch(url);
-      return rows.first['etag'] as String?;
+      return row['etag'] as String?;
     } catch (_) {
       return null;
     }
@@ -473,17 +472,22 @@ class EtagCacheStore {
     try {
       final encoded = await _encodeBinaryAll(writes);
       final now = _lruStamp();
-      await _db.transaction((txn) async {
+      await _db.writeTransaction((tx) async {
         for (final row in encoded) {
-          await txn.insert(_table, {
-            'key': row.url,
-            'etag': row.etag,
-            'content_type': row.contentType,
-            'kind': row.kind,
-            'body': row.body,
-            'size': row.size,
-            'time': now,
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
+          await tx.execute(
+            'INSERT OR REPLACE INTO $_table '
+            '(key, etag, content_type, kind, body, size, time) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [
+              row.url,
+              row.etag,
+              row.contentType,
+              row.kind,
+              row.body,
+              row.size,
+              now,
+            ],
+          );
         }
       });
       var added = 0;
@@ -519,15 +523,12 @@ class EtagCacheStore {
     required Uint8List body,
     required int size,
   }) async {
-    await _db.insert(_table, {
-      'key': url,
-      'etag': etag,
-      'content_type': contentType,
-      'kind': kind,
-      'body': body,
-      'size': size,
-      'time': _lruStamp(),
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
+    await _db.execute(
+      'INSERT OR REPLACE INTO $_table '
+      '(key, etag, content_type, kind, body, size, time) '
+      'VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [url, etag, contentType, kind, body, size, _lruStamp()],
+    );
     await _noteWrite(body.length, 1);
   }
 
@@ -545,7 +546,7 @@ class EtagCacheStore {
     if (tracked != null) _trackedBytes = tracked + addedBytes;
 
     if (maxBytes <= 0) {
-      await _db.delete(_table);
+      await _db.execute('DELETE FROM $_table');
       _trackedBytes = 0;
       _writesSinceSweep = 0;
       return;
@@ -583,7 +584,7 @@ class EtagCacheStore {
     // BY` is unchanged, so the `time` index still serves it without a sort.
     final victims = <String>{};
     for (var offset = 0; total > maxBytes; offset += _trimScanChunk) {
-      final rows = await _db.rawQuery(
+      final rows = await _db.getAll(
         'SELECT key, LENGTH(body) AS b FROM $_table '
         'ORDER BY time ASC LIMIT ? OFFSET ?',
         [_trimScanChunk, offset],
@@ -605,20 +606,19 @@ class EtagCacheStore {
     for (var i = 0; i < keys.length; i += _readInChunk) {
       final end = i + _readInChunk;
       final chunk = end < keys.length ? keys.sublist(i, end) : keys.sublist(i);
-      await _db.delete(
-        _table,
-        where: 'key IN (${List.filled(chunk.length, '?').join(',')})',
-        whereArgs: chunk,
+      await _db.execute(
+        'DELETE FROM $_table WHERE key IN (${List.filled(chunk.length, '?').join(',')})',
+        chunk,
       );
     }
     _trackedBytes = total;
   }
 
   Future<int> _measureBytes() async {
-    final rows = await _db.rawQuery(
+    final row = await _db.get(
       'SELECT COALESCE(SUM(LENGTH(body)), 0) AS b FROM $_table',
     );
-    return (rows.first['b'] as num).toInt();
+    return (row['b'] as num).toInt();
   }
 
   /// Brings the store back inside its byte budget.
@@ -643,7 +643,7 @@ class EtagCacheStore {
   /// Deletes every cached entry.
   Future<void> clear() async {
     try {
-      await _db.delete(_table);
+      await _db.execute('DELETE FROM $_table');
       _trackedBytes = 0;
       _writesSinceSweep = 0;
     } catch (_) {}
@@ -661,10 +661,9 @@ class EtagCacheStore {
   /// Row count and total stored body bytes — for the Debug page.
   Future<EtagCacheStats> stats() async {
     try {
-      final rows = await _db.rawQuery(
+      final row = await _db.get(
         'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(body)), 0) AS b FROM $_table',
       );
-      final row = rows.first;
       return (
         rows: (row['c'] as num).toInt(),
         bytes: (row['b'] as num).toInt(),
@@ -675,14 +674,13 @@ class EtagCacheStore {
   }
 
   Future<Map<String, Object?>?> _queryRow(String url) async {
-    final rows = await _db.query(
-      _table,
-      where: 'key = ?',
-      whereArgs: [url],
-      limit: 1,
+    final row = await _db.getOptional(
+      'SELECT key, etag, content_type, kind, body, size FROM $_table '
+      'WHERE key = ? LIMIT 1',
+      [url],
     );
-    if (rows.isEmpty) return null;
-    return rows.first;
+    if (row == null) return null;
+    return Map<String, Object?>.of(row);
   }
 
   /// JSON bodies are stored gzip-1; inflate off the UI isolate when large.
@@ -903,19 +901,41 @@ class EtagCacheStore {
     _pendingTouch.clear();
     final now = _lruStamp();
     try {
-      await _db.transaction((txn) async {
+      await _db.writeTransaction((tx) async {
         for (var i = 0; i < urls.length; i += _touchInChunk) {
           final end = i + _touchInChunk;
           final chunk = end < urls.length
               ? urls.sublist(i, end)
               : urls.sublist(i);
-          final placeholders = List.filled(chunk.length, '?').join(',');
-          await txn.rawUpdate(
-            'UPDATE $_table SET time = ? WHERE key IN ($placeholders)',
+          await tx.execute(
+            'UPDATE $_table SET time = ? WHERE key IN (${List.filled(chunk.length, '?').join(',')})',
             [now, ...chunk],
           );
         }
       });
     } catch (_) {}
   }
+}
+
+/// Pool factory for the cache file — adds the hot-read PRAGMAs to **every**
+/// connection sqlite_async opens (one writer plus up to [SqliteOptions.maxReaders]
+/// readers), which is where they belong: `cache_size` and `mmap_size` are
+/// per-connection settings, and a tile burst reads through whichever pooled
+/// reader picks it up.
+base class _CacheOpenFactory extends NativeSqliteOpenFactory {
+  _CacheOpenFactory({
+    required super.path,
+    required super.sqliteOptions,
+    required this.pageCacheKiB,
+  });
+
+  final int pageCacheKiB;
+
+  @override
+  List<String> pragmaStatements(covariant SqliteOpenOptions options) => [
+    ...super.pragmaStatements(options),
+    // Negative cache_size = kibibytes reserved for the pager (~25 MiB).
+    'PRAGMA cache_size = -$pageCacheKiB',
+    'PRAGMA mmap_size = ${64 * 1024 * 1024}',
+  ];
 }

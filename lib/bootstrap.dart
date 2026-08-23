@@ -72,7 +72,7 @@ import 'package:flutter/foundation.dart'
     show LicenseEntry, LicenseEntryWithLineBreaks, LicenseRegistry;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// Initializes platform services and launches the app.
 ///
@@ -411,22 +411,18 @@ Future<void> bootstrap() async {
 /// database can't be opened the app runs without HTTP caching / accounting rather
 /// than failing to launch. The usage tables are created with `IF NOT EXISTS` on
 /// every open, so they're added to a pre-existing cache DB without a version bump.
-Future<({EtagCacheStore etag, NetworkUsageStore usage, Database db})?>
+///
+/// The v1→v2 migration rides a probe instead of sqflite's `version`/`onUpgrade`
+/// hooks (sqlite_async has none): the v2 `CREATE TABLE IF NOT EXISTS` is
+/// harmless against either shape — [EtagCacheStore.migrateToV2] is what drops
+/// the legacy envelope table when its columns say v1.
+Future<({EtagCacheStore etag, NetworkUsageStore usage, SqliteDatabase db})?>
 _openCache() async {
   try {
     final base = await getApplicationCacheDirectory();
-    final db = await openDatabase(
-      '${base.path}/http_etag_cache.db',
-      version: 2,
-      onCreate: (db, _) => EtagCacheStore.createSchema(db),
-      onUpgrade: (db, oldVersion, newVersion) async {
-        // v1 was a gzip+json+base64 envelope — drop and rebuild for the fast
-        // columnar schema (one-time cold miss on upgrade).
-        if (oldVersion < 2) await EtagCacheStore.migrateToV2(db);
-      },
-    );
+    final db = EtagCacheStore.open(path: '${base.path}/http_etag_cache.db');
     await NetworkUsageStore.createSchema(db);
-    await EtagCacheStore.configureConnection(db);
+    await EtagCacheStore.createSchema(db);
     final usage = NetworkUsageStore(db);
     return (etag: EtagCacheStore(db, usage: usage), usage: usage, db: db);
   } catch (error, stackTrace) {
@@ -442,24 +438,32 @@ _openCache() async {
 /// cache is a separate file for exactly that reason, which is also what makes
 /// "clear cache" unable to reach any of this. See `core/storage/app_database.dart`.
 ///
-/// Best-effort like the cache: transient launch races get three bounded retries;
-/// a persistent failure means settings live only for this session rather than
-/// the app refusing to launch. Every schema statement is `IF NOT EXISTS` and
-/// runs on every open, so a database created by an older build picks up tables
-/// added later without a version bump.
-Future<Database?> _openDurable() async {
+/// Best-effort like the cache. The old failure mode this used to retry around —
+/// a notification-tap cold start losing a race for the file against the
+/// background engine awesome spins up, and degrading the session to "never been
+/// configured" — is gone at the source with sqlite_async: opens run on a
+/// background isolate with WAL and a built-in lock timeout (30 s default), so
+/// contention waits instead of failing. What remains here is the honest
+/// fallback for an open that still fails (missing parent directory, full disk,
+/// first-unlock encryption state): bounded retries at launch, then the session
+/// runs without persistence. Every schema statement is `IF NOT EXISTS`
+/// and runs on every open, so a database created by an older build picks up
+/// tables added later without a version bump.
+Future<SqliteDatabase?> _openDurable() async {
   const attempts = 3;
   Object? lastError;
   StackTrace? lastStackTrace;
   for (var attempt = 1; attempt <= attempts; attempt++) {
-    Database? db;
     try {
       final base = await getApplicationSupportDirectory();
-      db = await openDatabase(
-        '${base.path}/dpip.db',
-        version: appDatabaseVersion,
-        onConfigure: (db) => _configureJournal(db, durable: true),
-        onCreate: (db, _) => _createDurableSchema(db),
+      final db = SqliteDatabase(
+        path: '${base.path}/dpip.db',
+        options: const SqliteOptions(
+          // WAL + busy_timeout are package defaults; FULL fsyncs every commit,
+          // which is what settings, the mesh conversation and the log want —
+          // none of it can be fetched again (the cache file relaxes to NORMAL).
+          synchronous: SqliteSynchronous.full,
+        ),
       );
       await _createDurableSchema(db);
       if (attempt > 1) {
@@ -469,19 +473,11 @@ Future<Database?> _openDurable() async {
     } catch (error, stackTrace) {
       lastError = error;
       lastStackTrace = stackTrace;
-      if (db != null) {
-        try {
-          await db.close();
-        } on Object {
-          // The open/schema error is the useful failure; closing a partial
-          // handle must not replace it or prevent the next recovery attempt.
-        }
-      }
       if (attempt < attempts) {
         Log.warning(
-          'durable database attempt $attempt/$attempts failed; retrying',
+          'durable database attempt $attempt/$attempts failed: $error',
         );
-        await Future<void>.delayed(Duration(milliseconds: 100 * attempt));
+        await Future<void>.delayed(const Duration(milliseconds: 150));
       }
     }
   }
@@ -490,49 +486,7 @@ Future<Database?> _openDurable() async {
   return null;
 }
 
-/// Puts a database into **WAL**, so a commit is an append rather than a
-/// journal dance.
-///
-/// With the default rollback journal every transaction — a buffered log flush,
-/// an LRU touch, a tile batch — creates a journal file, fsyncs it, fsyncs the
-/// directory, writes the pages back, then deletes the journal and fsyncs the
-/// directory again: several barriers and a double write of every changed page,
-/// for a handful of rows. WAL appends the new pages to one long-lived `-wal`
-/// file and fsyncs that; the write-back into the database file is deferred to a
-/// checkpoint that amortizes over many commits. Same durability, a fraction of
-/// the IO and the flash wear.
-///
-/// This has to run in `onConfigure`: it is the only sqflite callback invoked
-/// outside a transaction, and `journal_mode` cannot be changed inside one.
-/// The mode itself is persisted in the file header (so it only has to take
-/// once), while `synchronous` is per connection and must be set on every open.
-///
-/// [durable] keeps `synchronous = FULL` — the SQLite default — for `dpip.db`:
-/// settings, the mesh conversation and the log cannot be fetched again, so a
-/// commit there still fsyncs before it counts. The cache file relaxes to
-/// `NORMAL`, where a WAL commit costs no fsync at all, because every byte in it
-/// is re-downloadable by definition and lives in a directory the OS may empty
-/// anyway. Both modes survive an app crash; only a power cut can cost the cache
-/// its last commits.
-///
-/// Best-effort, like the opens themselves: a database that will not take WAL
-/// keeps working on the rollback journal.
-Future<void> _configureJournal(Database db, {required bool durable}) async {
-  try {
-    // `PRAGMA journal_mode` returns a row, which Android's `execute` rejects
-    // and Darwin reports as "not an error" — sqflite's helper handles both.
-    await db.setJournalMode('WAL');
-    if (!durable) {
-      // A pragma still goes through [rawQuery] here for the same reason
-      // [EtagCacheStore.configureConnection] does.
-      await db.rawQuery('PRAGMA synchronous = NORMAL');
-    }
-  } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'WAL unavailable (rollback journal)');
-  }
-}
-
-Future<void> _createDurableSchema(Database db) async {
+Future<void> _createDurableSchema(SqliteDatabase db) async {
   await SettingsStore.createSchema(db);
   await LogStore.createSchema(db);
   await TleStore.createSchema(db);

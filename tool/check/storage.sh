@@ -7,17 +7,18 @@
 #    `SettingKey` and never a raw `String`, so an ad-hoc key cannot reach
 #    storage. Nothing may import the package; it is not a dependency.
 #
-# 2. `sqflite` is opened and schema'd only by the stores that own a table, plus
-#    bootstrap (which mints the handles). A feature reaching for a Database
-#    would be a feature able to drop somebody else's table — which is exactly
-#    what "clearing the cache must not delete anything else" is about.
+# 2. SQLite (`sqlite_async`) is opened and schema'd only by the stores that
+#    own a table, plus bootstrap (which mints the handles). A feature reaching
+#    for a SqliteDatabase would be a feature able to drop somebody else's
+#    table — which is exactly what "clearing the cache must not delete
+#    anything else" is about.
 #
 # Sibling to tool/check/layering.sh / check_l10n.sh; zero new packages.
 # See ARCHITECTURE.md → Persistence.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-sqflite_allow='lib/bootstrap.dart
+sqlite_allow='lib/bootstrap.dart
 lib/core/settings/settings_store.dart
 lib/core/logging/log_store.dart
 lib/core/storage/app_database.dart
@@ -36,15 +37,17 @@ while IFS= read -r file; do
     echo "    use SettingsStore (lib/core/settings/settings_store.dart)"
     fail=1
   fi
-  if grep -qE "(import|export)[[:space:]]+['\"]package:sqflite" "$file"; then
+  # The sqlite3 FFI is likewise store-only: raw handles bypass the pool's lock
+  # discipline that sqlite_async exists to provide.
+  if grep -qE "(import|export)[[:space:]]+['\"]package:(sqflite|sqlite3)" "$file"; then
     case "
-$sqflite_allow
+$sqlite_allow
 " in
       *"
 $file
 "*) ;;
       *)
-        echo "  ✗ $file opens sqflite directly — go through the store that owns"
+        echo "  ✗ $file opens SQLite directly — go through the store that owns"
         echo "    the table (see lib/core/storage/app_database.dart)"
         fail=1
         ;;

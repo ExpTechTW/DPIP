@@ -11,7 +11,7 @@
 library;
 
 import 'package:dpip/core/logging/log.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 /// The table this store owns.
 const String tleTable = 'tle';
@@ -29,14 +29,14 @@ class TleStore {
 
   /// Null when the database would not open — the caller then falls back to the
   /// bundled snapshot, which is a complete answer on its own.
-  final Database? _db;
+  final SqliteDatabase? _db;
 
   /// Creates the table. Safe on every open.
   ///
   /// `CHECK (id = 0)` is the single-row constraint: there is only ever one
   /// current element set, and making that a schema rule beats remembering to
   /// delete the old one.
-  static Future<void> createSchema(Database db) => db.execute(
+  static Future<void> createSchema(SqliteDatabase db) => db.execute(
     'CREATE TABLE IF NOT EXISTS $tleTable ('
     'id INTEGER PRIMARY KEY CHECK (id = 0), '
     'text TEXT NOT NULL, '
@@ -47,8 +47,9 @@ class TleStore {
     final db = _db;
     if (db == null) return null;
     try {
-      final rows = await db.query(tleTable, limit: 1);
-      final row = rows.firstOrNull;
+      final row = await db.getOptional(
+        'SELECT text, fetched_at FROM $tleTable LIMIT 1',
+      );
       if (row == null) return null;
       return StoredElements(
         text: row['text']! as String,
@@ -70,16 +71,16 @@ class TleStore {
     if (db == null) return;
     try {
       if (text == null) {
-        await db.update(tleTable, {
-          'fetched_at': fetchedAt.toUtc().millisecondsSinceEpoch,
-        }, where: 'id = 0');
+        await db.execute('UPDATE $tleTable SET fetched_at = ? WHERE id = 0', [
+          fetchedAt.toUtc().millisecondsSinceEpoch,
+        ]);
         return;
       }
-      await db.insert(tleTable, {
-        'id': 0,
-        'text': text,
-        'fetched_at': fetchedAt.toUtc().millisecondsSinceEpoch,
-      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      await db.execute(
+        'INSERT OR REPLACE INTO $tleTable (id, text, fetched_at) '
+        'VALUES (0, ?, ?)',
+        [text, fetchedAt.toUtc().millisecondsSinceEpoch],
+      );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'writing elements');
     }

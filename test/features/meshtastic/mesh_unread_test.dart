@@ -18,15 +18,13 @@ import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
+import '../../core/storage/memory_db.dart';
 
-Future<Database> _open() async {
-  final db = await databaseFactoryFfi.openDatabase(
-    inMemoryDatabasePath,
-    options: OpenDatabaseOptions(singleInstance: false),
-  );
+Future<SqliteDatabase> _open() async {
+  final db = openMemoryDb();
   await MeshStore.createSchema(db);
   return db;
 }
@@ -42,7 +40,9 @@ MeshMessage _incoming(String text, int channel, {int seconds = 0}) =>
 Future<void> _settle() =>
     Future<void>.delayed(const Duration(milliseconds: 80));
 
-Future<(MeshChatController, FakeMeshService)> _controller(Database db) async {
+Future<(MeshChatController, FakeMeshService)> _controller(
+  SqliteDatabase db,
+) async {
   final service = FakeMeshService();
   final settings = SettingsStore.inMemory();
   final controller = MeshChatController(
@@ -56,7 +56,6 @@ Future<(MeshChatController, FakeMeshService)> _controller(Database db) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(sqfliteFfiInit);
 
   group('unread', () {
     test('accrues off-screen, never on-screen, never for own sends', () async {
@@ -205,13 +204,11 @@ void main() {
       final db = await _open();
       addTearDown(db.close);
       // A row written before the channel-hash guard: `channel` holds a hash.
-      await db.insert('mesh_messages', {
-        'ts': DateTime.utc(2026, 1, 1).millisecondsSinceEpoch,
-        'node': 7,
-        'channel': 242,
-        'text': 'foreign',
-        'outgoing': 0,
-      });
+      await db.execute(
+        'INSERT INTO mesh_messages (ts, node, channel, text, outgoing) '
+        'VALUES (?, 7, 242, ?, 0)',
+        [DateTime.utc(2026, 1, 1).millisecondsSinceEpoch, 'foreign'],
+      );
       final store = MeshStore(db);
       await store.prune();
       expect(

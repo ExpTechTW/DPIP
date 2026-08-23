@@ -12,7 +12,8 @@ import 'package:dpip/core/astro/satellite.dart';
 import 'package:dpip/core/astro/tle_source.dart';
 import 'package:dpip/core/astro/tle_store.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../storage/memory_db.dart';
 
 /// The ISS on day 226 of 2026.
 const _older = '''
@@ -44,21 +45,9 @@ class _Never implements TleSource {
 }
 
 /// A real `tle` table in memory, so the test exercises the schema rather than
-/// a stand-in for it.
-/// A fresh in-memory database per call.
-///
-/// `singleInstance: false` matters: sqflite hands back the *same* handle for a
-/// repeated path, and `:memory:` is a path — so without it every test in the
-/// file shares one database and the second test starts with the first one's
-/// rows. That is exactly the kind of shared state that makes a suite pass in
-/// isolation and fail as a group.
-Future<Database> _openMemory() => databaseFactoryFfi.openDatabase(
-  inMemoryDatabasePath,
-  options: OpenDatabaseOptions(singleInstance: false),
-);
-
+/// a stand-in for it. A fresh database per call — see [openMemoryDb].
 Future<TleStore> _store({String? seed, DateTime? fetchedAt}) async {
-  final db = await _openMemory();
+  final db = openMemoryDb();
   await TleStore.createSchema(db);
   final store = TleStore(db);
   if (seed != null) {
@@ -69,7 +58,6 @@ Future<TleStore> _store({String? seed, DateTime? fetchedAt}) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
 
   var clock = DateTime.utc(2026, 8, 20);
 

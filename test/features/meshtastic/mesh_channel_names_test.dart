@@ -16,9 +16,10 @@ import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 import '../../core/meshtastic/fake_mesh_service.dart';
+import '../../core/storage/memory_db.dart';
 
 /// A service whose channel table can be set and cleared, the way a radio's is
 /// by connecting and disconnecting.
@@ -32,14 +33,8 @@ class _ChannelService extends FakeMeshService {
 MeshChannel _channel(int index, String name) =>
     MeshChannel(index: index, name: name, psk: const [1], enabled: true);
 
-Future<Database> _open() async {
-  // `singleInstance: false`: sqflite hands back the same handle for a repeated
-  // path, and `:memory:` is a path — without it every test here shares one
-  // database and tearDown closes the handle the next one is about to use.
-  final db = await databaseFactoryFfi.openDatabase(
-    inMemoryDatabasePath,
-    options: OpenDatabaseOptions(singleInstance: false),
-  );
+Future<SqliteDatabase> _open() async {
+  final db = openMemoryDb();
   await MeshStore.createSchema(db);
   return db;
 }
@@ -48,7 +43,6 @@ Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 60));
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(sqfliteFfiInit);
 
   test('a name reported by the radio is remembered', () async {
     final db = await _open();
