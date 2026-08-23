@@ -12,6 +12,7 @@ library;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
@@ -137,8 +138,9 @@ class _Header extends StatelessWidget {
     final colors = theme.colorScheme;
     final typeColor = isStable ? _stableColor : _snapshotColor;
     final title = note.name.isEmpty ? note.tagName : note.name;
-    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString())
-        .format(note.publishedAt.toLocal());
+    final date = DateFormat.yMMMd(
+      intlDateLocale(Localizations.localeOf(context)),
+    ).format(note.publishedAt.toLocal());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
