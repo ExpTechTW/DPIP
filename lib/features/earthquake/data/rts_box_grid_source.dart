@@ -10,6 +10,12 @@ import 'package:flutter/services.dart' show rootBundle;
 /// `Polygon` features, each carrying an integer `ID` property matched against
 /// `Rts.box`'s keys. Kept out of the pure domain (which only consumes the
 /// parsed grid) so the domain stays Flutter-free.
+///
+/// Deliberately **not** decoded in an isolate, unlike its sibling travel-time
+/// table: this asset is 773 bytes compressed / 7 KB inflated (43 polygons,
+/// 215 points), so the whole decode lands well under a millisecond, while an
+/// isolate spawn costs more than that before any work runs. Measured, not
+/// assumed — re-audit if the asset ever grows.
 class RtsBoxGridSource {
   const RtsBoxGridSource();
 
