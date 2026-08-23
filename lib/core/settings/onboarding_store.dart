@@ -24,4 +24,11 @@ class OnboardingStore extends ChangeNotifier {
     await _settings.setBool(SettingKeys.onboardingComplete, true);
     notifyListeners();
   }
+
+  /// Re-announces state after an external writer changed it underneath this
+  /// store — the background durable-database recovery adopting rows this
+  /// session never saw. Listeners (the services host, and anything gating on
+  /// [isComplete]) re-read; the router's redirect re-runs on the refresh that
+  /// follows, releasing a returning user held on the welcome page.
+  void reload() => notifyListeners();
 }

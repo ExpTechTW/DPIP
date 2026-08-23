@@ -38,8 +38,21 @@ import 'package:dpip/features/status/presentation/pages/server_status_page.dart'
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+/// Fires when a redirect *input* changes outside any navigation — today only
+/// the background durable-database recovery adopting settings rows this
+/// session launched without seeing ([bootstrap] calls [fire]). Without it,
+/// GoRouter re-runs [redirect] on navigation events alone, so a returning
+/// user held on the welcome page by a failed launch would stay there all
+/// session even after the completion flag came back.
+final OnboardingRefreshSignal onboardingRefresh = OnboardingRefreshSignal();
+
+final class OnboardingRefreshSignal extends ChangeNotifier {
+  void fire() => notifyListeners();
+}
 
 /// The application's route table.
 ///
@@ -49,6 +62,7 @@ import 'package:provider/provider.dart';
 /// page widgets to navigate.
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.homePath,
+  refreshListenable: onboardingRefresh,
   // Lets the shell notice that one of the full-screen routes below has covered
   // it, so the tabs underneath can idle instead of animating at nobody.
   observers: [shellRouteObserver],

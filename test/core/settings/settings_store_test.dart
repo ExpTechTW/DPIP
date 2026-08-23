@@ -96,6 +96,50 @@ void main() {
     expect(store.getString(SettingKeys.locale), 'th');
   });
 
+  test('a degraded session is visible, and attach replays both ways', () async {
+    // The launch whose database never opened: writes stay in memory (and are
+    // flagged), then the database opens mid-session. The session's own write
+    // must reach disk, and rows it never saw must come back — a returning
+    // user's onboarding flag among them — without clobbering what the
+    // session read or wrote.
+    final db = await _db();
+    await insertRow(db, SettingKeys.onboardingComplete.name, 'true');
+
+    final store = await SettingsStore.open(null);
+    expect(store.isDegraded, isTrue);
+    expect(store.getBool(SettingKeys.onboardingComplete), isNull);
+    await store.setInt(SettingKeys.channelVersion, 7);
+    await store.remove(SettingKeys.experimentalUnlocked);
+
+    expect(await store.attachDatabase(db), isTrue);
+    expect(store.isDegraded, isFalse);
+    // Disk → session: the unseen row is adopted…
+    expect(store.getBool(SettingKeys.onboardingComplete), isTrue);
+    // …and session → disk: the backlog landed, removals included.
+    expect(
+      (await SettingsStore.open(db)).getInt(SettingKeys.channelVersion),
+      7,
+    );
+
+    // A second attach is a no-op.
+    expect(await store.attachDatabase(db), isFalse);
+  });
+
+  test('attach never overwrites what the session holds', () async {
+    // The database remembers locale=ja from before a degraded launch; during
+    // that launch the user picked th. The session is what the user sees, so
+    // th must win in memory *and* on disk after the attach.
+    final db = await _db();
+    await insertRow(db, SettingKeys.locale.name, '"ja"');
+
+    final store = await SettingsStore.open(null);
+    await store.setString(SettingKeys.locale, 'th');
+    await store.attachDatabase(db);
+
+    expect(store.getString(SettingKeys.locale), 'th');
+    expect((await SettingsStore.open(db)).getString(SettingKeys.locale), 'th');
+  });
+
   test('a value written under one key is invisible under another', () {
     // The registry is the whole persisted surface; two keys sharing a storage
     // address would make one setting silently overwrite another.
