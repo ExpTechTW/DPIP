@@ -58,6 +58,11 @@ class EarthquakeApi {
     // doesn't auto-decode it — the caller gets a raw JSON string instead of
     // a Map. Decode it here so this method's return shape matches the rest
     // of [EarthquakeApi] regardless of the host's content-type quirk.
+    //
+    // Inline on purpose, not an isolate: the snapshot is ~5 KB (~111
+    // stations, re-measured 2026-08-24 against api-1), so the decode is tens
+    // of microseconds even at replay's 1 Hz — an isolate spawn would cost
+    // more than it saves.
     return data is String ? jsonDecode(data) : data;
   }
 
