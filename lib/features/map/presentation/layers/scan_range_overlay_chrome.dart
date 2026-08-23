@@ -25,12 +25,14 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// rain*, and an unidentified county is one you cannot act on.
 ///
 /// The county / township half of that chrome is [AdminOutlineChrome], which
-/// the wind forecast layer shares; this adds the radar scan-range outline on
-/// top of it. The geometry is the radar composite's ([RadarScanRange]) for
-/// every consumer: QPESUMS forecasts the same grid the radars observe, so its
-/// coverage is the same union of range circles. Only the ids differ, so a map
-/// showing radar and QPESUMS at once draws two outlines instead of clashing
-/// over one.
+/// the wind forecast layer shares; this adds the coverage outline on top of it.
+/// The geometry defaults to the radar composite's ([RadarScanRange]) and is
+/// overridable, because coverage is a fact about the source and not about this
+/// chrome: the QPESUMS forecast is published over a plain rectangle, so drawing
+/// it with the composite's range circles both claimed coverage it does not have
+/// on the corners and denied coverage it does have along the arcs. The ids are
+/// per-layer too, so a map showing radar and QPESUMS at once draws two outlines
+/// instead of clashing over one.
 mixin ScanRangeOverlayChrome on AdminOutlineChrome {
   /// Whether the observed area is outlined. On by default — see the class doc.
   final ValueNotifier<bool> showScanRange = ValueNotifier(true);
@@ -47,6 +49,12 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
   /// Blue-grey: distinct from every dBZ/mm/h colour in the scales, so the
   /// outline is never mistaken for precipitation.
   String get scanRangeColor;
+
+  /// The shape this layer outlines as its observed area.
+  ///
+  /// Defaults to the radar composite's union of range circles; a source whose
+  /// data covers something else overrides it.
+  Map<String, dynamic> get scanRangeGeoJson => RadarScanRange.geoJson();
 
   /// All chrome listenables, for a legend that follows the toggles.
   Listenable get chromeListenable =>
@@ -106,6 +114,7 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
           belowLayerId: chromeBelowLayerId,
           sourceId: scanRangeSourceId,
           layerId: scanRangeLayerId,
+          data: scanRangeGeoJson,
         );
       } else {
         await RadarScanRange.remove(

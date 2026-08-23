@@ -185,19 +185,21 @@ abstract final class RadarScanRange {
   /// Outline only — no fill. The covered area is where the echo itself is, and
   /// a wash over it would tint every dBZ colour on the map.
   ///
-  /// [sourceId]/[layerId] let a second raster (QPESUMS, whose coverage is the
-  /// same composite) draw its own outline under distinct ids — the defaults are
-  /// the radar ids, so existing callers pass nothing.
+  /// [sourceId]/[layerId] let a second raster draw its own outline under
+  /// distinct ids, and [data] lets it outline its own shape — the QPESUMS
+  /// forecast publishes a plain rectangle, not this union of range circles. All
+  /// three default to the radar's, so existing callers pass nothing.
   static Future<void> add(
     MapLibreMapController controller, {
     required String outlineColor,
     String? belowLayerId,
     String sourceId = RadarScanRange.sourceId,
     String layerId = RadarScanRange.outlineLayerId,
+    Map<String, dynamic>? data,
   }) async {
     await controller.addSource(
       sourceId,
-      GeojsonSourceProperties(data: geoJson()),
+      GeojsonSourceProperties(data: data ?? geoJson()),
     );
     await controller.addLineLayer(
       sourceId,

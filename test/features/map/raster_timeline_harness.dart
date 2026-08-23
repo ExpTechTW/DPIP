@@ -96,6 +96,10 @@ class RecordingMapController implements MapLibreMapController {
   /// Number of native property batches, regardless of updates per batch.
   int propertyBatches = 0;
 
+  /// GeoJSON handed to `addSource`, by source id — what the map was actually
+  /// told to draw, rather than merely that it was told something.
+  final Map<String, Map<String, dynamic>> sourceData = {};
+
   /// How many times the visible region was asked for. It is a platform
   /// round-trip, so a scrub that re-derives a rectangle the camera never moved
   /// is paying for it once per crossed frame.
@@ -121,6 +125,7 @@ class RecordingMapController implements MapLibreMapController {
             'a top-level string crashes NSJSONSerialization on iOS',
       );
     }
+    if (data is Map) sourceData[sourceId] = Map<String, dynamic>.from(data);
     calls.add('addSource:$sourceId');
   }
 
@@ -130,6 +135,7 @@ class RecordingMapController implements MapLibreMapController {
     Map<String, dynamic> geojson, {
     String? promoteId,
   }) async {
+    sourceData[sourceId] = geojson;
     calls.add('addSource:$sourceId');
   }
 

@@ -135,8 +135,7 @@ void main() {
       expect(layer.showScanRange.value, isTrue);
       expect(layer.showCountyOutline.value, isTrue);
       expect(layer.showTownOutline.value, isTrue);
-      // QPESUMS shares the radar composite's geometry but draws its own
-      // outline under its own ids, so both layers can be on the map at once.
+      // Its own ids, so radar and QPESUMS can both be on the map at once.
       expect(controller.calls, contains('addSource:qpesums-scan-range'));
       expect(
         controller.calls,
@@ -148,6 +147,28 @@ void main() {
       );
       expect(controller.calls, contains('addLineLayer:admin-county-outline'));
       expect(controller.calls, contains('addLineLayer:admin-town-outline'));
+    });
+
+    test('the outline is the forecast rectangle, not radar coverage', () async {
+      final (_, controller) = await attached();
+
+      final geo = controller.sourceData['qpesums-scan-range'];
+      expect(geo, isNotNull, reason: 'the outline source must carry geometry');
+      final feature = (geo!['features'] as List).single as Map;
+      final geometry = feature['geometry'] as Map;
+      expect(geometry['type'], 'Polygon');
+      expect(
+        (geometry['coordinates'] as List).single,
+        // 118.0–123.5125°E, 20.0–27.0125°N: the grid the forecast is published
+        // on, which is not the union of range circles the radars observe.
+        [
+          [123.5125, 20.0],
+          [123.5125, 27.0125],
+          [118.0, 27.0125],
+          [118.0, 20.0],
+          [123.5125, 20.0],
+        ],
+      );
     });
 
     test(

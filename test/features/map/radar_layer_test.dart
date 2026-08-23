@@ -4,6 +4,7 @@ import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show outlineLayerId, townLabelLayerId;
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
+import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1099,6 +1100,12 @@ void main() {
       expect(
         controller.calls,
         contains('addLineLayer:radar-scan-range-outline'),
+      );
+      // Radar keeps the composite's geometry. Only the QPESUMS forecast, whose
+      // grid is a plain rectangle, overrides it — see qpesums_layer_test.dart.
+      expect(
+        controller.sourceData['radar-scan-range'],
+        RadarScanRange.geoJson(),
       );
       expect(
         controller.calls,

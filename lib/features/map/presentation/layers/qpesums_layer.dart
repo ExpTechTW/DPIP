@@ -1,5 +1,6 @@
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
+import 'package:dpip/features/map/presentation/layers/qpesums_scan_range.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/scan_range_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
@@ -17,10 +18,11 @@ import 'package:flutter/material.dart';
 /// only the layer's identity, its opacity, and the QPESUMS hourly-rate colour
 /// key. Frame ids are Unix milliseconds, which [parseFrameTime] already reads.
 ///
-/// The forecast covers the same grid the radar composite observes, so it shares
-/// the radar's scan-range geometry — and, like radar, it redraws its own
-/// scan-range outline plus county/town borders **over** the raster
-/// ([ScanRangeOverlayChrome]), switchable from its options chip.
+/// Like radar, it redraws its own coverage outline plus county/town borders
+/// **over** the raster ([ScanRangeOverlayChrome]), switchable from its options
+/// chip — but not with radar's geometry: the forecast is published over a plain
+/// rectangle ([QpesumsScanRange]), while the composite the radars observe is a
+/// union of range circles.
 class QpesumsMapLayer extends RasterTimelineLayer
     with AdminOutlineChrome, ScanRangeOverlayChrome {
   QpesumsMapLayer(QpesumsRepository super.repository);
@@ -28,10 +30,14 @@ class QpesumsMapLayer extends RasterTimelineLayer
   /// Distinct from radar's ids: both layers can be on the map at once, and each
   /// draws its own outline instead of clashing over one source/layer pair.
   @override
-  String get scanRangeSourceId => 'qpesums-scan-range';
+  String get scanRangeSourceId => QpesumsScanRange.sourceId;
 
   @override
-  String get scanRangeLayerId => 'qpesums-scan-range-outline';
+  String get scanRangeLayerId => QpesumsScanRange.outlineLayerId;
+
+  /// The forecast grid's own rectangle, not the radar composite's circles.
+  @override
+  Map<String, dynamic> get scanRangeGeoJson => QpesumsScanRange.geoJson();
 
   @override
   String get scanRangeColor => '#78909C'.vision;
