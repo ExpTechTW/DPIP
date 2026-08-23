@@ -5,6 +5,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 
 /// The app's home locale: Traditional Chinese for Taiwan (`zh_TW`).
 ///
@@ -97,6 +98,21 @@ bool _isBareChinese(Locale locale) =>
     locale.languageCode == 'zh' &&
     locale.scriptCode == null &&
     locale.countryCode == null;
+
+/// A `DateFormat`-safe locale tag for [locale].
+///
+/// `intl` ships its own locale-data set, entirely separate from
+/// `flutter_localizations` — it does not know every locale this app
+/// supports either (`yue` included, the same gap the widgets-fallback
+/// delegates above patch for Material/Cupertino). Asking `DateFormat` to
+/// format with a tag it has no data for throws ("Invalid locale") rather than
+/// falling back, so every `DateFormat` call driven by the app's locale must
+/// go through this first. Falls back to [kHomeLocale], the same replacement
+/// the Material/Cupertino delegates use.
+String intlDateLocale(Locale locale) {
+  final tag = locale.toString();
+  return DateFormat.localeExists(tag) ? tag : kHomeLocale.toString();
+}
 
 /// Picks the best supported locale for [deviceLocales].
 ///

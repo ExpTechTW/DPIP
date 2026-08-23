@@ -4,6 +4,7 @@ library;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -238,7 +239,7 @@ class _DaySection extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
-    final locale = Localizations.localeOf(context).toString();
+    final locale = intlDateLocale(Localizations.localeOf(context));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

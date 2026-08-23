@@ -5,6 +5,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
@@ -276,8 +277,9 @@ class _ReleaseTile extends StatelessWidget {
         ? Icons.science_outlined
         : Icons.verified_outlined;
     final title = note.name.isEmpty ? note.tagName : note.name;
-    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString())
-        .format(note.publishedAt.toLocal());
+    final date = DateFormat.yMMMd(
+      intlDateLocale(Localizations.localeOf(context)),
+    ).format(note.publishedAt.toLocal());
     final emphasized = isCurrent || expanded;
 
     return CustomPaint(
