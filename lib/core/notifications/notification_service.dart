@@ -12,8 +12,8 @@ import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Fallback channel for a message with no/unknown `channel` — must be a
 /// registered channel or the OS rejects the notification.
@@ -74,7 +74,7 @@ class NotificationService {
   /// Initializes channels, the tap listener, and the FCM/APNs transport. Call
   /// once at start-up; safe to await best-effort (a failure just means no push).
   Future<void> init() async {
-    await _initChannels();
+    final channels = await _initChannels();
     await AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationTaps.onActionReceived,
       // Kept for operational visibility, not for one bug. `created` fires when
@@ -86,7 +86,35 @@ class NotificationService {
       onNotificationCreatedMethod: onNotificationCreated,
       onNotificationDisplayedMethod: onNotificationDisplayed,
     );
-    await _initMessaging();
+    await _initMessaging(channels);
+  }
+
+  /// One line per launch saying whether push actually came up.
+  ///
+  /// Push is the app's reason to exist and every one of its failures is silent:
+  /// a channel the OS rejected, a permission never granted, a token that never
+  /// arrived — the app looks identical in all of them and simply never rings.
+  /// Printed after the token settles rather than at the end of [init], because
+  /// the token is fetched in the background and a line without it would say
+  /// "ready" before the one thing that can still be missing is known.
+  void _logStartup({required int channels, required int rejected}) {
+    final stored = token;
+    final kind = Platform.isIOS ? 'APNs' : 'FCM';
+    final tokenText = stored == null
+        ? 'MISSING — this device cannot be reached'
+        : kDebugMode
+        ? '$kind $stored'
+        // Enough to tell two devices apart and to match against the backend,
+        // without putting the whole addressable identifier in a shared log.
+        : '$kind …${stored.substring(stored.length - 8)} (${stored.length})';
+    final channelText = rejected == 0
+        ? '$channels ok'
+        : '${channels - rejected}/$channels ok, $rejected REJECTED';
+    Log.info(
+      'push: ${stored == null ? 'DEGRADED' : 'ready'} · '
+      '${Platform.isIOS ? 'iOS' : 'Android'} · '
+      'channels $channelText · token $tokenText',
+    );
   }
 
   /// Requests ordinary notification permission. Call from a screen (e.g.
@@ -223,7 +251,7 @@ class NotificationService {
     return openNotificationSettingsPage();
   }
 
-  Future<void> _initChannels() async {
+  Future<({int total, int rejected})> _initChannels() async {
     final channels = NotificationChannels.channels;
 
     // The normal path is one batch call — the same one this always made.
@@ -277,7 +305,7 @@ class NotificationService {
           'notifications: no channel could be registered — every one was '
           'rejected. Alerts will not be delivered.',
         );
-        return;
+        return (total: channels.length, rejected: channels.length);
       }
     }
 
@@ -348,26 +376,11 @@ class NotificationService {
     // channels this launch. Mirror the catalogue under plain keys last, after
     // every purge and re-registration above has settled.
     await PlainChannels.ensure(channels);
+    return (total: channels.length, rejected: rejected.length);
   }
 
-  Future<void> _initMessaging() async {
-    final messaging = FirebaseMessaging.instance;
-
-    // Tell iOS what to do with a foreground push, because the default is
-    // nothing.
-    //
-    // firebase_messaging's iOS delegate reads these from NSUserDefaults and,
-    // when the key was never written, answers the system with
-    // `UNNotificationPresentationOptionNone` — silence, no banner. Nothing else
-    // writes that key, so an app that never calls this has a foreground that is
-    // off by default. It costs nothing when another delegate is in front.
-    await messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    // Push is awesome_notifications_fcm's job, on both platforms.
+  Future<void> _initMessaging(({int total, int rejected}) channels) async {
+    // Push belongs to awesome_notifications_fcm, on both platforms.
     //
     // `awesome_notifications` handles local notifications only — its own source
     // says so: "we do not chain to a previously-installed delegate … FCM is
@@ -377,28 +390,23 @@ class NotificationService {
     // format) and then had nothing to display it with, so the foreground went
     // silent and blank.
     //
-    // This is the pre-rewrite arrangement, restored. `firebase_messaging` stays
-    // for the APNs token below — upstream says the two must not coexist, but
-    // the app shipped them together for years and the token path depends on it.
+    // `firebase_messaging` is gone: upstream says the two must not coexist, and
+    // everything it was still doing here has an equivalent above — the two
+    // token handlers replace its refresh stream and its launch-time fetch, and
+    // the foreground presentation it configured is now decided by this app's
+    // own notification-centre delegate (see AppDelegate).
     await AwesomeNotificationsFcm().initialize(
       onFcmTokenHandle: (token) => _storeToken(token, isApns: false),
       onNativeTokenHandle: (token) => _storeToken(token, isApns: true),
       onFcmSilentDataHandle: onFcmSilentData,
       debug: kDebugMode,
     );
-
-    // This stream only ever carries the FCM registration token, so on iOS the
-    // rotation is the signal and the APNs token is what has to be re-read.
-    messaging.onTokenRefresh.listen((token) async {
-      await _storeToken(token, isApns: false);
-      if (Platform.isIOS) {
-        final apns = await messaging.getAPNSToken();
-        if (apns != null) await _storeToken(apns, isApns: true);
-      }
-    });
-    // Fire-and-forget: this can wait seconds for the iOS APNs token, and
-    // `init()` is awaited at launch, so it must not block start-up.
-    unawaited(_fetchToken());
+    unawaited(
+      _fetchToken().whenComplete(
+        () =>
+            _logStartup(channels: channels.total, rejected: channels.rejected),
+      ),
+    );
   }
 
   /// Fetches the push token and persists it as [SettingKeys.pushToken] —
@@ -444,28 +452,39 @@ class NotificationService {
     Log.debug('Push token stored (${isApns ? 'APNs' : 'FCM'})');
   }
 
+  /// The APNs device token, read from the iOS side that receives it.
+  static const _apns = MethodChannel('com.exptech.dpip/apns_token');
+
   Future<void> _fetchToken() async {
-    final messaging = FirebaseMessaging.instance;
     try {
-      String? apnsToken;
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
+      if (Platform.isIOS) {
+        // iOS hands the token to the app delegate whenever it finishes
+        // registering, which is usually a moment after launch. `onNativeTokenHandle`
+        // delivers it too, but only if it fires — and a token that never
+        // arrives is silent: the backend keeps the device on file and simply
+        // stops being able to reach it. Polling the native side closes that
+        // hole without another SDK in between.
         for (var attempt = 0; attempt < 5; attempt++) {
-          apnsToken = await messaging.getAPNSToken();
-          if (apnsToken != null) break;
+          final token = await _apns.invokeMethod<String>('token');
+          if (token != null) {
+            await _storeToken(token, isApns: true);
+            return;
+          }
           await Future<void>.delayed(const Duration(seconds: 1));
         }
+        Log.warning(
+          'APNs token still unavailable — push cannot reach this device',
+        );
+        return;
       }
-      final fcmToken = await messaging.getToken();
-      if (apnsToken != null) await _storeToken(apnsToken, isApns: true);
-      if (fcmToken != null) await _storeToken(fcmToken, isApns: false);
+      await _storeToken(
+        await AwesomeNotificationsFcm().requestFirebaseAppToken(),
+        isApns: false,
+      );
     } catch (error, stackTrace) {
-      // The failure mode is platform-specific: on iOS an unready APNs token is
-      // the usual cause, on Android getToken() fails at FCM registration (e.g.
-      // the app's signing SHA-1 not registered in the Firebase console).
-      final title = defaultTargetPlatform == TargetPlatform.iOS
-          ? 'getToken (APNs may not be ready)'
-          : 'getToken (FCM registration failed)';
-      Log.handle(error, stackTrace, title);
+      // On Android this is FCM registration failing, usually the app's signing
+      // SHA-1 not being registered in the Firebase console.
+      Log.handle(error, stackTrace, 'push token');
     }
   }
 }

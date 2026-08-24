@@ -33,6 +33,7 @@ import UserNotifications
     MapCachePlugin.register(with: registry.registrar(forPlugin: "MapCachePlugin")!)
     StorageScanPlugin.register(with: registry.registrar(forPlugin: "StorageScanPlugin")!)
     ScreenWakePlugin.register(with: registry.registrar(forPlugin: "ScreenWakePlugin")!)
+    ApnsTokenPlugin.register(with: registry.registrar(forPlugin: "ApnsTokenPlugin")!)
     BackgroundLocationPlugin.register(
       with: registry.registrar(forPlugin: "BackgroundLocationPlugin")!)
     BackgroundExecutionPlugin.register(

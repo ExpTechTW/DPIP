@@ -15,7 +15,6 @@ library;
 import 'dart:io';
 
 import 'package:dpip/core/build_info.g.dart';
-import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -26,7 +25,6 @@ import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/core/version/app_build.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -252,24 +250,6 @@ String _keptActive(UnusedAppRestrictions status) => switch (status) {
   UnusedAppRestrictions.unavailable => 'n/a',
 };
 
-Future<String?> _fcmToken() async {
-  try {
-    return await FirebaseMessaging.instance.getToken();
-  } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'dev: FCM token');
-    return null;
-  }
-}
-
-Future<String?> _apnsToken() async {
-  try {
-    return await FirebaseMessaging.instance.getAPNSToken();
-  } catch (error, stackTrace) {
-    Log.handle(error, stackTrace, 'dev: APNs token');
-    return null;
-  }
-}
-
 /// Reads every subsystem that can explain a support question.
 ///
 /// Takes its services rather than reaching for a locator, so a test can hand it
@@ -319,10 +299,13 @@ class DiagnosticsCollector {
     // back to the platform build number outside a repo.
     final buildRef = kGitCommit == 'unknown' ? info.buildNumber : kGitCommit;
     // Show the platform's own push token: FCM on Android, APNs on iOS.
-    final fcmToken = Platform.isAndroid
-        ? (notifications.token ?? await _fcmToken())
-        : null;
-    final apnsToken = Platform.isIOS ? await _apnsToken() : null;
+    //
+    // Read back from settings rather than asked for again. It is the same value
+    // the backend was registered with, which is the one worth seeing in a
+    // report — a freshly queried token that differs from the stored one would
+    // look reassuring and be exactly the bug.
+    final fcmToken = Platform.isAndroid ? notifications.token : null;
+    final apnsToken = Platform.isIOS ? notifications.token : null;
 
     final sections = <DiagnosticsSection>[
       (
