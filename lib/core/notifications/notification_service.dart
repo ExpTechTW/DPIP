@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
-import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -77,6 +77,14 @@ class NotificationService {
     await _initChannels();
     await AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationTaps.onActionReceived,
+      // Kept for operational visibility, not for one bug. `created` fires when
+      // awesome accepts a notification and `displayed` when it reaches the
+      // status bar, so the log answers "did the alert actually surface?" — the
+      // question that matters most in an app whose reason to exist is alerts,
+      // and the one that took five rebuilds to answer the last time it came up
+      // because nothing recorded it.
+      onNotificationCreatedMethod: onNotificationCreated,
+      onNotificationDisplayedMethod: onNotificationDisplayed,
     );
     await _initMessaging();
   }
@@ -345,17 +353,39 @@ class NotificationService {
   Future<void> _initMessaging() async {
     final messaging = FirebaseMessaging.instance;
 
-    FirebaseMessaging.onBackgroundMessage(onBackgroundMessage);
-    FirebaseMessaging.onMessage.listen((message) {
-      final content = contentFromMessage(message);
-      if (content != null) {
-        AwesomeNotifications().createNotification(content: content);
-      }
-    });
-    FirebaseMessaging.onMessageOpenedApp.listen((m) => _routeTap(m.data));
+    // Tell iOS what to do with a foreground push, because the default is
+    // nothing.
+    //
+    // firebase_messaging's iOS delegate reads these from NSUserDefaults and,
+    // when the key was never written, answers the system with
+    // `UNNotificationPresentationOptionNone` — silence, no banner. Nothing else
+    // writes that key, so an app that never calls this has a foreground that is
+    // off by default. It costs nothing when another delegate is in front.
+    await messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
-    final initial = await messaging.getInitialMessage();
-    if (initial != null) _routeTap(initial.data);
+    // Push is awesome_notifications_fcm's job, on both platforms.
+    //
+    // `awesome_notifications` handles local notifications only — its own source
+    // says so: "we do not chain to a previously-installed delegate … FCM is
+    // handled by awesome_notifications_fcm". Without that companion the remote
+    // path has no owner: on iOS a server push reached awesome's willPresent,
+    // was claimed as its own (the payload's `content` key is awesome's model
+    // format) and then had nothing to display it with, so the foreground went
+    // silent and blank.
+    //
+    // This is the pre-rewrite arrangement, restored. `firebase_messaging` stays
+    // for the APNs token below — upstream says the two must not coexist, but
+    // the app shipped them together for years and the token path depends on it.
+    await AwesomeNotificationsFcm().initialize(
+      onFcmTokenHandle: _onPushToken,
+      onNativeTokenHandle: _onPushToken,
+      onFcmSilentDataHandle: onFcmSilentData,
+      debug: kDebugMode,
+    );
 
     messaging.onTokenRefresh.listen((token) async {
       Log.debug('Push token refreshed');
@@ -399,6 +429,20 @@ class NotificationService {
   /// the APNs auth key uploaded to the Firebase console. Best-effort: a failure
   /// just leaves the token unset until [requestPermission] or
   /// `onTokenRefresh` tries again.
+  /// Stores a push token handed over by awesome_notifications_fcm.
+  ///
+  /// Both handlers land here on purpose: `onFcmTokenHandle` fires with the FCM
+  /// registration token and `onNativeTokenHandle` with the raw APNs one, and
+  /// each platform is given only the one it can produce. Which of the two the
+  /// backend needs is not symmetric — see [_fetchToken] — so the platform test
+  /// stays rather than trusting whichever arrived last.
+  @pragma('vm:entry-point')
+  Future<void> _onPushToken(String token) async {
+    if (token.isEmpty) return;
+    await _settings.setString(SettingKeys.pushToken, token);
+    Log.debug('Push token received (${token.length} chars)');
+  }
+
   Future<void> _fetchToken() async {
     final messaging = FirebaseMessaging.instance;
     try {
@@ -427,9 +471,6 @@ class NotificationService {
       Log.handle(error, stackTrace, title);
     }
   }
-
-  void _routeTap(Map<String, dynamic> data) =>
-      NotificationTaps.route(NotificationTap.fromData(data));
 }
 
 /// Builds notification content from a message's `data` (preferred, legacy
@@ -449,9 +490,23 @@ class NotificationService {
 ///
 /// Flat keys win where both exist. Nested JSON is parsed leniently: malformed
 /// or non-object content is treated as absent, never thrown on.
-NotificationContent? contentFromMessage(RemoteMessage message) {
-  final data = message.data;
-  final notification = message.notification;
+NotificationContent? contentFromMessage(RemoteMessage message) =>
+    contentFromData(
+      message.data,
+      fallbackTitle: message.notification?.title,
+      fallbackBody: message.notification?.body,
+    );
+
+/// The same, from a bare data map — what awesome_notifications_fcm delivers.
+///
+/// [fallbackTitle] / [fallbackBody] stand in for the FCM `notification` block,
+/// which only the [RemoteMessage] shape carries. A silent-data push has no such
+/// block, so its text has to come from the payload itself.
+NotificationContent? contentFromData(
+  Map<String, dynamic> data, {
+  String? fallbackTitle,
+  String? fallbackBody,
+}) {
   final nested = _nestedContent(data);
   String? nestedField(String name) => switch (nested?[name]) {
     final String value => value,
@@ -459,9 +514,8 @@ NotificationContent? contentFromMessage(RemoteMessage message) {
     _ => null,
   };
   final title =
-      (data['title'] as String?) ?? notification?.title ?? nestedField('title');
-  final body =
-      (data['body'] as String?) ?? notification?.body ?? nestedField('body');
+      (data['title'] as String?) ?? fallbackTitle ?? nestedField('title');
+  final body = (data['body'] as String?) ?? fallbackBody ?? nestedField('body');
   if (title == null && body == null) return null;
   final channelKey =
       (data['channel'] as String?) ??
@@ -519,18 +573,54 @@ int? _asNotificationId(Object? value) {
   return parsed;
 }
 
-/// Displays a background/terminated **data-only** message via awesome (a
-/// `notification`-payload message is shown by the OS itself). Runs on a
-/// background isolate, so awesome must be initialized here before use.
+/// Fires when awesome accepts a notification, before it is shown.
 @pragma('vm:entry-point')
-Future<void> onBackgroundMessage(RemoteMessage message) async {
-  if (message.notification != null) return;
-  final content = contentFromMessage(message);
-  if (content == null) return;
+Future<void> onNotificationCreated(ReceivedNotification notification) async {
+  Log.debug(
+    'notif created: id=${notification.id} channel=${notification.channelKey} '
+    'lifecycle=${notification.createdLifeCycle}',
+  );
+}
+
+/// Fires when a notification actually reaches the status bar.
+@pragma('vm:entry-point')
+Future<void> onNotificationDisplayed(ReceivedNotification notification) async {
+  Log.debug(
+    'notif displayed: id=${notification.id} channel=${notification.channelKey} '
+    'lifecycle=${notification.displayedLifeCycle}',
+  );
+}
+
+/// Draws a push that arrived through awesome_notifications_fcm.
+///
+/// Runs on a background isolate when the app is not in the foreground, so
+/// awesome has to be initialized here before it can be used — the isolate does
+/// not inherit the one `init()` set up.
+///
+/// The terminated case goes through `createNotificationFromJsonData` rather
+/// than a hand-built [NotificationContent]: at that point there is no engine
+/// state to rely on, and the payload is already in awesome's own wire format
+/// (the server sends a `content` object with `channelKey`), so handing it over
+/// whole is both shorter and closer to what the sender meant.
+@pragma('vm:entry-point')
+Future<void> onFcmSilentData(FcmSilentData silentData) async {
+  final data = silentData.data;
+  if (data == null || data.isEmpty) return;
+
   await AwesomeNotifications().initialize(
     NotificationChannels.icon,
     NotificationChannels.channels,
     channelGroups: NotificationChannels.groups,
   );
+
+  if (silentData.createdLifeCycle == NotificationLifeCycle.Terminated) {
+    await AwesomeNotifications().createNotificationFromJsonData(
+      data.cast<String, dynamic>(),
+    );
+    return;
+  }
+
+  final content = contentFromData(data.cast<String, dynamic>());
+  if (content == null) return;
   await AwesomeNotifications().createNotification(content: content);
 }

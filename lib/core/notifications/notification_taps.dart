@@ -20,8 +20,10 @@ abstract final class NotificationTaps {
 
   /// Routes [tap] now via [onTap], or stashes it for [drainPending] if the app /
   /// router isn't ready yet (cold start). Shared by awesome-displayed taps
-  /// ([onActionReceived]) and FCM-delivered taps (firebase's
-  /// `onMessageOpenedApp` / `getInitialMessage`).
+  /// ([onActionReceived]). Firebase's `onMessageOpenedApp` /
+  /// `getInitialMessage` no longer feed this: push is owned by
+  /// awesome_notifications_fcm, so every notification the user can tap was
+  /// displayed by awesome and arrives through [onActionReceived].
   static void route(NotificationTap tap) {
     final handler = onTap;
     if (handler != null) {
