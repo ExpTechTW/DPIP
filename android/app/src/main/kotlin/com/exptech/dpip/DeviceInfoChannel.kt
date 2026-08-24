@@ -3,6 +3,7 @@ package com.exptech.dpip
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.provider.Settings
 import io.flutter.plugin.common.MethodCall
@@ -39,10 +40,16 @@ class DeviceInfoChannel(private val context: Context) :
 
     /**
      * Where this build came from — which decides where an update prompt sends
-     * the user. A sideloaded APK has no store page to update from, so it is
-     * reported as such and gets the GitHub release instead.
+     * the user. A debuggable build (flutter run, Android Studio, adb) is a
+     * development environment and says so: the flag is part of the build, not
+     * an installer record, so it holds even though adb leaves no installer. A
+     * non-store release has no store page to update from and gets the GitHub
+     * release instead.
      */
     private fun installSource(): String {
+        if (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            return "development"
+        }
         val installer = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 context.packageManager
@@ -54,10 +61,10 @@ class DeviceInfoChannel(private val context: Context) :
             }
         } catch (e: Exception) {
             // The package can be queried out from under us (uninstalling while
-            // running); an unknown installer is a sideload for our purposes.
+            // running); an unknown installer means no store did it.
             null
         }
-        return if (installer == "com.android.vending") "playStore" else "sideload"
+        return if (installer == "com.android.vending") "playStore" else "github"
     }
 
     /** Total physical RAM in MiB — the cheap proxy for the low-end tier. */
