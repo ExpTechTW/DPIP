@@ -112,6 +112,10 @@ List<StorageSlice> storageBreakdown(StorageScan scan) {
   }
 
   known('ETag cache (SQLite)', (f) => f.name.startsWith('http_etag_cache.db'));
+  // Native-written movement history, budgeted at 50 MB. It grows without
+  // anybody opening anything, so it is the one slice a user could otherwise
+  // find no explanation for. `startsWith` catches the -wal and -shm companions.
+  known('Location track', (f) => f.name.startsWith('location_track.db'));
   known(
     'MapLibre',
     (f) => f.path.contains('MapLibre') || f.path.contains('mapbox'),

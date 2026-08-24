@@ -25,7 +25,8 @@ lib/core/storage/app_database.dart
 lib/core/astro/tle_store.dart
 lib/core/meshtastic/data/mesh_store.dart
 lib/core/network/etag_cache_store.dart
-lib/core/network/network_usage_store.dart'
+lib/core/network/network_usage_store.dart
+lib/core/geo/location_track.dart'
 
 fail=0
 while IFS= read -r file; do
