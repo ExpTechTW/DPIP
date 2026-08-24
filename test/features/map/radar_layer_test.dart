@@ -904,12 +904,17 @@ void main() {
     await layer.show(controller, frames.last);
     await pumpEventQueue();
 
+    // What this pins is the edge reassignment, not the number: at the newest
+    // frame there is no future side, so the whole budget goes to older frames.
+    // `RasterTimelineLayer.warmFrameBudget` is the source of truth for the
+    // number itself, and it is deliberately not 512 any more — see its doc.
+    const budget = 128;
     final warmed = source.warmed.single;
-    expect(warmed, hasLength(512));
+    expect(warmed, hasLength(budget));
     expect(warmed.first, frames.last.id);
     expect(
       warmed.last,
-      frames[frames.length - 512].id,
+      frames[frames.length - budget].id,
       reason: 'the missing future side is reassigned to older cached frames',
     );
   });

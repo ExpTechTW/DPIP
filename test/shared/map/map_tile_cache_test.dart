@@ -710,50 +710,54 @@ void main() {
     expect(nativeMemory.keys, unorderedEquals([keep, fresh]));
   });
 
-  test(
-    'a viewport change evicts one raster family, never every stale URL',
-    () async {
-      await cache.install(memoryBytes: 1024);
-      final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
-      const retiredFrame =
-          'https://static.exptech.dev/api/v2/tiles/radar/1787236800';
-      const retainedFrame =
-          'https://static.exptech.dev/api/v2/tiles/radar/1787237400';
-      const retiredA = '$retiredFrame/7/106/55.webp?style=jma';
-      const retiredB = '$retiredFrame/7/107/55.webp?style=jma';
-      const staleInRetained = '$retainedFrame/7/106/55.webp?style=jma';
-      const keep = '$retainedFrame/7/107/55.webp?style=jma';
-      for (final (url, value) in [
-        (retiredA, 1),
-        (retiredB, 2),
-        (staleInRetained, 3),
-        (keep, 4),
-      ]) {
-        await store.writeBytes(
-          url,
-          etag: '$value',
-          bytes: Uint8List.fromList([value]),
-        );
-      }
-      await warmer.warmUrls([
-        retiredA,
-        retiredB,
-        staleInRetained,
-        keep,
-      ], immediate: true);
-      nativeCalls.clear();
+  test('a viewport change evicts one raster family, never every stale URL', () async {
+    await cache.install(memoryBytes: 1024);
+    final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+    const retiredFrame =
+        'https://static.exptech.dev/api/v2/tiles/radar/1787236800';
+    const retainedFrame =
+        'https://static.exptech.dev/api/v2/tiles/radar/1787237400';
+    const retiredA = '$retiredFrame/7/106/55.webp?style=jma';
+    const retiredB = '$retiredFrame/7/107/55.webp?style=jma';
+    const staleInRetained = '$retainedFrame/7/106/55.webp?style=jma';
+    const keep = '$retainedFrame/7/107/55.webp?style=jma';
+    for (final (url, value) in [
+      (retiredA, 1),
+      (retiredB, 2),
+      (staleInRetained, 3),
+      (keep, 4),
+    ]) {
+      await store.writeBytes(
+        url,
+        etag: '$value',
+        bytes: Uint8List.fromList([value]),
+      );
+    }
+    await warmer.warmUrls([
+      retiredA,
+      retiredB,
+      staleInRetained,
+      keep,
+    ], immediate: true);
+    nativeCalls.clear();
 
-      await warmer.warmUrls([keep], immediate: true);
+    await warmer.warmUrls([keep], immediate: true);
 
-      final evict = nativeCalls.firstWhere((c) => c.method == 'evictTiles');
-      expect((evict.arguments as Map)['contains'], [
-        'https://static.exptech.dev/api/v2/tiles/radar/',
-      ]);
-      expect(nativeMemory.keys, [keep]);
-    },
-  );
+    final evict = nativeCalls.firstWhere((c) => c.method == 'evictTiles');
+    expect((evict.arguments as Map)['contains'], [
+      '$retiredFrame/',
+    ], reason: 'the retired frame is named precisely, not by its family');
+    expect(
+      nativeMemory.keys,
+      unorderedEquals([staleInRetained, keep]),
+      reason:
+          'a coordinate the camera moved off is still a live frame. Dropping '
+          'it means re-reading it from disk the moment the camera moves back, '
+          'and the mirror is a byte-capped LRU that reclaims it for free.',
+    );
+  });
 
-  test('many retired raster frames collapse to one family eviction', () async {
+  test('a live family is never wiped to reclaim its retired frames', () async {
     await cache.install(memoryBytes: 1024);
     final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
     final old = [
@@ -772,11 +776,47 @@ void main() {
 
     await warmer.warmUrls([fresh], immediate: true);
 
+    // Twelve retired frames is more than can be named individually, and the
+    // family prefix matches every radar tile there is — including the one just
+    // asked for. Naming it would not trim the working set, it would wipe it: a
+    // device trace caught exactly this costing a full SQLite refill on every
+    // camera nudge. Holding stale bytes the mirror's LRU will reclaim is the
+    // cheaper mistake.
+    expect(
+      nativeCalls.where((call) => call.method == 'evictTiles'),
+      isEmpty,
+      reason: 'no needle is better than one that matches the live frame too',
+    );
+    expect(nativeMemory.keys, contains(fresh));
+    expect(nativeMemory.keys, hasLength(old.length + 1));
+  });
+
+  test('a wholly retired family still collapses to one eviction', () async {
+    await cache.install(memoryBytes: 1024);
+    final warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
+    final radar = [
+      for (var i = 0; i < 12; i++)
+        'https://static.exptech.dev/api/v2/tiles/radar/'
+            '${1700000000 + i * 600}/7/106/55.webp',
+    ];
+    const satellite =
+        'https://static.exptech.dev/api/v2/tiles/satellite/'
+        '1800000000/7/106/55.webp';
+    for (final url in [...radar, satellite]) {
+      await store.writeBytes(url, etag: url, bytes: Uint8List.fromList([1]));
+    }
+    await warmer.warmUrls(radar, immediate: true);
+    nativeCalls.clear();
+
+    await warmer.warmUrls([satellite], immediate: true);
+
+    // Nothing of the radar family survives the switch, so one prefix is both
+    // the cheapest needle and an exact one — the case the collapse exists for.
     final evict = nativeCalls.firstWhere((call) => call.method == 'evictTiles');
     expect((evict.arguments as Map)['contains'], [
       'https://static.exptech.dev/api/v2/tiles/radar/',
     ]);
-    expect(nativeMemory.keys, [fresh]);
+    expect(nativeMemory.keys, [satellite]);
   });
 
   test('named working sets do not evict each other', () async {
