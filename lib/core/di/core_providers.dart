@@ -28,6 +28,7 @@ import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
+import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
@@ -55,6 +56,9 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ),
   ChangeNotifierProvider<MapLayerOrderController>.value(
     value: deps.mapLayerOrder,
+  ),
+  ChangeNotifierProvider<MapLayerVisibilityController>.value(
+    value: deps.mapLayerVisibility,
   ),
   Provider<SettingsStore>.value(value: deps.settings),
   Provider<AppDatabase>.value(value: deps.database),

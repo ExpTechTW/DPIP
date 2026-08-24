@@ -93,6 +93,11 @@ abstract final class SettingKeys {
   static const SettingKey<List<String>> mapLayerCategoryOrder =
       SettingKey<List<String>>._('map.layerCategoryOrder');
 
+  /// Map layer ids the user hid from the picker (empty = every layer shown).
+  /// See `MapLayerVisibilityController`.
+  static const SettingKey<List<String>> mapLayerHiddenIds =
+      SettingKey<List<String>>._('map.layerHiddenIds');
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const SettingKey<List<String>> savedRegionCodes =
       SettingKey<List<String>>._('home.savedRegionCodes');

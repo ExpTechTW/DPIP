@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
+import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_layer_category.dart';
@@ -93,6 +94,7 @@ class MapLayerSwitcher extends StatelessWidget {
 
   Future<void> _pick(BuildContext context) async {
     final orderController = context.read<MapLayerOrderController>();
+    final visibility = context.read<MapLayerVisibilityController>();
     // Owns restoring the sheet's own height when a remembered scroll offset
     // needs one — see `_RememberedOffsetList`'s doc for why.
     final sheetController = DraggableScrollableController();
@@ -127,24 +129,34 @@ class MapLayerSwitcher extends StatelessWidget {
                       tooltip: l10n.mapLayerOrderTitle,
                       visualDensity: VisualDensity.compact,
                       onPressed: () =>
-                          _editOrder(sheetContext, orderController),
+                          _editOrder(sheetContext, orderController, visibility),
                     ),
                   ),
                   Expanded(
                     // Live-updates when the order editor above changes it, so
-                    // the picker reflects a reorder the moment the editor
-                    // closes back on top of it.
+                    // the picker reflects a reorder — or a hide — the moment
+                    // the editor closes back on top of it. A hidden layer is
+                    // dropped from this list entirely; the eye toggle in the
+                    // order editor is the only way back.
                     child: ListenableBuilder(
-                      listenable: orderController,
+                      listenable: Listenable.merge([
+                        orderController,
+                        visibility,
+                      ]),
                       builder: (context, _) {
-                        final ordered = orderedLayers(
-                          layers,
-                          orderController.order,
-                        );
+                        final ordered =
+                            orderedLayers(layers, orderController.order)
+                                .where(
+                                  (layer) => !visibility.isHidden(layer.id),
+                                )
+                                .toList();
+                        final visibleCategories = {
+                          for (final layer in ordered) categoryOf(layer.id),
+                        };
                         final categories = orderedCategories(
                           MapLayerCategory.values,
                           orderController.categoryOrder,
-                        );
+                        ).where(visibleCategories.contains);
                         return _RememberedOffsetList(
                           // Remembers scroll offset across separate openings
                           // of this sheet — picking a layer pops the sheet
@@ -189,22 +201,30 @@ class MapLayerSwitcher extends StatelessWidget {
       },
     );
     sheetController.dispose();
-    if (selected != null && selected.id != active.id) onSelected(selected);
+    if (selected == null) return;
+    // Same-id picks are not skipped: the scaffold's own handler knows its
+    // *current* layer (post-fallback) and ignores true no-ops itself.
+    onSelected(selected);
   }
 
   /// Opens the layer-order editor over the picker. Reordering persists to
-  /// [orderController] on every drop, so closing the editor (or the picker)
+  /// [orderController] on every drop, and the eye toggles persist to
+  /// [visibility] immediately, so closing the editor (or the picker)
   /// never discards a change.
   Future<void> _editOrder(
     BuildContext sheetContext,
     MapLayerOrderController orderController,
+    MapLayerVisibilityController visibility,
   ) async {
     await showModalBottomSheet<void>(
       context: sheetContext,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) =>
-          _LayerOrderSheet(layers: layers, controller: orderController),
+      builder: (_) => _LayerOrderSheet(
+        layers: layers,
+        controller: orderController,
+        visibility: visibility,
+      ),
     );
   }
 }
@@ -418,10 +438,15 @@ class _LayerTile extends StatelessWidget {
 /// button clears both saved orders so the list falls back to the declared
 /// order.
 class _LayerOrderSheet extends StatefulWidget {
-  const _LayerOrderSheet({required this.layers, required this.controller});
+  const _LayerOrderSheet({
+    required this.layers,
+    required this.controller,
+    required this.visibility,
+  });
 
   final List<MapLayer> layers;
   final MapLayerOrderController controller;
+  final MapLayerVisibilityController visibility;
 
   @override
   State<_LayerOrderSheet> createState() => _LayerOrderSheetState();
@@ -437,6 +462,10 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
 
   /// The category whose layers are being edited; null shows the category list.
   MapLayerCategory? _editing;
+
+  /// Navigation direction of the last level switch — drill-in slides the new
+  /// list in from the right, going back mirrors it from the left.
+  bool _drillingIn = true;
 
   /// Layer ids in current block order — what gets persisted.
   List<String> get _ids => [
@@ -487,14 +516,45 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
                     icon: const Icon(Icons.arrow_back),
                     tooltip: MaterialLocalizations.of(context)
                         .backButtonTooltip,
-                    onPressed: () => setState(() => _editing = null),
+                    onPressed: () => setState(() {
+                      _drillingIn = false;
+                      _editing = null;
+                    }),
                   ),
                   right: closeButton,
                 ),
               Flexible(
-                child: editing == null
-                    ? _categoryList(context)
-                    : _layerList(context, editingBlock!),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    // The page matching the current editing state is the one
+                    // entering; it slides in from the right on a drill-in and
+                    // from the left on the way back. The outgoing page runs
+                    // the same tween reversed, so it exits toward the side
+                    // the user came from.
+                    final currentKey = ValueKey(
+                      _editing == null
+                          ? 'categories'
+                          : 'layers-${_editing!.name}',
+                    );
+                    final incoming = child.key == currentKey;
+                    final sign = _drillingIn ? 1.0 : -1.0;
+                    return ClipRect(
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: Offset(incoming ? sign : -sign, 0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: editing == null
+                      ? _categoryList(context)
+                      : _layerList(context, editingBlock!),
+                ),
               ),
             ],
           ),
@@ -505,6 +565,7 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
 
   Widget _categoryList(BuildContext context) {
     return ReorderableListView.builder(
+      key: const ValueKey('categories'),
       buildDefaultDragHandles: false,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -516,37 +577,127 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
       onReorderItem: _reorderCategory,
       itemBuilder: (context, index) {
         final block = _blocks[index];
-        final canOpen = block.ids.length > 1;
+        // Every category opens: the eye toggles live on level 2, so a
+        // single-layer category (radar, typhoon, rts) must be drill-in-able
+        // even though its reorder list holds exactly one row.
         return _CategoryOrderTile(
           key: ValueKey('category-${block.category.name}'),
           category: block.category,
           index: index,
-          canOpen: canOpen,
-          onTap: canOpen
-              ? () => setState(() => _editing = block.category)
-              : null,
+          onTap: () => setState(() {
+            _drillingIn = true;
+            _editing = block.category;
+          }),
         );
       },
     );
   }
 
   Widget _layerList(BuildContext context, _Block block) {
-    return ReorderableListView.builder(
-      buildDefaultDragHandles: false,
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        0,
-        AppSpacing.md,
-        AppSpacing.md,
-      ),
-      itemCount: block.ids.length,
-      onReorderItem: (oldIndex, newIndex) =>
-          _reorderLayer(block, oldIndex, newIndex),
-      itemBuilder: (context, index) {
-        final id = block.ids[index];
-        final layer = widget.layers.firstWhere((layer) => layer.id == id);
-        return _ReorderTile(key: ValueKey(id), layer: layer, index: index);
-      },
+    final l10n = AppLocalizations.of(context);
+    final hideIds = _idsToHideAllIn(block);
+    final showAllDisabled = block.ids.every(
+      (id) => !widget.visibility.isHidden(id),
+    );
+    final hideAllDisabled = hideIds.every(widget.visibility.isHidden);
+    return Column(
+      key: ValueKey('layers-${block.category.name}'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.xs,
+            AppSpacing.md,
+            AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: showAllDisabled
+                      ? null
+                      : () => _showAllInCategory(block),
+                  icon: const Icon(Icons.visibility, size: 18),
+                  label: Text(l10n.mapLayerShowAll),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: hideAllDisabled
+                      ? null
+                      : () => _hideAllInCategory(block),
+                  icon: const Icon(Icons.visibility_off, size: 18),
+                  label: Text(l10n.mapLayerHideAll),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Flexible(
+          child: ReorderableListView.builder(
+            key: ValueKey('layers-list-${block.category.name}'),
+            buildDefaultDragHandles: false,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.md,
+              AppSpacing.md,
+            ),
+            itemCount: block.ids.length,
+            onReorderItem: (oldIndex, newIndex) =>
+                _reorderLayer(block, oldIndex, newIndex),
+            itemBuilder: (context, index) {
+              final id = block.ids[index];
+              final layer = widget.layers.firstWhere((layer) => layer.id == id);
+              return _ReorderTile(
+                key: ValueKey(id),
+                layer: layer,
+                index: index,
+                hidden: widget.visibility.isHidden(id),
+                // Hiding must never leave the surface with nothing to show,
+                // so the last visible layer's eye is disabled until another
+                // one is shown again.
+                canHide:
+                    widget.visibility.isHidden(id) ||
+                    widget.layers
+                            .where((l) => !widget.visibility.isHidden(l.id))
+                            .length >
+                        1,
+                onToggleVisibility: () => _toggleVisibility(layer),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The ids in [block] that "hide all" would actually hide — every id in it,
+  /// unless nothing outside this category is visible, in which case the
+  /// first id stays exempt so the surface always has something to show.
+  List<String> _idsToHideAllIn(_Block block) {
+    final elsewhereVisible = widget.layers.any(
+      (layer) =>
+          categoryOf(layer.id) != block.category &&
+          !widget.visibility.isHidden(layer.id),
+    );
+    return elsewhereVisible ? block.ids : block.ids.skip(1).toList();
+  }
+
+  /// Shows every layer in [block] as one write — never blocked, since
+  /// showing more layers can't violate the "always something visible"
+  /// invariant.
+  void _showAllInCategory(_Block block) {
+    setState(() {});
+    unawaited(widget.visibility.setManyHidden(block.ids, hidden: false));
+  }
+
+  void _hideAllInCategory(_Block block) {
+    setState(() {});
+    unawaited(
+      widget.visibility.setManyHidden(_idsToHideAllIn(block), hidden: true),
     );
   }
 
@@ -567,6 +718,20 @@ class _LayerOrderSheetState extends State<_LayerOrderSheet> {
       block.ids.insert(newIndex, id);
     });
     unawaited(widget.controller.setOrder(_ids));
+  }
+
+  /// Flips a layer's hidden state. The sheet rebuilds from its own [setState]
+  /// — it does not listen to the controller — while the write itself is
+  /// fire-and-forget: every drop/tap supersedes the previous one and the
+  /// picker underneath reads the controller when it rebuilds.
+  void _toggleVisibility(MapLayer layer) {
+    setState(() {});
+    unawaited(
+      widget.visibility.setHidden(
+        layer.id,
+        hidden: !widget.visibility.isHidden(layer.id),
+      ),
+    );
   }
 
   void _reset() {
@@ -626,20 +791,18 @@ List<_Block> _buildBlocks(
 }
 
 /// One row of the level-1 category list. Dragging reorders the categories;
-/// tapping a category with more than one layer opens its level-2 layer list.
+/// tapping opens the level-2 layer list (order + visibility).
 class _CategoryOrderTile extends StatelessWidget {
   const _CategoryOrderTile({
     super.key,
     required this.category,
     required this.index,
-    required this.canOpen,
     required this.onTap,
   });
 
   final MapLayerCategory category;
   final int index;
-  final bool canOpen;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -668,8 +831,7 @@ class _CategoryOrderTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (canOpen)
-                  Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+                Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
                 ReorderableDragStartListener(
                   index: index,
                   child: const Padding(
@@ -734,18 +896,33 @@ class _CenteredHeader extends StatelessWidget {
   }
 }
 
-/// One row of the reorder editor: layer identity on the left, a drag handle on
-/// the right.
+/// One row of the reorder editor: layer identity on the left, an eye toggle
+/// (shown/hidden) and a drag handle on the right.
 class _ReorderTile extends StatelessWidget {
-  const _ReorderTile({super.key, required this.layer, required this.index});
+  const _ReorderTile({
+    super.key,
+    required this.layer,
+    required this.index,
+    required this.hidden,
+    required this.canHide,
+    required this.onToggleVisibility,
+  });
 
   final MapLayer layer;
   final int index;
+
+  /// Whether this layer is currently hidden from the picker.
+  final bool hidden;
+
+  /// Whether hiding is allowed right now — false for the last visible layer.
+  final bool canHide;
+  final VoidCallback onToggleVisibility;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Material(
@@ -756,6 +933,9 @@ class _ReorderTile extends StatelessWidget {
             horizontal: AppSpacing.md,
             vertical: AppSpacing.md,
           ),
+          // The row looks identical whether the layer is hidden or not — no
+          // dimming, no cross-fade — so pressing the eye never makes anything
+          // appear to vanish. The eye itself is the only state indicator.
           child: Row(
             children: [
               Icon(layer.icon, color: colors.onSurfaceVariant),
@@ -767,6 +947,23 @@ class _ReorderTile extends StatelessWidget {
                     color: colors.onSurface,
                   ),
                 ),
+              ),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                tooltip: hidden ? l10n.mapLayerShow : l10n.mapLayerHide,
+                // Same color in both states — `outlineVariant` (meant for
+                // faint dividers) made the icon nearly invisible against the
+                // tile the moment `hidden` flipped true, so tapping it looked
+                // like the icon itself vanished. The row already says the
+                // glyph swap alone should carry the state.
+                color: colors.onSurfaceVariant,
+                // No press overlay: this button's only feedback is the icon
+                // itself swapping between the two glyphs, so a translucent
+                // state layer on top would just look like a second, competing
+                // signal for the same tap.
+                style: IconButton.styleFrom(overlayColor: Colors.transparent),
+                onPressed: canHide ? onToggleVisibility : null,
+                icon: Icon(hidden ? Icons.visibility_off : Icons.visibility),
               ),
               ReorderableDragStartListener(
                 index: index,

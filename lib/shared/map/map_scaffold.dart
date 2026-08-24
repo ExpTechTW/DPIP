@@ -5,6 +5,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -129,6 +130,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
 
   /// Ranking → map: switch layer, frame station, open sheet.
   MapStationHandoff? _stationHandoff;
+
+  /// Hidden-layer set. Watched directly (not via the parent remounting on a
+  /// [ValueKey] change) so hiding the on-screen layer falls back through
+  /// [_onLayerSelected] in place — a remount would tear down this State and
+  /// close any sheet open above it, such as the layer-order editor the hide
+  /// itself was just tapped from.
+  MapLayerVisibilityController? _visibility;
 
   late MapLayer _active = _resolveInitial(widget);
 
@@ -257,6 +265,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       _stationHandoff?.removeListener(_onStationHandoff);
       _stationHandoff = station..addListener(_onStationHandoff);
     }
+    final visibility = context.read<MapLayerVisibilityController>();
+    if (visibility != _visibility) {
+      _visibility?.removeListener(_onVisibilityChanged);
+      _visibility = visibility..addListener(_onVisibilityChanged);
+    }
     final visibleTab = VisibleTabScope.of(context);
     if (identical(visibleTab, _visibleTab)) return;
     _visibleTab?.removeListener(_onTabChanged);
@@ -349,6 +362,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _basemapWarmer?.cancel();
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
+    _visibility?.removeListener(_onVisibilityChanged);
     super.dispose();
   }
 
@@ -1294,6 +1308,20 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         _pendingMapOps--;
       }
     });
+  }
+
+  /// Hiding the on-screen layer from the picker's eye toggle must take it off
+  /// screen — nothing else would. Route the exit through [_onLayerSelected] so
+  /// the outgoing overlay is cleared exactly as a manual switch would. The
+  /// picker keeps listing hidden layers, so the user can always come back.
+  void _onVisibilityChanged() {
+    final visibility = _visibility;
+    if (visibility == null || !visibility.isHidden(_active.id)) return;
+    final candidate = widget.layers.firstWhere(
+      (layer) => !visibility.isHidden(layer.id),
+      orElse: () => widget.layers.first,
+    );
+    if (candidate.id != _active.id) _onLayerSelected(candidate);
   }
 
   @override

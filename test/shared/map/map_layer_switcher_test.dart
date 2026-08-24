@@ -1,4 +1,5 @@
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
+import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -52,10 +53,19 @@ void main() {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    final controller = MapLayerOrderController(SettingsStore.inMemory(initial));
+    final settings = SettingsStore.inMemory(initial);
+    final controller = MapLayerOrderController(settings);
+    final visibility = MapLayerVisibilityController(settings);
     await tester.pumpWidget(
-      ChangeNotifierProvider<MapLayerOrderController>.value(
-        value: controller,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<MapLayerOrderController>.value(
+            value: controller,
+          ),
+          ChangeNotifierProvider<MapLayerVisibilityController>.value(
+            value: visibility,
+          ),
+        ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -188,7 +198,8 @@ void main() {
       closeTo(screenWidth(tester) / 2, 1),
     );
     // Level 1 is the category list: one drag handle per category, no layer
-    // rows, no chevron on a single-layer category (radar, typhoon).
+    // rows. Every category shows a chevron — single-layer ones too, since
+    // the visibility eyes live on level 2.
     expect(find.byIcon(Icons.drag_handle), findsNWidgets(5));
     Finder inEditor(String text) => find.descendant(
       of: find.byType(ReorderableListView),
@@ -200,11 +211,75 @@ void main() {
     expect(inEditor(l10n.mapLayerCategoryWeather), findsOneWidget);
     expect(inEditor(l10n.mapLayerCategorySatellite), findsOneWidget);
     // The picker behind still shows the active layer's tile — the editor's
-    // level-1 list must not. Only forecast holds more than one layer, so just
-    // one category is drill-in-able.
+    // level-1 list must not.
     expect(inEditor('Radar echo'), findsNothing);
-    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsNWidgets(5));
     expect(find.byIcon(Icons.close), findsOneWidget);
+  });
+
+  testWidgets('a single-layer category opens and hides its only layer', (
+    tester,
+  ) async {
+    await pumpSwitcher(tester, {});
+    await tester.tap(find.text('Radar echo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(MapLayerSwitcher)),
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ReorderableListView),
+        matching: find.text(l10n.mapLayerCategoryRadar),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The radar row is reachable on level 2 with a working eye — hiding it
+    // must not be blocked by the category holding just one layer. Scoped to
+    // the reorder list: the "show all" / "hide all" row above it has its own
+    // visibility icons.
+    final rows = find.byType(ReorderableListView);
+    expect(
+      find.descendant(of: rows, matching: find.byIcon(Icons.visibility)),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.descendant(of: rows, matching: find.byIcon(Icons.visibility)),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: rows, matching: find.byIcon(Icons.visibility_off)),
+      findsOneWidget,
+    );
+
+    // Back to level 1, close the editor, then look at the picker.
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    // Back on the picker: hiding drops the tile entirely, not just dims it —
+    // and radar's now-empty category (nothing else belongs to it) drops out
+    // of the list too. The editor's eye remains the only way back.
+    final sheet = find.byType(DraggableScrollableSheet);
+    expect(
+      find.descendant(of: sheet, matching: find.text('Radar echo')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: sheet,
+        matching: find.text(l10n.mapLayerCategoryRadar),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: sheet, matching: find.text('Rain')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('tapping a category opens its layer list and back returns', (
@@ -244,6 +319,152 @@ void main() {
     expect(editorText('Precip'), findsNothing);
     expect(editorText(l10n.mapLayerCategoryRadar), findsOneWidget);
   });
+
+  testWidgets('a hidden layer is left out of the picker', (tester) async {
+    await pumpSwitcher(tester, {
+      'map.layerHiddenIds': ['qpesums'],
+    });
+    await tester.tap(find.text('Radar echo'));
+    await tester.pumpAndSettle();
+
+    // The hidden layer drops out of the list entirely — nothing dims it,
+    // nothing marks it. Its still-visible category siblings are unaffected.
+    expect(find.text('Precip'), findsNothing);
+    expect(find.byIcon(Icons.visibility_off), findsNothing);
+    expect(find.text('ECMWF'), findsOneWidget);
+    expect(find.text('Rain'), findsOneWidget);
+  });
+
+  testWidgets('the editor eye toggle hides a layer live', (tester) async {
+    await pumpSwitcher(tester, {});
+    await tester.tap(find.text('Radar echo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ReorderableListView),
+        matching: find.text(
+          AppLocalizations.of(tester.element(find.byType(MapLayerSwitcher)))
+              .mapLayerCategoryForecast,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Three visible layers, three eyes. Scoped to the reorder list: the
+    // "show all" / "hide all" row above it has its own visibility icons.
+    // Hide the first row's layer.
+    final rows = find.byType(ReorderableListView);
+    Finder rowIcon(IconData icon) =>
+        find.descendant(of: rows, matching: find.byIcon(icon));
+    expect(rowIcon(Icons.visibility), findsNWidgets(3));
+    await tester.tap(rowIcon(Icons.visibility).first);
+    await tester.pumpAndSettle();
+    expect(rowIcon(Icons.visibility), findsNWidgets(2));
+    expect(rowIcon(Icons.visibility_off), findsOneWidget);
+
+    // Back to level 1, close the editor: back on the picker the hidden
+    // layer is gone — the order editor's eye is the only way to offer it
+    // again.
+    await tester.tap(find.byIcon(Icons.arrow_back));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(DraggableScrollableSheet),
+        matching: find.text('Precip'),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(DraggableScrollableSheet),
+        matching: find.byIcon(Icons.visibility_off),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('show all / hide all toggle every layer in the open category', (
+    tester,
+  ) async {
+    await pumpSwitcher(tester, {});
+    await tester.tap(find.text('Radar echo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(MapLayerSwitcher)),
+    );
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ReorderableListView),
+        matching: find.text(l10n.mapLayerCategoryForecast),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final rows = find.byType(ReorderableListView);
+    Finder rowIcon(IconData icon) =>
+        find.descendant(of: rows, matching: find.byIcon(icon));
+
+    expect(rowIcon(Icons.visibility), findsNWidgets(3));
+    await tester.tap(find.widgetWithText(OutlinedButton, l10n.mapLayerHideAll));
+    await tester.pumpAndSettle();
+    expect(rowIcon(Icons.visibility_off), findsNWidgets(3));
+
+    await tester.tap(find.widgetWithText(OutlinedButton, l10n.mapLayerShowAll));
+    await tester.pumpAndSettle();
+    expect(rowIcon(Icons.visibility), findsNWidgets(3));
+  });
+
+  testWidgets(
+    "hide all keeps the surface's last visible layer even inside the open "
+    'category',
+    (tester) async {
+      // Every other category already hidden — the open one (forecast) holds
+      // the only layers left on screen.
+      await pumpSwitcher(tester, {
+        'map.layerHiddenIds': ['radar', 'typhoon', 'rain', 'satellite'],
+      });
+      await tester.tap(find.text('Radar echo'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.tune));
+      await tester.pumpAndSettle();
+
+      final l10n = AppLocalizations.of(
+        tester.element(find.byType(MapLayerSwitcher)),
+      );
+      await tester.tap(
+        find.descendant(
+          of: find.byType(ReorderableListView),
+          matching: find.text(l10n.mapLayerCategoryForecast),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.widgetWithText(OutlinedButton, l10n.mapLayerHideAll),
+      );
+      await tester.pumpAndSettle();
+
+      // "Hide all" can't take the surface's last layer — one row stays
+      // visible instead of all three going dark.
+      final rows = find.byType(ReorderableListView);
+      expect(
+        find.descendant(of: rows, matching: find.byIcon(Icons.visibility)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: rows, matching: find.byIcon(Icons.visibility_off)),
+        findsNWidgets(2),
+      );
+    },
+  );
 
   testWidgets('dragging a category reorders the categories', (tester) async {
     final controller = await pumpSwitcher(tester, {});

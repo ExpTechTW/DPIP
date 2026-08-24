@@ -6,6 +6,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
@@ -51,6 +52,14 @@ import 'package:provider/provider.dart';
 ///
 /// The initial overlay comes from [DefaultMapLayerController]; a [ValueKey] on
 /// the scaffold remounts when that preference changes so the new default wins.
+/// The key is keyed on the *preference*, not on visibility — hiding the
+/// currently-open layer must not remount the whole scaffold (that would close
+/// any sheet open above it, such as the layer-order editor the hide was just
+/// tapped from). A hidden layer drops out of the picker's list entirely — the
+/// order editor's eye toggle is the only way to offer it again. A hide that
+/// removes the on-screen layer mid-session is handled by [MapScaffold] itself,
+/// which watches [MapLayerVisibilityController] directly and falls back in
+/// place.
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -110,15 +119,25 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final visibility = context.watch<MapLayerVisibilityController>();
     // In demo mode the monitor is what there is to see — open straight on it.
-    final initial = kMonitorDemoEnabled
+    final preferred = kMonitorDemoEnabled
         ? DefaultMapLayer.monitor
         : context.watch<DefaultMapLayerController>().layer;
+    // Open on the preferred layer unless it (and only it) is hidden; hidden
+    // layers are otherwise offered like any other.
+    final initial = _layers.firstWhere(
+      (layer) => layer.id == preferred.id && !visibility.isHidden(layer.id),
+      orElse: () => _layers.firstWhere(
+        (layer) => !visibility.isHidden(layer.id),
+        orElse: () => _layers.first,
+      ),
+    );
     return MapScaffold(
-      key: ValueKey(initial.id),
+      key: ValueKey(preferred.id),
       layers: _layers,
       initialLayerId: initial.id,
-      initialOsmEnabled: initial == DefaultMapLayer.dpm,
+      initialOsmEnabled: initial.id == DefaultMapLayer.dpm.id,
       tabIndex: MapPage.tabIndex,
     );
   }
