@@ -284,6 +284,14 @@ class MapTileCache {
         if (_isTile(url)) url,
     }.toList(growable: false);
     if (wanted.isEmpty) return (injected: 0, resident: <String>{});
+    if (shouldContinue?.call() == false) {
+      // Checked before the probe, not only inside it. A superseded schedule
+      // used to spend its full probe first — a device trace caught one paying
+      // 548 ms over 5,632 URLs and then reporting `cancelled before-l2`,
+      // having done nothing but delay the fill that replaced it.
+      trace(() => 'warm cancelled before-probe wanted=${wanted.length}');
+      return (injected: 0, resident: <String>{});
+    }
     final traceId = ++_traceSequence;
     final elapsed = Stopwatch()..start();
     trace(
@@ -429,6 +437,12 @@ class MapTileCache {
     var messages = 0;
     for (var i = 0; i < wanted.length; i += _probeChunk) {
       final end = math.min(i + _probeChunk, wanted.length);
+      if (shouldContinue?.call() == false) {
+        // Before the message, so a cancellation that lands mid-sweep costs the
+        // chunk in flight rather than the chunk after it as well.
+        missing.addAll(wanted.sublist(i));
+        break;
+      }
       missing.addAll(await mapLibreTilesMissing(wanted.sublist(i, end)));
       if (shouldContinue?.call() == false) {
         // Unprobed URLs are conservatively unknown/missing. That keeps the

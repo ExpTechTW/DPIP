@@ -273,14 +273,15 @@ class MapTileWarmer {
 
     final direct = <String>{};
     final framesByFamily = <String, Set<String>>{};
-    final flushFamilies = <String>{};
     for (final url in stale) {
       final prefix = _framePrefix(url);
       final family = _frameFamilyPrefix(url);
       if (prefix == null || family == null) {
         direct.add(url);
       } else if (wantedFrames.contains(prefix)) {
-        flushFamilies.add(family);
+        // Stale coordinates inside a frame the new set still wants: the camera
+        // moved, not the frame. Left alone — see below.
+        continue;
       } else {
         (framesByFamily[family] ??= <String>{}).add(prefix);
       }
@@ -290,20 +291,30 @@ class MapTileWarmer {
     for (final entry in framesByFamily.entries) {
       final family = entry.key;
       final frames = entry.value;
-      if (flushFamilies.contains(family) ||
-          frames.length > _maxFrameEvictionPatterns) {
+      final familyStillWanted = wantedFrames.any(
+        (wanted) => wanted.startsWith(family),
+      );
+      if (!familyStillWanted) {
+        // Nothing of this family survives the change — one prefix is both the
+        // cheapest needle and an exact one.
         patterns.add(family);
-      } else {
+      } else if (frames.length <= _maxFrameEvictionPatterns) {
         patterns.addAll(frames);
       }
-    }
-    // A retained frame can be the only stale member of its family, so it may
-    // not have created a framesByFamily entry above.
-    patterns.addAll(flushFamilies);
-    for (final family in flushFamilies) {
-      patterns.removeWhere(
-        (pattern) => pattern != family && pattern.startsWith(family),
-      );
+      // Otherwise: too many frames to name individually, and the family is
+      // still live. Evict nothing.
+      //
+      // A family prefix matches *every* tile of that overlay, so collapsing to
+      // it while the family is still wanted does not trim the working set — it
+      // wipes it. A device trace caught this costing a full refill on every
+      // camera nudge: 1,159 resident tiles, 737 of them stale, collapsed to
+      // `/api/v2/tiles/radar/`, and the next probe reported `l1-hit=0` and read
+      // megabytes back out of SQLite that had been in memory a moment earlier.
+      //
+      // Over-retention is bounded and self-correcting: the mirror is a byte-
+      // capped LRU that trims its own least-recently-used entries. Wiping live
+      // tiles is neither. When the choice is between holding stale bytes the
+      // LRU will reclaim and re-reading live ones from disk, hold them.
     }
     return patterns.toList(growable: false);
   }

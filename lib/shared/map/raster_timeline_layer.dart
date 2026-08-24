@@ -94,14 +94,22 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   /// Maximum frame candidates considered by one settled fill.
   ///
-  /// 512 candidates are intentionally wider than the 48 MiB mirror can usually
-  /// hold. The fill reads them centre-out in bounded batches and stops at 90%
-  /// of the real native cap, so this maximises the useful L1 range without
-  /// loading every candidate body into Dart or allowing a slow device to turn
-  /// one settle into an unbounded whole-history scan. Near a series edge the
-  /// unused side is given to the other side instead of wasting half the budget.
+  /// This was 512, chosen to be wider than the 48 MiB mirror can hold on the
+  /// reasoning that the fill stops at 90% of the native cap anyway. A device
+  /// trace showed why that reasoning does not survive contact: 512 candidates
+  /// is 12,288 tile URLs, whose **L1 presence probe alone cost 635 ms** — 32
+  /// platform messages — before a single byte was read, and the fill that
+  /// followed took 2.7 s and was superseded after scanning 3,456 of them. The
+  /// budget was never the mirror; it was the probe, and it was being paid in
+  /// full on every camera idle for a fill that rarely finished.
+  ///
+  /// 128 keeps a band several times wider than a fast drag can cross, costs a
+  /// quarter of the probe, and — being ~8 MiB of bodies — completes well inside
+  /// the mirror instead of racing it. A band that finishes is worth more than a
+  /// wider one that is cancelled. Near a series edge the unused side is given
+  /// to the other side instead of wasting half the budget.
   @protected
-  int get warmFrameBudget => 512;
+  int get warmFrameBudget => 128;
 
   /// Mounted-source ceiling. This is deliberately much smaller than
   /// [warmFrameBudget]: L1 holds compressed response bodies, while a mounted
@@ -314,7 +322,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     _refreshResidentOnNextSettle |= hadFrame;
     _surfaceVisible = false;
     _resumeBackgroundWork = false;
-    _warmCentre = null;
+    _invalidateWarmBand();
     _revealGeneration++;
     source.cancelTileWarm();
     _mapController = null;
@@ -413,6 +421,41 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// re-warm instead of one per frame.
   int? _warmCentre;
 
+  /// The camera [_warmCentre] was warmed for.
+  ///
+  /// The band is a function of both the frame it centres on **and** the
+  /// rectangle it warms, so the skip-guard has to be keyed on both. It used to
+  /// be keyed on the centre alone, which meant a camera move — same centre, new
+  /// viewport — could not be told apart from a duplicate call. [onCameraIdle]
+  /// worked around that by nulling the centre, which defeated the guard
+  /// outright: every idle re-ran the whole fill for a centre it had just
+  /// finished, evicting the tiles it had spent seconds injecting. A device
+  /// trace showed three 512-frame band warms inside four seconds, the second
+  /// evicting 1,358 freshly injected tiles and the third being cancelled
+  /// mid-probe.
+  String? _warmCamera;
+
+  /// The camera, rounded to the precision the warm actually depends on.
+  ///
+  /// Comparing [CameraPosition] directly makes the guard useless: the camera
+  /// settles with sub-pixel jitter, so every idle reported a different position
+  /// and re-ran the band. The band depends on which tiles the viewport covers,
+  /// and that does not change for a ten-thousandth of a degree — roughly 10 m,
+  /// against a tile that is kilometres across at these zooms.
+  static String? _warmKeyFor(CameraPosition? camera) {
+    if (camera == null) return null;
+    return '${camera.target.latitude.toStringAsFixed(4)},'
+        '${camera.target.longitude.toStringAsFixed(4)},'
+        '${camera.zoom.toStringAsFixed(2)},'
+        '${camera.bearing.round()},${camera.tilt.round()}';
+  }
+
+  /// Forgets the last warmed band so the next call re-warms.
+  void _invalidateWarmBand() {
+    _warmCentre = null;
+    _warmCamera = null;
+  }
+
   String _sourceId(String frameId) => '$id-src-$frameId';
   String _layerId(String frameId) => '$id-lyr-$frameId';
 
@@ -509,7 +552,7 @@ abstract class RasterTimelineLayer implements MapLayer {
           // timestamp. Both cancelled the old fill, so restart the wide L1
           // fill and ready-resident preload instead of leaving only the core
           // ring available to the next scrub.
-          _warmCentre = null;
+          _invalidateWarmBand();
           unawaited(
             _warmThenPreload(
               controller,
@@ -1200,7 +1243,7 @@ abstract class RasterTimelineLayer implements MapLayer {
   void _suspendWarm() {
     if (_warmSuspended) return;
     _warmSuspended = true;
-    _warmCentre = null;
+    _invalidateWarmBand();
     source.cancelTileWarm();
     MapTileCache.trace(() => 'timeline=$id warm-suspend');
   }
@@ -1424,8 +1467,11 @@ abstract class RasterTimelineLayer implements MapLayer {
     // that cross the old band edge coalesce onto this one re-warm instead of
     // each firing its own visible-region round-trip.
     final previous = _warmCentre;
-    if (previous == centre) return;
+    final previousCamera = _warmCamera;
+    final camera = _warmKeyFor(controller.cameraPosition);
+    if (previous == centre && previousCamera == camera) return;
     _warmCentre = centre;
+    _warmCamera = camera;
     final delta = previous == null ? 1 : centre - previous;
     final frames = _spreadFrames(centre, direction: delta < 0 ? -1 : 1);
     if (frames.length <= 1) return;
@@ -1433,6 +1479,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapTileCache.trace(
       () =>
           'timeline=$id warm-band start centre=$centre previous=$previous '
+          'camera=$camera was=${previousCamera == camera ? 'same' : previousCamera} '
           'direction=${delta < 0 ? 'backward' : 'forward'} '
           'frames=${frames.length} immediate=$immediate '
           'refresh=$refreshResident',
@@ -1441,7 +1488,9 @@ abstract class RasterTimelineLayer implements MapLayer {
       final viewport = await _viewport(controller);
       // Visibility can change while the platform answers the camera query. Do
       // not start a fresh warmer generation after the hidden-edge cancellation.
-      if (!_surfaceVisible || _warmCentre != centre) return;
+      if (!_surfaceVisible || _warmCentre != centre || _warmCamera != camera) {
+        return;
+      }
       await source.warmFrameTiles(
         frames: frames,
         south: viewport.bounds.southwest.latitude,
@@ -1554,9 +1603,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (_warmSuspended) return;
     final centre = _shownIndex;
     if (centre == null) return;
-    _warmCentre = null;
-    // The viewport moved, so the warmed tiles are the wrong ones — re-warm for
-    // where the camera actually is.
+    // No invalidation here. The band is keyed on the camera as well as the
+    // centre, so a real move re-warms on its own and an idle that reports the
+    // same camera is the duplicate it looks like.
     MapTileCache.trace(() => 'timeline=$id camera-idle centre=$centre');
     unawaited(_warmBand(controller, centre, immediate: true));
   }
@@ -1566,7 +1615,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     if (!_surfaceVisible) return;
     final centre = _shownIndex;
     if (centre == null) return;
-    _warmCentre = null;
+    _invalidateWarmBand();
     await _warmBand(controller, centre, immediate: true);
   }
 
@@ -1623,7 +1672,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     _requestedFrameId = null;
     _shownFrameId = null;
     _settledFrameId = null;
-    _warmCentre = null;
+    _invalidateWarmBand();
     _attached = false;
     // A style reload drops every runtime layer, the seam included.
     _seamMounted = false;
