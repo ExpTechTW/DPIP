@@ -98,6 +98,11 @@ dependencies:
   # so a cold-start lock contention window no longer fails opens on the UI
   # thread, and WAL + busy_timeout (lockTimeout) ship as sane defaults.
   sqlite_async: ^0.14.4
+  # The synchronous SQLite API. Not used to open anything in app code — it is
+  # here for two types: the in-memory test helper wraps one handle with
+  # SqliteDatabase.singleConnection, and the location track's read-only open
+  # factory has to name `Database` to override sqlite_async's connection hook.
+  sqlite3: ^3.5.2
   talker_flutter: ^5.1.9
   url_launcher: ^6.3.2
 
@@ -105,10 +110,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  # The synchronous SQLite API, for tests only: the in-memory helper
-  # (test/core/storage/memory_db.dart) wraps one open handle with
-  # SqliteDatabase.singleConnection so `:memory:` means one database.
-  sqlite3: ^3.5.2
   # Virtual time for timer-driven state machines (the traceroute timeout).
   fake_async: ^1.3.0
   # Dart 3.13 (Flutter 3.47) makes `final` illegal on non-primary-constructor

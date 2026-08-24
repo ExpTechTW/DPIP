@@ -30,6 +30,15 @@
 /// | `dpip.db`            | `mesh_nodes`        | meshtastic  |
 /// | `http_etag_cache.db` | `http_cache`        | cache       |
 /// | `http_etag_cache.db` | `net_bucket`        | cache       |
+/// | `location_track.db`  | `fix`               | movement    |
+///
+/// The third file is not opened here and has no handle on [AppDatabase],
+/// because nothing in Dart writes it: background location arrives when Dart is
+/// not running, so the native stores own both the writes and the eviction that
+/// keeps it under 50 MB. Dart reads it through
+/// `lib/core/geo/location_track.dart`, on a connection opened read-only. It is
+/// listed here because this table is where someone looks to find out what the
+/// app keeps on disk, and a file that grows on its own belongs on that list.
 library;
 
 import 'package:dpip/core/logging/log.dart';
