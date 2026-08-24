@@ -43,13 +43,13 @@ class SatelliteStyleMenu extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([
         layer.style,
-        layer.showGlobalOutline,
+        layer.referenceOutline,
         showTownLabels,
         showTerrain,
       ]),
       builder: (context, _) {
         final style = layer.style.value;
-        final showGlobal = layer.showGlobalOutline.value;
+        final showGlobal = layer.showGlobalOutline;
         final showLabels = showTownLabels.value;
         final showRelief = showTerrain.value;
         final active =
@@ -161,12 +161,12 @@ class SatelliteReferenceMenu extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
       listenable: Listenable.merge([
-        layer.showGlobalOutline,
+        layer.referenceOutline,
         showTownLabels,
         showTerrain,
       ]),
       builder: (context, _) {
-        final showGlobal = layer.showGlobalOutline.value;
+        final showGlobal = layer.showGlobalOutline;
         final showLabels = showTownLabels.value;
         final showRelief = showTerrain.value;
         return MenuAnchor(

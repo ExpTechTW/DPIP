@@ -35,7 +35,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// instead of clashing over one.
 mixin ScanRangeOverlayChrome on AdminOutlineChrome {
   /// Whether the observed area is outlined. On by default — see the class doc.
-  final ValueNotifier<bool> showScanRange = ValueNotifier(true);
+  bool get showScanRange => referenceOutline.showScanRange;
 
   bool _rangeShown = false;
 
@@ -56,26 +56,26 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
   /// data covers something else overrides it.
   Map<String, dynamic> get scanRangeGeoJson => RadarScanRange.geoJson();
 
-  /// All chrome listenables, for a legend that follows the toggles.
-  Listenable get chromeListenable =>
-      Listenable.merge([showScanRange, adminChromeListenable]);
+  /// All chrome listenables, for a legend that follows the toggles — scan
+  /// range and the admin outlines are all one shared controller now, so this
+  /// is just it.
+  Listenable get chromeListenable => adminChromeListenable;
 
-  /// Turns the coverage outline on/off, applying it to a live map immediately.
-  void setShowScanRange(bool value) {
-    if (showScanRange.value == value) return;
-    showScanRange.value = value;
-    unawaited(_syncRange());
-  }
+  /// Turns the coverage outline on/off, applying it to every attached layer
+  /// sharing [referenceOutline] immediately.
+  void setShowScanRange(bool value) => referenceOutline.setShowScanRange(value);
 
   @override
   Future<void> onAttached(MapLibreMapController controller) async {
     super.onAttached(controller);
+    referenceOutline.addListener(_onReferenceOutlineChanged);
     await _syncRange();
   }
 
   @override
   Future<void> onDetached(MapLibreMapController controller) async {
     super.onDetached(controller);
+    referenceOutline.removeListener(_onReferenceOutlineChanged);
     if (_rangeShown) {
       _rangeShown = false;
       await RadarScanRange.remove(
@@ -84,6 +84,10 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
         layerId: scanRangeLayerId,
       );
     }
+  }
+
+  void _onReferenceOutlineChanged() {
+    unawaited(_syncRange());
   }
 
   @override
@@ -99,7 +103,7 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
     final controller = this.controller;
     if (controller == null) return;
 
-    final wanted = showScanRange.value;
+    final wanted = showScanRange;
     if (wanted == _rangeShown) return;
     _rangeShown = wanted;
 
@@ -135,7 +139,7 @@ mixin ScanRangeOverlayChrome on AdminOutlineChrome {
   List<SymbolLegendItem> chromeLegendItems(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return [
-      if (showScanRange.value)
+      if (showScanRange)
         SymbolLegendItem(
           // The same blue-grey the outline is drawn in, and corrected the same
           // way: the ring is a vector line this app draws, not raster pixels.

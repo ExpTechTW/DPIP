@@ -27,6 +27,7 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -70,6 +71,7 @@ class SharedDeps {
     required this.defaultMapLayer,
     required this.mapLayerOrder,
     required this.mapLayerVisibility,
+    required this.mapReferenceOutline,
     required this.meshtastic,
     required this.meshLink,
     required this.meshAlerts,
@@ -157,6 +159,10 @@ class SharedDeps {
 
   /// The map layers the user hid (also provided).
   final MapLayerVisibilityController mapLayerVisibility;
+
+  /// The shared reference-chrome toggles every raster layer offers — admin
+  /// borders and scan range (also provided).
+  final MapReferenceOutlineController mapReferenceOutline;
 
   /// LoRa mesh (Meshtastic) over BLE — off-grid emergency messaging.
   final MeshtasticService meshtastic;

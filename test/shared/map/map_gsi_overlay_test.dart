@@ -1,5 +1,7 @@
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -87,7 +89,7 @@ void main() {
   });
 
   test('controller starts cold and retains per-group choices', () {
-    final controller = GsiOverlayController();
+    final controller = GsiOverlayController(SettingsStore.inMemory({}));
     addTearDown(controller.dispose);
 
     expect(controller.enabled, isFalse);
@@ -115,9 +117,54 @@ void main() {
     expect(controller.revision, 3);
   });
 
+  test(
+    'a choice persists — a fresh controller on the same store reads it back',
+    () {
+      final settings = SettingsStore.inMemory({});
+      final first = GsiOverlayController(settings);
+      addTearDown(first.dispose);
+      first.setEnabled(true);
+      first.setGroupEnabled(GsiLayerGroup.parks, true);
+      first.setGroupEnabled(GsiLayerGroup.buildings, false);
+
+      final second = GsiOverlayController(settings);
+      addTearDown(second.dispose);
+
+      expect(second.enabled, isTrue);
+      expect(second.groupEnabled(GsiLayerGroup.parks), isTrue);
+      expect(second.groupEnabled(GsiLayerGroup.buildings), isFalse);
+    },
+  );
+
+  test(
+    "forceEnabled starts the surface on without overwriting a saved 'off'",
+    () {
+      final settings = SettingsStore.inMemory({'map.gsiEnabled': false});
+      final controller = GsiOverlayController(settings, forceEnabled: true);
+      addTearDown(controller.dispose);
+
+      expect(controller.enabled, isTrue);
+      expect(settings.getBool(SettingKeys.mapGsiEnabled), isFalse);
+    },
+  );
+
+  test('a stale saved group name is dropped instead of crashing', () {
+    final settings = SettingsStore.inMemory({
+      'map.gsiEnabledGroups': ['roads', 'no-longer-a-group'],
+    });
+    final controller = GsiOverlayController(settings);
+    addTearDown(controller.dispose);
+
+    expect(controller.enabledGroupCount, 1);
+    expect(controller.groupEnabled(GsiLayerGroup.roads), isTrue);
+  });
+
   test('enabling OSM synchronously turns mutually-exclusive terrain off', () {
     final terrain = ValueNotifier<bool>(true);
-    final controller = GsiOverlayController(mutuallyExclusiveTerrain: terrain);
+    final controller = GsiOverlayController(
+      SettingsStore.inMemory({}),
+      mutuallyExclusiveTerrain: terrain,
+    );
     addTearDown(terrain.dispose);
     addTearDown(controller.dispose);
 
@@ -130,8 +177,9 @@ void main() {
   test('an OSM-first surface starts enabled with terrain off', () {
     final terrain = ValueNotifier<bool>(true);
     final controller = GsiOverlayController(
+      SettingsStore.inMemory({}),
       mutuallyExclusiveTerrain: terrain,
-      initiallyEnabled: true,
+      forceEnabled: true,
     );
     addTearDown(terrain.dispose);
     addTearDown(controller.dispose);
@@ -142,7 +190,7 @@ void main() {
 
   test('native add, grouped visibility, and removal stay coherent', () async {
     final map = RecordingMapController();
-    final selection = GsiOverlayController();
+    final selection = GsiOverlayController(SettingsStore.inMemory({}));
     addTearDown(selection.dispose);
 
     await addGsiOverlay(

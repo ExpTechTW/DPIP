@@ -19,13 +19,17 @@ void main() {
   test('frames chronological', () async {
     final layer = QpesumsMapLayer(
       _FakeQpesumsRepository(['1786209600000', '1786208400000']),
+      testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1786208400000', '1786209600000']);
   });
 
   test('a settle mounts the preload ring at forecast opacity', () async {
-    final layer = QpesumsMapLayer(_FakeQpesumsRepository(_ids(5)));
+    final layer = QpesumsMapLayer(
+      _FakeQpesumsRepository(_ids(5)),
+      testReferenceOutline(),
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -38,7 +42,10 @@ void main() {
   test(
     'scrubbing inside the ring is two opacity writes, nothing else',
     () async {
-      final layer = QpesumsMapLayer(_FakeQpesumsRepository(_ids(9)));
+      final layer = QpesumsMapLayer(
+        _FakeQpesumsRepository(_ids(9)),
+        testReferenceOutline(),
+      );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -65,7 +72,7 @@ void main() {
 
   test('clear releases tiles', () async {
     final source = _FakeQpesumsRepository(_ids(5));
-    final layer = QpesumsMapLayer(source);
+    final layer = QpesumsMapLayer(source, testReferenceOutline());
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -77,7 +84,10 @@ void main() {
   });
 
   testWidgets('timeline caption says forecast, not observed', (tester) async {
-    final layer = QpesumsMapLayer(_FakeQpesumsRepository(const []));
+    final layer = QpesumsMapLayer(
+      _FakeQpesumsRepository(const []),
+      testReferenceOutline(),
+    );
     String? caption;
     await tester.pumpWidget(
       MaterialApp(
@@ -95,7 +105,10 @@ void main() {
   });
 
   testWidgets('legend renders the QPESUMS mm/h scale', (tester) async {
-    final layer = QpesumsMapLayer(_FakeQpesumsRepository(const []));
+    final layer = QpesumsMapLayer(
+      _FakeQpesumsRepository(const []),
+      testReferenceOutline(),
+    );
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -115,7 +128,10 @@ void main() {
   group('overlays', () {
     /// A layer attached to a live map, ready for the toggles.
     Future<(QpesumsMapLayer, RecordingMapController)> attached() async {
-      final layer = QpesumsMapLayer(_FakeQpesumsRepository(_ids(3)));
+      final layer = QpesumsMapLayer(
+        _FakeQpesumsRepository(_ids(3)),
+        testReferenceOutline(),
+      );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
       await layer.prepare(controller, frames);
@@ -132,9 +148,9 @@ void main() {
     test('all three overlays are on by default and drawn on attach', () async {
       final (layer, controller) = await attached();
 
-      expect(layer.showScanRange.value, isTrue);
-      expect(layer.showCountyOutline.value, isTrue);
-      expect(layer.showTownOutline.value, isTrue);
+      expect(layer.showScanRange, isTrue);
+      expect(layer.showCountyOutline, isTrue);
+      expect(layer.showTownOutline, isTrue);
       // Its own ids, so radar and QPESUMS can both be on the map at once.
       expect(controller.calls, contains('addSource:qpesums-scan-range'));
       expect(
@@ -206,7 +222,7 @@ void main() {
         isEmpty,
         reason: 'dropping the fine mesh must not take the coarse frame with it',
       );
-      expect(layer.showCountyOutline.value, isTrue);
+      expect(layer.showCountyOutline, isTrue);
     });
 
     test('clear tears the chrome down with the layer', () async {

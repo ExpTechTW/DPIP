@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/forecast_overlay_menu.dart';
 import 'package:dpip/features/map/presentation/widgets/wind_particle_overlay.dart';
@@ -40,9 +41,13 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   WindForecastMapLayer(
     WindForecastRepository super.repository, {
     required this.model,
+    required this.referenceOutline,
   });
 
   final WindForecastModel model;
+
+  @override
+  final MapReferenceOutlineController referenceOutline;
 
   /// The wind grid backing the overlay's particles, loaded for the settled
   /// frame. It stays null while the timeline is moving and until that frame's

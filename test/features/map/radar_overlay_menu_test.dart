@@ -60,7 +60,7 @@ void main() {
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -90,7 +90,7 @@ void main() {
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     final terrain = ValueNotifier<bool>(true);
     final flipped = <bool>[];
     await tester.pumpWidget(
@@ -109,25 +109,25 @@ void main() {
 
   testWidgets('tapping the national-border row turns it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
-    expect(layer.showGlobalOutline.value, isTrue);
+    expect(layer.showGlobalOutline, isTrue);
     await tester.tap(find.byType(MapChipButton));
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.radarGlobalOutline));
     await tester.pumpAndSettle();
 
-    expect(layer.showGlobalOutline.value, isFalse);
+    expect(layer.showGlobalOutline, isFalse);
     // Independent controls: one must not drag the others with it.
-    expect(layer.showCountyOutline.value, isTrue);
-    expect(layer.showTownOutline.value, isTrue);
+    expect(layer.showCountyOutline, isTrue);
+    expect(layer.showTownOutline, isTrue);
   });
 
   testWidgets('tapping the coverage row turns it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -136,15 +136,15 @@ void main() {
     await tester.tap(find.text(l10n.radarScanRange));
     await tester.pumpAndSettle();
 
-    expect(layer.showScanRange.value, isFalse);
+    expect(layer.showScanRange, isFalse);
     // Independent controls: one must not drag the others with it.
-    expect(layer.showCountyOutline.value, isTrue);
-    expect(layer.showTownOutline.value, isTrue);
+    expect(layer.showCountyOutline, isTrue);
+    expect(layer.showTownOutline, isTrue);
   });
 
   testWidgets('tapping the county row turns it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -153,14 +153,14 @@ void main() {
     await tester.tap(find.text(l10n.radarCountyOutline));
     await tester.pumpAndSettle();
 
-    expect(layer.showCountyOutline.value, isFalse);
-    expect(layer.showScanRange.value, isTrue);
-    expect(layer.showTownOutline.value, isTrue);
+    expect(layer.showCountyOutline, isFalse);
+    expect(layer.showScanRange, isTrue);
+    expect(layer.showTownOutline, isTrue);
   });
 
   testWidgets('tapping the township row turns only it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -169,15 +169,15 @@ void main() {
     await tester.tap(find.text(l10n.radarTownOutline));
     await tester.pumpAndSettle();
 
-    expect(layer.showTownOutline.value, isFalse);
-    expect(layer.showCountyOutline.value, isTrue);
+    expect(layer.showTownOutline, isFalse);
+    expect(layer.showCountyOutline, isTrue);
   });
 
   testWidgets('tapping the township-label row reports the flip upward', (
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     final labels = ValueNotifier<bool>(true);
     final flipped = <bool>[];
     await tester.pumpWidget(
@@ -203,7 +203,7 @@ void main() {
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository());
+    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
     await tester.pumpWidget(_wrap(layer));
 
     // Both overlays ship on, so at rest the chip is unmarked.

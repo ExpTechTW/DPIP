@@ -30,7 +30,7 @@ class _CappedRadarRepository extends FakeRasterFrameSource
 void main() {
   test('mounted radar sources carry the pyramid cap as maxzoom', () async {
     final source = _CappedRadarRepository(_ids(9))..sourceMaxZoom = 8;
-    final layer = RadarMapLayer(source);
+    final layer = RadarMapLayer(source, testReferenceOutline());
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 

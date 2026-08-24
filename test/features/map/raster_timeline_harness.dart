@@ -4,10 +4,18 @@ library;
 import 'dart:math' show Point;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show landLayerId, outlineLayerId, townLabelLayerId;
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+/// A fresh, in-memory-backed [MapReferenceOutlineController] — every raster
+/// layer test that needs one constructs its own, so a toggle in one test
+/// never leaks into another.
+MapReferenceOutlineController testReferenceOutline() =>
+    MapReferenceOutlineController(SettingsStore.inMemory({}));
 
 /// A [RasterFrameSource] that records the tile-memory calls a layer makes.
 ///

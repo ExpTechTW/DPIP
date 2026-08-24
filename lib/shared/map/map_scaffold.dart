@@ -6,6 +6,8 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
@@ -206,6 +208,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// disaster-prevention map.
   late final GsiOverlayController _gsi;
 
+  /// Backs [_gsi] plus the [_showTerrain] / [_showTownLabels] persistence —
+  /// read once in [initState], since none of these three toggles need to
+  /// react to a settings change made elsewhere while this surface is open.
+  late final SettingsStore _settings;
+
   /// Whether the terrain source + hillshade layer are actually on the map.
   ///
   /// This mirrors the native state so the toggle can add/remove instead of
@@ -238,10 +245,14 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     super.initState();
     _trace(() => 'init active=${_active.id} timeline=${_active.usesTimeline}');
     _scrubBackpressure.addListener(_onScrubBackpressureChanged);
-    if (widget.initialOsmEnabled) _showTerrain.value = false;
+    _settings = context.read<SettingsStore>();
+    _showTerrain.value = _settings.getBool(SettingKeys.mapShowTerrain) ?? true;
+    _showTownLabels.value =
+        _settings.getBool(SettingKeys.mapShowTownLabels) ?? true;
     _gsi = GsiOverlayController(
+      _settings,
       mutuallyExclusiveTerrain: _showTerrain,
-      initiallyEnabled: widget.initialOsmEnabled,
+      forceEnabled: widget.initialOsmEnabled,
     );
     _gsiZoomEnabled = _gsi.enabled;
     _gsi.addListener(_onGsiChanged);
@@ -724,6 +735,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   void _setShowTownLabels(bool value) {
     if (_showTownLabels.value == value) return;
     _showTownLabels.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapShowTownLabels, value));
     _applyTownLabelVisibility();
   }
 
@@ -734,6 +746,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (value && _gsi.enabled) _gsi.setEnabled(false);
     if (_showTerrain.value == value) return;
     _showTerrain.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapShowTerrain, value));
     if (!value) {
       unawaited(_basemapWarmer?.discardWorkingSet('terrain'));
     }

@@ -100,6 +100,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(['1700000600', '1700000000']),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
@@ -109,6 +110,7 @@ void main() {
     final gfs = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     expect(gfs.id, 'wind-gfs');
     expect(gfs.icon, Icons.air);
@@ -117,6 +119,7 @@ void main() {
     final ecmwf = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.ecmwf,
+      referenceOutline: testReferenceOutline(),
     );
     expect(ecmwf.id, 'wind-ecmwf');
     expect(WindForecastModel.ecmwf.subtitle, '0.25° · 3 h');
@@ -133,6 +136,7 @@ void main() {
       final layer = WindForecastMapLayer(
         _FakeWindRepository(_ids(5)),
         model: WindForecastModel.ecmwf,
+        referenceOutline: testReferenceOutline(),
       );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
@@ -169,6 +173,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(_ids(5)),
       model: WindForecastModel.ecmwf,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -193,6 +198,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(_ids(5)),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -217,7 +223,11 @@ void main() {
 
   test('clear releases tiles', () async {
     final source = _FakeWindRepository(_ids(5));
-    final layer = WindForecastMapLayer(source, model: WindForecastModel.gfs);
+    final layer = WindForecastMapLayer(
+      source,
+      model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -232,6 +242,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(_ids(5)),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -254,7 +265,11 @@ void main() {
     'scrubbing clears particles and fetches only the settled frame',
     () async {
       final source = _ControlledWindRepository(_ids(3));
-      final layer = WindForecastMapLayer(source, model: WindForecastModel.gfs);
+      final layer = WindForecastMapLayer(
+        source,
+        model: WindForecastModel.gfs,
+        referenceOutline: testReferenceOutline(),
+      );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -282,7 +297,11 @@ void main() {
 
   test('a late old WND1 response cannot overwrite the latest frame', () async {
     final source = _ControlledWindRepository(_ids(3));
-    final layer = WindForecastMapLayer(source, model: WindForecastModel.gfs);
+    final layer = WindForecastMapLayer(
+      source,
+      model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -310,6 +329,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.ecmwf,
+      referenceOutline: testReferenceOutline(),
     );
     final overlay = layer.buildMapOverlay(
       tester.element(find.byType(Scaffold)),
@@ -323,6 +343,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     // The harness camera is zoom 7 over Taiwan, so a seeded particle must sit
     // inside the viewport and the ticker has somewhere to streak it.
@@ -376,6 +397,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     await layer.onAttached(RecordingMapController());
     layer.field.value = WindField(
@@ -462,6 +484,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     await layer.onAttached(RecordingMapController());
 
@@ -538,6 +561,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(const []),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     await tester.pumpWidget(
       const MaterialApp(

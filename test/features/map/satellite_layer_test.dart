@@ -23,6 +23,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(['1700000600', '1700000000']),
       channel: SatelliteChannel.irClean,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
@@ -32,6 +33,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(_ids(5)),
       channel: SatelliteChannel.irClean,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -48,6 +50,7 @@ void main() {
       final layer = SatelliteMapLayer(
         _FakeSatelliteRepository(_ids(9)),
         channel: SatelliteChannel.irClean,
+        referenceOutline: testReferenceOutline(),
       );
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
@@ -78,6 +81,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(_ids(5)),
       channel: SatelliteChannel.irClean,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -115,6 +119,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(_ids(5)),
       channel: SatelliteChannel.irClean,
+      referenceOutline: testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -145,7 +150,11 @@ void main() {
 
   test('clear releases tiles', () async {
     final source = _FakeSatelliteRepository(_ids(5));
-    final layer = SatelliteMapLayer(source, channel: SatelliteChannel.irClean);
+    final layer = SatelliteMapLayer(
+      source,
+      channel: SatelliteChannel.irClean,
+      referenceOutline: testReferenceOutline(),
+    );
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 

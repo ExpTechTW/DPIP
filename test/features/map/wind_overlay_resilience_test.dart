@@ -89,6 +89,7 @@ Future<(WindForecastMapLayer, _FlakyController)> _mount(
   final layer = WindForecastMapLayer(
     _Repo(['1700000000']),
     model: WindForecastModel.gfs,
+    referenceOutline: testReferenceOutline(),
   );
   final controller = _FlakyController();
   final frames = (await layer.frames()).valueOrNull!;
@@ -265,6 +266,7 @@ void main() {
     final wind = WindForecastMapLayer(
       _Repo(const ['1']),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     expect(wind.overlayFollowsCamera, isFalse);
   });
@@ -381,6 +383,7 @@ void main() {
     final layer = WindForecastMapLayer(
       _Repo(const ['1']),
       model: WindForecastModel.gfs,
+      referenceOutline: testReferenceOutline(),
     );
     expect(layer.interacting.value, isFalse);
     layer.onMapGestureStart();
