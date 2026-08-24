@@ -27,8 +27,9 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// Everything about scrubbing lives in [RasterTimelineLayer]; this supplies the
 /// model's identity, its opacity, the shared wind-speed colour key, the two
 /// admin-border overlays its options chip toggles ([AdminOutlineChrome]), and
-/// the particle animation ([WindParticleOverlay]) that rides the loaded
-/// [field].
+/// the particle animation — native on Android and iOS
+/// ([WindParticleNative]), [WindParticleOverlay] elsewhere — driven by the
+/// loaded [field].
 ///
 /// The tiles are a semi-transparent speed wash, so the layer draws its own
 /// county / township borders **over** the field the same way radar does over
@@ -50,10 +51,12 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
 
   /// The GPU renderer that draws the particles inside the map.
   ///
-  /// Where it is available it replaces [WindParticleOverlay] entirely. That is
-  /// not a preference: a Flutter overlay repainting above an Android platform
-  /// view leaks a full-screen graphics buffer per frame under HCPP, and the
-  /// particles were the only thing in the app repainting every frame.
+  /// Where it is available it replaces [WindParticleOverlay] entirely. On
+  /// Android that is not a preference but the leak escape: a Flutter overlay
+  /// repainting above a platform view leaks a full-screen graphics buffer per
+  /// frame under HCPP, and the particles were the only thing in the app
+  /// repainting every frame. iOS has no leak, but the same native path is where
+  /// map content belongs and keeps one wire for both.
   late final WindParticleNative particles = WindParticleNative(
     field: field,
     interacting: interacting,
@@ -185,10 +188,10 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
 
   /// The Flutter overlay, only where the map cannot draw the particles itself.
   ///
-  /// On Android the native layer carries them and this is deliberately empty —
-  /// returning the overlay anyway would reintroduce the per-frame Flutter
-  /// presentation that the whole port exists to remove. It is still the real
-  /// implementation everywhere else.
+  /// Where the native layer carries them (Android, iOS) this is deliberately
+  /// empty — returning the overlay anyway would put a per-frame Flutter
+  /// presentation back on platforms that no longer need one. It is still the
+  /// real implementation everywhere else.
   @override
   Widget buildMapOverlay(BuildContext context) => particles.isActive
       ? const SizedBox.shrink()
