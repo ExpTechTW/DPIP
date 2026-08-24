@@ -9,6 +9,7 @@ import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
+import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -333,6 +334,12 @@ class NotificationService {
         NotificationChannels.version,
       );
     }
+
+    // FCM renders background pushes itself against the PLAIN channel id, a
+    // lookup that must not depend on how awesome hashed or re-hashed its own
+    // channels this launch. Mirror the catalogue under plain keys last, after
+    // every purge and re-registration above has settled.
+    await PlainChannels.ensure(channels);
   }
 
   Future<void> _initMessaging() async {
@@ -472,7 +479,11 @@ NotificationContent? contentFromMessage(RemoteMessage message) {
     // symmetrically with the FCM-delivered path.
     payload: {'channel': channelKey, 'id': idText},
     wakeUpScreen: true,
-    category: NotificationCategory.Alarm,
+    // Deliberately NO `category: Alarm` here: awesome turns that into
+    // FLAG_INSISTENT | FLAG_NO_CLEAR, which repeats the channel sound until
+    // the notification is opened — reported as "the alert loops forever".
+    // Insistence is a per-channel policy decision, not something every push
+    // should inherit from a hardcoded default.
   );
 }
 
