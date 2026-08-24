@@ -221,6 +221,13 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       return
     }
     recenterRegion(coordinate)
+    // Before the distance gate on purpose. `shouldReport` exists to spare the
+    // server, and the local track has no server to spare — dropping a fix the
+    // OS took the trouble to deliver, because a report would have been too
+    // soon, would put holes in the history for a reason that has nothing to do
+    // with it.
+    LocationTrackStore.shared.record(
+      latitude: coordinate.latitude, longitude: coordinate.longitude)
     guard shouldReport(coordinate) else { return }
     report(coordinate)
     defaults.set(coordinate.latitude, forKey: Self.lastLatKey)
