@@ -54,7 +54,8 @@ UpdateDestination updateDestinationFor(
         scheme: 'market://details?id=$_androidPackage',
         web: 'https://play.google.com/store/apps/details?id=$_androidPackage',
       );
-    case InstallSource.sideload:
+    case InstallSource.development:
+    case InstallSource.github:
     case InstallSource.unknown:
       final url = releaseUrl.isEmpty
           ? 'https://github.com/ExpTechTW/DPIP/releases'

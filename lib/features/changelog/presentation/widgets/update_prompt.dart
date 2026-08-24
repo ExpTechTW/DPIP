@@ -137,7 +137,9 @@ class _UpdatePromptState extends State<UpdatePrompt> {
         InstallSource.appStore => l10n.updateOpenAppStore,
         InstallSource.testFlight => l10n.updateOpenTestFlight,
         InstallSource.playStore => l10n.updateOpenPlayStore,
-        InstallSource.sideload || InstallSource.unknown => l10n.updateDownload,
+        InstallSource.development ||
+        InstallSource.github ||
+        InstallSource.unknown => l10n.updateDownload,
       };
 
   Future<void> _openStore(InstallSource source, String releaseUrl) async {
