@@ -782,6 +782,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayerOrderTitle => 'Sắp xếp thứ tự lớp';
 
   @override
+  String get mapLayerShow => 'Hiện lớp bản đồ';
+
+  @override
+  String get mapLayerHide => 'Ẩn lớp bản đồ';
+
+  @override
+  String get mapLayerShowAll => 'Hiện tất cả';
+
+  @override
+  String get mapLayerHideAll => 'Ẩn tất cả';
+
+  @override
   String get dpmYes => 'Có';
 
   @override
@@ -1862,6 +1874,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get regionAddButton => 'Thêm khu vực';
+
+  @override
+  String get regionSearchHint => 'Tìm kiếm tỉnh và thành phố';
+
+  @override
+  String get regionSearchEmpty => 'Không tìm thấy tỉnh/thành phố phù hợp';
+
+  @override
+  String get regionSearchTownHint => 'Tìm kiếm xã';
+
+  @override
+  String get regionSearchTownEmpty => 'Không tìm thấy xã phù hợp';
 
   @override
   String get displaySettings => 'Hiển thị';

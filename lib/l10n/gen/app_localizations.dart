@@ -1547,6 +1547,30 @@ abstract class AppLocalizations {
   /// **'Reorder layers'**
   String get mapLayerOrderTitle;
 
+  /// No description provided for @mapLayerShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show layer'**
+  String get mapLayerShow;
+
+  /// No description provided for @mapLayerHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide layer'**
+  String get mapLayerHide;
+
+  /// No description provided for @mapLayerShowAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get mapLayerShowAll;
+
+  /// No description provided for @mapLayerHideAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide all'**
+  String get mapLayerHideAll;
+
   /// Affirmative value in the disaster-map detail sheet
   ///
   /// In en, this message translates to:
@@ -3556,6 +3580,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add a region'**
   String get regionAddButton;
+
+  /// No description provided for @regionSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search counties and cities'**
+  String get regionSearchHint;
+
+  /// No description provided for @regionSearchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching counties or cities'**
+  String get regionSearchEmpty;
+
+  /// No description provided for @regionSearchTownHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search townships'**
+  String get regionSearchTownHint;
+
+  /// No description provided for @regionSearchTownEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching townships'**
+  String get regionSearchTownEmpty;
 
   /// Display-settings menu entry and page title (theme mode)
   ///

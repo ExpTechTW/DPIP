@@ -785,6 +785,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayerOrderTitle => 'Urutkan lapisan';
 
   @override
+  String get mapLayerShow => 'Tampilkan lapisan';
+
+  @override
+  String get mapLayerHide => 'Sembunyikan lapisan';
+
+  @override
+  String get mapLayerShowAll => 'Tampilkan semua';
+
+  @override
+  String get mapLayerHideAll => 'Sembunyikan semua';
+
+  @override
   String get dpmYes => 'Ya';
 
   @override
@@ -1866,6 +1878,18 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get regionAddButton => 'Tambah wilayah';
+
+  @override
+  String get regionSearchHint => 'Cari kabupaten dan kota';
+
+  @override
+  String get regionSearchEmpty => 'Tidak ada kabupaten/kota yang cocok';
+
+  @override
+  String get regionSearchTownHint => 'Cari kecamatan';
+
+  @override
+  String get regionSearchTownEmpty => 'Tidak ada kecamatan yang cocok';
 
   @override
   String get displaySettings => 'Tampilan';

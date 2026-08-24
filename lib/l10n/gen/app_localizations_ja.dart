@@ -770,6 +770,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayerOrderTitle => 'レイヤーの順番';
 
   @override
+  String get mapLayerShow => 'レイヤーを表示';
+
+  @override
+  String get mapLayerHide => 'レイヤーを非表示';
+
+  @override
+  String get mapLayerShowAll => 'すべて表示';
+
+  @override
+  String get mapLayerHideAll => 'すべて非表示';
+
+  @override
   String get dpmYes => 'はい';
 
   @override
@@ -1830,6 +1842,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get regionAddButton => '地域を追加';
+
+  @override
+  String get regionSearchHint => '都道府県・市区を検索';
+
+  @override
+  String get regionSearchEmpty => '一致する地域がありません';
+
+  @override
+  String get regionSearchTownHint => '町村を検索';
+
+  @override
+  String get regionSearchTownEmpty => '該当する町村がありません';
 
   @override
   String get displaySettings => '表示';

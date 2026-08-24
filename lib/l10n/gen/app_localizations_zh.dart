@@ -765,6 +765,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayerOrderTitle => '調整圖層順序';
 
   @override
+  String get mapLayerShow => '顯示圖層';
+
+  @override
+  String get mapLayerHide => '隱藏圖層';
+
+  @override
+  String get mapLayerShowAll => '全部顯示';
+
+  @override
+  String get mapLayerHideAll => '全部隱藏';
+
+  @override
   String get dpmYes => '是';
 
   @override
@@ -1819,6 +1831,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get regionAddButton => '新增地區';
+
+  @override
+  String get regionSearchHint => '搜尋縣市';
+
+  @override
+  String get regionSearchEmpty => '找不到符合的縣市';
+
+  @override
+  String get regionSearchTownHint => '搜尋鄉鎮市區';
+
+  @override
+  String get regionSearchTownEmpty => '找不到符合的鄉鎮市區';
 
   @override
   String get displaySettings => '顯示設定';
@@ -3897,6 +3921,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayerOrderTitle => '调整图层顺序';
 
   @override
+  String get mapLayerShow => '显示图层';
+
+  @override
+  String get mapLayerHide => '隐藏图层';
+
+  @override
+  String get mapLayerShowAll => '全部显示';
+
+  @override
+  String get mapLayerHideAll => '全部隐藏';
+
+  @override
   String get dpmYes => '是';
 
   @override
@@ -4951,6 +4987,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get regionAddButton => '添加地区';
+
+  @override
+  String get regionSearchHint => '搜索县市';
+
+  @override
+  String get regionSearchEmpty => '找不到符合的县市';
+
+  @override
+  String get regionSearchTownHint => '搜索乡镇市区';
+
+  @override
+  String get regionSearchTownEmpty => '找不到符合的乡镇市区';
 
   @override
   String get displaySettings => '显示设置';
@@ -7029,6 +7077,18 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayerOrderTitle => '調整圖層順序';
 
   @override
+  String get mapLayerShow => '顯示圖層';
+
+  @override
+  String get mapLayerHide => '隱藏圖層';
+
+  @override
+  String get mapLayerShowAll => '全部顯示';
+
+  @override
+  String get mapLayerHideAll => '全部隱藏';
+
+  @override
   String get dpmYes => '是';
 
   @override
@@ -8083,6 +8143,18 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get regionAddButton => '新增地區';
+
+  @override
+  String get regionSearchHint => '搜尋縣市';
+
+  @override
+  String get regionSearchEmpty => '搵唔到符合嘅縣市';
+
+  @override
+  String get regionSearchTownHint => '搜尋鄉鎮';
+
+  @override
+  String get regionSearchTownEmpty => '搵唔到符合嘅鄉鎮';
 
   @override
   String get displaySettings => '顯示設定';
@@ -10161,6 +10233,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayerOrderTitle => '調整圖層順序';
 
   @override
+  String get mapLayerShow => '顯示圖層';
+
+  @override
+  String get mapLayerHide => '隱藏圖層';
+
+  @override
+  String get mapLayerShowAll => '全部顯示';
+
+  @override
+  String get mapLayerHideAll => '全部隱藏';
+
+  @override
   String get dpmYes => '是';
 
   @override
@@ -11215,6 +11299,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get regionAddButton => '新增地區';
+
+  @override
+  String get regionSearchHint => '搜尋縣市';
+
+  @override
+  String get regionSearchEmpty => '找不到符合的縣市';
+
+  @override
+  String get regionSearchTownHint => '搜尋鄉鎮市區';
+
+  @override
+  String get regionSearchTownEmpty => '找不到符合的鄉鎮市區';
 
   @override
   String get displaySettings => '顯示設定';

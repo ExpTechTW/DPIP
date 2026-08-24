@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "Sắp xếp thứ tự lớp",
+  "mapLayerShow": "Hiện lớp bản đồ",
+  "mapLayerHide": "Ẩn lớp bản đồ",
+  "mapLayerShowAll": "Hiện tất cả",
+  "mapLayerHideAll": "Ẩn tất cả",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "Áp thấp nhiệt đới TD {no}",
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "Thêm khu vực",
+  "regionSearchHint": "Tìm kiếm tỉnh và thành phố",
+  "regionSearchEmpty": "Không tìm thấy tỉnh/thành phố phù hợp",
+  "regionSearchTownHint": "Tìm kiếm xã",
+  "regionSearchTownEmpty": "Không tìm thấy xã phù hợp",
   "displaySettings": "Hiển thị",
   "restroomGradePoor": "Dưới chuẩn",
   "restroomCategoryTourist": "Khu du lịch thắng cảnh",
