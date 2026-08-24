@@ -272,21 +272,48 @@ class NotificationService {
       }
     }
 
-    // Android caches a channel's settings after first creation, so a changed
-    // sound or importance only takes effect with `forceUpdate` — which is what
-    // the catalogue version is for.
+    // Android freezes a created channel's behaviour — sound included — so a
+    // changed definition cannot simply be pushed. awesome's own update path
+    // makes it worse: a forced update deletes the channel under its plain key
+    // and recreates it under `<key>_<digest>`, an id FCM's system-tray renders
+    // can never find. The backend's pushes carry an FCM `notification` block,
+    // so background delivery is exactly that path — and every upgraded install
+    // fell back to the system default sound.
+    //
+    // The catalogue version therefore means **remove everything and register
+    // again**: `removeChannel` deletes both the plain and the hashed variant
+    // plus the registry entry, so each re-registration takes the "created"
+    // branch — plain key, current sound files, no hash suffix ever.
     final stored = _settings.getInt(SettingKeys.channelVersion) ?? 0;
-    final force = stored < NotificationChannels.version;
+    final outdated = stored < NotificationChannels.version;
 
     // On the happy path this only runs when the catalogue changed. On the
     // degraded path it always runs, because it is what registers the channels
     // the seed did not.
-    if (force || !registered) {
+    if (outdated || !registered) {
+      if (outdated && registered) {
+        var purged = true;
+        for (final channel in channels) {
+          if (rejected.contains(channel.channelKey)) continue;
+          try {
+            await AwesomeNotifications().removeChannel(channel.channelKey!);
+          } catch (error, stackTrace) {
+            purged = false;
+            Log.handle(error, stackTrace, 'purging ${channel.channelKey}');
+          }
+        }
+        if (!purged) {
+          Log.error(
+            'notifications: channel purge incomplete — stale sounds may '
+            'persist on upgraded installs until the next launch',
+          );
+        }
+      }
       for (final channel in channels) {
         if (identical(channel, seed)) continue;
         if (rejected.contains(channel.channelKey)) continue;
         try {
-          await AwesomeNotifications().setChannel(channel, forceUpdate: force);
+          await AwesomeNotifications().setChannel(channel);
         } catch (error, stackTrace) {
           rejected.add(channel.channelKey ?? '?');
           Log.handle(error, stackTrace, 'channel ${channel.channelKey}');
@@ -300,7 +327,7 @@ class NotificationService {
         'rejected — ${rejected.join(', ')}. The rest are registered.',
       );
     }
-    if (force) {
+    if (outdated) {
       await _settings.setInt(
         SettingKeys.channelVersion,
         NotificationChannels.version,
