@@ -755,6 +755,100 @@ void main() {
     );
   });
 
+  test(
+    'memory pressure releases speculative sources while the map is visible',
+    () async {
+      final source = _FakeRadarRepository(_ids(40));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[20]);
+      await pumpEventQueue();
+
+      int mounted() =>
+          controller.calls
+              .where((call) => call.startsWith('addSource:radar-src-'))
+              .length -
+          controller.calls
+              .where((call) => call.startsWith('removeSource:radar-src-'))
+              .length;
+
+      expect(
+        mounted(),
+        greaterThan(5),
+        reason: 'the idle pool preloads beyond the visible ring',
+      );
+
+      await layer.onMemoryPressure(controller);
+      await pumpEventQueue();
+
+      expect(
+        mounted(),
+        5,
+        reason:
+            'the OS asked for memory back and the surface is visible, so the '
+            'hidden-tab trim cannot cover this: only the visible ring may '
+            'keep its decoded textures',
+      );
+      expect(
+        source.abandoned,
+        isNot(contains(frames[20].id)),
+        reason: 'never release the frame the user is looking at',
+      );
+    },
+  );
+
+  test(
+    'a map that is still warming can be trimmed without losing its frame',
+    () async {
+      final source = _BlockingWarmRadarRepository(_ids(12));
+      final layer = RadarMapLayer(source);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+      expect(source.warmed, hasLength(1));
+
+      await layer.onMemoryPressure(controller);
+      await pumpEventQueue();
+
+      expect(
+        source.warmCancels,
+        1,
+        reason: 'the speculative fill is the cheapest thing to give back',
+      );
+
+      source.warmGate.complete();
+      await pumpEventQueue();
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+
+      expect(
+        source.warmed,
+        hasLength(1),
+        reason:
+            'refilling the band the instant the OS asked for memory back is '
+            'the one thing that must not happen — re-showing the frame that '
+            'is already settled is not a reason to warm',
+      );
+
+      await layer.show(controller, frames[6]);
+      await pumpEventQueue();
+
+      expect(
+        source.warmed.length,
+        greaterThan(1),
+        reason:
+            'pressure is a moment, not a mode: the next real settle warms '
+            'normally, so a later scrub is not left permanently cold',
+      );
+    },
+  );
+
   test('a long cached scrub keeps the resident source set bounded', () async {
     final source = _FakeRadarRepository(_ids(40));
     final layer = RadarMapLayer(source);
