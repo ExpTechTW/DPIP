@@ -14,7 +14,17 @@ abstract final class NotificationChannels {
   const NotificationChannels._();
 
   /// Bump when any channel definition below changes, to force a re-create.
-  static const int version = 2;
+  ///
+  /// **The bump is not optional paperwork.** Android resolves
+  /// `resource://raw/<name>` to a numeric resource ID when a channel is first
+  /// created and caches that number system-side; the docs forbid changing a
+  /// created channel's behaviour, so the only repair is delete + re-create.
+  /// Resource IDs are re-assigned whenever the resource set changes — and when
+  /// the sound files were re-encoded in place (#525) with no bump, upgraded
+  /// installs kept channels pointing at numbers from an older APK: crossed or
+  /// silent sounds on every device that had seen the previous build. Bumping
+  /// this counter is what makes [NotificationService] force-update them.
+  static const int version = 3;
 
   /// Default status-bar icon (Android) — a monochrome drawable.
   static const String icon = 'resource://drawable/ic_stat_name';
