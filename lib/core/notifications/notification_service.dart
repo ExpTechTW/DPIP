@@ -434,9 +434,7 @@ NotificationContent? contentFromMessage(RemoteMessage message) {
       nestedField('channelKey') ??
       _fallbackChannelKey;
   final id =
-      int.tryParse((data['id'] as String?) ?? '') ??
-      int.tryParse(nestedField('id') ?? '') ??
-      0;
+      _asNotificationId(data['id']) ?? _asNotificationId(nested?['id']) ?? 0;
   final idText = (data['id'] as String?) ?? nestedField('id');
   return NotificationContent(
     id: id,
@@ -462,6 +460,25 @@ Map<String, dynamic>? _nestedContent(Map<String, dynamic> data) {
   } on FormatException {
     return null;
   }
+}
+
+/// Coerces a payload id to the form awesome accepts.
+///
+/// awesome validates ids against the **signed 32-bit** range and throws —
+/// killing the whole notification — on anything wider. The producer computes
+/// its id as a 40-bit hex slice (`parseInt(md5slice, 16)`), so oversized ids
+/// are the common case, not the edge: they are treated as absent and the
+/// notification renders with id 0, replacing whatever came before it.
+int? _asNotificationId(Object? value) {
+  final parsed = switch (value) {
+    final int v => v,
+    final String s => int.tryParse(s),
+    _ => null,
+  };
+  if (parsed == null || parsed < -0x80000000 || parsed > 0x7FFFFFFF) {
+    return null;
+  }
+  return parsed;
 }
 
 /// Displays a background/terminated **data-only** message via awesome (a

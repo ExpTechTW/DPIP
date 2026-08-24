@@ -41,7 +41,7 @@ void main() {
       _message(
         {
           'content':
-              '{"id": ${0xF12345678}, "channelKey": "eq-v2", '
+              '{"id": 305419896, "channelKey": "eq-v2", '
               '"body": "高雄市 能見度 ＜1 km", "notificationLayout": "BigText"}',
         },
         notification: const RemoteNotification(
@@ -56,7 +56,28 @@ void main() {
     // carries `<br>` where the producer meant a newline.
     expect(content?.body, '高雄市(國一N361K) 能見度 ＜1 km，請注意安全。');
     expect(content?.title, '測試通知');
-    expect(content?.id, 0xF12345678);
+    expect(content?.id, 305419896);
+  });
+
+  test('an oversized id is dropped instead of killing the notification', () {
+    // The producer's id is `parseInt(md5.slice(0, 10), 16)` — up to 40 bits,
+    // routinely wider than the signed 32-bit range awesome validates. Before
+    // the clamp this threw out of createNotification and the foreground push
+    // simply never rendered.
+    final content = contentFromMessage(
+      _message({
+        'content':
+            '{"id": ${0xF12345678}, "channelKey": "eq-v2", "body": "測試"}',
+      }, notification: const RemoteNotification(title: '地震速報', body: '花蓮縣近海')),
+    );
+
+    expect(content?.id, 0, reason: 'out of 32-bit range → treated as absent');
+    expect(
+      content?.channelKey,
+      'eq-v2',
+      reason: 'the rest of the payload still applies',
+    );
+    expect(content?.title, '地震速報');
   });
 
   test('flat keys win where both shapes exist', () {
