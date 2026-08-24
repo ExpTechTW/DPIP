@@ -1950,5 +1950,8 @@
   "dumpCopyAgain": "もう一度コピー",
   "dumpUploadFailed": "アップロードに失敗しました",
   "statusLegendUnprobed": "未探知",
-  "statusLegendUnsupported": "非対応"
+  "statusLegendUnsupported": "非対応",
+  "rainScaleSection": "色階の間隔",
+  "rainScaleFine": "細かい",
+  "rainScaleCoarse": "粗い"
 }

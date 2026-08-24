@@ -3212,4 +3212,13 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => 'Hindi suportado';
+
+  @override
+  String get rainScaleSection => 'Antas ng kulay';
+
+  @override
+  String get rainScaleFine => 'Pino';
+
+  @override
+  String get rainScaleCoarse => 'Magaspang';
 }

@@ -18,6 +18,7 @@ class MapChipButton extends StatelessWidget {
     required this.tooltip,
     required this.active,
     required this.onTap,
+    this.label,
   });
 
   /// Whether the menu's settings differ from the defaults: tints the icon
@@ -26,6 +27,17 @@ class MapChipButton extends StatelessWidget {
 
   /// Glyph shown on the chip (outlined variant by convention).
   final IconData icon;
+
+  /// Optional current-value text beside the glyph.
+  ///
+  /// For a menu whose selection changes what the whole map means (the rainfall
+  /// accumulation window), where reading the current value is far more frequent
+  /// than changing it. The chip grows sideways only — its height is what the
+  /// compass parks under, so it must not move.
+  ///
+  /// A labelled chip drops the [active] marker dot: the label already says what
+  /// the dot was hinting at, and the dot would sit on top of the text.
+  final String? label;
 
   final String tooltip;
   final VoidCallback onTap;
@@ -75,13 +87,33 @@ class MapChipButton extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.sm),
-                  child: Icon(
-                    icon,
-                    size: 22,
-                    color: active ? colors.primary : colors.onSurfaceVariant,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        icon,
+                        size: 22,
+                        color: active
+                            ? colors.primary
+                            : colors.onSurfaceVariant,
+                      ),
+                      if (label case final text?) ...[
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          text,
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                height: 1,
+                                color: active
+                                    ? colors.primary
+                                    : colors.onSurfaceVariant,
+                              ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (active)
+                if (active && label == null)
                   Positioned(
                     top: 3,
                     right: 3,

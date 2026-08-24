@@ -6082,6 +6082,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not offered'**
   String get statusLegendUnsupported;
+
+  /// Menu section header for the rainfall colour-scale interval choice
+  ///
+  /// In en, this message translates to:
+  /// **'Colour scale'**
+  String get rainScaleSection;
+
+  /// Rainfall colour scale option: close-spaced thresholds (1-300 mm), for short accumulation windows
+  ///
+  /// In en, this message translates to:
+  /// **'Fine'**
+  String get rainScaleFine;
+
+  /// Rainfall colour scale option: wide-spaced thresholds (10-1500 mm), for multi-day totals
+  ///
+  /// In en, this message translates to:
+  /// **'Coarse'**
+  String get rainScaleCoarse;
 }
 
 class _AppLocalizationsDelegate

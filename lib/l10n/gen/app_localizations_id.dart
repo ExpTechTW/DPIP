@@ -3206,4 +3206,13 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => 'Tidak tersedia';
+
+  @override
+  String get rainScaleSection => 'Skala warna';
+
+  @override
+  String get rainScaleFine => 'Halus';
+
+  @override
+  String get rainScaleCoarse => 'Kasar';
 }

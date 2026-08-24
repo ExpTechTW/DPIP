@@ -62,6 +62,16 @@ abstract class WeatherStationLayer<
   /// value colour and the legend, so a second pass would compound on all three.
   List<(double, String)> get colorStops;
 
+  /// Whether [colorStops] are **band floors** rather than gradient anchors.
+  ///
+  /// Continuous fields (temperature, pressure, humidity) read as a gradient: a
+  /// value between two stops genuinely lies between two colours. Accumulations
+  /// do not — the published rainfall scale is a table of categories, and a dot
+  /// blended halfway between the 70 mm and 90 mm bands claims a precision the
+  /// band structure denies. Banded layers get a MapLibre `step`, [stepColor]
+  /// in the sheet, and a hard-edged legend, so all three agree.
+  bool get bandedColors => false;
+
   /// Whether to draw the value-coloured dot. A subclass may replace it with its
   /// own symbology (e.g. wind arrows) by returning false.
   @protected
@@ -151,13 +161,7 @@ abstract class WeatherStationLayer<
       await controller.addCircleLayer(
         _sourceId,
         _circleId,
-        CircleLayerProperties(
-          circleColor: _colorExpression(),
-          circleRadius: 6,
-          circleStrokeColor: _strokeColor,
-          circleStrokeWidth: 1,
-          circleOpacity: 0.9,
-        ),
+        _circleProperties(),
         // Non-interactive: we do our own nearest-station math in onMapTap and
         // want EVERY tap via map#onMapClick — an interactive layer would eat an
         // on-dot tap as feature#onTap (unhandled) so the station never selects.
@@ -224,7 +228,11 @@ abstract class WeatherStationLayer<
   @override
   Widget buildLegend(BuildContext context) {
     final header = legendHeader(context);
-    final scale = ColorScaleLegend(stops: colorStops, unit: unit);
+    final scale = ColorScaleLegend(
+      stops: colorStops,
+      unit: unit,
+      banded: bandedColors,
+    );
     final child = header == null
         ? scale
         : Column(
@@ -282,7 +290,10 @@ abstract class WeatherStationLayer<
   Color? valueColor(String id) {
     final observation = observationOf(id);
     final value = observation == null ? null : valueOf(observation);
-    return value == null ? null : rampColor(colorStops, value);
+    if (value == null) return null;
+    return bandedColors
+        ? stepColor(colorStops, value)
+        : rampColor(colorStops, value);
   }
 
   @override
@@ -371,12 +382,53 @@ abstract class WeatherStationLayer<
     return {'type': 'FeatureCollection', 'features': features};
   }
 
-  List<Object> _colorExpression() => <Object>[
-    'interpolate',
-    <Object>['linear'],
-    <Object>['get', 'value'],
-    for (final (at, color) in colorStops) ...[at, color],
-  ];
+  /// The dot's complete look. One definition, used by both the initial mount
+  /// and every later re-assert.
+  ///
+  /// It has to be complete: `setLayerProperties` defaults to `skipNulls: false`
+  /// and then assigns *every* field of the layer type, so a partial update
+  /// silently resets the ones it omits — a colour-only re-assert shrank these
+  /// dots to MapLibre's default radius and erased their white outline.
+  CircleLayerProperties _circleProperties() => CircleLayerProperties(
+    circleColor: _colorExpression(),
+    circleRadius: 6,
+    circleStrokeColor: _strokeColor,
+    circleStrokeWidth: 1,
+    circleOpacity: 0.9,
+  );
+
+  /// Re-asserts the value ramp on the already-mounted dot layer.
+  ///
+  /// A subclass whose [colorStops] depend on runtime state (the rainfall scale)
+  /// has to push the new expression itself: the GeoJSON carries values, not
+  /// colours, so re-setting the source alone repaints the identical picture.
+  /// Silent when the layer is not mounted or does not draw dots — the next
+  /// [render] builds it with the current ramp either way.
+  @protected
+  Future<void> applyColorRamp(MapLibreMapController controller) async {
+    if (!drawCircle) return;
+    await controller.setLayerProperties(_circleId, _circleProperties());
+  }
+
+  List<Object> _colorExpression() {
+    if (!bandedColors) {
+      return <Object>[
+        'interpolate',
+        <Object>['linear'],
+        <Object>['get', 'value'],
+        for (final (at, color) in colorStops) ...[at, color],
+      ];
+    }
+    // `step` takes the below-first-stop colour as its default argument, so the
+    // first stop supplies the fallback and only the rest are boundaries.
+    final stops = colorStops;
+    return <Object>[
+      'step',
+      <Object>['get', 'value'],
+      stops.first.$2,
+      for (final (at, color) in stops.skip(1)) ...[at, color],
+    ];
+  }
 
   Future<void> _removeFromMap(MapLibreMapController controller) async {
     // Layers must go before their source; tolerate any that aren't on the map.
