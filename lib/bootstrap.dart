@@ -14,6 +14,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/install_source.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
@@ -161,6 +162,18 @@ Future<void> bootstrap() async {
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
   _refuseUnlessLaunchedByTool();
+
+  // Which distributor this build came from (App Store, Play Store, TestFlight,
+  // or a non-store install — a GitHub release APK included).
+  // `InstallSourceService`
+  // memoizes and logs on its own first call, so firing it here just moves that
+  // line to the top of every session's log instead of leaving it to arrive
+  // whenever `UpdatePrompt` gets around to its own post-first-frame check —
+  // a bug report's most basic question ("did this even come from a store?")
+  // otherwise depended on that check having run and logged before the report
+  // was pulled. Unawaited: a platform channel round trip must never delay
+  // launch, and nothing here consumes the result.
+  unawaited(InstallSourceService.load());
 
   // The bundled weather glyphs are Material Symbols (Apache-2.0). Registering
   // the licence puts it in the app's own 開放原始碼授權 page (More → licences),
