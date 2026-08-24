@@ -169,52 +169,74 @@ final class SettingsStore {
   ///    spending its whole life looking like a first run.
   ///
   /// Returns whether anything moved in either direction. Attaching to an
-  /// already-attached store is a no-op that answers false.
+  /// already-attached store is a no-op that answers false. A reconciliation
+  /// failure leaves the store degraded and throws, so the caller can close the
+  /// failed handle and retry without losing the backlog.
   Future<bool> attachDatabase(SqliteDatabase db) async {
     if (_db != null) return false;
     var moved = false;
-    // Replay first: a session write over the same key must win over the
-    // stale row the database still holds from before the degradation.
-    final pending = Map<String, Object?>.of(_pendingWrites);
-    _pendingWrites.clear();
-    try {
-      for (final MapEntry(key: name, :value) in pending.entries) {
-        if (value == null) {
-          await db.execute('DELETE FROM $settingsTable WHERE key = ?', [name]);
-        } else {
-          await db.execute(
-            'INSERT OR REPLACE INTO $settingsTable (key, value) VALUES (?, ?)',
-            [name, jsonEncode(value)],
-          );
-        }
+    // Adopt disk first, without overwriting anything this session has already
+    // read or written. A write racing this await updates [_values] immediately,
+    // so the containsKey check still gives the session the final say.
+    for (final row in await db.getAll(
+      'SELECT key, value FROM $settingsTable',
+    )) {
+      final name = row['key'] as String?;
+      final raw = row['value'] as String?;
+      if (name == null ||
+          raw == null ||
+          _values.containsKey(name) ||
+          _pendingWrites.containsKey(name)) {
+        continue;
+      }
+      try {
+        _values[name] = jsonDecode(raw);
         moved = true;
+      } catch (_) {
+        // A row unreadable at attach time is no better than one unreadable at
+        // load time — skip it rather than poison the session.
       }
-      for (final row in await db.getAll(
-        'SELECT key, value FROM $settingsTable',
-      )) {
-        final name = row['key'] as String?;
-        final raw = row['value'] as String?;
-        if (name == null || raw == null || _values.containsKey(name)) continue;
-        try {
-          _values[name] = jsonDecode(raw);
-          moved = true;
-        } catch (_) {
-          // A row unreadable at attach time is no better than one unreadable
-          // at load time — skip it rather than poison the session.
-        }
-      }
-    } catch (error, stackTrace) {
-      // Whatever failed stays pending for another attempt; the memory copy is
-      // already authoritative either way.
-      for (final entry in pending.entries) {
-        if (!_pendingWrites.containsKey(entry.key)) {
-          _pendingWrites[entry.key] = entry.value;
-        }
-      }
-      Log.handle(error, stackTrace, 'attaching durable settings database');
     }
-    _db = db;
-    return moved;
+
+    // Drain until empty. Writes keep using [_pendingWrites] while [_db] is
+    // null; checking empty and publishing [_db] contain no await between them,
+    // so no write can land in an orphaned queue at the hand-off boundary.
+    while (true) {
+      final pending = Map<String, Object?>.of(_pendingWrites);
+      if (pending.isEmpty) {
+        _db = db;
+        return moved;
+      }
+      _pendingWrites.clear();
+      try {
+        await db.writeTransaction((tx) async {
+          for (final MapEntry(key: name, :value) in pending.entries) {
+            if (value == null) {
+              await tx.execute('DELETE FROM $settingsTable WHERE key = ?', [
+                name,
+              ]);
+            } else {
+              await tx.execute(
+                'INSERT OR REPLACE INTO $settingsTable (key, value) '
+                'VALUES (?, ?)',
+                [name, jsonEncode(value)],
+              );
+            }
+          }
+        });
+        moved = true;
+      } catch (error, stackTrace) {
+        // A newer racing write for the same key wins; otherwise restore the
+        // failed batch intact for the next recovery attempt.
+        for (final entry in pending.entries) {
+          if (!_pendingWrites.containsKey(entry.key)) {
+            _pendingWrites[entry.key] = entry.value;
+          }
+        }
+        Log.handle(error, stackTrace, 'attaching durable settings database');
+        rethrow;
+      }
+    }
   }
 
   Future<void> _put(SettingKey<Object?> key, Object value) async {
