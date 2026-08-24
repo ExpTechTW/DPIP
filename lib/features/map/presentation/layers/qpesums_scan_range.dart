@@ -8,10 +8,11 @@ import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 /// outlining it with the radar circles claimed coverage on the corners the
 /// forecast does have and denied it along the edges of the circles.
 ///
-/// 442 × 562 cell centres at the same 0.0125° step the composite uses:
-/// `118.0 + 441 × 0.0125 = 123.5125` and `20.0 + 561 × 0.0125 = 27.0125`. The
-/// bounds are written out rather than derived so the numbers in the file are
-/// the numbers on the wire.
+/// 441 × 561 cells at the same 0.0125° step the composite uses. 118.0°E,
+/// 20.0°N is the south-west edge of the first cell; the opposite **outer**
+/// edges are `118.0 + 441 × 0.0125 = 123.5125` and
+/// `20.0 + 561 × 0.0125 = 27.0125`. The bounds are written out rather than
+/// derived so the numbers in the file are the numbers on the wire.
 abstract final class QpesumsScanRange {
   QpesumsScanRange._();
 
@@ -55,7 +56,7 @@ abstract final class QpesumsScanRange {
         'type': 'Feature',
         'properties': <String, Object?>{
           'name': 'effective_extent',
-          'note': 'QPESUMS forecast grid, 442×562 at 0.0125°',
+          'note': 'QPESUMS forecast grid, 441×561 cells at 0.0125°',
         },
         'geometry': {
           'type': 'Polygon',
