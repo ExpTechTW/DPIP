@@ -415,6 +415,34 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     // a render resume nor a timeline refetch.
   }
 
+  /// The OS is short on memory and asked for caches back.
+  ///
+  /// Android delivers this from `onTrimMemory` at `TRIM_MEMORY_RUNNING_LOW`
+  /// and above; `RUNNING_CRITICAL` is the last notice before lmkd chooses a
+  /// victim. Returning nothing is how a process becomes that victim — DPIP was
+  /// OOM-killed at ~1 GB resident, 341 MB of it decoded raster textures held
+  /// by mounted timeline sources, with no code path willing to drop any of it.
+  ///
+  /// Only the active layer is asked: an inactive one holds no mounted sources
+  /// (`_onLayerSelected` clears it on the way out). The image cache is Flutter's
+  /// own and is rebuilt on demand.
+  @override
+  void didHaveMemoryPressure() {
+    final controller = _controller;
+    _trace(
+      () =>
+          'memory-pressure active=${_active.id} '
+          'controller=${controller != null}',
+    );
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    if (controller == null) return;
+    _queue(
+      () => _active.onMemoryPressure(controller),
+      label: '${_active.id}.memory-pressure',
+    );
+  }
+
   /// A framing request arrived (map re-opened from Home / the nav bar) — apply it
   /// once the style is up. Leaves it pending if not, for [_onStyleLoaded].
   void _onHandoff() {

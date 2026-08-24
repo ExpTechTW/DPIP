@@ -1210,35 +1210,79 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// displayed timestamp. Only the extra ready-resident sources are removed;
   /// their compressed tile bodies remain in the native L1 and SQLite L2 caches
   /// and are rebuilt by the idle pool after the surface is visible again.
-  Future<void> _trimHiddenResidents(MapLibreMapController controller) =>
-      _enqueueMutation(() async {
-        if (_surfaceVisible || _resident.isEmpty) return;
-        final shown = _shownIndex;
-        final keep = shown == null
-            ? <String>{?_shownFrameId}
-            : _ringAt(shown).$3;
-        final stale = [
-          for (final candidate in _resident)
-            if (!keep.contains(candidate)) candidate,
-        ];
-        if (stale.isEmpty) return;
-        mapTrace(
-          'timeline/$id',
-          () => 'hidden-trim start remove=${stale.length} keep=${keep.length}',
-        );
-        await source.abandonFrames(stale);
-        for (final candidate in stale) {
-          _resident.remove(candidate);
-          _ring.remove(candidate);
-          _readyFrames.remove(candidate);
-          _lru.remove(candidate);
-          await _removeFrame(controller, candidate);
-        }
-        mapTrace(
-          'timeline/$id',
-          () => 'hidden-trim done resident=${_resident.length}',
-        );
-      });
+  Future<void> _trimHiddenResidents(MapLibreMapController controller) async {
+    if (_surfaceVisible) return;
+    await _dropResidentsOutsideRing(controller, reason: 'hidden');
+  }
+
+  /// Removes every resident source outside the visible ring, outright.
+  ///
+  /// `visibility: none` does not release a source's decoded tile textures — the
+  /// source has to go. This is the only path that actually gives GPU memory
+  /// back, which is why both the hidden-tab edge and [onMemoryPressure] use it.
+  ///
+  /// [keep] defaults to the ring around the shown frame. The shown frame is
+  /// always retained: this releases speculation, never what the user is
+  /// looking at.
+  Future<void> _dropResidentsOutsideRing(
+    MapLibreMapController controller, {
+    required String reason,
+    Set<String>? keep,
+  }) => _enqueueMutation(() async {
+    if (_resident.isEmpty) return;
+    final shown = _shownIndex;
+    final retain =
+        keep ?? (shown == null ? <String>{?_shownFrameId} : _ringAt(shown).$3);
+    final stale = [
+      for (final candidate in _resident)
+        if (!retain.contains(candidate)) candidate,
+    ];
+    if (stale.isEmpty) return;
+    mapTrace(
+      'timeline/$id',
+      () => '$reason-trim start remove=${stale.length} keep=${retain.length}',
+    );
+    await source.abandonFrames(stale);
+    for (final candidate in stale) {
+      _resident.remove(candidate);
+      _ring.remove(candidate);
+      _readyFrames.remove(candidate);
+      _lru.remove(candidate);
+      await _removeFrame(controller, candidate);
+    }
+    mapTrace(
+      'timeline/$id',
+      () => '$reason-trim done resident=${_resident.length}',
+    );
+  });
+
+  /// Gives memory back to the OS without blanking the map.
+  ///
+  /// Three things are released, cheapest-to-rebuild first: the speculative warm
+  /// band (bytes we merely expected to want), then every mounted source outside
+  /// the visible ring (decoded textures — the expensive part), and nothing
+  /// else. The displayed frame and its immediate neighbours stay mounted, so
+  /// this is invisible to the user beyond a slower scrub afterwards.
+  ///
+  /// Deliberately not gated on [_surfaceVisible]: a foreground map is exactly
+  /// the case that gets a process killed, and it is the case
+  /// [_trimHiddenResidents] cannot cover.
+  @override
+  Future<void> onMemoryPressure(MapLibreMapController controller) async {
+    // Deliberately not [_suspendWarm]: that flag is sticky until a settle
+    // clears it, and pressure is a moment, not a mode. Cancel the fill that is
+    // running and invalidate the band so the next camera idle recomputes it —
+    // then normal warming resumes on its own.
+    _revealGeneration++;
+    _invalidateWarmBand();
+    source.cancelTileWarm();
+    MapTileCache.trace(
+      () =>
+          'timeline=$id memory-pressure resident=${_resident.length} '
+          'ring=${_ring.length} shown=$_shownFrameId',
+    );
+    await _dropResidentsOutsideRing(controller, reason: 'pressure');
+  }
 
   void _suspendWarm() {
     if (_warmSuspended) return;

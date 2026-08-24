@@ -212,6 +212,18 @@ abstract interface class MapLayer {
   /// nobody can see) and push one catch-up on the visible edge.
   void onSurfaceVisibility(bool visible);
 
+  /// Android/iOS asked every process to give memory back.
+  ///
+  /// This is not a hint. `TRIM_MEMORY_RUNNING_CRITICAL` is the last notice
+  /// before lmkd picks a victim, and a process that returns nothing is the
+  /// process it picks — DPIP was OOM-killed at ~1 GB resident with 341 MB of
+  /// it in mounted raster textures that no code path was willing to drop.
+  ///
+  /// Give back caches only. A layer must still be able to draw what the user
+  /// is looking at when this returns: never release the displayed frame, and
+  /// never let a release make a stale feed look current.
+  Future<void> onMemoryPressure(MapLibreMapController controller);
+
   /// This layer's frames in **chronological order** (oldest first); the last is
   /// "now". `Ok(<empty>)` when the layer currently has nothing to show.
   Future<Result<List<MapFrame>>> frames();
@@ -323,6 +335,9 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   void onSurfaceVisibility(bool visible) {}
+
+  @override
+  Future<void> onMemoryPressure(MapLibreMapController controller) async {}
 
   @override
   double get mapMinZoom => BaseMap.defaultMinZoom;
