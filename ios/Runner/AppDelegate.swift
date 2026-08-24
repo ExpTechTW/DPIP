@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -7,7 +8,29 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Claim the notification-center delegate BEFORE awesome_notifications'
+    // own didFinishLaunching observer does. awesome captures whoever is set
+    // at that point as its "original delegate" and only forwards to it when
+    // its own status-bar presenter declines — which is exactly the cold-start
+    // window where that presenter is not ready yet and pushes were swallowed
+    // whole (completionHandler([]) with nobody left to ask). Presenting here
+    // plays the aps sound exactly once; when the presenter succeeds instead,
+    // this is never called.
+    UNUserNotificationCenter.current().delegate = self
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  /// Presents pushes awesome's own status-bar presenter declined — the cold-
+  /// start window before that presenter is ready. Banner plus the payload's
+  /// own sound, played once by the system.
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions)
+      -> Void
+  ) {
+    completionHandler([.list, .banner, .sound])
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
