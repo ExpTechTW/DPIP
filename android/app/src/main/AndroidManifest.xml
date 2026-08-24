@@ -43,23 +43,43 @@
              compositing to the OS through Vulkan and SurfaceControl instead.
              Requires API 34+, Vulkan and Impeller; below that the engine falls
              back on its own, so this is safe to ship. Remove the line to revert. -->
-        <!-- Off deliberately. Do not turn this on again on Flutter 3.47.x.
-             Measured on a Pixel 9 (Android 17, Vulkan/Impeller): with HCPP on,
-             any Flutter overlay repainting above the map leaks GPU buffers
-             without bound. The wind layer's particle overlay took GL texture
-             memory from 394 MB to 8042 MB in 16 s (~500 MB/s) and lmkd killed
-             the process at 8.6 GB RSS. With HCPP off the same screen is flat at
-             ~500 MB. The radar timeline, same machinery minus the animated
-             overlay, is stable either way — the overlay is what triggers it.
-             Independently, PlatformViewsController2.onEndFrame() in this SDK
-             dereferences flutterView three times with no null check while
-             detachFromView() nulls it, so a teardown race aborts the process
-             (flutter/flutter#190609; the fix is master-only, NOT in 3.47.1).
-             Zoom smoothness comes from the fork's texture-layer composition
-             instead — see MapLibreMethodChannel.useHybridComposition. -->
+        <!-- On deliberately, with one known cost. HCPP composites the map as
+             its own SurfaceControl layer, so map pixels never pass through
+             Flutter's rasterizer. It is the only Android path that zooms
+             smoothly: Virtual Display is locked to 60 Hz by AOSP on this
+             120 Hz panel, and Flutter's own position on the texture-layer path
+             is "There are no plans to improve TLHC performance currently"
+             (flutter/flutter#183626). Both were measured here in a profile
+             build and both janked.
+
+             THE COST, measured on a Pixel 9 (Android 17, Vulkan/Impeller):
+             Flutter 3.47.x leaks one full-screen HardwareBuffer (10.47 MB) per
+             frame that any Flutter content presents ABOVE the map.
+             impeller/.../ahb/ahb_texture_pool_vk.cc Pop() allocates when the
+             pool is empty and Push() has no cap and no GC — the header still
+             claims both; PR #166943 deleted them. Push()'s only caller is a
+             SurfaceControl transaction on-complete callback that the engine
+             deliberately does not apply under HCPP. The file is byte-identical
+             (sha256 1a7016c1…) at 3.47.0, 3.47.1, flutter-3.48-candidate.0 and
+             master, so no upgrade available today fixes it.
+
+             In practice: the wind layer's animated particle overlay drove GL
+             memory 394 -> 8042 MB in 16 s and lmkd killed the process at
+             8.6 GB. Every other layer is stable (radar holds ~1 GB for minutes)
+             because nothing repaints continuously above the map. The wind
+             particles are being moved into a MapLibre layer to remove the last
+             continuous overlay; until that lands, wind is the one screen this
+             flag is not safe on.
+
+             Also unfixed on 3.47.x: PlatformViewsController2.onEndFrame() can
+             abort the process on teardown (flutter/flutter#190609). The guard
+             is on master only — verify by reading the tag's source, never by
+             version number. Detect with
+             adb logcat -b crash | grep 'Check failed: fml::jni::CheckException'
+             — Crashlytics cannot see a SIGABRT. -->
         <meta-data
             android:name="io.flutter.embedding.android.EnableHcpp"
-            android:value="false" />
+            android:value="true" />
         <!-- Monochrome status-bar icon for FCM/awesome notifications. -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
