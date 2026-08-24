@@ -29,7 +29,6 @@ dependencies:
   # Pinned to the exact version (not `^`) so a plain `pub upgrade` can't drift
   # the minor either.
   firebase_core: 4.11.0
-  firebase_messaging: 16.4.1
   flutter:
     sdk: flutter
   flutter_localizations:
