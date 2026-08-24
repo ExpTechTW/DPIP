@@ -117,6 +117,12 @@ object BgLocationStore {
         if (!enabled(context)) return
         val prefs = prefs(context)
 
+        // Before the throttle on purpose. The throttle below exists to spare the
+        // server a 429; the local track has no server to spare, and dropping a
+        // fix the OS took the trouble to deliver would put holes in the history
+        // for a reason that has nothing to do with it.
+        LocationTrackStore.record(context, lat, lng)
+
         // At most one report a minute, across every trigger.
         //
         // Four callers fire this independently — the geofence, the alarm
