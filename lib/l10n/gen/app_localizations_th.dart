@@ -3189,4 +3189,13 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => 'ไม่รองรับ';
+
+  @override
+  String get rainScaleSection => 'ช่วงระดับสี';
+
+  @override
+  String get rainScaleFine => 'ละเอียด';
+
+  @override
+  String get rainScaleCoarse => 'หยาบ';
 }

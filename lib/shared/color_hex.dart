@@ -19,6 +19,23 @@ Color? colorFromHexRgb(String hex) {
   return value == null ? null : Color(0xFF000000 | value);
 }
 
+/// [value] read against a **banded** `(at, hexColour)` ramp — the Dart twin of
+/// the `step` expression handed to MapLibre.
+///
+/// A value takes the colour of the last stop it is at or above; below the first
+/// stop it takes the first stop's colour. Unlike [rampColor] no colour is ever
+/// invented between two stops, which is the point: on a categorical scale (the
+/// CWA rainfall bands) a blend would render a reading that no band defines.
+Color? stepColor(List<(double, String)> stops, double value) {
+  if (stops.isEmpty) return null;
+  var chosen = stops.first.$2;
+  for (final (at, hex) in stops) {
+    if (value < at) break;
+    chosen = hex;
+  }
+  return colorFromHexRgb(chosen);
+}
+
 /// [value] interpolated on a `(at, hexColour)` ramp — the Dart twin of the
 /// `interpolate` expression handed to MapLibre, so a value-coloured dot on the
 /// map and its reading in the sheet agree by construction rather than by two

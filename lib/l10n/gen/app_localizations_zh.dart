@@ -3126,6 +3126,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => '不支援';
+
+  @override
+  String get rainScaleSection => '色階間距';
+
+  @override
+  String get rainScaleFine => '小間距';
+
+  @override
+  String get rainScaleCoarse => '大間距';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6249,6 +6258,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get statusLegendUnsupported => '不支持';
+
+  @override
+  String get rainScaleSection => '色阶间距';
+
+  @override
+  String get rainScaleFine => '小间距';
+
+  @override
+  String get rainScaleCoarse => '大间距';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -9372,6 +9390,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get statusLegendUnsupported => '不支援';
+
+  @override
+  String get rainScaleSection => '色階間距';
+
+  @override
+  String get rainScaleFine => '小間距';
+
+  @override
+  String get rainScaleCoarse => '大間距';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12495,4 +12522,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get statusLegendUnsupported => '不支援';
+
+  @override
+  String get rainScaleSection => '色階間距';
+
+  @override
+  String get rainScaleFine => '小間距';
+
+  @override
+  String get rainScaleCoarse => '大間距';
 }

@@ -328,6 +328,7 @@ class RecordingMapController implements MapLibreMapController {
     final json = properties.toJson();
     calls.add('set:$layerId:${json['raster-opacity']}');
     sentKeys.add(json.keys.toSet());
+    lastProperties[layerId] = json;
     _record(layerId, properties);
   }
 
@@ -341,9 +342,18 @@ class RecordingMapController implements MapLibreMapController {
       final json = update.properties.toJson(skipNulls: skipNulls);
       calls.add('set:${update.layerId}:${json['raster-opacity']}');
       sentKeys.add(json.keys.toSet());
+      lastProperties[update.layerId] = json;
       _record(update.layerId, update.properties);
     }
   }
+
+  /// The most recent property JSON sent for each layer.
+  ///
+  /// Kept raw and un-merged, unlike [_state]: the real `setLayerProperties`
+  /// defaults to `skipNulls: false` and then *assigns every field*, so a caller
+  /// that omits one silently resets it. A merging model cannot see that class
+  /// of bug, so this records exactly what went over the wire.
+  final Map<String, Map<String, dynamic>> lastProperties = {};
 
   /// Merges into the layer's state: the layer keeps whatever a call omits,
   /// which is exactly what `skipNulls` means on the wire.

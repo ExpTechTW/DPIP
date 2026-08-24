@@ -4,6 +4,7 @@ library;
 
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart';
+import 'package:dpip/features/map/presentation/layers/rain_color_scale.dart';
 import 'package:dpip/features/weather/domain/rain_interval.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
@@ -29,14 +30,38 @@ extension RainIntervalL10n on RainInterval {
   };
 }
 
+/// Localised labels for [RainColorScale].
+extension RainColorScaleL10n on RainColorScale {
+  String label(AppLocalizations l10n) => switch (this) {
+    RainColorScale.fine => l10n.rainScaleFine,
+    RainColorScale.coarse => l10n.rainScaleCoarse,
+  };
+}
+
 /// Shares [WeatherStationLayer]'s dots/sheet/trend machinery; only the value
 /// source (the accumulation window) and its chrome differ.
 class RainMapLayer
     extends WeatherStationLayer<RainSnapshot, RainObservation, RainTrend> {
   RainMapLayer(super.repository);
 
-  /// Selected accumulation window — default matches legacy (`now` = 今日).
-  final ValueNotifier<RainInterval> interval = ValueNotifier(RainInterval.now);
+  /// Selected accumulation window.
+  ///
+  /// One hour, not `now`: the day-so-far total answers "has it rained", which
+  /// the forecast already says, while the last hour answers "is it raining
+  /// hard right now" — the question a rainfall map is opened for.
+  final ValueNotifier<RainInterval> interval = ValueNotifier(
+    RainInterval.hour1,
+  );
+
+  /// Threshold table the ramp is read against.
+  ///
+  /// Changing the window re-suggests the scale that suits it, and an explicit
+  /// choice holds only until the next window change. Sticking to a manual
+  /// choice forever would silently flatten a 3-day total to one grey blob for
+  /// anyone who once picked the fine scale to inspect an hour.
+  final ValueNotifier<RainColorScale> colorScale = ValueNotifier(
+    RainColorScale.defaultFor(RainInterval.hour1),
+  );
 
   @override
   String get id => 'rain';
@@ -60,20 +85,15 @@ class RainMapLayer
   @override
   bool get chartBars => true;
 
-  /// Legacy precipitation colour ramp (mm).
+  /// CWA banded precipitation scale (mm) at the selected [colorScale].
   @override
   List<(double, String)> get colorStops => [
-    (0, '#c2c2c2'.vision),
-    (10, '#9cfcff'.vision),
-    (30, '#059bff'.vision),
-    (50, '#39ff03'.vision),
-    (100, '#fffb03'.vision),
-    (200, '#ff9500'.vision),
-    (300, '#ff0000'.vision),
-    (500, '#fb00ff'.vision),
-    (1000, '#960099'.vision),
-    (2000, '#000000'.vision),
+    for (final (at, hex) in colorScale.value.stops) (at, hex.vision),
   ];
+
+  /// The published scale is a table of categories, not a gradient.
+  @override
+  bool get bandedColors => true;
 
   @override
   double? valueOf(RainObservation observation) =>
@@ -106,7 +126,7 @@ class RainMapLayer
   ) => value > 0 || zoom > 8;
 
   @override
-  Listenable get chromeListenable => interval;
+  Listenable get chromeListenable => Listenable.merge([interval, colorScale]);
 
   @override
   Widget? legendHeader(BuildContext context) => Text(
@@ -121,16 +141,36 @@ class RainMapLayer
   }
 
   /// Switches the accumulation window and refreshes dots + labels in place.
+  ///
+  /// The scale follows: a window change is the moment an explicit scale choice
+  /// stops being informed, because it was made about a different range.
   Future<void> setInterval(RainInterval next) async {
     if (interval.value == next) return;
     interval.value = next;
+    colorScale.value = RainColorScale.defaultFor(next);
+    await _repaint();
+  }
+
+  /// Switches the threshold table, keeping the window.
+  Future<void> setColorScale(RainColorScale next) async {
+    if (colorScale.value == next) return;
+    colorScale.value = next;
+    await _repaint();
+  }
+
+  /// Re-pushes the source and the value ramp after a window/scale change.
+  ///
+  /// The dots carry their value in the GeoJSON but take their colour from the
+  /// layer's paint expression, so a scale change has to re-assert the ramp too
+  /// — the feature data alone is unchanged and would repaint identically.
+  Future<void> _repaint() async {
     final map = controller;
-    if (map != null) {
-      try {
-        await map.setGeoJsonSource(sourceId, geoJson);
-      } catch (_) {
-        // Source gone (layer torn down) — next [render] rebuilds it.
-      }
+    if (map == null) return;
+    try {
+      await map.setGeoJsonSource(sourceId, geoJson);
+      await applyColorRamp(map);
+    } catch (_) {
+      // Source gone (layer torn down) — next [render] rebuilds it.
     }
   }
 
@@ -146,18 +186,28 @@ class RainMapLayer
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return ListenableBuilder(
-      listenable: Listenable.merge([interval, showTownLabels, showTerrain]),
+      listenable: Listenable.merge([
+        interval,
+        colorScale,
+        showTownLabels,
+        showTerrain,
+      ]),
       builder: (context, _) {
         final current = interval.value;
+        final scale = colorScale.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
           style: MapChipButton.menuStyle(context),
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.timelapse_outlined,
+            // The window changes what every dot on the map means, so it is read
+            // far more often than it is set — a bare icon made the answer cost
+            // a menu open. Same chip affordance and height as every other
+            // layer's menu, so the compass (parked under the chip band) lines
+            // up across layers.
+            label: current.label(l10n),
             tooltip: l10n.rainIntervalMenu,
-            // Same chip affordance and height as every other layer's menu, so
-            // the compass (parked under the chip band) lines up across layers.
-            active: current != RainInterval.now,
+            active: current != RainInterval.hour1,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),
@@ -176,6 +226,16 @@ class RainMapLayer
                   MenuItemButton(
                     onPressed: () => setInterval(option),
                     trailingIcon: option == current
+                        ? Icon(Icons.check, size: 18, color: colors.primary)
+                        : null,
+                    child: Text(option.label(l10n)),
+                  ),
+                const MapMenuDivider(),
+                SectionHeader(l10n.rainScaleSection),
+                for (final option in RainColorScale.values)
+                  MenuItemButton(
+                    onPressed: () => setColorScale(option),
+                    trailingIcon: option == scale
                         ? Icon(Icons.check, size: 18, color: colors.primary)
                         : null,
                     child: Text(option.label(l10n)),

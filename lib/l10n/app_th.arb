@@ -1950,5 +1950,8 @@
   "dumpCopyAgain": "คัดลอกอีกครั้ง",
   "dumpUploadFailed": "อัปโหลดไม่สำเร็จ",
   "statusLegendUnprobed": "ยังไม่ตรวจ",
-  "statusLegendUnsupported": "ไม่รองรับ"
+  "statusLegendUnsupported": "ไม่รองรับ",
+  "rainScaleSection": "ช่วงระดับสี",
+  "rainScaleFine": "ละเอียด",
+  "rainScaleCoarse": "หยาบ"
 }

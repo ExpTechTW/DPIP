@@ -3854,5 +3854,17 @@
     "description": "Shown when a debug dump could not be uploaded"
   },
   "statusLegendUnprobed": "Not yet probed",
-  "statusLegendUnsupported": "Not offered"
+  "statusLegendUnsupported": "Not offered",
+  "rainScaleSection": "Colour scale",
+  "rainScaleFine": "Fine",
+  "rainScaleCoarse": "Coarse",
+  "@rainScaleSection": {
+    "description": "Menu section header for the rainfall colour-scale interval choice"
+  },
+  "@rainScaleFine": {
+    "description": "Rainfall colour scale option: close-spaced thresholds (1-300 mm), for short accumulation windows"
+  },
+  "@rainScaleCoarse": {
+    "description": "Rainfall colour scale option: wide-spaced thresholds (10-1500 mm), for multi-day totals"
+  }
 }

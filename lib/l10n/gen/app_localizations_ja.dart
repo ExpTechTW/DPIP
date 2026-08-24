@@ -3141,4 +3141,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get statusLegendUnsupported => '非対応';
+
+  @override
+  String get rainScaleSection => '色階の間隔';
+
+  @override
+  String get rainScaleFine => '細かい';
+
+  @override
+  String get rainScaleCoarse => '粗い';
 }

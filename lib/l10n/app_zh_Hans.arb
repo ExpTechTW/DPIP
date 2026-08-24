@@ -1950,5 +1950,8 @@
   "dumpCopyAgain": "再复制一次",
   "dumpUploadFailed": "上传失败，请稍后再试",
   "statusLegendUnprobed": "未探测",
-  "statusLegendUnsupported": "不支持"
+  "statusLegendUnsupported": "不支持",
+  "rainScaleSection": "色阶间距",
+  "rainScaleFine": "小间距",
+  "rainScaleCoarse": "大间距"
 }

@@ -1950,5 +1950,8 @@
   "dumpCopyAgain": "Kopyahin ulit",
   "dumpUploadFailed": "Nabigong mag-upload",
   "statusLegendUnprobed": "Hindi pa nasuri",
-  "statusLegendUnsupported": "Hindi suportado"
+  "statusLegendUnsupported": "Hindi suportado",
+  "rainScaleSection": "Antas ng kulay",
+  "rainScaleFine": "Pino",
+  "rainScaleCoarse": "Magaspang"
 }

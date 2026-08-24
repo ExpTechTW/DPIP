@@ -1950,5 +1950,8 @@
   "dumpCopyAgain": "Salin lagi",
   "dumpUploadFailed": "Gagal mengunggah",
   "statusLegendUnprobed": "Belum diperiksa",
-  "statusLegendUnsupported": "Tidak tersedia"
+  "statusLegendUnsupported": "Tidak tersedia",
+  "rainScaleSection": "Skala warna",
+  "rainScaleFine": "Halus",
+  "rainScaleCoarse": "Kasar"
 }

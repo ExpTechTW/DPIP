@@ -54,7 +54,12 @@ class MapLegendCard extends StatelessWidget {
 /// The unit, when present, is always shown **below** the scale ([unit]); it is
 /// never appended to every value label — a number column stays numbers.
 class ColorScaleLegend extends StatelessWidget {
-  const ColorScaleLegend({super.key, required this.stops, this.unit});
+  const ColorScaleLegend({
+    super.key,
+    required this.stops,
+    this.unit,
+    this.banded = false,
+  });
 
   /// Ascending value → hex colour pairs (same order as MapLibre ramps), in
   /// whatever colour the layer actually paints — corrected, or raster-exempt,
@@ -63,6 +68,15 @@ class ColorScaleLegend extends StatelessWidget {
 
   /// Unit shown below the scale, e.g. `m/s` or `°C`.
   final String? unit;
+
+  /// Draw hard-edged bands instead of a gradient.
+  ///
+  /// A banded scale is a table of categories, so each stop paints a solid cell
+  /// and its value is printed **on the boundary** it opens — the reading a
+  /// number marks is where one band ends and the next begins, not the middle of
+  /// a swatch. The lowest stop is the below-threshold band and prints no
+  /// number, which is why N stops show N-1 labels.
+  final bool banded;
 
   static const double _cell = 14;
   static const double _swatch = 8;
@@ -95,25 +109,40 @@ class ColorScaleLegend extends StatelessWidget {
             Container(
               width: _swatch,
               height: height,
+              clipBehavior: banded ? Clip.antiAlias : Clip.none,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(_corner),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: swatchColors,
-                ),
+                gradient: banded
+                    ? null
+                    : LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: swatchColors,
+                      ),
               ),
+              child: banded
+                  ? Column(
+                      children: [
+                        for (final color in swatchColors)
+                          Expanded(child: ColoredBox(color: color)),
+                      ],
+                    )
+                  : null,
             ),
             const SizedBox(width: AppSpacing.sm),
             SizedBox(
               height: height,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final stop in rows)
-                    Expanded(child: Text(_label(stop.$1), style: labelStyle)),
-                ],
-              ),
+              child: banded
+                  ? _BandBoundaryLabels(rows: rows, style: labelStyle)
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (final stop in rows)
+                          Expanded(
+                            child: Text(_label(stop.$1), style: labelStyle),
+                          ),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -333,4 +362,38 @@ class _LineSwatchPainter extends CustomPainter {
       old.casingColor != casingColor ||
       old.casingWidth != casingWidth ||
       old.dash != dash;
+}
+
+/// The number column of a banded scale.
+///
+/// Each label is centred on the line between two bands rather than inside one,
+/// which is how a published rainfall scale reads: `70` is the point the band
+/// changes, not a sample from within it. [rows] is strongest-first (top-down),
+/// so row *i* opens the boundary one cell below the top of its own band, and
+/// the last row — the below-threshold band — opens nothing and is skipped.
+class _BandBoundaryLabels extends StatelessWidget {
+  const _BandBoundaryLabels({required this.rows, required this.style});
+
+  final List<ColorStop> rows;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    const cell = ColorScaleLegend._cell;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        for (var i = 0; i < rows.length - 1; i++)
+          Positioned(
+            top: (i + 1) * cell - cell / 2,
+            left: 0,
+            height: cell,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(ColorScaleLegend._label(rows[i].$1), style: style),
+            ),
+          ),
+      ],
+    );
+  }
 }

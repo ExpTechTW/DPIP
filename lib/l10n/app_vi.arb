@@ -1950,5 +1950,8 @@
   "dumpCopyAgain": "Sao chép lại",
   "dumpUploadFailed": "Tải lên thất bại",
   "statusLegendUnprobed": "Chưa dò",
-  "statusLegendUnsupported": "Không có"
+  "statusLegendUnsupported": "Không có",
+  "rainScaleSection": "Thang màu",
+  "rainScaleFine": "Mịn",
+  "rainScaleCoarse": "Thô"
 }
