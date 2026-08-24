@@ -765,6 +765,18 @@ class AppLocalizationsYue extends AppLocalizations {
   String get mapLayerOrderTitle => '調整圖層順序';
 
   @override
+  String get mapLayerShow => '顯示圖層';
+
+  @override
+  String get mapLayerHide => '隱藏圖層';
+
+  @override
+  String get mapLayerShowAll => '全部顯示';
+
+  @override
+  String get mapLayerHideAll => '全部隱藏';
+
+  @override
   String get dpmYes => '係';
 
   @override
@@ -1819,6 +1831,18 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get regionAddButton => '新增地區';
+
+  @override
+  String get regionSearchHint => '搜尋縣市';
+
+  @override
+  String get regionSearchEmpty => '搵唔到符合嘅縣市';
+
+  @override
+  String get regionSearchTownHint => '搜尋鄉鎮';
+
+  @override
+  String get regionSearchTownEmpty => '搵唔到符合嘅鄉鎮';
 
   @override
   String get displaySettings => '顯示設定';

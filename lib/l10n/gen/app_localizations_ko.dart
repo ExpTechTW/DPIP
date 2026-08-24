@@ -769,6 +769,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayerOrderTitle => '레이어 순서';
 
   @override
+  String get mapLayerShow => '레이어 표시';
+
+  @override
+  String get mapLayerHide => '레이어 숨기기';
+
+  @override
+  String get mapLayerShowAll => '전체 표시';
+
+  @override
+  String get mapLayerHideAll => '전체 숨기기';
+
+  @override
   String get dpmYes => '예';
 
   @override
@@ -1830,6 +1842,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get regionAddButton => '지역 추가';
+
+  @override
+  String get regionSearchHint => '시·도 검색';
+
+  @override
+  String get regionSearchEmpty => '일치하는 시·도가 없습니다';
+
+  @override
+  String get regionSearchTownHint => '읍·면·동 검색';
+
+  @override
+  String get regionSearchTownEmpty => '일치하는 읍·면·동이 없습니다';
 
   @override
   String get displaySettings => '화면';

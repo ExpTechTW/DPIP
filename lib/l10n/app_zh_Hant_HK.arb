@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "調整圖層順序",
+  "mapLayerShow": "顯示圖層",
+  "mapLayerHide": "隱藏圖層",
+  "mapLayerShowAll": "全部顯示",
+  "mapLayerHideAll": "全部隱藏",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "熱帶性低氣壓 TD {no}",
   "mapLayerSatelliteWatervapor": "ひまわり 水氣",
   "regionAddButton": "新增地區",
+  "regionSearchHint": "搜尋縣市",
+  "regionSearchEmpty": "搵唔到符合嘅縣市",
+  "regionSearchTownHint": "搜尋鄉鎮",
+  "regionSearchTownEmpty": "搵唔到符合嘅鄉鎮",
   "displaySettings": "顯示設定",
   "restroomGradePoor": "不合格",
   "restroomCategoryTourist": "觀光地區及風景區",

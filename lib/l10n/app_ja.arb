@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "レイヤーの順番",
+  "mapLayerShow": "レイヤーを表示",
+  "mapLayerHide": "レイヤーを非表示",
+  "mapLayerShowAll": "すべて表示",
+  "mapLayerHideAll": "すべて非表示",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "熱帯低気圧 TD {no}",
   "mapLayerSatelliteWatervapor": "ひまわり 水蒸気",
   "regionAddButton": "地域を追加",
+  "regionSearchHint": "都道府県・市区を検索",
+  "regionSearchEmpty": "一致する地域がありません",
+  "regionSearchTownHint": "町村を検索",
+  "regionSearchTownEmpty": "該当する町村がありません",
   "displaySettings": "表示",
   "restroomGradePoor": "不合格",
   "restroomCategoryTourist": "観光地・景勝地",

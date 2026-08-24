@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "Ayusin ang ayos ng layer",
+  "mapLayerShow": "Ipakita ang layer",
+  "mapLayerHide": "Itago ang layer",
+  "mapLayerShowAll": "Ipakita lahat",
+  "mapLayerHideAll": "Itago lahat",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "Tropical depression TD {no}",
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "Magdagdag ng rehiyon",
+  "regionSearchHint": "Maghanap ng mga lalawigan at lungsod",
+  "regionSearchEmpty": "Walang tumugmang lalawigan o lungsod",
+  "regionSearchTownHint": "Maghanap ng mga bayan",
+  "regionSearchTownEmpty": "Walang tumugmang bayan",
   "displaySettings": "Pagpapakita",
   "restroomGradePoor": "Mas mababa sa pamantayan",
   "restroomCategoryTourist": "Lugar para sa turista",

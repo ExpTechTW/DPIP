@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "레이어 순서",
+  "mapLayerShow": "레이어 표시",
+  "mapLayerHide": "레이어 숨기기",
+  "mapLayerShowAll": "전체 표시",
+  "mapLayerHideAll": "전체 숨기기",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "열대 저기압 TD {no}",
   "mapLayerSatelliteWatervapor": "히마와리 수증기",
   "regionAddButton": "지역 추가",
+  "regionSearchHint": "시·도 검색",
+  "regionSearchEmpty": "일치하는 시·도가 없습니다",
+  "regionSearchTownHint": "읍·면·동 검색",
+  "regionSearchTownEmpty": "일치하는 읍·면·동이 없습니다",
   "displaySettings": "화면",
   "restroomGradePoor": "불합격",
   "restroomCategoryTourist": "관광 지역·경치 구역",

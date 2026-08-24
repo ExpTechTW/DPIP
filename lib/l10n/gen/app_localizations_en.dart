@@ -783,6 +783,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerOrderTitle => 'Reorder layers';
 
   @override
+  String get mapLayerShow => 'Show layer';
+
+  @override
+  String get mapLayerHide => 'Hide layer';
+
+  @override
+  String get mapLayerShowAll => 'Show all';
+
+  @override
+  String get mapLayerHideAll => 'Hide all';
+
+  @override
   String get dpmYes => 'Yes';
 
   @override
@@ -1862,6 +1874,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get regionAddButton => 'Add a region';
+
+  @override
+  String get regionSearchHint => 'Search counties and cities';
+
+  @override
+  String get regionSearchEmpty => 'No matching counties or cities';
+
+  @override
+  String get regionSearchTownHint => 'Search townships';
+
+  @override
+  String get regionSearchTownEmpty => 'No matching townships';
 
   @override
   String get displaySettings => 'Display';

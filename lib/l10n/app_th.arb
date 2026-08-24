@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "จัดเรียงเลเยอร์",
+  "mapLayerShow": "แสดงเลเยอร์",
+  "mapLayerHide": "ซ่อนเลเยอร์",
+  "mapLayerShowAll": "แสดงทั้งหมด",
+  "mapLayerHideAll": "ซ่อนทั้งหมด",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "ดีเปรสชันเขตร้อน TD {no}",
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "เพิ่มพื้นที่",
+  "regionSearchHint": "ค้นหาจังหวัดและเมือง",
+  "regionSearchEmpty": "ไม่พบจังหวัดหรือเมืองที่ตรงกัน",
+  "regionSearchTownHint": "ค้นหาตำบล",
+  "regionSearchTownEmpty": "ไม่พบตำบลที่ตรงกัน",
   "displaySettings": "การแสดงผล",
   "restroomGradePoor": "ต่ำกว่ามาตรฐาน",
   "restroomCategoryTourist": "แหล่งท่องเที่ยว",

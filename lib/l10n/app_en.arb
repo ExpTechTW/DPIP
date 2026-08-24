@@ -1027,6 +1027,10 @@
     "description": "Notify channel title"
   },
   "mapLayerOrderTitle": "Reorder layers",
+  "mapLayerShow": "Show layer",
+  "mapLayerHide": "Hide layer",
+  "mapLayerShowAll": "Show all",
+  "mapLayerHideAll": "Hide all",
   "@onboardingPermBackgroundDesc": {
     "description": "Permission row description: background location"
   },
@@ -2526,6 +2530,10 @@
   },
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "Add a region",
+  "regionSearchHint": "Search counties and cities",
+  "regionSearchEmpty": "No matching counties or cities",
+  "regionSearchTownHint": "Search townships",
+  "regionSearchTownEmpty": "No matching townships",
   "displaySettings": "Display",
   "restroomGradePoor": "Below standard",
   "@moreSectionNotify": {

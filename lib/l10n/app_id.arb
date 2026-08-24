@@ -359,6 +359,10 @@
     "description": "Send message button"
   },
   "mapLayerOrderTitle": "Urutkan lapisan",
+  "mapLayerShow": "Tampilkan lapisan",
+  "mapLayerHide": "Sembunyikan lapisan",
+  "mapLayerShowAll": "Tampilkan semua",
+  "mapLayerHideAll": "Sembunyikan semua",
   "@skyTimeNoon": {
     "description": "Label for the skyTimeNoon option in the experimental backdrop settings."
   },
@@ -921,6 +925,10 @@
   "typhoonPickerTd": "Depresi tropis TD {no}",
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "Tambah wilayah",
+  "regionSearchHint": "Cari kabupaten dan kota",
+  "regionSearchEmpty": "Tidak ada kabupaten/kota yang cocok",
+  "regionSearchTownHint": "Cari kecamatan",
+  "regionSearchTownEmpty": "Tidak ada kecamatan yang cocok",
   "displaySettings": "Tampilan",
   "restroomGradePoor": "Di bawah standar",
   "restroomCategoryTourist": "Kawasan wisata",

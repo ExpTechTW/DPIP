@@ -788,6 +788,18 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerOrderTitle => 'Ayusin ang ayos ng layer';
 
   @override
+  String get mapLayerShow => 'Ipakita ang layer';
+
+  @override
+  String get mapLayerHide => 'Itago ang layer';
+
+  @override
+  String get mapLayerShowAll => 'Ipakita lahat';
+
+  @override
+  String get mapLayerHideAll => 'Itago lahat';
+
+  @override
   String get dpmYes => 'Oo';
 
   @override
@@ -1872,6 +1884,18 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get regionAddButton => 'Magdagdag ng rehiyon';
+
+  @override
+  String get regionSearchHint => 'Maghanap ng mga lalawigan at lungsod';
+
+  @override
+  String get regionSearchEmpty => 'Walang tumugmang lalawigan o lungsod';
+
+  @override
+  String get regionSearchTownHint => 'Maghanap ng mga bayan';
+
+  @override
+  String get regionSearchTownEmpty => 'Walang tumugmang bayan';
 
   @override
   String get displaySettings => 'Pagpapakita';

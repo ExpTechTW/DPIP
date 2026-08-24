@@ -781,6 +781,18 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayerOrderTitle => 'จัดเรียงเลเยอร์';
 
   @override
+  String get mapLayerShow => 'แสดงเลเยอร์';
+
+  @override
+  String get mapLayerHide => 'ซ่อนเลเยอร์';
+
+  @override
+  String get mapLayerShowAll => 'แสดงทั้งหมด';
+
+  @override
+  String get mapLayerHideAll => 'ซ่อนทั้งหมด';
+
+  @override
   String get dpmYes => 'ใช่';
 
   @override
@@ -1858,6 +1870,18 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get regionAddButton => 'เพิ่มพื้นที่';
+
+  @override
+  String get regionSearchHint => 'ค้นหาจังหวัดและเมือง';
+
+  @override
+  String get regionSearchEmpty => 'ไม่พบจังหวัดหรือเมืองที่ตรงกัน';
+
+  @override
+  String get regionSearchTownHint => 'ค้นหาตำบล';
+
+  @override
+  String get regionSearchTownEmpty => 'ไม่พบตำบลที่ตรงกัน';
 
   @override
   String get displaySettings => 'การแสดงผล';
