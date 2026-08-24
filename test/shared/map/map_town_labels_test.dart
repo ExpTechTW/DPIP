@@ -1,3 +1,4 @@
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
@@ -18,7 +19,7 @@ Widget _wrap(
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   home: GsiOverlayScope(
-    controller: gsi ?? GsiOverlayController(),
+    controller: gsi ?? GsiOverlayController(SettingsStore.inMemory({})),
     child: Scaffold(
       body: Align(
         alignment: Alignment.topRight,
@@ -150,7 +151,7 @@ void main() {
   testWidgets('the detailed map exposes all documented layer groups', (
     tester,
   ) async {
-    final gsi = GsiOverlayController();
+    final gsi = GsiOverlayController(SettingsStore.inMemory({}));
     await tester.pumpWidget(_wrap(ValueNotifier(true), gsi: gsi));
 
     final l10n = await _l10n();

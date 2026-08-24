@@ -53,6 +53,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(),
       channel: SatelliteChannel.irClean,
+      referenceOutline: testReferenceOutline(),
     );
     await tester.pumpWidget(
       wrap(
@@ -87,6 +88,7 @@ void main() {
       final layer = SatelliteMapLayer(
         repository,
         channel: SatelliteChannel.irClean,
+        referenceOutline: testReferenceOutline(),
       );
       var reloads = 0;
       await tester.pumpWidget(
@@ -123,6 +125,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(),
       channel: SatelliteChannel.truecolor,
+      referenceOutline: testReferenceOutline(),
     );
     await tester.pumpWidget(const MaterialApp(home: Scaffold()));
     final chrome = layer.buildTopTrailingChrome(
@@ -143,6 +146,7 @@ void main() {
       final layer = SatelliteMapLayer(
         _FakeSatelliteRepository(),
         channel: SatelliteChannel.visibleBlue,
+        referenceOutline: testReferenceOutline(),
       );
       await tester.pumpWidget(const MaterialApp(home: Scaffold()));
       final chrome = layer.buildTopTrailingChrome(
@@ -162,6 +166,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(),
       channel: SatelliteChannel.irLong, // B14 — thermal
+      referenceOutline: testReferenceOutline(),
     );
     await tester.pumpWidget(const MaterialApp(home: Scaffold()));
     final chrome = layer.buildTopTrailingChrome(
@@ -183,6 +188,7 @@ void main() {
     final layer = SatelliteMapLayer(
       _FakeSatelliteRepository(),
       channel: SatelliteChannel.visibleBlue, // B01 — grayscale only
+      referenceOutline: testReferenceOutline(),
     );
     var reloads = 0;
     layer.setStyle(SatelliteStyle.jma, onReloadActive: () async => reloads++);

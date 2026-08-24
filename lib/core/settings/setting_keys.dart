@@ -98,6 +98,47 @@ abstract final class SettingKeys {
   static const SettingKey<List<String>> mapLayerHiddenIds =
       SettingKey<List<String>>._('map.layerHiddenIds');
 
+  /// Whether the OSM street/building overlay is on (absent = off, except the
+  /// disaster-prevention layer's own forced default). See
+  /// `GsiOverlayController`.
+  static const SettingKey<bool> mapGsiEnabled = SettingKey<bool>._(
+    'map.gsiEnabled',
+  );
+
+  /// Enabled OSM overlay sub-layer groups ([GsiLayerGroup] names; absent =
+  /// every group except the ones [gsiDefaultDisabledGroups] starts off). See
+  /// `GsiOverlayController`.
+  static const SettingKey<List<String>> mapGsiEnabledGroups =
+      SettingKey<List<String>>._('map.gsiEnabledGroups');
+
+  /// Whether the base map's terrain-relief hillshade is shown (absent =
+  /// true). See `MapScaffold`.
+  static const SettingKey<bool> mapShowTerrain = SettingKey<bool>._(
+    'map.showTerrain',
+  );
+
+  /// Whether the base map's township-name labels are shown (absent = true).
+  /// See `MapScaffold`.
+  static const SettingKey<bool> mapShowTownLabels = SettingKey<bool>._(
+    'map.showTownLabels',
+  );
+
+  /// The four reference-chrome toggles a raster layer (radar, QPESUMS,
+  /// satellite, wind forecast) redraws over itself — one shared preference
+  /// for every layer, all absent = true. See `MapReferenceOutlineController`.
+  static const SettingKey<bool> mapShowGlobalOutline = SettingKey<bool>._(
+    'map.showGlobalOutline',
+  );
+  static const SettingKey<bool> mapShowCountyOutline = SettingKey<bool>._(
+    'map.showCountyOutline',
+  );
+  static const SettingKey<bool> mapShowTownOutline = SettingKey<bool>._(
+    'map.showTownOutline',
+  );
+  static const SettingKey<bool> mapShowScanRange = SettingKey<bool>._(
+    'map.showScanRange',
+  );
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const SettingKey<List<String>> savedRegionCodes =
       SettingKey<List<String>>._('home.savedRegionCodes');

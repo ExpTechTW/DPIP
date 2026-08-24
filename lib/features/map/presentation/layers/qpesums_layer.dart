@@ -1,4 +1,5 @@
 import 'package:dpip/core/a11y/color_vision.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/qpesums_scan_range.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
@@ -25,7 +26,10 @@ import 'package:flutter/material.dart';
 /// union of range circles.
 class QpesumsMapLayer extends RasterTimelineLayer
     with AdminOutlineChrome, ScanRangeOverlayChrome {
-  QpesumsMapLayer(QpesumsRepository super.repository);
+  QpesumsMapLayer(QpesumsRepository super.repository, this.referenceOutline);
+
+  @override
+  final MapReferenceOutlineController referenceOutline;
 
   /// Distinct from radar's ids: both layers can be on the map at once, and each
   /// draws its own outline instead of clashing over one source/layer pair.

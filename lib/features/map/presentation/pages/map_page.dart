@@ -7,6 +7,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
@@ -74,15 +75,22 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   // Built once so each layer keeps its own MapLibre state across rebuilds.
   late final List<MapLayer> _layers = [
-    RadarMapLayer(context.read<RadarRepository>()),
+    RadarMapLayer(
+      context.read<RadarRepository>(),
+      context.read<MapReferenceOutlineController>(),
+    ),
     // The wind-forecast block sits right after radar: the picker groups by
     // category in declared order, and the numerical-forecast group (QPESUMS
     // then ECMWF then GFS) is what radar hands off to.
-    QpesumsMapLayer(context.read<QpesumsRepository>()),
+    QpesumsMapLayer(
+      context.read<QpesumsRepository>(),
+      context.read<MapReferenceOutlineController>(),
+    ),
     for (final model in WindForecastModel.values)
       WindForecastMapLayer(
         context.read<Map<WindForecastModel, WindForecastRepository>>()[model]!,
         model: model,
+        referenceOutline: context.read<MapReferenceOutlineController>(),
       ),
     // One layer per satellite channel — each fetches its own frame list and
     // serves its own channel-scoped tile path.
@@ -90,6 +98,7 @@ class _MapPageState extends State<MapPage> {
       SatelliteMapLayer(
         context.read<Map<SatelliteChannel, SatelliteRepository>>()[channel]!,
         channel: channel,
+        referenceOutline: context.read<MapReferenceOutlineController>(),
       ),
     LightningMapLayer(context.read<MeteorLightningRepository>()),
     TyphoonMapLayer(

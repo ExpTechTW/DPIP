@@ -1,4 +1,5 @@
 import 'package:dpip/core/a11y/color_vision.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
@@ -24,7 +25,10 @@ import 'package:flutter/material.dart';
 /// uninterrupted raster.
 class RadarMapLayer extends RasterTimelineLayer
     with AdminOutlineChrome, ScanRangeOverlayChrome {
-  RadarMapLayer(RadarRepository super.repository);
+  RadarMapLayer(RadarRepository super.repository, this.referenceOutline);
+
+  @override
+  final MapReferenceOutlineController referenceOutline;
 
   /// The radar composite's own ids — the default geometry and layer naming.
   @override

@@ -51,10 +51,10 @@ class ScanRangeOverlayMenu extends StatelessWidget {
         showTerrain,
       ]),
       builder: (context, _) {
-        final showRange = layer.showScanRange.value;
-        final showGlobal = layer.showGlobalOutline.value;
-        final showCounty = layer.showCountyOutline.value;
-        final showTown = layer.showTownOutline.value;
+        final showRange = layer.showScanRange;
+        final showGlobal = layer.showGlobalOutline;
+        final showCounty = layer.showCountyOutline;
+        final showTown = layer.showTownOutline;
         final showLabels = showTownLabels.value;
         final showRelief = showTerrain.value;
         return MenuAnchor(

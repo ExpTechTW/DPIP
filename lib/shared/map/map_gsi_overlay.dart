@@ -13,6 +13,8 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/network/api_paths.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
@@ -95,18 +97,28 @@ const Map<GsiLayerSection, List<GsiLayerGroup>> gsiLayerGroupsBySection = {
 };
 
 /// State shared by the base-map menu and the native style owner.
+///
+/// Both the on/off switch and the per-group selection are persisted, so a
+/// choice made in the menu is still in effect the next time this surface is
+/// opened. [forceEnabled] is a per-entry override on top of that — the
+/// disaster-prevention layer forces OSM on for the street/building context it
+/// needs — not the saved preference itself; it never overwrites what's stored.
 class GsiOverlayController extends ChangeNotifier {
-  GsiOverlayController({
+  GsiOverlayController(
+    this._settings, {
     this.mutuallyExclusiveTerrain,
-    bool initiallyEnabled = false,
-  }) : _enabled = initiallyEnabled {
-    if (initiallyEnabled) mutuallyExclusiveTerrain?.value = false;
+    bool forceEnabled = false,
+  }) : _enabled =
+           forceEnabled ||
+           (_settings.getBool(SettingKeys.mapGsiEnabled) ?? false),
+       _groups = _loadGroups(_settings) {
+    if (_enabled) mutuallyExclusiveTerrain?.value = false;
   }
 
+  final SettingsStore _settings;
   final ValueNotifier<bool>? mutuallyExclusiveTerrain;
   bool _enabled;
-  final Set<GsiLayerGroup> _groups = {...GsiLayerGroup.values}
-    ..removeAll(gsiDefaultDisabledGroups);
+  final Set<GsiLayerGroup> _groups;
   int _revision = 0;
 
   bool get enabled => _enabled;
@@ -114,6 +126,21 @@ class GsiOverlayController extends ChangeNotifier {
   int get enabledGroupCount => _groups.length;
 
   bool groupEnabled(GsiLayerGroup group) => _groups.contains(group);
+
+  /// The saved group set, or every group but [gsiDefaultDisabledGroups] on a
+  /// first run. A stale saved name (a group renamed or removed since) is
+  /// dropped rather than crashing, matching the tolerance every other
+  /// id-list setting in the app already gives a saved value that outgrew it.
+  static Set<GsiLayerGroup> _loadGroups(SettingsStore settings) {
+    final saved = settings.getStringList(SettingKeys.mapGsiEnabledGroups);
+    if (saved == null) {
+      return {...GsiLayerGroup.values}..removeAll(gsiDefaultDisabledGroups);
+    }
+    final byName = {
+      for (final group in GsiLayerGroup.values) group.name: group,
+    };
+    return {for (final name in saved) ?byName[name]};
+  }
 
   void setEnabled(bool value) {
     // The vector overlay already supplies its own land / road surface. Drawing
@@ -124,6 +151,7 @@ class GsiOverlayController extends ChangeNotifier {
     if (_enabled == value) return;
     _enabled = value;
     _revision++;
+    unawaited(_settings.setBool(SettingKeys.mapGsiEnabled, value));
     notifyListeners();
   }
 
@@ -131,6 +159,7 @@ class GsiOverlayController extends ChangeNotifier {
     final changed = value ? _groups.add(group) : _groups.remove(group);
     if (!changed) return;
     _revision++;
+    _persistGroups();
     notifyListeners();
   }
 
@@ -138,7 +167,16 @@ class GsiOverlayController extends ChangeNotifier {
     if (_groups.length == GsiLayerGroup.values.length) return;
     _groups.addAll(GsiLayerGroup.values);
     _revision++;
+    _persistGroups();
     notifyListeners();
+  }
+
+  void _persistGroups() {
+    unawaited(
+      _settings.setStringList(SettingKeys.mapGsiEnabledGroups, [
+        for (final group in _groups) group.name,
+      ]),
+    );
   }
 }
 

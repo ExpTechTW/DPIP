@@ -13,6 +13,7 @@ library;
 
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -34,8 +35,9 @@ class SatelliteLegend extends StatelessWidget {
   final ValueListenable<SatelliteStyle> style;
 
   /// Whether 國界 borders are currently on the map — null keeps the row shown
-  /// (a standalone legend with no live toggle).
-  final ValueListenable<bool>? showGlobal;
+  /// (a standalone legend with no live toggle). Shared across every raster
+  /// layer, so it also doubles as the listenable this legend rebuilds from.
+  final MapReferenceOutlineController? showGlobal;
 
   static Color get _county => const Color(0xFFFFD400).vision;
   static Color get _town => const Color(0xFFB79A00).vision;
@@ -335,7 +337,7 @@ class SatelliteLegend extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return SymbolLegend(
       items: [
-        if (showGlobal?.value ?? true)
+        if (showGlobal?.showGlobalOutline ?? true)
           SymbolLegendItem(
             swatch: LineSwatch(color: _county, width: 1.0),
             label: l10n.mapLayerSatelliteGlobalOutline,

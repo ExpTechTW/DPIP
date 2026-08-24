@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/map/presentation/widgets/satellite_legend.dart';
 import 'package:dpip/features/map/presentation/widgets/satellite_style_menu.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
@@ -22,11 +23,17 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   SatelliteMapLayer(
     SatelliteRepository super.repository, {
     required this.channel,
+    required this.referenceOutline,
   });
 
   /// Which view of Himawari this layer renders — sets both the tile URL's
   /// channel path and the picker label.
   final SatelliteChannel channel;
+
+  /// The shared reference-outline preference — the same one every other
+  /// raster layer's admin-border chrome reads from. See
+  /// [AdminOutlineChrome.referenceOutline].
+  final MapReferenceOutlineController referenceOutline;
 
   /// Colour rendering of a raw band (JMA grayscale default); ignored for named
   /// products, which carry their own palette. Non-default ⇒ the settings chip
@@ -39,7 +46,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   /// default — the same default as the radar / wind frame
   /// ([AdminOutlineChrome.showGlobalOutline]): the neighbours' outlines are
   /// the frame a reader navigates by on a basin-wide view.
-  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(true);
+  bool get showGlobalOutline => referenceOutline.showGlobalOutline;
 
   bool _globalShown = false;
 
@@ -48,18 +55,16 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   @protected
   MapLibreMapController? controller;
 
-  /// Turns the 國界 borders on/off, applying it to a live map immediately.
-  void setShowGlobalOutline(bool value) {
-    if (showGlobalOutline.value == value) return;
-    showGlobalOutline.value = value;
-    unawaited(_syncGlobalOutline());
-  }
+  /// Turns the 國界 borders on/off, applying it to every attached layer
+  /// sharing [referenceOutline] immediately.
+  void setShowGlobalOutline(bool value) =>
+      referenceOutline.setShowGlobalOutline(value);
 
   /// Adds or removes the 國界 line to match [showGlobalOutline].
   Future<void> _syncGlobalOutline() async {
     final controller = this.controller;
     if (controller == null) return;
-    final wanted = showGlobalOutline.value;
+    final wanted = showGlobalOutline;
     if (wanted == _globalShown) return;
     _globalShown = wanted;
     try {
@@ -196,6 +201,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
         belowLayerId: townLabelLayerId,
         enableInteraction: false,
       );
+      referenceOutline.addListener(_onReferenceOutlineChanged);
       await _syncGlobalOutline();
     } catch (_) {
       // Half-added outlines are worse than none — roll back and carry on.
@@ -203,8 +209,13 @@ class SatelliteMapLayer extends RasterTimelineLayer {
     }
   }
 
+  void _onReferenceOutlineChanged() {
+    unawaited(_syncGlobalOutline());
+  }
+
   @override
   Future<void> onDetached(MapLibreMapController controller) async {
+    referenceOutline.removeListener(_onReferenceOutlineChanged);
     this.controller = null;
     _globalShown = false;
     for (final layerId in const [
@@ -222,7 +233,7 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   Widget buildLegend(BuildContext context) => SatelliteLegend(
     channel: channel,
     style: style,
-    showGlobal: showGlobalOutline,
+    showGlobal: referenceOutline,
   );
 }
 

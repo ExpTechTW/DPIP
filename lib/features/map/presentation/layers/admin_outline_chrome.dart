@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
@@ -28,22 +29,27 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// consumer; only the ids come from the base style's own source, so a map
 /// showing two rasters at once draws two independent border sets.
 mixin AdminOutlineChrome on RasterTimelineLayer {
+  /// The persisted, shared toggle state — one instance for every raster layer
+  /// that mixes this in, so a choice made on one layer's menu is already in
+  /// effect (and already saved) on every other one, live.
+  MapReferenceOutlineController get referenceOutline;
+
   /// Whether 國界 (world country borders) are redrawn above the raster.
   ///
   /// On by default: the base style's own borders are covered by the raster
   /// everywhere the weather shows, and the world frame is the reference a
   /// reader keeps when the map zooms past a county mesh — so every weather
   /// layer ships with it, and a reader who finds it noise can turn it off.
-  final ValueNotifier<bool> showGlobalOutline = ValueNotifier(true);
+  bool get showGlobalOutline => referenceOutline.showGlobalOutline;
 
   /// Whether 縣市 borders are redrawn above the raster.
-  final ValueNotifier<bool> showCountyOutline = ValueNotifier(true);
+  bool get showCountyOutline => referenceOutline.showCountyOutline;
 
   /// Whether 鄉鎮 borders are redrawn above the raster. Separate from the
   /// county toggle: they are different questions ("which city" vs "which
   /// township"), and the finer mesh is the first thing a reader wants gone when
   /// studying a single cell.
-  final ValueNotifier<bool> showTownOutline = ValueNotifier(true);
+  bool get showTownOutline => referenceOutline.showTownOutline;
 
   /// The live map controller, set on attach and cleared on detach. Shared with
   /// chrome mixins layered above this one, so it is protected rather than
@@ -53,49 +59,47 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
   final Set<AdminBoundary> _boundariesShown = {};
 
   /// All admin-chrome listenables, for a legend that follows the toggles.
-  Listenable get adminChromeListenable =>
-      Listenable.merge([showGlobalOutline, showCountyOutline, showTownOutline]);
+  Listenable get adminChromeListenable => referenceOutline;
 
   /// Which boundary sets should currently be on the map.
   Set<AdminBoundary> get _wantedBoundaries => {
     // Inserted finest → coarsest so the later, coarser frame wins where two
     // run together along a coastline.
-    if (showTownOutline.value) AdminBoundary.town,
-    if (showCountyOutline.value) AdminBoundary.county,
-    if (showGlobalOutline.value) AdminBoundary.global,
+    if (showTownOutline) AdminBoundary.town,
+    if (showCountyOutline) AdminBoundary.county,
+    if (showGlobalOutline) AdminBoundary.global,
   };
 
-  /// Turns the 國界 borders on/off, applying it to a live map immediately.
-  void setShowGlobalOutline(bool value) {
-    if (showGlobalOutline.value == value) return;
-    showGlobalOutline.value = value;
-    unawaited(_syncBoundaries());
-  }
+  /// Turns the 國界 borders on/off, applying it to every attached layer
+  /// sharing [referenceOutline] immediately.
+  void setShowGlobalOutline(bool value) =>
+      referenceOutline.setShowGlobalOutline(value);
 
-  /// Turns the 縣市 borders on/off, applying it to a live map immediately.
-  void setShowCountyOutline(bool value) {
-    if (showCountyOutline.value == value) return;
-    showCountyOutline.value = value;
-    unawaited(_syncBoundaries());
-  }
+  /// Turns the 縣市 borders on/off, applying it to every attached layer
+  /// sharing [referenceOutline] immediately.
+  void setShowCountyOutline(bool value) =>
+      referenceOutline.setShowCountyOutline(value);
 
-  /// Turns the 鄉鎮 borders on/off, applying it to a live map immediately.
-  void setShowTownOutline(bool value) {
-    if (showTownOutline.value == value) return;
-    showTownOutline.value = value;
-    unawaited(_syncBoundaries());
-  }
+  /// Turns the 鄉鎮 borders on/off, applying it to every attached layer
+  /// sharing [referenceOutline] immediately.
+  void setShowTownOutline(bool value) =>
+      referenceOutline.setShowTownOutline(value);
 
   @override
   Future<void> onAttached(MapLibreMapController controller) async {
     super.onAttached(controller);
     this.controller = controller;
+    // A shared preference can change from another attached layer's menu, not
+    // just this one's — resync whenever it does, for as long as this layer is
+    // actually on the map to resync.
+    referenceOutline.addListener(_onReferenceOutlineChanged);
     await _syncBoundaries();
   }
 
   @override
   Future<void> onDetached(MapLibreMapController controller) async {
     super.onDetached(controller);
+    referenceOutline.removeListener(_onReferenceOutlineChanged);
     this.controller = null;
     // Only undo what was actually added — tearing down an overlay that was
     // never mounted issues removals the map never asked for.
@@ -103,6 +107,10 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
       _boundariesShown.remove(boundary);
       await AdminOutline.remove(controller, boundary);
     }
+  }
+
+  void _onReferenceOutlineChanged() {
+    unawaited(_syncBoundaries());
   }
 
   @override
@@ -150,7 +158,7 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
   List<SymbolLegendItem> adminLegendItems(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return [
-      if (showGlobalOutline.value)
+      if (showGlobalOutline)
         SymbolLegendItem(
           swatch: LineSwatch(
             color: colorFromHexRgb(AdminOutline.lineColor)!,
@@ -162,7 +170,7 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
           ),
           label: l10n.radarGlobalOutline,
         ),
-      if (showCountyOutline.value)
+      if (showCountyOutline)
         SymbolLegendItem(
           swatch: LineSwatch(
             color: colorFromHexRgb(AdminOutline.lineColor)!,
@@ -174,7 +182,7 @@ mixin AdminOutlineChrome on RasterTimelineLayer {
           ),
           label: l10n.radarCountyOutline,
         ),
-      if (showTownOutline.value)
+      if (showTownOutline)
         SymbolLegendItem(
           swatch: LineSwatch(
             color: colorFromHexRgb(AdminOutline.lineColor)!,
