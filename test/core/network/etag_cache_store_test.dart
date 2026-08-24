@@ -21,6 +21,49 @@ void main() {
 
   tearDown(() async => db.close());
 
+  test('opening v2 drops the legacy envelope table cleanly', () async {
+    final legacy = openMemoryDb();
+    addTearDown(legacy.close);
+    await legacy.executeMultiple(
+      'CREATE TABLE http_cache ('
+      'key TEXT PRIMARY KEY, value BLOB NOT NULL, time INTEGER NOT NULL);'
+      'CREATE INDEX http_cache_time ON http_cache(time)',
+    );
+    await legacy.execute(
+      'INSERT INTO http_cache (key, value, time) VALUES (?, ?, ?)',
+      [
+        'https://x/v1',
+        Uint8List.fromList([1, 2, 3]),
+        1,
+      ],
+    );
+
+    await EtagCacheStore.createSchema(legacy);
+
+    final columns = {
+      for (final row in await legacy.getAll('PRAGMA table_info(http_cache)'))
+        row['name'],
+    };
+    expect(columns, {
+      'key',
+      'etag',
+      'content_type',
+      'kind',
+      'body',
+      'size',
+      'time',
+    });
+    expect(
+      (await legacy.get('SELECT COUNT(*) AS n FROM http_cache'))['n'],
+      0,
+      reason: 'v1 is re-fetchable and must be dropped, not rewritten',
+    );
+
+    final migrated = EtagCacheStore(legacy);
+    await migrated.write('https://x/v2', etag: '2', body: '{"ok":true}');
+    expect((await migrated.read('https://x/v2'))?.body, '{"ok":true}');
+  });
+
   Future<void> setTime(String url, int time) =>
       db.execute('UPDATE http_cache SET time = ? WHERE key = ?', [time, url]);
 

@@ -191,8 +191,34 @@ class EtagCacheStore {
   int? _trackedBytes;
   int _writesSinceSweep = 0;
 
-  /// Creates the v2 cache table (idempotent) — call from `onCreate` / migrate.
+  static const _v2Columns = {
+    'key',
+    'etag',
+    'content_type',
+    'kind',
+    'body',
+    'size',
+    'time',
+  };
+
+  /// Creates the v2 cache table, dropping an incompatible legacy cache first.
+  ///
+  /// v1 stored one `value` envelope instead of v2's columnar body. There is no
+  /// data migration on purpose: every row is re-fetchable, so a clean drop is
+  /// both safer and cheaper than decoding and rewriting hundreds of megabytes.
   static Future<void> createSchema(SqliteDatabase db) async {
+    final columns = {
+      for (final row in await db.getAll('PRAGMA table_info($_table)'))
+        if (row['name'] case final String name) name,
+    };
+    if (columns.isNotEmpty && !columns.containsAll(_v2Columns)) {
+      await migrateToV2(db);
+      return;
+    }
+    await _createV2Schema(db);
+  }
+
+  static Future<void> _createV2Schema(SqliteDatabase db) async {
     await db.executeMultiple(
       'CREATE TABLE IF NOT EXISTS $_table ('
       'key TEXT PRIMARY KEY, '
@@ -229,7 +255,7 @@ class EtagCacheStore {
   /// every legacy row on the UI isolate.
   static Future<void> migrateToV2(SqliteDatabase db) async {
     await db.execute('DROP TABLE IF EXISTS $_table');
-    await createSchema(db);
+    await _createV2Schema(db);
   }
 
   /// Returns the cached **JSON** entry for [url], or null on a miss.

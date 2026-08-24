@@ -418,10 +418,10 @@ Future<void> bootstrap() async {
 /// than failing to launch. The usage tables are created with `IF NOT EXISTS` on
 /// every open, so they're added to a pre-existing cache DB without a version bump.
 ///
-/// The v1→v2 migration rides a probe instead of sqflite's `version`/`onUpgrade`
-/// hooks (sqlite_async has none): the v2 `CREATE TABLE IF NOT EXISTS` is
-/// harmless against either shape — [EtagCacheStore.migrateToV2] is what drops
-/// the legacy envelope table when its columns say v1.
+/// The v1→v2 migration rides a column probe instead of sqflite's
+/// `version`/`onUpgrade` hooks (sqlite_async has none):
+/// [EtagCacheStore.createSchema] drops the re-fetchable v1 envelope table when
+/// its columns do not match v2, then creates a clean columnar cache.
 Future<({EtagCacheStore etag, NetworkUsageStore usage, SqliteDatabase db})?>
 _openCache() async {
   try {
