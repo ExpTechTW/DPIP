@@ -15,6 +15,7 @@ import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_particle_sim.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -37,6 +38,28 @@ import 'package:flutter/scheduler.dart';
 /// screen) behind every other tab.
 class WindParticleOverlay extends StatefulWidget {
   const WindParticleOverlay({super.key, required this.layer});
+
+  /// Whether this platform may run the ticker at all. **Temporary containment,
+  /// not a preference** — remove it with the Flutter overlay itself.
+  ///
+  /// Android's HCPP platform-view mode leaks one full-screen HardwareBuffer
+  /// (10.47 MB) for every Flutter frame presented above the map, and a
+  /// ticker-driven overlay presents one every frame. Measured on a Pixel 9:
+  /// 394 -> 8042 MB of GPU memory in 16 s, then lmkd killed the process — which
+  /// takes the earthquake and radar monitoring down with it. A missing
+  /// animation is the cheaper failure. iOS is unaffected; the leak is in the
+  /// Android SurfaceControl/AHB swapchain path.
+  ///
+  /// Delete this once the particles live in a MapLibre layer, or once the
+  /// engine bounds `AHBTexturePoolVK` again — still unbounded at 3.47.1, the
+  /// 3.48 beta and master. See `android/app/src/main/AndroidManifest.xml`.
+  ///
+  /// Tests set this true: the simulation, the trail buffer and the ticker
+  /// lifecycle are all still live code that the MapLibre port has to match, so
+  /// their coverage must not lapse while the containment is in place.
+  @visibleForTesting
+  static bool animateOnThisPlatform =
+      defaultTargetPlatform != TargetPlatform.android;
 
   final WindForecastMapLayer layer;
 
@@ -155,7 +178,11 @@ class _WindParticleOverlayState extends State<WindParticleOverlay>
   /// Whether the animation should be running at all: there is a field, the map
   /// tab is on screen, and no gesture is in progress.
   bool get _shouldAnimate =>
-      _sim != null && _visible && _appForeground && !_interacting;
+      WindParticleOverlay.animateOnThisPlatform &&
+      _sim != null &&
+      _visible &&
+      _appForeground &&
+      !_interacting;
 
   /// Runs the ticker only while [_shouldAnimate].
   void _updateTicker() {

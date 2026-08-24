@@ -9,6 +9,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/forecast_overlay_menu.dart';
 import 'package:dpip/features/map/presentation/widgets/wind_particle_overlay.dart';
+import 'package:dpip/features/map/presentation/layers/wind_particle_native.dart';
 import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
@@ -47,6 +48,19 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   /// field arrives; the overlay starts its animation only once this is set.
   final ValueNotifier<WindField?> field = ValueNotifier(null);
 
+  /// The GPU renderer that draws the particles inside the map.
+  ///
+  /// Where it is available it replaces [WindParticleOverlay] entirely. That is
+  /// not a preference: a Flutter overlay repainting above an Android platform
+  /// view leaks a full-screen graphics buffer per frame under HCPP, and the
+  /// particles were the only thing in the app repainting every frame.
+  late final WindParticleNative particles = WindParticleNative(
+    field: field,
+    interacting: interacting,
+  );
+
+  bool _particlesAttached = false;
+
   /// Whether a finger is currently on the map.
   ///
   /// The particle field is torn down for the whole gesture and reseeded when it
@@ -72,12 +86,24 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
   /// the camera from it every frame.
   MapLibreMapController? get mapController => controller;
 
+  /// Attaches the native renderer the first time a controller is in hand.
+  ///
+  /// Lazily rather than in a constructor: the layer outlives any one platform
+  /// view, and a controller that has been replaced must not keep a layer bound
+  /// to the old one.
+  void _ensureParticles(MapLibreMapController controller) {
+    if (_particlesAttached || !particles.isSupported) return;
+    _particlesAttached = true;
+    particles.attach(controller);
+  }
+
   @override
   Future<void> show(
     MapLibreMapController controller,
     MapFrame frame, {
     bool scrubbing = false,
   }) async {
+    _ensureParticles(controller);
     if (scrubbing) {
       // A megabyte-scale WND1 grid per crossed frame cannot keep up with a
       // finger. More importantly, displaying the previous grid under a new
@@ -147,11 +173,26 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
     // The overlay is gone with the layer; stop advertising a field so a
     // re-attach starts clean rather than animating yesterday's grid.
     _invalidateField();
+    _particlesAttached = false;
+    await particles.detach();
   }
 
   @override
-  Widget buildMapOverlay(BuildContext context) =>
-      WindParticleOverlay(layer: this);
+  void onSurfaceVisibility(bool visible) {
+    super.onSurfaceVisibility(visible);
+    particles.setSurfaceVisible(visible);
+  }
+
+  /// The Flutter overlay, only where the map cannot draw the particles itself.
+  ///
+  /// On Android the native layer carries them and this is deliberately empty —
+  /// returning the overlay anyway would reintroduce the per-frame Flutter
+  /// presentation that the whole port exists to remove. It is still the real
+  /// implementation everywhere else.
+  @override
+  Widget buildMapOverlay(BuildContext context) => particles.isActive
+      ? const SizedBox.shrink()
+      : WindParticleOverlay(layer: this);
 
   /// The particle overlay reads the live camera on every tick, so it never
   /// needs a rebuild to reproject — and it must not get one: re-keying it on

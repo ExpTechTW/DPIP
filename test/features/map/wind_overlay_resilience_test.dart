@@ -10,8 +10,6 @@
 /// is exactly what a user sees after holding the map a while.
 library;
 
-import 'dart:typed_data';
-
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
@@ -19,6 +17,7 @@ import 'package:dpip/features/map/presentation/widgets/wind_particle_overlay.dar
 import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -115,6 +114,15 @@ Future<(WindForecastMapLayer, _FlakyController)> _mount(
 }
 
 void main() {
+  // The Android containment for the HCPP buffer leak is off for these tests:
+  // the simulation, trail buffer and ticker lifecycle are still live code that
+  // the MapLibre particle layer has to reproduce, so their coverage stays on.
+  setUp(() => WindParticleOverlay.animateOnThisPlatform = true);
+  tearDown(
+    () => WindParticleOverlay.animateOnThisPlatform =
+        defaultTargetPlatform != TargetPlatform.android,
+  );
+
   testWidgets('a throwing frame does not stop the animation', (tester) async {
     final (_, controller) = await _mount(tester);
     await tester.pump(const Duration(milliseconds: 16));

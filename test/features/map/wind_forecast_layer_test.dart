@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
@@ -10,6 +9,7 @@ import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer_category.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -87,6 +87,15 @@ WindField _windField(String marker) => WindField(
 );
 
 void main() {
+  // The Android containment for the HCPP buffer leak is off for these tests:
+  // the simulation, trail buffer and ticker lifecycle are still live code that
+  // the MapLibre particle layer has to reproduce, so their coverage stays on.
+  setUp(() => WindParticleOverlay.animateOnThisPlatform = true);
+  tearDown(
+    () => WindParticleOverlay.animateOnThisPlatform =
+        defaultTargetPlatform != TargetPlatform.android,
+  );
+
   test('frames chronological', () async {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(['1700000600', '1700000000']),
