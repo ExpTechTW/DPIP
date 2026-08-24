@@ -160,7 +160,12 @@ void main() {
   // is scaled by the fixed 1080 frame, so it also translates the lattice by
   // `uSize.y - 1080`. Keep the two coordinates separate.
   vec2 texXY = xy;
-#ifdef IMPELLER_TARGET_OPENGLES
+#if defined(IMPELLER_TARGET_OPENGLES) && !defined(IMPELLER_OPENGLES_UNFLIPPED_DEPRECATED)
+  // 3.47 changed the GLES backend to store render-to-texture top-down, like
+  // Metal and Vulkan (docs.flutter.dev → opengles-render-to-texture-top-down).
+  // On those releases this flip would mirror the backdrop, so it is gated off
+  // by the macro that marks the new orientation; older releases without the
+  // macro still need it.
   texXY.y = uSize.y - xy.y;
 #endif
 
