@@ -3159,6 +3159,63 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => '大間距';
+
+  @override
+  String get notifyTestTitle => '測試通知';
+
+  @override
+  String get notifyTestIntro => '點一下就會實際發送該則警報。重大警報會以最大音量播放，並穿透靜音與勿擾模式。';
+
+  @override
+  String get notifyTestCriticalDenied => '這台裝置未允許「重要警告」，重大警報在靜音時同樣不會發出聲音。';
+
+  @override
+  String get notifyTestPermissionOff => '通知已關閉，測試不會有任何反應。';
+
+  @override
+  String get notifyTestBehaviourOverrides => '會穿透靜音與勿擾模式';
+
+  @override
+  String get notifyTestBehaviourAlerts => '有聲音，並跳出橫幅';
+
+  @override
+  String get notifyTestBehaviourSounds => '有聲音，不跳出橫幅';
+
+  @override
+  String get notifyTestBehaviourSilent => '無聲，只出現在通知中心';
+
+  @override
+  String get notifyTestFailed => '無法發送測試通知。';
+
+  @override
+  String get moreBugReports => '已回报的错误';
+
+  @override
+  String get bugTrackerEmpty => '还没有已回报的错误';
+
+  @override
+  String get bugTrackerReplies => '回复';
+
+  @override
+  String get bugTrackerGoToDiscord => '找不到你的问题？快前往 Discord 回报！';
+
+  @override
+  String get bugTrackerNoMatch => '没有符合所选标签的错误回报';
+
+  @override
+  String get bugTrackerDeveloper => '开发人员';
+
+  @override
+  String get bugTrackerCannotDisplay => '无法显示此内容，请在 Discord 上查看';
+
+  @override
+  String get bugTrackerJoinDiscussion => '至 Discord 参与讨论';
+
+  @override
+  String get bugTrackerSortLast => '最后讨论';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '最多讨论';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6315,6 +6372,63 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get rainScaleCoarse => '大间距';
+
+  @override
+  String get notifyTestTitle => '测试通知';
+
+  @override
+  String get notifyTestIntro => '点一下就会实际发送该则警报。重大警报会以最大音量播放，并穿透静音与勿扰模式。';
+
+  @override
+  String get notifyTestCriticalDenied => '这台设备未允许「重要警告」，重大警报在静音时同样不会发出声音。';
+
+  @override
+  String get notifyTestPermissionOff => '通知已关闭，测试不会有任何反应。';
+
+  @override
+  String get notifyTestBehaviourOverrides => '会穿透静音与勿扰模式';
+
+  @override
+  String get notifyTestBehaviourAlerts => '有声音，并弹出横幅';
+
+  @override
+  String get notifyTestBehaviourSounds => '有声音，不弹出横幅';
+
+  @override
+  String get notifyTestBehaviourSilent => '无声，只出现在通知中心';
+
+  @override
+  String get notifyTestFailed => '无法发送测试通知。';
+
+  @override
+  String get moreBugReports => '已回报的错误';
+
+  @override
+  String get bugTrackerEmpty => '还没有已回报的错误';
+
+  @override
+  String get bugTrackerReplies => '回复';
+
+  @override
+  String get bugTrackerGoToDiscord => '找不到你的问题？快前往 Discord 回报！';
+
+  @override
+  String get bugTrackerNoMatch => '没有符合所选标签的错误回报';
+
+  @override
+  String get bugTrackerDeveloper => '开发人员';
+
+  @override
+  String get bugTrackerCannotDisplay => '无法显示此内容，请在 Discord 上查看';
+
+  @override
+  String get bugTrackerJoinDiscussion => '至 Discord 参与讨论';
+
+  @override
+  String get bugTrackerSortLast => '最后讨论';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '最多讨论';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -9471,6 +9585,63 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get rainScaleCoarse => '大間距';
+
+  @override
+  String get notifyTestTitle => '測試通知';
+
+  @override
+  String get notifyTestIntro => '點一下就會實際發送該則警報。重大警報會以最大音量播放，並穿透靜音與勿擾模式。';
+
+  @override
+  String get notifyTestCriticalDenied => '這台裝置未允許「重要警告」，重大警報在靜音時同樣不會發出聲音。';
+
+  @override
+  String get notifyTestPermissionOff => '通知已關閉，測試不會有任何反應。';
+
+  @override
+  String get notifyTestBehaviourOverrides => '會穿透靜音與勿擾模式';
+
+  @override
+  String get notifyTestBehaviourAlerts => '有聲音，並跳出橫幅';
+
+  @override
+  String get notifyTestBehaviourSounds => '有聲音，不跳出橫幅';
+
+  @override
+  String get notifyTestBehaviourSilent => '無聲，只出現在通知中心';
+
+  @override
+  String get notifyTestFailed => '無法發送測試通知。';
+
+  @override
+  String get moreBugReports => '已回報的錯誤';
+
+  @override
+  String get bugTrackerEmpty => '還沒有已回報的錯誤';
+
+  @override
+  String get bugTrackerReplies => '回覆';
+
+  @override
+  String get bugTrackerGoToDiscord => '找不到你的問題？快前往 Discord 回報！';
+
+  @override
+  String get bugTrackerNoMatch => '沒有符合所選標籤的錯誤回報';
+
+  @override
+  String get bugTrackerDeveloper => '開發人員';
+
+  @override
+  String get bugTrackerCannotDisplay => '無法顯示此內容，請在 Discord 上查看';
+
+  @override
+  String get bugTrackerJoinDiscussion => '至 Discord 參與討論';
+
+  @override
+  String get bugTrackerSortLast => '最後討論';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '最多討論';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12627,4 +12798,61 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get rainScaleCoarse => '大間距';
+
+  @override
+  String get notifyTestTitle => '測試通知';
+
+  @override
+  String get notifyTestIntro => '點一下就會實際發送該則警報。重大警報會以最大音量播放，並穿透靜音與勿擾模式。';
+
+  @override
+  String get notifyTestCriticalDenied => '這台裝置未允許「重要警告」，重大警報在靜音時同樣不會發出聲音。';
+
+  @override
+  String get notifyTestPermissionOff => '通知已關閉，測試不會有任何反應。';
+
+  @override
+  String get notifyTestBehaviourOverrides => '會穿透靜音與勿擾模式';
+
+  @override
+  String get notifyTestBehaviourAlerts => '有聲音，並跳出橫幅';
+
+  @override
+  String get notifyTestBehaviourSounds => '有聲音，不跳出橫幅';
+
+  @override
+  String get notifyTestBehaviourSilent => '無聲，只出現在通知中心';
+
+  @override
+  String get notifyTestFailed => '無法發送測試通知。';
+
+  @override
+  String get moreBugReports => '已回報的錯誤';
+
+  @override
+  String get bugTrackerEmpty => '還沒有已回報的錯誤';
+
+  @override
+  String get bugTrackerReplies => '回覆';
+
+  @override
+  String get bugTrackerGoToDiscord => '找不到你的問題？快前往 Discord 回報！';
+
+  @override
+  String get bugTrackerNoMatch => '沒有符合所選標籤的錯誤回報';
+
+  @override
+  String get bugTrackerDeveloper => '開發人員';
+
+  @override
+  String get bugTrackerCannotDisplay => '無法顯示此內容，請在 Discord 上查看';
+
+  @override
+  String get bugTrackerJoinDiscussion => '至 Discord 參與討論';
+
+  @override
+  String get bugTrackerSortLast => '最後討論';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '最多討論';
 }

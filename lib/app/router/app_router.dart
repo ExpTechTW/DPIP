@@ -24,6 +24,7 @@ import 'package:dpip/features/data/presentation/pages/tonight_page.dart';
 import 'package:dpip/features/data/presentation/pages/sun_page.dart';
 import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
+import 'package:dpip/features/notification/presentation/pages/notification_test_page.dart';
 import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
@@ -34,6 +35,8 @@ import 'package:dpip/features/settings/presentation/pages/eew_source_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
 import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
+import 'package:dpip/features/bug_tracker/presentation/pages/bug_list_page.dart';
+import 'package:dpip/features/bug_tracker/presentation/pages/bug_thread_page.dart';
 import 'package:dpip/features/status/presentation/pages/server_status_page.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -270,6 +273,13 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.notifySettingsPath,
       name: AppRoutes.notifySettings,
       builder: (_, _) => const NotifyPage(),
+      routes: [
+        GoRoute(
+          path: AppRoutes.notifyTestPath,
+          name: AppRoutes.notifyTest,
+          builder: (_, _) => const NotificationTestPage(),
+        ),
+      ],
     ),
     GoRoute(
       path: AppRoutes.sponsorPath,
@@ -280,6 +290,19 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.serverStatusPath,
       name: AppRoutes.serverStatus,
       builder: (_, _) => const ServerStatusPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.bugTrackerPath,
+      name: AppRoutes.bugTracker,
+      builder: (_, _) => const BugListPage(),
+      routes: [
+        GoRoute(
+          path: AppRoutes.bugThreadPath,
+          name: AppRoutes.bugThread,
+          builder: (_, state) =>
+              BugThreadPage(id: int.tryParse(state.pathParameters['id']!) ?? 0),
+        ),
+      ],
     ),
   ],
 );

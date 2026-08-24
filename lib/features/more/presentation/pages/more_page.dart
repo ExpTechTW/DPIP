@@ -7,6 +7,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
+import 'package:dpip/features/bug_tracker/bug_tracker_counter.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
@@ -157,6 +158,19 @@ class MorePage extends StatelessWidget {
                   icon: Icons.history_outlined,
                   title: l10n.changelogTitle,
                   onTap: () => context.pushNamed(AppRoutes.changelog),
+                ),
+                _MoreTile(
+                  icon: Icons.bug_report_outlined,
+                  title: l10n.moreBugReports,
+                  // The count rides the same ETag-cached index the page reads;
+                  // loaded once per session here, resynced by the list's own
+                  // pull-to-refresh.
+                  trailing: _BugReportCount(
+                    counter: context.watch<BugTrackerCounter>(),
+                    onLoad: () =>
+                        context.read<BugTrackerCounter>().ensureLoaded(),
+                  ),
+                  onTap: () => context.pushNamed(AppRoutes.bugTracker),
                 ),
                 _MoreTile(
                   icon: Icons.article_outlined,
@@ -1095,6 +1109,43 @@ class _AnnouncementCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The bug-tracker tile's trailing count — the number of open threads the
+/// tracker index reports, in GitHub's speech-bubble-plus-number shape. Null
+/// while loading or after a failure: an unreachable tracker must not read as
+/// "no bugs", and a missing count draws the plain chevron instead.
+class _BugReportCount extends StatelessWidget {
+  const _BugReportCount({required this.counter, required this.onLoad});
+
+  final BugTrackerCounter counter;
+  final VoidCallback onLoad;
+
+  @override
+  Widget build(BuildContext context) {
+    // Kick the one-shot load from outside build — notifyListeners during the
+    // same frame's build would throw.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) onLoad();
+    });
+    final count = counter.count;
+    if (count == null) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.mode_comment_outlined, size: 16, color: color),
+        const SizedBox(width: AppSpacing.xs),
+        Text(
+          '$count',
+          style: theme.textTheme.labelMedium?.copyWith(color: color),
+        ),
+        const SizedBox(width: AppSpacing.xs),
+        Icon(Icons.chevron_right, size: 20, color: color),
+      ],
     );
   }
 }

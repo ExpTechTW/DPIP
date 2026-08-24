@@ -3174,4 +3174,63 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => '넓게';
+
+  @override
+  String get notifyTestTitle => '알림 테스트';
+
+  @override
+  String get notifyTestIntro =>
+      '항목을 누르면 해당 알림이 실제로 전송됩니다. 중대 경보는 최대 음량으로 울리며 무음 스위치와 방해 금지 모드를 무시합니다.';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      '이 기기에서 긴급 알림이 허용되지 않아 중대 경보도 무음일 때는 소리가 나지 않습니다.';
+
+  @override
+  String get notifyTestPermissionOff => '알림이 꺼져 있어 테스트해도 아무것도 표시되지 않습니다.';
+
+  @override
+  String get notifyTestBehaviourOverrides => '무음·방해 금지 모드에서도 울림';
+
+  @override
+  String get notifyTestBehaviourAlerts => '소리와 배너';
+
+  @override
+  String get notifyTestBehaviourSounds => '소리만, 배너 없음';
+
+  @override
+  String get notifyTestBehaviourSilent => '무음 — 알림 목록에만 표시';
+
+  @override
+  String get notifyTestFailed => '테스트 알림을 보내지 못했습니다.';
+
+  @override
+  String get moreBugReports => '보고된 버그';
+
+  @override
+  String get bugTrackerEmpty => '아직 보고된 버그가 없습니다';
+
+  @override
+  String get bugTrackerReplies => '답글';
+
+  @override
+  String get bugTrackerGoToDiscord => '문제를 찾을 수 없나요? Discord에서 신고해 주세요!';
+
+  @override
+  String get bugTrackerNoMatch => '선택한 태그와 일치하는 버그가 없습니다';
+
+  @override
+  String get bugTrackerDeveloper => '개발자';
+
+  @override
+  String get bugTrackerCannotDisplay => '이 내용을 표시할 수 없습니다 — Discord에서 확인하세요';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'Discord에서 논의에 참여하기';
+
+  @override
+  String get bugTrackerSortLast => '최근 활동';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '답글 많은 순';
 }

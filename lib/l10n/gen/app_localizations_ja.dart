@@ -3174,4 +3174,63 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => '粗い';
+
+  @override
+  String get notifyTestTitle => '通知テスト';
+
+  @override
+  String get notifyTestIntro =>
+      '行をタップすると、そのアラートが実際に送信されます。重大な警報は最大音量で鳴り、消音スイッチとおやすみモードを貫通します。';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      'この端末では「緊急アラート」が許可されていないため、重大な警報も消音時には音が鳴りません。';
+
+  @override
+  String get notifyTestPermissionOff => '通知がオフのため、テストしても何も表示されません。';
+
+  @override
+  String get notifyTestBehaviourOverrides => '消音・おやすみモードを貫通';
+
+  @override
+  String get notifyTestBehaviourAlerts => '音とバナー';
+
+  @override
+  String get notifyTestBehaviourSounds => '音のみ、バナーなし';
+
+  @override
+  String get notifyTestBehaviourSilent => '無音 — 通知センターのみ';
+
+  @override
+  String get notifyTestFailed => 'テスト通知を送信できませんでした。';
+
+  @override
+  String get moreBugReports => '報告済みのバグ';
+
+  @override
+  String get bugTrackerEmpty => '報告されたバグはまだありません';
+
+  @override
+  String get bugTrackerReplies => '返信';
+
+  @override
+  String get bugTrackerGoToDiscord => '見つからない問題はDiscordで報告してください！';
+
+  @override
+  String get bugTrackerNoMatch => '選択したタグに一致する報告はありません';
+
+  @override
+  String get bugTrackerDeveloper => '開発者';
+
+  @override
+  String get bugTrackerCannotDisplay => 'この内容は表示できません — Discord でご確認ください';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'Discord で議論に参加する';
+
+  @override
+  String get bugTrackerSortLast => '最新の返信';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '返信が多い順';
 }

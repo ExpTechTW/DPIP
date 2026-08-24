@@ -148,6 +148,12 @@ abstract final class AppRoutes {
   static const String notifySettings = 'notifySettings';
   static const String notifySettingsPath = '/notify-settings';
 
+  /// Sample alerts, fired locally. A child of the settings page because it is
+  /// the same subject seen from the other side: settings decide what gets sent,
+  /// this shows what the phone does with it.
+  static const String notifyTest = 'notifyTest';
+  static const String notifyTestPath = 'test';
+
   // Support / in-app-purchase page.
   static const String sponsor = 'sponsor';
   static const String sponsorPath = '/sponsor';
@@ -155,4 +161,12 @@ abstract final class AppRoutes {
   /// ExpTech server status dashboard — pushed from the More hero cards.
   static const String serverStatus = 'serverStatus';
   static const String serverStatusPath = '/server-status';
+
+  /// The read-only bug-tracker mirror, pushed from the More list.
+  static const String bugTracker = 'bugTracker';
+  static const String bugTrackerPath = '/bug-tracker';
+
+  /// One bug thread with its replies.
+  static const String bugThread = 'bugThread';
+  static const String bugThreadPath = 'thread/:id';
 }
