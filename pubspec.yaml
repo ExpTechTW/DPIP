@@ -14,6 +14,14 @@ environment:
 
 dependencies:
   awesome_notifications: ^0.12.1
+  # The remote-push half of awesome. `awesome_notifications` alone handles only
+  # local notifications: its own source says "we do not chain to a
+  # previously-installed delegate … FCM is handled by awesome_notifications_fcm".
+  # Without it a server push reaches awesome's willPresent, is claimed as its own
+  # (the payload's `content` key is awesome's own model format), and then has no
+  # pipeline to display it — the app showed nothing in the foreground. The
+  # pre-rewrite app shipped this package; the rewrite dropped it.
+  awesome_notifications_fcm: ^0.12.0
   cupertino_icons: ^1.0.8
   dio: ^5.10.0
   # Firebase pinned deliberately — a newer major bumps the min iOS target and
