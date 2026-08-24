@@ -35,6 +35,31 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="false">
+
+        <!-- Hybrid Composition++ — the map is a platform view, and the default
+             strategy is Virtual Display, which the engine itself logs as
+             "legacy" and which Flutter's own docs say "can cause jank during
+             high-frequency updates". Zooming is exactly that. HCPP hands
+             compositing to the OS through Vulkan and SurfaceControl instead.
+             Requires API 34+, Vulkan and Impeller; below that the engine falls
+             back on its own, so this is safe to ship. Remove the line to revert. -->
+        <!-- Off deliberately. Do not turn this on again on Flutter 3.47.x.
+             Measured on a Pixel 9 (Android 17, Vulkan/Impeller): with HCPP on,
+             any Flutter overlay repainting above the map leaks GPU buffers
+             without bound. The wind layer's particle overlay took GL texture
+             memory from 394 MB to 8042 MB in 16 s (~500 MB/s) and lmkd killed
+             the process at 8.6 GB RSS. With HCPP off the same screen is flat at
+             ~500 MB. The radar timeline, same machinery minus the animated
+             overlay, is stable either way — the overlay is what triggers it.
+             Independently, PlatformViewsController2.onEndFrame() in this SDK
+             dereferences flutterView three times with no null check while
+             detachFromView() nulls it, so a teardown race aborts the process
+             (flutter/flutter#190609; the fix is master-only, NOT in 3.47.1).
+             Zoom smoothness comes from the fork's texture-layer composition
+             instead — see MapLibreMethodChannel.useHybridComposition. -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableHcpp"
+            android:value="false" />
         <!-- Monochrome status-bar icon for FCM/awesome notifications. -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
