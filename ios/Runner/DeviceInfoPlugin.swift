@@ -37,17 +37,31 @@ public class DeviceInfoPlugin: NSObject, FlutterPlugin {
   /// Where this build came from — which decides where an update prompt sends
   /// the user.
   ///
-  /// The App Store receipt's filename is the marker: TestFlight (and a debug
-  /// build run from Xcode) gets a `sandboxReceipt`, an App Store install gets
-  /// `receipt`. A DEBUG build is never a store install, so it is reported as a
-  /// sideload rather than as TestFlight, which would otherwise put every
+  /// The App Store receipt's filename is the first marker: TestFlight (and a
+  /// debug build run from Xcode) gets a `sandboxReceipt`, an App Store install
+  /// gets `receipt`. A DEBUG build is never a store install, so it is reported
+  /// as a sideload rather than as TestFlight, which would otherwise put every
   /// developer on the beta channel.
+  ///
+  /// On its own `sandboxReceipt` cannot separate TestFlight from a locally
+  /// signed install — the GitHub release IPA re-signed by AltStore or
+  /// Sideloadly carries one too, and that user must land on the GitHub release
+  /// page, not a TestFlight app that holds no DPIP update for them. The
+  /// discriminator is the embedded provisioning profile: App Store Connect
+  /// strips it from TestFlight builds, while any profile-signed bundle keeps
+  /// it.
   private static func installSource() -> String {
     #if DEBUG
-      return "sideload"
+      return "development"
     #else
-      guard let receipt = Bundle.main.appStoreReceiptURL else { return "sideload" }
-      return receipt.lastPathComponent == "sandboxReceipt" ? "testFlight" : "appStore"
+      guard let receipt = Bundle.main.appStoreReceiptURL else { return "github" }
+      // A simulator has no App Store; its receipt lives under CoreSimulator
+      // and would otherwise read as an App Store install.
+      if receipt.path.contains("CoreSimulator") { return "development" }
+      guard receipt.lastPathComponent == "sandboxReceipt" else { return "appStore" }
+      return Bundle.main.path(forResource: "embedded", ofType: "mobileprovision") == nil
+        ? "testFlight"
+        : "sideload"
     #endif
   }
 
