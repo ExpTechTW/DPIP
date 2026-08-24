@@ -7,8 +7,10 @@
 /// all. So the destination follows the installer, not `Platform.isIOS`.
 ///
 /// Native detection is cheap and definitive on both platforms: iOS reads the
-/// App Store receipt's filename (`sandboxReceipt` **is** the TestFlight
-/// marker), Android reads the installing package name.
+/// App Store receipt's filename (`sandboxReceipt` **is** the pre-release
+/// marker, narrowed to TestFlight by the absence of an embedded provisioning
+/// profile — see `DeviceInfoPlugin.installSource`), Android reads the
+/// installing package name.
 library;
 
 import 'package:dpip/core/logging/log.dart';
@@ -25,11 +27,22 @@ enum InstallSource {
   /// Android, installed by the Play Store.
   playStore,
 
-  /// Installed by something else: a sideloaded APK, an Xcode/`flutter run`
-  /// build, another Android store. There is no store page to send it to.
-  sideload,
+  /// A local development build: `flutter run`, Xcode, an adb-installed debug
+  /// APK. Detected by the DEBUG compilation condition on iOS and
+  /// `FLAG_DEBUGGABLE` on Android — both are build facts, not installer
+  /// records, so they work even though adb leaves no installer behind.
+  development,
 
-  /// Detection failed or has not run. Treated as [sideload] for destinations,
+  /// Installed outside any store: a GitHub release APK/IPA, a re-signed IPA,
+  /// another Android store. There is no store page to send it to.
+  ///
+  /// Named for the channel rather than the act: neither platform reveals
+  /// *where* a manually installed package was downloaded from, only that no
+  /// store did it — but every such install takes its updates from the same
+  /// place, the GitHub release page, so that is what the name says.
+  github,
+
+  /// Detection failed or has not run. Treated as [github] for destinations,
   /// and as the stable channel for update checks.
   unknown;
 
@@ -70,7 +83,8 @@ abstract final class InstallSourceService {
     'appStore' => InstallSource.appStore,
     'testFlight' => InstallSource.testFlight,
     'playStore' => InstallSource.playStore,
-    'sideload' => InstallSource.sideload,
+    'development' => InstallSource.development,
+    'sideload' || 'github' => InstallSource.github,
     _ => InstallSource.unknown,
   };
 }

@@ -203,17 +203,17 @@ void main() {
       }
     });
 
-    test('a sideload updates from the release page it came from', () {
+    test('a github install updates from the release page it came from', () {
       const url = 'https://github.com/ExpTechTW/DPIP/releases/tag/v3.9.9';
       final destination = updateDestinationFor(
-        InstallSource.sideload,
+        InstallSource.github,
         releaseUrl: url,
       );
       expect(destination.scheme, url);
       expect(destination.web, url);
       // With no release page, the listing still works.
       expect(
-        updateDestinationFor(InstallSource.sideload).web,
+        updateDestinationFor(InstallSource.github).web,
         'https://github.com/ExpTechTW/DPIP/releases',
       );
     });
