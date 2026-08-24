@@ -24,7 +24,7 @@ abstract final class NotificationChannels {
   /// installs kept channels pointing at numbers from an older APK: crossed or
   /// silent sounds on every device that had seen the previous build. Bumping
   /// this counter is what makes [NotificationService] force-update them.
-  static const int version = 3;
+  static const int version = 4;
 
   /// Default status-bar icon (Android) — a monochrome drawable.
   static const String icon = 'resource://drawable/ic_stat_name';
