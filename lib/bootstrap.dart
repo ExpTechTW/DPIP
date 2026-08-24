@@ -45,6 +45,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
+import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -223,6 +224,7 @@ Future<void> bootstrap() async {
   final display = DisplaySettings(settings);
   final defaultMapLayer = DefaultMapLayerController(settings);
   final mapLayerOrder = MapLayerOrderController(settings);
+  final mapLayerVisibility = MapLayerVisibilityController(settings);
   final cache = await cacheFuture;
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final endpointHealth = EndpointHealthMonitor();
@@ -374,6 +376,7 @@ Future<void> bootstrap() async {
     display: display,
     defaultMapLayer: defaultMapLayer,
     mapLayerOrder: mapLayerOrder,
+    mapLayerVisibility: mapLayerVisibility,
     meshtastic: meshtastic,
     meshLink: meshLink,
     meshAlerts: meshAlerts,
