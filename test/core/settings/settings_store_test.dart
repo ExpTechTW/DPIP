@@ -104,6 +104,7 @@ void main() {
     // session read or wrote.
     final db = await _db();
     await insertRow(db, SettingKeys.onboardingComplete.name, 'true');
+    await insertRow(db, SettingKeys.experimentalUnlocked.name, 'true');
 
     final store = await SettingsStore.open(null);
     expect(store.isDegraded, isTrue);
@@ -119,6 +120,12 @@ void main() {
     expect(
       (await SettingsStore.open(db)).getInt(SettingKeys.channelVersion),
       7,
+    );
+    expect(store.getBool(SettingKeys.experimentalUnlocked), isNull);
+    expect(
+      (await SettingsStore.open(db)).getBool(SettingKeys.experimentalUnlocked),
+      isNull,
+      reason: 'a degraded-session removal must not be adopted back from disk',
     );
 
     // A second attach is a no-op.
@@ -138,6 +145,41 @@ void main() {
 
     expect(store.getString(SettingKeys.locale), 'th');
     expect((await SettingsStore.open(db)).getString(SettingKeys.locale), 'th');
+  });
+
+  test('a write racing attach is drained before the hand-off', () async {
+    final db = await _db();
+    final store = await SettingsStore.open(null);
+
+    final attaching = store.attachDatabase(db);
+    // attach has yielded to its first database read while the store is still
+    // degraded. This write must join the backlog, then be drained before _db
+    // becomes visible to later writes.
+    await store.setString(SettingKeys.locale, 'th');
+
+    expect(await attaching, isTrue);
+    expect(store.isDegraded, isFalse);
+    expect((await SettingsStore.open(db)).getString(SettingKeys.locale), 'th');
+  });
+
+  test('a failed attach stays degraded and preserves its backlog', () async {
+    final failed = await _db();
+    await failed.execute(
+      'CREATE TRIGGER reject_setting BEFORE INSERT ON $settingsTable '
+      "BEGIN SELECT RAISE(ABORT, 'blocked'); END",
+    );
+    final store = await SettingsStore.open(null);
+    await store.setString(SettingKeys.locale, 'ja');
+
+    await expectLater(store.attachDatabase(failed), throwsA(anything));
+    expect(store.isDegraded, isTrue);
+
+    await failed.execute('DROP TRIGGER reject_setting');
+    expect(await store.attachDatabase(failed), isTrue);
+    expect(
+      (await SettingsStore.open(failed)).getString(SettingKeys.locale),
+      'ja',
+    );
   });
 
   test('a value written under one key is invisible under another', () {

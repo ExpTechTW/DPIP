@@ -510,9 +510,10 @@ Future<void> _recoverDurable(
   const interval = Duration(seconds: 3);
   for (var attempt = 1; attempt <= attempts; attempt++) {
     await Future<void>.delayed(interval);
+    SqliteDatabase? db;
     try {
       final base = await getApplicationSupportDirectory();
-      final db = SqliteDatabase(
+      db = SqliteDatabase(
         path: '${base.path}/dpip.db',
         options: const SqliteOptions(synchronous: SqliteSynchronous.full),
       );
@@ -529,6 +530,12 @@ Future<void> _recoverDurable(
       onboardingRefresh.fire();
       return;
     } catch (error) {
+      try {
+        await db?.close();
+      } on Object {
+        // The open/attach error is the useful failure. Closing a partial pool
+        // must not replace it or prevent the next recovery attempt.
+      }
       Log.warning('durable recovery attempt $attempt/$attempts failed: $error');
     }
   }
