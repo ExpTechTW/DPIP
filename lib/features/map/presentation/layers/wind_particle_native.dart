@@ -20,10 +20,14 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// 8 GB of GPU memory in sixteen seconds. Drawn inside the map instead, the
 /// particles produce no Flutter frame at all.
 ///
+/// iOS draws inside the map too, through `MLNCustomStyleLayer`'s Metal encoder
+/// (see `WindParticleEngine.swift` in the fork) — there was never a leak there,
+/// but the same pass is where map content belongs, and one wire feeds both.
+///
 /// This class owns only the *conversation* with that renderer — when to add it,
 /// what to upload, when to let it run. The simulation itself is gone from Dart;
-/// [WindParticleSim] survives as the numeric oracle its GLSL twin is checked
-/// against, not as something that runs in production.
+/// [WindParticleSim] survives as the numeric oracle the native shaders are
+/// checked against, not as something that runs in production.
 class WindParticleNative {
   WindParticleNative({
     required this.field,
@@ -64,10 +68,14 @@ class WindParticleNative {
 
   /// Whether this platform should even try.
   ///
-  /// Android only, for now. The leak this exists to avoid is in the Android
-  /// SurfaceControl path, and iOS would need the whole shader set rewritten in
-  /// Metal for a problem it does not have.
-  bool get isSupported => _platform == TargetPlatform.android;
+  /// Android and iOS. The Android path is the reason this class exists: the
+  /// HCPP overlay leak lives in that platform's SurfaceControl, and the map's
+  /// GL surface is where drawing costs nothing (see the native layer's class
+  /// comment). iOS draws through `MLNCustomStyleLayer`'s Metal encoder in the
+  /// map's own pass — same reasoning, no leak to escape — and arrived later;
+  /// see `WindParticleEngine.swift` in the fork for how its passes are split.
+  bool get isSupported =>
+      _platform == TargetPlatform.android || _platform == TargetPlatform.iOS;
 
   void attach(MapLibreMapController controller) {
     if (!isSupported || _unavailable) return;

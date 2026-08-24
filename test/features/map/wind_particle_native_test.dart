@@ -157,13 +157,13 @@ void main() {
       platform: platform,
     );
 
-    test('Android is the platform this exists for', () {
+    test('Android and iOS are the platforms this exists for', () {
       expect(build(TargetPlatform.android).isSupported, isTrue);
+      expect(build(TargetPlatform.iOS).isSupported, isTrue);
     });
 
     test('nowhere else, and nothing is active before it attaches', () {
       for (final platform in const [
-        TargetPlatform.iOS,
         TargetPlatform.macOS,
         TargetPlatform.windows,
         TargetPlatform.linux,
