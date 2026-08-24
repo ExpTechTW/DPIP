@@ -17,24 +17,31 @@ import 'package:dpip/features/weather/domain/wind_field.dart';
 /// Wind speed (m/s) that saturates the visual ramp — fixed across every frame
 /// and both models so a streak means the same thing everywhere
 /// (`web/wind.js`, `SPEED_SCALE`).
+/// The tuning curves below are **public because they are now a wire contract**.
+///
+/// The simulation they were written for no longer runs in production — the
+/// particles are advected on the GPU inside the map. These constants are sent
+/// to that renderer as endpoints and interpolated there with the same rules,
+/// so they keep exactly one definition. This file stays as the numeric oracle
+/// the GLSL is checked against; see `wind_particle_native.dart`.
 const double kWindSpeedScale = 32;
 
 /// The zooms the tuned values are pinned at (`web/index.html`, `ZOOM_STOPS`),
 /// which are also this layer's own limits.
-const double _kZoomLo = 3;
-const double _kZoomHi = 7;
+const double kWindZoomLo = 3;
+const double kWindZoomHi = 7;
 
 // Each pair is (value at z3, value at z7). Which ones interpolate
 // geometrically and which linearly is not a free choice either — it is what
 // `TUNE` declares, and a count that steps 6400 → 4096 → 2601 is a visibly
 // different field from one that steps 6400 → 5056 → 3712.
-const (double, double) _kParticles = (6400, 1024); // log
-const (double, double) _kPointSize = (1.5, 1.8); // lin, logical px
-const (double, double) _kSpeedFactor = (0.2, 0.0151); // log
-const (double, double) _kFadeOpacity = (0.95, 0.945); // lin
+const (double, double) kWindParticles = (6400, 1024); // log
+const (double, double) kWindPointSize = (1.5, 1.8); // lin, logical px
+const (double, double) kWindSpeedFactor = (0.2, 0.0151); // log
+const (double, double) kWindFadeOpacity = (0.95, 0.945); // lin
 
 /// Chance per frame that a particle in good standing is recycled anyway.
-const double _kDropRate = 0.011;
+const double kWindDropRate = 0.011;
 
 /// Relative density of particles in still air and in strong wind.
 ///
@@ -42,15 +49,15 @@ const double _kDropRate = 0.011;
 /// to say. See the note in `web/index.html`: once the colour underneath
 /// carries the speed, thinning the streaks where the weather is spends the one
 /// channel still describing direction.
-const double _kDensityCalm = 0.5;
-const double _kDensityStrong = 5.5;
+const double kWindDensityCalm = 0.5;
+const double kWindDensityStrong = 5.5;
 
 /// Where a zoom sits between the two tuned stops.
 ///
 /// Clamped rather than extrapolated, matching the web's `effective()`: outside
 /// the stops there is no judgement behind the number, only arithmetic.
 double _stopFraction(double zoom) =>
-    ((zoom - _kZoomLo) / (_kZoomHi - _kZoomLo)).clamp(0.0, 1.0);
+    ((zoom - kWindZoomLo) / (kWindZoomHi - kWindZoomLo)).clamp(0.0, 1.0);
 
 double _lerpStops((double, double) v, double zoom) {
   final f = _stopFraction(zoom);
@@ -68,14 +75,17 @@ double _logLerpStops((double, double) v, double zoom) {
 /// particle state and rounds to one; matching the count matters more than the
 /// squareness, but rounding the same way keeps the two exactly equal.
 int particleCountFor(double zoom) {
-  final edge = math.max(1, math.sqrt(_logLerpStops(_kParticles, zoom)).round());
+  final edge = math.max(
+    1,
+    math.sqrt(_logLerpStops(kWindParticles, zoom)).round(),
+  );
   return edge * edge;
 }
 
 /// Diameter of a particle in logical pixels. The web sets `gl_PointSize` in
 /// device pixels and multiplies by the device pixel ratio to get there, so the
 /// tuned number is already the logical one.
-double pointSizeFor(double zoom) => _lerpStops(_kPointSize, zoom);
+double pointSizeFor(double zoom) => _lerpStops(kWindPointSize, zoom);
 
 /// What fraction of the trail buffer survives each frame.
 ///
@@ -87,21 +97,22 @@ double pointSizeFor(double zoom) => _lerpStops(_kPointSize, zoom);
 ///
 /// Never 1: a fade that does not fade accumulates for ever and the screen
 /// saturates to white.
-double fadeOpacityFor(double zoom) => _lerpStops(_kFadeOpacity, zoom);
+double fadeOpacityFor(double zoom) => _lerpStops(kWindFadeOpacity, zoom);
 
 /// Field-space distance a particle rides per (m/s · frame) at [zoom].
 ///
 /// It has to fall with zoom: a field-space step is a fraction of the *world*,
 /// so the pixels it covers double with every zoom level in. Held constant at
 /// the value that suits z3, particles at z7 move 23× too fast.
-double fieldStepFor(double zoom) => 0.0001 * _logLerpStops(_kSpeedFactor, zoom);
+double fieldStepFor(double zoom) =>
+    0.0001 * _logLerpStops(kWindSpeedFactor, zoom);
 
 /// The web's `densityWeight`: how many particles a place should hold relative
 /// to spreading them evenly, by how hard the wind is blowing there.
 double densityWeight(double speed) {
   final t = (speed / (0.6 * kWindSpeedScale)).clamp(0.0, 1.0);
   final s = t * t * (3 - 2 * t); // smoothstep
-  return _kDensityCalm + (_kDensityStrong - _kDensityCalm) * s;
+  return kWindDensityCalm + (kWindDensityStrong - kWindDensityCalm) * s;
 }
 
 /// The camera a wind overlay is drawn under — enough to project a lat/lng to
@@ -375,7 +386,7 @@ class WindParticleSim {
       // Recycle a particle that has left, and occasionally a healthy one — the
       // field would otherwise empty out of wherever the density weighting is
       // not putting anything back.
-      if (!inView || _random.nextDouble() < _kDropRate) {
+      if (!inView || _random.nextDouble() < kWindDropRate) {
         _respawn(p, fieldSpace);
       }
     }
@@ -518,7 +529,7 @@ class WindParticleSim {
     final (u, v) = _sampleUV(x, y);
     final weight = densityWeight(math.sqrt(u * u + v * v));
     if (_random.nextDouble() <
-        weight / math.max(_kDensityCalm, _kDensityStrong)) {
+        weight / math.max(kWindDensityCalm, kWindDensityStrong)) {
       p.x = x;
       p.y = y;
     }

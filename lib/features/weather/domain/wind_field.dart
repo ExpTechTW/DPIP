@@ -40,6 +40,8 @@ class WindField {
     required this.model,
     required this.u,
     required this.v,
+    this.source,
+    this.planeOffset = 0,
   });
 
   /// Cells across — the field spans `dLon × width` degrees of longitude.
@@ -80,6 +82,22 @@ class WindField {
   /// Quantised northward component, `width × height`, raster order.
   final Uint8List v;
 
+  /// The undecoded WND1 body [u] and [v] are views into.
+  ///
+  /// Kept so the GPU renderer can be handed the payload untouched instead of a
+  /// re-serialised copy: the planes are already in the raster order a texture
+  /// upload wants, and re-packing 2 MB per forecast frame to send the same
+  /// bytes back out would be pure loss. It costs nothing to retain — the views
+  /// pin the buffer regardless.
+  ///
+  /// Null for a field assembled in code rather than decoded from the wire —
+  /// there is no payload to upload, and the GPU renderer skips it rather than
+  /// inventing one.
+  final Uint8List? source;
+
+  /// Byte offset of the u plane within [source]; the v plane follows it.
+  final int planeOffset;
+
   /// Parses a WND1 payload. Throws [FormatException] on any structural
   /// mismatch (bad magic, unsupported version, truncation) — the data layer
   /// wraps that into a [DecodeFailure] before anything else sees it.
@@ -118,6 +136,8 @@ class WindField {
       model: String.fromCharCodes(bytes.sublist(67, planeOffset)),
       u: Uint8List.sublistView(bytes, planeOffset, planeOffset + n),
       v: Uint8List.sublistView(bytes, planeOffset + n, planeOffset + n * 2),
+      source: bytes,
+      planeOffset: planeOffset,
     );
   }
 
