@@ -3229,4 +3229,68 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => 'Thô';
+
+  @override
+  String get notifyTestTitle => 'Thử thông báo';
+
+  @override
+  String get notifyTestIntro =>
+      'Chạm vào một mục sẽ gửi cảnh báo đó thật sự. Cảnh báo nghiêm trọng phát ở âm lượng tối đa và vang lên bất chấp chế độ im lặng và Không làm phiền.';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      'Thiết bị này chưa cho phép cảnh báo khẩn cấp, nên cảnh báo nghiêm trọng vẫn im lặng khi máy đang tắt tiếng.';
+
+  @override
+  String get notifyTestPermissionOff =>
+      'Thông báo đang tắt nên thử nghiệm sẽ không hiện gì cả.';
+
+  @override
+  String get notifyTestBehaviourOverrides =>
+      'Vang lên qua chế độ im lặng và Không làm phiền';
+
+  @override
+  String get notifyTestBehaviourAlerts => 'Có âm thanh và biểu ngữ';
+
+  @override
+  String get notifyTestBehaviourSounds => 'Có âm thanh, không biểu ngữ';
+
+  @override
+  String get notifyTestBehaviourSilent =>
+      'Im lặng — chỉ hiện trong danh sách thông báo';
+
+  @override
+  String get notifyTestFailed => 'Không gửi được thông báo thử.';
+
+  @override
+  String get moreBugReports => 'Lỗi đã báo cáo';
+
+  @override
+  String get bugTrackerEmpty => 'Chưa có lỗi nào được báo cáo';
+
+  @override
+  String get bugTrackerReplies => 'Phản hồi';
+
+  @override
+  String get bugTrackerGoToDiscord =>
+      'Không tìm thấy vấn đề của bạn? Hãy báo cáo trên Discord!';
+
+  @override
+  String get bugTrackerNoMatch => 'Không có lỗi nào khớp với thẻ đã chọn';
+
+  @override
+  String get bugTrackerDeveloper => 'Nhà phát triển';
+
+  @override
+  String get bugTrackerCannotDisplay =>
+      'Không thể hiển thị nội dung này — xem trên Discord';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'Tham gia thảo luận trên Discord';
+
+  @override
+  String get bugTrackerSortLast => 'Hoạt động mới nhất';
+
+  @override
+  String get bugTrackerSortMostDiscussed => 'Nhiều thảo luận nhất';
 }

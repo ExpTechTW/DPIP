@@ -3222,4 +3222,67 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => 'หยาบ';
+
+  @override
+  String get notifyTestTitle => 'ทดสอบการแจ้งเตือน';
+
+  @override
+  String get notifyTestIntro =>
+      'แตะที่รายการเพื่อส่งการแจ้งเตือนนั้นจริง ๆ การแจ้งเตือนสำคัญจะดังด้วยระดับเสียงสูงสุด และดังทะลุโหมดปิดเสียงและห้ามรบกวน';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      'อุปกรณ์นี้ไม่ได้อนุญาตการแจ้งเตือนฉุกเฉิน การแจ้งเตือนสำคัญจึงเงียบเมื่อปิดเสียงเครื่อง';
+
+  @override
+  String get notifyTestPermissionOff =>
+      'การแจ้งเตือนถูกปิดอยู่ การทดสอบจะไม่แสดงอะไรเลย';
+
+  @override
+  String get notifyTestBehaviourOverrides => 'ดังทะลุโหมดปิดเสียงและห้ามรบกวน';
+
+  @override
+  String get notifyTestBehaviourAlerts => 'มีเสียงและแบนเนอร์';
+
+  @override
+  String get notifyTestBehaviourSounds => 'มีเสียง ไม่มีแบนเนอร์';
+
+  @override
+  String get notifyTestBehaviourSilent =>
+      'เงียบ — แสดงในรายการแจ้งเตือนเท่านั้น';
+
+  @override
+  String get notifyTestFailed => 'ส่งการแจ้งเตือนทดสอบไม่สำเร็จ';
+
+  @override
+  String get moreBugReports => 'บั๊กที่รายงานแล้ว';
+
+  @override
+  String get bugTrackerEmpty => 'ยังไม่มีบั๊กที่รายงาน';
+
+  @override
+  String get bugTrackerReplies => 'การตอบกลับ';
+
+  @override
+  String get bugTrackerGoToDiscord =>
+      'ไม่พบปัญหาของคุณ? ไปแจ้งบั๊กที่ Discord!';
+
+  @override
+  String get bugTrackerNoMatch => 'ไม่มีบั๊กที่ตรงกับแท็กที่เลือก';
+
+  @override
+  String get bugTrackerDeveloper => 'นักพัฒนา';
+
+  @override
+  String get bugTrackerCannotDisplay =>
+      'ไม่สามารถแสดงเนื้อหานี้ได้ — ดูได้ที่ Discord';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'ร่วมพูดคุยที่ Discord';
+
+  @override
+  String get bugTrackerSortLast => 'ล่าสุด';
+
+  @override
+  String get bugTrackerSortMostDiscussed => 'พูดคุยมากที่สุด';
 }

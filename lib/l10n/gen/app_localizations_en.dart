@@ -3229,4 +3229,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => 'Coarse';
+
+  @override
+  String get notifyTestTitle => 'Test notifications';
+
+  @override
+  String get notifyTestIntro =>
+      'Tapping a row sends that alert for real. Major alerts play at full volume and sound through the silent switch and Do Not Disturb.';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      'Critical alerts aren\'t allowed on this device, so major alerts stay silent when your phone is.';
+
+  @override
+  String get notifyTestPermissionOff =>
+      'Notifications are turned off, so a test won\'t show anything.';
+
+  @override
+  String get notifyTestBehaviourOverrides =>
+      'Sounds through silent and Do Not Disturb';
+
+  @override
+  String get notifyTestBehaviourAlerts => 'Sound and a banner';
+
+  @override
+  String get notifyTestBehaviourSounds => 'Sound, no banner';
+
+  @override
+  String get notifyTestBehaviourSilent => 'Silent — notification list only';
+
+  @override
+  String get notifyTestFailed => 'Couldn\'t send the test notification.';
+
+  @override
+  String get moreBugReports => 'Bug reports';
+
+  @override
+  String get bugTrackerEmpty => 'No reported bugs yet';
+
+  @override
+  String get bugTrackerReplies => 'Replies';
+
+  @override
+  String get bugTrackerGoToDiscord =>
+      'Can\'t find your issue? Report it on Discord!';
+
+  @override
+  String get bugTrackerNoMatch => 'No threads match the selected tags';
+
+  @override
+  String get bugTrackerDeveloper => 'Developer';
+
+  @override
+  String get bugTrackerCannotDisplay =>
+      'This content can\'t be displayed here — view it on Discord';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'Join the discussion on Discord';
+
+  @override
+  String get bugTrackerSortLast => 'Latest activity';
+
+  @override
+  String get bugTrackerSortMostDiscussed => 'Most discussed';
 }

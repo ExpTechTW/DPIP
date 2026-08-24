@@ -66,6 +66,7 @@ import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/meshtastic/meshtastic_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
+import 'package:dpip/features/bug_tracker/bug_tracker_providers.dart';
 import 'package:dpip/features/status/status_providers.dart';
 import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
@@ -423,6 +424,7 @@ Future<void> bootstrap() async {
         ...sponsorProviders(),
         ...homeProviders(),
         ...statusProviders(deps),
+        ...bugTrackerProviders(deps),
       ],
     ),
   );

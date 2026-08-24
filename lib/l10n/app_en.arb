@@ -3874,5 +3874,81 @@
   },
   "@rainScaleCoarse": {
     "description": "Rainfall colour scale option: wide-spaced thresholds (10-1500 mm), for multi-day totals"
+  },
+  "notifyTestTitle": "Test notifications",
+  "@notifyTestTitle": {
+    "description": "Title of the page that sends sample notifications"
+  },
+  "notifyTestIntro": "Tapping a row sends that alert for real. Major alerts play at full volume and sound through the silent switch and Do Not Disturb.",
+  "@notifyTestIntro": {
+    "description": "Explains that a tap fires a real alert, and warns that major alerts ignore silent mode"
+  },
+  "notifyTestCriticalDenied": "Critical alerts aren't allowed on this device, so major alerts stay silent when your phone is.",
+  "@notifyTestCriticalDenied": {
+    "description": "Shown on iOS when the critical-alert permission was refused"
+  },
+  "notifyTestPermissionOff": "Notifications are turned off, so a test won't show anything.",
+  "@notifyTestPermissionOff": {
+    "description": "Shown when notification permission is not granted, so a test does nothing"
+  },
+  "notifyTestBehaviourOverrides": "Sounds through silent and Do Not Disturb",
+  "@notifyTestBehaviourOverrides": {
+    "description": "Channel behaviour: sounds through silent mode and Do Not Disturb"
+  },
+  "notifyTestBehaviourAlerts": "Sound and a banner",
+  "@notifyTestBehaviourAlerts": {
+    "description": "Channel behaviour: plays a sound and shows a heads-up banner"
+  },
+  "notifyTestBehaviourSounds": "Sound, no banner",
+  "@notifyTestBehaviourSounds": {
+    "description": "Channel behaviour: plays a sound but shows no banner"
+  },
+  "notifyTestBehaviourSilent": "Silent — notification list only",
+  "@notifyTestBehaviourSilent": {
+    "description": "Channel behaviour: no sound, appears only in the notification list"
+  },
+  "notifyTestFailed": "Couldn't send the test notification.",
+  "@notifyTestFailed": {
+    "description": "Snackbar shown when the test notification could not be posted"
+  },
+  "moreBugReports": "Bug reports",
+  "bugTrackerEmpty": "No reported bugs yet",
+  "@moreBugReports": {
+    "description": "Title of the read-only reported-bugs screen and its More-tab entry"
+  },
+  "@bugTrackerEmpty": {
+    "description": "Shown when the bug-tracker index has no threads"
+  },
+  "bugTrackerReplies": "Replies",
+  "@bugTrackerReplies": {
+    "description": "Header above the reply thread on a bug detail page"
+  },
+  "bugTrackerGoToDiscord": "Can't find your issue? Report it on Discord!",
+  "@bugTrackerGoToDiscord": {
+    "description": "Call-to-action above the bug list, linking to the Discord report channel"
+  },
+  "bugTrackerNoMatch": "No threads match the selected tags",
+  "@bugTrackerNoMatch": {
+    "description": "Shown when the active tag filters match no thread"
+  },
+  "bugTrackerDeveloper": "Developer",
+  "bugTrackerCannotDisplay": "This content can't be displayed here — view it on Discord",
+  "bugTrackerJoinDiscussion": "Join the discussion on Discord",
+  "@bugTrackerDeveloper": {
+    "description": "Badge beside staff names on bug threads"
+  },
+  "@bugTrackerCannotDisplay": {
+    "description": "Placeholder for a reply whose text is unavailable"
+  },
+  "@bugTrackerJoinDiscussion": {
+    "description": "Button handing discussion back to Discord"
+  },
+  "bugTrackerSortLast": "Latest activity",
+  "bugTrackerSortMostDiscussed": "Most discussed",
+  "@bugTrackerSortLast": {
+    "description": "Sort chip: threads with the most recent reply first"
+  },
+  "@bugTrackerSortMostDiscussed": {
+    "description": "Sort chip: threads with the most replies first"
   }
 }

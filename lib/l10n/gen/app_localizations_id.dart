@@ -3239,4 +3239,68 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => 'Kasar';
+
+  @override
+  String get notifyTestTitle => 'Uji notifikasi';
+
+  @override
+  String get notifyTestIntro =>
+      'Mengetuk baris akan benar-benar mengirim peringatan itu. Peringatan penting berbunyi pada volume penuh dan menembus mode senyap serta Jangan Ganggu.';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      'Perangkat ini belum mengizinkan peringatan kritis, jadi peringatan penting tetap senyap saat ponsel disenyapkan.';
+
+  @override
+  String get notifyTestPermissionOff =>
+      'Notifikasi dimatikan, jadi pengujian tidak akan menampilkan apa pun.';
+
+  @override
+  String get notifyTestBehaviourOverrides =>
+      'Menembus mode senyap dan Jangan Ganggu';
+
+  @override
+  String get notifyTestBehaviourAlerts => 'Suara dan banner';
+
+  @override
+  String get notifyTestBehaviourSounds => 'Suara, tanpa banner';
+
+  @override
+  String get notifyTestBehaviourSilent => 'Senyap — hanya di daftar notifikasi';
+
+  @override
+  String get notifyTestFailed => 'Tidak dapat mengirim notifikasi uji.';
+
+  @override
+  String get moreBugReports => 'Bug yang dilaporkan';
+
+  @override
+  String get bugTrackerEmpty => 'Belum ada bug yang dilaporkan';
+
+  @override
+  String get bugTrackerReplies => 'Balasan';
+
+  @override
+  String get bugTrackerGoToDiscord =>
+      'Tidak menemukan masalahmu? Laporkan di Discord!';
+
+  @override
+  String get bugTrackerNoMatch =>
+      'Tidak ada bug yang cocok dengan tag terpilih';
+
+  @override
+  String get bugTrackerDeveloper => 'Pengembang';
+
+  @override
+  String get bugTrackerCannotDisplay =>
+      'Konten ini tidak dapat ditampilkan — lihat di Discord';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'Ikuti diskusi di Discord';
+
+  @override
+  String get bugTrackerSortLast => 'Aktivitas terbaru';
+
+  @override
+  String get bugTrackerSortMostDiscussed => 'Paling banyak dibahas';
 }

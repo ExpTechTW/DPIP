@@ -3159,4 +3159,61 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => '大間距';
+
+  @override
+  String get notifyTestTitle => '測試通知';
+
+  @override
+  String get notifyTestIntro => '撳一下就會真係發送嗰則警報。重大警報會用最大音量播放，仲會穿透靜音同勿擾模式。';
+
+  @override
+  String get notifyTestCriticalDenied => '呢部裝置未允許「重要警告」，重大警報喺靜音時一樣唔會出聲。';
+
+  @override
+  String get notifyTestPermissionOff => '通知已關閉，測試唔會有任何反應。';
+
+  @override
+  String get notifyTestBehaviourOverrides => '會穿透靜音同勿擾模式';
+
+  @override
+  String get notifyTestBehaviourAlerts => '有聲音，仲會彈橫幅';
+
+  @override
+  String get notifyTestBehaviourSounds => '有聲音，唔會彈橫幅';
+
+  @override
+  String get notifyTestBehaviourSilent => '無聲，只會出現喺通知中心';
+
+  @override
+  String get notifyTestFailed => '無法發送測試通知。';
+
+  @override
+  String get moreBugReports => '已回報嘅錯誤';
+
+  @override
+  String get bugTrackerEmpty => '仲未有已回報嘅錯誤';
+
+  @override
+  String get bugTrackerReplies => '回覆';
+
+  @override
+  String get bugTrackerGoToDiscord => '搵唔到你嘅問題？快啲去 Discord 回報！';
+
+  @override
+  String get bugTrackerNoMatch => '冇符合所選標籤嘅錯誤回報';
+
+  @override
+  String get bugTrackerDeveloper => '開發人員';
+
+  @override
+  String get bugTrackerCannotDisplay => '無法顯示呢個內容，請去 Discord 查看';
+
+  @override
+  String get bugTrackerJoinDiscussion => '去 Discord 一齊傾';
+
+  @override
+  String get bugTrackerSortLast => '最後傾偈';
+
+  @override
+  String get bugTrackerSortMostDiscussed => '最多討論';
 }

@@ -3245,4 +3245,69 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get rainScaleCoarse => 'Magaspang';
+
+  @override
+  String get notifyTestTitle => 'Subukan ang mga notipikasyon';
+
+  @override
+  String get notifyTestIntro =>
+      'Ang pag-tap sa isang row ay talagang magpapadala ng alertong iyon. Ang mga mahalagang alerto ay tutunog nang pinakamalakas at dadaan sa silent switch at Do Not Disturb.';
+
+  @override
+  String get notifyTestCriticalDenied =>
+      'Hindi pinapayagan ang critical alerts sa device na ito, kaya mananatiling tahimik ang mga mahalagang alerto kapag naka-silent ang telepono.';
+
+  @override
+  String get notifyTestPermissionOff =>
+      'Naka-off ang mga notipikasyon, kaya walang lalabas kapag sinubukan.';
+
+  @override
+  String get notifyTestBehaviourOverrides =>
+      'Tutunog kahit naka-silent o Do Not Disturb';
+
+  @override
+  String get notifyTestBehaviourAlerts => 'May tunog at banner';
+
+  @override
+  String get notifyTestBehaviourSounds => 'May tunog, walang banner';
+
+  @override
+  String get notifyTestBehaviourSilent =>
+      'Tahimik — sa listahan ng notipikasyon lang';
+
+  @override
+  String get notifyTestFailed =>
+      'Hindi naipadala ang pansubok na notipikasyon.';
+
+  @override
+  String get moreBugReports => 'Mga naulat na bug';
+
+  @override
+  String get bugTrackerEmpty => 'Wala pang naulat na bug';
+
+  @override
+  String get bugTrackerReplies => 'Mga sagot';
+
+  @override
+  String get bugTrackerGoToDiscord =>
+      'Hindi mo makita ang iyong problema? Iulat ito sa Discord!';
+
+  @override
+  String get bugTrackerNoMatch => 'Walang bug na tumutugma sa mga piling tag';
+
+  @override
+  String get bugTrackerDeveloper => 'Developer';
+
+  @override
+  String get bugTrackerCannotDisplay =>
+      'Hindi maipakita ang nilalaman na ito — tingnan sa Discord';
+
+  @override
+  String get bugTrackerJoinDiscussion => 'Makilahok sa talakayan sa Discord';
+
+  @override
+  String get bugTrackerSortLast => 'Pinakabagong aktibidad';
+
+  @override
+  String get bugTrackerSortMostDiscussed => 'Pinakamaraming talakayan';
 }

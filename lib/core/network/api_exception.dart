@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/logging/log.dart';
 
 /// Runs [body] and folds it into a [Result]: its value on success, a typed
 /// [Failure] (via [mapException]) on any throw.
@@ -12,7 +13,11 @@ import 'package:dpip/core/error/result.dart';
 Future<Result<T>> guardResult<T>(Future<T> Function() body) async {
   try {
     return Ok(await body());
-  } catch (error) {
+  } catch (error, stackTrace) {
+    // Silent failures are the worst kind: the UI shows its error state and
+    // nothing else records WHY. One line per failure, here at the single
+    // choke point every repository passes through.
+    Log.handle(error, stackTrace, 'repository fetch/decode');
     return Err(mapException(error));
   }
 }

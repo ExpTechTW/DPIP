@@ -6148,6 +6148,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coarse'**
   String get rainScaleCoarse;
+
+  /// Title of the page that sends sample notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Test notifications'**
+  String get notifyTestTitle;
+
+  /// Explains that a tap fires a real alert, and warns that major alerts ignore silent mode
+  ///
+  /// In en, this message translates to:
+  /// **'Tapping a row sends that alert for real. Major alerts play at full volume and sound through the silent switch and Do Not Disturb.'**
+  String get notifyTestIntro;
+
+  /// Shown on iOS when the critical-alert permission was refused
+  ///
+  /// In en, this message translates to:
+  /// **'Critical alerts aren\'t allowed on this device, so major alerts stay silent when your phone is.'**
+  String get notifyTestCriticalDenied;
+
+  /// Shown when notification permission is not granted, so a test does nothing
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are turned off, so a test won\'t show anything.'**
+  String get notifyTestPermissionOff;
+
+  /// Channel behaviour: sounds through silent mode and Do Not Disturb
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds through silent and Do Not Disturb'**
+  String get notifyTestBehaviourOverrides;
+
+  /// Channel behaviour: plays a sound and shows a heads-up banner
+  ///
+  /// In en, this message translates to:
+  /// **'Sound and a banner'**
+  String get notifyTestBehaviourAlerts;
+
+  /// Channel behaviour: plays a sound but shows no banner
+  ///
+  /// In en, this message translates to:
+  /// **'Sound, no banner'**
+  String get notifyTestBehaviourSounds;
+
+  /// Channel behaviour: no sound, appears only in the notification list
+  ///
+  /// In en, this message translates to:
+  /// **'Silent — notification list only'**
+  String get notifyTestBehaviourSilent;
+
+  /// Snackbar shown when the test notification could not be posted
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send the test notification.'**
+  String get notifyTestFailed;
+
+  /// Title of the read-only reported-bugs screen and its More-tab entry
+  ///
+  /// In en, this message translates to:
+  /// **'Bug reports'**
+  String get moreBugReports;
+
+  /// Shown when the bug-tracker index has no threads
+  ///
+  /// In en, this message translates to:
+  /// **'No reported bugs yet'**
+  String get bugTrackerEmpty;
+
+  /// Header above the reply thread on a bug detail page
+  ///
+  /// In en, this message translates to:
+  /// **'Replies'**
+  String get bugTrackerReplies;
+
+  /// Call-to-action above the bug list, linking to the Discord report channel
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find your issue? Report it on Discord!'**
+  String get bugTrackerGoToDiscord;
+
+  /// Shown when the active tag filters match no thread
+  ///
+  /// In en, this message translates to:
+  /// **'No threads match the selected tags'**
+  String get bugTrackerNoMatch;
+
+  /// Badge beside staff names on bug threads
+  ///
+  /// In en, this message translates to:
+  /// **'Developer'**
+  String get bugTrackerDeveloper;
+
+  /// Placeholder for a reply whose text is unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'This content can\'t be displayed here — view it on Discord'**
+  String get bugTrackerCannotDisplay;
+
+  /// Button handing discussion back to Discord
+  ///
+  /// In en, this message translates to:
+  /// **'Join the discussion on Discord'**
+  String get bugTrackerJoinDiscussion;
+
+  /// Sort chip: threads with the most recent reply first
+  ///
+  /// In en, this message translates to:
+  /// **'Latest activity'**
+  String get bugTrackerSortLast;
+
+  /// Sort chip: threads with the most replies first
+  ///
+  /// In en, this message translates to:
+  /// **'Most discussed'**
+  String get bugTrackerSortMostDiscussed;
 }
 
 class _AppLocalizationsDelegate
