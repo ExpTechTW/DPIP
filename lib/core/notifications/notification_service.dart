@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -400,24 +401,67 @@ class NotificationService {
 /// Builds notification content from a message's `data` (preferred, legacy
 /// format) falling back to its `notification` block, or null when there's
 /// nothing to show.
+///
+/// Two payload shapes arrive here:
+///
+/// - **Flat** — `data['channel']` / `data['title']` / `data['body']` /
+///   `data['id']`, the contract [ARCHITECTURE.md] describes.
+/// - **Nested** — everything packed into `data['content']` as one JSON string
+///   (`{channelKey, id, body, …}`), which is what the push producer still
+///   sends: the FCM `notification` block carries the visible text while the
+///   structured fields ride inside that string. Without reading it back,
+///   every such message loses its channel and collapses onto the announcement
+///   fallback — wrong sound, wrong tap routing.
+///
+/// Flat keys win where both exist. Nested JSON is parsed leniently: malformed
+/// or non-object content is treated as absent, never thrown on.
 NotificationContent? contentFromMessage(RemoteMessage message) {
   final data = message.data;
   final notification = message.notification;
-  final title = (data['title'] as String?) ?? notification?.title;
-  final body = (data['body'] as String?) ?? notification?.body;
+  final nested = _nestedContent(data);
+  String? nestedField(String name) => switch (nested?[name]) {
+    final String value => value,
+    final int value => value.toString(),
+    _ => null,
+  };
+  final title =
+      (data['title'] as String?) ?? notification?.title ?? nestedField('title');
+  final body =
+      (data['body'] as String?) ?? notification?.body ?? nestedField('body');
   if (title == null && body == null) return null;
-  final channelKey = (data['channel'] as String?) ?? _fallbackChannelKey;
+  final channelKey =
+      (data['channel'] as String?) ??
+      nestedField('channelKey') ??
+      _fallbackChannelKey;
+  final id =
+      int.tryParse((data['id'] as String?) ?? '') ??
+      int.tryParse(nestedField('id') ?? '') ??
+      0;
+  final idText = (data['id'] as String?) ?? nestedField('id');
   return NotificationContent(
-    id: int.tryParse((data['id'] as String?) ?? '') ?? 0,
+    id: id,
     channelKey: channelKey,
     title: title,
     body: body,
     // Carry channel + id on the payload so an awesome-displayed tap deep-links
     // symmetrically with the FCM-delivered path.
-    payload: {'channel': channelKey, 'id': data['id'] as String?},
+    payload: {'channel': channelKey, 'id': idText},
     wakeUpScreen: true,
     category: NotificationCategory.Alarm,
   );
+}
+
+/// The structured fields of a message whose producer nested them inside
+/// `data['content']` as one JSON string — see [contentFromMessage]'s doc.
+Map<String, dynamic>? _nestedContent(Map<String, dynamic> data) {
+  final raw = data['content'];
+  if (raw is! String || raw.isEmpty) return null;
+  try {
+    final decoded = jsonDecode(raw);
+    return decoded is Map<String, dynamic> ? decoded : null;
+  } on FormatException {
+    return null;
+  }
 }
 
 /// Displays a background/terminated **data-only** message via awesome (a
