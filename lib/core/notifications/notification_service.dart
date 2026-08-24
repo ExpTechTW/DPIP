@@ -381,25 +381,20 @@ class NotificationService {
     // for the APNs token below — upstream says the two must not coexist, but
     // the app shipped them together for years and the token path depends on it.
     await AwesomeNotificationsFcm().initialize(
-      onFcmTokenHandle: _onPushToken,
-      onNativeTokenHandle: _onPushToken,
+      onFcmTokenHandle: (token) => _storeToken(token, isApns: false),
+      onNativeTokenHandle: (token) => _storeToken(token, isApns: true),
       onFcmSilentDataHandle: onFcmSilentData,
       debug: kDebugMode,
     );
 
+    // This stream only ever carries the FCM registration token, so on iOS the
+    // rotation is the signal and the APNs token is what has to be re-read.
     messaging.onTokenRefresh.listen((token) async {
-      Log.debug('Push token refreshed');
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        // This stream only carries the FCM registration token (see
-        // [_fetchToken] for why that's not what iOS registration needs);
-        // re-read the APNs token directly rather than persist [token] as-is.
+      await _storeToken(token, isApns: false);
+      if (Platform.isIOS) {
         final apns = await messaging.getAPNSToken();
-        if (apns != null) {
-          await _settings.setString(SettingKeys.pushToken, apns);
-        }
-        return;
+        if (apns != null) await _storeToken(apns, isApns: true);
       }
-      await _settings.setString(SettingKeys.pushToken, token);
     });
     // Fire-and-forget: this can wait seconds for the iOS APNs token, and
     // `init()` is awaited at launch, so it must not block start-up.
@@ -429,18 +424,24 @@ class NotificationService {
   /// the APNs auth key uploaded to the Firebase console. Best-effort: a failure
   /// just leaves the token unset until [requestPermission] or
   /// `onTokenRefresh` tries again.
-  /// Stores a push token handed over by awesome_notifications_fcm.
+  /// The one place [SettingKeys.pushToken] is written.
   ///
-  /// Both handlers land here on purpose: `onFcmTokenHandle` fires with the FCM
-  /// registration token and `onNativeTokenHandle` with the raw APNs one, and
-  /// each platform is given only the one it can produce. Which of the two the
-  /// backend needs is not symmetric — see [_fetchToken] — so the platform test
-  /// stays rather than trusting whichever arrived last.
-  @pragma('vm:entry-point')
-  Future<void> _onPushToken(String token) async {
+  /// Tokens arrive from three directions — awesome_notifications_fcm's two
+  /// handlers, firebase's refresh stream, and the launch-time fetch — and the
+  /// two kinds are **not interchangeable**: the backend keys on the raw APNs
+  /// token on iOS and the FCM registration token on Android. Registering the
+  /// wrong one is not a loud failure; it was measured to 202 on the write and
+  /// then 401 on every later lookup, which reads as "push is broken" with no
+  /// clue why.
+  ///
+  /// So every writer states which kind it holds and this decides, instead of
+  /// each caller repeating a platform test — the version that did not repeat
+  /// it let iOS overwrite a good APNs token with an FCM one seconds later.
+  Future<void> _storeToken(String token, {required bool isApns}) async {
     if (token.isEmpty) return;
+    if (isApns != Platform.isIOS) return;
     await _settings.setString(SettingKeys.pushToken, token);
-    Log.debug('Push token received (${token.length} chars)');
+    Log.debug('Push token stored (${isApns ? 'APNs' : 'FCM'})');
   }
 
   Future<void> _fetchToken() async {
@@ -455,12 +456,8 @@ class NotificationService {
         }
       }
       final fcmToken = await messaging.getToken();
-      final pushToken = defaultTargetPlatform == TargetPlatform.iOS
-          ? apnsToken
-          : fcmToken;
-      if (pushToken != null) {
-        await _settings.setString(SettingKeys.pushToken, pushToken);
-      }
+      if (apnsToken != null) await _storeToken(apnsToken, isApns: true);
+      if (fcmToken != null) await _storeToken(fcmToken, isApns: false);
     } catch (error, stackTrace) {
       // The failure mode is platform-specific: on iOS an unready APNs token is
       // the usual cause, on Android getToken() fails at FCM registration (e.g.
@@ -490,18 +487,8 @@ class NotificationService {
 ///
 /// Flat keys win where both exist. Nested JSON is parsed leniently: malformed
 /// or non-object content is treated as absent, never thrown on.
-NotificationContent? contentFromMessage(RemoteMessage message) =>
-    contentFromData(
-      message.data,
-      fallbackTitle: message.notification?.title,
-      fallbackBody: message.notification?.body,
-    );
-
-/// The same, from a bare data map — what awesome_notifications_fcm delivers.
-///
-/// [fallbackTitle] / [fallbackBody] stand in for the FCM `notification` block,
-/// which only the [RemoteMessage] shape carries. A silent-data push has no such
-/// block, so its text has to come from the payload itself.
+/// [fallbackTitle] / [fallbackBody] stand in for an FCM `notification` block.
+/// A silent-data push carries none, so its text has to come from the payload.
 NotificationContent? contentFromData(
   Map<String, dynamic> data, {
   String? fallbackTitle,
@@ -542,7 +529,7 @@ NotificationContent? contentFromData(
 }
 
 /// The structured fields of a message whose producer nested them inside
-/// `data['content']` as one JSON string — see [contentFromMessage]'s doc.
+/// `data['content']` as one JSON string — see [contentFromData]'s doc.
 Map<String, dynamic>? _nestedContent(Map<String, dynamic> data) {
   final raw = data['content'];
   if (raw is! String || raw.isEmpty) return null;
