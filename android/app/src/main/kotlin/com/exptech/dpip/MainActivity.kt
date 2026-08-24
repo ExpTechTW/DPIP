@@ -59,5 +59,8 @@ class MainActivity : FlutterActivity() {
 
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
+
+        MethodChannel(messenger, PlainChannelsChannel.NAME)
+            .setMethodCallHandler(PlainChannelsChannel(applicationContext))
     }
 }
