@@ -21,6 +21,8 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
@@ -42,10 +44,13 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/widgets/alert_cycle_chip.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
 import 'package:dpip/shared/map/map_compass.dart';
+import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
+import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show
         MapColors,
@@ -409,9 +414,39 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// north, kept in sync from [BaseMap.onCameraMove].
   final ValueNotifier<double> _bearing = ValueNotifier(0);
 
+  /// The three base-map toggles — OSM detailed map, terrain relief, township
+  /// names — persisted through the same [SettingKeys] the map tab writes, so
+  /// a choice made here is in force on every surface (and survives an app
+  /// restart, the settings table being sqlite-backed).
+  final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
+  final ValueNotifier<bool> _showTownLabels = ValueNotifier(true);
+  late final GsiOverlayController _gsi;
+  late final SettingsStore _settings;
+  final BasemapOverlaySync _basemapSync = BasemapOverlaySync();
+
+  /// Whether the initial style bakes terrain — mirrors the persisted OSM
+  /// state at mount (OSM-first styles omit the DEM, see [BaseMap]).
+  late final bool _initialOsmEnabled;
+
+  bool _styleLoaded = false;
+
+  /// Serialises basemap-overlay syncs so two rapid toggles cannot interleave
+  /// native add/remove calls on the same controller.
+  Future<void> _syncChain = Future<void>.value();
+
   @override
   void initState() {
     super.initState();
+    _settings = context.read<SettingsStore>();
+    _showTerrain.value = _settings.getBool(SettingKeys.mapShowTerrain) ?? true;
+    _showTownLabels.value =
+        _settings.getBool(SettingKeys.mapShowTownLabels) ?? true;
+    _initialOsmEnabled = _settings.getBool(SettingKeys.mapGsiEnabled) ?? false;
+    _gsi = GsiOverlayController(
+      _settings,
+      mutuallyExclusiveTerrain: _showTerrain,
+    );
+    _gsi.addListener(_onGsiChanged);
     widget.rts.addListener(_onRts);
     widget.tick.addListener(_onTick);
     widget.travelTimeTable.then((table) {
@@ -452,6 +487,10 @@ class _ReplayMapState extends State<_ReplayMap> {
     widget.tick.removeListener(_onTick);
     _blinkTimer?.cancel();
     _wavefrontTicker?.cancel();
+    _gsi.removeListener(_onGsiChanged);
+    _gsi.dispose();
+    _showTerrain.dispose();
+    _showTownLabels.dispose();
     _bearing.dispose();
     super.dispose();
   }
@@ -503,6 +542,59 @@ class _ReplayMapState extends State<_ReplayMap> {
     _controller = controller;
   }
 
+  void _onGsiChanged() {
+    // The controller cleared [_showTerrain] itself when OSM turned on (the
+    // vector overlay brings its own land surface); mirror the result.
+    _syncBasemapOverlays();
+  }
+
+  void _setShowTerrain(bool value) {
+    // Inverse edge of [GsiOverlayController.setEnabled]: terrain on → OSM off.
+    if (value && _gsi.enabled) _gsi.setEnabled(false);
+    if (_showTerrain.value == value) return;
+    _showTerrain.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapShowTerrain, value));
+    _syncBasemapOverlays();
+  }
+
+  void _setShowTownLabels(bool value) {
+    if (_showTownLabels.value == value) return;
+    _showTownLabels.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapShowTownLabels, value));
+    _applyTownLabelVisibility();
+  }
+
+  /// Pushes the township-label choice onto a live map. The base style's
+  /// `town-label` layer survives style reloads, which reset it to visible, so
+  /// this also runs after every [_onStyleLoaded] to re-assert the choice.
+  void _applyTownLabelVisibility() {
+    final controller = _controller;
+    if (controller == null) return;
+    unawaited(
+      controller
+          .setLayerVisibility(townLabelLayerId, _showTownLabels.value)
+          .catchError((Object e, StackTrace st) {
+            Log.handle(e, st, 'Failed to sync the township labels');
+          }),
+    );
+  }
+
+  void _syncBasemapOverlays() {
+    final controller = _controller;
+    if (!mounted || controller == null || !_styleLoaded) return;
+    final brightness = Theme.of(context).brightness;
+    _syncChain = _syncChain.then(
+      (_) => _basemapSync.sync(
+        controller,
+        showTerrain: () => _showTerrain.value,
+        gsi: _gsi,
+        brightness: brightness,
+        stillCurrent: () =>
+            mounted && identical(controller, _controller) && _styleLoaded,
+      ),
+    );
+  }
+
   /// Re-points the camera north, keeping centre / zoom. Mirrors
   /// [MapScaffold._resetNorth]: the needle is settled directly because a
   /// programmatic move may not emit a final north-up camera event.
@@ -529,6 +621,7 @@ class _ReplayMapState extends State<_ReplayMap> {
   Future<void> _onStyleLoaded() async {
     final controller = _controller;
     if (controller == null) return;
+    _styleLoaded = true;
     try {
       final data = await IntensityIconRenderer.render('cross');
       await controller.addImage(_crossIcon, data);
@@ -716,6 +809,11 @@ class _ReplayMapState extends State<_ReplayMap> {
     _setupBlink();
     _startWavefrontTicker();
     _frameTaiwan();
+    // A style (re)load wipes every runtime overlay and resets the base
+    // style's township-label layer to visible — re-assert the saved choices.
+    _applyTownLabelVisibility();
+    _basemapSync.onStyleLoaded(bakedTerrain: !_initialOsmEnabled);
+    _syncBasemapOverlays();
   }
 
   /// Loads the station directory once; the RTS feed carries only per-id
@@ -1075,33 +1173,52 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: BaseMap(
-            // GPS on: the map shows the user's position, and the EEW cards'
-            // local-intensity tiles resolve against the current location the
-            // same way the legacy monitor's did.
-            showUserLocation: true,
-            compassEnabled: false,
-            onMapCreated: _onMapCreated,
-            onStyleLoaded: () => unawaited(_onStyleLoaded()),
-            onCameraMove: (position) => _bearing.value = position.bearing,
-          ),
-        ),
-        // North indicator, matching the map tab's Flutter [MapCompass] —
-        // parked at top-right, level with the page's back button.
-        Positioned(
-          top: 0,
-          right: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+    return GsiOverlayScope(
+      controller: _gsi,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: BaseMap(
+              // GPS on: the map shows the user's position, and the EEW cards'
+              // local-intensity tiles resolve against the current location the
+              // same way the legacy monitor's did.
+              showUserLocation: true,
+              compassEnabled: false,
+              includeTerrainInStyle: !_initialOsmEnabled,
+              onMapCreated: _onMapCreated,
+              onStyleLoaded: () => unawaited(_onStyleLoaded()),
+              onCameraMove: (position) => _bearing.value = position.bearing,
             ),
           ),
-        ),
-      ],
+          // Base-map options (OSM detailed map / terrain relief / township
+          // names) above the compass — the same chrome the 強震監視器 carries in
+          // the map tab, persisted to the shared settings store. No sheet
+          // here, so the controls stay up for the whole replay.
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    MapBasemapMenu(
+                      showTownLabels: _showTownLabels,
+                      onShowTownLabelsChanged: _setShowTownLabels,
+                      showTerrain: _showTerrain,
+                      onShowTerrainChanged: _setShowTerrain,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    MapCompass(bearing: _bearing, onPressed: _resetNorth),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

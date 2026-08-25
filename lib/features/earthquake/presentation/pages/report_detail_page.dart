@@ -17,14 +17,20 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_compass.dart';
+import 'package:dpip/shared/map/map_gsi_overlay.dart';
+import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';
@@ -218,16 +224,107 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
 
   MapLibreMapController? _controller;
   bool _iconsLoaded = false;
+  bool _styleLoaded = false;
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
   /// north. Kept in sync from [BaseMap.onCameraMove] so the needle tracks
   /// rotation live, matching the map tab's compass.
   final ValueNotifier<double> _bearing = ValueNotifier(0);
 
+  /// The three base-map toggles — OSM detailed map, terrain relief, township
+  /// names — persisted through the same [SettingKeys] the map tab writes, so a
+  /// choice made here is in force on every surface (and survives an app
+  /// restart, the settings table being sqlite-backed).
+  final ValueNotifier<bool> _showTerrain = ValueNotifier(true);
+  final ValueNotifier<bool> _showTownLabels = ValueNotifier(true);
+  late final GsiOverlayController _gsi;
+  late final SettingsStore _settings;
+  final BasemapOverlaySync _basemapSync = BasemapOverlaySync();
+
+  /// Whether the initial style bakes terrain — mirrors the persisted OSM
+  /// state at mount (OSM-first styles omit the DEM, see [BaseMap]).
+  late final bool _initialOsmEnabled;
+
+  /// Serialises basemap-overlay syncs so two rapid toggles cannot interleave
+  /// native add/remove calls on the same controller.
+  Future<void> _syncChain = Future<void>.value();
+
+  @override
+  void initState() {
+    super.initState();
+    _settings = context.read<SettingsStore>();
+    _showTerrain.value = _settings.getBool(SettingKeys.mapShowTerrain) ?? true;
+    _showTownLabels.value =
+        _settings.getBool(SettingKeys.mapShowTownLabels) ?? true;
+    _initialOsmEnabled = _settings.getBool(SettingKeys.mapGsiEnabled) ?? false;
+    _gsi = GsiOverlayController(
+      _settings,
+      mutuallyExclusiveTerrain: _showTerrain,
+    );
+    _gsi.addListener(_onGsiChanged);
+  }
+
   @override
   void dispose() {
+    _gsi.removeListener(_onGsiChanged);
+    _gsi.dispose();
+    _showTerrain.dispose();
+    _showTownLabels.dispose();
     _bearing.dispose();
     super.dispose();
+  }
+
+  void _onGsiChanged() {
+    // The controller cleared [_showTerrain] itself when OSM turned on (the
+    // vector overlay brings its own land surface); mirror the result.
+    _syncBasemapOverlays();
+  }
+
+  void _setShowTerrain(bool value) {
+    // Inverse edge of [GsiOverlayController.setEnabled]: terrain on → OSM off.
+    if (value && _gsi.enabled) _gsi.setEnabled(false);
+    if (_showTerrain.value == value) return;
+    _showTerrain.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapShowTerrain, value));
+    _syncBasemapOverlays();
+  }
+
+  void _setShowTownLabels(bool value) {
+    if (_showTownLabels.value == value) return;
+    _showTownLabels.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapShowTownLabels, value));
+    _applyTownLabelVisibility();
+  }
+
+  /// Pushes the township-label choice onto a live map. The base style's
+  /// `town-label` layer survives style reloads, which reset it to visible, so
+  /// this also runs after every [_onStyleLoaded] to re-assert the choice.
+  void _applyTownLabelVisibility() {
+    final controller = _controller;
+    if (controller == null) return;
+    unawaited(
+      controller
+          .setLayerVisibility(townLabelLayerId, _showTownLabels.value)
+          .catchError((Object e, StackTrace st) {
+            Log.handle(e, st, 'Failed to sync the township labels');
+          }),
+    );
+  }
+
+  void _syncBasemapOverlays() {
+    final controller = _controller;
+    if (!mounted || controller == null || !_styleLoaded) return;
+    final brightness = Theme.of(context).brightness;
+    _syncChain = _syncChain.then(
+      (_) => _basemapSync.sync(
+        controller,
+        showTerrain: () => _showTerrain.value,
+        gsi: _gsi,
+        brightness: brightness,
+        stillCurrent: () =>
+            mounted && identical(controller, _controller) && _styleLoaded,
+      ),
+    );
   }
 
   void _onMapCreated(MapLibreMapController controller) {
@@ -260,6 +357,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   Future<void> _onStyleLoaded() async {
     final controller = _controller;
     if (controller == null) return;
+    _styleLoaded = true;
     final dark = Theme.of(context).brightness == Brightness.dark;
     try {
       if (!_iconsLoaded) {
@@ -284,6 +382,11 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
     } catch (e, st) {
       Log.handle(e, st, 'report detail map render failed');
     }
+    // A style (re)load wipes every runtime overlay and resets the base
+    // style's township-label layer to visible — re-assert the saved choices.
+    _applyTownLabelVisibility();
+    _basemapSync.onStyleLoaded(bakedTerrain: !_initialOsmEnabled);
+    _syncBasemapOverlays();
     _frame();
   }
 
@@ -353,36 +456,62 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: BaseMap(
-            showUserLocation: false,
-            compassEnabled: false,
-            onMapCreated: _onMapCreated,
-            onStyleLoaded: () => unawaited(_onStyleLoaded()),
-            onCameraMove: (position) => _bearing.value = position.bearing,
-          ),
-        ),
-        Positioned.fill(
-          child: _ReportSheet(
-            report: widget.report,
-            expandedNotifier: widget.sheetExpanded,
-          ),
-        ),
-        // North indicator above the sheet so a dragged-up sheet can never hide
-        // it — same Flutter [MapCompass] the map tab uses, parked at top-right.
-        Positioned(
-          top: 0,
-          right: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+    return GsiOverlayScope(
+      controller: _gsi,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: BaseMap(
+              showUserLocation: false,
+              compassEnabled: false,
+              includeTerrainInStyle: !_initialOsmEnabled,
+              onMapCreated: _onMapCreated,
+              onStyleLoaded: () => unawaited(_onStyleLoaded()),
+              onCameraMove: (position) => _bearing.value = position.bearing,
             ),
           ),
-        ),
-      ],
+          Positioned.fill(
+            child: _ReportSheet(
+              report: widget.report,
+              expandedNotifier: widget.sheetExpanded,
+            ),
+          ),
+          // Base-map options (OSM detailed map / terrain relief / township
+          // names) above the compass — the same chrome the 強震監視器 carries in
+          // the map tab, persisted to the shared settings store. Above the
+          // sheet so a dragged-up sheet can never hide the controls — but like
+          // the floating back button top-left, both disappear once the sheet
+          // is fully expanded, leaving the reading surface unobstructed.
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: widget.sheetExpanded,
+                  builder: (context, expanded, child) =>
+                      expanded ? const SizedBox.shrink() : child!,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      MapBasemapMenu(
+                        showTownLabels: _showTownLabels,
+                        onShowTownLabelsChanged: _setShowTownLabels,
+                        showTerrain: _showTerrain,
+                        onShowTerrainChanged: _setShowTerrain,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      MapCompass(bearing: _bearing, onPressed: _resetNorth),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
