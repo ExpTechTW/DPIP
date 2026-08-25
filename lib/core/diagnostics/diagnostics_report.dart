@@ -14,6 +14,7 @@ library;
 
 import 'dart:io';
 
+import 'package:dpip/core/geo/location_track.dart';
 import 'package:dpip/core/build_info.g.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -289,6 +290,12 @@ class DiagnosticsCollector {
     final tables = await database.tableStats();
     final device = await DeviceInfoService.load();
     final bgLocation = await backgroundLocation.diagnostics();
+    // Read-only, and absent on a device that has never recorded one — a fresh
+    // install and a denied background grant both land here, and neither is an
+    // error worth a row that says so.
+    final track = await LocationTrack.open();
+    final trackStats = await track?.stats();
+    await track?.close();
     // The two states that silently end background reporting while every
     // permission above still reads "granted" — and the two that were missing
     // from the dump people paste when asking why they got no alert.
@@ -382,6 +389,14 @@ class DiagnosticsCollector {
           // different fixes, and a single last-report row cannot tell them
           // apart — it says `never` for both.
           (label: 'Wakes', value: _wakes(bgLocation)),
+          // Fixes and bytes together: the ratio is the compression working or
+          // not, and a count that climbs while the file does not (or the other
+          // way round) is the first sign the delta chain has gone wrong.
+          if (trackStats != null)
+            (
+              label: 'Track fixes',
+              value: '${trackStats.fixes} · ${formatBytes(trackStats.bytes)}',
+            ),
           if (bgLocation['lastGeofenceError'] != null)
             (
               label: 'Geofence error',
