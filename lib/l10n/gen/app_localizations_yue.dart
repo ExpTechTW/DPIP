@@ -3176,10 +3176,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get notifyTestBehaviourOverrides => '會穿透靜音同勿擾模式';
 
   @override
-  String get notifyTestBehaviourAlerts => '有聲音，仲會彈橫幅';
+  String get notifyTestBehaviourAlerts => '有聲音仲會彈橫幅，但手機靜音時唔會響';
 
   @override
-  String get notifyTestBehaviourSounds => '有聲音，唔會彈橫幅';
+  String get notifyTestBehaviourSounds => '有聲音、唔會彈橫幅，手機靜音時唔會響';
 
   @override
   String get notifyTestBehaviourSilent => '無聲，只會出現喺通知中心';

@@ -3266,10 +3266,12 @@ class AppLocalizationsFil extends AppLocalizations {
       'Tutunog kahit naka-silent o Do Not Disturb';
 
   @override
-  String get notifyTestBehaviourAlerts => 'May tunog at banner';
+  String get notifyTestBehaviourAlerts =>
+      'May tunog at banner, maliban kung naka-silent ang telepono';
 
   @override
-  String get notifyTestBehaviourSounds => 'May tunog, walang banner';
+  String get notifyTestBehaviourSounds =>
+      'May tunog, walang banner, maliban kung naka-silent ang telepono';
 
   @override
   String get notifyTestBehaviourSilent =>

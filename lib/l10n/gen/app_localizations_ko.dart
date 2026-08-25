@@ -3193,10 +3193,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifyTestBehaviourOverrides => '무음·방해 금지 모드에서도 울림';
 
   @override
-  String get notifyTestBehaviourAlerts => '소리와 배너';
+  String get notifyTestBehaviourAlerts => '소리와 배너 (무음 모드에서는 울리지 않음)';
 
   @override
-  String get notifyTestBehaviourSounds => '소리만, 배너 없음';
+  String get notifyTestBehaviourSounds => '소리만, 배너 없음 (무음 모드에서는 울리지 않음)';
 
   @override
   String get notifyTestBehaviourSilent => '무음 — 알림 목록에만 표시';

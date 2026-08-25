@@ -6179,16 +6179,16 @@ abstract class AppLocalizations {
   /// **'Sounds through silent and Do Not Disturb'**
   String get notifyTestBehaviourOverrides;
 
-  /// Channel behaviour: plays a sound and shows a heads-up banner
+  /// Channel behaviour: sound plus a heads-up banner, but the silent switch still applies
   ///
   /// In en, this message translates to:
-  /// **'Sound and a banner'**
+  /// **'Sound and a banner, unless your phone is silenced'**
   String get notifyTestBehaviourAlerts;
 
-  /// Channel behaviour: plays a sound but shows no banner
+  /// Channel behaviour: sound but no banner, and the silent switch still applies
   ///
   /// In en, this message translates to:
-  /// **'Sound, no banner'**
+  /// **'Sound but no banner, unless your phone is silenced'**
   String get notifyTestBehaviourSounds;
 
   /// Channel behaviour: no sound, appears only in the notification list

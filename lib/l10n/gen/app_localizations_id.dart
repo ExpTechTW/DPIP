@@ -3260,10 +3260,12 @@ class AppLocalizationsId extends AppLocalizations {
       'Menembus mode senyap dan Jangan Ganggu';
 
   @override
-  String get notifyTestBehaviourAlerts => 'Suara dan banner';
+  String get notifyTestBehaviourAlerts =>
+      'Suara dan banner, kecuali ponsel sedang disenyapkan';
 
   @override
-  String get notifyTestBehaviourSounds => 'Suara, tanpa banner';
+  String get notifyTestBehaviourSounds =>
+      'Suara tanpa banner, kecuali ponsel sedang disenyapkan';
 
   @override
   String get notifyTestBehaviourSilent => 'Senyap — hanya di daftar notifikasi';

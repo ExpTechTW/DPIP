@@ -3176,10 +3176,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notifyTestBehaviourOverrides => '會穿透靜音與勿擾模式';
 
   @override
-  String get notifyTestBehaviourAlerts => '有聲音，並跳出橫幅';
+  String get notifyTestBehaviourAlerts => '有聲音並跳出橫幅，但手機靜音時不會響';
 
   @override
-  String get notifyTestBehaviourSounds => '有聲音，不跳出橫幅';
+  String get notifyTestBehaviourSounds => '有聲音、不跳出橫幅，手機靜音時不會響';
 
   @override
   String get notifyTestBehaviourSilent => '無聲，只出現在通知中心';
@@ -6389,10 +6389,10 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get notifyTestBehaviourOverrides => '会穿透静音与勿扰模式';
 
   @override
-  String get notifyTestBehaviourAlerts => '有声音，并弹出横幅';
+  String get notifyTestBehaviourAlerts => '有声音并弹出横幅，但手机静音时不会响';
 
   @override
-  String get notifyTestBehaviourSounds => '有声音，不弹出横幅';
+  String get notifyTestBehaviourSounds => '有声音、不弹出横幅，手机静音时不会响';
 
   @override
   String get notifyTestBehaviourSilent => '无声，只出现在通知中心';
@@ -9602,10 +9602,10 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get notifyTestBehaviourOverrides => '會穿透靜音與勿擾模式';
 
   @override
-  String get notifyTestBehaviourAlerts => '有聲音，並跳出橫幅';
+  String get notifyTestBehaviourAlerts => '有聲音並跳出橫幅，但手機靜音時不會響';
 
   @override
-  String get notifyTestBehaviourSounds => '有聲音，不跳出橫幅';
+  String get notifyTestBehaviourSounds => '有聲音、不跳出橫幅，手機靜音時不會響';
 
   @override
   String get notifyTestBehaviourSilent => '無聲，只出現在通知中心';
@@ -12815,10 +12815,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get notifyTestBehaviourOverrides => '會穿透靜音與勿擾模式';
 
   @override
-  String get notifyTestBehaviourAlerts => '有聲音，並跳出橫幅';
+  String get notifyTestBehaviourAlerts => '有聲音並跳出橫幅，但手機靜音時不會響';
 
   @override
-  String get notifyTestBehaviourSounds => '有聲音，不跳出橫幅';
+  String get notifyTestBehaviourSounds => '有聲音、不跳出橫幅，手機靜音時不會響';
 
   @override
   String get notifyTestBehaviourSilent => '無聲，只出現在通知中心';

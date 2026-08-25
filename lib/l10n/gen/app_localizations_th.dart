@@ -3242,10 +3242,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifyTestBehaviourOverrides => 'ดังทะลุโหมดปิดเสียงและห้ามรบกวน';
 
   @override
-  String get notifyTestBehaviourAlerts => 'มีเสียงและแบนเนอร์';
+  String get notifyTestBehaviourAlerts =>
+      'มีเสียงและแบนเนอร์ แต่จะเงียบเมื่อปิดเสียงเครื่อง';
 
   @override
-  String get notifyTestBehaviourSounds => 'มีเสียง ไม่มีแบนเนอร์';
+  String get notifyTestBehaviourSounds =>
+      'มีเสียง ไม่มีแบนเนอร์ และจะเงียบเมื่อปิดเสียงเครื่อง';
 
   @override
   String get notifyTestBehaviourSilent =>
