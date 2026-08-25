@@ -130,6 +130,24 @@ class BackgroundLocationService {
     }
   }
 
+  /// Deletes the on-device movement history.
+  ///
+  /// Native, not a file delete from here. The recorder caches its database
+  /// handle for the life of the process, so a file removed from Dart would be
+  /// an unlinked inode the native side keeps writing into — the rows come back
+  /// on the next read and the space is never returned. The side that owns
+  /// every write owns the delete too.
+  Future<void> clearTrack() async {
+    try {
+      await _channel.invokeMethod<void>('clearTrack');
+    } on MissingPluginException {
+      // Unsupported platform / test harness — nothing recorded, nothing to
+      // clear.
+    } on Object catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'background location clearTrack');
+    }
+  }
+
   Future<void> stop() async {
     try {
       await _channel.invokeMethod<void>('stop');

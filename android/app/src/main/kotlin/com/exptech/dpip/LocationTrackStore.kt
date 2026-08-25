@@ -94,6 +94,28 @@ object LocationTrackStore {
         }
     }
 
+    /**
+     * Deletes every recorded fix and hands the pages back to the filesystem.
+     *
+     * Through the open handle, never by deleting the file: this object caches
+     * the handle, and one whose file was removed underneath it goes on writing
+     * into an unlinked inode — the rows reappear on the next read, the space is
+     * never returned, and nothing reports a problem.
+     */
+    @Synchronized
+    fun clear(context: Context): Boolean {
+        val handle = open(context) ?: return false
+        return try {
+            handle.execSQL("DELETE FROM fix")
+            // Only returns bytes because `auto_vacuum=INCREMENTAL` was set
+            // before the table existed — see [open].
+            handle.execSQL("PRAGMA incremental_vacuum")
+            true
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
     private fun open(context: Context): SQLiteDatabase? {
         db?.let { if (it.isOpen) return it }
         return try {
