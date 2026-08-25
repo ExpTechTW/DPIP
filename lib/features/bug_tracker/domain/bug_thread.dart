@@ -41,6 +41,9 @@ const Set<int> bugTrackerAdminIds = {780043079385612319, 592012263834255360};
 /// one step quieter than the developer badge but still distinct from users.
 const Set<int> bugTrackerStaffIds = {
   452103762320949248,
+  815574915901554699,
+  878792688416227368,
+  860479942550093866,
   905433558921920562,
   1001016404289536051,
 };
