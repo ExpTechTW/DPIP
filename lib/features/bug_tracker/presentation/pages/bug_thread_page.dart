@@ -201,8 +201,15 @@ class _OpeningPost extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 14,
-                backgroundImage: BugAvatarImage(thread.authorAvatar, avatarFor),
-                onBackgroundImageError: (_, _) {},
+                backgroundImage: thread.authorAvatar.isEmpty
+                    ? null
+                    : BugAvatarImage(thread.authorAvatar, avatarFor),
+                onBackgroundImageError: thread.authorAvatar.isEmpty
+                    ? null
+                    : (_, _) {},
+                child: thread.authorAvatar.isEmpty
+                    ? const Icon(Icons.person_outline, size: 18)
+                    : null,
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -270,8 +277,15 @@ class _ChatReply extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 15,
-          backgroundImage: BugAvatarImage(message.authorAvatar, avatarFor),
-          onBackgroundImageError: (_, _) {},
+          backgroundImage: message.authorAvatar.isEmpty
+              ? null
+              : BugAvatarImage(message.authorAvatar, avatarFor),
+          onBackgroundImageError: message.authorAvatar.isEmpty
+              ? null
+              : (_, _) {},
+          child: message.authorAvatar.isEmpty
+              ? const Icon(Icons.person_outline, size: 16)
+              : null,
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
