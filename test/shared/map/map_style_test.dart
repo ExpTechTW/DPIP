@@ -57,8 +57,10 @@ void main() {
           'tiny (a whole-island view is one or two 512px tiles, vs ~49 at a '
           'zoomed-in hillshade viewport)',
     );
-    // 實測 terrain 服務到 z20 都有圖（2026-08-26），上限如實夾到 20。
-    expect(terrain['maxzoom'], 20);
+    // 實測（2026-08-26，以像素變異數驗證）：真實高度資料只到 z12，
+    // z13 起是 1880B 的全平佔位磚——cap 必須停在 12，deep zoom 靠
+    // overzoom 取 z12 磚，hillshade 才不會在放大後整片消失。
+    expect(terrain['maxzoom'], 12);
     expect(
       terrain['bounds'],
       [110, 10, 132, 35],
