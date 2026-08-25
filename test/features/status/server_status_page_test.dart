@@ -79,7 +79,8 @@ void main() {
     final l10n = l10nOf(tester);
     expect(find.text(l10n.serverStatusDown), findsWidgets);
     expect(find.text('2'), findsOneWidget);
-    expect(find.text('0.90%'), findsOneWidget);
+    // 去尾零：0.9 不再顯示為 0.90（三位數字上限的新格式）。
+    expect(find.text('0.9%'), findsOneWidget);
     expect(find.text('800ms'), findsOneWidget);
   });
 
