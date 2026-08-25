@@ -24,6 +24,10 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/version/app_build.dart';
+import 'package:dpip/features/bug_tracker/bug_tracker_counter.dart';
+import 'package:dpip/features/bug_tracker/domain/bug_repository.dart';
+import 'package:dpip/features/bug_tracker/domain/bug_thread.dart';
+import 'package:dpip/features/bug_tracker/data/bug_repository_impl.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/more/domain/developer_note.dart';
@@ -173,6 +177,11 @@ Future<void> _pump(
         ),
         // The version card's contributor strip reads the changelog.
         Provider<ChangelogRepository>(create: (_) => changelog),
+        // The bug-tracker tile watches this counter for its badge; an empty
+        // index keeps the tile unbadged, which is what these tests assume.
+        ChangeNotifierProvider<BugTrackerCounter>(
+          create: (_) => BugTrackerCounter(const _EmptyBugRepository()),
+        ),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -183,6 +192,42 @@ Future<void> _pump(
   );
   await tester.pump();
 }
+
+/// A bug repository answering an empty index — the More tile only reads the
+/// counter, which never fires without an explicit load.
+class _EmptyBugRepository implements BugRepository {
+  const _EmptyBugRepository();
+
+  @override
+  Future<Result<List<BugThread>>> threads() async => const Ok([]);
+
+  @override
+  Future<Result<BugThreadDetail>> thread(int id) async {
+    final parsed = parseBugThreads(_emptyIndex());
+    return Ok(BugThreadDetail(thread: parsed.first, messages: const []));
+  }
+
+  @override
+  Future<Result<Uint8List>> avatar(String url) async =>
+      Ok(Uint8List.fromList(<int>[]));
+}
+
+Map<String, Object> _emptyIndex() => {
+  'users': <String, Object>{},
+  'threads': <Map<String, Object>>[
+    {
+      'threads_id': 0,
+      'title': '',
+      'tags': <String>['DPIP'],
+      'body': '',
+      'author': 0,
+      'created_at': 1787511150,
+      'message_count': 0,
+      'locked': false,
+      'last_message_id': 0,
+    },
+  ],
+};
 
 void main() {
   testWidgets('offers every in-app destination', (tester) async {

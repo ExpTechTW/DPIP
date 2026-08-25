@@ -8,6 +8,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
+import 'package:dpip/core/notifications/notification_samples.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -249,6 +250,64 @@ class NotificationService {
     // without navigating anywhere and without an error, which is how the
     // "Open Settings" button became the next thing that did nothing.
     return openNotificationSettingsPage();
+  }
+
+  /// Posts [channelKey]'s sample alert locally, so the user can hear and see
+  /// what that channel actually does on this device.
+  ///
+  /// Local, not a round-trip through the backend: the thing being tested is the
+  /// last hop — the channel's sound, its importance, whether the OS lets it
+  /// through — and that hop is identical whether the notification came from
+  /// APNs or from here. Asking the server would only add a way for the test to
+  /// fail for a reason that has nothing to do with the answer.
+  ///
+  /// Returns false when the channel has no sample or the OS refused it.
+  ///
+  /// Two behaviours are deliberate rather than accidental:
+  ///
+  /// * **It rings for real.** A channel with `criticalAlerts` overrides the
+  ///   silent switch and Do Not Disturb, at a volume the user does not control.
+  ///   Nothing here softens that, because a test that is quieter than the real
+  ///   alert answers the wrong question. The page warns before the tap instead.
+  /// * **Tapping it navigates**, through the same [NotificationTaps] route
+  ///   table as a real alert — so the test covers the tap as well, and the user
+  ///   lands wherever the real one would have taken them.
+  Future<bool> showTest(String channelKey) async {
+    final sample = NotificationSamples.of(channelKey);
+    if (sample == null) return false;
+    try {
+      return await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: _testId(channelKey),
+          channelKey: channelKey,
+          title: sample.title,
+          body: sample.body,
+          // The alerts this reproduces are several lines long; the default
+          // layout truncates them to one, which would make every sample look
+          // alike in the shade — the opposite of what the page is for.
+          notificationLayout: NotificationLayout.BigText,
+        ),
+      );
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'test notification for $channelKey');
+      return false;
+    }
+  }
+
+  /// A stable, per-channel notification id reserved for tests.
+  ///
+  /// Negative, and derived from the channel's position in the catalogue, for
+  /// two reasons. Server alerts carry the backend's own positive ids, so a test
+  /// can never overwrite a real alert sitting in the shade. And one id *per
+  /// channel* — rather than legacy's single shared id — means re-testing a
+  /// channel replaces its own previous sample instead of stacking up, while two
+  /// different channels stay side by side where they can be compared. Comparing
+  /// them is most of the point.
+  static int _testId(String channelKey) {
+    final index = NotificationChannels.channels.indexWhere(
+      (channel) => channel.channelKey == channelKey,
+    );
+    return -1000 - (index < 0 ? 0 : index);
   }
 
   Future<({int total, int rejected})> _initChannels() async {
