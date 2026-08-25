@@ -91,6 +91,32 @@ final class LocationTrackStore {
     }
   }
 
+  /// Deletes every recorded fix and hands the pages back to the filesystem.
+  ///
+  /// Through the open handle on the store's own queue, never by unlinking the
+  /// file. This class caches `db` for the life of the process, and a handle
+  /// whose file was removed underneath it goes on writing perfectly happily
+  /// into an unlinked inode: the rows reappear the moment anything reads, the
+  /// space is never returned, and nothing anywhere reports a problem.
+  ///
+  /// [completion] fires on the queue once the delete has actually run, so a
+  /// caller that re-reads the count sees the cleared store rather than the one
+  /// it asked to clear.
+  func clear(completion: (() -> Void)? = nil) {
+    queue.async { [weak self] in
+      guard let self, let db = self.open() else {
+        completion?()
+        return
+      }
+      self.exec(db, "DELETE FROM fix")
+      // Only gives bytes back because `auto_vacuum=INCREMENTAL` was set before
+      // the table existed — see `open()`. Without that this deletes rows and
+      // leaves the file exactly as large as it was.
+      self.exec(db, "PRAGMA incremental_vacuum")
+      completion?()
+    }
+  }
+
   // MARK: - storage
 
   private func open() -> OpaquePointer? {

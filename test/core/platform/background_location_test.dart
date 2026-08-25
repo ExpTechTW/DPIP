@@ -83,6 +83,50 @@ void main() {
     },
   );
 
+  test('clearTrack asks the native side to delete, never Dart', () async {
+    final service = BackgroundLocationService(
+      platform: 0,
+      version: '1',
+      channel: channel,
+    );
+
+    await service.clearTrack();
+
+    // The whole point of the round trip. The recorder caches its database
+    // handle for the life of the process, so a file unlinked from Dart would
+    // leave it writing into a dead inode — the rows return on the next read
+    // and the space never comes back. One side owns every write, this one too.
+    expect(calls.single.method, 'clearTrack');
+    expect(calls.single.arguments, isNull);
+  });
+
+  test('clearTrack survives a platform with no such method', () async {
+    messenger.setMockMethodCallHandler(channel, null);
+    final service = BackgroundLocationService(
+      platform: 0,
+      version: '1',
+      channel: channel,
+    );
+
+    // A developer-page button must not throw on a platform that never recorded
+    // anything — nothing to clear is not a failure.
+    await expectLater(service.clearTrack(), completes);
+  });
+
+  test('clearTrack swallows a platform failure', () async {
+    messenger.setMockMethodCallHandler(
+      channel,
+      (call) async => throw PlatformException(code: 'disk'),
+    );
+    final service = BackgroundLocationService(
+      platform: 0,
+      version: '1',
+      channel: channel,
+    );
+
+    await expectLater(service.clearTrack(), completes);
+  });
+
   test('a platform failure is swallowed, not thrown', () async {
     messenger.setMockMethodCallHandler(
       channel,

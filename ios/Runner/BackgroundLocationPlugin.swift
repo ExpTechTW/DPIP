@@ -91,6 +91,13 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       result(nil)
     case "diagnostics":
       result(diagnostics())
+    // Answered only once the delete has run. The developer page re-reads the
+    // fix count the moment this returns, and replying early would show it the
+    // count it just asked to throw away.
+    case "clearTrack":
+      LocationTrackStore.shared.clear {
+        DispatchQueue.main.async { result(nil) }
+      }
     default:
       result(FlutterMethodNotImplemented)
     }

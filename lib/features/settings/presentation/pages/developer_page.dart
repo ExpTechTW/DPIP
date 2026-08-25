@@ -36,6 +36,9 @@ typedef _Field = ({String label, String? value});
 /// Shared by the row, the dialog title, and its confirm button.
 const String _clearCacheTitle = 'Clear cache';
 
+/// Shared by the row, the dialog title, and its confirm button.
+const String _clearTrackTitle = 'Clear location track';
+
 class DeveloperPage extends StatefulWidget {
   const DeveloperPage({super.key});
 
@@ -50,6 +53,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
   StorageScan? _storage;
   List<TableStat>? _tables;
   bool _clearing = false;
+  bool _clearingTrack = false;
 
   /// Version-row taps toward the experimental unlock. Deliberately not
   /// persisted — a fresh app start re-arms the easter egg.
@@ -159,6 +163,56 @@ class _DeveloperPageState extends State<DeveloperPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(const SnackBar(content: Text('Cache cleared')));
+  }
+
+  /// Empties the on-device movement history.
+  ///
+  /// Confirmed first, and worded as permanent because it is: the track is a
+  /// record of where this device has been, and unlike the cache above nothing
+  /// downloads it again. What is deleted is gone.
+  ///
+  /// The delete itself is native — see [BackgroundLocationService.clearTrack]
+  /// for why Dart must not unlink the file.
+  Future<void> _confirmClearTrack() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(_clearTrackTitle),
+        content: const Text(
+          'The recorded movement history on this device will be deleted and '
+          'the space returned. Recording continues; only what has already '
+          'been recorded is removed. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text(_clearTrackTitle),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final backgroundLocation = context.read<BackgroundLocationService>();
+    setState(() => _clearingTrack = true);
+    try {
+      await backgroundLocation.clearTrack();
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'dev: clear location track');
+    }
+    if (!mounted) return;
+    setState(() => _clearingTrack = false);
+    // Re-read so the Track fixes row above shows the emptied store rather than
+    // the count the button was pressed to get rid of.
+    await _load();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(content: Text('Location track cleared')));
   }
 
   /// Labels omitted from the clipboard dump (still shown on screen).
@@ -290,6 +344,25 @@ class _DeveloperPageState extends State<DeveloperPage> {
                     'Runs the background report path and refreshes the rows above',
                   ),
                   onTap: _reportNow,
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.route_outlined,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(
+                    _clearTrackTitle,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    'Deletes the recorded movement history on this device',
+                  ),
+                  trailing: _clearingTrack
+                      ? const InlineLoading(size: 18)
+                      : null,
+                  onTap: _clearingTrack ? null : _confirmClearTrack,
                 ),
                 ListTile(
                   leading: Icon(

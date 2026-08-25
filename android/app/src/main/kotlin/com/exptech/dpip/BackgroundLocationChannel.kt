@@ -116,6 +116,16 @@ class BackgroundLocationChannel(private val context: Context) :
                 }.start()
             }
 
+            // Off the main thread: this opens the database and vacuums it, and
+            // the caller re-reads the count as soon as it returns.
+            "clearTrack" -> {
+                val app = context.applicationContext
+                Thread {
+                    LocationTrackStore.clear(app)
+                    Handler(Looper.getMainLooper()).post { result.success(null) }
+                }.start()
+            }
+
             else -> result.notImplemented()
         }
     }
