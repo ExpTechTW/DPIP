@@ -122,6 +122,13 @@ class ColorScaleLegend extends StatelessWidget {
               ),
               child: banded
                   ? Column(
+                      // ColoredBox has no intrinsic width, and the default
+                      // cross axis is center — under the Container's loose
+                      // (0.._swatch) width the band column would collapse to
+                      // zero and the whole strip would vanish, leaving the
+                      // boundary numbers with no colour beside them. Stretch
+                      // forces every band to fill the swatch width.
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         for (final color in swatchColors)
                           Expanded(child: ColoredBox(color: color)),
@@ -380,20 +387,54 @@ class _BandBoundaryLabels extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const cell = ColorScaleLegend._cell;
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        for (var i = 0; i < rows.length - 1; i++)
-          Positioned(
-            top: (i + 1) * cell - cell / 2,
-            left: 0,
-            height: cell,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(ColorScaleLegend._label(rows[i].$1), style: style),
+    final labels = [
+      for (var i = 0; i < rows.length - 1; i++)
+        ColorScaleLegend._label(rows[i].$1),
+    ];
+    // The label column sits in a Row, which hands children unbounded width —
+    // and a Stack refuses that. Measure the widest boundary label so this
+    // column carries its own bounded width (text scaling included) instead of
+    // asking the map's collapsed-legend chip for one; without it, expanding
+    // the 雨量 legend throws a layout assertion every frame and the legend
+    // never appears.
+    final width = _widestLabel(labels, style, MediaQuery.textScalerOf(context));
+    return SizedBox(
+      width: width,
+      height: cell * rows.length,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            Positioned(
+              top: (i + 1) * cell - cell / 2,
+              left: 0,
+              height: cell,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(labels[i], style: style),
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
+  }
+
+  static double _widestLabel(
+    List<String> labels,
+    TextStyle? style,
+    TextScaler textScaler,
+  ) {
+    var widest = 0.0;
+    for (final label in labels) {
+      final painter = TextPainter(
+        text: TextSpan(text: label, style: style),
+        textDirection: TextDirection.ltr,
+        textScaler: textScaler,
+        maxLines: 1,
+      )..layout();
+      if (painter.width > widest) widest = painter.width;
+      painter.dispose();
+    }
+    return widest;
   }
 }
