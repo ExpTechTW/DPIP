@@ -273,41 +273,14 @@ class NotificationService {
   ///   table as a real alert — so the test covers the tap as well, and the user
   ///   lands wherever the real one would have taken them.
   Future<bool> showTest(String channelKey) async {
-    final sample = NotificationSamples.of(channelKey);
-    if (sample == null) return false;
+    final content = testNotificationContent(channelKey);
+    if (content == null) return false;
     try {
-      return await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: _testId(channelKey),
-          channelKey: channelKey,
-          title: sample.title,
-          body: sample.body,
-          // The alerts this reproduces are several lines long; the default
-          // layout truncates them to one, which would make every sample look
-          // alike in the shade — the opposite of what the page is for.
-          notificationLayout: NotificationLayout.BigText,
-        ),
-      );
+      return await AwesomeNotifications().createNotification(content: content);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'test notification for $channelKey');
       return false;
     }
-  }
-
-  /// A stable, per-channel notification id reserved for tests.
-  ///
-  /// Negative, and derived from the channel's position in the catalogue, for
-  /// two reasons. Server alerts carry the backend's own positive ids, so a test
-  /// can never overwrite a real alert sitting in the shade. And one id *per
-  /// channel* — rather than legacy's single shared id — means re-testing a
-  /// channel replaces its own previous sample instead of stacking up, while two
-  /// different channels stay side by side where they can be compared. Comparing
-  /// them is most of the point.
-  static int _testId(String channelKey) {
-    final index = NotificationChannels.channels.indexWhere(
-      (channel) => channel.channelKey == channelKey,
-    );
-    return -1000 - (index < 0 ? 0 : index);
   }
 
   Future<({int total, int rejected})> _initChannels() async {
@@ -546,6 +519,69 @@ class NotificationService {
       Log.handle(error, stackTrace, 'push token');
     }
   }
+}
+
+/// The markers legacy stamped on every test notification, kept verbatim.
+///
+/// Not decoration, and not optional. The samples reproduce real CWA alerts
+/// word for word, so an unmarked test is indistinguishable from the thing
+/// itself: a 緊急地震速報 on a lock screen that nobody issued — photographed,
+/// forwarded, and believed. The marker is the only thing standing between a
+/// settings screen and a fake earthquake warning in circulation.
+///
+/// Chinese, like the body it prefixes. The samples are Chinese because the
+/// backend only sends Chinese; a localized marker glued to an unlocalized
+/// alert would read as two different messages.
+const String testTitlePrefix = '[測試] ';
+const String testBodyMarker = '＊＊＊這是測試訊息＊＊＊';
+
+/// The notification a test tap posts for [channelKey], or null when the
+/// channel has no sample to reproduce.
+///
+/// Split out from [NotificationService.showTest] so the part that decides what
+/// the user sees can be tested without a platform channel — the same split
+/// [contentFromData] already uses in this file.
+NotificationContent? testNotificationContent(String channelKey) {
+  final sample = NotificationSamples.of(channelKey);
+  if (sample == null) return null;
+  return NotificationContent(
+    id: _testId(channelKey),
+    channelKey: channelKey,
+    title: '$testTitlePrefix${sample.title}',
+    // The separator is `<br>` on Android and a newline on iOS because awesome
+    // renders the Android body through `android.text.Html` (`Html.fromHtml`
+    // and the class itself are both in the shipped dex) and takes the iOS one
+    // literally. Legacy split it the same way; getting it wrong loses the line
+    // break rather than failing loudly.
+    //
+    // The sample's *own* newlines are left exactly as they are, on both
+    // platforms. On Android that means a multi-line CWA alert collapses to a
+    // single line — which is precisely what a real push from the backend does
+    // there, since it travels the same `Html.fromHtml` path. A test that read
+    // better than the alert it reproduces would be lying about the one thing
+    // it exists to show.
+    body: '$testBodyMarker${Platform.isIOS ? '\n' : '<br>'} ${sample.body}',
+    // The alerts this reproduces are several lines long; the default layout
+    // truncates them to one, which would make every sample look alike in the
+    // shade — the opposite of what the page is for.
+    notificationLayout: NotificationLayout.BigText,
+  );
+}
+
+/// A stable, per-channel notification id reserved for tests.
+///
+/// Negative, and derived from the channel's position in the catalogue, for
+/// two reasons. Server alerts carry the backend's own positive ids, so a test
+/// can never overwrite a real alert sitting in the shade. And one id *per
+/// channel* — rather than legacy's single shared id — means re-testing a
+/// channel replaces its own previous sample instead of stacking up, while two
+/// different channels stay side by side where they can be compared. Comparing
+/// them is most of the point.
+int _testId(String channelKey) {
+  final index = NotificationChannels.channels.indexWhere(
+    (channel) => channel.channelKey == channelKey,
+  );
+  return -1000 - (index < 0 ? 0 : index);
 }
 
 /// Builds notification content from a message's `data` (preferred, legacy
