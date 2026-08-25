@@ -33,9 +33,10 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'radar'),
         deps.mapTileWarmer(),
-        // Probed 2026-08-26: real content ends at z10 (deeper requests
-        // return 35-byte placeholder webps). Capped exactly there.
-        maxZoom: 10,
+        // Probed 2026-08-26 with a three-location byte-variance check:
+        // real content reaches z11 (deeper requests return identical
+        // 35-byte placeholder webps). Capped exactly there.
+        maxZoom: 11,
       ),
     ),
     Provider<QpesumsRepository>.value(
