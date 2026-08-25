@@ -57,7 +57,8 @@ void main() {
           'tiny (a whole-island view is one or two 512px tiles, vs ~49 at a '
           'zoomed-in hillshade viewport)',
     );
-    expect(terrain['maxzoom'], 12);
+    // 實測 terrain 服務到 z20 都有圖（2026-08-26），上限如實夾到 20。
+    expect(terrain['maxzoom'], 20);
     expect(
       terrain['bounds'],
       [110, 10, 132, 35],

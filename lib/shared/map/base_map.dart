@@ -94,7 +94,10 @@ class BaseMap extends StatefulWidget {
   /// Alias for call sites / framing that still reference [BaseMap.minZoom].
   static const double minZoom = defaultMinZoom;
 
-  static const double maxZoom = 11;
+  /// Deep-zoom ceiling for most surfaces. Was 11, which users kept hitting
+  /// as "the map goes blurry and then just stops" — vector basemap re-renders
+  /// crisply far past this, and raster sources now carry their own caps.
+  static const double maxZoom = 16;
 
   /// Called with the controller once the map is ready — add overlay layers here.
   final void Function(MapLibreMapController controller)? onMapCreated;
