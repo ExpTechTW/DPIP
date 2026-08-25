@@ -559,21 +559,35 @@ class _RainOnCardState extends State<RainOnCard>
           // Water sits above the card's top edge and must not be cut off.
           clipBehavior: Clip.none,
           children: [
-            // Gated the same as the splash below, not just by widget.glass on
-            // its own: the card sliding up toward the toolbar is exactly when
-            // its content is about to scroll away, and refracting droplets
-            // over content that is mid-scroll (or already off past the fold)
-            // has nothing left to sensibly distort.
-            widget.glass && _gateOpen
+            // **The gate rides the effect, never the tree's shape.**
+            //
+            // [RainOnGlass] documents this rule for its own subtree and this
+            // is the same rule one level up: [content] carries [_captureKey],
+            // and the gate is re-evaluated on scroll, so branching the tree on
+            // it re-parented a GlobalKey subtree mid-drag. That was not a
+            // cosmetic problem — it threw
+            // `'!child.attached': is not true` out of `flushSemantics` on
+            // every frame of the drag that flipped it, and killed the in-flight
+            // gesture the same way the note inside `RainOnGlass` describes.
+            //
+            // So the wrapper stays mounted and the gate only zeroes what it
+            // feeds: an intensity below `RainOnGlass`'s own threshold makes it
+            // an `ImageFiltered(enabled: false)` and stops its ticker, which is
+            // the same nothing the unwrapped branch used to render.
+            //
+            // [widget.glass] may still branch — it is a fixed property of each
+            // call site, decided at construction and never toggled while the
+            // card is alive.
+            widget.glass
                 ? RainOnGlass(
-                    intensity: widget.intensity,
+                    // A card sliding up toward the toolbar is about to scroll
+                    // away, and refracting droplets over content that is
+                    // mid-scroll has nothing left to sensibly distort. Running
+                    // the shader filter every frame just to skip it wastes the
+                    // GPU too. Reopening is free — the droplets resume from
+                    // their own clock.
+                    intensity: _gateOpen ? widget.intensity : 0,
                     opacity: widget.opacity,
-                    // The position gate closes the card's refracting droplets
-                    // along with its splash — a card sliding up toward the
-                    // toolbar has nothing left to sensibly distort, and
-                    // running the shader filter every frame just to skip it
-                    // wastes the GPU. Restarting when the gate reopens is free:
-                    // the droplets resume from their own clock.
                     active: widget.active && _gateOpen,
                     child: content,
                   )
