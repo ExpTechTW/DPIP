@@ -8,11 +8,13 @@ import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/features/notification/presentation/notify_controller.dart';
 import 'package:dpip/features/notification/presentation/notify_labels.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 /// Lets the user tune each push channel's filter. Settings live server-side
@@ -43,7 +45,20 @@ class _NotifyView extends StatelessWidget {
     final controller = context.watch<NotifyController>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.notifyTitle)),
+      appBar: AppBar(
+        title: Text(l10n.notifyTitle),
+        actions: [
+          // Outside the status switch below on purpose. The settings on this
+          // page need a push token; hearing whether this phone rings at all
+          // does not — and a device with no token is precisely the one whose
+          // owner wants to check.
+          IconButton(
+            tooltip: l10n.notifyTestTitle,
+            icon: const Icon(Icons.notifications_active_outlined),
+            onPressed: () => context.pushNamed(AppRoutes.notifyTest),
+          ),
+        ],
+      ),
       body: switch (controller.status) {
         NotifyLoadStatus.noToken => EmptyView(
           icon: Icons.notifications_off_outlined,

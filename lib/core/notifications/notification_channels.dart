@@ -414,6 +414,28 @@ abstract final class NotificationChannels {
     ),
   ];
 
+  /// What [channel] will actually do when it fires.
+  ///
+  /// Derived from the definition rather than written out beside it, so a
+  /// channel whose importance or sound changes cannot end up described by a
+  /// sentence that used to be true. Coarse on purpose: the question this
+  /// answers is "will I hear this at three in the morning", and the four
+  /// outcomes below are the only distinctions that change that answer.
+  static NotificationBehaviour behaviourOf(NotificationChannel channel) {
+    // Checked before sound and importance because it outranks both: a critical
+    // alert sounds at a volume the user does not control, through a silent
+    // switch and through Do Not Disturb.
+    if (channel.criticalAlerts ?? false) return NotificationBehaviour.overrides;
+    if (!(channel.playSound ?? true)) return NotificationBehaviour.silent;
+    // High is the threshold at which Android shows a heads-up banner, and the
+    // enum is declared in Android's own IMPORTANCE_* order, so comparing
+    // indices is comparing the platform constants.
+    final importance = channel.importance ?? NotificationImportance.Default;
+    return importance.index >= NotificationImportance.High.index
+        ? NotificationBehaviour.alerts
+        : NotificationBehaviour.sounds;
+  }
+
   /// The group a [channelKey] belongs to (`group_eew`, `group_eq`, …), or null
   /// if the key isn't a known channel. Lets the tap router resolve a screen by
   /// group so a new channel routes correctly without touching the mapping.
@@ -423,4 +445,26 @@ abstract final class NotificationChannels {
     }
     return null;
   }
+}
+
+/// The coarse outcome of a channel firing — see
+/// [NotificationChannels.behaviourOf].
+enum NotificationBehaviour {
+  /// Sounds through the silent switch and Do Not Disturb — an iOS critical
+  /// alert, or Android's alarm stream at Max importance.
+  ///
+  /// On iOS this is a promise the channel alone cannot keep: it also needs the
+  /// critical-alert grant, which the user can refuse. A caller showing this to
+  /// the user should check [NotificationService.criticalAllowed] before
+  /// presenting it as fact.
+  overrides,
+
+  /// Sound, and a banner over whatever is on screen.
+  alerts,
+
+  /// Sound, but no banner — it waits in the notification list.
+  sounds,
+
+  /// No sound at all.
+  silent,
 }
