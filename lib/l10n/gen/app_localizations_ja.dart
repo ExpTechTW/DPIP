@@ -3193,10 +3193,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifyTestBehaviourOverrides => '消音・おやすみモードを貫通';
 
   @override
-  String get notifyTestBehaviourAlerts => '音とバナー';
+  String get notifyTestBehaviourAlerts => '音とバナー（消音中は鳴りません）';
 
   @override
-  String get notifyTestBehaviourSounds => '音のみ、バナーなし';
+  String get notifyTestBehaviourSounds => '音のみ、バナーなし（消音中は鳴りません）';
 
   @override
   String get notifyTestBehaviourSilent => '無音 — 通知センターのみ';

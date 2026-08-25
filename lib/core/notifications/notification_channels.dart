@@ -459,10 +459,26 @@ enum NotificationBehaviour {
   /// presenting it as fact.
   overrides,
 
-  /// Sound, and a banner over whatever is on screen.
+  /// Sound, and a banner over whatever is on screen — **while the phone is
+  /// not silenced**.
+  ///
+  /// That caveat is the whole difference from [overrides] and it is not
+  /// cosmetic. awesome maps importance to an iOS interruption level in
+  /// `NotificationBuilder.setImportance` — High/Max become `.timeSensitive`,
+  /// Default becomes `.active` — and only the `.critical` level a
+  /// `criticalAlerts` channel gets bypasses the mute switch. The code that
+  /// attaches the sound is otherwise the *same branch* for both, so a channel
+  /// in this tier is not missing its sound on a muted phone: the sound is
+  /// attached and the OS declines to play it.
+  ///
+  /// Anything showing this to a user has to say so. Reported once as "震度速報
+  /// and 地震報告 have no sound" against a muted phone, and every static check
+  /// — the asset, its format, the bundling, the channel definition — came back
+  /// clean, because nothing was wrong.
   alerts,
 
-  /// Sound, but no banner — it waits in the notification list.
+  /// Sound but no banner — it waits in the notification list. Silenced with
+  /// the phone, exactly as [alerts] is.
   sounds,
 
   /// No sound at all.

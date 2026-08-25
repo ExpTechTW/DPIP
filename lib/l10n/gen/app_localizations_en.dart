@@ -3250,10 +3250,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sounds through silent and Do Not Disturb';
 
   @override
-  String get notifyTestBehaviourAlerts => 'Sound and a banner';
+  String get notifyTestBehaviourAlerts =>
+      'Sound and a banner, unless your phone is silenced';
 
   @override
-  String get notifyTestBehaviourSounds => 'Sound, no banner';
+  String get notifyTestBehaviourSounds =>
+      'Sound but no banner, unless your phone is silenced';
 
   @override
   String get notifyTestBehaviourSilent => 'Silent — notification list only';

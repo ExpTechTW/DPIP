@@ -3250,10 +3250,12 @@ class AppLocalizationsVi extends AppLocalizations {
       'Vang lên qua chế độ im lặng và Không làm phiền';
 
   @override
-  String get notifyTestBehaviourAlerts => 'Có âm thanh và biểu ngữ';
+  String get notifyTestBehaviourAlerts =>
+      'Có âm thanh và biểu ngữ, trừ khi máy đang tắt tiếng';
 
   @override
-  String get notifyTestBehaviourSounds => 'Có âm thanh, không biểu ngữ';
+  String get notifyTestBehaviourSounds =>
+      'Có âm thanh, không biểu ngữ, trừ khi máy đang tắt tiếng';
 
   @override
   String get notifyTestBehaviourSilent =>

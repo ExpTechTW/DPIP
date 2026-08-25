@@ -3895,13 +3895,13 @@
   "@notifyTestBehaviourOverrides": {
     "description": "Channel behaviour: sounds through silent mode and Do Not Disturb"
   },
-  "notifyTestBehaviourAlerts": "Sound and a banner",
+  "notifyTestBehaviourAlerts": "Sound and a banner, unless your phone is silenced",
   "@notifyTestBehaviourAlerts": {
-    "description": "Channel behaviour: plays a sound and shows a heads-up banner"
+    "description": "Channel behaviour: sound plus a heads-up banner, but the silent switch still applies"
   },
-  "notifyTestBehaviourSounds": "Sound, no banner",
+  "notifyTestBehaviourSounds": "Sound but no banner, unless your phone is silenced",
   "@notifyTestBehaviourSounds": {
-    "description": "Channel behaviour: plays a sound but shows no banner"
+    "description": "Channel behaviour: sound but no banner, and the silent switch still applies"
   },
   "notifyTestBehaviourSilent": "Silent — notification list only",
   "@notifyTestBehaviourSilent": {
