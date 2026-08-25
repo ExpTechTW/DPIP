@@ -272,7 +272,7 @@ String exptechVectorStyle(
   final terrain = terrainTileUrl == null
       ? ''
       : '''
-  ,"$terrainSourceId": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
+  ,"$terrainSourceId": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 20, "bounds": [110, 10, 132, 35] }''';
   final hillshade = terrainTileUrl == null
       ? ''
       : '''
