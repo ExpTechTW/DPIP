@@ -817,7 +817,7 @@ class _StatusGrid extends StatelessWidget {
               child: _metricCard(
                 context,
                 title: l10n.serverStatusErrorRate,
-                value: '${status.errorRate.value.toStringAsFixed(2)}%',
+                value: '${_compactPercent(status.errorRate.value)}%',
                 subtitle: _maybeInstance(status.errorRate.instance),
                 color: _threeTone(context, status.errorRate.value, 0.1, 0.3),
               ),
@@ -1125,6 +1125,27 @@ class _CloudflareTile extends StatelessWidget {
 extension on BuildContext {
   ThemeData get theme => Theme.of(this);
   ColorScheme get colorScheme => theme.colorScheme;
+}
+
+/// 最多三位數字的緊湊百分比——`0.02`、`30.2`、`124`。
+///
+/// 小數位讓給有效位數：數字越小保留越多小數，越大越早收整數，
+/// 但任何狀態下渲染出來的數字符號都不超過三個，卡片寬度就不會被
+/// `100.00%` 這類長度擠壞。
+String _compactPercent(num value) {
+  if (value == 0) return '0';
+  var text = '';
+  for (var decimals = 2; decimals >= 0; decimals--) {
+    text = value.toStringAsFixed(decimals);
+    final digits = text.replaceAll(RegExp(r'[^0-9]'), '');
+    // 前導零不算位數（`0.02` 只有「2」一位）。
+    if (digits.replaceFirst(RegExp(r'^0+(?=.)'), '').length <= 3) break;
+  }
+  if (text.contains('.')) {
+    text = text.replaceFirst(RegExp(r'0+$'), '');
+    text = text.replaceFirst(RegExp(r'\.$'), '');
+  }
+  return text;
 }
 
 Color _threeTone(BuildContext context, num value, double warn, double bad) {
