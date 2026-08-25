@@ -3305,4 +3305,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => 'Paling banyak dibahas';
+
+  @override
+  String get bugTrackerStaff => 'Staf';
 }

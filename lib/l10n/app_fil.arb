@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "Hindi maipakita ang nilalaman na ito — tingnan sa Discord",
   "bugTrackerJoinDiscussion": "Makilahok sa talakayan sa Discord",
   "bugTrackerSortLast": "Pinakabagong aktibidad",
-  "bugTrackerSortMostDiscussed": "Pinakamaraming talakayan"
+  "bugTrackerSortMostDiscussed": "Pinakamaraming talakayan",
+  "bugTrackerStaff": "Kawani"
 }

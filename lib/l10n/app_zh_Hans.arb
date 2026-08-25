@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "无法显示此内容，请在 Discord 上查看",
   "bugTrackerJoinDiscussion": "至 Discord 参与讨论",
   "bugTrackerSortLast": "最后讨论",
-  "bugTrackerSortMostDiscussed": "最多讨论"
+  "bugTrackerSortMostDiscussed": "最多讨论",
+  "bugTrackerStaff": "工作人员"
 }

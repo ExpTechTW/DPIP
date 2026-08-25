@@ -3216,6 +3216,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => '最多讨论';
+
+  @override
+  String get bugTrackerStaff => '工作人员';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6429,6 +6432,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get bugTrackerSortMostDiscussed => '最多讨论';
+
+  @override
+  String get bugTrackerStaff => '工作人员';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -9642,6 +9648,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get bugTrackerSortMostDiscussed => '最多討論';
+
+  @override
+  String get bugTrackerStaff => '工作人員';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12855,4 +12864,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get bugTrackerSortMostDiscussed => '最多討論';
+
+  @override
+  String get bugTrackerStaff => '工作人員';
 }

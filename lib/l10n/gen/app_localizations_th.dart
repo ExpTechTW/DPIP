@@ -3287,4 +3287,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => 'พูดคุยมากที่สุด';
+
+  @override
+  String get bugTrackerStaff => 'ทีมงาน';
 }

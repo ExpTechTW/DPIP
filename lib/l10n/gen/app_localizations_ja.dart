@@ -3233,4 +3233,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => '返信が多い順';
+
+  @override
+  String get bugTrackerStaff => 'スタッフ';
 }

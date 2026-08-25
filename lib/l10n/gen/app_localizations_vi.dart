@@ -3295,4 +3295,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => 'Nhiều thảo luận nhất';
+
+  @override
+  String get bugTrackerStaff => 'Nhân sự';
 }

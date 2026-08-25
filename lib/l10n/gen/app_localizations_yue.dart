@@ -3216,4 +3216,7 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => '最多討論';
+
+  @override
+  String get bugTrackerStaff => '工作人員';
 }

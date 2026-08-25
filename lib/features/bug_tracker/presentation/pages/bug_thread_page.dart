@@ -158,7 +158,7 @@ class _OpeningPost extends StatelessWidget {
     final created = DateFormat('yyyy/MM/dd HH:mm')
         .format(thread.createdAt.toLocal());
     // OP author id lives on the model; see bug_thread.dart.
-    final staff = isBugTrackerStaff(thread.author);
+    final role = bugAuthorRole(thread.author);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -225,13 +225,19 @@ class _OpeningPost extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.labelLarge?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: staff ? colors.primary : null,
+                              color: role == BugAuthorRole.admin
+                                  ? colors.primary
+                                  : null,
                             ),
                           ),
                         ),
-                        if (staff) ...[
+                        if (role == BugAuthorRole.admin) ...[
                           const SizedBox(width: AppSpacing.xs),
                           const _DeveloperBadge(),
+                        ],
+                        if (role == BugAuthorRole.staff) ...[
+                          const SizedBox(width: AppSpacing.xs),
+                          const _StaffBadge(),
                         ],
                       ],
                     ),
@@ -270,7 +276,7 @@ class _ChatReply extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final staff = isBugTrackerStaff(message.author);
+    final role = bugAuthorRole(message.author);
     final time = DateFormat('yyyy/MM/dd HH:mm').format(message.time.toLocal());
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,13 +307,19 @@ class _ChatReply extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: staff ? colors.primary : null,
+                        color: role == BugAuthorRole.admin
+                            ? colors.primary
+                            : null,
                       ),
                     ),
                   ),
-                  if (staff) ...[
+                  if (role == BugAuthorRole.admin) ...[
                     const SizedBox(width: AppSpacing.xs),
                     const _DeveloperBadge(),
+                  ],
+                  if (role == BugAuthorRole.staff) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    const _StaffBadge(),
                   ],
                   const SizedBox(width: AppSpacing.xs),
                   Text(
@@ -372,6 +384,32 @@ class _CannotDisplay extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The small「工作人員」tag beside triage-team names — tertiary tint, one
+/// step quieter than the developer badge.
+class _StaffBadge extends StatelessWidget {
+  const _StaffBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: colors.tertiary.withValues(alpha: 0.15),
+        borderRadius: AppRadius.small,
+      ),
+      child: Text(
+        AppLocalizations.of(context).bugTrackerStaff,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: colors.tertiary,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
