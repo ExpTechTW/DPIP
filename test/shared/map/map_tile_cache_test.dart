@@ -60,6 +60,9 @@ final class _TestFrameRepository extends FrameTileRepository {
   int get sourceMaxZoom => maxZoom;
 
   @override
+  int get sourceMinZoom => 0;
+
+  @override
   String get tilePathPrefix => '/api/v2/tiles/radar/';
 
   @override

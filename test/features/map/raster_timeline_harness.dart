@@ -32,6 +32,10 @@ abstract class FakeRasterFrameSource implements RasterFrameSource {
   @override
   int sourceMaxZoom = 22;
 
+  /// 同上：fake 一律不帶下限，行為與舊的無 minzoom 掛載一致。
+  @override
+  int sourceMinZoom = 0;
+
   /// One entry per [warmFrameTiles] call: the frames it was asked to warm.
   final List<List<String>> warmed = [];
 

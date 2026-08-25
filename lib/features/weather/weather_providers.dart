@@ -34,17 +34,19 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
         FrameTileApi(deps.apiClient, 'radar'),
         deps.mapTileWarmer(),
         // Probed 2026-08-26 with a three-location byte-variance check:
-        // real content reaches z11 (deeper requests return identical
-        // 35-byte placeholder webps). Capped exactly there.
+        // real content spans z5–11. Outside both ends the server returns
+        // identical placeholder webps.
         maxZoom: 11,
+        minZoom: 5,
       ),
     ),
     Provider<QpesumsRepository>.value(
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'qpesums'),
         deps.mapTileWarmer(),
-        // Probed 2026-08-26: real content ends at z9.
+        // Probed 2026-08-26: real content spans z5–9.
         maxZoom: 9,
+        minZoom: 5,
       ),
     ),
     Provider<SatelliteRepository>.value(
