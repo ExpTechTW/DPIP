@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "ไม่สามารถแสดงเนื้อหานี้ได้ — ดูได้ที่ Discord",
   "bugTrackerJoinDiscussion": "ร่วมพูดคุยที่ Discord",
   "bugTrackerSortLast": "ล่าสุด",
-  "bugTrackerSortMostDiscussed": "พูดคุยมากที่สุด"
+  "bugTrackerSortMostDiscussed": "พูดคุยมากที่สุด",
+  "bugTrackerStaff": "ทีมงาน"
 }

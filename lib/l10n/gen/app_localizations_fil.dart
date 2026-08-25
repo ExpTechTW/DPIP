@@ -3312,4 +3312,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get bugTrackerSortMostDiscussed => 'Pinakamaraming talakayan';
+
+  @override
+  String get bugTrackerStaff => 'Kawani';
 }

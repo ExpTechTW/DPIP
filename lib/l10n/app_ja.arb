@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "この内容は表示できません — Discord でご確認ください",
   "bugTrackerJoinDiscussion": "Discord で議論に参加する",
   "bugTrackerSortLast": "最新の返信",
-  "bugTrackerSortMostDiscussed": "返信が多い順"
+  "bugTrackerSortMostDiscussed": "返信が多い順",
+  "bugTrackerStaff": "スタッフ"
 }

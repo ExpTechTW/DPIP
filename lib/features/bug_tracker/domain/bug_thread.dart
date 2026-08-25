@@ -33,12 +33,26 @@ class UnixSecondsDateTime implements JsonConverter<DateTime, int> {
   int toJson(DateTime value) => value.millisecondsSinceEpoch ~/ 1000;
 }
 
-/// The tracker staff who answer reports — rendered with a developer badge so
-/// official replies are visually distinct from user chatter.
-const Set<int> bugTrackerAdminIds = {780043079385612319};
+/// The developers who build the app — rendered with a「開發人員」badge and a
+/// primary-coloured name.
+const Set<int> bugTrackerAdminIds = {780043079385612319, 592012263834255360};
 
-/// Whether this author id belongs to tracker staff.
-bool isBugTrackerStaff(int authorId) => bugTrackerAdminIds.contains(authorId);
+/// The tracker team who triage and reply — rendered with a「工作人員」badge,
+/// one step quieter than the developer badge but still distinct from users.
+const Set<int> bugTrackerStaffIds = {
+  452103762320949248,
+  905433558921920562,
+  1001016404289536051,
+};
+
+/// The role an author id carries on the tracker, driving badge and colour.
+enum BugAuthorRole { user, staff, admin }
+
+BugAuthorRole bugAuthorRole(int authorId) {
+  if (bugTrackerAdminIds.contains(authorId)) return BugAuthorRole.admin;
+  if (bugTrackerStaffIds.contains(authorId)) return BugAuthorRole.staff;
+  return BugAuthorRole.user;
+}
 
 /// One staff/victim reply inside a reported-bug thread.
 @freezed

@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "Konten ini tidak dapat ditampilkan — lihat di Discord",
   "bugTrackerJoinDiscussion": "Ikuti diskusi di Discord",
   "bugTrackerSortLast": "Aktivitas terbaru",
-  "bugTrackerSortMostDiscussed": "Paling banyak dibahas"
+  "bugTrackerSortMostDiscussed": "Paling banyak dibahas",
+  "bugTrackerStaff": "Staf"
 }

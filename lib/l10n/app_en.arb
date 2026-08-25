@@ -3950,5 +3950,9 @@
   },
   "@bugTrackerSortMostDiscussed": {
     "description": "Sort chip: threads with the most replies first"
+  },
+  "bugTrackerStaff": "Staff",
+  "@bugTrackerStaff": {
+    "description": "Badge beside triage-team names on bug threads"
   }
 }

@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "Không thể hiển thị nội dung này — xem trên Discord",
   "bugTrackerJoinDiscussion": "Tham gia thảo luận trên Discord",
   "bugTrackerSortLast": "Hoạt động mới nhất",
-  "bugTrackerSortMostDiscussed": "Nhiều thảo luận nhất"
+  "bugTrackerSortMostDiscussed": "Nhiều thảo luận nhất",
+  "bugTrackerStaff": "Nhân sự"
 }

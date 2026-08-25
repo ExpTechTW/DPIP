@@ -1980,5 +1980,6 @@
   "bugTrackerCannotDisplay": "이 내용을 표시할 수 없습니다 — Discord에서 확인하세요",
   "bugTrackerJoinDiscussion": "Discord에서 논의에 참여하기",
   "bugTrackerSortLast": "최근 활동",
-  "bugTrackerSortMostDiscussed": "답글 많은 순"
+  "bugTrackerSortMostDiscussed": "답글 많은 순",
+  "bugTrackerStaff": "스태프"
 }

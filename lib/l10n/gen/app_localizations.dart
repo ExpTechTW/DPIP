@@ -6262,6 +6262,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Most discussed'**
   String get bugTrackerSortMostDiscussed;
+
+  /// Badge beside triage-team names on bug threads
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get bugTrackerStaff;
 }
 
 class _AppLocalizationsDelegate
