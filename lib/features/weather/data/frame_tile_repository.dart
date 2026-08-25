@@ -249,7 +249,12 @@ final class FrameTileRepositoryImpl extends FrameTileRepository
         SatelliteRepository,
         QpesumsRepository,
         WindForecastRepository {
-  FrameTileRepositoryImpl(this._api, super.warmer, {this.maxZoom = 11});
+  FrameTileRepositoryImpl(
+    this._api,
+    super.warmer, {
+    this.maxZoom = 11,
+    this.minZoom = 0,
+  });
 
   final FrameTileApi _api;
 
@@ -265,8 +270,14 @@ final class FrameTileRepositoryImpl extends FrameTileRepository
   @override
   final int maxZoom;
 
+  /// The published floor (see [RasterFrameSource.sourceMinZoom]).
+  final int minZoom;
+
   @override
   int get sourceMaxZoom => maxZoom;
+
+  @override
+  int get sourceMinZoom => minZoom;
 
   @override
   String get tilePathPrefix => '${ApiPaths.tiles}/${_api.path}/';

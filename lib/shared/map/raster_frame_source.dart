@@ -22,15 +22,17 @@ abstract interface class RasterFrameSource {
 
   /// Highest zoom this overlay's tiles genuinely exist for.
   ///
-  /// Measured from the live endpoints, not guessed: radar / QPESUMS publish
-  /// real bytes for z3–12 and satellite / wind z0–11 (everything outside is
-  /// the empty placeholder), but each product's own resolution runs out around
-  /// z7–8 — deeper levels are the server resampling the same pixels, so a
-  /// request there costs a full viewport of round trips per zoom crossing and
-  /// gains no detail. The timeline passes this as the MapLibre source
-  /// `maxzoom`, so the renderer overzooms the top level instead of fetching
-  /// placeholders.
+  /// Measured from the live endpoints with a three-location byte-variance
+  /// check (2026-08-26): radar publishes z5–11, QPESUMS z5–9, satellite
+  /// z0–11 — everything outside is a constant-size placeholder tile. The
+  /// timeline passes this as the MapLibre source `maxzoom`, so the renderer
+  /// overzooms the top level instead of fetching placeholders.
   int get sourceMaxZoom;
+
+  /// Measured the same way: radar / QPESUMS publish nothing below z5, and
+  /// requesting there only earns 404s on every frame. The timeline passes
+  /// this as the MapLibre source `minzoom`.
+  int get sourceMinZoom;
 
   /// XYZ raster tile URL **template** for [frame] (contains `{z}/{x}/{y}`).
   String tileUrl(String frame);

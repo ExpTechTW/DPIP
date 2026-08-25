@@ -1338,6 +1338,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       RasterSourceProperties(
         tiles: [source.tileUrl(id)],
         tileSize: 256,
+        minzoom: source.sourceMinZoom.toDouble(),
         // Past this level MapLibre overzooms the top band instead of
         // requesting tiles that only come back as the empty placeholder —
         // and on Android every avoided request is a platform-thread round
