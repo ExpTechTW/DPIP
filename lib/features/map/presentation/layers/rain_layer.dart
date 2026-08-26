@@ -95,6 +95,12 @@ class RainMapLayer
   @override
   bool get bandedColors => true;
 
+  /// The legend draws as a gradient, unlike the dots and sheet reading above —
+  /// matching the QPESUMS forecast legend's look, since both are precipitation
+  /// scales shown on the same map.
+  @override
+  bool get legendBanded => false;
+
   @override
   double? valueOf(RainObservation observation) =>
       interval.value.valueOf(observation);

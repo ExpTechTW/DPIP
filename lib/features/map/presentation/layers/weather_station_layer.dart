@@ -68,9 +68,18 @@ abstract class WeatherStationLayer<
   /// value between two stops genuinely lies between two colours. Accumulations
   /// do not — the published rainfall scale is a table of categories, and a dot
   /// blended halfway between the 70 mm and 90 mm bands claims a precision the
-  /// band structure denies. Banded layers get a MapLibre `step`, [stepColor]
-  /// in the sheet, and a hard-edged legend, so all three agree.
+  /// band structure denies. Banded layers get a MapLibre `step` and
+  /// [stepColor] in the sheet — see [legendBanded] for the legend, which does
+  /// not always follow this.
   bool get bandedColors => false;
+
+  /// Whether the legend draws hard bands rather than a gradient.
+  ///
+  /// Defaults to [bandedColors], but a subclass may split the two: rain keeps
+  /// its dots and sheet reading banded (the CWA scale is genuinely
+  /// categorical) while drawing its legend as a gradient, to read
+  /// consistently with the other precipitation layers on the map.
+  bool get legendBanded => bandedColors;
 
   /// Whether to draw the value-coloured dot. A subclass may replace it with its
   /// own symbology (e.g. wind arrows) by returning false.
@@ -231,7 +240,7 @@ abstract class WeatherStationLayer<
     final scale = ColorScaleLegend(
       stops: colorStops,
       unit: unit,
-      banded: bandedColors,
+      banded: legendBanded,
     );
     final child = header == null
         ? scale
