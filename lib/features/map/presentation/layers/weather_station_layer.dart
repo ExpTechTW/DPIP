@@ -234,8 +234,14 @@ abstract class WeatherStationLayer<
   }
 
   /// Colour scale from [colorStops] + [unit], with an optional [legendHeader].
-  @override
-  Widget buildLegend(BuildContext context) {
+  ///
+  /// Built inside the [ListenableBuilder]'s callback, not before it: rain's
+  /// header and scale both read live state ([legendHeader]'s interval,
+  /// [colorStops]' colour scale), so building them once and handing
+  /// [ListenableBuilder] the finished card would freeze the legend at
+  /// whichever window was selected when it first appeared — every later
+  /// `chromeListenable` notify would just replay that same stale widget.
+  Widget _buildLegendCard(BuildContext context) {
     final header = legendHeader(context);
     final scale = ColorScaleLegend(
       stops: colorStops,
@@ -253,11 +259,18 @@ abstract class WeatherStationLayer<
               scale,
             ],
           );
-    final card = MapLegendCard(child: child);
+    return MapLegendCard(child: child);
+  }
+
+  @override
+  Widget buildLegend(BuildContext context) {
     final listenable = chromeListenable;
     return listenable == null
-        ? card
-        : ListenableBuilder(listenable: listenable, builder: (_, _) => card);
+        ? _buildLegendCard(context)
+        : ListenableBuilder(
+            listenable: listenable,
+            builder: (context, _) => _buildLegendCard(context),
+          );
   }
 
   @override
