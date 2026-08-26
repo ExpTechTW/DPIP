@@ -24,6 +24,7 @@ library;
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/rain_layer.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
+import 'package:dpip/features/weather/domain/rain_interval.dart';
 import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
@@ -136,6 +137,29 @@ void main() {
     expect((gradient.gradient as LinearGradient).colors, hasLength(17));
   });
 
+  testWidgets(
+    "the legend's header follows a later interval change, not just its "
+    'first build',
+    (tester) async {
+      final layer = RainMapLayer(_StubRainRepository());
+      await _pumpExpanded(tester, layer.buildLegend);
+
+      // Default window is 1 時 (see RainMapLayer.interval's doc).
+      expect(find.text('1 時'), findsOneWidget);
+      expect(find.text('今日'), findsNothing);
+
+      // buildLegend wraps its header + scale in a ListenableBuilder driven by
+      // chromeListenable (interval + colorScale). Building that header and
+      // scale *before* handing them to the builder — rather than inside its
+      // callback — would freeze the legend at whatever was selected when it
+      // first appeared, silently ignoring every later interval change.
+      await layer.setInterval(RainInterval.now);
+      await tester.pump();
+
+      expect(find.text('今日'), findsOneWidget);
+      expect(find.text('1 時'), findsNothing);
+    },
+  );
 
   testWidgets(
     'ColorScaleLegend(banded: true) still expands inside the chip without '
