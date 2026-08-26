@@ -68,6 +68,49 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
   static const String _radarLayer = 'home-radar-lyr';
   static const double _radarOpacity = 0.85;
 
+  /// Finds the lowest layer belonging to MapLibre Android's native location
+  /// puck in the *live* style, or null if it isn't there.
+  ///
+  /// Android and iOS need opposite handling here, and this one query gives
+  /// both the right answer without a platform branch:
+  ///
+  /// - **Android**: the puck is not an overlay drawn above the map — it is
+  ///   itself a handful of runtime style layers (ids like
+  ///   `mapbox-location-shadow-layer`, `…-foreground-layer`, …), so it does
+  ///   not automatically stay above whatever this backdrop adds afterward.
+  ///   Hardcoding one of those names is fragile: the SDK picks between a
+  ///   legacy multi-layer renderer and a newer single "location-indicator"
+  ///   layer internally, not through anything this plugin's Dart API
+  ///   exposes, so a name that matches today's build can silently stop
+  ///   matching after an SDK bump. Querying the live stack for whichever id
+  ///   actually contains "location" survives that. [style.getLayers()][1] —
+  ///   what `getLayerIds()` wraps — orders bottom to top, so the first match
+  ///   is the bottom of the puck's own layer group; anchoring
+  ///   [_addSelectedLayers] below *that* keeps it under every sub-layer the
+  ///   puck is made of, however many there are.
+  /// - **iOS**: this fork's `MapLibreMapController.swift` just flips
+  ///   `MLNMapView.showsUserLocation` — the puck is a native
+  ///   `MLNUserLocationAnnotationView`, composited over the rendered map by
+  ///   the SDK itself, never a style layer. No id here will ever contain
+  ///   "location", so this correctly returns null and [_addSelectedLayers]
+  ///   falls back to the plain top-of-stack add — which is already right on
+  ///   iOS, since nothing in the style's layer order can cover an annotation
+  ///   that isn't part of that stack in the first place.
+  ///
+  /// [1]: MapLibre Android's `Style.getLayers()`.
+  Future<String?> _locationPuckLayerId(MapLibreMapController controller) async {
+    try {
+      final ids = await controller.getLayerIds();
+      for (final id in ids) {
+        if (id is String && id.toLowerCase().contains('location')) return id;
+      }
+      Log.debug('Home map: no location layer found in $ids');
+    } catch (e, st) {
+      Log.handle(e, st, 'Home map: getLayerIds failed');
+    }
+    return null;
+  }
+
   /// How far the selected township's bounds are pushed outward before fitting —
   /// a fraction of the box's span added to every side — so it frames with
   /// surrounding context instead of edge-to-edge. Fitting the (expanded) bounds
@@ -311,6 +354,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
     List<Object> filter,
   ) async {
     await _removeLayerQuietly(controller, _selectedLineLayer);
+    final belowLayerId = await _locationPuckLayerId(controller);
     await controller.addLineLayer(
       'exptech',
       _selectedLineLayer,
@@ -319,6 +363,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       sourceLayer: 'town',
       filter: filter,
       enableInteraction: false,
+      belowLayerId: belowLayerId,
     );
   }
 
