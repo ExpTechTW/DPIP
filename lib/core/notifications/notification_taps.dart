@@ -27,8 +27,12 @@ abstract final class NotificationTaps {
   static void route(NotificationTap tap) {
     final handler = onTap;
     if (handler != null) {
+      Log.info('Notification tap: routing now, channel=${tap.channelKey}');
       handler(tap);
     } else {
+      Log.info(
+        'Notification tap: router not ready, stashing channel=${tap.channelKey}',
+      );
       _pending = tap;
     }
   }
@@ -36,8 +40,21 @@ abstract final class NotificationTaps {
   /// awesome_notifications tap entry point (must be a top-level static method).
   @pragma('vm:entry-point')
   static Future<void> onActionReceived(ReceivedAction action) async {
-    Log.debug('Notification tapped: channelKey=${action.channelKey}');
-    route(NotificationTap.fromData(action.payload));
+    // The channel comes off the action, not the payload — see
+    // [NotificationTap.fromData] for why the payload is empty on a push.
+    final tap = NotificationTap.fromData(
+      action.payload,
+      channelKey: action.channelKey,
+    );
+    // The resolved map, not just its keys. `payload=[]` was the whole symptom
+    // of the iOS deep link never firing, and a list of key names could not show
+    // that the values behind them were the ones routing depends on.
+    Log.info(
+      'Notification tapped: channel=${tap.channelKey} id=${tap.id} '
+      'data=${tap.data} lifeCycle=${action.actionLifeCycle?.name}',
+    );
+    Log.debug('Notification raw payload: ${action.payload}');
+    route(tap);
   }
 
   /// Replays a tap that arrived before [onTap] was registered (cold start).
@@ -45,6 +62,7 @@ abstract final class NotificationTaps {
     final tap = _pending;
     if (tap == null) return;
     _pending = null;
+    Log.info('Notification tap: replaying stashed channel=${tap.channelKey}');
     onTap?.call(tap);
   }
 }
