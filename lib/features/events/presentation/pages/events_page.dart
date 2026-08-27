@@ -76,13 +76,6 @@ class _EventsPageState extends State<EventsPage> {
         message: AppLocalizations.of(context).regionCurrentUnavailable,
       );
     }
-    return EventTimeline(
-      regionCode: switch (area) {
-        NationwideArea() => null,
-        CurrentArea(:final code) => code,
-        SavedArea(:final code) => code,
-      },
-      refreshSignal: _refresh,
-    );
+    return EventTimeline(regionCode: area.code, refreshSignal: _refresh);
   }
 }

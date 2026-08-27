@@ -41,6 +41,24 @@ void main() {
     },
   );
 
+  test('selectedCode answers for every area kind', () async {
+    // Nine screens used to switch over the area themselves; they now read this.
+    // 全國 and a fix-less 所在地 must both stay null, or a nationwide feed
+    // starts claiming to be local.
+    final store = await makeStore(['100']);
+
+    store.select(0);
+    expect(store.selectedCode, isNull, reason: '全國 has no township');
+
+    store.select(1);
+    expect(store.selectedCode, isNull, reason: '所在地 without a GPS fix');
+    store.setCurrentCode('200');
+    expect(store.selectedCode, '200');
+
+    store.select(2);
+    expect(store.selectedCode, '100');
+  });
+
   test('addSaved caps at 3, dedups, and persists codes', () async {
     final store = await makeStore();
     expect(store.addSaved('100'), isTrue);
