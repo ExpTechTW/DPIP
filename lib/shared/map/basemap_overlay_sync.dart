@@ -16,7 +16,7 @@ const RasterDemSourceProperties terrainSourceProps = RasterDemSourceProperties(
   tiles: [terrainOriginTileUrl],
   bounds: [110.0, 10.0, 132.0, 35.0],
   minzoom: 0,
-  maxzoom: 12,
+  maxzoom: terrainSourceMaxZoom,
   tileSize: 512,
   encoding: 'mapbox',
 );

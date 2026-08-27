@@ -12,6 +12,11 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/shared/map/town_label_points.g.dart';
 import 'package:dpip/core/network/api_paths.dart';
 
+/// Highest source levels that add useful visual information. The map's camera
+/// may continue past these; MapLibre then overzooms the final native tile.
+const double basemapSourceMaxZoom = 9;
+const double terrainSourceMaxZoom = 11;
+
 /// One brightness's cartographic hex colours — MapLibre paint strings only.
 ///
 /// Do not invent map hexes at call sites; resolve via [MapColors.of].
@@ -272,7 +277,7 @@ String exptechVectorStyle(
   final terrain = terrainTileUrl == null
       ? ''
       : '''
-  ,"$terrainSourceId": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": 12, "bounds": [110, 10, 132, 35] }''';
+  ,"$terrainSourceId": { "type": "raster-dem", "tiles": ["$terrainTileUrl"], "encoding": "mapbox", "tileSize": 512, "minzoom": 0, "maxzoom": $terrainSourceMaxZoom, "bounds": [110, 10, 132, 35] }''';
   final hillshade = terrainTileUrl == null
       ? ''
       : '''
@@ -285,7 +290,7 @@ String exptechVectorStyle(
   "version": 8,
   "glyphs": "$glyphsUrl",
   "sources": {
-    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "maxzoom": 12 },
+    "exptech": { "type": "vector", "tiles": ["$basemapTileUrl"], "minzoom": 0, "maxzoom": $basemapSourceMaxZoom },
     "$townLabelSourceId": { "type": "geojson", "data": $townLabelData }$terrain
   },
   "layers": [
