@@ -28,8 +28,10 @@ class _CappedRadarRepository extends FakeRasterFrameSource
 }
 
 void main() {
-  test('mounted radar sources carry the pyramid cap as maxzoom', () async {
-    final source = _CappedRadarRepository(_ids(9))..sourceMaxZoom = 8;
+  test('mounted radar sources carry both pyramid bounds', () async {
+    final source = _CappedRadarRepository(_ids(9))
+      ..sourceMinZoom = 3
+      ..sourceMaxZoom = 8;
     final layer = RadarMapLayer(source, testReferenceOutline());
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
@@ -46,6 +48,13 @@ void main() {
     expect(mounted, isNotEmpty, reason: 'the ring must have mounted sources');
     for (final entry in mounted.entries) {
       expect(
+        entry.value['minzoom'],
+        3.0,
+        reason:
+            '${entry.key} must not request placeholder tiles below the '
+            'published pyramid',
+      );
+      expect(
         entry.value['maxzoom'],
         8.0,
         reason:
@@ -56,10 +65,10 @@ void main() {
     }
   });
 
-  test('an uncapped fake keeps the old behaviour', () async {
+  test('an unconfigured fake keeps the MapLibre raster defaults', () async {
     // Guards against the cap accidentally leaking into sources whose data
     // really does extend to the camera ceiling: the default stays 22, which
-    // within the app's z4–z11 camera range means "no cap".
+    // means "no cap" for the fake rather than leaking another source's range.
     final source = _CappedRadarRepository(_ids(9));
     expect(source.sourceMaxZoom, 22);
   });

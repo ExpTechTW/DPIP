@@ -74,7 +74,10 @@ class _FakeTyphoonRepository implements MeteorTyphoonRepository {
 
 class _FakeRadarRepository extends FakeRasterFrameSource
     implements RadarRepository {
-  _FakeRadarRepository() : super(['1700000000']);
+  _FakeRadarRepository() : super(['1700000000']) {
+    sourceMinZoom = 3;
+    sourceMaxZoom = 12;
+  }
 
   @override
   String tileUrl(String frame) => 'https://host/radar/$frame/{z}/{x}/{y}.webp';
@@ -82,7 +85,10 @@ class _FakeRadarRepository extends FakeRasterFrameSource
 
 class _FakeSatelliteRepository extends FakeRasterFrameSource
     implements SatelliteRepository {
-  _FakeSatelliteRepository() : super(['1700000000']);
+  _FakeSatelliteRepository() : super(['1700000000']) {
+    sourceMinZoom = 0;
+    sourceMaxZoom = 11;
+  }
 
   @override
   String tileUrl(String frame) => 'https://host/sat/$frame/{z}/{x}/{y}.png';
@@ -115,6 +121,23 @@ Future<void> _drain() async {
 }
 
 void main() {
+  test(
+    'each weather underlay carries its own published source range',
+    () async {
+      final layer = _layer();
+      final controller = await _rendered(layer);
+
+      expect(controller.sourceProperties['typhoon-wx-src']?['minzoom'], 3.0);
+      expect(controller.sourceProperties['typhoon-wx-src']?['maxzoom'], 12.0);
+
+      layer.setWeatherOverlay(TyphoonWeatherOverlay.satellite);
+      await _drain();
+
+      expect(controller.sourceProperties['typhoon-wx-src']?['minzoom'], 0.0);
+      expect(controller.sourceProperties['typhoon-wx-src']?['maxzoom'], 11.0);
+    },
+  );
+
   test('the borders stay over the underlay across a re-sync', () async {
     // The chrome sync is diff-based — it re-adds a border only when its toggle
     // changes — so anything that re-mounts the raster has to leave the borders
