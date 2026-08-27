@@ -1,6 +1,6 @@
 // Version-highlight card content for DPIP 26.1 (normal).
 //
-// GENERATED from `release_highlights/assets/26.1/normal/cards.json` by `tool/gen/arb/json_to_dart_highlights.py` — edit the
+// GENERATED from `release_highlights/assets/26.1/normal/cards.json` by `tool/gen/release_highlights.py` — edit the
 // JSON, not this file. Rendering lives in `lib/features/release_highlights`;
 // this package carries only data.
 library;

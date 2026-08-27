@@ -7,7 +7,7 @@
 /// imports with the new version's; nothing else changes.
 ///
 /// Content is authored as JSON at `release_highlights/<version>/…/cards.json`
-/// and compiled to Dart by `tool/json_to_dart_highlights.py`.
+/// and compiled to Dart by `tool/gen/release_highlights.py`.
 library;
 
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
