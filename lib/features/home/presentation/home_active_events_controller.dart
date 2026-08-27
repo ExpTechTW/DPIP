@@ -36,11 +36,7 @@ class HomeActiveEventsController extends ChangeNotifier {
   Failure? get failure => _failure;
 
   /// Null → nationwide realtime list; otherwise the township code.
-  String? get _regionCode => switch (_regions.selected) {
-    NationwideArea() => null,
-    CurrentArea(:final code) => code,
-    SavedArea(:final code) => code,
-  };
+  String? get _regionCode => _regions.selectedCode;
 
   /// Cache key: distinguishes 全國 (`''`) from a missing GPS township (`null`
   /// CurrentArea) so a locate-then-lose cycle still refetches.

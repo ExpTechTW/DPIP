@@ -51,6 +51,10 @@ class RegionStore extends ChangeNotifier {
   /// The selected area.
   HomeArea get selected => areas[selectedIndex];
 
+  /// The selected area's township code — null for 全國, and for 所在地 without
+  /// a GPS fix. See [HomeArea.code].
+  String? get selectedCode => selected.code;
+
   /// Selects the area at [index]; ignored if unchanged / out of range.
   void select(int index) {
     final clamped = index.clamp(0, count - 1);
@@ -128,6 +132,8 @@ class RegionStore extends ChangeNotifier {
     final target = newIndex.clamp(0, _saved.length - 1);
     if (target == oldIndex) return;
 
+    // Deliberately not [selectedCode]: only a *saved* area's slot moves, so
+    // 所在地 must read as null here even though it has a code.
     final selectedCode = switch (selected) {
       SavedArea(:final code) => code,
       _ => null,

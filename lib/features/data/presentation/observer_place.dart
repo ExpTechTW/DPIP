@@ -13,7 +13,6 @@ library;
 
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -26,11 +25,6 @@ const ({double lat, double lng}) fallbackPlace = (lat: 25.0330, lng: 121.5654);
 Town? observerTown(BuildContext context) {
   final directory = context.read<TownDirectory>();
   final regions = context.watch<RegionStore>();
-  final code = switch (regions.selected) {
-    SavedArea(:final code) => code,
-    CurrentArea(:final code) => code,
-    NationwideArea() => null,
-  };
-  return directory.byCode(code ?? regions.currentCode) ??
+  return directory.byCode(regions.selectedCode ?? regions.currentCode) ??
       directory.nearest(fallbackPlace.lat, fallbackPlace.lng);
 }

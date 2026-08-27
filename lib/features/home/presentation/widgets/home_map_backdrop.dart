@@ -223,11 +223,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
         HomeMonitorBanner.height;
     final boundariesFuture = context.read<Future<TownBoundaries>>();
     final selected = _regions?.selected;
-    final code = switch (selected) {
-      SavedArea(:final code) => code,
-      CurrentArea(:final code) => code,
-      _ => null,
-    };
+    final code = selected?.code;
     final styleEpoch = _styleEpoch;
     // 所在地 is a *place*, not a region: the current GPS fix is the point, so
     // the camera centres on it (a fixed span around the fix) instead of framing

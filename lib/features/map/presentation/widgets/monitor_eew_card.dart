@@ -20,7 +20,6 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
@@ -99,12 +98,7 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
     // selected township's centroid — same resolution the home weather uses.
     // 全國 (or 所在地 without a GPS fix) has no point to estimate for, so the
     // local tiles drop rather than invent one.
-    final store = context.watch<RegionStore>();
-    final code = switch (store.selected) {
-      SavedArea(:final code) => code,
-      CurrentArea(:final code) => code,
-      NationwideArea() => null,
-    };
+    final code = context.watch<RegionStore>().selectedCode;
     final town = code == null
         ? null
         : context.read<TownDirectory>().byCode(code);

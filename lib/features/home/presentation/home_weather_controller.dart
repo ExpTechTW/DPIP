@@ -8,7 +8,6 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
@@ -86,11 +85,7 @@ class HomeWeatherController extends ChangeNotifier {
 
   /// The township code driving the weather. Null for 全國 (no point weather) and
   /// for 所在地 without a GPS fix.
-  String? get areaCode => switch (_regions.selected) {
-    SavedArea(:final code) => code,
-    CurrentArea(:final code) => code,
-    NationwideArea() => null,
-  };
+  String? get areaCode => _regions.selectedCode;
 
   /// Re-fetches the current area even though it has not changed — the
   /// pull-to-refresh / tab-reappear entry point.
