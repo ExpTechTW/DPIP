@@ -175,10 +175,9 @@ class _AppServicesHostState extends State<_AppServicesHost>
     NotificationTaps.onTap = routeNotificationTap;
     widget.onboarding.addListener(_onOnboardingChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Log.debug(
-        'first frame rendered ${Log.sinceStart.elapsedMilliseconds} ms '
-        'after start',
-      );
+      // INFO, not DEBUG: this is the number anyone asking "why is launch slow"
+      // needs, and a release log keeps DEBUG out.
+      Log.info('first frame rendered ${Log.sinceStartMs} ms after start');
       // Spread the first polls so the post-first-frame burst doesn't hammer
       // the network and UI isolate at once (EEW leads; the rest follow).
       widget.realtimeService.startAll(
