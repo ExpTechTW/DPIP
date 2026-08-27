@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/error/result.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// How much of one frame's current viewport is already in MapLibre's L1.
 ///
@@ -23,14 +24,13 @@ abstract interface class RasterFrameSource {
   /// Highest native zoom worth requesting for this overlay.
   ///
   /// Live probes establish the published pyramid, then pixel comparisons set a
-  /// possibly lower useful-detail ceiling. The timeline passes this as the
-  /// MapLibre source `maxzoom`, so the renderer overzooms the last useful
-  /// level instead of requesting visually redundant tiles (or placeholders
-  /// past the pyramid).
+  /// possibly lower useful-detail ceiling. Every MapLibre mount passes this as
+  /// source `maxzoom`, so the renderer overzooms the last useful level instead
+  /// of requesting visually redundant tiles (or placeholders past the pyramid).
   int get sourceMaxZoom;
 
   /// Measured the same way: radar / QPESUMS start at z3; satellite and wind at
-  /// z0. The timeline passes this as the MapLibre source `minzoom`.
+  /// z0. Every MapLibre mount passes this as the source `minzoom`.
   int get sourceMinZoom;
 
   /// XYZ raster tile URL **template** for [frame] (contains `{z}/{x}/{y}`).
@@ -96,3 +96,20 @@ abstract interface class RasterFrameSource {
   /// memory (bytes stay in the app's store). For a layer switch / teardown.
   Future<void> releaseTiles();
 }
+
+/// The one legal way to turn a [RasterFrameSource] frame into a MapLibre tile
+/// source.
+///
+/// A frame is mounted in three places — the main timeline, the home radar
+/// backdrop, and the typhoon weather underlay. Keeping the zoom contract here
+/// prevents a secondary surface from silently falling back to MapLibre's
+/// raster default (z0–22) and issuing requests outside the published pyramid.
+RasterSourceProperties rasterFrameSourceProperties(
+  RasterFrameSource source,
+  String frame,
+) => RasterSourceProperties(
+  tiles: [source.tileUrl(frame)],
+  tileSize: 256,
+  minzoom: source.sourceMinZoom.toDouble(),
+  maxzoom: source.sourceMaxZoom.toDouble(),
+);

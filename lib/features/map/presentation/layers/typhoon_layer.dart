@@ -35,6 +35,7 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -984,9 +985,9 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
       Log.warning('Typhoon weather overlay: no ${kind.name} frame ≤ $bulletin');
       return;
     }
-    final url = kind == TyphoonWeatherOverlay.radar
-        ? radar.tileUrl('$frame')
-        : satellite.tileUrl('$frame');
+    final RasterFrameSource frameSource = kind == TyphoonWeatherOverlay.radar
+        ? radar
+        : satellite;
     // Warm ambient via ApiClient before MapLibre races its own GETs.
     try {
       final bounds = await controller.getVisibleRegion();
@@ -1023,7 +1024,7 @@ class TyphoonMapLayer with MapLayerDefaults implements MapLayer {
     } catch (_) {}
     await controller.addSource(
       _wxSrc,
-      RasterSourceProperties(tiles: [url], tileSize: 256),
+      rasterFrameSourceProperties(frameSource, '$frame'),
     );
     // Sit under the bottom typhoon fill so vectors/warning stay on top.
     final below = _warningNames.isNotEmpty ? _warnLyr : _probLyr;

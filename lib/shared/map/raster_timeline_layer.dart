@@ -1335,16 +1335,10 @@ abstract class RasterTimelineLayer implements MapLayer {
     await _ensureSeam(controller);
     await controller.addSource(
       _sourceId(id),
-      RasterSourceProperties(
-        tiles: [source.tileUrl(id)],
-        tileSize: 256,
-        minzoom: source.sourceMinZoom.toDouble(),
-        // Past this level MapLibre overzooms the top band instead of
-        // requesting tiles that only come back as the empty placeholder —
-        // and on Android every avoided request is a platform-thread round
-        // trip a pinch gesture no longer has to wait behind.
-        maxzoom: source.sourceMaxZoom.toDouble(),
-      ),
+      // Past the declared top MapLibre overzooms instead of requesting the
+      // empty placeholder. The shared factory also protects the home and
+      // typhoon mounts from drifting back to the raster z0–22 default.
+      rasterFrameSourceProperties(source, id),
     );
     await controller.addRasterLayer(
       _sourceId(id),

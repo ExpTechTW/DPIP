@@ -16,6 +16,7 @@ import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_cache.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
+import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -391,7 +392,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
       await _removeSourceQuietly(controller, _radarSource);
       await controller.addSource(
         _radarSource,
-        RasterSourceProperties(tiles: [radar.tileUrl(latest)], tileSize: 256),
+        rasterFrameSourceProperties(radar, latest),
       );
       await controller.addRasterLayer(
         _radarSource,
