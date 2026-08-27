@@ -323,6 +323,27 @@ String _bugPreview(String body) => body
     .trim();
 
 /// One thread row — title, tag badges, body preview, author and reply count.
+/// The dot between two facts in a card's meta row.
+///
+/// Its own widget so the padding either side stays symmetric wherever it is
+/// used: a bare `Text('·')` inherits whatever `SizedBox` happens to sit next to
+/// it, and the separator then sits visibly closer to one side than the other.
+class _MetaDot extends StatelessWidget {
+  const _MetaDot({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs + 2),
+    // l10n-ignore: punctuation, not display text
+    child: Text(
+      '·',
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
+    ),
+  );
+}
+
 class _ThreadCard extends StatelessWidget {
   const _ThreadCard({required this.thread, required this.avatarFor});
 
@@ -418,12 +439,26 @@ class _ThreadCard extends StatelessWidget {
                       color: colors.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
+                  // The reply count and the date are two different facts about
+                  // the thread, and spacing alone left them reading as one
+                  // run-on figure. A middle dot is the separator, not a word —
+                  // it needs no translation and carries none.
+                  // l10n-ignore: punctuation, not display text
+                  _MetaDot(color: colors.onSurfaceVariant),
                   Text(
                     date,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
+                  ),
+                  // The row ends where the tap leads. The whole card is an
+                  // InkWell, but nothing in it said so until now — every other
+                  // list in the app puts a chevron at the end of a row that
+                  // opens something.
+                  Icon(
+                    Icons.chevron_right,
+                    size: 16,
+                    color: colors.onSurfaceVariant,
                   ),
                 ],
               ),
