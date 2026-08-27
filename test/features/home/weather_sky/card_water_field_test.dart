@@ -40,6 +40,39 @@ void _run(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  /// The neighbour search is a hash grid whose slot table is sized from
+  /// [CardWaterField.capacity]. The solver accumulates pair by pair and
+  /// floating-point addition does not commute, so if the table's layout ever
+  /// leaked into the order pairs are visited, two fields that differ only in a
+  /// cap neither of them reaches would drift apart. They must not.
+  test('the neighbour grid\'s table size is not observable', () {
+    String trace(int capacity, CardWaterPreset preset, double seconds) {
+      final field = _field(capacity: capacity);
+      _run(field, seconds, preset: preset);
+      final p = field.debugPositions;
+      final v = field.debugVelocities;
+      return [
+        field.liveCount,
+        for (var i = 0; i < p.length; i++)
+          '${p[i].dx},${p[i].dy},${v[i].dx},${v[i].dy}',
+      ].join('|');
+    }
+
+    for (final preset in const [
+      CardWaterPreset.light,
+      CardWaterPreset.moderate,
+      CardWaterPreset.heavy,
+    ]) {
+      for (final seconds in const [4.0, 25.0]) {
+        expect(
+          trace(200, preset, seconds),
+          trace(700, preset, seconds),
+          reason: 'caps 200 and 700 diverged after $seconds s',
+        );
+      }
+    }
+  });
+
   test('drops are born just above the edge, not a third of a screen up', () {
     // the emitter's spawn y is 0.91, but that is an absolute world y — the collision box
     // puts the card's top face at +0.852, so the spawn line is only 0.058 above
