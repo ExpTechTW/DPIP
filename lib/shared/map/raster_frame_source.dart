@@ -20,18 +20,17 @@ abstract interface class RasterFrameSource {
   /// Available frame ids, newest first; `Ok([])` when none.
   Future<Result<List<String>>> frames();
 
-  /// Highest zoom this overlay's tiles genuinely exist for.
+  /// Highest native zoom worth requesting for this overlay.
   ///
-  /// Measured from the live endpoints with a three-location byte-variance
-  /// check (2026-08-26): radar publishes z5–11, QPESUMS z5–9, satellite
-  /// z0–11 — everything outside is a constant-size placeholder tile. The
-  /// timeline passes this as the MapLibre source `maxzoom`, so the renderer
-  /// overzooms the top level instead of fetching placeholders.
+  /// Live probes establish the published pyramid, then pixel comparisons set a
+  /// possibly lower useful-detail ceiling. The timeline passes this as the
+  /// MapLibre source `maxzoom`, so the renderer overzooms the last useful
+  /// level instead of requesting visually redundant tiles (or placeholders
+  /// past the pyramid).
   int get sourceMaxZoom;
 
-  /// Measured the same way: radar / QPESUMS publish nothing below z5, and
-  /// requesting there only earns 404s on every frame. The timeline passes
-  /// this as the MapLibre source `minzoom`.
+  /// Measured the same way: radar / QPESUMS start at z3; satellite and wind at
+  /// z0. The timeline passes this as the MapLibre source `minzoom`.
   int get sourceMinZoom;
 
   /// XYZ raster tile URL **template** for [frame] (contains `{z}/{x}/{y}`).
