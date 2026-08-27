@@ -9,7 +9,6 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart';
 import 'package:dpip/features/map/presentation/widgets/forecast_overlay_menu.dart';
-import 'package:dpip/features/map/presentation/widgets/wind_particle_overlay.dart';
 import 'package:dpip/features/map/presentation/layers/wind_particle_native.dart';
 import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
@@ -29,7 +28,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// model's identity, its opacity, the shared wind-speed colour key, the two
 /// admin-border overlays its options chip toggles ([AdminOutlineChrome]), and
 /// the particle animation — native on Android and iOS
-/// ([WindParticleNative]), [WindParticleOverlay] elsewhere — driven by the
+/// ([WindParticleNative]) — driven by the
 /// loaded [field].
 ///
 /// The tiles are a semi-transparent speed wash, so the layer draws its own
@@ -56,7 +55,7 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
 
   /// The GPU renderer that draws the particles inside the map.
   ///
-  /// Where it is available it replaces [WindParticleOverlay] entirely. On
+  /// Where it is available the map draws the particles itself. On
   /// Android that is not a preference but the leak escape: a Flutter overlay
   /// repainting above a platform view leaks a full-screen graphics buffer per
   /// frame under HCPP, and the particles were the only thing in the app
@@ -191,16 +190,21 @@ class WindForecastMapLayer extends RasterTimelineLayer with AdminOutlineChrome {
     particles.setSurfaceVisible(visible);
   }
 
-  /// The Flutter overlay, only where the map cannot draw the particles itself.
+  /// Nothing. The particles are map content now, on every platform.
   ///
-  /// Where the native layer carries them (Android, iOS) this is deliberately
-  /// empty — returning the overlay anyway would put a per-frame Flutter
-  /// presentation back on platforms that no longer need one. It is still the
-  /// real implementation everywhere else.
+  /// There used to be a Flutter-drawn CPU fallback here for anywhere the
+  /// native layer could not run. It is gone, and its absence is deliberate:
+  /// two renderers behind one feature name meant a platform could quietly be
+  /// showing something else entirely. Days were spent comparing "iOS" against
+  /// "Android" before the logs revealed that the iOS side was the Simulator
+  /// running the fallback while Android ran the real one — the two were never
+  /// the same picture, and no amount of tuning was going to align them.
+  ///
+  /// Where the native layer cannot run, the field renders without particles.
+  /// The colour ramp still carries the wind speed, which is the information;
+  /// a wrong animation is worse than none.
   @override
-  Widget buildMapOverlay(BuildContext context) => particles.isActive
-      ? const SizedBox.shrink()
-      : WindParticleOverlay(layer: this);
+  Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
 
   /// The particle overlay reads the live camera on every tick, so it never
   /// needs a rebuild to reproject — and it must not get one: re-keying it on

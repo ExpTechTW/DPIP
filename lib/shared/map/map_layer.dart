@@ -176,7 +176,7 @@ abstract interface class MapLayer {
   /// the live camera itself every frame — re-keying one of those destroys its
   /// [State] on every pan, zoom and tap, which for an animation means the
   /// ticker, the simulation and the accumulated buffer are all rebuilt each
-  /// time (see `WindParticleOverlay`).
+  /// time.
   bool get overlayFollowsCamera => true;
 
   /// Camera settled after pan/zoom — sheet layers may prefetch viewport tiles.
