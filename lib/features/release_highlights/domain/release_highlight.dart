@@ -8,7 +8,7 @@
 /// content package, keyed by locale so every language reads its own copy.
 ///
 /// A new version is authored as JSON under `release_highlights/<version>/…`,
-/// converted to Dart by `tool/json_to_dart_highlights.py`, and the app's
+/// converted to Dart by `tool/gen/release_highlights.py`, and the app's
 /// repository imports the new version's files. Older versions stay in the
 /// package as the archive; unimported, they are never compiled into a build.
 library;
