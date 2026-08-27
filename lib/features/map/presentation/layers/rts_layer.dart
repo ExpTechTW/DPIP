@@ -142,6 +142,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   final Future<RtsBoxGrid> _boxGridFuture;
   final TownDirectory _townDirectory;
 
+  /// Township centroids, keyed by code — built once from the bundled
+  /// directory, which does not change while the app runs. Rebuilding it per
+  /// alert serial meant 368 map entries and 368 `LatLng`s allocated on the
+  /// frame an alert arrives, which is the frame with the least to spare.
+  Map<String, geo.LatLng>? _centroids;
+
   Map<String, SeismicStation> _stations = const {};
   MapLibreMapController? _controller;
   bool _listening = false;
@@ -778,7 +784,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         epicenter: eew.info.latlng,
         depth: eew.info.depth,
         mag: eew.info.magnitude,
-        regionCentroids: {
+        regionCentroids: _centroids ??= {
           for (final town in _townDirectory.all)
             town.code: geo.LatLng(town.lat, town.lng),
         },
