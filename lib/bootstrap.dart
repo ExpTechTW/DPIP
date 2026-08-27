@@ -160,6 +160,8 @@ void _refuseUnlessLaunchedByTool() {
 }
 
 Future<void> bootstrap() async {
+  // First statement, and it has to stay first — see [Log.startClock].
+  Log.startClock();
   WidgetsFlutterBinding.ensureInitialized();
 
   Log.installErrorHandlers();
@@ -200,10 +202,12 @@ Future<void> bootstrap() async {
   final appVersionFuture = AppBuild.ensureLoaded().then((_) => AppBuild.label);
 
   final durable = await durableFuture;
+  final durableMs = Log.sinceStartMs;
   final settings = await SettingsStore.open(durable);
   Log.info(
     'settings ready durable=${durable != null} keys=${settings.keys.length} '
-    'onboarding=${settings.getBool(SettingKeys.onboardingComplete)}',
+    'onboarding=${settings.getBool(SettingKeys.onboardingComplete)} '
+    'durable=${durableMs}ms settings=${Log.sinceStartMs - durableMs}ms',
   );
   final onboarding = OnboardingStore(settings);
   // A launch that could not open the database must not spend the whole session
@@ -228,7 +232,9 @@ Future<void> bootstrap() async {
   final mapLayerOrder = MapLayerOrderController(settings);
   final mapLayerVisibility = MapLayerVisibilityController(settings);
   final mapReferenceOutline = MapReferenceOutlineController(settings);
+  final cacheStart = Log.sinceStartMs;
   final cache = await cacheFuture;
+  final cacheMs = Log.sinceStartMs - cacheStart;
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final endpointHealth = EndpointHealthMonitor();
   final apiClient = ApiClient(dio, regions, endpointHealth);
@@ -237,7 +243,9 @@ Future<void> bootstrap() async {
   final mapTileCache = cache == null
       ? null
       : MapTileCache(cache.etag, usage: cache.usage);
+  final tileStart = Log.sinceStartMs;
   await mapTileCache?.install();
+  final tileMs = Log.sinceStartMs - tileStart;
   // Turn off the OS-level disk HTTP cache (iOS NSURLCache) and drop its
   // residue: every cached byte now lives in the app's own SQLite, so a second
   // disk copy is pure overhead. Fire-and-forget: it never delays launch.
@@ -275,7 +283,9 @@ Future<void> bootstrap() async {
   // the nearest-centroid fallback; the boundary polygons back exact
   // point-in-polygon GPS resolution and decode in a background isolate (see
   // `TownBoundaries.load`) so they never delay launch or the first frames.
+  final townStart = Log.sinceStartMs;
   final townDirectory = await townDirectoryFuture;
+  final townMs = Log.sinceStartMs - townStart;
   final regionStore = RegionStore(settings);
   final locationService = LocationService(
     townDirectory,
@@ -287,7 +297,9 @@ Future<void> bootstrap() async {
   // after the first frame once GPS permission is granted; a null token (not yet
   // registered) simply skips — it self-heals on the next move.
   final locationApi = LocationApi(apiClient);
+  final versionStart = Log.sinceStartMs;
   final appVersion = await appVersionFuture;
+  final versionMs = Log.sinceStartMs - versionStart;
   final reportPlatform = Platform.isIOS ? 1 : 0;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
@@ -409,7 +421,15 @@ Future<void> bootstrap() async {
 
   // Each feature turns [deps] into its providers (and registers its realtime
   // channels). Adding a feature = one line here + its `*Providers` function.
-  Log.info('bootstrap ready in ${Log.sinceStart.elapsedMilliseconds} ms');
+  // Every await that sits between launch and the first frame, so the next
+  // person to call this slow knows which one to look at. The five run
+  // concurrently, so they do not sum to the total — each is the time still
+  // left to wait when its turn came.
+  Log.info(
+    'bootstrap ready in ${Log.sinceStartMs} ms '
+    '(durable+settings ${durableMs}ms, cache ${cacheMs}ms, '
+    'tiles ${tileMs}ms, towns ${townMs}ms, version ${versionMs}ms)',
+  );
   runApp(
     DpipApp(
       deps: deps,

@@ -13,9 +13,29 @@ import 'package:talker_flutter/talker_flutter.dart';
 /// backed by Talker, which keeps a history for the in-app log screen and
 /// captures uncaught Flutter/async errors.
 abstract final class Log {
-  /// Monotonic stopwatch started when the app boots — lets any code report
-  /// "how long after launch" (e.g. bootstrap-ready and first-frame markers).
+  /// Monotonic stopwatch for "how long after launch" markers — bootstrap-ready
+  /// and first-frame among them.
+  ///
+  /// Started by [startClock], not by this initialiser, and the difference is
+  /// not academic. A `static final` in Dart initialises **lazily, on first
+  /// read**. While `..start()` here was the only thing that started it, the
+  /// first read was the bootstrap-ready log line itself — so that line reported
+  /// `0 ms` on every launch, and the first-frame marker measured from
+  /// bootstrap-ready rather than from start. Two numbers that looked like
+  /// measurements and were not.
   static final Stopwatch sinceStart = Stopwatch()..start();
+
+  /// Starts the launch clock. Must be the first statement of `bootstrap`.
+  ///
+  /// Reading [sinceStart] here is what forces its lazy initialiser to run; the
+  /// reset then pins zero to this moment rather than to whoever happened to
+  /// look first.
+  static void startClock() => sinceStart
+    ..reset()
+    ..start();
+
+  /// Milliseconds since [startClock], for a phase marker.
+  static int get sinceStartMs => sinceStart.elapsedMilliseconds;
 
   static final TalkerSettings _settings = TalkerSettings(
     useConsoleLogs: kDebugMode,
