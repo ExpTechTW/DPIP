@@ -44,9 +44,6 @@ library;
 import 'package:dpip/core/logging/log.dart';
 import 'package:sqlite_async/sqlite_async.dart';
 
-/// Schema version of the durable database.
-const int appDatabaseVersion = 1;
-
 /// The tables the cache file owns — the complete list of what [clearCache]
 /// may destroy. Anything not named here is, by construction, out of reach.
 const List<String> cacheTables = ['http_cache', 'net_bucket'];
