@@ -33,28 +33,29 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'radar'),
         deps.mapTileWarmer(),
-        // Probed 2026-08-26 with a three-location byte-variance check:
-        // real content spans z5–11. Outside both ends the server returns
-        // identical placeholder webps.
+        // The origin publishes z3–12. At three Taiwan locations and three
+        // content-rich frames, z11 overzoom versus native z12 stayed visually
+        // near-identical (median SSIM 0.963, MAE 1.42/255), so stop at z11.
         maxZoom: 11,
-        minZoom: 5,
+        minZoom: 3,
       ),
     ),
     Provider<QpesumsRepository>.value(
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'qpesums'),
         deps.mapTileWarmer(),
-        // Probed 2026-08-26: real content spans z5–9.
-        maxZoom: 9,
-        minZoom: 5,
+        // Also publishes z3–12; z11 overzoom versus z12 measured median SSIM
+        // 0.980 and MAE 0.89/255, so z12 is not worth another request level.
+        maxZoom: 11,
+        minZoom: 3,
       ),
     ),
     Provider<SatelliteRepository>.value(
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'satellite'),
         deps.mapTileWarmer(),
-        // Publishes z0–11 — the true top, so nothing to gain past it, but the
-        // cap now matches instead of overzooming z8–11 client-side.
+        // Every satellite product and colour style keeps the complete
+        // published z0–11 pyramid.
         maxZoom: 11,
       ),
     ),
@@ -72,17 +73,17 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       },
     ),
     // One repository per wind forecast model — each needs its own model path
-    // on both the frame list and every tile URL, and its own warmer. The
-    // 0.25° grids stop publishing at z7, which is where this cap sits: a
-    // 2026-08-26 probe found the wind origin serving 521s end to end, so
-    // anything past z7 remains unverifiable rather than proven available.
+    // on both the frame list and every tile URL, and its own warmer. Both
+    // model endpoints publish z0–11. At three Taiwan locations across three
+    // cycle positions, z6 overzoom versus native z11 measured SSIM >= 0.986 at
+    // p10 for both 0.25° models; z5 still changed visibly. Stop at useful z6.
     Provider<Map<WindForecastModel, WindForecastRepository>>.value(
       value: {
         for (final model in WindForecastModel.values)
           model: FrameTileRepositoryImpl(
             FrameTileApi(deps.apiClient, 'wind', model: model.key),
             deps.mapTileWarmer(),
-            maxZoom: 7,
+            maxZoom: 6,
           ),
       },
     ),
