@@ -14,6 +14,10 @@ void main() {
       ),
     ) as Map<String, dynamic>;
 
+    final base = style['sources']['exptech'] as Map<String, dynamic>;
+    expect(base['minzoom'], 0);
+    expect(base['maxzoom'], basemapSourceMaxZoom);
+
     final layers = style['layers'] as List<dynamic>;
     final ids = [for (final l in layers) (l as Map<String, dynamic>)['id']];
     expect(ids, [
@@ -57,10 +61,9 @@ void main() {
           'tiny (a whole-island view is one or two 512px tiles, vs ~49 at a '
           'zoomed-in hillshade viewport)',
     );
-    // 實測（2026-08-26，以像素變異數驗證）：真實高度資料只到 z12，
-    // z13 起是 1880B 的全平佔位磚——cap 必須停在 12，deep zoom 靠
-    // overzoom 取 z12 磚，hillshade 才不會在放大後整片消失。
-    expect(terrain['maxzoom'], 12);
+    // z11 overzoom 與原生 z12 hillshade 的中位 SSIM 0.982、海拔 RMSE
+    // 1.56m；z10 在山區已有明顯差異，因此只省掉最後一層。
+    expect(terrain['maxzoom'], terrainSourceMaxZoom);
     expect(
       terrain['bounds'],
       [110, 10, 132, 35],
