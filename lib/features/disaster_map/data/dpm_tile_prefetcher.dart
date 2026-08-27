@@ -4,6 +4,7 @@ library;
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/features/disaster_map/domain/dpm_tile_contract.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 
 /// Thin DPM wrapper over the shared warm spine ([MapTileWarmer]).
@@ -33,7 +34,7 @@ class DpmTilePrefetcher {
     north: north,
     east: east,
     zoom: zoom,
-    maxZoom: 16,
+    maxZoom: dpmSourceMaxZoom.toInt(),
     logLabel: 'dpm-$layer',
     workingSet: 'dpm-$layer',
   );
