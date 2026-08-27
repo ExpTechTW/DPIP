@@ -1023,6 +1023,7 @@
   "releaseHighlightsTabAdvanced": "Đi sâu",
   "releaseHighlightsEmpty": "Chưa có nội dung.",
   "moreVersionNotesEmpty": "Không tìm thấy nhật ký cập nhật cho bản này",
+  "reportNotFound": "Không tìm thấy báo cáo động đất này",
   "moreVersionSnapshot": "Bản thử nghiệm",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

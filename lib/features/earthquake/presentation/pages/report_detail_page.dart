@@ -9,6 +9,7 @@ import 'dart:typed_data';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -32,6 +33,7 @@ import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
@@ -71,6 +73,39 @@ class ReportDetailPage extends StatefulWidget {
 class _ReportDetailPageState extends State<ReportDetailPage> {
   final ValueNotifier<bool> _sheetExpanded = ValueNotifier(false);
 
+  /// Guards the bounce below — the error builder runs on every rebuild, and a
+  /// second `pop` would take the list away too.
+  bool _leaving = false;
+
+  /// Sends the reader back to the list when the report does not exist.
+  ///
+  /// A 404 here is a real case, not a defensive one: a notification deep-links
+  /// by id, and CWA withdraws and renumbers reports. Leaving a retry button on
+  /// screen for it is offering an action that cannot ever succeed.
+  ///
+  /// Only 404. A timeout or a 5xx keeps the retry, because those do come back.
+  void _leaveForList() {
+    if (_leaving) return;
+    _leaving = true;
+    // After the frame: this runs from inside a build, where navigating is not
+    // allowed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      final router = GoRouter.of(context);
+      // The report route is nested under the list, so `pop` lands there — the
+      // deep-linked stack has the list under it. `goNamed` covers the case
+      // where it somehow does not.
+      if (router.canPop()) {
+        router.pop();
+      } else {
+        router.goNamed(AppRoutes.earthquake);
+      }
+      messenger?.showSnackBar(SnackBar(content: Text(l10n.reportNotFound)));
+    });
+  }
+
   @override
   void dispose() {
     _sheetExpanded.dispose();
@@ -90,6 +125,20 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                 report: report,
                 sheetExpanded: _sheetExpanded,
               ),
+              error: (context, failure, retry) {
+                if (failure is NotFoundFailure) {
+                  Log.warning(
+                    'report ${widget.reportId} not found — returning to the list',
+                  );
+                  _leaveForList();
+                  return const Center(child: CircularProgressIndicator());
+                }
+                // Everything else keeps AsyncView's own retry state.
+                return ErrorView(
+                  headline: AppLocalizations.of(context).commonFetchFailed,
+                  onRetry: retry,
+                );
+              },
             ),
           ),
           Positioned(

@@ -2186,6 +2186,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreVersionNotesEmpty => 'Tidak ada changelog untuk build ini';
 
   @override
+  String get reportNotFound => 'Laporan gempa ini tidak ditemukan';
+
+  @override
   String get moreVersionSnapshot => 'Versi uji';
 
   @override

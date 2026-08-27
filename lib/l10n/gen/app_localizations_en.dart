@@ -2180,6 +2180,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreVersionNotesEmpty => 'No changelog for this build';
 
   @override
+  String get reportNotFound => 'That earthquake report is no longer available';
+
+  @override
   String get moreVersionSnapshot => 'Snapshot';
 
   @override

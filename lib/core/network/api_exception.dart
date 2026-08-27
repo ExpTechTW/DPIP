@@ -38,6 +38,9 @@ Failure mapException(Object error) {
         return const TimeoutFailure('Request timed out');
       case DioExceptionType.badResponse:
         final code = error.response?.statusCode;
+        // 404 separately: it is the one status where retrying is not a
+        // recovery, and the caller needs to know that to offer something else.
+        if (code == 404) return const NotFoundFailure('Not found');
         return NetworkFailure('Server error${code == null ? '' : ' ($code)'}');
       case DioExceptionType.cancel:
         return const NetworkFailure('Request cancelled');

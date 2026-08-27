@@ -1023,6 +1023,7 @@
   "releaseHighlightsTabAdvanced": "Mendalam",
   "releaseHighlightsEmpty": "Belum ada konten.",
   "moreVersionNotesEmpty": "Tidak ada changelog untuk build ini",
+  "reportNotFound": "Laporan gempa ini tidak ditemukan",
   "moreVersionSnapshot": "Versi uji",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

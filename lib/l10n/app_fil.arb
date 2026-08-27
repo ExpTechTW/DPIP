@@ -1023,6 +1023,7 @@
   "releaseHighlightsTabAdvanced": "Mas malalim",
   "releaseHighlightsEmpty": "Wala pang laman.",
   "moreVersionNotesEmpty": "Walang changelog para sa build na ito",
+  "reportNotFound": "Hindi mahanap ang ulat ng lindol na ito",
   "moreVersionSnapshot": "Bersyon ng pagsubok",
   "mapLayerSatelliteTransparentNoData": "Walang data (lupa) = transparent",
   "@meshtasticScanning": {

@@ -2668,6 +2668,10 @@
   "releaseHighlightsEmpty": "Nothing here yet.",
   "releaseHighlightsSeeNotes": "Full release notes",
   "moreVersionNotesEmpty": "No changelog for this build",
+  "reportNotFound": "That earthquake report is no longer available",
+  "@reportNotFound": {
+    "description": "Shown when a report opened from a notification or a deep link no longer exists (HTTP 404), just before the user is returned to the report list."
+  },
   "moreVersionSnapshot": "Snapshot",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

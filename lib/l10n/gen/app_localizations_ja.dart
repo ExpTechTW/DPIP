@@ -2143,6 +2143,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get moreVersionNotesEmpty => 'このビルドの更新履歴が見つかりません';
 
   @override
+  String get reportNotFound => 'この地震報告は見つかりませんでした';
+
+  @override
   String get moreVersionSnapshot => 'テスト版';
 
   @override

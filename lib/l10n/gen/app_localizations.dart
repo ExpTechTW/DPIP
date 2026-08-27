@@ -4151,6 +4151,12 @@ abstract class AppLocalizations {
   /// **'No changelog for this build'**
   String get moreVersionNotesEmpty;
 
+  /// Shown when a report opened from a notification or a deep link no longer exists (HTTP 404), just before the user is returned to the report list.
+  ///
+  /// In en, this message translates to:
+  /// **'That earthquake report is no longer available'**
+  String get reportNotFound;
+
   /// No description provided for @moreVersionSnapshot.
   ///
   /// In en, this message translates to:

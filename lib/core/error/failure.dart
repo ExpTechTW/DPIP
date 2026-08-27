@@ -32,6 +32,17 @@ final class NoDataFailure extends Failure {
   const NoDataFailure(super.message);
 }
 
+/// The thing asked for does not exist (404).
+///
+/// Its own type because the recovery is the opposite of every other network
+/// failure's. A 500 or a timeout is transient — the right response is a retry
+/// button. A 404 is permanent: the report was withdrawn, or the id in a
+/// notification payload never named anything. Retrying that forever is a
+/// button that cannot work, so callers send the user somewhere real instead.
+final class NotFoundFailure extends Failure {
+  const NotFoundFailure(super.message);
+}
+
 /// An unexpected, unclassified failure.
 final class UnexpectedFailure extends Failure {
   const UnexpectedFailure(super.message);
