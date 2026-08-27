@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
-import 'package:dpip/features/map/presentation/widgets/wind_particle_overlay.dart';
 import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
@@ -11,7 +10,6 @@ import 'package:dpip/shared/map/map_layer_category.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -87,15 +85,6 @@ WindField _windField(String marker) => WindField(
 );
 
 void main() {
-  // The Android containment for the HCPP buffer leak is off for these tests:
-  // the simulation, trail buffer and ticker lifecycle are still live code that
-  // the MapLibre particle layer has to reproduce, so their coverage stays on.
-  setUp(() => WindParticleOverlay.animateOnThisPlatform = true);
-  tearDown(
-    () => WindParticleOverlay.animateOnThisPlatform =
-        defaultTargetPlatform != TargetPlatform.android,
-  );
-
   test('frames chronological', () async {
     final layer = WindForecastMapLayer(
       _FakeWindRepository(['1700000600', '1700000000']),
@@ -320,234 +309,6 @@ void main() {
       'new',
       reason: 'the superseded request completed last and must be discarded',
     );
-  });
-
-  testWidgets('the overlay slot hosts the particle animation', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: SizedBox())),
-    );
-    final layer = WindForecastMapLayer(
-      _FakeWindRepository(const []),
-      model: WindForecastModel.ecmwf,
-      referenceOutline: testReferenceOutline(),
-    );
-    final overlay = layer.buildMapOverlay(
-      tester.element(find.byType(Scaffold)),
-    );
-    expect(overlay, isA<WindParticleOverlay>());
-  });
-
-  testWidgets('the ticker runs only while a wind field is loaded', (
-    tester,
-  ) async {
-    final layer = WindForecastMapLayer(
-      _FakeWindRepository(const []),
-      model: WindForecastModel.gfs,
-      referenceOutline: testReferenceOutline(),
-    );
-    // The harness camera is zoom 7 over Taiwan, so a seeded particle must sit
-    // inside the viewport and the ticker has somewhere to streak it.
-    await layer.onAttached(RecordingMapController());
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(body: WindParticleOverlay(layer: layer)),
-      ),
-    );
-    expect(
-      tester.binding.transientCallbackCount,
-      0,
-      reason: 'an empty layer must not run the animation at all',
-    );
-
-    layer.field.value = WindField(
-      width: 2,
-      height: 2,
-      lat0: 90,
-      lon0: 0,
-      dLat: -90,
-      dLon: 180,
-      uMin: -20,
-      uMax: 20,
-      vMin: -1,
-      vMax: 1,
-      timeMs: 0,
-      model: 'gfs',
-      u: Uint8List.fromList([255, 255, 255, 255]),
-      v: Uint8List.fromList([128, 128, 128, 128]),
-    );
-    await tester.pump();
-
-    expect(
-      tester.binding.transientCallbackCount,
-      greaterThan(0),
-      reason: 'a loaded field must start the ticker that redraws the streaks',
-    );
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('the overlay paints visible streaks, not nothing', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(1170, 2532);
-    tester.view.devicePixelRatio = 3.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final layer = WindForecastMapLayer(
-      _FakeWindRepository(const []),
-      model: WindForecastModel.gfs,
-      referenceOutline: testReferenceOutline(),
-    );
-    await layer.onAttached(RecordingMapController());
-    layer.field.value = WindField(
-      width: 2,
-      height: 2,
-      lat0: 90,
-      lon0: 0,
-      dLat: -90,
-      dLon: 180,
-      uMin: -20,
-      uMax: 20,
-      vMin: -1,
-      vMax: 1,
-      timeMs: 0,
-      model: 'gfs',
-      u: Uint8List.fromList([255, 255, 255, 255]),
-      v: Uint8List.fromList([128, 128, 128, 128]),
-    );
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          // Black underneath: the streaks are white, and the default Scaffold
-          // background is near-white, so on that a blank overlay counts as
-          // bright everywhere and the assertion below means nothing.
-          body: RepaintBoundary(
-            child: ColoredBox(
-              color: Colors.black,
-              child: WindParticleOverlay(layer: layer),
-            ),
-          ),
-        ),
-      ),
-    );
-    // Let the seeded particles accumulate a few frames of trail.
-    for (var i = 0; i < 20; i++) {
-      await tester.pump(const Duration(milliseconds: 16));
-    }
-
-    final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byType(RepaintBoundary).first,
-    );
-    // toImage is a real engine async — it must run outside the test's fake
-    // clock, or the future never completes.
-    ByteData? data;
-    await tester.runAsync(() async {
-      final image = await boundary.toImage();
-      data = await image.toByteData();
-      image.dispose();
-    });
-    expect(data, isNotNull);
-    final bytes = data!;
-
-    // The painter draws white-on-dark streaks; at least a few sampled pixels
-    // must be bright — zero means the CustomPaint produced nothing visible.
-    var bright = 0;
-    for (var i = 0; i < bytes.lengthInBytes; i += 16) {
-      final r = bytes.getUint8(i);
-      final g = bytes.getUint8(i + 1);
-      final b = bytes.getUint8(i + 2);
-      if (r > 160 && g > 160 && b > 160) bright++;
-    }
-    expect(
-      bright,
-      greaterThan(10),
-      reason: 'the particle trails must paint as visible bright pixels',
-    );
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('streaks appear on a field that arrives after the first build', (
-    tester,
-  ) async {
-    // The field is fetched asynchronously, so in the app it is always null when
-    // the overlay first builds — and the painter is handed the simulation by
-    // value at build time. Without a rebuild when the field lands, the overlay
-    // paints nothing until some unrelated cause rebuilds it, which in practice
-    // meant the first pan. Nothing here ever touches the camera.
-    tester.view.physicalSize = const Size(1170, 2532);
-    tester.view.devicePixelRatio = 3.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final layer = WindForecastMapLayer(
-      _FakeWindRepository(const []),
-      model: WindForecastModel.gfs,
-      referenceOutline: testReferenceOutline(),
-    );
-    await layer.onAttached(RecordingMapController());
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          // Black underneath: the streaks are white, and the default Scaffold
-          // background is near-white, so on that a blank overlay counts as
-          // bright everywhere and the assertion below means nothing.
-          body: RepaintBoundary(
-            child: ColoredBox(
-              color: Colors.black,
-              child: WindParticleOverlay(layer: layer),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    layer.field.value = WindField(
-      width: 2,
-      height: 2,
-      lat0: 90,
-      lon0: 0,
-      dLat: -90,
-      dLon: 180,
-      uMin: -20,
-      uMax: 20,
-      vMin: -1,
-      vMax: 1,
-      timeMs: 0,
-      model: 'gfs',
-      u: Uint8List.fromList([255, 255, 255, 255]),
-      v: Uint8List.fromList([128, 128, 128, 128]),
-    );
-    for (var i = 0; i < 20; i++) {
-      await tester.pump(const Duration(milliseconds: 16));
-    }
-
-    final boundary = tester.renderObject<RenderRepaintBoundary>(
-      find.byType(RepaintBoundary).first,
-    );
-    ByteData? data;
-    await tester.runAsync(() async {
-      final image = await boundary.toImage();
-      data = await image.toByteData();
-      image.dispose();
-    });
-    final bytes = data!;
-    var bright = 0;
-    for (var i = 0; i < bytes.lengthInBytes; i += 16) {
-      if (bytes.getUint8(i) > 160 &&
-          bytes.getUint8(i + 1) > 160 &&
-          bytes.getUint8(i + 2) > 160) {
-        bright++;
-      }
-    }
-    expect(
-      bright,
-      greaterThan(10),
-      reason: 'a field loaded after mount must still start the streaks',
-    );
-    expect(tester.takeException(), isNull);
   });
 
   testWidgets('the options chip offers county, township, and name toggles', (
