@@ -31,11 +31,8 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/astro/moon_orientation.dart';
 import 'package:dpip/core/astro/moon_phase.dart';
 import 'package:dpip/core/astro/moon_rise_set.dart';
-import 'package:dpip/core/geo/town.dart';
-import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/app_time.dart';
-import 'package:dpip/core/settings/home_area.dart';
-import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/data/presentation/observer_place.dart';
 import 'package:dpip/features/data/presentation/widgets/moon_calendar.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -44,7 +41,6 @@ import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 /// Taiwan's fixed offset — the wall clock every date on this page is read in.
 const Duration _taiwanOffset = Duration(hours: 8);
@@ -57,10 +53,6 @@ const int _daysEitherSide = 31;
 /// hour, so two hours is roughly one degree — the coarsest step at which
 /// consecutive frames still look different.
 const int _stepHours = 2;
-
-/// Used only when no township is known. Taipei City Hall; resolved through the
-/// directory so the page names a real township rather than a coordinate.
-const ({double lat, double lng}) _fallbackPlace = (lat: 25.0330, lng: 121.5654);
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -203,27 +195,12 @@ class _MoonPageState extends State<MoonPage> {
     _select(_indexAt(target));
   }
 
-  /// The township rise and set are computed for: the current GPS township, or
-  /// the selected saved one, or the nearest to [_fallbackPlace].
-  Town? _observer(BuildContext context) {
-    final directory = context.read<TownDirectory>();
-    final regions = context.watch<RegionStore>();
-    final selected = regions.selected;
-    final code = switch (selected) {
-      SavedArea(:final code) => code,
-      CurrentArea(:final code) => code,
-      NationwideArea() => null,
-    };
-    return directory.byCode(code ?? regions.currentCode) ??
-        directory.nearest(_fallbackPlace.lat, _fallbackPlace.lng);
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final phase = MoonPhase.at(_selected);
     final libration = MoonPhase.librationAt(_selected);
-    final town = _observer(context);
+    final town = observerTown(context);
     final local = _selectedLocal;
     final riseSet = town == null
         ? null
