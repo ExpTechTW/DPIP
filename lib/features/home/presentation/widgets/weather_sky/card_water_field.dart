@@ -303,7 +303,8 @@ class CardWaterField {
         weight[i] += bodyW[i];
       }
     }
-    final pairs = _buildPairs(diameter, weight);
+    _buildPairs(diameter, weight);
+    final pairCount = _pairCount;
 
     // SolvePressure.
     final criticalVelocity = diameter * invDt;
@@ -324,12 +325,14 @@ class CardWaterField {
       if (bodyW[i] == 0) continue;
       _p.vy[i] -= vpp * bodyW[i] * (accum[i] + ppw * bodyW[i]);
     }
-    for (final c in pairs) {
-      final f = vpp * c.w * (accum[c.a] + accum[c.b]);
-      _p.vx[c.a] -= f * c.nx;
-      _p.vy[c.a] -= f * c.ny;
-      _p.vx[c.b] += f * c.nx;
-      _p.vy[c.b] += f * c.ny;
+    for (var k = 0; k < pairCount; k++) {
+      final a = _pairA[k], b = _pairB[k];
+      final nx = _pairNx[k], ny = _pairNy[k];
+      final f = vpp * _pairW[k] * (accum[a] + accum[b]);
+      _p.vx[a] -= f * nx;
+      _p.vy[a] -= f * ny;
+      _p.vx[b] += f * nx;
+      _p.vy[b] += f * ny;
     }
 
     // SolveDamping.
@@ -356,16 +359,20 @@ class CardWaterField {
       );
       _p.vy[i] += damp * vn;
     }
-    for (final c in pairs) {
-      final vn =
-          (_p.vx[c.b] - _p.vx[c.a]) * c.nx + (_p.vy[c.b] - _p.vy[c.a]) * c.ny;
+    for (var k = 0; k < pairCount; k++) {
+      final a = _pairA[k], b = _pairB[k];
+      final nx = _pairNx[k], ny = _pairNy[k];
+      final vn = (_p.vx[b] - _p.vx[a]) * nx + (_p.vy[b] - _p.vy[a]) * ny;
       if (vn >= 0) continue;
-      final damp = math.max(_dampingStrength * c.w, math.min(-quad * vn, 0.5));
+      final damp = math.max(
+        _dampingStrength * _pairW[k],
+        math.min(-quad * vn, 0.5),
+      );
       final f = damp * vn;
-      _p.vx[c.a] += f * c.nx;
-      _p.vy[c.a] += f * c.ny;
-      _p.vx[c.b] -= f * c.nx;
-      _p.vy[c.b] -= f * c.ny;
+      _p.vx[a] += f * nx;
+      _p.vy[a] += f * ny;
+      _p.vx[b] -= f * nx;
+      _p.vy[b] -= f * ny;
     }
 
     // LimitVelocity — one diameter of travel per sub-step.
@@ -441,23 +448,50 @@ class CardWaterField {
   static const double _particleMass = 1.0 / _particleInvMass;
   static const double _b2ParticleStride = 0.75;
 
-  /// Contact pairs within one diameter, with their weights and normals.
-  List<_Contact> _buildPairs(double diameter, Float32List weight) {
-    final out = _pairsScratch..clear();
-    if (_live < 2) return out;
+  /// Contact pairs within one diameter, with their weights and normals, into
+  /// [_pairA]…[_pairNy] and [_pairCount].
+  ///
+  /// Runs five times per 20 ms tick — 250 times a second while it rains — so
+  /// nothing here may allocate. The previous version built a
+  /// `Map<int, List<int>>` bucket index and one `_Contact` object per pair on
+  /// every call; at the 200-drop cap that is on the order of a hundred
+  /// thousand short-lived objects a second, which is young-generation
+  /// collections landing inside frames rather than between them.
+  ///
+  /// The grid is the same uniform hash, expressed as an open-addressed slot
+  /// table plus a per-cell singly linked list over the particle indices. Cells
+  /// are filled by walking **i downwards** and pushing to the front, so each
+  /// chain comes out in ascending i — the exact order `List.add` produced. The
+  /// solver accumulates into velocities pair by pair and floating-point
+  /// addition does not commute, so that ordering is part of the result, not an
+  /// implementation detail.
+  void _buildPairs(double diameter, Float32List weight) {
+    _pairCount = 0;
+    if (_live < 2) return;
     final d2Max = diameter * diameter;
-    final buckets = <int, List<int>>{};
+
+    _ensureGrid();
+    final cellX = _cellXScratch;
+    final cellY = _cellYScratch;
     for (var i = 0; i < _live; i++) {
-      (buckets[_cellKey(_p.x[i], _p.y[i], diameter)] ??= <int>[]).add(i);
+      cellX[i] = (_p.x[i] / diameter).floor();
+      cellY[i] = (_p.y[i] / diameter).floor();
     }
+    _clearGrid();
+    for (var i = _live - 1; i >= 0; i--) {
+      final slot = _slotFor(_key(cellX[i], cellY[i]));
+      _nextInCell[i] = _cellHead[slot];
+      _cellHead[slot] = i;
+    }
+
     for (var i = 0; i < _live; i++) {
-      final cx = (_p.x[i] / diameter).floor();
-      final cy = (_p.y[i] / diameter).floor();
+      final cx = cellX[i];
+      final cy = cellY[i];
       for (var ox = -1; ox <= 1; ox++) {
         for (var oy = -1; oy <= 1; oy++) {
-          final cell = buckets[_key(cx + ox, cy + oy)];
-          if (cell == null) continue;
-          for (final j in cell) {
+          final slot = _findSlot(_key(cx + ox, cy + oy));
+          if (slot < 0) continue;
+          for (var j = _cellHead[slot]; j >= 0; j = _nextInCell[j]) {
             if (j <= i) continue;
             final dx = _p.x[j] - _p.x[i];
             final dy = _p.y[j] - _p.y[i];
@@ -467,16 +501,108 @@ class CardWaterField {
             final w = 1.0 - d / diameter;
             weight[i] += w;
             weight[j] += w;
-            out.add(_Contact(i, j, w, dx / d, dy / d));
+            final k = _pairCount;
+            if (k == _pairA.length) _growPairs();
+            _pairA[k] = i;
+            _pairB[k] = j;
+            _pairW[k] = w;
+            _pairNx[k] = dx / d;
+            _pairNy[k] = dy / d;
+            _pairCount = k + 1;
           }
         }
       }
     }
-    return out;
   }
 
-  /// Contact list reused across iterations — cleared, never reallocated.
-  final List<_Contact> _pairsScratch = <_Contact>[];
+  // --- contact scratch (structure of arrays, grown, never per-call) --------
+  Int32List _pairA = Int32List(0);
+  Int32List _pairB = Int32List(0);
+  // The solver reads these at full precision; Float32 would round the normals
+  // and change the trajectory.
+  Float64List _pairW = Float64List(0);
+  Float64List _pairNx = Float64List(0);
+  Float64List _pairNy = Float64List(0);
+  int _pairCount = 0;
+
+  void _growPairs() {
+    final next = _pairA.isEmpty ? 256 : _pairA.length * 2;
+    _pairA = Int32List(next)..setRange(0, _pairA.length, _pairA);
+    _pairB = Int32List(next)..setRange(0, _pairB.length, _pairB);
+    _pairW = Float64List(next)..setRange(0, _pairW.length, _pairW);
+    _pairNx = Float64List(next)..setRange(0, _pairNx.length, _pairNx);
+    _pairNy = Float64List(next)..setRange(0, _pairNy.length, _pairNy);
+  }
+
+  // --- neighbour grid -----------------------------------------------------
+  Int32List _cellXScratch = Int32List(0);
+  Int32List _cellYScratch = Int32List(0);
+  Int32List _nextInCell = Int32List(0);
+
+  /// Slot table: `_slotKey[s] + 1` (0 marks an empty slot) and the head of
+  /// that cell's chain. Sized to the drop cap, so it is allocated once.
+  Int32List _slotKey = Int32List(0);
+  Int32List _cellHead = Int32List(0);
+
+  /// The slots touched this call, so clearing costs O(live), not O(table).
+  Int32List _usedSlots = Int32List(0);
+  int _usedSlotCount = 0;
+  int _slotMask = 0;
+
+  void _ensureGrid() {
+    if (_cellXScratch.length >= capacity && _slotMask != 0) return;
+    _cellXScratch = Int32List(capacity);
+    _cellYScratch = Int32List(capacity);
+    _nextInCell = Int32List(capacity);
+    _usedSlots = Int32List(capacity);
+    // Power-of-two table at =< 50 % load, so the linear probe stays short.
+    var size = 16;
+    while (size < capacity * 2) {
+      size <<= 1;
+    }
+    _slotKey = Int32List(size);
+    _cellHead = Int32List(size);
+    _slotMask = size - 1;
+  }
+
+  void _clearGrid() {
+    for (var n = 0; n < _usedSlotCount; n++) {
+      _slotKey[_usedSlots[n]] = 0;
+    }
+    _usedSlotCount = 0;
+  }
+
+  /// Fibonacci hash of a packed cell key, masked to the table.
+  static int _hash(int key) => (key * 0x9E3779B1) & 0x3FFFFFFF;
+
+  /// The slot holding [key], claiming a free one if it is not present yet.
+  int _slotFor(int key) {
+    final stored = key + 1;
+    var s = _hash(key) & _slotMask;
+    while (true) {
+      final k = _slotKey[s];
+      if (k == stored) return s;
+      if (k == 0) {
+        _slotKey[s] = stored;
+        _cellHead[s] = -1;
+        _usedSlots[_usedSlotCount++] = s;
+        return s;
+      }
+      s = (s + 1) & _slotMask;
+    }
+  }
+
+  /// The slot holding [key], or -1 when the cell is empty.
+  int _findSlot(int key) {
+    final stored = key + 1;
+    var s = _hash(key) & _slotMask;
+    while (true) {
+      final k = _slotKey[s];
+      if (k == stored) return s;
+      if (k == 0) return -1;
+      s = (s + 1) & _slotMask;
+    }
+  }
 
   /// the emitter's `particleSystem.setRadius(0.01)`, in world units.
   static const double _particleRadius = 0.01;
@@ -486,9 +612,6 @@ class CardWaterField {
   /// be scaled by the same factor; the decoded normal is a ratio and is not
   /// affected.
   static const double accumulationScale = 0x40 / 0xFF;
-
-  static int _cellKey(double x, double y, double cell) =>
-      _key((x / cell).floor(), (y / cell).floor());
 
   /// Packs a cell coordinate into one int. The offset keeps negatives (drops
   /// above the edge) on distinct keys.
@@ -988,12 +1111,3 @@ Future<ui.Image> _imageFromRgba(Uint8List rgba, int size) {
 }
 
 /// One particle-particle contact: indices, weight and the A→B unit normal.
-class _Contact {
-  const _Contact(this.a, this.b, this.w, this.nx, this.ny);
-
-  final int a;
-  final int b;
-  final double w;
-  final double nx;
-  final double ny;
-}
