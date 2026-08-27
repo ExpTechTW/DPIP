@@ -2132,6 +2132,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
 
   @override
+  String get reportNotFound => '找不到這份地震報告';
+
+  @override
   String get moreVersionSnapshot => '測試版';
 
   @override
@@ -5346,6 +5349,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moreVersionNotesEmpty => '找不到当前版本的更新日志';
+
+  @override
+  String get reportNotFound => '找不到这份地震报告';
 
   @override
   String get moreVersionSnapshot => '測試版';
@@ -8564,6 +8570,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
 
   @override
+  String get reportNotFound => '搵唔到呢份地震報告';
+
+  @override
   String get moreVersionSnapshot => '測試版';
 
   @override
@@ -11778,6 +11787,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moreVersionNotesEmpty => '找不到目前版本的更新日誌';
+
+  @override
+  String get reportNotFound => '找不到這份地震報告';
 
   @override
   String get moreVersionSnapshot => '測試版';

@@ -1023,6 +1023,7 @@
   "releaseHighlightsTabAdvanced": "技術詳細",
   "releaseHighlightsEmpty": "まだコンテンツがありません。",
   "moreVersionNotesEmpty": "このビルドの更新履歴が見つかりません",
+  "reportNotFound": "この地震報告は見つかりませんでした",
   "moreVersionSnapshot": "テスト版",
   "mapLayerSatelliteTransparentNoData": "データなし(陸上) = 透明",
   "@meshtasticScanning": {

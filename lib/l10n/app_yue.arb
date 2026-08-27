@@ -1023,6 +1023,7 @@
   "releaseHighlightsTabAdvanced": "深入技術",
   "releaseHighlightsEmpty": "而家冇內容。",
   "moreVersionNotesEmpty": "找唔到而家版本嘅更新日誌",
+  "reportNotFound": "搵唔到呢份地震報告",
   "moreVersionSnapshot": "測試版",
   "mapLayerSatelliteTransparentNoData": "無資料(陸地) = 透明",
   "@meshtasticScanning": {

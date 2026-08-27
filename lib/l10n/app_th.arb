@@ -1023,6 +1023,7 @@
   "releaseHighlightsTabAdvanced": "เจาะลึก",
   "releaseHighlightsEmpty": "ยังไม่มีเนื้อหา",
   "moreVersionNotesEmpty": "ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้",
+  "reportNotFound": "ไม่พบรายงานแผ่นดินไหวนี้",
   "moreVersionSnapshot": "เวอร์ชันทดสอบ",
   "mapLayerSatelliteTransparentNoData": "No data (land) = transparent",
   "@meshtasticScanning": {

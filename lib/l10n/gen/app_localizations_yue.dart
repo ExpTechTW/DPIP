@@ -2132,6 +2132,9 @@ class AppLocalizationsYue extends AppLocalizations {
   String get moreVersionNotesEmpty => '找唔到而家版本嘅更新日誌';
 
   @override
+  String get reportNotFound => '搵唔到呢份地震報告';
+
+  @override
   String get moreVersionSnapshot => '測試版';
 
   @override

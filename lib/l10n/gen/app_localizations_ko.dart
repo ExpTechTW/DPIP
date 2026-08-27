@@ -2143,6 +2143,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreVersionNotesEmpty => '이 빌드의 업데이트 내역을 찾을 수 없습니다';
 
   @override
+  String get reportNotFound => '해당 지진 보고서를 찾을 수 없습니다';
+
+  @override
   String get moreVersionSnapshot => '테스트 버전';
 
   @override

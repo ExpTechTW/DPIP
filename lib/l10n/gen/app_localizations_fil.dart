@@ -2194,6 +2194,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreVersionNotesEmpty => 'Walang changelog para sa build na ito';
 
   @override
+  String get reportNotFound => 'Hindi mahanap ang ulat ng lindol na ito';
+
+  @override
   String get moreVersionSnapshot => 'Bersyon ng pagsubok';
 
   @override

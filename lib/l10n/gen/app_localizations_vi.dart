@@ -2181,6 +2181,9 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không tìm thấy nhật ký cập nhật cho bản này';
 
   @override
+  String get reportNotFound => 'Không tìm thấy báo cáo động đất này';
+
+  @override
   String get moreVersionSnapshot => 'Bản thử nghiệm';
 
   @override

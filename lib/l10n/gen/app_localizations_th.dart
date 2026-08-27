@@ -2175,6 +2175,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreVersionNotesEmpty => 'ไม่พบประวัติการอัปเดตสำหรับบิลด์นี้';
 
   @override
+  String get reportNotFound => 'ไม่พบรายงานแผ่นดินไหวนี้';
+
+  @override
   String get moreVersionSnapshot => 'เวอร์ชันทดสอบ';
 
   @override
