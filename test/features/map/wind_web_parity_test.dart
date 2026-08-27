@@ -1,4 +1,7 @@
 import 'package:dpip/features/map/presentation/layers/wind_particle_sim.dart';
+
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
 
 /// Every number here was computed by running `effective()` from
@@ -32,12 +35,19 @@ void main() {
     });
   });
 
-  test('point size matches the web (TUNE: zoom lin)', () {
-    expect(pointSizeFor(3), closeTo(1.5, 1e-9));
-    expect(pointSizeFor(4), closeTo(1.575, 1e-9));
-    expect(pointSizeFor(5), closeTo(1.65, 1e-9));
-    expect(pointSizeFor(6), closeTo(1.725, 1e-9));
-    expect(pointSizeFor(7), closeTo(1.8, 1e-9));
+  test('line width matches the reference integer-zoom table', () {
+    expect(lineWidthFor(3), closeTo(1, 1e-9));
+    expect(lineWidthFor(4), closeTo(1.2, 1e-9));
+    expect(lineWidthFor(5), closeTo(1.6, 1e-9));
+    expect(lineWidthFor(6), closeTo(1.8, 1e-9));
+    expect(lineWidthFor(7), closeTo(2, 1e-9));
+    expect(lineWidthFor(4.5), closeTo(1.4, 1e-9));
+  });
+
+  test('rendered stroke includes the reference physical-pixel fringe', () {
+    // z6: max(1, 1.8 × 1.3 × 2.625) + one physical AA pixel.
+    expect(pointSizeFor(6, pixelRatio: 2.625), closeTo(7.1425 / 2.625, 1e-9));
+    expect(pointSizeFor(3), closeTo(2.3, 1e-9));
   });
 
   test('field step matches the web (TUNE: zoom log)', () {
@@ -54,11 +64,26 @@ void main() {
     expectStep(7, 0.0151);
   });
 
-  group('fade opacity (TUNE: zoom lin)', () {
-    test('matches the web at every stop', () {
-      expect(fadeOpacityFor(3), closeTo(0.95, 1e-9));
-      expect(fadeOpacityFor(5), closeTo(0.9475, 1e-9));
-      expect(fadeOpacityFor(7), closeTo(0.945, 1e-9));
+  group('fade opacity', () {
+    // Deliberately NOT the reference's 0.97. DPIP renders the short dash the
+    // old Flutter overlay drew — 14 frames of history — rather than Windy's
+    // second-long streak, and 0.85 is where the exponential lands the same
+    // window (`0.85^14 = 0.10`). See kWindFadeOpacity for the reasoning.
+    test('is constant across the zoom range', () {
+      expect(fadeOpacityFor(3), closeTo(0.85, 1e-9));
+      expect(fadeOpacityFor(5), closeTo(0.85, 1e-9));
+      expect(fadeOpacityFor(7), closeTo(0.85, 1e-9));
+    });
+
+    test('keeps a stroke visible for roughly the intended window', () {
+      // The look this replaced showed 14 frames of history and nothing older.
+      final f = fadeOpacityFor(5);
+      expect(
+        math.pow(f, 14),
+        lessThan(0.15),
+        reason: 'the tail should be gone',
+      );
+      expect(math.pow(f, 5), greaterThan(0.3), reason: 'but not immediately');
     });
 
     test('never reaches 1, at any zoom', () {

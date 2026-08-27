@@ -145,12 +145,16 @@ class WindParticleNative {
     await controller.setWindParticleField(payload);
   }
 
-  /// The animation runs only when there is something to animate and someone to
-  /// see it. A gesture no longer stops it: the particle count is fixed on the
-  /// GPU, so a pinch changes how many are drawn rather than reseeding the
-  /// population, and there is nothing left for hiding them to protect.
+  /// The animation runs only when there is something to animate, someone to
+  /// see it, and the camera is stable. Pausing during a gesture prevents a
+  /// state pair sampled under different projections from becoming a streak;
+  /// native clears its trail buffers before resuming.
   Future<void> _pushPlaying(MapLibreMapController controller) async {
-    final want = _visible && _uploaded?.source != null;
+    final want = windParticleShouldPlay(
+      visible: _visible,
+      interacting: interacting.value,
+      field: _uploaded,
+    );
     if (want == _playing) return;
     _playing = want;
     await controller.setWindParticlePlaying(want);
@@ -179,6 +183,14 @@ class WindParticleNative {
   }
 }
 
+/// Whether the native render loop should currently advance its GPU state.
+@visibleForTesting
+bool windParticleShouldPlay({
+  required bool visible,
+  required bool interacting,
+  required WindField? field,
+}) => visible && !interacting && field?.source != null;
+
 /// The display scale the point size is expressed in.
 ///
 /// `pointSize` is tuned in logical pixels, but `gl_PointSize` is in physical
@@ -203,8 +215,12 @@ Map<String, double> windParticleTuning({double pixelRatio = 1}) => {
   'zoomHi': kWindZoomHi,
   'particlesLo': kWindParticles.$1,
   'particlesHi': kWindParticles.$2,
-  'pointSizeLo': kWindPointSize.$1,
-  'pointSizeHi': kWindPointSize.$2,
+  'lineWidthZ3': kWindLineWidths[0],
+  'lineWidthZ4': kWindLineWidths[1],
+  'lineWidthZ5': kWindLineWidths[2],
+  'lineWidthZ6': kWindLineWidths[3],
+  'lineWidthZ7': kWindLineWidths[4],
+  'particleWidth': kWindParticleWidth,
   'speedFactorLo': kWindSpeedFactor.$1,
   'speedFactorHi': kWindSpeedFactor.$2,
   'fadeOpacityLo': kWindFadeOpacity.$1,
