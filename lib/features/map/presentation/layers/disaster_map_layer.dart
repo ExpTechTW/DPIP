@@ -11,6 +11,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
+import 'package:dpip/features/disaster_map/domain/dpm_tile_contract.dart';
 import 'package:dpip/features/disaster_map/domain/restroom_detail.dart';
 import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 import 'package:dpip/features/map/presentation/widgets/disaster_map_overlay_menu.dart';
@@ -324,7 +325,11 @@ class DisasterMapLayer with MapLayerDefaults implements MapLayer {
 
       await controller.addSource(
         sub.sourceId,
-        VectorSourceProperties(tiles: [tileUrl], minzoom: 0, maxzoom: 16),
+        VectorSourceProperties(
+          tiles: [tileUrl],
+          minzoom: 0,
+          maxzoom: dpmSourceMaxZoom,
+        ),
       );
 
       final markerId = _markerImageId(sub.id);
