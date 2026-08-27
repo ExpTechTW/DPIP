@@ -124,6 +124,10 @@ class _BugListPageState extends State<BugListPage> {
               future: repo.threads,
               refreshSignal: _refresh,
               isEmpty: (threads) => threads.isEmpty,
+              empty: (context) => EmptyView(
+                icon: Icons.bug_report_outlined,
+                message: l10n.bugTrackerEmpty,
+              ),
               builder: (context, threads) {
                 final theme = Theme.of(context);
                 final visible = _visibleThreads(threads);
