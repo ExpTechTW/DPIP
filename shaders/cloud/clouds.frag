@@ -234,12 +234,16 @@ void main() {
   vec3 normal = normalize(mapN);
 
   // The fourth light is light 0 with z mirrored — the reference's back light.
-  vec3 lightDir3 = vec3(iLightDir0.xy, -iLightDir0.z);
+  // Mirroring z only flips the sign of that one term, so the two dot products
+  // are the same plane term plus and minus the same depth term: compute each
+  // once and the back light costs an add rather than a second dot.
+  float plane0 = dot(iLightDir0.xy, normal.xy);
+  float depth0 = iLightDir0.z * normal.z;
 
-  float l0 = max(dot(iLightDir0, normal), 0.0) * ONE_OVER_PI;
+  float l0 = max(plane0 + depth0, 0.0) * ONE_OVER_PI;
   float l1 = max(dot(iLightDir1, normal), 0.0) * ONE_OVER_PI;
   float l2 = max(dot(iLightDir2, normal), 0.0) * ONE_OVER_PI;
-  float l3 = max(dot(lightDir3, normal), 0.0) * ONE_OVER_PI;
+  float l3 = max(plane0 - depth0, 0.0) * ONE_OVER_PI;
 
   // How thin the cloud is here. Thin cloud transmits, so it is brighter and
   // takes the silver-lining rim.
