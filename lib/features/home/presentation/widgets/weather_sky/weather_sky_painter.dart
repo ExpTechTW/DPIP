@@ -300,7 +300,9 @@ class WeatherSkyPainter extends CustomPainter {
     // The sun's direction swings across the sky with its height, so lit faces
     // move around the cloud through the day.
     final day = frame.dayAmount;
-    final sunDir = [-0.55 + 1.1 * day, 0.25 + 0.70 * day, 0.45];
+    final sunDirX = -0.55 + 1.1 * day;
+    final sunDirY = 0.25 + 0.70 * day;
+    const sunDirZ = 0.45;
 
     // The base and haze sky probes are pixel-independent, so their colours are
     // read once per frame from the CPU LUT readback rather than fetched on
@@ -317,64 +319,74 @@ class WeatherSkyPainter extends CustomPainter {
         fallback;
     final hazeSky = lutCache.skyAt(lutU, _skyAtV(0.95)) ?? fallback;
 
+    // Only five of the forty-three uniform slots differ between instances —
+    // the sprite's size, its opacity, and the texture's own size. The rest
+    // describe the frame, so they are written once here instead of forty
+    // times a frame through a closure allocated per sprite. A draw call
+    // snapshots the shader's uniforms, so a slot left from the previous
+    // instance is the value that instance drew with.
+    shader
+      ..setFloat(2, sunDirX)
+      ..setFloat(3, sunDirY)
+      ..setFloat(4, sunDirZ)
+      // Ground bounce, from below.
+      ..setFloat(5, 0.0)
+      ..setFloat(6, -1.0)
+      ..setFloat(7, 0.2)
+      // Ambient, from above.
+      ..setFloat(8, 0.0)
+      ..setFloat(9, 1.0)
+      ..setFloat(10, 0.1)
+      ..setFloat(11, lighting.base.$1)
+      ..setFloat(12, lighting.base.$2)
+      ..setFloat(13, lighting.base.$3)
+      ..setFloat(14, lighting.sun.$1)
+      ..setFloat(15, lighting.sun.$2)
+      ..setFloat(16, lighting.sun.$3)
+      ..setFloat(17, lighting.ground.$1)
+      ..setFloat(18, lighting.ground.$2)
+      ..setFloat(19, lighting.ground.$3)
+      ..setFloat(20, lighting.ambient.$1)
+      ..setFloat(21, lighting.ambient.$2)
+      ..setFloat(22, lighting.ambient.$3)
+      ..setFloat(24, 0.05) // start edge
+      ..setFloat(25, 0.23) // end edge
+      ..setFloat(26, 1.0) // progress — deck fully revealed
+      ..setFloat(27, 0.35) // smooth
+      ..setFloat(28, 0.85) // cloud depth
+      ..setFloat(29, day)
+      ..setFloat(30, frame.fog * 0.5)
+      ..setFloat(31, frame.lightning.flash * 0.8)
+      ..setFloat(32, lighting.whitePer)
+      // iLutSize. NOTE: `clouds.frag` reads `iLutSize.y`, and slot 34 is that
+      // `.y` — so the shader's manual bilinear divides by 1.0, not by the
+      // column's 141 rows. Carried over verbatim from the per-sprite version
+      // rather than corrected here: swapping these two changes what the cloud
+      // deck looks like, which is a rendering decision, not a refactor.
+      ..setFloat(33, SkyLutCache.skyViewSize.height)
+      ..setFloat(34, 1.0)
+      ..setFloat(37, baseSky.r)
+      ..setFloat(38, baseSky.g)
+      ..setFloat(39, baseSky.b)
+      ..setFloat(40, hazeSky.r)
+      ..setFloat(41, hazeSky.g)
+      ..setFloat(42, hazeSky.b)
+      ..setImageSampler(1, skyColumn);
+
+    final paint = Paint()..shader = shader;
     for (final p in placed) {
       final sprite = cloudSprites[p.sprite % cloudSprites.length];
-      var i = 0;
-      void set(double v) => shader.setFloat(i++, v);
-      set(p.width);
-      set(p.height);
-      set(sunDir[0]);
-      set(sunDir[1]);
-      set(sunDir[2]);
-      set(0.0);
-      set(-1.0);
-      set(0.2); // ground bounce, from below
-      set(0.0);
-      set(1.0);
-      set(0.1); // ambient, from above
-      set(lighting.base.$1);
-      set(lighting.base.$2);
-      set(lighting.base.$3);
-      set(lighting.sun.$1);
-      set(lighting.sun.$2);
-      set(lighting.sun.$3);
-      set(lighting.ground.$1);
-      set(lighting.ground.$2);
-      set(lighting.ground.$3);
-      set(lighting.ambient.$1);
-      set(lighting.ambient.$2);
-      set(lighting.ambient.$3);
-      set(p.opacity);
-      set(0.05); // start edge
-      set(0.23); // end edge
-      set(1.0); // progress — deck fully revealed
-      set(0.35); // smooth
-      set(0.85); // cloud depth
-      set(day);
-      set(frame.fog * 0.5);
-      set(frame.lightning.flash * 0.8);
-      set(lighting.whitePer);
-      // The LUT sampler is the CPU-extracted column: `.y` is its height (141)
-      // and `.x` is unused by the shader.
-      set(SkyLutCache.skyViewSize.height);
-      set(1.0);
-      set(sprite.width.toDouble());
-      set(sprite.height.toDouble());
-      set(baseSky.r);
-      set(baseSky.g);
-      set(baseSky.b);
-      set(hazeSky.r);
-      set(hazeSky.g);
-      set(hazeSky.b);
-      shader.setImageSampler(0, sprite);
-      shader.setImageSampler(1, skyColumn);
+      shader
+        ..setFloat(0, p.width)
+        ..setFloat(1, p.height)
+        ..setFloat(23, p.opacity)
+        ..setFloat(35, sprite.width.toDouble())
+        ..setFloat(36, sprite.height.toDouble())
+        ..setImageSampler(0, sprite);
 
       canvas.save();
       canvas.translate(p.left, p.top);
-      canvas.drawRect(
-        Rect.fromLTWH(0, 0, p.width, p.height),
-        Paint()..shader = shader,
-      );
+      canvas.drawRect(Rect.fromLTWH(0, 0, p.width, p.height), paint);
       canvas.restore();
     }
   }
