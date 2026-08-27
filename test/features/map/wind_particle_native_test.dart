@@ -40,8 +40,10 @@ void main() {
       expect(tuning['zoomHi'], kWindZoomHi);
       expect(tuning['particlesLo'], kWindParticles.$1);
       expect(tuning['particlesHi'], kWindParticles.$2);
-      expect(tuning['pointSizeLo'], kWindPointSize.$1);
-      expect(tuning['pointSizeHi'], kWindPointSize.$2);
+      for (var i = 0; i < kWindLineWidths.length; i++) {
+        expect(tuning['lineWidthZ${i + 3}'], kWindLineWidths[i]);
+      }
+      expect(tuning['particleWidth'], kWindParticleWidth);
       expect(tuning['speedFactorLo'], kWindSpeedFactor.$1);
       expect(tuning['speedFactorHi'], kWindSpeedFactor.$2);
       expect(tuning['fadeOpacityLo'], kWindFadeOpacity.$1);
@@ -57,12 +59,7 @@ void main() {
       // Every curve must arrive as its two ends. A single value would mean
       // Dart evaluated it — which puts a platform call on the camera path and
       // leaves two copies of the curve to drift apart.
-      for (final base in const [
-        'particles',
-        'pointSize',
-        'speedFactor',
-        'fadeOpacity',
-      ]) {
+      for (final base in const ['particles', 'speedFactor', 'fadeOpacity']) {
         expect(tuning, contains('${base}Lo'), reason: base);
         expect(tuning, contains('${base}Hi'), reason: base);
         expect(
@@ -185,6 +182,34 @@ void main() {
     test('detaching without ever attaching is a no-op, not a crash', () async {
       await expectLater(build(TargetPlatform.iOS).detach(), completes);
       await expectLater(build(TargetPlatform.android).detach(), completes);
+    });
+  });
+
+  group('render-loop gating', () {
+    final field = WindField.fromWnd1(_wnd1());
+
+    test('runs only for a visible decoded field with a stable camera', () {
+      expect(
+        windParticleShouldPlay(visible: true, interacting: false, field: field),
+        isTrue,
+      );
+      expect(
+        windParticleShouldPlay(visible: true, interacting: true, field: field),
+        isFalse,
+        reason: 'camera gestures pause GPU state and prevent projection jumps',
+      );
+      expect(
+        windParticleShouldPlay(
+          visible: false,
+          interacting: false,
+          field: field,
+        ),
+        isFalse,
+      );
+      expect(
+        windParticleShouldPlay(visible: true, interacting: false, field: null),
+        isFalse,
+      );
     });
   });
 }

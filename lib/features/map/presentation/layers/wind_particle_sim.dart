@@ -36,9 +36,36 @@ const double kWindZoomHi = 7;
 // `TUNE` declares, and a count that steps 6400 → 4096 → 2601 is a visibly
 // different field from one that steps 6400 → 5056 → 3712.
 const (double, double) kWindParticles = (6400, 1024); // log
-const (double, double) kWindPointSize = (1.5, 1.8); // lin, logical px
 const (double, double) kWindSpeedFactor = (0.2, 0.0151); // log
-const (double, double) kWindFadeOpacity = (0.95, 0.945); // lin
+// Windy's default blending is 1.0. Mobile multiplies it by 1.06, and the
+// renderer's `0.9 + 0.5 * (blending - 0.92)` formula therefore gives 0.97.
+// DPIP only runs this native renderer on mobile, so there is no desktop branch
+// to preserve here.
+/// What fraction of the accumulated trail survives each 60 Hz step.
+///
+/// 0.85, not the reference's 0.97, and the difference is a deliberate choice
+/// about what a streak should look like rather than a correction.
+///
+/// Windy's 0.97 has a 46-step half life, so a stroke stays visible for most of
+/// a second and the field reads as long continuous flow lines. The Flutter
+/// overlay this app used to fall back to drew something else entirely: the last
+/// **14 frames** of dot positions with a quadratic alpha ramp, which reads as
+/// short bright dashes. That was the look chosen here.
+///
+/// 0.85 puts the exponential where the 14-frame window was — `0.85^14 = 0.10`,
+/// and the composite's black-point lift removes what is left — so the native
+/// renderer produces the dash rather than the streak.
+const (double, double) kWindFadeOpacity = (0.85, 0.85); // mobile, constant
+
+/// Windy's integer-zoom line-width table over this layer's z3–z7 range.
+///
+/// This is not an endpoint curve: the reference has a deliberate kink at
+/// every zoom (`1, 1.2, 1.6, 1.8, 2`). Collapsing it to z3/z7 endpoints makes
+/// z5 only 1.5 and is visibly thinner than the source renderer.
+const List<double> kWindLineWidths = [1, 1.2, 1.6, 1.8, 2];
+
+/// `glParticleWidth` from the reference wind product.
+const double kWindParticleWidth = 1.3;
 
 /// Chance per frame that a particle in good standing is recycled anyway.
 const double kWindDropRate = 0.011;
@@ -82,10 +109,31 @@ int particleCountFor(double zoom) {
   return edge * edge;
 }
 
-/// Diameter of a particle in logical pixels. The web sets `gl_PointSize` in
-/// device pixels and multiplies by the device pixel ratio to get there, so the
-/// tuned number is already the logical one.
-double pointSizeFor(double zoom) => _lerpStops(kWindPointSize, zoom);
+/// Base line width at [zoom], interpolated between the reference's exact
+/// integer stops and clamped to this layer's supported range.
+double lineWidthFor(double zoom) {
+  final z = zoom.clamp(kWindZoomLo, kWindZoomHi);
+  final lo = z.floor() - kWindZoomLo.toInt();
+  final hi = z.ceil() - kWindZoomLo.toInt();
+  if (lo == hi) return kWindLineWidths[lo];
+  final f = z - z.floor();
+  return kWindLineWidths[lo] * (1 - f) + kWindLineWidths[hi] * f;
+}
+
+/// Full rendered stroke width in logical pixels.
+///
+/// The reference first computes `widthFactor = max(1, lineWidth × 1.3 × DPR)`
+/// and then grows the antialiased quad by one physical pixel. Keeping that
+/// final pixel in physical space matters: adding one logical pixel made the
+/// same wind conspicuously heavier on high-density phones.
+double pointSizeFor(double zoom, {double pixelRatio = 1}) {
+  final ratio = pixelRatio <= 0 ? 1 : pixelRatio;
+  final widthFactor = math.max(
+    1.0,
+    lineWidthFor(zoom) * kWindParticleWidth * ratio,
+  );
+  return (widthFactor + 1) / ratio;
+}
 
 /// What fraction of the trail buffer survives each frame.
 ///
