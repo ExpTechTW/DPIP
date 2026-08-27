@@ -1,6 +1,11 @@
 /// The bug-tracker wire → domain parsers, against payloads shaped like the
-/// live tracker's updated contract (2026-08-24): a `users` directory keyed by
+/// live tracker's updated contract (2026-08-27): a `users` directory keyed by
 /// Discord snowflake plus `threads`/`msg` entries that reference it by id.
+///
+/// The two endpoints spell tags differently — the index sends the forum's
+/// slugs, the detail endpoint still reflects Discord's bilingual labels — so
+/// the fixtures deliberately use both forms and both must canonicalise the
+/// same way.
 library;
 
 import 'package:dpip/features/bug_tracker/data/bug_repository_impl.dart';
@@ -22,7 +27,7 @@ void main() {
         {
           'threads_id': 1541158207970349066,
           'title': 'ET-2026-0122 DPIP3.9過段時間，程式會重製',
-          'tags': ['DPIP', '臭蟲 bug'],
+          'tags': ['dpip', 'bug'],
           'body': '我的dpip放一段時間，在按進去它就會回到是否同意以上...',
           'author': _chenId,
           'created_at': 1787511150,
@@ -36,13 +41,34 @@ void main() {
 
     expect(threads, hasLength(1));
     expect(threads.first.id, 1541158207970349066);
-    // The routing marker is stripped; the bilingual label keeps its head.
-    expect(threads.first.tags, ['臭蟲']);
+    // The routing marker is stripped; the slug survives verbatim.
+    expect(threads.first.tags, ['bug']);
     expect(threads.first.authorName, '陳');
     expect(
       threads.first.createdAt.toUtc(),
       DateTime.utc(2026, 8, 23, 18, 52, 30),
     );
+  });
+
+  test('the index accepts the detail endpoint\'s bilingual labels too', () {
+    final threads = parseBugThreads({
+      'users': {_chenId: _user(_chenId, '陳')},
+      'threads': [
+        {
+          'threads_id': 1,
+          'title': 't',
+          'tags': ['DPIP', '臭蟲 bug', '已解決 fixed'],
+          'body': 'b',
+          'author': _chenId,
+          'created_at': 1787511150,
+          'last_message_id': 1,
+        },
+      ],
+    });
+
+    // Canonical form is the slug, so the English tail wins and the routing
+    // marker matches whichever way the server spelt it.
+    expect(threads.single.tags, ['bug', 'fixed']);
   });
 
   test('threads without the DPIP routing tag are dropped', () {
@@ -59,20 +85,21 @@ void main() {
     final threads = parseBugThreads({
       'users': {},
       'threads': [
-        thread(1, ['DPIP']),
+        thread(1, ['dpip']),
         thread(2, <String>[]),
-        thread(3, ['OTHER']),
+        thread(3, ['station']),
+        thread(4, ['DPIP']),
       ],
     });
 
-    expect([for (final t in threads) t.id], [1]);
+    expect([for (final t in threads) t.id], [4, 1]);
   });
 
   test('the index is ordered by last activity, not source order', () {
     Map<String, Object> thread(int id) => {
       'threads_id': id,
       'title': 't$id',
-      'tags': ['DPIP'],
+      'tags': ['dpip'],
       'body': 'b',
       'author': _chenId,
       'created_at': 1787511150,
@@ -92,7 +119,7 @@ void main() {
     Map<String, Object> thread(int id, {required bool locked}) => {
       'threads_id': id,
       'title': 't$id',
-      'tags': ['DPIP'],
+      'tags': ['dpip'],
       'body': 'b',
       'author': _chenId,
       'created_at': 1787511150,
@@ -118,7 +145,7 @@ void main() {
         {
           'threads_id': 9,
           'title': 't9',
-          'tags': ['DPIP'],
+          'tags': ['dpip'],
           'body': null,
           'author': _chenId,
           'created_at': 1787511150,
@@ -170,7 +197,7 @@ int staff0() => 879008115696230430;
 Map<String, Object> _threadShell({required int id, required int author}) => {
   'threads_id': id,
   'title': 't$id',
-  'tags': ['DPIP'],
+  'tags': ['dpip'],
   'body': 'b',
   'author': author,
   'created_at': 1787511150,

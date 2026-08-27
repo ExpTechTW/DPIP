@@ -14,71 +14,95 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:flutter/material.dart';
 
 /// Which known tag this is, driving the badge's icon and accent colour.
+///
+/// The vocabulary is the tracker forum's, narrowed to what a DPIP reader can
+/// actually see. The forum declares nineteen tags; seven of them —
+/// `station`, `trem_lite`, `trem_variety`, `rts_map`, `es_net_wave`, `web`,
+/// `plugin` — belong to ExpTech's other products, and the index endpoint is
+/// already filtered to `dpip`, so they cannot arrive here. Measured over the
+/// 200 most recent threads: `bug` 111, `fixed` 77, `confirmed` 44, `invalid`
+/// 30, `in_triage` 23, `api` 22, `duplicate` 17, `improvement` 11,
+/// `processing` 3, `wontfix` 2 — and `dpip` on all 200, which is why the data
+/// layer drops it rather than rendering a badge that says nothing.
+///
+/// `vulnerability` has not appeared in that window but is kept: it is declared,
+/// it is a security state, and falling through to neutral grey is the wrong
+/// way to find that out.
 enum BugTagKind {
   bug,
   duplicate,
   confirmed,
   improvement,
   api,
-  needsInfo,
-  inProgress,
+  inTriage,
+  processing,
   fixed,
   wontfix,
   invalid,
   vulnerability,
   other;
 
-  /// Tags arrive as the forum's bilingual labels; after cleaning they carry
-  /// the Chinese head only (`臭蟲`, `處理中`…), so exact Chinese matches lead
-  /// and English keywords stay as a tolerant fallback.
+  /// Tags reach the UI canonicalised to the forum's slugs by the data layer,
+  /// so an exact match leads. The bilingual labels stay as a fallback — the
+  /// detail endpoint still reflects Discord's raw `臭蟲 bug` form, and a body
+  /// replayed from the offline store predates the canonicalisation.
   static BugTagKind of(String tag) {
-    final t = tag.trim().toLowerCase();
-    // l10n-ignore: server tag value
-    if (t.contains('duplicate') || tag == '重複') {
-      return duplicate;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('confirmed') || tag == '已確認') {
-      return confirmed;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('fixed') || tag == '已解決') {
-      return fixed;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('wontfix') || tag == '無法解決') {
-      return wontfix;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('invalid') || tag == '無效') {
-      return invalid;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('improvement') || tag == '增強') {
-      return improvement;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('triage') || tag == '需要更多資訊') {
-      return needsInfo;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('progress') || tag == '處理中') {
-      return inProgress;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('vulnerab') || tag == '漏洞') {
-      return vulnerability;
-    }
-    // l10n-ignore: server tag value
-    if (t == 'api') {
-      return api;
-    }
-    // l10n-ignore: server tag value
-    if (t.contains('bug') || tag == '臭蟲') {
-      return bug;
-    }
-    return other;
+    final trimmed = tag.trim();
+    final space = trimmed.lastIndexOf(' ');
+    final slug = (space < 0 ? trimmed : trimmed.substring(space + 1))
+        .toLowerCase();
+    return switch (slug) {
+      // l10n-ignore: server tag value
+      'bug' => BugTagKind.bug,
+      // l10n-ignore: server tag value
+      'duplicate' => BugTagKind.duplicate,
+      // l10n-ignore: server tag value
+      'confirmed' => BugTagKind.confirmed,
+      // l10n-ignore: server tag value
+      'improvement' => BugTagKind.improvement,
+      // l10n-ignore: server tag value
+      'api' => BugTagKind.api,
+      // l10n-ignore: server tag value
+      'in_triage' => BugTagKind.inTriage,
+      // l10n-ignore: server tag value
+      'processing' => BugTagKind.processing,
+      // l10n-ignore: server tag value
+      'fixed' => BugTagKind.fixed,
+      // l10n-ignore: server tag value
+      'wontfix' => BugTagKind.wontfix,
+      // l10n-ignore: server tag value
+      'invalid' => BugTagKind.invalid,
+      // l10n-ignore: server tag value
+      'vulnerability' => BugTagKind.vulnerability,
+      _ => _fromLabel(trimmed),
+    };
   }
+
+  /// The Chinese head of a bilingual label, for payloads that never went
+  /// through canonicalisation.
+  static BugTagKind _fromLabel(String tag) => switch (tag) {
+    // l10n-ignore: server tag value
+    '臭蟲' => BugTagKind.bug,
+    // l10n-ignore: server tag value
+    '重複' => BugTagKind.duplicate,
+    // l10n-ignore: server tag value
+    '已確認' => BugTagKind.confirmed,
+    // l10n-ignore: server tag value
+    '增強' => BugTagKind.improvement,
+    // l10n-ignore: server tag value
+    '需要更多資訊' => BugTagKind.inTriage,
+    // l10n-ignore: server tag value
+    '處理中' => BugTagKind.processing,
+    // l10n-ignore: server tag value
+    '已解決' => BugTagKind.fixed,
+    // l10n-ignore: server tag value
+    '無法解決' => BugTagKind.wontfix,
+    // l10n-ignore: server tag value
+    '無效' => BugTagKind.invalid,
+    // l10n-ignore: server tag value
+    '漏洞' => BugTagKind.vulnerability,
+    _ => BugTagKind.other,
+  };
 }
 
 /// The accent colour each kind renders with — one hue per state, close to
@@ -90,12 +114,53 @@ Color bugTagAccent(BugTagKind kind) => switch (kind) {
   BugTagKind.fixed => const Color(0xFF1A7F37),
   BugTagKind.improvement => const Color(0xFF8250DF),
   BugTagKind.api => const Color(0xFF6639BA),
-  BugTagKind.inProgress => const Color(0xFFBF8700),
-  BugTagKind.needsInfo => const Color(0xFF9A6700),
+  BugTagKind.processing => const Color(0xFFBF8700),
+  BugTagKind.inTriage => const Color(0xFF9A6700),
   BugTagKind.duplicate => const Color(0xFF6E7781),
   BugTagKind.wontfix => const Color(0xFF57606A),
   BugTagKind.invalid => const Color(0xFF0550AE),
   BugTagKind.other => const Color(0xFF6E7781),
+};
+
+/// The tag's display name, in formal Taiwanese Traditional Chinese.
+///
+/// Hardcoded rather than routed through `AppLocalizations`, by decision: this
+/// is a fixed eleven-word vocabulary owned by the tracker, the tracker itself
+/// is Chinese-only, and every thread it lists has a Chinese title and body. A
+/// reader who cannot read the threads gains nothing from a translated badge.
+/// The same call was made for the notification test payloads.
+///
+/// The forum's own Chinese labels are looser than these — `臭蟲` for a bug,
+/// `無法解決` for wontfix (which says "cannot", where the tag means "will
+/// not"), `已解決` for fixed (resolved, not repaired). These are the formal
+/// readings of what the slug actually means.
+///
+/// An unknown tag falls through to its raw slug: better a reader sees
+/// `es_net_wave` than a badge that has silently invented a name for it.
+String bugTagLabel(BugTagKind kind, String raw) => switch (kind) {
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.bug => '錯誤',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.inTriage => '待分類',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.confirmed => '已確認',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.processing => '處理中',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.fixed => '已修復',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.wontfix => '不予修復',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.invalid => '無效',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.duplicate => '重複回報',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.improvement => '功能改進',
+  // l10n-ignore: tracker vocabulary, Chinese-only by design
+  BugTagKind.vulnerability => '安全漏洞',
+  // l10n-ignore: an acronym, and read as one in Taiwan
+  BugTagKind.api => 'API',
+  BugTagKind.other => raw,
 };
 
 IconData? _iconFor(BugTagKind kind) => switch (kind) {
@@ -105,8 +170,8 @@ IconData? _iconFor(BugTagKind kind) => switch (kind) {
   BugTagKind.fixed => Icons.check_circle_outlined,
   BugTagKind.improvement => Icons.auto_awesome,
   BugTagKind.api => Icons.api,
-  BugTagKind.inProgress => Icons.autorenew,
-  BugTagKind.needsInfo => Icons.help_outline,
+  BugTagKind.processing => Icons.autorenew,
+  BugTagKind.inTriage => Icons.help_outline,
   BugTagKind.duplicate => Icons.content_copy,
   BugTagKind.wontfix => Icons.block,
   BugTagKind.invalid => Icons.cancel_outlined,
@@ -144,7 +209,7 @@ class BugTagBadge extends StatelessWidget {
             const SizedBox(width: 4),
           ],
           Text(
-            tag,
+            bugTagLabel(kind, tag),
             style: theme.textTheme.labelSmall?.copyWith(
               color: accent,
               fontWeight: FontWeight.w700,
@@ -212,7 +277,7 @@ class BugTagFilterChip extends StatelessWidget {
               const SizedBox(width: 4),
             ],
             Text(
-              tag,
+              bugTagLabel(kind, tag),
               style: theme.textTheme.labelMedium?.copyWith(
                 color: selected ? accent : colors.onSurfaceVariant,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,

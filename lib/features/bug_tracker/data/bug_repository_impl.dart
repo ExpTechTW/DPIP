@@ -11,7 +11,10 @@ import 'package:flutter/foundation.dart';
 
 /// The forum tag that marks a thread as about THIS app. A routing marker, not
 /// a category — it is filtered on and never rendered.
-const String appBugTag = 'DPIP';
+///
+/// In canonical form: see [canonicalBugTag] for why the two endpoints disagree
+/// about how they spell it.
+const String appBugTag = 'dpip';
 
 class BugRepositoryImpl implements BugRepository {
   const BugRepositoryImpl(this._api);
@@ -40,6 +43,32 @@ String _normalise(String body) => body.replaceAllMapped(
   _emoteToken,
   (match) => match.group(1) ?? match.input,
 );
+
+/// The two tracker endpoints spell the same tag two different ways.
+///
+/// The index sends the forum's slugs — `["dpip", "bug"]`. The detail endpoint
+/// still reflects Discord's raw forum labels, which are bilingual — `["臭蟲
+/// bug", "DPIP", "已解決 fixed"]`. Left alone, one thread carries `bug` in the
+/// list and `臭蟲` on its own page, and the routing marker matches `dpip` in
+/// one place and `DPIP` in the other — which drops every thread from the
+/// index, because nothing equals `DPIP` once the server started sending slugs.
+///
+/// The slug is the canonical form, so a bilingual label yields its English
+/// tail. `臭蟲 bug` → `bug`, `DPIP` → `dpip`, `bug` → `bug`.
+String canonicalBugTag(String tag) {
+  final trimmed = tag.trim();
+  final space = trimmed.lastIndexOf(' ');
+  return (space < 0 ? trimmed : trimmed.substring(space + 1)).toLowerCase();
+}
+
+List<String> _canonicalTags(Object? raw) {
+  if (raw is! List) return const [];
+  return [
+    for (final tag in raw)
+      if (tag is String)
+        if (canonicalBugTag(tag) case final slug when slug != appBugTag) slug,
+  ];
+}
 
 Map<String, dynamic> _asObject(Object? value, String what) {
   if (value is Map) return Map<String, dynamic>.from(value);
@@ -114,23 +143,21 @@ List<BugThread> parseBugThreads(Object? body) {
     for (final entry in raw)
       _normaliseIntoThread(BugThread.fromJson(_asObject(entry, 'thread'))),
   ];
-  // `DPIP` is the forum's routing marker: threads without it are not about
-  // this app (other bots share the channel), so they never reach the index.
-  // Locked threads are staff-side conversations — same.
+  // `dpip` is the forum's routing marker: threads without it are not about
+  // this app (other products share the tracker), so they never reach the
+  // index. Locked threads are staff-side conversations — same. Matched in
+  // canonical form, because the marker arrives spelt both ways.
   threads.removeWhere(
-    (thread) => thread.locked || !thread.tags.contains(appBugTag),
+    (thread) =>
+        thread.locked || !thread.tags.map(canonicalBugTag).contains(appBugTag),
   );
-  // The routing marker is a filter, never a category label; bilingual labels
-  // keep their Chinese head only. freezed lists are unmodifiable, so this
+  // The routing marker is a filter, never a category label, so it is dropped
+  // along with the canonicalisation. freezed lists are unmodifiable, so this
   // rebuilds each thread instead of mutating it.
   threads = [
     for (final thread in threads)
       thread.copyWith(
-        tags: [
-          for (final tag in thread.tags)
-            if (tag != appBugTag)
-              tag.contains(' ') ? tag.split(' ').first : tag,
-        ],
+        tags: _canonicalTags(thread.tags),
         authorName: _authorOf(users, thread.author).name,
         authorAvatar: _authorOf(users, thread.author).avatar,
       ),
@@ -147,11 +174,7 @@ BugThreadDetail parseBugThreadDetail(Object? body) {
   final users = _parseUsers(map['users']);
   final opAuthor = _authorOf(users, map['author']);
   final thread = BugThread.fromJson(map).copyWith(
-    tags: [
-      for (final tag in (map['tags'] ?? const <String>[]) as List)
-        if (tag != appBugTag)
-          (tag as String).contains(' ') ? tag.split(' ').first : tag,
-    ],
+    tags: _canonicalTags(map['tags']),
     authorName: opAuthor.name,
     authorAvatar: opAuthor.avatar,
   );
