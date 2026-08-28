@@ -80,9 +80,48 @@ EOF
   # is identical either way.
   local owned
   owned="$(cd "$root" && mise where flutter 2>/dev/null || true)"
-  if [[ -z $owned || $resolved != "$owned"/* ]]; then
+  if [[ -z $owned ]]; then
     printf '\n  flutter resolves to %s\n' "$resolved" >&2
-    printf '  which is not inside mise (%s).\n\n' "${owned:-not installed}" >&2
+    printf '  but mise reports that flutter is not installed.\n\n' >&2
+    printf '  Run `mise install` from %s.\n\n' "$root" >&2
+    exit 1
+  fi
+
+  local resolved_for_compare="$resolved"
+  local owned_for_compare="$owned"
+
+  case "${OSTYPE:-}" in
+    msys*|cygwin*)
+      # Git Bash/MSYS and Cygwin may express one Windows path as C:\Users\...
+      # in one command and /c/Users/... in another. Normalize both to the same
+      # mixed Windows form before checking ownership; do not skip the check.
+      if ! command -v cygpath >/dev/null 2>&1; then
+        cat >&2 <<'EOF'
+
+  cygpath is required to verify that flutter belongs to mise, but it could not
+  be found in this MSYS/Cygwin environment.
+
+EOF
+        exit 1
+      fi
+
+      resolved_for_compare="$(cygpath -am -- "$resolved")"
+      owned_for_compare="$(cygpath -am -- "$owned")"
+
+      # Windows paths are case-insensitive. Mixed form uses forward slashes,
+      # and removing a trailing slash keeps the prefix test unambiguous.
+      resolved_for_compare="${resolved_for_compare,,}"
+      owned_for_compare="${owned_for_compare%/}"
+      owned_for_compare="${owned_for_compare,,}"
+      ;;
+    *)
+      owned_for_compare="${owned_for_compare%/}"
+      ;;
+  esac
+
+  if [[ $resolved_for_compare != "$owned_for_compare"/* ]]; then
+    printf '\n  flutter resolves to %s\n' "$resolved" >&2
+    printf '  which is not inside mise (%s).\n\n' "$owned" >&2
     printf '  Run `mise install` from %s.\n\n' "$root" >&2
     exit 1
   fi

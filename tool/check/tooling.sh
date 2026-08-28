@@ -75,7 +75,20 @@ done
 while IFS= read -r script; do
   bash -n "$script" 2>/dev/null || report "$script: does not parse"
 
-  [[ -x $script ]] || report "$script: is not executable (chmod +x)"
+  case "${OSTYPE:-}" in
+    msys*|cygwin*)
+      # Windows filesystems do not expose Unix executable bits reliably.
+      # Git's index is authoritative for the mode that macOS, Linux, and CI
+      # receive after checkout.
+      mode="$(git ls-files --stage -- "$script" | awk 'NR == 1 { print $1 }')"
+      [[ $mode == 100755 ]] ||
+        report "$script: is not executable in git (git update-index --chmod=+x)"
+      ;;
+    *)
+      [[ -x $script ]] ||
+        report "$script: is not executable (chmod +x)"
+      ;;
+  esac
 
   head -1 "$script" | grep -q '^#!/usr/bin/env bash$' ||
     [[ $script == tool/dev/_lib.sh ]] ||
