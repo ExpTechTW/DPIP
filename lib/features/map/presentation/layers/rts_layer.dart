@@ -278,8 +278,15 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     'features': <dynamic>[],
   };
 
+  /// This layer's `MapLayer.id` — 強震監視器.
+  ///
+  /// A constant as well as the getter because a caller outside the map needs
+  /// it without an instance: an EEW notification tap names this overlay when
+  /// it opens the map tab (`notificationChannelMapLayers`).
+  static const String layerId = 'monitor';
+
   @override
-  String get id => 'monitor';
+  String get id => layerId;
 
   @override
   IconData get icon => Icons.sensors_outlined;

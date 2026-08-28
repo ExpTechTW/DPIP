@@ -1,6 +1,7 @@
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
+import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -65,14 +66,15 @@ void main() {
   });
 
   test('routes each family to the expected screen', () {
+    // 地震速報 opens 強震監視器, which is an overlay on the map tab rather than a
+    // screen of its own — see the map-layer test below for the other half.
     expect(
       routeForNotificationChannel('eew_alert-important-v2'),
-      AppRoutes.eew,
+      AppRoutes.map,
     );
     // The intra-family split: 震度速報 is a live broadcast and opens the
     // monitor, while a 地震報告 is a finished record and opens the list.
-    expect(routeForNotificationChannel('eq-v2'), AppRoutes.eew);
-    expect(routeForNotificationChannel('int_report-general-v2'), AppRoutes.eew);
+    expect(routeForNotificationChannel('eq-v2'), AppRoutes.map);
     expect(
       routeForNotificationChannel('report-general-v2'),
       AppRoutes.earthquake,
@@ -94,7 +96,7 @@ void main() {
       channelKey: 'eew_alert-important-v2',
     );
     expect(tap.channelKey, 'eew_alert-important-v2');
-    expect(routeForNotificationChannel(tap.channelKey), AppRoutes.eew);
+    expect(routeForNotificationChannel(tap.channelKey), AppRoutes.map);
   });
 
   test('a locally displayed tap still routes off its payload', () {
@@ -128,7 +130,7 @@ void main() {
     }, channelKey: 'int_report-general-v2');
     expect(tap.channelKey, 'int_report-general-v2');
     expect(tap.id, '1897213924');
-    expect(routeForNotificationChannel(tap.channelKey), AppRoutes.eew);
+    expect(routeForNotificationChannel(tap.channelKey), AppRoutes.home);
   });
 
   test('a malformed content string still routes', () {
@@ -362,7 +364,7 @@ void main() {
       named.add(name);
     }
 
-    // EEW channel → the live monitor tab.
+    // EEW channel → the map tab, where 強震監視器 lives.
     routeNotificationTap(
       const NotificationTap(channelKey: 'eew_alert-important-v2'),
       navigate: record,
@@ -378,6 +380,55 @@ void main() {
       navigate: record,
     );
 
-    expect(named, [AppRoutes.eew, AppRoutes.earthquake, AppRoutes.home]);
+    expect(named, [AppRoutes.map, AppRoutes.earthquake, AppRoutes.home]);
+  });
+
+  // Half of an EEW tap's destination is the route; the other half is which of
+  // the map's fourteen overlays it lands on. Routing alone would drop the user
+  // on whatever the session was last looking at.
+  test('an EEW tap asks the map for 強震監視器, before it navigates', () {
+    final order = <String>[];
+    void record(
+      String name, {
+      Map<String, String> pathParameters = const {},
+      Map<String, dynamic> queryParameters = const {},
+      String? fragment,
+      Object? extra,
+    }) => order.add('go:$name');
+
+    routeNotificationTap(
+      const NotificationTap(channelKey: 'eew_alert-important-v2'),
+      navigate: record,
+      focusMapLayer: (layerId) => order.add('layer:$layerId'),
+    );
+
+    // The map consumes one pending overlay per open, so the request has to be
+    // waiting before the tab is shown, not queued after it.
+    expect(order, ['layer:$monitorMapLayerId', 'go:${AppRoutes.map}']);
+  });
+
+  test('a channel with no overlay of its own leaves the map alone', () {
+    final focused = <String>[];
+    routeNotificationTap(
+      const NotificationTap(channelKey: 'report-general-v2'),
+      navigate: (
+        name, {
+        Map<String, String> pathParameters = const {},
+        Map<String, dynamic> queryParameters = const {},
+        String? fragment,
+        Object? extra,
+      }) {},
+      focusMapLayer: focused.add,
+    );
+    expect(focused, isEmpty);
+  });
+
+  // The id is a literal in `app/router` because that layer must not import a
+  // feature's presentation code. This is what keeps the literal honest.
+  test('every mapped overlay id is one the map actually offers', () {
+    expect(RtsMapLayer.layerId, monitorMapLayerId);
+    for (final id in notificationChannelMapLayers.values) {
+      expect(id, monitorMapLayerId);
+    }
   });
 }

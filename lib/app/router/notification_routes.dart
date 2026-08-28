@@ -9,6 +9,13 @@ import 'package:url_launcher/url_launcher.dart';
 /// Opens a URL outside the app. Injectable so tests never reach the browser.
 typedef NotificationUrlLauncher = Future<bool> Function(Uri url);
 
+/// Asks the map tab to open on a given `MapLayer.id` when it next appears.
+///
+/// Injected rather than reached for: this function has no `BuildContext`, and
+/// the hand-off it drives lives in the widget tree. `app.dart` supplies the
+/// real one; a test supplies a recorder.
+typedef NotificationMapFocus = void Function(String layerId);
+
 /// The slice of the router a notification tap needs — [GoRouter.goNamed].
 typedef NotificationRouteNavigator = void Function(
   String name, {
@@ -29,6 +36,7 @@ void routeNotificationTap(
   NotificationTap tap, {
   NotificationRouteNavigator? navigate,
   NotificationUrlLauncher? launch,
+  NotificationMapFocus? focusMapLayer,
 }) {
   final go = navigate ?? appRouter.goNamed;
   Log.info(
@@ -55,6 +63,14 @@ void routeNotificationTap(
   final reason = notificationChannelDetailRoutes.containsKey(tap.channelKey)
       ? 'no $notificationTargetKey in payload'
       : 'channel has no detail route';
+  // Before the navigation, not after: the map consumes the pending overlay on
+  // the first frame it is ready, and a request queued after that frame waits
+  // for the *next* time the tab opens.
+  final layerId = notificationChannelMapLayers[tap.channelKey];
+  if (layerId != null) {
+    Log.info('Notification tap: channel=${tap.channelKey} -> layer=$layerId');
+    focusMapLayer?.call(layerId);
+  }
   Log.info(
     'Notification tap: channel=${tap.channelKey} -> route=$route ($reason)',
   );
@@ -76,6 +92,28 @@ const Map<String, String> notificationChannelDetailRoutes = {
   'report-general-v2': AppRoutes.earthquakeReport,
   'report-silence-v2': AppRoutes.earthquakeReport,
 };
+
+/// Channels whose destination is a specific map overlay, and its `MapLayer.id`.
+///
+/// The map tab is one route for fourteen overlays, and it keeps whichever one
+/// the session was last on. So a route is not a destination here — an EEW tap
+/// that arrives while the user was reading radar would open radar. The overlay
+/// is handed over the same way every other in-app "open this on the map" does
+/// (`MapCameraHandoff`), as a one-shot the map consumes when it is ready.
+const Map<String, String> notificationChannelMapLayers = {
+  'eew_alert-important-v2': monitorMapLayerId,
+  'eew_alert-general-v2': monitorMapLayerId,
+  'eew_alert-silent-v2': monitorMapLayerId,
+  'eew-important-v2': monitorMapLayerId,
+  'eew-general-v2': monitorMapLayerId,
+  'eew-silence-v2': monitorMapLayerId,
+  'eq-v2': monitorMapLayerId,
+};
+
+/// `RtsMapLayer.id` — 強震監視器. A literal because `app/router` must not import
+/// a feature's presentation layer; `notification_routes_test` pins the two
+/// together.
+const String monitorMapLayerId = 'monitor';
 
 /// The payload key naming the item a tap should open.
 const String notificationTargetKey = 'reportId';
@@ -155,16 +193,18 @@ const Map<String, String> notificationChannelUrls = {
 /// Grouped by subject for reading only — the lookup is exact, so order and
 /// grouping carry no meaning and no prefix can shadow another.
 const Map<String, String> notificationChannelRoutes = {
-  // 地震速報 — the live monitor, where the countdown and the shaking are.
-  'eew_alert-important-v2': AppRoutes.eew,
-  'eew_alert-general-v2': AppRoutes.eew,
-  'eew_alert-silent-v2': AppRoutes.eew,
-  'eew-important-v2': AppRoutes.eew,
-  'eew-general-v2': AppRoutes.eew,
-  'eew-silence-v2': AppRoutes.eew,
-  'eq-v2': AppRoutes.eew,
-  'int_report-general-v2': AppRoutes.eew, // 需要 ID
-  'int_report-silence-v2': AppRoutes.eew, // 需要 ID
+  // 地震速報 — 強震監視器 on the map, where the countdown, the wavefront and
+  // the shaking all are. The overlay comes from [notificationChannelMapLayers];
+  // the route alone would land on whichever layer the session last used.
+  'eew_alert-important-v2': AppRoutes.map,
+  'eew_alert-general-v2': AppRoutes.map,
+  'eew_alert-silent-v2': AppRoutes.map,
+  'eew-important-v2': AppRoutes.map,
+  'eew-general-v2': AppRoutes.map,
+  'eew-silence-v2': AppRoutes.map,
+  'eq-v2': AppRoutes.map,
+  'int_report-general-v2': AppRoutes.home, // 需要 ID
+  'int_report-silence-v2': AppRoutes.home, // 需要 ID
   // 地震 — the report list. Detail-by-id comes later; the tap already carries
   // the id, so that is a change to `routeNotificationTap`, not to this table.
   'report-general-v2': AppRoutes.earthquake, // 需要 ID
