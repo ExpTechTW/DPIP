@@ -2,10 +2,11 @@
 /// live tracker's updated contract (2026-08-27): a `users` directory keyed by
 /// Discord snowflake plus `threads`/`msg` entries that reference it by id.
 ///
-/// The two endpoints spell tags differently — the index sends the forum's
-/// slugs, the detail endpoint still reflects Discord's bilingual labels — so
-/// the fixtures deliberately use both forms and both must canonicalise the
-/// same way.
+/// Both endpoints send the forum's slugs, lower-case (`["bug", "dpip"]`). The
+/// detail endpoint used to reflect Discord's bilingual labels instead; the
+/// fixtures still put a upper-case marker through the parser, because that is
+/// the spelling whose failure is silent — a routing tag that stops matching
+/// empties the whole list rather than mislabelling one badge.
 library;
 
 import 'package:dpip/features/bug_tracker/data/bug_repository_impl.dart';
@@ -50,14 +51,14 @@ void main() {
     );
   });
 
-  test('the index accepts the detail endpoint\'s bilingual labels too', () {
+  test('a tag is matched by its slug, whatever case it arrives in', () {
     final threads = parseBugThreads({
       'users': {_chenId: _user(_chenId, '陳')},
       'threads': [
         {
           'threads_id': 1,
           'title': 't',
-          'tags': ['DPIP', '臭蟲 bug', '已解決 fixed'],
+          'tags': ['DPIP', 'Bug', 'fixed'],
           'body': 'b',
           'author': _chenId,
           'created_at': 1787511150,
@@ -66,8 +67,9 @@ void main() {
       ],
     });
 
-    // Canonical form is the slug, so the English tail wins and the routing
-    // marker matches whichever way the server spelt it.
+    // The marker matched despite its case (the thread survived at all), and
+    // the categories come through lower-cased, which is the form the badge
+    // table is keyed by.
     expect(threads.single.tags, ['bug', 'fixed']);
   });
 
