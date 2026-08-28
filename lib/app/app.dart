@@ -21,6 +21,8 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -172,7 +174,15 @@ class _AppServicesHostState extends State<_AppServicesHost>
     super.initState();
     _observer = RealtimeLifecycleObserver(widget.realtimeService);
     WidgetsBinding.instance.addObserver(this);
-    NotificationTaps.onTap = routeNotificationTap;
+    // The map tab keeps whichever overlay the session left it on, so an EEW
+    // tap has to name 強震監視器 as well as the route. Same hand-off the home
+    // monitor banner and the nav bar use, so the map has one way in.
+    final mapCamera = context.read<MapCameraHandoff>();
+    NotificationTaps.onTap = (tap) => routeNotificationTap(
+      tap,
+      focusMapLayer: (layerId) =>
+          mapCamera.request(BaseMap.taiwanBounds, layerId: layerId),
+    );
     widget.onboarding.addListener(_onOnboardingChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // INFO, not DEBUG: this is the number anyone asking "why is launch slow"
