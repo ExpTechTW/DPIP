@@ -164,6 +164,12 @@ class HomeContent extends StatelessWidget {
   /// distance.
   static const double _forecastExpandExtent = 200;
 
+  /// Minimum room for the header + the hero's bottom weather card. A short
+  /// phone can provide less than this after the region-bar inset; making that
+  /// extra height part of the outer list keeps both the loading/rain card and
+  /// the fully expanded dry forecast scrollable instead of clipping them.
+  static const double _minimumWeatherHeroHeight = 760;
+
   /// Current growth of the hero forecast card for [offset].
   static double _forecastExpansion(double offset) =>
       (offset / _forecastExpandExtent).clamp(0.0, 1.0);
@@ -260,6 +266,12 @@ class HomeContent extends StatelessWidget {
                   // sky-tuned ink is exactly what makes scrolled content hard
                   // to read, no matter how dimmed the backdrop behind it is.
                   final reveal = this.reveal * (1 - _focus(offset));
+                  final forecastExpansion = _forecastExpansion(offset);
+                  final heroLayoutHeight = heroHeight == null
+                      ? null
+                      : heroHeight < _minimumWeatherHeroHeight
+                      ? _minimumWeatherHeroHeight
+                      : heroHeight;
                   return Column(
                     key: ValueKey(areaIndex),
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -274,7 +286,7 @@ class HomeContent extends StatelessWidget {
                       // changes shape, so it never needs to be torn down and
                       // rebuilt when the sheet opens or closes.
                       SizedBox(
-                        height: heroHeight,
+                        height: heroLayoutHeight,
                         // Only the trailing gap depends on scroll offset, so
                         // that is all this block's Padding re-reads per tick.
                         child: Padding(
@@ -340,7 +352,7 @@ class HomeContent extends StatelessWidget {
                                     opacity: reveal,
                                     child: HomeForecastSection(
                                       key: ValueKey('forecast-hero-$areaIndex'),
-                                      expansion: _forecastExpansion(offset),
+                                      expansion: forecastExpansion,
                                       reveal: reveal,
                                       sky: sky,
                                       weatherMode: weatherMode,

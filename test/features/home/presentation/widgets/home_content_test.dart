@@ -36,13 +36,17 @@ import 'package:provider/provider.dart';
 /// Stub weather: home content resolves no towns from an empty directory, so
 /// neither endpoint is invoked in the switch tests.
 class _FakeWeatherRepository implements MeteorWeatherRepository {
+  const _FakeWeatherRepository({this.forecastValue});
+
+  final WeatherForecast? forecastValue;
+
   @override
   Future<Result<WeatherRealtime?>> realtime(double lat, double lng) async =>
       const Ok(null);
 
   @override
   Future<Result<WeatherForecast>> forecast(String code) async =>
-      Ok(WeatherForecast(updateTime: 0, forecast: const []));
+      Ok(forecastValue ?? WeatherForecast(updateTime: 0, forecast: const []));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
@@ -115,7 +119,9 @@ class _StaticEewSource extends RealtimeSource<List<Eew>> {
 Widget _wrap(
   RegionStore store, {
   bool expanded = false,
+  double topInset = 0,
   RainHourTrendRepository? hourTrend,
+  WeatherForecast? forecast,
   TownDirectory directory = const TownDirectory(<String, Town>{}),
 }) {
   final events = _FakeEventRepository();
@@ -130,7 +136,7 @@ Widget _wrap(
         Provider<EventRepository>.value(value: events),
         ChangeNotifierProvider<HomeWeatherController>(
           create: (_) => HomeWeatherController(
-            _FakeWeatherRepository(),
+            _FakeWeatherRepository(forecastValue: forecast),
             hourTrend ?? _FakeHourTrendRepository(),
             store,
             directory,
@@ -156,6 +162,7 @@ Widget _wrap(
         body: HomeContent(
           scrollController: ScrollController(),
           expanded: expanded,
+          topInset: topInset,
         ),
       ),
     ),
@@ -396,6 +403,68 @@ void main() {
       expect(find.byType(HomeForecastSection), findsOneWidget);
     },
   );
+
+  testWidgets('a short phone can scroll to the full forecast detail band', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final store = await _store();
+    store
+      ..select(1)
+      ..setCurrentCode('100');
+    const directory = TownDirectory({
+      '100': Town(
+        code: '100',
+        city: 'Test',
+        town: 'North',
+        lat: 25.0,
+        lng: 121.5,
+        cityLevel: 'City',
+        townLevel: 'District',
+      ),
+    });
+    const point = WeatherForecastPoint(
+      time: '14:00',
+      temperature: 30,
+      apparentTemp: 33,
+      humidity: 70,
+      weather: 'Clear',
+      weatherCode: 100,
+      pop: 0,
+      wind: ForecastWind(direction: 'NE', speed: 2, beaufort: 2),
+    );
+    await tester.pumpWidget(
+      _wrap(
+        store,
+        expanded: true,
+        topInset: 88,
+        hourTrend: _FakeHourTrendRepository(dry: true),
+        forecast: const WeatherForecast(
+          updateTime: 0,
+          forecast: [point, point, point],
+        ),
+        directory: directory,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull, reason: 'initial short layout');
+
+    final details = find.text('Feels like 33°');
+    await tester.scrollUntilVisible(
+      details,
+      120,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(details, findsOneWidget);
+    expect(details.hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('全國 keeps its events card (it is not a missing location)', (
     tester,
