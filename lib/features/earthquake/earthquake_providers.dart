@@ -56,6 +56,8 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   // without waiting for a live event.
   final eewSource = kMonitorDemoEnabled
       ? DemoEewSource(reports) as RealtimeSource<List<Eew>>
+      : kStartupEewDemoEnabled
+      ? StartupEewDemoSource() as RealtimeSource<List<Eew>>
       : EewRealtimeSource(api.openEewSse, cwaOnly: () => eewCwaOnly.enabled)
             as RealtimeSource<List<Eew>>;
   final eewChannel = RealtimeChannel<List<Eew>>(

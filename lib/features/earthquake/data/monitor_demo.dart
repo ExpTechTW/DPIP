@@ -114,6 +114,52 @@ abstract final class MonitorDemo {
   static DateTime? _origin;
 }
 
+/// A single, stable EEW inserted on debug startup for visual testing.
+///
+/// [RealtimeChannel] continues polling at its normal safety-critical cadence,
+/// but every fetch returns this same immutable alert. Its collection equality
+/// therefore suppresses every later poll and consumers observe exactly one
+/// alert rather than a new serial every second.
+class StartupEewDemoSource extends RealtimeSource<List<Eew>> {
+  StartupEewDemoSource({DateTime Function()? clock})
+    : _alerts = [
+        Eew(
+          agency: 'DEMO',
+          id: 'startup-demo',
+          serial: 1,
+          status: 0,
+          isFinal: false,
+          info: EewInfo(
+            time: (clock ?? DateTime.now)().toUtc().millisecondsSinceEpoch,
+            longitude: 121.7,
+            latitude: 23.9,
+            depth: 10,
+            magnitude: 6.5,
+            location: '花蓮縣近海',
+            max: 7,
+          ),
+        ),
+      ];
+
+  final List<Eew> _alerts;
+
+  @override
+  Future<Result<List<Eew>>> fetch() async => Ok(_alerts);
+
+  @override
+  DateTime? timestampOf(List<Eew> value) => null;
+
+  @override
+  bool sameData(List<Eew>? a, List<Eew>? b) {
+    if (a == null || b == null) return a == b;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+}
+
 /// Polls as an always-live EEW alert for [MonitorDemo]'s event, bumping the
 /// serial every couple of seconds so the feed visibly updates and the monitor
 /// cards re-render while the wavefront keeps expanding.

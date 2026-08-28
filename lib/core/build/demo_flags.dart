@@ -15,12 +15,27 @@ const String _monitorDemoRaw = String.fromEnvironment('DPIP_DEMO_MONITOR');
 const String _monitorDemoSevereRaw = String.fromEnvironment(
   'DPIP_DEMO_MONITOR_SEVERE',
 );
+const String _startupEewDemoRaw = String.fromEnvironment(
+  'DPIP_DEMO_STARTUP_EEW',
+);
 
 /// Whether the 強震監視器 demo feeds are on: debug builds launched with
 /// `--dart-define=DPIP_DEMO_MONITOR=true` (or `=1`). The flag is forced off
 /// outside [kDebugMode] so a release build can never ship the synthetic feeds.
 const bool kMonitorDemoEnabled =
     (_monitorDemoRaw == 'true' || _monitorDemoRaw == '1') && kDebugMode;
+
+/// Temporary startup-only EEW used for visual testing with
+/// `--dart-define=DPIP_DEMO_STARTUP_EEW=true` (or `=1`). It is deliberately
+/// impossible in release builds and yields to the explicit full monitor demo
+/// above.
+///
+/// Remove this flag and the corresponding provider branch when the startup
+/// alert test is finished.
+const bool kStartupEewDemoEnabled =
+    (_startupEewDemoRaw == 'true' || _startupEewDemoRaw == '1') &&
+    kDebugMode &&
+    !kMonitorDemoEnabled;
 
 /// Whether the demo event uses a fixed, severe preset (large magnitude,
 /// shallow depth) instead of the newest real report —
