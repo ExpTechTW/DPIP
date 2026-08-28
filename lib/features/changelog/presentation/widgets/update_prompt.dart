@@ -16,6 +16,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/platform/install_source.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/domain/update_check.dart';
@@ -102,18 +103,38 @@ class _UpdatePromptState extends State<UpdatePrompt> {
         icon: const Icon(Icons.system_update_outlined),
         title: Text(l10n.updateAvailableTitle),
         content: Text(l10n.updateAvailableBody(version)),
+        // A regular AlertDialog OverflowBar stacks these three buttons at the
+        // trailing edge on a phone, making them look detached from each other.
+        // Keep the two alternatives together and give the primary destination
+        // a stable, full-width row at every supported phone width.
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, _UpdateAction.skip),
-            child: Text(l10n.updateSkip),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, _UpdateAction.changelog),
-            child: Text(l10n.updateViewChangelog),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, _UpdateAction.update),
-            child: Text(_updateLabel(l10n, source)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () =>
+                          Navigator.pop(context, _UpdateAction.skip),
+                      child: Text(l10n.updateSkip),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () =>
+                          Navigator.pop(context, _UpdateAction.changelog),
+                      child: Text(l10n.updateViewChangelog),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, _UpdateAction.update),
+                child: Text(_updateLabel(l10n, source)),
+              ),
+            ],
           ),
         ],
       ),
