@@ -137,6 +137,26 @@ void main() {
     expect(find.text('App Store'), findsOneWidget);
   });
 
+  testWidgets('keeps phone-width actions in two intentional rows', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(371, 667);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await _pump(tester, version: '3.2.0');
+
+    final skip = tester.getRect(find.text('Skip this one'));
+    final changes = tester.getRect(find.text('View changes'));
+    final store = tester.getRect(
+      find.widgetWithText(FilledButton, 'App Store'),
+    );
+    expect(skip.center.dy, changes.center.dy);
+    expect(store.top, greaterThan(skip.bottom));
+    expect(store.width, greaterThan(skip.width + changes.width));
+  });
+
   testWidgets('a TestFlight build is sent to TestFlight', (tester) async {
     await _pump(
       tester,
