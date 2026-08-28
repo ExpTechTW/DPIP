@@ -254,6 +254,22 @@ abstract interface class MapLayer {
   void onStyleReset();
 }
 
+/// Transfers the hosting surface's visibility when its active layer changes.
+///
+/// Inactive realtime layers may retain `visible = false` from an earlier tab
+/// switch. Merely calling [MapLayer.render] when selecting one again does not
+/// repair that state, so its guarded map pushes remain disabled even though the
+/// user is looking at it. Every selection therefore hides the outgoing layer
+/// and explicitly gives the incoming one the surface's current visibility.
+void handoffMapLayerVisibility({
+  required MapLayer previous,
+  required MapLayer next,
+  required bool surfaceVisible,
+}) {
+  previous.onSurfaceVisibility(false);
+  next.onSurfaceVisibility(surfaceVisible);
+}
+
 /// No-op bodies for the [MapLayer] members a given layer type doesn't use.
 ///
 /// Timeline layers (radar, satellite, QPESUMS) draw nothing in [MapLayer.render]
