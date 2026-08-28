@@ -1142,6 +1142,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (layer.id == _active.id) return;
     final controller = _controller;
     final previous = _active;
+    // A layer can have retained `visible = false` since it was active when the
+    // map tab was hidden. Rendering it again is not enough: realtime layers
+    // gate their source updates on that flag, leaving their freshly-created
+    // sources empty. Transfer visibility on every selection so switching back
+    // to the monitor immediately replays the current EEW snapshot.
+    handoffMapLayerVisibility(
+      previous: previous,
+      next: layer,
+      surfaceVisible: _isVisible,
+    );
     // Invalidate in-flight loads/renders of the previous layer.
     _generation++;
     setState(() {
