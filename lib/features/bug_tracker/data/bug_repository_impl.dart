@@ -9,13 +9,6 @@ import 'package:dpip/features/bug_tracker/domain/bug_thread.dart';
 import 'package:dpip/features/bug_tracker/domain/bug_repository.dart';
 import 'package:flutter/foundation.dart';
 
-/// The forum tag that marks a thread as about THIS app. A routing marker, not
-/// a category — it is filtered on and never rendered.
-///
-/// In canonical form: see [canonicalBugTag] for why the two endpoints disagree
-/// about how they spell it.
-const String appBugTag = 'dpip';
-
 class BugRepositoryImpl implements BugRepository {
   const BugRepositoryImpl(this._api);
 
@@ -44,22 +37,20 @@ String _normalise(String body) => body.replaceAllMapped(
   (match) => match.group(1) ?? match.input,
 );
 
-/// The two tracker endpoints spell the same tag two different ways.
+/// A tag as the app matches it: the forum's slug, lower-cased.
 ///
-/// The index sends the forum's slugs — `["dpip", "bug"]`. The detail endpoint
-/// still reflects Discord's raw forum labels, which are bilingual — `["臭蟲
-/// bug", "DPIP", "已解決 fixed"]`. Left alone, one thread carries `bug` in the
-/// list and `臭蟲` on its own page, and the routing marker matches `dpip` in
-/// one place and `DPIP` in the other — which drops every thread from the
-/// index, because nothing equals `DPIP` once the server started sending slugs.
+/// Both endpoints now send slugs — `["bug", "dpip", "fixed"]` — verified
+/// across the index and ten detail replies covering every tag in the
+/// vocabulary. They did not always agree: the detail endpoint used to reflect
+/// Discord's raw bilingual labels (`臭蟲 bug`, `DPIP`, `已解決 fixed`), so this
+/// took a label's English tail to reconcile the two. That split is gone with
+/// the behaviour it compensated for; a tag with a space in it is now a tag
+/// with a space in it.
 ///
-/// The slug is the canonical form, so a bilingual label yields its English
-/// tail. `臭蟲 bug` → `bug`, `DPIP` → `dpip`, `bug` → `bug`.
-String canonicalBugTag(String tag) {
-  final trimmed = tag.trim();
-  final space = trimmed.lastIndexOf(' ');
-  return (space < 0 ? trimmed : trimmed.substring(space + 1)).toLowerCase();
-}
+/// The lower-casing stays. It is what the routing marker actually needed —
+/// `DPIP` had to equal `dpip` or every thread fell out of the index — and it
+/// is one comparison against a regression whose other failure mode is silent.
+String canonicalBugTag(String tag) => tag.trim().toLowerCase();
 
 List<String> _canonicalTags(Object? raw) {
   if (raw is! List) return const [];
@@ -145,8 +136,11 @@ List<BugThread> parseBugThreads(Object? body) {
   ];
   // `dpip` is the forum's routing marker: threads without it are not about
   // this app (other products share the tracker), so they never reach the
-  // index. Locked threads are staff-side conversations — same. Matched in
-  // canonical form, because the marker arrives spelt both ways.
+  // index. `BugApi.list` already asks the server for that tag, so this is the
+  // backstop rather than the mechanism — a server that stops honouring the
+  // query would otherwise put another product's threads in this list with no
+  // other symptom. Locked threads are staff-side conversations, which the
+  // query cannot express at all.
   threads.removeWhere(
     (thread) =>
         thread.locked || !thread.tags.map(canonicalBugTag).contains(appBugTag),
