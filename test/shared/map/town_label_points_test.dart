@@ -41,12 +41,15 @@ void main() {
   /// data does not carry — and by nothing else. A wider gap means someone
   /// regenerated against stale boundaries.
   ///
-  /// Today that is one township, and the gap is not a label problem:
-  /// 新竹市香山區 has **no polygon at all** in `town_boundaries.json.gz`, and
-  /// 新竹市北區's polygon covers its ground, so `TownBoundaries.codeAt` answers
-  /// 北區 for a GPS fix anywhere in 香山. That misroutes township-level alert
-  /// targeting for everyone there, not just the label, and it can only be fixed
-  /// in the source data.
+  /// Today the boundary data carries all 368, so the gap is empty.
+  ///
+  /// It was not always: 新竹市香山區 used to have no polygon at all, because the
+  /// upstream township source gave it 北區's code (300) instead of its own (309)
+  /// and the by-code keying merged the two. `TownBoundaries.codeAt` therefore
+  /// answered 北區 for a GPS fix anywhere in 香山, misrouting township-level
+  /// alert targeting for everyone there. The boundaries were split back apart
+  /// against the high-resolution source; if this gap ever reopens, suspect the
+  /// same class of collision rather than the label table.
   test(
     'the table covers every township that has a boundary to place in',
     () async {
@@ -65,7 +68,7 @@ void main() {
       expect(missing, equals(withoutBoundary));
       expect(
         withoutBoundary,
-        ['新竹市香山區 (309)'],
+        isEmpty,
         reason: 'a new gap here is a boundary-data regression, not a label one',
       );
     },
