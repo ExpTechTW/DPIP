@@ -8,8 +8,8 @@
 #   code   what both stores sort by     426000298   426000299
 #   date   the day the build was cut    26-08-17    26-08-17
 #
-# One code, not one per store. They can be aligned because the two floors do
-# not both apply at once — see FLOOR and BURNED_TRAINS below.
+# One code, not one per store. They can be aligned because the leading
+# generation digit clears both stores' history at once — see SCHEME below.
 #
 # They are separated because they answer different questions and obey
 # different rules:
@@ -47,9 +47,16 @@ set -euo pipefail
 # commit — and it moves by exactly as much as the work did.
 #
 # What it costs: a rewritten history can lower it, where a clock cannot. That
-# is why the release workflow refuses to build when the code is not above
-# every one already published — a rewrite then stops the run instead of
-# poisoning a store, and the fix is to raise FLOOR by a line.
+# is why the release workflow compares the code against every one it has
+# already published, and refuses to build when this one is *below* — a rewrite
+# stops the run instead of poisoning a store, and the fix is to raise SCHEME.
+#
+# It is also why a release tag does not always get the count. Every push to
+# main publishes a snapshot, and a snapshot uploads to both stores, so a
+# commit has spent its number by the time anyone can tag it; the workflow
+# raises a tagged build past the tie rather than failing on it. A release's
+# code is therefore the next free number, not necessarily its commit count.
+# See the ordinal step in `.github/workflows/release.yml`.
 #
 # The code is `4 | yy | commits-this-year`, read straight off the digits:
 #

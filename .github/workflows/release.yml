@@ -25,7 +25,9 @@ jobs:
     outputs:
       label: ${{ steps.v.outputs.label }}
       train: ${{ steps.v.outputs.train }}
-      code: ${{ steps.v.outputs.code }}
+      # From the guard, not from `v`: a release tag on a commit the snapshot
+      # run already published is raised there. See that step.
+      code: ${{ steps.ordinal.outputs.code }}
       date: ${{ steps.v.outputs.date }}
       prerelease: ${{ steps.v.outputs.prerelease }}
     steps:
@@ -60,7 +62,30 @@ jobs:
       # is invisible to it — which is how 408283049 reached TestFlight ahead of
       # the scheme. The per-store floors in tool/release/version.sh are what cover
       # those; raise one whenever something is shipped outside this workflow.
+      #
+      # Equal and lower are different failures, and only one of them is a bug.
+      #
+      # **Lower** means the ordinal went backwards — a rewritten history, which
+      # is what the check was written for. It still stops the run.
+      #
+      # **Equal** on a tag means this commit was already published as a
+      # snapshot. That is not an accident, it is the normal shape of a release:
+      # every push to main publishes, so by the time anyone can tag a commit it
+      # has already spent its number, and both uploads below run for a snapshot
+      # exactly as they do for a release. `v26.1` only shipped because its
+      # commit never went out as a snapshot; on `v26.2` (`d2b4664b`, carrying
+      # both `26w35g` and `v26.2`) the tag run computed the snapshot's own
+      # 426000507 and died. There is no way to tag around it — a branch push
+      # and a tag push are two events on one commit, so a fresh commit collides
+      # the same way.
+      #
+      # So a tie on a tag takes the next number instead. What that gives up is
+      # the ordinal reading back as an exact commit count for release builds
+      # only; what it buys is a release path that exists. A tie on a *branch*
+      # is still a failure — nothing should publish the same commit twice as a
+      # snapshot.
       - name: Ordinal must be higher than the last published one
+        id: ordinal
         env:
           GH_TOKEN: ${{ github.token }}
           # Through the environment rather than interpolated into the script:
@@ -79,10 +104,19 @@ jobs:
           previous="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
             --jq '[.[] | (.body // "") | capture("<!--\\s*dpip-build:\\s*(?<c>\\d+)") | .c | tonumber] | max // 0')"
           echo "previous=$previous current=$CODE"
-          if [ "$CODE" -le "$previous" ]; then
-            echo "::error::build ordinal $CODE is not above the published $previous"
+          if [ "$CODE" -lt "$previous" ]; then
+            echo "::error::build ordinal $CODE is below the published $previous"
             exit 1
           fi
+          if [ "$CODE" -eq "$previous" ]; then
+            if [ "$GITHUB_REF_TYPE" != "tag" ]; then
+              echo "::error::build ordinal $CODE repeats the published $previous"
+              exit 1
+            fi
+            CODE=$((previous + 1))
+            echo "::notice::this commit already published $previous as a snapshot; the release takes $CODE"
+          fi
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
 
   build:
     needs: version
