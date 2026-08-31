@@ -28,6 +28,16 @@ void _writeFixture(String path, List<(int, double, double)> fixes) {
     'lat INTEGER NOT NULL, lng INTEGER NOT NULL)',
   );
 
+  // One transaction for the whole fixture. The loop below writes a row at a
+  // time because that is what the native stores do, but in WAL mode each of
+  // those is its own commit and its own fsync — 20 000 of them for the
+  // compactness test at the bottom of this file. A local SSD answers an fsync
+  // in tens of microseconds and a shared CI runner's disk in a millisecond or
+  // two, which is the whole distance between a one-second test here and the
+  // thirty-second timeout that took `main` red. Batching moves when the pages
+  // reach the disk, not what is in them: the file comes out at exactly the
+  // same 282 624 bytes, so the byte-per-fix budget still measures the encoding.
+  db.execute('BEGIN');
   for (final (time, latitude, longitude) in fixes) {
     final lat = (latitude * _scale).round();
     final lng = (longitude * _scale).round();
@@ -47,6 +57,7 @@ void _writeFixture(String path, List<(int, double, double)> fixes) {
       previous == null ? lng : lng - previous.$3,
     ]);
   }
+  db.execute('COMMIT');
   db.close();
 }
 
