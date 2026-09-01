@@ -88,6 +88,11 @@ EOF
   fi
 
   export DPIP_MISE_CHECKED=1
+
+  # The pinned SDK carries repo-owned patches (tool/patches). Applied here, at
+  # the one gate every toolchain call already passes through, so no script and
+  # no machine can be the one that forgot. Silent unless it changes something.
+  "$root/tool/internal/apply_sdk_patches.sh"
 }
 
 # `flutter`/`dart`/anything else, on the pinned toolchain.
