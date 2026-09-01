@@ -371,7 +371,14 @@ class WeatherSkyPainter extends CustomPainter {
       ..setFloat(40, hazeSky.r)
       ..setFloat(41, hazeSky.g)
       ..setFloat(42, hazeSky.b)
-      ..setImageSampler(1, skyColumn);
+      ..setImageSampler(1, skyColumn)
+      // Slot 0 is per-sprite and the loop below overwrites it — but
+      // `Paint.shader=` refuses a shader with any sampler still unassigned,
+      // and on the first frame after `fragmentShader()` slot 0 has never been
+      // written. Seeding it here is what makes that frame draw at all: the
+      // throw propagates out of `paint()`, so it took the whole sky down with
+      // it, not just the clouds. `cloudSprites` is non-empty by the guard.
+      ..setImageSampler(0, cloudSprites.first);
 
     final paint = Paint()..shader = shader;
     for (final p in placed) {
