@@ -30,13 +30,14 @@ it, so a toolchain bump leaves the old SDK on PATH until the session is
 replaced, and a run against the wrong SDK announces nothing: it builds, it runs,
 its tests pass.
 
-Three things enforce it, none of which relies on anybody remembering:
+Four things enforce it, none of which relies on anybody remembering:
 
 | Where | What it refuses |
 |---|---|
 | `require_mise` in `tool/dev/_lib.sh` | no mise, no `mise.toml`, or a flutter that resolves outside mise's own installs — the last one is the dangerous case, because `mise exec` will happily forward to a system SDK |
 | `tool/check/tooling.sh` | a bare toolchain command in the docs or CI; and, for every script in `tool/`, one that does not parse, is not executable, has no shebang, or reaches `flutter` / `dart` / `mise exec` without going through `pinned` |
-| `tool/run.sh` | runs both before it starts anything (0.34 s) |
+| `tool/internal/apply_sdk_patches.sh` | an SDK that is missing a patch this repo owns, or a patch that no longer applies to the pinned version — see [SDK patches](#sdk-patches) |
+| `tool/run.sh` | runs them before it starts anything (0.34 s) |
 
 ```sh
 tool/dev/analyze.sh
@@ -60,6 +61,29 @@ tool/dev/analyze.sh
 `tool/` is organised by what a script is for: `dev/` daily workflows, `check/`
 the CI gates, `release/` versioning and notes, `gen/` asset and code
 generators, `internal/` pieces other scripts call and nobody runs by hand.
+
+### SDK patches
+
+**The pinned Flutter SDK is not stock.** `tool/patches/*.patch` is applied to it
+by `require_mise`, so every script here — and every CI job, which reaches the
+toolchain the same way — runs a patched framework. Each patch names its upstream
+issue in its own header; read that before touching one.
+
+This is the one place the repo deliberately does what the rest of this section
+exists to prevent, so it is held to the same standard. The patch lives in the
+repo rather than in an install, it is applied at the single gate every toolchain
+call already passes, and it says so the first time it changes anything. A patch
+applied on one laptop and forgotten on a runner would be exactly the
+works-here-fails-there the pin was bought to stop.
+
+Two things follow, and both matter:
+
+- **A patch that no longer applies is a hard stop**, not a skip. That is almost
+  always a Flutter bump. Somebody has to decide whether upstream fixed the bug —
+  delete the patch — or whether it has to be re-cut against the new source.
+- **Every patch carries a test that fails without it.** The test, not a check
+  script, is what proves the patch is really in; it is also what stays behind
+  once the patch is deleted, to say the upstream fix is real.
 
 ## Running
 

@@ -1,0 +1,49 @@
+Guard SemanticsNode.attach() against a stale child list.
+
+    flutter#189902  https://github.com/flutter/flutter/issues/189902  (open)
+    cut against     flutter 3.47.0
+
+`detach()` documents that `_children` is allowed to be stale — it may hold
+nodes that have since been re-parented — and skips those:
+
+    if (child.parent == this) { child.detach(); }
+
+`attach()` walks the same list with no such guard, so it re-attaches a node
+that now belongs to somebody else. That produces a node with `attached == true`
+and `parent == null`, and the next `_replaceChildren` trips
+
+    'package:flutter/src/semantics/semantics.dart': line 3013
+    Failed assertion: '!child.attached': is not true.
+
+Every `Tooltip` is an `OverlayPortal` (`RawTooltip` is built on
+`OverlayPortal.overlayChildLayoutBuilder`), so showing and dismissing one
+twice is enough to reach it — which is what DPIP hit. Related, all open and
+all traced to `fccfa978a97` "Reland: Refactor OverlayPortal semantics", in
+stable since 3.41.0: flutter#187198, flutter#182604.
+
+The assert is debug-only, but the inconsistent parent/child pointers it
+catches are real in release too, where they silently mis-shape the tree a
+screen reader walks.
+
+`test/shared/semantics_overlay_portal_test.dart` fails without this patch.
+That test — not a check script — is what keeps the patch honest: when upstream
+lands a fix and mise.toml moves off 3.47.0, this patch stops applying and
+tool/internal/apply_sdk_patches.sh fails loudly. Delete it then, and the test
+should stay green on its own.
+
+--- a/packages/flutter/lib/src/semantics/semantics.dart	2026-09-01 13:49:30
++++ b/packages/flutter/lib/src/semantics/semantics.dart	2026-09-01 13:49:30
+@@ -3263,7 +3263,12 @@
+     }
+     if (_children != null) {
+       for (final SemanticsNode child in _children!) {
+-        child.attach(owner);
++        // The list of children may be stale and may contain nodes that have
++        // been assigned to a different parent. Mirrors the guard `detach()`
++        // already has. See https://github.com/flutter/flutter/issues/189902
++        if (child.parent == this) {
++          child.attach(owner);
++        }
+       }
+     }
+   }
