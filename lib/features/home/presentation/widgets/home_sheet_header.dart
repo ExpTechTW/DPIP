@@ -234,15 +234,30 @@ class HomeSheetHeader extends StatelessWidget {
                         color: conditionAccent,
                       ),
                       const SizedBox(width: AppSpacing.md),
-                      Text.rich(
-                        TextSpan(
-                          children: [
+                      // The reading is one unbreakable token — `28.7°C` has
+                      // nowhere to wrap — beside an icon that does not scale
+                      // with text, so on a narrow phone at a large accessibility
+                      // size it grew past the row and the last digits were cut
+                      // off. Scaled down to the width that is left instead:
+                      // shrinking only when it must, and the temperature stays
+                      // the largest thing on the screen either way. Truncating
+                      // it was never an option — half a temperature reads as a
+                      // different temperature.
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text.rich(
                             TextSpan(
-                              text: temp?.toStringAsFixed(1) ?? '—',
-                              style: tempStyle,
+                              children: [
+                                TextSpan(
+                                  text: temp?.toStringAsFixed(1) ?? '—',
+                                  style: tempStyle,
+                                ),
+                                TextSpan(text: '°C', style: unitStyle),
+                              ],
                             ),
-                            TextSpan(text: '°C', style: unitStyle),
-                          ],
+                          ),
                         ),
                       ),
                     ],

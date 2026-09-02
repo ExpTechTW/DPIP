@@ -66,6 +66,17 @@ class HomeForecastSection extends StatefulWidget {
 }
 
 class _HomeForecastSectionState extends State<HomeForecastSection> {
+  /// Height of the fully grown temperature curve. Not text-scaled — it is a
+  /// chart, and its readable size comes from the width it is drawn across.
+  static const double _sparklineHeight = 36;
+
+  /// Expansion at which the detail band snaps open. Halfway through the
+  /// reveal, so the same pull that grows the curve carries the band with it,
+  /// and the band never sits on a threshold the scroll cannot cross —
+  /// `HomeContent` normalises [HomeForecastSection.expansion] against the
+  /// scroll range that actually exists, so 0.5 is always half a pull away.
+  static const double _detailOpenAt = 0.5;
+
   int _selected = 0;
   WeatherForecast? _seriesForecast;
   _ForecastTemperatureSeries? _series;
@@ -184,104 +195,128 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
                   ),
                 ),
               ),
-              Text(
-                l10n.homeForecastHighLow(
-                  maxTemp.round().toString(),
-                  minTemp.round().toString(),
+              // Flexible, not a bare [Text]: a Row lays its non-flex children
+              // out unbounded, so at a large text step this one grew past the
+              // width left over and the whole title row overflowed to the
+              // right. Sharing the row with the title lets it wrap onto a
+              // second line instead — the high and the low are numbers, and a
+              // number that is ellipsised is worse than a number on its own
+              // line. At every ordinary text size it still fits on one.
+              Flexible(
+                child: Text(
+                  l10n.homeForecastHighLow(
+                    maxTemp.round().toString(),
+                    minTemp.round().toString(),
+                  ),
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.labelLarge?.copyWith(color: secondary),
                 ),
-                style: theme.textTheme.labelLarge?.copyWith(color: secondary),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          // The sparkline and detail band reveal with [expansion] — the summary
-          // card shows only the title + hour chips, and pulling the sheet up
-          // grows this same card into its full height. Clipped so the not-yet-
-          // revealed parts never bleed over the hour chips below.
-          ClipRect(
-            child: Align(
-              alignment: Alignment.topCenter,
-              heightFactor: expansion,
-              child: Opacity(
-                opacity: expansion,
-                child: SizedBox(
-                  height: 36,
-                  width: double.infinity,
-                  child: CustomPaint(
-                    painter: _TempSparklinePainter(
-                      temps: temps,
-                      min: minTemp,
-                      max: maxTemp,
-                      selected: selected,
-                      line: colors.primary,
-                      fill: colors.primary.withValues(alpha: 0.18),
-                      mark: foreground,
-                    ),
-                    child: const SizedBox.expand(),
-                  ),
+          // The sparkline reveals with [expansion] — the summary card shows
+          // only the title + hour chips, and pulling the sheet up grows this
+          // same card into its full height. Grown by handing the painter a
+          // shorter box, never by clipping a full-height one: the painter maps
+          // the series onto whatever height it is given, so every fraction is
+          // a whole curve. The scroll can rest at any fraction, and a clipped
+          // chart parked at 0.7 reads as a chart with its bottom sliced off.
+          Opacity(
+            opacity: expansion,
+            child: SizedBox(
+              height: _sparklineHeight * expansion,
+              width: double.infinity,
+              child: CustomPaint(
+                painter: _TempSparklinePainter(
+                  temps: temps,
+                  min: minTemp,
+                  max: maxTemp,
+                  selected: selected,
+                  line: colors.primary,
+                  fill: colors.primary.withValues(alpha: 0.18),
+                  mark: foreground,
                 ),
+                child: const SizedBox.expand(),
               ),
             ),
           ),
           SizedBox(height: AppSpacing.md * expansion),
-          SizedBox(
-            height: 108,
-            child: ListView.separated(
+          // The strip is exactly as tall as the tallest chip wants to be, not
+          // a fixed height the chips are expected to fit inside. Every line in
+          // a chip grows with the text-size setting while the icon does not,
+          // so no constant is right at every step: 108 fit until 特大, where
+          // the chips ran 16 px over it and the rain chance was cut in half.
+          // The intrinsic pass costs one extra layout of a row of ~24 chips of
+          // three short strings each.
+          IntrinsicHeight(
+            child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              itemCount: points.length,
-              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (context, index) {
-                final p = points[index];
-                final hour = _hourNumber(p.time);
-                final (icon, accent) = weatherVisual(
-                  p.weather,
-                  p.weatherCode,
-                  colors,
-                  // Per hour, not per row: a clear 02:00 chip must show a moon
-                  // while the 14:00 chip beside it shows a sun.
-                  isNight: hour < sunlight.sunrise || hour >= sunlight.sunset,
-                );
-                final isSelected = index == selected;
-                return _HourChip(
-                  time: l10n.chartHourLabel(hour),
-                  icon: icon,
-                  iconColor: accent ?? secondary,
-                  temp: '${p.temperature.round()}°',
-                  pop: l10n.homeForecastPop(p.pop.toString()),
-                  selected: isSelected,
-                  foreground: foreground,
-                  secondary: secondary,
-                  selectedFill: colors.primary.withValues(alpha: 0.16),
-                  onTap: () => setState(() => _selected = index),
-                );
-              },
-            ),
-          ),
-          ClipRect(
-            child: Align(
-              alignment: Alignment.topCenter,
-              heightFactor: expansion,
-              child: Opacity(
-                opacity: expansion,
-                child: _DetailBand(
-                  weather: point.weather,
-                  time: point.time,
-                  feelsLike: l10n.homeForecastFeelsLike(
-                    point.apparentTemp.round().toString(),
-                  ),
-                  humidity: l10n.homeForecastHumidity(
-                    point.humidity.toString(),
-                  ),
-                  wind: l10n.homeForecastWind(
-                    point.wind.direction,
-                    point.wind.beaufort.toString(),
-                  ),
-                  foreground: foreground,
-                  secondary: secondary,
-                  divider: secondary.withValues(alpha: 0.35),
-                ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AppSpacing.sm,
+                children: [
+                  for (final (index, p) in points.indexed)
+                    Builder(
+                      builder: (context) {
+                        final hour = _hourNumber(p.time);
+                        final (icon, accent) = weatherVisual(
+                          p.weather,
+                          p.weatherCode,
+                          colors,
+                          // Per hour, not per row: a clear 02:00 chip must show
+                          // a moon while the 14:00 chip beside it shows a sun.
+                          isNight:
+                              hour < sunlight.sunrise ||
+                              hour >= sunlight.sunset,
+                        );
+                        return _HourChip(
+                          time: l10n.chartHourLabel(hour),
+                          icon: icon,
+                          iconColor: accent ?? secondary,
+                          temp: '${p.temperature.round()}°',
+                          pop: l10n.homeForecastPop(p.pop.toString()),
+                          selected: index == selected,
+                          foreground: foreground,
+                          secondary: secondary,
+                          selectedFill: colors.primary.withValues(alpha: 0.16),
+                          onTap: () => setState(() => _selected = index),
+                        );
+                      },
+                    ),
+                ],
               ),
             ),
+          ),
+          // Snapped open, not scroll-linked like the sparkline above: this band
+          // is text, and a fraction of a line of text is a line cut in half.
+          // The scroll rests wherever the finger leaves it, so a scroll-linked
+          // clip here parks a sliced line on screen for as long as the user
+          // stays — which is exactly what it used to do. It crosses
+          // [_detailOpenAt] once and animates to its own full height.
+          AnimatedSize(
+            duration: AppMotion.medium,
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: expansion < _detailOpenAt
+                ? const SizedBox(width: double.infinity)
+                : _DetailBand(
+                    weather: point.weather,
+                    time: point.time,
+                    feelsLike: l10n.homeForecastFeelsLike(
+                      point.apparentTemp.round().toString(),
+                    ),
+                    humidity: l10n.homeForecastHumidity(
+                      point.humidity.toString(),
+                    ),
+                    wind: l10n.homeForecastWind(
+                      point.wind.direction,
+                      point.wind.beaufort.toString(),
+                    ),
+                    foreground: foreground,
+                    secondary: secondary,
+                    divider: secondary.withValues(alpha: 0.35),
+                  ),
           ),
         ],
       ),

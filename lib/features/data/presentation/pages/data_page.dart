@@ -2,6 +2,8 @@
 /// weather observation rankings, …).
 library;
 
+import 'dart:math' as math;
+
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -73,8 +75,9 @@ class DataPage extends StatelessWidget {
               ),
             ),
             SectionHeader(l10n.dataSectionWeather),
-            GridView.count(
-              crossAxisCount: 2,
+            // Wide and short: icon left, label right, one glance per tile.
+            GridView(
+              gridDelegate: _rankingGrid(context),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(
@@ -83,10 +86,6 @@ class DataPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.sm,
               ),
-              crossAxisSpacing: AppSpacing.sm,
-              mainAxisSpacing: AppSpacing.sm,
-              // Wide and short: icon left, label right, one glance per tile.
-              childAspectRatio: 2.4,
               children: [
                 for (final (tab, icon) in _weatherRankingEntries)
                   _RankingGridTile(
@@ -105,8 +104,8 @@ class DataPage extends StatelessWidget {
               ],
             ),
             SectionHeader(l10n.dataSectionAstronomy),
-            GridView.count(
-              crossAxisCount: 2,
+            GridView(
+              gridDelegate: _rankingGrid(context),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(
@@ -115,9 +114,6 @@ class DataPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.sm,
               ),
-              crossAxisSpacing: AppSpacing.sm,
-              mainAxisSpacing: AppSpacing.sm,
-              childAspectRatio: 2.4,
               children: [
                 for (final (route, icon, label, accent)
                     in <(String, IconData, String, Color)>[
@@ -238,6 +234,34 @@ class _SeismicCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The ranking tiles' geometry, shared by both grids so 氣象 and 天文 stay the
+/// same shape.
+///
+/// Width-driven, not count-driven: two columns on a phone, four on a tablet,
+/// and a tile of the same size either way. `crossAxisCount: 2` with a
+/// `childAspectRatio` tied the tile's *height* to the screen's width — on a
+/// 1366 pt iPad the two columns are 668 pt wide, so every tile came out 278 pt
+/// tall and its single line of label floated in the middle of a sea of tonal
+/// grey.
+///
+/// The height is stated outright instead, and follows the text scale rather
+/// than the window: the tile holds a 34 pt icon badge beside a label of at most
+/// two lines, so that is what it is tall enough for at any text size. The 80
+/// floor is the height a phone drew before this, kept so the phone layout is
+/// untouched.
+SliverGridDelegate _rankingGrid(BuildContext context) {
+  const twoLabelLines = 44.0;
+  return SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: 340,
+    crossAxisSpacing: AppSpacing.sm,
+    mainAxisSpacing: AppSpacing.sm,
+    mainAxisExtent: math.max(
+      80,
+      AppSpacing.md * 2 + MediaQuery.textScalerOf(context).scale(twoLabelLines),
+    ),
+  );
 }
 
 /// A metric card in a grid — tonal surface, leading icon badge, label, and a

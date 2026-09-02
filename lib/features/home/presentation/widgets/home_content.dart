@@ -170,9 +170,32 @@ class HomeContent extends StatelessWidget {
   /// the fully expanded dry forecast scrollable instead of clipping them.
   static const double _minimumWeatherHeroHeight = 760;
 
-  /// Current growth of the hero forecast card for [offset].
-  static double _forecastExpansion(double offset) =>
-      (offset / _forecastExpandExtent).clamp(0.0, 1.0);
+  /// Current growth of the hero forecast card for [offset], over whichever is
+  /// shorter: [_forecastExpandExtent] or the scroll [reach] the list actually
+  /// has.
+  ///
+  /// The ramp has to be normalised because the distance it asks for is not a
+  /// distance the list is guaranteed to own. The hero block fills the viewport
+  /// exactly, so everything the sheet can scroll is what sits *after* it — on
+  /// a dry hour that is the grab handle, one gap and the (usually empty)
+  /// active-events card, about 140 px. A fixed 200 px ramp then tops out near
+  /// 0.7 at the very bottom of the list: the card could never finish opening
+  /// on a tall phone, no matter how hard it was pulled. Short phones hid this,
+  /// because [_minimumWeatherHeroHeight] hands them a hero taller than their
+  /// own viewport and the leftover is scroll distance; so did a larger text
+  /// size, which grows the cards below and with them the reach — which is why
+  /// this reads as a per-device, per-text-size bug rather than a constant.
+  ///
+  /// [reach] of 0 means the list cannot scroll at all, so no gesture is left
+  /// to reveal anything with: the card opens rather than sitting forever at
+  /// its summary.
+  static double _forecastExpansion(double offset, double reach) {
+    if (reach <= 0) return 1;
+    final extent = reach < _forecastExpandExtent
+        ? reach
+        : _forecastExpandExtent;
+    return (offset / extent).clamp(0.0, 1.0);
+  }
 
   /// How wet the rain-trend card gets for a given backdrop.
   ///
@@ -258,7 +281,8 @@ class HomeContent extends StatelessWidget {
                 // rebuild the whole panel for identical output. Keep this the
                 // max of the ramp extents if a longer ramp is ever added.
                 saturation: _forecastExpandExtent,
-                builder: (context, offset) {
+                builder: (context, reading) {
+                  final offset = reading.offset;
                   // The cards read as a pane of the sky only while the sky is
                   // the point (hero showing). Once the list scrolls, they
                   // solidify back into solid plates and their ink back onto
@@ -266,7 +290,10 @@ class HomeContent extends StatelessWidget {
                   // sky-tuned ink is exactly what makes scrolled content hard
                   // to read, no matter how dimmed the backdrop behind it is.
                   final reveal = this.reveal * (1 - _focus(offset));
-                  final forecastExpansion = _forecastExpansion(offset);
+                  final forecastExpansion = _forecastExpansion(
+                    offset,
+                    reading.reach,
+                  );
                   final heroLayoutHeight = heroHeight == null
                       ? null
                       : heroHeight < _minimumWeatherHeroHeight
@@ -285,13 +312,36 @@ class HomeContent extends StatelessWidget {
                       // SizedBox > Padding > Column > RainOnCard) never
                       // changes shape, so it never needs to be torn down and
                       // rebuilt when the sheet opens or closes.
-                      SizedBox(
-                        height: heroLayoutHeight,
+                      // A floor, not a fixed height: the block is
+                      // [heroLayoutHeight] tall whenever its own content fits
+                      // in that, and taller when it does not. At the largest
+                      // text step the header and the fully opened forecast
+                      // card together want ~60 px more than the viewport, and
+                      // a fixed height turned that into a RenderFlex overflow
+                      // — the bottom of the card, silently cut. Growing
+                      // instead hands the surplus to the list as scroll
+                      // distance, which is where a block taller than the
+                      // screen belongs.
+                      //
+                      // The floor is a `minHeight` and the column below sizes
+                      // to its children (`MainAxisSize.min`), which is why the
+                      // gap between header and card is `spaceBetween` rather
+                      // than the [Expanded] it used to be: a flex reads its
+                      // *constrained* size, so it still fills the floor and
+                      // still parks the card against the bottom edge, but it
+                      // is now free to exceed it instead of overflowing. An
+                      // [IntrinsicHeight] would express the same thing and
+                      // cannot be used — the header holds a [LayoutBuilder],
+                      // which refuses to answer intrinsic queries.
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: heroLayoutHeight ?? 0,
+                        ),
                         // Only the trailing gap depends on scroll offset, so
                         // that is all this block's Padding re-reads per tick.
                         child: Padding(
-                          // Deflates the tight SizedBox height so the Expanded
-                          // gap between header and trend card shrinks by exactly
+                          // Deflates the block height so the gap between
+                          // header and trend card shrinks by exactly
                           // this much and heroHeight itself — and with it the
                           // forecast/events fold below — never moves. Collapses
                           // to 0 as the sheet scrolls — see
@@ -303,6 +353,8 @@ class HomeContent extends StatelessWidget {
                                 : _heroBottomGap(offset, bottomSafeArea),
                           ),
                           child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               RainOnCard(
@@ -335,11 +387,12 @@ class HomeContent extends StatelessWidget {
                                 ),
                               ),
                               if (heroHeight != null) ...[
-                                // The gap is the point — open sky between the
-                                // two fixed edges, not a forgotten card.
-                                // `HomeSheet` blurs it back in once the scroll
-                                // below carries the trend card past the top.
-                                const Expanded(child: SizedBox.shrink()),
+                                // The gap between this card and the header —
+                                // the column's `spaceBetween` — is the point:
+                                // open sky between the two fixed edges, not a
+                                // forgotten card. `HomeSheet` blurs it back in
+                                // once the scroll below carries the trend card
+                                // past the top.
                                 if (dryTrend)
                                   // A dry hour has no rain chart, so the forecast
                                   // card itself takes the hero slot — a one-glance
@@ -582,14 +635,19 @@ class HomeSheetHandle extends StatelessWidget {
   }
 }
 
-/// Rebuilds [builder] only when the scroll offset, clamped to
-/// `[0, saturation]`, actually changes.
+/// How far the list is scrolled and how far it *can* be scrolled: the offset
+/// clamped to `[0, saturation]`, and the position's own max scroll extent.
+typedef _ScrollReading = ({double offset, double reach});
+
+/// Rebuilds [builder] only when the scroll reading — offset clamped to
+/// `[0, saturation]`, plus the reach the ramps are measured against —
+/// actually changes.
 ///
 /// A [ScrollController] notifies on every scrolled pixel. The panel this
 /// drives derives everything from clamping ramps that saturate early, so most
 /// of those notifications produce byte-identical output — the clamp runs
-/// here, in the listener, and [ValueNotifier]'s own equality drops the
-/// duplicates before any widget rebuilds.
+/// here, in the listener, and the record's own equality drops the duplicates
+/// before any widget rebuilds.
 class _SaturatingOffsetBuilder extends StatefulWidget {
   const _SaturatingOffsetBuilder({
     required this.controller,
@@ -599,7 +657,7 @@ class _SaturatingOffsetBuilder extends StatefulWidget {
 
   final ScrollController controller;
   final double saturation;
-  final Widget Function(BuildContext context, double offset) builder;
+  final Widget Function(BuildContext context, _ScrollReading reading) builder;
 
   @override
   State<_SaturatingOffsetBuilder> createState() =>
@@ -607,13 +665,37 @@ class _SaturatingOffsetBuilder extends StatefulWidget {
 }
 
 class _SaturatingOffsetBuilderState extends State<_SaturatingOffsetBuilder> {
-  late final ValueNotifier<double> _offset = ValueNotifier(_read());
+  late final ValueNotifier<_ScrollReading> _reading = ValueNotifier(_read());
 
-  double _read() => widget.controller.hasClients
-      ? widget.controller.offset.clamp(0.0, widget.saturation)
-      : 0.0;
+  /// [ScrollPosition] announces a changed *offset* to its listeners, but a
+  /// changed content extent only as a `ScrollMetricsNotification`, which
+  /// bubbles up past this builder (it is a child of the list). Re-reading the
+  /// reach on every scroll tick is what keeps it current instead: any content
+  /// change the user has not yet scrolled through leaves the offset at 0,
+  /// where the reach does not affect a single ramp.
+  ///
+  /// Before first layout there is no position to read. The reach is reported
+  /// as the full [HomeContent._forecastExpandExtent] rather than 0 for that
+  /// frame — 0 means "cannot scroll", and answering that before the list has
+  /// ever been measured would pop the forecast card open on the first frame.
+  _ScrollReading _read() {
+    if (!widget.controller.hasClients) {
+      return (offset: 0.0, reach: widget.saturation);
+    }
+    final position = widget.controller.position;
+    return (
+      offset: position.hasPixels
+          ? position.pixels.clamp(0.0, widget.saturation)
+          : 0.0,
+      // Both are still unset while this builds inside the list's very first
+      // layout, and reading either one there throws.
+      reach: position.hasContentDimensions
+          ? position.maxScrollExtent
+          : widget.saturation,
+    );
+  }
 
-  void _onScroll() => _offset.value = _read();
+  void _onScroll() => _reading.value = _read();
 
   @override
   void initState() {
@@ -634,13 +716,13 @@ class _SaturatingOffsetBuilderState extends State<_SaturatingOffsetBuilder> {
   @override
   void dispose() {
     widget.controller.removeListener(_onScroll);
-    _offset.dispose();
+    _reading.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder<double>(
-    valueListenable: _offset,
-    builder: (context, offset, _) => widget.builder(context, offset),
+  Widget build(BuildContext context) => ValueListenableBuilder<_ScrollReading>(
+    valueListenable: _reading,
+    builder: (context, reading, _) => widget.builder(context, reading),
   );
 }

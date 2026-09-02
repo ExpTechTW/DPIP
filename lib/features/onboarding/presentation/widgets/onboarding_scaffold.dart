@@ -26,6 +26,15 @@ class OnboardingScaffold extends StatefulWidget {
 }
 
 class _OnboardingScaffoldState extends State<OnboardingScaffold> {
+  /// The widest the step's column is allowed to get. A tablet is wide enough
+  /// that an unconstrained onboarding stretches every row to the screen's
+  /// edges: the body becomes a single line of text a foot long, each
+  /// permission card strands its 授權 button half a screen away from the
+  /// sentence explaining it, and the final call to action is a button wider
+  /// than any thumb travels. Same measure as the settings sheet, so the two
+  /// permission surfaces are the same shape.
+  static const double _maxContentWidth = 560;
+
   final ScrollController _controller = ScrollController();
   bool _atEnd = false;
   bool _checkScheduled = false;
@@ -96,7 +105,14 @@ class _OnboardingScaffoldState extends State<OnboardingScaffold> {
               child: SingleChildScrollView(
                 controller: _controller,
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                child: widget.child,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: _maxContentWidth,
+                    ),
+                    child: widget.child,
+                  ),
+                ),
               ),
             ),
           ),
@@ -110,7 +126,14 @@ class _OnboardingScaffoldState extends State<OnboardingScaffold> {
               AppSpacing.lg,
               AppSpacing.lg,
             ),
-            child: widget.actionBuilder(context, atEnd),
+            // Same measure as the body above it, so the action sits under the
+            // content it acts on rather than under the whole window.
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _maxContentWidth),
+                child: widget.actionBuilder(context, atEnd),
+              ),
+            ),
           ),
         ),
       ],

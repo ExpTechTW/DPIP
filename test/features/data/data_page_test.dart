@@ -91,6 +91,37 @@ void main() {
     expect(astronomy, greaterThan(weather));
   });
 
+  testWidgets('a tablet gets more columns, not taller tiles', (tester) async {
+    // An iPad in landscape. The grid used to be two fixed columns whose height
+    // came from a `childAspectRatio`, so the wider the screen the taller the
+    // tile: 668 pt columns gave 278 pt cells, each holding one line of label
+    // in the middle of an otherwise empty card.
+    tester.view.physicalSize = const Size(2752, 2064);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: _router([]),
+      ),
+    );
+    await tester.pump();
+
+    final tile = tester.getRect(
+      find
+          .ancestor(of: find.text('Moon'), matching: find.byType(InkWell))
+          .first,
+    );
+    expect(
+      tile.height,
+      lessThan(120),
+      reason: 'tile height, not a screen slice',
+    );
+    // Four columns of ~330, not two of ~670.
+    expect(tile.width, lessThan(400));
+  });
+
   for (final (route, label) in _astronomyTiles) {
     testWidgets('the $label tile navigates to $route', (tester) async {
       // A fresh router per tile: a tile wired to the wrong route would
