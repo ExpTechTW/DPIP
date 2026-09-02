@@ -47,7 +47,7 @@ Future<void> _pumpPage(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets("the app bar names the train's highlights", (tester) async {
+  testWidgets('the app bar names the cycle, not the train', (tester) async {
     AppBuild.debugSet(label: '26w35a', code: 42, train: '26.1');
     addTearDown(() => AppBuild.debugSet(label: 'dev', code: 0));
     await _pumpPage(tester);
@@ -55,8 +55,11 @@ void main() {
     final l10n = AppLocalizations.of(
       tester.element(find.byType(ReleaseHighlightsPage)),
     );
-    // The page's own name stays in the app bar… plus the train number.
-    expect(find.text(l10n.releaseHighlightsTitle('26.1')), findsOneWidget);
+    // The page's own name stays in the app bar… over the cycle, so every
+    // train in it reaches the same heading. A build riding 26.1 must not
+    // title the page 26.1, or the highlights read as this build's alone.
+    expect(find.text(l10n.releaseHighlightsTitle('26.x')), findsOneWidget);
+    expect(find.text(l10n.releaseHighlightsTitle('26.1')), findsNothing);
   });
 
   testWidgets('renders both decks without overflow on a narrow phone', (

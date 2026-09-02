@@ -1,11 +1,11 @@
-// Version-highlight card content for DPIP 26.1 (advanced).
+// Version-highlight card content for DPIP 26.x (advanced).
 //
-// GENERATED from `release_highlights/assets/26.1/advanced/cards.json` by `tool/gen/release_highlights.py` — edit the
+// GENERATED from `release_highlights/assets/26.x/advanced/cards.json` by `tool/gen/release_highlights.py` — edit the
 // JSON, not this file. Rendering lives in `lib/features/release_highlights`;
 // this package carries only data.
 library;
 
-const title = {"zh_Hant": "DPIP 26.1 技術變更", "zh_Hans": "DPIP 26.1 技术变更", "en": "DPIP 26.1 technical changes", "ja": "DPIP 26.1 技術変更", "ko": "DPIP 26.1 기술 변경 사항", "th": "การเปลี่ยนแปลงทางเทคนิคใน DPIP 26.1", "vi": "Thay đổi kỹ thuật trong DPIP 26.1", "id": "Perubahan teknis DPIP 26.1", "fil": "Mga teknikal na pagbabago sa DPIP 26.1"};
+const title = {"zh_Hant": "DPIP 26.x 技術變更", "zh_Hans": "DPIP 26.x 技术变更", "en": "DPIP 26.x technical changes", "ja": "DPIP 26.x 技術変更", "ko": "DPIP 26.x 기술 변경 사항", "th": "การเปลี่ยนแปลงทางเทคนิคใน DPIP 26.x", "vi": "Thay đổi kỹ thuật trong DPIP 26.x", "id": "Perubahan teknis DPIP 26.x", "fil": "Mga teknikal na pagbabago sa DPIP 26.x"};
 const subtitle = {"zh_Hant": "以下內容已直接對照現行與 legacy 程式碼，只保留可由實作確認的差異。", "zh_Hans": "以下内容已直接对照现行与 legacy 代码，只保留可由实现确认的差异。", "en": "Each item was checked directly against the current and legacy code; only implementation-backed differences remain.", "ja": "現行版と旧版のコードを直接照合し、実装で確認できる差分だけを残しました。", "ko": "현재 코드와 레거시 코드를 직접 대조해 구현으로 확인되는 차이만 남겼습니다.", "th": "ตรวจสอบแต่ละรายการกับโค้ดปัจจุบันและ legacy โดยตรง และคงไว้เฉพาะความต่างที่ยืนยันได้จากการทำงานจริง", "vi": "Mỗi mục đã được đối chiếu trực tiếp với mã hiện tại và legacy; chỉ giữ lại khác biệt có thể xác nhận từ phần triển khai.", "id": "Setiap item diperiksa langsung terhadap kode saat ini dan legacy; hanya perbedaan yang didukung implementasi yang dipertahankan.", "fil": "Direktang inihambing ang bawat item sa kasalukuyan at legacy code; mga pagkakaibang napapatunayan ng implementation lang ang nanatili."};
 const cards = <Map<String, dynamic>>[
   {

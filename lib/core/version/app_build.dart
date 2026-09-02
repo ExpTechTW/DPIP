@@ -53,6 +53,20 @@ abstract final class AppBuild {
   /// page version card shows it as the big number, above the label.
   static String get train => _train;
 
+  /// The release cycle this build belongs to, written `26.x`.
+  ///
+  /// Every train in a cycle ships the same highlights, so the two pages that
+  /// present them name the cycle rather than whichever train happens to be
+  /// installed: `26.1` and `26.2` both read `26.x`, and the trains after them
+  /// read `27.x`. Anything naming the *build* still uses [train] — the More
+  /// page version card and Apple's marketing version both need the real
+  /// number.
+  static String get cycle {
+    if (_train.isEmpty) return _train;
+    final dot = _train.indexOf('.');
+    return '${dot < 0 ? _train : _train.substring(0, dot)}.x';
+  }
+
   /// The version the platform itself records for this build — what the OS
   /// shows under Settings → app. For a local debug run that is the pubspec
   /// placeholder (`26.1.0`); CI stamps `--build-name` on iOS and `DPIP_LABEL`
