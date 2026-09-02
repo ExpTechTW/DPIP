@@ -688,11 +688,25 @@ const List<Object> _nameExpression = [
   ['get', 'name_int'],
 ];
 
+/// Mounts the OSM detailed overlay at two anchors, because the overlay is two
+/// different things.
+///
+/// [groundBelowLayerId] takes the opaque *ground* — landcover, land use,
+/// parks, water, buildings. It has to go under the township shaking wash: at
+/// one anchor for everything, the 0.9-opacity landcover painted straight over
+/// the wash, and 強震監視器 showed a fully tinted island only where OSM
+/// happened to have no polygon — a township with no colour reads as a township
+/// with no shaking.
+///
+/// [belowLayerId] takes the roads, place names and POI. Those stay *above* the
+/// wash: they are thin, they do not hide a colour, and they are the only thing
+/// left to navigate by once the island is tinted.
 Future<void> addGsiOverlay(
   MapLibreMapController controller, {
   required Brightness brightness,
   required GsiOverlayController selection,
   required String belowLayerId,
+  required String groundBelowLayerId,
 }) async {
   final layers = gsiStyleLayers(brightness);
   final added = <String>[];
@@ -708,7 +722,7 @@ Future<void> addGsiOverlay(
             gsiSourceId,
             layer.id,
             properties as FillLayerProperties,
-            belowLayerId: belowLayerId,
+            belowLayerId: groundBelowLayerId,
             sourceLayer: layer.sourceLayer,
             minzoom: layer.minZoom,
             filter: layer.filter,

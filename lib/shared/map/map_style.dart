@@ -125,6 +125,18 @@ const String countyFillLayerId = 'county';
 /// Id of the base township-fill layer (`town` source-layer) — recoloured the
 /// same way, keyed per `CODE`, when an EEW wants the whole island tinted by
 /// estimated shaking (legacy monitor behaviour).
+///
+/// Mounted at `fill-opacity: 0`: this layer paints the shaking wash and
+/// nothing else. The grey landmass under it is [countyFillLayerId]'s job —
+/// the two cover the same island in the same [MapPalette.fill], which is why
+/// the wash can already hide the county fill outright and still leave a whole
+/// grey island where the estimate is 0.
+///
+/// It has to start invisible so that something can be drawn *between* the
+/// landmass and the wash: the OSM detailed ground mounts here (see
+/// `basemap_overlay_sync`), and an opaque grey township would bury it. That
+/// is the same reason the wash's own `match` falls back to transparent rather
+/// than to the palette's grey.
 const String townFillLayerId = 'town';
 
 /// Id of the faint township-outline layer (below the county borders).
@@ -297,7 +309,7 @@ String exptechVectorStyle(
     { "id": "bg", "type": "background", "paint": { "background-color": "$background" } },
     { "id": "$landLayerId", "type": "fill", "source": "exptech", "source-layer": "global", "paint": { "fill-color": "$fill" } },
     { "id": "county", "type": "fill", "source": "exptech", "source-layer": "city", "paint": { "fill-color": "$fill" } },
-    { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill" } }$hillshade,
+    { "id": "town", "type": "fill", "source": "exptech", "source-layer": "town", "paint": { "fill-color": "$fill", "fill-opacity": 0 } }$hillshade,
     { "id": "$townOutlineLayerId", "type": "line", "source": "exptech", "source-layer": "town", "paint": { "line-color": "$townOutline", "line-width": 0.4, "line-opacity": 0.7 } },
     { "id": "$outlineLayerId", "type": "line", "source": "exptech", "source-layer": "city", "paint": { "line-color": "$outline", "line-width": 1.0 } },
     { "id": "$townLabelLayerId", "type": "symbol", "source": "$townLabelSourceId", "minzoom": $townLabelMinZoom, "layout": {

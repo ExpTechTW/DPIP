@@ -100,6 +100,7 @@ class BasemapOverlaySync {
             brightness: brightness,
             selection: gsi,
             belowLayerId: townOutlineLayerId,
+            groundBelowLayerId: townFillLayerId,
           );
           if (!stillCurrent()) return;
           _gsiOnMap = true;

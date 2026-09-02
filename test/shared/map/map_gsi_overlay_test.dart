@@ -3,6 +3,7 @@ import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -197,7 +198,8 @@ void main() {
       map,
       brightness: Brightness.dark,
       selection: selection,
-      belowLayerId: 'town-outline',
+      belowLayerId: townOutlineLayerId,
+      groundBelowLayerId: townFillLayerId,
     );
 
     expect(map.calls.first, 'addSource:$gsiSourceId');
@@ -208,7 +210,13 @@ void main() {
       hasLength(19),
     );
     for (final layer in gsiStyleLayers(Brightness.dark)) {
-      expect(map.belowOf(layer.id), 'town-outline', reason: layer.id);
+      // The ground goes under the township fill (which carries the shaking
+      // wash); everything thin stays above it.
+      expect(
+        map.belowOf(layer.id),
+        layer.kind == GsiLayerKind.fill ? townFillLayerId : townOutlineLayerId,
+        reason: layer.id,
+      );
     }
 
     selection.setGroupEnabled(GsiLayerGroup.roads, false);
@@ -225,6 +233,42 @@ void main() {
       map.calls.where((call) => call.startsWith('removeLayer:')),
       hasLength(19),
     );
+  });
+
+  test('the shaking wash sits over OSM ground, under OSM roads', () async {
+    // 強震監視器 and 重播 tint the island by recolouring the baked `town` fill.
+    // With every OSM layer anchored at one place, the overlay's 0.9-opacity
+    // landcover painted straight over that wash, and a township with no OSM
+    // polygon under it was the only one that still showed its colour — a map
+    // whose blank patches read as "no shaking here".
+    final map = RecordingMapController();
+    final selection = GsiOverlayController(SettingsStore.inMemory({}));
+    addTearDown(selection.dispose);
+
+    await addGsiOverlay(
+      map,
+      brightness: Brightness.dark,
+      selection: selection,
+      belowLayerId: townOutlineLayerId,
+      groundBelowLayerId: townFillLayerId,
+    );
+
+    for (final layer in gsiStyleLayers(Brightness.dark)) {
+      final ground = layer.kind == GsiLayerKind.fill;
+      expect(
+        map.isAbove(townFillLayerId, layer.id),
+        ground,
+        reason: '${layer.id} vs the wash',
+      );
+    }
+    // Named outright, so a layer changing kind cannot quietly move sides.
+    expect(map.isAbove(townFillLayerId, 'gsi-landcover'), isTrue);
+    expect(map.isAbove(townFillLayerId, 'gsi-building'), isTrue);
+    expect(map.isAbove('gsi-transportation', townFillLayerId), isTrue);
+    expect(map.isAbove('gsi-place', townFillLayerId), isTrue);
+    // …and the base map's own borders still end up over all of it.
+    expect(map.isAbove(townOutlineLayerId, 'gsi-place'), isTrue);
+    expect(map.isAbove(outlineLayerId, 'gsi-transportation'), isTrue);
   });
 
   test('OSM PBFs share the immutable map-tile cache path', () {
