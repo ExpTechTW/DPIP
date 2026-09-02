@@ -1,18 +1,20 @@
-/// Loads the current version's highlight cards from the content package.
+/// Loads the current cycle's highlight cards from the content package.
 ///
-/// Each version's cards live as Dart source in `package:dpip_release_highlights`
-/// (`lib/<version>/{normal,advanced}.dart`) — the *current* version's files
-/// are imported below. Older versions stay in the package as the archive and
-/// are never compiled into a build. When a new version ships, replace these two
-/// imports with the new version's; nothing else changes.
+/// Highlights are written once per *cycle*, not per train: every 26 release
+/// reads the same `26.x` deck, and 27 opens a new one. They live as Dart source
+/// in `package:dpip_release_highlights` (`lib/<cycle>/{normal,advanced}.dart`)
+/// — the current cycle's files are imported below. Closed cycles stay in the
+/// package as the archive and are never compiled into a build. When a cycle
+/// opens, replace these two imports with its own; nothing else changes.
 ///
-/// Content is authored as JSON at `release_highlights/<version>/…/cards.json`
-/// and compiled to Dart by `tool/gen/release_highlights.py`.
+/// Content is authored as JSON at
+/// `release_highlights/assets/<cycle>/…/cards.json` and compiled to Dart by
+/// `tool/gen/release_highlights.py`.
 library;
 
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
-import 'package:dpip_release_highlights/26.1/advanced.dart' as current_advanced;
-import 'package:dpip_release_highlights/26.1/normal.dart' as current_normal;
+import 'package:dpip_release_highlights/26.x/advanced.dart' as current_advanced;
+import 'package:dpip_release_highlights/26.x/normal.dart' as current_normal;
 
 /// Stateless loader that assembles [HighlightDeck]s from the current version's
 /// Dart content.

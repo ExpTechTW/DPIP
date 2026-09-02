@@ -94,11 +94,11 @@ class VersionNotesPage extends StatelessWidget {
                 AppSpacing.xl + MediaQuery.paddingOf(context).bottom,
               ),
               children: [
-                // The version's own story, one level further in: the train's
-                // key highlights, named for the release (e.g. 26.1 重點整理)
+                // The version's own story, one level further in: the cycle's
+                // key highlights, named for the cycle (e.g. 26.x 重點整理)
                 // rather than this build. Sits right under the app bar so the
                 // reader finds the summary first, before this build's note.
-                _HighlightsEntry(train: AppBuild.train),
+                _HighlightsEntry(cycle: AppBuild.cycle),
                 const SizedBox(height: AppSpacing.md),
                 _Header(note: note, isStable: stable),
                 const SizedBox(height: AppSpacing.md),
@@ -206,9 +206,9 @@ class _Header extends StatelessWidget {
 /// level further in from this build's own note. Label carries the train
 /// number so the reader sees where the note they just read fits.
 class _HighlightsEntry extends StatelessWidget {
-  const _HighlightsEntry({required this.train});
+  const _HighlightsEntry({required this.cycle});
 
-  final String train;
+  final String cycle;
 
   @override
   Widget build(BuildContext context) {
@@ -252,7 +252,7 @@ class _HighlightsEntry extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.releaseHighlightsTitle(train),
+                      l10n.releaseHighlightsTitle(cycle),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.2,
