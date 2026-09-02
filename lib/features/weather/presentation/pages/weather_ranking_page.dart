@@ -348,6 +348,13 @@ void _openStationOnMap(
   context.goNamed(AppRoutes.map);
 }
 
+/// Bottom inset so the last ranked rows aren't hidden by the shell's
+/// bottom nav bar (extendBody scaffolds). Same value every nested /data page
+/// uses. With `extendBody: true` the bar floats over the page body, so its
+/// own height plus the safe-area inset has to be padded away by the list.
+double _rankingBottomPad(BuildContext context) =>
+    AppSpacing.xl + MediaQuery.paddingOf(context).bottom;
+
 double _fillFraction({
   required List<RankedObservation> ranked,
   required int index,
@@ -426,46 +433,46 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
             ),
           ),
           Expanded(
-            child: ranked.isEmpty
-                ? ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height: 240,
-                        child: EmptyView(
-                          icon: Icons.umbrella_outlined,
-                          message: l10n.weatherRankingEmpty,
-                        ),
-                      ),
-                    ],
-                  )
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.xs,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                0,
+                AppSpacing.xs,
+                0,
+                _rankingBottomPad(context),
+              ),
+              children: [
+                if (ranked.isEmpty)
+                  SizedBox(
+                    height: 240,
+                    child: EmptyView(
+                      icon: Icons.umbrella_outlined,
+                      message: l10n.weatherRankingEmpty,
                     ),
-                    itemCount: ranked.length,
-                    itemBuilder: (context, index) {
-                      final item = ranked[index];
-                      final label = item.value == item.value.roundToDouble()
-                          ? '${item.value.toStringAsFixed(0)} mm'
-                          : '${item.value.toStringAsFixed(1)} mm';
-                      return WeatherRankingRow(
-                        rank: index + 1,
+                  )
+                else
+                  ...List.generate(ranked.length, (index) {
+                    final item = ranked[index];
+                    final label = item.value == item.value.roundToDouble()
+                        ? '${item.value.toStringAsFixed(0)} mm'
+                        : '${item.value.toStringAsFixed(1)} mm';
+                    return WeatherRankingRow(
+                      rank: index + 1,
+                      item: item,
+                      merge: RankingMerge.none,
+                      valueLabel: label,
+                      fraction: ranked.first.value == 0
+                          ? 0
+                          : item.value / ranked.first.value,
+                      onTap: () => _openStationOnMap(
+                        context,
+                        layerId: widget.mapLayerId,
                         item: item,
-                        merge: RankingMerge.none,
-                        valueLabel: label,
-                        fraction: ranked.first.value == 0
-                            ? 0
-                            : item.value / ranked.first.value,
-                        onTap: () => _openStationOnMap(
-                          context,
-                          layerId: widget.mapLayerId,
-                          item: item,
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  }),
+              ],
+            ),
           ),
         ],
       ),
@@ -633,9 +640,8 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                   )
                 : ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.xs,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs)
+                        .copyWith(bottom: _rankingBottomPad(context)),
                     itemCount: ranked.length,
                     itemBuilder: (context, index) {
                       final item = ranked[index];
@@ -838,9 +844,8 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
                   )
                 : ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.xs,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs)
+                        .copyWith(bottom: _rankingBottomPad(context)),
                     itemCount: ranked.length,
                     itemBuilder: (context, index) {
                       final item = ranked[index];
