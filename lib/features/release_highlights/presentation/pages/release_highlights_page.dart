@@ -10,7 +10,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-/// The page behind the version card's chevron — the train's key highlights
+/// The page behind the version card's chevron — the cycle's key highlights
 /// and technical notes.
 class ReleaseHighlightsPage extends StatelessWidget {
   const ReleaseHighlightsPage({super.key});
@@ -22,7 +22,7 @@ class ReleaseHighlightsPage extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.releaseHighlightsTitle(AppBuild.train)),
+          title: Text(l10n.releaseHighlightsTitle(AppBuild.cycle)),
           bottom: TabBar(
             tabs: [
               Tab(text: l10n.releaseHighlightsTabNormal),
