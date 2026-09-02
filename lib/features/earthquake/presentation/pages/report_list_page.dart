@@ -251,11 +251,13 @@ class _DaySection extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(
-                _dayLabel(day, l10n, locale),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w700,
+              Flexible(
+                child: Text(
+                  _dayLabel(day, l10n, locale),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -302,9 +304,17 @@ class _DaySection extends StatelessWidget {
 
   static String _dayLabel(DateTime day, AppLocalizations l10n, String locale) {
     final today = taipeiCalendarDay(AppTime.utc);
-    if (day == today) return l10n.reportListToday;
-    if (day == today.subtract(const Duration(days: 1))) {
-      return l10n.reportListYesterday;
+    String? relative;
+    if (day == today) {
+      relative = l10n.reportListToday;
+    } else if (day == today.subtract(const Duration(days: 1))) {
+      relative = l10n.reportListYesterday;
+    }
+    if (relative != null) {
+      final date = _relativeDayFormats
+          .putIfAbsent(locale, () => DateFormat.yMMMd(locale))
+          .format(day);
+      return '$relative ($date)';
     }
     // Parsing a locale's pattern is not free — memoised per locale.
     return _dayFormats
@@ -313,6 +323,7 @@ class _DaySection extends StatelessWidget {
   }
 
   static final Map<String, DateFormat> _dayFormats = {};
+  static final Map<String, DateFormat> _relativeDayFormats = {};
 }
 
 class _ReportTile extends StatelessWidget {
