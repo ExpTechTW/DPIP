@@ -94,6 +94,37 @@ void main() {
     );
   });
 
+  testWidgets('a tablet keeps the body and the action to one measure', (
+    tester,
+  ) async {
+    // An iPad in portrait. Unconstrained, the step's column and the call to
+    // action each stretched the full 1032 pt: the permission cards put their
+    // 授權 button half a screen from the sentence explaining it, and 開始使用
+    // became a button wider than any thumb travels.
+    tester.view.devicePixelRatio = 2;
+    tester.view.physicalSize = const Size(2064, 2752);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      _wrap(
+        OnboardingScaffold(
+          child: const Text('body'),
+          actionBuilder: (context, atEnd) =>
+              FilledButton(onPressed: () {}, child: const Text('go')),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final screen = tester.getSize(find.byType(OnboardingScaffold)).width;
+    final action = tester.getRect(find.byType(FilledButton));
+    expect(screen, greaterThan(1000), reason: 'the tablet width under test');
+    expect(action.width, lessThanOrEqualTo(560));
+    // Centred, not left-aligned against a sea of empty space.
+    expect(action.center.dx, closeTo(screen / 2, 0.5));
+  });
+
   testWidgets('re-checks when new window metrics make the content fit', (
     tester,
   ) async {

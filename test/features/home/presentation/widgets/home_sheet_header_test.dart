@@ -119,6 +119,7 @@ Widget _wrap(
   MapStationHandoff handoff, {
   Future<({double lat, double lng})?> Function()? gpsFix,
   bool expanded = false,
+  double textScale = 1,
 }) {
   final router = GoRouter(
     initialLocation: '/',
@@ -140,9 +141,15 @@ Widget _wrap(
               ),
             ),
           ],
-          child: Scaffold(
-            body: SingleChildScrollView(
-              child: HomeSheetHeader(expanded: expanded),
+          child: Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(context)
+                  .copyWith(textScaler: TextScaler.linear(textScale)),
+              child: Scaffold(
+                body: SingleChildScrollView(
+                  child: HomeSheetHeader(expanded: expanded),
+                ),
+              ),
             ),
           ),
         ),
@@ -164,6 +171,33 @@ Widget _wrap(
 }
 
 void main() {
+  // The full-screen reading is one unbreakable token beside an icon that does
+  // not scale with text: at a large accessibility size on a narrow phone the
+  // row overflowed and the last digits of the temperature were cut off. 2.0 is
+  // the system's own maximum on Android, before the app's own step is applied.
+  testWidgets('expanded: the hero temperature fits a narrow phone at 2x text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final store = await _store()
+      ..select(2); // '100'
+    final repo = _GatedWeatherRepository();
+    final handoff = MapStationHandoff();
+    await tester.pumpWidget(
+      _wrap(store, repo, handoff, expanded: true, textScale: 2),
+    );
+
+    repo.complete(25.0, 121.5, _realtime('信義', 28.7));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.textContaining('28.7'), findsOneWidget);
+  });
+
   testWidgets('collapsed: station data time shows, view-on-map link does not', (
     tester,
   ) async {

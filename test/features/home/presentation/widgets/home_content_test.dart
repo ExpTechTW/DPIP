@@ -120,6 +120,8 @@ Widget _wrap(
   RegionStore store, {
   bool expanded = false,
   double topInset = 0,
+  double textScale = 1,
+  ScrollController? controller,
   RainHourTrendRepository? hourTrend,
   WeatherForecast? forecast,
   TownDirectory directory = const TownDirectory(<String, Town>{}),
@@ -158,11 +160,17 @@ Widget _wrap(
           ),
         ),
       ],
-      child: Scaffold(
-        body: HomeContent(
-          scrollController: ScrollController(),
-          expanded: expanded,
-          topInset: topInset,
+      child: Builder(
+        builder: (context) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
+          child: Scaffold(
+            body: HomeContent(
+              scrollController: controller ?? ScrollController(),
+              expanded: expanded,
+              topInset: topInset,
+            ),
+          ),
         ),
       ),
     ),
@@ -175,6 +183,52 @@ Future<RegionStore> _store() async {
   return RegionStore(
     SettingsStore.inMemory({
       'home.savedRegionCodes': ['100', '200'],
+    }),
+  );
+}
+
+/// A located township on a dry hour: the hero block carries the one forecast
+/// card, and everything below it is the (empty) events card — the shape whose
+/// scroll range is shorter than the reveal ramp used to assume.
+Future<Widget> _dryHeroApp({
+  required double textScale,
+  required ScrollController controller,
+}) async {
+  final store = await _store();
+  store
+    ..select(1)
+    ..setCurrentCode('100');
+  const point = WeatherForecastPoint(
+    time: '14:00',
+    temperature: 30,
+    apparentTemp: 33,
+    humidity: 70,
+    weather: 'Clear',
+    weatherCode: 100,
+    pop: 0,
+    wind: ForecastWind(direction: 'NE', speed: 2, beaufort: 2),
+  );
+  return _wrap(
+    store,
+    expanded: true,
+    topInset: 88,
+    textScale: textScale,
+    controller: controller,
+    hourTrend: _FakeHourTrendRepository(dry: true),
+    forecast: const WeatherForecast(
+      updateTime: 0,
+      forecast: [point, point, point],
+    ),
+    directory: const TownDirectory({
+      '100': Town(
+        code: '100',
+        city: 'Test',
+        town: 'North',
+        lat: 25.0,
+        lng: 121.5,
+        cityLevel: 'City',
+        townLevel: 'District',
+      ),
     }),
   );
 }
@@ -464,6 +518,138 @@ void main() {
     expect(details, findsOneWidget);
     expect(details.hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  // A tall phone is the case the fixed 200 px reveal ramp could not serve: its
+  // hero block fills the viewport exactly, so the whole scroll range is the
+  // handle, one gap and the empty events card — about 140 px. The card used to
+  // top out near 0.7 at the very bottom of the list and sit there with its last
+  // line of text cut in half. A short phone never showed it, because the 760 px
+  // hero floor hands it scroll distance its own viewport does not have.
+  testWidgets('a tall phone can open the forecast card all the way', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1284, 2778); // 428 × 926 at 3×
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      await _dryHeroApp(textScale: 1, controller: controller),
+    );
+    await tester.pumpAndSettle();
+
+    final reach = controller.position.maxScrollExtent;
+    expect(
+      reach,
+      lessThan(200),
+      reason: 'the case under test: less scroll than the ramp asks for',
+    );
+
+    controller.jumpTo(reach);
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<HomeForecastSection>(find.byType(HomeForecastSection))
+          .expansion,
+      1,
+    );
+    expect(find.text('Feels like 33°').hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  // The scroll rests wherever the finger leaves it, so every offset in between
+  // is a state someone sits and reads. The detail band is text: a fraction of
+  // a line of text is a line cut in half, which is why it snaps open rather
+  // than tracking the scroll like the curve above it does.
+  testWidgets('no resting scroll position leaves the detail band sliced', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1284, 2778);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      await _dryHeroApp(textScale: 1, controller: controller),
+    );
+    await tester.pumpAndSettle();
+
+    final reach = controller.position.maxScrollExtent;
+    for (final fraction in const [0.0, 0.2, 0.4, 0.55, 0.7, 0.9, 1.0]) {
+      controller.jumpTo(reach * fraction);
+      await tester.pumpAndSettle();
+
+      final wind = find.text('NE · Force 2'); // the band's last line
+      if (wind.evaluate().isEmpty) continue; // not open yet at this offset
+      expect(
+        tester.getRect(wind).bottom,
+        lessThanOrEqualTo(
+          tester.getRect(find.byType(HomeForecastSection)).bottom,
+        ),
+        reason: 'band drawn past the card edge at $fraction of the scroll',
+      );
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  // Every line in an hour chip grows with the text-size setting while its icon
+  // does not, so the strip's old fixed 108 px height ran 16 px short at 特大 and
+  // cut the rain chance off the bottom of every chip.
+  for (final scale in const [1.2, 1.45]) {
+    testWidgets('the hour chips fit at text scale $scale', (tester) async {
+      tester.view.physicalSize = const Size(1284, 2778);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final controller = ScrollController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        await _dryHeroApp(textScale: scale, controller: controller),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: 'summary card');
+
+      controller.jumpTo(controller.position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: 'fully opened card');
+      expect(
+        find.text('0%'),
+        findsWidgets,
+      ); // the chip line that used to be cut
+    });
+  }
+
+  // The narrow phone at the largest in-app text step: the card's title row laid
+  // its high/low out unbounded, so the row overflowed 35 px to the right and
+  // the reading was cut off at the card's edge. 320 pt is the smallest screen
+  // the app ships to, and 1.45 is 特大 with the system size left alone.
+  testWidgets('the forecast card fits a narrow phone at text scale 1.45', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      await _dryHeroApp(textScale: 1.45, controller: controller),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull, reason: 'summary card');
+
+    controller.jumpTo(controller.position.maxScrollExtent);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull, reason: 'fully opened card');
+    expect(find.text('H 30° · L 30°'), findsOneWidget);
   });
 
   testWidgets('全國 keeps its events card (it is not a missing location)', (
