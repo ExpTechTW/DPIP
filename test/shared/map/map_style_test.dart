@@ -31,6 +31,33 @@ void main() {
     ]);
   });
 
+  test('the township fill is mounted invisible — it is only ever the wash', () {
+    final style = jsonDecode(
+      exptechVectorStyle(
+        MapColors.dark,
+        basemapTileUrl: 'https://example.com/{z}/{x}/{y}.pbf',
+        glyphsUrl: 'https://example.com/{fontstack}/{range}.pbf',
+      ),
+    ) as Map<String, dynamic>;
+    final layers = style['layers'] as List<dynamic>;
+    final byId = {for (final l in layers) (l as Map<String, dynamic>)['id']: l};
+
+    // The grey island is the county fill's; the township fill exists only so
+    // an EEW can recolour it per CODE. It starts at zero opacity so the OSM
+    // detailed ground, which anchors directly beneath it, is not buried under
+    // a second sheet of the same grey.
+    final town = byId[townFillLayerId] as Map<String, dynamic>;
+    expect(town['paint']['fill-opacity'], 0);
+    expect(
+      town['paint']['fill-color'],
+      MapColors.dark.fill,
+      reason: 'still the palette grey, so a wash can restore it',
+    );
+    final county = byId[countyFillLayerId] as Map<String, dynamic>;
+    expect(county['paint'].containsKey('fill-opacity'), isFalse);
+    expect(county['paint']['fill-color'], MapColors.dark.fill);
+  });
+
   test('terrain adds a mapbox-encoded raster-dem source and hillshade between fills and borders', () {
     final style = jsonDecode(
       exptechVectorStyle(

@@ -779,9 +779,13 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           countyFillLayerId,
           FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
         );
+        // Back to the baked default. This layer is the wash and nothing else:
+        // with no alert up it paints nothing, so the OSM detailed ground —
+        // which mounts directly beneath it — keeps showing. The grey island is
+        // [countyFillLayerId]'s job, restored just above.
         await controller.setLayerProperties(
           townFillLayerId,
-          FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
+          const FillLayerProperties(fillColor: '#00000000', fillOpacity: 0),
         );
         return;
       }
@@ -817,7 +821,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
             'match',
             ['get', 'CODE'],
             ...entries,
-            baseFill,
+            // Transparent, not the palette grey: a township the estimate puts
+            // at 0 has to leave whatever is under it showing — the OSM
+            // detailed ground when that layer is on, the grey `land` fill when
+            // it is not. Falling back to grey painted a flat sheet over the
+            // detailed map everywhere the shaking was 0.
+            'rgba(0, 0, 0, 0)',
           ],
           fillOpacity: 1,
         ),

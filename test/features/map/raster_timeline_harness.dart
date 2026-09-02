@@ -7,7 +7,13 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/map_style.dart'
-    show landLayerId, outlineLayerId, townLabelLayerId;
+    show
+        countyFillLayerId,
+        landLayerId,
+        outlineLayerId,
+        townFillLayerId,
+        townLabelLayerId,
+        townOutlineLayerId;
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -236,7 +242,19 @@ class RecordingMapController implements MapLibreMapController {
   /// anchor and so the most recently added one ends up highest. That is exactly
   /// how a timeline scrub used to bury the county borders under the echo. So
   /// this models the real insertion, seeded with the base style's own layers.
-  final List<String> order = [landLayerId, outlineLayerId, townLabelLayerId];
+  ///
+  /// The seed mirrors `exptechVectorStyle`'s own layer list bottom-up, not just
+  /// the anchors overlays quote: the OSM overlay now mounts its opaque ground
+  /// *below* the township fill and its roads and labels *above* it, and the
+  /// difference between those two only exists if the fills are in the model.
+  final List<String> order = [
+    landLayerId,
+    countyFillLayerId,
+    townFillLayerId,
+    townOutlineLayerId,
+    outlineLayerId,
+    townLabelLayerId,
+  ];
 
   void _insert(String layerId, String? belowLayerId) {
     order.remove(layerId);
