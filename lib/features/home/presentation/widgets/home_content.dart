@@ -438,13 +438,21 @@ class HomeContent extends StatelessWidget {
                       // thing on the dashboard that matters in the seconds it
                       // exists. Nothing renders when calm, so the sheet's
                       // ordinary layout is untouched outside an earthquake.
-                      const HomeEewSection(),
-                      // The section renders nothing when calm — only reserve
-                      // the gap below it while an alert is actually showing,
-                      // or a calm dashboard gains an extra empty lg here on
-                      // top of the one already before this section.
-                      if (HomeEewSection.isActive(context))
-                        const SizedBox(height: AppSpacing.lg),
+                      //
+                      // Full-screen only: while the sheet rests half-open,
+                      // `HomeMonitorBanner` is still on screen carrying the same
+                      // alert (it only slides away as the sheet rises), and two
+                      // copies of one warning in one view is one too many. The
+                      // card takes over exactly where the banner leaves off.
+                      if (expanded) ...[
+                        const HomeEewSection(),
+                        // The section renders nothing when calm — only reserve
+                        // the gap below it while an alert is actually showing,
+                        // or a calm dashboard gains an extra empty lg here on
+                        // top of the one already before this section.
+                        if (HomeEewSection.isActive(context))
+                          const SizedBox(height: AppSpacing.lg),
+                      ],
                       // Collapsed, or nothing to anchor a hero to: active events
                       // only. Full-screen township: the hero above, then forecast
                       // → events reached by scrolling past it. 全國: events only

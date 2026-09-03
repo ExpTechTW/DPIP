@@ -80,43 +80,19 @@ class _EewSectionBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.warning_amber_outlined, size: 18, color: colors.error),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                l10n.eewTitle,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            Text(
-              l10n.eewSerial(alert.serial),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => context.pushNamed(AppRoutes.eew),
-            child: _EewAlertCard(alert: alert),
-          ),
-        ),
-      ],
+    // No section header outside the card: the space between the sheet's cards
+    // is the scroll-dimmed weather sky (`_ScrollBlurredWeather`), not a
+    // surface, and it is dimmed precisely so the solid plates carry the
+    // reading. Bare theme-ink text there is unreadable in the light theme —
+    // near-black `onSurface` on a 45 %-dimmed sky. The title lives inside the
+    // card instead, exactly like every sibling section's.
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => context.pushNamed(AppRoutes.eew),
+        child: _EewAlertCard(alert: alert),
+      ),
     );
   }
 }
@@ -211,6 +187,32 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_outlined,
+                  size: 18,
+                  color: colors.error,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    l10n.eewTitle,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Text(
+                  l10n.eewSerial(widget.alert.serial),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
             Row(
               children: [
                 Expanded(
