@@ -106,6 +106,7 @@ Widget _wrap(RealtimeNotifier<List<Eew>> notifier, RegionStore store) =>
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
+      theme: ThemeData(brightness: Brightness.light),
       home: MultiProvider(
         providers: [
           ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>.value(
@@ -152,6 +153,27 @@ void main() {
     // a second serial).
     expect(find.text('Report 2'), findsOneWidget);
     // Tear down so the card's countdown timer is cancelled.
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('title and serial sit inside the card, not on the backdrop', (
+    tester,
+  ) async {
+    final setup = await _liveNotifier([_alert()]);
+    final store = await _store();
+    await tester.pumpWidget(_wrap(setup.notifier, store));
+
+    // The gap between the home sheet's cards is the scroll-dimmed weather sky,
+    // not a surface — theme on-surface ink is unreadable there in the light
+    // theme. Both header texts must be on the card's opaque plate.
+    for (final label in ['Earthquake early warning', 'Report 2']) {
+      expect(
+        find.ancestor(of: find.text(label), matching: find.byType(Card)),
+        findsOneWidget,
+        reason: '"$label" must render inside the alert card',
+      );
+    }
+
     await tester.pumpWidget(const SizedBox());
   });
 

@@ -1,4 +1,6 @@
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -11,12 +13,14 @@ import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
+import 'package:dpip/features/home/presentation/widgets/home_eew_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_forecast_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_rain_trend_section.dart';
 import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
@@ -114,11 +118,43 @@ class _StaticEewSource extends RealtimeSource<List<Eew>> {
   bool sameData(List<Eew>? a, List<Eew>? b) => listEquals(a, b);
 }
 
+/// A refreshed EEW channel carrying one live alert, ready to hand to [_wrap].
+Future<RealtimeNotifier<List<Eew>>> _liveEew() async {
+  final channel = RealtimeChannel<List<Eew>>(
+    source: _StaticEewSource([
+      Eew(
+        agency: 'CWA',
+        id: 'test',
+        serial: 34,
+        status: 0,
+        isFinal: false,
+        info: const EewInfo(
+          time: 1786362600000,
+          longitude: 121.5,
+          latitude: 23.5,
+          depth: 10,
+          magnitude: 7.5,
+          location: '臺東縣',
+          max: 6,
+        ),
+      ),
+    ]),
+    clock: _FakeClock(),
+    elapsed: _FakeElapsed(),
+    ticker: _FakeTicker(),
+    config: RealtimeConfig.eew,
+    label: 'test-eew',
+  );
+  await channel.refreshNow();
+  return RealtimeNotifier<List<Eew>>(channel);
+}
+
 /// Pumps [HomeContent] with everything it reads: a [RegionStore] to switch on
 /// and localizations for the body.
 Widget _wrap(
   RegionStore store, {
   bool expanded = false,
+  RealtimeNotifier<List<Eew>>? eew,
   double topInset = 0,
   double textScale = 1,
   ScrollController? controller,
@@ -147,18 +183,36 @@ Widget _wrap(
         ChangeNotifierProvider<HomeActiveEventsController>(
           create: (_) => HomeActiveEventsController(events, store),
         ),
-        ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>(
-          create: (_) => RealtimeNotifier<List<Eew>>(
-            RealtimeChannel<List<Eew>>(
-              source: _StaticEewSource(const []),
-              clock: _FakeClock(),
-              elapsed: _FakeElapsed(),
-              ticker: _FakeTicker(),
-              config: RealtimeConfig.eew,
-              label: 'test-eew',
-            ),
+        // Read by the EEW alert card for its 所在地預估 countdown.
+        Provider<Future<SeismicTravelTimeTable>>.value(
+          value: Future<SeismicTravelTimeTable>.value(
+            const SeismicTravelTimeTable({}),
           ),
         ),
+        Provider<LocationService>.value(
+          value: LocationService(
+            directory,
+            isAvailable: () async => false,
+            fix: () async => null,
+            lastKnown: () async => null,
+            status: () async => LocationStatus.denied,
+          ),
+        ),
+        if (eew != null)
+          ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>.value(value: eew)
+        else
+          ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>(
+            create: (_) => RealtimeNotifier<List<Eew>>(
+              RealtimeChannel<List<Eew>>(
+                source: _StaticEewSource(const []),
+                clock: _FakeClock(),
+                elapsed: _FakeElapsed(),
+                ticker: _FakeTicker(),
+                config: RealtimeConfig.eew,
+                label: 'test-eew',
+              ),
+            ),
+          ),
       ],
       child: Builder(
         builder: (context) => MediaQuery(
@@ -362,6 +416,33 @@ void main() {
     expect(find.byType(HomeRainTrendSection), findsOneWidget);
     expect(find.byType(HomeForecastSection), findsOneWidget);
     expect(find.byType(HomeActiveEventsSection), findsOneWidget);
+  });
+
+  testWidgets('the EEW card is full-screen only, never at rest', (
+    tester,
+  ) async {
+    final store = await _store();
+    store
+      ..select(1)
+      ..setCurrentCode('100');
+
+    // At rest `HomeMonitorBanner` is still on screen with the same alert, so
+    // the in-sheet card would be a second copy of one warning.
+    await tester.pumpWidget(_wrap(store, eew: await _liveEew()));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeEewSection), findsNothing);
+    expect(find.text('臺東縣'), findsNothing);
+
+    // Full-screen the banner has slid away, so the card carries the alert.
+    await tester.pumpWidget(
+      _wrap(store, expanded: true, eew: await _liveEew()),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeEewSection), findsOneWidget);
+    expect(find.text('臺東縣'), findsOneWidget);
+
+    // Tear down so the card's countdown timer is cancelled.
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets('a dry hour hides the rain trend and raises a compact forecast', (
