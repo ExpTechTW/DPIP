@@ -7,37 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* rain.aiff */; };
+		05A9E1F31DB4B19A7C04393F /* Sounds/rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */; };
 		071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */; };
-		10D4BCAF9E098BDA400160FB /* tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* tsunami.aiff */; };
+		10D4BCAF9E098BDA400160FB /* Sounds/tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
-		17BD5D769AA990E7EE681203 /* eew_alert.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 4D00D2962CF4598B61D0C722 /* eew_alert.aiff */; };
+		17BD5D769AA990E7EE681203 /* Sounds/eew_alert.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
 		522508B9301F863A006148C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 522508B7301F863A006148C2 /* InfoPlist.strings */; };
-		72E4CBC23930C168D057AC64 /* warn.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 3AE87ED82FDB896B2B5C5F1B /* warn.aiff */; };
+		72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		9F74F772B6E8760DD47AB2FE /* normal.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B916667D1B2356583B174E80 /* normal.aiff */; };
-		A8D382D04B4ACD327E29F46B /* eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* eq.aiff */; };
+		9F74F772B6E8760DD47AB2FE /* Sounds/normal.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B916667D1B2356583B174E80 /* Sounds/normal.aiff */; };
+		A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */; };
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
-		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
-		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
-		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
-		AE92AD9862B7A721B0924557 /* eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* eew.aiff */; };
+		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
+		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
+		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
+		AE92AD9862B7A721B0924557 /* Sounds/eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */; };
 		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */; };
 		CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */; };
 		CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000D002 /* StorageScanPlugin.swift */; };
-		DB8E84D957A6C2B12EEB0AB7 /* report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* report.aiff */; };
-		E1EBD3F0B2991F7D60DF56C5 /* weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* weather.aiff */; };
-		F56D5186166227E46D96919D /* info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* info.aiff */; };
+		DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */; };
+		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
+		E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* Sounds/weather.aiff */; };
+		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,21 +68,22 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3AE87ED82FDB896B2B5C5F1B /* warn.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/warn.aiff; sourceTree = "<group>"; };
+		3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/warn.aiff; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
-		4D00D2962CF4598B61D0C722 /* eew_alert.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/eew_alert.aiff; sourceTree = "<group>"; };
+		4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/eew_alert.aiff; sourceTree = "<group>"; };
 		522508B8301F863A006148C2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		522508BA301F8687006148C2 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		522508BB301F868B006148C2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		522508BC301F868E006148C2 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		682D0165E2FF3895C5B252C5 /* eq.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/eq.aiff; sourceTree = "<group>"; };
+		52632D1A304BDB7500955176 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/eq.aiff; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		762B2690D1D999F97D84162C /* weather.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/weather.aiff; sourceTree = "<group>"; };
+		762B2690D1D999F97D84162C /* Sounds/weather.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/weather.aiff; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapSnapshotPlugin.swift; sourceTree = "<group>"; };
-		7A6E88CB92902C0CACB07792 /* eew.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/eew.aiff; sourceTree = "<group>"; };
+		7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/eew.aiff; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
@@ -91,21 +92,21 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		A382CD9DEA741E45DBF741D7 /* rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/rain.aiff; sourceTree = "<group>"; };
+		A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/rain.aiff; sourceTree = "<group>"; };
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
-		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
-		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
-		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
-		B916667D1B2356583B174E80 /* normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/normal.aiff; sourceTree = "<group>"; };
+		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
+		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
+		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
+		B916667D1B2356583B174E80 /* Sounds/normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/normal.aiff; sourceTree = "<group>"; };
 		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundLocationPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundExecutionPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000D002 /* StorageScanPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageScanPlugin.swift; sourceTree = "<group>"; };
-		CCF0E2286072A9283A916C69 /* tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/tsunami.aiff; sourceTree = "<group>"; };
-		F9BCED8E5498E9FD7A454E8F /* info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/info.aiff; sourceTree = "<group>"; };
-		FD769D73A7C4BE3619C1F9FB /* report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/report.aiff; sourceTree = "<group>"; };
+		CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/tsunami.aiff; sourceTree = "<group>"; };
+		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/info.aiff; sourceTree = "<group>"; };
+		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/report.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,16 +191,16 @@
 				CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */,
 				CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */,
 				CAC4EF00000000000000D002 /* StorageScanPlugin.swift */,
-				7A6E88CB92902C0CACB07792 /* eew.aiff */,
-				4D00D2962CF4598B61D0C722 /* eew_alert.aiff */,
-				682D0165E2FF3895C5B252C5 /* eq.aiff */,
-				F9BCED8E5498E9FD7A454E8F /* info.aiff */,
-				B916667D1B2356583B174E80 /* normal.aiff */,
-				A382CD9DEA741E45DBF741D7 /* rain.aiff */,
-				FD769D73A7C4BE3619C1F9FB /* report.aiff */,
-				CCF0E2286072A9283A916C69 /* tsunami.aiff */,
-				3AE87ED82FDB896B2B5C5F1B /* warn.aiff */,
-				762B2690D1D999F97D84162C /* weather.aiff */,
+				7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */,
+				4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */,
+				682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */,
+				F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */,
+				B916667D1B2356583B174E80 /* Sounds/normal.aiff */,
+				A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */,
+				FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */,
+				CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */,
+				3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */,
+				762B2690D1D999F97D84162C /* Sounds/weather.aiff */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -278,6 +279,7 @@
 				"zh-Hant",
 				ja,
 				ko,
+				"zh-Hans",
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
@@ -311,16 +313,16 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				522508B9301F863A006148C2 /* InfoPlist.strings in Resources */,
-				AE92AD9862B7A721B0924557 /* eew.aiff in Resources */,
-				17BD5D769AA990E7EE681203 /* eew_alert.aiff in Resources */,
-				A8D382D04B4ACD327E29F46B /* eq.aiff in Resources */,
-				F56D5186166227E46D96919D /* info.aiff in Resources */,
-				9F74F772B6E8760DD47AB2FE /* normal.aiff in Resources */,
-				05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */,
-				DB8E84D957A6C2B12EEB0AB7 /* report.aiff in Resources */,
-				10D4BCAF9E098BDA400160FB /* tsunami.aiff in Resources */,
-				72E4CBC23930C168D057AC64 /* warn.aiff in Resources */,
-				E1EBD3F0B2991F7D60DF56C5 /* weather.aiff in Resources */,
+				AE92AD9862B7A721B0924557 /* Sounds/eew.aiff in Resources */,
+				17BD5D769AA990E7EE681203 /* Sounds/eew_alert.aiff in Resources */,
+				A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */,
+				F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */,
+				9F74F772B6E8760DD47AB2FE /* Sounds/normal.aiff in Resources */,
+				05A9E1F31DB4B19A7C04393F /* Sounds/rain.aiff in Resources */,
+				DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */,
+				10D4BCAF9E098BDA400160FB /* Sounds/tsunami.aiff in Resources */,
+				72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */,
+				E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +409,7 @@
 				522508BA301F8687006148C2 /* zh-Hant */,
 				522508BB301F868B006148C2 /* ja */,
 				522508BC301F868E006148C2 /* ko */,
+				52632D1A304BDB7500955176 /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
