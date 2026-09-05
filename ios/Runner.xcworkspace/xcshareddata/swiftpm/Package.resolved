@@ -100,15 +100,6 @@
       }
     },
     {
-      "identity" : "iosawnfcmcore",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/rafaelsetragni/IosAwnFcmCore.git",
-      "state" : {
-        "revision" : "4c914884b3c0213284df7bcd8237c469ed58f4d2",
-        "version" : "0.12.0"
-      }
-    },
-    {
       "identity" : "leveldb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/leveldb.git",
