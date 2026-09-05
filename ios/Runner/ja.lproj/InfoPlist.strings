@@ -1,3 +1,4 @@
 "CFBundleDisplayName" = "DPIP防災";
-"NSLocationAlwaysAndWhenInUseUsageDescription" = "DPIP 需要在背景持續存取你的位置，即使關閉 App 也能為你所在地推送地震、天氣等災害警報。";
-"NSLocationWhenInUseUsageDescription" = "DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "DPIPは、Appを閉じている場合でも、お住まいの地域に地震や気象などの災害警報を通知するため、バックグラウンドで継続的に位置情報へアクセスする必要があります。";
+"NSLocationWhenInUseUsageDescription" = "DPIPは、お住まいの地域の地震や気象などの災害警報を提供するため、位置情報を使用します。";
+"NSBluetoothAlwaysUsageDescription" = "DPIPはMeshtastic LoRa無線機に接続し、通信が途絶した際に緊急メッセージを送受信するため、Bluetoothを使用します。";
