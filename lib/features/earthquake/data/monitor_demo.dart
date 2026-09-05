@@ -161,12 +161,14 @@ class StartupEewDemoSource extends RealtimeSource<List<Eew>> {
 }
 
 /// Polls as an always-live EEW alert for [MonitorDemo]'s event, bumping the
-/// serial every couple of seconds so the feed visibly updates and the monitor
-/// cards re-render while the wavefront keeps expanding.
+/// serial every twelve seconds so the feed visibly updates while leaving even
+/// the slower Google zh-TW voice enough time to finish. A two-second demo
+/// cadence kept interrupting the phrase at its comma; six seconds still cut
+/// the final word after accounting for that engine's startup latency.
 class DemoEewSource extends RealtimeSource<List<Eew>> {
   DemoEewSource(this._reports) {
     _alerts = [_build(1)];
-    _tick = Timer.periodic(const Duration(seconds: 2), (_) {
+    _tick = Timer.periodic(const Duration(seconds: 12), (_) {
       _alerts = [_build(++_serial)];
     });
     unawaited(_loadReport());

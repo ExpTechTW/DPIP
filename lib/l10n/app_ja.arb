@@ -1982,5 +1982,7 @@
   "bugTrackerJoinDiscussion": "Discord で議論に参加する",
   "bugTrackerSortLast": "最新の返信",
   "bugTrackerSortMostDiscussed": "返信が多い順",
-  "bugTrackerStaff": "スタッフ"
+  "bugTrackerStaff": "スタッフ",
+  "eewSpokenLocalIntensity": "現在地の予想震度、{intensity}。",
+  "eewSpokenMaxIntensity": "予想最大震度、{intensity}。"
 }

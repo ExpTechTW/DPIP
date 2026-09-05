@@ -90,19 +90,19 @@ jobs:
           bash tool/dev/deps.sh
           bash tool/dev/codegen.sh
 
-      - name: Decode keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/my-release-key.jks
-
-      - name: Create key.properties
-        run: |
-          cat > android/key.properties << EOF
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword=${{ secrets.KEY_PASSWORD }}
-          keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=my-release-key.jks
-          EOF
-
+      # No keystore, and deliberately so. This job builds the artifact nobody
+      # installs — release.yml signs and uploads the one that ships — so the
+      # release keystore buys nothing here, and asking for it is what breaks
+      # the job outright: a pull request opened from a fork is handed no
+      # repository secrets at all, so `secrets.KEYSTORE_BASE64` is the empty
+      # string, android/key.properties is written with four empty values, and
+      # Gradle fails inside packageRelease with a keystore error that says
+      # nothing about forks. Every other check on such a pull request passes,
+      # including the iOS build, which never codesigns.
+      #
+      # android/app/build.gradle.kts already falls back to the debug signing
+      # config when android/key.properties is absent, so what comes out is the
+      # same release build, debug-signed.
       - name: Build Release APK
         run: bash tool/dev/build.sh android
 

@@ -1974,5 +1974,7 @@
   "bugTrackerJoinDiscussion": "至 Discord 参与讨论",
   "bugTrackerSortLast": "最后讨论",
   "bugTrackerSortMostDiscussed": "最多讨论",
-  "bugTrackerStaff": "工作人员"
+  "bugTrackerStaff": "工作人员",
+  "eewSpokenLocalIntensity": "所在地預估震度，{intensity}。",
+  "eewSpokenMaxIntensity": "預估最大震度，{intensity}。"
 }

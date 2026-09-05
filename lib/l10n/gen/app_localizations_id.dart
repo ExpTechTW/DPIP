@@ -3311,4 +3311,14 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => 'Staf';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return 'Perkiraan intensitas di lokasi Anda: $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return 'Perkiraan intensitas maksimum: $intensity.';
+  }
 }

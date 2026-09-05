@@ -3300,4 +3300,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => 'Staff';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return 'Estimated intensity at your location: $intensity.';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return 'Estimated maximum intensity: $intensity.';
+  }
 }

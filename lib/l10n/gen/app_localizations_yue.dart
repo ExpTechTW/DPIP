@@ -3222,4 +3222,14 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => '工作人員';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return '所在地預估震度，$intensity。';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return '預估最大震度，$intensity。';
+  }
 }

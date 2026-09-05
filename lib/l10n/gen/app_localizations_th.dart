@@ -3293,4 +3293,14 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get bugTrackerStaff => 'ทีมงาน';
+
+  @override
+  String eewSpokenLocalIntensity(String intensity) {
+    return 'คาดการณ์ความรุนแรง ณ ตำแหน่งของคุณ: $intensity';
+  }
+
+  @override
+  String eewSpokenMaxIntensity(String intensity) {
+    return 'คาดการณ์ความรุนแรงสูงสุด: $intensity';
+  }
 }
