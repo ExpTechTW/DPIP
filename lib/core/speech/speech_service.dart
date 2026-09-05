@@ -3,8 +3,7 @@ library;
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/services.dart';
 
 /// Speaks short phrases through the platform speech engine.
 abstract interface class SpeechService {
@@ -18,45 +17,36 @@ abstract interface class SpeechService {
   void dispose();
 }
 
-/// Android `TextToSpeech` / iOS `AVSpeechSynthesizer` implementation.
+/// Android `TextToSpeech` / iOS `AVSpeechSynthesizer`, over an app-owned
+/// platform channel.
+///
+/// A channel rather than a package, like the rest of the native surface: the
+/// only TTS package on pub with the API this needs (`flutter_tts`) ships no
+/// Swift Package Manager support, and this project builds iOS without
+/// CocoaPods (README → 參與開發). Adopting it would have pulled a Podfile back
+/// in through a transitive dependency, for two calls whose native side is
+/// thirty lines each.
 class SystemSpeechService implements SpeechService {
-  SystemSpeechService({FlutterTts? engine}) : _engine = engine ?? FlutterTts();
+  SystemSpeechService({MethodChannel? channel})
+    : _channel = channel ?? const MethodChannel(channelName);
 
-  final FlutterTts _engine;
-  bool _configured = false;
+  /// The channel `SpeechChannel.kt` and `SpeechPlugin.swift` answer on.
+  static const String channelName = 'com.exptech.dpip/speech';
 
-  Future<void> _configure() async {
-    if (_configured) return;
-    await _engine.awaitSpeakCompletion(true);
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      // The plugin's default iOS category follows the Silent switch. A
-      // foreground disaster announcement must remain audible there as well;
-      // voicePrompt + duckOthers keeps it intelligible without permanently
-      // taking ownership of another app's audio session.
-      await _engine.setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
-        IosTextToSpeechAudioCategoryOptions.duckOthers,
-      ], IosTextToSpeechAudioMode.voicePrompt);
-    }
-    // Maximise the utterance within the user's selected media-volume level.
-    // Changing the device's stream volume would be intrusive and would persist
-    // after the warning, so that remains under the user's control.
-    await _engine.setVolume(1.0);
-    _configured = true;
-  }
+  final MethodChannel _channel;
+
+  /// Speaks [text], completing when the utterance finishes.
+  ///
+  /// A phrase superseded by a later [speak] — or cut short by [stop] — also
+  /// completes normally rather than throwing: latest-report-wins is the
+  /// expected path here, not a failure. Only an engine that is absent or
+  /// refuses the utterance raises.
+  @override
+  Future<void> speak(String text, {required String languageTag}) => _channel
+      .invokeMethod<void>('speak', {'text': text, 'language': languageTag});
 
   @override
-  Future<void> speak(String text, {required String languageTag}) async {
-    await _configure();
-    await _engine.stop();
-    await _engine.setLanguage(languageTag);
-    final result = await _engine.speak(text);
-    if (result != 1) throw StateError('System TTS rejected speech');
-  }
-
-  @override
-  Future<void> stop() async {
-    await _engine.stop();
-  }
+  Future<void> stop() => _channel.invokeMethod<void>('stop');
 
   @override
   void dispose() {

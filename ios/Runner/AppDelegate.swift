@@ -34,6 +34,7 @@ import UserNotifications
     StorageScanPlugin.register(with: registry.registrar(forPlugin: "StorageScanPlugin")!)
     ScreenWakePlugin.register(with: registry.registrar(forPlugin: "ScreenWakePlugin")!)
     ApnsTokenPlugin.register(with: registry.registrar(forPlugin: "ApnsTokenPlugin")!)
+    SpeechPlugin.register(with: registry.registrar(forPlugin: "SpeechPlugin")!)
     BackgroundLocationPlugin.register(
       with: registry.registrar(forPlugin: "BackgroundLocationPlugin")!)
     BackgroundExecutionPlugin.register(

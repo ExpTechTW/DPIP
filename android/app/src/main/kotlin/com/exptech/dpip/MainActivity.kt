@@ -62,5 +62,8 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(messenger, PlainChannelsChannel.NAME)
             .setMethodCallHandler(PlainChannelsChannel(applicationContext))
+
+        MethodChannel(messenger, SpeechChannel.NAME)
+            .setMethodCallHandler(SpeechChannel(applicationContext))
     }
 }
