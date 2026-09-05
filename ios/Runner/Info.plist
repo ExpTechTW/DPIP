@@ -2,7 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Local networking permitted (debug tooling / future loopback). -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
@@ -12,11 +11,7 @@
 	<string>DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>DPIP 需要在背景持續存取你的位置，即使關閉 App 也能為你所在地推送地震、天氣等災害警報。</string>
-	<!-- Bluetooth (meshtastic_flutter): BLE 連線 LoRa 網狀無線電。這兩個 key
-	     同時讓 permission_handler 的 SPM Package.swift 啟用藍牙權限編譯。 -->
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>DPIP 需要藍牙以連線 Meshtastic LoRa 無線電，在通訊中斷時收發緊急訊息。</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>DPIP 需要藍牙以連線 Meshtastic LoRa 無線電，在通訊中斷時收發緊急訊息。</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
