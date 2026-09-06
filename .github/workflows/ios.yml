@@ -15,7 +15,7 @@ jobs:
     outputs:
       ios: ${{ steps.filter.outputs.ios }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -34,7 +34,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Flutter and Dart come from mise.toml, the same pin CI and every laptop
       # use. Not subosito/flutter-action with `channel: stable`: that resolves
@@ -47,7 +47,7 @@ jobs:
       # The iOS build uses Swift Package Manager, not CocoaPods (there is no
       # Podfile). Cache SPM's clone/artifact store keyed on the resolved pins.
       - name: Cache Swift Packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # build/ios/SourcePackages, not DerivedData. Flutter always passes
           # -clonedSourcePackagesDirPath pointing there (ios/xcodeproj.dart), so
