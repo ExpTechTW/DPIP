@@ -49,15 +49,17 @@ class PlanetsPage extends StatelessWidget {
         ? null
         : Observer(latitude: town.lat, longitude: town.lng);
 
-    final entries = [
-      for (final planet in Planet.values)
+    // `PlanetEphemeris.at` solves Kepler three times — Earth, the planet, then
+    // the planet again for light-time — not a lookup, so bind it once per
+    // planet and reuse it for the horizontal look-up below.
+    final entries = <_Entry>[];
+    for (final planet in Planet.values) {
+      final body = PlanetEphemeris.at(planet, now);
+      entries.add(
         _Entry(
           planet: planet,
-          body: PlanetEphemeris.at(planet, now),
-          now: observer?.lookAt(
-            PlanetEphemeris.at(planet, now).equatorial,
-            now,
-          ),
+          body: body,
+          now: observer?.lookAt(body.equatorial, now),
           events: observer == null
               ? null
               : RiseSet.solve(
@@ -67,7 +69,9 @@ class PlanetsPage extends StatelessWidget {
                   horizon: (_) => pointHorizon,
                 ),
         ),
-    ]..sort((a, b) => b.rank.compareTo(a.rank));
+      );
+    }
+    entries.sort((a, b) => b.rank.compareTo(a.rank));
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.planetsTitle)),

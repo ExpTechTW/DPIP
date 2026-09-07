@@ -93,7 +93,7 @@ class WeatherRankingRow extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       child: Material(
-        color: Colors.transparent,
+        type: MaterialType.transparency,
         child: InkWell(
           onTap: onTap,
           borderRadius: AppRadius.small,

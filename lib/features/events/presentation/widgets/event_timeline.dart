@@ -68,54 +68,81 @@ class _EventTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _Connector(
+    return Stack(
+      children: [
+        // The rail spans the whole tile, but the tile's height comes from the
+        // text beside it — or the dot, whichever is taller — which a Row can
+        // only hand back through an IntrinsicHeight, i.e. a speculative pass
+        // that re-measures all three Texts on every layout of the tile, not
+        // just on inflation: a width or text-scale change re-runs it too.
+        // Positioning the connector against the Stack gets it the same tight
+        // height for nothing: the Row below sizes the Stack, the connector then
+        // fills it.
+        PositionedDirectional(
+          start: 0,
+          top: 0,
+          bottom: 0,
+          width: _Connector._dotSize,
+          child: _Connector(
             icon: eventTypeIcon(event.type.iconKey),
             isFirst: isFirst,
             isLast: isLast,
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _clockFormat.format(event.time),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Holds open the column the connector is positioned over, plus the
+            // gap after it. Its height is the connector's own: a tile with very
+            // little text must still be tall enough for the dot, which is what
+            // IntrinsicHeight used to guarantee.
+            const SizedBox(
+              width: _Connector._dotSize + AppSpacing.md,
+              height: _Connector._minHeight,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _clockFormat.format(event.time),
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    event.title,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      event.title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    event.description,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      event.description,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }
 
-/// The left rail: a connecting line with an icon dot, so consecutive events read
-/// as one thread ([isFirst]/[isLast] trim the line at the ends).
+/// The leading rail — start-side, so it mirrors to the right under RTL: a
+/// connecting line with an icon dot, so consecutive events read as one thread
+/// ([isFirst]/[isLast] trim the line at the ends).
+///
+/// [_EventTile] positions this to the full height of its tile, so the trailing
+/// [Expanded] line can fill whatever is left below the dot.
 class _Connector extends StatelessWidget {
   const _Connector({
     required this.icon,
@@ -128,6 +155,10 @@ class _Connector extends StatelessWidget {
   final bool isLast;
 
   static const double _dotSize = 36;
+
+  /// Stub plus dot — the shortest this can draw itself. [_EventTile] reserves
+  /// it in its Row so the tile is never too short to hold the dot.
+  static const double _minHeight = AppSpacing.sm + _dotSize;
 
   @override
   Widget build(BuildContext context) {

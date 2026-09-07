@@ -354,11 +354,13 @@ class _ThreadCard extends StatelessWidget {
   final BugThread thread;
   final AvatarFetch avatarFor;
 
+  static final DateFormat _date = DateFormat('yyyy/MM/dd');
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final date = DateFormat('yyyy/MM/dd').format(thread.createdAt.toLocal());
+    final date = _date.format(thread.createdAt.toLocal());
     return Card(
       margin: EdgeInsets.zero,
       color: colors.surfaceContainerHigh,

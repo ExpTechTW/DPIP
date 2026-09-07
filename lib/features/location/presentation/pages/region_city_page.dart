@@ -44,6 +44,27 @@ class RegionCityPage extends StatefulWidget {
 class _RegionCityPageState extends State<RegionCityPage> {
   final _searchController = TextEditingController();
 
+  /// The townships of [RegionCityPage.city]. The directory is one immutable
+  /// instance for the app's life, so scan it once per city instead of once per
+  /// build: [build] re-runs on every keystroke and the scan walks all 368
+  /// towns, building a `cityName` string for each.
+  late List<Town> _towns = context.read<TownDirectory>().townsInCity(
+    widget.city,
+  );
+
+  @override
+  void didUpdateWidget(covariant RegionCityPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // go_router keys a page by its route *pattern* (`:city`), not by the
+    // resolved city, so a `go()` or a deep link to another city reuses this
+    // State with a different `widget.city`. The push path used today mints a
+    // fresh one, which is what makes the scan above an optimisation and this
+    // re-scan the thing that keeps it correct.
+    if (oldWidget.city != widget.city) {
+      _towns = context.read<TownDirectory>().townsInCity(widget.city);
+    }
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -53,15 +74,15 @@ class _RegionCityPageState extends State<RegionCityPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final directory = context.read<TownDirectory>();
     final store = context.watch<RegionStore>();
-    final towns = directory.townsInCity(widget.city);
+    // Read `savedCodes` once (the getter allocates a fresh list each call).
+    final savedCodes = store.savedCodes;
     final query = GoRouterState.of(context).uri.queryParameters;
     final effectiveReplaceCode = widget.replaceCode ?? query['replace'];
 
     final needle = _searchController.text.trim().toLowerCase();
     final shown = [
-      for (final town in towns)
+      for (final town in _towns)
         if (needle.isEmpty || town.townName.toLowerCase().contains(needle))
           town,
     ];
@@ -100,10 +121,7 @@ class _RegionCityPageState extends State<RegionCityPage> {
             ),
           ),
           SectionHeader(
-            l10n.regionSelectCount(
-              store.savedCodes.length,
-              RegionStore.maxSaved,
-            ),
+            l10n.regionSelectCount(savedCodes.length, RegionStore.maxSaved),
           ),
           if (shown.isEmpty)
             EmptyView(
@@ -114,15 +132,15 @@ class _RegionCityPageState extends State<RegionCityPage> {
             for (final town in shown)
               _TownTile(
                 town: town,
-                saved: store.savedCodes.contains(town.code),
+                saved: savedCodes.contains(town.code),
                 enabled:
                     effectiveReplaceCode == null ||
                     town.code == effectiveReplaceCode ||
-                    !store.savedCodes.contains(town.code),
+                    !savedCodes.contains(town.code),
                 canAdd:
                     effectiveReplaceCode != null ||
                     store.canSave(town.code) ||
-                    store.savedCodes.contains(town.code),
+                    savedCodes.contains(town.code),
                 onToggle: () => _toggle(context, store, town),
               ),
         ],
