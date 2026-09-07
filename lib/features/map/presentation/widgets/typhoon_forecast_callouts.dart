@@ -603,6 +603,12 @@ class _LeaderPainter extends CustomPainter {
       ..strokeWidth = 1.4
       ..style = PaintingStyle.stroke;
     final fill = Paint()..color = color;
+    // The ring never varies with the callout, so it is built once beside
+    // `paint` and `fill` instead of once per anchor.
+    final ring = Paint()
+      ..color = Colors.white.withValues(alpha: 0.9)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
     for (final c in callouts) {
       final attach = Offset(
         c.tip.dx + c.width / 2,
@@ -610,29 +616,34 @@ class _LeaderPainter extends CustomPainter {
       );
       _dashLine(canvas, paint, attach, c.anchor);
       canvas.drawCircle(c.anchor, 3, fill);
-      canvas.drawCircle(
-        c.anchor,
-        3,
-        Paint()
-          ..color = Colors.white.withValues(alpha: 0.9)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2,
-      );
+      canvas.drawCircle(c.anchor, 3, ring);
     }
   }
 
+  /// Draws a dashed leader from [a] to [b] as one stroked path.
+  ///
+  /// The path stays per-leader on purpose. Its own dashes are collinear and
+  /// disjoint (butt caps, 3 px gap) so one stroke covers exactly what separate
+  /// lines would; a path shared across callouts would not, because the
+  /// leader colour is translucent — a crossing would blend once instead of
+  /// twice — and it would force every anchor dot above or below every leader.
   void _dashLine(Canvas canvas, Paint paint, Offset a, Offset b) {
     const dash = 4.5;
     const gap = 3.0;
     final total = (b - a).distance;
     if (total < 1) return;
     final dir = (b - a) / total;
+    final path = Path();
     var t = 0.0;
     while (t < total) {
       final t2 = math.min(t + dash, total);
-      canvas.drawLine(a + dir * t, a + dir * t2, paint);
+      final from = a + dir * t;
+      final to = a + dir * t2;
+      path.moveTo(from.dx, from.dy);
+      path.lineTo(to.dx, to.dy);
       t = t2 + gap;
     }
+    canvas.drawPath(path, paint);
   }
 
   @override

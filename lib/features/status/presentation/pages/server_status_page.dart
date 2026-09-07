@@ -381,7 +381,7 @@ class _ClientEndpoints extends StatelessWidget {
       children: [
         _SummaryBanner(summary: summary),
         const SizedBox(height: AppSpacing.md),
-        _Legend(),
+        const _Legend(),
         const SizedBox(height: AppSpacing.md),
         for (final g in _groups) ...[
           _ServiceTable(
