@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
   /// content and is never dimmed with it.
   static const double _mapDimPeak = 0.35;
 
-  /// The filter instance last handed to the [ImageFiltered] — [ImageFilter]
+  /// The filter instance last handed to the [BackdropFilter] — [ImageFilter]
   /// has no value equality, so a fresh `blur(...)` per drag tick would
   /// recomposite the full-screen blur every frame even though the sigma
   /// quantises to the same step (same pattern as [_CachedBlur] in HomeSheet).
@@ -226,14 +226,23 @@ class _HomePageState extends State<HomePage> {
                           sigmaY: sigma,
                         );
                       }
-                      // The tree's shape never changes — no SizedBox/ImageFiltered
-                      // swap at t=0, which would re-parent the subtree right over
-                      // the map platform view at the exact edge the sheet starts
-                      // climbing (the same re-parent flash as the sheet's sky).
-                      // `enabled` makes the filter a no-op at rest without
-                      // touching the tree.
-                      return ImageFiltered(
-                        imageFilter: _mapBlur!,
+                      // [BackdropFilter], not [ImageFiltered]: the filter has
+                      // to reach the map painted *beneath* this layer, and the
+                      // map backdrop is the Stack child directly below. An
+                      // ImageFiltered filters its own child instead, and that
+                      // child is a uniform ColoredBox — blurring a flat colour
+                      // moves nothing but the feathering of its outer edge, so
+                      // the map stayed sharp however high the sheet climbed.
+                      //
+                      // The tree's shape never changes — no SizedBox/Backdrop-
+                      // Filter swap at t=0, which would re-parent the subtree
+                      // right over the map platform view at the exact edge the
+                      // sheet starts climbing (the same re-parent flash as the
+                      // sheet's sky). `enabled` makes the filter a no-op at
+                      // rest without touching the tree: disabled, it paints the
+                      // child straight through and reads back nothing.
+                      return BackdropFilter(
+                        filter: _mapBlur!,
                         enabled: t > 0,
                         child: ColoredBox(
                           color: Colors.black.withValues(alpha: dim),
