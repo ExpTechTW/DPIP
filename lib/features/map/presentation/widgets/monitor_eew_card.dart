@@ -2,7 +2,8 @@
 /// monitor's `EewCard`, sharing its domain math (`estimateLocalShaking`) and
 /// its tile styling (`EewEstimateTile`), so the map overlay's numbers and
 /// colours can never drift from the monitor's. The S-wave countdown ticks
-/// against the calibrated [AppTime] clock and stops on dispose.
+/// against the calibrated [AppTime] clock, pauses while the map tab is not the
+/// selected branch, and stops on dispose.
 ///
 /// Lives in this feature (not `features/earthquake`) because the layering gate
 /// forbids `features/map` importing another feature's presentation; the home
@@ -60,9 +61,30 @@ class MonitorEewCard extends StatefulWidget {
 class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
   /// The RTS panel's own gate suppresses feed-notify rebuilds behind other
   /// tabs, but the countdown has its own timer — same gate here.
+  ///
+  /// Deliberately the tab test only, not [VisibleTab.isOnScreen], and for a
+  /// sharper reason than [RefreshOnAppear]'s: `isOnScreen` also goes false for
+  /// *any* root-navigator push, and `showDialog` defaults to that navigator
+  /// while painting a translucent barrier. Gating on it would freeze a live
+  /// S-wave countdown at whatever second it held, in full view around the
+  /// dialog — a stale safety number presented as current. An unselected branch
+  /// is genuinely unpainted (`_RenderIndexedStack` paints only the selected
+  /// child), so the branch test alone carries the whole saving safely.
   @override
   bool get secondTickerActive =>
-      VisibleTabScope.of(context)?.isOnScreen(MapPage.tabIndex) ?? true;
+      (_visibleTab?.value ?? MapPage.tabIndex) == MapPage.tabIndex;
+
+  /// The shell's visible-tab notifier, subscribed to rather than merely read.
+  ///
+  /// [SecondTicker] re-reads [secondTickerActive] on every [syncSecondTicker],
+  /// so the gate is not latched — but nothing *calls* that sync on a tab
+  /// change, because [VisibleTabScope] hands the same instance down for the
+  /// page's whole life and so never notifies its dependents. Reading the scope
+  /// is how a consumer finds the notifier; only the subscription is a change
+  /// signal. Before this, the timer stayed in whatever state the lifecycle
+  /// edges last left it in. The panel that hosts this card subscribes the same
+  /// way for the same reason.
+  VisibleTab? _visibleTab;
 
   /// The CWA P/S travel-time table once it resolves — the countdown settles on
   /// the table's arrival time the moment it loads (see [estimateLocalShaking]).
@@ -85,6 +107,26 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
         setState(() => _fix = LatLng(fix.lat, fix.lng));
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    // Ahead of `super`, which runs [SecondTicker]'s own first sync: the gate
+    // above has to find the notifier before it is evaluated, or that sync
+    // reads the null fallback and starts the timer on a hidden card.
+    final visibleTab = VisibleTabScope.of(context);
+    if (!identical(visibleTab, _visibleTab)) {
+      _visibleTab?.removeListener(syncSecondTicker);
+      _visibleTab = visibleTab;
+      visibleTab?.addListener(syncSecondTicker);
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _visibleTab?.removeListener(syncSecondTicker);
+    super.dispose();
   }
 
   @override
