@@ -674,7 +674,7 @@
   "notifyEew": "การเตือนแผ่นดินไหวฉุกเฉิน",
   "regionNationwide": "ทั่วประเทศ",
   "moreNotifyLog": "บันทึกการส่งการแจ้งเตือนของ DPIP",
-  "regionCurrent": "ตำแหน่งปัจจุบัน",
+  "regionCurrent": "ตำแหน่ง",
   "meshtasticNotConnected": "ยังไม่ได้เชื่อมต่อกับวิทยุ",
   "weatherModeSnow": "หิมะตก",
   "mapLayerMeshtastic": "โหนด Meshtastic",

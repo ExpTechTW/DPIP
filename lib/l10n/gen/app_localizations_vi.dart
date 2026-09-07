@@ -1420,7 +1420,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreNotifyLog => 'Nhật ký thông báo DPIP';
 
   @override
-  String get regionCurrent => 'Vị trí hiện tại';
+  String get regionCurrent => 'Vị trí';
 
   @override
   String get meshtasticNotConnected => 'Chưa kết nối radio';

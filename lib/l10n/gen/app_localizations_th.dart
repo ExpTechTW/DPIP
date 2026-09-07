@@ -1416,7 +1416,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreNotifyLog => 'บันทึกการส่งการแจ้งเตือนของ DPIP';
 
   @override
-  String get regionCurrent => 'ตำแหน่งปัจจุบัน';
+  String get regionCurrent => 'ตำแหน่ง';
 
   @override
   String get meshtasticNotConnected => 'ยังไม่ได้เชื่อมต่อกับวิทยุ';

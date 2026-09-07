@@ -416,7 +416,7 @@ abstract class AppLocalizations {
   /// Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker
   ///
   /// In en, this message translates to:
-  /// **'1h Precipitation Forecast'**
+  /// **'1h Rain Forecast'**
   String get mapLayerQpesums;
 
   /// Section title in map overlay settings menus: base-map settings
@@ -1364,7 +1364,7 @@ abstract class AppLocalizations {
   /// Name of the composite radar reflectivity layer in the layer picker
   ///
   /// In en, this message translates to:
-  /// **'Composite Radar Reflectivity'**
+  /// **'Radar Reflectivity'**
   String get mapLayerRadar;
 
   /// Restroom venue category: religious / ceremonial venue
@@ -2732,7 +2732,7 @@ abstract class AppLocalizations {
   /// Region bar label for the whole-country view
   ///
   /// In en, this message translates to:
-  /// **'Nationwide'**
+  /// **'National'**
   String get regionNationwide;
 
   /// More-menu link to the DPIP notification send-record website
@@ -2744,7 +2744,7 @@ abstract class AppLocalizations {
   /// Region bar label for the current GPS township
   ///
   /// In en, this message translates to:
-  /// **'Current location'**
+  /// **'Location'**
   String get regionCurrent;
 
   /// Empty message log while not connected

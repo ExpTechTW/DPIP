@@ -173,7 +173,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayerRain => 'Rainfall';
 
   @override
-  String get mapLayerQpesums => '1h Precipitation Forecast';
+  String get mapLayerQpesums => '1h Rain Forecast';
 
   @override
   String get mapOverlaySectionMap => 'Map';
@@ -682,7 +682,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eewLocalIntensity => 'Estimated at my location';
 
   @override
-  String get mapLayerRadar => 'Composite Radar Reflectivity';
+  String get mapLayerRadar => 'Radar Reflectivity';
 
   @override
   String get restroomCategoryReligious => 'Religious';
@@ -1413,13 +1413,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifyEew => 'Emergency earthquake alert';
 
   @override
-  String get regionNationwide => 'Nationwide';
+  String get regionNationwide => 'National';
 
   @override
   String get moreNotifyLog => 'DPIP notification log';
 
   @override
-  String get regionCurrent => 'Current location';
+  String get regionCurrent => 'Location';
 
   @override
   String get meshtasticNotConnected => 'Not connected to a radio';

@@ -672,9 +672,9 @@
   "changelogOpenOnGitHub": "Tingnan sa GitHub",
   "radarGlobalOutline": "Mga hangganan ng bansa",
   "notifyEew": "Emergency na alerto sa lindol",
-  "regionNationwide": "Buong bansa",
+  "regionNationwide": "Bansa",
   "moreNotifyLog": "Log ng notipikasyon ng DPIP",
-  "regionCurrent": "Kasalukuyang lokasyon",
+  "regionCurrent": "Lokasyon",
   "meshtasticNotConnected": "Hindi konektado sa radyo",
   "weatherModeSnow": "Niyebe",
   "mapLayerMeshtastic": "Meshtastic nodes",
@@ -1111,7 +1111,7 @@
     }
   },
   "mapLayerSatelliteB11": "Himawari SO₂ / Cloud Phase (B11)",
-  "navEvents": "Mga Kaganapan",
+  "navEvents": "Kaganapan",
   "onboardingTermsTitle": "Mga Tuntunin ng Serbisyo",
   "@meshtasticChannels": {
     "description": "Section: the radio's channel table"
