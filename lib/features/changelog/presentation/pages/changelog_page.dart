@@ -236,11 +236,15 @@ class _ChangelogPageState extends State<ChangelogPage> {
     });
   }
 
+  /// Compiled once. `_isCurrent` runs per visible tile per rebuild, and Dart
+  /// interns nothing — every `RegExp(...)` compiles a fresh pattern.
+  static final RegExp _vPrefix = RegExp(r'^v');
+
   bool _isCurrent(ReleaseNote note) {
     final installed = _installedVersion;
     if (installed == null) return false;
-    final tag = note.tagName.replaceFirst(RegExp(r'^v'), '');
-    final name = note.name.replaceFirst(RegExp(r'^v'), '');
+    final tag = note.tagName.replaceFirst(_vPrefix, '');
+    final name = note.name.replaceFirst(_vPrefix, '');
     return tag == installed || name == installed;
   }
 }
@@ -267,6 +271,10 @@ class _ReleaseTile extends StatelessWidget {
   static const _prerelease = Color(0xFFEF6C00);
   static const _railWidth = 28.0;
 
+  /// Parsing a locale's date pattern is not free — memoised per locale, since
+  /// every visible tile formats its date again on every page rebuild.
+  static final Map<String, DateFormat> _dateFormats = {};
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -277,9 +285,10 @@ class _ReleaseTile extends StatelessWidget {
         ? Icons.science_outlined
         : Icons.verified_outlined;
     final title = note.name.isEmpty ? note.tagName : note.name;
-    final date = DateFormat.yMMMd(
-      intlDateLocale(Localizations.localeOf(context)),
-    ).format(note.publishedAt.toLocal());
+    final dateLocale = intlDateLocale(Localizations.localeOf(context));
+    final date = _dateFormats
+        .putIfAbsent(dateLocale, () => DateFormat.yMMMd(dateLocale))
+        .format(note.publishedAt.toLocal());
     final emphasized = isCurrent || expanded;
 
     return CustomPaint(
@@ -407,8 +416,12 @@ class _ReleaseTile extends StatelessWidget {
                 thickness: 1,
                 color: colors.outlineVariant.withValues(alpha: 0.55),
               ),
-              if (contributorsFromBody(note.body).isNotEmpty ||
-                  note.htmlUrl.isNotEmpty)
+              // `htmlUrl` first: it is a field read, while the contributor
+              // test walks the whole multi-language body, and a GitHub release
+              // always carries a URL — so this drops the guard's own scan. The
+              // strip below still runs one of its own for the badges it draws.
+              if (note.htmlUrl.isNotEmpty ||
+                  contributorsFromBody(note.body).isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg,

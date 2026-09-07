@@ -601,6 +601,14 @@ class _MapTimelineState extends State<MapTimeline> {
                       controller: _scroll,
                       scrollDirection: Axis.horizontal,
                       physics: const _ScrubPhysics(),
+                      // A tick is a hairline and a label — cheaper to repaint
+                      // than to composite, and the whole ruler moves together
+                      // when scrubbed, so per-child layers would all be
+                      // invalidated at once anyway. Nothing here holds state
+                      // worth keeping alive off screen either: [_Tick] is
+                      // stateless and rebuilt from `frames` on demand.
+                      addRepaintBoundaries: false,
+                      addAutomaticKeepAlives: false,
                       padding: EdgeInsets.symmetric(horizontal: pad),
                       itemExtent: widget.itemExtent,
                       itemCount: widget.frames.length,
