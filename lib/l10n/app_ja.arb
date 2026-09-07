@@ -1994,5 +1994,9 @@
   "radarLightningOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。",
   "radarWindOverlay": "風向を表示",
   "radarWindOverlayHint": "表示中のエコーと同時刻の観測風向",
-  "radarWindOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の観測所の風向・風速を重ねて表示します。"
+  "radarWindOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の観測所の風向・風速を重ねて表示します。",
+  "moreSectionAccessibility": "アクセシビリティ",
+  "eewSpokenAnnouncementOn": "オン",
+  "eewSpokenAnnouncementOnDescription": "予想震度を音声で読み上げてから警報音を鳴らします。その分、警報音は読み上げの長さだけ遅れます。",
+  "eewSpokenAnnouncementOff": "オフ"
 }

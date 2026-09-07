@@ -92,6 +92,7 @@ const _tiles = <(String, String)>[
   (AppRoutes.language, 'Language'),
   (AppRoutes.display, 'Display'),
   (AppRoutes.log, 'App logs'),
+  (AppRoutes.spokenIntensity, 'Speak estimated intensity'),
 ];
 
 GoRouter _router(List<String> visited) => GoRouter(
@@ -310,32 +311,40 @@ void main() {
     expect(beta.dy, lessThan(partner.dy));
   });
 
-  testWidgets(
-    'the spoken-announcement row starts off and the whole row toggles',
-    (tester) async {
-      await _pump(tester, _router([]));
-      const label = 'Speak estimated intensity';
-      Switch speechSwitch() => tester.widget<Switch>(
-        find.descendant(
-          of: find.widgetWithText(ListTile, label),
-          matching: find.byType(Switch),
-        ),
-      );
+  testWidgets('the accessibility row shows its state and opens its page', (
+    tester,
+  ) async {
+    final visited = <String>[];
+    await _pump(tester, _router(visited));
+    const label = 'Speak estimated intensity';
 
-      // Defaults to off: speech delays the warning sound, so it is opt-in.
-      expect(speechSwitch().value, isFalse);
+    // The row reads as a destination like every other row in this menu — the
+    // choice and the trade it makes live on the page, not in the menu.
+    final tile = tester.widget<ListTile>(find.widgetWithText(ListTile, label));
+    expect(tile.trailing, isA<Icon>());
+    expect(find.byType(Switch), findsNothing);
 
-      // The tap lands on the row, not the switch — a control you can only hit by
-      // aiming at the switch is a much smaller target than the row it sits in.
-      await tester.tap(find.widgetWithText(ListTile, label));
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(speechSwitch().value, isTrue);
+    // Off by default, and the row says so without opening anything.
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, label),
+        matching: find.text('Off'),
+      ),
+      findsOneWidget,
+    );
 
-      await tester.tap(find.widgetWithText(ListTile, label));
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(speechSwitch().value, isFalse);
-    },
-  );
+    // Under 無障礙, not 通知 — a row that drifts back into another section is
+    // exactly the kind of edit nothing else would notice.
+    final accessibility = tester.getTopLeft(find.text('Accessibility')).dy;
+    final row = tester.getTopLeft(find.widgetWithText(ListTile, label)).dy;
+    final nextSection = tester.getTopLeft(find.text('Mesh network')).dy;
+    expect(row, greaterThan(accessibility));
+    expect(row, lessThan(nextSection));
+
+    await tester.tap(find.widgetWithText(ListTile, label));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(visited, [AppRoutes.spokenIntensity]);
+  });
 
   testWidgets('permission check sits with the notification settings', (
     tester,
