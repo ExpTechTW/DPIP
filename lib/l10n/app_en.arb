@@ -196,7 +196,7 @@
       }
     }
   },
-  "mapLayerQpesums": "1h Precipitation Forecast",
+  "mapLayerQpesums": "1h Rain Forecast",
   "@notifyOptWeatherLocal": {
     "description": "Notify option label"
   },
@@ -874,7 +874,7 @@
   "windForecastGlobalOutlineHint": "Every country's outer frame",
   "rainInterval1h": "1 h",
   "eewLocalIntensity": "Estimated at my location",
-  "mapLayerRadar": "Composite Radar Reflectivity",
+  "mapLayerRadar": "Radar Reflectivity",
   "@onboardingPermCriticalDesc": {
     "description": "Permission row description: critical alerts"
   },
@@ -1936,12 +1936,12 @@
   "@mapLayerSatelliteB15": {
     "description": "Himawari longwave-infrared channel (B15, 12.4 µm) layer name"
   },
-  "regionNationwide": "Nationwide",
+  "regionNationwide": "National",
   "moreNotifyLog": "DPIP notification log",
   "@mapLayerStyleBdTooltip": {
     "description": "Explains the Dvorak BD band rendering"
   },
-  "regionCurrent": "Current location",
+  "regionCurrent": "Location",
   "@mapLayerHumidity": {
     "description": "Map layer switcher label for the humidity layer"
   },

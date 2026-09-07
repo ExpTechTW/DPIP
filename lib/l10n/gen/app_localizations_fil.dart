@@ -1422,13 +1422,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get notifyEew => 'Emergency na alerto sa lindol';
 
   @override
-  String get regionNationwide => 'Buong bansa';
+  String get regionNationwide => 'Bansa';
 
   @override
   String get moreNotifyLog => 'Log ng notipikasyon ng DPIP';
 
   @override
-  String get regionCurrent => 'Kasalukuyang lokasyon';
+  String get regionCurrent => 'Lokasyon';
 
   @override
   String get meshtasticNotConnected => 'Hindi konektado sa radyo';
@@ -2356,7 +2356,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayerSatelliteB11 => 'Himawari SO₂ / Cloud Phase (B11)';
 
   @override
-  String get navEvents => 'Mga Kaganapan';
+  String get navEvents => 'Kaganapan';
 
   @override
   String get onboardingTermsTitle => 'Mga Tuntunin ng Serbisyo';

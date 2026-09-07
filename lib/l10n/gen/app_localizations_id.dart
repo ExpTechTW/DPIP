@@ -1416,13 +1416,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifyEew => 'Peringatan gempa darurat';
 
   @override
-  String get regionNationwide => 'Seluruh negeri';
+  String get regionNationwide => 'Nasional';
 
   @override
   String get moreNotifyLog => 'Log notifikasi DPIP';
 
   @override
-  String get regionCurrent => 'Lokasi saat ini';
+  String get regionCurrent => 'Lokasi';
 
   @override
   String get meshtasticNotConnected => 'Belum terhubung ke radio';
