@@ -106,6 +106,12 @@ abstract final class AppRoutes {
   static const String eewSource = 'eewSource';
   static const String eewSourcePath = '/eew-source';
 
+  /// Whether the monitor speaks the estimated intensity before the warning
+  /// sound — a page of its own rather than a switch in the menu, so the
+  /// trade it makes has somewhere to be explained.
+  static const String spokenIntensity = 'spokenIntensity';
+  static const String spokenIntensityPath = '/spoken-intensity';
+
   static const String log = 'log';
   static const String logPath = '/log';
 

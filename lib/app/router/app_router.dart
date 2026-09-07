@@ -32,6 +32,7 @@ import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/features/settings/presentation/pages/default_map_layer_page.dart';
 import 'package:dpip/features/settings/presentation/pages/eew_source_page.dart';
+import 'package:dpip/features/settings/presentation/pages/spoken_intensity_page.dart';
 import 'package:dpip/features/settings/presentation/pages/language_page.dart';
 import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
@@ -239,6 +240,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.eewSourcePath,
       name: AppRoutes.eewSource,
       builder: (_, _) => const EewSourcePage(),
+    ),
+    GoRoute(
+      path: AppRoutes.spokenIntensityPath,
+      name: AppRoutes.spokenIntensity,
+      builder: (_, _) => const SpokenIntensityPage(),
     ),
     GoRoute(
       path: AppRoutes.regionManagePath,

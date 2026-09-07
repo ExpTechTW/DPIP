@@ -1994,5 +1994,9 @@
   "radarLightningOverlaySubtitle": "ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง",
   "radarWindOverlay": "แสดงลม",
   "radarWindOverlayHint": "ลมจากสถานีในเวลาเดียวกับภาพที่แสดง",
-  "radarWindOverlaySubtitle": "ซ้อนทิศทางและความเร็วลมจากสถานีตรวจวัดในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง"
+  "radarWindOverlaySubtitle": "ซ้อนทิศทางและความเร็วลมจากสถานีตรวจวัดในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง",
+  "moreSectionAccessibility": "การช่วยการเข้าถึง",
+  "eewSpokenAnnouncementOn": "เปิด",
+  "eewSpokenAnnouncementOnDescription": "อ่านออกเสียงความรุนแรงที่คาดการณ์ก่อน แล้วจึงส่งเสียงเตือน ซึ่งทำให้เสียงเตือนช้าลงตามความยาวของประโยค",
+  "eewSpokenAnnouncementOff": "ปิด"
 }

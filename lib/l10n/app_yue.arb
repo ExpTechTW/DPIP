@@ -1994,5 +1994,9 @@
   "radarLightningOverlaySubtitle": "喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。",
   "radarWindOverlay": "顯示風向",
   "radarWindOverlayHint": "顯示同畫面回波同一時間嘅測站風向",
-  "radarWindOverlaySubtitle": "喺而家嘅雷達回波上面疊加同一時間嘅測站風向同風速。"
+  "radarWindOverlaySubtitle": "喺而家嘅雷達回波上面疊加同一時間嘅測站風向同風速。",
+  "moreSectionAccessibility": "無障礙",
+  "eewSpokenAnnouncementOn": "開啟",
+  "eewSpokenAnnouncementOnDescription": "會先讀出預估震度，之後先播警示音——即係警示音會遲咗一句嘢咁耐。",
+  "eewSpokenAnnouncementOff": "關閉"
 }
