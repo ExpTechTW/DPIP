@@ -7,7 +7,7 @@ import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/speech/speech_service.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
-import 'package:dpip/features/map/presentation/monitor_eew_announcement_controller.dart';
+import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _FakeSpeech implements SpeechService {

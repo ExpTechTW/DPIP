@@ -22,7 +22,7 @@ import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
-import 'package:dpip/features/map/presentation/monitor_eew_announcement_controller.dart';
+import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
 import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';

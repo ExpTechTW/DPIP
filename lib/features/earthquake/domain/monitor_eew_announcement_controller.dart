@@ -1,4 +1,10 @@
-/// Latest-report-wins speech state machine for the visible seismic monitor.
+/// Latest-report-wins speech state machine for a seismic monitor.
+///
+/// In `domain/` rather than beside the panel that first used it: the live
+/// monitor lives in the map feature and the 重播 page in this one, and the
+/// layering gate forbids either feature from importing the other's
+/// presentation. Nothing here is presentation anyway — no Flutter import, no
+/// widget, no build; it is the announcement policy, driven by a feed snapshot.
 library;
 
 import 'dart:async';

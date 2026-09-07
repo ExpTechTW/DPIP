@@ -29,6 +29,13 @@ import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
+import 'package:dpip/shared/seismic/spoken_intensity.dart';
+import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
+import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
+import 'package:dpip/core/speech/speech_service.dart';
+import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
+import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
@@ -101,6 +108,18 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// advances it through the alert set (modulo the count in the builder).
   int _eewIndex = 0;
 
+  /// Speaks each new report's estimated intensity while the replay runs, the
+  /// same way the live monitor does — a replay that stayed silent would not be
+  /// a replay of what the user would have heard.
+  MonitorEewAnnouncementController? _announcement;
+  EewSpokenAnnouncementSettings? _speechSettings;
+  AppLocalizations? _l10n;
+  String _languageTag = 'zh-Hant';
+
+  /// False while nobody is looking — backgrounded or on another tab — so the
+  /// announcement idles together with the polling (see [_applyActivity]).
+  bool _resumed = true;
+
   @override
   void initState() {
     super.initState();
@@ -117,6 +136,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       widget.replayTimestamp,
       cwaOnly: () => cwaOnly.enabled,
     )..start();
+    _session.eew.addListener(_syncAnnouncement);
     _startTicker();
   }
 
@@ -135,6 +155,9 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// go_router freezes the exit transition the moment the branch deactivates,
   /// so `dispose` does not run until the user comes *back*. Until then the
   /// replay would keep polling twice a second for a page nobody can see.
+  ///
+  /// The spoken announcement follows the same signal: a replay nobody is
+  /// looking at must not keep talking either.
   void _applyActivity(bool active) {
     if (active) {
       _startTicker();
@@ -144,6 +167,8 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       _ticker = null;
       _session.pause();
     }
+    _resumed = active;
+    _syncAnnouncement();
   }
 
   void _startTicker() {
@@ -154,9 +179,70 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _l10n = AppLocalizations.of(context);
+    _languageTag = Localizations.localeOf(context).toLanguageTag();
+    _announcement ??= _createAnnouncementController();
+    final speechSettings = context.read<EewSpokenAnnouncementSettings?>();
+    if (!identical(speechSettings, _speechSettings)) {
+      _speechSettings?.removeListener(_syncAnnouncement);
+      _speechSettings = speechSettings;
+      speechSettings?.addListener(_syncAnnouncement);
+    }
+    _syncAnnouncement();
+  }
+
+  MonitorEewAnnouncementController? _createAnnouncementController() {
+    // Nullable read keeps the page testable without the app's provider list.
+    final speech = context.read<SpeechService?>();
+    if (speech == null) return null;
+    final location = context.read<LocationService>();
+    return MonitorEewAnnouncementController(
+      speech,
+      // A gate of this page's own, never NotificationService's. A replay
+      // produces no notification to sequence, and borrowing the shared one
+      // would let a phrase about a historical earthquake hold back the sound
+      // of a real alert that arrives while the replay is playing.
+      ForegroundEewAnnouncementGate(),
+      (alert) async {
+        final fix = await location.lastKnownFix();
+        if (fix == null) {
+          return (scale: alert.info.max.clamp(0, 9), isLocal: false);
+        }
+        final estimate = estimateLocalShaking(
+          alert,
+          geo.LatLng(fix.lat, fix.lng),
+        );
+        return (scale: estimate.scale, isLocal: true);
+      },
+    );
+  }
+
+  void _syncAnnouncement() {
+    final controller = _announcement;
+    final l10n = _l10n;
+    if (controller == null || l10n == null) return;
+    controller.setActive((_speechSettings?.enabled ?? false) && _resumed);
+    controller.update(
+      _session.eew.state,
+      languageTag: _languageTag,
+      format: (estimate) {
+        final intensity = spokenIntensityLabel(estimate.scale, _languageTag);
+        return estimate.isLocal
+            ? l10n.eewSpokenLocalIntensity(intensity)
+            : l10n.eewSpokenMaxIntensity(intensity);
+      },
+    );
+  }
+
+  @override
   void dispose() {
     _ticker?.cancel();
     _tick.dispose();
+    _session.eew.removeListener(_syncAnnouncement);
+    _speechSettings?.removeListener(_syncAnnouncement);
+    _announcement?.dispose();
     _session.dispose();
     super.dispose();
   }
