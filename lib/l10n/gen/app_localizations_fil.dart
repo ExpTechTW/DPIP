@@ -3351,4 +3351,17 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo.';
+
+  @override
+  String get moreSectionAccessibility => 'Accessibility';
+
+  @override
+  String get eewSpokenAnnouncementOn => 'Naka-on';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      'Babasahin muna nang malakas ang tinatayang intensidad bago tumunog ang babala — kaya naaantala ito nang kasinghaba ng pangungusap.';
+
+  @override
+  String get eewSpokenAnnouncementOff => 'Naka-off';
 }

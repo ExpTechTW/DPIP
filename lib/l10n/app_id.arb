@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "Lapisan data",
   "radarLightningOverlay": "Tampilkan petir",
   "radarLightningOverlayHint": "Petir pada waktu bingkai yang tampil",
-  "radarLightningOverlaySubtitle": "Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat."
+  "radarLightningOverlaySubtitle": "Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat.",
+  "moreSectionAccessibility": "Aksesibilitas",
+  "eewSpokenAnnouncementOn": "Aktif",
+  "eewSpokenAnnouncementOnDescription": "Intensitas perkiraan dibacakan lebih dulu, lalu suara peringatan diputar — sehingga suara itu tertunda selama kalimatnya.",
+  "eewSpokenAnnouncementOff": "Nonaktif"
 }

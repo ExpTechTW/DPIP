@@ -3345,4 +3345,17 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat.';
+
+  @override
+  String get moreSectionAccessibility => 'Aksesibilitas';
+
+  @override
+  String get eewSpokenAnnouncementOn => 'Aktif';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      'Intensitas perkiraan dibacakan lebih dulu, lalu suara peringatan diputar — sehingga suara itu tertunda selama kalimatnya.';
+
+  @override
+  String get eewSpokenAnnouncementOff => 'Nonaktif';
 }

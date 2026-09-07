@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "ชั้นข้อมูล",
   "radarLightningOverlay": "แสดงฟ้าผ่า",
   "radarLightningOverlayHint": "ฟ้าผ่าในเวลาเดียวกับภาพที่แสดง",
-  "radarLightningOverlaySubtitle": "ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง"
+  "radarLightningOverlaySubtitle": "ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง",
+  "moreSectionAccessibility": "การช่วยการเข้าถึง",
+  "eewSpokenAnnouncementOn": "เปิด",
+  "eewSpokenAnnouncementOnDescription": "อ่านออกเสียงความรุนแรงที่คาดการณ์ก่อน แล้วจึงส่งเสียงเตือน ซึ่งทำให้เสียงเตือนช้าลงตามความยาวของประโยค",
+  "eewSpokenAnnouncementOff": "ปิด"
 }

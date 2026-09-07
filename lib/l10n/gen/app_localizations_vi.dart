@@ -3334,4 +3334,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị.';
+
+  @override
+  String get moreSectionAccessibility => 'Trợ năng';
+
+  @override
+  String get eewSpokenAnnouncementOn => 'Bật';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      'Cường độ dự kiến được đọc lên trước, sau đó mới phát âm báo động — nên âm báo động chậm lại đúng bằng thời lượng câu đọc.';
+
+  @override
+  String get eewSpokenAnnouncementOff => 'Tắt';
 }

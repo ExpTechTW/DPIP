@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "数据图层",
   "radarLightningOverlay": "显示闪电",
   "radarLightningOverlayHint": "显示与画面回波同一时间的落雷",
-  "radarLightningOverlaySubtitle": "在当前的雷达回波上叠加同一时间的闪电落雷。"
+  "radarLightningOverlaySubtitle": "在当前的雷达回波上叠加同一时间的闪电落雷。",
+  "moreSectionAccessibility": "无障碍",
+  "eewSpokenAnnouncementOn": "开启",
+  "eewSpokenAnnouncementOnDescription": "先用语音朗读预估烈度，再播放警示音——警示音会因此延后一句话的长度。",
+  "eewSpokenAnnouncementOff": "关闭"
 }

@@ -3333,4 +3333,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.';
+
+  @override
+  String get moreSectionAccessibility => 'Accessibility';
+
+  @override
+  String get eewSpokenAnnouncementOn => 'On';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      'The estimated intensity is read aloud first, then the warning sound plays — which delays it by however long the phrase takes.';
+
+  @override
+  String get eewSpokenAnnouncementOff => 'Off';
 }

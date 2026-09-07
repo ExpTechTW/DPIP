@@ -3253,6 +3253,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get radarLightningOverlaySubtitle => '在当前的雷达回波上叠加同一时间的闪电落雷。';
+
+  @override
+  String get moreSectionAccessibility => '无障碍';
+
+  @override
+  String get eewSpokenAnnouncementOn => '开启';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '先用语音朗读预估烈度，再播放警示音——警示音会因此延后一句话的长度。';
+
+  @override
+  String get eewSpokenAnnouncementOff => '关闭';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6503,6 +6516,19 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get radarLightningOverlaySubtitle => '在当前的雷达回波上叠加同一时间的闪电落雷。';
+
+  @override
+  String get moreSectionAccessibility => '无障碍';
+
+  @override
+  String get eewSpokenAnnouncementOn => '开启';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '先用语音朗读预估烈度，再播放警示音——警示音会因此延后一句话的长度。';
+
+  @override
+  String get eewSpokenAnnouncementOff => '关闭';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -9753,6 +9779,19 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get radarLightningOverlaySubtitle => '喺目前嘅雷達回波上疊加同一時間嘅閃電落雷。';
+
+  @override
+  String get moreSectionAccessibility => '無障礙';
+
+  @override
+  String get eewSpokenAnnouncementOn => '開啟';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '先以語音朗讀預估震度，再播放警示音——警示音會因此延後一句話的長度。';
+
+  @override
+  String get eewSpokenAnnouncementOff => '關閉';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13003,4 +13042,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get radarLightningOverlaySubtitle => '在目前的雷達回波上疊加同一時間的閃電落雷。';
+
+  @override
+  String get moreSectionAccessibility => '無障礙';
+
+  @override
+  String get eewSpokenAnnouncementOn => '開啟';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '先以語音朗讀預估震度，再播放警示音——警示音會因此延後一句話的長度。';
+
+  @override
+  String get eewSpokenAnnouncementOff => '關閉';
 }

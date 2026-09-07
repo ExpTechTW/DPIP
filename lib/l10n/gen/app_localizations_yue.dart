@@ -3253,4 +3253,17 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get radarLightningOverlaySubtitle => '喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。';
+
+  @override
+  String get moreSectionAccessibility => '無障礙';
+
+  @override
+  String get eewSpokenAnnouncementOn => '開啟';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '會先讀出預估震度，之後先播警示音——即係警示音會遲咗一句嘢咁耐。';
+
+  @override
+  String get eewSpokenAnnouncementOff => '關閉';
 }

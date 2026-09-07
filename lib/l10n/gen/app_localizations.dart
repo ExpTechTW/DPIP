@@ -6328,6 +6328,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.'**
   String get radarLightningOverlaySubtitle;
+
+  /// More menu section header for accessibility settings
+  ///
+  /// In en, this message translates to:
+  /// **'Accessibility'**
+  String get moreSectionAccessibility;
+
+  /// Option label: the monitor speaks before the warning sound
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get eewSpokenAnnouncementOn;
+
+  /// Explains that speech delays the warning sound by the length of the phrase
+  ///
+  /// In en, this message translates to:
+  /// **'The estimated intensity is read aloud first, then the warning sound plays — which delays it by however long the phrase takes.'**
+  String get eewSpokenAnnouncementOnDescription;
+
+  /// Option label: no announcement, warning sound only
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get eewSpokenAnnouncementOff;
 }
 
 class _AppLocalizationsDelegate
