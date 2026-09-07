@@ -1,8 +1,9 @@
 /// The monitor's spoken-announcement switch.
 ///
-/// The default is the whole point of these tests: an EEW announcement that
-/// silently defaults to off is a feature nobody ever hears, and the failure
-/// looks exactly like a broken TTS engine.
+/// The default is the whole point of these tests: speech delays the warning
+/// sound by however long the phrase takes, so it has to be something the user
+/// asked for. A default that silently drifted to on would push that trade onto
+/// everyone.
 library;
 
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
@@ -11,27 +12,27 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('defaults to on when nothing was ever saved', () {
+  test('defaults to off when nothing was ever saved', () {
     final settings = EewSpokenAnnouncementSettings(SettingsStore.inMemory());
-    expect(settings.enabled, isTrue);
+    expect(settings.enabled, isFalse);
   });
 
   test('reads back what was saved, in both directions', () async {
     final store = SettingsStore.inMemory();
     final settings = EewSpokenAnnouncementSettings(store);
 
-    await settings.setEnabled(false);
-    expect(settings.enabled, isFalse);
-    expect(store.getBool(SettingKeys.eewSpokenAnnouncement), isFalse);
-
     await settings.setEnabled(true);
     expect(settings.enabled, isTrue);
+    expect(store.getBool(SettingKeys.eewSpokenAnnouncement), isTrue);
+
+    await settings.setEnabled(false);
+    expect(settings.enabled, isFalse);
   });
 
   test('a saved value survives a new instance over the same store', () async {
     final store = SettingsStore.inMemory();
-    await EewSpokenAnnouncementSettings(store).setEnabled(false);
-    expect(EewSpokenAnnouncementSettings(store).enabled, isFalse);
+    await EewSpokenAnnouncementSettings(store).setEnabled(true);
+    expect(EewSpokenAnnouncementSettings(store).enabled, isTrue);
   });
 
   test('notifies listeners so the monitor re-reads it mid-alert', () async {

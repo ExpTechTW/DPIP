@@ -311,7 +311,7 @@ void main() {
   });
 
   testWidgets(
-    'the spoken-announcement row starts on and the whole row toggles',
+    'the spoken-announcement row starts off and the whole row toggles',
     (tester) async {
       await _pump(tester, _router([]));
       const label = 'Speak estimated intensity';
@@ -322,18 +322,18 @@ void main() {
         ),
       );
 
-      // Defaults to on: an announcement nobody opted into is the point.
-      expect(speechSwitch().value, isTrue);
+      // Defaults to off: speech delays the warning sound, so it is opt-in.
+      expect(speechSwitch().value, isFalse);
 
       // The tap lands on the row, not the switch — a control you can only hit by
       // aiming at the switch is a much smaller target than the row it sits in.
       await tester.tap(find.widgetWithText(ListTile, label));
       await tester.pump(const Duration(milliseconds: 100));
-      expect(speechSwitch().value, isFalse);
+      expect(speechSwitch().value, isTrue);
 
       await tester.tap(find.widgetWithText(ListTile, label));
       await tester.pump(const Duration(milliseconds: 100));
-      expect(speechSwitch().value, isTrue);
+      expect(speechSwitch().value, isFalse);
     },
   );
 
