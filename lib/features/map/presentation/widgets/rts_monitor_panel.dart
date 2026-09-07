@@ -191,11 +191,11 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel>
     if (controller == null || l10n == null) return;
     final foreground =
         _lifecycleState == null || _lifecycleState == AppLifecycleState.resumed;
-    // Absent provider means a test that supplied neither — announce, matching
+    // Absent provider means a test that supplied none — stay silent, matching
     // the default. Switching off deactivates the controller, which stops any
     // phrase in flight and releases the notification the gate was holding, so
     // the warning sound is never delayed by a setting the user just turned off.
-    final speechEnabled = _speechSettings?.enabled ?? true;
+    final speechEnabled = _speechSettings?.enabled ?? false;
     controller.setActive(speechEnabled && _isMonitorOnScreen && foreground);
     controller.update(
       widget.eew.state,
