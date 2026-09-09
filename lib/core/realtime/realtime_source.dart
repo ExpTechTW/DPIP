@@ -1,5 +1,7 @@
 import 'package:dpip/core/error/result.dart';
 
+import '../error/failure.dart';
+
 /// The transport + freshness-reference seam a [RealtimeChannel] polls.
 ///
 /// One implementation per feed (EEW now, RTS later). Implementing this is the
@@ -22,6 +24,10 @@ abstract class RealtimeSource<T> {
   /// stream emissions. Defaults to value equality; override for collections
   /// whose default `==` is identity (e.g. `List`).
   bool sameData(T? a, T? b) => identical(a, b) || a == b;
+
+  /// Returns true when a fetch failure means there is simply no data
+  /// for the requested point in time, rather than a realtime failure.
+  bool isIgnorableFailure(Failure failure) => false;
 
   /// Drops any transport the source is holding open while the app is in the
   /// background, where nothing is watching the feed.

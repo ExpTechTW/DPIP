@@ -234,6 +234,9 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
           );
           if (changed) _publish();
         case Err(:final failure):
+          if (_source.isIgnorableFailure(failure)) {
+            return;
+          }
           final status = _classify();
           final changed = status != _current.status;
           _current = _current.copyWith(

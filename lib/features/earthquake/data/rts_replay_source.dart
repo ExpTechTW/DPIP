@@ -5,6 +5,8 @@ import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 
+import '../../../core/error/failure.dart';
+
 /// Replays the RTS feed at a fixed point in the past — a plain **polling**
 /// source (not SSE): each [fetch] asks [EarthquakeApi.getRtsAt] for the
 /// snapshot at the current second of [clock], which ticks 1:1 with real time
@@ -25,7 +27,10 @@ class RtsReplaySource extends RealtimeSource<Rts> {
     final seconds = clock.now().millisecondsSinceEpoch ~/ 1000;
     final json = await _api.getRtsAt(seconds);
     return Rts.fromJson(json as Map<String, dynamic>);
-  });
+  }, shouldLog: (failure) => failure is! NotFoundFailure);
+
+  @override
+  bool isIgnorableFailure(Failure failure) => failure is NotFoundFailure;
 
   /// Null: freshness is "did the last poll succeed", not payload age — the
   /// payload's own [Rts.time] is *intentionally* historical, so keying off it
