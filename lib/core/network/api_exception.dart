@@ -10,15 +10,21 @@ import 'package:dpip/core/logging/log.dart';
 /// every repository method is a one-liner and none can accidentally forget the
 /// `try` or return `Ok` on failure — which for a safety feed would turn a dead
 /// source into a false all-clear.
-Future<Result<T>> guardResult<T>(Future<T> Function() body) async {
+Future<Result<T>> guardResult<T>(
+  Future<T> Function() body, {
+  bool Function(Failure failure)? shouldLog,
+}) async {
   try {
     return Ok(await body());
   } catch (error, stackTrace) {
     // Silent failures are the worst kind: the UI shows its error state and
     // nothing else records WHY. One line per failure, here at the single
     // choke point every repository passes through.
-    Log.handle(error, stackTrace, 'repository fetch/decode');
-    return Err(mapException(error));
+    final failure = mapException(error);
+    if (shouldLog?.call(failure) ?? true) {
+      Log.handle(error, stackTrace, 'repository fetch/decode');
+    }
+    return Err(failure);
   }
 }
 
