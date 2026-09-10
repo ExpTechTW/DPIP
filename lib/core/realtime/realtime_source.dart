@@ -1,6 +1,5 @@
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
-
-import '../error/failure.dart';
 
 /// The transport + freshness-reference seam a [RealtimeChannel] polls.
 ///
@@ -25,8 +24,20 @@ abstract class RealtimeSource<T> {
   /// whose default `==` is identity (e.g. `List`).
   bool sameData(T? a, T? b) => identical(a, b) || a == b;
 
-  /// Returns true when a fetch failure means there is simply no data
-  /// for the requested point in time, rather than a realtime failure.
+  /// Whether a fetch failure means there is simply no data for the requested
+  /// point in time, rather than a fault worth counting. The channel still
+  /// records it as `lastFailure` — that is what a replay page reads to say the
+  /// instant has no snapshot instead of calling itself disconnected — but does
+  /// not count it toward `consecutiveFailures` and does not log it.
+  ///
+  /// **A noise switch, not a liveness one.** Freshness is unaffected either
+  /// way: the channel ages its status from elapsed time alone, so a source that
+  /// ignores every failure still goes stale and then offline on schedule and
+  /// nothing here can present a dead feed as current.
+  ///
+  /// Only a replay source has cause to override it — it polls a fixed instant
+  /// in the past, where "this far back is no longer retained" is an answer, not
+  /// a fault. For a live feed every failure is a real one; leave this alone.
   bool isIgnorableFailure(Failure failure) => false;
 
   /// Drops any transport the source is holding open while the app is in the

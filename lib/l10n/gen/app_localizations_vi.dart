@@ -630,6 +630,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get feedOffline => 'Mất kết nối';
 
   @override
+  String get feedReplaying => 'Đang phát lại';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

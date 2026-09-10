@@ -831,6 +831,7 @@
   },
   "moreSectionLinks": "Links",
   "feedOffline": "Connection lost",
+  "feedReplaying": "Replaying",
   "mapLayerStyleBd": "Dvorak BD",
   "@mapLayerSatelliteB09": {
     "description": "Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name"
@@ -1135,6 +1136,9 @@
   "moonPhaseWaningGibbous": "Waning gibbous",
   "@feedOffline": {
     "description": "Banner/headline when a realtime feed has gone offline"
+  },
+  "@feedReplaying": {
+    "description": "Status word on the replay page when the replayed instant is older than the RTS retention window: the replay is running, the server just has no shaking snapshot that far back. Never 'offline' — the feed is not broken"
   },
   "reportFilterIntensityInfoModernTitle": "Current (from 2020)",
   "@mapAppGoogleMaps": {

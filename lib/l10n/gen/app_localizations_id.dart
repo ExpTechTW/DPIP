@@ -633,6 +633,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get feedOffline => 'Koneksi terputus';
 
   @override
+  String get feedReplaying => 'Memutar ulang';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

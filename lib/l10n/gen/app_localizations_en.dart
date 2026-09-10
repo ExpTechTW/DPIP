@@ -632,6 +632,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedOffline => 'Connection lost';
 
   @override
+  String get feedReplaying => 'Replaying';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

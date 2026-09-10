@@ -630,6 +630,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get feedOffline => 'การเชื่อมต่อขาดหาย';
 
   @override
+  String get feedReplaying => 'กำลังเล่นซ้ำ';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

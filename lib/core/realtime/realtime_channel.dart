@@ -224,6 +224,10 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
           final status = _classify();
           final changed =
               status != _current.status ||
+              // A recovery is always worth telling: the state being replaced
+              // carries the reason the feed was empty, which the replay page
+              // shows even while the status word itself hasn't moved.
+              _current.lastFailure != null ||
               !_source.sameData(value, _current.data);
           _current = RealtimeState<T>(
             status: status,
@@ -234,20 +238,38 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
           );
           if (changed) _publish();
         case Err(:final failure):
-          if (_source.isIgnorableFailure(failure)) {
-            return;
-          }
+          // "There is no data for that instant" is an answer, not a fault. It
+          // is still *recorded* — a replay page reads it to say "重播中" rather
+          // than "連線中斷" — but it is not counted and not logged: the poll
+          // runs at 1 Hz, so an old replay would otherwise file one crash
+          // report a second for its whole length.
+          //
+          // Freshness is untouched either way. The tick that preceded this
+          // fetch already aged the status (see [_onTick]), so an ignored
+          // failure still reaches stale and then offline on schedule — nothing
+          // here can hold a feed that is receiving nothing at `live`.
+          final ignorable = _source.isIgnorableFailure(failure);
           final status = _classify();
-          final changed = status != _current.status;
+          // A change of failure *kind* is published even when the status word
+          // hasn't moved, because that is what the replay page switches on.
+          // Repeats of one kind are not: at 1 Hz that would be a rebuild a
+          // second for the length of an outage.
+          final changed =
+              status != _current.status ||
+              _current.lastFailure.runtimeType != failure.runtimeType;
           _current = _current.copyWith(
             status: status,
             lastFailure: failure,
-            consecutiveFailures: _current.consecutiveFailures + 1,
+            consecutiveFailures: ignorable
+                ? _current.consecutiveFailures
+                : _current.consecutiveFailures + 1,
           );
-          Log.warning(
-            '[$_label] poll failed '
-            '(${_current.consecutiveFailures}×): ${failure.message}',
-          );
+          if (!ignorable) {
+            Log.warning(
+              '[$_label] poll failed '
+              '(${_current.consecutiveFailures}×): ${failure.message}',
+            );
+          }
           if (changed) _publish();
       }
     } catch (error, stackTrace) {

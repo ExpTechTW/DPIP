@@ -623,6 +623,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get feedOffline => '연결이 끊어졌습니다';
 
   @override
+  String get feedReplaying => '재생 중';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
