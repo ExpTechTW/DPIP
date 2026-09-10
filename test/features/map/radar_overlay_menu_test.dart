@@ -56,11 +56,11 @@ void _useTallSurface(WidgetTester tester) {
 }
 
 void main() {
-  testWidgets('the chip opens a menu carrying all six overlay toggles', (
+  testWidgets('the chip opens a menu carrying all seven overlay toggles', (
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -76,21 +76,52 @@ void main() {
     expect(find.text(l10n.radarTownOutline), findsOneWidget);
     expect(find.text(l10n.mapTownLabels), findsOneWidget);
     expect(find.text(l10n.mapTerrainRelief), findsOneWidget);
+    expect(find.text(l10n.radarLightningOverlay), findsOneWidget);
     // The menu is sectioned like the typhoon one: the raster's reference
     // chrome first, then the base-map settings.
     expect(find.text(l10n.mapOverlaySectionReference), findsOneWidget);
     expect(find.text(l10n.mapOverlaySectionMap), findsOneWidget);
+    expect(find.text(l10n.mapOverlaySectionData), findsOneWidget);
     // Reference chrome (scan range, county, town, 國界) and the name and
-    // relief toggles all ship on; nothing ships off.
+    // relief toggles all ship on. Lightning is the one that ships off: it is
+    // extra data drawn over the echo, not chrome, so it is opt-in.
     expect(find.byIcon(Icons.check_box), findsNWidgets(6));
-    expect(find.byIcon(Icons.check_box_outline_blank), findsNothing);
+    expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+  });
+
+  testWidgets('the lightning row toggles the overlay and its chip dot', (
+    tester,
+  ) async {
+    _useTallSurface(tester);
+    final layer = testRadarLayer(_FakeRadarRepository());
+    await tester.pumpWidget(_wrap(layer));
+
+    final l10n = await _l10n();
+    expect(layer.showLightning.value, isFalse);
+    // Everything else ships at its default, so the chip is undotted until
+    // lightning is switched on.
+    expect(
+      tester.widget<MapChipButton>(find.byType(MapChipButton)).active,
+      isFalse,
+    );
+
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.radarLightningOverlay));
+    await tester.pumpAndSettle();
+
+    expect(layer.showLightning.value, isTrue);
+    expect(
+      tester.widget<MapChipButton>(find.byType(MapChipButton)).active,
+      isTrue,
+    );
   });
 
   testWidgets('tapping the terrain-relief row reports the flip upward', (
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     final terrain = ValueNotifier<bool>(true);
     final flipped = <bool>[];
     await tester.pumpWidget(
@@ -109,7 +140,7 @@ void main() {
 
   testWidgets('tapping the national-border row turns it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -127,7 +158,7 @@ void main() {
 
   testWidgets('tapping the coverage row turns it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -144,7 +175,7 @@ void main() {
 
   testWidgets('tapping the county row turns it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -160,7 +191,7 @@ void main() {
 
   testWidgets('tapping the township row turns only it off', (tester) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     final l10n = await _l10n();
@@ -177,7 +208,7 @@ void main() {
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     final labels = ValueNotifier<bool>(true);
     final flipped = <bool>[];
     await tester.pumpWidget(
@@ -203,7 +234,7 @@ void main() {
     tester,
   ) async {
     _useTallSurface(tester);
-    final layer = RadarMapLayer(_FakeRadarRepository(), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadarRepository());
     await tester.pumpWidget(_wrap(layer));
 
     // Both overlays ship on, so at rest the chip is unmarked.

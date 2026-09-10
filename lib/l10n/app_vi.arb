@@ -1987,5 +1987,9 @@
   "eewSpokenLocalIntensity": "Cường độ dự kiến tại vị trí của bạn: {intensity}.",
   "eewSpokenMaxIntensity": "Cường độ tối đa dự kiến: {intensity}.",
   "eewSpokenAnnouncementTitle": "Đọc cường độ dự kiến",
-  "eewSpokenAnnouncementDescription": "Khi mở màn hình theo dõi động đất, cường độ dự kiến được đọc lên trước khi phát âm báo động."
+  "eewSpokenAnnouncementDescription": "Khi mở màn hình theo dõi động đất, cường độ dự kiến được đọc lên trước khi phát âm báo động.",
+  "mapOverlaySectionData": "Lớp dữ liệu",
+  "radarLightningOverlay": "Hiện sét",
+  "radarLightningOverlayHint": "Sét cùng thời điểm với ảnh đang xem",
+  "radarLightningOverlaySubtitle": "Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị."
 }

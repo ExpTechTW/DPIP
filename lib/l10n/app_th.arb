@@ -1987,5 +1987,9 @@
   "eewSpokenLocalIntensity": "คาดการณ์ความรุนแรง ณ ตำแหน่งของคุณ: {intensity}",
   "eewSpokenMaxIntensity": "คาดการณ์ความรุนแรงสูงสุด: {intensity}",
   "eewSpokenAnnouncementTitle": "อ่านออกเสียงความรุนแรงที่คาดการณ์",
-  "eewSpokenAnnouncementDescription": "เมื่อเปิดจอเฝ้าระวังแผ่นดินไหว จะอ่านออกเสียงความรุนแรงที่คาดการณ์ก่อนเสียงเตือน"
+  "eewSpokenAnnouncementDescription": "เมื่อเปิดจอเฝ้าระวังแผ่นดินไหว จะอ่านออกเสียงความรุนแรงที่คาดการณ์ก่อนเสียงเตือน",
+  "mapOverlaySectionData": "ชั้นข้อมูล",
+  "radarLightningOverlay": "แสดงฟ้าผ่า",
+  "radarLightningOverlayHint": "ฟ้าผ่าในเวลาเดียวกับภาพที่แสดง",
+  "radarLightningOverlaySubtitle": "ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง"
 }

@@ -1987,5 +1987,9 @@
   "eewSpokenLocalIntensity": "Perkiraan intensitas di lokasi Anda: {intensity}.",
   "eewSpokenMaxIntensity": "Perkiraan intensitas maksimum: {intensity}.",
   "eewSpokenAnnouncementTitle": "Bacakan intensitas perkiraan",
-  "eewSpokenAnnouncementDescription": "Saat monitor gempa terbuka, intensitas perkiraan dibacakan sebelum suara peringatan diputar."
+  "eewSpokenAnnouncementDescription": "Saat monitor gempa terbuka, intensitas perkiraan dibacakan sebelum suara peringatan diputar.",
+  "mapOverlaySectionData": "Lapisan data",
+  "radarLightningOverlay": "Tampilkan petir",
+  "radarLightningOverlayHint": "Petir pada waktu bingkai yang tampil",
+  "radarLightningOverlaySubtitle": "Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat."
 }

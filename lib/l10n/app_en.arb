@@ -3988,5 +3988,21 @@
   },
   "@eewSpokenAnnouncementDescription": {
     "description": "Explains what the spoken-announcement toggle does and when it speaks"
+  },
+  "mapOverlaySectionData": "Data layers",
+  "@mapOverlaySectionData": {
+    "description": "Section title in map overlay settings menus: the data overlays a layer can add on top of itself"
+  },
+  "radarLightningOverlay": "Show lightning",
+  "@radarLightningOverlay": {
+    "description": "Lightning overlay toggle in the map's radar overlay menu."
+  },
+  "radarLightningOverlayHint": "Strikes from the frame on screen",
+  "@radarLightningOverlayHint": {
+    "description": "Hint under the lightning toggle in the radar overlay menu."
+  },
+  "radarLightningOverlaySubtitle": "Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.",
+  "@radarLightningOverlaySubtitle": {
+    "description": "Tooltip for the lightning toggle in the radar overlay menu."
   }
 }

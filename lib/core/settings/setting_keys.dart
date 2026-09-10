@@ -139,6 +139,13 @@ abstract final class SettingKeys {
     'map.showScanRange',
   );
 
+  /// Whether the radar echo also draws the lightning strikes of the frame it is
+  /// showing (absent = false — it is extra data over the echo, not chrome, so
+  /// it is opt-in). See `RadarMapLayer`.
+  static const SettingKey<bool> mapRadarShowLightning = SettingKey<bool>._(
+    'map.radarShowLightning',
+  );
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const SettingKey<List<String>> savedRegionCodes =
       SettingKey<List<String>>._('home.savedRegionCodes');

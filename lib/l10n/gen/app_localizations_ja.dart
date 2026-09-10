@@ -3259,4 +3259,16 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       '強震モニタを開いているとき、警報音の前に予想震度を音声で読み上げます。';
+
+  @override
+  String get mapOverlaySectionData => 'データレイヤー';
+
+  @override
+  String get radarLightningOverlay => '雷を表示';
+
+  @override
+  String get radarLightningOverlayHint => '表示中のエコーと同時刻の落雷';
+
+  @override
+  String get radarLightningOverlaySubtitle => '表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。';
 }

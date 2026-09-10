@@ -3259,4 +3259,17 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       '지진 모니터를 열었을 때 경보음보다 먼저 예상 진도를 음성으로 안내합니다.';
+
+  @override
+  String get mapOverlaySectionData => '데이터 레이어';
+
+  @override
+  String get radarLightningOverlay => '번개 표시';
+
+  @override
+  String get radarLightningOverlayHint => '화면에 표시된 시각의 낙뢰';
+
+  @override
+  String get radarLightningOverlaySubtitle =>
+      '현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다.';
 }

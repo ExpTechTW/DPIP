@@ -3241,6 +3241,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get eewSpokenAnnouncementDescription => '打开强震监视器时，先用语音朗读预估烈度，再播放警示音。';
+
+  @override
+  String get mapOverlaySectionData => '数据图层';
+
+  @override
+  String get radarLightningOverlay => '显示闪电';
+
+  @override
+  String get radarLightningOverlayHint => '显示与画面回波同一时间的落雷';
+
+  @override
+  String get radarLightningOverlaySubtitle => '在当前的雷达回波上叠加同一时间的闪电落雷。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6479,6 +6491,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get eewSpokenAnnouncementDescription => '打开强震监视器时，先用语音朗读预估烈度，再播放警示音。';
+
+  @override
+  String get mapOverlaySectionData => '数据图层';
+
+  @override
+  String get radarLightningOverlay => '显示闪电';
+
+  @override
+  String get radarLightningOverlayHint => '显示与画面回波同一时间的落雷';
+
+  @override
+  String get radarLightningOverlaySubtitle => '在当前的雷达回波上叠加同一时间的闪电落雷。';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -9717,6 +9741,18 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get eewSpokenAnnouncementDescription => '開啟強震監視器時，先以語音朗讀預估震度，再播放警示音。';
+
+  @override
+  String get mapOverlaySectionData => '資料圖層';
+
+  @override
+  String get radarLightningOverlay => '顯示閃電';
+
+  @override
+  String get radarLightningOverlayHint => '顯示與畫面回波同一時間嘅落雷';
+
+  @override
+  String get radarLightningOverlaySubtitle => '喺目前嘅雷達回波上疊加同一時間嘅閃電落雷。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12955,4 +12991,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get eewSpokenAnnouncementDescription => '開啟強震監視器時，先以語音朗讀預估震度，再播放警示音。';
+
+  @override
+  String get mapOverlaySectionData => '資料圖層';
+
+  @override
+  String get radarLightningOverlay => '顯示閃電';
+
+  @override
+  String get radarLightningOverlayHint => '顯示與畫面回波同時間的落雷';
+
+  @override
+  String get radarLightningOverlaySubtitle => '在目前的雷達回波上疊加同一時間的閃電落雷。';
 }

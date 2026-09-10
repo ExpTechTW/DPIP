@@ -17,7 +17,6 @@ import 'dart:typed_data';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
-import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
@@ -104,7 +103,7 @@ Future<(RecordingMapController, List<String>)> _scrub(
 
 void main() {
   test('a scrub never buries the admin borders under the echo', () async {
-    final layer = RadarMapLayer(_FakeRadar(_ids(9)), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadar(_ids(9)));
     final (controller, ids) = await _scrub(layer);
 
     for (final boundary in [AdminBoundary.county, AdminBoundary.town]) {
@@ -126,7 +125,7 @@ void main() {
   });
 
   test('the borders still stay under the township names', () async {
-    final layer = RadarMapLayer(_FakeRadar(_ids(9)), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadar(_ids(9)));
     final (controller, _) = await _scrub(layer);
     // The labels are the top-most text on every surface: a border line must
     // never cross a place name.
@@ -137,7 +136,7 @@ void main() {
   });
 
   test('the scan-range circle is drawn over the echo, not under it', () async {
-    final layer = RadarMapLayer(_FakeRadar(_ids(9)), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadar(_ids(9)));
     layer.setShowScanRange(true);
     final (controller, ids) = await _scrub(layer);
 
@@ -153,7 +152,7 @@ void main() {
   });
 
   test('the seam sits between the frames and the chrome', () async {
-    final layer = RadarMapLayer(_FakeRadar(_ids(9)), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadar(_ids(9)));
     final (controller, ids) = await _scrub(layer);
     final seam = layer.frameSeamLayerId;
 
@@ -166,7 +165,7 @@ void main() {
   });
 
   test('the seam is torn down with the layer', () async {
-    final layer = RadarMapLayer(_FakeRadar(_ids(9)), testReferenceOutline());
+    final layer = testRadarLayer(_FakeRadar(_ids(9)));
     final (controller, _) = await _scrub(layer);
     expect(controller.order, contains(layer.frameSeamLayerId));
 
@@ -180,7 +179,7 @@ void main() {
 
   test('every timeline layer keeps its own chrome above its frames', () async {
     final layers = <RasterTimelineLayer>[
-      RadarMapLayer(_FakeRadar(_ids(9)), testReferenceOutline()),
+      testRadarLayer(_FakeRadar(_ids(9))),
       QpesumsMapLayer(_FakeQpesums(_ids(9)), testReferenceOutline()),
       WindForecastMapLayer(
         _FakeWind(_ids(9)),
