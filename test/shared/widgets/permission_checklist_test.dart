@@ -93,4 +93,23 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Open Settings'), findsOneWidget);
   });
+
+  testWidgets('a settled preference drops its settings action', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        PermissionRow(
+          icon: Icons.notifications_active_outlined,
+          title: 'Major EEW',
+          description: 'Allowed during Do Not Disturb',
+          granted: true,
+          settingsAction: true,
+          onGrant: () async {},
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.text('Open Settings'), findsNothing);
+    expect(find.byType(OutlinedButton), findsNothing);
+  });
 }
