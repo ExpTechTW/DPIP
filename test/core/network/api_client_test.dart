@@ -175,6 +175,28 @@ void main() {
     expect(health.summary, EndpointState.degraded);
   });
 
+  test('a 4xx is not charged to the host', () async {
+    // A 404 says the route or the resource is wrong, not that the region is
+    // sick. Replaying an event older than the RTS retention 404s once a second,
+    // and counting those parked the host at `down` for the rest of the session.
+    final health = EndpointHealthMonitor();
+    final adapter = _FakeAdapter((_, _) => _json('{"err":"bad"}', 404));
+    await expectLater(
+      () => monitoredClient(adapter, health).request(ApiTier.lbApi, '/x'),
+      throwsA(isA<DioException>()),
+    );
+
+    expect(
+      health.of(
+        EndpointService.other,
+        ApiTier.lbApi,
+        'api.lb-tpe1.exptech.dev',
+      ),
+      isNull, // untouched, not merely still healthy
+    );
+    expect(health.summary, EndpointState.unknown);
+  });
+
   test('exclusive and core tiers track the same host separately', () async {
     final health = EndpointHealthMonitor();
     final adapter = _FakeAdapter((_, _) => _json('{"ok":true}', 200));
