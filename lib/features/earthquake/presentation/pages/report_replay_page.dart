@@ -37,7 +37,10 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
+import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart'
+    show ReportListPage;
 import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
+import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/features/earthquake/replay_session.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -108,21 +111,32 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       cwaOnly: () => context.read<EewCwaOnlySettings>().enabled,
     )..start();
     _startTicker();
-    // The session's channels live outside RealtimeService (a replay must not
-    // look like a live feed), so its lifecycle pause never reaches them —
-    // this page pauses its own polling and its 5 Hz UI tick itself, or a
-    // backgrounded replay keeps two polls a second running indefinitely.
-    _lifecycle = AppLifecycleListener(
-      onPause: () {
-        _ticker?.cancel();
-        _ticker = null;
-        _session.pause();
-      },
-      onResume: () {
-        _startTicker();
-        _session.resume();
-      },
-    );
+  }
+
+  /// Runs or idles the polling and the UI tick to match whether anyone is
+  /// actually looking — the [ActiveWhileVisible] around the body decides that.
+  ///
+  /// Both sides are idempotent (the channels' `resume`/`pause` and
+  /// [_startTicker] tolerate being called when already in that state), so this
+  /// can be driven from either the foreground or the on-screen signal without
+  /// tracking which one moved.
+  ///
+  /// The session's channels live outside `RealtimeService` — a replay must not
+  /// look like a live feed — so the service's own lifecycle pause never reaches
+  /// them and this page has to stop them itself. Waiting for [dispose] is not
+  /// enough: `MainShell` pops this route when the user leaves the data tab, but
+  /// go_router freezes the exit transition the moment the branch deactivates,
+  /// so `dispose` does not run until the user comes *back*. Until then the
+  /// replay would keep polling twice a second for a page nobody can see.
+  void _applyActivity(bool active) {
+    if (active) {
+      _startTicker();
+      _session.resume();
+    } else {
+      _ticker?.cancel();
+      _ticker = null;
+      _session.pause();
+    }
   }
 
   void _startTicker() {
@@ -132,11 +146,8 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     );
   }
 
-  late final AppLifecycleListener _lifecycle;
-
   @override
   void dispose() {
-    _lifecycle.dispose();
     _ticker?.cancel();
     _tick.dispose();
     _session.dispose();
@@ -145,111 +156,115 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: _ReplayMap(
-              stationRepository: context.read<TremStationRepository>(),
-              travelTimeTable: context.read<Future<SeismicTravelTimeTable>>(),
-              boxGrid: context.read<Future<RtsBoxGrid>>(),
-              rts: _session.rts,
-              eew: _session.eew,
-              tick: _tick,
-              clock: _session.clock,
-              eewIndex: _eewIndex,
+    return ActiveWhileVisible(
+      tabIndex: ReportListPage.tabIndex,
+      onActiveChanged: _applyActivity,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: _ReplayMap(
+                stationRepository: context.read<TremStationRepository>(),
+                travelTimeTable: context.read<Future<SeismicTravelTimeTable>>(),
+                boxGrid: context.read<Future<RtsBoxGrid>>(),
+                rts: _session.rts,
+                eew: _session.eew,
+                tick: _tick,
+                clock: _session.clock,
+                eewIndex: _eewIndex,
+              ),
             ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FrostedSurface(
-                      borderRadius: AppRadius.large,
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () => context.pop(),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FrostedSurface(
+                        borderRadius: AppRadius.large,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => context.pop(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    // The replay surface is the 強震監視器 frozen in time —
-                    // the same intensity legend the live monitor carries,
-                    // switching to the EEW felt-scale while an alert is up
-                    // (the legacy monitor did exactly this on active EEW).
-                    ListenableBuilder(
-                      listenable: _session.eew,
-                      builder: (context, _) {
-                        final hasEew = _session.eew.alerts.isNotEmpty;
-                        return MapLegendCard(
-                          child: IntensityLegend(
-                            mode: hasEew
-                                ? IntensityLegendMode.eew
-                                : IntensityLegendMode.rts,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.md),
+                      // The replay surface is the 強震監視器 frozen in time —
+                      // the same intensity legend the live monitor carries,
+                      // switching to the EEW felt-scale while an alert is up
+                      // (the legacy monitor did exactly this on active EEW).
+                      ListenableBuilder(
+                        listenable: _session.eew,
+                        builder: (context, _) {
+                          final hasEew = _session.eew.alerts.isNotEmpty;
+                          return MapLegendCard(
+                            child: IntensityLegend(
+                              mode: hasEew
+                                  ? IntensityLegendMode.eew
+                                  : IntensityLegendMode.rts,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ListenableBuilder(
-                      listenable: _session.eew,
-                      builder: (context, _) {
-                        final alerts = _session.eew.alerts;
-                        if (alerts.isEmpty) return const SizedBox.shrink();
-                        // One card at a time — tapping cycles through the
-                        // active alerts (parallel earthquakes, overlapping
-                        // reports) instead of stacking every one on screen.
-                        // The index is clamped by modulo, so a report leaving
-                        // the active set mid-replay can't point past the list.
-                        final index = _eewIndex % alerts.length;
-                        final eew = alerts[index];
-                        return _EewAlertCard(
-                          eew: eew,
-                          clock: () => _session.clock.now(),
-                          position: index + 1,
-                          count: alerts.length,
-                          onTap: alerts.length > 1
-                              ? () => setState(
-                                  () => _eewIndex =
-                                      (_eewIndex + 1) % alerts.length,
-                                )
-                              : null,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _ReplayStatusBar(
-                      clock: _session.clock,
-                      tick: _tick,
-                      rts: _session.rts,
-                      eew: _session.eew,
-                    ),
-                  ],
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ListenableBuilder(
+                        listenable: _session.eew,
+                        builder: (context, _) {
+                          final alerts = _session.eew.alerts;
+                          if (alerts.isEmpty) return const SizedBox.shrink();
+                          // One card at a time — tapping cycles through the
+                          // active alerts (parallel earthquakes, overlapping
+                          // reports) instead of stacking every one on screen.
+                          // The index is clamped by modulo, so a report leaving
+                          // the active set mid-replay can't point past the list.
+                          final index = _eewIndex % alerts.length;
+                          final eew = alerts[index];
+                          return _EewAlertCard(
+                            eew: eew,
+                            clock: () => _session.clock.now(),
+                            position: index + 1,
+                            count: alerts.length,
+                            onTap: alerts.length > 1
+                                ? () => setState(
+                                    () => _eewIndex =
+                                        (_eewIndex + 1) % alerts.length,
+                                  )
+                                : null,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _ReplayStatusBar(
+                        clock: _session.clock,
+                        tick: _tick,
+                        rts: _session.rts,
+                        eew: _session.eew,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -461,28 +476,34 @@ class _ReplayMapState extends State<_ReplayMap> {
     });
   }
 
-  /// Pauses the 1 Hz blink and the wave-front ticker while the app is
-  /// backgrounded — their platform writes would keep running under the lock
-  /// screen otherwise. Restarting on resume just resets the blink phase,
-  /// which is invisible.
-  late final AppLifecycleListener _blinkLifecycle = AppLifecycleListener(
-    onPause: () {
-      _blinkTimer?.cancel();
-      _blinkTimer = null;
-      _wavefrontTicker?.cancel();
-      _wavefrontTicker = null;
-    },
-    onResume: () {
+  /// Whether anyone is looking, as reported by the [ActiveWhileVisible] around
+  /// the map. Kept because the style may finish loading while hidden, and
+  /// [_onStyleLoaded] must not start the timers behind the user's back.
+  bool _active = true;
+
+  /// Runs or pauses the 1 Hz blink and the 60 Hz wave-front ticker.
+  ///
+  /// Neither is worth a frame while the page is off screen, and leaving the tab
+  /// does not dispose this route (see [_ReportReplayPageState._applyActivity]),
+  /// so without this they would keep writing to a native map surface the user
+  /// switched away from. Restarting resets the blink phase, which is invisible.
+  void _applyTickers(bool active) {
+    _active = active;
+    if (active) {
       if (_ready) {
         _setupBlink();
         _startWavefrontTicker();
       }
-    },
-  );
+    } else {
+      _blinkTimer?.cancel();
+      _blinkTimer = null;
+      _wavefrontTicker?.cancel();
+      _wavefrontTicker = null;
+    }
+  }
 
   @override
   void dispose() {
-    _blinkLifecycle.dispose();
     widget.rts.removeListener(_onRts);
     widget.tick.removeListener(_onTick);
     _blinkTimer?.cancel();
@@ -806,8 +827,9 @@ class _ReplayMapState extends State<_ReplayMap> {
     unawaited(_updateRts());
     unawaited(_updateBox());
     unawaited(_updateEew());
-    _setupBlink();
-    _startWavefrontTicker();
+    // Through [_applyTickers], so a style that finishes loading while the tab
+    // is already hidden does not start the two timers behind it.
+    _applyTickers(_active);
     _frameTaiwan();
     // A style (re)load wipes every runtime overlay and resets the base
     // style's township-label layer to visible — re-assert the saved choices.
@@ -1182,51 +1204,60 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   @override
   Widget build(BuildContext context) {
-    return GsiOverlayScope(
-      controller: _gsi,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: BaseMap(
-              // GPS on: the map shows the user's position, and the EEW cards'
-              // local-intensity tiles resolve against the current location the
-              // same way the legacy monitor's did.
-              showUserLocation: true,
-              compassEnabled: false,
-              includeTerrainInStyle: !_initialOsmEnabled,
-              onMapCreated: _onMapCreated,
-              onStyleLoaded: () => unawaited(_onStyleLoaded()),
-              onCameraMove: (position) => _bearing.value = position.bearing,
+    return ActiveWhileVisible(
+      tabIndex: ReportListPage.tabIndex,
+      onActiveChanged: _applyTickers,
+      child: GsiOverlayScope(
+        controller: _gsi,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: BaseMap(
+                // GPS on: the map shows the user's position, and the EEW cards'
+                // local-intensity tiles resolve against the current location the
+                // same way the legacy monitor's did.
+                showUserLocation: true,
+                compassEnabled: false,
+                // This route is retained inside the data branch while another tab
+                // is selected, so the surface needs the branch index to know when
+                // to idle its native render loop — the same reason the
+                // [ActiveWhileVisible] above stops this page's timers.
+                tabIndex: ReportListPage.tabIndex,
+                includeTerrainInStyle: !_initialOsmEnabled,
+                onMapCreated: _onMapCreated,
+                onStyleLoaded: () => unawaited(_onStyleLoaded()),
+                onCameraMove: (position) => _bearing.value = position.bearing,
+              ),
             ),
-          ),
-          // Base-map options (OSM detailed map / terrain relief / township
-          // names) above the compass — the same chrome the 強震監視器 carries in
-          // the map tab, persisted to the shared settings store. No sheet
-          // here, so the controls stay up for the whole replay.
-          Positioned(
-            top: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    MapBasemapMenu(
-                      showTownLabels: _showTownLabels,
-                      onShowTownLabelsChanged: _setShowTownLabels,
-                      showTerrain: _showTerrain,
-                      onShowTerrainChanged: _setShowTerrain,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    MapCompass(bearing: _bearing, onPressed: _resetNorth),
-                  ],
+            // Base-map options (OSM detailed map / terrain relief / township
+            // names) above the compass — the same chrome the 強震監視器 carries in
+            // the map tab, persisted to the shared settings store. No sheet
+            // here, so the controls stay up for the whole replay.
+            Positioned(
+              top: 0,
+              right: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      MapBasemapMenu(
+                        showTownLabels: _showTownLabels,
+                        onShowTownLabelsChanged: _setShowTownLabels,
+                        showTerrain: _showTerrain,
+                        onShowTerrainChanged: _setShowTerrain,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      MapCompass(bearing: _bearing, onPressed: _resetNorth),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

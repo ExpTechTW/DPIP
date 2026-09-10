@@ -161,6 +161,101 @@ class _RefreshOnAppearState extends State<RefreshOnAppear>
   Widget build(BuildContext context) => widget.child;
 }
 
+/// Reports when the page inside it is — and stops being — in front of the user,
+/// so work that only makes sense on screen can be stopped while it is not.
+///
+/// The sibling of [RefreshOnAppear] for the *other* half of the problem: that
+/// one fetches on re-entry, this one idles on exit. The condition is both
+/// halves of "someone is looking": the app is in the foreground **and**
+/// [VisibleTab.isOnScreen] holds for [tabIndex] — so a covered shell counts as
+/// hidden, unlike the tab-only test [RefreshOnAppear] deliberately uses.
+///
+/// It exists because leaving is not observable from a page's own lifecycle. A
+/// branch's pages stay mounted in the shell's `IndexedStack`, and even a route
+/// that is being popped on the way out stops mid-transition: go_router wraps an
+/// inactive branch in `TickerMode(enabled: false)`, so the exit animation
+/// freezes and `dispose` does not run until the user returns to that tab.
+/// Anything a page stops in `dispose` alone — a poll, a timer, a native render
+/// loop — therefore keeps running behind the tab the user switched to.
+///
+/// [onActiveChanged] fires once after the first frame with the current state,
+/// then on every flip. Handlers should be idempotent.
+class ActiveWhileVisible extends StatefulWidget {
+  const ActiveWhileVisible({
+    super.key,
+    required this.tabIndex,
+    required this.onActiveChanged,
+    required this.child,
+  });
+
+  /// The shell branch this page belongs to, or null for a surface that belongs
+  /// to no branch (then only the foreground and shell-cover tests apply).
+  final int? tabIndex;
+
+  /// Called with `true` when the page is in front of the user, `false` when it
+  /// is not.
+  final ValueChanged<bool> onActiveChanged;
+
+  final Widget child;
+
+  @override
+  State<ActiveWhileVisible> createState() => _ActiveWhileVisibleState();
+}
+
+class _ActiveWhileVisibleState extends State<ActiveWhileVisible>
+    with WidgetsBindingObserver {
+  VisibleTab? _visibleTab;
+  bool _foreground = true;
+  bool? _reported;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _report();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final visibleTab = VisibleTabScope.of(context);
+    if (visibleTab == _visibleTab) return;
+    _visibleTab?.removeListener(_report);
+    _visibleTab = visibleTab?..addListener(_report);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // `resumed` is the only state the app is actually usable in; everything
+    // else (inactive, hidden, paused, detached) is a reason to idle.
+    _foreground = state == AppLifecycleState.resumed;
+    _report();
+  }
+
+  /// Absent scope (a test, or a page hosted outside the shell) = on screen.
+  bool get _active =>
+      _foreground && (_visibleTab?.isOnScreen(widget.tabIndex) ?? true);
+
+  void _report() {
+    final active = _active;
+    if (active == _reported) return;
+    _reported = active;
+    widget.onActiveChanged(active);
+  }
+
+  @override
+  void dispose() {
+    _visibleTab?.removeListener(_report);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
 /// Hands the shell's [VisibleTab] down to the pages inside it.
 ///
 /// An [InheritedWidget] rather than a provider so a page can be pumped in a test
