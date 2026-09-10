@@ -4,6 +4,7 @@ import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,10 @@ import 'package:provider/provider.dart';
 class _FakePlatform extends MapLibrePlatform {
   final paused = <bool>[];
   int buildCount = 0;
-  bool failResume = false;
+
+  /// Thrown by the next resume, standing in for whatever the native side
+  /// reports back through the method channel.
+  Object? resumeError;
 
   @override
   Future<void> initPlatform(int id) async {}
@@ -34,9 +38,8 @@ class _FakePlatform extends MapLibrePlatform {
   @override
   Future<void> setRenderPaused(bool paused) async {
     this.paused.add(paused);
-    if (!paused && failResume) {
-      throw StateError('native renderer did not resume');
-    }
+    final error = resumeError;
+    if (!paused && error != null) throw error;
   }
 
   @override
@@ -134,7 +137,7 @@ void main() {
       final visibleTab = VisibleTab(2);
       final created = <MapLibreMapController>[];
       final invalidated = <MapLibreMapController>[];
-      platform.failResume = true;
+      platform.resumeError = StateError('native renderer did not resume');
       await pump(
         tester,
         VisibleTabScope(
@@ -161,6 +164,57 @@ void main() {
       expect(created, hasLength(2));
       expect(invalidated, [created.first]);
       expect(created.last, isNot(same(created.first)));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
+  testWidgets('a surface with no window is left alone, not rebuilt', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final visibleTab = VisibleTab(2);
+      final created = <MapLibreMapController>[];
+      final invalidated = <MapLibreMapController>[];
+      // What the fork reports for a view that is not in the hierarchy: it
+      // cannot render, so the watchdog times out waiting for a frame. A route
+      // whose exit transition go_router froze is in exactly this state when its
+      // branch is selected again.
+      platform.resumeError = PlatformException(
+        code: 'map_resume_timeout',
+        message: 'MapLibre did not render a frame after resume.',
+        details: const {
+          'window': false,
+          'hidden': false,
+          'frame': '{{0, 0}, {402, 874}}',
+        },
+      );
+      await pump(
+        tester,
+        VisibleTabScope(
+          visibleTab: visibleTab,
+          child: BaseMap(
+            tabIndex: 2,
+            recreateOnReturn: true,
+            onMapCreated: created.add,
+            onMapInvalidated: invalidated.add,
+          ),
+        ),
+      );
+
+      visibleTab.value = 0;
+      await tester.pump();
+      visibleTab.value = 2;
+      await tester.pump();
+      await tester.pump();
+
+      expect(platform.paused, [true, false], reason: 'the resume still ran');
+      // Rebuilding costs a style reload and every layer remount, on a map that
+      // is off screen precisely because it is on its way out.
+      expect(platform.buildCount, 1);
+      expect(invalidated, isEmpty);
+      expect(created, hasLength(1));
     } finally {
       debugDefaultTargetPlatformOverride = null;
     }
