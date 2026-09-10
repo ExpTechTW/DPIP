@@ -7,7 +7,6 @@
 [![正式版](https://img.shields.io/github/v/release/exptechtw/dpip?label=%E6%AD%A3%E5%BC%8F%E7%89%88&color=1B8A50)](https://github.com/ExpTechTW/DPIP/releases/latest)
 [![測試版](https://img.shields.io/github/v/tag/exptechtw/dpip?sort=date&label=%E6%B8%AC%E8%A9%A6%E7%89%88&color=orange)](https://github.com/ExpTechTW/DPIP/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/ExpTechTW/DPIP/ci.yml?branch=main&label=CI)](https://github.com/ExpTechTW/DPIP/actions/workflows/ci.yml)
-[![翻譯進度](https://badges.crowdin.net/dpip/localized.svg)](https://crowdin.com/project/dpip)
 [![Discord](https://img.shields.io/discord/926545182407688273?logo=discord&logoColor=white&label=Discord&color=5865F2)](https://discord.gg/5dbHqV8ees)
 
 [官網](https://exptech.dev) • [更新日誌](https://github.com/ExpTechTW/DPIP/releases) • [開發文件](AGENTS.md)
@@ -88,7 +87,7 @@ TREM-Net 由 [ExpTech Studio](https://exptech.dev/) 建置與維運，自 2022 �
 
 ## 翻譯
 
-DPIP 介面目前有 10 種語言，翻譯在 [Crowdin](https://crowdin.com/project/dpip) 上進行，挑一個你熟悉的語言就能開始。
+DPIP 介面目前有 11 種語言。
 
 清單裡沒有你的語言，就到 [Issues](https://github.com/ExpTechTW/DPIP/issues) 開一則，我們會加上去。
 
