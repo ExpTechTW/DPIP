@@ -21,6 +21,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/urgent_notification_settings.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
@@ -35,6 +36,7 @@ import 'package:provider/provider.dart';
 enum _PermissionItem {
   notify,
   critical,
+  urgent,
   location,
   background,
   execution,
@@ -82,9 +84,12 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   final UnusedAppRestrictionsService _unusedApp =
       UnusedAppRestrictionsService();
   final BackgroundExecutionService _execution = BackgroundExecutionService();
+  final UrgentNotificationSettings _urgentSettings =
+      UrgentNotificationSettings();
 
   bool _notify = false;
   bool _critical = false;
+  UrgentNotificationStatus? _urgent;
   bool _location = false;
   bool _background = false;
   bool _batteryOk = false;
@@ -103,6 +108,15 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       const BackgroundExecutionStatus();
 
   _PermissionItem? _busy;
+
+  /// Which urgent channel is being opened. The section holds several rows that
+  /// share one [_PermissionItem], so without this every channel in it would
+  /// spin while one of them is being changed.
+  String? _busyUrgentChannel;
+
+  /// The channel the user opened settings for and came back from unchanged.
+  /// Per channel for the same reason as [_busyUrgentChannel].
+  String? _unchangedUrgentChannel;
   _PermissionItem? _awaitingReturn;
   _PermissionItem? _feedbackItem;
   PermissionRowFeedback? _feedback;
@@ -126,8 +140,51 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     // Every grant that cannot be made in-app is made in system settings, so
     // coming back is the moment to look again.
     if (state != AppLifecycleState.resumed) return;
-    final pending = _awaitingReturn;
-    unawaited(_refresh(feedbackFor: pending));
+    unawaited(_recheck(_awaitingReturn));
+  }
+
+  /// Re-reads what coming back from a system screen can have changed.
+  ///
+  /// Every item but the urgent channels gets the whole page: the grants there
+  /// gate each other, and Settings can revoke one while granting another. A Do
+  /// Not Disturb channel gates nothing — it is a preference on one channel — so
+  /// it re-reads only itself. The full sweep is a dozen platform round trips
+  /// and repaints every row, which reads as the page re-checking the lot after
+  /// a single toggle.
+  Future<void> _recheck(_PermissionItem? item) => item == _PermissionItem.urgent
+      ? _refreshUrgentChannels()
+      : _refresh(feedbackFor: item);
+
+  /// Whether [channel] still deserves the "came back unchanged" hint.
+  ///
+  /// The user went to that channel's settings to let it through Do Not
+  /// Disturb; finding the switch still off says the trip did not take. Like
+  /// every other row's feedback, it stands until the thing it asks for is
+  /// done, and only on the channel that was opened — the rest were never
+  /// asked about.
+  String? _urgentHint(String? channel, UrgentNotificationStatus? status) {
+    if (channel == null || status == null) return null;
+    final unchanged = status.channels.any(
+      (each) =>
+          each.channelId == channel &&
+          each.state != UrgentNotificationChannelState.bypasses,
+    );
+    return unchanged ? channel : null;
+  }
+
+  Future<void> _refreshUrgentChannels() async {
+    final epoch = ++_refreshEpoch;
+    final opened = _busyUrgentChannel;
+    final urgent = await _urgentSettings.status();
+    if (!mounted || epoch != _refreshEpoch) return;
+    Log.info('permission state: urgent=${urgent.allBypass}');
+    setState(() {
+      _urgent = urgent;
+      _unchangedUrgentChannel = _urgentHint(opened, urgent);
+      _busy = null;
+      _busyUrgentChannel = null;
+      _awaitingReturn = null;
+    });
   }
 
   Future<void> _refresh({_PermissionItem? feedbackFor}) async {
@@ -139,6 +196,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     final critical = Platform.isIOS
         ? await notifications.criticalAllowed()
         : false;
+    final urgent = Platform.isAndroid ? await _urgentSettings.status() : null;
     final locationGranted = await location.granted();
     final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
@@ -147,6 +205,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     if (!mounted || epoch != _refreshEpoch) return;
     Log.info(
       'permission state: notify=$notify critical=$critical '
+      'urgent=${urgent?.allBypass} '
       'location=$locationGranted background=$backgroundGranted '
       'battery=$batteryOk unusedApp=${unusedApp.name} '
       'bgExec=${execution.restricted ? "restricted" : "ok"} '
@@ -169,12 +228,15 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     setState(() {
       _notify = notify;
       _critical = critical;
+      _urgent = urgent;
       _location = locationGranted;
       _background = backgroundGranted;
       _batteryOk = batteryOk;
       _unusedAppStatus = unusedApp;
       _executionStatus = execution;
+      _unchangedUrgentChannel = _urgentHint(_unchangedUrgentChannel, urgent);
       _busy = null;
+      _busyUrgentChannel = null;
       _awaitingReturn = null;
       if (feedbackFor == _PermissionItem.vendor) {
         _feedbackItem = feedbackFor;
@@ -220,6 +282,11 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   }) => switch (item) {
     _PermissionItem.notify => notify,
     _PermissionItem.critical => critical,
+    // The section is many channels behind one item, so a single verdict cannot
+    // say anything useful about it. Its feedback is per channel instead, in
+    // [_urgentHint], and it never reaches here: [_recheck] routes the urgent
+    // item away from this sweep.
+    _PermissionItem.urgent => true,
     _PermissionItem.location => location,
     _PermissionItem.background => background,
     _PermissionItem.execution => !execution.restricted,
@@ -231,6 +298,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   void _begin(_PermissionItem item) {
     setState(() {
       _busy = item;
+      if (item == _PermissionItem.urgent) _unchangedUrgentChannel = null;
       if (_feedbackItem == item) {
         _feedbackItem = null;
         _feedback = null;
@@ -240,7 +308,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
 
   void _cancel(_PermissionItem item) {
     if (!mounted || _busy != item) return;
-    setState(() => _busy = null);
+    setState(() {
+      _busy = null;
+      _busyUrgentChannel = null;
+    });
   }
 
   Future<bool> _leaveForSettings(
@@ -344,6 +415,27 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     );
   }
 
+  Future<void> _openUrgentSettings(
+    UrgentNotificationChannelStatus target,
+  ) async {
+    final channelId = target.channelId;
+    if (channelId == null) return;
+    final l10n = AppLocalizations.of(context);
+    _busyUrgentChannel = channelId;
+    await _openGuidedSettings(
+      _PermissionItem.urgent,
+      l10n.onboardingPermUrgentAndroid,
+      PermissionSettingsGuide(instruction: l10n.permissionGuideUrgentAndroid),
+      () async {
+        final destination = await _urgentSettings.openChannelSettings(
+          channelId,
+        );
+        Log.info('permission[urgent notification]: opened $destination');
+        return destination != 'none';
+      },
+    );
+  }
+
   // Foreground location only. Background ("Always") is a SEPARATE step —
   // Android 11+ silently denies both if they're requested in the same gesture.
   Future<void> _grantLocation() {
@@ -442,7 +534,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     );
     if (opened || !mounted) return;
     if (attempted) {
-      await _refresh(feedbackFor: item);
+      await _recheck(item);
     } else {
       _cancel(item);
     }
@@ -512,6 +604,20 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             blocked: _busy != null,
             feedback: _rowFeedback(_PermissionItem.critical),
             onGrant: _grantCritical,
+          ),
+        ],
+        if (Platform.isAndroid && _urgent != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          _UrgentNotificationSection(
+            status: _urgent!,
+            title: l10n.onboardingPermUrgentAndroid,
+            description: l10n.onboardingPermUrgentAndroidDesc,
+            loadingChannelId: _loading(_PermissionItem.urgent)
+                ? _busyUrgentChannel
+                : null,
+            unchangedChannelId: _unchangedUrgentChannel,
+            blocked: _busy != null,
+            onOpen: _openUrgentSettings,
           ),
         ],
         const SizedBox(height: AppSpacing.sm),
@@ -764,6 +870,114 @@ class PermissionRow extends StatelessWidget {
             Align(alignment: Alignment.centerRight, child: action),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _UrgentNotificationSection extends StatelessWidget {
+  const _UrgentNotificationSection({
+    required this.status,
+    required this.title,
+    required this.description,
+    required this.loadingChannelId,
+    required this.unchangedChannelId,
+    required this.blocked,
+    required this.onOpen,
+  });
+
+  final UrgentNotificationStatus status;
+  final String title;
+  final String description;
+
+  /// The one channel being opened, if any. These rows share a
+  /// [_PermissionItem], so a section-wide flag would spin all of them.
+  final String? loadingChannelId;
+
+  /// The one channel the user came back from without allowing it, if any.
+  final String? unchangedChannelId;
+  final bool blocked;
+  final Future<void> Function(UrgentNotificationChannelStatus) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final channels = status.channels
+        .where((channel) => channel.channelId != null && channel.name != null)
+        .toList(growable: false);
+    if (channels.isEmpty) return const SizedBox.shrink();
+
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.medium,
+      clipBehavior: Clip.antiAlias,
+      // A ListTile reserves 40 for its leading and puts 16 beside it, so this
+      // header would indent its title 24 further than every PermissionRow
+      // above and below it. Stripping those back to the row's own icon width
+      // and gap is what keeps the column of titles straight; the same goes for
+      // the vertical padding, which is the row's, not the tile's.
+      child: ListTileTheme.merge(
+        minLeadingWidth: 0,
+        horizontalTitleGap: AppSpacing.md,
+        minVerticalPadding: 0,
+        child: ExpansionTile(
+          minTileHeight: 0,
+          tilePadding: const EdgeInsets.all(AppSpacing.md),
+          leading: Icon(Icons.priority_high_outlined, color: colors.primary),
+          title: Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              description,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+          shape: const Border(),
+          collapsedShape: const Border(),
+          childrenPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.md,
+            AppSpacing.md,
+          ),
+          children: [
+            for (var index = 0; index < channels.length; index++) ...[
+              if (index > 0) const SizedBox(height: AppSpacing.sm),
+              PermissionRow(
+                icon: Icons.notifications_active_outlined,
+                title: channels[index].name!,
+                description:
+                    channels[index].state ==
+                        UrgentNotificationChannelState.bypasses
+                    ? l10n.urgentNotificationBypassesDnd
+                    : l10n.urgentNotificationFollowsDnd,
+                granted:
+                    channels[index].state ==
+                    UrgentNotificationChannelState.bypasses,
+                loading:
+                    loadingChannelId != null &&
+                    channels[index].channelId == loadingChannelId,
+                blocked: blocked,
+                settingsAction: true,
+                feedback:
+                    unchangedChannelId != null &&
+                        channels[index].channelId == unchangedChannelId
+                    ? PermissionRowFeedback.stillNeeded
+                    : null,
+                onGrant: () => onOpen(channels[index]),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
