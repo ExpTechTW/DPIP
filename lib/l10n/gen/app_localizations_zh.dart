@@ -620,6 +620,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feedOffline => '連線中斷';
 
   @override
+  String get feedReplaying => '重播中';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -3853,6 +3856,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get feedOffline => '连接中断';
+
+  @override
+  String get feedReplaying => '重播中';
 
   @override
   String get mapLayerStyleBd => 'Dvorak BD';
@@ -7090,6 +7096,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get feedOffline => '連接中斷';
 
   @override
+  String get feedReplaying => '重播中';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -10323,6 +10332,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get feedOffline => '連線中斷';
+
+  @override
+  String get feedReplaying => '重播中';
 
   @override
   String get mapLayerStyleBd => 'Dvorak BD';

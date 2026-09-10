@@ -53,6 +53,11 @@ class _FakeSource extends RealtimeSource<int> {
   Result<int> next = const Ok(0);
   Completer<Result<int>>? pending;
 
+  /// Only a replay source overrides this in production; here it lets a test
+  /// pick which failures the channel should treat as "no data for that
+  /// instant" rather than as a fault.
+  bool Function(Failure)? ignorable;
+
   @override
   Future<Result<int>> fetch() async {
     fetchCount++;
@@ -62,6 +67,9 @@ class _FakeSource extends RealtimeSource<int> {
 
   @override
   DateTime? timestampOf(int value) => null; // fetch-freshness
+
+  @override
+  bool isIgnorableFailure(Failure failure) => ignorable?.call(failure) ?? false;
 }
 
 /// Flushes pending microtasks so broadcast emissions and unawaited fetches land.
@@ -178,6 +186,53 @@ void main() {
     expect(channel.state.data, 10);
     expect(channel.state.consecutiveFailures, 0);
     expect(channel.state.lastFailure, isNull);
+  });
+
+  test('an ignorable failure is recorded but not counted', () async {
+    source.ignorable = (failure) => failure is NotFoundFailure;
+    source.next = const Ok(9);
+    await channel.refreshNow();
+    await pump();
+    final count = events.length;
+
+    source.next = const Err(NotFoundFailure('nothing at that instant'));
+    await channel.refreshNow();
+    await pump();
+    expect(channel.state.data, 9); // the last snapshot is kept
+    // The reason is kept for the UI (a replay says so instead of calling
+    // itself disconnected) without being charged to the feed as a fault.
+    expect(channel.state.lastFailure, isA<NotFoundFailure>());
+    expect(channel.state.consecutiveFailures, 0);
+    expect(events.length, count + 1);
+
+    // A repeat of the same kind is not republished: at 1 Hz that would be a
+    // rebuild a second for the length of the replay.
+    await channel.refreshNow();
+    await pump();
+    expect(events.length, count + 1);
+
+    // Recovering clears the reason, and says so even though the status word
+    // never moved.
+    source.next = const Ok(10);
+    await channel.refreshNow();
+    await pump();
+    expect(channel.state.lastFailure, isNull);
+    expect(events.length, count + 2);
+  });
+
+  test('an ignored failure still ages the feed to offline', () async {
+    // The safety property: ignoring a failure silences the *record* of it, and
+    // must never keep a feed that is receiving nothing looking current.
+    source.ignorable = (failure) => failure is NotFoundFailure;
+    source.next = const Err(NotFoundFailure('retention ran out'));
+    channel.start();
+    await pump();
+    expect(channel.state.status, RealtimeStatus.connecting);
+
+    elapsed.advance(const Duration(seconds: 11)); // > offlineAfter(10)
+    ticker.fire();
+    await pump();
+    expect(channel.state.status, RealtimeStatus.offline);
   });
 
   test('a slow poll is not stacked by the next tick', () async {

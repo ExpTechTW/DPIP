@@ -1,3 +1,4 @@
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
@@ -29,4 +30,12 @@ class RtsRealtimeController extends RealtimeNotifier<Rts> {
 
   /// Whether the feed has aged past the freshness threshold.
   bool get isStale => status == RealtimeStatus.stale;
+
+  /// Whether the last poll found no snapshot for the instant it asked for.
+  ///
+  /// Only a replay reaches this: RTS snapshots are retained for far less time
+  /// than the EEW history, so an old enough event still has alerts to replay
+  /// and no shaking left to draw. The feed is not broken, so a UI must not call
+  /// it disconnected — there is simply nothing recorded that far back.
+  bool get isMissingHistory => state.lastFailure is NotFoundFailure;
 }

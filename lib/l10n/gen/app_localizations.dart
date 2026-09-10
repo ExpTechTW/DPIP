@@ -1265,6 +1265,12 @@ abstract class AppLocalizations {
   /// **'Connection lost'**
   String get feedOffline;
 
+  /// Status word on the replay page when the replayed instant is older than the RTS retention window: the replay is running, the server just has no shaking snapshot that far back. Never 'offline' — the feed is not broken
+  ///
+  /// In en, this message translates to:
+  /// **'Replaying'**
+  String get feedReplaying;
+
   /// Colour-style option: Dvorak BD curve stepped grayscale
   ///
   /// In en, this message translates to:

@@ -10,6 +10,12 @@ import 'package:dpip/core/logging/log.dart';
 /// every repository method is a one-liner and none can accidentally forget the
 /// `try` or return `Ok` on failure — which for a safety feed would turn a dead
 /// source into a false all-clear.
+///
+/// [shouldLog] is the narrow exception to the logging below, for a caller whose
+/// failure is an expected shape rather than a fault — a replay polling past the
+/// end of a feed's retention, say, where the 404 arrives once a second for the
+/// whole session. It drops the log line only; the [Err] is returned either way,
+/// so no caller can mistake a suppressed log for a success.
 Future<Result<T>> guardResult<T>(
   Future<T> Function() body, {
   bool Function(Failure failure)? shouldLog,
@@ -19,7 +25,8 @@ Future<Result<T>> guardResult<T>(
   } catch (error, stackTrace) {
     // Silent failures are the worst kind: the UI shows its error state and
     // nothing else records WHY. One line per failure, here at the single
-    // choke point every repository passes through.
+    // choke point every repository passes through — unless the caller has
+    // said this particular failure is expected (see [shouldLog]).
     final failure = mapException(error);
     if (shouldLog?.call(failure) ?? true) {
       Log.handle(error, stackTrace, 'repository fetch/decode');

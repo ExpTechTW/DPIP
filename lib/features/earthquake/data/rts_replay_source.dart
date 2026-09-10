@@ -1,11 +1,10 @@
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
-
-import '../../../core/error/failure.dart';
 
 /// Replays the RTS feed at a fixed point in the past — a plain **polling**
 /// source (not SSE): each [fetch] asks [EarthquakeApi.getRtsAt] for the
@@ -27,8 +26,14 @@ class RtsReplaySource extends RealtimeSource<Rts> {
     final seconds = clock.now().millisecondsSinceEpoch ~/ 1000;
     final json = await _api.getRtsAt(seconds);
     return Rts.fromJson(json as Map<String, dynamic>);
-  }, shouldLog: (failure) => failure is! NotFoundFailure);
+  }, shouldLog: (failure) => !isIgnorableFailure(failure));
 
+  /// A 404 is the ordinary shape of an old replay, not a fault: RTS snapshots
+  /// are retained for far less time than the EEW history, so an event old
+  /// enough (0403, say) still has alerts to replay and no shaking left to draw.
+  /// Counted as a failure it would be one crash report and one log line **per
+  /// second** for the whole session — the poll runs at 1 Hz, which never trips
+  /// `Log`'s repeat suppression (8 within 5s).
   @override
   bool isIgnorableFailure(Failure failure) => failure is NotFoundFailure;
 

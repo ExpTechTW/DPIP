@@ -635,6 +635,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get feedOffline => 'Nawala ang koneksyon';
 
   @override
+  String get feedReplaying => 'Nire-replay';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

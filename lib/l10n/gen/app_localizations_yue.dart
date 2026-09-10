@@ -620,6 +620,9 @@ class AppLocalizationsYue extends AppLocalizations {
   String get feedOffline => '連接中斷';
 
   @override
+  String get feedReplaying => '重播緊';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

@@ -1342,12 +1342,18 @@ class _ReplayStatusBar extends StatelessWidget {
     final taipeiTime = AppTime.taipei(clock.now());
     final timeText = _clockFormat.format(taipeiTime);
 
-    final (Color dot, String? statusWord) = switch (rts.status) {
-      RealtimeStatus.live => (Colors.green, null),
-      RealtimeStatus.stale => (Colors.amber, l10n.feedStale),
-      RealtimeStatus.offline => (Colors.red, l10n.feedOffline),
-      RealtimeStatus.connecting => (Colors.grey, l10n.feedConnecting),
-    };
+    // RTS snapshots age out of the server long before the EEW history does, so
+    // an old enough event replays as alerts over a map with no shaking on it.
+    // That feed is not broken and saying "連線中斷" reads as a broken app —
+    // the replay is running, there is just nothing recorded that far back.
+    final (Color dot, String? statusWord) = rts.isMissingHistory
+        ? (Colors.orange, l10n.feedReplaying)
+        : switch (rts.status) {
+            RealtimeStatus.live => (Colors.green, null),
+            RealtimeStatus.stale => (Colors.amber, l10n.feedStale),
+            RealtimeStatus.offline => (Colors.red, l10n.feedOffline),
+            RealtimeStatus.connecting => (Colors.grey, l10n.feedConnecting),
+          };
 
     final alertCount = eew.alerts.length;
     final hasActiveEew = alertCount > 0;

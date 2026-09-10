@@ -624,6 +624,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get feedOffline => '接続が切断されました';
 
   @override
+  String get feedReplaying => '再生中';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
