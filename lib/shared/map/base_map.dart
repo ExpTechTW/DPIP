@@ -9,6 +9,7 @@ import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 
@@ -333,6 +334,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
                   'render-sync native-error pause=$pause '
                   'dt=${started.elapsedMilliseconds}ms error=$error',
             );
+            if (_isDetachedSurface(error)) return;
             Log.handle(error, stackTrace, 'map render pause');
             if (!pause &&
                 mounted &&
@@ -345,6 +347,34 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
             }
           }),
     );
+  }
+
+  /// Whether a failed resume merely means the native view is not in the view
+  /// hierarchy — in which case it is not a stuck renderer and there is nothing
+  /// to recover.
+  ///
+  /// The fork's watchdog resolves `map#resume` only once MapLibre confirms a
+  /// rendered frame, and reports `window: false` when the `MLNMapView` has no
+  /// window. Such a view *cannot* draw, so "no frame" describes where the
+  /// surface is, not the state of its renderer.
+  ///
+  /// It happens on the ordinary way out of a nested route. `MainShell` pops a
+  /// page when its tab is left, but go_router freezes an inactive branch's exit
+  /// transition, so the page is still mounted — detached — when the user
+  /// returns and the shell resumes every surface the branch owns. Treating that
+  /// as a fault used to throw the platform view away and rebuild it (a style
+  /// reload and every layer remounted) for a map already on its way off screen,
+  /// and log an exception the user could do nothing about.
+  bool _isDetachedSurface(Object error) {
+    if (error is! PlatformException || error.code != 'map_resume_timeout') {
+      return false;
+    }
+    final details = error.details;
+    final detached = details is Map && details['window'] == false;
+    if (detached) {
+      _trace(() => 'render-sync resume ignored: surface is not in a window');
+    }
+    return detached;
   }
 
   void _onTabChanged() {
