@@ -188,9 +188,15 @@ class ApiClient {
         _health?.success(tier, hosts[i], path);
         return response;
       } on DioException catch (e) {
-        _health?.failure(tier, hosts[i], path);
+        final retryable = _isRetryable(e);
+        // Only what the *host* is answerable for, which is what [_isRetryable]
+        // already separates. A 404 says the route or the resource is wrong, not
+        // that the region is sick: replaying an event older than the RTS
+        // retention 404s once a second, and charging those to the host parked
+        // `api-1` at `down` on the status screen for the rest of the session.
+        if (retryable) _health?.failure(tier, hosts[i], path);
         final isLastHost = i == hosts.length - 1;
-        if (isLastHost || !_isRetryable(e)) rethrow;
+        if (isLastHost || !retryable) rethrow;
         Log.warning(
           'ApiClient: ${tier.name} ${hosts[i]} failed (${_describe(e)}); '
           'failing over to ${hosts[i + 1]}',
@@ -239,9 +245,12 @@ class ApiClient {
         _health?.success(tier, hosts[i], path);
         return StreamedResponse(response.data!.stream, cancelToken.cancel);
       } on DioException catch (e) {
-        _health?.failure(tier, hosts[i], path);
+        // Same split as [request]: a host is only charged for what it is
+        // answerable for.
+        final retryable = _isRetryable(e);
+        if (retryable) _health?.failure(tier, hosts[i], path);
         final isLastHost = i == hosts.length - 1;
-        if (isLastHost || !_isRetryable(e)) rethrow;
+        if (isLastHost || !retryable) rethrow;
         Log.warning(
           'ApiClient: ${tier.name} stream ${hosts[i]} failed (${_describe(e)}); '
           'failing over to ${hosts[i + 1]}',
