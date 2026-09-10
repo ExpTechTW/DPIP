@@ -1987,5 +1987,9 @@
   "eewSpokenLocalIntensity": "所在地預估震度，{intensity}。",
   "eewSpokenMaxIntensity": "預估最大震度，{intensity}。",
   "eewSpokenAnnouncementTitle": "朗讀預估震度",
-  "eewSpokenAnnouncementDescription": "開咗強震監視器嘅時候，會先讀出預估震度，之後先播警示音。"
+  "eewSpokenAnnouncementDescription": "開咗強震監視器嘅時候，會先讀出預估震度，之後先播警示音。",
+  "mapOverlaySectionData": "資料圖層",
+  "radarLightningOverlay": "顯示閃電",
+  "radarLightningOverlayHint": "顯示同畫面回波同一時間嘅落雷",
+  "radarLightningOverlaySubtitle": "喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。"
 }

@@ -7,7 +7,6 @@
 /// source declares is what the mounted raster source carries as `maxzoom`.
 library;
 
-import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -32,7 +31,7 @@ void main() {
     final source = _CappedRadarRepository(_ids(9))
       ..sourceMinZoom = 3
       ..sourceMaxZoom = 8;
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 

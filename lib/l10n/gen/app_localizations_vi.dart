@@ -3321,4 +3321,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       'Khi mở màn hình theo dõi động đất, cường độ dự kiến được đọc lên trước khi phát âm báo động.';
+
+  @override
+  String get mapOverlaySectionData => 'Lớp dữ liệu';
+
+  @override
+  String get radarLightningOverlay => 'Hiện sét';
+
+  @override
+  String get radarLightningOverlayHint => 'Sét cùng thời điểm với ảnh đang xem';
+
+  @override
+  String get radarLightningOverlaySubtitle =>
+      'Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị.';
 }

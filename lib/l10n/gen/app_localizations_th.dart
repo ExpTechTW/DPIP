@@ -3313,4 +3313,17 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       'เมื่อเปิดจอเฝ้าระวังแผ่นดินไหว จะอ่านออกเสียงความรุนแรงที่คาดการณ์ก่อนเสียงเตือน';
+
+  @override
+  String get mapOverlaySectionData => 'ชั้นข้อมูล';
+
+  @override
+  String get radarLightningOverlay => 'แสดงฟ้าผ่า';
+
+  @override
+  String get radarLightningOverlayHint => 'ฟ้าผ่าในเวลาเดียวกับภาพที่แสดง';
+
+  @override
+  String get radarLightningOverlaySubtitle =>
+      'ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง';
 }

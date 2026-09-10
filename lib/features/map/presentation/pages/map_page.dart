@@ -7,6 +7,7 @@ import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/map_reference_outline_controller.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
@@ -77,6 +78,10 @@ class _MapPageState extends State<MapPage> {
     RadarMapLayer(
       context.read<RadarRepository>(),
       context.read<MapReferenceOutlineController>(),
+      // The echo's optional lightning overlay reads the same strike repository
+      // the standalone 閃電 layer does — one cache, one source of marks.
+      lightning: context.read<MeteorLightningRepository>(),
+      settings: context.read<SettingsStore>(),
     ),
     // The wind-forecast block sits right after radar: the picker groups by
     // category in declared order, and the numerical-forecast group (QPESUMS

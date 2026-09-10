@@ -3320,4 +3320,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       'When the seismic monitor is open, the estimated intensity is read aloud before the warning sound plays.';
+
+  @override
+  String get mapOverlaySectionData => 'Data layers';
+
+  @override
+  String get radarLightningOverlay => 'Show lightning';
+
+  @override
+  String get radarLightningOverlayHint => 'Strikes from the frame on screen';
+
+  @override
+  String get radarLightningOverlaySubtitle =>
+      'Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.';
 }

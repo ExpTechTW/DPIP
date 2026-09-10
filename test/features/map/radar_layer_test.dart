@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:dpip/core/error/result.dart';
+import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
+import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show outlineLayerId, townLabelLayerId;
@@ -97,9 +100,8 @@ class _BlockedNeighboursRadarRepository extends _FakeRadarRepository {
 
 void main() {
   test('frames chronological', () async {
-    final layer = RadarMapLayer(
+    final layer = testRadarLayer(
       _FakeRadarRepository(['1700000600', '1700000000']),
-      testReferenceOutline(),
     );
     final frames = (await layer.frames()).valueOrNull!;
     expect(frames.map((f) => f.id), ['1700000000', '1700000600']);
@@ -107,7 +109,7 @@ void main() {
 
   test('a settle mounts the preload ring around the target', () async {
     final source = _FakeRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -140,7 +142,7 @@ void main() {
 
   test('a cancelled incomplete frame is recreated before reuse', () async {
     final source = _FakeRadarRepository(_ids(15));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
     final oldFrame = frames[2].id;
@@ -169,7 +171,7 @@ void main() {
     'a complete retired frame remains reusable without cancellation',
     () async {
       final source = _FakeRadarRepository(_ids(15));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
       final oldFrame = frames[2].id;
@@ -193,7 +195,7 @@ void main() {
 
   test('a blocked warm cannot leave two timestamps at full opacity', () async {
     final source = _BlockingWarmRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -224,7 +226,7 @@ void main() {
     'scrubbing inside the ring is two opacity writes, nothing else',
     () async {
       final source = _FakeRadarRepository(_ids(9));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -275,7 +277,7 @@ void main() {
 
   test('timeline touch cancels preload before the first frame event', () async {
     final source = _FakeRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -296,7 +298,7 @@ void main() {
 
   test('native idle makes an ambient-cache ring scrub-ready', () async {
     final source = _ControlledReadinessRadarRepository(_ids(5))..ready = false;
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -323,7 +325,7 @@ void main() {
 
   test('a late native idle completes a settle after an L1 miss', () async {
     final source = _ControlledReadinessRadarRepository(_ids(5))..ready = false;
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -341,7 +343,7 @@ void main() {
 
   test('a scrub derives the visible region once, not once per frame', () async {
     final source = _ControlledReadinessRadarRepository(_ids(9))..ready = false;
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -380,7 +382,7 @@ void main() {
 
   test('camera movement invalidates native readiness during a scrub', () async {
     final source = _ControlledReadinessRadarRepository(_ids(5));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -400,10 +402,7 @@ void main() {
   });
 
   test('frames mount without opacity or per-tile fades', () async {
-    final layer = RadarMapLayer(
-      _FakeRadarRepository(_ids(9)),
-      testReferenceOutline(),
-    );
+    final layer = testRadarLayer(_FakeRadarRepository(_ids(9)));
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -429,7 +428,7 @@ void main() {
 
   test('an idle-preloaded scrub target restores and flips from L1', () async {
     final source = _FakeRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -462,7 +461,7 @@ void main() {
     'idle settle fills the resident ceiling without extra draw passes',
     () async {
       final source = _FakeRadarRepository(_ids(40));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -517,7 +516,7 @@ void main() {
     () async {
       final ids = _ids(40);
       final source = _BlockedNeighboursRadarRepository(ids);
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       source.blockedFrames = {frames[23].id, frames[17].id, frames[24].id};
       final controller = RecordingMapController();
@@ -554,7 +553,7 @@ void main() {
 
   test('hiding a settled map releases decoded preload sources', () async {
     final source = _FakeRadarRepository(_ids(40));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -592,7 +591,7 @@ void main() {
     'a replacement map refreshes repaired L1 before mounting tiles',
     () async {
       final source = _FakeRadarRepository(_ids(5));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final oldController = RecordingMapController();
 
@@ -629,7 +628,7 @@ void main() {
     'one gesture cancels warm once and restarts it after settling',
     () async {
       final source = _FakeRadarRepository(_ids(12));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -657,7 +656,7 @@ void main() {
     'returning to the map restores the cancelled GIF preload window',
     () async {
       final source = _BlockingWarmRadarRepository(_ids(12));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -697,7 +696,7 @@ void main() {
     'a timeline born off-screen does no warm work before first reveal',
     () async {
       final source = _FakeRadarRepository(_ids(12));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -732,7 +731,7 @@ void main() {
   test('hiding the map cancels all in-flight idle preload lanes', () async {
     final ids = _ids(40);
     final source = _BlockedNeighboursRadarRepository(ids);
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     source.blockedFrames = {frames[23].id, frames[17].id, frames[24].id};
     final controller = RecordingMapController();
@@ -763,7 +762,7 @@ void main() {
     'memory pressure releases speculative sources while the map is visible',
     () async {
       final source = _FakeRadarRepository(_ids(40));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -808,7 +807,7 @@ void main() {
     'a map that is still warming can be trimmed without losing its frame',
     () async {
       final source = _BlockingWarmRadarRepository(_ids(12));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -855,7 +854,7 @@ void main() {
 
   test('a long cached scrub keeps the resident source set bounded', () async {
     final source = _FakeRadarRepository(_ids(40));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -896,7 +895,7 @@ void main() {
 
   test('a cold fast scrub mounts only the final ring on finger-up', () async {
     final source = _ControlledReadinessRadarRepository(_ids(12));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -928,7 +927,7 @@ void main() {
 
   test('a settle abandons the frames the scrub swept past', () async {
     final source = _FakeRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -946,7 +945,7 @@ void main() {
 
   test('finger-up settles the cold frame held during scrubbing', () async {
     final source = _ControlledReadinessRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -972,7 +971,7 @@ void main() {
   test('a settle warms outward from the frame, far beyond the ring', () async {
     // 25 frames so the ±4 ring is a strict subset of the warm spread.
     final source = _FakeRadarRepository(_ids(25));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -994,7 +993,7 @@ void main() {
 
   test('a settled fill uses the full frame budget at a series edge', () async {
     final source = _FakeRadarRepository(_ids(700));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -1019,7 +1018,7 @@ void main() {
 
   test('scrubbing never launches a whole-history warm scan', () async {
     final source = _FakeRadarRepository(_ids(25));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -1053,7 +1052,7 @@ void main() {
 
   test('a cold scrub target cannot replace the complete frame', () async {
     final source = _ControlledReadinessRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -1101,7 +1100,7 @@ void main() {
 
   test('a held scrub frame can retry after backpressure quiet', () async {
     final source = _ControlledReadinessRadarRepository(_ids(9));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -1127,7 +1126,7 @@ void main() {
     'an older readiness completion cannot overwrite a newer target',
     () async {
       final source = _ControlledReadinessRadarRepository(_ids(12));
-      final layer = RadarMapLayer(source, testReferenceOutline());
+      final layer = testRadarLayer(source);
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
 
@@ -1147,7 +1146,7 @@ void main() {
 
   test('clear releases tiles and removes every mounted frame', () async {
     final source = _FakeRadarRepository(_ids(5));
-    final layer = RadarMapLayer(source, testReferenceOutline());
+    final layer = testRadarLayer(source);
     final frames = (await layer.frames()).valueOrNull!;
     final controller = RecordingMapController();
 
@@ -1169,20 +1168,14 @@ void main() {
 
   test('history length uncapped', () async {
     final ids = [for (var i = 0; i < 500; i++) '${1700000000 + i * 600}'];
-    final layer = RadarMapLayer(
-      _FakeRadarRepository(ids.reversed.toList()),
-      testReferenceOutline(),
-    );
+    final layer = testRadarLayer(_FakeRadarRepository(ids.reversed.toList()));
     expect((await layer.frames()).valueOrNull!.length, 500);
   });
 
   group('overlays', () {
     /// A layer attached to a live map, ready for the toggles.
     Future<(RadarMapLayer, RecordingMapController)> attached() async {
-      final layer = RadarMapLayer(
-        _FakeRadarRepository(_ids(3)),
-        testReferenceOutline(),
-      );
+      final layer = testRadarLayer(_FakeRadarRepository(_ids(3)));
       final frames = (await layer.frames()).valueOrNull!;
       final controller = RecordingMapController();
       await layer.prepare(controller, frames);
@@ -1417,6 +1410,135 @@ void main() {
       expect(fresh.calls, contains('addLineLayer:admin-county-outline'));
     });
   });
+
+  group('lightning overlay', () {
+    // Radar frames run 1700000000 + i*600 (see [_ids]); the strike snapshots
+    // are offset by a minute so nothing lines up exactly — which is the real
+    // case, and what the nearest-within-tolerance match exists for.
+    const radarFrame = 1700000000 + 4 * 600;
+    List<int> lightningNear() => const [
+      radarFrame - 660,
+      radarFrame - 60,
+      radarFrame + 540,
+    ];
+
+    Future<(RadarMapLayer, RecordingMapController, _FakeLightning)> shown({
+      required List<int> history,
+      bool enabled = true,
+    }) async {
+      final lightning = _FakeLightning(history);
+      final layer = testRadarLayer(
+        _FakeRadarRepository(_ids(9)),
+        lightning: lightning,
+      );
+      if (enabled) layer.setShowLightning(true);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      // The strike work is deliberately off the echo's critical path, so it
+      // lands a microtask or two behind the frame it belongs to.
+      await pumpEventQueue();
+      return (layer, controller, lightning);
+    }
+
+    test('stays off the map until it is switched on', () async {
+      final (_, controller, lightning) = await shown(
+        history: lightningNear(),
+        enabled: false,
+      );
+      expect(
+        controller.calls,
+        isNot(contains('addSource:radar-lightning-src')),
+      );
+      expect(
+        lightning.historyCalls,
+        0,
+        reason:
+            'an overlay nobody asked for must not cost a request — the strike '
+            'history is only fetched once the toggle is on',
+      );
+    });
+
+    test('draws the snapshot nearest the frame on screen', () async {
+      final (_, controller, lightning) = await shown(history: lightningNear());
+
+      expect(controller.calls, contains('addSource:radar-lightning-src'));
+      expect(controller.calls, contains('addSymbolLayer:radar-lightning-lyr'));
+      expect(
+        lightning.fetched,
+        contains(radarFrame - 60),
+        reason: 'the nearest snapshot to the shown frame, not the newest',
+      );
+      final features =
+          controller.sourceData['radar-lightning-src']!['features'] as List;
+      expect(features, hasLength(1));
+    });
+
+    test('draws nothing when no snapshot is near the frame', () async {
+      // Every snapshot is more than the ten-minute tolerance away: strikes
+      // that far out of step with the echo are a different storm, so the
+      // overlay stays mounted and empty rather than showing them.
+      final (_, controller, _) = await shown(
+        history: const [radarFrame - 3600, radarFrame + 3600],
+      );
+
+      expect(controller.calls, contains('addSource:radar-lightning-src'));
+      final features =
+          controller.sourceData['radar-lightning-src']!['features'] as List;
+      expect(features, isEmpty);
+    });
+
+    test('switching it back off takes the strikes off the map', () async {
+      final (layer, controller, _) = await shown(history: lightningNear());
+      controller.calls.clear();
+
+      layer.setShowLightning(false);
+      await pumpEventQueue();
+
+      expect(controller.calls, contains('removeLayer:radar-lightning-lyr'));
+      expect(controller.calls, contains('removeSource:radar-lightning-src'));
+    });
+  });
+}
+
+/// A strike repository with a fixed history and one cloud-to-ground strike in
+/// every snapshot — enough to tell "drew this frame" from "drew nothing".
+class _FakeLightning implements MeteorLightningRepository {
+  _FakeLightning(this._history);
+
+  final List<int> _history;
+
+  /// Snapshot seconds actually requested, in order.
+  final List<int> fetched = [];
+  int historyCalls = 0;
+
+  @override
+  Future<Result<List<int>>> history() async {
+    historyCalls++;
+    return Ok(_history);
+  }
+
+  @override
+  Future<Result<LightningSnapshot>> latest() => at(_history.last);
+
+  @override
+  Future<Result<LightningSnapshot>> at(int second) async {
+    fetched.add(second);
+    return Ok(
+      LightningSnapshot(
+        time: second,
+        strikes: [
+          LightningStrike(
+            type: 1,
+            time: second - 30,
+            latitude: 23.5,
+            longitude: 121,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// [count] frame ids, newest first (the wire order).

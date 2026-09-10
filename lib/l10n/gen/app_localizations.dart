@@ -6304,6 +6304,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'When the seismic monitor is open, the estimated intensity is read aloud before the warning sound plays.'**
   String get eewSpokenAnnouncementDescription;
+
+  /// Section title in map overlay settings menus: the data overlays a layer can add on top of itself
+  ///
+  /// In en, this message translates to:
+  /// **'Data layers'**
+  String get mapOverlaySectionData;
+
+  /// Lightning overlay toggle in the map's radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Show lightning'**
+  String get radarLightningOverlay;
+
+  /// Hint under the lightning toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Strikes from the frame on screen'**
+  String get radarLightningOverlayHint;
+
+  /// Tooltip for the lightning toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.'**
+  String get radarLightningOverlaySubtitle;
 }
 
 class _AppLocalizationsDelegate

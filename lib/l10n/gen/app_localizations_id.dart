@@ -3331,4 +3331,18 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       'Saat monitor gempa terbuka, intensitas perkiraan dibacakan sebelum suara peringatan diputar.';
+
+  @override
+  String get mapOverlaySectionData => 'Lapisan data';
+
+  @override
+  String get radarLightningOverlay => 'Tampilkan petir';
+
+  @override
+  String get radarLightningOverlayHint =>
+      'Petir pada waktu bingkai yang tampil';
+
+  @override
+  String get radarLightningOverlaySubtitle =>
+      'Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat.';
 }

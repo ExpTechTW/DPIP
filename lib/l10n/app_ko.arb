@@ -1987,5 +1987,9 @@
   "eewSpokenLocalIntensity": "현재 위치 예상 진도, {intensity}.",
   "eewSpokenMaxIntensity": "예상 최대 진도, {intensity}.",
   "eewSpokenAnnouncementTitle": "예상 진도 음성 안내",
-  "eewSpokenAnnouncementDescription": "지진 모니터를 열었을 때 경보음보다 먼저 예상 진도를 음성으로 안내합니다."
+  "eewSpokenAnnouncementDescription": "지진 모니터를 열었을 때 경보음보다 먼저 예상 진도를 음성으로 안내합니다.",
+  "mapOverlaySectionData": "데이터 레이어",
+  "radarLightningOverlay": "번개 표시",
+  "radarLightningOverlayHint": "화면에 표시된 시각의 낙뢰",
+  "radarLightningOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다."
 }

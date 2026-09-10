@@ -3241,4 +3241,16 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get eewSpokenAnnouncementDescription => '開咗強震監視器嘅時候，會先讀出預估震度，之後先播警示音。';
+
+  @override
+  String get mapOverlaySectionData => '資料圖層';
+
+  @override
+  String get radarLightningOverlay => '顯示閃電';
+
+  @override
+  String get radarLightningOverlayHint => '顯示同畫面回波同一時間嘅落雷';
+
+  @override
+  String get radarLightningOverlaySubtitle => '喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。';
 }

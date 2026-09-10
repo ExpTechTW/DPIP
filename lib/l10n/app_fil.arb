@@ -1987,5 +1987,9 @@
   "eewSpokenLocalIntensity": "Tinatayang intensidad sa iyong lokasyon: {intensity}.",
   "eewSpokenMaxIntensity": "Tinatayang pinakamataas na intensidad: {intensity}.",
   "eewSpokenAnnouncementTitle": "Basahin ang tinatayang intensidad",
-  "eewSpokenAnnouncementDescription": "Kapag bukas ang seismic monitor, binabasa nang malakas ang tinatayang intensidad bago tumunog ang babala."
+  "eewSpokenAnnouncementDescription": "Kapag bukas ang seismic monitor, binabasa nang malakas ang tinatayang intensidad bago tumunog ang babala.",
+  "mapOverlaySectionData": "Mga layer ng datos",
+  "radarLightningOverlay": "Ipakita ang kidlat",
+  "radarLightningOverlayHint": "Kidlat sa oras ng frame na nakikita",
+  "radarLightningOverlaySubtitle": "Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo."
 }

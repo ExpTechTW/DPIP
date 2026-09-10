@@ -3338,4 +3338,17 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get eewSpokenAnnouncementDescription =>
       'Kapag bukas ang seismic monitor, binabasa nang malakas ang tinatayang intensidad bago tumunog ang babala.';
+
+  @override
+  String get mapOverlaySectionData => 'Mga layer ng datos';
+
+  @override
+  String get radarLightningOverlay => 'Ipakita ang kidlat';
+
+  @override
+  String get radarLightningOverlayHint => 'Kidlat sa oras ng frame na nakikita';
+
+  @override
+  String get radarLightningOverlaySubtitle =>
+      'Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo.';
 }

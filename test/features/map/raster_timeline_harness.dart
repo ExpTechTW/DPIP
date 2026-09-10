@@ -6,6 +6,10 @@ import 'dart:math' show Point;
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
+import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
+import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
+import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show
         countyFillLayerId,
@@ -22,6 +26,36 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// never leaks into another.
 MapReferenceOutlineController testReferenceOutline() =>
     MapReferenceOutlineController(SettingsStore.inMemory({}));
+
+/// A [RadarMapLayer] wired for a test: a fresh reference-outline controller, a
+/// fresh settings store, and a lightning repository that answers "no snapshots"
+/// so the strike overlay (off by default) stays out of every assertion about
+/// the echo. A test that is *about* the lightning overlay passes its own.
+RadarMapLayer testRadarLayer(
+  RadarRepository source, {
+  MapReferenceOutlineController? referenceOutline,
+  MeteorLightningRepository? lightning,
+  SettingsStore? settings,
+}) => RadarMapLayer(
+  source,
+  referenceOutline ?? testReferenceOutline(),
+  lightning: lightning ?? EmptyLightningRepository(),
+  settings: settings ?? SettingsStore.inMemory({}),
+);
+
+/// A lightning repository with nothing in it — the default for radar tests.
+class EmptyLightningRepository implements MeteorLightningRepository {
+  @override
+  Future<Result<List<int>>> history() async => const Ok([]);
+
+  @override
+  Future<Result<LightningSnapshot>> latest() async =>
+      const Ok(LightningSnapshot(time: 0, strikes: <LightningStrike>[]));
+
+  @override
+  Future<Result<LightningSnapshot>> at(int second) async =>
+      Ok(LightningSnapshot(time: second, strikes: const []));
+}
 
 /// A [RasterFrameSource] that records the tile-memory calls a layer makes.
 ///
@@ -168,6 +202,15 @@ class RecordingMapController implements MapLibreMapController {
   }) async {
     sourceData[sourceId] = geojson;
     calls.add('addSource:$sourceId');
+  }
+
+  @override
+  Future<void> setGeoJsonSource(
+    String sourceId,
+    Map<String, dynamic> geojson,
+  ) async {
+    sourceData[sourceId] = geojson;
+    calls.add('setGeoJsonSource:$sourceId');
   }
 
   /// `raster-opacity-transition` each layer was mounted with, by layer id.

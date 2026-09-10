@@ -4,12 +4,16 @@ library;
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/scan_range_overlay_menu.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
+import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
+import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// The radar layer's own options chip — the shared chrome menu, titled for
-/// radar. Kept as a separate type so callers read "radar options", not "some
-/// overlay menu".
+/// radar and carrying one extra row the other rasters do not have: the
+/// lightning overlay, which draws the strikes belonging to whichever echo frame
+/// is on screen.
 class RadarOverlayMenu extends StatelessWidget {
   const RadarOverlayMenu({
     super.key,
@@ -28,12 +32,32 @@ class RadarOverlayMenu extends StatelessWidget {
   final ValueChanged<bool> onShowTerrainChanged;
 
   @override
-  Widget build(BuildContext context) => ScanRangeOverlayMenu(
-    layer: layer,
-    tooltip: AppLocalizations.of(context).radarOverlayMenuTooltip,
-    showTownLabels: showTownLabels,
-    onShowTownLabelsChanged: onShowTownLabelsChanged,
-    showTerrain: showTerrain,
-    onShowTerrainChanged: onShowTerrainChanged,
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+    valueListenable: layer.showLightning,
+    builder: (context, showLightning, _) {
+      final l10n = AppLocalizations.of(context);
+      return ScanRangeOverlayMenu(
+        layer: layer,
+        tooltip: l10n.radarOverlayMenuTooltip,
+        showTownLabels: showTownLabels,
+        onShowTownLabelsChanged: onShowTownLabelsChanged,
+        showTerrain: showTerrain,
+        onShowTerrainChanged: onShowTerrainChanged,
+        // Off by default, so having it on is a departure worth the chip's dot.
+        extraActive: showLightning,
+        extraSections: [
+          const MapMenuDivider(),
+          SectionHeader(l10n.mapOverlaySectionData),
+          MapMenuToggleRow(
+            selected: showLightning,
+            icon: Icons.bolt_outlined,
+            title: l10n.radarLightningOverlay,
+            subtitle: l10n.radarLightningOverlayHint,
+            tooltip: l10n.radarLightningOverlaySubtitle,
+            onTap: () => layer.setShowLightning(!showLightning),
+          ),
+        ],
+      );
+    },
   );
 }

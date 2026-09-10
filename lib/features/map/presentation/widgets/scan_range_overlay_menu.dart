@@ -27,6 +27,8 @@ class ScanRangeOverlayMenu extends StatelessWidget {
     required this.onShowTownLabelsChanged,
     required this.showTerrain,
     required this.onShowTerrainChanged,
+    this.extraSections = const [],
+    this.extraActive = false,
   });
 
   final ScanRangeOverlayChrome layer;
@@ -34,6 +36,17 @@ class ScanRangeOverlayMenu extends StatelessWidget {
   /// Tooltip for the options chip (layer-specific, so each raster says what it
   /// is configuring).
   final String tooltip;
+
+  /// Rows a specific raster adds above the shared reference section — the radar
+  /// echo's lightning overlay, for one. They come first because they are about
+  /// the *data* being shown; the reference chrome underneath is the same four
+  /// toggles on every raster, and a reader looking for the layer-specific
+  /// switch should not have to scroll past them.
+  final List<Widget> extraSections;
+
+  /// Whether [extraSections] currently holds a non-default choice, so the
+  /// chip's "not the defaults" dot accounts for them too.
+  final bool extraActive;
 
   final ValueListenable<bool> showTownLabels;
   final ValueChanged<bool> onShowTownLabelsChanged;
@@ -72,7 +85,8 @@ class ScanRangeOverlayMenu extends StatelessWidget {
                 !showCounty ||
                 !showTown ||
                 !showLabels ||
-                !showRelief,
+                !showRelief ||
+                extraActive,
             onTap: () =>
                 controller.isOpen ? controller.close() : controller.open(),
           ),
@@ -85,6 +99,7 @@ class ScanRangeOverlayMenu extends StatelessWidget {
                   showTerrain: showTerrain,
                   onShowTerrainChanged: onShowTerrainChanged,
                 ),
+                ...extraSections,
                 const MapMenuDivider(),
                 SectionHeader(l10n.mapOverlaySectionReference),
                 MapMenuToggleRow(
