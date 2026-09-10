@@ -104,11 +104,18 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   @override
   void initState() {
     super.initState();
+    // The notifier itself, not `context`: this closure is called from inside a
+    // fetch, which can still be in flight when the page unmounts — and a
+    // `context.read` there throws "State no longer has a context". Capturing
+    // the app-scoped instance keeps the point of the closure (each fetch reads
+    // the setting *fresh*, so toggling it mid-replay takes effect on the next
+    // poll) without outliving anything.
+    final cwaOnly = context.read<EewCwaOnlySettings>();
     _session = ReplaySession(
       context.read<ApiClient>(),
       context.read<RealtimeService>().clock,
       widget.replayTimestamp,
-      cwaOnly: () => context.read<EewCwaOnlySettings>().enabled,
+      cwaOnly: () => cwaOnly.enabled,
     )..start();
     _startTicker();
   }
