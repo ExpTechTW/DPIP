@@ -1736,6 +1736,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPermCritical => 'Critical alerts';
 
   @override
+  String get onboardingPermUrgentAndroid => 'Major alerts in Do Not Disturb';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      'Choose which major-alert channels Android may allow during Do Not Disturb. Silent mode, volume, and the active Mode still apply.';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      'In the channel settings, choose whether this notification may interrupt Do Not Disturb, then return to DPIP.';
+
+  @override
+  String get urgentNotificationBypassesDnd => 'Allowed during Do Not Disturb';
+
+  @override
+  String get urgentNotificationFollowsDnd => 'Follows Do Not Disturb';
+
+  @override
   String trendCumulativeTotal(String total) {
     return 'Cumulative $total mm';
   }

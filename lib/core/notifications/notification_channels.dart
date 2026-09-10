@@ -414,6 +414,18 @@ abstract final class NotificationChannels {
     ),
   ];
 
+  /// Android channels whose system settings should be reviewed for Do Not
+  /// Disturb bypass. The two general EEW channels also use `criticalAlerts`,
+  /// but are not major alerts.
+  static const Set<String> urgentChannelKeys = {
+    'eew_alert-important-v2',
+    'eew-important-v2',
+    'thunderstorm-important-v2',
+    'weather_major-important-v2',
+    'evacuation_major-important-v2',
+    'tsunami-important-v2',
+  };
+
   /// What [channel] will actually do when it fires.
   ///
   /// Derived from the definition rather than written out beside it, so a

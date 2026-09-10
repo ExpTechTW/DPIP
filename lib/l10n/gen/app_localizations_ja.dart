@@ -1707,6 +1707,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingPermCritical => '重大な通知';
 
   @override
+  String get onboardingPermUrgentAndroid => 'おやすみモード中の重大通知';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '重大通知の各チャンネルを確認し、Android でおやすみモード中の通知を許可します。消音、音量、現在のモード設定は引き続き適用されます。';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      'チャンネル設定で、この通知がおやすみモードを中断できるかを選択してから、DPIP に戻ってください。';
+
+  @override
+  String get urgentNotificationBypassesDnd => 'おやすみモード中も許可';
+
+  @override
+  String get urgentNotificationFollowsDnd => 'おやすみモードに従う';
+
+  @override
   String trendCumulativeTotal(String total) {
     return '累計 $total mm';
   }

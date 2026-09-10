@@ -93,4 +93,30 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Open Settings'), findsOneWidget);
   });
+
+  testWidgets('a granted preference still offers its settings action', (
+    tester,
+  ) async {
+    var tapCount = 0;
+    await tester.pumpWidget(
+      _wrap(
+        PermissionRow(
+          icon: Icons.notifications_active_outlined,
+          title: 'Major EEW',
+          description: 'Allowed during Do Not Disturb',
+          granted: true,
+          settingsAction: true,
+          actionWhenGranted: true,
+          onGrant: () async => tapCount++,
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.text('Open Settings'), findsOneWidget);
+    final button = tester.widget<OutlinedButton>(find.byType(OutlinedButton));
+    expect(button.onPressed, isNotNull);
+    await tester.tap(find.byType(OutlinedButton));
+    expect(tapCount, 1);
+  });
 }

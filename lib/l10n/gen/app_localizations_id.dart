@@ -1740,6 +1740,24 @@ class AppLocalizationsId extends AppLocalizations {
   String get onboardingPermCritical => 'Peringatan kritis';
 
   @override
+  String get onboardingPermUrgentAndroid =>
+      'Peringatan penting saat Jangan Ganggu';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      'Periksa setiap saluran peringatan penting agar Android dapat mengizinkannya saat Jangan Ganggu. Mode senyap, volume, dan Mode aktif tetap berlaku.';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      'Di setelan saluran, pilih apakah notifikasi ini boleh menginterupsi Jangan Ganggu, lalu kembali ke DPIP.';
+
+  @override
+  String get urgentNotificationBypassesDnd => 'Diizinkan saat Jangan Ganggu';
+
+  @override
+  String get urgentNotificationFollowsDnd => 'Mengikuti Jangan Ganggu';
+
+  @override
   String trendCumulativeTotal(String total) {
     return 'Total $total mm';
   }

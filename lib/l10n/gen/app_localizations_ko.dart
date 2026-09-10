@@ -1707,6 +1707,23 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingPermCritical => '중요 알림';
 
   @override
+  String get onboardingPermUrgentAndroid => '방해 금지 모드의 중요 알림';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '각 중요 알림 채널을 확인하여 Android가 방해 금지 모드에서도 허용하도록 설정하세요. 무음, 음량 및 현재 모드 설정은 계속 적용됩니다.';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      '채널 설정에서 이 알림이 방해 금지 모드를 중단할 수 있는지 선택한 후 DPIP로 돌아오세요.';
+
+  @override
+  String get urgentNotificationBypassesDnd => '방해 금지 모드에서도 허용';
+
+  @override
+  String get urgentNotificationFollowsDnd => '방해 금지 모드 따름';
+
+  @override
   String trendCumulativeTotal(String total) {
     return '누적 $total mm';
   }
