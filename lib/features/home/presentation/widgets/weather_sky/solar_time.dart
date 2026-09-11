@@ -88,6 +88,55 @@ SolarPosition solarPosition(
   double longitude = kTaiwanLongitude,
   double utcOffsetHours = 8,
 }) {
+  // One-entry memo, keyed to the minute. Every caller feeds this "now" —
+  // `isNightAt(AppTime.utc)` from a header that rebuilds at frame rate while
+  // the sheet drags, the forecast strip's glyphs, the backdrop's day anchor —
+  // and the ephemeris below is ~15 trig calls that move the answer by well
+  // under a tenth of a second across a minute (the sun's declination shifts
+  // ~0.0003° in that time). The minute is the UTC one, so the key is a plain
+  // integer division with no `DateTime` built for it.
+  final minute = utc.millisecondsSinceEpoch ~/ Duration.millisecondsPerMinute;
+  final cached = _sunTimesMemo;
+  if (cached != null &&
+      cached.minute == minute &&
+      cached.latitude == latitude &&
+      cached.longitude == longitude &&
+      cached.utcOffsetHours == utcOffsetHours) {
+    return cached.times;
+  }
+  final times = _sunTimes(
+    utc,
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+  );
+  _sunTimesMemo = (
+    minute: minute,
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+    times: times,
+  );
+  return times;
+}
+
+/// [sunTimes]'s memo — see the note at the top of that function.
+({
+  int minute,
+  double latitude,
+  double longitude,
+  double utcOffsetHours,
+  ({double sunrise, double sunset}) times,
+})?
+_sunTimesMemo;
+
+/// The ephemeris behind [sunTimes], unmemoised.
+({double sunrise, double sunset}) _sunTimes(
+  DateTime utc, {
+  required double latitude,
+  required double longitude,
+  required double utcOffsetHours,
+}) {
   final n = _julianDays(utc);
 
   final meanLongitude = (280.460 + 0.9856474 * n) % 360.0;

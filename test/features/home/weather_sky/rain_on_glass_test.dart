@@ -77,4 +77,25 @@ void main() {
 
     expect(tester.binding.transientCallbackCount, 0);
   });
+
+  testWidgets('a card faded to zero opacity schedules no frames', (
+    tester,
+  ) async {
+    // `build` never constructs the filter below opacity 0.004, so the Skia
+    // capability check above never fires here — the only thing that can stop
+    // the ticker is the opacity gate itself. Before it existed, this widget
+    // spun a vsync loop forever on an invisible card.
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RainOnGlass(intensity: 0.8, opacity: 0, child: SizedBox.expand()),
+      ),
+    );
+    // A bounded pump: with the bug the ticker repeats forever and
+    // `pumpAndSettle` would never return.
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
+    expect(tester.binding.transientCallbackCount, 0);
+  });
 }
