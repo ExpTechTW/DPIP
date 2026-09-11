@@ -168,6 +168,12 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 }
 
+/// `yyyy/MM/dd HH:mm:ss` for the origin time — the peek summary and the info
+/// card both print it. Numeric only, so no locale symbol data is needed, and
+/// one parsed pattern instead of one per build: `DateFormat(...)` parses its
+/// pattern on construction, which the peek summary re-ran on every rebuild.
+final DateFormat _originTimeFormat = DateFormat('yyyy/MM/dd HH:mm:ss');
+
 /// The report's epicentre + station bounds, in the map library's coordinate
 /// type — computed here (not on the domain model) so the domain layer stays
 /// free of a `maplibre_gl` dependency.
@@ -833,7 +839,7 @@ class _ReportPeekSummary extends StatelessWidget {
       report.originTimeUtc,
     );
     final taipei = AppTime.taipei(report.originTimeUtc);
-    final time = DateFormat('yyyy/MM/dd HH:mm:ss').format(taipei);
+    final time = _originTimeFormat.format(taipei);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1047,7 +1053,7 @@ class _ReportInfoCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final taipei = AppTime.taipei(report.originTimeUtc);
-    final originTime = DateFormat('yyyy/MM/dd HH:mm:ss').format(taipei);
+    final originTime = _originTimeFormat.format(taipei);
     final coordinates =
         '${report.latitude.toStringAsFixed(2)}°N・'
         '${report.longitude.toStringAsFixed(2)}°E';

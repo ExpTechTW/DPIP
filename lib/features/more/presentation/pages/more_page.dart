@@ -1363,10 +1363,15 @@ class _VersionCardState extends State<_VersionCard> {
   /// notes page's match (tag or name, `v` stripped) so both pages agree on
   /// which entry is "current" without sharing state.
   static bool _isCurrent(ReleaseNote note, String label) {
-    final tag = note.tagName.replaceFirst(RegExp(r'^v'), '');
-    final name = note.name.replaceFirst(RegExp(r'^v'), '');
+    final tag = note.tagName.replaceFirst(_vPrefix, '');
+    final name = note.name.replaceFirst(_vPrefix, '');
     return tag == label || name == label;
   }
+
+  /// Compiled once — `_isCurrent` runs per fetched note, and every inline
+  /// `RegExp(...)` compiles a fresh pattern (same reasoning as the changelog
+  /// page's copy).
+  static final RegExp _vPrefix = RegExp(r'^v');
 
   /// The number's gradient, derived from the version string itself so every
   /// build wears its own colours — 26w34a is one pair, 26w34b another — and
