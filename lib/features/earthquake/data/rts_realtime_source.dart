@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/sse_realtime_source.dart';
@@ -29,6 +30,18 @@ class RtsRealtimeSource extends SseRealtimeSource<Rts> {
   @override
   Rts decode(String data) =>
       Rts.fromJson(jsonDecode(data) as Map<String, dynamic>);
+
+  /// The live path. Parses the inflated UTF-8 directly — the fused decoder
+  /// is the pair `jsonDecode` itself uses on a byte input, so the map handed
+  /// to [Rts.fromJson] is shape-for-shape what [decode] builds from a string;
+  /// it just never builds the string. See [SseRealtimeSource.decodeBytes].
+  @override
+  Rts decodeBytes(Uint8List utf8Json) =>
+      Rts.fromJson(_utf8Json.convert(utf8Json) as Map<String, dynamic>);
+
+  /// Fused once; `fuse` builds a new converter object per call.
+  static final Converter<List<int>, Object?> _utf8Json = const Utf8Decoder()
+      .fuse(const JsonDecoder());
 
   /// Null: freshness is event-recency (above), not payload age — so clock skew
   /// on the snapshot's `time` can't reclassify a live feed.
