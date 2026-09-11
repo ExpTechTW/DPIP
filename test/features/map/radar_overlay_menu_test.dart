@@ -117,6 +117,34 @@ void main() {
     );
   });
 
+  testWidgets('a row leaves the menu open; the chip closes it', (tester) async {
+    _useTallSurface(tester);
+    final layer = testRadarLayer(_FakeRadarRepository());
+    await tester.pumpWidget(_wrap(layer));
+
+    final l10n = await _l10n();
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.radarCountyOutline));
+    await tester.pumpAndSettle();
+
+    // The map behind the menu has already changed; a reader comparing two or
+    // three toggles against it must not have to reopen the menu each time.
+    expect(layer.showCountyOutline, isFalse);
+    expect(find.text(l10n.radarCountyOutline), findsOneWidget);
+
+    // A second toggle, from the menu still standing open.
+    await tester.tap(find.text(l10n.radarTownOutline));
+    await tester.pumpAndSettle();
+    expect(layer.showTownOutline, isFalse);
+    expect(find.text(l10n.radarTownOutline), findsOneWidget);
+
+    // The chip is what closes it — the same tap that opened it.
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.radarCountyOutline), findsNothing);
+  });
+
   testWidgets('tapping the terrain-relief row reports the flip upward', (
     tester,
   ) async {

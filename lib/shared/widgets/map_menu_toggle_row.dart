@@ -11,6 +11,15 @@ import 'package:flutter/material.dart';
 /// Shared so every layer's options menu reads identically — a toggle in the
 /// radar menu must not look like a different kind of control from the same
 /// toggle in the typhoon menu.
+///
+/// **The menu stays open when a row is tapped.** These dropdowns are settings
+/// panels, not command menus: the choices interact (two overlays that exclude
+/// each other, borders judged against the layer under them), and the map
+/// behind the menu updates live, so a reader is normally changing several rows
+/// while watching the result. Closing after each tap would make them reopen
+/// the menu for every one. The chip itself and a tap outside are what close
+/// it — a row that leaves for somewhere else (a sheet, a page) is the one
+/// exception, and is not built from this widget.
 class MapMenuToggleRow extends StatelessWidget {
   const MapMenuToggleRow({
     super.key,
@@ -20,7 +29,6 @@ class MapMenuToggleRow extends StatelessWidget {
     required this.tooltip,
     required this.onTap,
     this.subtitle,
-    this.closeOnActivate = true,
   });
 
   /// Whether the overlay is currently on.
@@ -37,9 +45,6 @@ class MapMenuToggleRow extends StatelessWidget {
   final String tooltip;
   final VoidCallback onTap;
 
-  /// Whether activating this row closes its surrounding [MenuAnchor].
-  final bool closeOnActivate;
-
   /// Row width — fixed so a dropdown's rows line up regardless of label length.
   static const double width = 228;
 
@@ -51,7 +56,7 @@ class MapMenuToggleRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
-        closeOnActivate: closeOnActivate,
+        closeOnActivate: false,
         style: MapChipButton.rowStyle(
           selected
               ? colors.primaryContainer.withValues(alpha: 0.45)
