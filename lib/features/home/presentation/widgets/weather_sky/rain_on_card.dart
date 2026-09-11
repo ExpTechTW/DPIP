@@ -121,11 +121,38 @@ class _RainOnCardState extends State<RainOnCard>
   /// Repaints the water without rebuilding the card beneath it.
   final ValueNotifier<int> _frame = ValueNotifier(0);
 
+  /// The painter's repaint trigger: [_frame], plus the sky re-bake so the
+  /// water's ambient follows the backdrop it falls out of. Built once — the
+  /// merge is the same pair for the State's whole life, and building it in
+  /// `build` allocated a fresh listenable (and re-subscribed the painter) on
+  /// every scroll tick.
+  late final Listenable _repaint = Listenable.merge([
+    _frame,
+    SkyLutCache.panelAmbient,
+  ]);
+
   ui.FragmentShader? _shader;
   Duration _last = Duration.zero;
   Size _size = Size.zero;
   double _screenHeight = 0;
   Size _screenSize = Size.zero;
+
+  /// Screen-derived values, recomputed only when [_screenSize] changes — see
+  /// [_syncScreen]. They are read on every build and every paint, and none of
+  /// them moves between one frame and the next.
+  double _pointSize = 5.0;
+  double _threshold = 0.6;
+  // The values a zero screen produces — what [_syncScreen] would compute for
+  // its initial [_screenSize], so a build that never sees a real size draws
+  // exactly what it always did.
+  late Paint _blurPaint = Paint()
+    ..imageFilter = ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0);
+
+  /// Local minute of the cached [_night], so the wall-clock read and the
+  /// keyframe-ring lookup run once a minute rather than once per build (a
+  /// scroll rebuilds this card on every pixel).
+  int _nightMinuteKey = -1;
+  bool _night = false;
 
   /// Wraps [RainOnCard.child] so [_capture] has something to rasterise —
   /// only meaningful while [RainOnCard.silhouette] is on, but cheap enough to
@@ -511,14 +538,76 @@ class _RainOnCardState extends State<RainOnCard>
   /// Those are **buffer** pixels, not logical ones: the particle pass renders
   /// into an 800-tall render texture that stands for the whole screen, so a
   /// drop covers `size/800` of the screen's height whatever the device.
-  (double, double) get _pointSizeAndThreshold {
-    final w = _screenSize.width;
-    final h = _screenSize.height;
+  static (double, double) _pointSizeAndThreshold(Size screen) {
+    final w = screen.width;
+    final h = screen.height;
     if (w <= 0 || h <= 0) return (5.0, 0.6);
     final scale = h / CardWaterField.bufferHeight;
     if (h / w >= 2.0) return (5.0 * scale, 0.6);
     if (h > w) return (3.3 * scale, 0.3);
     return (3.7 * scale, 0.3);
+  }
+
+  /// The separable 5-tap blur the reference runs between the particle pass and
+  /// the composite, as an equivalent gaussian.
+  ///
+  /// Taps sit at ±0.7 and ±0.35 of `uBlurBufferSize` with weights
+  /// .164/.217/.238, so σ is `sqrt(2·(0.164·0.7² + 0.217·0.35²))` = 0.4625 of
+  /// that step. The step is the load-bearing part: the reference computes it
+  /// as `1/((w·355)/h)` **while both fields are still 1**, and only assigns the
+  /// buffer's width and height afterwards — so the aspect correction is dead
+  /// code and *both* axes get a flat 1/355 in **UV**.
+  ///
+  /// A UV step is not a pixel step. On the 800-tall buffer that is 1.04 px
+  /// vertically but only `1.04·W/H` horizontally — the blur is 2.2x wider
+  /// down the screen than across it, and reading it as one isotropic 0.46 px
+  /// (as an earlier version did) leaves each drop far too sharp and far too
+  /// much of it above the alpha cut.
+  static const double _blurStepUv = 1 / 355;
+  static const double _blurSigmaUv = 0.46253 * _blurStepUv;
+
+  /// Refreshes everything derived from the screen size, only when it changes.
+  ///
+  /// The blur's σ pair depends on nothing but the screen, yet the painter used
+  /// to build a fresh `ImageFilter.blur` (and its `Paint`) twice per frame per
+  /// card — one per signed accumulation pass. The filter is immutable, so one
+  /// instance serves every frame until the screen itself changes (a rotation,
+  /// a window resize).
+  void _syncScreen(Size screen) {
+    if (screen == _screenSize) return;
+    _screenSize = screen;
+    _screenHeight = screen.height;
+    final (pointSize, threshold) = _pointSizeAndThreshold(screen);
+    _pointSize = pointSize;
+    _threshold = threshold;
+    _blurPaint = Paint()
+      ..imageFilter = ui.ImageFilter.blur(
+        sigmaX: _blurSigmaUv * screen.width,
+        sigmaY: _blurSigmaUv * screen.height,
+      );
+  }
+
+  /// The reference's night flag is `hour >= 15 || hour <= 4` — and that hour
+  /// is the scene's position on its 24-keyframe day ring, where ~15 is dusk
+  /// and ~4 is dawn. DPIP has the same mapping; the theme's brightness (used
+  /// here before) is unrelated to the sun.
+  ///
+  /// Memoised to the local minute: the ring position is a function of the
+  /// wall-clock hour and minute alone, so within one minute the answer cannot
+  /// change, and a scroll rebuilds this card at frame rate.
+  bool _nightNow() {
+    final utc = AppTime.utc;
+    final minuteKey = utc.millisecondsSinceEpoch ~/ 60000;
+    if (minuteKey != _nightMinuteKey) {
+      _nightMinuteKey = minuteKey;
+      final wall = AppTime.taipei(utc);
+      final key = keyframePosition(
+        wall.hour + wall.minute / 60.0,
+        frameCount: 24,
+      );
+      _night = key >= 15.0 || key <= 4.0;
+    }
+    return _night;
   }
 
   @override
@@ -531,19 +620,8 @@ class _RainOnCardState extends State<RainOnCard>
 
   @override
   Widget build(BuildContext context) {
-    _screenSize = MediaQuery.sizeOf(context);
-    _screenHeight = _screenSize.height;
-    // The reference's night flag is `hour >= 15 || hour <= 4` — and that hour is
-    // the scene's position on its 24-keyframe day ring, where ~15 is dusk and
-    // ~4 is dawn. DPIP has the same mapping; the theme's brightness (used here
-    // before) is unrelated to the sun.
-    final wall = AppTime.utc8;
-    final key = keyframePosition(
-      wall.hour + wall.minute / 60.0,
-      frameCount: 24,
-    );
-    final night = key >= 15.0 || key <= 4.0;
-    final (pointSize, threshold) = _pointSizeAndThreshold;
+    _syncScreen(MediaQuery.sizeOf(context));
+    final night = _nightNow();
     return LayoutBuilder(
       builder: (context, constraints) {
         _size = Size(
@@ -600,17 +678,13 @@ class _RainOnCardState extends State<RainOnCard>
                       primary: _primary,
                       secondary: _secondary,
                       shader: _shader,
-                      // Also repaints when the sky re-bakes, so the water's
-                      // ambient follows the backdrop it falls out of.
-                      repaint: Listenable.merge([
-                        _frame,
-                        SkyLutCache.panelAmbient,
-                      ]),
+                      repaint: _repaint,
+                      blurPaint: _blurPaint,
                       opacity: widget.opacity.clamp(0.0, 1.0),
                       night: night,
                       screenHeight: _screenHeight,
-                      pointSize: pointSize,
-                      threshold: threshold,
+                      pointSize: _pointSize,
+                      threshold: _threshold,
                       screenWidth: _screenSize.width,
                       gateOpen: _gateOpen,
                     ),
@@ -631,6 +705,7 @@ class _CardWaterPainter extends CustomPainter {
     required this.secondary,
     required this.shader,
     required Listenable repaint,
+    required this.blurPaint,
     required this.opacity,
     required this.night,
     required this.screenHeight,
@@ -643,6 +718,12 @@ class _CardWaterPainter extends CustomPainter {
   final CardWaterField primary;
   final CardWaterField secondary;
   final ui.FragmentShader? shader;
+
+  /// The accumulation layer's blur, owned by the State and rebuilt only when
+  /// the screen size changes — see `_RainOnCardState._syncScreen` for the σ
+  /// derivation. Held as a [Paint] rather than an `ImageFilter` so `saveLayer`
+  /// allocates nothing per pass either.
+  final Paint blurPaint;
   final double opacity;
   final bool night;
   final double screenHeight;
@@ -654,27 +735,6 @@ class _CardWaterPainter extends CustomPainter {
   final double pointSize;
   final double threshold;
 
-  /// The separable 5-tap blur the reference runs between the particle pass and
-  /// the composite, as an equivalent gaussian.
-  ///
-  /// Taps sit at ±0.7 and ±0.35 of `uBlurBufferSize` with weights
-  /// .164/.217/.238, so σ is `sqrt(2·(0.164·0.7² + 0.217·0.35²))` = 0.4625 of
-  /// that step. The step is the load-bearing part: the reference computes it
-  /// as `1/((w·355)/h)` **while both fields are still 1**, and only assigns the
-  /// buffer's width and height afterwards — so the aspect correction is dead
-  /// code and *both* axes get a flat 1/355 in **UV**.
-  ///
-  /// A UV step is not a pixel step. On the 800-tall buffer that is 1.04 px
-  /// vertically but only `1.04·W/H` horizontally — the blur is 2.2x wider
-  /// down the screen than across it, and reading it as one isotropic 0.46 px
-  /// (as an earlier version did) leaves each drop far too sharp and far too
-  /// much of it above the alpha cut.
-  static const double _blurStepUv = 1 / 355;
-  static const double _blurSigmaUv = 0.46253 * _blurStepUv;
-
-  double get _sigmaX => _blurSigmaUv * screenWidth;
-  double get _sigmaY => _blurSigmaUv * screenHeight;
-
   /// One signed half of the accumulation — see [CardWaterField.paintCoverage].
   ui.Image _accumulate(
     Size fieldSize,
@@ -683,11 +743,7 @@ class _CardWaterPainter extends CustomPainter {
   }) {
     final recorder = ui.PictureRecorder();
     final offscreen = Canvas(recorder);
-    offscreen.saveLayer(
-      Offset.zero & fieldSize,
-      Paint()
-        ..imageFilter = ui.ImageFilter.blur(sigmaX: _sigmaX, sigmaY: _sigmaY),
-    );
+    offscreen.saveLayer(Offset.zero & fieldSize, blurPaint);
     offscreen.translate(0, headroom);
     primary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     secondary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);

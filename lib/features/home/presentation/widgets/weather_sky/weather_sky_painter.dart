@@ -174,9 +174,10 @@ class WeatherSkyPainter extends CustomPainter {
     _paintRainbow(canvas, size);
   }
 
+  // A frame is built fresh per tick, so identity alone already implies "a new
+  // tick" — the old `time` comparison was subsumed by it.
   @override
-  bool shouldRepaint(WeatherSkyPainter old) =>
-      old.frame.time != frame.time || !identical(old.frame, frame);
+  bool shouldRepaint(WeatherSkyPainter old) => !identical(old.frame, frame);
 
   void _fill(
     Canvas canvas,
@@ -287,7 +288,10 @@ class WeatherSkyPainter extends CustomPainter {
     if (shader == null || skyColumn == null || cloudSprites.isEmpty) return;
     if (frame.cloudCoverage < 0.02) return;
 
-    final lighting = cloudLighting(sunAngleY: frame.sky.sunAngleY);
+    final probes = _cloudProbes();
+    final lighting = probes.lighting;
+    final baseSky = probes.baseSky;
+    final hazeSky = probes.hazeSky;
     final placed = placeClouds(
       frame.cloudLayout,
       width: size.width,
@@ -303,21 +307,6 @@ class WeatherSkyPainter extends CustomPainter {
     final sunDirX = -0.55 + 1.1 * day;
     final sunDirY = 0.25 + 0.70 * day;
     const sunDirZ = 0.45;
-
-    // The base and haze sky probes are pixel-independent, so their colours are
-    // read once per frame from the CPU LUT readback rather than fetched on
-    // every cloud pixel (see clouds.frag's iBaseSky / iHazeSky). The picker
-    // mapping mirrors the shader's `skyAt` exactly, and the base picker rides
-    // the same `cloudDepth` lerp the shader applies.
-    final lutU = frame.sky.sunAngleY.clamp(0.0, 1.0);
-    final fallback = SkyLutCache.panelAmbient.value ?? const Color(0xFF5C6B7E);
-    final baseSky =
-        lutCache.skyAt(
-          lutU,
-          _skyAtV(0.05 + (lighting.base.$1 - 0.05) * 0.85),
-        ) ??
-        fallback;
-    final hazeSky = lutCache.skyAt(lutU, _skyAtV(0.95)) ?? fallback;
 
     // Only five of the forty-three uniform slots differ between instances —
     // the sprite's size, its opacity, and the texture's own size. The rest
@@ -397,6 +386,61 @@ class WeatherSkyPainter extends CustomPainter {
       canvas.restore();
     }
   }
+
+  /// The cloud deck's keyframe-derived inputs: the five-group lighting and
+  /// the base/haze sky probes.
+  ///
+  /// The base and haze probes are pixel-independent, so their colours are
+  /// read from the CPU LUT readback rather than fetched on every cloud pixel
+  /// (see clouds.frag's iBaseSky / iHazeSky). The picker mapping mirrors the
+  /// shader's `skyAt` exactly, and the base picker rides the same
+  /// `cloudDepth` lerp the shader applies.
+  ///
+  /// All of it is a function of `frame.sky` — which `_syncSky` resolves once
+  /// a minute and hands to every frame in between by identity — plus what the
+  /// LUT cache has read back so far. Memoised on exactly those: the keyframe's
+  /// identity, the cache instance and its readback generation (before the
+  /// first readback `skyAt` is null and the fallback shows; the same keyframe
+  /// must re-resolve once it lands), and the fallback colour itself. Keying
+  /// on `sunAngleY` alone would be wrong the other way: two keyframes can
+  /// share a sun angle and still not share a bake.
+  ({CloudLighting lighting, Color baseSky, Color hazeSky}) _cloudProbes() {
+    final sky = frame.sky;
+    final generation = lutCache.readbackGeneration;
+    final fallback = SkyLutCache.panelAmbient.value ?? const Color(0xFF5C6B7E);
+    final cached = _probes;
+    if (cached != null &&
+        identical(sky, _probeSky) &&
+        identical(lutCache, _probeCache) &&
+        generation == _probeGeneration &&
+        fallback == _probeFallback) {
+      return cached;
+    }
+
+    final lighting = cloudLighting(sunAngleY: sky.sunAngleY);
+    final lutU = sky.sunAngleY.clamp(0.0, 1.0);
+    final baseSky =
+        lutCache.skyAt(
+          lutU,
+          _skyAtV(0.05 + (lighting.base.$1 - 0.05) * 0.85),
+        ) ??
+        fallback;
+    final hazeSky = lutCache.skyAt(lutU, _skyAtV(0.95)) ?? fallback;
+
+    _probeSky = sky;
+    _probeCache = lutCache;
+    _probeGeneration = generation;
+    _probeFallback = fallback;
+    return _probes = (lighting: lighting, baseSky: baseSky, hazeSky: hazeSky);
+  }
+
+  /// [_cloudProbes]'s memo. Static because the painter is rebuilt every
+  /// frame; one entry suffices — only the home sky draws clouds.
+  static ResolvedSky? _probeSky;
+  static SkyLutCache? _probeCache;
+  static int _probeGeneration = -1;
+  static Color? _probeFallback;
+  static ({CloudLighting lighting, Color baseSky, Color hazeSky})? _probes;
 
   /// The cloud shader's `skyAt` picker→LUT-v mapping, mirrored on the CPU for
   /// the pre-baked base/haze probes — the shader's `elevation = picker·(π/2)`
@@ -566,31 +610,6 @@ class WeatherSkyPainter extends CustomPainter {
     final sunY = 0.5 - arcY;
     final golden = frame.goldenAmount;
 
-    var i = 0;
-    void set(double v) => shader.setFloat(i++, v);
-    set(size.width);
-    set(size.height);
-    set(sunX);
-    set(sunY);
-    set(1.0);
-    set(0.80 - 0.14 * golden);
-    set(0.45 - 0.22 * golden); // ray tint
-    set(frame.time);
-    set(intensity);
-    // The disc survives cloud better than the rays do — it is far brighter.
-    set((1.0 - 0.55 * frame.cloudCoverage).clamp(0.0, 1.0));
-    set((0.35 + 0.5 * golden) * (1.0 - 0.7 * frame.cloudCoverage));
-    // `uAnnulusAlpha` is 0.13 while the sun is up.
-    set(0.13 * (1.0 - frame.cloudCoverage));
-    // `uCircleAlpha` 1.03, and `uCircleOffset` -0.5.
-    set(1.03 * (1.0 - 0.8 * frame.cloudCoverage));
-    set(-0.5);
-    set((frame.time / 9.0).floorToDouble());
-    set((0.7 + 0.3 * golden) * (1.0 - 0.5 * frame.cloudCoverage));
-    shader.setImageSampler(0, sunTextures[0]);
-    shader.setImageSampler(1, sunTextures[1]);
-    shader.setImageSampler(2, sunTextures[2]);
-
     // The reference renders the sun into a **quarter-resolution** buffer
     // (`new C1502b(ctx, w / 4, h / 4, true)`) and blits it back up with
     // The reference shader, which is just `texture(uTex, vUv) * uOpacity`. All of the
@@ -603,9 +622,6 @@ class WeatherSkyPainter extends CustomPainter {
       (size.width / 4).ceilToDouble().clamp(1, double.infinity),
       (size.height / 4).ceilToDouble().clamp(1, double.infinity),
     );
-    // The shader's own resolution uniform must match the buffer it draws into.
-    shader.setFloat(0, quarter.width);
-    shader.setFloat(1, quarter.height);
 
     // The bake is a synchronous GPU rasterisation on the UI thread, and the
     // sun's motion is slow (a keyframed arc + ~2 rad/s rays) — re-bake only
@@ -623,6 +639,38 @@ class WeatherSkyPainter extends CustomPainter {
       frame.cloudCoverage,
     );
     if (_sunFlare == null || bakeKey != _sunFlareKey) {
+      // The uniforms are written only on the frames that bake. Nothing reads
+      // them outside this branch — the blit below samples the baked image,
+      // not the shader — so writing all nineteen slots on every frame (as an
+      // earlier version did) was 19 engine calls to feed a draw that then did
+      // not happen.
+      var i = 0;
+      void set(double v) => shader.setFloat(i++, v);
+      // The shader's own resolution must match the buffer it draws into —
+      // the quarter buffer, not the screen.
+      set(quarter.width);
+      set(quarter.height);
+      set(sunX);
+      set(sunY);
+      set(1.0);
+      set(0.80 - 0.14 * golden);
+      set(0.45 - 0.22 * golden); // ray tint
+      set(frame.time);
+      set(intensity);
+      // The disc survives cloud better than the rays do — it is far brighter.
+      set((1.0 - 0.55 * frame.cloudCoverage).clamp(0.0, 1.0));
+      set((0.35 + 0.5 * golden) * (1.0 - 0.7 * frame.cloudCoverage));
+      // `uAnnulusAlpha` is 0.13 while the sun is up.
+      set(0.13 * (1.0 - frame.cloudCoverage));
+      // `uCircleAlpha` 1.03, and `uCircleOffset` -0.5.
+      set(1.03 * (1.0 - 0.8 * frame.cloudCoverage));
+      set(-0.5);
+      set((frame.time / 9.0).floorToDouble());
+      set((0.7 + 0.3 * golden) * (1.0 - 0.5 * frame.cloudCoverage));
+      shader.setImageSampler(0, sunTextures[0]);
+      shader.setImageSampler(1, sunTextures[1]);
+      shader.setImageSampler(2, sunTextures[2]);
+
       _sunFlareKey = bakeKey;
       _sunFlare?.dispose();
       final recorder = ui.PictureRecorder();
