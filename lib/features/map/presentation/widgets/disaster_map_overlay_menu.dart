@@ -120,6 +120,9 @@ class _ToggleRow extends StatelessWidget {
       message: tooltip,
       child: MenuItemButton(
         onPressed: onTap,
+        // Settings panel, not a command menu: the chip or a tap outside
+        // closes it, never a row — see [MapMenuToggleRow].
+        closeOnActivate: false,
         style: MapChipButton.rowStyle(
           selected
               ? colors.primaryContainer.withValues(alpha: 0.45)

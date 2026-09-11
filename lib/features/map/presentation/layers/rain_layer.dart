@@ -231,6 +231,9 @@ class RainMapLayer
                 for (final option in RainInterval.values)
                   MenuItemButton(
                     onPressed: () => setInterval(option),
+                    // Picking a step keeps the menu open, like every
+                    // other row — see [MapMenuToggleRow].
+                    closeOnActivate: false,
                     trailingIcon: option == current
                         ? Icon(Icons.check, size: 18, color: colors.primary)
                         : null,
@@ -241,6 +244,7 @@ class RainMapLayer
                 for (final option in RainColorScale.values)
                   MenuItemButton(
                     onPressed: () => setColorScale(option),
+                    closeOnActivate: false,
                     trailingIcon: option == scale
                         ? Icon(Icons.check, size: 18, color: colors.primary)
                         : null,
