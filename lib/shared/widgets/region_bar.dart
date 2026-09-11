@@ -2,7 +2,6 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/area_page_sync.dart';
@@ -63,6 +62,8 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
     final blend = widget.blend;
     final dismiss = widget.dismiss;
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final directory = context.read<TownDirectory>();
     // Slide up by the bar's own height and fade out once the sheet invades it;
     // release taps to the sheet behind as soon as it is mostly gone.
     return IgnorePointer(
@@ -81,16 +82,27 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
                   controller: areaPageController,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: areas.length,
-                  itemBuilder: (context, index) => AnimatedBuilder(
-                    animation: areaPageController,
-                    builder: (context, _) => _RegionBadge(
-                      index: index,
-                      area: areas[index],
-                      distance: (areaPage - index).abs(),
-                      blend: blend,
-                      skyIsLight: widget.skyIsLight,
-                    ),
-                  ),
+                  itemBuilder: (context, index) {
+                    // Resolved here, once per item, not inside the builder
+                    // below: the label is a directory lookup that does not
+                    // depend on the page position, and the builder runs for
+                    // every visible badge on every pixel of the slide.
+                    final label = regionAreaLabel(
+                      l10n,
+                      directory,
+                      areas[index],
+                    );
+                    return AnimatedBuilder(
+                      animation: areaPageController,
+                      builder: (context, _) => _RegionBadge(
+                        index: index,
+                        label: label,
+                        distance: (areaPage - index).abs(),
+                        blend: blend,
+                        skyIsLight: widget.skyIsLight,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -105,24 +117,24 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
 class _RegionBadge extends StatelessWidget {
   const _RegionBadge({
     required this.index,
-    required this.area,
+    required this.label,
     required this.distance,
     required this.blend,
     required this.skyIsLight,
   });
 
   final int index;
-  final HomeArea area;
+
+  /// The area's display name, resolved by the bar (see its `itemBuilder`).
+  final String label;
   final double distance;
   final double blend;
   final bool skyIsLight;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final label = regionAreaLabel(l10n, context.read<TownDirectory>(), area);
 
     // 1 at the centre → 0 one step away: badge fill and text emphasis.
     final fill = (1 - distance).clamp(0.0, 1.0);
