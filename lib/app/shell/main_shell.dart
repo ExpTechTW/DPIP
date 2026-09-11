@@ -59,10 +59,30 @@ class _MainShellState extends State<MainShell> with RouteAware {
   /// [shellRouteObserver]. Held so the subscription can be dropped again.
   ModalRoute<void>? _shellRoute;
 
+  /// The bottom bar's dismissal, derived from [HomeSheetExtent] — not the raw
+  /// extent. The sheet publishes every scroll tick; the bar only moves while
+  /// Home is the visible branch *and* the extent crosses [HomeChrome.navDismiss]'s
+  /// ramp, so listening to the extent directly rebuilt the bar on every tick
+  /// from every tab for a value that was 0 the whole time. This is assigned
+  /// only when the derived value changes (see [_syncNavDismiss]).
+  final ValueNotifier<double> _navDismiss = ValueNotifier(0);
+  late final HomeSheetExtent _sheetExtent;
+
   @override
   void initState() {
     super.initState();
     _trace(() => 'init current=${widget.navigationShell.currentIndex}');
+    _sheetExtent = context.read<HomeSheetExtent>()
+      ..addListener(_syncNavDismiss);
+  }
+
+  /// Only Home dismisses the bar; every other tab keeps it (dismiss 0).
+  void _syncNavDismiss() {
+    final dismiss = widget.navigationShell.currentIndex == 0
+        ? HomeChrome.navDismiss(_sheetExtent.value)
+        : 0.0;
+    if (dismiss == _navDismiss.value) return;
+    _navDismiss.value = dismiss;
   }
 
   @override
@@ -104,6 +124,8 @@ class _MainShellState extends State<MainShell> with RouteAware {
   void dispose() {
     _trace(() => 'dispose');
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
+    _sheetExtent.removeListener(_syncNavDismiss);
+    _navDismiss.dispose();
     _visibleTab.dispose();
     super.dispose();
   }
@@ -149,6 +171,11 @@ class _MainShellState extends State<MainShell> with RouteAware {
       });
     }
     _lastIndex = index;
+    // The branch is an input to the bar's dismissal too — pin it to 0 the
+    // moment another branch is on screen, regardless of where Home's sheet
+    // was left. Safe mid-build: the only listener is the builder below, a
+    // descendant that this build re-creates anyway.
+    _syncNavDismiss();
     // Publish after the frame: pages listening to this rebuild on the edge, and
     // a notify during build would land mid-build for them.
     if (_visibleTab.value != index) {
@@ -216,11 +243,9 @@ class _MainShellState extends State<MainShell> with RouteAware {
           ),
         ],
       ),
-      // Only Home dismisses the bar; every other tab keeps it (dismiss 0).
       bottomNavigationBar: ValueListenableBuilder<double>(
-        valueListenable: context.read<HomeSheetExtent>(),
-        builder: (context, extent, child) {
-          final dismiss = index == 0 ? HomeChrome.navDismiss(extent) : 0.0;
+        valueListenable: _navDismiss,
+        builder: (context, dismiss, child) {
           // Slide the bar down by its own height and fade it out; stop it
           // catching taps once it is mostly gone so the sheet behind gets them.
           return IgnorePointer(
