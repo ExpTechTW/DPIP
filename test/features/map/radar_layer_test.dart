@@ -15,6 +15,7 @@ import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -141,7 +142,10 @@ void main() {
         'visible',
         reason: 'neighbours stay visible so their tiles stay loaded',
       );
-      expect(controller.opacityOf('radar-lyr-${frames[i].id}'), '0.0');
+      expect(
+        controller.opacityOf('radar-lyr-${frames[i].id}'),
+        '${RasterTimelineLayer.preloadOpacity}',
+      );
     }
   });
 
@@ -253,7 +257,7 @@ void main() {
         reason: 'one scrub frame must cross the platform channel only once',
       );
       expect(controller.calls, [
-        'set:radar-lyr-${frames[4].id}:0.0',
+        'set:radar-lyr-${frames[4].id}:${RasterTimelineLayer.preloadOpacity}',
         'set:radar-lyr-${frames[5].id}:0.85',
       ]);
       expect(
@@ -318,7 +322,10 @@ void main() {
     expect(layer.readyVisibleFrameId.value, frames[2].id);
     await layer.show(controller, frames[3], scrubbing: true);
 
-    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
+    expect(
+      controller.opacityOf('radar-lyr-${frames[2].id}'),
+      '${RasterTimelineLayer.preloadOpacity}',
+    );
     expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
     expect(layer.readyVisibleFrameId.value, frames[3].id);
     expect(
@@ -342,7 +349,10 @@ void main() {
     layer.onMapIdle();
     await Future<void>.delayed(const Duration(milliseconds: 80));
 
-    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
+    expect(
+      controller.opacityOf('radar-lyr-${frames[2].id}'),
+      '${RasterTimelineLayer.preloadOpacity}',
+    );
     expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
   });
 
@@ -446,11 +456,14 @@ void main() {
 
     await layer.show(controller, frames[1], scrubbing: true);
 
-    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.0');
+    expect(
+      controller.opacityOf('radar-lyr-${frames[4].id}'),
+      '${RasterTimelineLayer.preloadOpacity}',
+    );
     expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0.85');
     expect(controller.calls, [
-      'set:radar-lyr-${frames[1].id}:0.0',
-      'set:radar-lyr-${frames[4].id}:0.0',
+      'set:radar-lyr-${frames[1].id}:${RasterTimelineLayer.preloadOpacity}',
+      'set:radar-lyr-${frames[4].id}:${RasterTimelineLayer.preloadOpacity}',
       'set:radar-lyr-${frames[1].id}:0.85',
     ]);
     expect(
