@@ -119,10 +119,15 @@ class EndpointHealth {
   /// `TPE1`. Also covers the static hosts (`static.core-tnn1…`) and legacy
   /// `api-1` (no region → the host's own last segment).
   String get regionCode {
-    final core = RegExp(r'-(tpe1|khh1|tyo1|tnn1)\.').firstMatch(host);
+    final core = _regionInHost.firstMatch(host);
     if (core != null) return core.group(1)!.toUpperCase();
     return host.split('.').first.toUpperCase();
   }
+
+  /// Compiled once: the status table reads this getter for every cell on
+  /// every rebuild, and a `RegExp(...)` literal inside it re-compiled the
+  /// pattern each time.
+  static final RegExp _regionInHost = RegExp(r'-(tpe1|khh1|tyo1|tnn1)\.');
 }
 
 /// Tracks per-service-host request outcomes so the UI can show which region is

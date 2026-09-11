@@ -38,11 +38,14 @@ class LocaleController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// `-` or the legacy `_` — compiled once rather than per parse.
+  static final RegExp _separator = RegExp('[-_]');
+
   /// Parses a BCP-47 tag (`zh-Hant-HK`) back into a [Locale], recognising the
   /// 4-letter script subtag so it survives the round-trip. Also tolerates the
   /// legacy `_` separator from earlier builds.
   static Locale _parseTag(String tag) {
-    final parts = tag.split(RegExp('[-_]'));
+    final parts = tag.split(_separator);
     String? script;
     String? country;
     for (final part in parts.skip(1)) {
