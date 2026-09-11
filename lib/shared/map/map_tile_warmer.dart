@@ -8,7 +8,9 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
+import 'package:dpip/shared/map/tile_url.dart';
 import 'package:dpip/shared/map/xyz_tiles.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 /// Shared warm-up spine for radar / satellite / DPM / basemap.
 ///
@@ -274,8 +276,11 @@ class MapTileWarmer {
     final direct = <String>{};
     final framesByFamily = <String, Set<String>>{};
     for (final url in stale) {
+      // The family is the frame prefix minus its last segment, so it is cut
+      // from the prefix already in hand — deriving it from the URL again
+      // parsed every stale URL twice.
       final prefix = _framePrefix(url);
-      final family = _frameFamilyPrefix(url);
+      final family = prefix == null ? null : _familyOfFrame(prefix);
       if (prefix == null || family == null) {
         direct.add(url);
       } else if (wantedFrames.contains(prefix)) {
@@ -319,7 +324,32 @@ class MapTileWarmer {
     return patterns.toList(growable: false);
   }
 
-  static String? _framePrefix(String url) {
+  /// Memoised per frame directory: every `z/x/y` sibling of one frame shares
+  /// its prefix, and a fill names thousands of siblings. `Uri.tryParse` plus
+  /// the regex ran for each of them — with the working-set diff asking twice
+  /// per stale URL — which was the single largest Dart cost of a settled fill.
+  ///
+  /// Exact, because the answer cannot depend on a plain `z/x/y.ext` tail: the
+  /// regex requires exactly three segments after the frame directory and
+  /// captures everything before them, so any plain tail yields the same
+  /// group; the origin and the parse's success come from the scheme and
+  /// authority, which the tail never touches. Pinned by
+  /// `tile_url_test.dart`.
+  static final TileUrlMemo<String?> _framePrefixMemo = TileUrlMemo(
+    _parseFramePrefix,
+  );
+
+  static String? _framePrefix(String url) => _framePrefixMemo(url);
+
+  /// [_framePrefix] without the memo — the reference the memo must match.
+  @visibleForTesting
+  static String? parseFramePrefix(String url) => _parseFramePrefix(url);
+
+  /// The memoised path, for the equivalence test.
+  @visibleForTesting
+  static String? framePrefixOf(String url) => _framePrefix(url);
+
+  static String? _parseFramePrefix(String url) {
     final uri = Uri.tryParse(url);
     if (uri == null || !uri.hasScheme || uri.host.isEmpty) return null;
     final match = _frameTilePath.firstMatch(uri.path);
@@ -328,9 +358,9 @@ class MapTileWarmer {
     return '${uri.origin}$path';
   }
 
-  static String? _frameFamilyPrefix(String url) {
-    final frame = _framePrefix(url);
-    if (frame == null) return null;
+  /// The raster family a [_framePrefix] belongs to — the prefix with its
+  /// trailing `<timestamp>/` segment removed.
+  static String? _familyOfFrame(String frame) {
     final slash = frame.lastIndexOf('/', frame.length - 2);
     if (slash < 0) return null;
     return frame.substring(0, slash + 1);
