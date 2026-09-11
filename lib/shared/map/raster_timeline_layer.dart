@@ -29,8 +29,8 @@ enum _IdlePreloadOutcome { ready, timeout, cancelled }
 ///
 /// ## Four tiers
 /// - **The ring** — frames within [ringRadius] are mounted **visible**, only
-///   the current one at full [opacity] and its neighbours at
-///   [preloadOpacity] (not zero — at zero MapLibre would not fetch them). During a
+///   the current one at full [opacity] and its neighbours at zero (which
+///   MapLibre does not fetch — see [preloadOpacity] for what does). During a
 ///   drag, an L1-complete frame may join this set on demand; [maxResident]
 ///   bounds the extra sources. A frame replaces the current timestamp only
 ///   after [RasterFrameSource.frameTileReadiness] proves that one complete
@@ -505,7 +505,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     rasterOpacityTransition: _instantTransition,
   );
 
-  /// What a mounted-but-not-shown frame is drawn at.
+  /// What a frame that must *load* while staying unseen is drawn at: the
+  /// settle target under the still-opaque previous frame, and an idle-preload
+  /// candidate.
   ///
   /// Not zero, and the difference is whether the frame loads at all. MapLibre
   /// Native's `RenderRasterLayer::evaluate` sets the layer's render pass to
@@ -519,6 +521,12 @@ abstract class RasterTimelineLayer implements MapLayer {
   /// One 8-bit level is under what a pixel can show over the opaque current
   /// frame, and it is enough for the renderer to treat the layer as drawn —
   /// which is what makes it fetch.
+  ///
+  /// The ±[ringRadius] neighbours deliberately stay at **0**: at this value
+  /// every one of them would re-fetch and re-decode its viewport on every pan,
+  /// five viewports of raster work per gesture on a low-end phone instead of
+  /// one. They come from the L2 warm band and the idle preload instead, which
+  /// is where their bytes were always coming from.
   @visibleForTesting
   static const double preloadOpacity = 1 / 255;
 
@@ -681,9 +689,7 @@ abstract class RasterTimelineLayer implements MapLayer {
       if (previous != null && previous != frameId)
         (
           layerId: _layerId(previous),
-          properties: _ring.contains(previous)
-              ? _opacity(preloadOpacity)
-              : _hidden,
+          properties: _ring.contains(previous) ? _opacity(0) : _hidden,
         ),
       (layerId: _layerId(frameId), properties: _opacity(opacity)),
     ], skipNulls: true);
@@ -726,7 +732,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     // timestamp remains fully opaque below them.
     await Future.wait([
       for (final id in ring)
-        if (id != _shownFrameId) _mount(controller, id, preloadOpacity),
+        if (id != _shownFrameId)
+          // Only the target has to fetch; see [preloadOpacity].
+          _mount(controller, id, id == frameId ? preloadOpacity : 0),
     ]);
     _ring.addAll(ring);
     MapTileCache.trace(
@@ -891,7 +899,8 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapLibreMapController controller,
     String frameId,
   ) async {
-    await _mount(controller, frameId, preloadOpacity);
+    // Its tiles are already in L1 (the probe passed), so nothing to fetch.
+    await _mount(controller, frameId, 0);
     _ring.add(frameId);
     final keep = <String>{frameId};
     final shown = _shownFrameId;

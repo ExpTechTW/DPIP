@@ -2,7 +2,6 @@ import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/shared/map/map_style.dart';
-import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -45,35 +44,38 @@ void main() {
     expect(controller.opacityOf('satellite-lyr-${frames[2].id}'), '1.0');
   });
 
-  test('scrubbing inside the ring is two opacity writes, nothing else', () async {
-    final layer = SatelliteMapLayer(
-      _FakeSatelliteRepository(_ids(9)),
-      channel: SatelliteChannel.irClean,
-      referenceOutline: testReferenceOutline(),
-    );
-    final frames = (await layer.frames()).valueOrNull!;
-    final controller = RecordingMapController();
+  test(
+    'scrubbing inside the ring is two opacity writes, nothing else',
+    () async {
+      final layer = SatelliteMapLayer(
+        _FakeSatelliteRepository(_ids(9)),
+        channel: SatelliteChannel.irClean,
+        referenceOutline: testReferenceOutline(),
+      );
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
 
-    await layer.prepare(controller, frames);
-    await layer.show(controller, frames[4]);
-    controller.calls.clear();
-    controller.sentKeys.clear();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      controller.calls.clear();
+      controller.sentKeys.clear();
 
-    await layer.show(controller, frames[3], scrubbing: true);
+      await layer.show(controller, frames[3], scrubbing: true);
 
-    expect(controller.calls, [
-      'set:satellite-lyr-${frames[4].id}:${RasterTimelineLayer.preloadOpacity}',
-      'set:satellite-lyr-${frames[3].id}:1.0',
-    ]);
-    expect(
-      controller.sentKeys,
-      everyElement(equals({'raster-opacity', 'raster-opacity-transition'})),
-      reason:
-          'the scrub path must not re-send visibility or the seven other '
-          'raster properties the layer type has — only the opacity and the '
-          'zero cross-fade that keeps a scrub a loop instead of a smear',
-    );
-  });
+      expect(controller.calls, [
+        'set:satellite-lyr-${frames[4].id}:0.0',
+        'set:satellite-lyr-${frames[3].id}:1.0',
+      ]);
+      expect(
+        controller.sentKeys,
+        everyElement(equals({'raster-opacity', 'raster-opacity-transition'})),
+        reason:
+            'the scrub path must not re-send visibility or the seven other '
+            'raster properties the layer type has — only the opacity and the '
+            'zero cross-fade that keeps a scrub a loop instead of a smear',
+      );
+    },
+  );
 
   test('bright yellow county and town outlines are added once and removed on clear', () async {
     final layer = SatelliteMapLayer(
