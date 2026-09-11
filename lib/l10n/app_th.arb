@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "ชั้นข้อมูล",
   "radarLightningOverlay": "แสดงฟ้าผ่า",
   "radarLightningOverlayHint": "ฟ้าผ่าในเวลาเดียวกับภาพที่แสดง",
-  "radarLightningOverlaySubtitle": "ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง"
+  "radarLightningOverlaySubtitle": "ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง",
+  "radarWindOverlay": "แสดงลม",
+  "radarWindOverlayHint": "ลมจากสถานีในเวลาเดียวกับภาพที่แสดง",
+  "radarWindOverlaySubtitle": "ซ้อนทิศทางและความเร็วลมจากสถานีตรวจวัดในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง"
 }

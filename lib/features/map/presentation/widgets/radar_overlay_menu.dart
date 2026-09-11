@@ -11,9 +11,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// The radar layer's own options chip — the shared chrome menu, titled for
-/// radar and carrying one extra row the other rasters do not have: the
-/// lightning overlay, which draws the strikes belonging to whichever echo frame
-/// is on screen.
+/// radar and carrying two extra rows the other rasters do not have: the
+/// lightning and wind overlays, which draw the strikes / station readings
+/// belonging to whichever echo frame is on screen.
+///
+/// They read as two checkboxes but behave as a three-way choice (neither /
+/// lightning / wind): turning one on turns the other off, because two dense
+/// mark sets over one island hide each other. Both rows stay tappable — a
+/// greyed-out row would make the user turn one off before they could turn the
+/// other on, to reach a state they can reach in one tap.
 class RadarOverlayMenu extends StatelessWidget {
   const RadarOverlayMenu({
     super.key,
@@ -32,10 +38,12 @@ class RadarOverlayMenu extends StatelessWidget {
   final ValueChanged<bool> onShowTerrainChanged;
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
-    valueListenable: layer.showLightning,
-    builder: (context, showLightning, _) {
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: Listenable.merge([layer.showLightning, layer.showWind]),
+    builder: (context, _) {
       final l10n = AppLocalizations.of(context);
+      final showLightning = layer.showLightning.value;
+      final showWind = layer.showWind.value;
       return ScanRangeOverlayMenu(
         layer: layer,
         tooltip: l10n.radarOverlayMenuTooltip,
@@ -43,8 +51,9 @@ class RadarOverlayMenu extends StatelessWidget {
         onShowTownLabelsChanged: onShowTownLabelsChanged,
         showTerrain: showTerrain,
         onShowTerrainChanged: onShowTerrainChanged,
-        // Off by default, so having it on is a departure worth the chip's dot.
-        extraActive: showLightning,
+        // Both off by default, so either one on is a departure worth the chip's
+        // dot.
+        extraActive: showLightning || showWind,
         extraSections: [
           const MapMenuDivider(),
           SectionHeader(l10n.mapOverlaySectionData),
@@ -55,6 +64,14 @@ class RadarOverlayMenu extends StatelessWidget {
             subtitle: l10n.radarLightningOverlayHint,
             tooltip: l10n.radarLightningOverlaySubtitle,
             onTap: () => layer.setShowLightning(!showLightning),
+          ),
+          MapMenuToggleRow(
+            selected: showWind,
+            icon: Icons.air,
+            title: l10n.radarWindOverlay,
+            subtitle: l10n.radarWindOverlayHint,
+            tooltip: l10n.radarWindOverlaySubtitle,
+            onTap: () => layer.setShowWind(!showWind),
           ),
         ],
       );

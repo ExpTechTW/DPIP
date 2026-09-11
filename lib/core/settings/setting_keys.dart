@@ -146,6 +146,15 @@ abstract final class SettingKeys {
     'map.radarShowLightning',
   );
 
+  /// Whether the radar echo also draws the station wind arrows of the frame it
+  /// is showing (absent = false, for the same reason as the lightning one).
+  /// Mutually exclusive with [mapRadarShowLightning] — the two sets of marks
+  /// cover each other, so `RadarMapLayer` turns one off when the other goes on
+  /// and both may be saved off, never both on.
+  static const SettingKey<bool> mapRadarShowWind = SettingKey<bool>._(
+    'map.radarShowWind',
+  );
+
   /// Saved Home township codes (ordered list). See `RegionStore`.
   static const SettingKey<List<String>> savedRegionCodes =
       SettingKey<List<String>>._('home.savedRegionCodes');

@@ -3351,4 +3351,15 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo.';
+
+  @override
+  String get radarWindOverlay => 'Ipakita ang hangin';
+
+  @override
+  String get radarWindOverlayHint =>
+      'Hangin ng istasyon sa oras ng frame na nakikita';
+
+  @override
+  String get radarWindOverlaySubtitle =>
+      'Ipinapatong ang direksyon at bilis ng hangin mula sa mga istasyon na naitala sa parehong oras ng radar na tinitingnan mo.';
 }

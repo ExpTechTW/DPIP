@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "資料圖層",
   "radarLightningOverlay": "顯示閃電",
   "radarLightningOverlayHint": "顯示與畫面回波同時間的落雷",
-  "radarLightningOverlaySubtitle": "在目前的雷達回波上疊加同一時間的閃電落雷。"
+  "radarLightningOverlaySubtitle": "在目前的雷達回波上疊加同一時間的閃電落雷。",
+  "radarWindOverlay": "顯示風向",
+  "radarWindOverlayHint": "顯示與畫面回波同時間的測站風向",
+  "radarWindOverlaySubtitle": "在目前的雷達回波上疊加同一時間的測站風向與風速。"
 }
