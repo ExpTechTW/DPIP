@@ -516,16 +516,36 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
   bool _ascending = false;
   RankingMerge _merge = RankingMerge.none;
 
+  /// The last ranking and the inputs it was computed from (see [_ranked]).
+  List<RankedObservation>? _rankedCache;
+  Map<String, WeatherStation>? _rankedStations;
+  WeatherSnapshot? _rankedSnapshot;
+  bool _rankedAscending = false;
+  RankingMerge _rankedMerge = RankingMerge.none;
+
   void _setMerge(RankingMerge next) {
     setState(() {
       _merge = _merge == next ? RankingMerge.none : next;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
+  /// Ranks the snapshot once per (stations, snapshot, order, merge) — the
+  /// page rebuilds this panel on every tab swipe and pull-to-refresh frame,
+  /// and re-sorting several hundred stations for the same answer is what
+  /// made those stutter. Identity, not equality, for the two maps: a refresh
+  /// hands the panel new objects, and anything else hands it the same ones.
+  /// The accessor closures are deliberately not keyed on — the parent
+  /// creates them anew per build, and each panel sits in a fixed
+  /// [TabBarView] slot, so the same State never sees a different metric.
+  List<RankedObservation> _ranked() {
+    final cached = _rankedCache;
+    if (cached != null &&
+        identical(_rankedStations, widget.stations) &&
+        identical(_rankedSnapshot, widget.snapshot) &&
+        _rankedAscending == _ascending &&
+        _rankedMerge == _merge) {
+      return cached;
+    }
     final ranked = rankWeather(
       stations: widget.stations,
       snapshot: widget.snapshot,
@@ -536,6 +556,18 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
       merge: _merge,
       requirePositive: widget.requirePositive,
     );
+    _rankedStations = widget.stations;
+    _rankedSnapshot = widget.snapshot;
+    _rankedAscending = _ascending;
+    _rankedMerge = _merge;
+    return _rankedCache = ranked;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final ranked = _ranked();
     final time = _formatSnapshotTime(widget.snapshot.time);
 
     return RefreshIndicator(
