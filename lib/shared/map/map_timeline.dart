@@ -538,6 +538,17 @@ class _MapTimelineState extends State<MapTimeline> {
     final nowIndex = nowFrameIndex(widget.frames, now: AppTime.utc);
     final era = _eraOf(_liveIndex, nowIndex);
     final labelStep = (48 / widget.itemExtent).ceil();
+    // The three era colours once per build, not once per tick: `_eraColor`
+    // runs the colour-vision transform (a linear-light round trip when a
+    // correction is on), and the ruler lays out dozens of ticks on every frame
+    // the finger crosses. Same pure function of the same inputs, so each tick
+    // gets exactly the colour it computed for itself before.
+    final brightness = theme.brightness;
+    final eraColors = (
+      past: _eraColor(TimelineEra.past, brightness),
+      now: _eraColor(TimelineEra.now, brightness),
+      future: _eraColor(TimelineEra.future, brightness),
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -615,10 +626,11 @@ class _MapTimelineState extends State<MapTimeline> {
                       itemBuilder: (context, i) => _Tick(
                         width: widget.itemExtent,
                         label: i % labelStep == 0 ? _times[i] : null,
-                        labelColor: _eraColor(
-                          _eraOf(i, nowIndex),
-                          theme.brightness,
-                        ),
+                        labelColor: switch (_eraOf(i, nowIndex)) {
+                          TimelineEra.past => eraColors.past,
+                          TimelineEra.now => eraColors.now,
+                          TimelineEra.future => eraColors.future,
+                        },
                         emphasised: i == _liveIndex,
                         colors: colors,
                         textStyle: theme.textTheme.labelSmall,
