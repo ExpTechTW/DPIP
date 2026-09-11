@@ -182,6 +182,40 @@ class _MoonPageState extends State<MoonPage> {
     _visibleMonth = AppTime.taipei(_frames[index].time);
   });
 
+  /// Calendar phase per day, keyed `yyyymmdd`. The calendar's grid is
+  /// `shrinkWrap`, so every one of its ~35 cells is rebuilt on every page
+  /// rebuild — and every timeline scrub tick is a rebuild. Each cell asked
+  /// for a fresh Meeus lunar series (`MoonEphemeris.at`, ~120 trig terms), so
+  /// a scrub frame paid for a month of ephemerides to redraw glyphs whose
+  /// inputs had not changed. A day's noon phase is a pure function of the
+  /// day, so it is computed once. Bounded by the calendar's own reach: it
+  /// can only page within the timeline's ±31 days, a few months at most.
+  final Map<int, double> _dayPhase = {};
+
+  double _phaseOfDay(DateTime day) => _dayPhase.putIfAbsent(
+    day.year * 10000 + day.month * 100 + day.day,
+    () => MoonPhase.angleAt(
+      DateTime.utc(day.year, day.month, day.day, 12).subtract(_taiwanOffset),
+    ),
+  );
+
+  /// The next full / new moon after the selection. Each is a five-pass
+  /// settle over the ephemeris, and both depend only on the selected frame —
+  /// but the page also rebuilds when the calendar pages a month, where the
+  /// selection has not moved. Remembered for the frame they were solved for.
+  int? _upcomingFor;
+  late DateTime _nextFull;
+  late DateTime _nextNew;
+
+  (DateTime full, DateTime newMoon) get _upcoming {
+    if (_upcomingFor != _selectedIndex) {
+      _upcomingFor = _selectedIndex;
+      _nextFull = MoonPhase.nextFullMoon(_selected);
+      _nextNew = MoonPhase.nextNewMoon(_selected);
+    }
+    return (_nextFull, _nextNew);
+  }
+
   /// Jumps to [day] (Taipei wall time) keeping the time of day, so stepping
   /// through the calendar compares like with like.
   void _selectDay(DateTime day) {
@@ -200,6 +234,7 @@ class _MoonPageState extends State<MoonPage> {
     final l10n = AppLocalizations.of(context);
     final phase = MoonPhase.at(_selected);
     final libration = MoonPhase.librationAt(_selected);
+    final (nextFull, nextNew) = _upcoming;
     final town = observerTown(context);
     final local = _selectedLocal;
     final riseSet = town == null
@@ -330,12 +365,12 @@ class _MoonPageState extends State<MoonPage> {
               (
                 Icons.brightness_1_outlined,
                 l10n.moonNextFullMoon,
-                _stamp(MoonPhase.nextFullMoon(_selected)),
+                _stamp(nextFull),
               ),
               (
                 Icons.brightness_3_outlined,
                 l10n.moonNextNewMoon,
-                _stamp(MoonPhase.nextNewMoon(_selected)),
+                _stamp(nextNew),
               ),
             ],
           ),
@@ -355,14 +390,7 @@ class _MoonPageState extends State<MoonPage> {
               lastDay: AppTime.taipei(_frames.last.time),
               onMonthChanged: (month) => setState(() => _visibleMonth = month),
               onDaySelected: _selectDay,
-              phaseAt: (day) => MoonPhase.angleAt(
-                DateTime.utc(
-                  day.year,
-                  day.month,
-                  day.day,
-                  12,
-                ).subtract(_taiwanOffset),
-              ),
+              phaseAt: _phaseOfDay,
             ),
           ),
         ],
