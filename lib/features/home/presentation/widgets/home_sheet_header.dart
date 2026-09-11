@@ -39,7 +39,7 @@ import 'package:provider/provider.dart';
 /// fetch is in flight. Ink tracks the weather sky via [inkOverWeather] — dark
 /// theme [ColorScheme.onSurface] is white and vanishes on a clear daylight
 /// backdrop without that shift.
-class HomeSheetHeader extends StatelessWidget {
+class HomeSheetHeader extends StatefulWidget {
   const HomeSheetHeader({
     super.key,
     this.reveal = 0,
@@ -68,11 +68,34 @@ class HomeSheetHeader extends StatelessWidget {
   static final DateFormat _clockFormat = DateFormat('HH:mm');
 
   @override
+  State<HomeSheetHeader> createState() => _HomeSheetHeaderState();
+}
+
+class _HomeSheetHeaderState extends State<HomeSheetHeader> {
+  /// The UTC minute [_night] was computed for, or -1 before the first build.
+  int _nightMinute = -1;
+  bool _night = false;
+
+  /// Whether the condition glyph takes its night form, cached to the minute.
+  /// The sheet rebuilds this header on every scroll tick, and [isNightAt] is
+  /// a full solar ephemeris — sunrise moves by about a minute a day, so the
+  /// answer cannot change within one, and the day/night flip lands on the
+  /// same minute boundary it would have anyway.
+  bool _isNight(DateTime utc) {
+    final minute = utc.millisecondsSinceEpoch ~/ Duration.millisecondsPerMinute;
+    if (minute == _nightMinute) return _night;
+    _nightMinute = minute;
+    return _night = isNightAt(utc);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final skyIsLight = skyIsLightFrom(sky, weatherMode);
+    final reveal = widget.reveal;
+    final expanded = widget.expanded;
+    final skyIsLight = skyIsLightFrom(widget.sky, widget.weatherMode);
     // Directly on the weather sky — not inside a glass card. Dark theme's
     // onSurface is white; on clear/fog daylight that must go dark with reveal.
     final foreground = inkOverWeather(colors, reveal, skyIsLight: skyIsLight);
@@ -122,7 +145,7 @@ class HomeSheetHeader extends StatelessWidget {
             data.weather,
             data.weatherCode,
             colors,
-            isNight: isNightAt(AppTime.utc),
+            isNight: _isNight(AppTime.utc),
           );
     final conditionIcon = weather?.$1 ?? cloudy;
     // Not `weather?.$2` — that accent is a fixed [ColorScheme] role (amber for
@@ -179,7 +202,7 @@ class HomeSheetHeader extends StatelessWidget {
             Text(
               l10n.weatherDataTime(
                 current.station.name,
-                _clockFormat.format(
+                HomeSheetHeader._clockFormat.format(
                   AppTime.taipei(
                     DateTime.fromMillisecondsSinceEpoch(
                       current.time * 1000,

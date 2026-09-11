@@ -36,11 +36,22 @@ class RegionStore extends ChangeNotifier {
   String? get currentCode => _currentCode;
 
   /// The ordered areas: 全國, 所在地, then each saved township.
-  List<HomeArea> get areas => [
+  ///
+  /// Built once per (current code, saved list) and handed out as the same
+  /// unmodifiable instance until a mutator changes one of those. [selected],
+  /// [selectedIndex], [selectedCode] and [count] all go through here, and a
+  /// header rebuilding per scroll tick reads several of them per build — a
+  /// fresh list of fresh [HomeArea]s each time also meant `select`-style
+  /// listeners could never see an unchanged value, since [HomeArea] compares
+  /// by identity.
+  List<HomeArea> get areas => _areas ??= List.unmodifiable([
     const NationwideArea(),
     CurrentArea(_currentCode),
     for (final code in _saved) SavedArea(code),
-  ];
+  ]);
+
+  /// The memoised [areas]; null after any change to what it is built from.
+  List<HomeArea>? _areas;
 
   /// Number of areas (drop-in for the region bar/pager).
   int get count => areas.length;
@@ -73,6 +84,7 @@ class RegionStore extends ChangeNotifier {
   void setCurrentCode(String? code) {
     if (code == _currentCode) return;
     _currentCode = code;
+    _areas = null;
     notifyListeners();
   }
 
@@ -84,6 +96,7 @@ class RegionStore extends ChangeNotifier {
   bool addSaved(String code) {
     if (!canSave(code)) return false;
     _saved = [..._saved, code];
+    _areas = null;
     _persist();
     notifyListeners();
     return true;
@@ -102,6 +115,8 @@ class RegionStore extends ChangeNotifier {
       for (final c in _saved)
         if (c != code) c,
     ];
+    // Before the clamp below: [count] reads [areas].
+    _areas = null;
     _persist();
     if (removedIndex < _selectedIndex) _selectedIndex -= 1;
     _selectedIndex = _selectedIndex.clamp(0, count - 1);
@@ -119,6 +134,7 @@ class RegionStore extends ChangeNotifier {
     final list = [..._saved];
     list[position] = newCode;
     _saved = list;
+    _areas = null;
     _persist();
     notifyListeners();
     return true;
@@ -141,6 +157,7 @@ class RegionStore extends ChangeNotifier {
     final list = [..._saved];
     list.insert(target, list.removeAt(oldIndex));
     _saved = list;
+    _areas = null;
     _persist();
     // Saved areas start at index 2 (after 全國, 所在地); keep the same one active.
     if (selectedCode != null) {
