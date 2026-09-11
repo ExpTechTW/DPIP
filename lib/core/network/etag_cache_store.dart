@@ -185,6 +185,12 @@ class EtagCacheStore {
   /// Compressed bytes above which a batch inflate is worth an isolate hop.
   static const _isolateThreshold = 64 * 1024;
 
+  /// JSON body length (code units, so ~bytes for the ASCII these are) above
+  /// which the write-side gzip is worth an isolate hop — the same 16 KB line
+  /// [readJson] draws for the inflate. Below it a spawn (plus copying the
+  /// body across) costs more than the deflate it moves.
+  static const _jsonIsolateThreshold = 16 * 1024;
+
   /// Running `SUM(LENGTH(body))`, seeded by the first trim. Replacements are
   /// counted as pure additions between sweeps, so this only ever over-estimates
   /// — which triggers a sweep early rather than letting the store overrun.
@@ -335,9 +341,11 @@ class EtagCacheStore {
       if (kind != kindBinary && kind != kindBinaryGzip) return null;
       if (touch) _scheduleTouch(url);
       final blob = row['body'] as Uint8List;
-      final bytes = kind == kindBinaryGzip
-          ? await _gunzip(blob)
-          : Uint8List.fromList(blob);
+      // The raw blob is served as-is: sqlite_async already hands over a
+      // Uint8List this isolate owns (it crossed from the database isolate),
+      // nothing else holds it, and no caller writes into it — so the copy
+      // that used to sit here doubled every WebP tile for no reader.
+      final bytes = kind == kindBinaryGzip ? await _gunzip(blob) : blob;
       final entry = CachedBytes(
         etag: row['etag'] as String,
         bytes: bytes,
@@ -403,9 +411,10 @@ class EtagCacheStore {
         final kind = row['kind'] as int;
         if (kind != kindBinary && kind != kindBinaryGzip) continue;
         final key = row['key'] as String;
+        // Same as [readBytes]: the raw blob is already this isolate's own.
         final bytes = kind == kindBinaryGzip
             ? inflated[key]
-            : Uint8List.fromList(row['body'] as Uint8List);
+            : row['body'] as Uint8List;
         if (bytes == null) continue;
         final entry = CachedBytes(
           etag: row['etag'] as String,
@@ -457,12 +466,14 @@ class EtagCacheStore {
     int size = 0,
   }) async {
     try {
-      // Light gzip on a worker isolate so large JSON writes don't jank the UI.
-      final blob = await Isolate.run(() {
-        return Uint8List.fromList(
-          GZipCodec(level: 1).encode(utf8.encode(body)),
-        );
-      });
+      // Light gzip on a worker isolate so large JSON writes don't jank the UI
+      // — but only when the body is big enough to be worth the hop. Most JSON
+      // responses are a few KB (an EEW list, a report page); spawning an
+      // isolate for those cost more than deflating them inline, and the bytes
+      // written are identical either way.
+      final blob = body.length > _jsonIsolateThreshold
+          ? await Isolate.run(() => _gzipJson(body))
+          : _gzipJson(body);
       await _insert(
         url,
         etag: etag,
@@ -708,6 +719,9 @@ class EtagCacheStore {
     if (row == null) return null;
     return Map<String, Object?>.of(row);
   }
+
+  static Uint8List _gzipJson(String body) =>
+      Uint8List.fromList(GZipCodec(level: 1).encode(utf8.encode(body)));
 
   /// JSON bodies are stored gzip-1; inflate off the UI isolate when large.
   static Future<String> _decodeJsonBody(Uint8List blob) async {
