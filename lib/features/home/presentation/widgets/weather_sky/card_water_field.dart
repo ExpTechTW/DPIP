@@ -69,7 +69,10 @@ class CardWaterField {
     this.capacity = 200,
     int seed = 7,
   }) : _p = _Drops(capacity),
-       _random = math.Random(seed);
+       _random = math.Random(seed),
+       _transforms = Float32List(capacity * 4),
+       _rects = Float32List(capacity * 4),
+       _colors = Int32List(capacity)..fillRange(0, capacity, 0x40FFFFFF);
 
   /// Drops currently alive.
   int get liveCount => _live;
@@ -714,43 +717,68 @@ class CardWaterField {
     if (_live == 0) return;
     final sprite = negative ? spriteNeg : spritePos;
 
-    final transforms = Float32List(_live * 4);
-    final rects = Float32List(_live * 4);
-    final colors = Int32List(_live);
-
     final w = sprite.width.toDouble();
     final h = sprite.height.toDouble();
     final scale = dropSize / w;
 
+    // Every drop samples the whole sprite, so the rect is one value repeated
+    // — refilled only when the sprite itself is swapped (the procedural
+    // stand-in for the baked pair), not per pass.
+    if (w != _rectW || h != _rectH) {
+      _rectW = w;
+      _rectH = h;
+      for (var i = 0; i < capacity; i++) {
+        final o = i * 4;
+        _rects[o] = 0;
+        _rects[o + 1] = 0;
+        _rects[o + 2] = w;
+        _rects[o + 3] = h;
+      }
+    }
+
+    final transforms = _transforms;
     for (var i = 0; i < _live; i++) {
       final o = i * 4;
       transforms[o] = scale;
       transforms[o + 1] = 0;
       transforms[o + 2] = _p.x[i] - w * scale / 2;
       transforms[o + 3] = _p.y[i] - h * scale / 2;
-
-      rects[o] = 0;
-      rects[o + 1] = 0;
-      rects[o + 2] = w;
-      rects[o + 3] = h;
-
-      // 0x40FFFFFF premultiplies to ×0.251 on *every* channel — exactly the
-      // accumulation scale. (An rgb of 0x40 here would premultiply twice.)
-      colors[i] = 0x40FFFFFF;
     }
 
+    // `drawRawAtlas` copies the arrays into the display list as it records,
+    // so the live prefix of one fixed buffer is handed over as a view — no
+    // per-pass allocation, and the next pass may overwrite it freely.
     canvas.drawRawAtlas(
       sprite,
-      transforms,
-      rects,
-      colors,
+      Float32List.sublistView(transforms, 0, _live * 4),
+      Float32List.sublistView(_rects, 0, _live * 4),
+      Int32List.sublistView(_colors, 0, _live),
       BlendMode.modulate,
       null,
-      Paint()
-        ..filterQuality = FilterQuality.medium
-        ..blendMode = BlendMode.plus,
+      _coveragePaint,
     );
   }
+
+  /// [paintCoverage]'s atlas payload, sized to [capacity] once and reused —
+  /// two accumulation passes per frame per card used to allocate all three
+  /// fresh each time.
+  final Float32List _transforms;
+  final Float32List _rects;
+
+  /// 0x40FFFFFF premultiplies to ×0.251 on *every* channel — exactly the
+  /// accumulation scale. (An rgb of 0x40 here would premultiply twice.) The
+  /// same value for every drop, so it is written once at construction.
+  final Int32List _colors;
+
+  /// Sprite size the [_rects] buffer was last filled for.
+  double _rectW = -1;
+  double _rectH = -1;
+
+  /// The additive accumulation paint. Immutable in practice — nothing else
+  /// touches it — so one instance serves every pass.
+  static final Paint _coveragePaint = Paint()
+    ..filterQuality = FilterQuality.medium
+    ..blendMode = BlendMode.plus;
 
   /// Empties the field.
   void clear() {

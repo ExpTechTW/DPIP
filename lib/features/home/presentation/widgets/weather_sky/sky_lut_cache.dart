@@ -73,9 +73,23 @@ class SkyLutCache {
   /// out of*, experimental overrides included.
   static final ValueNotifier<Color?> panelAmbient = ValueNotifier(null);
 
+  /// Whether [panelAmbient] is light enough for dark ink — the same
+  /// [ThemeData.estimateBrightnessForColor] judgment `skyIsLightFrom` makes,
+  /// evaluated once per bake here rather than once per widget per frame (it
+  /// is three `pow` calls, and five widgets ask on every sheet-drag rebuild).
+  /// `null` until the first readback, exactly when [panelAmbient] is.
+  static final ValueNotifier<bool?> panelAmbientIsLight = ValueNotifier(null);
+
   /// Where the panel water samples the LUT: `vUv` ≈ (0.5, 0.7) — the card
   /// sits in the lower third of the screen.
   static const Offset _ambientSample = Offset(0.5, 0.7);
+
+  /// Bumped every time [_skyViewBytes] is replaced — i.e. every time a
+  /// readback lands. [skyAt] answers differently before and after that
+  /// moment for the *same* keyframe (null → real colours), so anything
+  /// caching a [skyAt]-derived value keys on this alongside the keyframe.
+  int _readbackGeneration = 0;
+  int get readbackGeneration => _readbackGeneration;
 
   /// Re-bakes if [sky] differs from what is cached. Returns whether it did.
   bool update(ResolvedSky sky) {
@@ -104,16 +118,23 @@ class SkyLutCache {
         .then((data) {
           if (data == null) return;
           _skyViewBytes = data.buffer.asUint8List();
+          _readbackGeneration++;
           final bytes = _skyViewBytes!;
           final x = (_ambientSample.dx * (skyViewSize.width - 1)).round();
           final y = (_ambientSample.dy * (skyViewSize.height - 1)).round();
           final o = (y * skyViewSize.width.toInt() + x) * 4;
-          panelAmbient.value = Color.fromARGB(
+          final ambient = Color.fromARGB(
             255,
             bytes[o],
             bytes[o + 1],
             bytes[o + 2],
           );
+          // The brightness verdict is published *before* the colour so a
+          // listener on [panelAmbient] that reads [panelAmbientIsLight] in
+          // the same callback never sees the two disagree.
+          panelAmbientIsLight.value =
+              ThemeData.estimateBrightnessForColor(ambient) == Brightness.light;
+          panelAmbient.value = ambient;
           _bakeSkyColumn(sky);
           _bakeSkyGradient(sky);
         })
@@ -348,6 +369,8 @@ class SkyLutCache {
     _skyGradient = null;
     _skyColumn = null;
     _skyViewBytes = null;
+    // The bytes are gone, so a value derived from them is stale too.
+    _readbackGeneration++;
     _baked = null;
   }
 }

@@ -180,16 +180,14 @@ class PrecipitationField {
       _p.transforms[o + 3] =
           _p.y[i] - (_p.transforms[o + 1] * ax + _p.transforms[o] * ay);
 
-      // Depth picks the width variant. `particle_rain.comp` makes the quad's
-      // width `startSize * 0.4 * (3 - 2*depth)` against a length of
-      // `startSize * 3.0`, so a *distant* drop is relatively the widest — and
-      // the atlas is baked widest-first, so the index is depth itself.
-      final v = variants == 1
-          ? 0
-          : ((depth * (variants - 1)).round()).clamp(0, variants - 1);
-      _p.rects[o] = v * cell.width;
+      // The atlas cell this drop samples, chosen at spawn (see [_spawn]). The
+      // four floats still have to be written here rather than once per
+      // particle: the alpha cull above (`continue`) compacts the draw list,
+      // so output slot `n` is not particle `i`, and a rect written at spawn
+      // to slot `i` would be read back for the wrong drop.
+      _p.rects[o] = _p.atlasLeft[i];
       _p.rects[o + 1] = 0;
-      _p.rects[o + 2] = (v + 1) * cell.width;
+      _p.rects[o + 2] = _p.atlasRight[i];
       _p.rects[o + 3] = cell.height;
 
       // Pack the drop's colour in place of `tint.withValues(alpha: a)`: the
@@ -216,6 +214,18 @@ class PrecipitationField {
 
     _p.depth[i] = depth;
     _p.size[i] = sizeMin + (sizeMax - sizeMin) * depth;
+    // Depth picks the width variant. `particle_rain.comp` makes the quad's
+    // width `startSize * 0.4 * (3 - 2*depth)` against a length of
+    // `startSize * 3.0`, so a *distant* drop is relatively the widest — and
+    // the atlas is baked widest-first, so the index is depth itself. Depth is
+    // fixed for the drop's life, so the cell edges are resolved here, once,
+    // instead of a `round().clamp()` (which boxes through `num`) per drop per
+    // frame.
+    final v = variants == 1
+        ? 0
+        : ((depth * (variants - 1)).round()).clamp(0, variants - 1);
+    _p.atlasLeft[i] = v * cell.width;
+    _p.atlasRight[i] = (v + 1) * cell.width;
     // The reference sets `setLife(3.0f, 3.0f)` — a constant, not a range.
     _p.life[i] = life;
     _p.age[i] = 0;
@@ -248,6 +258,10 @@ class _Particle {
   final Float64List spin;
   final Float64List phase;
 
+  /// The atlas cell's left and right edge, in texels — fixed at spawn.
+  final Float64List atlasLeft;
+  final Float64List atlasRight;
+
   final Float32List transforms;
   final Float32List rects;
   final Int32List colors;
@@ -261,6 +275,8 @@ class _Particle {
       age = Float64List(n),
       spin = Float64List(n),
       phase = Float64List(n),
+      atlasLeft = Float64List(n),
+      atlasRight = Float64List(n),
       transforms = Float32List(n * 4),
       rects = Float32List(n * 4),
       colors = Int32List(n);
