@@ -363,6 +363,13 @@ class NotificationService {
       }
     }
 
+    // The plugin is up in *this* isolate now, by whichever branch. Record it so
+    // a foreground push — which runs [onFcmSilentData] here, on the main
+    // isolate — does not rewrite the whole channel catalogue through the
+    // platform main thread while the user is looking at the screen (see
+    // [ensureAwesomeInitialized]).
+    _awesomeReady ??= Future<void>.value();
+
     // Android freezes a created channel's behaviour — sound included — so a
     // changed definition cannot simply be pushed. awesome's own update path
     // makes it worse: a forced update deletes the channel under its plain key
@@ -728,6 +735,59 @@ int? _asNotificationId(Object? value) {
   return parsed;
 }
 
+/// The one `initialize` handshake this isolate performs, if it has done one.
+///
+/// `initialize` is not the cheap idempotent handshake its name suggests. The
+/// native side takes it on the **platform main thread**
+/// (`channelMethodInitialize` → `AwesomeNotifications.initialize`) and writes
+/// every one of [NotificationChannels.channels] through the plugin's own
+/// SQLite (`me.carda.awesome_notifications.core.databases.SQLitePrimitivesDB`).
+///
+/// [onFcmSilentData] used to call it per message. The channels are process-wide
+/// native state that [NotificationService.init] has already registered, so
+/// every push after the first rewrote the whole catalogue for nothing — on the
+/// main thread, during exactly the burst of pushes an earthquake produces.
+/// Play's ANR reports name that database and say "I/O on main thread".
+///
+/// What a background isolate genuinely needs is its own one-time handshake,
+/// because plugin state does not cross an isolate. So: once per isolate, which
+/// is what the plugin asks for. A failure is not remembered, so the next
+/// message retries rather than drawing nothing for the rest of the isolate's
+/// life.
+Future<void>? _awesomeReady;
+
+/// Performs that handshake, at most once per isolate and once concurrently.
+///
+/// Single-flight rather than a bare flag: two pushes can arrive together, and
+/// both would otherwise start their own full registration.
+///
+/// [initializer] is the seam a test counts — the plugin resolves to a no-op
+/// implementation off-device, so the platform channel cannot show whether the
+/// handshake was skipped. Production callers pass nothing.
+@visibleForTesting
+Future<void> ensureAwesomeInitialized({Future<void> Function()? initializer}) {
+  final pending = _awesomeReady;
+  if (pending != null) return pending;
+  final future = (initializer ?? _initializeAwesome)();
+  _awesomeReady = future;
+  return future.catchError((Object error, StackTrace stackTrace) {
+    if (identical(_awesomeReady, future)) _awesomeReady = null;
+    Error.throwWithStackTrace(error, stackTrace);
+  });
+}
+
+Future<void> _initializeAwesome() => AwesomeNotifications()
+    .initialize(
+      NotificationChannels.icon,
+      NotificationChannels.channels,
+      channelGroups: NotificationChannels.groups,
+    )
+    .then((_) {});
+
+/// Forgets this isolate's handshake — for a test that needs a cold start.
+@visibleForTesting
+void resetAwesomeInitializedForTest() => _awesomeReady = null;
+
 /// Fires when awesome accepts a notification, before it is shown.
 @pragma('vm:entry-point')
 Future<void> onNotificationCreated(ReceivedNotification notification) async {
@@ -762,11 +822,7 @@ Future<void> onFcmSilentData(FcmSilentData silentData) async {
   final data = silentData.data;
   if (data == null || data.isEmpty) return;
 
-  await AwesomeNotifications().initialize(
-    NotificationChannels.icon,
-    NotificationChannels.channels,
-    channelGroups: NotificationChannels.groups,
-  );
+  await ensureAwesomeInitialized();
 
   if (silentData.createdLifeCycle == NotificationLifeCycle.Terminated) {
     await AwesomeNotifications().createNotificationFromJsonData(
