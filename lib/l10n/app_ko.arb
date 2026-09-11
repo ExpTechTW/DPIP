@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "데이터 레이어",
   "radarLightningOverlay": "번개 표시",
   "radarLightningOverlayHint": "화면에 표시된 시각의 낙뢰",
-  "radarLightningOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다."
+  "radarLightningOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다.",
+  "radarWindOverlay": "바람 표시",
+  "radarWindOverlayHint": "화면에 표시된 시각의 관측 바람",
+  "radarWindOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 관측소 풍향·풍속을 겹쳐서 표시합니다."
 }

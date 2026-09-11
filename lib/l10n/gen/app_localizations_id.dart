@@ -3345,4 +3345,15 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat.';
+
+  @override
+  String get radarWindOverlay => 'Tampilkan angin';
+
+  @override
+  String get radarWindOverlayHint =>
+      'Angin stasiun pada waktu bingkai yang tampil';
+
+  @override
+  String get radarWindOverlaySubtitle =>
+      'Menampilkan arah dan kecepatan angin dari stasiun pengamatan pada waktu yang sama dengan citra radar yang sedang dilihat.';
 }

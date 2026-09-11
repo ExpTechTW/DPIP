@@ -3334,4 +3334,14 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị.';
+
+  @override
+  String get radarWindOverlay => 'Hiện gió';
+
+  @override
+  String get radarWindOverlayHint => 'Gió trạm cùng thời điểm với ảnh đang xem';
+
+  @override
+  String get radarWindOverlaySubtitle =>
+      'Chồng hướng và tốc độ gió từ các trạm quan trắc cùng thời điểm với ảnh radar đang hiển thị.';
 }

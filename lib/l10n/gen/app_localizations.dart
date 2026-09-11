@@ -6328,6 +6328,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.'**
   String get radarLightningOverlaySubtitle;
+
+  /// Wind overlay toggle in the map's radar overlay menu. Mutually exclusive with the lightning one.
+  ///
+  /// In en, this message translates to:
+  /// **'Show wind'**
+  String get radarWindOverlay;
+
+  /// Hint under the wind toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Station wind from the frame on screen'**
+  String get radarWindOverlayHint;
+
+  /// Tooltip for the wind toggle in the radar overlay menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Overlays the station wind direction and speed recorded at the same time as the radar frame you are looking at.'**
+  String get radarWindOverlaySubtitle;
 }
 
 class _AppLocalizationsDelegate

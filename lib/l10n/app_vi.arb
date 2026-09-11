@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "Lớp dữ liệu",
   "radarLightningOverlay": "Hiện sét",
   "radarLightningOverlayHint": "Sét cùng thời điểm với ảnh đang xem",
-  "radarLightningOverlaySubtitle": "Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị."
+  "radarLightningOverlaySubtitle": "Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị.",
+  "radarWindOverlay": "Hiện gió",
+  "radarWindOverlayHint": "Gió trạm cùng thời điểm với ảnh đang xem",
+  "radarWindOverlaySubtitle": "Chồng hướng và tốc độ gió từ các trạm quan trắc cùng thời điểm với ảnh radar đang hiển thị."
 }

@@ -9,7 +9,10 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
+import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
+import 'package:dpip/features/weather/domain/weather_snapshot.dart';
+import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show
         countyFillLayerId,
@@ -28,18 +31,21 @@ MapReferenceOutlineController testReferenceOutline() =>
     MapReferenceOutlineController(SettingsStore.inMemory({}));
 
 /// A [RadarMapLayer] wired for a test: a fresh reference-outline controller, a
-/// fresh settings store, and a lightning repository that answers "no snapshots"
-/// so the strike overlay (off by default) stays out of every assertion about
-/// the echo. A test that is *about* the lightning overlay passes its own.
+/// fresh settings store, and lightning / weather repositories that answer "no
+/// snapshots" so the data overlays (both off by default) stay out of every
+/// assertion about the echo. A test that is *about* one of the overlays passes
+/// its own.
 RadarMapLayer testRadarLayer(
   RadarRepository source, {
   MapReferenceOutlineController? referenceOutline,
   MeteorLightningRepository? lightning,
+  MeteorWeatherRepository? weather,
   SettingsStore? settings,
 }) => RadarMapLayer(
   source,
   referenceOutline ?? testReferenceOutline(),
   lightning: lightning ?? EmptyLightningRepository(),
+  weather: weather ?? EmptyWeatherRepository(),
   settings: settings ?? SettingsStore.inMemory({}),
 );
 
@@ -55,6 +61,29 @@ class EmptyLightningRepository implements MeteorLightningRepository {
   @override
   Future<Result<LightningSnapshot>> at(int second) async =>
       Ok(LightningSnapshot(time: second, strikes: const []));
+}
+
+/// A weather repository with nothing in it — the default for radar tests.
+///
+/// Only the four calls the wind overlay makes are answered; the rest belong to
+/// the 風向 layer's sheet, which no radar test goes near.
+class EmptyWeatherRepository implements MeteorWeatherRepository {
+  @override
+  Future<Result<List<int>>> history() async => const Ok([]);
+
+  @override
+  Future<Result<Map<String, WeatherStation>>> stations() async => const Ok({});
+
+  @override
+  Future<Result<WeatherSnapshot>> latest() async =>
+      const Ok(WeatherSnapshot(time: 0, stations: <WeatherObservation>[]));
+
+  @override
+  Future<Result<WeatherSnapshot>> at(int second) async =>
+      Ok(WeatherSnapshot(time: second, stations: const []));
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// A [RasterFrameSource] that records the tile-memory calls a layer makes.

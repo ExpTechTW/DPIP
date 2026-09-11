@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "Mga layer ng datos",
   "radarLightningOverlay": "Ipakita ang kidlat",
   "radarLightningOverlayHint": "Kidlat sa oras ng frame na nakikita",
-  "radarLightningOverlaySubtitle": "Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo."
+  "radarLightningOverlaySubtitle": "Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo.",
+  "radarWindOverlay": "Ipakita ang hangin",
+  "radarWindOverlayHint": "Hangin ng istasyon sa oras ng frame na nakikita",
+  "radarWindOverlaySubtitle": "Ipinapatong ang direksyon at bilis ng hangin mula sa mga istasyon na naitala sa parehong oras ng radar na tinitingnan mo."
 }
