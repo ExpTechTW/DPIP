@@ -1,6 +1,7 @@
 import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
 import 'package:dpip/features/weather/domain/qpesums_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -60,7 +61,7 @@ void main() {
       await layer.show(controller, frames[5], scrubbing: true);
 
       expect(controller.calls, [
-        'set:qpesums-lyr-${frames[4].id}:0.0',
+        'set:qpesums-lyr-${frames[4].id}:${RasterTimelineLayer.preloadOpacity}',
         'set:qpesums-lyr-${frames[5].id}:0.85',
       ]);
       expect(
