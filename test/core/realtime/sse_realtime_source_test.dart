@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 
@@ -38,14 +39,35 @@ class _TestSseSource extends SseRealtimeSource<String> {
 
 /// Drives a [SseRealtimeSource] with a controllable connection factory, a
 /// manually-completed reconnect delay, and a fake monotonic clock.
+/// A source that overrides the byte hook, so a test can tell which path a
+/// compressed frame took: the default routes bytes through [decode].
+class _BytesSseSource extends _TestSseSource {
+  _BytesSseSource({
+    required super.connect,
+    super.liveness,
+    super.elapsed,
+    super.delay,
+  });
+
+  @override
+  String decodeBytes(Uint8List utf8Json) => 'bytes:${utf8.decode(utf8Json)}';
+}
+
 class _Harness {
-  _Harness({SseLiveness? liveness}) {
-    source = _TestSseSource(
-      connect: _connect,
-      liveness: liveness,
-      elapsed: elapsed,
-      delay: _delay,
-    );
+  _Harness({SseLiveness? liveness, bool bytesSource = false}) {
+    source = bytesSource
+        ? _BytesSseSource(
+            connect: _connect,
+            liveness: liveness,
+            elapsed: elapsed,
+            delay: _delay,
+          )
+        : _TestSseSource(
+            connect: _connect,
+            liveness: liveness,
+            elapsed: elapsed,
+            delay: _delay,
+          );
   }
 
   final connects = <StreamController<SseEvent>>[];
@@ -101,6 +123,28 @@ void main() {
       expect((await h.source.fetch()).valueOrNull, 'a');
       expect(h.connects, hasLength(1), reason: 'no reconnect churn while open');
     });
+
+    test('a compressed frame reaches decodeBytes, never decode', () async {
+      final h = _Harness(bytesSource: true);
+      await h.source.fetch();
+      final packed = base64.encode(gzip.encode(utf8.encode('shaken')));
+      h.current.add(SseEvent(name: 'g', data: packed));
+      await Future<void>.delayed(Duration.zero);
+      final result = await h.source.fetch();
+      expect(result.valueOrNull, 'bytes:shaken');
+    });
+
+    test(
+      'an empty compressed frame is metadata, not an empty snapshot',
+      () async {
+        final h = _Harness(bytesSource: true);
+        await h.source.fetch();
+        final packed = base64.encode(gzip.encode(utf8.encode('')));
+        h.current.add(SseEvent(name: 'g', data: packed));
+        await Future<void>.delayed(Duration.zero);
+        expect((await h.source.fetch()).isOk, isFalse);
+      },
+    );
 
     test('decompresses a compressed payload (event: g, base64 gzip)', () async {
       final h = _Harness();

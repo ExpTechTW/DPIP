@@ -45,6 +45,15 @@ void main() {
       },
     );
 
+    test('empty data lines still contribute their newline', () async {
+      // The join used to be "append a newline after every line, strip one at
+      // the end"; it is now "a newline between lines". Both give these.
+      final events = await HttpSseClient.parse(
+        _bytes(['data:\ndata:\n\n', 'data: a\ndata:\n\n', 'data:\n\n']),
+      ).toList();
+      expect(events.map((e) => e.data), ['\n', 'a\n', '']);
+    });
+
     test('skips comment / heartbeat lines', () async {
       final events = await HttpSseClient.parse(
         _bytes([': keep-alive\ndata: x\n\n']),

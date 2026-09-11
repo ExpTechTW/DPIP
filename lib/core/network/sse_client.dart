@@ -71,6 +71,7 @@ class HttpSseClient implements SseClient {
   static Stream<SseEvent> parse(Stream<List<int>> bytes) async* {
     String? name;
     final data = StringBuffer();
+    var dataLines = 0;
     Duration? retry;
     var dirty = false;
 
@@ -78,14 +79,11 @@ class HttpSseClient implements SseClient {
     await for (final line in lines) {
       if (line.isEmpty) {
         if (dirty) {
-          yield SseEvent(
-            name: name,
-            data: _stripTrailingNewline(data.toString()),
-            retry: retry,
-          );
+          yield SseEvent(name: name, data: data.toString(), retry: retry);
         }
         name = null;
         data.clear();
+        dataLines = 0;
         retry = null;
         dirty = false;
         continue;
@@ -100,9 +98,15 @@ class HttpSseClient implements SseClient {
         case 'event':
           name = value;
         case 'data':
-          data
-            ..write(value)
-            ..write('\n');
+          // The separator goes *between* lines, never after the last one, so
+          // the buffer already holds the spec's joined form and [toString]
+          // is the frame: the trailing-newline strip that used to follow it
+          // copied every payload once more — at 1 Hz on RTS, a 20 KB string
+          // per second for nothing. Same output: `a`,`b` → `a\nb`; an empty
+          // `data:` line still contributes its empty string.
+          if (dataLines > 0) data.write('\n');
+          data.write(value);
+          dataLines++;
         case 'retry':
           final ms = int.tryParse(value);
           if (ms != null) retry = Duration(milliseconds: ms);
@@ -111,7 +115,4 @@ class HttpSseClient implements SseClient {
       }
     }
   }
-
-  static String _stripTrailingNewline(String s) =>
-      s.endsWith('\n') ? s.substring(0, s.length - 1) : s;
 }
