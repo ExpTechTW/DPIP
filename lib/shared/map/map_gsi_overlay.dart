@@ -819,7 +819,6 @@ class MapGsiOverlayControls extends StatelessWidget {
             title: l10n.mapOsmOverlay,
             subtitle: l10n.mapOsmOverlayHint,
             tooltip: l10n.mapOsmOverlayHint,
-            closeOnActivate: false,
             onTap: () => controller.setEnabled(!controller.enabled),
           ),
           if (controller.enabled)
