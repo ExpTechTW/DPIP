@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
@@ -106,6 +107,18 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   /// JSON the one-shot GET returns, so this mirrors the repository's mapping.
   T decode(String data);
 
+  /// Decodes an inflated `compress=1` payload — the same JSON as [decode]'s
+  /// argument, still as UTF-8 bytes.
+  ///
+  /// Default: materialise the string and hand it to [decode], which is what
+  /// every source did before this hook existed. A source whose payload is
+  /// large and continuous (RTS, ~1000 stations at 1 Hz) overrides it to parse
+  /// the bytes directly with `Utf8Decoder.fuse(JsonDecoder)`: `dart:convert`
+  /// then walks the UTF-8 once, instead of decoding it into a 60 KB `String`
+  /// only to tokenise that string a second time. Same object graph out, one
+  /// full copy of every frame fewer — on the UI isolate, every second.
+  T decodeBytes(Uint8List utf8Json) => decode(utf8.decode(utf8Json));
+
   @override
   Future<Result<T>> fetch() async {
     if (_disposed) {
@@ -192,11 +205,18 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     // decompressed here at the application layer.
     if (event.name == _compressedEvent || event.isDefault) {
       try {
-        final json = event.name == _compressedEvent
-            ? utf8.decode(gzip.decode(base64.decode(event.data.trim())))
-            : event.data;
-        if (json.isEmpty) return; // metadata-only frame, not a payload
-        _latest = decode(json);
+        // Metadata-only frames carry no payload: skipped before decoding on
+        // either path, exactly as the empty-string check did.
+        if (event.name == _compressedEvent) {
+          final bytes = gzip.decode(base64.decode(event.data.trim()));
+          if (bytes.isEmpty) return;
+          _latest = decodeBytes(
+            bytes is Uint8List ? bytes : Uint8List.fromList(bytes),
+          );
+        } else {
+          if (event.data.isEmpty) return;
+          _latest = decode(event.data);
+        }
         _hasSnapshot = true;
         _lastEventMark = _elapsed.elapsed;
       } catch (error, stackTrace) {
