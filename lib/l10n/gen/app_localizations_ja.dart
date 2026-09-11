@@ -3271,4 +3271,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get radarLightningOverlaySubtitle => '表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。';
+
+  @override
+  String get radarWindOverlay => '風向を表示';
+
+  @override
+  String get radarWindOverlayHint => '表示中のエコーと同時刻の観測風向';
+
+  @override
+  String get radarWindOverlaySubtitle => '表示中のレーダーエコーと同じ時刻の観測所の風向・風速を重ねて表示します。';
 }

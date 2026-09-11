@@ -81,6 +81,9 @@ class _MapPageState extends State<MapPage> {
       // The echo's optional lightning overlay reads the same strike repository
       // the standalone 閃電 layer does — one cache, one source of marks.
       lightning: context.read<MeteorLightningRepository>(),
+      // …and its wind overlay reads the same observation repository the
+      // standalone 風向 layer does, for the same reason.
+      weather: context.read<MeteorWeatherRepository>(),
       settings: context.read<SettingsStore>(),
     ),
     // The wind-forecast block sits right after radar: the picker groups by

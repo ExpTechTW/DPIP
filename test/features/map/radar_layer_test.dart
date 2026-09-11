@@ -1,8 +1,13 @@
 import 'dart:async';
 
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
+import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/weather_snapshot.dart';
+import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/shared/map/admin_outline.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show outlineLayerId, townLabelLayerId;
@@ -1500,6 +1505,228 @@ void main() {
       expect(controller.calls, contains('removeSource:radar-lightning-src'));
     });
   });
+
+  group('wind overlay', () {
+    // The observation feed is hourly against the echo's ten minutes, so a frame
+    // almost never lands on a snapshot: one reading covers the six frames after
+    // it. `- 60` is the one in effect at frame 4, `+ 540` the one that has not
+    // been taken yet when it was captured.
+    const radarFrame = 1700000000 + 4 * 600;
+    List<int> windNear() => const [
+      radarFrame - 3660,
+      radarFrame - 60,
+      radarFrame + 540,
+    ];
+
+    Future<(RadarMapLayer, RecordingMapController, _FakeWeather)> shown({
+      required List<int> history,
+      bool enabled = true,
+    }) async {
+      final weather = _FakeWeather(history);
+      final layer = testRadarLayer(
+        _FakeRadarRepository(_ids(9)),
+        weather: weather,
+      );
+      if (enabled) layer.setShowWind(true);
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      // The arrow work is off the echo's critical path, same as the strikes'.
+      await pumpEventQueue();
+      return (layer, controller, weather);
+    }
+
+    test('stays off the map until it is switched on', () async {
+      final (_, controller, weather) = await shown(
+        history: windNear(),
+        enabled: false,
+      );
+      expect(controller.calls, isNot(contains('addSource:radar-wind-src')));
+      expect(
+        weather.historyCalls,
+        0,
+        reason:
+            'an overlay nobody asked for must not cost a request — the '
+            'observation history is only fetched once the toggle is on',
+      );
+    });
+
+    test('draws the observation in effect at the frame on screen', () async {
+      final (_, controller, weather) = await shown(history: windNear());
+
+      expect(controller.calls, contains('addSource:radar-wind-src'));
+      expect(controller.calls, contains('addSymbolLayer:radar-wind-lyr'));
+      expect(
+        weather.fetched,
+        contains(radarFrame - 60),
+        reason: 'the reading in effect at the shown frame, not the newest',
+      );
+      final features =
+          controller.sourceData['radar-wind-src']!['features'] as List;
+      expect(
+        features,
+        hasLength(1),
+        reason:
+            'the second station reported a speed but no direction, and an '
+            'arrow drawn for it would be an invented bearing',
+      );
+    });
+
+    test('the arrow points where the wind blows toward', () async {
+      final (_, controller, _) = await shown(history: windNear());
+
+      final features =
+          controller.sourceData['radar-wind-src']!['features'] as List;
+      final properties =
+          (features.single as Map)['properties'] as Map<String, dynamic>;
+      expect(
+        properties['blow_to'],
+        (_FakeWeather.windFrom + 180) % 360,
+        reason:
+            'the reading is the direction the wind comes *from*; the glyph '
+            'points the other way',
+      );
+      expect(properties['value'], _FakeWeather.windSpeed);
+    });
+
+    test('one hourly reading covers every frame until the next', () async {
+      // Fifty minutes old at the frame on screen. Matched the way the strikes
+      // are — nearest within ten minutes — this frame would have had nothing
+      // to draw, and so would four of the five before it: an hourly feed only
+      // ever lands on one radar step in six. It is still the wind that was
+      // blowing under this echo, which is what the arrows claim to show.
+      final (_, controller, weather) = await shown(
+        history: const [radarFrame - 3000],
+      );
+
+      expect(weather.fetched, contains(radarFrame - 3000));
+      final features =
+          controller.sourceData['radar-wind-src']!['features'] as List;
+      expect(features, hasLength(1));
+    });
+
+    test('a reading taken after the frame is never drawn on it', () async {
+      // Nine minutes after this echo — nearer to it than the hourly reading
+      // before it would be, and still the wrong wind: it is what came next,
+      // not what was blowing. Scrubbing back must not show the future.
+      final (_, controller, _) = await shown(history: const [radarFrame + 540]);
+
+      expect(controller.calls, contains('addSource:radar-wind-src'));
+      final features =
+          controller.sourceData['radar-wind-src']!['features'] as List;
+      expect(features, isEmpty);
+    });
+
+    test('draws nothing when the last reading is more than an hour old', () async {
+      // A gap in the feed. Two-hour-old wind painted over a live echo is not a
+      // slightly stale picture, so the overlay stays mounted and empty.
+      final (_, controller, _) = await shown(
+        history: const [radarFrame - 7200, radarFrame + 3600],
+      );
+
+      expect(controller.calls, contains('addSource:radar-wind-src'));
+      final features =
+          controller.sourceData['radar-wind-src']!['features'] as List;
+      expect(features, isEmpty);
+    });
+
+    test('switching it back off takes the arrows off the map', () async {
+      final (layer, controller, _) = await shown(history: windNear());
+      controller.calls.clear();
+
+      layer.setShowWind(false);
+      await pumpEventQueue();
+
+      expect(controller.calls, contains('removeLayer:radar-wind-lyr'));
+      expect(controller.calls, contains('removeSource:radar-wind-src'));
+    });
+  });
+
+  group('the two data overlays exclude each other', () {
+    const radarFrame = 1700000000 + 4 * 600;
+    const near = [radarFrame - 60];
+
+    /// A radar layer on a map with both overlays available, showing frame 4.
+    Future<(RadarMapLayer, RecordingMapController)> mounted([
+      SettingsStore? settings,
+    ]) async {
+      final layer = testRadarLayer(
+        _FakeRadarRepository(_ids(9)),
+        lightning: _FakeLightning(near),
+        weather: _FakeWeather(near),
+        settings: settings,
+      );
+      final frames = (await layer.frames()).valueOrNull!;
+      final controller = RecordingMapController();
+      await layer.prepare(controller, frames);
+      await layer.show(controller, frames[4]);
+      await pumpEventQueue();
+      return (layer, controller);
+    }
+
+    test('switching the wind on takes the strikes off', () async {
+      final (layer, controller) = await mounted();
+      layer.setShowLightning(true);
+      await pumpEventQueue();
+      controller.calls.clear();
+
+      layer.setShowWind(true);
+      await pumpEventQueue();
+
+      expect(layer.showLightning.value, isFalse);
+      expect(controller.calls, contains('removeLayer:radar-lightning-lyr'));
+      expect(controller.calls, contains('addSymbolLayer:radar-wind-lyr'));
+    });
+
+    test('switching the strikes on takes the wind off', () async {
+      final (layer, controller) = await mounted();
+      layer.setShowWind(true);
+      await pumpEventQueue();
+      controller.calls.clear();
+
+      layer.setShowLightning(true);
+      await pumpEventQueue();
+
+      expect(layer.showWind.value, isFalse);
+      expect(controller.calls, contains('removeLayer:radar-wind-lyr'));
+      expect(controller.calls, contains('addSymbolLayer:radar-lightning-lyr'));
+    });
+
+    test('a store holding both on restores only the strikes', () async {
+      // An older build wrote the lightning flag alone, and nothing stops a
+      // hand-edited store from carrying both — the UI can only describe one,
+      // so the older option wins rather than mounting two mark sets.
+      final (layer, controller) = await mounted(
+        SettingsStore.inMemory({
+          'map.radarShowLightning': true,
+          'map.radarShowWind': true,
+        }),
+      );
+
+      expect(layer.showLightning.value, isTrue);
+      expect(layer.showWind.value, isFalse);
+      expect(controller.calls, contains('addSymbolLayer:radar-lightning-lyr'));
+      expect(controller.calls, isNot(contains('addSource:radar-wind-src')));
+    });
+
+    test('each toggle is remembered on its own key', () async {
+      final settings = SettingsStore.inMemory({});
+      final (layer, _) = await mounted(settings);
+
+      layer.setShowWind(true);
+      await pumpEventQueue();
+
+      expect(settings.getBool(SettingKeys.mapRadarShowWind), isTrue);
+      expect(
+        settings.getBool(SettingKeys.mapRadarShowLightning),
+        isNot(isTrue),
+        reason:
+            'turning one on must also persist the other going off, or the '
+            'next launch restores the pair the UI cannot describe',
+      );
+    });
+  });
 }
 
 /// A strike repository with a fixed history and one cloud-to-ground strike in
@@ -1539,6 +1766,75 @@ class _FakeLightning implements MeteorLightningRepository {
       ),
     );
   }
+}
+
+/// An observation repository with a fixed history and two stations in every
+/// snapshot: one reporting both speed and direction (the arrow), one reporting
+/// a speed with the direction missing (no arrow — there is no bearing to draw).
+class _FakeWeather implements MeteorWeatherRepository {
+  _FakeWeather(this._history);
+
+  /// The reading the drawn arrow carries, so a test can assert the rotation
+  /// without restating the numbers.
+  static const int windFrom = 90;
+  static const double windSpeed = 7.4;
+
+  final List<int> _history;
+
+  /// Snapshot seconds actually requested, in order.
+  final List<int> fetched = [];
+  int historyCalls = 0;
+
+  @override
+  Future<Result<List<int>>> history() async {
+    historyCalls++;
+    return Ok(_history);
+  }
+
+  @override
+  Future<Result<Map<String, WeatherStation>>> stations() async => const Ok({
+    'A0A010': WeatherStation(
+      name: '測站一',
+      county: '臺北市',
+      town: '中正區',
+      altitude: 6,
+      latitude: 25.04,
+      longitude: 121.51,
+    ),
+    'A0A020': WeatherStation(
+      name: '測站二',
+      county: '高雄市',
+      town: '苓雅區',
+      altitude: 3,
+      latitude: 22.62,
+      longitude: 120.31,
+    ),
+  });
+
+  @override
+  Future<Result<WeatherSnapshot>> latest() => at(_history.last);
+
+  @override
+  Future<Result<WeatherSnapshot>> at(int second) async {
+    fetched.add(second);
+    return Ok(
+      WeatherSnapshot(
+        time: second,
+        stations: const [
+          WeatherObservation(
+            id: 'A0A010',
+            weatherCode: 100,
+            windDirection: windFrom,
+            windSpeed: windSpeed,
+          ),
+          WeatherObservation(id: 'A0A020', weatherCode: 100, windSpeed: 3.1),
+        ],
+      ),
+    );
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// [count] frame ids, newest first (the wire order).

@@ -1983,5 +1983,8 @@
   "mapOverlaySectionData": "数据图层",
   "radarLightningOverlay": "显示闪电",
   "radarLightningOverlayHint": "显示与画面回波同一时间的落雷",
-  "radarLightningOverlaySubtitle": "在当前的雷达回波上叠加同一时间的闪电落雷。"
+  "radarLightningOverlaySubtitle": "在当前的雷达回波上叠加同一时间的闪电落雷。",
+  "radarWindOverlay": "显示风向",
+  "radarWindOverlayHint": "显示与画面回波同一时间的测站风向",
+  "radarWindOverlaySubtitle": "在当前的雷达回波上叠加同一时间的测站风向与风速。"
 }

@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "Lapisan data",
   "radarLightningOverlay": "Tampilkan petir",
   "radarLightningOverlayHint": "Petir pada waktu bingkai yang tampil",
-  "radarLightningOverlaySubtitle": "Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat."
+  "radarLightningOverlaySubtitle": "Menampilkan sambaran petir yang tercatat pada waktu yang sama dengan citra radar yang sedang dilihat.",
+  "radarWindOverlay": "Tampilkan angin",
+  "radarWindOverlayHint": "Angin stasiun pada waktu bingkai yang tampil",
+  "radarWindOverlaySubtitle": "Menampilkan arah dan kecepatan angin dari stasiun pengamatan pada waktu yang sama dengan citra radar yang sedang dilihat."
 }

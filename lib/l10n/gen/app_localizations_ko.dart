@@ -3272,4 +3272,14 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       '현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다.';
+
+  @override
+  String get radarWindOverlay => '바람 표시';
+
+  @override
+  String get radarWindOverlayHint => '화면에 표시된 시각의 관측 바람';
+
+  @override
+  String get radarWindOverlaySubtitle =>
+      '현재 보고 있는 레이더 영상과 같은 시각의 관측소 풍향·풍속을 겹쳐서 표시합니다.';
 }
