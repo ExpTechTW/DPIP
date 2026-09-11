@@ -95,7 +95,7 @@ class TleSet {
       final exponent = field.substring(6).trim();
       if (mantissa.isEmpty || mantissa == '00000') return 0;
       final sign = mantissa.startsWith('-') ? -1 : 1;
-      final digits = mantissa.replaceAll(RegExp('[+-]'), '');
+      final digits = mantissa.replaceAll(_signChars, '');
       return sign *
           double.parse('0.$digits') *
           math.pow(10, int.parse(exponent)).toDouble();
@@ -127,6 +127,10 @@ class TleSet {
       bstar: implied(line1.substring(53, 61)),
     );
   }
+
+  /// Compiled once: [parseAll] runs [parse] per set in a catalogue file, and
+  /// a `RegExp` literal inside [parse] re-compiled it for each.
+  static final RegExp _signChars = RegExp('[+-]');
 
   /// Every element set in a standard TLE file.
   static List<TleSet> parseAll(String text) {
@@ -500,37 +504,39 @@ class Sgp4 {
   ///
   /// TEME is an inertial frame, so the Earth is rotated under it by the
   /// sidereal angle before the observer's position is subtracted.
+  ///
+  /// [state] is the satellite's TEME state at [utc] when the caller already
+  /// has it; otherwise it is propagated here. The pass search hands it in so
+  /// each step propagates once — it used to propagate here *and* again in the
+  /// sunlit test for the same instant, and SGP4 is the whole cost of a step.
   Horizontal lookFrom(
     DateTime utc, {
     required double latitude,
     required double longitude,
+    SatelliteState? state,
   }) {
-    final state = at(utc);
+    state ??= at(utc);
     final gmst = greenwichSiderealTime(utc);
     final localSidereal = gmst + longitude * degrees;
 
-    // The observer, in the same rotating-into-inertial sense.
+    // The observer, in the same rotating-into-inertial sense. One sine and
+    // one cosine of the latitude, reused below — they were each evaluated
+    // two or three times for the same angle.
     final phi = latitude * degrees;
+    final sinPhi = math.sin(phi);
+    final cosPhi = math.cos(phi);
     const flattening = 1 / 298.26; // WGS-72, to match SGP4's Earth.
     final c =
-        1 /
-        math.sqrt(
-          1 + flattening * (flattening - 2) * math.pow(math.sin(phi), 2),
-        );
-    final observerX =
-        _earthRadiusKm * c * math.cos(phi) * math.cos(localSidereal);
-    final observerY =
-        _earthRadiusKm * c * math.cos(phi) * math.sin(localSidereal);
-    final observerZ =
-        _earthRadiusKm * c * math.pow(1 - flattening, 2) * math.sin(phi);
+        1 / math.sqrt(1 + flattening * (flattening - 2) * math.pow(sinPhi, 2));
+    final observerX = _earthRadiusKm * c * cosPhi * math.cos(localSidereal);
+    final observerY = _earthRadiusKm * c * cosPhi * math.sin(localSidereal);
+    final observerZ = _earthRadiusKm * c * math.pow(1 - flattening, 2) * sinPhi;
 
     final rx = state.position.$1 - observerX;
     final ry = state.position.$2 - observerY;
     final rz = state.position.$3 - observerZ.toDouble();
 
     // Rotate the range vector into the observer's south-east-zenith frame.
-    final sinPhi = math.sin(phi);
-    final cosPhi = math.cos(phi);
     final sinTheta = math.sin(localSidereal);
     final cosTheta = math.cos(localSidereal);
     final south = sinPhi * cosTheta * rx + sinPhi * sinTheta * ry - cosPhi * rz;
@@ -586,20 +592,26 @@ abstract final class SatellitePasses {
   }) {
     final passes = <SatellitePass>[];
     const step = Duration(seconds: 30);
+    final end = from.add(window);
+    // Immutable, so one for the whole search rather than one per step.
+    final observer = Observer(latitude: latitude, longitude: longitude);
     DateTime? rose;
     var best = -math.pi;
     var bestAt = from;
     var bestAzimuth = 0.0;
 
-    for (var at = from; at.isBefore(from.add(window)); at = at.add(step)) {
+    for (var at = from; at.isBefore(end); at = at.add(step)) {
+      // Propagated once per step and shared with the sunlit test below; the
+      // look and the shadow check are two views of this same state.
+      final state = satellite.at(at);
       final look = satellite.lookFrom(
         at,
         latitude: latitude,
         longitude: longitude,
+        state: state,
       );
       final visible =
-          look.altitude > 0 &&
-          (!sunlitOnly || _isSunlit(satellite, at, latitude, longitude));
+          look.altitude > 0 && (!sunlitOnly || _isSunlit(state, at, observer));
       if (visible) {
         rose ??= at;
         if (look.altitude > best) {
@@ -628,14 +640,10 @@ abstract final class SatellitePasses {
 
   /// Whether the satellite is in sunlight while the ground is dark — the
   /// condition that makes a pass actually visible to the eye.
-  static bool _isSunlit(
-    Sgp4 satellite,
-    DateTime at,
-    double latitude,
-    double longitude,
-  ) {
+  ///
+  /// [state] is the satellite at [at], already propagated by the caller.
+  static bool _isSunlit(SatelliteState state, DateTime at, Observer observer) {
     // The ground must be at least in civil twilight, or the sky outshines it.
-    final observer = Observer(latitude: latitude, longitude: longitude);
     final sunAltitude = observer
         .lookAt(SunEphemeris.at(at).equatorial, at)
         .altitude;
@@ -643,7 +651,7 @@ abstract final class SatellitePasses {
     final sun = _sunTeme(at);
 
     // And the satellite must be outside the Earth's shadow cylinder.
-    final position = satellite.at(at).position;
+    final position = state.position;
     final dot =
         position.$1 * sun.$1 + position.$2 * sun.$2 + position.$3 * sun.$3;
     if (dot > 0) return true;
