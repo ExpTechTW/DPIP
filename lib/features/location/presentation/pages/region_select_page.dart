@@ -35,6 +35,15 @@ class RegionSelectPage extends StatefulWidget {
 class _RegionSelectPageState extends State<RegionSelectPage> {
   final _searchController = TextEditingController();
 
+  /// The city list, read once for the page's lifetime.
+  ///
+  /// [TownDirectory.cities] is a getter that walks every township to collapse
+  /// them into the ~20 city names, and [build] runs on every character typed
+  /// into the search field. The directory is built once at bootstrap and never
+  /// mutated, so the result cannot differ between keystrokes — the filter below
+  /// narrows this list instead of rebuilding it.
+  late final List<String> _cities = context.read<TownDirectory>().cities;
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -57,7 +66,7 @@ class _RegionSelectPageState extends State<RegionSelectPage> {
     };
     final needle = _searchController.text.trim().toLowerCase();
     final cities = [
-      for (final city in directory.cities)
+      for (final city in _cities)
         if (needle.isEmpty || city.toLowerCase().contains(needle)) city,
     ];
 

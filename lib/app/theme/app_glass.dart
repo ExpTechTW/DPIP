@@ -61,13 +61,38 @@ Color glassSurface(ColorScheme colors, double reveal, {Color? sky, int? hour}) {
   if (colors.brightness == Brightness.light) return colors.surfaceContainerLow;
   final revealed = sky == null
       ? colors.surface.withValues(alpha: 0.92)
-      : skyCardTint(sky, hour: hour ?? AppTime.utc8.hour);
+      : _skyCardTintMemo(sky, hour ?? _taipeiHour());
   return Color.lerp(
     colors.surfaceContainerHighest.withValues(alpha: 0.55),
     revealed,
     reveal,
   )!;
 }
+
+/// The current Taipei wall-clock hour, from the calibrated instant's epoch
+/// arithmetic: `AppTime.utc8` is exactly `utc + 8 h`, and a UTC-flagged
+/// `DateTime`'s `hour` is `(ms ~/ 1 h) % 24` for any post-epoch instant — so
+/// this is the same integer without the second `DateTime` per call.
+int _taipeiHour() =>
+    ((AppTime.utc.millisecondsSinceEpoch + 8 * Duration.millisecondsPerHour) ~/
+        Duration.millisecondsPerHour) %
+    24;
+
+/// [skyCardTint] behind a one-entry memo. Every glass card on Home asks for
+/// the same `(panelAmbient, hour)` pair on every sheet-drag rebuild, and the
+/// two HSL round trips behind it are pure — the answer only moves when the
+/// sky re-bakes (once a minute) or the hour bucket turns.
+Color _skyCardTintMemo(Color sky, int hour) {
+  final cached = _cardTintMemo;
+  if (cached != null && cached.sky == sky && cached.hour == hour) {
+    return cached.tint;
+  }
+  final tint = skyCardTint(sky, hour: hour);
+  _cardTintMemo = (sky: sky, hour: hour, tint: tint);
+  return tint;
+}
+
+({Color sky, int hour, Color tint})? _cardTintMemo;
 
 /// Ink for content **inside** a [glassSurface] card.
 ///
@@ -135,10 +160,24 @@ bool weatherSkyIsLight(WeatherMode mode) => switch (mode) {
 /// luminance cutoff — it is the same "is this background light or dark"
 /// judgment Flutter already ships and tunes, so a border-hue sky (dawn, a
 /// hazy overcast) resolves the way the rest of the framework would resolve it.
+///
+/// Memoised on the last [sky] seen: `estimateBrightnessForColor` is a
+/// relative-luminance computation (three `pow` calls), and every widget on
+/// the sheet asks about the *same* `SkyLutCache.panelAmbient` value on every
+/// rebuild of a drag — the answer changes once a minute, when the sky
+/// re-bakes, and the memo turns the rest into one colour comparison.
+/// (`SkyLutCache.panelAmbientIsLight` publishes the same verdict at the
+/// source for callers that already listen there.)
 bool skyIsLightFrom(Color? sky, WeatherMode fallbackMode) {
   if (sky == null) return weatherSkyIsLight(fallbackMode);
-  return ThemeData.estimateBrightnessForColor(sky) == Brightness.light;
+  final cached = _skyIsLightMemo;
+  if (cached != null && cached.sky == sky) return cached.isLight;
+  final isLight = ThemeData.estimateBrightnessForColor(sky) == Brightness.light;
+  _skyIsLightMemo = (sky: sky, isLight: isLight);
+  return isLight;
 }
+
+({Color sky, bool isLight})? _skyIsLightMemo;
 
 /// Ink for content drawn **on** the weather sky (header, region badges).
 ///

@@ -173,14 +173,14 @@ List<PlacedCloud> placeClouds(
   // Loop-invariant pieces of the per-cloud math: the wind-scaled deck speed
   // and the depth-dependent size/opacity factors are hoisted out of the loop.
   final windSpeed = layout.speed * (1.0 + wind * 2.0);
+  // Wrap over two screen widths so a sprite is never popped into view.
+  const span = 2.4;
 
   for (var i = 0; i < layout.clouds.length && i < visible; i++) {
     final c = layout.clouds[i];
 
     // Near clouds drift faster — the parallax the reference gets from its 3D layout.
     final speed = windSpeed * (1.6 - c.depth);
-    // Wrap over two screen widths so a sprite is never popped into view.
-    final span = 2.4;
     var x = (c.x + time * speed) % span;
     if (x < 0) x += span;
     x -= 0.7; // start off the left edge
@@ -211,19 +211,21 @@ List<PlacedCloud> placeClouds(
 /// 1 = zenith), `multi` is a gain and `intensity` scales the contribution.
 typedef LightConfig = (double picker, double multi, double intensity);
 
-/// Cloud lighting for a given sun height, in the reference's five-group form.
-///
-/// The engine authors these per keyframe; the ramps here follow the same
-/// shape — as the sun drops, every probe slides toward the horizon, which is
-/// what turns the clouds gold at dusk without any colour being named.
-({
+/// The four light groups plus the warm-mix weight the cloud shader takes.
+typedef CloudLighting = ({
   LightConfig base,
   LightConfig sun,
   LightConfig ground,
   LightConfig ambient,
   double whitePer,
-})
-cloudLighting({required double sunAngleY}) {
+});
+
+/// Cloud lighting for a given sun height, in the reference's five-group form.
+///
+/// The engine authors these per keyframe; the ramps here follow the same
+/// shape — as the sun drops, every probe slides toward the horizon, which is
+/// what turns the clouds gold at dusk without any colour being named.
+CloudLighting cloudLighting({required double sunAngleY}) {
   // 0 at night, 1 at midday. `sunAngleY` runs ~0.01 … 0.57.
   final day = ((sunAngleY - 0.02) / 0.42).clamp(0.0, 1.0);
 

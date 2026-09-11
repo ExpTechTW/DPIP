@@ -438,7 +438,6 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   SkyFrame _buildFrame() {
     final utc = AppTime.utc;
-    final local = AppTime.utc8;
     final time = _clock.elapsedMilliseconds / 1000.0;
 
     final look = _lookFor(widget.mode);
@@ -450,7 +449,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     final rain = widget.rainIntensity ?? look.rain;
     final snow = widget.snowIntensity ?? look.snow;
 
-    _syncSky(utc, local, frames);
+    _syncSky(utc, frames);
 
     return SkyFrame(
       time: time,
@@ -476,8 +475,9 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   /// that genuinely move every frame ([_lightningAt], particle time): before
   /// this, the ephemeris ran (and the LUT re-baked, see [_minuteKey]) on every
   /// tick.
-  void _syncSky(DateTime utc, DateTime local, List<SkyKeyframe> frames) {
-    final dayKey = utc.millisecondsSinceEpoch ~/ 86400000;
+  void _syncSky(DateTime utc, List<SkyKeyframe> frames) {
+    final utcMs = utc.millisecondsSinceEpoch;
+    final dayKey = utcMs ~/ 86400000;
     if (dayKey != _dayKey) {
       _dayKey = dayKey;
       // Anchor the ring to the day's real sunrise and sunset, so dawn keyframes
@@ -489,9 +489,14 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       );
       _moon = _moonPhase(utc);
     }
-    final minuteKey = local.millisecondsSinceEpoch ~/ 60000;
+    // The local minute, from the UTC instant's epoch arithmetic rather than a
+    // second `DateTime` per vsync: `AppTime.utc8` is exactly `utc + 8 h`, so
+    // its epoch milliseconds are `utcMs + 28 800 000` and the wall-clock
+    // `DateTime` is only needed — and only built — once a minute, below.
+    final minuteKey = (utcMs + 8 * Duration.millisecondsPerHour) ~/ 60000;
     if (minuteKey != _minuteKey) {
       _minuteKey = minuteKey;
+      final local = AppTime.taipei(utc);
       final hour =
           skyTimeHour(widget.timeMode) ?? (local.hour + local.minute / 60.0);
       _position = keyframePosition(
@@ -529,10 +534,14 @@ typedef _Look = ({
 /// The keyframe tables cover all 14 of the engine's weather types; the five
 /// user-facing modes pick from them, so adding a mode later is a table entry
 /// rather than new artwork.
+///
+/// Every arm is a `const` record: `_buildFrame` asks once per vsync, and a
+/// non-const record literal here would be a fresh allocation every frame for
+/// a value that never changes.
 _Look _lookFor(WeatherMode mode) => switch (mode) {
   // Until a live feed drives it, `auto` is Taiwan's typical humid, lightly
   // clouded sky.
-  WeatherMode.auto => (
+  WeatherMode.auto => const (
     keyframes: cloudyKeyframes,
     layout: CloudLayout.scattered,
     coverage: 0.55,
@@ -543,7 +552,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.25,
     lightning: false,
   ),
-  WeatherMode.clear => (
+  WeatherMode.clear => const (
     keyframes: sunnyKeyframes,
     layout: CloudLayout.fair,
     coverage: 0.35,
@@ -554,7 +563,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.18,
     lightning: false,
   ),
-  WeatherMode.cloudy => (
+  WeatherMode.cloudy => const (
     keyframes: cloudyKeyframes,
     layout: CloudLayout.scattered,
     coverage: 0.85,
@@ -565,7 +574,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.30,
     lightning: false,
   ),
-  WeatherMode.overcast => (
+  WeatherMode.overcast => const (
     keyframes: overcastKeyframes,
     layout: CloudLayout.overcast,
     coverage: 1.0,
@@ -576,7 +585,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.20,
     lightning: false,
   ),
-  WeatherMode.snow => (
+  WeatherMode.snow => const (
     keyframes: snowyMediumKeyframes,
     layout: CloudLayout.overcast,
     coverage: 0.95,
@@ -589,7 +598,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
   ),
   // No sand shader yet — the sandy keyframes plus a heavy dust-coloured haze
   // stand in, so the mode is at least testable.
-  WeatherMode.sand => (
+  WeatherMode.sand => const (
     keyframes: sandyHeavyKeyframes,
     layout: CloudLayout.overcast,
     coverage: 0.65,
@@ -600,7 +609,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.55,
     lightning: false,
   ),
-  WeatherMode.rain => (
+  WeatherMode.rain => const (
     keyframes: rainyMediumKeyframes,
     layout: CloudLayout.rain,
     coverage: 1.0,
@@ -616,7 +625,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.40,
     lightning: false,
   ),
-  WeatherMode.fog => (
+  WeatherMode.fog => const (
     keyframes: foggyKeyframes,
     layout: CloudLayout.overcast,
     coverage: 0.7,
@@ -627,7 +636,7 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     wind: 0.10,
     lightning: false,
   ),
-  WeatherMode.thunderstorm => (
+  WeatherMode.thunderstorm => const (
     keyframes: rainyExtremeKeyframes,
     layout: CloudLayout.rain,
     coverage: 1.0,

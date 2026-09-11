@@ -47,11 +47,14 @@ class HomeMonitorBanner extends StatelessWidget {
   /// exposed so a caller that needs to lay out *around* this banner (Home's
   /// overlap stack with the gold support bar) reads the identical condition
   /// instead of re-deriving it and risking the two disagreeing.
-  static bool isActive(BuildContext context) {
-    final eew = context.watch<RealtimeNotifier<List<Eew>>>();
-    final alerts = eew.state.data ?? const <Eew>[];
-    return eew.state.status == RealtimeStatus.live && alerts.isNotEmpty;
-  }
+  static bool isActive(BuildContext context) =>
+      // `select`, not `watch`: the Home overlap stack calls this to lay out
+      // around the banner, and a watch there rebuilt it on every EEW serial
+      // update. The boolean is the same; only a flip rebuilds the caller.
+      context.select<RealtimeNotifier<List<Eew>>, bool>((eew) {
+        final alerts = eew.state.data ?? const <Eew>[];
+        return eew.state.status == RealtimeStatus.live && alerts.isNotEmpty;
+      });
 
   @override
   Widget build(BuildContext context) {

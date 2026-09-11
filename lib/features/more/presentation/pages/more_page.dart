@@ -144,7 +144,8 @@ class MorePage extends StatelessWidget {
                   title: l10n.meshtasticTitle,
                   // A message arrived in a conversation the user has not read —
                   // the same state as the chat page's unread pills, selected
-                  // down to one boolean so only this tile rebuilds.
+                  // down to one boolean so the page rebuilds only when that
+                  // boolean flips, not on every mesh packet.
                   alert: context.select<MeshUnread, bool>((u) => u.hasUnread),
                   onTap: () => context.pushNamed(AppRoutes.meshtastic),
                 ),
@@ -155,7 +156,9 @@ class MorePage extends StatelessWidget {
               children: [
                 // Hidden until ten taps on the Developer page's version row
                 // (ExperimentalSettings.unlocked).
-                if (context.watch<ExperimentalSettings>().unlocked)
+                if (context.select<ExperimentalSettings, bool>(
+                  (s) => s.unlocked,
+                ))
                   _MoreTile(
                     icon: Icons.science_outlined,
                     title: l10n.experimentalFeatures,
@@ -171,11 +174,15 @@ class MorePage extends StatelessWidget {
                   title: l10n.moreBugReports,
                   // The count rides the same ETag-cached index the page reads;
                   // loaded once per session here, resynced by the list's own
-                  // pull-to-refresh.
-                  trailing: _BugReportCount(
-                    counter: context.watch<BugTrackerCounter>(),
-                    onLoad: () =>
-                        context.read<BugTrackerCounter>().ensureLoaded(),
+                  // pull-to-refresh. Read through a Consumer rather than on the
+                  // page's context: that refresh notifies while the bug list is
+                  // pushed over this page, and only this trailing slot wants
+                  // the number.
+                  trailing: Consumer<BugTrackerCounter>(
+                    builder: (context, counter, _) => _BugReportCount(
+                      counter: counter,
+                      onLoad: counter.ensureLoaded,
+                    ),
                   ),
                   onTap: () => context.pushNamed(AppRoutes.bugTracker),
                 ),
@@ -421,10 +428,14 @@ class _MoreGroup extends StatelessWidget {
           ),
         );
       }
-      rows.add(Material(type: MaterialType.transparency, child: children[i]));
+      rows.add(children[i]);
     }
     // Material (not DecoratedBox) so ListTile ink paints on this ancestor —
-    // a colored DecoratedBox between tile and Material asserts in debug.
+    // a colored DecoratedBox between tile and Material asserts in debug. One
+    // Material for the whole card is all it takes: every row's ink comes from
+    // a ListTile or a button, so the splash is bounded by its own InkWell and
+    // clipped by this card's rounded rect either way — a transparent Material
+    // per row would host nothing this one does not.
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -943,32 +954,18 @@ class _DeveloperNoteCard extends StatelessWidget {
 /// ranking is carried by the gold alone, rendered flat: a warm champagne
 /// fill, a hairline along the edge, and a filled badge holding the most
 /// saturated step.
-class _SupportCallout extends StatefulWidget {
+class _SupportCallout extends StatelessWidget {
   const _SupportCallout();
 
-  @override
-  State<_SupportCallout> createState() => _SupportCalloutState();
-}
-
-class _SupportCalloutState extends State<_SupportCallout>
-    with SingleTickerProviderStateMixin {
-  /// The border's breathing pulse — a slow sine that keeps the gold border
-  /// gently swelling, so the card draws the eye without any of the strobing
-  /// an opacity blink would. Repeats forever, but costs nothing when the card
-  /// is off screen (the ticker pauses) and the test suite treats it as a
-  /// plain animation.
-  late final AnimationController _breath = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1800),
-    lowerBound: 0.55,
-    upperBound: 1.0,
-  )..repeat(reverse: true);
-
-  @override
-  void dispose() {
-    _breath.dispose();
-    super.dispose();
-  }
+  /// The hairline's alpha, formerly sampled from a repeating controller that
+  /// nothing listened to — no `AnimatedBuilder`, no listener, no `setState`.
+  /// The controller pumped frames for as long as this page was mounted and the
+  /// border never animated once: `build` read `.value` at whatever phase the
+  /// sine happened to be in, so a cold first build drew the 0.55 lower bound
+  /// and every later rebuild (theme, locale, an unread-count change) froze an
+  /// arbitrary brighter edge until the next one. 0.55 is the resting value
+  /// that was, and the only one the card reliably showed.
+  static const double _edgeAlpha = 0.55;
 
   @override
   Widget build(BuildContext context) {
@@ -979,7 +976,7 @@ class _SupportCalloutState extends State<_SupportCallout>
       decoration: BoxDecoration(
         color: gold.fill,
         borderRadius: AppRadius.large,
-        border: Border.all(color: gold.edge.withValues(alpha: _breath.value)),
+        border: Border.all(color: gold.edge.withValues(alpha: _edgeAlpha)),
         // No gradient: the card sits on the same tonal plane as its two
         // neighbours, and the ranking is carried by the gold colour alone —
         // the badge is what reads as paid, not the sheen.
@@ -1366,10 +1363,15 @@ class _VersionCardState extends State<_VersionCard> {
   /// notes page's match (tag or name, `v` stripped) so both pages agree on
   /// which entry is "current" without sharing state.
   static bool _isCurrent(ReleaseNote note, String label) {
-    final tag = note.tagName.replaceFirst(RegExp(r'^v'), '');
-    final name = note.name.replaceFirst(RegExp(r'^v'), '');
+    final tag = note.tagName.replaceFirst(_vPrefix, '');
+    final name = note.name.replaceFirst(_vPrefix, '');
     return tag == label || name == label;
   }
+
+  /// Compiled once — `_isCurrent` runs per fetched note, and every inline
+  /// `RegExp(...)` compiles a fresh pattern (same reasoning as the changelog
+  /// page's copy).
+  static final RegExp _vPrefix = RegExp(r'^v');
 
   /// The number's gradient, derived from the version string itself so every
   /// build wears its own colours — 26w34a is one pair, 26w34b another — and

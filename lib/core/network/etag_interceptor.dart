@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 /// Dio interceptor implementing HTTP ETag revalidation against an
 /// [EtagCacheStore].
@@ -47,13 +48,20 @@ class EtagInterceptor extends Interceptor {
   /// GET is the default cacheable verb; POST is only cached for status-exptech
   /// dashboards, whose query body is a constant baked into the client and whose
   /// URL therefore pins the result — content-addressed, like an immutable tile.
-  static bool _cacheable(RequestOptions o) {
-    if (o.method.toUpperCase() == 'GET') {
+  ///
+  /// [uri] is the request's resolved URI, parsed **once** by the caller.
+  /// `RequestOptions.uri` is a getter that re-runs `Uri.parse` (plus a regex
+  /// and `normalizePath`) on every read, and each hook below used to read it
+  /// three or four times — per tile, in a viewport of dozens. Threading one
+  /// parsed value through is the same URI every time.
+  static bool _cacheable(RequestOptions o, Uri uri) {
+    final method = o.method.toUpperCase();
+    if (method == 'GET') {
       return o.responseType != ResponseType.stream &&
-          !isUncacheablePath(o.uri.path);
+          !isUncacheablePath(uri.path);
     }
-    if (o.method.toUpperCase() == 'POST') {
-      return o.uri.host == 'status.exptech.dev' &&
+    if (method == 'POST') {
+      return uri.host == 'status.exptech.dev' &&
           o.responseType != ResponseType.stream;
     }
     return false;
@@ -138,11 +146,42 @@ class EtagInterceptor extends Interceptor {
       response.headers.value(Headers.contentLengthHeader) ?? '',
     );
     if (length != null && length > 0) return length;
-    if (encoded != null) return utf8.encode(encoded).length;
+    if (encoded != null) return utf8Length(encoded);
     final data = response.data;
     if (data == null) return 0;
     if (data is List<int>) return data.length;
-    return utf8.encode(data is String ? data : jsonEncode(data)).length;
+    return utf8Length(data is String ? data : jsonEncode(data));
+  }
+
+  /// `utf8.encode(s).length` without materialising the encoding.
+  ///
+  /// The metering fallback runs on almost every JSON miss (the platform strips
+  /// `Content-Length` when it gunzips), and `utf8.encode` allocated and filled
+  /// a full byte copy of the body — 130 KB for a station catalogue — on the UI
+  /// isolate only to read its `.length`. Counting is the same number:
+  /// 1 byte below U+0080, 2 below U+0800, 4 for a surrogate *pair*, and 3 for
+  /// everything else — including a lone surrogate, which `Utf8Encoder`
+  /// replaces with U+FFFD (three bytes). Pinned by a test against the encoder.
+  @visibleForTesting
+  static int utf8Length(String s) {
+    var bytes = 0;
+    final length = s.length;
+    for (var i = 0; i < length; i++) {
+      final unit = s.codeUnitAt(i);
+      if (unit < 0x80) {
+        bytes += 1;
+      } else if (unit < 0x800) {
+        bytes += 2;
+      } else if ((unit & 0xFC00) == 0xD800 &&
+          i + 1 < length &&
+          (s.codeUnitAt(i + 1) & 0xFC00) == 0xDC00) {
+        bytes += 4;
+        i++;
+      } else {
+        bytes += 3;
+      }
+    }
+    return bytes;
   }
 
   static Uint8List _asBytes(Object? data) {
@@ -156,15 +195,16 @@ class EtagInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (!_cacheable(options)) {
+    final uri = options.uri;
+    if (!_cacheable(options, uri)) {
       handler.next(options);
       return;
     }
-    final url = options.uri.toString();
+    final url = uri.toString();
 
     // Immutable tiles: URL is the key — serve SQLite hits locally. Never send
     // If-None-Match (content is pinned by the URL; revalidation is pointless).
-    if (_isBytes(options) && isImmutableTile(options.uri)) {
+    if (_isBytes(options) && isImmutableTile(uri)) {
       final cached = await _store.readBytes(url);
       if (cached != null) {
         // Hit metering lives in [EtagCacheStore.readBytes].
@@ -200,8 +240,9 @@ class EtagInterceptor extends Interceptor {
     ResponseInterceptorHandler handler,
   ) async {
     final options = response.requestOptions;
-    if (_cacheable(options)) {
-      final url = options.uri.toString();
+    final uri = options.uri;
+    if (_cacheable(options, uri)) {
+      final url = uri.toString();
       final binary = _isBytes(options);
       final post = options.method.toUpperCase() == 'POST';
       if (response.statusCode == 304) {
@@ -264,14 +305,13 @@ class EtagInterceptor extends Interceptor {
             ? _downBytes(response, encoded: jsonBody)
             : _downBytes(response);
         final immutable =
-            post ||
-            (binary && response.data != null && isImmutableTile(options.uri));
+            post || (binary && response.data != null && isImmutableTile(uri));
         var etag = response.headers.value('etag');
         if (immutable) {
           // POST (a dashboard query whose body is a constant) and URL-pinned
           // tiles both carry their content in the URL — ignore any server ETag
           // and always store under the URL hash.
-          etag = etagFromUrl(options.uri);
+          etag = etagFromUrl(uri);
           response.headers.set('etag', etag);
         }
         // Non-immutable: ETag only — no ETag ⇒ no store. Immutable responses
@@ -316,13 +356,14 @@ class EtagInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     final options = err.requestOptions;
+    final uri = options.uri;
     final status = err.response?.statusCode;
     // Basemap PBF only — ocean / uncovered z/x/y is stable. Not radar/sat/DPM.
-    if (_cacheable(options) &&
+    if (_cacheable(options, uri) &&
         _isBytes(options) &&
         status == 404 &&
-        isBasemapPbf(options.uri)) {
-      final url = options.uri.toString();
+        isBasemapPbf(uri)) {
+      final url = uri.toString();
       await _store.writeBytes(
         url,
         etag: negativeTileEtag,
@@ -344,8 +385,8 @@ class EtagInterceptor extends Interceptor {
     if (!_isBytes(options) &&
         options.method.toUpperCase() == 'POST' &&
         status == null &&
-        options.uri.host == 'status.exptech.dev') {
-      final cached = await _store.readJson(options.uri.toString());
+        uri.host == 'status.exptech.dev') {
+      final cached = await _store.readJson(uri.toString());
       if (cached != null) {
         handler.resolve(
           Response<dynamic>(

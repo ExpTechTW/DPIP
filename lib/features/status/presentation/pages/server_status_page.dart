@@ -381,7 +381,7 @@ class _ClientEndpoints extends StatelessWidget {
       children: [
         _SummaryBanner(summary: summary),
         const SizedBox(height: AppSpacing.md),
-        _Legend(),
+        const _Legend(),
         const SizedBox(height: AppSpacing.md),
         for (final g in _groups) ...[
           _ServiceTable(
@@ -1137,16 +1137,24 @@ String _compactPercent(num value) {
   var text = '';
   for (var decimals = 2; decimals >= 0; decimals--) {
     text = value.toStringAsFixed(decimals);
-    final digits = text.replaceAll(RegExp(r'[^0-9]'), '');
+    final digits = text.replaceAll(_nonDigits, '');
     // 前導零不算位數（`0.02` 只有「2」一位）。
-    if (digits.replaceFirst(RegExp(r'^0+(?=.)'), '').length <= 3) break;
+    if (digits.replaceFirst(_leadingZeros, '').length <= 3) break;
   }
   if (text.contains('.')) {
-    text = text.replaceFirst(RegExp(r'0+$'), '');
-    text = text.replaceFirst(RegExp(r'\.$'), '');
+    text = text.replaceFirst(_trailingZeros, '');
+    text = text.replaceFirst(_trailingDot, '');
   }
   return text;
 }
+
+// Compiled once. `_compactPercent` runs on every rebuild of the status grid,
+// and an inline `RegExp(...)` compiles a fresh pattern on every call — up to
+// eight compilations per build for a string a few characters long.
+final RegExp _nonDigits = RegExp(r'[^0-9]');
+final RegExp _leadingZeros = RegExp(r'^0+(?=.)');
+final RegExp _trailingZeros = RegExp(r'0+$');
+final RegExp _trailingDot = RegExp(r'\.$');
 
 Color _threeTone(BuildContext context, num value, double warn, double bad) {
   final colors = context.colorScheme;

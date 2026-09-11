@@ -26,6 +26,23 @@ void main() {
     expect(rts.station['2012144']!.intensity, -3.0);
   });
 
+  test('decodeBytes (the compress=1 path) builds the same Rts as decode', () {
+    final data = jsonEncode({
+      'station': {
+        '2012144': {'pga': 2.79, 'pgv': 0.52, 'i': -2.9, 'I': -3, 'alert': 1},
+        '11339996': {'pga': 0.1, 'pgv': 0.01, 'i': -3.1, 'I': -3.2},
+      },
+      'box': {'1': 2},
+      'int': [
+        {'code': 400, 'i': 3},
+      ],
+      'time': 1783968266383,
+    });
+    final source = _source();
+    // Freezed deep equality: every station, box and intensity compared.
+    expect(source.decodeBytes(utf8.encode(data)), source.decode(data));
+  });
+
   test('timestampOf is null → event-recency freshness, not payload age', () {
     final rts = _source().decode(jsonEncode({'time': 1783968266383}));
     expect(_source().timestampOf(rts), isNull);

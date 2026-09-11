@@ -1,11 +1,11 @@
-// Version-highlight card content for DPIP 26.1 (normal).
+// Version-highlight card content for DPIP 26.x (normal).
 //
-// GENERATED from `release_highlights/assets/26.1/normal/cards.json` by `tool/gen/release_highlights.py` — edit the
+// GENERATED from `release_highlights/assets/26.x/normal/cards.json` by `tool/gen/release_highlights.py` — edit the
 // JSON, not this file. Rendering lives in `lib/features/release_highlights`;
 // this package carries only data.
 library;
 
-const title = {"zh_Hant": "DPIP 26.1 更新重點", "zh_Hans": "DPIP 26.1 更新重点", "en": "DPIP 26.1 highlights", "ja": "DPIP 26.1 更新内容", "ko": "DPIP 26.1 주요 변경 사항", "th": "ไฮไลต์ของ DPIP 26.1", "vi": "Điểm nổi bật của DPIP 26.1", "id": "Sorotan DPIP 26.1", "fil": "Mga highlight ng DPIP 26.1"};
+const title = {"zh_Hant": "DPIP 26.x 更新重點", "zh_Hans": "DPIP 26.x 更新重点", "en": "DPIP 26.x highlights", "ja": "DPIP 26.x 更新内容", "ko": "DPIP 26.x 주요 변경 사항", "th": "ไฮไลต์ของ DPIP 26.x", "vi": "Điểm nổi bật của DPIP 26.x", "id": "Sorotan DPIP 26.x", "fil": "Mga highlight ng DPIP 26.x"};
 const subtitle = {"zh_Hant": "本版改善即時資料傳輸、網路與地圖快取、時間校正，以及資料儲存方式。", "zh_Hans": "本版改进实时数据传输、网络与地图缓存、时间校正，以及数据存储方式。", "en": "This release improves realtime delivery, network and map caching, calibrated time, and data storage.", "ja": "リアルタイム配信、ネットワークと地図のキャッシュ、時刻補正、データ保存を改善しました。", "ko": "실시간 전송, 네트워크 및 지도 캐시, 시간 보정, 데이터 저장 방식을 개선했습니다.", "th": "รุ่นนี้ปรับปรุงการส่งข้อมูลเรียลไทม์ แคชเครือข่ายและแผนที่ การเทียบเวลา และการจัดเก็บข้อมูล", "vi": "Bản này cải thiện truyền dữ liệu thời gian thực, cache mạng và bản đồ, hiệu chỉnh thời gian và lưu trữ dữ liệu.", "id": "Rilis ini meningkatkan pengiriman realtime, cache jaringan dan peta, kalibrasi waktu, serta penyimpanan data.", "fil": "Pinahusay ng release na ito ang realtime delivery, network at map cache, calibrated time, at data storage."};
 const cards = <Map<String, dynamic>>[
   {

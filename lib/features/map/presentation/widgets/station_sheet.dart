@@ -681,6 +681,12 @@ class _TrendChart extends StatelessWidget {
   /// uses a line.
   final bool bars;
 
+  /// The 7-day axis date. One instance: fl_chart asks `getTitlesWidget` for
+  /// every tick on every layout, and each ask re-parsed this pattern into a
+  /// fresh formatter. Numeric-only, so no locale symbol data is needed — the
+  /// same reasoning as the timeline's `HH:mm` / `yyyy/MM/dd` statics.
+  static final DateFormat _monthDay = DateFormat('M/d');
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -752,11 +758,11 @@ class _TrendChart extends StatelessWidget {
       );
       final hourMark = l10n.chartHourLabel(t.hour);
       // Daily-or-wider: date only. Sub-daily 7d: date + hour. 24h: compact hour.
-      if (labelStep >= 24 * hourSec) return DateFormat('M/d').format(t);
+      if (labelStep >= 24 * hourSec) return _monthDay.format(t);
       if (range == '7d') {
         return t.hour == 0
-            ? DateFormat('M/d').format(t)
-            : '${DateFormat('M/d').format(t)} $hourMark';
+            ? _monthDay.format(t)
+            : '${_monthDay.format(t)} $hourMark';
       }
       return hourMark;
     }

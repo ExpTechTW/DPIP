@@ -69,100 +69,98 @@ class _ReleaseHighlightTile extends StatelessWidget {
         : localized(card.headline!, tag);
     final stat = card.stat == null ? null : localized(card.stat!, tag);
 
-    return Theme(
-      data: theme.copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        key: PageStorageKey('release-highlight-${card.id}'),
-        maintainState: true,
-        backgroundColor: Colors.transparent,
-        collapsedBackgroundColor: Colors.transparent,
-        shape: const Border(),
-        collapsedShape: const Border(),
-        tilePadding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.sm,
-          AppSpacing.md,
-          AppSpacing.sm,
+    // `shape` and `collapsedShape` are both load-bearing, and neither is
+    // decoration: ExpansionTile falls back to a Border built from
+    // `theme.dividerColor` for the expanded state and to a transparent one for
+    // the collapsed state, so dropping `shape` draws a line above and below
+    // every expanded segment. They are why the `Theme(dividerColor:
+    // transparent)` wrapper that used to sit here was inert.
+    return ExpansionTile(
+      key: PageStorageKey('release-highlight-${card.id}'),
+      backgroundColor: Colors.transparent,
+      collapsedBackgroundColor: Colors.transparent,
+      shape: const Border(),
+      collapsedShape: const Border(),
+      tilePadding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.sm,
+      ),
+      childrenPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.lg,
+      ),
+      leading: Icon(highlightIcon(card.icon), color: colors.primary, size: 24),
+      title: Text(
+        localized(card.title, tag),
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: colors.onSurface,
+          fontWeight: FontWeight.w700,
+          height: 1.3,
         ),
-        childrenPadding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          0,
-          AppSpacing.lg,
-          AppSpacing.lg,
-        ),
-        leading: Icon(
-          highlightIcon(card.icon),
-          color: colors.primary,
-          size: 24,
-        ),
-        title: Text(
-          localized(card.title, tag),
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: colors.onSurface,
-            fontWeight: FontWeight.w700,
-            height: 1.3,
-          ),
-        ),
-        subtitle: headline == null && stat == null
-            ? null
-            : Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.xs),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (headline != null)
-                      Text(
-                        headline,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colors.onSurfaceVariant,
-                          height: 1.45,
-                        ),
+      ),
+      subtitle: headline == null && stat == null
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (headline != null)
+                    Text(
+                      headline,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                        height: 1.45,
                       ),
-                    if (stat != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        stat,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w700,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                        ),
+                    ),
+                  if (stat != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      stat,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
-                    ],
+                    ),
                   ],
-                ),
-              ),
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (card.body != null)
-            Text(
-              localized(card.body!, tag),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                height: 1.6,
+                ],
               ),
             ),
-          if (card.statLabel != null) ...[
-            if (card.body != null) const SizedBox(height: AppSpacing.md),
-            Text(
-              localized(card.statLabel!, tag),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-                height: 1.5,
-              ),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (card.body != null)
+          Text(
+            localized(card.body!, tag),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+              height: 1.6,
             ),
-          ],
-          if (card.highlights.isNotEmpty) ...[
-            if (card.body != null || card.statLabel != null)
-              const SizedBox(height: AppSpacing.lg),
-            for (var index = 0; index < card.highlights.length; index++) ...[
-              _Bullet(text: localized(card.highlights[index], tag)),
-              if (index < card.highlights.length - 1)
-                const SizedBox(height: AppSpacing.sm),
-            ],
+          ),
+        if (card.statLabel != null) ...[
+          if (card.body != null) const SizedBox(height: AppSpacing.md),
+          Text(
+            localized(card.statLabel!, tag),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              height: 1.5,
+            ),
+          ),
+        ],
+        if (card.highlights.isNotEmpty) ...[
+          if (card.body != null || card.statLabel != null)
+            const SizedBox(height: AppSpacing.lg),
+          for (var index = 0; index < card.highlights.length; index++) ...[
+            _Bullet(text: localized(card.highlights[index], tag)),
+            if (index < card.highlights.length - 1)
+              const SizedBox(height: AppSpacing.sm),
           ],
         ],
-      ),
+      ],
     );
   }
 }
@@ -238,61 +236,59 @@ class _TechnicalHighlightTile extends StatelessWidget {
     final colors = theme.colorScheme;
     final tag = localeTagOf(context);
 
-    return Theme(
-      data: theme.copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        key: PageStorageKey('technical-highlight-${card.id}'),
-        maintainState: true,
-        backgroundColor: Colors.transparent,
-        collapsedBackgroundColor: Colors.transparent,
-        shape: const Border(),
-        collapsedShape: const Border(),
-        tilePadding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.sm,
-          AppSpacing.md,
-          AppSpacing.sm,
-        ),
-        childrenPadding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          0,
-          AppSpacing.lg,
-          AppSpacing.lg,
-        ),
-        leading: Icon(
-          highlightIcon(card.icon),
-          color: colors.primary,
-          size: 24,
-        ),
-        title: Text(
-          localized(card.title, tag),
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: colors.onSurface,
-            fontWeight: FontWeight.w700,
-            height: 1.35,
-          ),
-        ),
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (card.body != null)
-            Text(
-              localized(card.body!, tag),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-                height: 1.65,
-              ),
-            ),
-          if (card.details.isNotEmpty) ...[
-            if (card.body != null) const SizedBox(height: AppSpacing.lg),
-            _TechnicalDetails(details: card.details, tag: tag),
-          ],
-          if (card.stats.isNotEmpty) ...[
-            if (card.body != null || card.details.isNotEmpty)
-              const SizedBox(height: AppSpacing.lg),
-            _StatRows(stats: card.stats, tag: tag),
-          ],
-        ],
+    // `shape` and `collapsedShape` are both load-bearing, and neither is
+    // decoration: ExpansionTile falls back to a Border built from
+    // `theme.dividerColor` for the expanded state and to a transparent one for
+    // the collapsed state, so dropping `shape` draws a line above and below
+    // every expanded segment. They are why the `Theme(dividerColor:
+    // transparent)` wrapper that used to sit here was inert.
+    return ExpansionTile(
+      key: PageStorageKey('technical-highlight-${card.id}'),
+      backgroundColor: Colors.transparent,
+      collapsedBackgroundColor: Colors.transparent,
+      shape: const Border(),
+      collapsedShape: const Border(),
+      tilePadding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.sm,
       ),
+      childrenPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.lg,
+      ),
+      leading: Icon(highlightIcon(card.icon), color: colors.primary, size: 24),
+      title: Text(
+        localized(card.title, tag),
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: colors.onSurface,
+          fontWeight: FontWeight.w700,
+          height: 1.35,
+        ),
+      ),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (card.body != null)
+          Text(
+            localized(card.body!, tag),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+              height: 1.65,
+            ),
+          ),
+        if (card.details.isNotEmpty) ...[
+          if (card.body != null) const SizedBox(height: AppSpacing.lg),
+          _TechnicalDetails(details: card.details, tag: tag),
+        ],
+        if (card.stats.isNotEmpty) ...[
+          if (card.body != null || card.details.isNotEmpty)
+            const SizedBox(height: AppSpacing.lg),
+          _StatRows(stats: card.stats, tag: tag),
+        ],
+      ],
     );
   }
 }
