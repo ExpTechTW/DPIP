@@ -29,7 +29,14 @@ class EewEstimateTile extends StatelessWidget {
   /// theme or arrival state — M3's dark-mode `error` role is a pale pink for
   /// contrast, which reads as calm rather than urgent for a safety-critical
   /// warning.
-  static Color alertRed() => AppTheme.scheme(Brightness.light).error;
+  static Color alertRed() => _alertRed;
+
+  /// Resolved once. `AppTheme.scheme` runs `ColorScheme.fromSeed` — a full
+  /// HCT tonal-palette derivation, milliseconds on a low-end phone — and this
+  /// used to run it on every build of every EEW card, i.e. once a second per
+  /// card for the whole countdown. The seed, brightness and contrast are all
+  /// fixed here, so the answer never changes.
+  static final Color _alertRed = AppTheme.scheme(Brightness.light).error;
 
   @override
   Widget build(BuildContext context) {
