@@ -18,10 +18,10 @@ int lngToTileX(double lng, int z) {
 int latToTileY(double lat, int z) {
   final n = 1 << z;
   final latRad = degToRad(lat.clamp(-85.05112878, 85.05112878));
+  // Mercator y = ln(tan φ + sec φ), and tan φ + sec φ ≡ tan(π/4 + φ/2) — the
+  // same number from one transcendental call instead of three.
   final y =
-      ((1.0 - math.log(math.tan(latRad) + 1.0 / math.cos(latRad)) / math.pi) /
-          2.0) *
-      n;
+      (1.0 - math.log(math.tan(math.pi / 4 + latRad / 2)) / math.pi) / 2.0 * n;
   return y.floor().clamp(0, n - 1);
 }
 
