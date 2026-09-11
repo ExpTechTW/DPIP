@@ -178,6 +178,13 @@ abstract final class ColorVisionFilter {
       ? c * 12.92
       : 1.055 * math.pow(c, 1 / 2.4).toDouble() - 0.055;
 
+  /// `rgba(r, g, b, a)` / `rgb(r, g, b)`. Compiled once: [transformHex] runs
+  /// per paint value each time a map layer's style is built, and an inline
+  /// `RegExp(...)` compiles a fresh pattern on every call.
+  static final RegExp _rgbaFunctional = RegExp(
+    r'^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$',
+  );
+
   /// `(r, g, b, a, wasFunctional)` in 0–255 / 0–1, or null if unrecognised.
   static (int, int, int, double, bool)? _parseRgba(String value) {
     final text = value.trim();
@@ -201,9 +208,7 @@ abstract final class ColorVisionFilter {
         return null;
       }
     }
-    final match = RegExp(
-      r'^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$',
-    ).firstMatch(text);
+    final match = _rgbaFunctional.firstMatch(text);
     if (match == null) return null;
     try {
       return (

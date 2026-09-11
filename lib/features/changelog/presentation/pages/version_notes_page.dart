@@ -42,17 +42,25 @@ class VersionNotesPage extends StatelessWidget {
   /// page's match (tag or name, `v` stripped) so both pages agree on which
   /// entry is "current" without sharing state.
   static bool _isCurrent(ReleaseNote note, String label) {
-    final tag = note.tagName.replaceFirst(RegExp(r'^v'), '');
-    final name = note.name.replaceFirst(RegExp(r'^v'), '');
+    final tag = note.tagName.replaceFirst(_vPrefix, '');
+    final name = note.name.replaceFirst(_vPrefix, '');
     return tag == label || name == label;
   }
+
+  /// Compiled once — `_isCurrent` runs per fetched note on every build, and
+  /// every inline `RegExp(...)` compiles a fresh pattern.
+  static final RegExp _vPrefix = RegExp(r'^v');
+
+  /// A release label is a plain `major.minor`; compiled once for the same
+  /// reason as [_vPrefix].
+  static final RegExp _releaseLabel = RegExp(r'^\d+\.\d+$');
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final repo = context.read<ChangelogRepository>();
     final label = AppBuild.label;
-    final stable = RegExp(r'^\d+\.\d+$').hasMatch(label);
+    final stable = _releaseLabel.hasMatch(label);
     final typeColor = stable ? _stableColor : _snapshotColor;
     final refresh = RefreshSignal();
     return Scaffold(
