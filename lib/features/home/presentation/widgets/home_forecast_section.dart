@@ -83,6 +83,14 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
   int _sunMinute = -1;
   ({double sunrise, double sunset})? _sunlight;
 
+  /// The hour-chip strip last handed to the tree, with the inputs it was
+  /// built from (see [_chipStrip]).
+  _HourChipStrip? _strip;
+
+  /// A method, not a closure built in `build`, so the strip's callback is
+  /// the same tear-off every time and never a reason to rebuild it.
+  void _select(int index) => setState(() => _selected = index);
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -242,51 +250,13 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
             ),
           ),
           SizedBox(height: AppSpacing.md * expansion),
-          // The strip is exactly as tall as the tallest chip wants to be, not
-          // a fixed height the chips are expected to fit inside. Every line in
-          // a chip grows with the text-size setting while the icon does not,
-          // so no constant is right at every step: 108 fit until 特大, where
-          // the chips ran 16 px over it and the rain chance was cut in half.
-          // The intrinsic pass costs one extra layout of a row of ~24 chips of
-          // three short strings each.
-          IntrinsicHeight(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: AppSpacing.sm,
-                children: [
-                  for (final (index, p) in points.indexed)
-                    Builder(
-                      builder: (context) {
-                        final hour = _hourNumber(p.time);
-                        final (icon, accent) = weatherVisual(
-                          p.weather,
-                          p.weatherCode,
-                          colors,
-                          // Per hour, not per row: a clear 02:00 chip must show
-                          // a moon while the 14:00 chip beside it shows a sun.
-                          isNight:
-                              hour < sunlight.sunrise ||
-                              hour >= sunlight.sunset,
-                        );
-                        return _HourChip(
-                          time: l10n.chartHourLabel(hour),
-                          icon: icon,
-                          iconColor: accent ?? secondary,
-                          temp: '${p.temperature.round()}°',
-                          pop: l10n.homeForecastPop(p.pop.toString()),
-                          selected: index == selected,
-                          foreground: foreground,
-                          secondary: secondary,
-                          selectedFill: colors.primary.withValues(alpha: 0.16),
-                          onTap: () => setState(() => _selected = index),
-                        );
-                      },
-                    ),
-                ],
-              ),
-            ),
+          _chipStrip(
+            forecast: forecast,
+            selected: selected,
+            colors: colors,
+            foreground: foreground,
+            secondary: secondary,
+            sunlight: sunlight,
           ),
           // Snapped open, not scroll-linked like the sparkline above: this band
           // is text, and a fraction of a line of text is a line cut in half.
@@ -323,11 +293,45 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     );
   }
 
-  /// `"14:00"` → `14` for [AppLocalizations.chartHourLabel] (`14時`).
-  static int _hourNumber(String time) {
-    final colon = time.indexOf(':');
-    final raw = colon <= 0 ? time : time.substring(0, colon);
-    return int.tryParse(raw) ?? 0;
+  /// The hour-chip strip — the *same* widget instance as last time whenever
+  /// nothing it reads has changed.
+  ///
+  /// This section rebuilds on every scroll tick while [HomeForecastSection.expansion]
+  /// animates, and nothing in the strip depends on the expansion. Handing the
+  /// tree an identical instance lets `Element.updateChild` short-circuit the
+  /// whole subtree — the 24 chips, and the [IntrinsicHeight] pass over them
+  /// — the same trick the rain-trend chart uses. Keyed on the forecast's
+  /// identity rather than its point list: the freezed getter wraps the list
+  /// anew on every read, so the list is never the same object twice. Theme
+  /// and locale are read by the strip from its own context, so those still
+  /// reach it through the inherited-widget path.
+  _HourChipStrip _chipStrip({
+    required WeatherForecast forecast,
+    required int selected,
+    required ColorScheme colors,
+    required Color foreground,
+    required Color secondary,
+    required ({double sunrise, double sunset}) sunlight,
+  }) {
+    final cached = _strip;
+    if (cached != null &&
+        identical(cached.forecast, forecast) &&
+        cached.selected == selected &&
+        cached.colors == colors &&
+        cached.foreground == foreground &&
+        cached.secondary == secondary &&
+        cached.sunlight == sunlight) {
+      return cached;
+    }
+    return _strip = _HourChipStrip(
+      forecast: forecast,
+      selected: selected,
+      colors: colors,
+      foreground: foreground,
+      secondary: secondary,
+      sunlight: sunlight,
+      onSelect: _select,
+    );
   }
 
   _ForecastTemperatureSeries _temperatureSeries(WeatherForecast forecast) {
@@ -361,6 +365,89 @@ class _HomeForecastSectionState extends State<HomeForecastSection> {
     _sunMinute = minute;
     _sunlight = sunlight;
     return sunlight;
+  }
+}
+
+/// The horizontally scrolling row of hour chips under the sparkline.
+///
+/// Hoisted out of [HomeForecastSection]'s build so the section can hand the
+/// tree one instance per set of inputs (see `_chipStrip`); every field here
+/// is one of those inputs.
+class _HourChipStrip extends StatelessWidget {
+  const _HourChipStrip({
+    required this.forecast,
+    required this.selected,
+    required this.colors,
+    required this.foreground,
+    required this.secondary,
+    required this.sunlight,
+    required this.onSelect,
+  });
+
+  final WeatherForecast forecast;
+  final int selected;
+  final ColorScheme colors;
+  final Color foreground;
+  final Color secondary;
+  final ({double sunrise, double sunset}) sunlight;
+  final ValueChanged<int> onSelect;
+
+  /// `"14:00"` → `14` for [AppLocalizations.chartHourLabel] (`14時`).
+  static int _hourNumber(String time) {
+    final colon = time.indexOf(':');
+    final raw = colon <= 0 ? time : time.substring(0, colon);
+    return int.tryParse(raw) ?? 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final points = forecast.forecast;
+    final selectedFill = colors.primary.withValues(alpha: 0.16);
+    // The strip is exactly as tall as the tallest chip wants to be, not
+    // a fixed height the chips are expected to fit inside. Every line in
+    // a chip grows with the text-size setting while the icon does not,
+    // so no constant is right at every step: 108 fit until 特大, where
+    // the chips ran 16 px over it and the rain chance was cut in half.
+    // The intrinsic pass costs one extra layout of a row of ~24 chips of
+    // three short strings each.
+    return IntrinsicHeight(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpacing.sm,
+          children: [
+            for (final (index, p) in points.indexed)
+              Builder(
+                builder: (context) {
+                  final hour = _hourNumber(p.time);
+                  final (icon, accent) = weatherVisual(
+                    p.weather,
+                    p.weatherCode,
+                    colors,
+                    // Per hour, not per row: a clear 02:00 chip must show
+                    // a moon while the 14:00 chip beside it shows a sun.
+                    isNight: hour < sunlight.sunrise || hour >= sunlight.sunset,
+                  );
+                  return _HourChip(
+                    time: l10n.chartHourLabel(hour),
+                    icon: icon,
+                    iconColor: accent ?? secondary,
+                    temp: '${p.temperature.round()}°',
+                    pop: l10n.homeForecastPop(p.pop.toString()),
+                    selected: index == selected,
+                    foreground: foreground,
+                    secondary: secondary,
+                    selectedFill: selectedFill,
+                    onTap: () => onSelect(index),
+                  );
+                },
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
