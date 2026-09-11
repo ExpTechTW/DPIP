@@ -51,6 +51,38 @@ EewLocalEstimate estimateLocalShaking(
   LatLng user, {
   SeismicTravelTimeTable? table,
 }) {
+  // One-entry memo. Every alert card (home, monitor, list) recomputes this on
+  // its one-second countdown tick, and the inputs only move when a new serial
+  // arrives or the observer moves: two haversines, the attenuation law and a
+  // travel-time table scan per tick per card, for the same answer. `Eew` and
+  // `LatLng` are value types, so equality is the exact "same inputs" test;
+  // the table is compared by identity because it is a loaded asset that never
+  // changes in place.
+  final last = _last;
+  if (last != null &&
+      last.eew == eew &&
+      last.user == user &&
+      identical(last.table, table)) {
+    return last.estimate;
+  }
+  final estimate = _estimate(eew, user, table);
+  _last = (eew: eew, user: user, table: table, estimate: estimate);
+  return estimate;
+}
+
+({
+  Eew eew,
+  LatLng user,
+  SeismicTravelTimeTable? table,
+  EewLocalEstimate estimate,
+})?
+_last;
+
+EewLocalEstimate _estimate(
+  Eew eew,
+  LatLng user,
+  SeismicTravelTimeTable? table,
+) {
   final location = EewEstimator.locationInfo(
     mag: eew.info.magnitude,
     depth: eew.info.depth,
