@@ -10,7 +10,8 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:dpip/shared/map/tile_url.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// What one L1 warm actually accomplished.
@@ -725,8 +726,31 @@ class MapTileCache {
     return sample.isEmpty ? '-' : sample.join(',');
   }
 
-  static bool _isTile(String url) {
+  /// Memoised per frame directory: [warm] and [residentUrls] gate every URL
+  /// they are handed through this, and a settled fill hands over 12k+ — each
+  /// paid a `Uri.tryParse`, a `toString` and ten substring searches for an
+  /// answer its `z/x/y` siblings had already established.
+  ///
+  /// Exact, because a plain `z/x/y.ext` tail cannot change the answer: the
+  /// parse succeeds or fails on the scheme and authority, which the tail is
+  /// not part of, and every marker in [EtagInterceptor.immutableAssetMarkers]
+  /// ends in a letter followed by `/` — something a run of decimal digits can
+  /// neither contain nor complete. Both halves are pinned by
+  /// `tile_url_test.dart`.
+  static final TileUrlMemo<bool> _isTileMemo = TileUrlMemo(_parseIsTile);
+
+  static bool _isTile(String url) => _isTileMemo(url);
+
+  static bool _parseIsTile(String url) {
     final uri = Uri.tryParse(url);
     return uri != null && EtagInterceptor.isImmutableTile(uri);
   }
+
+  /// [_isTile] without the memo — the reference the memo must match.
+  @visibleForTesting
+  static bool parseIsTile(String url) => _parseIsTile(url);
+
+  /// The memoised path, for the equivalence test.
+  @visibleForTesting
+  static bool isTileUrl(String url) => _isTile(url);
 }

@@ -15,6 +15,7 @@ import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/shared/map/map_tile_warmer.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
+import 'package:dpip/shared/map/tile_url.dart';
 import 'package:dpip/shared/map/xyz_tiles.dart';
 import 'package:flutter/foundation.dart';
 
@@ -76,12 +77,20 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     // its fallback and prefetch levels. Warming only cameraZoom.floor() missed
     // the z+1 requests MapLibre makes for 256 px tiles on Retina displays,
     // which made an apparently full L1 useless during scrubs.
+    //
+    // One [TileUrlTemplate] per frame, not a `replaceFirst` chain per tile. It
+    // is compiled from `tileUrl(frame)` rather than a frame id because
+    // building the URL resolves the host list and the query string; the three
+    // placeholder scans on top of that were then repeated for every tile of
+    // every frame — 36k scans and 36k intermediate strings on a 12k-URL fill.
+    // The expansion is the same string (see [TileUrlTemplate.expand]); the
+    // readiness probe below shares the template for the same reason.
     final urls = <String>[];
     for (final frame in frames) {
-      final template = tileUrl(frame);
+      final template = TileUrlTemplate(tileUrl(frame));
       for (final group in groups) {
         for (final tile in group) {
-          urls.add(_expand(template, tile));
+          urls.add(template.expand(tile));
         }
       }
     }
@@ -117,14 +126,14 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     if (tileGroups.isEmpty) {
       return (ready: false, resident: 0, required: 0);
     }
-    final template = tileUrl(frame);
+    final template = TileUrlTemplate(tileUrl(frame));
     // Parent tiles are a useful visual fallback, but revealing on a complete
     // parent lets MapLibre replace it child-by-child a moment later — exactly
     // the patchwork flash this gate exists to prevent. The first group is the
     // highest display level native is expected to request, so only that whole
     // group makes the timestamp display-ready.
     final display = [
-      for (final tile in tileGroups.first) _expand(template, tile),
+      for (final tile in tileGroups.first) template.expand(tile),
     ];
 
     // A warm probe also *fills*, so it is handed every level — the fallback and
@@ -138,7 +147,7 @@ abstract base class FrameTileRepository implements RasterFrameSource {
       final all = <String>{
         ...display,
         for (var i = 1; i < tileGroups.length; i++)
-          for (final tile in tileGroups[i]) _expand(template, tile),
+          for (final tile in tileGroups[i]) template.expand(tile),
       };
       resident = (await warmer.prepareUrls(all)).resident;
     } else {
@@ -212,16 +221,6 @@ abstract base class FrameTileRepository implements RasterFrameSource {
     _groups = groups;
     return groups;
   }
-
-  /// Fills one `tileUrl(frame)` template in for [tile].
-  ///
-  /// The template is a parameter rather than a frame id because building it
-  /// resolves the host list and the query string: doing that per tile made a
-  /// viewport's worth of identical strings for every frame warmed or probed.
-  static String _expand(String template, XyzTile tile) => template
-      .replaceFirst('{z}', '${tile.z}')
-      .replaceFirst('{x}', '${tile.x}')
-      .replaceFirst('{y}', '${tile.y}');
 
   @override
   void cancelTileWarm() => warmer.cancel();
