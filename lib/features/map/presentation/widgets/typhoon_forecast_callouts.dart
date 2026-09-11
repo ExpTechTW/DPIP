@@ -16,6 +16,8 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/typhoon/domain/compass_direction.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart'
+    show mapChromeBlursBackdrop;
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -445,6 +447,8 @@ class _PlacedCallout {
 class _CalloutCard extends StatelessWidget {
   const _CalloutCard({required this.data, required this.selected});
 
+  static final ImageFilter _blur = ImageFilter.blur(sigmaX: 12, sigmaY: 12);
+
   final ForecastCalloutData data;
   final bool selected;
 
@@ -456,10 +460,16 @@ class _CalloutCard extends StatelessWidget {
         ? colors.tertiary
         : colors.outline.withValues(alpha: 0.35);
 
+    // One filter for every card: [ImageFilter] has no value equality, so a
+    // fresh one per build recomposited each card's backdrop on every
+    // reprojection. Android draws the card flat — the blur cannot reach a
+    // platform-view map there, or costs a whole-scene re-raster per map frame
+    // (see [mapChromeBlursBackdrop]).
     return ClipRRect(
       borderRadius: AppRadius.small,
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        filter: _blur,
+        enabled: mapChromeBlursBackdrop,
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: colors.surface.withValues(alpha: 0.88),
