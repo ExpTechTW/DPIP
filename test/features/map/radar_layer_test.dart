@@ -142,10 +142,7 @@ void main() {
         'visible',
         reason: 'neighbours stay visible so their tiles stay loaded',
       );
-      expect(
-        controller.opacityOf('radar-lyr-${frames[i].id}'),
-        '${RasterTimelineLayer.preloadOpacity}',
-      );
+      expect(controller.opacityOf('radar-lyr-${frames[i].id}'), '0.0');
     }
   });
 
@@ -257,7 +254,7 @@ void main() {
         reason: 'one scrub frame must cross the platform channel only once',
       );
       expect(controller.calls, [
-        'set:radar-lyr-${frames[4].id}:${RasterTimelineLayer.preloadOpacity}',
+        'set:radar-lyr-${frames[4].id}:0.0',
         'set:radar-lyr-${frames[5].id}:0.85',
       ]);
       expect(
@@ -322,10 +319,7 @@ void main() {
     expect(layer.readyVisibleFrameId.value, frames[2].id);
     await layer.show(controller, frames[3], scrubbing: true);
 
-    expect(
-      controller.opacityOf('radar-lyr-${frames[2].id}'),
-      '${RasterTimelineLayer.preloadOpacity}',
-    );
+    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
     expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
     expect(layer.readyVisibleFrameId.value, frames[3].id);
     expect(
@@ -333,6 +327,39 @@ void main() {
       isEmpty,
       reason: 'native render readiness must not be overruled by an empty L1',
     );
+  });
+
+  test('a cold settle target fetches; its ring neighbours do not', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(9))..ready = false;
+    final layer = testRadarLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    await layer.show(controller, frames[4]);
+
+    expect(
+      controller.opacityOf('radar-lyr-${frames[4].id}'),
+      '${RasterTimelineLayer.preloadOpacity}',
+      reason:
+          'at exactly 0 MapLibre never requests the tiles, and the settle '
+          'waited out its whole readiness timeout for nothing',
+    );
+    expect(
+      controller.opacityOf('radar-lyr-${frames[2].id}'),
+      '0.85',
+      reason: 'the previous complete frame stays on screen meanwhile',
+    );
+    for (final i in [3, 5, 6]) {
+      expect(
+        controller.opacityOf('radar-lyr-${frames[i].id}'),
+        '0.0',
+        reason:
+            'a neighbour above 0 would re-fetch its viewport on every pan — '
+            'five viewports of raster decode per gesture on a low-end phone',
+      );
+    }
   });
 
   test('a late native idle completes a settle after an L1 miss', () async {
@@ -349,10 +376,7 @@ void main() {
     layer.onMapIdle();
     await Future<void>.delayed(const Duration(milliseconds: 80));
 
-    expect(
-      controller.opacityOf('radar-lyr-${frames[2].id}'),
-      '${RasterTimelineLayer.preloadOpacity}',
-    );
+    expect(controller.opacityOf('radar-lyr-${frames[2].id}'), '0.0');
     expect(controller.opacityOf('radar-lyr-${frames[3].id}'), '0.85');
   });
 
@@ -456,14 +480,11 @@ void main() {
 
     await layer.show(controller, frames[1], scrubbing: true);
 
-    expect(
-      controller.opacityOf('radar-lyr-${frames[4].id}'),
-      '${RasterTimelineLayer.preloadOpacity}',
-    );
+    expect(controller.opacityOf('radar-lyr-${frames[4].id}'), '0.0');
     expect(controller.opacityOf('radar-lyr-${frames[1].id}'), '0.85');
     expect(controller.calls, [
-      'set:radar-lyr-${frames[1].id}:${RasterTimelineLayer.preloadOpacity}',
-      'set:radar-lyr-${frames[4].id}:${RasterTimelineLayer.preloadOpacity}',
+      'set:radar-lyr-${frames[1].id}:0.0',
+      'set:radar-lyr-${frames[4].id}:0.0',
       'set:radar-lyr-${frames[1].id}:0.85',
     ]);
     expect(
