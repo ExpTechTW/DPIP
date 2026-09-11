@@ -348,27 +348,28 @@ class NetworkUsageStore {
     int hour,
     _Pending add,
   ) async {
-    final sets = _columns.map((c) => '$c = $c + ?').join(', ');
     final values = [add.down, add.saved, add.hits, add.misses];
-    final result = await tx.execute(
-      'UPDATE $_buckets SET $sets WHERE hour = ?',
-      [...values, hour],
-    );
+    final result = await tx.execute(_updateSql, [...values, hour]);
     if (result.isEmpty) {
-      await tx.execute(
-        'INSERT INTO $_buckets (hour, ${_columns.join(', ')}) '
-        'VALUES (?, ?, ?, ?, ?)',
-        [hour, ...values],
-      );
+      await tx.execute(_insertSql, [hour, ...values]);
     }
   }
 
+  // The statements are assembled once. They were rebuilt from [_columns] by
+  // map/join on every flush and every stats read — the same string each time.
+  static final String _updateSql =
+      'UPDATE $_buckets SET '
+      '${_columns.map((c) => '$c = $c + ?').join(', ')} WHERE hour = ?';
+  static final String _insertSql =
+      'INSERT INTO $_buckets (hour, ${_columns.join(', ')}) '
+      'VALUES (?, ?, ?, ?, ?)';
+  static final String _sumSql =
+      'SELECT ${_columns.map((c) => 'COALESCE(SUM($c), 0) AS $c').join(', ')} '
+      'FROM $_buckets WHERE hour >= ?';
+
   /// Sums every counter over one trailing window in a single query.
   Future<_Pending> _sumSince(int sinceHour) async {
-    final sums = _columns.map((c) => 'COALESCE(SUM($c), 0) AS $c').join(', ');
-    final row = await _db.get('SELECT $sums FROM $_buckets WHERE hour >= ?', [
-      sinceHour,
-    ]);
+    final row = await _db.get(_sumSql, [sinceHour]);
     return _Pending()
       ..down = (row['down'] as num).toInt()
       ..saved = (row['saved'] as num).toInt()
