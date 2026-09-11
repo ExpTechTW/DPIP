@@ -1665,8 +1665,16 @@ abstract class RasterTimelineLayer implements MapLayer {
     // No invalidation here. The band is keyed on the camera as well as the
     // centre, so a real move re-warms on its own and an idle that reports the
     // same camera is the duplicate it looks like.
+    //
+    // Not immediate: the warmer's settle delay is what lets a step-pan (move,
+    // pause, move) coalesce. Started at once, each pause began a
+    // [warmFrameBudget]-frame L1 probe and SQLite fill on the platform thread
+    // — the same thread the newly visible tiles have to come back through —
+    // only for the next step to cancel it mid-probe. Nothing the fill would
+    // have done in those first 120 ms is lost: it runs the same, once the
+    // camera has genuinely stopped.
     MapTileCache.trace(() => 'timeline=$id camera-idle centre=$centre');
-    unawaited(_warmBand(controller, centre, immediate: true));
+    unawaited(_warmBand(controller, centre));
   }
 
   @override
