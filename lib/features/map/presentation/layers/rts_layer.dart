@@ -4,6 +4,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -184,6 +185,17 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   Timer? _blinkTimer;
   bool _boxVisible = true;
   bool _epicenterVisible = true;
+
+  /// Signature of the box collection currently on the map (see [_pushBox]).
+  ///
+  /// The wavefront ticker calls [_pushBox] at display rate, but the grid it
+  /// draws only changes when the feed's box set changes (~1 Hz) or a box is
+  /// swept past by the S wave (once, ever, per box). Every other tick used to
+  /// re-serialise the whole grid, ship it across the platform channel and make
+  /// MapLibre re-tile it — sixty times a second, during an alert, on the
+  /// device's worst minute. `null` means nothing is known to be there, so the
+  /// next push always lands.
+  String? _boxOnMap;
 
   /// Whether the EEW source on the map currently holds [_emptyCollection].
   ///
@@ -396,6 +408,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     _appliedStatus = null;
     // [_setupEew] has just seeded the source with [_emptyCollection].
     _eewSourceEmpty = true;
+    // The box source was just re-added empty above.
+    _boxOnMap = null;
     await _pushUpdate();
     if (!_listening) {
       _feed.addListener(_onFeed);
@@ -632,7 +646,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final hasBox = (_feed.state.data?.box.isNotEmpty) ?? false;
     try {
       if (hasBox) {
-        await controller.setGeoJsonSource(_boxSourceId, _boxGeoJson(grid));
+        final (geoJson, signature) = _boxGeoJson(grid);
+        if (signature != _boxOnMap) {
+          await controller.setGeoJsonSource(_boxSourceId, geoJson);
+          _boxOnMap = signature;
+        }
       }
       if (hasBox != _boxVisible) {
         _boxVisible = hasBox;
@@ -648,11 +666,17 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// S-wave has already fully swept past (see [_isBoxFullyCovered]) so it
   /// stops blinking instead of blinking forever once it's no longer live
   /// information.
-  Map<String, dynamic> _boxGeoJson(RtsBoxGrid grid) {
+  ///
+  /// Also returns the collection's signature — the surviving ids with their
+  /// intensities, in order — which is everything the geometry depends on,
+  /// since a ring is a function of its id alone. [_pushBox] compares it
+  /// against what the map already holds.
+  (Map<String, dynamic>, String) _boxGeoJson(RtsBoxGrid grid) {
     final box = _feed.state.data?.box ?? const {};
     final alerts = _eew.state.data ?? const <Eew>[];
     final now = AppTime.utc;
     final features = <Map<String, dynamic>>[];
+    final signature = StringBuffer();
     for (final entry in box.entries) {
       final id = int.tryParse(entry.key);
       final ring = id == null ? null : grid.rings[id];
@@ -661,6 +685,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           _isBoxFullyCovered(ring, alerts, _travelTime!, now)) {
         continue;
       }
+      signature
+        ..write(entry.key)
+        ..write(':')
+        ..write(entry.value)
+        ..write(',');
       features.add({
         'type': 'Feature',
         'geometry': {
@@ -670,8 +699,17 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         'properties': {'i': entry.value},
       });
     }
-    return {'type': 'FeatureCollection', 'features': features};
+    return (
+      {'type': 'FeatureCollection', 'features': features},
+      signature.toString(),
+    );
   }
+
+  /// Metres per degree of latitude on the sphere [geo.LatLng.distanceTo]
+  /// measures on — the great-circle distance between two points is never less
+  /// than their meridional separation, so a corner whose latitude alone puts
+  /// it past the radius is outside it without the trig.
+  static const double _metresPerLatDegree = 6378137 * math.pi / 180;
 
   /// Whether every corner of [ring] is already within some active alert's
   /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
@@ -693,13 +731,16 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       final radiusKm = table.waveRadius(info.depth, elapsed).s;
       if (radiusKm <= 0) continue;
       final epicenter = info.latlng;
-      final allCornersCovered = ring
-          .take(4)
-          .every(
-            (point) =>
-                epicenter.distanceTo(geo.LatLng(point[1], point[0])) / 1000 <=
-                radiusKm,
-          );
+      final radiusMetres = radiusKm * 1000;
+      final allCornersCovered = ring.take(4).every((point) {
+        final lat = point[1];
+        // Exact reject: meridional distance is a lower bound on the geodesic.
+        if ((lat - epicenter.latitude).abs() * _metresPerLatDegree >
+            radiusMetres) {
+          return false;
+        }
+        return epicenter.distanceTo(geo.LatLng(lat, point[0])) <= radiusMetres;
+      });
       if (allCornersCovered) return true;
     }
     return false;
@@ -922,6 +963,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   @override
   void onStyleReset() {
     _added = false;
+    _boxOnMap = null;
     // The style reload wipes the base style's county/town fill back to
     // default — this cache would otherwise think a still-active alert's
     // tint is already applied and skip re-painting it.
