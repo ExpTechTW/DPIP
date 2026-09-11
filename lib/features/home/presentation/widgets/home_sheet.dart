@@ -7,6 +7,8 @@ import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart'
+    show mapChromeBlursBackdrop;
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -244,9 +246,15 @@ class _CachedBlurState extends State<_CachedBlur> {
     // filter resolves or the layer is pushed, and leaves the widget, element and
     // render object in place — so it cannot cause the re-parent flash this file
     // warns about in [_ScrollBlurredWeather].
+    //
+    // Android never blurs here: the map under this sheet is a platform view,
+    // and a backdrop filter over it is either blind (HCPP) or the reason every
+    // map frame re-rasterises the whole sheet (virtual display) — see
+    // [mapChromeBlursBackdrop]. The tint alone is what those phones showed
+    // through the frost anyway; the tree keeps its shape either way.
     return BackdropFilter(
       filter: _filter!,
-      enabled: _sigma > 0,
+      enabled: _sigma > 0 && mapChromeBlursBackdrop,
       child: widget.child,
     );
   }

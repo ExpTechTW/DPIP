@@ -22,6 +22,8 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart'
+    show mapChromeBlursBackdrop;
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
 import 'package:flutter/material.dart';
@@ -241,9 +243,14 @@ class _HomePageState extends State<HomePage> {
                       // sheet's sky). `enabled` makes the filter a no-op at
                       // rest without touching the tree: disabled, it paints the
                       // child straight through and reads back nothing.
+                      //
+                      // Android keeps only the dim: over a platform-view map
+                      // the blur is blind (HCPP) or makes every map frame
+                      // re-rasterise the whole screen through it (virtual
+                      // display) — see [mapChromeBlursBackdrop].
                       return BackdropFilter(
                         filter: _mapBlur!,
-                        enabled: t > 0,
+                        enabled: t > 0 && mapChromeBlursBackdrop,
                         child: ColoredBox(
                           color: Colors.black.withValues(alpha: dim),
                         ),
