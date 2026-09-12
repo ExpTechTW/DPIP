@@ -1696,6 +1696,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingPermCritical => '重大通知';
 
   @override
+  String get onboardingPermUrgentAndroid => '勿擾模式下的重大通知';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '依需求選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。';
+
+  @override
+  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。';
+
+  @override
+  String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
+
+  @override
+  String get urgentNotificationFollowsDnd => '遵循勿擾模式';
+
+  @override
   String trendCumulativeTotal(String total) {
     return '累計 $total mm';
   }
@@ -4944,6 +4960,22 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get onboardingPermCritical => '重要警告';
+
+  @override
+  String get onboardingPermUrgentAndroid => '勿扰模式下的重要通知';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '按需选择可在勿扰模式期间发出的重要通知。静音、音量及当前模式仍会影响声音。';
+
+  @override
+  String get permissionGuideUrgentAndroid => '请在频道设置中选择是否允许此通知打断勿扰模式,再返回 DPIP。';
+
+  @override
+  String get urgentNotificationBypassesDnd => '勿扰模式期间仍允许通知';
+
+  @override
+  String get urgentNotificationFollowsDnd => '遵循勿扰模式';
 
   @override
   String trendCumulativeTotal(String total) {
@@ -8196,6 +8228,22 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingPermCritical => '重大通知';
 
   @override
+  String get onboardingPermUrgentAndroid => '勿擾模式下的重大通知';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '依需要選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。';
+
+  @override
+  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。';
+
+  @override
+  String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
+
+  @override
+  String get urgentNotificationFollowsDnd => '遵循勿擾模式';
+
+  @override
   String trendCumulativeTotal(String total) {
     return '累計 $total mm';
   }
@@ -11444,6 +11492,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingPermCritical => '重大通知';
+
+  @override
+  String get onboardingPermUrgentAndroid => '勿擾模式下的重大通知';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '依需求選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。';
+
+  @override
+  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。';
+
+  @override
+  String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
+
+  @override
+  String get urgentNotificationFollowsDnd => '遵循勿擾模式';
 
   @override
   String trendCumulativeTotal(String total) {

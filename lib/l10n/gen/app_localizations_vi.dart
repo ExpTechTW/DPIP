@@ -1737,6 +1737,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingPermCritical => 'Cảnh báo quan trọng';
 
   @override
+  String get onboardingPermUrgentAndroid =>
+      'Cảnh báo quan trọng trong Không làm phiền';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      'Kiểm tra từng kênh cảnh báo quan trọng để Android có thể cho phép trong chế độ Không làm phiền. Chế độ im lặng, âm lượng và Chế độ hiện tại vẫn áp dụng.';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      'Trong cài đặt kênh, chọn xem thông báo này có thể làm gián đoạn chế độ Không làm phiền hay không, rồi quay lại DPIP.';
+
+  @override
+  String get urgentNotificationBypassesDnd => 'Được phép trong Không làm phiền';
+
+  @override
+  String get urgentNotificationFollowsDnd => 'Tuân theo Không làm phiền';
+
+  @override
   String trendCumulativeTotal(String total) {
     return 'Tổng cộng $total mm';
   }

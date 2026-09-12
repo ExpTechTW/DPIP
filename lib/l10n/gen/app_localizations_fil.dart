@@ -1746,6 +1746,24 @@ class AppLocalizationsFil extends AppLocalizations {
   String get onboardingPermCritical => 'Mga kritikal na alerto';
 
   @override
+  String get onboardingPermUrgentAndroid =>
+      'Mahahalagang alerto sa Do Not Disturb';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      'Suriin ang bawat mahalagang channel para payagan ito ng Android sa Do Not Disturb. Nalalapat pa rin ang silent mode, volume, at kasalukuyang Mode.';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      'Sa channel settings, piliin kung maaaring gambalain ng notification na ito ang Do Not Disturb, pagkatapos ay bumalik sa DPIP.';
+
+  @override
+  String get urgentNotificationBypassesDnd => 'Pinapayagan sa Do Not Disturb';
+
+  @override
+  String get urgentNotificationFollowsDnd => 'Sumusunod sa Do Not Disturb';
+
+  @override
   String trendCumulativeTotal(String total) {
     return 'Kabuuang $total mm';
   }
