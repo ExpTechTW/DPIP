@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "資料圖層",
   "radarLightningOverlay": "顯示閃電",
   "radarLightningOverlayHint": "顯示同畫面回波同一時間嘅落雷",
-  "radarLightningOverlaySubtitle": "喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。"
+  "radarLightningOverlaySubtitle": "喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。",
+  "moreSectionAccessibility": "無障礙",
+  "eewSpokenAnnouncementOn": "開啟",
+  "eewSpokenAnnouncementOnDescription": "會先讀出預估震度，之後先播警示音——即係警示音會遲咗一句嘢咁耐。",
+  "eewSpokenAnnouncementOff": "關閉"
 }

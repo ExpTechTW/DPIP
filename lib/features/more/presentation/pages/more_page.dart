@@ -39,6 +39,9 @@ class MorePage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
     final eewCwaOnly = context.watch<EewCwaOnlySettings>().enabled;
+    final spokenIntensity = context
+        .watch<EewSpokenAnnouncementSettings>()
+        .enabled;
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -87,12 +90,6 @@ class MorePage extends StatelessWidget {
                   ),
                   onTap: () => context.pushNamed(AppRoutes.permissions),
                 ),
-                // In the notification group rather than under 顯示: what this
-                // switches is the order of two *sounds*, not anything drawn.
-                // Below 權限檢查, which has to stay next to the notification
-                // settings — it is the row people reach for when an alert did
-                // not arrive.
-                const _SpokenAnnouncementTile(),
                 // What the system says actually went out — a status page, kept
                 // in the notification group because that is where you look when
                 // an alert did not arrive.
@@ -136,6 +133,26 @@ class MorePage extends StatelessWidget {
             // Its own section rather than a row under 進階: the LoRa mesh is the
             // app's off-grid reception path, not a developer curiosity, and the
             // radio it pairs with is a physical thing the user owns and manages.
+            // Its own section rather than a row under 通知 or 顯示: what it
+            // switches is neither a notification's delivery nor anything drawn,
+            // and the settings it belongs beside — colour vision, contrast,
+            // text size — are currently inside the Display page. This section
+            // is where they would move if that page is ever split up.
+            SectionHeader(l10n.moreSectionAccessibility),
+            _MoreGroup(
+              children: [
+                _MoreTile(
+                  icon: spokenIntensity
+                      ? Icons.record_voice_over_outlined
+                      : Icons.voice_over_off_outlined,
+                  title: l10n.eewSpokenAnnouncementTitle,
+                  subtitle: spokenIntensity
+                      ? l10n.eewSpokenAnnouncementOn
+                      : l10n.eewSpokenAnnouncementOff,
+                  onTap: () => context.pushNamed(AppRoutes.spokenIntensity),
+                ),
+              ],
+            ),
             SectionHeader(l10n.moreSectionMesh),
             _MoreGroup(
               children: [
@@ -476,35 +493,6 @@ class _MoreTile extends StatelessWidget {
       subtitle: subtitle == null ? null : Text(subtitle!),
       trailing: trailing ?? const Icon(Icons.chevron_right),
       onTap: onTap,
-    );
-  }
-}
-
-/// The monitor's spoken-intensity switch.
-///
-/// A row that acts rather than navigates, so it carries its own trailing
-/// [Switch] instead of `_MoreTile`'s chevron, and the whole row toggles — a
-/// switch you can only hit by aiming at the switch is a smaller target than the
-/// row it sits in.
-class _SpokenAnnouncementTile extends StatelessWidget {
-  const _SpokenAnnouncementTile();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final settings = context.watch<EewSpokenAnnouncementSettings>();
-    final enabled = settings.enabled;
-    return _MoreTile(
-      icon: enabled
-          ? Icons.record_voice_over_outlined
-          : Icons.voice_over_off_outlined,
-      title: l10n.eewSpokenAnnouncementTitle,
-      subtitle: l10n.eewSpokenAnnouncementDescription,
-      trailing: Switch(
-        value: enabled,
-        onChanged: (value) => settings.setEnabled(value),
-      ),
-      onTap: () => settings.setEnabled(!enabled),
     );
   }
 }

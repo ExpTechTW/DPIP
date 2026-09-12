@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "データレイヤー",
   "radarLightningOverlay": "雷を表示",
   "radarLightningOverlayHint": "表示中のエコーと同時刻の落雷",
-  "radarLightningOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。"
+  "radarLightningOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。",
+  "moreSectionAccessibility": "アクセシビリティ",
+  "eewSpokenAnnouncementOn": "オン",
+  "eewSpokenAnnouncementOnDescription": "予想震度を音声で読み上げてから警報音を鳴らします。その分、警報音は読み上げの長さだけ遅れます。",
+  "eewSpokenAnnouncementOff": "オフ"
 }

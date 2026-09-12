@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "Mga layer ng datos",
   "radarLightningOverlay": "Ipakita ang kidlat",
   "radarLightningOverlayHint": "Kidlat sa oras ng frame na nakikita",
-  "radarLightningOverlaySubtitle": "Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo."
+  "radarLightningOverlaySubtitle": "Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo.",
+  "moreSectionAccessibility": "Accessibility",
+  "eewSpokenAnnouncementOn": "Naka-on",
+  "eewSpokenAnnouncementOnDescription": "Babasahin muna nang malakas ang tinatayang intensidad bago tumunog ang babala — kaya naaantala ito nang kasinghaba ng pangungusap.",
+  "eewSpokenAnnouncementOff": "Naka-off"
 }

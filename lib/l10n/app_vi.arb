@@ -1991,5 +1991,9 @@
   "mapOverlaySectionData": "Lớp dữ liệu",
   "radarLightningOverlay": "Hiện sét",
   "radarLightningOverlayHint": "Sét cùng thời điểm với ảnh đang xem",
-  "radarLightningOverlaySubtitle": "Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị."
+  "radarLightningOverlaySubtitle": "Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị.",
+  "moreSectionAccessibility": "Trợ năng",
+  "eewSpokenAnnouncementOn": "Bật",
+  "eewSpokenAnnouncementOnDescription": "Cường độ dự kiến được đọc lên trước, sau đó mới phát âm báo động — nên âm báo động chậm lại đúng bằng thời lượng câu đọc.",
+  "eewSpokenAnnouncementOff": "Tắt"
 }

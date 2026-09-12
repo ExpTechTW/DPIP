@@ -3272,4 +3272,17 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       '현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다.';
+
+  @override
+  String get moreSectionAccessibility => '접근성';
+
+  @override
+  String get eewSpokenAnnouncementOn => '켜기';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '예상 진도를 음성으로 먼저 안내한 뒤 경보음이 울립니다. 그만큼 경보음이 늦어집니다.';
+
+  @override
+  String get eewSpokenAnnouncementOff => '끄기';
 }

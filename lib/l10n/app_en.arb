@@ -4004,5 +4004,21 @@
   "radarLightningOverlaySubtitle": "Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.",
   "@radarLightningOverlaySubtitle": {
     "description": "Tooltip for the lightning toggle in the radar overlay menu."
+  },
+  "moreSectionAccessibility": "Accessibility",
+  "@moreSectionAccessibility": {
+    "description": "More menu section header for accessibility settings"
+  },
+  "eewSpokenAnnouncementOn": "On",
+  "eewSpokenAnnouncementOnDescription": "The estimated intensity is read aloud first, then the warning sound plays — which delays it by however long the phrase takes.",
+  "eewSpokenAnnouncementOff": "Off",
+  "@eewSpokenAnnouncementOn": {
+    "description": "Option label: the monitor speaks before the warning sound"
+  },
+  "@eewSpokenAnnouncementOnDescription": {
+    "description": "Explains that speech delays the warning sound by the length of the phrase"
+  },
+  "@eewSpokenAnnouncementOff": {
+    "description": "Option label: no announcement, warning sound only"
   }
 }

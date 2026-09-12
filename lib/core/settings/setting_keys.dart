@@ -244,8 +244,8 @@ abstract final class SettingKeys {
     'earthquake.eewCwaOnly',
   );
 
-  /// Whether the visible seismic monitor speaks the estimated intensity before
-  /// the EEW warning sound. Defaults to true. See
+  /// Whether the seismic monitor speaks the estimated intensity before the EEW
+  /// warning sound. Defaults to false — it delays the sound. See
   /// `EewSpokenAnnouncementSettings`.
   static const SettingKey<bool> eewSpokenAnnouncement = SettingKey<bool>._(
     'earthquake.eewSpokenAnnouncement',
