@@ -63,6 +63,7 @@ import 'package:dpip/shared/map/map_style.dart'
         townLabelLayerId;
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
@@ -202,18 +203,29 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                       // the same intensity legend the live monitor carries,
                       // switching to the EEW felt-scale while an alert is up
                       // (the legacy monitor did exactly this on active EEW).
-                      ListenableBuilder(
-                        listenable: _session.eew,
-                        builder: (context, _) {
-                          final hasEew = _session.eew.alerts.isNotEmpty;
-                          return MapLegendCard(
-                            child: IntensityLegend(
-                              mode: hasEew
-                                  ? IntensityLegendMode.eew
-                                  : IntensityLegendMode.rts,
-                            ),
-                          );
-                        },
+                      //
+                      // Collapsible, and collapsed to a chip to start with,
+                      // exactly as [MapScaffold] mounts every layer's legend:
+                      // this page is a full-screen map too, and an eleven-row
+                      // scale pinned open covers the north-west corner of the
+                      // island for the whole replay. The wrap sits *outside*
+                      // the mode swap on purpose — an alert arriving mid-replay
+                      // changes the scale being shown, not whether the user
+                      // asked to see it.
+                      CollapsibleMapLegend(
+                        legend: ListenableBuilder(
+                          listenable: _session.eew,
+                          builder: (context, _) {
+                            final hasEew = _session.eew.alerts.isNotEmpty;
+                            return MapLegendCard(
+                              child: IntensityLegend(
+                                mode: hasEew
+                                    ? IntensityLegendMode.eew
+                                    : IntensityLegendMode.rts,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -944,9 +956,11 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// Tints the whole island by estimated shaking while an EEW alert is up —
   /// the legacy monitor's county/town fill behaviour, driven by the same
   /// [`EewEstimator.areaPga`] math. The base style's own `town` fill layer is
-  /// recoloured with a `match` on each township's `CODE` (hidden counties
-  /// beneath), so the felt-intensity wash reads over the base map without a
-  /// second geometry source; when the alerts clear the fills are restored.
+  /// recoloured with a `match` on each township's `CODE`, so the felt-intensity
+  /// wash reads over the base map without a second geometry source; when the
+  /// alerts clear the wash is cleared. The county fill underneath stays the
+  /// opaque grey island throughout — the wash is transparent wherever the
+  /// estimate reads 0, and something has to be opaque over Taiwan there.
   ///
   /// With two simultaneous quakes this must use whichever alert
   /// [_ReplayMap.eewIndex] currently selects (the same one the card above is
@@ -966,11 +980,17 @@ class _ReplayMapState extends State<_ReplayMap> {
 
     final baseFill = MapColors.of(Theme.of(context).brightness).fill;
     try {
+      // The opaque grey island is this layer's job in *every* state, alert or
+      // not, so it is restored before the branch rather than hidden under the
+      // wash. Hiding it during an alert left nothing opaque over Taiwan
+      // wherever the estimate reads 0 — the wash falls back to transparent
+      // there — and the EEW S-wave disc, anchored below [landLayerId] so it
+      // washes open sea only, came through the island instead.
+      await controller.setLayerProperties(
+        countyFillLayerId,
+        FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
+      );
       if (selected == null) {
-        await controller.setLayerProperties(
-          countyFillLayerId,
-          FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
-        );
         // Back to the baked default. This layer is the wash and nothing else:
         // with no alert up it paints nothing, so the OSM detailed ground —
         // which mounts directly beneath it — keeps showing. The grey island is
@@ -1003,10 +1023,6 @@ class _ReplayMapState extends State<_ReplayMap> {
       if (entries.isEmpty) return;
 
       await controller.setLayerProperties(
-        countyFillLayerId,
-        const FillLayerProperties(fillColor: '#00000000', fillOpacity: 0),
-      );
-      await controller.setLayerProperties(
         townFillLayerId,
         FillLayerProperties(
           fillColor: <Object>[
@@ -1015,9 +1031,9 @@ class _ReplayMapState extends State<_ReplayMap> {
             ...entries,
             // Transparent, not the palette grey: a township the estimate puts
             // at 0 has to leave whatever is under it showing — the OSM
-            // detailed ground when that layer is on, the grey `land` fill when
-            // it is not. Falling back to grey painted a flat sheet over the
-            // detailed map everywhere the shaking was 0.
+            // detailed ground when that layer is on, the county fill's grey
+            // when it is not. Falling back to grey painted a flat sheet over
+            // the detailed map everywhere the shaking was 0.
             'rgba(0, 0, 0, 0)',
           ],
           fillOpacity: 1,

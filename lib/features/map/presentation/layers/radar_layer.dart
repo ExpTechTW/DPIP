@@ -9,8 +9,10 @@ import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart'
 import 'package:dpip/features/map/presentation/layers/lightning_strike_overlay.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/map/presentation/layers/scan_range_overlay_chrome.dart';
+import 'package:dpip/features/map/presentation/layers/wind_arrow_overlay.dart';
 import 'package:dpip/features/map/presentation/widgets/radar_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
+import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -33,26 +35,47 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// all: while they came through from underneath there was no way to get an
 /// uninterrupted raster.
 ///
-/// The options chip also carries the **lightning** overlay: the strikes of the
-/// frame the echo is showing, drawn by the same [LightningStrikeOverlay] the
-/// standalone 閃電 layer uses. It follows the timeline rather than the wall
-/// clock — scrubbing back an hour moves the strikes back with the echo — which
-/// is the whole point of putting it here instead of asking the user to compare
+/// The options chip also carries two **data** overlays: the **lightning**
+/// strikes of the frame the echo is showing, drawn by the same
+/// [LightningStrikeOverlay] the standalone 閃電 layer uses, and the station
+/// **wind** arrows of that same frame, drawn by the same [WindArrowOverlay] the
+/// standalone 風向 layer uses. Both follow the timeline rather than the wall
+/// clock — scrubbing back an hour moves the marks back with the echo — which is
+/// the whole point of putting them here instead of asking the user to compare
 /// two layers by memory.
+///
+/// The two feeds run on their own clocks, so "the same frame" is resolved per
+/// overlay rather than assumed: strikes take the snapshot nearest the frame
+/// ([_lightningTolerance]), hourly observations the one in effect at it
+/// ([_windMaxAge]).
+///
+/// **At most one of the two is ever on.** Strikes and arrows are both dense
+/// point marks over the whole island at the same on-screen size, so together
+/// they cover each other and the echo underneath; switching one on therefore
+/// switches the other off rather than offering a third, unreadable, state.
 class RadarMapLayer extends RasterTimelineLayer
     with AdminOutlineChrome, ScanRangeOverlayChrome {
   RadarMapLayer(
     RadarRepository super.repository,
     this.referenceOutline, {
     required MeteorLightningRepository lightning,
+    required MeteorWeatherRepository weather,
     required SettingsStore settings,
   }) : _settings = settings,
        _lightning = LightningStrikeOverlay(
          lightning,
          namespace: 'radar-lightning',
        ),
+       _wind = WindArrowOverlay(weather, namespace: 'radar-wind'),
        showLightning = ValueNotifier(
          settings.getBool(SettingKeys.mapRadarShowLightning) ?? false,
+       ),
+       // A stored `true` on both (an older build, a hand-edited store) would
+       // mount two overlays the UI can only describe as one, so lightning —
+       // the older option — wins and wind stays off until it is asked for.
+       showWind = ValueNotifier(
+         (settings.getBool(SettingKeys.mapRadarShowWind) ?? false) &&
+             !(settings.getBool(SettingKeys.mapRadarShowLightning) ?? false),
        );
 
   @override
@@ -64,35 +87,60 @@ class RadarMapLayer extends RasterTimelineLayer
   /// here can never collide with the standalone 閃電 layer's mount.
   final LightningStrikeOverlay _lightning;
 
+  /// The wind arrows, likewise on this layer's own ids so they cannot collide
+  /// with the standalone 風向 layer's mount.
+  final WindArrowOverlay _wind;
+
   /// Whether the echo also draws its frame's strikes. Persisted, and off by
   /// default: the echo alone is what a reader came for, and every extra mark
   /// on it is one the reader did not ask for.
   final ValueNotifier<bool> showLightning;
 
-  /// The lightning snapshot times (Unix seconds, ascending) the strike overlay
-  /// can be asked for — the radar timeline has its own, coarser steps, so the
-  /// two lists are matched by [_lightningIdFor] rather than assumed aligned.
-  List<int> _lightningSeconds = const [];
+  /// Whether the echo also draws its frame's station wind arrows. Same default
+  /// and same reason as [showLightning]; never on at the same time as it.
+  final ValueNotifier<bool> showWind;
 
-  /// How far a lightning snapshot may sit from the radar frame and still be
-  /// drawn on it.
+  /// The lightning / weather snapshot times (Unix seconds, ascending) each
+  /// overlay can be asked for — the radar timeline has its own, coarser steps,
+  /// so the lists are matched by [_nearestId] rather than assumed aligned.
+  List<int> _lightningSeconds = const [];
+  List<int> _windSeconds = const [];
+
+  /// How far a strike snapshot may sit from the radar frame and still be drawn
+  /// on it.
   ///
   /// The radar composite publishes every ten minutes and the strike snapshots
-  /// on their own cadence, so an exact match is not on offer and some slack is
-  /// required. Beyond this the overlay draws nothing rather than something:
-  /// strikes half an hour out of step with the echo under them are not a
-  /// slightly stale picture, they are a different storm.
+  /// every five, so an exact match is not on offer and some slack is required —
+  /// but only that much. Beyond this the overlay draws nothing rather than
+  /// something: strikes half an hour out of step with the echo under them are
+  /// not a slightly stale picture, they are a different storm.
   static const Duration _lightningTolerance = Duration(minutes: 10);
 
-  /// Serialises the overlay's map mutations. A scrub can deliver frames faster
-  /// than a fetch completes, and two interleaved `setGeoJsonSource` calls on
-  /// one source leave whichever finished last on screen — not whichever frame
-  /// the timeline is actually on.
-  Future<void> _lightningChain = Future<void>.value();
+  /// How old the station observation drawn on a radar frame may be.
+  ///
+  /// The observation feed is **hourly** — `/meteor/weather/list` steps in
+  /// 3600s, and even `latest` lands on the hour — against the echo's ten
+  /// minutes. Matched the way the strikes are, nearest-within-ten-minutes, five
+  /// of every six frames would have no observation near enough and the arrows
+  /// would blink out for most of a scrub. So wind is matched the way an hourly
+  /// reading actually applies: each frame draws the newest observation taken
+  /// **at or before** it, which is the wind that was blowing under that echo,
+  /// and stays drawn until the next hour's reading replaces it. This bounds how
+  /// far that can be stretched — a gap in the feed must still go blank rather
+  /// than paint two-hour-old wind over a live echo.
+  static const Duration _windMaxAge = Duration(hours: 1);
+
+  /// Serialises **both** overlays' map mutations. A scrub can deliver frames
+  /// faster than a fetch completes, and two interleaved `setGeoJsonSource`
+  /// calls on one source leave whichever finished last on screen — not
+  /// whichever frame the timeline is actually on. One chain rather than two,
+  /// because switching overlays queues a clear of one and a draw of the other,
+  /// and those must not interleave either.
+  Future<void> _overlayChain = Future<void>.value();
 
   /// The controller this layer is mounted on, and the frame it was last asked
-  /// to show — what the lightning toggle needs to catch up to the echo the
-  /// moment it is switched on, rather than at the next timeline step.
+  /// to show — what a data toggle needs to catch up to the echo the moment it
+  /// is switched on, rather than at the next timeline step.
   MapLibreMapController? _controller;
   MapFrame? _currentFrame;
 
@@ -178,35 +226,66 @@ class RadarMapLayer extends RasterTimelineLayer
     (65, ColorVisionFilter.rasterExemptHex('#9600FF')),
   ];
 
-  /// The legend follows the lightning toggle too, so switching the strikes on
-  /// brings their key with them.
+  /// The legend follows the data toggles too, so switching an overlay on brings
+  /// its key with it.
   @override
   Listenable get chromeListenable =>
-      Listenable.merge([super.chromeListenable, showLightning]);
+      Listenable.merge([super.chromeListenable, showLightning, showWind]);
 
-  /// The strike key is appended only while the strikes are actually drawn — a
-  /// legend naming marks that are not on the map is worse than no legend.
+  /// An overlay's key is appended only while its marks are actually drawn — a
+  /// legend naming marks that are not on the map is worse than no legend. At
+  /// most one of the two can be on, so at most one key is ever appended.
   @override
   List<SymbolLegendItem> chromeLegendItems(BuildContext context) => [
     ...super.chromeLegendItems(context),
     if (showLightning.value) ...LightningStrikeOverlay.legendItems(context),
+    // With the unit, unlike the 風向 layer's own card: this key lands inside
+    // the echo's legend under a dBZ scale, with nowhere else to say m/s.
+    if (showWind.value)
+      ...WindArrowOverlay.legendItems(context, withUnit: true),
   ];
 
-  /// Turns the strike overlay on/off and remembers the choice.
+  /// Turns the strike overlay on/off and remembers the choice. Switching it on
+  /// switches the wind arrows off — see the class doc.
   void setShowLightning(bool value) {
     if (showLightning.value == value) return;
+    if (value) _setShowWind(false);
     showLightning.value = value;
     unawaited(_settings.setBool(SettingKeys.mapRadarShowLightning, value));
+    _syncOverlay(value, _applyLightning, _lightning.clear);
+  }
 
+  /// Turns the wind overlay on/off and remembers the choice. Switching it on
+  /// switches the strikes off — see the class doc.
+  void setShowWind(bool value) {
+    if (showWind.value == value) return;
+    if (value) setShowLightning(false);
+    _setShowWind(value);
+  }
+
+  /// The wind half of [setShowWind], without the mutual-exclusion step — so
+  /// [setShowLightning] can turn the arrows off without recursing back into it.
+  void _setShowWind(bool value) {
+    if (showWind.value == value) return;
+    showWind.value = value;
+    unawaited(_settings.setBool(SettingKeys.mapRadarShowWind, value));
+    _syncOverlay(value, _applyWind, _wind.clear);
+  }
+
+  /// Queues the map work a toggle implies: catch [apply] up to the frame
+  /// already on screen (the reader switched this on to see *this* echo's
+  /// marks, not the next one's), or [teardown] the overlay.
+  ///
+  /// Silent with no controller — the layer is not on a map, and [render] mounts
+  /// whatever is on when it next is.
+  void _syncOverlay(
+    bool value,
+    Future<void> Function() apply,
+    Future<void> Function(MapLibreMapController) teardown,
+  ) {
     final controller = _controller;
     if (controller == null) return;
-    if (value) {
-      // Catch up to the frame already on screen — the reader switched this on
-      // to see *this* echo's strikes, not the next one's.
-      _enqueueLightning(() => _applyLightning());
-    } else {
-      _enqueueLightning(() => _lightning.clear(controller));
-    }
+    _enqueueOverlay(value ? apply : () => teardown(controller));
   }
 
   @override
@@ -216,7 +295,8 @@ class RadarMapLayer extends RasterTimelineLayer
   ) async {
     _controller = controller;
     await super.prepare(controller, frames);
-    if (showLightning.value) _enqueueLightning(_ensureLightningFrames);
+    if (showLightning.value) _enqueueOverlay(_ensureLightningFrames);
+    if (showWind.value) _enqueueOverlay(_ensureWindFrames);
   }
 
   @override
@@ -228,10 +308,13 @@ class RadarMapLayer extends RasterTimelineLayer
     _controller = controller;
     _currentFrame = frame;
     // Deliberately not awaited, and deliberately before the raster call: the
-    // strikes are an extra on top of the echo, and making the echo's reveal
-    // wait on a lightning fetch would put a network round-trip inside a scrub.
+    // overlay marks are an extra on top of the echo, and making the echo's
+    // reveal wait on their fetch would put a network round-trip inside a scrub.
     if (showLightning.value) {
-      _enqueueLightning(() => _applyLightning(scrubbing: scrubbing));
+      _enqueueOverlay(() => _applyLightning(scrubbing: scrubbing));
+    }
+    if (showWind.value) {
+      _enqueueOverlay(() => _applyWind(scrubbing: scrubbing));
     }
     return super.show(controller, frame, scrubbing: scrubbing);
   }
@@ -241,26 +324,28 @@ class RadarMapLayer extends RasterTimelineLayer
     _currentFrame = null;
     _controller = null;
     await _lightning.clear(controller);
+    await _wind.clear(controller);
     await super.clear(controller);
   }
 
   @override
   void onStyleReset() {
     _lightning.onStyleReset();
+    _wind.onStyleReset();
     super.onStyleReset();
   }
 
-  /// Runs [work] after whatever lightning work is already in flight.
+  /// Runs [work] after whatever overlay work is already in flight.
   ///
   /// A scrub delivers frames faster than a snapshot fetch completes, and two
   /// overlapping `setGeoJsonSource` calls on one source leave whichever
   /// finished last on screen — not whichever frame the timeline is on.
-  void _enqueueLightning(Future<void> Function() work) {
-    _lightningChain = _lightningChain.then((_) => work()).catchError((
+  void _enqueueOverlay(Future<void> Function() work) {
+    _overlayChain = _overlayChain.then((_) => work()).catchError((
       Object error,
       StackTrace stackTrace,
     ) {
-      Log.handle(error, stackTrace, 'radar lightning overlay');
+      Log.handle(error, stackTrace, 'radar data overlay');
     });
   }
 
@@ -294,7 +379,7 @@ class RadarMapLayer extends RasterTimelineLayer
     final frame = _currentFrame;
     if (controller == null || !showLightning.value) return;
 
-    final id = frame == null ? null : _lightningIdFor(frame.time);
+    final id = frame == null ? null : _nearestId(_lightningSeconds, frame.time);
     if (id == null) {
       // Mounted and empty rather than absent: "the overlay is on and this
       // frame has no matching strike data" is not the same as "off".
@@ -304,14 +389,53 @@ class RadarMapLayer extends RasterTimelineLayer
     await _lightning.show(controller, id, scrubbing: scrubbing);
   }
 
-  /// The strike snapshot nearest [frameTime], or null when the closest one is
-  /// further away than [_lightningTolerance].
-  String? _lightningIdFor(DateTime frameTime) {
-    if (_lightningSeconds.isEmpty) return null;
+  /// Loads the observation snapshot times once, and registers them with the
+  /// overlay so it can prefetch around whatever frame is shown.
+  Future<void> _ensureWindFrames() async {
+    final controller = _controller;
+    if (controller == null || _windSeconds.isNotEmpty) return;
+    final result = await _wind.history();
+    result.when(
+      ok: (seconds) {
+        _windSeconds = List<int>.of(seconds)..sort();
+      },
+      err: (failure) {
+        // Left empty, so the next frame retries: the observation history is a
+        // side dish here, and a failed fetch must not disable the toggle.
+        Log.warning('radar wind history: ${failure.message}');
+      },
+    );
+    if (_windSeconds.isEmpty) return;
+    await _wind.prepare(controller, [for (final sec in _windSeconds) '$sec']);
+  }
+
+  /// Draws the station wind belonging to the frame the echo is showing.
+  Future<void> _applyWind({bool scrubbing = false}) async {
+    if (!showWind.value) return;
+    await _ensureWindFrames();
+    final controller = _controller;
+    final frame = _currentFrame;
+    if (controller == null || !showWind.value) return;
+
+    final id = frame == null ? null : _activeId(_windSeconds, frame.time);
+    if (id == null) {
+      // Mounted and empty — see [_applyLightning]. Reached only at the far end
+      // of the timeline, where the echo predates the observation history, or
+      // through a gap in the feed.
+      await _wind.showEmpty(controller);
+      return;
+    }
+    await _wind.show(controller, id, scrubbing: scrubbing);
+  }
+
+  /// The snapshot in [seconds] nearest [frameTime], or null when the closest
+  /// one is further away than [_lightningTolerance].
+  static String? _nearestId(List<int> seconds, DateTime frameTime) {
+    if (seconds.isEmpty) return null;
     final target = frameTime.millisecondsSinceEpoch ~/ 1000;
-    var best = _lightningSeconds.first;
+    var best = seconds.first;
     var bestDelta = (best - target).abs();
-    for (final sec in _lightningSeconds) {
+    for (final sec in seconds) {
       final delta = (sec - target).abs();
       if (delta < bestDelta) {
         best = sec;
@@ -319,6 +443,25 @@ class RadarMapLayer extends RasterTimelineLayer
       }
     }
     return bestDelta > _lightningTolerance.inSeconds ? null : '$best';
+  }
+
+  /// The newest snapshot in [seconds] taken **at or before** [frameTime] — the
+  /// reading that was in effect when the frame was captured — or null when
+  /// there is none, or the newest one is older than [_windMaxAge].
+  ///
+  /// Deliberately never the *nearest*: the snapshot after a frame was taken
+  /// later than the echo under it, and drawing it would put a reading from the
+  /// future on a past frame. Scrubbing back an hour must show the wind of an
+  /// hour ago, not the wind that came next.
+  static String? _activeId(List<int> seconds, DateTime frameTime) {
+    final target = frameTime.millisecondsSinceEpoch ~/ 1000;
+    int? best;
+    for (final sec in seconds) {
+      if (sec > target) continue;
+      if (best == null || sec > best) best = sec;
+    }
+    if (best == null) return null;
+    return target - best > _windMaxAge.inSeconds ? null : '$best';
   }
 
   @override

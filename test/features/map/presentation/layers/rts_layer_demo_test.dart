@@ -23,6 +23,8 @@ import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
+import 'package:dpip/shared/map/map_style.dart'
+    show countyFillLayerId, townFillLayerId;
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -599,5 +601,65 @@ void main() {
           'switching which alert the card shows must repaint the ground '
           'tint too — the card and the map are one choice, not two',
     );
+  });
+
+  test('the grey island stays opaque under the shaking wash, so the S-wave '
+      'disc cannot bleed through a township reading 0', () async {
+    // Two towns either side of the epicentre distance: 新城 is on top of it
+    // (a non-zero estimate, so it gets a colour) and 恆春 is ~250 km away
+    // (an estimate of 0, so the wash leaves it transparent) — the case that
+    // decides what shows through.
+    const directory = TownDirectory({
+      '100': Town(
+        code: '100',
+        city: '花蓮',
+        town: '新城',
+        lat: 24.1,
+        lng: 121.6,
+        cityLevel: '縣',
+        townLevel: '鄉',
+      ),
+      '200': Town(
+        code: '200',
+        city: '屏東',
+        town: '恆春',
+        lat: 22.0,
+        lng: 120.7,
+        cityLevel: '縣',
+        townLevel: '鎮',
+      ),
+    });
+    final origin = DateTime.now().toUtc().subtract(const Duration(seconds: 5));
+    final built = await _build(
+      alerts: [_alert(origin: origin, longitude: 121.6, latitude: 24.1)],
+      table: table,
+      grid: grid,
+      townDirectory: directory,
+    );
+    final controller = _RecordingController();
+    await built.layer.render(controller);
+    await pumpEventQueue();
+
+    // The wash is up, and a township the estimate puts at 0 is left
+    // transparent — that part of 'keep the OSM ground visible' stands.
+    final town = controller.lastProperties[townFillLayerId];
+    expect(town, isNotNull, reason: 'a live alert must paint the wash');
+    expect(town!['fill-color'], isA<List<Object>>());
+    expect((town['fill-color'] as List).first, 'match');
+    expect((town['fill-color'] as List).last, 'rgba(0, 0, 0, 0)');
+
+    // …which is exactly why the county fill underneath must not be hidden.
+    // The EEW S-wave disc is anchored below the land layer so it washes open
+    // sea only; with nothing opaque over Taiwan it washed the island too.
+    final county = controller.lastProperties[countyFillLayerId];
+    expect(county, isNotNull, reason: 'the grey island must be (re)asserted');
+    expect(
+      county!['fill-opacity'],
+      1,
+      reason:
+          'hiding the county fill during an alert leaves a transparent hole '
+          'wherever the estimate reads 0, and the S-wave disc shows through',
+    );
+    expect(county['fill-color'], isNot('#00000000'));
   });
 }

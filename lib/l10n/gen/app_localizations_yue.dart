@@ -3253,4 +3253,13 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get radarLightningOverlaySubtitle => '喺而家嘅雷達回波上面疊加同一時間嘅閃電落雷。';
+
+  @override
+  String get radarWindOverlay => '顯示風向';
+
+  @override
+  String get radarWindOverlayHint => '顯示同畫面回波同一時間嘅測站風向';
+
+  @override
+  String get radarWindOverlaySubtitle => '喺而家嘅雷達回波上面疊加同一時間嘅測站風向同風速。';
 }

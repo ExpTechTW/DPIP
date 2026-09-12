@@ -1991,5 +1991,8 @@
   "mapOverlaySectionData": "データレイヤー",
   "radarLightningOverlay": "雷を表示",
   "radarLightningOverlayHint": "表示中のエコーと同時刻の落雷",
-  "radarLightningOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。"
+  "radarLightningOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の落雷を重ねて表示します。",
+  "radarWindOverlay": "風向を表示",
+  "radarWindOverlayHint": "表示中のエコーと同時刻の観測風向",
+  "radarWindOverlaySubtitle": "表示中のレーダーエコーと同じ時刻の観測所の風向・風速を重ねて表示します。"
 }

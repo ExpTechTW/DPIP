@@ -748,9 +748,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// — the legacy monitor's county/town fill behaviour, driven by the same
   /// [EewEstimator.areaPga] math the replay page uses. The base style's own
   /// `town` fill layer is recoloured with a `match` on each township's
-  /// `CODE` (hidden counties beneath), so the felt-intensity wash reads over
-  /// the base map without a second geometry source; when the alerts clear
-  /// the fills are restored.
+  /// `CODE`, so the felt-intensity wash reads over the base map without a
+  /// second geometry source; when the alerts clear the wash is cleared. The
+  /// county fill underneath stays the opaque grey island throughout — the
+  /// wash is transparent wherever the estimate reads 0, and something has to
+  /// be opaque over Taiwan there.
   ///
   /// With two simultaneous quakes this must use whichever alert [eewIndex]
   /// currently selects (the same one the monitor card is showing), not just
@@ -774,11 +776,17 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final baseFill = MapColors.of(_dark ? Brightness.dark : Brightness.light)
         .fill;
     try {
+      // The opaque grey island is this layer's job in *every* state, alert or
+      // not, so it is restored before the branch rather than hidden under the
+      // wash. Hiding it during an alert left nothing opaque over Taiwan
+      // wherever the estimate reads 0 — the wash falls back to transparent
+      // there — and the EEW S-wave disc, anchored below [landLayerId] so it
+      // washes open sea only, came through the island instead.
+      await controller.setLayerProperties(
+        countyFillLayerId,
+        FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
+      );
       if (selected == null) {
-        await controller.setLayerProperties(
-          countyFillLayerId,
-          FillLayerProperties(fillColor: baseFill, fillOpacity: 1),
-        );
         // Back to the baked default. This layer is the wash and nothing else:
         // with no alert up it paints nothing, so the OSM detailed ground —
         // which mounts directly beneath it — keeps showing. The grey island is
@@ -811,10 +819,6 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       if (entries.isEmpty) return;
 
       await controller.setLayerProperties(
-        countyFillLayerId,
-        const FillLayerProperties(fillColor: '#00000000', fillOpacity: 0),
-      );
-      await controller.setLayerProperties(
         townFillLayerId,
         FillLayerProperties(
           fillColor: <Object>[
@@ -823,9 +827,9 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
             ...entries,
             // Transparent, not the palette grey: a township the estimate puts
             // at 0 has to leave whatever is under it showing — the OSM
-            // detailed ground when that layer is on, the grey `land` fill when
-            // it is not. Falling back to grey painted a flat sheet over the
-            // detailed map everywhere the shaking was 0.
+            // detailed ground when that layer is on, the county fill's grey
+            // when it is not. Falling back to grey painted a flat sheet over
+            // the detailed map everywhere the shaking was 0.
             'rgba(0, 0, 0, 0)',
           ],
           fillOpacity: 1,

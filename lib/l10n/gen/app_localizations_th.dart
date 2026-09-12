@@ -3326,4 +3326,14 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'ซ้อนตำแหน่งฟ้าผ่าที่บันทึกในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง';
+
+  @override
+  String get radarWindOverlay => 'แสดงลม';
+
+  @override
+  String get radarWindOverlayHint => 'ลมจากสถานีในเวลาเดียวกับภาพที่แสดง';
+
+  @override
+  String get radarWindOverlaySubtitle =>
+      'ซ้อนทิศทางและความเร็วลมจากสถานีตรวจวัดในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง';
 }

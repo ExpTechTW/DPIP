@@ -3333,4 +3333,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get radarLightningOverlaySubtitle =>
       'Overlays the lightning strikes recorded at the same time as the radar frame you are looking at.';
+
+  @override
+  String get radarWindOverlay => 'Show wind';
+
+  @override
+  String get radarWindOverlayHint => 'Station wind from the frame on screen';
+
+  @override
+  String get radarWindOverlaySubtitle =>
+      'Overlays the station wind direction and speed recorded at the same time as the radar frame you are looking at.';
 }
