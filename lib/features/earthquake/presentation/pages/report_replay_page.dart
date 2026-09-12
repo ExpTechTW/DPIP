@@ -63,6 +63,7 @@ import 'package:dpip/shared/map/map_style.dart'
         townLabelLayerId;
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
@@ -202,18 +203,29 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                       // the same intensity legend the live monitor carries,
                       // switching to the EEW felt-scale while an alert is up
                       // (the legacy monitor did exactly this on active EEW).
-                      ListenableBuilder(
-                        listenable: _session.eew,
-                        builder: (context, _) {
-                          final hasEew = _session.eew.alerts.isNotEmpty;
-                          return MapLegendCard(
-                            child: IntensityLegend(
-                              mode: hasEew
-                                  ? IntensityLegendMode.eew
-                                  : IntensityLegendMode.rts,
-                            ),
-                          );
-                        },
+                      //
+                      // Collapsible, and collapsed to a chip to start with,
+                      // exactly as [MapScaffold] mounts every layer's legend:
+                      // this page is a full-screen map too, and an eleven-row
+                      // scale pinned open covers the north-west corner of the
+                      // island for the whole replay. The wrap sits *outside*
+                      // the mode swap on purpose — an alert arriving mid-replay
+                      // changes the scale being shown, not whether the user
+                      // asked to see it.
+                      CollapsibleMapLegend(
+                        legend: ListenableBuilder(
+                          listenable: _session.eew,
+                          builder: (context, _) {
+                            final hasEew = _session.eew.alerts.isNotEmpty;
+                            return MapLegendCard(
+                              child: IntensityLegend(
+                                mode: hasEew
+                                    ? IntensityLegendMode.eew
+                                    : IntensityLegendMode.rts,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
