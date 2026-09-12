@@ -138,6 +138,19 @@ class RadarMapLayer extends RasterTimelineLayer
   /// and those must not interleave either.
   Future<void> _overlayChain = Future<void>.value();
 
+  /// Completes once the overlay work queued so far has run — for tests, which
+  /// otherwise have to guess how many event-loop turns it takes.
+  ///
+  /// Guessing does not work here. Mounting either overlay bakes its icons
+  /// through `Picture.toImage` + `toByteData`, and those complete from the
+  /// engine rather than the microtask queue: sixteen round-trips that each land
+  /// in a turn of their own, against `pumpEventQueue()`'s twenty for the whole
+  /// chain — history fetch, `addSource`, `addSymbolLayer` and the first
+  /// `setGeoJsonSource` included. It fits on an idle machine because some
+  /// completions share a turn, and stops fitting under load.
+  @visibleForTesting
+  Future<void> get overlaySettled => _overlayChain;
+
   /// The controller this layer is mounted on, and the frame it was last asked
   /// to show — what a data toggle needs to catch up to the echo the moment it
   /// is switched on, rather than at the next timeline step.
