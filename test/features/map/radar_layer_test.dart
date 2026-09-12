@@ -1442,8 +1442,10 @@ void main() {
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[4]);
       // The strike work is deliberately off the echo's critical path, so it
-      // lands a microtask or two behind the frame it belongs to.
-      await pumpEventQueue();
+      // lands behind the frame it belongs to — and it is awaited on its own
+      // chain rather than by pumping turns, because mounting the overlay bakes
+      // eight icons through the engine (see [RadarMapLayer.overlaySettled]).
+      await layer.overlaySettled;
       return (layer, controller, lightning);
     }
 
@@ -1499,7 +1501,7 @@ void main() {
       controller.calls.clear();
 
       layer.setShowLightning(false);
-      await pumpEventQueue();
+      await layer.overlaySettled;
 
       expect(controller.calls, contains('removeLayer:radar-lightning-lyr'));
       expect(controller.calls, contains('removeSource:radar-lightning-src'));
@@ -1532,8 +1534,9 @@ void main() {
       final controller = RecordingMapController();
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[4]);
-      // The arrow work is off the echo's critical path, same as the strikes'.
-      await pumpEventQueue();
+      // The arrow work is off the echo's critical path, same as the strikes',
+      // and awaited the same way — the arrows are baked through the engine too.
+      await layer.overlaySettled;
       return (layer, controller, weather);
     }
 
@@ -1636,7 +1639,7 @@ void main() {
       controller.calls.clear();
 
       layer.setShowWind(false);
-      await pumpEventQueue();
+      await layer.overlaySettled;
 
       expect(controller.calls, contains('removeLayer:radar-wind-lyr'));
       expect(controller.calls, contains('removeSource:radar-wind-src'));
@@ -1661,18 +1664,18 @@ void main() {
       final controller = RecordingMapController();
       await layer.prepare(controller, frames);
       await layer.show(controller, frames[4]);
-      await pumpEventQueue();
+      await layer.overlaySettled;
       return (layer, controller);
     }
 
     test('switching the wind on takes the strikes off', () async {
       final (layer, controller) = await mounted();
       layer.setShowLightning(true);
-      await pumpEventQueue();
+      await layer.overlaySettled;
       controller.calls.clear();
 
       layer.setShowWind(true);
-      await pumpEventQueue();
+      await layer.overlaySettled;
 
       expect(layer.showLightning.value, isFalse);
       expect(controller.calls, contains('removeLayer:radar-lightning-lyr'));
@@ -1682,11 +1685,11 @@ void main() {
     test('switching the strikes on takes the wind off', () async {
       final (layer, controller) = await mounted();
       layer.setShowWind(true);
-      await pumpEventQueue();
+      await layer.overlaySettled;
       controller.calls.clear();
 
       layer.setShowLightning(true);
-      await pumpEventQueue();
+      await layer.overlaySettled;
 
       expect(layer.showWind.value, isFalse);
       expect(controller.calls, contains('removeLayer:radar-wind-lyr'));
@@ -1715,7 +1718,7 @@ void main() {
       final (layer, _) = await mounted(settings);
 
       layer.setShowWind(true);
-      await pumpEventQueue();
+      await layer.overlaySettled;
 
       expect(settings.getBool(SettingKeys.mapRadarShowWind), isTrue);
       expect(
