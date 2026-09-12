@@ -118,8 +118,14 @@ const String landLayerId = 'land';
 const String outlineLayerId = 'county-outline';
 
 /// Id of the base county-fill layer (`city` source-layer) — a runtime overlay
-/// can recolour it to tint each county by a reading, and hide it while a
-/// township-level tint takes over (the replay EEW area-intensity wash).
+/// can recolour it to tint each county by a reading.
+///
+/// This is the layer that makes Taiwan opaque, and it has to stay that way
+/// even while a township-level tint takes over above it (the EEW
+/// area-intensity wash): that wash is transparent wherever the estimate reads
+/// 0, so hiding the county fill leaves nothing over the island at all and
+/// whatever is anchored below [landLayerId] — the EEW S-wave disc — shows
+/// through it.
 const String countyFillLayerId = 'county';
 
 /// Id of the base township-fill layer (`town` source-layer) — recoloured the
@@ -127,10 +133,9 @@ const String countyFillLayerId = 'county';
 /// estimated shaking (legacy monitor behaviour).
 ///
 /// Mounted at `fill-opacity: 0`: this layer paints the shaking wash and
-/// nothing else. The grey landmass under it is [countyFillLayerId]'s job —
-/// the two cover the same island in the same [MapPalette.fill], which is why
-/// the wash can already hide the county fill outright and still leave a whole
-/// grey island where the estimate is 0.
+/// nothing else. The grey landmass under it is [countyFillLayerId]'s job and
+/// stays up while the wash does — the wash is transparent where the estimate
+/// reads 0, so it cannot be the island's only opaque layer.
 ///
 /// It has to start invisible so that something can be drawn *between* the
 /// landmass and the wash: the OSM detailed ground mounts here (see
