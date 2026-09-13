@@ -246,15 +246,35 @@ class _SeismicCard extends StatelessWidget {
 /// tall and its single line of label floated in the middle of a sea of tonal
 /// grey.
 ///
-/// The height is stated outright instead, and follows the text scale rather
-/// than the window: the tile holds a 34 pt icon badge beside a label of at most
-/// two lines, so that is what it is tall enough for at any text size. The 80
-/// floor is the height a phone drew before this, kept so the phone layout is
+/// Two columns is a floor, not an outcome of that division. A 340 pt tile
+/// against the 343 pt of content a 375 pt iPhone SE has left after the page
+/// padding divides to **one** column, so the SE drew full-width bars where the
+/// 390 pt iPhone 12 next to it drew a grid — the same page, unrecognisable on
+/// the smaller phone. The width still decides how many columns a wider window
+/// gets; it just may not decide fewer than two.
+///
+/// The height is stated outright, and follows the text scale rather than the
+/// window: the tile holds a 34 pt icon badge beside a label of at most two
+/// lines, so that is what it is tall enough for at any text size. The 80 floor
+/// is the height a phone drew before this, kept so the phone layout is
 /// untouched.
 SliverGridDelegate _rankingGrid(BuildContext context) {
   const twoLabelLines = 44.0;
-  return SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: 340,
+  const maxTileWidth = 340.0;
+  // Measured the way the grid is actually laid out: the window, less the
+  // display cutouts [SafeArea] takes off the sides in landscape, less the
+  // page's own horizontal padding.
+  final insets = MediaQuery.paddingOf(context);
+  final width =
+      MediaQuery.sizeOf(context).width -
+      insets.left -
+      insets.right -
+      AppSpacing.lg * 2;
+  return SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: math.max(
+      2,
+      (width / (maxTileWidth + AppSpacing.sm)).ceil(),
+    ),
     crossAxisSpacing: AppSpacing.sm,
     mainAxisSpacing: AppSpacing.sm,
     mainAxisExtent: math.max(

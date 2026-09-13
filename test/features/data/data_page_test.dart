@@ -122,6 +122,46 @@ void main() {
     expect(tile.width, lessThan(400));
   });
 
+  // The 375 pt SE, the 390 pt iPhone 12, and the 320 pt phone below both. The
+  // SE used to fall on the far side of the grid's width test and draw the hub
+  // as a column of full-width bars while the phone next to it drew a grid.
+  for (final (name, logical) in const <(String, Size)>[
+    ('iPhone SE', Size(375, 667)),
+    ('iPhone 12', Size(390, 844)),
+    ('a 320 pt phone', Size(320, 568)),
+  ]) {
+    testWidgets('$name lays the hub out in two columns', (tester) async {
+      tester.view.physicalSize = logical * 2;
+      tester.view.devicePixelRatio = 2;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: _router([]),
+        ),
+      );
+      await tester.pump();
+
+      Rect tileOf(String label) => tester.getRect(
+        find.ancestor(of: find.text(label), matching: find.byType(InkWell)),
+      );
+      final rain = tileOf('Rainfall');
+      final temperature = tileOf('Temperature');
+
+      expect(
+        temperature.top,
+        rain.top,
+        reason: 'the first two metrics share a row, they do not stack',
+      );
+      expect(
+        rain.width,
+        lessThan(logical.width / 2),
+        reason: 'a tile is a grid cell, not a full-width bar',
+      );
+    });
+  }
+
   for (final (route, label) in _astronomyTiles) {
     testWidgets('the $label tile navigates to $route', (tester) async {
       // A fresh router per tile: a tile wired to the wrong route would
