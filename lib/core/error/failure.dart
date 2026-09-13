@@ -73,3 +73,18 @@ final class MeshChannelConflictFailure extends Failure {
 final class PermissionDeniedFailure extends Failure {
   const PermissionDeniedFailure(super.message);
 }
+
+/// Recoverable failures at the native Widget snapshot writing boundary.
+enum WidgetSnapshotFailureReason {
+  unavailable,
+  invalidKind,
+  invalidPayload,
+  appGroupUnavailable,
+  writeFailed,
+}
+
+final class WidgetSnapshotFailure extends Failure {
+  const WidgetSnapshotFailure(this.reason, super.message);
+
+  final WidgetSnapshotFailureReason reason;
+}

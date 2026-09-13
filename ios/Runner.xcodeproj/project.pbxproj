@@ -33,6 +33,7 @@
 		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */; };
 		CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */; };
+		CAC4EF00000000000000E101 /* WidgetSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */; };
 		CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000D002 /* StorageScanPlugin.swift */; };
 		DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */; };
 		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
@@ -102,6 +103,7 @@
 		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundLocationPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundExecutionPlugin.swift; sourceTree = "<group>"; };
+		CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000D002 /* StorageScanPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageScanPlugin.swift; sourceTree = "<group>"; };
 		CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; path = Sounds/tsunami.aiff; sourceTree = "<group>"; };
 		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -190,6 +192,7 @@
 				CAC4EF00000000000000B002 /* MapCachePlugin.swift */,
 				CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */,
 				CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */,
+				CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */,
 				CAC4EF00000000000000D002 /* StorageScanPlugin.swift */,
 				7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */,
 				4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */,
@@ -387,6 +390,7 @@
 				CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */,
 				CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */,
 				CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */,
+				CAC4EF00000000000000E101 /* WidgetSnapshotPlugin.swift in Sources */,
 				CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
