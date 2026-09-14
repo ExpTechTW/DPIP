@@ -250,7 +250,7 @@ void main() {
   testWidgets('lists formal data sources quietly under About', (tester) async {
     await _pump(tester, _router([]));
     await tester.fling(find.byType(ListView), const Offset(0, -5000), 5000);
-    // The support card breathes forever; a fixed pump completes the fling.
+    // Enough for the fling's ballistic scroll to carry the list to the end.
     await tester.pump(const Duration(milliseconds: 600));
     const sources = [
       '探索智慧科技有限公司 — TREM-Net',
@@ -355,9 +355,7 @@ void main() {
       final visited = <String>[];
       await _pump(tester, _router(visited));
       await tester.tap(find.widgetWithText(ListTile, label));
-      // pumpAndSettle would time out: the support card's border breathes
-      // forever. A fixed pump covers the navigation transition.
-      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
       expect(visited, [route]);
     });
   }
@@ -527,9 +525,7 @@ void main() {
     await _pump(tester, _router(visited));
     // The card is the DPIP row with the chevron — tap its label.
     await tester.tap(find.text('DPIP').first);
-    // pumpAndSettle would time out: the support card's border breathes
-    // forever. A fixed pump covers the navigation transition.
-    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
     expect(visited, [AppRoutes.versionNotes]);
   });
 

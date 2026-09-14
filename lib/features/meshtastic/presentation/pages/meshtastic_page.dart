@@ -27,6 +27,7 @@ import 'package:dpip/features/meshtastic/presentation/widgets/mesh_chart_section
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_ratio_chart.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
+import 'package:dpip/shared/widgets/second_ticker.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -446,46 +447,27 @@ class _RadioStrip extends StatefulWidget {
   State<_RadioStrip> createState() => _RadioStripState();
 }
 
-class _RadioStripState extends State<_RadioStrip> {
-  Timer? _ticker;
-
-  @override
-  void initState() {
-    super.initState();
-    _syncTicker();
-  }
-
-  @override
-  void didUpdateWidget(_RadioStrip oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _syncTicker();
-  }
-
-  /// Runs the 1 Hz tick **only while there is a link**.
+class _RadioStripState extends State<_RadioStrip> with SecondTicker {
+  /// Runs the 1 Hz tick **only while there is a link** and the strip can be
+  /// seen.
   ///
   /// The "last packet Ns ago" readout has to age on its own — without a tick it
   /// would freeze at whatever it said when the last packet arrived, which is
   /// exactly the reassurance-without-evidence this strip exists to avoid. But
   /// the strip renders nothing when disconnected, so ticking then would rebuild
   /// a hidden widget once a second forever (and never let a widget test settle).
-  void _syncTicker() {
-    final needed = widget.link.isConnected;
-    if (needed == (_ticker != null)) return;
-    if (needed) {
-      _ticker = Timer.periodic(
-        const Duration(seconds: 1),
-        (_) => setState(() {}),
-      );
-    } else {
-      _ticker?.cancel();
-      _ticker = null;
-    }
-  }
+  /// The [TickerMode] half is the same gate the EEW countdown uses: this page
+  /// stays mounted behind whichever tab the user switches to, and a bare
+  /// `Timer` would keep rebuilding it there; [SecondTicker] also stops it while
+  /// the app is backgrounded.
+  @override
+  bool get secondTickerActive =>
+      widget.link.isConnected && TickerMode.valuesOf(context).enabled;
 
   @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
+  void didUpdateWidget(_RadioStrip oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    syncSecondTicker();
   }
 
   @override

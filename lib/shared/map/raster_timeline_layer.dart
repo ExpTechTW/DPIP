@@ -29,7 +29,8 @@ enum _IdlePreloadOutcome { ready, timeout, cancelled }
 ///
 /// ## Four tiers
 /// - **The ring** — frames within [ringRadius] are mounted **visible**, only
-///   the current one at full [opacity] and its neighbours at zero. During a
+///   the current one at full [opacity] and its neighbours at zero (which
+///   MapLibre does not fetch — see [preloadOpacity] for what does). During a
 ///   drag, an L1-complete frame may join this set on demand; [maxResident]
 ///   bounds the extra sources. A frame replaces the current timestamp only
 ///   after [RasterFrameSource.frameTileReadiness] proves that one complete
@@ -504,6 +505,31 @@ abstract class RasterTimelineLayer implements MapLayer {
     rasterOpacityTransition: _instantTransition,
   );
 
+  /// What a frame that must *load* while staying unseen is drawn at: the
+  /// settle target under the still-opaque previous frame, and an idle-preload
+  /// candidate.
+  ///
+  /// Not zero, and the difference is whether the frame loads at all. MapLibre
+  /// Native's `RenderRasterLayer::evaluate` sets the layer's render pass to
+  /// *none* when `raster-opacity` is exactly 0; a layer with no pass does not
+  /// `needsRendering()`, and the tile pyramid then marks its tiles *optional*
+  /// — served from cache if present, never requested. So a "transparent"
+  /// mount at 0 preloaded nothing: every cold settle sat out the full
+  /// readiness timeout waiting for tiles nobody had asked for, and the idle
+  /// preload timed out candidate after candidate the same way.
+  ///
+  /// One 8-bit level is under what a pixel can show over the opaque current
+  /// frame, and it is enough for the renderer to treat the layer as drawn —
+  /// which is what makes it fetch.
+  ///
+  /// The ±[ringRadius] neighbours deliberately stay at **0**: at this value
+  /// every one of them would re-fetch and re-decode its viewport on every pan,
+  /// five viewports of raster work per gesture on a low-end phone instead of
+  /// one. They come from the L2 warm band and the idle preload instead, which
+  /// is where their bytes were always coming from.
+  @visibleForTesting
+  static const double preloadOpacity = 1 / 255;
+
   static const RasterLayerProperties _hidden = RasterLayerProperties(
     visibility: 'none',
     rasterOpacity: 0,
@@ -706,7 +732,9 @@ abstract class RasterTimelineLayer implements MapLayer {
     // timestamp remains fully opaque below them.
     await Future.wait([
       for (final id in ring)
-        if (id != _shownFrameId) _mount(controller, id, 0),
+        if (id != _shownFrameId)
+          // Only the target has to fetch; see [preloadOpacity].
+          _mount(controller, id, id == frameId ? preloadOpacity : 0),
     ]);
     _ring.addAll(ring);
     MapTileCache.trace(
@@ -871,6 +899,7 @@ abstract class RasterTimelineLayer implements MapLayer {
     MapLibreMapController controller,
     String frameId,
   ) async {
+    // Its tiles are already in L1 (the probe passed), so nothing to fetch.
     await _mount(controller, frameId, 0);
     _ring.add(frameId);
     final keep = <String>{frameId};
@@ -1120,7 +1149,7 @@ abstract class RasterTimelineLayer implements MapLayer {
 
     await _enqueueMutation(() async {
       if (!current()) return;
-      await _mount(controller, candidate, 0);
+      await _mount(controller, candidate, preloadOpacity);
       _ring.add(candidate);
       await _evictOverflow(controller, keep: preloadSet);
     });
@@ -1645,8 +1674,16 @@ abstract class RasterTimelineLayer implements MapLayer {
     // No invalidation here. The band is keyed on the camera as well as the
     // centre, so a real move re-warms on its own and an idle that reports the
     // same camera is the duplicate it looks like.
+    //
+    // Not immediate: the warmer's settle delay is what lets a step-pan (move,
+    // pause, move) coalesce. Started at once, each pause began a
+    // [warmFrameBudget]-frame L1 probe and SQLite fill on the platform thread
+    // — the same thread the newly visible tiles have to come back through —
+    // only for the next step to cancel it mid-probe. Nothing the fill would
+    // have done in those first 120 ms is lost: it runs the same, once the
+    // camera has genuinely stopped.
     MapTileCache.trace(() => 'timeline=$id camera-idle centre=$centre');
-    unawaited(_warmBand(controller, centre, immediate: true));
+    unawaited(_warmBand(controller, centre));
   }
 
   @override

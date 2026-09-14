@@ -900,6 +900,32 @@ class _RouteOverlayState extends State<_RouteOverlay>
     duration: const Duration(milliseconds: 900),
   )..repeat();
 
+  /// The segments' path metrics, built once per projection.
+  ///
+  /// Only [_phase] changes between frames — the geometry is fixed until the
+  /// camera settles and the overlay is reprojected. Building the paths and
+  /// walking `computeMetrics` on every frame of a 60 Hz march re-derived the
+  /// same curves sixty times a second; the painter now only slides the dash
+  /// offset along metrics it was handed.
+  late List<PathMetric> _metrics = _metricsFor(widget.segments);
+
+  static List<PathMetric> _metricsFor(List<List<Offset>> segments) => [
+    for (final segment in segments)
+      if (segment.length >= 2)
+        ...(Path()
+              ..moveTo(segment.first.dx, segment.first.dy)
+              ..addPolygon(segment.sublist(1), false))
+            .computeMetrics(),
+  ];
+
+  @override
+  void didUpdateWidget(_RouteOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.segments, widget.segments)) {
+      _metrics = _metricsFor(widget.segments);
+    }
+  }
+
   @override
   void dispose() {
     _phase.dispose();
@@ -915,6 +941,7 @@ class _RouteOverlayState extends State<_RouteOverlay>
           size: Size.infinite,
           painter: _RoutePainter(
             segments: widget.segments,
+            metrics: _metrics,
             color: widget.color,
             phase: _phase.value,
           ),
@@ -927,11 +954,16 @@ class _RouteOverlayState extends State<_RouteOverlay>
 class _RoutePainter extends CustomPainter {
   const _RoutePainter({
     required this.segments,
+    required this.metrics,
     required this.color,
     required this.phase,
   });
 
   final List<List<Offset>> segments;
+
+  /// One metric per drawable segment, in [segments] order (see
+  /// `_RouteOverlayState._metricsFor`).
+  final List<PathMetric> metrics;
   final Color color;
 
   /// 0..1 — where the dash pattern sits along the path; the controller
@@ -949,21 +981,14 @@ class _RoutePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..color = color;
-    final cycle = _dash + _gap;
+    const cycle = _dash + _gap;
     final offset = phase * cycle;
-    for (final segment in segments) {
-      if (segment.length < 2) continue;
-      final path = Path()..moveTo(segment.first.dx, segment.first.dy);
-      for (final point in segment.skip(1)) {
-        path.lineTo(point.dx, point.dy);
-      }
-      for (final metric in path.computeMetrics()) {
-        var distance = offset;
-        while (distance < metric.length) {
-          final end = math.min(distance + _dash, metric.length);
-          canvas.drawPath(metric.extractPath(distance, end), stroke);
-          distance += cycle;
-        }
+    for (final metric in metrics) {
+      var distance = offset;
+      while (distance < metric.length) {
+        final end = math.min(distance + _dash, metric.length);
+        canvas.drawPath(metric.extractPath(distance, end), stroke);
+        distance += cycle;
       }
     }
     // Endpoints as dots, so the path says where it starts and where it ends
@@ -978,7 +1003,7 @@ class _RoutePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RoutePainter oldDelegate) =>
-      oldDelegate.segments != segments ||
+      oldDelegate.metrics != metrics ||
       oldDelegate.color != color ||
       oldDelegate.phase != phase;
 }

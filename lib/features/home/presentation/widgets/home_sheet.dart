@@ -7,6 +7,8 @@ import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/home_content.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart'
+    show mapChromeBlursBackdrop;
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -169,21 +171,16 @@ class HomeSheet extends StatelessWidget {
                       // stop together (see `_syncRunning`), so when the list
                       // returns to the top the animation resumes where it left
                       // off — no jump.
-                      child: ListenableBuilder(
-                        listenable: scrollController,
-                        builder: (context, _) {
-                          final scrolled =
-                              scrollController.hasClients &&
-                              scrollController.offset > 0;
-                          return WeatherSkyBackground(
-                            mode: weatherMode,
-                            rainIntensity: rainIntensity,
-                            snowIntensity: snowIntensity,
-                            humidity: humidity ?? 0.65,
-                            timeMode: skyTimeMode,
-                            active: HomeChrome.weatherActive(e) && !scrolled,
-                          );
-                        },
+                      child: _ScrolledGate(
+                        scrollController: scrollController,
+                        builder: (context, scrolled) => WeatherSkyBackground(
+                          mode: weatherMode,
+                          rainIntensity: rainIntensity,
+                          snowIntensity: snowIntensity,
+                          humidity: humidity ?? 0.65,
+                          timeMode: skyTimeMode,
+                          active: HomeChrome.weatherActive(e) && !scrolled,
+                        ),
                       ),
                     ),
                   ),
@@ -201,6 +198,66 @@ class HomeSheet extends StatelessWidget {
   /// computed alongside it in [build], kept in sync via the same constants.
   static double _flush(double e) =>
       ((e - _flushFrom) / (maxExtent - _flushFrom)).clamp(0.0, 1.0);
+}
+
+/// Rebuilds [builder] only when the list crosses between "at the top" and
+/// "scrolled" — not on every scroll pixel.
+///
+/// The sky under the sheet used to sit inside a `ListenableBuilder` on the
+/// scroll controller, so every pixel of a list scroll rebuilt
+/// `WeatherSkyBackground` (its element, its `LayoutBuilder`, its
+/// `AnimatedBuilder`) to recompute a boolean that flips exactly once per
+/// gesture. The controller notifies here too, but the notifier in between
+/// only fires on the edge, so the sky's subtree sees two rebuilds per gesture
+/// instead of hundreds.
+class _ScrolledGate extends StatefulWidget {
+  const _ScrolledGate({required this.scrollController, required this.builder});
+
+  final ScrollController scrollController;
+  final Widget Function(BuildContext context, bool scrolled) builder;
+
+  @override
+  State<_ScrolledGate> createState() => _ScrolledGateState();
+}
+
+class _ScrolledGateState extends State<_ScrolledGate> {
+  final ValueNotifier<bool> _scrolled = ValueNotifier(false);
+
+  bool get _isScrolled =>
+      widget.scrollController.hasClients && widget.scrollController.offset > 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_onScroll);
+    _scrolled.value = _isScrolled;
+  }
+
+  @override
+  void didUpdateWidget(_ScrolledGate oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.scrollController, widget.scrollController)) {
+      oldWidget.scrollController.removeListener(_onScroll);
+      widget.scrollController.addListener(_onScroll);
+      _onScroll();
+    }
+  }
+
+  // ValueNotifier only notifies on a real change, so this is the edge filter.
+  void _onScroll() => _scrolled.value = _isScrolled;
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_onScroll);
+    _scrolled.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+    valueListenable: _scrolled,
+    builder: (context, scrolled, _) => widget.builder(context, scrolled),
+  );
 }
 
 /// A [BackdropFilter] that reuses its [ImageFilter] instance while [sigma]
@@ -244,9 +301,15 @@ class _CachedBlurState extends State<_CachedBlur> {
     // filter resolves or the layer is pushed, and leaves the widget, element and
     // render object in place — so it cannot cause the re-parent flash this file
     // warns about in [_ScrollBlurredWeather].
+    //
+    // Android never blurs here: the map under this sheet is a platform view,
+    // and a backdrop filter over it is either blind (HCPP) or the reason every
+    // map frame re-rasterises the whole sheet (virtual display) — see
+    // [mapChromeBlursBackdrop]. The tint alone is what those phones showed
+    // through the frost anyway; the tree keeps its shape either way.
     return BackdropFilter(
       filter: _filter!,
-      enabled: _sigma > 0,
+      enabled: _sigma > 0 && mapChromeBlursBackdrop,
       child: widget.child,
     );
   }

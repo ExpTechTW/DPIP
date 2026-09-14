@@ -10,6 +10,7 @@ import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -321,6 +322,39 @@ void main() {
       isEmpty,
       reason: 'native render readiness must not be overruled by an empty L1',
     );
+  });
+
+  test('a cold settle target fetches; its ring neighbours do not', () async {
+    final source = _ControlledReadinessRadarRepository(_ids(9))..ready = false;
+    final layer = testRadarLayer(source);
+    final frames = (await layer.frames()).valueOrNull!;
+    final controller = RecordingMapController();
+
+    await layer.prepare(controller, frames);
+    await layer.show(controller, frames[2]);
+    await layer.show(controller, frames[4]);
+
+    expect(
+      controller.opacityOf('radar-lyr-${frames[4].id}'),
+      '${RasterTimelineLayer.preloadOpacity}',
+      reason:
+          'at exactly 0 MapLibre never requests the tiles, and the settle '
+          'waited out its whole readiness timeout for nothing',
+    );
+    expect(
+      controller.opacityOf('radar-lyr-${frames[2].id}'),
+      '0.85',
+      reason: 'the previous complete frame stays on screen meanwhile',
+    );
+    for (final i in [3, 5, 6]) {
+      expect(
+        controller.opacityOf('radar-lyr-${frames[i].id}'),
+        '0.0',
+        reason:
+            'a neighbour above 0 would re-fetch its viewport on every pan — '
+            'five viewports of raster decode per gesture on a low-end phone',
+      );
+    }
   });
 
   test('a late native idle completes a settle after an L1 miss', () async {

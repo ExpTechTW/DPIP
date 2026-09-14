@@ -48,13 +48,18 @@ class HomeEewSection extends StatelessWidget {
   /// [build] gates on, exposed so `HomeContent` can decide whether to
   /// reserve a gap after it without re-deriving (and risking drifting from)
   /// the same liveness condition.
-  static bool isActive(BuildContext context) {
-    final state = context.watch<RealtimeNotifier<List<Eew>>>().state;
-    final alerts = state.data;
-    return state.status == RealtimeStatus.live &&
-        alerts != null &&
-        alerts.isNotEmpty;
-  }
+  static bool isActive(BuildContext context) =>
+      // `select`, not `watch`: the caller (`HomeContent`'s scroll-driven panel
+      // builder) only needs the boolean, and a plain watch rebuilt that whole
+      // panel on every EEW serial update. Same answer, rebuilt only when the
+      // answer flips.
+      context.select<RealtimeNotifier<List<Eew>>, bool>((controller) {
+        final state = controller.state;
+        final alerts = state.data;
+        return state.status == RealtimeStatus.live &&
+            alerts != null &&
+            alerts.isNotEmpty;
+      });
 
   @override
   Widget build(BuildContext context) {

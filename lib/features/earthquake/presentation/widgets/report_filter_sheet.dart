@@ -292,9 +292,8 @@ class _ReportFilterSheetState extends State<_ReportFilterSheet> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final media = MediaQuery.of(context);
     final dateFmt = DateFormat('yyyy/MM/dd');
-    final height = media.size.height;
+    final height = MediaQuery.sizeOf(context).height;
 
     return SizedBox(
       height: height,

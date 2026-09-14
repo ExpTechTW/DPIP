@@ -95,6 +95,18 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// on a real transition). The wave-front rings redraw on their own, faster
   /// cadence instead — see `_ReplayMapState._wavefrontTicker`.
   final ValueNotifier<int> _tick = ValueNotifier(0);
+
+  /// The replay clock's whole second, for the status bar — it shows `HH:mm:ss`
+  /// and nothing finer, so rebuilding it on every 5 Hz [_tick] redrew the same
+  /// digits four times out of five. Assigned only when the second changes.
+  final ValueNotifier<int> _clockSecond = ValueNotifier(0);
+
+  void _syncClockSecond() {
+    final second = _session.clock.now().millisecondsSinceEpoch ~/ 1000;
+    if (second == _clockSecond.value) return;
+    _clockSecond.value = second;
+  }
+
   Timer? _ticker;
 
   /// Which active alert the single EEW card currently shows — tapping the card
@@ -147,16 +159,17 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   }
 
   void _startTicker() {
-    _ticker ??= Timer.periodic(
-      const Duration(milliseconds: 200),
-      (_) => _tick.value++,
-    );
+    _ticker ??= Timer.periodic(const Duration(milliseconds: 200), (_) {
+      _tick.value++;
+      _syncClockSecond();
+    });
   }
 
   @override
   void dispose() {
     _ticker?.cancel();
     _tick.dispose();
+    _clockSecond.dispose();
     _session.dispose();
     super.dispose();
   }
@@ -261,7 +274,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                       const SizedBox(height: AppSpacing.sm),
                       _ReplayStatusBar(
                         clock: _session.clock,
-                        tick: _tick,
+                        second: _clockSecond,
                         rts: _session.rts,
                         eew: _session.eew,
                       ),
@@ -650,6 +663,9 @@ class _ReplayMapState extends State<_ReplayMap> {
     final controller = _controller;
     if (controller == null) return;
     _styleLoaded = true;
+    // A style (re)load recreates every source below empty — whatever the box
+    // source held before is gone, so the next [_updateBox] must not skip.
+    _boxSignature = null;
     try {
       final data = await IntensityIconRenderer.render('cross');
       await controller.addImage(_crossIcon, data);
@@ -906,14 +922,31 @@ class _ReplayMapState extends State<_ReplayMap> {
     final grid = _boxGrid;
     if (controller == null || !_ready || grid == null) return;
     final hasBox = widget.rts.box.isNotEmpty;
+    if (!hasBox) return;
+    final (:geoJson, :signature) = _boxGeoJson(grid);
+    // This runs at the page's 5 Hz tick as well as on every poll, and the
+    // feature set only changes when the feed does or the S-wave sweeps
+    // past a box — a handful of times per event. The same set was being
+    // re-serialised and re-uploaded a few times a second in between.
+    if (signature == _boxSignature) return;
+    // Claimed before the await, not after: two in-flight writes land on the
+    // platform channel in call order, so the later call's set is the one the
+    // source ends up holding — and it must be the one recorded here.
+    _boxSignature = signature;
     try {
-      if (hasBox) {
-        await controller.setGeoJsonSource(_boxSourceId, _boxGeoJson(grid));
-      }
+      await controller.setGeoJsonSource(_boxSourceId, geoJson);
     } catch (_) {
-      // Source/layer not on the map yet (mid style-reload) — the next update retries.
+      // Source/layer not on the map yet (mid style-reload) — the next update
+      // retries; the claim is dropped because the write never landed.
+      _boxSignature = null;
     }
   }
+
+  /// The feature set [_boxSourceId] last received — the box ids that survived
+  /// the coverage check with their intensities, in feed order (see
+  /// [_boxGeoJson]). Null whenever the source has just been (re)created, so
+  /// the first upload after a style load always lands.
+  String? _boxSignature;
 
   /// Whether [_eewSourceId] currently holds the empty collection — mirrors
   /// the live monitor's flag. The old blanket `alerts.isEmpty` skip made the
@@ -922,23 +955,36 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// the map for the rest of the replay.
   bool _eewSourceEmpty = true;
 
+  /// Whether an [_updateEew] write is still on the platform channel. The
+  /// wave-front ticker fires every 16 ms and does not wait for the previous
+  /// write to land, so without this a slow frame let several ring uploads
+  /// queue up behind each other — each one a full polygon set the map would
+  /// render in turn, none of them the current one.
+  bool _eewUpdating = false;
+
   Future<void> _updateEew() async {
     final controller = _controller;
     if (controller == null || !_ready) return;
-    final empty = widget.eew.alerts.isEmpty;
-    // Nothing to draw and nothing drawn — skip the per-tick round trip.
-    if (empty && _eewSourceEmpty) return;
+    if (_eewUpdating) return;
+    _eewUpdating = true;
     try {
-      await controller.setGeoJsonSource(
-        _eewSourceId,
-        empty ? _emptyCollection : _eewGeoJson(),
-      );
-      _eewSourceEmpty = empty;
-    } catch (_) {
-      // Source not on the map yet (mid style-reload) — the next update
-      // retries; the flag is untouched because the write never landed.
+      final empty = widget.eew.alerts.isEmpty;
+      // Nothing to draw and nothing drawn — skip the per-tick round trip.
+      if (empty && _eewSourceEmpty) return;
+      try {
+        await controller.setGeoJsonSource(
+          _eewSourceId,
+          empty ? _emptyCollection : _eewGeoJson(),
+        );
+        _eewSourceEmpty = empty;
+      } catch (_) {
+        // Source not on the map yet (mid style-reload) — the next update
+        // retries; the flag is untouched because the write never landed.
+      }
+      await _updateAreaFill(controller);
+    } finally {
+      _eewUpdating = false;
     }
-    await _updateAreaFill(controller);
   }
 
   /// Tints the whole island by estimated shaking while an EEW alert is up —
@@ -1084,15 +1130,29 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// S-wave has already fully swept past (see [_isBoxFullyCovered]) so it
   /// stops blinking instead of blinking forever once it's no longer live
   /// information.
-  Map<String, dynamic> _boxGeoJson(RtsBoxGrid grid) {
+  ///
+  /// Also returns a [signature] of the set — every surviving box id and its
+  /// intensity, in order — cheap enough to build on every call and exact
+  /// enough that an equal signature means an identical upload: a box's
+  /// geometry is a function of its id alone (the static grid), so id +
+  /// intensity is everything the feature carries.
+  ({Map<String, dynamic> geoJson, String signature}) _boxGeoJson(
+    RtsBoxGrid grid,
+  ) {
     final table = _travelTimeTable;
     final now = widget.clock.now();
     final features = <Map<String, dynamic>>[];
+    final signature = StringBuffer();
     for (final entry in widget.rts.box.entries) {
       final id = int.tryParse(entry.key);
       final ring = id == null ? null : grid.rings[id];
       if (ring == null) continue;
       if (table != null && _isBoxFullyCovered(ring, table, now)) continue;
+      signature
+        ..write(entry.key)
+        ..write(':')
+        ..write(entry.value)
+        ..write(';');
       features.add({
         'type': 'Feature',
         'geometry': {
@@ -1102,8 +1162,17 @@ class _ReplayMapState extends State<_ReplayMap> {
         'properties': {'i': entry.value},
       });
     }
-    return {'type': 'FeatureCollection', 'features': features};
+    return (
+      geoJson: {'type': 'FeatureCollection', 'features': features},
+      signature: signature.toString(),
+    );
   }
+
+  /// Kilometres per degree of latitude along a meridian, rounded *down* from
+  /// the 111.3195 km/° of [geo.LatLng.distanceTo]'s sphere. See
+  /// [_isBoxFullyCovered] — the rounding direction is what keeps the reject
+  /// exact.
+  static const double _kmPerDegreeLatitude = 111.3;
 
   /// Whether every corner of [ring] is already within some active alert's
   /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
@@ -1124,13 +1193,21 @@ class _ReplayMapState extends State<_ReplayMap> {
       final radiusKm = table.waveRadius(info.depth, elapsed).s;
       if (radiusKm <= 0) continue;
       final epicenter = info.latlng;
-      final allCornersCovered = ring
-          .take(4)
-          .every(
-            (point) =>
-                epicenter.distanceTo(geo.LatLng(point[1], point[0])) / 1000 <=
-                radiusKm,
-          );
+      final allCornersCovered = ring.take(4).every((point) {
+        // Exact bounding reject before the haversine: the great-circle
+        // distance is never shorter than the meridional (latitude-only)
+        // leg, so a corner whose latitude gap alone exceeds the radius
+        // cannot be inside. The multiplier is rounded below the sphere's
+        // true km/°, so this can only under-estimate that leg — it never
+        // rejects a corner the haversine would have accepted. This runs
+        // 4 × boxes × alerts at 5 Hz, and most corners fail here.
+        if ((point[1] - epicenter.latitude).abs() * _kmPerDegreeLatitude >
+            radiusKm) {
+          return false;
+        }
+        return epicenter.distanceTo(geo.LatLng(point[1], point[0])) / 1000 <=
+            radiusKm;
+      });
       if (allCornersCovered) return true;
     }
     return false;
@@ -1349,20 +1426,23 @@ class _EewAlertCard extends StatelessWidget {
 class _ReplayStatusBar extends StatelessWidget {
   const _ReplayStatusBar({
     required this.clock,
-    required this.tick,
+    required this.second,
     required this.rts,
     required this.eew,
   });
 
   final ReplayClock clock;
-  final ValueNotifier<int> tick;
+
+  /// [clock]'s whole second — the finest thing this bar displays, so it is
+  /// what the bar rebuilds on (see `_ReportReplayPageState._clockSecond`).
+  final ValueNotifier<int> second;
   final RtsRealtimeController rts;
   final EewRealtimeController eew;
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<int>(
-      valueListenable: tick,
+      valueListenable: second,
       builder: (context, _, _) => ListenableBuilder(
         listenable: Listenable.merge([rts, eew]),
         builder: (context, _) => _buildContent(context),

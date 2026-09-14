@@ -333,6 +333,11 @@ class _StatusBar extends StatelessWidget {
   final RealtimeState<Rts> state;
   final RealtimeNotifier<List<Eew>> eew;
 
+  /// The snapshot clock. One instance: this strip rebuilds on every ~1 Hz RTS
+  /// poll, and each build re-parsed the pattern into a fresh formatter. The
+  /// pattern is numeric-only, so no locale symbol data is involved.
+  static final DateFormat _clock = DateFormat('HH:mm:ss');
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -350,7 +355,7 @@ class _StatusBar extends StatelessWidget {
     // corrected clock — both on the server clock, so the lag is device-skew
     // immune. Latency floored at 0 against sub-sync jitter.
     final dataTime = hasData
-        ? DateFormat('HH:mm:ss').format(
+        ? _clock.format(
             AppTime.taipei(
               DateTime.fromMillisecondsSinceEpoch(time, isUtc: true),
             ),

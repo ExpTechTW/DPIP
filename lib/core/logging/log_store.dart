@@ -88,6 +88,20 @@ class LogStore {
 
   final _pending = <StoredLog>[];
   Timer? _timer;
+
+  /// The row ceiling, as one statement both [flush] and [prune] run.
+  ///
+  /// "Everything but the newest N" is *every id below the N-th newest*, and
+  /// that one id is a single `OFFSET N-1` read down the primary-key index. It
+  /// used to be `id NOT IN (SELECT id … LIMIT N)`, which materialises all N
+  /// ids into a temporary table and probes it per row — on every flush,
+  /// i.e. every three seconds while anything logs. Same rows deleted: with
+  /// fewer than N rows the subquery is NULL, `id < NULL` matches nothing, and
+  /// with more, the rows below the N-th newest are exactly the ones outside
+  /// the old `IN` list.
+  static const String _capSql =
+      'DELETE FROM $logTable WHERE id < ('
+      'SELECT id FROM $logTable ORDER BY id DESC LIMIT 1 OFFSET ?)';
   Future<void> _databaseTail = Future<void>.value();
 
   /// Preserves the order in which persistence operations were requested.
@@ -149,11 +163,7 @@ class LogStore {
             _now().toUtc().subtract(logRetention).millisecondsSinceEpoch,
           ]);
           // See [logMaxRows]: the newest lines survive whatever the clock says.
-          await tx.execute(
-            'DELETE FROM $logTable WHERE id NOT IN ('
-            'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
-            [logMaxRows],
-          );
+          await tx.execute(_capSql, [logMaxRows - 1]);
         });
       } on Object {
         // Reporting a logging failure through the logger is how a write loop
@@ -196,11 +206,7 @@ class LogStore {
           // primary key and monotonic: a clock that steps backwards would
           // otherwise make the newest rows look like the oldest and delete
           // them.
-          await tx.execute(
-            'DELETE FROM $logTable WHERE id NOT IN ('
-            'SELECT id FROM $logTable ORDER BY id DESC LIMIT ?)',
-            [logMaxRows],
-          );
+          await tx.execute(_capSql, [logMaxRows - 1]);
         });
       } on Object {
         // Deliberately silent: reporting a logging failure through the logger

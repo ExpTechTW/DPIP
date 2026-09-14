@@ -317,14 +317,24 @@ class _DiscordReportButton extends StatelessWidget {
 /// stripped here and the result flows as ordinary text. Images vanish, link
 /// labels survive, headings lose their `#`, emphasis markers come off.
 String _bugPreview(String body) => body
-    .replaceAllMapped(RegExp(r'!\[([^\]]*)\]\([^)]*\)'), (_) => '')
-    .replaceAllMapped(RegExp(r'\[([^\]]+)\]\([^)]*\)'), (m) => m.group(1)!)
-    .replaceAll(RegExp(r'```[a-zA-Z]*'), ' ')
-    .replaceAll(RegExp(r'^#{1,6}\s*', multiLine: true), '')
-    .replaceAll(RegExp(r'^\s*[-+*]\s+', multiLine: true), '• ')
-    .replaceAll(RegExp(r'[*_~`]'), '')
+    .replaceAllMapped(_mdImage, (_) => '')
+    .replaceAllMapped(_mdLink, (m) => m.group(1)!)
+    .replaceAll(_mdFence, ' ')
+    .replaceAll(_mdHeading, '')
+    .replaceAll(_mdBullet, '• ')
+    .replaceAll(_mdEmphasis, '')
     .replaceAll('\n', ' ')
     .trim();
+
+// Compiled once. `_bugPreview` runs for every card on every list rebuild —
+// each sort or tag-filter toggle — and an inline `RegExp(...)` compiles a
+// fresh pattern per call, so six patterns × every visible card × every toggle.
+final RegExp _mdImage = RegExp(r'!\[([^\]]*)\]\([^)]*\)');
+final RegExp _mdLink = RegExp(r'\[([^\]]+)\]\([^)]*\)');
+final RegExp _mdFence = RegExp(r'```[a-zA-Z]*');
+final RegExp _mdHeading = RegExp(r'^#{1,6}\s*', multiLine: true);
+final RegExp _mdBullet = RegExp(r'^\s*[-+*]\s+', multiLine: true);
+final RegExp _mdEmphasis = RegExp(r'[*_~`]');
 
 /// One thread row — title, tag badges, body preview, author and reply count.
 /// The dot between two facts in a card's meta row.
@@ -354,11 +364,13 @@ class _ThreadCard extends StatelessWidget {
   final BugThread thread;
   final AvatarFetch avatarFor;
 
+  static final DateFormat _date = DateFormat('yyyy/MM/dd');
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final date = DateFormat('yyyy/MM/dd').format(thread.createdAt.toLocal());
+    final date = _date.format(thread.createdAt.toLocal());
     return Card(
       margin: EdgeInsets.zero,
       color: colors.surfaceContainerHigh,

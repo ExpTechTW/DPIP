@@ -84,8 +84,16 @@ class _RainOnGlassState extends State<RainOnGlass>
   void _syncRunning() {
     // No shader means there can be no visible frame. This also permanently
     // stops the vsync loop on Skia after the filter capability check fails.
+    //
+    // The opacity term mirrors [build]'s own short-circuit: below 0.004 the
+    // filter is never built, so a ticker kept alive there only rebuilds an
+    // `ImageFiltered(enabled: false)` sixty times a second. The header card's
+    // opacity reaches exactly 0 once the hero scrolls past the fold, and that
+    // is the state this used to spin in (`RainOnCard` gates its own ticker
+    // the same way).
     if (widget.active &&
         widget.intensity > 0.01 &&
+        widget.opacity > 0.004 &&
         _shader != null &&
         !_filterUnsupported) {
       if (!_clock.isRunning) _clock.start();
@@ -100,7 +108,8 @@ class _RainOnGlassState extends State<RainOnGlass>
   void didUpdateWidget(RainOnGlass oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.active != widget.active ||
-        (oldWidget.intensity > 0.01) != (widget.intensity > 0.01)) {
+        (oldWidget.intensity > 0.01) != (widget.intensity > 0.01) ||
+        (oldWidget.opacity > 0.004) != (widget.opacity > 0.004)) {
       _syncRunning();
     }
   }

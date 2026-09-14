@@ -94,6 +94,13 @@ itself (sky colour at 20 % alpha, HSL-lightness shifted by time of day — see
 `skyCardTint`). Ink follows the sky, not the theme. Shared surfaces built from
 it: `shared/widgets/frosted_surface.dart`, `sheet_surface.dart`.
 
+Frost over the **map** is iOS-only. On Android the map is a platform view and a
+`BackdropFilter` over it is either blind (HCPP) or the reason every map frame
+re-rasterises the whole Flutter scene (virtual display), so every map-chrome
+blur is gated on `mapChromeBlursBackdrop` (`frosted_surface.dart`) and Android
+draws the same panel as a slightly stronger flat tint. Do not add a blur over
+the map without going through that gate.
+
 ## Shared components — `lib/shared/widgets/`
 
 - `SectionHeader(title)` — the small primary-tinted header above a settings/menu
