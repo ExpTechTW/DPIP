@@ -1,13 +1,22 @@
 import Flutter
 import Foundation
+import WidgetKit
 
-/// The native allowlist also provides the WidgetKit kind for a future reload.
+/// The native allowlist provides storage and WidgetKit identities.
 enum WidgetSnapshotKind: String {
   case weatherForecast
 
   var filename: String {
     switch self {
-    case .weatherForecast: return "weather-forecast.json"
+    case .weatherForecast:
+      return "weather-forecast.json"
+    }
+  }
+
+  var widgetKind: String {
+    switch self {
+    case .weatherForecast:
+      return "DPIPWidgets"
     }
   }
 }
@@ -113,7 +122,7 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
 
       do {
         try WidgetSnapshotFile.replace(data, kind: kind, in: container)
-        // Future WidgetCenter.reloadTimelines(ofKind: kind.rawValue) belongs here.
+        WidgetCenter.shared.reloadTimelines(ofKind: kind.widgetKind)
         DispatchQueue.main.async { result(nil) }
       } catch {
         DispatchQueue.main.async { result(self.flutterError(.writeFailed)) }
