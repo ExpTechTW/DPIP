@@ -244,39 +244,47 @@ class _DaySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            left: AppSpacing.xs,
-            bottom: AppSpacing.sm,
-          ),
-          child: Row(
-            children: [
-              Flexible(
-                child: Text(
-                  _dayLabel(day, l10n, locale),
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colors.primary,
-                    fontWeight: FontWeight.w700,
+        SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: AppSpacing.xs,
+              bottom: AppSpacing.sm,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _dayLabel(day, l10n, locale),
+                      softWrap: false,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: colors.outlineVariant.withValues(alpha: 0.55),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: colors.outlineVariant.withValues(alpha: 0.55),
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                l10n.reportListDayCount(reports.length),
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontFeatures: const [FontFeature.tabularFigures()],
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  l10n.reportListDayCount(reports.length),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         Material(
@@ -310,20 +318,13 @@ class _DaySection extends StatelessWidget {
     } else if (day == today.subtract(const Duration(days: 1))) {
       relative = l10n.reportListYesterday;
     }
-    if (relative != null) {
-      final date = _relativeDayFormats
-          .putIfAbsent(locale, () => DateFormat.yMMMd(locale))
-          .format(day);
-      return '$relative ($date)';
-    }
-    // Parsing a locale's pattern is not free — memoised per locale.
-    return _dayFormats
+    final date = _dayFormats
         .putIfAbsent(locale, () => DateFormat.yMMMEd(locale))
         .format(day);
+    return relative == null ? date : '$date ($relative)';
   }
 
   static final Map<String, DateFormat> _dayFormats = {};
-  static final Map<String, DateFormat> _relativeDayFormats = {};
 }
 
 class _ReportTile extends StatelessWidget {
