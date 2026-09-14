@@ -323,6 +323,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLegendExpand => 'Chú giải';
 
   @override
+  String get monitorIntensityRanking => 'Xếp hạng cường độ';
+
+  @override
+  String get monitorIntensityRankingEmpty =>
+      'Hiện không có khu vực nào rung lắc';
+
+  @override
   String get eewNone => 'Hiện không có cảnh báo sớm động đất';
 
   @override

@@ -320,6 +320,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLegendExpand => '凡例';
 
   @override
+  String get monitorIntensityRanking => '震度ランキング';
+
+  @override
+  String get monitorIntensityRankingEmpty => '現在、揺れを観測した地域はありません';
+
+  @override
   String get eewNone => '現在、緊急地震速報はありません';
 
   @override

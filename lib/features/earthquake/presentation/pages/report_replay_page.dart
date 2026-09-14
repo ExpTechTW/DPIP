@@ -31,6 +31,7 @@ import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
+import 'package:dpip/features/earthquake/domain/rts_area_ranking.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -62,10 +63,11 @@ import 'package:dpip/shared/map/map_style.dart'
         townFillLayerId,
         townLabelLayerId;
 import 'package:dpip/shared/seismic/intensity_colors.dart';
-import 'package:dpip/shared/widgets/frosted_surface.dart';
-import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:dpip/shared/widgets/map_intensity_ranking.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -188,46 +190,55 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FrostedSurface(
-                        borderRadius: AppRadius.large,
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () => context.pop(),
+                  child: MapCornerControls(
+                    leading: MapChipButton(
+                      icon: Icons.arrow_back,
+                      tooltip: MaterialLocalizations.of(context)
+                          .backButtonTooltip,
+                      active: false,
+                      onTap: () => context.pop(),
+                    ),
+                    // The replay surface is the 強震監視器 frozen in time, so it
+                    // shows the same intensity scale the live monitor does —
+                    // swapping to the EEW felt-scale while an alert is up, as
+                    // the legacy monitor did. The swap sits inside the open
+                    // panel on purpose: an alert arriving mid-replay changes
+                    // the scale being shown, not whether the user asked to see
+                    // it.
+                    legend: ListenableBuilder(
+                      listenable: _session.eew,
+                      builder: (context, _) => MapLegendCard(
+                        child: IntensityLegend(
+                          mode: _session.eew.alerts.isNotEmpty
+                              ? IntensityLegendMode.eew
+                              : IntensityLegendMode.rts,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      // The replay surface is the 強震監視器 frozen in time —
-                      // the same intensity legend the live monitor carries,
-                      // switching to the EEW felt-scale while an alert is up
-                      // (the legacy monitor did exactly this on active EEW).
-                      //
-                      // Collapsible, and collapsed to a chip to start with,
-                      // exactly as [MapScaffold] mounts every layer's legend:
-                      // this page is a full-screen map too, and an eleven-row
-                      // scale pinned open covers the north-west corner of the
-                      // island for the whole replay. The wrap sits *outside*
-                      // the mode swap on purpose — an alert arriving mid-replay
-                      // changes the scale being shown, not whether the user
-                      // asked to see it.
-                      CollapsibleMapLegend(
-                        legend: ListenableBuilder(
-                          listenable: _session.eew,
-                          builder: (context, _) {
-                            final hasEew = _session.eew.alerts.isNotEmpty;
-                            return MapLegendCard(
-                              child: IntensityLegend(
-                                mode: hasEew
-                                    ? IntensityLegendMode.eew
-                                    : IntensityLegendMode.rts,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
+                    panel: MapCornerPanel(
+                      icon: Icons.leaderboard_outlined,
+                      tooltip: AppLocalizations.of(context)
+                          .monitorIntensityRanking,
+                      listenable: _session.rts,
+                      // An old replay the server kept no RTS for has nothing to
+                      // rank, and RTS can stop mid-replay with the panel open —
+                      // null takes the button and its card off the row together.
+                      build: (context) {
+                        final areas = rtsAreaRanking(_session.rts.state);
+                        if (areas == null) return null;
+                        return (
+                          card: IntensityRankingCard(
+                            areas: areas,
+                            directory: context.read<TownDirectory>(),
+                          ),
+                          badge: areas.isEmpty
+                              ? null
+                              : IntensityRankingBadge(
+                                  intensity: areas.first.intensity,
+                                ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

@@ -695,6 +695,18 @@ abstract class AppLocalizations {
   /// **'Legend'**
   String get mapLegendExpand;
 
+  /// Title of the seismic monitor's township intensity ranking, on the chip beside the map legend and as the expanded card's heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity Ranking'**
+  String get monitorIntensityRanking;
+
+  /// Shown inside the expanded intensity ranking when the live feed reports no shaking townships.
+  ///
+  /// In en, this message translates to:
+  /// **'No areas currently shaking'**
+  String get monitorIntensityRankingEmpty;
+
   /// Calm state of the earthquake monitor when the live feed reports no alert
   ///
   /// In en, this message translates to:

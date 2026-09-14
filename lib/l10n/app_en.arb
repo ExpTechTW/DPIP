@@ -407,6 +407,14 @@
     "description": "The radio rejected the channel write"
   },
   "mapLegendExpand": "Legend",
+  "monitorIntensityRanking": "Intensity Ranking",
+  "monitorIntensityRankingEmpty": "No areas currently shaking",
+  "@monitorIntensityRanking": {
+    "description": "Title of the seismic monitor's township intensity ranking, on the chip beside the map legend and as the expanded card's heading."
+  },
+  "@monitorIntensityRankingEmpty": {
+    "description": "Shown inside the expanded intensity ranking when the live feed reports no shaking townships."
+  },
   "eewNone": "No active earthquake early warning",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "Tsunami advisories and warnings",

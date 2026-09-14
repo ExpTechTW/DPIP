@@ -319,6 +319,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLegendExpand => '범례';
 
   @override
+  String get monitorIntensityRanking => '진도 순위';
+
+  @override
+  String get monitorIntensityRankingEmpty => '현재 흔들림이 감지된 지역이 없습니다';
+
+  @override
   String get eewNone => '현재 지진 조기경보가 없습니다';
 
   @override

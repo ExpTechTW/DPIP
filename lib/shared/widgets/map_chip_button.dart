@@ -19,6 +19,7 @@ class MapChipButton extends StatelessWidget {
     required this.active,
     required this.onTap,
     this.label,
+    this.trailing,
   });
 
   /// Whether the menu's settings differ from the defaults: tints the icon
@@ -38,6 +39,13 @@ class MapChipButton extends StatelessWidget {
   /// A labelled chip drops the [active] marker dot: the label already says what
   /// the dot was hinting at, and the dot would sit on top of the text.
   final String? label;
+
+  /// Optional widget after the glyph, for a chip that carries a live reading —
+  /// the monitor's ranking hangs its strongest intensity here, so a user who
+  /// never opens it still sees that something is shaking. Keep it glyph-sized
+  /// (22): the chip may sit in a row of plain ones, and only its width should
+  /// give.
+  final Widget? trailing;
 
   final String tooltip;
   final VoidCallback onTap;
@@ -109,6 +117,10 @@ class MapChipButton extends StatelessWidget {
                                     : colors.onSurfaceVariant,
                               ),
                         ),
+                      ],
+                      if (trailing case final widget?) ...[
+                        const SizedBox(width: AppSpacing.xs),
+                        widget,
                       ],
                     ],
                   ),

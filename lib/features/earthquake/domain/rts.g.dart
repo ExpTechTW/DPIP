@@ -13,16 +13,29 @@ _Rts _$RtsFromJson(Map<String, dynamic> json) => _Rts(
       ) ??
       const <String, RtsStation>{},
   box: json['box'] as Map<String, dynamic>? ?? const <String, dynamic>{},
-  intensities: json['int'] as List<dynamic>? ?? const <dynamic>[],
+  intensities:
+      (json['int'] as List<dynamic>?)
+          ?.map((e) => RtsAreaIntensity.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <RtsAreaIntensity>[],
   time: (json['time'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$RtsToJson(_Rts instance) => <String, dynamic>{
   'station': instance.station.map((k, e) => MapEntry(k, e.toJson())),
   'box': instance.box,
-  'int': instance.intensities,
+  'int': instance.intensities.map((e) => e.toJson()).toList(),
   'time': instance.time,
 };
+
+_RtsAreaIntensity _$RtsAreaIntensityFromJson(Map<String, dynamic> json) =>
+    _RtsAreaIntensity(
+      code: (json['code'] as num?)?.toInt() ?? 0,
+      intensity: (json['i'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$RtsAreaIntensityToJson(_RtsAreaIntensity instance) =>
+    <String, dynamic>{'code': instance.code, 'i': instance.intensity};
 
 _RtsStation _$RtsStationFromJson(Map<String, dynamic> json) => _RtsStation(
   pga: (json['pga'] as num?)?.toDouble() ?? 0.0,

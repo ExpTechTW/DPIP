@@ -15,6 +15,7 @@ import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/rts_area_ranking.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -38,6 +39,8 @@ import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
+import 'package:dpip/shared/widgets/map_intensity_ranking.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -891,6 +894,29 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       child: IntensityLegend(mode: IntensityLegendMode.rts),
     );
   }
+
+  /// 震度排行榜 — a button beside the legend's, opening into the slot below it.
+  /// Rebuilt on every feed tick; `rtsAreaRanking` decides whether there is
+  /// anything to show at all, so a stale feed takes the whole panel off the map
+  /// rather than freezing a reading.
+  @override
+  MapCornerPanel? buildLegendPanel(BuildContext context) => MapCornerPanel(
+    icon: Icons.leaderboard_outlined,
+    tooltip: AppLocalizations.of(context).monitorIntensityRanking,
+    listenable: _feed,
+    build: (context) {
+      final areas = rtsAreaRanking(_feed.state);
+      if (areas == null) return null;
+      return (
+        card: IntensityRankingCard(areas: areas, directory: _townDirectory),
+        // The strongest reading rides on the collapsed button, so a user who
+        // never opens the panel still sees that something is shaking.
+        badge: areas.isEmpty
+            ? null
+            : IntensityRankingBadge(intensity: areas.first.intensity),
+      );
+    },
+  );
 
   /// [render]/the data-push methods get no `BuildContext`, but the intensity
   /// icons come in light/dark artwork and the area fill needs the base

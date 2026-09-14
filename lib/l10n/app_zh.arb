@@ -132,6 +132,8 @@
   },
   "locationBannerFix": "開啟設定",
   "mapLegendExpand": "圖例",
+  "monitorIntensityRanking": "震度排行",
+  "monitorIntensityRankingEmpty": "目前無區域觸發",
   "eewNone": "目前沒有地震速報",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "海嘯消息、海嘯警報",

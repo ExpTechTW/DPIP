@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Rts {
 
- Map<String, RtsStation> get station; Map<String, dynamic> get box;@JsonKey(name: 'int') List<dynamic> get intensities; int get time;
+ Map<String, RtsStation> get station; Map<String, dynamic> get box;@JsonKey(name: 'int') List<RtsAreaIntensity> get intensities; int get time;
 /// Create a copy of Rts
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $RtsCopyWith<$Res>  {
   factory $RtsCopyWith(Rts value, $Res Function(Rts) _then) = _$RtsCopyWithImpl;
 @useResult
 $Res call({
- Map<String, RtsStation> station, Map<String, dynamic> box,@JsonKey(name: 'int') List<dynamic> intensities, int time
+ Map<String, RtsStation> station, Map<String, dynamic> box,@JsonKey(name: 'int') List<RtsAreaIntensity> intensities, int time
 });
 
 
@@ -71,7 +71,7 @@ class _$RtsCopyWithImpl<$Res>
 station: null == station ? _self.station : station // ignore: cast_nullable_to_non_nullable
 as Map<String, RtsStation>,box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,intensities: null == intensities ? _self.intensities : intensities // ignore: cast_nullable_to_non_nullable
-as List<dynamic>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+as List<RtsAreaIntensity>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -157,7 +157,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<dynamic> intensities,  int time)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<RtsAreaIntensity> intensities,  int time)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Rts() when $default != null:
 return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
@@ -178,7 +178,7 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<dynamic> intensities,  int time)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<RtsAreaIntensity> intensities,  int time)  $default,) {final _that = this;
 switch (_that) {
 case _Rts():
 return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
@@ -198,7 +198,7 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<dynamic> intensities,  int time)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<RtsAreaIntensity> intensities,  int time)?  $default,) {final _that = this;
 switch (_that) {
 case _Rts() when $default != null:
 return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
@@ -213,7 +213,7 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 @JsonSerializable()
 
 class _Rts implements Rts {
-  const _Rts({ Map<String, RtsStation> station = const <String, RtsStation>{},  Map<String, dynamic> box = const <String, dynamic>{}, @JsonKey(name: 'int')  List<dynamic> intensities = const <dynamic>[], this.time = 0}): _station = station,_box = box,_intensities = intensities;
+  const _Rts({ Map<String, RtsStation> station = const <String, RtsStation>{},  Map<String, dynamic> box = const <String, dynamic>{}, @JsonKey(name: 'int')  List<RtsAreaIntensity> intensities = const <RtsAreaIntensity>[], this.time = 0}): _station = station,_box = box,_intensities = intensities;
   factory _Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 
  final  Map<String, RtsStation> _station;
@@ -230,8 +230,8 @@ class _Rts implements Rts {
   return EqualUnmodifiableMapView(_box);
 }
 
- final  List<dynamic> _intensities;
-@override@JsonKey(name: 'int') List<dynamic> get intensities {
+ final  List<RtsAreaIntensity> _intensities;
+@override@JsonKey(name: 'int') List<RtsAreaIntensity> get intensities {
   if (_intensities is EqualUnmodifiableListView) return _intensities;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_intensities);
@@ -272,7 +272,7 @@ abstract mixin class _$RtsCopyWith<$Res> implements $RtsCopyWith<$Res> {
   factory _$RtsCopyWith(_Rts value, $Res Function(_Rts) _then) = __$RtsCopyWithImpl;
 @override @useResult
 $Res call({
- Map<String, RtsStation> station, Map<String, dynamic> box,@JsonKey(name: 'int') List<dynamic> intensities, int time
+ Map<String, RtsStation> station, Map<String, dynamic> box,@JsonKey(name: 'int') List<RtsAreaIntensity> intensities, int time
 });
 
 
@@ -294,7 +294,273 @@ class __$RtsCopyWithImpl<$Res>
 station: null == station ? _self._station : station // ignore: cast_nullable_to_non_nullable
 as Map<String, RtsStation>,box: null == box ? _self._box : box // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,intensities: null == intensities ? _self._intensities : intensities // ignore: cast_nullable_to_non_nullable
-as List<dynamic>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+as List<RtsAreaIntensity>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$RtsAreaIntensity {
+
+ int get code;@JsonKey(name: 'i') int get intensity;
+/// Create a copy of RtsAreaIntensity
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RtsAreaIntensityCopyWith<RtsAreaIntensity> get copyWith => _$RtsAreaIntensityCopyWithImpl<RtsAreaIntensity>(this as RtsAreaIntensity, _$identity);
+
+  /// Serializes this RtsAreaIntensity to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsAreaIntensity&&(identical(other.code, code) || other.code == code)&&(identical(other.intensity, intensity) || other.intensity == intensity));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,code,intensity);
+
+@override
+String toString() {
+  return 'RtsAreaIntensity(code: $code, intensity: $intensity)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $RtsAreaIntensityCopyWith<$Res>  {
+  factory $RtsAreaIntensityCopyWith(RtsAreaIntensity value, $Res Function(RtsAreaIntensity) _then) = _$RtsAreaIntensityCopyWithImpl;
+@useResult
+$Res call({
+ int code,@JsonKey(name: 'i') int intensity
+});
+
+
+
+
+}
+/// @nodoc
+class _$RtsAreaIntensityCopyWithImpl<$Res>
+    implements $RtsAreaIntensityCopyWith<$Res> {
+  _$RtsAreaIntensityCopyWithImpl(this._self, this._then);
+
+  final RtsAreaIntensity _self;
+  final $Res Function(RtsAreaIntensity) _then;
+
+/// Create a copy of RtsAreaIntensity
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? code = null,Object? intensity = null,}) {
+  return _then(RtsAreaIntensity(
+code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as int,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [RtsAreaIntensity].
+extension RtsAreaIntensityPatterns on RtsAreaIntensity {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _RtsAreaIntensity value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _RtsAreaIntensity() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _RtsAreaIntensity value)  $default,){
+final _that = this;
+switch (_that) {
+case _RtsAreaIntensity():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _RtsAreaIntensity value)?  $default,){
+final _that = this;
+switch (_that) {
+case _RtsAreaIntensity() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int code, @JsonKey(name: 'i')  int intensity)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _RtsAreaIntensity() when $default != null:
+return $default(_that.code,_that.intensity);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int code, @JsonKey(name: 'i')  int intensity)  $default,) {final _that = this;
+switch (_that) {
+case _RtsAreaIntensity():
+return $default(_that.code,_that.intensity);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int code, @JsonKey(name: 'i')  int intensity)?  $default,) {final _that = this;
+switch (_that) {
+case _RtsAreaIntensity() when $default != null:
+return $default(_that.code,_that.intensity);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _RtsAreaIntensity extends RtsAreaIntensity {
+  const _RtsAreaIntensity({this.code = 0, @JsonKey(name: 'i') this.intensity = 0}): super._();
+  factory _RtsAreaIntensity.fromJson(Map<String, dynamic> json) => _$RtsAreaIntensityFromJson(json);
+
+@override@JsonKey() final  int code;
+@override@JsonKey(name: 'i') final  int intensity;
+
+/// Create a copy of RtsAreaIntensity
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$RtsAreaIntensityCopyWith<_RtsAreaIntensity> get copyWith => __$RtsAreaIntensityCopyWithImpl<_RtsAreaIntensity>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$RtsAreaIntensityToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsAreaIntensity&&(identical(other.code, code) || other.code == code)&&(identical(other.intensity, intensity) || other.intensity == intensity));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,code,intensity);
+
+@override
+String toString() {
+  return 'RtsAreaIntensity(code: $code, intensity: $intensity)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$RtsAreaIntensityCopyWith<$Res> implements $RtsAreaIntensityCopyWith<$Res> {
+  factory _$RtsAreaIntensityCopyWith(_RtsAreaIntensity value, $Res Function(_RtsAreaIntensity) _then) = __$RtsAreaIntensityCopyWithImpl;
+@override @useResult
+$Res call({
+ int code,@JsonKey(name: 'i') int intensity
+});
+
+
+
+
+}
+/// @nodoc
+class __$RtsAreaIntensityCopyWithImpl<$Res>
+    implements _$RtsAreaIntensityCopyWith<$Res> {
+  __$RtsAreaIntensityCopyWithImpl(this._self, this._then);
+
+  final _RtsAreaIntensity _self;
+  final $Res Function(_RtsAreaIntensity) _then;
+
+/// Create a copy of RtsAreaIntensity
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? code = null,Object? intensity = null,}) {
+  return _then(_RtsAreaIntensity(
+code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as int,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

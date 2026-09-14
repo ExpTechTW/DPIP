@@ -132,6 +132,8 @@
   },
   "locationBannerFix": "설정 열기",
   "mapLegendExpand": "범례",
+  "monitorIntensityRanking": "진도 순위",
+  "monitorIntensityRankingEmpty": "현재 흔들림이 감지된 지역이 없습니다",
   "eewNone": "현재 지진 조기경보가 없습니다",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "지진해일 주의보 및 경보",

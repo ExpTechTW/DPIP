@@ -132,6 +132,8 @@
   },
   "locationBannerFix": "Mở cài đặt",
   "mapLegendExpand": "Chú giải",
+  "monitorIntensityRanking": "Xếp hạng cường độ",
+  "monitorIntensityRankingEmpty": "Hiện không có khu vực nào rung lắc",
   "eewNone": "Hiện không có cảnh báo sớm động đất",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "Tin và cảnh báo sóng thần",

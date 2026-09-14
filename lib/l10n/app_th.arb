@@ -132,6 +132,8 @@
   },
   "locationBannerFix": "เปิดการตั้งค่า",
   "mapLegendExpand": "คำอธิบาย",
+  "monitorIntensityRanking": "อันดับความรุนแรง",
+  "monitorIntensityRankingEmpty": "ขณะนี้ไม่มีพื้นที่ที่สั่นไหว",
   "eewNone": "ขณะนี้ไม่มีการเตือนแผ่นดินไหวล่วงหน้า",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "ข่าวสารและการเตือนภัยสึนามิ",

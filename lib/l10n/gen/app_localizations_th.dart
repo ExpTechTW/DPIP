@@ -323,6 +323,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLegendExpand => 'คำอธิบาย';
 
   @override
+  String get monitorIntensityRanking => 'อันดับความรุนแรง';
+
+  @override
+  String get monitorIntensityRankingEmpty => 'ขณะนี้ไม่มีพื้นที่ที่สั่นไหว';
+
+  @override
   String get eewNone => 'ขณะนี้ไม่มีการเตือนแผ่นดินไหวล่วงหน้า';
 
   @override

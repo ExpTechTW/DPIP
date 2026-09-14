@@ -132,6 +132,8 @@
   },
   "locationBannerFix": "Buka pengaturan",
   "mapLegendExpand": "Legenda",
+  "monitorIntensityRanking": "Peringkat Intensitas",
+  "monitorIntensityRankingEmpty": "Tidak ada wilayah yang berguncang saat ini",
   "eewNone": "Tidak ada peringatan dini gempa aktif",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "Imbauan dan peringatan tsunami",

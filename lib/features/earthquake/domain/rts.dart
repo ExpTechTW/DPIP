@@ -10,19 +10,43 @@ part 'rts.g.dart';
 /// This is the payload the RTS feed streams (`/api/v2/trem/rts?sse=1`, the same
 /// JSON the plain GET returns). It is a continuous ~1 Hz feed, so the realtime
 /// source keys freshness off event recency (not [time], to stay clock-skew
-/// immune); [time] is the snapshot's server instant, kept for display. `box` /
-/// `intensities` stay flexibly typed (empty while calm) until the RTS map
-/// consumes them.
+/// immune); [time] is the snapshot's server instant, kept for display. `box`
+/// stays flexibly typed (empty while calm) until the RTS map consumes it.
 @freezed
 abstract class Rts with _$Rts {
   const factory Rts({
     @Default(<String, RtsStation>{}) Map<String, RtsStation> station,
     @Default(<String, dynamic>{}) Map<String, dynamic> box,
-    @JsonKey(name: 'int') @Default(<dynamic>[]) List<dynamic> intensities,
+    @JsonKey(name: 'int')
+    @Default(<RtsAreaIntensity>[])
+    List<RtsAreaIntensity> intensities,
     @Default(0) int time,
   }) = _Rts;
 
   factory Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
+}
+
+/// One township the feed currently reports as shaking: its directory [code]
+/// (the same key [TownDirectory] is built on, carried on the wire as a number)
+/// and the felt [intensity] 震度 0–9 observed there.
+///
+/// The wire list (`int`) is empty while calm and arrives roughly strongest-
+/// first, but nothing in the protocol promises that order — anything ranking
+/// these must sort for itself.
+@freezed
+abstract class RtsAreaIntensity with _$RtsAreaIntensity {
+  const RtsAreaIntensity._();
+
+  const factory RtsAreaIntensity({
+    @Default(0) int code,
+    @JsonKey(name: 'i') @Default(0) int intensity,
+  }) = _RtsAreaIntensity;
+
+  factory RtsAreaIntensity.fromJson(Map<String, dynamic> json) =>
+      _$RtsAreaIntensityFromJson(json);
+
+  /// [code] as the string key [TownDirectory.byCode] expects.
+  String get townCode => '$code';
 }
 
 /// One station's live shaking: peak ground acceleration / velocity and its

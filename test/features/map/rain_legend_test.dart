@@ -29,7 +29,7 @@ import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -75,7 +75,7 @@ Future<void> _pumpExpanded(
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: CollapsibleMapLegend(
+                    child: MapCornerControls(
                       key: const ValueKey('legend-under-test'),
                       legend: legendBuilder(context),
                     ),

@@ -29,8 +29,8 @@ import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart'
     show VisibleTab, VisibleTabScope;
-import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -1348,17 +1348,23 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             ),
           ),
         ),
-        // Colour / key legend — top-left. Under the sheet so a dragged-up
-        // sheet covers it instead of sitting behind a floating chip.
+        // Colour / key legend (+ the layer's optional second panel, e.g. the
+        // monitor's intensity ranking) — top-left. Under the sheet so a
+        // dragged-up sheet covers it instead of sitting behind a floating chip.
         Positioned(
           top: 0,
           left: 0,
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: CollapsibleMapLegend(
-                key: ValueKey(_active.id),
-                legend: _active.buildLegend(context),
+              child: Builder(
+                builder: (context) => MapCornerControls(
+                  // Keyed by layer so switching closes whatever was open: the
+                  // new layer's legend is a different scale entirely.
+                  key: ValueKey(_active.id),
+                  legend: _active.buildLegend(context),
+                  panel: _active.buildLegendPanel(context),
+                ),
               ),
             ),
           ),

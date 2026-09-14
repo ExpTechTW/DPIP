@@ -13,6 +13,7 @@ import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -232,6 +233,9 @@ abstract class RasterTimelineLayer implements MapLayer {
 
   @override
   Widget buildSheet(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  MapCornerPanel? buildLegendPanel(BuildContext context) => null;
 
   @override
   Widget buildTopTrailingChrome(

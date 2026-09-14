@@ -1,6 +1,7 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -135,6 +136,17 @@ abstract interface class MapLayer {
   /// Return [SizedBox.shrink] when the layer has nothing to key (rare). Keep it
   /// compact — the map must stay readable beside the layer switcher.
   Widget buildLegend(BuildContext context);
+
+  /// Optional second panel in the scaffold's top-left row — a button beside the
+  /// legend's, opening one card into the slot below them.
+  ///
+  /// For a layer-specific readout the user opens on demand — the monitor's
+  /// 震度排行榜 is the only one so far. It shares the legend's row rather than
+  /// the layer switcher's because both are keys to what the map is currently
+  /// showing, and the top-right corner is already two chips deep. The scaffold
+  /// owns which one is open, so the pair can never crowd out the map together.
+  /// Default null.
+  MapCornerPanel? buildLegendPanel(BuildContext context);
 
   /// Optional chrome to the left of the layer switcher (top-right).
   ///
@@ -314,6 +326,9 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   Widget buildLegend(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  MapCornerPanel? buildLegendPanel(BuildContext context) => null;
 
   @override
   Widget buildTopTrailingChrome(

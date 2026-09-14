@@ -1,25 +1,23 @@
-/// The intensity legend as the replay page mounts it — inside
-/// [CollapsibleMapLegend], with the RTS/EEW mode swap *under* the collapse
-/// wrap rather than around it.
+/// The intensity legend inside [MapCornerControls], with the RTS/EEW mode
+/// swap *under* the collapse wrap rather than around it — how the monitor layer
+/// hands its legend to `MapScaffold`.
 ///
-/// The replay page is a full-screen map with no [MapScaffold], so it wires the
-/// chip itself; this pins the two things that wiring decides. An eleven-row
-/// scale left pinned open sits over the north-west of the island for the whole
-/// replay, so it has to start collapsed — and an alert arriving mid-replay
-/// swaps which scale is drawn, which must not throw away the user's choice to
-/// have the legend open.
+/// Pins the two things that wiring decides. An eleven-row scale left pinned
+/// open sits over the north-west of the island, so it has to start collapsed —
+/// and an alert arriving mid-shake swaps which scale is drawn, which must not
+/// throw away the user's choice to have the legend open.
 library;
 
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
+import 'package:dpip/shared/widgets/map_corner_controls.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Mirrors the replay page's own subtree: a top-left overlay whose
-/// `AnimatedSize` lays the legend out with unbounded width, and a listenable
-/// standing in for the EEW feed that flips the scale.
+/// Mirrors how a map page mounts it: a top-left overlay whose `AnimatedSize`
+/// lays the legend out with unbounded width, and a listenable standing in for
+/// the EEW feed that flips the scale.
 Future<void> _pumpLegend(WidgetTester tester, ValueNotifier<bool> hasEew) {
   return tester.pumpWidget(
     MaterialApp(
@@ -35,7 +33,7 @@ Future<void> _pumpLegend(WidgetTester tester, ValueNotifier<bool> hasEew) {
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: CollapsibleMapLegend(
+                  child: MapCornerControls(
                     legend: ListenableBuilder(
                       listenable: hasEew,
                       builder: (context, _) => MapLegendCard(
@@ -64,9 +62,7 @@ Future<void> _settle(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('the replay legend starts collapsed and opens on tap', (
-    tester,
-  ) async {
+  testWidgets('the legend starts collapsed and opens on tap', (tester) async {
     final hasEew = ValueNotifier(false);
     addTearDown(hasEew.dispose);
     await _pumpLegend(tester, hasEew);
@@ -87,12 +83,14 @@ void main() {
     // felt scale has no row for — so this is the mode, not just "a legend".
     expect(find.text('-3'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.expand_less));
+    // The button that opened it is what closes it — there is no second control
+    // floating over the scale.
+    await tester.tap(find.byIcon(Icons.legend_toggle));
     await _settle(tester);
     expect(find.byType(IntensityLegend), findsNothing);
   });
 
-  testWidgets('an alert arriving mid-replay swaps the scale without closing '
+  testWidgets('an alert arriving mid-shake swaps the scale without closing '
       'the legend the user opened', (tester) async {
     final hasEew = ValueNotifier(false);
     addTearDown(hasEew.dispose);
