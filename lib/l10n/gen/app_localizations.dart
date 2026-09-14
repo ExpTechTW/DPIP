@@ -3335,6 +3335,36 @@ abstract class AppLocalizations {
   /// **'Critical alerts'**
   String get onboardingPermCritical;
 
+  /// Android permission-check row for urgent notification channels
+  ///
+  /// In en, this message translates to:
+  /// **'Major alerts in Do Not Disturb'**
+  String get onboardingPermUrgentAndroid;
+
+  /// Limitations of Android urgent notification channel settings
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which major-alert channels Android may allow during Do Not Disturb. Silent mode, volume, and the active Mode still apply.'**
+  String get onboardingPermUrgentAndroidDesc;
+
+  /// Instruction before opening one Android notification channel
+  ///
+  /// In en, this message translates to:
+  /// **'In the channel settings, choose whether this notification may interrupt Do Not Disturb, then return to DPIP.'**
+  String get permissionGuideUrgentAndroid;
+
+  /// Android notification channel currently bypasses Do Not Disturb
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed during Do Not Disturb'**
+  String get urgentNotificationBypassesDnd;
+
+  /// Android notification channel currently follows Do Not Disturb
+  ///
+  /// In en, this message translates to:
+  /// **'Follows Do Not Disturb'**
+  String get urgentNotificationFollowsDnd;
+
   /// Running total label above the cumulative station rain trend chart
   ///
   /// In en, this message translates to:

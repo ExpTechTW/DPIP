@@ -21,6 +21,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/urgent_notification_settings.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
@@ -35,6 +36,7 @@ import 'package:provider/provider.dart';
 enum _PermissionItem {
   notify,
   critical,
+  urgent,
   location,
   background,
   execution,
@@ -82,9 +84,12 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   final UnusedAppRestrictionsService _unusedApp =
       UnusedAppRestrictionsService();
   final BackgroundExecutionService _execution = BackgroundExecutionService();
+  final UrgentNotificationSettings _urgentSettings =
+      UrgentNotificationSettings();
 
   bool _notify = false;
   bool _critical = false;
+  UrgentNotificationStatus? _urgent;
   bool _location = false;
   bool _background = false;
   bool _batteryOk = false;
@@ -139,6 +144,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     final critical = Platform.isIOS
         ? await notifications.criticalAllowed()
         : false;
+    final urgent = Platform.isAndroid ? await _urgentSettings.status() : null;
     final locationGranted = await location.granted();
     final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
@@ -147,6 +153,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     if (!mounted || epoch != _refreshEpoch) return;
     Log.info(
       'permission state: notify=$notify critical=$critical '
+      'urgent=${urgent?.allBypass} '
       'location=$locationGranted background=$backgroundGranted '
       'battery=$batteryOk unusedApp=${unusedApp.name} '
       'bgExec=${execution.restricted ? "restricted" : "ok"} '
@@ -169,6 +176,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     setState(() {
       _notify = notify;
       _critical = critical;
+      _urgent = urgent;
       _location = locationGranted;
       _background = backgroundGranted;
       _batteryOk = batteryOk;
@@ -220,6 +228,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   }) => switch (item) {
     _PermissionItem.notify => notify,
     _PermissionItem.critical => critical,
+    // This is a preference, not a grant: returning from any channel settings is
+    // never an error just because the user chose to keep Do Not Disturb active.
+    _PermissionItem.urgent => true,
     _PermissionItem.location => location,
     _PermissionItem.background => background,
     _PermissionItem.execution => !execution.restricted,
@@ -341,6 +352,26 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       () async => PermissionSettingsGuide(
         instruction: l10n.permissionGuideNotification,
       ),
+    );
+  }
+
+  Future<void> _openUrgentSettings(
+    UrgentNotificationChannelStatus target,
+  ) async {
+    final channelId = target.channelId;
+    if (channelId == null) return;
+    final l10n = AppLocalizations.of(context);
+    await _openGuidedSettings(
+      _PermissionItem.urgent,
+      l10n.onboardingPermUrgentAndroid,
+      PermissionSettingsGuide(instruction: l10n.permissionGuideUrgentAndroid),
+      () async {
+        final destination = await _urgentSettings.openChannelSettings(
+          channelId,
+        );
+        Log.info('permission[urgent notification]: opened $destination');
+        return destination != 'none';
+      },
     );
   }
 
@@ -514,6 +545,17 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             onGrant: _grantCritical,
           ),
         ],
+        if (Platform.isAndroid && _urgent != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          _UrgentNotificationSection(
+            status: _urgent!,
+            title: l10n.onboardingPermUrgentAndroid,
+            description: l10n.onboardingPermUrgentAndroidDesc,
+            loading: _loading(_PermissionItem.urgent),
+            blocked: _busy != null,
+            onOpen: _openUrgentSettings,
+          ),
+        ],
         const SizedBox(height: AppSpacing.sm),
         PermissionRow(
           icon: Icons.location_on_outlined,
@@ -628,6 +670,7 @@ class PermissionRow extends StatelessWidget {
     this.loading = false,
     this.blocked = false,
     this.settingsAction = false,
+    this.actionWhenGranted = false,
     this.feedback,
   });
 
@@ -648,6 +691,7 @@ class PermissionRow extends StatelessWidget {
   final bool loading;
   final bool blocked;
   final bool settingsAction;
+  final bool actionWhenGranted;
   final PermissionRowFeedback? feedback;
 
   @override
@@ -668,7 +712,7 @@ class PermissionRow extends StatelessWidget {
     final borderColor =
         feedbackColor ??
         (loading ? colors.primary : colors.outlineVariant.withValues(alpha: 0));
-    final action = onGrant == null || granted
+    final action = onGrant == null || (granted && !actionWhenGranted)
         ? null
         : settingsAction || advisory
         ? OutlinedButton.icon(
@@ -762,6 +806,89 @@ class PermissionRow extends StatelessWidget {
           if (action != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Align(alignment: Alignment.centerRight, child: action),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _UrgentNotificationSection extends StatelessWidget {
+  const _UrgentNotificationSection({
+    required this.status,
+    required this.title,
+    required this.description,
+    required this.loading,
+    required this.blocked,
+    required this.onOpen,
+  });
+
+  final UrgentNotificationStatus status;
+  final String title;
+  final String description;
+  final bool loading;
+  final bool blocked;
+  final Future<void> Function(UrgentNotificationChannelStatus) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final channels = status.channels
+        .where((channel) => channel.channelId != null && channel.name != null)
+        .toList(growable: false);
+    if (channels.isEmpty) return const SizedBox.shrink();
+
+    return Material(
+      color: colors.surfaceContainer,
+      borderRadius: AppRadius.medium,
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        leading: Icon(Icons.priority_high_outlined, color: colors.primary),
+        title: Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.xs),
+          child: Text(
+            description,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+        ),
+        shape: const Border(),
+        collapsedShape: const Border(),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          0,
+          AppSpacing.md,
+          AppSpacing.md,
+        ),
+        children: [
+          for (var index = 0; index < channels.length; index++) ...[
+            if (index > 0) const SizedBox(height: AppSpacing.sm),
+            PermissionRow(
+              icon: Icons.notifications_active_outlined,
+              title: channels[index].name!,
+              description:
+                  channels[index].state ==
+                      UrgentNotificationChannelState.bypasses
+                  ? l10n.urgentNotificationBypassesDnd
+                  : l10n.urgentNotificationFollowsDnd,
+              granted:
+                  channels[index].state ==
+                  UrgentNotificationChannelState.bypasses,
+              loading: loading,
+              blocked: blocked,
+              settingsAction: true,
+              actionWhenGranted: true,
+              onGrant: () => onOpen(channels[index]),
+            ),
           ],
         ],
       ),

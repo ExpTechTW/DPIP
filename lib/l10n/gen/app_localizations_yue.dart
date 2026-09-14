@@ -1696,6 +1696,22 @@ class AppLocalizationsYue extends AppLocalizations {
   String get onboardingPermCritical => '重大通知';
 
   @override
+  String get onboardingPermUrgentAndroid => '勿擾模式下嘅重大通知';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      '按需要選擇可喺勿擾模式期間發出嘅重大通知。靜音、音量同目前模式仍然會影響聲音。';
+
+  @override
+  String get permissionGuideUrgentAndroid => '請喺頻道設定選擇係咪允許呢個通知打斷勿擾模式,再返到 DPIP。';
+
+  @override
+  String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
+
+  @override
+  String get urgentNotificationFollowsDnd => '跟隨勿擾模式';
+
+  @override
   String trendCumulativeTotal(String total) {
     return '累計 $total mm';
   }

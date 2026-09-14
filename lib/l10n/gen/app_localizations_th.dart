@@ -1733,6 +1733,23 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingPermCritical => 'การแจ้งเตือนสำคัญ';
 
   @override
+  String get onboardingPermUrgentAndroid => 'การแจ้งเตือนสำคัญในโหมดห้ามรบกวน';
+
+  @override
+  String get onboardingPermUrgentAndroidDesc =>
+      'ตรวจสอบแต่ละช่องการแจ้งเตือนสำคัญเพื่อให้ Android อนุญาตในโหมดห้ามรบกวน โหมดเงียบ ระดับเสียง และโหมดปัจจุบันยังคงมีผล';
+
+  @override
+  String get permissionGuideUrgentAndroid =>
+      'ในการตั้งค่าช่อง ให้เลือกว่าจะอนุญาตให้การแจ้งเตือนนี้ขัดจังหวะโหมดห้ามรบกวนหรือไม่ แล้วกลับมาที่ DPIP';
+
+  @override
+  String get urgentNotificationBypassesDnd => 'อนุญาตระหว่างโหมดห้ามรบกวน';
+
+  @override
+  String get urgentNotificationFollowsDnd => 'ทำตามโหมดห้ามรบกวน';
+
+  @override
   String trendCumulativeTotal(String total) {
     return 'สะสม $total มม.';
   }
