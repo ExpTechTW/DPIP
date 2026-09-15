@@ -1,4 +1,7 @@
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/platform/widget_snapshot_writer.dart';
+import 'package:dpip/features/weather/current_weather_widget_coordinator.dart';
+import 'package:dpip/features/weather/data/current_weather_widget_publisher.dart';
 import 'package:dpip/features/weather/data/frame_tile_api.dart';
 import 'package:dpip/features/weather/data/frame_tile_repository.dart';
 import 'package:dpip/features/weather/data/meteor_lightning_repository_impl.dart';
@@ -8,6 +11,7 @@ import 'package:dpip/features/weather/data/meteor_weather_api.dart';
 import 'package:dpip/features/weather/data/meteor_weather_repository_impl.dart';
 import 'package:dpip/features/weather/data/rain_hour_trend_api.dart';
 import 'package:dpip/features/weather/data/rain_hour_trend_repository_impl.dart';
+import 'package:dpip/features/weather/domain/current_weather_widget_sync.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
@@ -29,6 +33,13 @@ import 'package:provider/single_child_widget.dart';
 /// DB wouldn't open) degrades to a no-op warmer, never a failed launch.
 List<SingleChildWidget> weatherProviders(SharedDeps deps) {
   return [
+    Provider<CurrentWeatherWidgetSync>.value(
+      value: CurrentWeatherWidgetCoordinator(
+        deps.regionStore,
+        deps.townDirectory,
+        CurrentWeatherWidgetPublisher(IosWidgetSnapshotWriter()),
+      ),
+    ),
     Provider<RadarRepository>.value(
       value: FrameTileRepositoryImpl(
         FrameTileApi(deps.apiClient, 'radar'),
