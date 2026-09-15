@@ -130,9 +130,6 @@ class MorePage extends StatelessWidget {
                 ),
               ],
             ),
-            // Its own section rather than a row under 進階: the LoRa mesh is the
-            // app's off-grid reception path, not a developer curiosity, and the
-            // radio it pairs with is a physical thing the user owns and manages.
             // Its own section rather than a row under 通知 or 顯示: what it
             // switches is neither a notification's delivery nor anything drawn,
             // and the settings it belongs beside — colour vision, contrast,
@@ -153,6 +150,9 @@ class MorePage extends StatelessWidget {
                 ),
               ],
             ),
+            // Its own section rather than a row under 進階: the LoRa mesh is the
+            // app's off-grid reception path, not a developer curiosity, and the
+            // radio it pairs with is a physical thing the user owns and manages.
             SectionHeader(l10n.moreSectionMesh),
             _MoreGroup(
               children: [
