@@ -22,7 +22,7 @@ import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
-import 'package:dpip/features/map/presentation/monitor_eew_announcement_controller.dart';
+import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
 import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -191,11 +191,11 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel>
     if (controller == null || l10n == null) return;
     final foreground =
         _lifecycleState == null || _lifecycleState == AppLifecycleState.resumed;
-    // Absent provider means a test that supplied neither — announce, matching
+    // Absent provider means a test that supplied none — stay silent, matching
     // the default. Switching off deactivates the controller, which stops any
     // phrase in flight and releases the notification the gate was holding, so
     // the warning sound is never delayed by a setting the user just turned off.
-    final speechEnabled = _speechSettings?.enabled ?? true;
+    final speechEnabled = _speechSettings?.enabled ?? false;
     controller.setActive(speechEnabled && _isMonitorOnScreen && foreground);
     controller.update(
       widget.eew.state,

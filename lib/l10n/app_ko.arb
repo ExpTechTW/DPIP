@@ -1994,5 +1994,9 @@
   "radarLightningOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 낙뢰를 겹쳐서 표시합니다.",
   "radarWindOverlay": "바람 표시",
   "radarWindOverlayHint": "화면에 표시된 시각의 관측 바람",
-  "radarWindOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 관측소 풍향·풍속을 겹쳐서 표시합니다."
+  "radarWindOverlaySubtitle": "현재 보고 있는 레이더 영상과 같은 시각의 관측소 풍향·풍속을 겹쳐서 표시합니다.",
+  "moreSectionAccessibility": "접근성",
+  "eewSpokenAnnouncementOn": "켜기",
+  "eewSpokenAnnouncementOnDescription": "예상 진도를 음성으로 먼저 안내한 뒤 경보음이 울립니다. 그만큼 경보음이 늦어집니다.",
+  "eewSpokenAnnouncementOff": "끄기"
 }

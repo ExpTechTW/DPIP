@@ -3280,4 +3280,17 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get radarWindOverlaySubtitle => '表示中のレーダーエコーと同じ時刻の観測所の風向・風速を重ねて表示します。';
+
+  @override
+  String get moreSectionAccessibility => 'アクセシビリティ';
+
+  @override
+  String get eewSpokenAnnouncementOn => 'オン';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      '予想震度を音声で読み上げてから警報音を鳴らします。その分、警報音は読み上げの長さだけ遅れます。';
+
+  @override
+  String get eewSpokenAnnouncementOff => 'オフ';
 }

@@ -1994,5 +1994,9 @@
   "radarLightningOverlaySubtitle": "Chồng các cú sét được ghi nhận cùng thời điểm với ảnh radar đang hiển thị.",
   "radarWindOverlay": "Hiện gió",
   "radarWindOverlayHint": "Gió trạm cùng thời điểm với ảnh đang xem",
-  "radarWindOverlaySubtitle": "Chồng hướng và tốc độ gió từ các trạm quan trắc cùng thời điểm với ảnh radar đang hiển thị."
+  "radarWindOverlaySubtitle": "Chồng hướng và tốc độ gió từ các trạm quan trắc cùng thời điểm với ảnh radar đang hiển thị.",
+  "moreSectionAccessibility": "Trợ năng",
+  "eewSpokenAnnouncementOn": "Bật",
+  "eewSpokenAnnouncementOnDescription": "Cường độ dự kiến được đọc lên trước, sau đó mới phát âm báo động — nên âm báo động chậm lại đúng bằng thời lượng câu đọc.",
+  "eewSpokenAnnouncementOff": "Tắt"
 }

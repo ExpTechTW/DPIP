@@ -3336,4 +3336,17 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get radarWindOverlaySubtitle =>
       'ซ้อนทิศทางและความเร็วลมจากสถานีตรวจวัดในเวลาเดียวกับภาพเรดาร์ที่กำลังแสดง';
+
+  @override
+  String get moreSectionAccessibility => 'การช่วยการเข้าถึง';
+
+  @override
+  String get eewSpokenAnnouncementOn => 'เปิด';
+
+  @override
+  String get eewSpokenAnnouncementOnDescription =>
+      'อ่านออกเสียงความรุนแรงที่คาดการณ์ก่อน แล้วจึงส่งเสียงเตือน ซึ่งทำให้เสียงเตือนช้าลงตามความยาวของประโยค';
+
+  @override
+  String get eewSpokenAnnouncementOff => 'ปิด';
 }

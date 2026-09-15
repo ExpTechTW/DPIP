@@ -1994,5 +1994,9 @@
   "radarLightningOverlaySubtitle": "Ipinapatong ang mga kidlat na naitala sa parehong oras ng radar na tinitingnan mo.",
   "radarWindOverlay": "Ipakita ang hangin",
   "radarWindOverlayHint": "Hangin ng istasyon sa oras ng frame na nakikita",
-  "radarWindOverlaySubtitle": "Ipinapatong ang direksyon at bilis ng hangin mula sa mga istasyon na naitala sa parehong oras ng radar na tinitingnan mo."
+  "radarWindOverlaySubtitle": "Ipinapatong ang direksyon at bilis ng hangin mula sa mga istasyon na naitala sa parehong oras ng radar na tinitingnan mo.",
+  "moreSectionAccessibility": "Accessibility",
+  "eewSpokenAnnouncementOn": "Naka-on",
+  "eewSpokenAnnouncementOnDescription": "Babasahin muna nang malakas ang tinatayang intensidad bago tumunog ang babala — kaya naaantala ito nang kasinghaba ng pangungusap.",
+  "eewSpokenAnnouncementOff": "Naka-off"
 }
