@@ -119,7 +119,13 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
 
   /// False while nobody is looking — backgrounded or on another tab — so the
   /// announcement idles together with the polling (see [_applyActivity]).
-  bool _resumed = true;
+  ///
+  /// Starts false rather than true: [ActiveWhileVisible] only reports after
+  /// the first frame, and [didChangeDependencies] runs before it. Guessing
+  /// "visible" in that gap is the mistake `RtsMonitorPanel._isMonitorOnScreen`
+  /// already guards against — sound needs a stricter check than rendering, so
+  /// an unanswered visibility question has to mean silence.
+  bool _resumed = false;
 
   @override
   void initState() {
