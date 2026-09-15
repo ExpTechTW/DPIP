@@ -1,14 +1,26 @@
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 
+enum CurrentWeatherWidgetCondition {
+  clear,
+  cloudy,
+  overcast,
+  rain,
+  thunderstorm,
+  snow,
+  fog,
+  unknown,
+}
+
 final class CurrentWeatherWidgetSnapshot {
   const CurrentWeatherWidgetSnapshot({
-    this.schemaVersion = 1,
+    this.schemaVersion = 2,
     required this.regionCode,
     required this.regionName,
     required this.observationTime,
     required this.stationName,
     required this.weather,
     required this.weatherCode,
+    required this.condition,
     this.temperature,
     this.humidity,
     this.rain,
@@ -25,6 +37,7 @@ final class CurrentWeatherWidgetSnapshot {
 
   final String weather;
   final int weatherCode;
+  final CurrentWeatherWidgetCondition condition;
 
   final double? temperature;
   final int? humidity;
@@ -39,11 +52,46 @@ final class CurrentWeatherWidgetSnapshot {
       'stationName': stationName,
       'weather': weather,
       'weatherCode': weatherCode,
+      'condition': condition.name,
       'temperature': temperature,
       'humidity': humidity,
       'rain': rain,
     };
   }
+}
+
+CurrentWeatherWidgetCondition currentWeatherWidgetCondition(int code) {
+  if (code <= 0) {
+    return CurrentWeatherWidgetCondition.unknown;
+  }
+
+  final suffix = code % 100;
+
+  final phenomenon = switch (suffix) {
+    1 || 2 || 5 => CurrentWeatherWidgetCondition.fog,
+    3 ||
+    4 ||
+    14 ||
+    15 ||
+    16 ||
+    17 ||
+    18 ||
+    19 => CurrentWeatherWidgetCondition.thunderstorm,
+    6 || 7 || 11 || 13 => CurrentWeatherWidgetCondition.rain,
+    8 || 9 || 10 || 12 => CurrentWeatherWidgetCondition.snow,
+    _ => null,
+  };
+
+  if (phenomenon != null) {
+    return phenomenon;
+  }
+
+  return switch (code ~/ 100) {
+    1 => CurrentWeatherWidgetCondition.clear,
+    2 => CurrentWeatherWidgetCondition.cloudy,
+    3 => CurrentWeatherWidgetCondition.overcast,
+    _ => CurrentWeatherWidgetCondition.unknown,
+  };
 }
 
 CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
@@ -58,6 +106,7 @@ CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
     stationName: weather.station.name,
     weather: weather.data.weather,
     weatherCode: weather.data.weatherCode,
+    condition: currentWeatherWidgetCondition(weather.data.weatherCode),
     temperature: weather.data.temperature,
     humidity: weather.data.humidity,
     rain: weather.data.rain,
