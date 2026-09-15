@@ -34,7 +34,7 @@ void main() {
 
     final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 1);
+    expect(decoded['schemaVersion'], 2);
     expect(decoded['regionCode'], '660');
     expect(decoded['regionName'], '西屯區');
     expect(decoded['stationName'], '西屯');
