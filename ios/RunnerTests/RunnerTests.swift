@@ -7,6 +7,9 @@ final class RunnerTests: XCTestCase {
     let kind = try WidgetSnapshotFile.kind("weatherForecast")
     XCTAssertEqual(kind.filename, "weather-forecast.json")
     XCTAssertEqual(kind.rawValue, "weatherForecast")
+    let currentWeather = try WidgetSnapshotFile.kind("currentWeather")
+    XCTAssertEqual(currentWeather.filename, "current-weather.json")
+    XCTAssertEqual(currentWeather.rawValue, "currentWeather")
     XCTAssertThrowsError(try WidgetSnapshotFile.kind("../other.json")) { error in
       XCTAssertEqual(error as? WidgetSnapshotError, .invalidKind)
     }
@@ -38,5 +41,23 @@ final class RunnerTests: XCTestCase {
     XCTAssertEqual(try Data(contentsOf: target), first)
     try WidgetSnapshotFile.replace(second, kind: kind, in: container)
     XCTAssertEqual(try Data(contentsOf: target), second)
+  }
+
+  func testSnapshotClearIsIdempotent() throws {
+    let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: container) }
+    let kind = try WidgetSnapshotFile.kind("currentWeather")
+    let data = try WidgetSnapshotFile.payload("{\"schemaVersion\":1}")
+    let target = container.appendingPathComponent("WidgetSnapshots/current-weather.json")
+
+    XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
+
+    try WidgetSnapshotFile.replace(data, kind: kind, in: container)
+    XCTAssertTrue(FileManager.default.fileExists(atPath: target.path))
+
+    try WidgetSnapshotFile.clear(kind, in: container)
+    XCTAssertFalse(FileManager.default.fileExists(atPath: target.path))
+
+    XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
   }
 }
