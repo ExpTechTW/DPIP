@@ -5,17 +5,22 @@ import WidgetKit
 /// The native allowlist provides storage and WidgetKit identities.
 enum WidgetSnapshotKind: String {
   case weatherForecast
+  case currentWeather
 
   var filename: String {
     switch self {
     case .weatherForecast:
       return "weather-forecast.json"
+    case .currentWeather:
+      return "current-weather.json"
     }
   }
 
   var widgetKind: String {
     switch self {
     case .weatherForecast:
+      return "DPIPWidgets"
+    case .currentWeather:
       return "DPIPWidgets"
     }
   }
@@ -70,6 +75,18 @@ enum WidgetSnapshotFile {
       throw WidgetSnapshotError.writeFailed
     }
   }
+
+  static func clear(_ kind: WidgetSnapshotKind, in container: URL) throws {
+    let directory = container.appendingPathComponent("WidgetSnapshots", isDirectory: true)
+    let snapshot = directory.appendingPathComponent(kind.filename)
+    do {
+      try FileManager.default.removeItem(at: snapshot)
+    } catch let error as CocoaError where error.code == .fileNoSuchFile {
+      // Clearing an absent snapshot is intentionally idempotent.
+    } catch {
+      throw WidgetSnapshotError.writeFailed
+    }
+  }
 }
 
 /// Infrastructure-only Flutter bridge. It never interprets domain JSON.
@@ -84,6 +101,11 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    if call.method == "clear" {
+      handleClear(call, result: result)
+      return
+    }
+
     guard call.method == "write" else {
       result(FlutterMethodNotImplemented)
       return
@@ -122,6 +144,44 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
 
       do {
         try WidgetSnapshotFile.replace(data, kind: kind, in: container)
+        WidgetCenter.shared.reloadTimelines(ofKind: kind.widgetKind)
+        DispatchQueue.main.async { result(nil) }
+      } catch {
+        DispatchQueue.main.async { result(self.flutterError(.writeFailed)) }
+      }
+    }
+  }
+
+  private func handleClear(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    guard let arguments = call.arguments as? [String: Any],
+      let rawKind = arguments["kind"] as? String
+    else {
+      result(flutterError(.invalidKind))
+      return
+    }
+
+    let kind: WidgetSnapshotKind
+    do {
+      kind = try WidgetSnapshotFile.kind(rawKind)
+    } catch let error as WidgetSnapshotError {
+      result(flutterError(error))
+      return
+    } catch {
+      result(flutterError(.invalidKind))
+      return
+    }
+
+    writeQueue.async {
+      guard let group = Bundle.main.object(forInfoDictionaryKey: "DPIPWidgetAppGroupIdentifier") as? String,
+        let container = FileManager.default.containerURL(
+          forSecurityApplicationGroupIdentifier: group)
+      else {
+        DispatchQueue.main.async { result(self.flutterError(.appGroupUnavailable)) }
+        return
+      }
+
+      do {
+        try WidgetSnapshotFile.clear(kind, in: container)
         WidgetCenter.shared.reloadTimelines(ofKind: kind.widgetKind)
         DispatchQueue.main.async { result(nil) }
       } catch {
