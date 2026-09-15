@@ -76,6 +76,75 @@ void main() {
     );
   });
 
+  test('clears a typed kind without exposing a file path', () async {
+    final writer = IosWidgetSnapshotWriter(
+      channel: channel,
+      isSupportedPlatform: true,
+    );
+
+    final result = await writer.clear(kind: WidgetSnapshotKind.currentWeather);
+
+    expect(result.isOk, isTrue);
+    expect(calls.single.method, 'clear');
+    expect(calls.single.arguments, {'kind': 'currentWeather'});
+  });
+
+  test('clear on an unsupported platform does not call the channel', () async {
+    final writer = IosWidgetSnapshotWriter(
+      channel: channel,
+      isSupportedPlatform: false,
+    );
+
+    final result = await writer.clear(kind: WidgetSnapshotKind.currentWeather);
+
+    expect(
+      (result.failureOrNull as WidgetSnapshotFailure).reason,
+      WidgetSnapshotFailureReason.unavailable,
+    );
+    expect(calls, isEmpty);
+  });
+
+  test('clear maps a missing plugin to unavailable', () async {
+    messenger.setMockMethodCallHandler(channel, null);
+    final writer = IosWidgetSnapshotWriter(
+      channel: channel,
+      isSupportedPlatform: true,
+    );
+
+    final result = await writer.clear(kind: WidgetSnapshotKind.currentWeather);
+
+    expect(
+      (result.failureOrNull as WidgetSnapshotFailure).reason,
+      WidgetSnapshotFailureReason.unavailable,
+    );
+  });
+
+  for (final entry in <String, WidgetSnapshotFailureReason>{
+    'invalid_kind': WidgetSnapshotFailureReason.invalidKind,
+    'app_group_unavailable': WidgetSnapshotFailureReason.appGroupUnavailable,
+    'write_failed': WidgetSnapshotFailureReason.writeFailed,
+  }.entries) {
+    test('clear ${entry.key} maps to a typed failure', () async {
+      messenger.setMockMethodCallHandler(
+        channel,
+        (_) async => throw PlatformException(code: entry.key),
+      );
+      final writer = IosWidgetSnapshotWriter(
+        channel: channel,
+        isSupportedPlatform: true,
+      );
+
+      final result = await writer.clear(
+        kind: WidgetSnapshotKind.currentWeather,
+      );
+
+      expect(
+        (result.failureOrNull as WidgetSnapshotFailure).reason,
+        entry.value,
+      );
+    });
+  }
+
   for (final entry in <String, WidgetSnapshotFailureReason>{
     'invalid_kind': WidgetSnapshotFailureReason.invalidKind,
     'invalid_payload': WidgetSnapshotFailureReason.invalidPayload,

@@ -2,11 +2,14 @@ import Foundation
 
 enum WidgetSnapshotKind {
     case weatherForecast
+    case currentWeather
 
     var filename: String {
         switch self {
         case .weatherForecast:
             return "weather-forecast.json"
+        case .currentWeather:
+            return "current-weather.json"
         }
     }
 }
@@ -38,5 +41,16 @@ struct WidgetSnapshotStore {
         }
 
         return try? Data(contentsOf: url)
+    }
+
+    func loadCurrentWeatherSnapshot() -> CurrentWeatherWidgetSnapshot? {
+        guard let data = loadData(for: .currentWeather) else {
+            return nil
+        }
+
+        return try? JSONDecoder().decode(
+            CurrentWeatherWidgetSnapshot.self,
+            from: data
+        )
     }
 }

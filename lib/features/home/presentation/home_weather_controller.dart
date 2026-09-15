@@ -16,6 +16,13 @@ import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter/foundation.dart';
 
+typedef RealtimeWeatherLoadedCallback = Future<void> Function(
+  String regionCode,
+  WeatherRealtime weather,
+);
+
+typedef RealtimeWeatherInvalidatedCallback = Future<void> Function();
+
 /// Fetches nearest-station realtime weather, the township hourly forecast, and
 /// the next-hour rain trend for the home sheet, following the selected
 /// [RegionStore] township. 全國 has no point weather — [areaCode] is null and
@@ -32,6 +39,8 @@ class HomeWeatherController extends ChangeNotifier {
     this._regions,
     this._directory, {
     this.gpsFix,
+    this.onRealtimeLoaded,
+    this.onRealtimeInvalidated,
   }) {
     _regions.addListener(_sync);
     _sync();
@@ -42,8 +51,12 @@ class HomeWeatherController extends ChangeNotifier {
   final RegionStore _regions;
   final TownDirectory _directory;
 
+  bool _hasSyncedRegion = false;
+
   /// Live GPS fix for the debug log; null when unavailable.
   final Future<GpsFix?> Function()? gpsFix;
+  final RealtimeWeatherLoadedCallback? onRealtimeLoaded;
+  final RealtimeWeatherInvalidatedCallback? onRealtimeInvalidated;
 
   WeatherRealtime? _weather;
   String? _weatherCode;
@@ -98,8 +111,21 @@ class HomeWeatherController extends ChangeNotifier {
 
   void _sync() {
     final code = areaCode;
-    if (code == _loadedCode) return;
+
+    if (_hasSyncedRegion && code == _loadedCode) {
+      return;
+    }
+
+    if (_hasSyncedRegion) {
+      final callback = onRealtimeInvalidated;
+      if (callback != null) {
+        unawaited(callback());
+      }
+    }
+
+    _hasSyncedRegion = true;
     _loadedCode = code;
+
     final town = code == null ? null : _directory.byCode(code);
     if (town == null || code == null) {
       _weather = null;
@@ -141,7 +167,14 @@ class HomeWeatherController extends ChangeNotifier {
       ok: (value) {
         _weather = value;
         _weatherCode = value == null ? null : code;
-        if (value != null) unawaited(_logRealtime(code, gpsFuture, value));
+        if (value != null) {
+          unawaited(_logRealtime(code, gpsFuture, value));
+
+          final callback = onRealtimeLoaded;
+          if (callback != null) {
+            unawaited(callback(code, value));
+          }
+        }
       },
       err: (failure) {
         _failure = failure;
