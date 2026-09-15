@@ -201,10 +201,14 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   }
 
   MonitorEewAnnouncementController? _createAnnouncementController() {
-    // Nullable read keeps the page testable without the app's provider list.
+    // Nullable reads keep the page testable without the app's provider list —
+    // both of them, not just the speech one. A test that supplies a
+    // SpeechService is exactly the test that wants to reach this code, and a
+    // non-null read here would throw on it unless it also stood up a
+    // LocationService it has no interest in.
     final speech = context.read<SpeechService?>();
     if (speech == null) return null;
-    final location = context.read<LocationService>();
+    final location = context.read<LocationService?>();
     return MonitorEewAnnouncementController(
       speech,
       // A gate of this page's own, never NotificationService's. A replay
@@ -213,7 +217,9 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       // of a real alert that arrives while the replay is playing.
       ForegroundEewAnnouncementGate(),
       (alert) async {
-        final fix = await location.lastKnownFix();
+        // No service or no cached fix both mean the same thing here: nothing
+        // to estimate a local intensity from, so announce the alert's max.
+        final fix = await location?.lastKnownFix();
         if (fix == null) {
           return (scale: alert.info.max.clamp(0, 9), isLocal: false);
         }
