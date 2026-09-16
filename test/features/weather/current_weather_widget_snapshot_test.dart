@@ -95,9 +95,11 @@ void main() {
       regionCode: '660',
       regionName: '西屯區',
       weather: weather,
+      isNight: false,
+      nextDayNightTransitionTime: 1_789_562_700,
     );
 
-    expect(snapshot.schemaVersion, 2);
+    expect(snapshot.schemaVersion, 3);
     expect(snapshot.regionCode, '660');
     expect(snapshot.regionName, '西屯區');
     expect(snapshot.observationTime, 1789398000);
@@ -105,6 +107,8 @@ void main() {
     expect(snapshot.weather, '多雲時雨');
     expect(snapshot.weatherCode, 214);
     expect(snapshot.condition, CurrentWeatherWidgetCondition.thunderstorm);
+    expect(snapshot.isNight, isFalse);
+    expect(snapshot.nextDayNightTransitionTime, 1_789_562_700);
     expect(snapshot.temperature, 28.4);
     expect(snapshot.humidity, 76);
     expect(snapshot.rain, 0.0);
@@ -112,9 +116,11 @@ void main() {
     final json = jsonEncode(snapshot.toJson());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 2);
+    expect(decoded['schemaVersion'], 3);
     expect(decoded['regionCode'], '660');
     expect(decoded['condition'], 'thunderstorm');
+    expect(decoded['isNight'], isFalse);
+    expect(decoded['nextDayNightTransitionTime'], 1_789_562_700);
     expect(decoded['temperature'], 28.4);
   });
 
@@ -127,16 +133,21 @@ void main() {
       weather: '多雲',
       weatherCode: 200,
       condition: .cloudy,
+      isNight: true,
+      nextDayNightTransitionTime: 1_789_562_700,
       temperature: null,
       humidity: null,
       rain: null,
     );
 
+    expect(snapshot.isNight, isTrue);
+    expect(snapshot.nextDayNightTransitionTime, 1_789_562_700);
+
     final json = jsonEncode(snapshot.toJson());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
     expect(decoded, {
-      'schemaVersion': 2,
+      'schemaVersion': 3,
       'regionCode': '660',
       'regionName': '西屯區',
       'observationTime': 1789398000,
@@ -144,6 +155,8 @@ void main() {
       'weather': '多雲',
       'weatherCode': 200,
       'condition': 'cloudy',
+      'isNight': true,
+      'nextDayNightTransitionTime': 1_789_562_700,
       'temperature': null,
       'humidity': null,
       'rain': null,

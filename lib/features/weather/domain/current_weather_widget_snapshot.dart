@@ -13,7 +13,7 @@ enum CurrentWeatherWidgetCondition {
 
 final class CurrentWeatherWidgetSnapshot {
   const CurrentWeatherWidgetSnapshot({
-    this.schemaVersion = 2,
+    this.schemaVersion = 3,
     required this.regionCode,
     required this.regionName,
     required this.observationTime,
@@ -21,6 +21,8 @@ final class CurrentWeatherWidgetSnapshot {
     required this.weather,
     required this.weatherCode,
     required this.condition,
+    required this.isNight,
+    required this.nextDayNightTransitionTime,
     this.temperature,
     this.humidity,
     this.rain,
@@ -38,6 +40,8 @@ final class CurrentWeatherWidgetSnapshot {
   final String weather;
   final int weatherCode;
   final CurrentWeatherWidgetCondition condition;
+  final bool isNight;
+  final int nextDayNightTransitionTime;
 
   final double? temperature;
   final int? humidity;
@@ -53,6 +57,8 @@ final class CurrentWeatherWidgetSnapshot {
       'weather': weather,
       'weatherCode': weatherCode,
       'condition': condition.name,
+      'isNight': isNight,
+      'nextDayNightTransitionTime': nextDayNightTransitionTime,
       'temperature': temperature,
       'humidity': humidity,
       'rain': rain,
@@ -98,6 +104,8 @@ CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
   required String regionCode,
   required String regionName,
   required WeatherRealtime weather,
+  required bool isNight,
+  required int nextDayNightTransitionTime,
 }) {
   return CurrentWeatherWidgetSnapshot(
     regionCode: regionCode,
@@ -107,6 +115,8 @@ CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
     weather: weather.data.weather,
     weatherCode: weather.data.weatherCode,
     condition: currentWeatherWidgetCondition(weather.data.weatherCode),
+    isNight: isNight,
+    nextDayNightTransitionTime: nextDayNightTransitionTime,
     temperature: weather.data.temperature,
     humidity: weather.data.humidity,
     rain: weather.data.rain,

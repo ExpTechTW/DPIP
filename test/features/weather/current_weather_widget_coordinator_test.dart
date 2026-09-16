@@ -34,11 +34,13 @@ void main() {
 
     final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 2);
+    expect(decoded['schemaVersion'], 3);
     expect(decoded['regionCode'], '660');
     expect(decoded['regionName'], '西屯區');
     expect(decoded['stationName'], '西屯');
     expect(decoded['weather'], '多雲');
+    expect(decoded['isNight'], isA<bool>());
+    expect(decoded['nextDayNightTransitionTime'], isA<int>());
     expect(decoded['temperature'], 28.4);
   });
 
