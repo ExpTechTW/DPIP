@@ -1,0 +1,74 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "widget.current_weather" : {
+      "comment" : "Display name for the current weather Widget in the Widget Gallery.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Weather"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目前天氣"
+          }
+        }
+      }
+    },
+    "widget.current_weather_description" : {
+      "comment" : "Description for the current weather Widget in the Widget Gallery.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows current weather for the area selected in DPIP."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示 DPIP 所選地區的目前天氣。"
+          }
+        }
+      }
+    },
+    "widget.no_weather_data" : {
+      "comment" : "Message shown when the Widget has no current weather snapshot.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No weather data"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚無天氣資料"
+          }
+        }
+      }
+    },
+    "widget.stale" : {
+      "comment" : "Label shown when the current weather snapshot is outdated.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outdated"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "較舊"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
