@@ -67,6 +67,7 @@ class HomeWeatherController extends ChangeNotifier {
   Failure? _forecastFailure;
   Failure? _hourTrendFailure;
   String? _loadedCode;
+  int _requestGeneration = 0;
 
   /// The latest realtime observation, or null before the first load / at sea.
   WeatherRealtime? get weather => _weather;
@@ -128,10 +129,12 @@ class HomeWeatherController extends ChangeNotifier {
 
     final town = code == null ? null : _directory.byCode(code);
     if (town == null || code == null) {
+      _requestGeneration += 1;
       _weather = null;
       _weatherCode = null;
       _forecast = null;
       _hourTrend = null;
+      _loading = false;
       _failure = null;
       _forecastFailure = null;
       _hourTrendFailure = null;
@@ -142,6 +145,8 @@ class HomeWeatherController extends ChangeNotifier {
   }
 
   Future<void> _load(String code, double lat, double lng) async {
+    final requestGeneration = ++_requestGeneration;
+
     _loading = true;
     _failure = null;
     _forecastFailure = null;
@@ -159,8 +164,10 @@ class HomeWeatherController extends ChangeNotifier {
     final realtime = await realtimeFuture;
     final forecast = await forecastFuture;
     final hourTrend = await hourTrendFuture;
-    // Drop a superseded response if the user switched area mid-flight.
-    if (_loadedCode != code) return;
+    // Region equality alone cannot distinguish two requests for the same area,
+    // or A1 from a later A2 after an A → B → A sequence. Only the most recent
+    // generation may mutate any state or publish a Widget snapshot.
+    if (requestGeneration != _requestGeneration) return;
 
     _loading = false;
     realtime.when(
@@ -226,6 +233,7 @@ class HomeWeatherController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _requestGeneration += 1;
     _regions.removeListener(_sync);
     super.dispose();
   }
