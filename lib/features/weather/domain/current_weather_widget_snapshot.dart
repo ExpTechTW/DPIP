@@ -1,3 +1,4 @@
+import 'package:dpip/core/weather/weather_code.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 
 enum CurrentWeatherWidgetCondition {
@@ -67,36 +68,15 @@ final class CurrentWeatherWidgetSnapshot {
 }
 
 CurrentWeatherWidgetCondition currentWeatherWidgetCondition(int code) {
-  if (code <= 0) {
-    return CurrentWeatherWidgetCondition.unknown;
-  }
-
-  final suffix = code % 100;
-
-  final phenomenon = switch (suffix) {
-    1 || 2 || 5 => CurrentWeatherWidgetCondition.fog,
-    3 ||
-    4 ||
-    14 ||
-    15 ||
-    16 ||
-    17 ||
-    18 ||
-    19 => CurrentWeatherWidgetCondition.thunderstorm,
-    6 || 7 || 11 || 13 => CurrentWeatherWidgetCondition.rain,
-    8 || 9 || 10 || 12 => CurrentWeatherWidgetCondition.snow,
-    _ => null,
-  };
-
-  if (phenomenon != null) {
-    return phenomenon;
-  }
-
-  return switch (code ~/ 100) {
-    1 => CurrentWeatherWidgetCondition.clear,
-    2 => CurrentWeatherWidgetCondition.cloudy,
-    3 => CurrentWeatherWidgetCondition.overcast,
-    _ => CurrentWeatherWidgetCondition.unknown,
+  return switch (weatherConditionForCode(code)) {
+    WeatherCondition.clear => CurrentWeatherWidgetCondition.clear,
+    WeatherCondition.cloudy => CurrentWeatherWidgetCondition.cloudy,
+    WeatherCondition.overcast => CurrentWeatherWidgetCondition.overcast,
+    WeatherCondition.rain => CurrentWeatherWidgetCondition.rain,
+    WeatherCondition.thunderstorm => CurrentWeatherWidgetCondition.thunderstorm,
+    WeatherCondition.snow => CurrentWeatherWidgetCondition.snow,
+    WeatherCondition.fog => CurrentWeatherWidgetCondition.fog,
+    WeatherCondition.unknown => CurrentWeatherWidgetCondition.unknown,
   };
 }
 

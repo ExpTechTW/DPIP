@@ -1,4 +1,5 @@
 import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/core/weather/weather_code.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,24 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const colors = ColorScheme.light();
+
+  group('weatherConditionForCode', () {
+    test('classifies families and lets phenomena take precedence', () {
+      expect(weatherConditionForCode(100), WeatherCondition.clear);
+      expect(weatherConditionForCode(200), WeatherCondition.cloudy);
+      expect(weatherConditionForCode(300), WeatherCondition.overcast);
+      expect(weatherConditionForCode(106), WeatherCondition.rain);
+      expect(weatherConditionForCode(214), WeatherCondition.thunderstorm);
+      expect(weatherConditionForCode(305), WeatherCondition.fog);
+      expect(weatherConditionForCode(308), WeatherCondition.snow);
+    });
+
+    test('invalid and unsupported codes are unknown', () {
+      expect(weatherConditionForCode(0), WeatherCondition.unknown);
+      expect(weatherConditionForCode(-1), WeatherCondition.unknown);
+      expect(weatherConditionForCode(420), WeatherCondition.unknown);
+    });
+  });
 
   group('weatherModeFor', () {
     test('plain families map clear / cloudy / overcast', () {
