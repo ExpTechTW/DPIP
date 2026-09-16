@@ -14,7 +14,7 @@ import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('initial valid-region sync does not invalidate realtime', () async {
+  test('initial valid-region sync invalidates persisted realtime', () async {
     final regions = _savedRegions(['660'])..select(2);
     addTearDown(regions.dispose);
     var invalidationCount = 0;
@@ -32,10 +32,10 @@ void main() {
     await _waitUntilSettled(controller);
 
     expect(regions.selectedCode, '660');
-    expect(invalidationCount, 0);
+    expect(invalidationCount, 1);
   });
 
-  test('initial null-region sync does not invalidate realtime', () {
+  test('initial null-region sync invalidates persisted realtime', () {
     final regions = _savedRegions(['660']);
     addTearDown(regions.dispose);
     var invalidationCount = 0;
@@ -51,8 +51,34 @@ void main() {
     addTearDown(controller.dispose);
 
     expect(regions.selectedCode, isNull);
-    expect(invalidationCount, 0);
+    expect(invalidationCount, 1);
   });
+
+  test(
+    'initial valid-region sync clears before publishing fresh data',
+    () async {
+      final regions = _savedRegions(['660'])..select(2);
+      addTearDown(regions.dispose);
+      final events = <String>[];
+      final controller = HomeWeatherController(
+        _FakeWeatherRepository(onRealtime: (_, _) async => Ok(_weather())),
+        const _FakeHourTrendRepository(),
+        regions,
+        _directory,
+        onRealtimeLoaded: (regionCode, _) async {
+          events.add('loaded:$regionCode');
+        },
+        onRealtimeInvalidated: () async {
+          events.add('invalidated');
+        },
+      );
+      addTearDown(controller.dispose);
+
+      await _waitUntilSettled(controller);
+
+      expect(events, ['invalidated', 'loaded:660']);
+    },
+  );
 
   test('valid region change invalidates realtime exactly once', () async {
     final regions = _savedRegions(['660', '100'])..select(2);
@@ -69,6 +95,7 @@ void main() {
     );
     addTearDown(controller.dispose);
     await _waitUntilSettled(controller);
+    invalidationCount = 0;
 
     regions.select(3);
     await _waitUntilSettled(controller);
@@ -119,6 +146,7 @@ void main() {
     );
     addTearDown(controller.dispose);
     await _waitUntilSettled(controller);
+    invalidationCount = 0;
 
     regions.select(0);
 
@@ -140,6 +168,7 @@ void main() {
       },
     );
     addTearDown(controller.dispose);
+    invalidationCount = 0;
 
     regions.select(2);
     await _waitUntilSettled(controller);
@@ -165,6 +194,7 @@ void main() {
       );
       addTearDown(controller.dispose);
       await _waitUntilSettled(controller);
+      invalidationCount = 0;
 
       expect(regions.addSaved('100'), isTrue);
 
