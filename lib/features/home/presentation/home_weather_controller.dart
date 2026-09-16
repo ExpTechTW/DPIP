@@ -117,11 +117,9 @@ class HomeWeatherController extends ChangeNotifier {
       return;
     }
 
-    if (_hasSyncedRegion) {
-      final callback = onRealtimeInvalidated;
-      if (callback != null) {
-        unawaited(callback());
-      }
+    final callback = onRealtimeInvalidated;
+    if (callback != null) {
+      unawaited(callback());
     }
 
     _hasSyncedRegion = true;
