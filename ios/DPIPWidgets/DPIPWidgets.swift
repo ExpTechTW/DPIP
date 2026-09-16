@@ -3,18 +3,22 @@ import SwiftUI
 
 struct DPIPWidgetProvider: TimelineProvider {
     private let staleAfter: TimeInterval = 30 * 60
+    private let snapshotStore = WidgetSnapshotStore()
 
     func placeholder(in context: Context) -> DPIPWidgetEntry {
-        DPIPWidgetEntry(date: .now, snapshot: nil, isStale: false)
+        DPIPWidgetEntry(
+            date: .now,
+            snapshot: nil,
+            isStale: false,
+            isNight: false,
+        )
     }
 
     func getSnapshot(
         in context: Context,
         completion: @escaping (DPIPWidgetEntry) -> Void
     ) {
-        let snapshot = WidgetSnapshotStore()
-            .loadCurrentWeatherSnapshot()
-
+        let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
         let now = Date.now
 
         let isStale: Bool
@@ -33,7 +37,10 @@ struct DPIPWidgetProvider: TimelineProvider {
         let entry = DPIPWidgetEntry(
             date: now,
             snapshot: snapshot,
-            isStale: isStale
+            isStale: isStale,
+            isNight: snapshot.map {
+                isNight(for: $0, at: now)
+            } ?? false
         )
 
         completion(entry)
@@ -43,62 +50,90 @@ struct DPIPWidgetProvider: TimelineProvider {
         in context: Context,
         completion: @escaping (Timeline<DPIPWidgetEntry>) -> Void
     ) {
-        let snapshot = WidgetSnapshotStore()
-            .loadCurrentWeatherSnapshot()
+        let now = Date()
 
-        let now = Date.now
-
-        guard let snapshot else {
+        guard let snapshot = snapshotStore.loadCurrentWeatherSnapshot() else {
             let entry = DPIPWidgetEntry(
                 date: now,
                 snapshot: nil,
-                isStale: false
+                isStale: false,
+                isNight: false
             )
 
             completion(
-                Timeline(entries: [entry], policy: .never)
+                Timeline(
+                    entries: [entry],
+                    policy: .never
+                )
             )
             return
         }
 
         let observationDate = Date(
-            timeIntervalSince1970: TimeInterval(snapshot.observationTime)
+            timeIntervalSince1970:
+                TimeInterval(snapshot.observationTime)
         )
 
-        let staleAt = observationDate.addingTimeInterval(staleAfter)
+        let staleAt = observationDate.addingTimeInterval(
+            staleAfter
+        )
 
-        if now >= staleAt {
-            let staleEntry = DPIPWidgetEntry(
-                date: now,
-                snapshot: snapshot,
-                isStale: true
-            )
+        let transitionAt = Date(
+            timeIntervalSince1970:
+                TimeInterval(snapshot.nextDayNightTransitionTime)
+        )
 
-            completion(
-                Timeline(
-                    entries: [staleEntry],
-                    policy: .never
-                )
-            )
-        } else {
-            let freshEntry = DPIPWidgetEntry(
-                date: now,
-                snapshot: snapshot,
-                isStale: false
-            )
+        var dates = [now]
 
-            let staleEntry = DPIPWidgetEntry(
-                date: staleAt,
-                snapshot: snapshot,
-                isStale: true
-            )
-            completion(
-                Timeline(
-                    entries: [freshEntry, staleEntry],
-                    policy: .never
-                )
-            )
+        if staleAt > now {
+            dates.append(staleAt)
         }
+
+        if snapshot.nextDayNightTransitionTime > 0,
+           transitionAt > now {
+            dates.append(transitionAt)
+        }
+
+        let entries = Array(Set(dates))
+            .sorted()
+            .map { date in
+                DPIPWidgetEntry(
+                    date: date,
+                    snapshot: snapshot,
+                    isStale: date >= staleAt,
+                    isNight: isNight(
+                        for: snapshot,
+                        at: date
+                    )
+                )
+            }
+
+        completion(
+            Timeline(
+                entries: entries,
+                policy: .never
+            )
+        )
+    }
+
+    private func isNight(
+        for snapshot: CurrentWeatherWidgetSnapshot,
+        at date: Date
+    ) -> Bool {
+        guard snapshot.nextDayNightTransitionTime > 0 else {
+            return snapshot.isNight
+        }
+
+        let transitionAt = Date(
+            timeIntervalSince1970:
+                TimeInterval(snapshot.nextDayNightTransitionTime)
+        )
+
+        if date >= transitionAt {
+            return !snapshot.isNight
+        }
+
+        return snapshot.isNight
     }
 }
 
@@ -106,6 +141,7 @@ struct DPIPWidgetEntry: TimelineEntry {
     let date: Date
     let snapshot: CurrentWeatherWidgetSnapshot?
     let isStale: Bool
+    let isNight: Bool
 }
 
 struct DPIPWidgetsEntryView : View {
@@ -126,7 +162,9 @@ struct DPIPWidgetsEntryView : View {
                     Spacer()
 
                     HStack(spacing: 4) {
-                        Image(systemName: snapshot.condition.systemImageName)
+                        Image(systemName: snapshot.condition.systemImageName(
+                            isNight: entry.isNight
+                        ))
 
                         Text(snapshot.weather)
                             .lineLimit(1)
@@ -238,18 +276,20 @@ struct DPIPWidgets_Previews: PreviewProvider {
     private static let previewEntry = DPIPWidgetEntry(
         date: .now,
         snapshot: CurrentWeatherWidgetSnapshot(
-            schemaVersion: 1,
+            schemaVersion: 3,
             regionCode: "660",
             regionName: "西屯區",
             observationTime: 0,
             stationName: "西屯",
-            weather: "短暫雷雨",
-            weatherCode: 200,
-            condition: .thunderstorm,
+            weather: "晴",
+            weatherCode: 100,
+            condition: .clear,
+            isNight: true,
+            nextDayNightTransitionTime: 1_789_562_700,
             temperature: 28.4,
             humidity: 76,
             rain: 0
-        ),isStale: true
+        ),isStale: true, isNight: true
     )
 
     static var previews: some View {

@@ -10,22 +10,33 @@ enum CurrentWeatherWidgetCondition: String, Decodable {
     case fog
     case unknown
 
-    var systemImageName: String {
+    func systemImageName(isNight: Bool) -> String {
         switch self {
         case .clear:
-            return "sun.max.fill"
+            return isNight
+                ? "moon.stars.fill"
+                : "sun.max.fill"
+
         case .cloudy:
-            return "cloud.sun.fill"
+            return isNight
+                ? "cloud.moon.fill"
+                : "cloud.sun.fill"
+
         case .overcast:
             return "cloud.fill"
+
         case .rain:
             return "cloud.rain.fill"
+
         case .thunderstorm:
             return "cloud.bolt.rain.fill"
+
         case .snow:
             return "cloud.snow.fill"
+
         case .fog:
             return "cloud.fog.fill"
+
         case .unknown:
             return "cloud.fill"
         }
@@ -45,6 +56,8 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
     let weather: String
     let weatherCode: Int
     let condition: CurrentWeatherWidgetCondition
+    let isNight: Bool
+    let nextDayNightTransitionTime: Int
 
     let temperature: Double?
     let humidity: Int?
@@ -59,6 +72,8 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         case weather
         case weatherCode
         case condition
+        case isNight
+        case nextDayNightTransitionTime
         case temperature
         case humidity
         case rain
@@ -73,6 +88,8 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         weather: String,
         weatherCode: Int,
         condition: CurrentWeatherWidgetCondition,
+        isNight: Bool,
+        nextDayNightTransitionTime: Int,
         temperature: Double?,
         humidity: Int?,
         rain: Double?
@@ -85,6 +102,8 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         self.weather = weather
         self.weatherCode = weatherCode
         self.condition = condition
+        self.isNight = isNight
+        self.nextDayNightTransitionTime = nextDayNightTransitionTime
         self.temperature = temperature
         self.humidity = humidity
         self.rain = rain
@@ -138,6 +157,16 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         condition = conditionRawValue
             .flatMap(CurrentWeatherWidgetCondition.init(rawValue:))
             ?? .unknown
+
+        isNight = try container.decodeIfPresent(
+            Bool.self,
+            forKey: .isNight
+        ) ?? false
+
+        nextDayNightTransitionTime = try container.decodeIfPresent(
+            Int.self,
+            forKey: .nextDayNightTransitionTime
+        ) ?? 0
 
         temperature = try container.decodeIfPresent(
             Double.self,
