@@ -5,43 +5,18 @@
 library;
 
 import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/core/weather/weather_code.dart';
 import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:flutter/material.dart';
 
-/// The single mapping for CWB's weather-code table: families 100 (晴) / 200
-/// (多雲) / 300 (陰), each carrying the same 20 phenomenon suffixes (ones
-/// digits 1–19, `0` = the plain family sky). `0` alone means 缺值/未知.
+/// CWB families 100 (晴) / 200 (多雲) / 300 (陰) each carry the same 20
+/// phenomenon suffixes (ones digits 1–19, `0` = the plain family sky). `0`
+/// alone means 缺值/未知.
 ///
-/// Consumers never read the raw table — they call [weatherVisual] for the
-/// icon/accent and [weatherModeFor] for the backdrop, so the code→look
-/// decisions live in exactly one place.
+/// The pure code→semantic mapping lives in [weatherConditionForCode]. This
+/// file only translates that semantic result into Flutter visuals and modes.
 
-/// Ones digit → backdrop mode. The suffix describes a phenomenon the family
-/// base already classifies as sky cover; where the two conflict the phenomenon
-/// wins — a clear-code 106 (有雨) is still rain.
-const Map<int, WeatherMode> _phenomenonMode = {
-  1: WeatherMode.fog, // 有霾
-  2: WeatherMode.fog, // 有靄
-  3: WeatherMode.thunderstorm, // 有閃電
-  4: WeatherMode.thunderstorm, // 有雷聲
-  5: WeatherMode.fog, // 有霧
-  6: WeatherMode.rain, // 有雨
-  7: WeatherMode.rain, // 有雨雪 — a rain-snow mix; rain is the dominant hazard
-  8: WeatherMode.snow, // 有大雪
-  9: WeatherMode.snow, // 有雪珠
-  10: WeatherMode.snow, // 有冰珠
-  11: WeatherMode.rain, // 有陣雨
-  12: WeatherMode.snow, // 陣雨雪
-  13: WeatherMode.rain, // 有雹
-  14: WeatherMode.thunderstorm, // 有雷雨
-  15: WeatherMode.thunderstorm, // 有雷雪
-  16: WeatherMode.thunderstorm, // 有雷雹
-  17: WeatherMode.thunderstorm, // 大雷雨
-  18: WeatherMode.thunderstorm, // 大雷雹
-  19: WeatherMode.thunderstorm, // 有雷
-};
-
-/// Ones digit → a distinct glyph, finer than the eight backdrop modes.
+/// Weather-code suffix → a distinct glyph, finer than the eight backdrop modes.
 ///
 /// Drawn from the bundled weather font, which exists precisely because
 /// Flutter's icon set has no rain glyph: the three rain intensities, the
@@ -79,16 +54,6 @@ const Map<int, IconData> _phenomenonIcon = {
   19: bolt, // 有雷
 };
 
-/// The plain sky of a code's family (its hundreds digit), used when the ones
-/// digit is `0` or unknown. `0` (缺值) and any unrecognised family fall back
-/// to [WeatherMode.auto].
-WeatherMode _familyMode(int code) => switch (code ~/ 100) {
-  1 => WeatherMode.clear,
-  2 => WeatherMode.cloudy,
-  3 => WeatherMode.overcast,
-  _ => WeatherMode.auto,
-};
-
 /// The plain-sky glyph for a family, by daylight.
 ///
 /// This is the one place day and night differ: a clear midnight drawn as a sun
@@ -104,8 +69,16 @@ IconData _familySky(WeatherMode mode, {required bool isNight}) =>
 /// The backdrop mode for a CWB [code]: the phenomenon (ones digit) wins over
 /// the family sky, and `0`/unknown codes fall back to [WeatherMode.auto].
 WeatherMode weatherModeFor(int code) {
-  if (code <= 0) return WeatherMode.auto;
-  return _phenomenonMode[code % 100] ?? _familyMode(code);
+  return switch (weatherConditionForCode(code)) {
+    WeatherCondition.clear => WeatherMode.clear,
+    WeatherCondition.cloudy => WeatherMode.cloudy,
+    WeatherCondition.overcast => WeatherMode.overcast,
+    WeatherCondition.rain => WeatherMode.rain,
+    WeatherCondition.thunderstorm => WeatherMode.thunderstorm,
+    WeatherCondition.snow => WeatherMode.snow,
+    WeatherCondition.fog => WeatherMode.fog,
+    WeatherCondition.unknown => WeatherMode.auto,
+  };
 }
 
 /// Rain intensity for a CWB [code], on the painter's continuous ladder where
