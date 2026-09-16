@@ -96,7 +96,7 @@ struct DPIPWidgetsEntryView : View {
                             isNight: entry.isNight
                         ))
 
-                        Text(snapshot.weather)
+                        Text(snapshot.condition.localizedDisplayName)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                     }
