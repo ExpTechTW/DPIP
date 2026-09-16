@@ -150,6 +150,23 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
 }
 
 final class CurrentWeatherWidgetConditionTests: XCTestCase {
+    func testEveryConditionHasItsOwnLocalizationKey() {
+        let expected: [(CurrentWeatherWidgetCondition, String)] = [
+            (.clear, "weather.clear"),
+            (.cloudy, "weather.cloudy"),
+            (.overcast, "weather.overcast"),
+            (.rain, "weather.rain"),
+            (.thunderstorm, "weather.thunderstorm"),
+            (.snow, "weather.snow"),
+            (.fog, "weather.fog"),
+            (.unknown, "weather.unknown"),
+        ]
+
+        for (condition, key) in expected {
+            XCTAssertEqual(condition.displayNameLocalizationKey, key)
+        }
+    }
+
     func testClearAndCloudyUseDayNightSymbols() {
         XCTAssertEqual(
             CurrentWeatherWidgetCondition.clear.systemImageName(isNight: false),

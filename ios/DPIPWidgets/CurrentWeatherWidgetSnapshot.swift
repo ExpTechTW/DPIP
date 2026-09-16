@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum CurrentWeatherWidgetCondition: String, Decodable {
     case clear
@@ -9,6 +10,31 @@ enum CurrentWeatherWidgetCondition: String, Decodable {
     case snow
     case fog
     case unknown
+
+    var localizedDisplayName: LocalizedStringKey {
+        LocalizedStringKey(displayNameLocalizationKey)
+    }
+
+    var displayNameLocalizationKey: String {
+        switch self {
+        case .clear:
+            return "weather.clear"
+        case .cloudy:
+            return "weather.cloudy"
+        case .overcast:
+            return "weather.overcast"
+        case .rain:
+            return "weather.rain"
+        case .thunderstorm:
+            return "weather.thunderstorm"
+        case .snow:
+            return "weather.snow"
+        case .fog:
+            return "weather.fog"
+        case .unknown:
+            return "weather.unknown"
+        }
+    }
 
     func systemImageName(isNight: Bool) -> String {
         switch self {
