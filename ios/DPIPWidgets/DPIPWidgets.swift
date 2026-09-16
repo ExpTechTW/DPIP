@@ -19,10 +19,10 @@ struct DPIPWidgetProvider: TimelineProvider {
         completion: @escaping (DPIPWidgetEntry) -> Void
     ) {
         let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
-        let now = Date.now
+        let deviceNow = Date.now
         let state = CurrentWeatherWidgetTimeline.state(
             snapshot: snapshot,
-            at: now,
+            at: deviceNow,
             staleAfter: staleAfter
         )
 
@@ -40,11 +40,11 @@ struct DPIPWidgetProvider: TimelineProvider {
         in context: Context,
         completion: @escaping (Timeline<DPIPWidgetEntry>) -> Void
     ) {
-        let now = Date()
+        let deviceNow = Date()
         let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
         let entries = CurrentWeatherWidgetTimeline.states(
             snapshot: snapshot,
-            now: now,
+            deviceNow: deviceNow,
             staleAfter: staleAfter
         )
             .map { state in
@@ -59,6 +59,8 @@ struct DPIPWidgetProvider: TimelineProvider {
         completion(
             Timeline(
                 entries: entries,
+                // The app owns refreshes. This timeline projects only the
+                // stale deadline and one solar transition in the snapshot.
                 policy: .never
             )
         )
@@ -204,7 +206,7 @@ struct DPIPWidgets_Previews: PreviewProvider {
     private static let previewEntry = DPIPWidgetEntry(
         date: .now,
         snapshot: CurrentWeatherWidgetSnapshot(
-            schemaVersion: 3,
+            schemaVersion: 4,
             regionCode: "660",
             regionName: "西屯區",
             observationTime: 0,
@@ -214,6 +216,7 @@ struct DPIPWidgets_Previews: PreviewProvider {
             condition: .clear,
             isNight: true,
             nextDayNightTransitionTime: 1_789_562_700,
+            calibratedTimeOffsetMilliseconds: 0,
             temperature: 28.4,
             humidity: 76,
             rain: 0
