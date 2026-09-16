@@ -57,7 +57,12 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
     let weatherCode: Int
     let condition: CurrentWeatherWidgetCondition
     let isNight: Bool
+
+    /// The one next solar transition carried by this snapshot.
     let nextDayNightTransitionTime: Int
+
+    /// Calibrated/server time minus device time, in milliseconds.
+    let calibratedTimeOffsetMilliseconds: Int
 
     let temperature: Double?
     let humidity: Int?
@@ -74,6 +79,7 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         case condition
         case isNight
         case nextDayNightTransitionTime
+        case calibratedTimeOffsetMilliseconds
         case temperature
         case humidity
         case rain
@@ -90,6 +96,7 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         condition: CurrentWeatherWidgetCondition,
         isNight: Bool,
         nextDayNightTransitionTime: Int,
+        calibratedTimeOffsetMilliseconds: Int,
         temperature: Double?,
         humidity: Int?,
         rain: Double?
@@ -104,6 +111,8 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         self.condition = condition
         self.isNight = isNight
         self.nextDayNightTransitionTime = nextDayNightTransitionTime
+        self.calibratedTimeOffsetMilliseconds =
+            calibratedTimeOffsetMilliseconds
         self.temperature = temperature
         self.humidity = humidity
         self.rain = rain
@@ -167,6 +176,18 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
             Int.self,
             forKey: .nextDayNightTransitionTime
         ) ?? 0
+
+        if schemaVersion >= 4 {
+            calibratedTimeOffsetMilliseconds = try container.decode(
+                Int.self,
+                forKey: .calibratedTimeOffsetMilliseconds
+            )
+        } else {
+            calibratedTimeOffsetMilliseconds = try container.decodeIfPresent(
+                Int.self,
+                forKey: .calibratedTimeOffsetMilliseconds
+            ) ?? 0
+        }
 
         temperature = try container.decodeIfPresent(
             Double.self,
