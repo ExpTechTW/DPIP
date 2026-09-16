@@ -146,7 +146,7 @@ struct DPIPWidgetsEntryView : View {
 
                 HStack(spacing: 4) {
                     if entry.isStale {
-                        Text("較舊")
+                        Text("widget.stale")
                             .lineLimit(1)
                     }
 
@@ -166,7 +166,7 @@ struct DPIPWidgetsEntryView : View {
                 Image(systemName: "cloud.fill")
                     .font(.title)
 
-                Text("尚無天氣資料")
+                Text("widget.no_weather_data")
                     .font(.caption)
             }
             .foregroundStyle(.secondary)
@@ -195,8 +195,8 @@ struct DPIPWidgets: Widget {
             }
         }
         .supportedFamilies([.systemSmall])
-        .configurationDisplayName("目前天氣")
-        .description("顯示 DPIP 所選地區的目前天氣。")
+        .configurationDisplayName("widget.current_weather")
+        .description("widget.current_weather_description")
     }
 }
 
