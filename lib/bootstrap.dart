@@ -269,7 +269,7 @@ Future<void> bootstrap() async {
     NtpTimeSource(),
   );
   AppTime.install(serverClock);
-  serverClock.sync().ignore();
+  AppTime.sync().ignore();
   final realtimeService = RealtimeService(serverClock);
 
   // Push: best-effort and off the first frame — a missing push environment or
