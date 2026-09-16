@@ -4,6 +4,8 @@ import 'package:dpip/features/weather/data/current_weather_widget_publisher.dart
 import 'package:dpip/features/weather/domain/current_weather_widget_snapshot.dart';
 import 'package:dpip/features/weather/domain/current_weather_widget_sync.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
+import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/core/weather/solar_time.dart';
 
 final class CurrentWeatherWidgetCoordinator
     implements CurrentWeatherWidgetSync {
@@ -32,10 +34,22 @@ final class CurrentWeatherWidgetCoordinator
       return;
     }
 
+    final now = AppTime.utc;
+
+    final isNight = isNightAt(now, latitude: town.lat, longitude: town.lng);
+
+    final nextTransition = nextDayNightTransitionAt(
+      now,
+      latitude: town.lat,
+      longitude: town.lng,
+    );
+
     final snapshot = createCurrentWeatherWidgetSnapshot(
       regionCode: regionCode,
       regionName: town.townName,
       weather: weather,
+      isNight: isNight,
+      nextDayNightTransitionTime: nextTransition.millisecondsSinceEpoch ~/ 1000,
     );
 
     await _publisher.publish(snapshot);

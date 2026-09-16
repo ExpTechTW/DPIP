@@ -206,18 +206,126 @@ bool isNightHour(
 }
 
 /// Whether the sun is below the horizon at the instant [utc].
+///
+/// Sunrise and sunset are fixed for the local calendar day and rounded to the
+/// same whole-second precision used by the Widget snapshot contract. The
+/// rounded sunrise second is daytime; the rounded sunset second is nighttime.
 bool isNightAt(
   DateTime utc, {
   double latitude = kTaiwanLatitude,
   double longitude = kTaiwanLongitude,
   double utcOffsetHours = 8,
 }) {
-  final local = utc.add(Duration(minutes: (utcOffsetHours * 60).round()));
-  return isNightHour(
-    local.hour + local.minute / 60.0 + local.second / 3600.0,
-    utcDay: utc,
+  final instant = utc.toUtc();
+
+  final offset = Duration(minutes: (utcOffsetHours * 60).round());
+
+  final local = instant.add(offset);
+  final times = _sunSecondsForLocalDay(
+    local,
+    offset,
     latitude: latitude,
     longitude: longitude,
     utcOffsetHours: utcOffsetHours,
   );
+
+  return _isNightAtLocalSecond(local, times);
+}
+
+bool _isNightAtLocalSecond(DateTime local, ({int sunrise, int sunset}) times) {
+  final localSeconds = local.hour * 3600 + local.minute * 60 + local.second;
+
+  return localSeconds < times.sunrise || localSeconds >= times.sunset;
+}
+
+DateTime _localSecondToUtc(DateTime localDay, int second, Duration offset) {
+  final localMidnight = DateTime.utc(
+    localDay.year,
+    localDay.month,
+    localDay.day,
+  );
+
+  return localMidnight.add(Duration(seconds: second)).subtract(offset);
+}
+
+DateTime _localDayAnchorUtc(DateTime localDay, Duration offset) {
+  final localNoon = DateTime.utc(
+    localDay.year,
+    localDay.month,
+    localDay.day,
+    12,
+  );
+
+  return localNoon.subtract(offset);
+}
+
+({int sunrise, int sunset}) _sunSecondsForLocalDay(
+  DateTime localDay,
+  Duration offset, {
+  required double latitude,
+  required double longitude,
+  required double utcOffsetHours,
+}) {
+  final times = sunTimes(
+    _localDayAnchorUtc(localDay, offset),
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+  );
+
+  return (
+    sunrise: (times.sunrise * Duration.secondsPerHour).round(),
+    sunset: (times.sunset * Duration.secondsPerHour).round(),
+  );
+}
+
+/// Returns the next sunrise or sunset after the whole second containing [utc].
+///
+/// This uses the same local-day anchor and second rounding as [isNightAt], so
+/// the two exact-instant APIs agree at sunrise and sunset boundaries.
+DateTime nextDayNightTransitionAt(
+  DateTime utc, {
+  double latitude = kTaiwanLatitude,
+  double longitude = kTaiwanLongitude,
+  double utcOffsetHours = 8,
+}) {
+  final instant = utc.toUtc();
+
+  final offset = Duration(minutes: (utcOffsetHours * 60).round());
+
+  final localNow = instant.add(offset);
+  final today = _sunSecondsForLocalDay(
+    localNow,
+    offset,
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+  );
+
+  final localSeconds =
+      localNow.hour * 3600 + localNow.minute * 60 + localNow.second;
+
+  if (localSeconds < today.sunrise) {
+    return _localSecondToUtc(localNow, today.sunrise, offset);
+  }
+
+  if (localSeconds < today.sunset) {
+    return _localSecondToUtc(localNow, today.sunset, offset);
+  }
+
+  final tomorrowLocal = DateTime.utc(
+    localNow.year,
+    localNow.month,
+    localNow.day + 1,
+  );
+
+  final tomorrow = _sunSecondsForLocalDay(
+    tomorrowLocal,
+    offset,
+    latitude: latitude,
+    longitude: longitude,
+    utcOffsetHours: utcOffsetHours,
+  );
+
+  return _localSecondToUtc(tomorrowLocal, tomorrow.sunrise, offset);
 }
