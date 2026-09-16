@@ -20,27 +20,17 @@ struct DPIPWidgetProvider: TimelineProvider {
     ) {
         let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
         let now = Date.now
-
-        let isStale: Bool
-
-        if let snapshot {
-            let observationDate = Date(
-                timeIntervalSince1970: TimeInterval(snapshot.observationTime)
-            )
-
-            isStale =
-                now >= observationDate.addingTimeInterval(staleAfter)
-        } else {
-            isStale = false
-        }
+        let state = CurrentWeatherWidgetTimeline.state(
+            snapshot: snapshot,
+            at: now,
+            staleAfter: staleAfter
+        )
 
         let entry = DPIPWidgetEntry(
-            date: now,
+            date: state.date,
             snapshot: snapshot,
-            isStale: isStale,
-            isNight: snapshot.map {
-                isNight(for: $0, at: now)
-            } ?? false
+            isStale: state.isStale,
+            isNight: state.isNight
         )
 
         completion(entry)
@@ -51,60 +41,18 @@ struct DPIPWidgetProvider: TimelineProvider {
         completion: @escaping (Timeline<DPIPWidgetEntry>) -> Void
     ) {
         let now = Date()
-
-        guard let snapshot = snapshotStore.loadCurrentWeatherSnapshot() else {
-            let entry = DPIPWidgetEntry(
-                date: now,
-                snapshot: nil,
-                isStale: false,
-                isNight: false
-            )
-
-            completion(
-                Timeline(
-                    entries: [entry],
-                    policy: .never
-                )
-            )
-            return
-        }
-
-        let observationDate = Date(
-            timeIntervalSince1970:
-                TimeInterval(snapshot.observationTime)
+        let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
+        let entries = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot,
+            now: now,
+            staleAfter: staleAfter
         )
-
-        let staleAt = observationDate.addingTimeInterval(
-            staleAfter
-        )
-
-        let transitionAt = Date(
-            timeIntervalSince1970:
-                TimeInterval(snapshot.nextDayNightTransitionTime)
-        )
-
-        var dates = [now]
-
-        if staleAt > now {
-            dates.append(staleAt)
-        }
-
-        if snapshot.nextDayNightTransitionTime > 0,
-           transitionAt > now {
-            dates.append(transitionAt)
-        }
-
-        let entries = Array(Set(dates))
-            .sorted()
-            .map { date in
+            .map { state in
                 DPIPWidgetEntry(
-                    date: date,
+                    date: state.date,
                     snapshot: snapshot,
-                    isStale: date >= staleAt,
-                    isNight: isNight(
-                        for: snapshot,
-                        at: date
-                    )
+                    isStale: state.isStale,
+                    isNight: state.isNight
                 )
             }
 
@@ -114,26 +62,6 @@ struct DPIPWidgetProvider: TimelineProvider {
                 policy: .never
             )
         )
-    }
-
-    private func isNight(
-        for snapshot: CurrentWeatherWidgetSnapshot,
-        at date: Date
-    ) -> Bool {
-        guard snapshot.nextDayNightTransitionTime > 0 else {
-            return snapshot.isNight
-        }
-
-        let transitionAt = Date(
-            timeIntervalSince1970:
-                TimeInterval(snapshot.nextDayNightTransitionTime)
-        )
-
-        if date >= transitionAt {
-            return !snapshot.isNight
-        }
-
-        return snapshot.isNight
     }
 }
 
