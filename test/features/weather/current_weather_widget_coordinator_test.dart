@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dpip/core/error/result.dart';
@@ -11,7 +12,7 @@ import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('publishes a snapshot for the matching selected region', () async {
+  test('already synced publishes immediately with calibrated offset', () async {
     final regions = RegionStore(
       SettingsStore.inMemory({
         'home.savedRegionCodes': ['660'],
@@ -19,29 +20,116 @@ void main() {
     );
     final directory = _directoryWithXitun();
     final writer = _FakeWidgetSnapshotWriter();
+    var syncCallCount = 0;
     final coordinator = CurrentWeatherWidgetCoordinator(
       regions,
       directory,
       CurrentWeatherWidgetPublisher(writer),
+      time: () => (
+        calibratedNow: DateTime.utc(2026, 9, 16, 4),
+        calibratedTimeOffset: const Duration(minutes: -5),
+      ),
+      isTimeSynced: () => true,
+      syncTime: () async {
+        syncCallCount += 1;
+      },
     );
 
     regions.select(2);
 
     await coordinator.publish(regionCode: '660', weather: _weather());
 
-    expect(writer.called, isTrue);
+    expect(syncCallCount, 0);
+    expect(writer.writeCallCount, 1);
     expect(writer.writtenKind, WidgetSnapshotKind.currentWeather);
 
     final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 3);
+    expect(decoded['schemaVersion'], 4);
     expect(decoded['regionCode'], '660');
     expect(decoded['regionName'], '西屯區');
     expect(decoded['stationName'], '西屯');
     expect(decoded['weather'], '多雲');
     expect(decoded['isNight'], isA<bool>());
     expect(decoded['nextDayNightTransitionTime'], isA<int>());
+    expect(decoded['calibratedTimeOffsetMilliseconds'], -300_000);
     expect(decoded['temperature'], 28.4);
+  });
+
+  test('waits for initial sync then publishes exactly once', () async {
+    final regions = RegionStore(
+      SettingsStore.inMemory({
+        'home.savedRegionCodes': ['660'],
+      }),
+    );
+    final writer = _FakeWidgetSnapshotWriter();
+    final sync = Completer<void>();
+    var isSynced = false;
+    var timeCallCount = 0;
+    var syncCallCount = 0;
+    final coordinator = CurrentWeatherWidgetCoordinator(
+      regions,
+      _directoryWithXitun(),
+      CurrentWeatherWidgetPublisher(writer),
+      time: () {
+        timeCallCount += 1;
+        return (
+          calibratedNow: DateTime.utc(2026, 9, 16, 4),
+          calibratedTimeOffset: const Duration(minutes: 3),
+        );
+      },
+      isTimeSynced: () => isSynced,
+      syncTime: () {
+        syncCallCount += 1;
+        return sync.future;
+      },
+    );
+    regions.select(2);
+
+    final publish = coordinator.publish(regionCode: '660', weather: _weather());
+
+    expect(syncCallCount, 1);
+    expect(timeCallCount, 0);
+    expect(writer.writeCallCount, 0);
+
+    isSynced = true;
+    sync.complete();
+    await publish;
+
+    expect(timeCallCount, 1);
+    expect(writer.writeCallCount, 1);
+    final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
+    expect(decoded['calibratedTimeOffsetMilliseconds'], 180_000);
+  });
+
+  test('does not publish when initial sync fails', () async {
+    final regions = RegionStore(
+      SettingsStore.inMemory({
+        'home.savedRegionCodes': ['660'],
+      }),
+    );
+    final writer = _FakeWidgetSnapshotWriter();
+    var timeCallCount = 0;
+    final coordinator = CurrentWeatherWidgetCoordinator(
+      regions,
+      _directoryWithXitun(),
+      CurrentWeatherWidgetPublisher(writer),
+      time: () {
+        timeCallCount += 1;
+        return (
+          calibratedNow: DateTime.utc(2026, 9, 16, 4),
+          calibratedTimeOffset: Duration.zero,
+        );
+      },
+      isTimeSynced: () => false,
+      syncTime: () async {},
+    );
+    regions.select(2);
+
+    await coordinator.publish(regionCode: '660', weather: _weather());
+
+    expect(timeCallCount, 0);
+    expect(writer.writeCallCount, 0);
   });
 
   test('does not publish when the selected region does not match', () async {
@@ -139,6 +227,7 @@ WeatherRealtime _weather() {
 
 final class _FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
   bool called = false;
+  int writeCallCount = 0;
   WidgetSnapshotKind? writtenKind;
   String? writtenJson;
   int clearCallCount = 0;
@@ -157,6 +246,7 @@ final class _FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
     required String json,
   }) async {
     called = true;
+    writeCallCount += 1;
     writtenKind = kind;
     writtenJson = json;
 

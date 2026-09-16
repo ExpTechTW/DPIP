@@ -97,9 +97,10 @@ void main() {
       weather: weather,
       isNight: false,
       nextDayNightTransitionTime: 1_789_562_700,
+      calibratedTimeOffsetMilliseconds: -300_000,
     );
 
-    expect(snapshot.schemaVersion, 3);
+    expect(snapshot.schemaVersion, 4);
     expect(snapshot.regionCode, '660');
     expect(snapshot.regionName, '西屯區');
     expect(snapshot.observationTime, 1789398000);
@@ -109,6 +110,7 @@ void main() {
     expect(snapshot.condition, CurrentWeatherWidgetCondition.thunderstorm);
     expect(snapshot.isNight, isFalse);
     expect(snapshot.nextDayNightTransitionTime, 1_789_562_700);
+    expect(snapshot.calibratedTimeOffsetMilliseconds, -300_000);
     expect(snapshot.temperature, 28.4);
     expect(snapshot.humidity, 76);
     expect(snapshot.rain, 0.0);
@@ -116,11 +118,12 @@ void main() {
     final json = jsonEncode(snapshot.toJson());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 3);
+    expect(decoded['schemaVersion'], 4);
     expect(decoded['regionCode'], '660');
     expect(decoded['condition'], 'thunderstorm');
     expect(decoded['isNight'], isFalse);
     expect(decoded['nextDayNightTransitionTime'], 1_789_562_700);
+    expect(decoded['calibratedTimeOffsetMilliseconds'], -300_000);
     expect(decoded['temperature'], 28.4);
   });
 
@@ -135,6 +138,7 @@ void main() {
       condition: .cloudy,
       isNight: true,
       nextDayNightTransitionTime: 1_789_562_700,
+      calibratedTimeOffsetMilliseconds: 300_000,
       temperature: null,
       humidity: null,
       rain: null,
@@ -147,7 +151,7 @@ void main() {
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
     expect(decoded, {
-      'schemaVersion': 3,
+      'schemaVersion': 4,
       'regionCode': '660',
       'regionName': '西屯區',
       'observationTime': 1789398000,
@@ -157,6 +161,7 @@ void main() {
       'condition': 'cloudy',
       'isNight': true,
       'nextDayNightTransitionTime': 1_789_562_700,
+      'calibratedTimeOffsetMilliseconds': 300_000,
       'temperature': null,
       'humidity': null,
       'rain': null,

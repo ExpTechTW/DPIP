@@ -2,7 +2,45 @@ import Foundation
 import XCTest
 
 final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
-    func testDecodesSchemaVersionThreeSnapshot() throws {
+    func testDecodesSchemaVersionFourSnapshot() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 4,
+              "regionCode": "660",
+              "regionName": "西屯區",
+              "observationTime": 1789567200,
+              "stationName": "西屯",
+              "weather": "晴",
+              "weatherCode": 100,
+              "condition": "clear",
+              "isNight": true,
+              "nextDayNightTransitionTime": 1789562700,
+              "calibratedTimeOffsetMilliseconds": -300000,
+              "temperature": 28.5,
+              "humidity": null,
+              "rain": 0.0
+            }
+            """
+        )
+
+        XCTAssertEqual(snapshot.schemaVersion, 4)
+        XCTAssertEqual(snapshot.regionCode, "660")
+        XCTAssertEqual(snapshot.regionName, "西屯區")
+        XCTAssertEqual(snapshot.observationTime, 1_789_567_200)
+        XCTAssertEqual(snapshot.stationName, "西屯")
+        XCTAssertEqual(snapshot.weather, "晴")
+        XCTAssertEqual(snapshot.weatherCode, 100)
+        XCTAssertEqual(snapshot.condition, .clear)
+        XCTAssertTrue(snapshot.isNight)
+        XCTAssertEqual(snapshot.nextDayNightTransitionTime, 1_789_562_700)
+        XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, -300_000)
+        XCTAssertEqual(snapshot.temperature, 28.5)
+        XCTAssertNil(snapshot.humidity)
+        XCTAssertEqual(snapshot.rain, 0)
+    }
+
+    func testDecodesSchemaVersionThreeSnapshotWithZeroCalibration() throws {
         let snapshot = try decode(
             """
             {
@@ -16,29 +54,22 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
               "condition": "clear",
               "isNight": true,
               "nextDayNightTransitionTime": 1789562700,
-              "temperature": 28.5,
+              "temperature": null,
               "humidity": null,
-              "rain": 0.0
+              "rain": null
             }
             """
         )
 
-        XCTAssertEqual(snapshot.schemaVersion, 3)
-        XCTAssertEqual(snapshot.regionCode, "660")
-        XCTAssertEqual(snapshot.regionName, "西屯區")
-        XCTAssertEqual(snapshot.observationTime, 1_789_567_200)
-        XCTAssertEqual(snapshot.stationName, "西屯")
-        XCTAssertEqual(snapshot.weather, "晴")
-        XCTAssertEqual(snapshot.weatherCode, 100)
-        XCTAssertEqual(snapshot.condition, .clear)
         XCTAssertTrue(snapshot.isNight)
         XCTAssertEqual(snapshot.nextDayNightTransitionTime, 1_789_562_700)
-        XCTAssertEqual(snapshot.temperature, 28.5)
+        XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 0)
+        XCTAssertNil(snapshot.temperature)
         XCTAssertNil(snapshot.humidity)
-        XCTAssertEqual(snapshot.rain, 0)
+        XCTAssertNil(snapshot.rain)
     }
 
-    func testDecodesOlderSnapshotWithDayNightDefaults() throws {
+    func testDecodesSchemaVersionTwoSnapshotWithLegacyDefaults() throws {
         let snapshot = try decode(
             """
             {
@@ -59,9 +90,31 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
 
         XCTAssertFalse(snapshot.isNight)
         XCTAssertEqual(snapshot.nextDayNightTransitionTime, 0)
-        XCTAssertNil(snapshot.temperature)
-        XCTAssertNil(snapshot.humidity)
-        XCTAssertNil(snapshot.rain)
+        XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 0)
+    }
+
+    func testSchemaVersionFourRequiresCalibration() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "schemaVersion": 4,
+                  "regionCode": "660",
+                  "regionName": "西屯區",
+                  "observationTime": 1789567200,
+                  "stationName": "西屯",
+                  "weather": "晴",
+                  "weatherCode": 100,
+                  "condition": "clear",
+                  "isNight": false,
+                  "nextDayNightTransitionTime": 1789562700,
+                  "temperature": null,
+                  "humidity": null,
+                  "rain": null
+                }
+                """
+            )
+        )
     }
 
     func testUnknownConditionDecodesAsUnknown() throws {
@@ -139,7 +192,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: false,
                 transitionTime: 11_200
             ),
-            now: now,
+            deviceNow: now,
             staleAfter: staleAfter
         )
 
@@ -153,6 +206,65 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
         )
     }
 
+    func testDeviceClockAheadUsesNegativeOffsetForScheduling() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_200,
+                offsetMilliseconds: -300_000
+            ),
+            deviceNow: date(10_300),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 10_300, isStale: false, isNight: false),
+                state(at: 11_500, isStale: false, isNight: true),
+                state(at: 12_100, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testDeviceClockBehindUsesPositiveOffsetForScheduling() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_200,
+                offsetMilliseconds: 300_000
+            ),
+            deviceNow: date(9_700),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 9_700, isStale: false, isNight: false),
+                state(at: 10_900, isStale: false, isNight: true),
+                state(at: 11_500, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testStaleBoundaryUsesCalibratedTime() {
+        let state = CurrentWeatherWidgetTimeline.state(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 0,
+                offsetMilliseconds: -300_000
+            ),
+            at: date(12_100),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertTrue(state.isStale)
+    }
+
     func testStaleBeforeDayToNightTransition() {
         let states = CurrentWeatherWidgetTimeline.states(
             snapshot: snapshot(
@@ -160,7 +272,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: false,
                 transitionTime: 11_200
             ),
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -181,7 +293,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: true,
                 transitionTime: 11_200
             ),
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -197,7 +309,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: false,
                 transitionTime: 11_800
             ),
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -217,7 +329,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: false,
                 transitionTime: 9_999
             ),
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -233,7 +345,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: false,
                 transitionTime: 0
             ),
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -250,7 +362,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
                 isNight: true,
                 transitionTime: 0
             ),
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -266,7 +378,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
     func testNoSnapshotProducesOneEmptyState() {
         let states = CurrentWeatherWidgetTimeline.states(
             snapshot: nil,
-            now: date(10_000),
+            deviceNow: date(10_000),
             staleAfter: staleAfter
         )
 
@@ -294,10 +406,11 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
     private func snapshot(
         observationTime: Int,
         isNight: Bool,
-        transitionTime: Int
+        transitionTime: Int,
+        offsetMilliseconds: Int = 0
     ) -> CurrentWeatherWidgetSnapshot {
         CurrentWeatherWidgetSnapshot(
-            schemaVersion: 3,
+            schemaVersion: 4,
             regionCode: "660",
             regionName: "西屯區",
             observationTime: observationTime,
@@ -307,6 +420,7 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
             condition: .clear,
             isNight: isNight,
             nextDayNightTransitionTime: transitionTime,
+            calibratedTimeOffsetMilliseconds: offsetMilliseconds,
             temperature: 28,
             humidity: 76,
             rain: 0
