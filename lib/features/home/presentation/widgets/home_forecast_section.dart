@@ -12,7 +12,7 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
-import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.dart';
+import 'package:dpip/core/weather/solar_time.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
