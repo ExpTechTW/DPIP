@@ -1,0 +1,25 @@
+# What Codecov does with the lcov CI uploads (.github/workflows/ci.yml).
+#
+# There is no ignore list here on purpose. Generated code never reaches the
+# report: `flutter test` leaves out every file marked `// coverage:ignore-file`,
+# which build.yaml and l10n.yaml put into everything the generators write. One
+# exclusion, honoured by CI, the editor and anybody running the suite by hand.
+coverage:
+  status:
+    # The total, against the base commit. A percent of drift is noise — which
+    # tests happened to load which libraries — rather than a regression, so it
+    # takes more than that to turn the check red.
+    project:
+      default:
+        target: auto
+        threshold: 1%
+
+    # The lines a pull request adds or changes. It reports and does not block:
+    # a gate that fails half the pull requests in a codebase still climbing out
+    # of 55% teaches people to ignore the check rather than to write tests.
+    patch:
+      default:
+        informational: true
+
+comment:
+  layout: condensed_header, condensed_files, condensed_footer

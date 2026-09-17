@@ -146,6 +146,11 @@ out without it.
 
 Nobody has to remember to run it:
 
+- **CI** runs it as the test step and uploads the lcov to
+  [Codecov](https://app.codecov.io/gh/ExpTechTW/DPIP), which is where the
+  README's badge and sunburst graph, the per-file view and the pull-request
+  comment all come from. `codecov.yml` holds its settings; the upload signs
+  with an OIDC token, so there is no secret to keep.
 - **`tool/check.sh`** runs it too, because it is what CI runs.
 
 **In VS Code**, the Dart extension runs it from the Testing view: **Run Tests

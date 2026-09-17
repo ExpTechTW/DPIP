@@ -15,6 +15,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Naming any permission sets every one not listed to none, so the checkout's
+    # read is spelled out beside the OIDC token the Codecov upload signs with.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       # Full history: the commit gate walks the range this push or PR adds, and
       # a shallow clone has no base to compare against.
@@ -171,8 +176,29 @@ jobs:
       # The ETag-cache tests run SQLite on the host via sqflite_common_ffi;
       # ubuntu ships libsqlite3.so.0 but not the unversioned symlink its loader
       # needs, so install the dev package.
-      - name: Install SQLite (sqflite_common_ffi host tests)
+      - name: Install SQLite
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
 
-      - name: Test
-        run: bash tool/dev/test.sh
+      # The test suite, run once, with coverage. The coverage run *is* the test
+      # run — a failing test fails this step exactly as tool/dev/test.sh would —
+      # so the lcov below costs a few seconds of instrumentation rather than a
+      # second pass over the suite.
+      - name: Test (with coverage)
+        run: bash tool/dev/coverage.sh
+
+      # Codecov is where the badge in the README, its sunburst graph and the
+      # pull-request comment all come from; codecov.yml holds the settings.
+      #
+      # OIDC rather than a token: there is nothing to store and nothing to
+      # rotate. A pull request from a fork cannot mint one, so the upload is
+      # allowed to fail rather than fail the run — by this point the suite has
+      # passed, which is what the check is for. Uploads from forks need the
+      # tokenless opt-out for public repositories, in the Codecov org settings.
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() && hashFiles('coverage/lcov.info') != '' }}
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
+          files: coverage/lcov.info
+          disable_search: true
+          fail_ci_if_error: false
