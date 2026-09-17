@@ -12,6 +12,7 @@ import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/settings/locale_config.dart';
@@ -51,6 +52,7 @@ class DpipApp extends StatelessWidget {
         notificationService: deps.notificationService,
         locationService: deps.locationService,
         regionStore: deps.regionStore,
+        widgetLocationCatalogCoordinator: deps.widgetLocationCatalogCoordinator,
         deviceLocationReporter: deps.deviceLocationReporter,
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
@@ -141,6 +143,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.notificationService,
     required this.locationService,
     required this.regionStore,
+    required this.widgetLocationCatalogCoordinator,
     required this.deviceLocationReporter,
     required this.backgroundLocation,
     required this.locationMonitor,
@@ -153,6 +156,7 @@ class _AppServicesHost extends StatefulWidget {
   final NotificationService notificationService;
   final LocationService locationService;
   final RegionStore regionStore;
+  final WidgetLocationCatalogCoordinator widgetLocationCatalogCoordinator;
   final DeviceLocationReporter deviceLocationReporter;
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
@@ -174,6 +178,8 @@ class _AppServicesHostState extends State<_AppServicesHost>
     super.initState();
     _observer = RealtimeLifecycleObserver(widget.realtimeService);
     WidgetsBinding.instance.addObserver(this);
+
+    widget.widgetLocationCatalogCoordinator.start();
     // The map tab keeps whichever overlay the session left it on, so an EEW
     // tap has to name 強震監視器 as well as the route. Same hand-off the home
     // monitor banner and the nav bar use, so the map has one way in.
@@ -276,6 +282,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     NotificationTaps.onTap = null;
     widget.onboarding.removeListener(_onOnboardingChanged);
     WidgetsBinding.instance.removeObserver(this);
+    widget.widgetLocationCatalogCoordinator.dispose();
     _observer.dispose();
     widget.locationMonitor.dispose();
     widget.permissionHealth.dispose();
