@@ -1101,13 +1101,13 @@ packages:
     source: hosted
     version: "3.5.2"
   sqlite3_connection_pool:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: sqlite3_connection_pool
-      sha256: "8f2df36dc9f0f51ec04506b90848769b5a4538a9f937472147a274910a92e7ee"
+      sha256: b01024fd67922680e5512abf3201974dab2d98d0664d145ec741740b448fdc5f
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.9"
+    version: "0.2.11"
   sqlite3_web:
     dependency: transitive
     description:
@@ -1120,10 +1120,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite_async
-      sha256: "83aff15d2bb3b296d35e15419a85c3207df3baca62b64b778958a59eb291502d"
+      sha256: "40c7d6f660322e4a2b4367ff75b9d5111389441aaa87e44f417420b56e0b0c97"
       url: "https://pub.dev"
     source: hosted
-    version: "0.14.4"
+    version: "0.14.5"
   stack_trace:
     dependency: transitive
     description:
