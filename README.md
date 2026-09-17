@@ -7,6 +7,7 @@
 [![正式版](https://img.shields.io/github/v/release/exptechtw/dpip?label=%E6%AD%A3%E5%BC%8F%E7%89%88&color=1B8A50)](https://github.com/ExpTechTW/DPIP/releases/latest)
 [![測試版](https://img.shields.io/github/v/tag/exptechtw/dpip?sort=date&label=%E6%B8%AC%E8%A9%A6%E7%89%88&color=orange)](https://github.com/ExpTechTW/DPIP/releases)
 [![CI](https://img.shields.io/github/actions/workflow/status/ExpTechTW/DPIP/ci.yml?branch=main&label=CI)](https://github.com/ExpTechTW/DPIP/actions/workflows/ci.yml)
+[![測試覆蓋率](https://img.shields.io/codecov/c/github/ExpTechTW/DPIP/main?label=%E6%B8%AC%E8%A9%A6%E8%A6%86%E8%93%8B%E7%8E%87)](https://app.codecov.io/gh/ExpTechTW/DPIP)
 [![Discord](https://img.shields.io/discord/926545182407688273?logo=discord&logoColor=white&label=Discord&color=5865F2)](https://discord.gg/5dbHqV8ees)
 
 [官網](https://exptech.dev) • [更新日誌](https://github.com/ExpTechTW/DPIP/releases) • [開發文件](AGENTS.md)
@@ -126,12 +127,19 @@ tool/dev/build.sh ios        # iOS（不含簽章）
 | 要做什麼 | 指令 |
 |---|---|
 | 跑測試 | `tool/dev/test.sh` |
+| 跑測試並算覆蓋率 | `tool/dev/coverage.sh` |
 | 格式化 + 靜態分析 | `tool/dev/analyze.sh` |
 | 只格式化 | `tool/dev/format.sh` |
 | 重新產生 l10n | `tool/dev/l10n.sh` |
 | 重新產生 codegen | `tool/dev/codegen.sh` |
 | 砍掉重建 | `tool/dev/clean.sh` |
 | 跑完 CI 會跑的每一道關卡 | `tool/check.sh` |
+
+覆蓋率由 CI 上傳到 [Codecov](https://app.codecov.io/gh/ExpTechTW/DPIP)。下圖由內到外是資料夾層級，每個扇形是一個檔案，大小是行數、顏色是覆蓋率：
+
+[![測試覆蓋率旭日圖](https://codecov.io/gh/ExpTechTW/DPIP/branch/main/graphs/sunburst.svg)](https://app.codecov.io/gh/ExpTechTW/DPIP)
+
+產生出來的程式碼不算在內：`flutter test` 會跳過標了 `// coverage:ignore-file` 的檔案，而 `build.yaml` 與 `l10n.yaml` 讓產生器自動加上那一行。
 
 **mise 是必要條件，不是建議。** 沒有 mise 就不能建置這個專案 —— 腳本會直接拒絕執行並告訴你怎麼裝。
 
