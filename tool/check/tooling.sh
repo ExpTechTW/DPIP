@@ -107,6 +107,7 @@ version:
 
   tool/run.sh              start the app
   tool/dev/test.sh         the test suite
+  tool/dev/coverage.sh     the test suite, with coverage
   tool/dev/analyze.sh      format + analyzer
   tool/dev/deps.sh         dependencies
   tool/check.sh            every gate CI runs

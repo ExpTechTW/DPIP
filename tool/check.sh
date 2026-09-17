@@ -30,15 +30,6 @@
 source "$(dirname "${BASH_SOURCE[0]}")/dev/_lib.sh"
 cd "$(repo_root)"
 
-# What each cached step reads. Anything a step's result depends on has to be in
-# its list, or the cache will happily hand back an answer about a file that has
-# since changed — the one failure mode of a cache like this, and a silent one.
-readonly -a CODE_INPUTS=(
-  lib test tool
-  pubspec.yaml pubspec.lock analysis_options.yaml l10n.yaml build.yaml
-)
-readonly -a TEST_INPUTS=("${CODE_INPUTS[@]}" assets shaders)
-
 step 'format + analyze'
 cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 
@@ -91,7 +82,13 @@ codegen_check() {
 }
 cached codegen "$(cache_key "${CODE_INPUTS[@]}")" codegen_check
 
-step 'test'
-cached test "$(cache_key "${TEST_INPUTS[@]}")" tool/dev/test.sh
+step 'test (with coverage)'
+# The suite as CI runs it. CI's test step is tool/dev/coverage.sh, and running a
+# different command here is how this list and ci.yml would start to disagree:
+# the coverage run also compiles one test that imports every library in lib/,
+# and a file that does not build on the test VM fails there and nowhere in
+# tool/dev/test.sh. It caches itself on the same inputs the suite reads, and a
+# run leaves the report in coverage/ current as a side effect.
+tool/dev/coverage.sh --if-changed
 
 step 'all gates passed'
