@@ -112,7 +112,19 @@ dependencies:
   # sqflite: every operation runs on a background isolate through sqlite3 FFI,
   # so a cold-start lock contention window no longer fails opens on the UI
   # thread, and WAL + busy_timeout (lockTimeout) ship as sane defaults.
-  sqlite_async: ^0.14.4
+  #
+  # 0.14.5 is the floor because `close()` before it returned while connections
+  # were still open.
+  sqlite_async: ^0.14.5
+  # Not used directly — sqlite_async's pool. Declared only to hold a floor
+  # sqlite_async itself does not (it accepts ^0.2.7). Up to 0.2.9 every lease,
+  # readers included, was treated as the writer, so the update notification
+  # sent after each read could run against the writer's update and commit hooks
+  # on another thread and corrupt memory (simolus3/sqlite3.dart@00634a8). With
+  # connections opened without a mutex, that surfaced as native crashes inside
+  # SQLite itself: a garbage expression pointer in the parser on iOS, and
+  # `vdbeCommit` on Android. Do not lower this below 0.2.10.
+  sqlite3_connection_pool: ^0.2.10
   # The synchronous SQLite API. Not used to open anything in app code — it is
   # here for two types: the in-memory test helper wraps one handle with
   # SqliteDatabase.singleConnection, and the location track's read-only open
