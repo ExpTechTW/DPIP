@@ -7,9 +7,16 @@ final class RunnerTests: XCTestCase {
     let kind = try WidgetSnapshotFile.kind("weatherForecast")
     XCTAssertEqual(kind.filename, "weather-forecast.json")
     XCTAssertEqual(kind.rawValue, "weatherForecast")
+
     let currentWeather = try WidgetSnapshotFile.kind("currentWeather")
     XCTAssertEqual(currentWeather.filename, "current-weather.json")
     XCTAssertEqual(currentWeather.rawValue, "currentWeather")
+
+    let locationCatalog = try WidgetSnapshotFile.kind("locationCatalog")
+    XCTAssertEqual(locationCatalog.filename, "location-catalog.json")
+    XCTAssertEqual(locationCatalog.rawValue, "locationCatalog")
+    XCTAssertNil(locationCatalog.widgetKind)
+
     XCTAssertThrowsError(try WidgetSnapshotFile.kind("../other.json")) { error in
       XCTAssertEqual(error as? WidgetSnapshotError, .invalidKind)
     }

@@ -15,6 +15,8 @@ import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/platform/install_source.dart';
+import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
+import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
@@ -287,6 +289,12 @@ Future<void> bootstrap() async {
   final townDirectory = await townDirectoryFuture;
   final townMs = Log.sinceStartMs - townStart;
   final regionStore = RegionStore(settings);
+  final widgetSnapshotWriter = IosWidgetSnapshotWriter();
+  final widgetLocationCatalogCoordinator = WidgetLocationCatalogCoordinator(
+    regionStore,
+    townDirectory,
+    widgetSnapshotWriter,
+  );
   final locationService = LocationService(
     townDirectory,
     boundaries: townBoundaries,
@@ -379,6 +387,7 @@ Future<void> bootstrap() async {
     townDirectory: townDirectory,
     townBoundaries: townBoundaries,
     regionStore: regionStore,
+    widgetLocationCatalogCoordinator: widgetLocationCatalogCoordinator,
     locationService: locationService,
     deviceLocationReporter: deviceLocationReporter,
     backgroundLocation: backgroundLocation,

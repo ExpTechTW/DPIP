@@ -200,6 +200,30 @@ void main() {
         entry.value,
       );
     });
+
+    test(
+      'writes the location catalog kind without exposing a file path',
+      () async {
+        final writer = IosWidgetSnapshotWriter(
+          channel: channel,
+          isSupportedPlatform: true,
+        );
+
+        const json = '{"schemaVersion":1,"locations":[]}';
+
+        final result = await writer.write(
+          kind: WidgetSnapshotKind.locationCatalog,
+          json: json,
+        );
+
+        expect(result.isOk, isTrue);
+        expect(calls.single.method, 'write');
+        expect(calls.single.arguments, {
+          'kind': 'locationCatalog',
+          'json': json,
+        });
+      },
+    );
   }
 }
 
