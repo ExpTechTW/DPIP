@@ -7,3 +7,12 @@ targets:
           # Nested models serialize via their own toJson (so round-trips and
           # local caching produce plain JSON, not embedded objects).
           explicit_to_json: true
+      # Generated code is not code anyone tests into shape. `flutter test`
+      # leaves out every file that says `// coverage:ignore-file`, so CI's
+      # report and the editor's agree without a list of suffixes kept in step.
+      # freezed writes the comment into `.freezed.dart` on its own; this puts
+      # it into every `.g.dart`. test/tool/generated_code_coverage_test.dart
+      # fails when a generated file comes out without it.
+      source_gen:combining_builder:
+        options:
+          preamble: "// coverage:ignore-file"
