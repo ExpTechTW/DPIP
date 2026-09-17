@@ -859,7 +859,7 @@
   "onboardingPermCritical": "重大通知",
   "onboardingPermUrgentAndroid": "勿擾模式下的重大通知",
   "onboardingPermUrgentAndroidDesc": "依需求選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。",
-  "permissionGuideUrgentAndroid": "請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。",
+  "permissionGuideUrgentAndroid": "請在頻道設定中選擇是否允許此通知打斷勿擾模式，再返回 DPIP。",
   "urgentNotificationBypassesDnd": "勿擾模式期間仍允許通知",
   "urgentNotificationFollowsDnd": "遵循勿擾模式",
   "trendCumulativeTotal": "累計 {total} mm",

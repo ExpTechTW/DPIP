@@ -1711,7 +1711,7 @@ class AppLocalizationsZh extends AppLocalizations {
       '依需求選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。';
 
   @override
-  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。';
+  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式，再返回 DPIP。';
 
   @override
   String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
@@ -5005,7 +5005,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
       '按需选择可在勿扰模式期间发出的重要通知。静音、音量及当前模式仍会影响声音。';
 
   @override
-  String get permissionGuideUrgentAndroid => '请在频道设置中选择是否允许此通知打断勿扰模式,再返回 DPIP。';
+  String get permissionGuideUrgentAndroid => '请在频道设置中选择是否允许此通知打断勿扰模式，再返回 DPIP。';
 
   @override
   String get urgentNotificationBypassesDnd => '勿扰模式期间仍允许通知';
@@ -8299,7 +8299,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
       '依需要選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。';
 
   @override
-  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。';
+  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式，再返回 DPIP。';
 
   @override
   String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
@@ -11593,7 +11593,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
       '依需求選擇可在勿擾模式期間發出的重大通知。靜音、音量及目前模式仍會影響聲音。';
 
   @override
-  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式,再返回 DPIP。';
+  String get permissionGuideUrgentAndroid => '請在頻道設定中選擇是否允許此通知打斷勿擾模式，再返回 DPIP。';
 
   @override
   String get urgentNotificationBypassesDnd => '勿擾模式期間仍允許通知';
