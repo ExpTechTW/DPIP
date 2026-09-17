@@ -946,6 +946,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get morePartnerTwds => 'TWDS';
 
   @override
+  String get morePartnerThinktron => 'Thinktron';
+
+  @override
+  String get morePartnerJimsun => 'Jimsun Embedded';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Chỉ có mức 0–7, không tách 5−/5+/6−/6+.';
 

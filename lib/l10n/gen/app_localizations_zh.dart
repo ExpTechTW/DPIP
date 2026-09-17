@@ -923,6 +923,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get morePartnerTwds => '台灣數位串流有限公司';
 
   @override
+  String get morePartnerThinktron => '興創知能股份有限公司';
+
+  @override
+  String get morePartnerJimsun => '阿良的嵌入式系統技術學習區';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
 
   @override
@@ -4193,6 +4199,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get morePartnerTwds => '台湾数位串流有限公司';
+
+  @override
+  String get morePartnerThinktron => '兴创知能股份有限公司';
+
+  @override
+  String get morePartnerJimsun => '阿良的嵌入式系统技术学习区';
 
   @override
   String get reportFilterIntensityInfoLegacyBody => '震度仅 0–7，没有 5弱／5强／6弱／6强。';
@@ -7467,6 +7479,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get morePartnerTwds => '台灣數位串流有限公司';
 
   @override
+  String get morePartnerThinktron => '興創知能股份有限公司';
+
+  @override
+  String get morePartnerJimsun => '阿良的嵌入式系統技術學習區';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';
 
   @override
@@ -10737,6 +10755,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get morePartnerTwds => '台灣數位串流有限公司';
+
+  @override
+  String get morePartnerThinktron => '興創知能股份有限公司';
+
+  @override
+  String get morePartnerJimsun => '阿良的嵌入式系統技術學習區';
 
   @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，沒有 5弱／5強／6弱／6強。';

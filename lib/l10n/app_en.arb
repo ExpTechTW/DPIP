@@ -1233,6 +1233,8 @@
   "morePartnersNote": "Listed in order of partnership. Thank you to the individuals and companies whose contributions to disaster preparedness made DPIP possible.",
   "morePartnerGeoscience": "Geoscience",
   "morePartnerTwds": "TWDS",
+  "morePartnerThinktron": "Thinktron",
+  "morePartnerJimsun": "Jimsun Embedded",
   "reportFilterIntensityInfoLegacyBody": "Only levels 0–7. No 5− / 5+ / 6− / 6+ split.",
   "@notifyTsunami": {
     "description": "Notify channel title"

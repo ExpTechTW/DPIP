@@ -944,6 +944,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get morePartnerTwds => 'TWDS';
 
   @override
+  String get morePartnerThinktron => 'Thinktron';
+
+  @override
+  String get morePartnerJimsun => 'Jimsun Embedded';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'มีระดับ 0–7 เท่านั้น ไม่แยก 5−/5+/6−/6+';
 

@@ -949,6 +949,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get morePartnerTwds => 'TWDS';
 
   @override
+  String get morePartnerThinktron => 'Thinktron';
+
+  @override
+  String get morePartnerJimsun => 'Jimsun Embedded';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Hanya tingkat 0–7, tanpa pemisahan 5−/5+/6−/6+.';
 

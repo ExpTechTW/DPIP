@@ -444,6 +444,8 @@
   "morePartnersNote": "파트너십 순서대로 표시됩니다. 재난 예방에 기여한 개인과 기업에 감사드립니다. 그들의 기여 더봉에 DPIP가 가능했습니다.",
   "morePartnerGeoscience": "Geoscience",
   "morePartnerTwds": "TWDS",
+  "morePartnerThinktron": "Thinktron",
+  "morePartnerJimsun": "Jimsun Embedded",
   "reportFilterIntensityInfoLegacyBody": "진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.",
   "mapLayerSatelliteSst": "히마와리 해수면 온도",
   "qpesumsOverlayMenuTooltip": "정량 강수 예보 레이어 옵션",

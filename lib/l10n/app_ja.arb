@@ -444,6 +444,8 @@
   "morePartnersNote": "提携順に表示しています。防災への貢献で DPIP を支えてくださった個人・企業の皆様に感謝します。",
   "morePartnerGeoscience": "Geoscience",
   "morePartnerTwds": "TWDS",
+  "morePartnerThinktron": "Thinktron",
+  "morePartnerJimsun": "Jimsun Embedded",
   "reportFilterIntensityInfoLegacyBody": "震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。",
   "mapLayerSatelliteSst": "ひまわり 海面水温",
   "qpesumsOverlayMenuTooltip": "定量降水予報レイヤー設定",

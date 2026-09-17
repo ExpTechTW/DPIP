@@ -444,6 +444,8 @@
   "morePartnersNote": "เรียงตามลำดับคู่ความร่วมมือ ขอบคุณบุคคลและบริษัทที่มีส่วนร่วมในการป้องกันภัยพิบัติ การสนับสนุนของพวกเขาทำให้ DPIP เกิดขึ้นได้",
   "morePartnerGeoscience": "Geoscience",
   "morePartnerTwds": "TWDS",
+  "morePartnerThinktron": "Thinktron",
+  "morePartnerJimsun": "Jimsun Embedded",
   "reportFilterIntensityInfoLegacyBody": "มีระดับ 0–7 เท่านั้น ไม่แยก 5−/5+/6−/6+",
   "mapLayerSatelliteSst": "Himawari Sea Surface Temperature",
   "qpesumsOverlayMenuTooltip": "ตัวเลือกชั้นพยากรณ์น้ำฝน",

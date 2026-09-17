@@ -297,6 +297,14 @@ void main() {
       findsOneWidget,
     );
     expect(find.widgetWithText(ListTile, l10n.morePartnerTwds), findsOneWidget);
+    expect(
+      find.widgetWithText(ListTile, l10n.morePartnerThinktron),
+      findsOneWidget,
+    );
+    expect(
+      find.widgetWithText(ListTile, l10n.morePartnerJimsun),
+      findsOneWidget,
+    );
     // And they land below the store rows, in the 取得 App order.
     final play = tester.getTopLeft(
       find.widgetWithText(ListTile, 'Google Play'),
