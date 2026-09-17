@@ -155,23 +155,6 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       ? _refreshUrgentChannels()
       : _refresh(feedbackFor: item);
 
-  /// Whether [channel] still deserves the "came back unchanged" hint.
-  ///
-  /// The user went to that channel's settings to let it through Do Not
-  /// Disturb; finding the switch still off says the trip did not take. Like
-  /// every other row's feedback, it stands until the thing it asks for is
-  /// done, and only on the channel that was opened — the rest were never
-  /// asked about.
-  String? _urgentHint(String? channel, UrgentNotificationStatus? status) {
-    if (channel == null || status == null) return null;
-    final unchanged = status.channels.any(
-      (each) =>
-          each.channelId == channel &&
-          each.state != UrgentNotificationChannelState.bypasses,
-    );
-    return unchanged ? channel : null;
-  }
-
   Future<void> _refreshUrgentChannels() async {
     final epoch = ++_refreshEpoch;
     final opened = _busyUrgentChannel;
@@ -180,7 +163,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     Log.info('permission state: urgent=${urgent.allBypass}');
     setState(() {
       _urgent = urgent;
-      _unchangedUrgentChannel = _urgentHint(opened, urgent);
+      _unchangedUrgentChannel = urgentUnchangedHint(opened, urgent);
       _busy = null;
       _busyUrgentChannel = null;
       _awaitingReturn = null;
@@ -234,7 +217,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       _batteryOk = batteryOk;
       _unusedAppStatus = unusedApp;
       _executionStatus = execution;
-      _unchangedUrgentChannel = _urgentHint(_unchangedUrgentChannel, urgent);
+      _unchangedUrgentChannel = urgentUnchangedHint(
+        _unchangedUrgentChannel,
+        urgent,
+      );
       _busy = null;
       _busyUrgentChannel = null;
       _awaitingReturn = null;
@@ -284,8 +270,8 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     _PermissionItem.critical => critical,
     // The section is many channels behind one item, so a single verdict cannot
     // say anything useful about it. Its feedback is per channel instead, in
-    // [_urgentHint], and it never reaches here: [_recheck] routes the urgent
-    // item away from this sweep.
+    // [urgentUnchangedHint], and it never reaches here: [_recheck] routes the
+    // urgent item away from this sweep.
     _PermissionItem.urgent => true,
     _PermissionItem.location => location,
     _PermissionItem.background => background,
@@ -608,7 +594,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
         ],
         if (Platform.isAndroid && _urgent != null) ...[
           const SizedBox(height: AppSpacing.sm),
-          _UrgentNotificationSection(
+          UrgentNotificationSection(
             status: _urgent!,
             title: l10n.onboardingPermUrgentAndroid,
             description: l10n.onboardingPermUrgentAndroidDesc,
@@ -875,8 +861,31 @@ class PermissionRow extends StatelessWidget {
   }
 }
 
-class _UrgentNotificationSection extends StatelessWidget {
-  const _UrgentNotificationSection({
+/// Whether [channel] still deserves the "came back unchanged" hint.
+///
+/// The user went to that channel's settings to let it through Do Not Disturb;
+/// finding the switch still off says the trip did not take. Like every other
+/// row's feedback, it stands until the thing it asks for is done, and only on
+/// the channel that was opened — the rest were never asked about.
+@visibleForTesting
+String? urgentUnchangedHint(String? channel, UrgentNotificationStatus? status) {
+  if (channel == null || status == null) return null;
+  final unchanged = status.channels.any(
+    (each) =>
+        each.channelId == channel &&
+        each.state != UrgentNotificationChannelState.bypasses,
+  );
+  return unchanged ? channel : null;
+}
+
+/// The Android urgent-channel rows: one expandable section, one row per
+/// channel the system actually has.
+///
+/// Public only so its per-channel states can be tested; the checklist is its
+/// one real host.
+@visibleForTesting
+class UrgentNotificationSection extends StatelessWidget {
+  const UrgentNotificationSection({
     required this.status,
     required this.title,
     required this.description,
