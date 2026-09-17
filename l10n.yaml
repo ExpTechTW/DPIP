@@ -13,3 +13,7 @@ output-dir: lib/l10n/gen
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 nullable-getter: false
+# Keeps the generated localizations out of test coverage: thousands of getters
+# that a string test either reaches or does not would move the total whenever a
+# translation is added. `flutter test` honours the comment (see build.yaml).
+header: "// coverage:ignore-file"
