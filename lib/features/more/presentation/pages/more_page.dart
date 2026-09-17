@@ -321,6 +321,18 @@ class MorePage extends StatelessWidget {
                   host: 'twds.com.tw',
                   url: 'https://www.twds.com.tw/',
                 ),
+                _MoreLinkTile(
+                  icon: Icons.public_outlined,
+                  title: l10n.morePartnerThinktron,
+                  host: 'thinktronltd.com',
+                  url: 'https://www.thinktronltd.com/',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.memory_outlined,
+                  title: l10n.morePartnerJimsun,
+                  host: 'jimsun-embedded.blogspot.com',
+                  url: 'https://jimsun-embedded.blogspot.com/?m=1',
+                ),
               ],
             ),
             SectionHeader(l10n.moreSectionAbout),

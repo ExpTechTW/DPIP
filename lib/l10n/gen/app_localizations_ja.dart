@@ -929,6 +929,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get morePartnerTwds => 'TWDS';
 
   @override
+  String get morePartnerThinktron => 'Thinktron';
+
+  @override
+  String get morePartnerJimsun => 'Jimsun Embedded';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       '震度は 0–7 のみ。5弱／5強／6弱／6強の区分はありません。';
 

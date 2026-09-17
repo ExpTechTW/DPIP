@@ -1853,6 +1853,18 @@ abstract class AppLocalizations {
   /// **'TWDS'**
   String get morePartnerTwds;
 
+  /// No description provided for @morePartnerThinktron.
+  ///
+  /// In en, this message translates to:
+  /// **'Thinktron'**
+  String get morePartnerThinktron;
+
+  /// No description provided for @morePartnerJimsun.
+  ///
+  /// In en, this message translates to:
+  /// **'Jimsun Embedded'**
+  String get morePartnerJimsun;
+
   /// No description provided for @reportFilterIntensityInfoLegacyBody.
   ///
   /// In en, this message translates to:

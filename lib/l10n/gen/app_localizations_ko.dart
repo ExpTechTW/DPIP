@@ -929,6 +929,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get morePartnerTwds => 'TWDS';
 
   @override
+  String get morePartnerThinktron => 'Thinktron';
+
+  @override
+  String get morePartnerJimsun => 'Jimsun Embedded';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       '진도는 0–7만 있으며 5약/5강/6약/6강 구분이 없습니다.';
 

@@ -923,6 +923,12 @@ class AppLocalizationsYue extends AppLocalizations {
   String get morePartnerTwds => '台灣數位串流有限公司';
 
   @override
+  String get morePartnerThinktron => '興創知能股份有限公司';
+
+  @override
+  String get morePartnerJimsun => '阿良的嵌入式系統技術學習區';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody => '震度僅 0–7，冇 5弱／5強／6弱／6強。';
 
   @override

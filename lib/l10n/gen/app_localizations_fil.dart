@@ -952,6 +952,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get morePartnerTwds => 'TWDS';
 
   @override
+  String get morePartnerThinktron => 'Thinktron';
+
+  @override
+  String get morePartnerJimsun => 'Jimsun Embedded';
+
+  @override
   String get reportFilterIntensityInfoLegacyBody =>
       'Antas 0–7 lang; walang 5−/5+/6−/6+.';
 

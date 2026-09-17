@@ -176,6 +176,8 @@ tool/dev/build.sh ios        # iOS（不含簽章）
 |---|---|
 | [<img alt="巨科資訊有限公司" height="28" src="https://github.com/user-attachments/assets/34875ff1-ace2-4e92-ac32-d98e5717b62e">](https://www.geoscience.com.tw/) | [巨科資訊有限公司](https://www.geoscience.com.tw/) 提供開發與測試所需的設備 |
 | [<img alt="台灣數位串流有限公司" height="28" src="https://branding.twds.com.tw/assets/twds_text_standard.svg">](https://www.twds.com.tw/) | [台灣數位串流有限公司](https://www.twds.com.tw/) 提供雲端運算資源、網路頻寬與技術諮詢 |
+| [<img alt="興創知能股份有限公司" height="28" src="https://www.thinktronltd.com/wp-content/uploads/2024/05/cropped-%E8%88%88%E5%89%B5%E7%9F%A5%E8%83%BD%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8logo2023-1-scaled-768x256.png">](https://www.thinktronltd.com/) | [興創知能股份有限公司](https://www.thinktronltd.com/) 提供開發與測試所需的設備 |
+| | [阿良的嵌入式系統技術學習區](https://jimsun-embedded.blogspot.com/?m=1) 提供開發與測試所需的設備 |
 
 ## 授權
 
