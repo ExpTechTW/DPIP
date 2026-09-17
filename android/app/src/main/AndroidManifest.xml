@@ -87,11 +87,20 @@
         <meta-data
             android:name="com.exptech.dpip.default_notification_icon"
             android:resource="@drawable/ic_stat_name"/>
+        <!-- No android:taskAffinity="" on purpose. The Flutter project template
+             adds it against task hijacking (StrandHogg), which Android 11+ already
+             prevents and which it only partly stops on Android 8 to 10. What it
+             cost here was real on every version: an empty affinity is null, and
+             Recents only drops a stale task when the new one shares its affinity
+             or its exact launch intent (RecentTasks.findRemoveIndexForAddTask).
+             A notification tap launches with awesome's SELECT_NOTIFICATION action,
+             never the launcher's MAIN, so once the old task had no live activity,
+             tapping an alert left two DPIP cards in Recents. The default affinity
+             (the package name) lets the system replace the stale one. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
