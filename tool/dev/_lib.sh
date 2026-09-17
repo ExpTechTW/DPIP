@@ -136,6 +136,19 @@ cache_key() {
     shasum -a 256 | cut -d' ' -f1
 }
 
+# What each cached step reads. Anything a step's result depends on has to be in
+# its list, or the cache will happily hand back an answer about a file that has
+# since changed — the one failure mode of a cache like this, and a silent one.
+#
+# Here rather than in tool/check.sh because two scripts key on them: the gate,
+# and tool/dev/coverage.sh. Two copies of this list would be two lists by the
+# next edit.
+CODE_INPUTS=(
+  lib test tool
+  pubspec.yaml pubspec.lock analysis_options.yaml l10n.yaml build.yaml
+)
+TEST_INPUTS=("${CODE_INPUTS[@]}" assets shaders)
+
 # cached <name> <key> <command...>
 #
 # `DPIP_NO_CACHE=1` forces a run — for when you suspect the cache itself, which

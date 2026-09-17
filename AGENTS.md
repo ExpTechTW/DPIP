@@ -47,6 +47,7 @@ tool/dev/analyze.sh
 |---|---|
 | Start the app | `tool/run.sh` (see [Running](#running)) |
 | Run the tests | `tool/dev/test.sh` |
+| Test coverage, into `coverage/` | `tool/dev/coverage.sh` (see [Coverage](#coverage)) |
 | Format + analyze | `tool/dev/analyze.sh` |
 | Reformat in place | `tool/dev/format.sh` |
 | Resolve dependencies | `tool/dev/deps.sh` (`--offline` when pub.dev stalls) |
@@ -124,6 +125,35 @@ a target Dart file and fails with `Target file "ios" not found`.
   ```sh
   open "$(xcode-select -p)/../Applications/DeviceHub.app"
   ```
+
+## Coverage
+
+```sh
+tool/dev/coverage.sh
+```
+
+It runs the test suite with coverage and writes `coverage/lcov.info`, plus
+`coverage/html/` where `genhtml` is installed (`brew install lcov`). Every
+library in `lib/` is counted, including the ones no test imports; leaving those
+out used to make the total read higher than the truth.
+
+Generated code is left out by the standard `// coverage:ignore-file` comment,
+which `flutter test` itself honours, so every way of measuring leaves out the
+same files. freezed writes it, `build.yaml` has source_gen add it to every
+`.g.dart`, and `l10n.yaml` has gen-l10n add it to the localizations.
+`test/tool/generated_code_coverage_test.dart` fails when a generated file comes
+out without it.
+
+Nobody has to remember to run it:
+
+- **`tool/check.sh`** runs it too, because it is what CI runs.
+
+**In VS Code**, the Dart extension runs it from the Testing view: **Run Tests
+with Coverage** puts a bar on every folder and file under Test Coverage, a
+percentage beside each file in the Explorer, and the lines that ran in the
+editor. That is the extension's own run, so its numbers are close to this
+script's rather than equal to them: it leaves out the libraries no test imports,
+and it also counts the lines its branch data names.
 
 ## Commits
 
