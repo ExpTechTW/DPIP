@@ -12,13 +12,16 @@
 		10D4BCAF9E098BDA400160FB /* Sounds/tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		17BD5D769AA990E7EE681203 /* Sounds/eew_alert.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */; };
+		270FCEA5305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */; };
+		270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */; };
 		2715FCD830570C1C0014DC8A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2715FCD730570C1C0014DC8A /* WidgetKit.framework */; };
 		2715FCDA30570C1C0014DC8A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2715FCD930570C1C0014DC8A /* SwiftUI.framework */; };
 		2715FCE530570C1D0014DC8A /* DPIPWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		27CACBA3305BD77F0046F79C /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27CACBA2305BD77F0046F79C /* Intents.framework */; };
+		27CACBAA305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */; };
+		27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
-		D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */; };
-		D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */; };
-		D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		522508B9301F863A006148C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 522508B7301F863A006148C2 /* InfoPlist.strings */; };
 		72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */; };
@@ -41,6 +44,9 @@
 		CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */; };
 		CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000D002 /* StorageScanPlugin.swift */; };
 		CAC4EF00000000000000E101 /* WidgetSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */; };
+		D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */; };
+		D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */; };
+		D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */; };
 		DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */; };
 		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
 		E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* Sounds/weather.aiff */; };
@@ -54,6 +60,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2715FCD430570C1C0014DC8A;
 			remoteInfo = DPIPWidgetsExtension;
+		};
+		27CACBA8305BD77F0046F79C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 27CACBA0305BD77F0046F79C;
+			remoteInfo = DPIPWidgetIntentsExtension;
 		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -71,6 +84,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				27CACBAA305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex in Embed Foundation Extensions */,
 				2715FCE530570C1D0014DC8A /* DPIPWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -91,15 +105,18 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherSnapshotAddressTests.swift; sourceTree = "<group>"; };
+		270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotFileTests.swift; sourceTree = "<group>"; };
 		2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DPIPWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2715FCD730570C1C0014DC8A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		2715FCD930570C1C0014DC8A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		272EFB373057247600B78F5D /* DPIPWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DPIPWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DPIPWidgetIntentsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		27CACBA2305BD77F0046F79C /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
+		27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetLocationIntentTests.swift; sourceTree = "<group>"; };
+		27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetLocationCatalogTests.swift; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetTests.swift; sourceTree = "<group>"; };
-		D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshot.swift; path = ../DPIPWidgets/CurrentWeatherWidgetSnapshot.swift; sourceTree = "<group>"; };
-		D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetTimeline.swift; path = ../DPIPWidgets/CurrentWeatherWidgetTimeline.swift; sourceTree = "<group>"; };
 		3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/warn.aiff; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eew_alert.aiff; sourceTree = "<group>"; };
@@ -137,12 +154,36 @@
 		CAC4EF00000000000000D002 /* StorageScanPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageScanPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotPlugin.swift; sourceTree = "<group>"; };
 		CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/tsunami.aiff; sourceTree = "<group>"; };
+		D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetTests.swift; sourceTree = "<group>"; };
+		D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshot.swift; path = ../DPIPWidgets/CurrentWeatherWidgetSnapshot.swift; sourceTree = "<group>"; };
+		D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetTimeline.swift; path = ../DPIPWidgets/CurrentWeatherWidgetTimeline.swift; sourceTree = "<group>"; };
 		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		270FCEA1305CD07F003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CurrentWeatherSnapshotAddress.swift,
+			);
+			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
+		};
+		270FCEA3305CD1DD003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CurrentWeatherSnapshotAddress.swift,
+			);
+			target = 97C146ED1CF9000F007C117D /* Runner */;
+		};
+		270FCEA6305CD2D6003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CurrentWeatherSnapshotAddress.swift,
+			);
+			target = 331C8080294A63A400263BE5 /* RunnerTests */;
+		};
 		2715FCEA30570C1D0014DC8A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -150,10 +191,50 @@
 			);
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 		};
+		27CACB9C305BD2A60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WeatherWidgetConfiguration.intentdefinition,
+				WeatherWidgetConfiguration.intentdefinition.xcstrings,
+			);
+			target = 97C146ED1CF9000F007C117D /* Runner */;
+		};
+		27CACBAF305BD77F0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
+		};
+		27CACBB1305BD7E60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WeatherWidgetConfiguration.intentdefinition,
+				WeatherWidgetConfiguration.intentdefinition.xcstrings,
+			);
+			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
+		};
+		27CACC5E305C66560046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WidgetLocationCatalog.swift,
+				WidgetLocationOptions.swift,
+			);
+			target = 331C8080294A63A400263BE5 /* RunnerTests */;
+		};
+		27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WidgetLocationTarget.swift,
+			);
+			target = 331C8080294A63A400263BE5 /* RunnerTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		2715FCDB30570C1C0014DC8A /* DPIPWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2715FCEA30570C1D0014DC8A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgets; sourceTree = "<group>"; };
+		270FCE9B305CD066003D1E62 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (270FCEA1305CD07F003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 270FCEA3305CD1DD003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 270FCEA6305CD2D6003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		2715FCDB30570C1C0014DC8A /* DPIPWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2715FCEA30570C1D0014DC8A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACB9C305BD2A60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACBB1305BD7E60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgets; sourceTree = "<group>"; };
+		27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (27CACC5E305C66560046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACBAF305BD77F0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgetIntentsExtension; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +244,14 @@
 			files = (
 				2715FCDA30570C1C0014DC8A /* SwiftUI.framework in Frameworks */,
 				2715FCD830570C1C0014DC8A /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		27CACB9E305BD77F0046F79C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27CACBA3305BD77F0046F79C /* Intents.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,6 +278,7 @@
 			children = (
 				2715FCD730570C1C0014DC8A /* WidgetKit.framework */,
 				2715FCD930570C1C0014DC8A /* SwiftUI.framework */,
+				27CACBA2305BD77F0046F79C /* Intents.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -200,6 +290,10 @@
 				D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */,
 				D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */,
 				D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */,
+				27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */,
+				27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */,
+				270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */,
+				270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -219,10 +313,12 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				270FCE9B305CD066003D1E62 /* Shared */,
 				272EFB373057247600B78F5D /* DPIPWidgetsExtension.entitlements */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				2715FCDB30570C1C0014DC8A /* DPIPWidgets */,
+				27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */,
 				2715FCD630570C1C0014DC8A /* Frameworks */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
@@ -235,6 +331,7 @@
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */,
+				27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -303,6 +400,29 @@
 			productReference = 2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27CACBAB305BD77F0046F79C /* Build configuration list for PBXNativeTarget "DPIPWidgetIntentsExtension" */;
+			buildPhases = (
+				27CACB9D305BD77F0046F79C /* Sources */,
+				27CACB9E305BD77F0046F79C /* Frameworks */,
+				27CACB9F305BD77F0046F79C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				270FCE9B305CD066003D1E62 /* Shared */,
+				27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */,
+			);
+			name = DPIPWidgetIntentsExtension;
+			packageProductDependencies = (
+			);
+			productName = DPIPWidgetIntentsExtension;
+			productReference = 27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		331C8080294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -337,6 +457,7 @@
 			);
 			dependencies = (
 				2715FCE430570C1D0014DC8A /* PBXTargetDependency */,
+				27CACBA9305BD77F0046F79C /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -358,6 +479,9 @@
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					2715FCD430570C1C0014DC8A = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					27CACBA0305BD77F0046F79C = {
 						CreatedOnToolsVersion = 26.6;
 					};
 					331C8080294A63A400263BE5 = {
@@ -393,12 +517,20 @@
 				2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */,
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2715FCD330570C1C0014DC8A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		27CACB9F305BD77F0046F79C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -479,13 +611,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		27CACB9D305BD77F0046F79C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807D294A63A400263BE5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				270FCEA5305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 				D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */,
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
+				27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */,
+				270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */,
+				27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */,
 				D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -518,6 +661,11 @@
 			isa = PBXTargetDependency;
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 			targetProxy = 2715FCE330570C1D0014DC8A /* PBXContainerItemProxy */;
+		};
+		27CACBA9305BD77F0046F79C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
+			targetProxy = 27CACBA8305BD77F0046F79C /* PBXContainerItemProxy */;
 		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -767,6 +915,132 @@
 			};
 			name = Profile;
 		};
+		27CACBAC305BD77F0046F79C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = DPIPWidgetIntentsExtension/DPIPWidgetIntentsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = 98Q7JARYZF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DPIPWidgetIntentsExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DPIPWidgetIntentsExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.dpip.DPIPWidgetIntentsExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		27CACBAD305BD77F0046F79C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = DPIPWidgetIntentsExtension/DPIPWidgetIntentsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = 98Q7JARYZF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DPIPWidgetIntentsExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DPIPWidgetIntentsExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.dpip.DPIPWidgetIntentsExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		27CACBAE305BD77F0046F79C /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = DPIPWidgetIntentsExtension/DPIPWidgetIntentsExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = 98Q7JARYZF;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DPIPWidgetIntentsExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = DPIPWidgetIntentsExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.dpip.DPIPWidgetIntentsExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 		331C8088294A63A400263BE5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -985,6 +1259,16 @@
 				2715FCE730570C1D0014DC8A /* Debug */,
 				2715FCE830570C1D0014DC8A /* Release */,
 				2715FCE930570C1D0014DC8A /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		27CACBAB305BD77F0046F79C /* Build configuration list for PBXNativeTarget "DPIPWidgetIntentsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				27CACBAC305BD77F0046F79C /* Debug */,
+				27CACBAD305BD77F0046F79C /* Release */,
+				27CACBAE305BD77F0046F79C /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

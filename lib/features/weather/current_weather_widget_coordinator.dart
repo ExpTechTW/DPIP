@@ -1,5 +1,6 @@
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/weather/solar_time.dart';
 import 'package:dpip/features/weather/data/current_weather_widget_publisher.dart';
@@ -96,7 +97,18 @@ final class CurrentWeatherWidgetCoordinator
       longitude: town.lng,
     );
 
+    final sourceIdentifier = switch (_regions.selected) {
+      CurrentArea(:final code) when code == regionCode => 'current-location',
+      SavedArea(:final code) when code == regionCode => 'region:$code',
+      _ => null,
+    };
+
+    if (sourceIdentifier == null) {
+      return;
+    }
+
     final snapshot = createCurrentWeatherWidgetSnapshot(
+      sourceIdentifier: sourceIdentifier,
       regionCode: regionCode,
       regionName: town.townName,
       weather: weather,

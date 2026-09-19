@@ -2,6 +2,85 @@ import Foundation
 import XCTest
 
 final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
+    func testDecodesSchemaVersionFiveSnapshot() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 5,
+              "sourceIdentifier": "region:220",
+              "regionCode": "220",
+              "regionName": "板橋區",
+              "observationTime": 1789567200,
+              "stationName": "板橋",
+              "weather": "晴",
+              "weatherCode": 100,
+              "condition": "clear",
+              "isNight": false,
+              "nextDayNightTransitionTime": 1789562700,
+              "calibratedTimeOffsetMilliseconds": 0,
+              "temperature": 28.5,
+              "humidity": 70,
+              "rain": 0.0
+            }
+            """
+        )
+
+        XCTAssertEqual(snapshot.schemaVersion, 5)
+        XCTAssertEqual(snapshot.sourceIdentifier, "region:220")
+        XCTAssertEqual(snapshot.regionCode, "220")
+    }
+
+    func testSchemaVersionFiveRequiresSourceIdentifier() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "schemaVersion": 5,
+                  "regionCode": "220",
+                  "regionName": "板橋區",
+                  "observationTime": 1789567200,
+                  "stationName": "板橋",
+                  "weather": "晴",
+                  "weatherCode": 100,
+                  "condition": "clear",
+                  "isNight": false,
+                  "nextDayNightTransitionTime": 1789562700,
+                  "calibratedTimeOffsetMilliseconds": 0,
+                  "temperature": null,
+                  "humidity": null,
+                  "rain": null
+                }
+                """
+            )
+        )
+    }
+
+    func testRejectsUnsupportedSchemaVersion() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "schemaVersion": 6,
+                  "sourceIdentifier": "region:220",
+                  "regionCode": "220",
+                  "regionName": "板橋區",
+                  "observationTime": 1789567200,
+                  "stationName": "板橋",
+                  "weather": "晴",
+                  "weatherCode": 100,
+                  "condition": "clear",
+                  "isNight": false,
+                  "nextDayNightTransitionTime": 1789562700,
+                  "calibratedTimeOffsetMilliseconds": 0,
+                  "temperature": null,
+                  "humidity": null,
+                  "rain": null
+                }
+                """
+            )
+        )
+    }
+
     func testDecodesSchemaVersionFourSnapshot() throws {
         let snapshot = try decode(
             """
@@ -25,6 +104,7 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         )
 
         XCTAssertEqual(snapshot.schemaVersion, 4)
+        XCTAssertNil(snapshot.sourceIdentifier)
         XCTAssertEqual(snapshot.regionCode, "660")
         XCTAssertEqual(snapshot.regionName, "西屯區")
         XCTAssertEqual(snapshot.observationTime, 1_789_567_200)

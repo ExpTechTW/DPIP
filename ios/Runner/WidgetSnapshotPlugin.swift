@@ -69,13 +69,32 @@ enum WidgetSnapshotFile {
     return data
   }
 
-  static func replace(_ data: Data, kind: WidgetSnapshotKind, in container: URL) throws {
-    let directory = container.appendingPathComponent("WidgetSnapshots", isDirectory: true)
+  static func replace(
+    _ data: Data,
+    kind: WidgetSnapshotKind,
+    sourceIdentifier: String? = nil,
+    in container: URL
+  ) throws {
+    let destination: URL
+
     do {
-      try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-      // Foundation stages the complete bytes in this directory and renames the
-      // temporary file over the destination. Readers see an old or new inode.
-      try data.write(to: directory.appendingPathComponent(kind.filename), options: .atomic)
+      destination = try snapshotURL(
+        kind: kind,
+        sourceIdentifier: sourceIdentifier,
+        in: container
+      )
+
+      try FileManager.default.createDirectory(
+        at: destination.deletingLastPathComponent(),
+        withIntermediateDirectories: true
+      )
+
+      try data.write(
+        to: destination,
+        options: .atomic
+      )
+    } catch let error as WidgetSnapshotError {
+      throw error
     } catch {
       throw WidgetSnapshotError.writeFailed
     }
@@ -90,6 +109,46 @@ enum WidgetSnapshotFile {
       // Clearing an absent snapshot is intentionally idempotent.
     } catch {
       throw WidgetSnapshotError.writeFailed
+    }
+  }
+
+  static func snapshotURL(
+    kind: WidgetSnapshotKind,
+    sourceIdentifier: String?,
+    in container: URL
+  ) throws -> URL {
+    let directory = container.appendingPathComponent(
+      "WidgetSnapshots",
+      isDirectory: true
+    )
+
+    switch kind {
+    case .currentWeather:
+      guard
+        let sourceIdentifier,
+        let address = CurrentWeatherSnapshotAddress(
+          sourceIdentifier: sourceIdentifier
+        )
+      else {
+        throw WidgetSnapshotError.invalidPayload
+      }
+
+      return directory
+        .appendingPathComponent(
+          "current-weather",
+          isDirectory: true
+        )
+        .appendingPathComponent(address.filename)
+
+    case .weatherForecast:
+      return directory.appendingPathComponent(
+        kind.filename
+      )
+
+    case .locationCatalog:
+      return directory.appendingPathComponent(
+        kind.filename
+      )
     }
   }
 }
@@ -124,6 +183,8 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
       return
     }
 
+    let sourceIdentifier = arguments["sourceIdentifier"] as? String
+
     let kind: WidgetSnapshotKind
     let data: Data
     do {
@@ -148,11 +209,18 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
       }
 
       do {
-        try WidgetSnapshotFile.replace(data, kind: kind, in: container)
-          if let widgetKind = kind.widgetKind {
-            WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
-          };
-          DispatchQueue.main.async { result(nil) }
+        try WidgetSnapshotFile.replace(
+          data,
+          kind: kind,
+          sourceIdentifier: sourceIdentifier,
+          in: container
+        )
+        if let widgetKind = kind.widgetKind {
+          WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
+        }
+        DispatchQueue.main.async { result(nil) }
+      } catch let error as WidgetSnapshotError {
+        DispatchQueue.main.async { result(self.flutterError(error)) }
       } catch {
         DispatchQueue.main.async { result(self.flutterError(.writeFailed)) }
       }
@@ -189,9 +257,9 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
 
       do {
         try WidgetSnapshotFile.clear(kind, in: container)
-          if let widgetKind = kind.widgetKind {
-            WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
-          }
+        if let widgetKind = kind.widgetKind {
+          WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
+        }
         DispatchQueue.main.async { result(nil) }
       } catch {
         DispatchQueue.main.async { result(self.flutterError(.writeFailed)) }
