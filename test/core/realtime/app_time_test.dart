@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -41,6 +42,12 @@ class _ControlledSource implements ServerTimeSource {
 void main() {
   final device = DateTime.utc(2026, 1, 1, 0, 0, 0);
 
+  test('sync before clock installation is a no-op', () async {
+    await AppTime.sync();
+
+    expect(AppTime.isSynced, isFalse);
+  });
+
   test('exposes calibrated time and calibrated-minus-device offset', () async {
     final clock = ServerClock(
       _FakeClock(device),
@@ -56,6 +63,10 @@ void main() {
     expect(AppTime.utc, device.add(const Duration(seconds: 5)));
     expect(AppTime.calibratedTimeOffset, const Duration(seconds: 5));
     expect(AppTime.utc8, device.add(const Duration(hours: 8, seconds: 5)));
+    expect(
+      AppTime.fromDevice(device.subtract(const Duration(minutes: 1))),
+      device.subtract(const Duration(seconds: 55)),
+    );
     // UTC+8 wall-clock fields (Taipei), independent of the device timezone.
     expect(AppTime.utc8.hour, 8);
   });
@@ -78,5 +89,38 @@ void main() {
 
     expect(AppTime.isSynced, isTrue);
     expect(AppTime.calibratedTimeOffset, const Duration(seconds: 5));
+
+    final next = AppTime.sync();
+
+    expect(source.requests, hasLength(2));
+    source.requests.last.complete(
+      Ok(device.add(const Duration(seconds: 7)).millisecondsSinceEpoch),
+    );
+    await next;
+
+    expect(AppTime.calibratedTimeOffset, const Duration(seconds: 7));
+  });
+
+  test('allows retry after a failed sync attempt', () async {
+    final source = _ControlledSource();
+    final clock = ServerClock(_FakeClock(device), _FakeElapsed(), source);
+    AppTime.install(clock);
+
+    final failed = AppTime.sync();
+    source.requests.single.complete(const Err(NetworkFailure('offline')));
+    await failed;
+
+    expect(AppTime.isSynced, isFalse);
+
+    final retry = AppTime.sync();
+
+    expect(source.requests, hasLength(2));
+    source.requests.last.complete(
+      Ok(device.add(const Duration(seconds: 9)).millisecondsSinceEpoch),
+    );
+    await retry;
+
+    expect(AppTime.isSynced, isTrue);
+    expect(AppTime.calibratedTimeOffset, const Duration(seconds: 9));
   });
 }
