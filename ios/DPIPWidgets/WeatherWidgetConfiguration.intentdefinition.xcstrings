@@ -1,0 +1,91 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "2S3UQT" : {
+      "comment" : "Introduction shown when multiple locations match a configuration choice.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There are ${count} options matching ‘${location}’."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有 ${count} 個符合「${location}」的選項。"
+          }
+        }
+      }
+    },
+    "DaIeN6" : {
+      "comment" : "Title of the location parameter in weather widget configuration.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地點"
+          }
+        }
+      }
+    },
+    "DOe8sM" : {
+      "comment" : "Confirmation shown for a selected widget location.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Just to confirm, you wanted ‘${location}’?"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "確認一下，你要的是「${location}」嗎？"
+          }
+        }
+      }
+    },
+    "aDbkHe" : {
+      "comment" : "Title of the weather widget configuration intent.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weather Widget Configuration"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "天氣小工具設定"
+          }
+        }
+      }
+    },
+    "waoyke" : {
+      "comment" : "Display name of a saved widget location.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget Location"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小工具地點"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
