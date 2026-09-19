@@ -42,10 +42,12 @@ void main() {
     expect(syncCallCount, 0);
     expect(writer.writeCallCount, 1);
     expect(writer.writtenKind, WidgetSnapshotKind.currentWeather);
+    expect(writer.writtenSourceIdentifier, 'region:660');
 
     final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 4);
+    expect(decoded['schemaVersion'], 5);
+    expect(decoded['sourceIdentifier'], 'region:660');
     expect(decoded['regionCode'], '660');
     expect(decoded['regionName'], '西屯區');
     expect(decoded['stationName'], '西屯');
@@ -230,6 +232,7 @@ final class _FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
   int writeCallCount = 0;
   WidgetSnapshotKind? writtenKind;
   String? writtenJson;
+  String? writtenSourceIdentifier;
   int clearCallCount = 0;
   WidgetSnapshotKind? clearedKind;
 
@@ -244,11 +247,13 @@ final class _FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
   Future<Result<void>> write({
     required WidgetSnapshotKind kind,
     required String json,
+    String? sourceIdentifier,
   }) async {
     called = true;
     writeCallCount += 1;
     writtenKind = kind;
     writtenJson = json;
+    writtenSourceIdentifier = sourceIdentifier;
 
     return const Ok(null);
   }

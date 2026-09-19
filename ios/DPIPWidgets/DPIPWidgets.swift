@@ -1,9 +1,23 @@
 import WidgetKit
 import SwiftUI
+import Intents
 
-struct DPIPWidgetProvider: TimelineProvider {
+struct DPIPWidgetProvider: IntentTimelineProvider {
+    typealias Intent = WeatherWidgetConfigurationIntent
     private let staleAfter: TimeInterval = 30 * 60
     private let snapshotStore = WidgetSnapshotStore()
+
+    private func snapshot(
+        for configuration: WeatherWidgetConfigurationIntent
+    ) -> CurrentWeatherWidgetSnapshot? {
+        let target = WidgetLocationTarget(
+            identifier: configuration.location?.identifier
+        )
+
+        return snapshotStore.loadCurrentWeatherSnapshot(
+            for: target
+        )
+    }
 
     func placeholder(in context: Context) -> DPIPWidgetEntry {
         DPIPWidgetEntry(
@@ -15,11 +29,13 @@ struct DPIPWidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(
+        for configuration: WeatherWidgetConfigurationIntent,
         in context: Context,
         completion: @escaping (DPIPWidgetEntry) -> Void
     ) {
-        let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
+        let snapshot = snapshot(for: configuration)
         let deviceNow = Date.now
+
         let state = CurrentWeatherWidgetTimeline.state(
             snapshot: snapshot,
             at: deviceNow,
@@ -37,11 +53,13 @@ struct DPIPWidgetProvider: TimelineProvider {
     }
 
     func getTimeline(
+        for configuration: WeatherWidgetConfigurationIntent,
         in context: Context,
         completion: @escaping (Timeline<DPIPWidgetEntry>) -> Void
     ) {
         let deviceNow = Date()
-        let snapshot = snapshotStore.loadCurrentWeatherSnapshot()
+        let snapshot = snapshot(for: configuration)
+
         let entries = CurrentWeatherWidgetTimeline.states(
             snapshot: snapshot,
             deviceNow: deviceNow,
@@ -184,7 +202,11 @@ struct DPIPWidgets: Widget {
     let kind: String = "DPIPWidgets"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: DPIPWidgetProvider()) { entry in
+        IntentConfiguration(
+            kind: kind,
+            intent: WeatherWidgetConfigurationIntent.self,
+            provider: DPIPWidgetProvider()
+        ) { entry in
             if #available(iOS 17.0, *) {
                 DPIPWidgetsEntryView(entry: entry)
                     .widgetURL(URL(string: "dpip:///home"))
@@ -206,7 +228,8 @@ struct DPIPWidgets_Previews: PreviewProvider {
     private static let previewEntry = DPIPWidgetEntry(
         date: .now,
         snapshot: CurrentWeatherWidgetSnapshot(
-            schemaVersion: 4,
+            schemaVersion: 5,
+            sourceIdentifier: "current-location",
             regionCode: "660",
             regionName: "西屯區",
             observationTime: 0,
@@ -220,7 +243,9 @@ struct DPIPWidgets_Previews: PreviewProvider {
             temperature: 28.4,
             humidity: 76,
             rain: 0
-        ),isStale: true, isNight: true
+        ),
+        isStale: true,
+        isNight: true
     )
 
     static var previews: some View {

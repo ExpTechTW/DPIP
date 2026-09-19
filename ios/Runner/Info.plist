@@ -2,19 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>DPIPWidgetAppGroupIdentifier</key>
-	<string>group.com.exptech.dpip.dpip.widgets</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>DPIP 需要在背景持續存取你的位置，即使關閉 App 也能為你所在地推送地震、天氣等災害警報。</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>DPIP 需要藍牙以連線 Meshtastic LoRa 無線電，在通訊中斷時收發緊急訊息。</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -35,27 +22,41 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.exptech.dpip.dpip</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>dpip</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLName</key>
-            <string>com.exptech.dpip.dpip</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>dpip</string>
-            </array>
-        </dict>
-    </array>
+	<key>DPIPWidgetAppGroupIdentifier</key>
+	<string>group.com.exptech.dpip.dpip.widgets</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>UIBackgroundModes</key>
+	<key>MLNIdeographicFontFamilyName</key>
+	<string>PingFang TC</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>DPIP 需要藍牙以連線 Meshtastic LoRa 無線電，在通訊中斷時收發緊急訊息。</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>DPIP 需要在背景持續存取你的位置，即使關閉 App 也能為你所在地推送地震、天氣等災害警報。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。</string>
+	<key>NSUserActivityTypes</key>
 	<array>
-		<string>remote-notification</string>
-		<string>location</string>
+		<string>WeatherWidgetConfigurationIntent</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
@@ -80,6 +81,11 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>location</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -97,7 +103,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>MLNIdeographicFontFamilyName</key>
-	<string>PingFang TC</string>
 </dict>
 </plist>
