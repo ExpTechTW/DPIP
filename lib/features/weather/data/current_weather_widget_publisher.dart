@@ -12,7 +12,11 @@ final class CurrentWeatherWidgetPublisher {
   Future<Result<void>> publish(CurrentWeatherWidgetSnapshot snapshot) {
     final json = jsonEncode(snapshot.toJson());
 
-    return _writer.write(kind: WidgetSnapshotKind.currentWeather, json: json);
+    return _writer.write(
+      kind: WidgetSnapshotKind.currentWeather,
+      json: json,
+      sourceIdentifier: snapshot.sourceIdentifier,
+    );
   }
 
   Future<Result<void>> clear() {
