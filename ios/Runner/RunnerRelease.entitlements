@@ -16,5 +16,9 @@
 	     and provisioning profile must both carry it or signing fails outright. -->
 	<key>com.apple.developer.usernotifications.critical-alerts</key>
 	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.exptech.dpip.dpip.widgets</string>
+	</array>
 </dict>
 </plist>

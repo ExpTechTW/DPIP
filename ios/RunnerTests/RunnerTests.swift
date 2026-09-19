@@ -1,12 +1,63 @@
-import Flutter
-import UIKit
+import Foundation
 import XCTest
+@testable import Runner
 
-class RunnerTests: XCTestCase {
-
-  func testExample() {
-    // If you add code to the Runner application, consider adding tests here.
-    // See https://developer.apple.com/documentation/xctest for more information about using XCTest.
+final class RunnerTests: XCTestCase {
+  func testSnapshotKindAllowlist() throws {
+    let kind = try WidgetSnapshotFile.kind("weatherForecast")
+    XCTAssertEqual(kind.filename, "weather-forecast.json")
+    XCTAssertEqual(kind.rawValue, "weatherForecast")
+    let currentWeather = try WidgetSnapshotFile.kind("currentWeather")
+    XCTAssertEqual(currentWeather.filename, "current-weather.json")
+    XCTAssertEqual(currentWeather.rawValue, "currentWeather")
+    XCTAssertThrowsError(try WidgetSnapshotFile.kind("../other.json")) { error in
+      XCTAssertEqual(error as? WidgetSnapshotError, .invalidKind)
+    }
   }
 
+  func testPayloadValidationAndSizeLimit() throws {
+    XCTAssertEqual(try WidgetSnapshotFile.payload("{\"schemaVersion\":1}"), Data("{\"schemaVersion\":1}".utf8))
+    XCTAssertThrowsError(try WidgetSnapshotFile.payload("{")) { error in
+      XCTAssertEqual(error as? WidgetSnapshotError, .invalidPayload)
+    }
+    XCTAssertThrowsError(try WidgetSnapshotFile.payload("[]")) { error in
+      XCTAssertEqual(error as? WidgetSnapshotError, .invalidPayload)
+    }
+    let oversized = "{\"data\":\"\(String(repeating: "a", count: WidgetSnapshotFile.maximumPayloadBytes))\"}"
+    XCTAssertThrowsError(try WidgetSnapshotFile.payload(oversized)) { error in
+      XCTAssertEqual(error as? WidgetSnapshotError, .invalidPayload)
+    }
+  }
+
+  func testAtomicSnapshotReplacement() throws {
+    let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: container) }
+    let kind = try WidgetSnapshotFile.kind("weatherForecast")
+    let first = try WidgetSnapshotFile.payload("{\"schemaVersion\":1,\"value\":\"old\"}")
+    let second = try WidgetSnapshotFile.payload("{\"schemaVersion\":1,\"value\":\"new\"}")
+    let target = container.appendingPathComponent("WidgetSnapshots/weather-forecast.json")
+
+    try WidgetSnapshotFile.replace(first, kind: kind, in: container)
+    XCTAssertEqual(try Data(contentsOf: target), first)
+    try WidgetSnapshotFile.replace(second, kind: kind, in: container)
+    XCTAssertEqual(try Data(contentsOf: target), second)
+  }
+
+  func testSnapshotClearIsIdempotent() throws {
+    let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: container) }
+    let kind = try WidgetSnapshotFile.kind("currentWeather")
+    let data = try WidgetSnapshotFile.payload("{\"schemaVersion\":1}")
+    let target = container.appendingPathComponent("WidgetSnapshots/current-weather.json")
+
+    XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
+
+    try WidgetSnapshotFile.replace(data, kind: kind, in: container)
+    XCTAssertTrue(FileManager.default.fileExists(atPath: target.path))
+
+    try WidgetSnapshotFile.clear(kind, in: container)
+    XCTAssertFalse(FileManager.default.fileExists(atPath: target.path))
+
+    XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
+  }
 }

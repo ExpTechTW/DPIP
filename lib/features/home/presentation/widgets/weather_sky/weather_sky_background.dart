@@ -12,7 +12,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.d
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
-import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.dart';
+import 'package:dpip/core/weather/solar_time.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
