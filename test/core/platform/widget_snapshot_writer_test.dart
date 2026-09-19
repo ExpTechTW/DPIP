@@ -76,6 +76,22 @@ void main() {
     );
   });
 
+  test('unexpected write error maps to writeFailed', () async {
+    final writer = IosWidgetSnapshotWriter(
+      channel: _ThrowingMethodChannel(StateError('unexpected')),
+      isSupportedPlatform: true,
+    );
+
+    final result = await writer.write(
+      kind: WidgetSnapshotKind.weatherForecast,
+      json: '{}',
+    );
+
+    final failure = result.failureOrNull as WidgetSnapshotFailure;
+    expect(failure.reason, WidgetSnapshotFailureReason.writeFailed);
+    expect(failure.message, 'Widget snapshot could not be written.');
+  });
+
   test('clears a typed kind without exposing a file path', () async {
     final writer = IosWidgetSnapshotWriter(
       channel: channel,
@@ -117,6 +133,19 @@ void main() {
       (result.failureOrNull as WidgetSnapshotFailure).reason,
       WidgetSnapshotFailureReason.unavailable,
     );
+  });
+
+  test('unexpected clear error maps to writeFailed', () async {
+    final writer = IosWidgetSnapshotWriter(
+      channel: _ThrowingMethodChannel(StateError('unexpected')),
+      isSupportedPlatform: true,
+    );
+
+    final result = await writer.clear(kind: WidgetSnapshotKind.currentWeather);
+
+    final failure = result.failureOrNull as WidgetSnapshotFailure;
+    expect(failure.reason, WidgetSnapshotFailureReason.writeFailed);
+    expect(failure.message, 'Widget snapshot could not be cleared.');
   });
 
   for (final entry in <String, WidgetSnapshotFailureReason>{
@@ -172,4 +201,14 @@ void main() {
       );
     });
   }
+}
+
+final class _ThrowingMethodChannel extends MethodChannel {
+  const _ThrowingMethodChannel(this.error) : super('test/throwing');
+
+  final Object error;
+
+  @override
+  Future<T?> invokeMethod<T>(String method, [dynamic arguments]) =>
+      Future<T?>.error(error);
 }
