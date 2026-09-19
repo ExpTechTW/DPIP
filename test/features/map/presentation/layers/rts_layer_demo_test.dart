@@ -24,7 +24,7 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/shared/map/map_style.dart'
-    show countyFillLayerId, townFillLayerId;
+    show countyFillLayerId, landLayerId, townFillLayerId;
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -424,6 +424,67 @@ void main() {
       isTrue,
       reason: 'the box grid must still sit above the plain station dots',
     );
+  });
+
+  test('every monitor layer is appended above the township names, except the '
+      'S-wave disc anchored below the land', () async {
+    final origin = DateTime.now().toUtc().subtract(const Duration(seconds: 5));
+    final built = await _build(
+      rts: Rts(
+        time: origin.millisecondsSinceEpoch,
+        box: {'1': 4},
+        station: const {
+          'TWD001': RtsStation(
+            pga: 40,
+            pgv: 8,
+            intensityRaw: 4.0,
+            intensity: 4.0,
+            alert: true,
+          ),
+        },
+      ),
+      alerts: [_alert(origin: origin)],
+      table: table,
+      grid: grid,
+    );
+    final controller = _RecordingController();
+    await built.layer.render(controller);
+    await pumpEventQueue();
+
+    // A null anchor means `addLayer` appended at the very top of the style, so
+    // the layer lands over the base style's `town-label`. Anchoring any of
+    // these below the names again — the state this stack shipped in — puts a
+    // place name over a live reading, which is the one thing it must not do.
+    // The names are meant to end up second from the bottom of the whole map:
+    // above the estimated-shaking wash (which *is* the base style's `town`
+    // fill, recoloured in place, so it is never added here) and below
+    // everything below.
+    for (final layerId in const [
+      'rts-circle',
+      'rts-label',
+      'rts-intensity-circle',
+      'rts-box-line',
+      'rts-eew-p',
+      'rts-eew-s',
+      'rts-eew-epicenter',
+    ]) {
+      expect(
+        controller.calls.where(
+          (call) => call.startsWith('add') && call.endsWith(':$layerId'),
+        ),
+        isNotEmpty,
+        reason: '$layerId was never added, so its anchor proves nothing',
+      );
+      expect(
+        controller.belowOf(layerId),
+        isNull,
+        reason: '$layerId must be appended above the township names',
+      );
+    }
+    // The one exception, and the reason it is one: the disc washes open sea
+    // only, so it goes under the whole land/county/town area rather than over
+    // the names.
+    expect(controller.belowOf('rts-eew-s-fill'), landLayerId);
   });
 
   test(

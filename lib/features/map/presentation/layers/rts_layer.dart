@@ -6,9 +6,7 @@ library;
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/geo/town_directory.dart';
-import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
@@ -25,14 +23,9 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
 import 'package:dpip/shared/map/map_layer.dart';
-import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/map/map_style.dart'
-    show
-        MapColors,
-        countyFillLayerId,
-        landLayerId,
-        townFillLayerId,
-        townLabelLayerId;
+    show MapColors, countyFillLayerId, townFillLayerId;
+import 'package:dpip/shared/map/monitor_map_stack.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
@@ -110,8 +103,8 @@ Map<String, dynamic> eewWaveGeoJson(
 /// detection boxes (see [_pushBox]) mirror the legacy monitor and the replay
 /// page. Station dots stay circles always: while a large event's box grid is
 /// up, a shaking station gets a circular discrete-reading badge (see
-/// [_intensityCircleId]/[IntensityCircleRenderer]) drawn over its dot, but
-/// that badge is still a circle — the discrete-intensity *square* badges
+/// [MonitorLayerIds.stationBadge]/[IntensityCircleRenderer]) drawn over its
+/// dot, but that badge is still a circle — the discrete-intensity *square* badges
 /// ([IntensityIconRenderer]) are 震度速報/地震報告 artwork, a different data
 /// product from this feed's live instrumental reading, and this layer never
 /// reaches for those instead. Not tap- or timeline-driven; its "sheet" is a
@@ -197,7 +190,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// next push always lands.
   String? _boxOnMap;
 
-  /// Whether the EEW source on the map currently holds [_emptyCollection].
+  /// Whether the EEW source on the map is currently the empty collection.
   ///
   /// [_pushUpdate] ends with an unconditional [_pushEew], and the RTS feed
   /// notifies about once a second, so a **calm** feed was re-uploading the same
@@ -221,46 +214,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// per-tick round trip when a status change re-notifies without new data.
   Object? _lastSent;
 
-  static const String _sourceId = 'rts-src';
-  static const String _circleId = 'rts-circle';
-  static const String _labelId = 'rts-label';
-
-  /// Per-station discrete-reading badge — a circular version of the legacy
-  /// monitor's square `intensity` layer (see [IntensityCircleRenderer]):
-  /// while a large event's detection boxes are up, each shaking station gets
-  /// a numbered badge over its dot instead of the plain colour, but the
-  /// shape stays a circle — this is still live instrumental data, never the
-  /// report/rapid-report square. `icon` is empty for a station with nothing
-  /// to badge, so a plain dot underneath just keeps showing through.
-  static const String _intensityCircleId = 'rts-intensity-circle';
-  static const String _eewSourceId = 'rts-eew-src';
-  static const String _eewPWaveId = 'rts-eew-p';
-  static const String _eewSWaveId = 'rts-eew-s';
-  static const String _eewSWaveFillId = 'rts-eew-s-fill';
-  static const String _eewEpicenterId = 'rts-eew-epicenter';
-  static const String _eewCrossIcon = 'rts-eew-cross';
-
-  static const String _boxSourceId = 'rts-box-src';
-  static const String _boxLineId = 'rts-box-line';
-
-  /// Box-grid border colour by intensity `i`: red ≥4, yellow 2–3, green
-  /// below — ported from the legacy monitor's box colour scheme.
-  static const List<Object> _boxColorExpression = [
-    'case',
-    [
-      '>=',
-      ['get', 'i'],
-      4,
-    ],
-    '#FF0000',
-    [
-      '>=',
-      ['get', 'i'],
-      2,
-    ],
-    '#EAC100',
-    '#00DB00',
-  ];
+  /// Every source/layer/image id this overlay owns — `rts-src`, `rts-circle`,
+  /// `rts-eew-epicenter` and the rest, derived from the `rts` prefix. The
+  /// stack's shape and paint live in [addMonitorLayers], shared with the report
+  /// replay map so a change to one surface can't silently skip the other.
+  static const MonitorLayerIds _ids = rtsMonitorIds;
 
   /// Wave-front rings keep expanding between RTS polls (a realtime channel only
   /// emits on a real transition) — a fixed cadence redraws them against the
@@ -275,20 +233,6 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   static const int _maxStationRetries = 8;
   static const double _liveOpacity = 1.0;
   static const double _staleOpacity = 0.35;
-
-  /// A neutral hairline separating overlapping dots — legacy uses the theme's
-  /// outlineVariant, but render() has no BuildContext, so a mid-grey that reads
-  /// on both light and dark tiles stands in.
-  ///
-  /// A getter, not a `const`: the colour-vision transform runs at the
-  /// definition and isn't a compile-time constant. (It is the identity on a
-  /// pure grey — routing it anyway keeps the rule uniform for whoever tints
-  /// this later.)
-  static String get _strokeColor => '#9E9E9E'.vision;
-  static const Map<String, dynamic> _emptyCollection = {
-    'type': 'FeatureCollection',
-    'features': <dynamic>[],
-  };
 
   /// This layer's `MapLayer.id` — 強震監視器.
   ///
@@ -326,87 +270,23 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
     await _ensureStations();
-    await _removeFromMap(controller);
-    await controller.addSource(
-      _sourceId,
-      GeojsonSourceProperties(data: _geoJson()),
+    await removeMonitorLayers(controller, _ids);
+    // The whole stack — sources, layers, badge icons, and the order they mount
+    // in — is [addMonitorLayers], shared with the report replay map. The
+    // stacking rules it enforces (everything appended above the base style's
+    // township names, only the EEW S-wave disc anchored) are documented there,
+    // once, so they cannot be changed on one surface and silently missed on
+    // the other.
+    await addMonitorLayers(
+      controller,
+      _ids,
+      stationData: _geoJson(),
+      dotOpacity: _liveOpacity,
+      logTag: 'rts',
     );
-    await controller.addCircleLayer(
-      _sourceId,
-      _circleId,
-      _circleProps(_liveOpacity),
-      // Station dots under the township names — a live reading must never
-      // hide where you are.
-      belowLayerId: townLabelLayerId,
-    );
-    // Station id over its raw intensity, pinned under the dot; the sort key
-    // lets hot stations win placement (see [stationLabelProps]).
-    await controller.addSymbolLayer(
-      _sourceId,
-      _labelId,
-      _labelProps(_liveOpacity),
-      minzoom: 10,
-      // Township names stay the top-most text — station labels give way to
-      // them on collision (the layer order decides who wins placement).
-      belowLayerId: townLabelLayerId,
-    );
-    await _loadIntensityCircleIcons(controller);
-    // The discrete-reading badge — always on top of the plain dot (added
-    // after [_circleId]/[_labelId], same anchor); `icon` is empty for most
-    // stations most of the time, so this is a no-op render for them.
-    await controller.addSymbolLayer(
-      _sourceId,
-      _intensityCircleId,
-      const SymbolLayerProperties(
-        iconImage: <Object>['get', 'icon'],
-        // The baked artwork is a fixed 64px canvas — left at the default
-        // 1.0 it drew full-size at every zoom, badge circles swallowing
-        // whole townships. Scales with zoom instead, same stops as the
-        // legacy monitor's own badge layer.
-        iconSize: _badgeIconSize,
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-        // Same "stronger wins" rule as the dot layer's circleSortKey below —
-        // two badges can overlap just like two dots can, and a low reading
-        // must never paint over a high one. (`symbol-z-order` defaults to
-        // `auto`, which honours the sort key; naming it `source` here would
-        // silently drop back to feed-iteration order.)
-        symbolSortKey: _sortKey,
-      ),
-      belowLayerId: townLabelLayerId,
-    );
-    // RTS box grid, in its own try/catch — before the EEW wave/epicentre
-    // setup below, so it stacks *below* the epicentre cross and the P/S wave
-    // rings once both are anchored at the same [townLabelLayerId] (each
-    // insertion goes directly below its anchor, so the later one ends up on
-    // top) — matching the legacy monitor's insertion order: box, then wave
-    // rings, then epicentre last/topmost. Isolated so a failure here can
-    // never take down the station dots / EEW layers.
-    try {
-      await controller.addSource(
-        _boxSourceId,
-        GeojsonSourceProperties(data: _emptyCollection),
-      );
-      await controller.addLineLayer(
-        _boxSourceId,
-        _boxLineId,
-        const LineLayerProperties(
-          lineColor: _boxColorExpression,
-          lineWidth: 2,
-          visibility: 'none',
-          // Red always draws over yellow/green — ported from the legacy
-          // monitor's box layer (`lineSortKey: [Expressions.get, 'i']`).
-          lineSortKey: <Object>['get', 'i'],
-        ),
-        belowLayerId: townLabelLayerId,
-      );
-    } catch (e, st) {
-      Log.handle(e, st, 'rts box layer render failed');
-    }
-    await _setupEew(controller);
     _added = true;
     _appliedStatus = null;
-    // [_setupEew] has just seeded the source with [_emptyCollection].
+    // [addMonitorLayers] has just seeded the EEW source empty.
     _eewSourceEmpty = true;
     // The box source was just re-added empty above.
     _boxOnMap = null;
@@ -503,8 +383,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       if (!identical(payloadKey, _lastSent)) {
         _lastSent = payloadKey;
         await controller.setGeoJsonSource(
-          _sourceId,
-          offline ? _emptyCollection : _geoJson(),
+          _ids.stationSource,
+          offline ? monitorEmptyCollection : _geoJson(),
         );
       }
       if (status != _appliedStatus) {
@@ -512,8 +392,14 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         final opacity = status == RealtimeStatus.live
             ? _liveOpacity
             : _staleOpacity;
-        await controller.setLayerProperties(_circleId, _circleProps(opacity));
-        await controller.setLayerProperties(_labelId, _labelProps(opacity));
+        await controller.setLayerProperties(
+          _ids.stationDot,
+          monitorDotProps(opacity: opacity),
+        );
+        await controller.setLayerProperties(
+          _ids.stationLabel,
+          monitorLabelProps(opacity: opacity),
+        );
       }
     } catch (_) {
       // Source not on the map (mid style-reload); the next render re-adds it.
@@ -536,8 +422,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     if (!live && _eewSourceEmpty) return;
     try {
       await controller.setGeoJsonSource(
-        _eewSourceId,
-        live ? _eewGeoJson() : _emptyCollection,
+        _ids.eewSource,
+        live ? _eewGeoJson() : monitorEmptyCollection,
       );
       _eewSourceEmpty = !live;
     } catch (_) {
@@ -549,88 +435,6 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
 
   Map<String, dynamic> _eewGeoJson() =>
       eewWaveGeoJson(_eew.state.data ?? const [], _travelTime, AppTime.utc);
-
-  /// Adds the EEW source + layers: the S wave's translucent disc ("inner
-  /// circle") — the damaging, already-shaking zone — anchored below the land
-  /// layer so the wash only shows over open sea, never over Taiwan itself. The
-  /// P wave is a heads-up leading edge only, no fill; the epicentre cross sits
-  /// on top. The cross artwork is drawn in code, like every other map icon —
-  /// the legacy PNG `assets/map/icons/cross.png` does not exist and must not
-  /// be loaded. Isolated in its own try/catch so a failure here can never take
-  /// down the station dots set up above.
-  Future<void> _setupEew(MapLibreMapController controller) async {
-    try {
-      final data = await IntensityIconRenderer.render('cross');
-      await controller.addImage(_eewCrossIcon, data.buffer.asUint8List());
-      await controller.addSource(
-        _eewSourceId,
-        GeojsonSourceProperties(data: _emptyCollection),
-      );
-      await controller.addFillLayer(
-        _eewSourceId,
-        _eewSWaveFillId,
-        // Vector geometry we draw ourselves, so it recolours with the app.
-        FillLayerProperties(fillColor: '#FF3B30'.vision, fillOpacity: 0.16),
-        belowLayerId: landLayerId,
-        filter: const [
-          '==',
-          ['get', 'type'],
-          's-fill',
-        ],
-      );
-      await controller.addLineLayer(
-        _eewSourceId,
-        _eewPWaveId,
-        LineLayerProperties(lineColor: '#00E5FF'.vision, lineWidth: 2),
-        belowLayerId: townLabelLayerId,
-        filter: const [
-          '==',
-          ['get', 'type'],
-          'p-line',
-        ],
-      );
-      await controller.addLineLayer(
-        _eewSourceId,
-        _eewSWaveId,
-        LineLayerProperties(lineColor: '#FF3B30'.vision, lineWidth: 2),
-        belowLayerId: townLabelLayerId,
-        filter: const [
-          '==',
-          ['get', 'type'],
-          's-line',
-        ],
-      );
-      await controller.addSymbolLayer(
-        _eewSourceId,
-        _eewEpicenterId,
-        const SymbolLayerProperties(
-          iconImage: _eewCrossIcon,
-          iconSize: 1.0,
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-        belowLayerId: townLabelLayerId,
-        filter: const [
-          '==',
-          ['get', 'type'],
-          'x',
-        ],
-      );
-    } catch (e, st) {
-      Log.handle(e, st, 'rts EEW layer render failed');
-    }
-  }
-
-  /// Registers the 18 circular discrete-reading badges (1–9 light + dark) —
-  /// drawn in code (see [IntensityCircleRenderer]), loaded once per render.
-  Future<void> _loadIntensityCircleIcons(
-    MapLibreMapController controller,
-  ) async {
-    final icons = await IntensityCircleRenderer.renderAll();
-    for (final entry in icons.entries) {
-      await controller.addImage(entry.key, entry.value);
-    }
-  }
 
   /// Updates the box-grid overlay: a large event the feed reports at
   /// box-grid resolution (`rts.box` non-empty) draws the coloured grid cells
@@ -648,13 +452,13 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       if (hasBox) {
         final (geoJson, signature) = _boxGeoJson(grid);
         if (signature != _boxOnMap) {
-          await controller.setGeoJsonSource(_boxSourceId, geoJson);
+          await controller.setGeoJsonSource(_ids.boxSource, geoJson);
           _boxOnMap = signature;
         }
       }
       if (hasBox != _boxVisible) {
         _boxVisible = hasBox;
-        await controller.setLayerVisibility(_boxLineId, hasBox);
+        await controller.setLayerVisibility(_ids.boxLine, hasBox);
       }
     } catch (_) {
       // Source/layer not on the map yet (mid style-reload) — the next update retries.
@@ -760,10 +564,10 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         final hasBox = (_feed.state.data?.box.isNotEmpty) ?? false;
         if (hasBox) {
           _boxVisible = !_boxVisible;
-          await controller.setLayerVisibility(_boxLineId, _boxVisible);
+          await controller.setLayerVisibility(_ids.boxLine, _boxVisible);
         } else if (_boxVisible) {
           _boxVisible = false;
-          await controller.setLayerVisibility(_boxLineId, false);
+          await controller.setLayerVisibility(_ids.boxLine, false);
         }
 
         final hasEew =
@@ -772,12 +576,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         if (hasEew) {
           _epicenterVisible = !_epicenterVisible;
           await controller.setLayerVisibility(
-            _eewEpicenterId,
+            _ids.eewEpicenter,
             _epicenterVisible,
           );
         } else if (!_epicenterVisible) {
           _epicenterVisible = true;
-          await controller.setLayerVisibility(_eewEpicenterId, true);
+          await controller.setLayerVisibility(_ids.eewEpicenter, true);
         }
       } catch (_) {
         // Layers gone mid style-reload — the next blink retries.
@@ -881,44 +685,6 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     }
   }
 
-  /// The full circle style at [opacity] — passed whole (not a partial update),
-  /// since setLayerProperties resets any property left null. Colour comes from
-  /// the shared instrumental-intensity palette, so the dots and the legend can
-  /// never drift — except a `grey`-flagged feature (see [_geoJson]), which
-  /// paints the discrete scale's own 0-grey instead: a station on a large
-  /// event's alert list reading a flat 0 stays visibly part of the network
-  /// rather than fading into whatever pale colour the continuous ramp gives
-  /// a near-zero reading — ported from the legacy monitor's separate
-  /// `intensity0` grey layer.
-  CircleLayerProperties _circleProps(double opacity) => CircleLayerProperties(
-    circleColor: <Object>[
-      'case',
-      [
-        '==',
-        ['get', 'grey'],
-        1,
-      ],
-      IntensityColors.discrete(0).toHexRgb(),
-      InstrumentalIntensityColors.mapLibreInterpolate,
-    ],
-    circleRadius: _radiusExpression,
-    circleStrokeColor: _strokeColor,
-    circleStrokeWidth: 1,
-    circleOpacity: opacity,
-    // Stronger stations sort above weaker ones so a hot dot is never hidden.
-    circleSortKey: _sortKey,
-  );
-
-  /// The full label style at [opacity] — station id over its raw intensity.
-  /// Passed whole (setLayerProperties nulls anything omitted); the sort key
-  /// places the strongest stations first so a hot reading never loses.
-  SymbolLayerProperties _labelProps(double opacity) => stationLabelProps(
-    textField: const <Object>['get', 'label'],
-    textSize: 10,
-    opacity: opacity,
-    sortKey: _labelSortKey,
-  );
-
   @override
   Widget buildSheet(BuildContext context) {
     _captureBrightness(context);
@@ -960,7 +726,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     // this layer's own — leaving it tinted would bleed into whichever layer
     // becomes active next. [_updateAreaFill] no-ops if nothing was applied.
     await _updateAreaFill(controller, const []);
-    await _removeFromMap(controller);
+    await removeMonitorLayers(controller, _ids);
     _controller = null;
   }
 
@@ -1001,8 +767,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     // Large event: the feed also carries box-grid data. The legacy monitor
     // decluttered to just the stations that registered something and badged
     // each with its discrete reading — ported here as a circular badge (see
-    // [_intensityCircleId]), never a shape swap: the dot underneath is still
-    // the same circle, the badge is just a fuller circle drawn over it.
+    // [MonitorLayerIds.stationBadge]), never a shape swap: the dot underneath
+    // is still the same circle, the badge is just a fuller one drawn over it.
     final hasBox = (_feed.state.data?.box.isNotEmpty) ?? false;
     final features = <Map<String, dynamic>>[];
     for (final entry in live.entries) {
@@ -1033,7 +799,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           'sort': effective,
           'label': '${entry.key}\n${data.intensityRaw.toStringAsFixed(1)}',
           'icon': hasBox && level > 0
-              ? _intensityCircleIcon(level, dark: _dark)
+              ? monitorBadgeIcon(level, dark: _dark)
               : '',
           // Only reachable when `alert` is true (the filter above already
           // dropped a calm zero) — an alerting station reading a flat 0
@@ -1045,84 +811,4 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     }
     return {'type': 'FeatureCollection', 'features': features};
   }
-
-  /// The circular badge icon for scale index 1–9, dark or light artwork.
-  static String _intensityCircleIcon(int level, {required bool dark}) =>
-      dark ? 'circle-$level-dark' : 'circle-$level';
-
-  Future<void> _removeFromMap(MapLibreMapController controller) async {
-    // Layers before their sources; tolerate any not currently on the map.
-    for (final layerId in [
-      _circleId,
-      _labelId,
-      _intensityCircleId,
-      _boxLineId,
-      _eewEpicenterId,
-      _eewSWaveId,
-      _eewPWaveId,
-      _eewSWaveFillId,
-    ]) {
-      try {
-        await controller.removeLayer(layerId);
-      } catch (_) {
-        // Expected when the layer isn't on the map yet.
-      }
-    }
-    for (final sourceId in [_sourceId, _eewSourceId, _boxSourceId]) {
-      try {
-        await controller.removeSource(sourceId);
-      } catch (_) {
-        // Expected when the source isn't on the map yet.
-      }
-    }
-  }
-
-  /// Dots scale with zoom so they stay legible zoomed in (legacy: 2px at z4 →
-  /// 8px at z12).
-  static const List<Object> _radiusExpression = [
-    'interpolate',
-    ['linear'],
-    ['zoom'],
-    4,
-    2.0,
-    12,
-    8.0,
-  ];
-
-  /// The discrete-reading badge's on-map scale of its 64px artwork. The
-  /// legacy monitor's own badge layer used 0.2 at z5 → 0.8 at z10, but that
-  /// assumed native-resolution PNG assets — applied to a baked canvas here it
-  /// renders at only device-pixel size, ~13px on a 3x display and effectively
-  /// invisible. [ReportDetailPage] already solved this for the same 64px
-  /// canvas class ([IntensityIconRenderer]); reusing its scale here.
-  static const List<Object> _badgeIconSize = [
-    'interpolate',
-    ['linear'],
-    ['zoom'],
-    5,
-    0.75,
-    15,
-    1.7,
-  ];
-
-  /// Higher effective intensity draws on top (dot, badge, and label all key off
-  /// this) — reads `sort` (see [_geoJson]), the alert-aware value the badge is
-  /// actually drawn from, not the raw `i`. Stations without a `sort` sink.
-  static const List<Object> _sortKey = [
-    'coalesce',
-    ['get', 'sort'],
-    -5,
-  ];
-
-  /// Labels place strongest-first: a symbol's *lower* sort key wins a collision,
-  /// so negate the intensity — a hot station's reading never loses to a calm one.
-  static const List<Object> _labelSortKey = [
-    '-',
-    0,
-    [
-      'coalesce',
-      ['get', 'sort'],
-      -5,
-    ],
-  ];
 }
