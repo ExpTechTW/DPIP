@@ -918,6 +918,18 @@ class UrgentNotificationSection extends StatelessWidget {
         .toList(growable: false);
     if (channels.isEmpty) return const SizedBox.shrink();
 
+    // A channel that still follows Do Not Disturb is only visible once the
+    // section is open, and collapsed is how it starts — so the header carries
+    // a dot saying there is something inside to deal with. Announced for
+    // screen readers, where a dot is otherwise silent.
+    final attention = channels.any(
+      (channel) => channel.state != UrgentNotificationChannelState.bypasses,
+    );
+    final headerIcon = Icon(
+      Icons.priority_high_outlined,
+      color: colors.primary,
+    );
+
     return Material(
       color: colors.surfaceContainer,
       borderRadius: AppRadius.medium,
@@ -934,7 +946,12 @@ class UrgentNotificationSection extends StatelessWidget {
         child: ExpansionTile(
           minTileHeight: 0,
           tilePadding: const EdgeInsets.all(AppSpacing.md),
-          leading: Icon(Icons.priority_high_outlined, color: colors.primary),
+          leading: attention
+              ? Semantics(
+                  label: l10n.permissionsAttention,
+                  child: Badge(child: headerIcon),
+                )
+              : headerIcon,
           title: Text(
             title,
             style: theme.textTheme.titleMedium?.copyWith(
