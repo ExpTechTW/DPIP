@@ -84,23 +84,33 @@ struct DPIPWidgetsEntryView : View {
             )
 
             VStack(alignment: .leading) {
-                HStack {
-                    Text(snapshot.regionName)
-                        .font(.headline)
-                        .layoutPriority(1)
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(snapshot.regionName)
+                            .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .layoutPriority(1)
+
+                        Text(observationDate, style: .time)
+                            .lineLimit(1)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
 
                     Spacer()
 
-                    HStack(spacing: 4) {
+                    VStack(alignment: .center, spacing: 2) {
                         Image(systemName: snapshot.condition.systemImageName(
                             isNight: entry.isNight
                         ))
+                        .font(.title)
 
                         Text(snapshot.condition.localizedDisplayName)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
+                            .font(.caption2)
                     }
-                    .font(.caption)
                     .foregroundStyle(.secondary)
                 }
 
@@ -145,23 +155,6 @@ struct DPIPWidgetsEntryView : View {
                         .font(.caption)
                     }
                 }
-
-                HStack(spacing: 4) {
-                    if entry.isStale {
-                        Text("widget.stale")
-                            .lineLimit(1)
-                    }
-
-                    Spacer()
-
-                    Image(systemName: "clock")
-
-                    Text(observationDate, style: .time)
-                        .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: false)
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
             }
         } else {
             VStack(spacing: 8) {
