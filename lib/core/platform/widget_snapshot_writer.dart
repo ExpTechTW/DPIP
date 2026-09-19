@@ -14,6 +14,7 @@ abstract interface class WidgetSnapshotWriter {
   Future<Result<void>> write({
     required WidgetSnapshotKind kind,
     required String json,
+    String? sourceIdentifier,
   });
 
   Future<Result<void>> clear({required WidgetSnapshotKind kind});
@@ -33,6 +34,7 @@ final class IosWidgetSnapshotWriter implements WidgetSnapshotWriter {
   Future<Result<void>> write({
     required WidgetSnapshotKind kind,
     required String json,
+    String? sourceIdentifier,
   }) async {
     if (!_isSupportedPlatform) {
       return const Err(
@@ -47,6 +49,7 @@ final class IosWidgetSnapshotWriter implements WidgetSnapshotWriter {
       await _channel.invokeMethod<void>('write', {
         'kind': kind.name,
         'json': json,
+        'sourceIdentifier': ?sourceIdentifier,
       });
       return const Ok(null);
     } on MissingPluginException {

@@ -375,6 +375,7 @@ final class _RecordingWidgetSnapshotWriter implements WidgetSnapshotWriter {
   Future<Result<void>> write({
     required WidgetSnapshotKind kind,
     required String json,
+    String? sourceIdentifier,
   }) async {
     writes.add((kind: kind, json: json));
     return const Ok(null);
@@ -397,6 +398,7 @@ final class _BlockingFirstWriteWidgetSnapshotWriter
   Future<Result<void>> write({
     required WidgetSnapshotKind kind,
     required String json,
+    String? sourceIdentifier,
   }) async {
     writes.add((kind: kind, json: json));
 
