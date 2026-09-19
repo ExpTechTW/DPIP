@@ -55,15 +55,33 @@ final class RunnerTests: XCTestCase {
     defer { try? FileManager.default.removeItem(at: container) }
     let kind = try WidgetSnapshotFile.kind("currentWeather")
     let data = try WidgetSnapshotFile.payload("{\"schemaVersion\":1}")
-    let target = container.appendingPathComponent("WidgetSnapshots/current-weather.json")
+    let directory = container.appendingPathComponent("WidgetSnapshots")
+    let legacyTarget = directory.appendingPathComponent("current-weather.json")
+    let perLocationTarget = try WidgetSnapshotFile.snapshotURL(
+      kind: kind,
+      sourceIdentifier: "region:220",
+      in: container
+    )
 
     XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
 
-    try WidgetSnapshotFile.replace(data, kind: kind, in: container)
-    XCTAssertTrue(FileManager.default.fileExists(atPath: target.path))
+    try FileManager.default.createDirectory(
+      at: directory,
+      withIntermediateDirectories: true
+    )
+    try data.write(to: legacyTarget, options: .atomic)
+    try WidgetSnapshotFile.replace(
+      data,
+      kind: kind,
+      sourceIdentifier: "region:220",
+      in: container
+    )
+    XCTAssertTrue(FileManager.default.fileExists(atPath: legacyTarget.path))
+    XCTAssertTrue(FileManager.default.fileExists(atPath: perLocationTarget.path))
 
     try WidgetSnapshotFile.clear(kind, in: container)
-    XCTAssertFalse(FileManager.default.fileExists(atPath: target.path))
+    XCTAssertFalse(FileManager.default.fileExists(atPath: legacyTarget.path))
+    XCTAssertTrue(FileManager.default.fileExists(atPath: perLocationTarget.path))
 
     XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
   }

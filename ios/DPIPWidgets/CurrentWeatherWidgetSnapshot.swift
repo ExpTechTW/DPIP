@@ -45,6 +45,7 @@ enum CurrentWeatherWidgetCondition: String, Decodable {
 
 struct CurrentWeatherWidgetSnapshot: Decodable {
     let schemaVersion: Int
+    let sourceIdentifier: String?
 
     let regionCode: String
     let regionName: String
@@ -70,6 +71,7 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case schemaVersion
+        case sourceIdentifier
         case regionCode
         case regionName
         case observationTime
@@ -87,6 +89,7 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
 
     init(
         schemaVersion: Int,
+        sourceIdentifier: String? = nil,
         regionCode: String,
         regionName: String,
         observationTime: Int,
@@ -102,6 +105,7 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         rain: Double?
     ) {
         self.schemaVersion = schemaVersion
+        self.sourceIdentifier = sourceIdentifier
         self.regionCode = regionCode
         self.regionName = regionName
         self.observationTime = observationTime
@@ -117,7 +121,6 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
         self.humidity = humidity
         self.rain = rain
     }
-
     init(from decoder: Decoder) throws {
         let container = try decoder.container(
             keyedBy: CodingKeys.self
@@ -127,6 +130,24 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
             Int.self,
             forKey: .schemaVersion
         )
+
+        guard (1...5).contains(schemaVersion) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .schemaVersion,
+                in: container,
+                debugDescription:
+                    "Unsupported current-weather snapshot schema version."
+            )
+        }
+
+        if schemaVersion >= 5 {
+            sourceIdentifier = try container.decode(
+                String.self,
+                forKey: .sourceIdentifier
+            )
+        } else {
+            sourceIdentifier = nil
+        }
 
         regionCode = try container.decode(
             String.self,
