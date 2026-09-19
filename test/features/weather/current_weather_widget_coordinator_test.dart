@@ -4,6 +4,11 @@ import 'dart:convert';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/platform/widget_snapshot_writer.dart';
+import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/core/realtime/clock.dart';
+import 'package:dpip/core/realtime/elapsed.dart';
+import 'package:dpip/core/realtime/server_clock.dart';
+import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/weather/current_weather_widget_coordinator.dart';
@@ -12,6 +17,46 @@ import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test(
+    'default clock adapters sync before publishing calibrated time',
+    () async {
+      final deviceNow = DateTime.utc(2026, 9, 16, 4);
+      final source = _ControlledTimeSource();
+      AppTime.install(
+        ServerClock(_FakeClock(deviceNow), _FakeElapsed(), source),
+      );
+      final regions = RegionStore(
+        SettingsStore.inMemory({
+          'home.savedRegionCodes': ['660'],
+        }),
+      );
+      final writer = _FakeWidgetSnapshotWriter();
+      final coordinator = CurrentWeatherWidgetCoordinator(
+        regions,
+        _directoryWithXitun(),
+        CurrentWeatherWidgetPublisher(writer),
+      );
+      regions.select(2);
+
+      final publish = coordinator.publish(
+        regionCode: '660',
+        weather: _weather(),
+      );
+
+      expect(source.requests, hasLength(1));
+      expect(writer.writeCallCount, 0);
+
+      source.requests.single.complete(
+        Ok(deviceNow.add(const Duration(minutes: 3)).millisecondsSinceEpoch),
+      );
+      await publish;
+
+      expect(writer.writeCallCount, 1);
+      final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
+      expect(decoded['calibratedTimeOffsetMilliseconds'], 180_000);
+    },
+  );
+
   test('already synced publishes immediately with calibrated offset', () async {
     final regions = RegionStore(
       SettingsStore.inMemory({
@@ -128,6 +173,43 @@ void main() {
 
     await coordinator.publish(regionCode: '660', weather: _weather());
 
+    expect(timeCallCount, 0);
+    expect(writer.writeCallCount, 0);
+  });
+
+  test('does not publish when region changes while sync is pending', () async {
+    final regions = RegionStore(
+      SettingsStore.inMemory({
+        'home.savedRegionCodes': ['660', '100'],
+      }),
+    );
+    final writer = _FakeWidgetSnapshotWriter();
+    final sync = Completer<void>();
+    var isSynced = false;
+    var timeCallCount = 0;
+    final coordinator = CurrentWeatherWidgetCoordinator(
+      regions,
+      _directoryWithXitun(),
+      CurrentWeatherWidgetPublisher(writer),
+      time: () {
+        timeCallCount += 1;
+        return (
+          calibratedNow: DateTime.utc(2026, 9, 16, 4),
+          calibratedTimeOffset: Duration.zero,
+        );
+      },
+      isTimeSynced: () => isSynced,
+      syncTime: () => sync.future,
+    );
+    regions.select(2);
+
+    final publish = coordinator.publish(regionCode: '660', weather: _weather());
+    regions.select(3);
+    isSynced = true;
+    sync.complete();
+    await publish;
+
+    expect(regions.selectedCode, '100');
     expect(timeCallCount, 0);
     expect(writer.writeCallCount, 0);
   });
@@ -251,5 +333,30 @@ final class _FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
     writtenJson = json;
 
     return const Ok(null);
+  }
+}
+
+final class _FakeClock implements Clock {
+  _FakeClock(this.current);
+
+  final DateTime current;
+
+  @override
+  DateTime now() => current;
+}
+
+final class _FakeElapsed implements Elapsed {
+  @override
+  Duration get elapsed => Duration.zero;
+}
+
+final class _ControlledTimeSource implements ServerTimeSource {
+  final requests = <Completer<Result<int>>>[];
+
+  @override
+  Future<Result<int>> serverTimeMs() {
+    final request = Completer<Result<int>>();
+    requests.add(request);
+    return request.future;
   }
 }
