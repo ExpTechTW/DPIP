@@ -21,6 +21,8 @@
 		27CACBAA305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */; };
 		27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */; };
+		28A000000000000000000003 /* WidgetSNTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A000000000000000000001 /* WidgetSNTPClientTests.swift */; };
+		28A000000000000000000004 /* WidgetServerClockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A000000000000000000002 /* WidgetServerClockTests.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		522508B9301F863A006148C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 522508B7301F863A006148C2 /* InfoPlist.strings */; };
@@ -117,6 +119,8 @@
 		27CACBA2305BD77F0046F79C /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
 		27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetLocationIntentTests.swift; sourceTree = "<group>"; };
 		27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetLocationCatalogTests.swift; sourceTree = "<group>"; };
+		28A000000000000000000001 /* WidgetSNTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSNTPClientTests.swift; sourceTree = "<group>"; };
+		28A000000000000000000002 /* WidgetServerClockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetServerClockTests.swift; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/warn.aiff; sourceTree = "<group>"; };
@@ -238,6 +242,8 @@
 				CurrentWeatherWidgetSnapshotFactory.swift,
 				CurrentWeatherWidgetSnapshotWriter.swift,
 				SavedWidgetLocationResolver.swift,
+				WidgetServerClock.swift,
+				WidgetSNTPClient.swift,
 				WidgetLocationTarget.swift,
 				WidgetResolvedWeatherLocation.swift,
 				WidgetSolarTime.swift,
@@ -309,6 +315,8 @@
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				28A000000000000000000001 /* WidgetSNTPClientTests.swift */,
+				28A000000000000000000002 /* WidgetServerClockTests.swift */,
 				D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */,
 				D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */,
 				D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */,
@@ -647,6 +655,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				270FCEA5305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift in Sources */,
+				28A000000000000000000003 /* WidgetSNTPClientTests.swift in Sources */,
+				28A000000000000000000004 /* WidgetServerClockTests.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 				D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */,
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
