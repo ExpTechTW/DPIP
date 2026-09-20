@@ -1236,3 +1236,311 @@ final class CurrentWeatherClientTests: XCTestCase {
         }
     }
 }
+
+private struct SolarGolden {
+    let id: String
+    let latitude: Double
+    let longitude: Double
+    let nowUnixSeconds: Int64
+    let expectedIsNight: Bool
+    let expectedNextTransitionUnixSeconds: Int64
+}
+
+private let solarGoldens: [SolarGolden] = [
+    // 臺北市中正區, region 100
+    .init(id: "100-2024-02-29-noon", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_709_179_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_709_200_528),
+    .init(id: "100-2024-03-20-noon", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_907_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_103),
+    .init(id: "100-2024-06-21-noon", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_718_942_400, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_718_966_796),
+    .init(id: "100-2024-09-22-noon", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_726_977_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_726_998_631),
+    .init(id: "100-2024-12-21-noon", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_734_753_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_734_772_166),
+    .init(id: "100-2024-12-31-noon", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_735_617_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_735_636_511),
+
+    // 臺中市中區, region 400
+    .init(id: "400-2024-02-29-noon", latitude: 24.1439458, longitude: 120.6794414, nowUnixSeconds: 1_709_179_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_709_200_763),
+    .init(id: "400-2024-03-20-noon", latitude: 24.1439458, longitude: 120.6794414, nowUnixSeconds: 1_710_907_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_303),
+    .init(id: "400-2024-06-21-noon", latitude: 24.1439458, longitude: 120.6794414, nowUnixSeconds: 1_718_942_400, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_718_966_881),
+    .init(id: "400-2024-09-22-noon", latitude: 24.1439458, longitude: 120.6794414, nowUnixSeconds: 1_726_977_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_726_998_830),
+    .init(id: "400-2024-12-21-noon", latitude: 24.1439458, longitude: 120.6794414, nowUnixSeconds: 1_734_753_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_734_772_480),
+    .init(id: "400-2024-12-31-noon", latitude: 24.1439458, longitude: 120.6794414, nowUnixSeconds: 1_735_617_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_735_636_822),
+
+    // 高雄市新興區, region 800
+    .init(id: "800-2024-02-29-noon", latitude: 22.6310347, longitude: 120.3101095, nowUnixSeconds: 1_709_179_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_709_200_908),
+    .init(id: "800-2024-03-20-noon", latitude: 22.6310347, longitude: 120.3101095, nowUnixSeconds: 1_710_907_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_389),
+    .init(id: "800-2024-06-21-noon", latitude: 22.6310347, longitude: 120.3101095, nowUnixSeconds: 1_718_942_400, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_718_966_776),
+    .init(id: "800-2024-09-22-noon", latitude: 22.6310347, longitude: 120.3101095, nowUnixSeconds: 1_726_977_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_726_998_915),
+    .init(id: "800-2024-12-21-noon", latitude: 22.6310347, longitude: 120.3101095, nowUnixSeconds: 1_734_753_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_734_772_755),
+    .init(id: "800-2024-12-31-noon", latitude: 22.6310347, longitude: 120.3101095, nowUnixSeconds: 1_735_617_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_735_637_094),
+
+    // 花蓮縣花蓮市, region 970
+    .init(id: "970-2024-02-29-noon", latitude: 23.9820651, longitude: 121.6067705, nowUnixSeconds: 1_709_179_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_709_200_546),
+    .init(id: "970-2024-03-20-noon", latitude: 23.9820651, longitude: 121.6067705, nowUnixSeconds: 1_710_907_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_080),
+    .init(id: "970-2024-06-21-noon", latitude: 23.9820651, longitude: 121.6067705, nowUnixSeconds: 1_718_942_400, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_718_966_637),
+    .init(id: "970-2024-09-22-noon", latitude: 23.9820651, longitude: 121.6067705, nowUnixSeconds: 1_726_977_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_726_998_607),
+    .init(id: "970-2024-12-21-noon", latitude: 23.9820651, longitude: 121.6067705, nowUnixSeconds: 1_734_753_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_734_772_277),
+    .init(id: "970-2024-12-31-noon", latitude: 23.9820651, longitude: 121.6067705, nowUnixSeconds: 1_735_617_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_735_636_619),
+
+    // 臺東縣蘭嶼鄉, region 952
+    .init(id: "952-2024-02-29-noon", latitude: 22.0244984, longitude: 121.5560627, nowUnixSeconds: 1_709_179_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_709_200_631),
+    .init(id: "952-2024-03-20-noon", latitude: 22.0244984, longitude: 121.5560627, nowUnixSeconds: 1_710_907_200, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_089),
+    .init(id: "952-2024-06-21-noon", latitude: 22.0244984, longitude: 121.5560627, nowUnixSeconds: 1_718_942_400, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_718_966_401),
+    .init(id: "952-2024-09-22-noon", latitude: 22.0244984, longitude: 121.5560627, nowUnixSeconds: 1_726_977_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_726_998_615),
+    .init(id: "952-2024-12-21-noon", latitude: 22.0244984, longitude: 121.5560627, nowUnixSeconds: 1_734_753_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_734_772_530),
+    .init(id: "952-2024-12-31-noon", latitude: 22.0244984, longitude: 121.5560627, nowUnixSeconds: 1_735_617_600, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_735_636_867),
+
+    // Taipei exact boundaries, 2024-03-20
+    .init(id: "100-before-sunrise", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_885_457, expectedIsNight: true, expectedNextTransitionUnixSeconds: 1_710_885_458),
+    .init(id: "100-at-sunrise", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_885_458, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_103),
+    .init(id: "100-after-sunrise", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_885_459, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_103),
+    .init(id: "100-before-sunset", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_929_102, expectedIsNight: false, expectedNextTransitionUnixSeconds: 1_710_929_103),
+    .init(id: "100-at-sunset", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_929_103, expectedIsNight: true, expectedNextTransitionUnixSeconds: 1_710_971_796),
+    .init(id: "100-after-sunset", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_710_929_104, expectedIsNight: true, expectedNextTransitionUnixSeconds: 1_710_971_796),
+
+    // 2024-12-31 after sunset -> 2025-01-01 sunrise
+    .init(id: "100-year-rollover-after-sunset", latitude: 25.032188, longitude: 121.5183226, nowUnixSeconds: 1_735_636_512, expectedIsNight: true, expectedNextTransitionUnixSeconds: 1_735_684_745),
+]
+
+final class WidgetSolarTimeTests: XCTestCase {
+    func testSolarGoldensMatchDartAuthority() {
+        for golden in solarGoldens {
+            let (nowUnixMilliseconds, overflow) =
+                golden.nowUnixSeconds.multipliedReportingOverflow(
+                    by: 1_000
+                )
+
+            XCTAssertFalse(
+                overflow,
+                "Unix millisecond conversion overflowed for \(golden.id)"
+            )
+
+            guard !overflow else {
+                continue
+            }
+
+            XCTAssertEqual(
+                WidgetSolarTime.isNight(
+                    unixMilliseconds: nowUnixMilliseconds,
+                    latitude: golden.latitude,
+                    longitude: golden.longitude
+                ),
+                golden.expectedIsNight,
+                "Unexpected day/night state for \(golden.id)"
+            )
+
+            XCTAssertEqual(
+                WidgetSolarTime.nextDayNightTransition(
+                    unixMilliseconds: nowUnixMilliseconds,
+                    latitude: golden.latitude,
+                    longitude: golden.longitude
+                ),
+                golden.expectedNextTransitionUnixSeconds,
+                "Unexpected next transition for \(golden.id)"
+            )
+        }
+    }
+
+    func testPositiveModuloKeepsPositiveValue() {
+        XCTAssertEqual(
+            WidgetSolarTime.positiveModulo(
+                10,
+                modulus: 360
+            ),
+            10
+        )
+    }
+
+    func testPositiveModuloWrapsOverflow() {
+        XCTAssertEqual(
+            WidgetSolarTime.positiveModulo(
+                370,
+                modulus: 360
+            ),
+            10
+        )
+    }
+
+    func testPositiveModuloWrapsNegativeValue() {
+        XCTAssertEqual(
+            WidgetSolarTime.positiveModulo(
+                -10,
+                modulus: 360
+            ),
+            350
+        )
+    }
+
+    func testPositiveModuloWrapsMultipleNegativeCycles() {
+        XCTAssertEqual(
+            WidgetSolarTime.positiveModulo(
+                -730,
+                modulus: 360
+            ),
+            350
+        )
+    }
+
+    func testPositiveModuloNormalizesNegativeZero() {
+        let result = WidgetSolarTime.positiveModulo(
+            -0.0,
+            modulus: 360
+        )
+
+        XCTAssertEqual(result, 0)
+        XCTAssertEqual(result.sign, .plus)
+    }
+
+    func testJulianDaysIsZeroAtJ2000Noon() {
+        XCTAssertEqual(
+            WidgetSolarTime.julianDays(
+                unixMilliseconds: 946_728_000_000
+            ),
+            0
+        )
+    }
+
+    func testJulianDaysIsNegativeHalfAtJ2000Midnight() {
+        XCTAssertEqual(
+            WidgetSolarTime.julianDays(
+                unixMilliseconds: 946_684_800_000
+            ),
+            -0.5
+        )
+    }
+
+    func testJulianDaysAdvancesOnePerDay() {
+        XCTAssertEqual(
+            WidgetSolarTime.julianDays(
+                unixMilliseconds: 946_814_400_000
+            ),
+            1
+        )
+    }
+
+    func testJulianDaysMatchesUnixEpochOffset() {
+        XCTAssertEqual(
+            WidgetSolarTime.julianDays(
+                unixMilliseconds: 0
+            ),
+            -10_957.5
+        )
+    }
+
+    func testSolarTermsAtJ2000() {
+        let terms = WidgetSolarTime.solarTerms(
+            unixMilliseconds: 946_728_000_000
+        )
+
+        XCTAssertEqual(
+            terms.meanLongitudeDegrees,
+            280.460,
+            accuracy: 0.000_001
+        )
+
+        XCTAssertEqual(
+            terms.rightAscensionRadians,
+            -1.3738212627,
+            accuracy: 0.000_000_001
+        )
+
+        XCTAssertEqual(
+            terms.declinationRadians,
+            -0.4020091673,
+            accuracy: 0.000_000_001
+        )
+    }
+
+    func testIsNightMatchesTaipeiSolarBoundaries() {
+        let latitude = 25.032188
+        let longitude = 121.5183226
+
+        let cases: [(Int64, Bool)] = [
+            (1_710_885_457_000, true),
+            (1_710_885_458_000, false),
+            (1_710_885_459_000, false),
+
+            (1_710_929_102_000, false),
+            (1_710_929_103_000, true),
+            (1_710_929_104_000, true),
+        ]
+
+        for (unixMilliseconds, expectedIsNight) in cases {
+            XCTAssertEqual(
+                WidgetSolarTime.isNight(
+                    unixMilliseconds: unixMilliseconds,
+                    latitude: latitude,
+                    longitude: longitude
+                ),
+                expectedIsNight,
+                "Unexpected day/night state at \(unixMilliseconds)"
+            )
+        }
+    }
+
+    func testIsNightIgnoresSubsecondWithinBoundarySecond() {
+        let latitude = 25.032188
+        let longitude = 121.5183226
+
+        XCTAssertFalse(
+            WidgetSolarTime.isNight(
+                unixMilliseconds: 1_710_885_458_999,
+                latitude: latitude,
+                longitude: longitude
+            )
+        )
+
+        XCTAssertTrue(
+            WidgetSolarTime.isNight(
+                unixMilliseconds: 1_710_929_103_999,
+                latitude: latitude,
+                longitude: longitude
+            )
+        )
+    }
+
+    func testNextTransitionMatchesTaipeiSolarBoundaries() {
+        let latitude = 25.032188
+        let longitude = 121.5183226
+
+        let cases: [(now: Int64, expected: Int64)] = [
+            // one second before sunrise → today's sunrise
+            (1_710_885_457_000, 1_710_885_458),
+
+            // exactly sunrise → today's sunset
+            (1_710_885_458_000, 1_710_929_103),
+
+            // one second after sunrise → today's sunset
+            (1_710_885_459_000, 1_710_929_103),
+
+            // one second before sunset → today's sunset
+            (1_710_929_102_000, 1_710_929_103),
+
+            // exactly sunset → tomorrow's sunrise
+            (1_710_929_103_000, 1_710_971_796),
+
+            // one second after sunset → tomorrow's sunrise
+            (1_710_929_104_000, 1_710_971_796),
+        ]
+
+        for testCase in cases {
+            XCTAssertEqual(
+                WidgetSolarTime.nextDayNightTransition(
+                    unixMilliseconds: testCase.now,
+                    latitude: latitude,
+                    longitude: longitude
+                ),
+                testCase.expected,
+                "Unexpected transition at \(testCase.now)"
+            )
+        }
+    }
+
+    func testNextTransitionCrossesYearBoundary() {
+        XCTAssertEqual(
+            WidgetSolarTime.nextDayNightTransition(
+                unixMilliseconds: 1_735_636_512_000,
+                latitude: 25.032188,
+                longitude: 121.5183226
+            ),
+            1_735_684_745
+        )
+    }
+}
