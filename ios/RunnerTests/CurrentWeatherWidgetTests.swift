@@ -539,6 +539,311 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             from: Data(json.utf8)
         )
     }
+
+    private func makeSnapshot(
+        schemaVersion: Int = 5,
+        sourceIdentifier: String? = "region:100",
+        regionCode: String = "100",
+        condition: CurrentWeatherWidgetCondition = .clear,
+        temperature: Double? = 28.5,
+        humidity: Int? = 70,
+        rain: Double? = 0
+    ) -> CurrentWeatherWidgetSnapshot {
+        CurrentWeatherWidgetSnapshot(
+            schemaVersion: schemaVersion,
+            sourceIdentifier: sourceIdentifier,
+            regionCode: regionCode,
+            regionName: "中正區",
+            observationTime: 1_710_900_000,
+            stationName: "臺北",
+            weather: "晴",
+            weatherCode: 100,
+            condition: condition,
+            isNight: false,
+            nextDayNightTransitionTime: 1_710_929_103,
+            calibratedTimeOffsetMilliseconds: -5_000,
+            temperature: temperature,
+            humidity: humidity,
+            rain: rain
+        )
+    }
+
+    func testEncodesSchemaVersionFiveWithAllFields() throws {
+        let snapshot = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 5,
+            sourceIdentifier: "region:100",
+            regionCode: "100",
+            regionName: "中正區",
+            observationTime: 1_710_900_000,
+            stationName: "臺北",
+            weather: "晴",
+            weatherCode: 100,
+            condition: .clear,
+            isNight: false,
+            nextDayNightTransitionTime: 1_710_929_103,
+            calibratedTimeOffsetMilliseconds: -5_000,
+            temperature: 28.5,
+            humidity: 70,
+            rain: 0
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(
+                with: data
+            ) as? [String: Any]
+        )
+
+        XCTAssertEqual(json.count, 15)
+
+        XCTAssertEqual(json["schemaVersion"] as? Int, 5)
+        XCTAssertEqual(
+            json["sourceIdentifier"] as? String,
+            "region:100"
+        )
+        XCTAssertEqual(
+            json["regionCode"] as? String,
+            "100"
+        )
+        XCTAssertEqual(
+            json["regionName"] as? String,
+            "中正區"
+        )
+        XCTAssertEqual(
+            json["observationTime"] as? Int,
+            1_710_900_000
+        )
+        XCTAssertEqual(
+            json["stationName"] as? String,
+            "臺北"
+        )
+        XCTAssertEqual(
+            json["weather"] as? String,
+            "晴"
+        )
+        XCTAssertEqual(
+            json["weatherCode"] as? Int,
+            100
+        )
+        XCTAssertEqual(
+            json["condition"] as? String,
+            "clear"
+        )
+        XCTAssertEqual(
+            json["isNight"] as? Bool,
+            false
+        )
+        XCTAssertEqual(
+            json["nextDayNightTransitionTime"] as? Int,
+            1_710_929_103
+        )
+        XCTAssertEqual(
+            json["calibratedTimeOffsetMilliseconds"] as? Int,
+            -5_000
+        )
+        XCTAssertEqual(
+            json["temperature"] as? Double,
+            28.5
+        )
+        XCTAssertEqual(
+            json["humidity"] as? Int,
+            70
+        )
+        XCTAssertEqual(
+            json["rain"] as? Double,
+            0
+        )
+    }
+
+    func testEncodingPreservesExplicitNullWeatherValues()
+        throws
+    {
+        let snapshot = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 5,
+            sourceIdentifier: "region:100",
+            regionCode: "100",
+            regionName: "中正區",
+            observationTime: 1_710_900_000,
+            stationName: "臺北",
+            weather: "晴",
+            weatherCode: 100,
+            condition: .clear,
+            isNight: false,
+            nextDayNightTransitionTime: 1_710_929_103,
+            calibratedTimeOffsetMilliseconds: 0,
+            temperature: nil,
+            humidity: nil,
+            rain: nil
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(
+                with: data
+            ) as? [String: Any]
+        )
+
+        XCTAssertEqual(json.count, 15)
+
+        XCTAssertTrue(json["temperature"] is NSNull)
+        XCTAssertTrue(json["humidity"] is NSNull)
+        XCTAssertTrue(json["rain"] is NSNull)
+    }
+
+    func testSchemaVersionFourCannotBeEncoded() {
+        let snapshot = makeSnapshot(schemaVersion: 4)
+
+        XCTAssertThrowsError(
+            try JSONEncoder().encode(snapshot)
+        )
+    }
+
+    func testSchemaVersionFiveWithoutSourceIdentifierCannotBeEncoded() {
+        let snapshot = makeSnapshot(sourceIdentifier: nil)
+
+        XCTAssertThrowsError(
+            try JSONEncoder().encode(snapshot)
+        )
+    }
+
+    func testSchemaVersionFiveRejectsMalformedSourceIdentifiers() {
+        let malformedSourceIdentifiers = [
+            "",
+            "region:",
+            "region:10",
+            "region:1000",
+            "region:ABC",
+            "region:１００",
+            "something-else",
+        ]
+
+        for sourceIdentifier in malformedSourceIdentifiers {
+            let snapshot = makeSnapshot(
+                sourceIdentifier: sourceIdentifier
+            )
+
+            XCTAssertThrowsError(
+                try JSONEncoder().encode(snapshot),
+                sourceIdentifier
+            )
+        }
+    }
+
+    func testSavedSourceIdentifierMustMatchPayloadRegionCode() {
+        let snapshot = makeSnapshot(
+            sourceIdentifier: "region:100",
+            regionCode: "407"
+        )
+
+        XCTAssertThrowsError(
+            try JSONEncoder().encode(snapshot)
+        )
+    }
+
+    func testCurrentLocationWithResolvedRegionCodeCanBeEncoded() {
+        let snapshot = makeSnapshot(
+            sourceIdentifier: "current-location",
+            regionCode: "407"
+        )
+
+        XCTAssertNoThrow(
+            try JSONEncoder().encode(snapshot)
+        )
+    }
+
+    func testEncodedSchemaVersionFiveContainsExactlyContractKeys() throws {
+        let data = try JSONEncoder().encode(makeSnapshot())
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: data)
+                as? [String: Any]
+        )
+
+        XCTAssertEqual(
+            Set(json.keys),
+            Set([
+                "schemaVersion",
+                "sourceIdentifier",
+                "regionCode",
+                "regionName",
+                "observationTime",
+                "stationName",
+                "weather",
+                "weatherCode",
+                "condition",
+                "isNight",
+                "nextDayNightTransitionTime",
+                "calibratedTimeOffsetMilliseconds",
+                "temperature",
+                "humidity",
+                "rain",
+            ])
+        )
+    }
+
+    func testConditionEncodesUsingRawSchemaValue() throws {
+        let data = try JSONEncoder().encode(
+            makeSnapshot(condition: .thunderstorm)
+        )
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: data)
+                as? [String: Any]
+        )
+
+        XCTAssertEqual(
+            json["condition"] as? String,
+            "thunderstorm"
+        )
+    }
+
+    func testSchemaVersionFiveRoundTripPreservesAllFields() throws {
+        let original = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 5,
+            sourceIdentifier: "region:407",
+            regionCode: "407",
+            regionName: "西屯區",
+            observationTime: 1_789_567_200,
+            stationName: "西屯",
+            weather: "雷雨",
+            weatherCode: 214,
+            condition: .thunderstorm,
+            isNight: true,
+            nextDayNightTransitionTime: 1_789_562_700,
+            calibratedTimeOffsetMilliseconds: -300_000,
+            temperature: 27.5,
+            humidity: 83,
+            rain: 12.5
+        )
+
+        let encoded = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(
+            CurrentWeatherWidgetSnapshot.self,
+            from: encoded
+        )
+
+        XCTAssertEqual(decoded.schemaVersion, original.schemaVersion)
+        XCTAssertEqual(decoded.sourceIdentifier, original.sourceIdentifier)
+        XCTAssertEqual(decoded.regionCode, original.regionCode)
+        XCTAssertEqual(decoded.regionName, original.regionName)
+        XCTAssertEqual(decoded.observationTime, original.observationTime)
+        XCTAssertEqual(decoded.stationName, original.stationName)
+        XCTAssertEqual(decoded.weather, original.weather)
+        XCTAssertEqual(decoded.weatherCode, original.weatherCode)
+        XCTAssertEqual(decoded.condition, original.condition)
+        XCTAssertEqual(decoded.isNight, original.isNight)
+        XCTAssertEqual(
+            decoded.nextDayNightTransitionTime,
+            original.nextDayNightTransitionTime
+        )
+        XCTAssertEqual(
+            decoded.calibratedTimeOffsetMilliseconds,
+            original.calibratedTimeOffsetMilliseconds
+        )
+        XCTAssertEqual(decoded.temperature, original.temperature)
+        XCTAssertEqual(decoded.humidity, original.humidity)
+        XCTAssertEqual(decoded.rain, original.rain)
+    }
 }
 
 final class CurrentWeatherWidgetConditionTests: XCTestCase {
@@ -1558,6 +1863,200 @@ final class WidgetSolarTimeTests: XCTestCase {
                 longitude: 121.5183226
             ),
             1_735_684_745
+        )
+    }
+}
+
+final class WidgetResolvedWeatherLocationTests: XCTestCase {
+    func testAcceptsValidSavedLocation() {
+        let location = WidgetResolvedWeatherLocation(
+            address: .saved(regionCode: "407"),
+            regionCode: "407",
+            regionName: "西屯區",
+            latitude: 24.1658213,
+            longitude: 120.6336717
+        )
+
+        XCTAssertEqual(
+            location?.address,
+            .saved(regionCode: "407")
+        )
+        XCTAssertEqual(location?.regionCode, "407")
+        XCTAssertEqual(location?.regionName, "西屯區")
+        XCTAssertEqual(location?.latitude, 24.1658213)
+        XCTAssertEqual(location?.longitude, 120.6336717)
+    }
+
+    func testRejectsSavedAddressRegionMismatch() {
+        XCTAssertNil(
+            WidgetResolvedWeatherLocation(
+                address: .saved(regionCode: "407"),
+                regionCode: "100",
+                regionName: "中正區",
+                latitude: 25.032188,
+                longitude: 121.5183226
+            )
+        )
+    }
+
+    func testAcceptsCurrentLocationWithResolvedRegion() {
+        let location = WidgetResolvedWeatherLocation(
+            address: .currentLocation,
+            regionCode: "407",
+            regionName: "西屯區",
+            latitude: 24.1658213,
+            longitude: 120.6336717
+        )
+
+        XCTAssertEqual(
+            location?.address,
+            .currentLocation
+        )
+
+        XCTAssertEqual(
+            location?.regionCode,
+            "407"
+        )
+    }
+
+    func testRejectsInvalidRegionCode() {
+        XCTAssertNil(
+            WidgetResolvedWeatherLocation(
+                address: .currentLocation,
+                regionCode: "40A",
+                regionName: "西屯區",
+                latitude: 24.1658213,
+                longitude: 120.6336717
+            )
+        )
+    }
+
+    func testRejectsInvalidCoordinates() {
+        XCTAssertNil(
+            WidgetResolvedWeatherLocation(
+                address: .currentLocation,
+                regionCode: "407",
+                regionName: "西屯區",
+                latitude: 91,
+                longitude: 120.6336717
+            )
+        )
+
+        XCTAssertNil(
+            WidgetResolvedWeatherLocation(
+                address: .currentLocation,
+                regionCode: "407",
+                regionName: "西屯區",
+                latitude: 24.1658213,
+                longitude: .infinity
+            )
+        )
+    }
+}
+
+final class CurrentWeatherSnapshotTimeTests: XCTestCase {
+    func testStoresCalibratedTimeSample() {
+        let time = CurrentWeatherSnapshotTime(
+            calibratedNowUnixMilliseconds: 1_789_567_200_123,
+            calibratedTimeOffsetMilliseconds: -5_000
+        )
+
+        XCTAssertEqual(
+            time.calibratedNowUnixMilliseconds,
+            1_789_567_200_123
+        )
+        XCTAssertEqual(
+            time.calibratedTimeOffsetMilliseconds,
+            -5_000
+        )
+    }
+}
+
+final class CurrentWeatherWidgetSnapshotFactoryTests: XCTestCase {
+    func testCreatesSchemaFiveSnapshotFromResolvedInputs() throws {
+        let observation = try makeObservation()
+
+        let location = try XCTUnwrap(
+            WidgetResolvedWeatherLocation(
+                address: .saved(regionCode: "100"),
+                regionCode: "100",
+                regionName: "中正區",
+                latitude: 25.032188,
+                longitude: 121.5183226
+            )
+        )
+
+        let time = CurrentWeatherSnapshotTime(
+            calibratedNowUnixMilliseconds:
+                1_710_907_200_000,
+            calibratedTimeOffsetMilliseconds:
+                -5_000
+        )
+
+        let snapshot =
+            CurrentWeatherWidgetSnapshotFactory.make(
+                observation: observation,
+                location: location,
+                time: time
+            )
+
+        XCTAssertEqual(snapshot.schemaVersion, 5)
+        XCTAssertEqual(
+            snapshot.sourceIdentifier,
+            "region:100"
+        )
+
+        XCTAssertEqual(snapshot.regionCode, "100")
+        XCTAssertEqual(snapshot.regionName, "中正區")
+
+        XCTAssertEqual(
+            snapshot.observationTime,
+            1_710_900_000
+        )
+
+        XCTAssertEqual(snapshot.stationName, "臺北")
+        XCTAssertEqual(snapshot.weather, "晴")
+        XCTAssertEqual(snapshot.weatherCode, 100)
+        XCTAssertEqual(snapshot.condition, .clear)
+
+        XCTAssertFalse(snapshot.isNight)
+        XCTAssertEqual(
+            snapshot.nextDayNightTransitionTime,
+            1_710_929_103
+        )
+
+        XCTAssertEqual(
+            snapshot.calibratedTimeOffsetMilliseconds,
+            -5_000
+        )
+
+        XCTAssertEqual(snapshot.temperature, 28.5)
+        XCTAssertEqual(snapshot.humidity, 70)
+        XCTAssertEqual(snapshot.rain, 0)
+    }
+
+    private func makeObservation() throws
+        -> CurrentWeatherRemoteDTO
+    {
+        let json = """
+        {
+          "station": {
+            "name": "臺北"
+          },
+          "time": 1710900000,
+          "data": {
+            "weather": "晴",
+            "weatherCode": 100,
+            "temperature": 28.5,
+            "humidity": 70,
+            "rain": 0
+          }
+        }
+        """
+
+        return try JSONDecoder().decode(
+            CurrentWeatherRemoteDTO.self,
+            from: Data(json.utf8)
         )
     }
 }

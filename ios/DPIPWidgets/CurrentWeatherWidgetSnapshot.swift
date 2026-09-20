@@ -69,7 +69,7 @@ enum CurrentWeatherWidgetCondition: String, Decodable {
     }
 }
 
-struct CurrentWeatherWidgetSnapshot: Decodable {
+struct CurrentWeatherWidgetSnapshot: Codable {
     let schemaVersion: Int
     let sourceIdentifier: String?
 
@@ -250,5 +250,154 @@ struct CurrentWeatherWidgetSnapshot: Decodable {
             Double.self,
             forKey: .rain
         )
+    }
+
+    func encode(to encoder: Encoder) throws {
+        guard schemaVersion == 5 else {
+            throw EncodingError.invalidValue(
+                schemaVersion,
+                .init(
+                    codingPath: encoder.codingPath,
+                    debugDescription:
+                        "Only current-weather snapshot schema version 5 can be encoded."
+                )
+            )
+        }
+
+        guard let sourceIdentifier else {
+            throw EncodingError.invalidValue(
+                sourceIdentifier as Any,
+                .init(
+                    codingPath: encoder.codingPath,
+                    debugDescription:
+                        "Schema version 5 requires a source identifier."
+                )
+            )
+        }
+
+        guard let address = CurrentWeatherSnapshotAddress(
+            sourceIdentifier: sourceIdentifier
+        ) else {
+            throw EncodingError.invalidValue(
+                sourceIdentifier,
+                .init(
+                    codingPath: encoder.codingPath,
+                    debugDescription:
+                        "Invalid current-weather snapshot source identifier."
+                )
+            )
+        }
+
+        guard CurrentWeatherSnapshotAddress(
+            sourceIdentifier: "region:\(regionCode)"
+        ) != nil else {
+            throw EncodingError.invalidValue(
+                regionCode,
+                .init(
+                    codingPath: encoder.codingPath,
+                    debugDescription:
+                        "Current-weather snapshot region code must be exactly three ASCII digits."
+                )
+            )
+        }
+
+        if case let .saved(addressRegionCode) = address {
+            guard addressRegionCode == regionCode else {
+                throw EncodingError.invalidValue(
+                    regionCode,
+                    .init(
+                        codingPath: encoder.codingPath,
+                        debugDescription:
+                            "Saved snapshot source identifier and payload region code must match."
+                    )
+                )
+            }
+        }
+
+        var container = encoder.container(
+            keyedBy: CodingKeys.self
+        )
+
+        try container.encode(
+            schemaVersion,
+            forKey: .schemaVersion
+        )
+        try container.encode(
+            sourceIdentifier,
+            forKey: .sourceIdentifier
+        )
+        try container.encode(
+            regionCode,
+            forKey: .regionCode
+        )
+        try container.encode(
+            regionName,
+            forKey: .regionName
+        )
+        try container.encode(
+            observationTime,
+            forKey: .observationTime
+        )
+        try container.encode(
+            stationName,
+            forKey: .stationName
+        )
+        try container.encode(
+            weather,
+            forKey: .weather
+        )
+        try container.encode(
+            weatherCode,
+            forKey: .weatherCode
+        )
+        try container.encode(
+            condition.rawValue,
+            forKey: .condition
+        )
+        try container.encode(
+            isNight,
+            forKey: .isNight
+        )
+        try container.encode(
+            nextDayNightTransitionTime,
+            forKey: .nextDayNightTransitionTime
+        )
+        try container.encode(
+            calibratedTimeOffsetMilliseconds,
+            forKey: .calibratedTimeOffsetMilliseconds
+        )
+
+        if let temperature {
+            try container.encode(
+                temperature,
+                forKey: .temperature
+            )
+        } else {
+            try container.encodeNil(
+                forKey: .temperature
+            )
+        }
+
+        if let humidity {
+            try container.encode(
+                humidity,
+                forKey: .humidity
+            )
+        } else {
+            try container.encodeNil(
+                forKey: .humidity
+            )
+        }
+
+        if let rain {
+            try container.encode(
+                rain,
+                forKey: .rain
+            )
+        } else {
+            try container.encodeNil(
+                forKey: .rain
+            )
+        }
     }
 }
