@@ -50,11 +50,12 @@
 		D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */; };
 		D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */; };
 		D91A00000000000000000014 /* CurrentWeatherRemoteDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */; };
-		E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */; };
-		E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */; };
 		DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */; };
 		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
 		E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* Sounds/weather.aiff */; };
+		E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */; };
+		E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */; };
+		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
 /* End PBXBuildFile section */
 
@@ -165,9 +166,10 @@
 		D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshot.swift; path = ../DPIPWidgets/CurrentWeatherWidgetSnapshot.swift; sourceTree = "<group>"; };
 		D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetTimeline.swift; path = ../DPIPWidgets/CurrentWeatherWidgetTimeline.swift; sourceTree = "<group>"; };
 		D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherRemoteDTO.swift; path = ../DPIPWidgets/CurrentWeatherRemoteDTO.swift; sourceTree = "<group>"; };
+		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetSnapshotWriterTests.swift; sourceTree = "<group>"; };
 		E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
-		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -243,12 +245,14 @@
 				CurrentWeatherSnapshotTime.swift,
 				CurrentWeatherWidgetSnapshotFactory.swift,
 				CurrentWeatherWidgetSnapshotWriter.swift,
+				DPIPWidgetProviderSupport.swift,
 				SavedCurrentWeatherWidgetRefreshService.swift,
 				SavedWidgetLocationResolver.swift,
-				WidgetServerClock.swift,
-				WidgetSNTPClient.swift,
 				WidgetLocationTarget.swift,
 				WidgetResolvedWeatherLocation.swift,
+				WidgetServerClock.swift,
+				WidgetSNTPClient.swift,
+				WidgetSnapshotStore.swift,
 				WidgetSolarTime.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
@@ -330,6 +334,7 @@
 				270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */,
 				E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */,
 				E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */,
+				F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -671,6 +676,7 @@
 				D91A00000000000000000014 /* CurrentWeatherRemoteDTO.swift in Sources */,
 				E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */,
 				E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */,
+				F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

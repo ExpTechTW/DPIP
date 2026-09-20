@@ -159,15 +159,21 @@ extension WidgetLocationCatalogLocation: Decodable {
 }
 
 struct WidgetLocationCatalogStore: Sendable {
-    private let appGroupIdentifier =
-        "group.com.exptech.dpip.dpip.widgets"
+    private let containerURL: URL?
+
+    init() {
+        containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier:
+                "group.com.exptech.dpip.dpip.widgets"
+        )
+    }
+
+    init(containerURL: URL) {
+        self.containerURL = containerURL
+    }
 
     func load() -> WidgetLocationCatalog? {
-        guard let containerURL =
-            FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: appGroupIdentifier
-            )
-        else {
+        guard let containerURL else {
             return nil
         }
 
