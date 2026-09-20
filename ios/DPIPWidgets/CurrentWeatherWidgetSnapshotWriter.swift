@@ -4,7 +4,7 @@ enum CurrentWeatherWidgetSnapshotWriterError: Error {
     case invalidSourceIdentifier
 }
 
-struct CurrentWeatherWidgetSnapshotWriter {
+struct CurrentWeatherWidgetSnapshotWriter: Sendable {
     let containerURL: URL
 
     func write(
