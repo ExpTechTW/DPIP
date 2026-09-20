@@ -75,10 +75,27 @@ enum WidgetSnapshotFile {
     sourceIdentifier: String? = nil,
     in container: URL
   ) throws {
-    let destination: URL
-
     do {
-      destination = try snapshotURL(
+      if kind == .currentWeather {
+        guard
+          let sourceIdentifier,
+          let address = CurrentWeatherSnapshotAddress(
+            sourceIdentifier: sourceIdentifier
+          )
+        else {
+          throw WidgetSnapshotError.invalidPayload
+        }
+
+        try CurrentWeatherSnapshotStorage(
+          containerURL: container
+        ).replace(
+          data,
+          for: address
+        )
+        return
+      }
+
+      let destination = try snapshotURL(
         kind: kind,
         sourceIdentifier: sourceIdentifier,
         in: container
@@ -133,12 +150,9 @@ enum WidgetSnapshotFile {
         throw WidgetSnapshotError.invalidPayload
       }
 
-      return directory
-        .appendingPathComponent(
-          "current-weather",
-          isDirectory: true
-        )
-        .appendingPathComponent(address.filename)
+      return CurrentWeatherSnapshotStorage(
+        containerURL: container
+      ).snapshotURL(for: address)
 
     case .weatherForecast:
       return directory.appendingPathComponent(
