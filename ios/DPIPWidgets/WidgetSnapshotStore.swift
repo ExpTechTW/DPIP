@@ -72,16 +72,9 @@ struct WidgetSnapshotStore {
             return nil
         }
 
-        return appGroupContainerURL
-            .appendingPathComponent(
-                "WidgetSnapshots",
-                isDirectory: true
-            )
-            .appendingPathComponent(
-                "current-weather",
-                isDirectory: true
-            )
-            .appendingPathComponent(address.filename)
+        return CurrentWeatherSnapshotStorage(
+            containerURL: appGroupContainerURL
+        ).snapshotURL(for: address)
     }
 
     func loadCurrentWeatherSnapshot(
