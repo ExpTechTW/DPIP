@@ -280,8 +280,8 @@ final class SavedWidgetLocationResolverTests: XCTestCase {
             resolver.resolve(
                 target: WidgetLocationTarget(identifier: "region:242")
             ),
-            ResolvedSavedLocation(
-                sourceIdentifier: "region:242",
+            WidgetResolvedWeatherLocation(
+                address: .saved(regionCode: "242"),
                 regionCode: "242",
                 regionName: "新莊區",
                 latitude: 25.0358303,

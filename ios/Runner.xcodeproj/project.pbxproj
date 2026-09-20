@@ -229,8 +229,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherClient.swift,
+				CurrentWeatherSnapshotTime.swift,
+				CurrentWeatherWidgetSnapshotFactory.swift,
 				SavedWidgetLocationResolver.swift,
 				WidgetLocationTarget.swift,
+				WidgetResolvedWeatherLocation.swift,
 				WidgetSolarTime.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
