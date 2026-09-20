@@ -47,6 +47,7 @@
 		D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */; };
 		D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */; };
 		D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */; };
+		D91A00000000000000000014 /* CurrentWeatherRemoteDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */; };
 		DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */; };
 		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
 		E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* Sounds/weather.aiff */; };
@@ -157,6 +158,7 @@
 		D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetTests.swift; sourceTree = "<group>"; };
 		D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshot.swift; path = ../DPIPWidgets/CurrentWeatherWidgetSnapshot.swift; sourceTree = "<group>"; };
 		D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetTimeline.swift; path = ../DPIPWidgets/CurrentWeatherWidgetTimeline.swift; sourceTree = "<group>"; };
+		D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherRemoteDTO.swift; path = ../DPIPWidgets/CurrentWeatherRemoteDTO.swift; sourceTree = "<group>"; };
 		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
+				WidgetLocationCatalog.swift,
 			);
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 		};
@@ -181,6 +184,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
+				WidgetLocationCatalog.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
@@ -217,7 +221,6 @@
 		27CACC5E305C66560046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				WidgetLocationCatalog.swift,
 				WidgetLocationOptions.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
@@ -225,6 +228,7 @@
 		27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				SavedWidgetLocationResolver.swift,
 				WidgetLocationTarget.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
@@ -290,6 +294,7 @@
 				D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */,
 				D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */,
 				D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */,
+				D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */,
 				27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */,
 				27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */,
 				270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */,
@@ -630,6 +635,7 @@
 				270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */,
 				27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */,
 				D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */,
+				D91A00000000000000000014 /* CurrentWeatherRemoteDTO.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
