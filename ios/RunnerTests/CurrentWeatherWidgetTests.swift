@@ -1,6 +1,238 @@
 import Foundation
 import XCTest
 
+final class CurrentWeatherRemoteDTOTests: XCTestCase {
+    func testDecodesValidClearResponse() throws {
+        let weather = try decode(
+            """
+            {
+              "id": "C0X16",
+              "station": {
+                "name": "仁德",
+                "lat": 22.9683,
+                "lon": 120.2577,
+                "altitude": 26,
+                "distance": 0.81
+              },
+              "time": 1789567200,
+              "data": {
+                "weather": "晴",
+                "weatherCode": 100,
+                "temperature": 28.5,
+                "humidity": 70,
+                "rain": 0.0,
+                "wind": { "speed": 1.5, "beaufort": 1 },
+                "gust": { "speed": 3.0, "beaufort": 2 }
+              }
+            }
+            """
+        )
+
+        XCTAssertEqual(weather.stationName, "仁德")
+        XCTAssertEqual(weather.time, 1_789_567_200)
+        XCTAssertEqual(weather.weather, "晴")
+        XCTAssertEqual(weather.weatherCode, 100)
+        XCTAssertEqual(weather.condition, .clear)
+        XCTAssertEqual(weather.temperature, 28.5)
+        XCTAssertEqual(weather.humidity, 70)
+        XCTAssertEqual(weather.rain, 0)
+    }
+
+    func testDecodesValidRainResponse() throws {
+        let weather = try decode(
+            validJSON(
+                weather: "有雨",
+                weatherCode: 106
+            )
+        )
+
+        XCTAssertEqual(weather.weather, "有雨")
+        XCTAssertEqual(weather.weatherCode, 106)
+        XCTAssertEqual(weather.condition, .rain)
+    }
+
+    func testMissingSentinelsDecodeAsNil() throws {
+        let weather = try decode(
+            validJSON(
+                temperature: "-99",
+                humidity: "-99",
+                rain: "-99"
+            )
+        )
+
+        XCTAssertNil(weather.temperature)
+        XCTAssertNil(weather.humidity)
+        XCTAssertNil(weather.rain)
+    }
+
+    func testRejectsMissingStationName() {
+        XCTAssertThrowsError(
+            try decode(
+                validJSON(station: "{}")
+            )
+        )
+    }
+
+    func testRejectsMissingTime() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "station": { "name": "仁德" },
+                  "data": {
+                    "weather": "晴",
+                    "weatherCode": 100
+                  }
+                }
+                """
+            )
+        )
+    }
+
+    func testRejectsMissingWeather() {
+        XCTAssertThrowsError(
+            try decode(
+                validJSON(weather: nil)
+            )
+        )
+    }
+
+    func testRejectsMissingWeatherCode() {
+        XCTAssertThrowsError(
+            try decode(
+                validJSON(weatherCode: nil)
+            )
+        )
+    }
+
+    func testRejectsMalformedDataStructure() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "station": { "name": "仁德" },
+                  "time": 1789567200,
+                  "data": []
+                }
+                """
+            )
+        )
+    }
+
+    func testRejectsMalformedRequiredFieldType() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "station": { "name": "仁德" },
+                  "time": "1789567200",
+                  "data": {
+                    "weather": "晴",
+                    "weatherCode": 100
+                  }
+                }
+                """
+            )
+        )
+    }
+
+    func testMatchesDartWeatherCodeSemantics() {
+        let cases: [(Int, CurrentWeatherWidgetCondition)] = [
+            (100, .clear),
+            (200, .cloudy),
+            (300, .overcast),
+            (101, .fog),
+            (102, .fog),
+            (105, .fog),
+            (103, .thunderstorm),
+            (104, .thunderstorm),
+            (114, .thunderstorm),
+            (115, .thunderstorm),
+            (116, .thunderstorm),
+            (117, .thunderstorm),
+            (118, .thunderstorm),
+            (119, .thunderstorm),
+            (106, .rain),
+            (107, .rain),
+            (111, .rain),
+            (113, .rain),
+            (108, .snow),
+            (109, .snow),
+            (110, .snow),
+            (112, .snow),
+        ]
+
+        for (code, condition) in cases {
+            XCTAssertEqual(
+                currentWeatherWidgetCondition(for: code),
+                condition,
+                "weather code \(code)"
+            )
+        }
+    }
+
+    func testPhenomenonTakesPrecedenceOverSkyState() {
+        let cases: [(Int, CurrentWeatherWidgetCondition)] = [
+            (106, .rain),
+            (214, .thunderstorm),
+            (305, .fog),
+        ]
+
+        for (code, condition) in cases {
+            XCTAssertEqual(
+                currentWeatherWidgetCondition(for: code),
+                condition,
+                "weather code \(code)"
+            )
+        }
+    }
+
+    func testUnknownWeatherCodesReturnUnknown() {
+        for code in [0, -1, 420] {
+            XCTAssertEqual(
+                currentWeatherWidgetCondition(for: code),
+                .unknown,
+                "weather code \(code)"
+            )
+        }
+    }
+
+    private func decode(_ json: String) throws -> CurrentWeatherRemoteDTO {
+        try JSONDecoder().decode(
+            CurrentWeatherRemoteDTO.self,
+            from: Data(json.utf8)
+        )
+    }
+
+    private func validJSON(
+        station: String = #"{ "name": "仁德" }"#,
+        weather: String? = "晴",
+        weatherCode: Int? = 100,
+        temperature: String = "28.5",
+        humidity: String = "70",
+        rain: String = "0.0"
+    ) -> String {
+        let weatherField = weather.map { #""weather": "\#($0)","# } ?? ""
+        let weatherCodeField = weatherCode.map {
+            #""weatherCode": \#($0),"#
+        } ?? ""
+
+        return """
+        {
+          "station": \(station),
+          "time": 1789567200,
+          "data": {
+            \(weatherField)
+            \(weatherCodeField)
+            "temperature": \(temperature),
+            "humidity": \(humidity),
+            "rain": \(rain)
+          }
+        }
+        """
+    }
+}
+
 final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
     func testDecodesSchemaVersionFiveSnapshot() throws {
         let snapshot = try decode(
