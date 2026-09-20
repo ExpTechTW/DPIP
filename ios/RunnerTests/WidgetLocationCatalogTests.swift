@@ -21,6 +21,86 @@ final class WidgetLocationCatalogTests: XCTestCase {
         XCTAssertEqual(catalog.locations[0].longitude, 121.4500307)
     }
 
+    func testEmptyCatalogIsValid() throws {
+        let catalog = try XCTUnwrap(
+            WidgetLocationCatalog.decode(
+                Data(
+                    #"{"schemaVersion":1,"locations":[]}"#.utf8
+                )
+            )
+        )
+
+        XCTAssertEqual(catalog.locations, [])
+    }
+
+    func testAcceptsCoordinateBoundaries() throws {
+        let coordinates = [
+            (-90.0, -180.0),
+            (-90.0, 180.0),
+            (90.0, -180.0),
+            (90.0, 180.0),
+        ]
+
+        for (latitude, longitude) in coordinates {
+            let catalog = try XCTUnwrap(
+                WidgetLocationCatalog.decode(
+                    validCatalogData(
+                        latitude: latitude,
+                        longitude: longitude
+                    )
+                )
+            )
+
+            XCTAssertEqual(catalog.locations[0].latitude, latitude)
+            XCTAssertEqual(catalog.locations[0].longitude, longitude)
+        }
+    }
+
+    func testIntegerJSONCoordinatesDecodeAsDouble() throws {
+        let json = """
+        {
+          "schemaVersion": 1,
+          "locations": [
+            {
+              "regionCode": "242",
+              "displayName": "新莊區",
+              "administrativeAreaName": "新北市",
+              "latitude": 25,
+              "longitude": 121
+            }
+          ]
+        }
+        """
+
+        let catalog = try XCTUnwrap(
+            WidgetLocationCatalog.decode(Data(json.utf8))
+        )
+
+        XCTAssertEqual(catalog.locations[0].latitude, 25.0)
+        XCTAssertEqual(catalog.locations[0].longitude, 121.0)
+    }
+
+    func testEmptyDisplayNamePreservesCurrentBehavior() throws {
+        let catalog = try XCTUnwrap(
+            WidgetLocationCatalog.decode(
+                validCatalogData(displayName: "")
+            )
+        )
+
+        XCTAssertEqual(catalog.locations[0].displayName, "")
+    }
+
+    func testUnicodeDisplayNamePreservesCurrentBehavior() throws {
+        let displayName = "臺北🌧️"
+        let catalog = try XCTUnwrap(
+            WidgetLocationCatalog.decode(
+                validCatalogData(displayName: displayName)
+            )
+        )
+
+        XCTAssertEqual(catalog.locations[0].displayName, displayName)
+    }
+
     func testRejectsUnsupportedSchemaVersion() {
         XCTAssertNil(
             WidgetLocationCatalog.decode(
@@ -169,6 +249,7 @@ final class WidgetLocationCatalogTests: XCTestCase {
     private func validCatalogData(
         schemaVersion: Int = 1,
         regionCode: String = "242",
+        displayName: String = "新莊區",
         latitude: Double = 25.0358303,
         longitude: Double = 121.4500307
     ) -> Data {
@@ -179,7 +260,7 @@ final class WidgetLocationCatalogTests: XCTestCase {
               "locations": [
                 {
                   "regionCode": "\(regionCode)",
-                  "displayName": "新莊區",
+                  "displayName": "\(displayName)",
                   "administrativeAreaName": "新北市",
                   "latitude": \(latitude),
                   "longitude": \(longitude)
