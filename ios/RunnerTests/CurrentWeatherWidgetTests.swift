@@ -65,6 +65,85 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
         XCTAssertNil(weather.rain)
     }
 
+    func testMissingOptionalKeysDecodeAsNil() throws {
+        let weather = try decode(
+            """
+            {
+              "station": { "name": "仁德" },
+              "time": 1789567200,
+              "data": {
+                "weather": "晴",
+                "weatherCode": 100
+              }
+            }
+            """
+        )
+
+        XCTAssertNil(weather.temperature)
+        XCTAssertNil(weather.humidity)
+        XCTAssertNil(weather.rain)
+    }
+
+    func testExplicitNullOptionalValuesDecodeAsNil() throws {
+        let weather = try decode(
+            validJSON(
+                temperature: "null",
+                humidity: "null",
+                rain: "null"
+            )
+        )
+
+        XCTAssertNil(weather.temperature)
+        XCTAssertNil(weather.humidity)
+        XCTAssertNil(weather.rain)
+    }
+
+    func testIntegerJSONValuesDecodeAsDouble() throws {
+        let weather = try decode(
+            validJSON(
+                temperature: "28",
+                rain: "1"
+            )
+        )
+
+        XCTAssertEqual(weather.temperature, 28.0)
+        XCTAssertEqual(weather.rain, 1.0)
+    }
+
+    func testIntegralFloatingPointJSONValueDecodesAsInt() throws {
+        let weather = try decode(
+            validJSON(humidity: "70.0")
+        )
+
+        XCTAssertEqual(weather.humidity, 70)
+    }
+
+    func testRejectsFractionalJSONValueForInt() {
+        XCTAssertThrowsError(
+            try decode(validJSON(humidity: "70.5"))
+        )
+    }
+
+    func testRejectsBooleanForNumericField() {
+        XCTAssertThrowsError(
+            try decode(validJSON(temperature: "true"))
+        )
+    }
+
+    func testRejectsOversizedInt() {
+        XCTAssertThrowsError(
+            try decode(
+                validJSON(time: "9223372036854775808")
+            )
+        )
+    }
+
+    func testNegativeTimestampPreservesCurrentDecodingBehavior() throws {
+        let weather = try decode(validJSON(time: "-1"))
+
+        XCTAssertEqual(weather.time, -1)
+    }
+
     func testRejectsMissingStationName() {
         XCTAssertThrowsError(
             try decode(
@@ -206,6 +285,7 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
 
     private func validJSON(
         station: String = #"{ "name": "仁德" }"#,
+        time: String = "1789567200",
         weather: String? = "晴",
         weatherCode: Int? = 100,
         temperature: String = "28.5",
@@ -220,7 +300,7 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
         return """
         {
           "station": \(station),
-          "time": 1789567200,
+          "time": \(time),
           "data": {
             \(weatherField)
             \(weatherCodeField)
@@ -770,5 +850,406 @@ final class CurrentWeatherWidgetTimelineTests: XCTestCase {
 
     private func date(_ timestamp: TimeInterval) -> Date {
         Date(timeIntervalSince1970: timestamp)
+    }
+}
+
+private final class MockURLProtocol: URLProtocol {
+    static var requestHandler: ((URLRequest) throws -> (URLResponse, Data))?
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        true
+    }
+
+    override class func canonicalRequest(
+        for request: URLRequest
+    ) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        guard let handler = Self.requestHandler else {
+            client?.urlProtocol(
+                self,
+                didFailWithError: URLError(.badServerResponse)
+            )
+            return
+        }
+
+        do {
+            let (response, data) = try handler(request)
+
+            client?.urlProtocol(
+                self,
+                didReceive: response,
+                cacheStoragePolicy: .notAllowed
+            )
+
+            client?.urlProtocol(
+                self,
+                didLoad: data
+            )
+
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(
+                self,
+                didFailWithError: error
+            )
+        }
+    }
+
+    override func stopLoading() {}
+}
+
+final class CurrentWeatherClientTests: XCTestCase {
+    private var session: URLSession!
+    private var client: CurrentWeatherClient!
+
+    override func setUp() {
+        super.setUp()
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+
+        session = URLSession(configuration: configuration)
+        client = CurrentWeatherClient(session: session)
+    }
+
+    override func tearDown() {
+        MockURLProtocol.requestHandler = nil
+        session.invalidateAndCancel()
+
+        client = nil
+        session = nil
+
+        super.tearDown()
+    }
+
+    func testMakeURLBuildsRealtimeEndpoint() throws {
+        let url = try client.makeURL(
+            latitude: 24.1658,
+            longitude: 120.6336
+        )
+
+        let components = try XCTUnwrap(
+            URLComponents(url: url, resolvingAgainstBaseURL: false)
+        )
+
+        XCTAssertEqual(
+            url.absoluteString,
+            "https://api.core-tnn1.exptech.dev/api/v5/meteor/weather/realtime/24.1658,120.6336"
+        )
+        XCTAssertEqual(components.scheme, "https")
+        XCTAssertEqual(components.host, "api.core-tnn1.exptech.dev")
+        XCTAssertEqual(
+            components.path,
+            "/api/v5/meteor/weather/realtime/24.1658,120.6336"
+        )
+        XCTAssertNil(components.query)
+    }
+
+    func testMakeURLPreservesNegativeCoordinatesAndOrdering() throws {
+        let url = try client.makeURL(
+            latitude: -24.1658,
+            longitude: -120.6336
+        )
+
+        XCTAssertEqual(
+            url.absoluteString,
+            "https://api.core-tnn1.exptech.dev/api/v5/meteor/weather/realtime/-24.1658,-120.6336"
+        )
+    }
+
+    func testMakeURLAcceptsCoordinateBoundaries() throws {
+        XCTAssertEqual(
+            try client.makeURL(
+                latitude: 90,
+                longitude: 180
+            ).absoluteString,
+            "https://api.core-tnn1.exptech.dev/api/v5/meteor/weather/realtime/90.0,180.0"
+        )
+
+        XCTAssertEqual(
+            try client.makeURL(
+                latitude: -90,
+                longitude: -180
+            ).absoluteString,
+            "https://api.core-tnn1.exptech.dev/api/v5/meteor/weather/realtime/-90.0,-180.0"
+        )
+    }
+
+    func testMakeURLRejectsInvalidLatitude() {
+        XCTAssertThrowsError(
+            try client.makeURL(latitude: 90.1, longitude: 120)
+        ) { error in
+            XCTAssertEqual(
+                error as? CurrentWeatherClientError,
+                .invalidCoordinate
+            )
+        }
+
+        XCTAssertThrowsError(
+            try client.makeURL(latitude: -90.1, longitude: 120)
+        ) { error in
+            XCTAssertEqual(
+                error as? CurrentWeatherClientError,
+                .invalidCoordinate
+            )
+        }
+    }
+
+    func testMakeURLRejectsInvalidLongitude() {
+        XCTAssertThrowsError(
+            try client.makeURL(latitude: 24, longitude: 180.1)
+        ) { error in
+            XCTAssertEqual(
+                error as? CurrentWeatherClientError,
+                .invalidCoordinate
+            )
+        }
+
+        XCTAssertThrowsError(
+            try client.makeURL(latitude: 24, longitude: -180.1)
+        ) { error in
+            XCTAssertEqual(
+                error as? CurrentWeatherClientError,
+                .invalidCoordinate
+            )
+        }
+    }
+
+    func testMakeURLRejectsNonFiniteCoordinates() {
+        let invalidCoordinates: [(Double, Double)] = [
+            (.nan, 120),
+            (.infinity, 120),
+            (-.infinity, 120),
+            (24, .nan),
+            (24, .infinity),
+            (24, -.infinity),
+        ]
+
+        for (latitude, longitude) in invalidCoordinates {
+            XCTAssertThrowsError(
+                try client.makeURL(
+                    latitude: latitude,
+                    longitude: longitude
+                )
+            ) { error in
+                XCTAssertEqual(
+                    error as? CurrentWeatherClientError,
+                    .invalidCoordinate
+                )
+            }
+        }
+    }
+
+    func testFetchReturnsDecodedWeather() async throws {
+        let json = """
+        {
+          "id": "C0F9T",
+          "station": {
+            "name": "西屯"
+          },
+          "time": 1789877400,
+          "data": {
+            "weather": "晴",
+            "weatherCode": 100,
+            "temperature": 30.6,
+            "humidity": 66,
+            "rain": 0
+          }
+        }
+        """
+
+        MockURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.timeoutInterval, 6)
+            XCTAssertEqual(
+                request.url?.absoluteString,
+                "https://api.core-tnn1.exptech.dev/api/v5/meteor/weather/realtime/24.1658,120.6336"
+            )
+
+            let response = try XCTUnwrap(
+                HTTPURLResponse(
+                    url: request.url!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                )
+            )
+
+            return (
+                response,
+                Data(json.utf8)
+            )
+        }
+
+        let result = try await client.fetch(
+            latitude: 24.1658,
+            longitude: 120.6336
+        )
+
+        let weather = try XCTUnwrap(result)
+
+        XCTAssertEqual(weather.stationName, "西屯")
+        XCTAssertEqual(weather.time, 1789877400)
+        XCTAssertEqual(weather.weather, "晴")
+        XCTAssertEqual(weather.weatherCode, 100)
+        XCTAssertEqual(weather.temperature, 30.6)
+        XCTAssertEqual(weather.humidity, 66)
+        XCTAssertEqual(weather.rain, 0)
+    }
+
+    func testFetchReturnsNilForStructurallyEmptyObjects() async throws {
+        for body in ["{}", "  { \n } \n"] {
+            setHTTPResponse(data: Data(body.utf8))
+
+            let result = try await fetch()
+
+            XCTAssertNil(result, body)
+        }
+    }
+
+    func testFetchRejectsMalformedOrWrongShapeResponses() async {
+        let cases = [
+            ("malformed JSON", #"{"station":"#),
+            ("top-level array", "[]"),
+            ("missing realtime structure", #"{"message":"ok"}"#),
+            (
+                "invalid required field type",
+                """
+                {
+                  "station": { "name": "西屯" },
+                  "time": "1789877400",
+                  "data": {
+                    "weather": "晴",
+                    "weatherCode": 100
+                  }
+                }
+                """
+            ),
+        ]
+
+        for (name, body) in cases {
+            setHTTPResponse(data: Data(body.utf8))
+
+            do {
+                _ = try await fetch()
+                XCTFail("Expected decoding failure for \(name)")
+            } catch {
+                XCTAssertFalse(
+                    error is CurrentWeatherClientError,
+                    "\(name): \(error)"
+                )
+            }
+        }
+    }
+
+    func testFetchRejectsHTTPFailures() async {
+        for statusCode in [404, 500] {
+            setHTTPResponse(
+                statusCode: statusCode,
+                data: Data("{}".utf8)
+            )
+
+            await assertFetchThrows(
+                .httpStatus(statusCode),
+                context: "HTTP \(statusCode)"
+            )
+        }
+    }
+
+    func testFetchAcceptsOnlyHTTP200() async {
+        setHTTPResponse(statusCode: 204, data: Data())
+
+        await assertFetchThrows(.httpStatus(204))
+    }
+
+    func testFetchRejectsOversizedResponse() async {
+        setHTTPResponse(
+            data: Data(repeating: 0x20, count: 128 * 1024 + 1)
+        )
+
+        await assertFetchThrows(.responseTooLarge)
+    }
+
+    func testFetchPropagatesTransportFailure() async {
+        MockURLProtocol.requestHandler = { _ in
+            throw URLError(.timedOut)
+        }
+
+        do {
+            _ = try await fetch()
+            XCTFail("Expected transport failure")
+        } catch {
+            XCTAssertEqual((error as? URLError)?.code, .timedOut)
+            XCTAssertFalse(error is CurrentWeatherClientError)
+        }
+    }
+
+    func testFetchRejectsNonHTTPResponse() async {
+        MockURLProtocol.requestHandler = { request in
+            let url = try XCTUnwrap(request.url)
+            let response = URLResponse(
+                url: url,
+                mimeType: "application/json",
+                expectedContentLength: 2,
+                textEncodingName: "utf-8"
+            )
+
+            return (response, Data("{}".utf8))
+        }
+
+        await assertFetchThrows(.invalidResponse)
+    }
+
+    private func fetch() async throws -> CurrentWeatherRemoteDTO? {
+        try await client.fetch(
+            latitude: 24.1658,
+            longitude: 120.6336
+        )
+    }
+
+    private func setHTTPResponse(
+        statusCode: Int = 200,
+        data: Data
+    ) {
+        MockURLProtocol.requestHandler = { request in
+            let url = try XCTUnwrap(request.url)
+            let response = try XCTUnwrap(
+                HTTPURLResponse(
+                    url: url,
+                    statusCode: statusCode,
+                    httpVersion: nil,
+                    headerFields: nil
+                )
+            )
+
+            return (response, data)
+        }
+    }
+
+    private func assertFetchThrows(
+        _ expectedError: CurrentWeatherClientError,
+        context: String = "",
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) async {
+        do {
+            _ = try await fetch()
+            XCTFail(
+                "Expected \(expectedError) \(context)",
+                file: file,
+                line: line
+            )
+        } catch {
+            XCTAssertEqual(
+                error as? CurrentWeatherClientError,
+                expectedError,
+                context,
+                file: file,
+                line: line
+            )
+        }
     }
 }
