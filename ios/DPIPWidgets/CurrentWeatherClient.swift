@@ -8,7 +8,7 @@ enum CurrentWeatherClientError: Error, Equatable {
     case responseTooLarge
 }
 
-struct CurrentWeatherClient {
+struct CurrentWeatherClient: Sendable {
     private static let scheme = "https"
     private static let host = "api.core-tnn1.exptech.dev"
     private static let realtimePath = "/api/v5/meteor/weather/realtime"
