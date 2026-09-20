@@ -14,16 +14,15 @@ enum WidgetSnapshotKind {
     }
 }
 
-struct WidgetSnapshotStore {
-    private let appGroupIdentifier =
-        "group.com.exptech.dpip.dpip.widgets"
+struct WidgetSnapshotStore: Sendable {
+    private let appGroupContainerURL: URL?
+
+    init(containerURL: URL?) {
+        appGroupContainerURL = containerURL
+    }
 
     func snapshotURL(for kind: WidgetSnapshotKind) -> URL? {
-        guard let appGroupContainerURL =
-            FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier: appGroupIdentifier
-            )
-        else {
+        guard let appGroupContainerURL else {
             return nil
         }
 
@@ -63,12 +62,7 @@ struct WidgetSnapshotStore {
             return nil
         }
 
-        guard let appGroupContainerURL =
-            FileManager.default.containerURL(
-                forSecurityApplicationGroupIdentifier:
-                    appGroupIdentifier
-            )
-        else {
+        guard let appGroupContainerURL else {
             return nil
         }
 
