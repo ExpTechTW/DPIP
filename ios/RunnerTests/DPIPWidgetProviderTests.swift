@@ -188,7 +188,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
         )
     }
     #else
-    func testReleaseTimelineRequestsRefreshAfterThirtyMinutes() async {
+    func testReleaseTimelineRequestsRefreshAfterTwentyMinutes() async {
         let target = WidgetLocationTarget.currentLocation
         let store = ProviderTimelineTestStore(
             refreshResult: .failed,
@@ -197,11 +197,11 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
         let plan = await planner(store: store).plan(for: target)
 
-        XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 30 * 60)
+        XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 20 * 60)
         XCTAssertGreaterThan(plan.reloadDate, now)
         XCTAssertEqual(
             plan.reloadDate,
-            now.addingTimeInterval(30 * 60)
+            now.addingTimeInterval(20 * 60)
         )
     }
     #endif
