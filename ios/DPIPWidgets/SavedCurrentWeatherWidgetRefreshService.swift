@@ -57,8 +57,33 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
             resolveLocation: resolveLocation,
             fetchWeather: fetchWeather,
             synchronizeClock: {
+                #if DEBUG
+                WidgetWeatherRefreshDiagnostics.log(
+                    "clock synchronization started"
+                )
+                #endif
+                #if DEBUG
+                let synchronized = await clock.synchronize()
+                #else
                 _ = await clock.synchronize()
-                guard await clock.hasSynchronized else {
+                #endif
+                let hasSynchronized = await clock.hasSynchronized
+                #if DEBUG
+                if synchronized {
+                    WidgetWeatherRefreshDiagnostics.log(
+                        "clock synchronized"
+                    )
+                } else if hasSynchronized {
+                    WidgetWeatherRefreshDiagnostics.log(
+                        "clock failed retainedPreviousAnchor=true"
+                    )
+                } else {
+                    WidgetWeatherRefreshDiagnostics.log(
+                        "clock failed retainedPreviousAnchor=false"
+                    )
+                }
+                #endif
+                guard hasSynchronized else {
                     return nil
                 }
                 return await clock.currentWeatherSnapshotTime()
@@ -83,35 +108,106 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
         target: WidgetLocationTarget
     ) async -> SavedCurrentWeatherWidgetRefreshResult {
         guard let location = resolveLocation(target) else {
+            #if DEBUG
+            WidgetWeatherRefreshDiagnostics.log(
+                "location resolution unavailable target="
+                    + WidgetWeatherRefreshDiagnostics.targetIdentifier(target)
+            )
+            #endif
             return .unavailable
         }
 
+        #if DEBUG
+        WidgetWeatherRefreshDiagnostics.log(
+            "location resolved sourceIdentifier="
+                + location.address.sourceIdentifier
+                + " regionCode=\(location.regionCode)"
+        )
+        #endif
+
+        #if DEBUG
+        async let observation = fetchWeatherWithDiagnostics(location)
+        #else
         async let observation = fetchWeather(
             location.latitude,
             location.longitude
         )
+        #endif
         async let snapshotTime = synchronizeClock()
 
+        let resolvedObservation: CurrentWeatherRemoteDTO?
+        let resolvedSnapshotTime: CurrentWeatherSnapshotTime?
         do {
-            let (resolvedObservation, resolvedSnapshotTime) =
-                try await (observation, snapshotTime)
-
-            guard let resolvedObservation else {
-                return .noObservation
-            }
-            guard let resolvedSnapshotTime else {
-                return .failed
-            }
-
-            let snapshot = CurrentWeatherWidgetSnapshotFactory.make(
-                observation: resolvedObservation,
-                location: location,
-                time: resolvedSnapshotTime
+            (resolvedObservation, resolvedSnapshotTime) = try await (
+                observation,
+                snapshotTime
             )
-            try writeSnapshot(snapshot)
-            return .refreshed
         } catch {
             return .failed
         }
+
+        guard let resolvedObservation else {
+            return .noObservation
+        }
+        guard let resolvedSnapshotTime else {
+            return .failed
+        }
+
+        let snapshot = CurrentWeatherWidgetSnapshotFactory.make(
+            observation: resolvedObservation,
+            location: location,
+            time: resolvedSnapshotTime
+        )
+        #if DEBUG
+        WidgetWeatherRefreshDiagnostics.log(
+            "snapshot write attempted sourceIdentifier="
+                + (snapshot.sourceIdentifier ?? "none")
+                + " regionCode=\(snapshot.regionCode) "
+                + "observationTime=\(snapshot.observationTime)"
+        )
+        #endif
+        do {
+            try writeSnapshot(snapshot)
+            #if DEBUG
+            WidgetWeatherRefreshDiagnostics.log("snapshot write succeeded")
+            #endif
+            return .refreshed
+        } catch {
+            #if DEBUG
+            WidgetWeatherRefreshDiagnostics.log("snapshot write failed")
+            #endif
+            return .failed
+        }
     }
+
+    #if DEBUG
+    private func fetchWeatherWithDiagnostics(
+        _ location: WidgetResolvedWeatherLocation
+    ) async throws -> CurrentWeatherRemoteDTO? {
+        WidgetWeatherRefreshDiagnostics.log(
+            "weather started sourceIdentifier="
+                + location.address.sourceIdentifier
+        )
+        do {
+            let observation = try await fetchWeather(
+                location.latitude,
+                location.longitude
+            )
+            if let observation {
+                WidgetWeatherRefreshDiagnostics.log(
+                    "weather observation received observationTime="
+                        + "\(observation.time)"
+                )
+            } else {
+                WidgetWeatherRefreshDiagnostics.log(
+                    "weather no observation"
+                )
+            }
+            return observation
+        } catch {
+            WidgetWeatherRefreshDiagnostics.log("weather failed")
+            throw error
+        }
+    }
+    #endif
 }
