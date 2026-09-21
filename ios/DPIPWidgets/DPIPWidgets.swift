@@ -66,6 +66,26 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             identifier: configuration.location?.identifier
         )
 
+        #if DEBUG
+        WidgetWeatherRefreshDiagnostics.log(
+            "getTimeline target="
+                + WidgetWeatherRefreshDiagnostics.targetIdentifier(target)
+        )
+        switch target {
+        case .saved(let regionCode):
+            WidgetWeatherRefreshDiagnostics.log(
+                "target=saved region=\(regionCode)"
+            )
+        case .currentLocation:
+            WidgetWeatherRefreshDiagnostics.log(
+                "target=current-location nativeRefresh=not-implemented "
+                    + "cacheLoad=enabled"
+            )
+        case .invalid:
+            WidgetWeatherRefreshDiagnostics.log("target=invalid")
+        }
+        #endif
+
         Task {
             let plan = await dependencies.timelinePlanner.plan(
                 for: target
