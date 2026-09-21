@@ -1,6 +1,6 @@
 import Foundation
 
-struct CurrentWeatherWidgetTimelineState: Equatable {
+struct CurrentWeatherWidgetTimelineState: Equatable, Sendable {
     /// Device-clock date supplied to WidgetKit for entry scheduling.
     let date: Date
     let isStale: Bool

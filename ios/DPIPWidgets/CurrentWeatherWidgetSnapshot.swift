@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-enum CurrentWeatherWidgetCondition: String, Decodable {
+enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
     case clear
     case cloudy
     case overcast
@@ -69,7 +69,7 @@ enum CurrentWeatherWidgetCondition: String, Decodable {
     }
 }
 
-struct CurrentWeatherWidgetSnapshot: Codable {
+struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
     let schemaVersion: Int
     let sourceIdentifier: String?
 
