@@ -50,11 +50,65 @@ final class RunnerTests: XCTestCase {
     XCTAssertEqual(try Data(contentsOf: target), second)
   }
 
+  func testCurrentWeatherRequestTokenPreservesArrivalOrder() throws {
+    let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: container) }
+    let kind = try WidgetSnapshotFile.kind("currentWeather")
+    let older = try WidgetSnapshotFile.beginCurrentWeatherWrite(
+      sourceIdentifier: "current-location",
+      in: container
+    )
+    let newer = try WidgetSnapshotFile.beginCurrentWeatherWrite(
+      sourceIdentifier: "current-location",
+      in: container
+    )
+    let olderData = try WidgetSnapshotFile.payload(
+      "{\"schemaVersion\":5,\"observationTime\":100,\"regionCode\":\"407\"}"
+    )
+    let newerData = try WidgetSnapshotFile.payload(
+      "{\"schemaVersion\":5,\"observationTime\":100,\"regionCode\":\"110\"}"
+    )
+
+    XCTAssertEqual(
+      try WidgetSnapshotFile.replace(
+        newerData,
+        kind: kind,
+        sourceIdentifier: "current-location",
+        in: container,
+        currentWeatherWriteToken: newer
+      ),
+      .written
+    )
+    XCTAssertEqual(
+      try WidgetSnapshotFile.replace(
+        olderData,
+        kind: kind,
+        sourceIdentifier: "current-location",
+        in: container,
+        currentWeatherWriteToken: older
+      ),
+      .rejected
+    )
+
+    let target = try WidgetSnapshotFile.snapshotURL(
+      kind: kind,
+      sourceIdentifier: "current-location",
+      in: container
+    )
+    let stored = try XCTUnwrap(
+      JSONSerialization.jsonObject(with: Data(contentsOf: target))
+        as? [String: Any]
+    )
+    XCTAssertEqual(stored["regionCode"] as? String, "110")
+  }
+
   func testSnapshotClearIsIdempotent() throws {
     let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: container) }
     let kind = try WidgetSnapshotFile.kind("currentWeather")
-    let data = try WidgetSnapshotFile.payload("{\"schemaVersion\":1}")
+    let data = try WidgetSnapshotFile.payload(
+      "{\"schemaVersion\":5,\"observationTime\":100,\"regionCode\":\"220\"}"
+    )
     let directory = container.appendingPathComponent("WidgetSnapshots")
     let legacyTarget = directory.appendingPathComponent("current-weather.json")
     let perLocationTarget = try WidgetSnapshotFile.snapshotURL(

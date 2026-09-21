@@ -419,6 +419,45 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         XCTAssertEqual(result, .refreshed)
     }
 
+    func testRejectedWriteReturnsSuperseded() async throws {
+        let expectedToken = CurrentWeatherSnapshotWriteToken(
+            address: .currentLocation,
+            generation: 9
+        )
+        let weather = CurrentLocationScriptedWeather(
+            result: .success(try makeObservation())
+        )
+        let preciseLocation = preciseLocation
+        let resolvedLocation = resolvedLocation()
+        let service = CurrentLocationCurrentWeatherWidgetRefreshService(
+            acquireLocation: { @MainActor in
+                .acquired(preciseLocation)
+            },
+            resolveTownship: { _ in
+                resolvedLocation
+            },
+            fetchWeather: { latitude, longitude in
+                try await weather.fetch(
+                    latitude: latitude,
+                    longitude: longitude
+                )
+            },
+            synchronizeClock: makeSnapshotTime,
+            beginWrite: { address in
+                XCTAssertEqual(address, expectedToken.address)
+                return expectedToken
+            },
+            commitSnapshot: { _, token in
+                XCTAssertEqual(token, expectedToken)
+                return .rejected
+            }
+        )
+
+        let result = await service.refresh()
+
+        XCTAssertEqual(result, .superseded)
+    }
+
     private func makeService(
         locationResult: WidgetCurrentLocationResult? = nil,
         resolvedLocation: WidgetResolvedWeatherLocation? = nil,
