@@ -100,7 +100,7 @@ protocol WidgetLocationManaging: AnyObject {
     var isAuthorizedForWidgetUpdates: Bool { get }
     var desiredAccuracy: Double { get set }
 
-    func requestLocation()
+    func startUpdatingLocation()
     func stopUpdatingLocation()
 }
 
@@ -125,6 +125,7 @@ final class WidgetCurrentLocationClient {
 
     nonisolated static let defaultTimeout: TimeInterval = 10
     nonisolated static let defaultMaximumAge: TimeInterval = 10 * 60
+    nonisolated static let defaultRequestStartTolerance: TimeInterval = 1
     nonisolated static let defaultDesiredAccuracy: Double =
         kCLLocationAccuracyKilometer
 
@@ -133,6 +134,7 @@ final class WidgetCurrentLocationClient {
     private let timeoutScheduler: any WidgetLocationTimeoutScheduling
     private let timeout: TimeInterval
     private let maximumAge: TimeInterval
+    private let requestStartTolerance: TimeInterval
     private let desiredAccuracy: Double
     private let now: Now
     private var activeRequests: [UUID: WidgetCurrentLocationRequest] = [:]
@@ -147,6 +149,7 @@ final class WidgetCurrentLocationClient {
         timeoutScheduler: (any WidgetLocationTimeoutScheduling)? = nil,
         timeout: TimeInterval = defaultTimeout,
         maximumAge: TimeInterval = defaultMaximumAge,
+        requestStartTolerance: TimeInterval = defaultRequestStartTolerance,
         desiredAccuracy: Double = defaultDesiredAccuracy,
         now: @escaping Now = Date.init
     ) {
@@ -156,6 +159,7 @@ final class WidgetCurrentLocationClient {
             ?? WidgetLocationDispatchTimeoutScheduler()
         self.timeout = timeout
         self.maximumAge = maximumAge
+        self.requestStartTolerance = requestStartTolerance
         self.desiredAccuracy = desiredAccuracy
         self.now = now
     }
@@ -167,7 +171,7 @@ final class WidgetCurrentLocationClient {
                 "current-location authorizationState=services-disabled "
                     + "widgetUpdatesAuthorized=false"
             )
-            WidgetWeatherRefreshDiagnostics.log("current-location unavailable")
+            WidgetWeatherRefreshDiagnostics.log("current location unavailable")
             #endif
             return .unavailable
         }
@@ -189,7 +193,7 @@ final class WidgetCurrentLocationClient {
               widgetUpdatesAuthorized
         else {
             #if DEBUG
-            WidgetWeatherRefreshDiagnostics.log("current-location unavailable")
+            WidgetWeatherRefreshDiagnostics.log("current location unavailable")
             #endif
             return .unavailable
         }
@@ -201,6 +205,7 @@ final class WidgetCurrentLocationClient {
                 timeoutScheduler: timeoutScheduler,
                 timeout: timeout,
                 maximumAge: maximumAge,
+                requestStartTolerance: requestStartTolerance,
                 desiredAccuracy: desiredAccuracy,
                 now: now
             ) { [weak self] result in
@@ -223,12 +228,14 @@ private final class WidgetCurrentLocationRequest:
     private let timeoutScheduler: any WidgetLocationTimeoutScheduling
     private let timeout: TimeInterval
     private let maximumAge: TimeInterval
+    private let requestStartTolerance: TimeInterval
     private let desiredAccuracy: Double
     private let now: WidgetCurrentLocationClient.Now
     private var completion: Completion?
     private var timeoutCancellation: (
         any WidgetLocationTimeoutCancellable
     )?
+    private var startedAt: Date?
     private var hasFinished = false
 
     init(
@@ -236,6 +243,7 @@ private final class WidgetCurrentLocationRequest:
         timeoutScheduler: any WidgetLocationTimeoutScheduling,
         timeout: TimeInterval,
         maximumAge: TimeInterval,
+        requestStartTolerance: TimeInterval,
         desiredAccuracy: Double,
         now: @escaping WidgetCurrentLocationClient.Now,
         completion: @escaping Completion
@@ -244,6 +252,7 @@ private final class WidgetCurrentLocationRequest:
         self.timeoutScheduler = timeoutScheduler
         self.timeout = timeout
         self.maximumAge = maximumAge
+        self.requestStartTolerance = requestStartTolerance
         self.desiredAccuracy = desiredAccuracy
         self.now = now
         self.completion = completion
@@ -252,6 +261,7 @@ private final class WidgetCurrentLocationRequest:
     func start() {
         manager.delegate = self
         manager.desiredAccuracy = desiredAccuracy
+        startedAt = now()
         timeoutCancellation = timeoutScheduler.schedule(
             after: timeout
         ) { [weak self] in
@@ -259,9 +269,9 @@ private final class WidgetCurrentLocationRequest:
         }
 
         #if DEBUG
-        WidgetWeatherRefreshDiagnostics.log("current-location request started")
+        WidgetWeatherRefreshDiagnostics.log("current location request started")
         #endif
-        manager.requestLocation()
+        manager.startUpdatingLocation()
     }
 
     func widgetLocationManager(
@@ -272,11 +282,21 @@ private final class WidgetCurrentLocationRequest:
             return
         }
 
+        guard let startedAt else {
+            return
+        }
+
         let requestNow = now()
+        let earliestAcceptedTimestamp = startedAt.addingTimeInterval(
+            -requestStartTolerance
+        )
         let location: WidgetCurrentLocation? = samples.reversed().compactMap {
             sample -> WidgetCurrentLocation? in
             let age = requestNow.timeIntervalSince(sample.timestamp)
-            guard age >= 0, age <= maximumAge else {
+            guard age >= -requestStartTolerance,
+                  age <= maximumAge,
+                  sample.timestamp >= earliestAcceptedTimestamp
+            else {
                 return nil
             }
             return WidgetCurrentLocation(
@@ -286,7 +306,6 @@ private final class WidgetCurrentLocationRequest:
         }.first
 
         guard let location else {
-            finish(.failed)
             return
         }
         finish(.acquired(location))
@@ -312,13 +331,13 @@ private final class WidgetCurrentLocationRequest:
         #if DEBUG
         switch result {
         case .acquired:
-            WidgetWeatherRefreshDiagnostics.log("current-location acquired")
+            WidgetWeatherRefreshDiagnostics.log("current location acquired")
         case .unavailable:
-            WidgetWeatherRefreshDiagnostics.log("current-location unavailable")
+            WidgetWeatherRefreshDiagnostics.log("current location unavailable")
         case .timedOut:
-            WidgetWeatherRefreshDiagnostics.log("current-location timeout")
+            WidgetWeatherRefreshDiagnostics.log("current location timeout")
         case .failed:
-            WidgetWeatherRefreshDiagnostics.log("current-location failed")
+            WidgetWeatherRefreshDiagnostics.log("current location failed")
         }
         #endif
 
@@ -356,8 +375,8 @@ private final class CoreLocationWidgetLocationManager: NSObject,
         manager.delegate = self
     }
 
-    func requestLocation() {
-        manager.requestLocation()
+    func startUpdatingLocation() {
+        manager.startUpdatingLocation()
     }
 
     func stopUpdatingLocation() {

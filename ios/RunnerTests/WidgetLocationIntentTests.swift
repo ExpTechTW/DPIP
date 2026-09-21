@@ -53,6 +53,15 @@ final class WidgetLocationIntentTests: XCTestCase {
         XCTAssertEqual(options.first?.displayString, "所在地")
     }
 
+    func testDefaultLocationOptionIsExplicitCurrentLocation() {
+        let option = makeCurrentWidgetLocationOption(
+            displayString: "所在地"
+        )
+
+        XCTAssertEqual(option.identifier, "current-location")
+        XCTAssertEqual(option.displayString, "所在地")
+    }
+
     func testCatalogLocationsPreserveSavedOrder() throws {
         let firstLocation = try XCTUnwrap(
             WidgetLocationCatalogLocation(
