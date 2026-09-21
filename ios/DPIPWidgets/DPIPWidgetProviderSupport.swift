@@ -393,6 +393,8 @@ private extension SavedCurrentWeatherWidgetRefreshResult {
         switch self {
         case .refreshed:
             return "refreshed"
+        case .superseded:
+            return "superseded"
         case .noObservation:
             return "noObservation"
         case .unavailable:
@@ -408,6 +410,8 @@ private extension CurrentLocationCurrentWeatherWidgetRefreshResult {
         switch self {
         case .refreshed:
             return "refreshed"
+        case .superseded:
+            return "superseded"
         case .noObservation:
             return "noObservation"
         case .unavailable:
