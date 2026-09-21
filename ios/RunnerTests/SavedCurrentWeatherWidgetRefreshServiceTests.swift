@@ -371,6 +371,41 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         XCTAssertEqual(result, .refreshed)
     }
 
+    func testRejectedWriteReturnsSuperseded() async throws {
+        let resolver = try makeResolver(codes: ["242"])
+        let weather = ScriptedRefreshWeather(
+            result: .success(try makeObservation())
+        )
+        let expectedToken = CurrentWeatherSnapshotWriteToken(
+            address: .saved(regionCode: "242"),
+            generation: 7
+        )
+        let service = SavedCurrentWeatherWidgetRefreshService(
+            resolveLocation: resolver.resolve,
+            fetchWeather: { latitude, longitude in
+                try await weather.fetch(
+                    latitude: latitude,
+                    longitude: longitude
+                )
+            },
+            synchronizeClock: makeSnapshotTime,
+            beginWrite: { address in
+                XCTAssertEqual(address, expectedToken.address)
+                return expectedToken
+            },
+            commitSnapshot: { _, token in
+                XCTAssertEqual(token, expectedToken)
+                return .rejected
+            }
+        )
+
+        let result = await service.refresh(
+            target: .saved(regionCode: "242")
+        )
+
+        XCTAssertEqual(result, .superseded)
+    }
+
     private func makeService(
         codes: [String],
         weather: ScriptedRefreshWeather,

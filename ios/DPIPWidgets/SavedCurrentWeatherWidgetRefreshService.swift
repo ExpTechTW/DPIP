@@ -1,5 +1,6 @@
 enum SavedCurrentWeatherWidgetRefreshResult: Equatable, Sendable {
     case refreshed
+    case superseded
     case noObservation
     case unavailable
     case failed
@@ -18,11 +19,19 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
     typealias WriteSnapshot = @Sendable (
         CurrentWeatherWidgetSnapshot
     ) throws -> Void
+    typealias BeginWrite = @Sendable (
+        CurrentWeatherSnapshotAddress
+    ) throws -> CurrentWeatherSnapshotWriteToken
+    typealias CommitSnapshot = @Sendable (
+        CurrentWeatherWidgetSnapshot,
+        CurrentWeatherSnapshotWriteToken
+    ) throws -> CurrentWeatherSnapshotWriteResult
 
     private let resolveLocation: ResolveLocation
     private let fetchWeather: FetchWeather
     private let synchronizeClock: SynchronizeClock
-    private let writeSnapshot: WriteSnapshot
+    private let beginWrite: BeginWrite
+    private let commitSnapshot: CommitSnapshot
 
     init(
         resolver: SavedWidgetLocationResolver,
@@ -40,9 +49,14 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
                     longitude: longitude
                 )
             },
-            clock: clock,
-            writeSnapshot: { snapshot in
-                try writer.write(snapshot)
+            synchronizeClock: {
+                await Self.synchronizedSnapshotTime(clock: clock)
+            },
+            beginWrite: { address in
+                try writer.beginWrite(for: address)
+            },
+            commitSnapshot: { snapshot, token in
+                try writer.write(snapshot, using: token)
             }
         )
     }
@@ -57,36 +71,7 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
             resolveLocation: resolveLocation,
             fetchWeather: fetchWeather,
             synchronizeClock: {
-                #if DEBUG
-                WidgetWeatherRefreshDiagnostics.log(
-                    "clock synchronization started"
-                )
-                #endif
-                #if DEBUG
-                let synchronized = await clock.synchronize()
-                #else
-                _ = await clock.synchronize()
-                #endif
-                let hasSynchronized = await clock.hasSynchronized
-                #if DEBUG
-                if synchronized {
-                    WidgetWeatherRefreshDiagnostics.log(
-                        "clock synchronized"
-                    )
-                } else if hasSynchronized {
-                    WidgetWeatherRefreshDiagnostics.log(
-                        "clock failed retainedPreviousAnchor=true"
-                    )
-                } else {
-                    WidgetWeatherRefreshDiagnostics.log(
-                        "clock failed retainedPreviousAnchor=false"
-                    )
-                }
-                #endif
-                guard hasSynchronized else {
-                    return nil
-                }
-                return await clock.currentWeatherSnapshotTime()
+                await Self.synchronizedSnapshotTime(clock: clock)
             },
             writeSnapshot: writeSnapshot
         )
@@ -98,10 +83,35 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
         synchronizeClock: @escaping SynchronizeClock,
         writeSnapshot: @escaping WriteSnapshot
     ) {
+        self.init(
+            resolveLocation: resolveLocation,
+            fetchWeather: fetchWeather,
+            synchronizeClock: synchronizeClock,
+            beginWrite: { address in
+                CurrentWeatherSnapshotWriteToken(
+                    address: address,
+                    generation: 1
+                )
+            },
+            commitSnapshot: { snapshot, _ in
+                try writeSnapshot(snapshot)
+                return .written
+            }
+        )
+    }
+
+    init(
+        resolveLocation: @escaping ResolveLocation,
+        fetchWeather: @escaping FetchWeather,
+        synchronizeClock: @escaping SynchronizeClock,
+        beginWrite: @escaping BeginWrite,
+        commitSnapshot: @escaping CommitSnapshot
+    ) {
         self.resolveLocation = resolveLocation
         self.fetchWeather = fetchWeather
         self.synchronizeClock = synchronizeClock
-        self.writeSnapshot = writeSnapshot
+        self.beginWrite = beginWrite
+        self.commitSnapshot = commitSnapshot
     }
 
     func refresh(
@@ -124,6 +134,13 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
                 + " regionCode=\(location.regionCode)"
         )
         #endif
+
+        let writeToken: CurrentWeatherSnapshotWriteToken
+        do {
+            writeToken = try beginWrite(location.address)
+        } catch {
+            return .failed
+        }
 
         #if DEBUG
         async let observation = fetchWeatherWithDiagnostics(location)
@@ -167,17 +184,54 @@ struct SavedCurrentWeatherWidgetRefreshService: Sendable {
         )
         #endif
         do {
-            try writeSnapshot(snapshot)
+            let writeResult = try commitSnapshot(snapshot, writeToken)
             #if DEBUG
-            WidgetWeatherRefreshDiagnostics.log("snapshot write succeeded")
+            WidgetWeatherRefreshDiagnostics.log(
+                writeResult == .written
+                    ? "snapshot write succeeded"
+                    : "snapshot write superseded"
+            )
             #endif
-            return .refreshed
+            return writeResult == .written ? .refreshed : .superseded
         } catch {
             #if DEBUG
             WidgetWeatherRefreshDiagnostics.log("snapshot write failed")
             #endif
             return .failed
         }
+    }
+
+    private static func synchronizedSnapshotTime(
+        clock: WidgetServerClock
+    ) async -> CurrentWeatherSnapshotTime? {
+        #if DEBUG
+        WidgetWeatherRefreshDiagnostics.log(
+            "clock synchronization started"
+        )
+        let synchronized = await clock.synchronize()
+        #else
+        _ = await clock.synchronize()
+        #endif
+        let hasSynchronized = await clock.hasSynchronized
+        #if DEBUG
+        if synchronized {
+            WidgetWeatherRefreshDiagnostics.log(
+                "clock synchronized"
+            )
+        } else if hasSynchronized {
+            WidgetWeatherRefreshDiagnostics.log(
+                "clock failed retainedPreviousAnchor=true"
+            )
+        } else {
+            WidgetWeatherRefreshDiagnostics.log(
+                "clock failed retainedPreviousAnchor=false"
+            )
+        }
+        #endif
+        guard hasSynchronized else {
+            return nil
+        }
+        return await clock.currentWeatherSnapshotTime()
     }
 
     #if DEBUG
