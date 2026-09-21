@@ -7,11 +7,44 @@ enum CurrentWeatherWidgetSnapshotWriterError: Error {
 struct CurrentWeatherWidgetSnapshotWriter: Sendable {
     let containerURL: URL
 
+    func beginWrite(
+        for address: CurrentWeatherSnapshotAddress
+    ) throws -> CurrentWeatherSnapshotWriteToken {
+        try CurrentWeatherSnapshotStorage(
+            containerURL: containerURL
+        ).beginWrite(for: address)
+    }
+
     func write(
         _ snapshot: CurrentWeatherWidgetSnapshot
     ) throws {
+        let address = try address(for: snapshot)
+        let token = try beginWrite(for: address)
+        _ = try write(snapshot, using: token)
+    }
+
+    func write(
+        _ snapshot: CurrentWeatherWidgetSnapshot,
+        using token: CurrentWeatherSnapshotWriteToken
+    ) throws -> CurrentWeatherSnapshotWriteResult {
         let data = try JSONEncoder().encode(snapshot)
 
+        let address = try address(for: snapshot)
+        guard address == token.address else {
+            throw CurrentWeatherSnapshotStorageError.invalidWriteToken
+        }
+
+        return try CurrentWeatherSnapshotStorage(
+            containerURL: containerURL
+        ).replace(
+            data,
+            using: token
+        )
+    }
+
+    private func address(
+        for snapshot: CurrentWeatherWidgetSnapshot
+    ) throws -> CurrentWeatherSnapshotAddress {
         guard
             let sourceIdentifier = snapshot.sourceIdentifier,
             let address = CurrentWeatherSnapshotAddress(
@@ -21,12 +54,6 @@ struct CurrentWeatherWidgetSnapshotWriter: Sendable {
             throw CurrentWeatherWidgetSnapshotWriterError
                 .invalidSourceIdentifier
         }
-
-        try CurrentWeatherSnapshotStorage(
-            containerURL: containerURL
-        ).replace(
-            data,
-            for: address
-        )
+        return address
     }
 }
