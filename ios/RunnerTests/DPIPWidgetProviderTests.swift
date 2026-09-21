@@ -37,7 +37,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
         XCTAssertEqual(
             store.events,
-            [.refresh(target), .load(target)]
+            [.load(target), .refresh(target), .load(target)]
         )
         XCTAssertEqual(plan.snapshot?.stationName, "refreshed-station")
     }
@@ -98,7 +98,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
         let plan = await planner(store: store).plan(for: target)
 
         XCTAssertEqual(plan.snapshot?.stationName, "region-407")
-        XCTAssertEqual(store.loadTargets, [target])
+        XCTAssertEqual(store.loadTargets, [target, target])
     }
 
     func testCurrentLocationDoesNotInvokeSavedRefresh() async {
@@ -170,7 +170,8 @@ final class DPIPWidgetProviderTests: XCTestCase {
         )
     }
 
-    func testTimelineRequestsFutureRefreshEveryThirtyMinutes() async {
+    #if DEBUG
+    func testDebugTimelineRequestsRefreshAfterSixtySeconds() async {
         let target = WidgetLocationTarget.currentLocation
         let store = ProviderTimelineTestStore(
             refreshResult: .failed,
@@ -179,11 +180,34 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
         let plan = await planner(store: store).plan(for: target)
 
+        XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 60)
         XCTAssertGreaterThan(plan.reloadDate, now)
         XCTAssertEqual(
             plan.reloadDate,
-            now.addingTimeInterval(staleAfter)
+            now.addingTimeInterval(60)
         )
+    }
+    #else
+    func testReleaseTimelineRequestsRefreshAfterThirtyMinutes() async {
+        let target = WidgetLocationTarget.currentLocation
+        let store = ProviderTimelineTestStore(
+            refreshResult: .failed,
+            snapshots: []
+        )
+
+        let plan = await planner(store: store).plan(for: target)
+
+        XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 30 * 60)
+        XCTAssertGreaterThan(plan.reloadDate, now)
+        XCTAssertEqual(
+            plan.reloadDate,
+            now.addingTimeInterval(30 * 60)
+        )
+    }
+    #endif
+
+    func testRuntimeKeepsThirtyMinuteStaleInterval() {
+        XCTAssertEqual(staleAfter, 30 * 60)
     }
 
     func testTimelineProjectionDelegatesToCurrentWeatherTimeline() async {
@@ -238,7 +262,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
         let fixedNow = now
         return DPIPWidgetTimelinePlanner(
             staleAfter: staleAfter,
-            refreshInterval: staleAfter,
+            refreshInterval: DPIPWidgetProviderRuntime.refreshInterval,
             loadSnapshot: store.load,
             refreshSaved: store.refresh,
             now: { fixedNow }
