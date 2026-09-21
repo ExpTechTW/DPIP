@@ -7,6 +7,12 @@ final class IntentHandler: INExtension,
         return self
     }
 
+    func defaultLocation(
+        for intent: WeatherWidgetConfigurationIntent
+    ) -> WidgetLocation? {
+        makeCurrentWidgetLocation()
+    }
+
     func provideLocationOptionsCollection(
         for intent: WeatherWidgetConfigurationIntent,
         with completion: @escaping (
@@ -15,11 +21,6 @@ final class IntentHandler: INExtension,
         ) -> Void
     ) {
         let catalog = WidgetLocationCatalogStore().load()
-        let currentLocationDisplayString = String(
-            localized: "intent.current_location",
-            bundle: .main,
-            comment: "Current-location option in weather widget configuration."
-        )
 
         let locations = makeWidgetLocationOptions(
             from: catalog,
@@ -34,6 +35,24 @@ final class IntentHandler: INExtension,
         completion(
             INObjectCollection(items: locations),
             nil
+        )
+    }
+
+    private func makeCurrentWidgetLocation() -> WidgetLocation {
+        let option = makeCurrentWidgetLocationOption(
+            displayString: currentLocationDisplayString
+        )
+        return WidgetLocation(
+            identifier: option.identifier,
+            display: option.displayString
+        )
+    }
+
+    private var currentLocationDisplayString: String {
+        String(
+            localized: "intent.current_location",
+            bundle: .main,
+            comment: "Current-location option in weather widget configuration."
         )
     }
 }

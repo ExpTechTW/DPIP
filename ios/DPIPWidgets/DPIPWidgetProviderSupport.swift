@@ -34,6 +34,33 @@ enum WidgetWeatherRefreshDiagnostics {
             + "regionCode=\(snapshot.regionCode) "
             + "observationTime=\(snapshot.observationTime)"
     }
+
+    static func cacheChanged(
+        from previous: CurrentWeatherWidgetSnapshot?,
+        to current: CurrentWeatherWidgetSnapshot?
+    ) -> Bool {
+        guard let previous, let current else {
+            return (previous == nil) != (current == nil)
+        }
+
+        return previous.schemaVersion != current.schemaVersion
+            || previous.sourceIdentifier != current.sourceIdentifier
+            || previous.regionCode != current.regionCode
+            || previous.regionName != current.regionName
+            || previous.observationTime != current.observationTime
+            || previous.stationName != current.stationName
+            || previous.weather != current.weather
+            || previous.weatherCode != current.weatherCode
+            || previous.condition != current.condition
+            || previous.isNight != current.isNight
+            || previous.nextDayNightTransitionTime
+                != current.nextDayNightTransitionTime
+            || previous.calibratedTimeOffsetMilliseconds
+                != current.calibratedTimeOffsetMilliseconds
+            || previous.temperature != current.temperature
+            || previous.humidity != current.humidity
+            || previous.rain != current.rain
+    }
 }
 #endif
 
@@ -50,12 +77,15 @@ struct DPIPWidgetTimelinePlanner: Sendable {
     typealias RefreshSaved = @Sendable (
         WidgetLocationTarget
     ) async -> SavedCurrentWeatherWidgetRefreshResult
+    typealias RefreshCurrent = @Sendable () async
+        -> CurrentLocationCurrentWeatherWidgetRefreshResult
     typealias Now = @Sendable () -> Date
 
     private let staleAfter: TimeInterval
     private let refreshInterval: TimeInterval
     private let loadSnapshot: LoadSnapshot
     private let refreshSaved: RefreshSaved
+    private let refreshCurrent: RefreshCurrent
     private let now: Now
 
     init(
@@ -63,12 +93,14 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         refreshInterval: TimeInterval,
         loadSnapshot: @escaping LoadSnapshot,
         refreshSaved: @escaping RefreshSaved,
+        refreshCurrent: @escaping RefreshCurrent,
         now: @escaping Now
     ) {
         self.staleAfter = staleAfter
         self.refreshInterval = refreshInterval
         self.loadSnapshot = loadSnapshot
         self.refreshSaved = refreshSaved
+        self.refreshCurrent = refreshCurrent
         self.now = now
     }
 
@@ -77,7 +109,8 @@ struct DPIPWidgetTimelinePlanner: Sendable {
     ) async -> DPIPWidgetTimelinePlan {
         #if DEBUG
         let snapshotBeforeRefresh: CurrentWeatherWidgetSnapshot?
-        if case .saved = target {
+        switch target {
+        case .saved, .currentLocation:
             snapshotBeforeRefresh = loadSnapshot(target)
             WidgetWeatherRefreshDiagnostics.log(
                 "cacheBefore "
@@ -85,12 +118,13 @@ struct DPIPWidgetTimelinePlanner: Sendable {
                         snapshotBeforeRefresh
                     )
             )
-        } else {
+        case .invalid:
             snapshotBeforeRefresh = nil
         }
         #endif
 
-        if case .saved = target {
+        switch target {
+        case .saved:
             #if DEBUG
             WidgetWeatherRefreshDiagnostics.log(
                 "refresh began target="
@@ -106,6 +140,20 @@ struct DPIPWidgetTimelinePlanner: Sendable {
             #else
             _ = await refreshSaved(target)
             #endif
+        case .currentLocation:
+            #if DEBUG
+            WidgetWeatherRefreshDiagnostics.log(
+                "refresh began target=current-location"
+            )
+            let refreshResult = await refreshCurrent()
+            WidgetWeatherRefreshDiagnostics.log(
+                "refresh result=\(refreshResult.diagnosticName)"
+            )
+            #else
+            _ = await refreshCurrent()
+            #endif
+        case .invalid:
+            break
         }
 
         // Always reload after the refresh attempt. Failed refreshes leave the
@@ -124,12 +172,17 @@ struct DPIPWidgetTimelinePlanner: Sendable {
             "cacheAfter "
                 + WidgetWeatherRefreshDiagnostics.snapshotSummary(snapshot)
         )
-        if case .saved = target {
-            let cacheChanged = snapshotBeforeRefresh?.observationTime
-                != snapshot?.observationTime
+        switch target {
+        case .saved, .currentLocation:
+            let cacheChanged = WidgetWeatherRefreshDiagnostics.cacheChanged(
+                from: snapshotBeforeRefresh,
+                to: snapshot
+            )
             WidgetWeatherRefreshDiagnostics.log(
                 "cacheChanged=\(cacheChanged)"
             )
+        case .invalid:
+            break
         }
         let stale = states.first?.isStale ?? false
         WidgetWeatherRefreshDiagnostics.log(
@@ -171,11 +224,38 @@ struct SavedCurrentWeatherWidgetRefreshRuntime: Sendable {
     }
 }
 
+struct CurrentLocationCurrentWeatherWidgetRefreshRuntime: Sendable {
+    typealias RefreshWithClock = @Sendable (
+        WidgetServerClock
+    ) async -> CurrentLocationCurrentWeatherWidgetRefreshResult
+
+    private let serverClock: WidgetServerClock
+    private let refreshWithClock: RefreshWithClock
+
+    init(
+        serverClock: WidgetServerClock,
+        refreshWithClock: @escaping RefreshWithClock
+    ) {
+        self.serverClock = serverClock
+        self.refreshWithClock = refreshWithClock
+    }
+
+    func refresh() async -> CurrentLocationCurrentWeatherWidgetRefreshResult {
+        await refreshWithClock(serverClock)
+    }
+}
+
 struct DPIPWidgetProviderDependencies: Sendable {
     typealias LoadSnapshot = DPIPWidgetTimelinePlanner.LoadSnapshot
 
     let loadSnapshot: LoadSnapshot
     let timelinePlanner: DPIPWidgetTimelinePlanner
+
+    func snapshot(
+        for target: WidgetLocationTarget
+    ) -> CurrentWeatherWidgetSnapshot? {
+        loadSnapshot(target)
+    }
 }
 
 enum DPIPWidgetProviderRuntime {
@@ -204,10 +284,14 @@ enum DPIPWidgetProviderRuntime {
         }
 
         let weatherClient = CurrentWeatherClient()
-        let refreshRuntime = SavedCurrentWeatherWidgetRefreshRuntime(
-            serverClock: WidgetServerClock(),
+        let serverClock = WidgetServerClock()
+        let writer = containerURL.map {
+            CurrentWeatherWidgetSnapshotWriter(containerURL: $0)
+        }
+        let savedRefreshRuntime = SavedCurrentWeatherWidgetRefreshRuntime(
+            serverClock: serverClock,
             refreshWithClock: { clock, target in
-                guard let containerURL else {
+                guard let containerURL, let writer else {
                     #if DEBUG
                     WidgetWeatherRefreshDiagnostics.log(
                         "catalog unavailable appGroupContainer=false"
@@ -240,14 +324,50 @@ enum DPIPWidgetProviderRuntime {
                     ),
                     weatherClient: weatherClient,
                     clock: clock,
-                    writer: CurrentWeatherWidgetSnapshotWriter(
-                        containerURL: containerURL
-                    )
+                    writer: writer
                 )
 
                 return await service.refresh(target: target)
             }
         )
+        let currentRefreshRuntime =
+            CurrentLocationCurrentWeatherWidgetRefreshRuntime(
+                serverClock: serverClock,
+                refreshWithClock: { clock in
+                    guard let writer else {
+                        #if DEBUG
+                        WidgetWeatherRefreshDiagnostics.log(
+                            "current location refresh unavailable "
+                                + "appGroupContainer=false"
+                        )
+                        #endif
+                        return .unavailable
+                    }
+                    guard let resolver =
+                        WidgetTownshipResolverRuntime.shared
+                    else {
+                        #if DEBUG
+                        WidgetWeatherRefreshDiagnostics.log(
+                            "township resolver unavailable"
+                        )
+                        #endif
+                        return .unavailable
+                    }
+
+                    let service =
+                        CurrentLocationCurrentWeatherWidgetRefreshService(
+                            acquireLocation: { @MainActor in
+                                await WidgetCurrentLocationClient()
+                                    .acquireLocation()
+                            },
+                            resolver: resolver,
+                            weatherClient: weatherClient,
+                            clock: clock,
+                            writer: writer
+                        )
+                    return await service.refresh()
+                }
+            )
 
         return DPIPWidgetProviderDependencies(
             loadSnapshot: loadSnapshot,
@@ -255,7 +375,12 @@ enum DPIPWidgetProviderRuntime {
                 staleAfter: staleAfter,
                 refreshInterval: refreshInterval,
                 loadSnapshot: loadSnapshot,
-                refreshSaved: refreshRuntime.refresh,
+                refreshSaved: { target in
+                    await savedRefreshRuntime.refresh(target: target)
+                },
+                refreshCurrent: {
+                    await currentRefreshRuntime.refresh()
+                },
                 now: { Date.now }
             )
         )
@@ -264,6 +389,21 @@ enum DPIPWidgetProviderRuntime {
 
 #if DEBUG
 private extension SavedCurrentWeatherWidgetRefreshResult {
+    var diagnosticName: String {
+        switch self {
+        case .refreshed:
+            return "refreshed"
+        case .noObservation:
+            return "noObservation"
+        case .unavailable:
+            return "unavailable"
+        case .failed:
+            return "failed"
+        }
+    }
+}
+
+private extension CurrentLocationCurrentWeatherWidgetRefreshResult {
     var diagnosticName: String {
         switch self {
         case .refreshed:
