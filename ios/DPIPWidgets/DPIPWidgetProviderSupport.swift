@@ -186,7 +186,7 @@ enum DPIPWidgetProviderRuntime {
     #if DEBUG
     static let refreshInterval: TimeInterval = 60
     #else
-    static let refreshInterval: TimeInterval = 30 * 60
+    static let refreshInterval: TimeInterval = 20 * 60
     #endif
 
     // This process-scoped dependency graph retains one clock for every
