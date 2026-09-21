@@ -14,7 +14,8 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
         _ = await planner(store: store).plan(for: target)
 
-        XCTAssertEqual(store.refreshTargets, [target])
+        XCTAssertEqual(store.savedRefreshTargets, [target])
+        XCTAssertEqual(store.currentRefreshCount, 0)
     }
 
     func testSavedTargetReloadsCacheAfterSuccessfulRefresh() async {
@@ -37,7 +38,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
         XCTAssertEqual(
             store.events,
-            [.load(target), .refresh(target), .load(target)]
+            [.load(target), .refreshSaved(target), .load(target)]
         )
         XCTAssertEqual(plan.snapshot?.stationName, "refreshed-station")
     }
@@ -101,22 +102,50 @@ final class DPIPWidgetProviderTests: XCTestCase {
         XCTAssertEqual(store.loadTargets, [target, target])
     }
 
-    func testCurrentLocationDoesNotInvokeSavedRefresh() async {
+    func testCurrentLocationInvokesOnlyCurrentRefresh() async {
         let target = WidgetLocationTarget.currentLocation
         let store = ProviderTimelineTestStore(
             refreshResult: .refreshed,
+            currentRefreshResult: .refreshed,
             snapshots: [(target, snapshot(for: target))]
         )
 
         _ = await planner(store: store).plan(for: target)
 
-        XCTAssertTrue(store.refreshTargets.isEmpty)
+        XCTAssertTrue(store.savedRefreshTargets.isEmpty)
+        XCTAssertEqual(store.currentRefreshCount, 1)
     }
 
-    func testCurrentLocationDisplaysExistingCache() async {
+    func testCurrentLocationSuccessReloadsCurrentLocationCache() async {
+        let target = WidgetLocationTarget.currentLocation
+        let refreshedSnapshot = snapshot(
+            for: target,
+            stationName: "refreshed-current-location"
+        )
+        let store = ProviderTimelineTestStore(
+            refreshResult: .failed,
+            currentRefreshResult: .refreshed,
+            snapshots: [(target, snapshot(for: target))],
+            refreshedSnapshot: refreshedSnapshot
+        )
+
+        let plan = await planner(store: store).plan(for: target)
+
+        XCTAssertEqual(
+            store.events,
+            [.load(target), .refreshCurrent, .load(target)]
+        )
+        XCTAssertEqual(
+            plan.snapshot?.stationName,
+            "refreshed-current-location"
+        )
+    }
+
+    func testCurrentLocationFailureReloadsStaleCache() async {
         let target = WidgetLocationTarget.currentLocation
         let store = ProviderTimelineTestStore(
             refreshResult: .failed,
+            currentRefreshResult: .failed,
             snapshots: [
                 (target, snapshot(
                     for: target,
@@ -130,6 +159,28 @@ final class DPIPWidgetProviderTests: XCTestCase {
         XCTAssertEqual(
             plan.snapshot?.stationName,
             "current-location-cache"
+        )
+        XCTAssertEqual(
+            store.events,
+            [.load(target), .refreshCurrent, .load(target)]
+        )
+    }
+
+    func testCurrentLocationFailureWithoutCacheKeepsNoDataBehavior() async {
+        let target = WidgetLocationTarget.currentLocation
+        let store = ProviderTimelineTestStore(
+            refreshResult: .failed,
+            currentRefreshResult: .failed,
+            snapshots: []
+        )
+
+        let plan = await planner(store: store).plan(for: target)
+
+        XCTAssertNil(plan.snapshot)
+        XCTAssertEqual(plan.states.count, 1)
+        XCTAssertEqual(
+            store.events,
+            [.load(target), .refreshCurrent, .load(target)]
         )
     }
 
@@ -145,7 +196,8 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
         let plan = await planner(store: store).plan(for: target)
 
-        XCTAssertTrue(store.refreshTargets.isEmpty)
+        XCTAssertTrue(store.savedRefreshTargets.isEmpty)
+        XCTAssertEqual(store.currentRefreshCount, 0)
         XCTAssertNil(plan.snapshot)
         XCTAssertEqual(store.loadTargets, [target])
     }
@@ -256,6 +308,54 @@ final class DPIPWidgetProviderTests: XCTestCase {
         XCTAssertEqual(Set(recorder.identities).count, 1)
     }
 
+    func testSavedAndCurrentRefreshRuntimesShareOneServerClock() async {
+        let recorder = ProviderClockIdentityRecorder()
+        let clock = WidgetServerClock()
+        let savedRuntime = SavedCurrentWeatherWidgetRefreshRuntime(
+            serverClock: clock,
+            refreshWithClock: { receivedClock, _ in
+                recorder.record(receivedClock)
+                return .failed
+            }
+        )
+        let currentRuntime =
+            CurrentLocationCurrentWeatherWidgetRefreshRuntime(
+                serverClock: clock,
+                refreshWithClock: { receivedClock in
+                    recorder.record(receivedClock)
+                    return .failed
+                }
+            )
+
+        _ = await savedRuntime.refresh(
+            target: .saved(regionCode: "407")
+        )
+        _ = await currentRuntime.refresh()
+
+        XCTAssertEqual(recorder.identities.count, 2)
+        XCTAssertEqual(Set(recorder.identities).count, 1)
+    }
+
+    func testSnapshotPathIsCacheOnlyAndDoesNotInvokeRefresh() {
+        let target = WidgetLocationTarget.currentLocation
+        let store = ProviderTimelineTestStore(
+            refreshResult: .refreshed,
+            currentRefreshResult: .refreshed,
+            snapshots: [(target, snapshot(for: target))]
+        )
+        let dependencies = DPIPWidgetProviderDependencies(
+            loadSnapshot: store.load,
+            timelinePlanner: planner(store: store)
+        )
+
+        let loaded = dependencies.snapshot(for: target)
+
+        XCTAssertEqual(loaded?.sourceIdentifier, "current-location")
+        XCTAssertEqual(store.loadTargets, [target])
+        XCTAssertTrue(store.savedRefreshTargets.isEmpty)
+        XCTAssertEqual(store.currentRefreshCount, 0)
+    }
+
     private func planner(
         store: ProviderTimelineTestStore
     ) -> DPIPWidgetTimelinePlanner {
@@ -264,7 +364,8 @@ final class DPIPWidgetProviderTests: XCTestCase {
             staleAfter: staleAfter,
             refreshInterval: DPIPWidgetProviderRuntime.refreshInterval,
             loadSnapshot: store.load,
-            refreshSaved: store.refresh,
+            refreshSaved: store.refreshSaved,
+            refreshCurrent: store.refreshCurrent,
             now: { fixedNow }
         )
     }
@@ -305,13 +406,16 @@ final class DPIPWidgetProviderTests: XCTestCase {
 }
 
 private enum ProviderTimelineEvent: Equatable {
-    case refresh(WidgetLocationTarget)
+    case refreshSaved(WidgetLocationTarget)
+    case refreshCurrent
     case load(WidgetLocationTarget)
 }
 
 private final class ProviderTimelineTestStore: @unchecked Sendable {
     private let lock = NSLock()
-    private let refreshResult: SavedCurrentWeatherWidgetRefreshResult
+    private let savedRefreshResult: SavedCurrentWeatherWidgetRefreshResult
+    private let currentRefreshResult:
+        CurrentLocationCurrentWeatherWidgetRefreshResult
     private let refreshedSnapshot: CurrentWeatherWidgetSnapshot?
 
     private var storedSnapshots: [String: CurrentWeatherWidgetSnapshot]
@@ -320,13 +424,16 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
 
     init(
         refreshResult: SavedCurrentWeatherWidgetRefreshResult,
+        currentRefreshResult:
+            CurrentLocationCurrentWeatherWidgetRefreshResult = .failed,
         snapshots: [(
             WidgetLocationTarget,
             CurrentWeatherWidgetSnapshot
         )],
         refreshedSnapshot: CurrentWeatherWidgetSnapshot? = nil
     ) {
-        self.refreshResult = refreshResult
+        savedRefreshResult = refreshResult
+        self.currentRefreshResult = currentRefreshResult
         self.refreshedSnapshot = refreshedSnapshot
         storedSnapshots = Dictionary(
             uniqueKeysWithValues: snapshots.map {
@@ -335,11 +442,18 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         )
     }
 
-    func refresh(
+    func refreshSaved(
         target: WidgetLocationTarget
     ) async -> SavedCurrentWeatherWidgetRefreshResult {
-        recordRefresh(target)
-        return refreshResult
+        recordSavedRefresh(target)
+        return savedRefreshResult
+    }
+
+    func refreshCurrent() async
+        -> CurrentLocationCurrentWeatherWidgetRefreshResult
+    {
+        recordCurrentRefresh()
+        return currentRefreshResult
     }
 
     func load(
@@ -365,13 +479,17 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         return storedEvents
     }
 
-    var refreshTargets: [WidgetLocationTarget] {
+    var savedRefreshTargets: [WidgetLocationTarget] {
         events.compactMap { event in
-            guard case let .refresh(target) = event else {
+            guard case let .refreshSaved(target) = event else {
                 return nil
             }
             return target
         }
+    }
+
+    var currentRefreshCount: Int {
+        events.filter { $0 == .refreshCurrent }.count
     }
 
     var loadTargets: [WidgetLocationTarget] {
@@ -389,14 +507,27 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         return storedCacheMutationCount
     }
 
-    private func recordRefresh(
+    private func recordSavedRefresh(
         _ target: WidgetLocationTarget
     ) {
         lock.lock()
         defer { lock.unlock() }
-        storedEvents.append(.refresh(target))
+        storedEvents.append(.refreshSaved(target))
 
-        if refreshResult == .refreshed,
+        if savedRefreshResult == .refreshed,
+           let refreshedSnapshot {
+            storedSnapshots[Self.key(for: target)] = refreshedSnapshot
+            storedCacheMutationCount += 1
+        }
+    }
+
+    private func recordCurrentRefresh() {
+        lock.lock()
+        defer { lock.unlock() }
+        let target = WidgetLocationTarget.currentLocation
+        storedEvents.append(.refreshCurrent)
+
+        if currentRefreshResult == .refreshed,
            let refreshedSnapshot {
             storedSnapshots[Self.key(for: target)] = refreshedSnapshot
             storedCacheMutationCount += 1

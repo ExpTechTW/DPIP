@@ -21,7 +21,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             identifier: configuration.location?.identifier
         )
 
-        return dependencies.loadSnapshot(target)
+        return dependencies.snapshot(for: target)
     }
 
     func placeholder(in context: Context) -> DPIPWidgetEntry {
@@ -78,8 +78,8 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             )
         case .currentLocation:
             WidgetWeatherRefreshDiagnostics.log(
-                "target=current-location nativeRefresh=not-implemented "
-                    + "cacheLoad=enabled"
+                "target=current-location nativeRefresh=enabled "
+                    + "cacheReload=enabled"
             )
         case .invalid:
             WidgetWeatherRefreshDiagnostics.log("target=invalid")
