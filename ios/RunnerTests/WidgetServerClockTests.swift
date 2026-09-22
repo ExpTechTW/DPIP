@@ -228,103 +228,8 @@ final class WidgetServerClockTests: XCTestCase {
             deviceClock: wallClock,
             monotonicClock: monotonic,
             serverTimeSource: source,
-            timeoutRunner: PassthroughTimeoutRunner()
+            timeoutRunner: PassthroughServerClockTimeoutRunner()
         )
-    }
-}
-
-private final class TestWallClock: WidgetWallTimeSource,
-    @unchecked Sendable
-{
-    private let lock = NSLock()
-    private var milliseconds: Int64
-    private var _readCount = 0
-
-    init(milliseconds: Int64) {
-        self.milliseconds = milliseconds
-    }
-
-    var readCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return _readCount
-    }
-
-    func now() -> Date {
-        lock.lock()
-        _readCount += 1
-        let milliseconds = milliseconds
-        lock.unlock()
-        return Date(
-            timeIntervalSince1970: TimeInterval(milliseconds) / 1_000
-        )
-    }
-
-    func set(milliseconds: Int64) {
-        lock.lock()
-        self.milliseconds = milliseconds
-        lock.unlock()
-    }
-
-    func resetReadCount() {
-        lock.lock()
-        _readCount = 0
-        lock.unlock()
-    }
-}
-
-private final class TestMonotonicClock: WidgetMonotonicTimeSource,
-    @unchecked Sendable
-{
-    private let lock = NSLock()
-    private var milliseconds: Int64
-    private var _readCount = 0
-
-    init(milliseconds: Int64) {
-        self.milliseconds = milliseconds
-    }
-
-    var readCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return _readCount
-    }
-
-    func elapsedMilliseconds() -> Int64 {
-        lock.lock()
-        _readCount += 1
-        let milliseconds = milliseconds
-        lock.unlock()
-        return milliseconds
-    }
-
-    func set(milliseconds: Int64) {
-        lock.lock()
-        self.milliseconds = milliseconds
-        lock.unlock()
-    }
-
-    func resetReadCount() {
-        lock.lock()
-        _readCount = 0
-        lock.unlock()
-    }
-}
-
-private actor ScriptedServerTimeSource: WidgetServerTimeSource {
-    private(set) var callCount = 0
-    private var results: [Result<Int64, Error>]
-
-    init(results: [Result<Int64, Error>]) {
-        self.results = results
-    }
-
-    func serverTimeUnixMilliseconds() async throws -> Int64 {
-        callCount += 1
-        guard !results.isEmpty else {
-            throw WidgetSNTPError.allHostsFailed
-        }
-        return try results.removeFirst().get()
     }
 }
 
@@ -342,17 +247,6 @@ private actor GatedServerTimeSource: WidgetServerTimeSource {
     func succeed(with value: Int64) {
         continuation?.resume(returning: value)
         continuation = nil
-    }
-}
-
-private struct PassthroughTimeoutRunner:
-    WidgetServerClockTimeoutRunning
-{
-    func serverTimeUnixMilliseconds(
-        from source: any WidgetServerTimeSource,
-        timeout: TimeInterval
-    ) async throws -> Int64 {
-        try await source.serverTimeUnixMilliseconds()
     }
 }
 
