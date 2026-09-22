@@ -16,14 +16,6 @@ struct CurrentWeatherWidgetSnapshotWriter: Sendable {
     }
 
     func write(
-        _ snapshot: CurrentWeatherWidgetSnapshot
-    ) throws {
-        let address = try address(for: snapshot)
-        let token = try beginWrite(for: address)
-        _ = try write(snapshot, using: token)
-    }
-
-    func write(
         _ snapshot: CurrentWeatherWidgetSnapshot,
         using token: CurrentWeatherSnapshotWriteToken
     ) throws -> CurrentWeatherSnapshotWriteResult {

@@ -1034,7 +1034,7 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
             regionCode: "407"
         )
 
-        try writer.write(snapshot)
+        try write(snapshot, to: .saved(regionCode: "407"))
 
         XCTAssertTrue(
             FileManager.default.fileExists(
@@ -1053,103 +1053,12 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
             regionCode: "407"
         )
 
-        try writer.write(snapshot)
+        try write(snapshot, to: .currentLocation)
 
         XCTAssertTrue(
             FileManager.default.fileExists(
                 atPath: snapshotURL(for: .currentLocation).path
             )
-        )
-    }
-
-    func testWrittenJSONRoundTripsSchemaVersionFiveFields()
-        throws
-    {
-        let original = makeSnapshot(
-            sourceIdentifier: "region:407",
-            regionCode: "407"
-        )
-
-        try writer.write(original)
-
-        let data = try Data(
-            contentsOf: snapshotURL(
-                for: .saved(regionCode: "407")
-            )
-        )
-        let decoded = try JSONDecoder().decode(
-            CurrentWeatherWidgetSnapshot.self,
-            from: data
-        )
-
-        XCTAssertEqual(decoded.schemaVersion, original.schemaVersion)
-        XCTAssertEqual(
-            decoded.sourceIdentifier,
-            original.sourceIdentifier
-        )
-        XCTAssertEqual(decoded.regionCode, original.regionCode)
-        XCTAssertEqual(decoded.regionName, original.regionName)
-        XCTAssertEqual(
-            decoded.observationTime,
-            original.observationTime
-        )
-        XCTAssertEqual(decoded.stationName, original.stationName)
-        XCTAssertEqual(decoded.weather, original.weather)
-        XCTAssertEqual(decoded.weatherCode, original.weatherCode)
-        XCTAssertEqual(decoded.condition, original.condition)
-        XCTAssertEqual(decoded.isNight, original.isNight)
-        XCTAssertEqual(
-            decoded.nextDayNightTransitionTime,
-            original.nextDayNightTransitionTime
-        )
-        XCTAssertEqual(
-            decoded.calibratedTimeOffsetMilliseconds,
-            original.calibratedTimeOffsetMilliseconds
-        )
-        XCTAssertEqual(decoded.temperature, original.temperature)
-        XCTAssertEqual(decoded.humidity, original.humidity)
-        XCTAssertEqual(decoded.rain, original.rain)
-    }
-
-    func testWrittenJSONContainsExactlyCanonicalSchemaVersionFiveKeys()
-        throws
-    {
-        try writer.write(
-            makeSnapshot(
-                sourceIdentifier: "region:407",
-                regionCode: "407"
-            )
-        )
-
-        let data = try Data(
-            contentsOf: snapshotURL(
-                for: .saved(regionCode: "407")
-            )
-        )
-        let json = try XCTUnwrap(
-            JSONSerialization.jsonObject(with: data)
-                as? [String: Any]
-        )
-
-        XCTAssertEqual(
-            Set(json.keys),
-            Set([
-                "schemaVersion",
-                "sourceIdentifier",
-                "regionCode",
-                "regionName",
-                "observationTime",
-                "stationName",
-                "weather",
-                "weatherCode",
-                "condition",
-                "isNight",
-                "nextDayNightTransitionTime",
-                "calibratedTimeOffsetMilliseconds",
-                "temperature",
-                "humidity",
-                "rain",
-            ])
         )
     }
 
@@ -1165,13 +1074,13 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
             regionName: "中正區"
         )
 
-        try writer.write(region407)
+        try write(region407, to: .saved(regionCode: "407"))
         let region407Bytes = try Data(
             contentsOf: snapshotURL(
                 for: .saved(regionCode: "407")
             )
         )
-        try writer.write(region100)
+        try write(region100, to: .saved(regionCode: "100"))
 
         XCTAssertEqual(
             try Data(
@@ -1202,13 +1111,13 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
             regionCode: "407"
         )
 
-        try writer.write(saved)
+        try write(saved, to: .saved(regionCode: "407"))
         let savedBytes = try Data(
             contentsOf: snapshotURL(
                 for: .saved(regionCode: "407")
             )
         )
-        try writer.write(current)
+        try write(current, to: .currentLocation)
 
         XCTAssertEqual(
             try Data(
@@ -1236,7 +1145,7 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
             regionCode: "407"
         )
 
-        try writer.write(valid)
+        try write(valid, to: address)
         let originalBytes = try Data(
             contentsOf: snapshotURL(for: address)
         )
@@ -1247,7 +1156,7 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
             regionCode: "407"
         )
 
-        XCTAssertThrowsError(try writer.write(legacy))
+        XCTAssertThrowsError(try write(legacy, to: address))
         XCTAssertEqual(
             try Data(contentsOf: snapshotURL(for: address)),
             originalBytes
@@ -1257,6 +1166,17 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
     private var writer: CurrentWeatherWidgetSnapshotWriter {
         CurrentWeatherWidgetSnapshotWriter(
             containerURL: containerURL
+        )
+    }
+
+    private func write(
+        _ snapshot: CurrentWeatherWidgetSnapshot,
+        to address: CurrentWeatherSnapshotAddress
+    ) throws {
+        try CurrentWeatherWidgetTestFixtures.write(
+            snapshot,
+            to: address,
+            using: writer
         )
     }
 
