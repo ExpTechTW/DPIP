@@ -128,11 +128,20 @@ struct DPIPWidgetsEntryView : View {
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(snapshot.regionName)
-                            .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .layoutPriority(1)
+                        HStack(spacing: 4) {
+                            Text(snapshot.regionName)
+                                .font(.headline)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                                .layoutPriority(1)
+
+                            if snapshot.sourceIdentifier == "current-location" {
+                                Image(systemName: "location.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize()
+                            }
+                        }
 
                         Text(observationDate, style: .time)
                             .lineLimit(1)
