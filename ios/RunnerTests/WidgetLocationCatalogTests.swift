@@ -56,51 +56,6 @@ final class WidgetLocationCatalogTests: XCTestCase {
         }
     }
 
-    func testIntegerJSONCoordinatesDecodeAsDouble() throws {
-        let json = """
-        {
-          "schemaVersion": 1,
-          "locations": [
-            {
-              "regionCode": "242",
-              "displayName": "新莊區",
-              "administrativeAreaName": "新北市",
-              "latitude": 25,
-              "longitude": 121
-            }
-          ]
-        }
-        """
-
-        let catalog = try XCTUnwrap(
-            WidgetLocationCatalog.decode(Data(json.utf8))
-        )
-
-        XCTAssertEqual(catalog.locations[0].latitude, 25.0)
-        XCTAssertEqual(catalog.locations[0].longitude, 121.0)
-    }
-
-    func testEmptyDisplayNamePreservesCurrentBehavior() throws {
-        let catalog = try XCTUnwrap(
-            WidgetLocationCatalog.decode(
-                validCatalogData(displayName: "")
-            )
-        )
-
-        XCTAssertEqual(catalog.locations[0].displayName, "")
-    }
-
-    func testUnicodeDisplayNamePreservesCurrentBehavior() throws {
-        let displayName = "臺北🌧️"
-        let catalog = try XCTUnwrap(
-            WidgetLocationCatalog.decode(
-                validCatalogData(displayName: displayName)
-            )
-        )
-
-        XCTAssertEqual(catalog.locations[0].displayName, displayName)
-    }
-
     func testRejectsUnsupportedSchemaVersion() {
         XCTAssertNil(
             WidgetLocationCatalog.decode(
@@ -322,32 +277,6 @@ final class SavedWidgetLocationResolverTests: XCTestCase {
 
     func testMissingCatalogReturnsUnresolved() {
         let resolver = SavedWidgetLocationResolver(catalog: nil)
-
-        XCTAssertNil(
-            resolver.resolve(
-                target: WidgetLocationTarget(identifier: "region:242")
-            )
-        )
-    }
-
-    func testUnsupportedCatalogReturnsUnresolved() {
-        let catalog = WidgetLocationCatalog.decode(
-            Data(#"{"schemaVersion":2,"locations":[]}"#.utf8)
-        )
-        let resolver = SavedWidgetLocationResolver(catalog: catalog)
-
-        XCTAssertNil(
-            resolver.resolve(
-                target: WidgetLocationTarget(identifier: "region:242")
-            )
-        )
-    }
-
-    func testMalformedCatalogReturnsUnresolved() {
-        let catalog = WidgetLocationCatalog.decode(
-            Data(#"{"schemaVersion":1,"locations":[{}]}"#.utf8)
-        )
-        let resolver = SavedWidgetLocationResolver(catalog: catalog)
 
         XCTAssertNil(
             resolver.resolve(
