@@ -862,7 +862,7 @@ final class CurrentWeatherSnapshotStorageTests: XCTestCase {
     ) -> Data {
         try! JSONEncoder().encode(
             CurrentWeatherWidgetSnapshot(
-                schemaVersion: 5,
+                schemaVersion: 6,
                 sourceIdentifier: sourceIdentifier,
                 regionCode: regionCode,
                 regionName: regionName,
@@ -1189,7 +1189,7 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
     }
 
     private func makeSnapshot(
-        schemaVersion: Int = 5,
+        schemaVersion: Int = 6,
         sourceIdentifier: String,
         regionCode: String,
         regionName: String = "西屯區"

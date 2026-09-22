@@ -15,7 +15,11 @@ enum CurrentWeatherWidgetTestFixtures {
                 "weatherCode": 100,
                 "temperature": 28.5,
                 "humidity": 70,
-                "rain": 0
+                "rain": 0,
+                "wind": {
+                  "direction": "南南西",
+                  "speed": 1.5
+                }
               }
             }
             """.utf8
@@ -52,7 +56,7 @@ enum CurrentWeatherWidgetTestFixtures {
         sourceIdentifier: String,
         regionCode: String,
         regionName: String = "舊快取",
-        schemaVersion: Int = 5
+        schemaVersion: Int = 6
     ) -> CurrentWeatherWidgetSnapshot {
         CurrentWeatherWidgetSnapshot(
             schemaVersion: schemaVersion,

@@ -91,7 +91,7 @@ void main() {
 
     final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 5);
+    expect(decoded['schemaVersion'], 6);
     expect(decoded['sourceIdentifier'], 'region:660');
     expect(decoded['regionCode'], '660');
     expect(decoded['regionName'], '西屯區');
@@ -101,6 +101,8 @@ void main() {
     expect(decoded['nextDayNightTransitionTime'], isA<int>());
     expect(decoded['calibratedTimeOffsetMilliseconds'], -300_000);
     expect(decoded['temperature'], 28.4);
+    expect(decoded['windDirection'], '北');
+    expect(decoded['windSpeed'], 1.5);
   });
 
   test('waits for initial sync then publishes exactly once', () async {
