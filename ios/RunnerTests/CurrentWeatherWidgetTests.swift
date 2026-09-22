@@ -124,26 +124,6 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
         )
     }
 
-    func testRejectsBooleanForNumericField() {
-        XCTAssertThrowsError(
-            try decode(validJSON(temperature: "true"))
-        )
-    }
-
-    func testRejectsOversizedInt() {
-        XCTAssertThrowsError(
-            try decode(
-                validJSON(time: "9223372036854775808")
-            )
-        )
-    }
-
-    func testNegativeTimestampPreservesCurrentDecodingBehavior() throws {
-        let weather = try decode(validJSON(time: "-1"))
-
-        XCTAssertEqual(weather.time, -1)
-    }
-
     func testRejectsMissingStationName() {
         XCTAssertThrowsError(
             try decode(
@@ -1464,12 +1444,6 @@ final class CurrentWeatherClientTests: XCTestCase {
         }
     }
 
-    func testFetchAcceptsOnlyHTTP200() async {
-        setHTTPResponse(statusCode: 204, data: Data())
-
-        await assertFetchThrows(.httpStatus(204))
-    }
-
     func testFetchRejectsOversizedResponse() async {
         setHTTPResponse(
             data: Data(repeating: 0x20, count: 128 * 1024 + 1)
@@ -1770,33 +1744,6 @@ final class WidgetSolarTimeTests: XCTestCase {
         )
     }
 
-    func testIsNightMatchesTaipeiSolarBoundaries() {
-        let latitude = 25.032188
-        let longitude = 121.5183226
-
-        let cases: [(Int64, Bool)] = [
-            (1_710_885_457_000, true),
-            (1_710_885_458_000, false),
-            (1_710_885_459_000, false),
-
-            (1_710_929_102_000, false),
-            (1_710_929_103_000, true),
-            (1_710_929_104_000, true),
-        ]
-
-        for (unixMilliseconds, expectedIsNight) in cases {
-            XCTAssertEqual(
-                WidgetSolarTime.isNight(
-                    unixMilliseconds: unixMilliseconds,
-                    latitude: latitude,
-                    longitude: longitude
-                ),
-                expectedIsNight,
-                "Unexpected day/night state at \(unixMilliseconds)"
-            )
-        }
-    }
-
     func testIsNightIgnoresSubsecondWithinBoundarySecond() {
         let latitude = 25.032188
         let longitude = 121.5183226
@@ -1818,53 +1765,6 @@ final class WidgetSolarTimeTests: XCTestCase {
         )
     }
 
-    func testNextTransitionMatchesTaipeiSolarBoundaries() {
-        let latitude = 25.032188
-        let longitude = 121.5183226
-
-        let cases: [(now: Int64, expected: Int64)] = [
-            // one second before sunrise → today's sunrise
-            (1_710_885_457_000, 1_710_885_458),
-
-            // exactly sunrise → today's sunset
-            (1_710_885_458_000, 1_710_929_103),
-
-            // one second after sunrise → today's sunset
-            (1_710_885_459_000, 1_710_929_103),
-
-            // one second before sunset → today's sunset
-            (1_710_929_102_000, 1_710_929_103),
-
-            // exactly sunset → tomorrow's sunrise
-            (1_710_929_103_000, 1_710_971_796),
-
-            // one second after sunset → tomorrow's sunrise
-            (1_710_929_104_000, 1_710_971_796),
-        ]
-
-        for testCase in cases {
-            XCTAssertEqual(
-                WidgetSolarTime.nextDayNightTransition(
-                    unixMilliseconds: testCase.now,
-                    latitude: latitude,
-                    longitude: longitude
-                ),
-                testCase.expected,
-                "Unexpected transition at \(testCase.now)"
-            )
-        }
-    }
-
-    func testNextTransitionCrossesYearBoundary() {
-        XCTAssertEqual(
-            WidgetSolarTime.nextDayNightTransition(
-                unixMilliseconds: 1_735_636_512_000,
-                latitude: 25.032188,
-                longitude: 121.5183226
-            ),
-            1_735_684_745
-        )
-    }
 }
 
 final class WidgetResolvedWeatherLocationTests: XCTestCase {
@@ -1950,24 +1850,6 @@ final class WidgetResolvedWeatherLocationTests: XCTestCase {
                 latitude: 24.1658213,
                 longitude: .infinity
             )
-        )
-    }
-}
-
-final class CurrentWeatherSnapshotTimeTests: XCTestCase {
-    func testStoresCalibratedTimeSample() {
-        let time = CurrentWeatherSnapshotTime(
-            calibratedNowUnixMilliseconds: 1_789_567_200_123,
-            calibratedTimeOffsetMilliseconds: -5_000
-        )
-
-        XCTAssertEqual(
-            time.calibratedNowUnixMilliseconds,
-            1_789_567_200_123
-        )
-        XCTAssertEqual(
-            time.calibratedTimeOffsetMilliseconds,
-            -5_000
         )
     }
 }

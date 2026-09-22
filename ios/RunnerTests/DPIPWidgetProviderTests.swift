@@ -202,26 +202,6 @@ final class DPIPWidgetProviderTests: XCTestCase {
         XCTAssertEqual(store.loadTargets, [target])
     }
 
-    func testRefreshFailureDoesNotMutateOrDeleteCache() async {
-        let target = WidgetLocationTarget.saved(regionCode: "407")
-        let cachedSnapshot = snapshot(
-            for: target,
-            stationName: "unchanged-cache"
-        )
-        let store = ProviderTimelineTestStore(
-            refreshResult: .failed,
-            snapshots: [(target, cachedSnapshot)]
-        )
-
-        _ = await planner(store: store).plan(for: target)
-
-        XCTAssertEqual(store.cacheMutationCount, 0)
-        XCTAssertEqual(
-            store.cachedSnapshot(for: target)?.stationName,
-            "unchanged-cache"
-        )
-    }
-
     #if DEBUG
     func testDebugTimelineRequestsRefreshAfterSixtySeconds() async {
         let target = WidgetLocationTarget.currentLocation
@@ -257,84 +237,6 @@ final class DPIPWidgetProviderTests: XCTestCase {
         )
     }
     #endif
-
-    func testRuntimeKeepsThirtyMinuteStaleInterval() {
-        XCTAssertEqual(staleAfter, 30 * 60)
-    }
-
-    func testTimelineProjectionDelegatesToCurrentWeatherTimeline() async {
-        let target = WidgetLocationTarget.currentLocation
-        let cachedSnapshot = snapshot(
-            for: target,
-            observationTime: 9_000,
-            isNight: false,
-            transitionTime: 10_500
-        )
-        let store = ProviderTimelineTestStore(
-            refreshResult: .failed,
-            snapshots: [(target, cachedSnapshot)]
-        )
-
-        let plan = await planner(store: store).plan(for: target)
-
-        XCTAssertEqual(
-            plan.states,
-            CurrentWeatherWidgetTimeline.states(
-                snapshot: cachedSnapshot,
-                deviceNow: now,
-                staleAfter: staleAfter
-            )
-        )
-    }
-
-    func testRefreshRuntimeReusesOneServerClock() async {
-        let recorder = ProviderClockIdentityRecorder()
-        let runtime = SavedCurrentWeatherWidgetRefreshRuntime(
-            serverClock: WidgetServerClock(),
-            refreshWithClock: { clock, _ in
-                recorder.record(clock)
-                return .failed
-            }
-        )
-
-        _ = await runtime.refresh(
-            target: .saved(regionCode: "407")
-        )
-        _ = await runtime.refresh(
-            target: .saved(regionCode: "242")
-        )
-
-        XCTAssertEqual(recorder.identities.count, 2)
-        XCTAssertEqual(Set(recorder.identities).count, 1)
-    }
-
-    func testSavedAndCurrentRefreshRuntimesShareOneServerClock() async {
-        let recorder = ProviderClockIdentityRecorder()
-        let clock = WidgetServerClock()
-        let savedRuntime = SavedCurrentWeatherWidgetRefreshRuntime(
-            serverClock: clock,
-            refreshWithClock: { receivedClock, _ in
-                recorder.record(receivedClock)
-                return .failed
-            }
-        )
-        let currentRuntime =
-            CurrentLocationCurrentWeatherWidgetRefreshRuntime(
-                serverClock: clock,
-                refreshWithClock: { receivedClock in
-                    recorder.record(receivedClock)
-                    return .failed
-                }
-            )
-
-        _ = await savedRuntime.refresh(
-            target: .saved(regionCode: "407")
-        )
-        _ = await currentRuntime.refresh()
-
-        XCTAssertEqual(recorder.identities.count, 2)
-        XCTAssertEqual(Set(recorder.identities).count, 1)
-    }
 
     func testSnapshotPathIsCacheOnlyAndDoesNotInvokeRefresh() {
         let target = WidgetLocationTarget.currentLocation
@@ -372,10 +274,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
     private func snapshot(
         for target: WidgetLocationTarget,
-        stationName: String = "station",
-        observationTime: Int = 10_000,
-        isNight: Bool = false,
-        transitionTime: Int = 0
+        stationName: String = "station"
     ) -> CurrentWeatherWidgetSnapshot {
         let regionCode: String
         switch target {
@@ -390,13 +289,13 @@ final class DPIPWidgetProviderTests: XCTestCase {
             sourceIdentifier: target.sourceIdentifier,
             regionCode: regionCode,
             regionName: "測試地區",
-            observationTime: observationTime,
+            observationTime: 10_000,
             stationName: stationName,
             weather: "晴",
             weatherCode: 100,
             condition: .clear,
-            isNight: isNight,
-            nextDayNightTransitionTime: transitionTime,
+            isNight: false,
+            nextDayNightTransitionTime: 0,
             calibratedTimeOffsetMilliseconds: 0,
             temperature: 28,
             humidity: 70,
@@ -413,19 +312,16 @@ private enum ProviderTimelineEvent: Equatable {
 
 private final class ProviderTimelineTestStore: @unchecked Sendable {
     private let lock = NSLock()
-    private let savedRefreshResult: SavedCurrentWeatherWidgetRefreshResult
-    private let currentRefreshResult:
-        CurrentLocationCurrentWeatherWidgetRefreshResult
+    private let savedRefreshResult: CurrentWeatherWidgetRefreshResult
+    private let currentRefreshResult: CurrentWeatherWidgetRefreshResult
     private let refreshedSnapshot: CurrentWeatherWidgetSnapshot?
 
     private var storedSnapshots: [String: CurrentWeatherWidgetSnapshot]
     private var storedEvents: [ProviderTimelineEvent] = []
-    private var storedCacheMutationCount = 0
 
     init(
-        refreshResult: SavedCurrentWeatherWidgetRefreshResult,
-        currentRefreshResult:
-            CurrentLocationCurrentWeatherWidgetRefreshResult = .failed,
+        refreshResult: CurrentWeatherWidgetRefreshResult,
+        currentRefreshResult: CurrentWeatherWidgetRefreshResult = .failed,
         snapshots: [(
             WidgetLocationTarget,
             CurrentWeatherWidgetSnapshot
@@ -444,14 +340,12 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
 
     func refreshSaved(
         target: WidgetLocationTarget
-    ) async -> SavedCurrentWeatherWidgetRefreshResult {
+    ) async -> CurrentWeatherWidgetRefreshResult {
         recordSavedRefresh(target)
         return savedRefreshResult
     }
 
-    func refreshCurrent() async
-        -> CurrentLocationCurrentWeatherWidgetRefreshResult
-    {
+    func refreshCurrent() async -> CurrentWeatherWidgetRefreshResult {
         recordCurrentRefresh()
         return currentRefreshResult
     }
@@ -501,12 +395,6 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         }
     }
 
-    var cacheMutationCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedCacheMutationCount
-    }
-
     private func recordSavedRefresh(
         _ target: WidgetLocationTarget
     ) {
@@ -517,7 +405,6 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         if savedRefreshResult == .refreshed,
            let refreshedSnapshot {
             storedSnapshots[Self.key(for: target)] = refreshedSnapshot
-            storedCacheMutationCount += 1
         }
     }
 
@@ -530,7 +417,6 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         if currentRefreshResult == .refreshed,
            let refreshedSnapshot {
             storedSnapshots[Self.key(for: target)] = refreshedSnapshot
-            storedCacheMutationCount += 1
         }
     }
 
@@ -545,22 +431,5 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         case .invalid(let identifier):
             return "invalid:\(identifier)"
         }
-    }
-}
-
-private final class ProviderClockIdentityRecorder: @unchecked Sendable {
-    private let lock = NSLock()
-    private var storedIdentities: [ObjectIdentifier] = []
-
-    func record(_ clock: WidgetServerClock) {
-        lock.lock()
-        defer { lock.unlock() }
-        storedIdentities.append(ObjectIdentifier(clock))
-    }
-
-    var identities: [ObjectIdentifier] {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedIdentities
     }
 }

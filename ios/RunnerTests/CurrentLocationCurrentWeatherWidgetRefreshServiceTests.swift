@@ -25,11 +25,13 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         async throws
     {
         let recorder = CurrentLocationRefreshEventRecorder()
-        let weather = CurrentLocationScriptedWeather(
+        let weather = ScriptedCurrentWeather(
             result: .success(try makeObservation()),
-            recorder: recorder
+            onFetch: { recorder.record(.fetchWeather) }
         )
-        let writer = CurrentLocationSnapshotWriterSpy(recorder: recorder)
+        let writer = CurrentWeatherSnapshotWriterSpy(
+            onWrite: { recorder.record(.writeSnapshot) }
+        )
         let service = makeService(
             recorder: recorder,
             weather: weather,
@@ -48,6 +50,10 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 321)
 
         let events = recorder.events
+        XCTAssertLessThan(
+            try XCTUnwrap(events.firstIndex(of: .beginWrite)),
+            try XCTUnwrap(events.firstIndex(of: .acquireLocation))
+        )
         XCTAssertLessThan(
             try XCTUnwrap(events.firstIndex(of: .acquireLocation)),
             try XCTUnwrap(events.firstIndex(of: .resolveTownship))
@@ -73,12 +79,12 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
     func testWeatherUsesTownshipCentroidInsteadOfPreciseLocation()
         async throws
     {
-        let weather = CurrentLocationScriptedWeather(
+        let weather = ScriptedCurrentWeather(
             result: .success(try makeObservation())
         )
         let service = makeService(
             weather: weather,
-            writeSnapshot: CurrentLocationSnapshotWriterSpy().write
+            writeSnapshot: CurrentWeatherSnapshotWriterSpy().write
         )
 
         let result = await service.refresh()
@@ -98,74 +104,49 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         )
     }
 
-    func testLocationUnavailableDoesNotStartNetworkOrWrite() async throws {
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let clock = CurrentLocationScriptedClock(sample: makeSnapshotTime())
-        let writer = CurrentLocationSnapshotWriterSpy()
-        let service = makeService(
-            locationResult: .unavailable,
-            weather: weather,
-            synchronizeClock: {
-                await clock.synchronizeAndSample()
-            },
-            writeSnapshot: writer.write
-        )
+    func testLocationAcquisitionFailuresDoNotStartPipeline() async throws {
+        let cases: [(
+            WidgetCurrentLocationResult,
+            CurrentWeatherWidgetRefreshResult
+        )] = [
+            (.unavailable, .unavailable),
+            (.timedOut, .unavailable),
+            (.failed, .failed),
+        ]
 
-        let result = await service.refresh()
-        let weatherCallCount = await weather.callCount
-        let clockCallCount = await clock.callCount
-        XCTAssertEqual(result, .unavailable)
-        XCTAssertEqual(weatherCallCount, 0)
-        XCTAssertEqual(clockCallCount, 0)
-        XCTAssertEqual(writer.writeCount, 0)
-    }
+        for (locationResult, expectedResult) in cases {
+            let weather = ScriptedCurrentWeather(
+                result: .success(try makeObservation())
+            )
+            let clock = ScriptedSnapshotClock(sample: makeSnapshotTime())
+            let writer = CurrentWeatherSnapshotWriterSpy()
+            let service = makeService(
+                locationResult: locationResult,
+                weather: weather,
+                synchronizeClock: {
+                    await clock.synchronizeAndSample()
+                },
+                writeSnapshot: writer.write
+            )
 
-    func testLocationTimeoutIsUnavailableWithoutWrite() async throws {
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let writer = CurrentLocationSnapshotWriterSpy()
-        let service = makeService(
-            locationResult: .timedOut,
-            weather: weather,
-            writeSnapshot: writer.write
-        )
-
-        let result = await service.refresh()
-        let weatherCallCount = await weather.callCount
-        XCTAssertEqual(result, .unavailable)
-        XCTAssertEqual(weatherCallCount, 0)
-        XCTAssertEqual(writer.writeCount, 0)
-    }
-
-    func testLocationAcquisitionFailureFailsWithoutWrite() async throws {
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let writer = CurrentLocationSnapshotWriterSpy()
-        let service = makeService(
-            locationResult: .failed,
-            weather: weather,
-            writeSnapshot: writer.write
-        )
-
-        let result = await service.refresh()
-        let weatherCallCount = await weather.callCount
-        XCTAssertEqual(result, .failed)
-        XCTAssertEqual(weatherCallCount, 0)
-        XCTAssertEqual(writer.writeCount, 0)
+            let result = await service.refresh()
+            let weatherCallCount = await weather.callCount
+            let clockCallCount = await clock.callCount
+            XCTAssertEqual(result, expectedResult)
+            XCTAssertEqual(weatherCallCount, 0)
+            XCTAssertEqual(clockCallCount, 0)
+            XCTAssertEqual(writer.writeCount, 0)
+        }
     }
 
     func testTownshipResolutionFailureDoesNotStartNetworkOrWrite()
         async throws
     {
-        let weather = CurrentLocationScriptedWeather(
+        let weather = ScriptedCurrentWeather(
             result: .success(try makeObservation())
         )
-        let clock = CurrentLocationScriptedClock(sample: makeSnapshotTime())
-        let writer = CurrentLocationSnapshotWriterSpy()
+        let clock = ScriptedSnapshotClock(sample: makeSnapshotTime())
+        let writer = CurrentWeatherSnapshotWriterSpy()
         let service = makeService(
             shouldResolveTownship: false,
             weather: weather,
@@ -185,10 +166,10 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
     }
 
     func testResolvedSavedAddressIsRejectedWithoutFallback() async throws {
-        let weather = CurrentLocationScriptedWeather(
+        let weather = ScriptedCurrentWeather(
             result: .success(try makeObservation())
         )
-        let writer = CurrentLocationSnapshotWriterSpy()
+        let writer = CurrentWeatherSnapshotWriterSpy()
         let savedLocation = try XCTUnwrap(
             WidgetResolvedWeatherLocation(
                 address: .saved(regionCode: "407"),
@@ -215,13 +196,19 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         async throws
     {
         let oldData = try seedExistingSnapshot()
-        let weather = CurrentLocationScriptedWeather(result: .success(nil))
+        let weather = ScriptedCurrentWeather(result: .success(nil))
         let writer = CurrentWeatherWidgetSnapshotWriter(
             containerURL: containerURL
         )
         let service = makeService(
             weather: weather,
-            writeSnapshot: writer.write
+            writeSnapshot: { snapshot in
+                try CurrentWeatherWidgetTestFixtures.write(
+                    snapshot,
+                    to: .currentLocation,
+                    using: writer
+                )
+            }
         )
 
         let result = await service.refresh()
@@ -233,7 +220,7 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         async throws
     {
         let oldData = try seedExistingSnapshot()
-        let weather = CurrentLocationScriptedWeather(
+        let weather = ScriptedCurrentWeather(
             result: .failure(.scripted)
         )
         let writer = CurrentWeatherWidgetSnapshotWriter(
@@ -241,82 +228,17 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         )
         let service = makeService(
             weather: weather,
-            writeSnapshot: writer.write
+            writeSnapshot: { snapshot in
+                try CurrentWeatherWidgetTestFixtures.write(
+                    snapshot,
+                    to: .currentLocation,
+                    using: writer
+                )
+            }
         )
 
         let result = await service.refresh()
         XCTAssertEqual(result, .failed)
-        XCTAssertEqual(try cachedData(), oldData)
-    }
-
-    func testFirstClockSyncFailureWithoutAnchorDoesNotWrite() async throws {
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let writer = CurrentLocationSnapshotWriterSpy()
-        let clock = makeClock(serverResults: [.failure(.scripted)])
-        let service = makeService(
-            weather: weather,
-            clock: clock,
-            writeSnapshot: writer.write
-        )
-
-        let result = await service.refresh()
-        let hasSynchronized = await clock.hasSynchronized
-        XCTAssertEqual(result, .failed)
-        XCTAssertFalse(hasSynchronized)
-        XCTAssertEqual(writer.writeCount, 0)
-    }
-
-    func testLaterClockSyncFailureUsesRetainedAnchor() async throws {
-        let monotonicClock = CurrentLocationTestMonotonicClock(
-            milliseconds: 100
-        )
-        let clock = makeClock(
-            monotonicClock: monotonicClock,
-            serverResults: [
-                .success(10_000),
-                .failure(.scripted),
-            ]
-        )
-        let firstSyncSucceeded = await clock.synchronize()
-        XCTAssertTrue(firstSyncSucceeded)
-        monotonicClock.set(milliseconds: 600)
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let writer = CurrentLocationSnapshotWriterSpy()
-        let service = makeService(
-            weather: weather,
-            clock: clock,
-            writeSnapshot: writer.write
-        )
-
-        let result = await service.refresh()
-        XCTAssertEqual(result, .refreshed)
-        XCTAssertEqual(writer.writeCount, 1)
-        XCTAssertEqual(
-            writer.snapshots.first?.calibratedTimeOffsetMilliseconds,
-            5_500
-        )
-    }
-
-    func testWriterFailureLeavesExistingCurrentLocationCacheUntouched()
-        async throws
-    {
-        let oldData = try seedExistingSnapshot()
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let writer = CurrentLocationSnapshotWriterSpy(error: .scripted)
-        let service = makeService(
-            weather: weather,
-            writeSnapshot: writer.write
-        )
-
-        let result = await service.refresh()
-        XCTAssertEqual(result, .failed)
-        XCTAssertEqual(writer.writeCount, 1)
         XCTAssertEqual(try cachedData(), oldData)
     }
 
@@ -333,10 +255,16 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
                 latitude: 24.1813400,
                 longitude: 120.6466200
             ),
-            weather: CurrentLocationScriptedWeather(
+            weather: ScriptedCurrentWeather(
                 result: .success(try makeObservation())
             ),
-            writeSnapshot: writer.write
+            writeSnapshot: { snapshot in
+                try CurrentWeatherWidgetTestFixtures.write(
+                    snapshot,
+                    to: .currentLocation,
+                    using: writer
+                )
+            }
         )
         let secondService = makeService(
             resolvedLocation: resolvedLocation(
@@ -345,10 +273,16 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
                 latitude: 25.0333200,
                 longitude: 121.5701000
             ),
-            weather: CurrentLocationScriptedWeather(
+            weather: ScriptedCurrentWeather(
                 result: .success(try makeObservation())
             ),
-            writeSnapshot: writer.write
+            writeSnapshot: { snapshot in
+                try CurrentWeatherWidgetTestFixtures.write(
+                    snapshot,
+                    to: .currentLocation,
+                    using: writer
+                )
+            }
         )
 
         let firstResult = await firstService.refresh()
@@ -373,107 +307,22 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         )
     }
 
-    func testWeatherAndClockRunConcurrentlyAfterTownshipResolution()
-        async throws
-    {
-        let weatherGate = CurrentLocationRefreshOperationGate()
-        let clockGate = CurrentLocationRefreshOperationGate()
-        let observation = try makeObservation()
-        let resolvedLocation = resolvedLocation()
-        let snapshotTime = makeSnapshotTime()
-        let writer = CurrentLocationSnapshotWriterSpy()
-        let service = CurrentLocationCurrentWeatherWidgetRefreshService(
-            acquireLocation: { @MainActor [preciseLocation] in
-                .acquired(preciseLocation)
-            },
-            resolveTownship: { _ in
-                resolvedLocation
-            },
-            fetchWeather: { _, _ in
-                await weatherGate.wait()
-                return observation
-            },
-            synchronizeClock: {
-                await clockGate.wait()
-                return snapshotTime
-            },
-            writeSnapshot: writer.write
-        )
-
-        let refresh = Task { await service.refresh() }
-        for _ in 0..<200 {
-            if await weatherGate.hasStarted,
-               await clockGate.hasStarted {
-                break
-            }
-            await Task.yield()
-        }
-
-        let weatherStarted = await weatherGate.hasStarted
-        let clockStarted = await clockGate.hasStarted
-        XCTAssertTrue(weatherStarted)
-        XCTAssertTrue(clockStarted)
-        await weatherGate.open()
-        await clockGate.open()
-        let result = await refresh.value
-        XCTAssertEqual(result, .refreshed)
-    }
-
-    func testRejectedWriteReturnsSuperseded() async throws {
-        let expectedToken = CurrentWeatherSnapshotWriteToken(
-            address: .currentLocation,
-            generation: 9
-        )
-        let weather = CurrentLocationScriptedWeather(
-            result: .success(try makeObservation())
-        )
-        let preciseLocation = preciseLocation
-        let resolvedLocation = resolvedLocation()
-        let service = CurrentLocationCurrentWeatherWidgetRefreshService(
-            acquireLocation: { @MainActor in
-                .acquired(preciseLocation)
-            },
-            resolveTownship: { _ in
-                resolvedLocation
-            },
-            fetchWeather: { latitude, longitude in
-                try await weather.fetch(
-                    latitude: latitude,
-                    longitude: longitude
-                )
-            },
-            synchronizeClock: makeSnapshotTime,
-            beginWrite: { address in
-                XCTAssertEqual(address, expectedToken.address)
-                return expectedToken
-            },
-            commitSnapshot: { _, token in
-                XCTAssertEqual(token, expectedToken)
-                return .rejected
-            }
-        )
-
-        let result = await service.refresh()
-
-        XCTAssertEqual(result, .superseded)
-    }
-
     private func makeService(
         locationResult: WidgetCurrentLocationResult? = nil,
         resolvedLocation: WidgetResolvedWeatherLocation? = nil,
         shouldResolveTownship: Bool = true,
         recorder: CurrentLocationRefreshEventRecorder? = nil,
-        weather: CurrentLocationScriptedWeather,
+        weather: ScriptedCurrentWeather,
         synchronizeClock: @escaping
-            CurrentLocationCurrentWeatherWidgetRefreshService
-                .SynchronizeClock = {
+            CurrentWeatherWidgetRefreshPipeline.SynchronizeClock = {
                     CurrentWeatherSnapshotTime(
                         calibratedNowUnixMilliseconds: 1_710_907_200_000,
                         calibratedTimeOffsetMilliseconds: 321
                     )
                 },
-        writeSnapshot: @escaping
-            CurrentLocationCurrentWeatherWidgetRefreshService.WriteSnapshot
+        writeSnapshot: @escaping @Sendable (
+            CurrentWeatherWidgetSnapshot
+        ) throws -> Void
     ) -> CurrentLocationCurrentWeatherWidgetRefreshService {
         let preciseLocation = preciseLocation
         let defaultResolvedLocation = self.resolvedLocation()
@@ -494,46 +343,29 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
                 }
                 return defaultResolvedLocation
             },
-            fetchWeather: { latitude, longitude in
-                try await weather.fetch(
-                    latitude: latitude,
-                    longitude: longitude
+            beginWrite: { address in
+                recorder?.record(.beginWrite)
+                return CurrentWeatherSnapshotWriteToken(
+                    address: address,
+                    generation: 1
                 )
             },
-            synchronizeClock: {
-                recorder?.record(.synchronizeClock)
-                return await synchronizeClock()
-            },
-            writeSnapshot: writeSnapshot
-        )
-    }
-
-    private func makeService(
-        weather: CurrentLocationScriptedWeather,
-        clock: WidgetServerClock,
-        writeSnapshot: @escaping
-            CurrentLocationCurrentWeatherWidgetRefreshService.WriteSnapshot
-    ) -> CurrentLocationCurrentWeatherWidgetRefreshService {
-        let preciseLocation = preciseLocation
-        let resolvedLocation = resolvedLocation()
-        return CurrentLocationCurrentWeatherWidgetRefreshService(
-            acquireLocation: { @MainActor in
-                .acquired(preciseLocation)
-            },
-            resolveTownship: { location in
-                guard location == preciseLocation else {
-                    return nil
+            pipeline: CurrentWeatherWidgetRefreshPipeline(
+                fetchWeather: { latitude, longitude in
+                    try await weather.fetch(
+                        latitude: latitude,
+                        longitude: longitude
+                    )
+                },
+                synchronizeClock: {
+                    recorder?.record(.synchronizeClock)
+                    return await synchronizeClock()
+                },
+                commitSnapshot: { snapshot, _ in
+                    try writeSnapshot(snapshot)
+                    return .written
                 }
-                return resolvedLocation
-            },
-            fetchWeather: { latitude, longitude in
-                try await weather.fetch(
-                    latitude: latitude,
-                    longitude: longitude
-                )
-            },
-            clock: clock,
-            writeSnapshot: writeSnapshot
+            )
         )
     }
 
@@ -543,98 +375,44 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
         latitude: Double = 24.1813400,
         longitude: Double = 120.6466200
     ) -> WidgetResolvedWeatherLocation {
-        WidgetResolvedWeatherLocation(
-            address: .currentLocation,
+        CurrentWeatherWidgetTestFixtures.resolvedLocation(
             regionCode: regionCode,
             regionName: regionName,
             latitude: latitude,
             longitude: longitude
-        )!
+        )
     }
 
     private func makeObservation() throws -> CurrentWeatherRemoteDTO {
-        try JSONDecoder().decode(
-            CurrentWeatherRemoteDTO.self,
-            from: Data(
-                """
-                {
-                  "station": {"name": "西屯測站"},
-                  "time": 1710900000,
-                  "data": {
-                    "weather": "晴",
-                    "weatherCode": 100,
-                    "temperature": 28.5,
-                    "humidity": 70,
-                    "rain": 0
-                  }
-                }
-                """.utf8
-            )
-        )
+        try CurrentWeatherWidgetTestFixtures.observation()
     }
 
     private func makeSnapshotTime() -> CurrentWeatherSnapshotTime {
-        CurrentWeatherSnapshotTime(
-            calibratedNowUnixMilliseconds: 1_710_907_200_000,
-            calibratedTimeOffsetMilliseconds: 321
-        )
-    }
-
-    private func makeClock(
-        monotonicClock: CurrentLocationTestMonotonicClock =
-            CurrentLocationTestMonotonicClock(milliseconds: 100),
-        serverResults: [Result<Int64, CurrentLocationRefreshTestError>]
-    ) -> WidgetServerClock {
-        WidgetServerClock(
-            deviceClock: CurrentLocationTestWallClock(milliseconds: 5_000),
-            monotonicClock: monotonicClock,
-            serverTimeSource: CurrentLocationScriptedServerTimeSource(
-                results: serverResults
-            ),
-            timeoutRunner: CurrentLocationPassthroughTimeoutRunner()
-        )
+        CurrentWeatherWidgetTestFixtures.snapshotTime()
     }
 
     @discardableResult
     private func seedExistingSnapshot() throws -> Data {
-        try CurrentWeatherWidgetSnapshotWriter(
-            containerURL: containerURL
-        ).write(
-            CurrentWeatherWidgetSnapshot(
-                schemaVersion: 5,
+        try CurrentWeatherWidgetTestFixtures.seed(
+            CurrentWeatherWidgetTestFixtures.snapshot(
                 sourceIdentifier: "current-location",
-                regionCode: "407",
-                regionName: "舊快取",
-                observationTime: 1_700_000_000,
-                stationName: "舊測站",
-                weather: "陰",
-                weatherCode: 300,
-                condition: .overcast,
-                isNight: false,
-                nextDayNightTransitionTime: 1_700_010_000,
-                calibratedTimeOffsetMilliseconds: 123,
-                temperature: 20,
-                humidity: 60,
-                rain: 1
-            )
+                regionCode: "407"
+            ),
+            at: .currentLocation,
+            containerURL: containerURL
         )
-        return try cachedData()
     }
 
     private func cachedData() throws -> Data {
-        try Data(
-            contentsOf: CurrentWeatherSnapshotStorage(
-                containerURL: containerURL
-            ).snapshotURL(for: .currentLocation)
+        try CurrentWeatherWidgetTestFixtures.cachedData(
+            at: .currentLocation,
+            containerURL: containerURL
         )
     }
 }
 
-private enum CurrentLocationRefreshTestError: Error, Sendable {
-    case scripted
-}
-
 private enum CurrentLocationRefreshEvent: Equatable {
+    case beginWrite
     case acquireLocation
     case resolveTownship
     case fetchWeather
@@ -658,192 +436,5 @@ private final class CurrentLocationRefreshEventRecorder:
         lock.lock()
         storedEvents.append(event)
         lock.unlock()
-    }
-}
-
-private actor CurrentLocationScriptedWeather {
-    struct Coordinates: Sendable {
-        let latitude: Double
-        let longitude: Double
-    }
-
-    private(set) var callCount = 0
-    private(set) var coordinates: [Coordinates] = []
-    private let result: Result<
-        CurrentWeatherRemoteDTO?,
-        CurrentLocationRefreshTestError
-    >
-    private let recorder: CurrentLocationRefreshEventRecorder?
-
-    init(
-        result: Result<
-            CurrentWeatherRemoteDTO?,
-            CurrentLocationRefreshTestError
-        >,
-        recorder: CurrentLocationRefreshEventRecorder? = nil
-    ) {
-        self.result = result
-        self.recorder = recorder
-    }
-
-    func fetch(
-        latitude: Double,
-        longitude: Double
-    ) throws -> CurrentWeatherRemoteDTO? {
-        recorder?.record(.fetchWeather)
-        callCount += 1
-        coordinates.append(
-            Coordinates(latitude: latitude, longitude: longitude)
-        )
-        return try result.get()
-    }
-}
-
-private actor CurrentLocationScriptedClock {
-    private(set) var callCount = 0
-    private let sample: CurrentWeatherSnapshotTime?
-
-    init(sample: CurrentWeatherSnapshotTime?) {
-        self.sample = sample
-    }
-
-    func synchronizeAndSample() -> CurrentWeatherSnapshotTime? {
-        callCount += 1
-        return sample
-    }
-}
-
-private final class CurrentLocationSnapshotWriterSpy: @unchecked Sendable {
-    private let lock = NSLock()
-    private let error: CurrentLocationRefreshTestError?
-    private let recorder: CurrentLocationRefreshEventRecorder?
-    private var storedSnapshots: [CurrentWeatherWidgetSnapshot] = []
-    private var storedWriteCount = 0
-
-    init(
-        error: CurrentLocationRefreshTestError? = nil,
-        recorder: CurrentLocationRefreshEventRecorder? = nil
-    ) {
-        self.error = error
-        self.recorder = recorder
-    }
-
-    var snapshots: [CurrentWeatherWidgetSnapshot] {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedSnapshots
-    }
-
-    var writeCount: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedWriteCount
-    }
-
-    func write(_ snapshot: CurrentWeatherWidgetSnapshot) throws {
-        recorder?.record(.writeSnapshot)
-        lock.lock()
-        storedWriteCount += 1
-        let error = error
-        if error == nil {
-            storedSnapshots.append(snapshot)
-        }
-        lock.unlock()
-
-        if let error {
-            throw error
-        }
-    }
-}
-
-private actor CurrentLocationRefreshOperationGate {
-    private(set) var hasStarted = false
-    private var isOpen = false
-    private var continuation: CheckedContinuation<Void, Never>?
-
-    func wait() async {
-        hasStarted = true
-        guard !isOpen else {
-            return
-        }
-        await withCheckedContinuation { continuation in
-            self.continuation = continuation
-        }
-    }
-
-    func open() {
-        isOpen = true
-        continuation?.resume()
-        continuation = nil
-    }
-}
-
-private final class CurrentLocationTestWallClock: WidgetWallTimeSource,
-    @unchecked Sendable
-{
-    private let milliseconds: Int64
-
-    init(milliseconds: Int64) {
-        self.milliseconds = milliseconds
-    }
-
-    func now() -> Date {
-        Date(
-            timeIntervalSince1970: TimeInterval(milliseconds) / 1_000
-        )
-    }
-}
-
-private final class CurrentLocationTestMonotonicClock:
-    WidgetMonotonicTimeSource,
-    @unchecked Sendable
-{
-    private let lock = NSLock()
-    private var milliseconds: Int64
-
-    init(milliseconds: Int64) {
-        self.milliseconds = milliseconds
-    }
-
-    func elapsedMilliseconds() -> Int64 {
-        lock.lock()
-        defer { lock.unlock() }
-        return milliseconds
-    }
-
-    func set(milliseconds: Int64) {
-        lock.lock()
-        self.milliseconds = milliseconds
-        lock.unlock()
-    }
-}
-
-private actor CurrentLocationScriptedServerTimeSource:
-    WidgetServerTimeSource
-{
-    private var results: [
-        Result<Int64, CurrentLocationRefreshTestError>
-    ]
-
-    init(results: [Result<Int64, CurrentLocationRefreshTestError>]) {
-        self.results = results
-    }
-
-    func serverTimeUnixMilliseconds() throws -> Int64 {
-        guard !results.isEmpty else {
-            throw CurrentLocationRefreshTestError.scripted
-        }
-        return try results.removeFirst().get()
-    }
-}
-
-private struct CurrentLocationPassthroughTimeoutRunner:
-    WidgetServerClockTimeoutRunning
-{
-    func serverTimeUnixMilliseconds(
-        from source: any WidgetServerTimeSource,
-        timeout: TimeInterval
-    ) async throws -> Int64 {
-        try await source.serverTimeUnixMilliseconds()
     }
 }

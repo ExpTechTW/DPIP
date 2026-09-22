@@ -27,6 +27,8 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		4F1000000000000000000002 /* WidgetCurrentLocationClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1000000000000000000001 /* WidgetCurrentLocationClientTests.swift */; };
 		4F3000000000000000000002 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3000000000000000000001 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift */; };
+		4F4000000000000000000002 /* WidgetRefreshTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F4000000000000000000001 /* WidgetRefreshTestSupport.swift */; };
+		4F5000000000000000000002 /* CurrentWeatherWidgetTestFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5000000000000000000001 /* CurrentWeatherWidgetTestFixtures.swift */; };
 		522508B9301F863A006148C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 522508B7301F863A006148C2 /* InfoPlist.strings */; };
 		72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -133,6 +135,8 @@
 		4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eew_alert.aiff; sourceTree = "<group>"; };
 		4F1000000000000000000001 /* WidgetCurrentLocationClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetCurrentLocationClientTests.swift; sourceTree = "<group>"; };
 		4F3000000000000000000001 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
+		4F4000000000000000000001 /* WidgetRefreshTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetRefreshTestSupport.swift; sourceTree = "<group>"; };
+		4F5000000000000000000001 /* CurrentWeatherWidgetTestFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetTestFixtures.swift; sourceTree = "<group>"; };
 		522508B8301F863A006148C2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		522508BA301F8687006148C2 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		522508BB301F868B006148C2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -251,6 +255,7 @@
 				CurrentLocationCurrentWeatherWidgetRefreshService.swift,
 				CurrentWeatherSnapshotTime.swift,
 				CurrentWeatherWidgetSnapshotFactory.swift,
+				CurrentWeatherWidgetRefreshPipeline.swift,
 				CurrentWeatherWidgetSnapshotWriter.swift,
 				DPIPWidgetProviderSupport.swift,
 				SavedCurrentWeatherWidgetRefreshService.swift,
@@ -337,6 +342,8 @@
 				28A000000000000000000002 /* WidgetServerClockTests.swift */,
 				4F1000000000000000000001 /* WidgetCurrentLocationClientTests.swift */,
 				4F3000000000000000000001 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift */,
+				4F4000000000000000000001 /* WidgetRefreshTestSupport.swift */,
+				4F5000000000000000000001 /* CurrentWeatherWidgetTestFixtures.swift */,
 				D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */,
 				D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */,
 				D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */,
@@ -682,6 +689,8 @@
 				28A000000000000000000004 /* WidgetServerClockTests.swift in Sources */,
 				4F1000000000000000000002 /* WidgetCurrentLocationClientTests.swift in Sources */,
 				4F3000000000000000000002 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift in Sources */,
+				4F4000000000000000000002 /* WidgetRefreshTestSupport.swift in Sources */,
+				4F5000000000000000000002 /* CurrentWeatherWidgetTestFixtures.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 				D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */,
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
