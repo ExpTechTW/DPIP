@@ -14,7 +14,7 @@ enum CurrentWeatherWidgetCondition {
 
 final class CurrentWeatherWidgetSnapshot {
   const CurrentWeatherWidgetSnapshot({
-    this.schemaVersion = 5,
+    this.schemaVersion = 6,
     required this.sourceIdentifier,
     required this.regionCode,
     required this.regionName,
@@ -29,6 +29,8 @@ final class CurrentWeatherWidgetSnapshot {
     this.temperature,
     this.humidity,
     this.rain,
+    this.windDirection,
+    this.windSpeed,
   });
 
   final int schemaVersion;
@@ -61,6 +63,8 @@ final class CurrentWeatherWidgetSnapshot {
   final double? temperature;
   final int? humidity;
   final double? rain;
+  final String? windDirection;
+  final double? windSpeed;
 
   Map<String, Object?> toJson() {
     return {
@@ -79,6 +83,8 @@ final class CurrentWeatherWidgetSnapshot {
       'temperature': temperature,
       'humidity': humidity,
       'rain': rain,
+      'windDirection': windDirection,
+      'windSpeed': windSpeed,
     };
   }
 }
@@ -120,5 +126,7 @@ CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
     temperature: weather.data.temperature,
     humidity: weather.data.humidity,
     rain: weather.data.rain,
+    windDirection: weather.data.wind.direction,
+    windSpeed: weather.data.wind.speed,
   );
 }

@@ -22,12 +22,14 @@ void main() {
       'data': {
         'weather': '陰',
         'weatherCode': 300,
-        'wind': {'speed': -99, 'beaufort': -99},
+        'wind': {'direction': '南南西', 'speed': 1.5, 'beaufort': 1},
         'gust': {'speed': -99, 'beaufort': -99},
       },
     });
 
     expect(realtime.id, 'C0X160');
+    expect(realtime.data.wind.direction, '南南西');
+    expect(realtime.data.wind.speed, 1.5);
   });
 
   test('an already-6-char id is left untouched', () {
@@ -50,5 +52,34 @@ void main() {
     });
 
     expect(realtime.id, '467410');
+    expect(realtime.data.wind.speed, isNull);
+  });
+
+  test('nullable and missing sustained wind values decode as null', () {
+    for (final wind in [
+      <String, Object?>{'direction': null, 'speed': null},
+      <String, Object?>{},
+    ]) {
+      final realtime = WeatherRealtime.fromJson({
+        'id': '467410',
+        'station': {
+          'name': '臺南',
+          'lat': 23.0,
+          'lon': 120.2,
+          'altitude': 40,
+          'distance': 1.2,
+        },
+        'time': 0,
+        'data': {
+          'weather': '晴',
+          'weatherCode': 100,
+          'wind': wind,
+          'gust': <String, Object?>{},
+        },
+      });
+
+      expect(realtime.data.wind.direction, isNull);
+      expect(realtime.data.wind.speed, isNull);
+    }
   });
 }

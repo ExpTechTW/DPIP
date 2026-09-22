@@ -90,7 +90,7 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         }
     }
 
-    func testSuccessfulRefreshWritesSchemaFiveResolvedSnapshot() async throws {
+    func testSuccessfulRefreshWritesSchemaSixResolvedSnapshot() async throws {
         let observation = try makeObservation()
         let weather = ScriptedCurrentWeather(
             result: .success(observation)
@@ -112,7 +112,7 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
 
         XCTAssertEqual(result, .refreshed)
         let snapshot = try XCTUnwrap(writer.snapshots.first)
-        XCTAssertEqual(snapshot.schemaVersion, 5)
+        XCTAssertEqual(snapshot.schemaVersion, 6)
         XCTAssertEqual(snapshot.sourceIdentifier, "region:242")
         XCTAssertEqual(snapshot.regionCode, "242")
         XCTAssertEqual(snapshot.regionName, "新莊區")
@@ -123,6 +123,8 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         XCTAssertEqual(snapshot.temperature, observation.temperature)
         XCTAssertEqual(snapshot.humidity, observation.humidity)
         XCTAssertEqual(snapshot.rain, observation.rain)
+        XCTAssertEqual(snapshot.windDirection, observation.windDirection)
+        XCTAssertEqual(snapshot.windSpeed, observation.windSpeed)
         XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 5_000)
         let coordinates = await weather.coordinates
         XCTAssertEqual(coordinates.count, 1)
