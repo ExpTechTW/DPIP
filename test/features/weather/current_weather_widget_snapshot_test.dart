@@ -101,7 +101,7 @@ void main() {
       calibratedTimeOffsetMilliseconds: -300_000,
     );
 
-    expect(snapshot.schemaVersion, 5);
+    expect(snapshot.schemaVersion, 6);
     expect(snapshot.sourceIdentifier, 'current-location');
     expect(snapshot.regionCode, '660');
     expect(snapshot.regionName, '西屯區');
@@ -116,11 +116,13 @@ void main() {
     expect(snapshot.temperature, 28.4);
     expect(snapshot.humidity, 76);
     expect(snapshot.rain, 0.0);
+    expect(snapshot.windDirection, '北');
+    expect(snapshot.windSpeed, 1.5);
 
     final json = jsonEncode(snapshot.toJson());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 5);
+    expect(decoded['schemaVersion'], 6);
     expect(decoded['sourceIdentifier'], 'current-location');
     expect(decoded['regionCode'], '660');
     expect(decoded['condition'], 'thunderstorm');
@@ -128,6 +130,8 @@ void main() {
     expect(decoded['nextDayNightTransitionTime'], 1_789_562_700);
     expect(decoded['calibratedTimeOffsetMilliseconds'], -300_000);
     expect(decoded['temperature'], 28.4);
+    expect(decoded['windDirection'], '北');
+    expect(decoded['windSpeed'], 1.5);
   });
 
   test('serializes condition name and preserves nullable weather values', () {
@@ -146,6 +150,8 @@ void main() {
       temperature: null,
       humidity: null,
       rain: null,
+      windDirection: null,
+      windSpeed: null,
     );
 
     expect(snapshot.isNight, isTrue);
@@ -155,7 +161,7 @@ void main() {
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
     expect(decoded, {
-      'schemaVersion': 5,
+      'schemaVersion': 6,
       'sourceIdentifier': 'current-location',
       'regionCode': '660',
       'regionName': '西屯區',
@@ -170,6 +176,8 @@ void main() {
       'temperature': null,
       'humidity': null,
       'rain': null,
+      'windDirection': null,
+      'windSpeed': null,
     });
   });
 }
