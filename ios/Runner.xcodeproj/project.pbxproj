@@ -251,6 +251,7 @@
 		27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CurrentApparentTemperature.swift,
 				CurrentWeatherClient.swift,
 				CurrentLocationCurrentWeatherWidgetRefreshService.swift,
 				CurrentWeatherSnapshotTime.swift,

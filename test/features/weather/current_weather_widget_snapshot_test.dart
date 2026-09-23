@@ -101,7 +101,7 @@ void main() {
       calibratedTimeOffsetMilliseconds: -300_000,
     );
 
-    expect(snapshot.schemaVersion, 6);
+    expect(snapshot.schemaVersion, 7);
     expect(snapshot.sourceIdentifier, 'current-location');
     expect(snapshot.regionCode, '660');
     expect(snapshot.regionName, '西屯區');
@@ -118,11 +118,12 @@ void main() {
     expect(snapshot.rain, 0.0);
     expect(snapshot.windDirection, '北');
     expect(snapshot.windSpeed, 1.5);
+    expect(snapshot.apparentTemperature, closeTo(31.722497337967848, 1e-9));
 
     final json = jsonEncode(snapshot.toJson());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 6);
+    expect(decoded['schemaVersion'], 7);
     expect(decoded['sourceIdentifier'], 'current-location');
     expect(decoded['regionCode'], '660');
     expect(decoded['condition'], 'thunderstorm');
@@ -132,6 +133,7 @@ void main() {
     expect(decoded['temperature'], 28.4);
     expect(decoded['windDirection'], '北');
     expect(decoded['windSpeed'], 1.5);
+    expect(decoded['apparentTemperature'], closeTo(31.722497337967848, 1e-9));
   });
 
   test('serializes condition name and preserves nullable weather values', () {
@@ -161,7 +163,7 @@ void main() {
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
     expect(decoded, {
-      'schemaVersion': 6,
+      'schemaVersion': 7,
       'sourceIdentifier': 'current-location',
       'regionCode': '660',
       'regionName': '西屯區',
@@ -178,6 +180,44 @@ void main() {
       'rain': null,
       'windDirection': null,
       'windSpeed': null,
+      'apparentTemperature': null,
     });
   });
+
+  test(
+    'missing sustained wind keeps snapshot and nil apparent temperature',
+    () {
+      final weather = WeatherRealtime(
+        id: 'C0X160',
+        station: const WeatherRealtimeStation(
+          name: '西屯',
+          latitude: 24.18,
+          longitude: 120.64,
+          altitude: 85,
+          distance: 1.2,
+        ),
+        time: 1789398000,
+        data: const WeatherRealtimeData(
+          weather: '多雲',
+          weatherCode: 200,
+          temperature: 28.4,
+          humidity: 76,
+          wind: WeatherWind(),
+          gust: WeatherWind(speed: 3),
+        ),
+      );
+      final snapshot = createCurrentWeatherWidgetSnapshot(
+        sourceIdentifier: 'current-location',
+        regionCode: '660',
+        regionName: '西屯區',
+        weather: weather,
+        isNight: false,
+        nextDayNightTransitionTime: 1789562700,
+        calibratedTimeOffsetMilliseconds: 0,
+      );
+      expect(snapshot.windSpeed, isNull);
+      expect(snapshot.apparentTemperature, isNull);
+      expect(snapshot.toJson()['apparentTemperature'], isNull);
+    },
+  );
 }

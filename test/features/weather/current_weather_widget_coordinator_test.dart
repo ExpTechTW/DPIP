@@ -91,7 +91,7 @@ void main() {
 
     final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 6);
+    expect(decoded['schemaVersion'], 7);
     expect(decoded['sourceIdentifier'], 'region:660');
     expect(decoded['regionCode'], '660');
     expect(decoded['regionName'], '西屯區');
@@ -103,7 +103,41 @@ void main() {
     expect(decoded['temperature'], 28.4);
     expect(decoded['windDirection'], '北');
     expect(decoded['windSpeed'], 1.5);
+    expect(decoded['apparentTemperature'], closeTo(31.722497337967848, 1e-9));
   });
+
+  test(
+    'publishes snapshot with null apparent temperature when wind is missing',
+    () async {
+      final regions = RegionStore(
+        SettingsStore.inMemory({
+          'home.savedRegionCodes': ['660'],
+        }),
+      );
+      final writer = _FakeWidgetSnapshotWriter();
+      final coordinator = CurrentWeatherWidgetCoordinator(
+        regions,
+        _directoryWithXitun(),
+        CurrentWeatherWidgetPublisher(writer),
+        time: () => (
+          calibratedNow: DateTime.utc(2026, 9, 16, 4),
+          calibratedTimeOffset: Duration.zero,
+        ),
+        isTimeSynced: () => true,
+      );
+      regions.select(2);
+
+      await coordinator.publish(
+        regionCode: '660',
+        weather: _weather(windSpeed: null),
+      );
+
+      expect(writer.writeCallCount, 1);
+      final decoded = jsonDecode(writer.writtenJson!) as Map<String, dynamic>;
+      expect(decoded['windSpeed'], isNull);
+      expect(decoded['apparentTemperature'], isNull);
+    },
+  );
 
   test('waits for initial sync then publishes exactly once', () async {
     final regions = RegionStore(
@@ -288,7 +322,7 @@ TownDirectory _directoryWithXitun() {
   });
 }
 
-WeatherRealtime _weather() {
+WeatherRealtime _weather({double? windSpeed = 1.5}) {
   return WeatherRealtime(
     id: 'C0X160',
     station: const WeatherRealtimeStation(
@@ -299,14 +333,14 @@ WeatherRealtime _weather() {
       distance: 1.2,
     ),
     time: 1789398000,
-    data: const WeatherRealtimeData(
+    data: WeatherRealtimeData(
       weather: '多雲',
       weatherCode: 200,
       temperature: 28.4,
       humidity: 76,
       rain: 0.0,
-      wind: WeatherWind(direction: '北', speed: 1.5, beaufort: 1),
-      gust: WeatherWind(speed: 3.0, beaufort: 2),
+      wind: WeatherWind(direction: '北', speed: windSpeed, beaufort: 1),
+      gust: const WeatherWind(speed: 3.0, beaufort: 2),
     ),
   );
 }

@@ -70,6 +70,7 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
     let rain: Double?
     let windDirection: String?
     let windSpeed: Double?
+    let apparentTemperature: Double?
 
     private enum CodingKeys: String, CodingKey {
         case schemaVersion
@@ -89,6 +90,7 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
         case rain
         case windDirection
         case windSpeed
+        case apparentTemperature
     }
 
     init(
@@ -108,7 +110,8 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
         humidity: Int?,
         rain: Double?,
         windDirection: String? = nil,
-        windSpeed: Double? = nil
+        windSpeed: Double? = nil,
+        apparentTemperature: Double? = nil
     ) {
         self.schemaVersion = schemaVersion
         self.sourceIdentifier = sourceIdentifier
@@ -128,6 +131,7 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
         self.rain = rain
         self.windDirection = windDirection
         self.windSpeed = windSpeed
+        self.apparentTemperature = apparentTemperature
     }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(
@@ -139,7 +143,7 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
             forKey: .schemaVersion
         )
 
-        guard (1...6).contains(schemaVersion) else {
+        guard (1...7).contains(schemaVersion) else {
             throw DecodingError.dataCorruptedError(
                 forKey: .schemaVersion,
                 in: container,
@@ -246,16 +250,25 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
             windDirection = nil
             windSpeed = nil
         }
+
+        if schemaVersion >= 7 {
+            apparentTemperature = try container.decodeIfPresent(
+                Double.self,
+                forKey: .apparentTemperature
+            )
+        } else {
+            apparentTemperature = nil
+        }
     }
 
     func encode(to encoder: Encoder) throws {
-        guard schemaVersion == 6 else {
+        guard schemaVersion == 7 else {
             throw EncodingError.invalidValue(
                 schemaVersion,
                 .init(
                     codingPath: encoder.codingPath,
                     debugDescription:
-                        "Only current-weather snapshot schema version 6 can be encoded."
+                        "Only current-weather snapshot schema version 7 can be encoded."
                 )
             )
         }
@@ -266,7 +279,7 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
                 .init(
                     codingPath: encoder.codingPath,
                     debugDescription:
-                        "Schema version 6 requires a source identifier."
+                        "Schema version 7 requires a source identifier."
                 )
             )
         }
@@ -415,6 +428,17 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
         } else {
             try container.encodeNil(
                 forKey: .windSpeed
+            )
+        }
+
+        if let apparentTemperature {
+            try container.encode(
+                apparentTemperature,
+                forKey: .apparentTemperature
+            )
+        } else {
+            try container.encodeNil(
+                forKey: .apparentTemperature
             )
         }
     }
