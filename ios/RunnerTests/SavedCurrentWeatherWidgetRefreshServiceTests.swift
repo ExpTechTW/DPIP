@@ -90,7 +90,7 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         }
     }
 
-    func testSuccessfulRefreshWritesSchemaSixResolvedSnapshot() async throws {
+    func testSuccessfulRefreshWritesSchemaSevenResolvedSnapshot() async throws {
         let observation = try makeObservation()
         let weather = ScriptedCurrentWeather(
             result: .success(observation)
@@ -112,7 +112,7 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
 
         XCTAssertEqual(result, .refreshed)
         let snapshot = try XCTUnwrap(writer.snapshots.first)
-        XCTAssertEqual(snapshot.schemaVersion, 6)
+        XCTAssertEqual(snapshot.schemaVersion, 7)
         XCTAssertEqual(snapshot.sourceIdentifier, "region:242")
         XCTAssertEqual(snapshot.regionCode, "242")
         XCTAssertEqual(snapshot.regionName, "新莊區")
@@ -125,11 +125,35 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         XCTAssertEqual(snapshot.rain, observation.rain)
         XCTAssertEqual(snapshot.windDirection, observation.windDirection)
         XCTAssertEqual(snapshot.windSpeed, observation.windSpeed)
+        XCTAssertEqual(
+            try XCTUnwrap(snapshot.apparentTemperature),
+            31.39512521394631,
+            accuracy: 1e-9
+        )
         XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 5_000)
         let coordinates = await weather.coordinates
         XCTAssertEqual(coordinates.count, 1)
         XCTAssertEqual(coordinates.first?.latitude, 25.0358303)
         XCTAssertEqual(coordinates.first?.longitude, 121.4500307)
+    }
+
+    func testMissingWindStillRefreshesWithNilApparentTemperature() async throws {
+        let weather = ScriptedCurrentWeather(
+            result: .success(try CurrentWeatherWidgetTestFixtures.observation(
+                windSpeed: "null"
+            ))
+        )
+        let writer = CurrentWeatherSnapshotWriterSpy()
+        let service = try makeService(
+            codes: ["242"],
+            weather: weather,
+            writeSnapshot: writer.write
+        )
+
+        let result = await service.refresh(target: .saved(regionCode: "242"))
+        XCTAssertEqual(result, .refreshed)
+        let snapshot = try XCTUnwrap(writer.snapshots.first)
+        XCTAssertNil(snapshot.apparentTemperature)
     }
 
     func testFirstClockSyncFailureDoesNotWrite() async throws {
