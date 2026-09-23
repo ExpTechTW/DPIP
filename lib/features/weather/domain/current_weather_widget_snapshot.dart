@@ -1,4 +1,5 @@
 import 'package:dpip/core/weather/weather_code.dart';
+import 'package:dpip/features/weather/domain/apparent_temperature.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 
 enum CurrentWeatherWidgetCondition {
@@ -14,7 +15,7 @@ enum CurrentWeatherWidgetCondition {
 
 final class CurrentWeatherWidgetSnapshot {
   const CurrentWeatherWidgetSnapshot({
-    this.schemaVersion = 6,
+    this.schemaVersion = 7,
     required this.sourceIdentifier,
     required this.regionCode,
     required this.regionName,
@@ -31,6 +32,7 @@ final class CurrentWeatherWidgetSnapshot {
     this.rain,
     this.windDirection,
     this.windSpeed,
+    this.apparentTemperature,
   });
 
   final int schemaVersion;
@@ -65,6 +67,7 @@ final class CurrentWeatherWidgetSnapshot {
   final double? rain;
   final String? windDirection;
   final double? windSpeed;
+  final double? apparentTemperature;
 
   Map<String, Object?> toJson() {
     return {
@@ -85,6 +88,7 @@ final class CurrentWeatherWidgetSnapshot {
       'rain': rain,
       'windDirection': windDirection,
       'windSpeed': windSpeed,
+      'apparentTemperature': apparentTemperature,
     };
   }
 }
@@ -128,5 +132,10 @@ CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
     rain: weather.data.rain,
     windDirection: weather.data.wind.direction,
     windSpeed: weather.data.wind.speed,
+    apparentTemperature: currentApparentTemperature(
+      temperature: weather.data.temperature,
+      humidity: weather.data.humidity,
+      windSpeed: weather.data.wind.speed,
+    ),
   );
 }

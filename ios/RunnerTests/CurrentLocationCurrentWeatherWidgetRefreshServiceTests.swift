@@ -42,13 +42,18 @@ final class CurrentLocationCurrentWeatherWidgetRefreshServiceTests:
 
         XCTAssertEqual(result, .refreshed)
         let snapshot = try XCTUnwrap(writer.snapshots.first)
-        XCTAssertEqual(snapshot.schemaVersion, 6)
+        XCTAssertEqual(snapshot.schemaVersion, 7)
         XCTAssertEqual(snapshot.sourceIdentifier, "current-location")
         XCTAssertEqual(snapshot.regionCode, "407")
         XCTAssertEqual(snapshot.regionName, "西屯區")
         XCTAssertEqual(snapshot.stationName, "西屯測站")
         XCTAssertEqual(snapshot.windDirection, "南南西")
         XCTAssertEqual(snapshot.windSpeed, 1.5)
+        XCTAssertEqual(
+            try XCTUnwrap(snapshot.apparentTemperature),
+            31.39512521394631,
+            accuracy: 1e-9
+        )
         XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 321)
 
         let events = recorder.events
