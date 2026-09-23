@@ -19,7 +19,7 @@ enum CurrentWeatherWidgetSnapshotFactory {
             )
 
         return CurrentWeatherWidgetSnapshot(
-            schemaVersion: 6,
+            schemaVersion: 7,
             sourceIdentifier: location.address.sourceIdentifier,
             regionCode: location.regionCode,
             regionName: location.regionName,
@@ -36,7 +36,12 @@ enum CurrentWeatherWidgetSnapshotFactory {
             humidity: observation.humidity,
             rain: observation.rain,
             windDirection: observation.windDirection,
-            windSpeed: observation.windSpeed
+            windSpeed: observation.windSpeed,
+            apparentTemperature: currentApparentTemperature(
+                temperature: observation.temperature,
+                humidity: observation.humidity,
+                windSpeed: observation.windSpeed
+            )
         )
     }
 }
