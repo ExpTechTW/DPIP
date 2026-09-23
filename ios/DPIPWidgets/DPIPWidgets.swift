@@ -116,7 +116,7 @@ struct DPIPWidgetEntry: TimelineEntry {
     let isNight: Bool
 }
 
-struct DPIPWidgetsEntryView : View {
+private struct SmallCurrentWeatherView: View {
     let entry: DPIPWidgetEntry
 
     var body: some View {
@@ -220,6 +220,22 @@ struct DPIPWidgetsEntryView : View {
                 maxWidth: .infinity,
                 maxHeight: .infinity
             )
+        }
+    }
+}
+
+struct DPIPWidgetsEntryView : View {
+    @Environment(\.widgetFamily) private var family
+
+    let entry: DPIPWidgetEntry
+
+    var body: some View {
+        switch family {
+        case .systemSmall:
+            SmallCurrentWeatherView(entry: entry)
+
+        default:
+            SmallCurrentWeatherView(entry: entry)
         }
     }
 }
