@@ -1,8 +1,27 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "-- mm" : {
+      "shouldTranslate" : false
+    },
+    "--%" : {
+      "shouldTranslate" : false
+    },
+    "--°" : {
+      "shouldTranslate" : false
+    },
+    "%.0f°" : {
+      "shouldTranslate" : false
+    },
+    "%.1f mm" : {
+      "shouldTranslate" : false
+    },
+    "%lld%%" : {
+      "shouldTranslate" : false
+    },
     "weather.clear" : {
       "comment" : "Localized current weather condition for clear skies.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -20,6 +39,7 @@
     },
     "weather.cloudy" : {
       "comment" : "Localized current weather condition for cloudy skies.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -37,6 +57,7 @@
     },
     "weather.fog" : {
       "comment" : "Localized current weather condition for fog.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -54,6 +75,7 @@
     },
     "weather.overcast" : {
       "comment" : "Localized current weather condition for overcast skies.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -71,6 +93,7 @@
     },
     "weather.rain" : {
       "comment" : "Localized current weather condition for rain.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -88,6 +111,7 @@
     },
     "weather.snow" : {
       "comment" : "Localized current weather condition for snow.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -105,6 +129,7 @@
     },
     "weather.thunderstorm" : {
       "comment" : "Localized current weather condition for thunderstorms.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -122,6 +147,7 @@
     },
     "weather.unknown" : {
       "comment" : "Localized fallback when the current weather condition is unknown.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -160,13 +186,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Shows current weather for the area selected in DPIP."
+            "value" : "Shows current weather for the location configured for this widget."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "顯示 DPIP 所選地區的目前天氣。"
+            "value" : "顯示此小工具所設定地區的目前天氣。"
           }
         }
       }
