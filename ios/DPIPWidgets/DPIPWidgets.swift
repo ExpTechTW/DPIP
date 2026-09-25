@@ -40,6 +40,9 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
     ) {
         let snapshot = snapshot(for: configuration)
         let deviceNow = Date.now
+        let target = WidgetLocationTarget(
+            identifier: configuration.location?.identifier
+        )
 
         let state = CurrentWeatherWidgetTimeline.state(
             snapshot: snapshot,
@@ -51,7 +54,13 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             date: state.date,
             snapshot: snapshot,
             isStale: state.isStale,
-            isNight: state.isNight
+            isNight: state.isNight,
+            forecast: dependencies.forecastSnapshot(
+                for: target,
+                currentSnapshot: snapshot,
+                at: deviceNow,
+                family: context.family
+            )
         )
 
         completion(entry)
@@ -88,14 +97,16 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
 
         Task {
             let plan = await dependencies.timelinePlanner.plan(
-                for: target
+                for: target,
+                family: context.family
             )
             let entries = plan.states.map { state in
                 DPIPWidgetEntry(
                     date: state.date,
                     snapshot: plan.snapshot,
                     isStale: state.isStale,
-                    isNight: state.isNight
+                    isNight: state.isNight,
+                    forecast: plan.forecast(at: state.date)
                 )
             }
 
@@ -114,6 +125,17 @@ struct DPIPWidgetEntry: TimelineEntry {
     let snapshot: CurrentWeatherWidgetSnapshot?
     let isStale: Bool
     let isNight: Bool
+    let forecast: ForecastWidgetSnapshot?
+
+    init(date: Date, snapshot: CurrentWeatherWidgetSnapshot?,
+         isStale: Bool, isNight: Bool,
+         forecast: ForecastWidgetSnapshot? = nil) {
+        self.date = date
+        self.snapshot = snapshot
+        self.isStale = isStale
+        self.isNight = isNight
+        self.forecast = forecast
+    }
 }
 
 private struct SmallCurrentWeatherView: View {

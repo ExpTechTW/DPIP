@@ -59,6 +59,7 @@
 		E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* Sounds/weather.aiff */; };
 		E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */; };
 		E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */; };
+		E9F000000000000000000001 /* ForecastWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F000000000000000000002 /* ForecastWidgetTests.swift */; };
 		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */; };
 		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
@@ -179,6 +180,7 @@
 		E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetSnapshotWriterTests.swift; sourceTree = "<group>"; };
 		E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
 		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
+		E9F000000000000000000002 /* ForecastWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastWidgetTests.swift; sourceTree = "<group>"; };
 		F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTownshipResolverTests.swift; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
@@ -259,6 +261,12 @@
 				CurrentWeatherWidgetRefreshPipeline.swift,
 				CurrentWeatherWidgetSnapshotWriter.swift,
 				DPIPWidgetProviderSupport.swift,
+				ForecastClient.swift,
+				ForecastRemoteDTO.swift,
+				ForecastWidgetExpiry.swift,
+				ForecastWidgetRefreshService.swift,
+				ForecastWidgetSnapshot.swift,
+				ForecastWidgetSnapshotStore.swift,
 				SavedCurrentWeatherWidgetRefreshService.swift,
 				SavedWidgetLocationResolver.swift,
 				WidgetCurrentLocationClient.swift,
@@ -356,6 +364,7 @@
 				E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */,
 				E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */,
 				F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */,
+				E9F000000000000000000002 /* ForecastWidgetTests.swift */,
 				F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */,
 			);
 			path = RunnerTests;
@@ -703,6 +712,7 @@
 				E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */,
 				E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */,
 				F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */,
+				E9F000000000000000000001 /* ForecastWidgetTests.swift in Sources */,
 				F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
