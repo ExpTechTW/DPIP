@@ -224,6 +224,176 @@ private struct SmallCurrentWeatherView: View {
     }
 }
 
+private struct MediumCurrentWeatherView: View {
+    let entry: DPIPWidgetEntry
+
+    var body: some View {
+        if let snapshot = entry.snapshot {
+            let observationDate = Date(
+                timeIntervalSince1970: TimeInterval(snapshot.observationTime)
+            )
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline) {
+                    HStack(spacing: 4) {
+                        Text(snapshot.regionName)
+                            .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .layoutPriority(1)
+
+                        if snapshot.sourceIdentifier == "current-location" {
+                            Image(systemName: "location.fill")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .fixedSize()
+                        }
+                    }
+
+                    Spacer()
+
+                    Text(observationDate, style: .time)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+                    .frame(height: 4)
+
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        if let temperature = snapshot.temperature {
+                            Text("\(temperature, specifier: "%.0f")°")
+                                .font(.system(
+                                    size: 42,
+                                    weight: .semibold,
+                                    design: .rounded
+                                ))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        } else {
+                            Text("—°")
+                                .font(.system(
+                                    size: 42,
+                                    weight: .semibold,
+                                    design: .rounded
+                                ))
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let apparentTemperature = snapshot.apparentTemperature {
+                            HStack(spacing: 4) {
+                                Text("widget.feels_like")
+                                Text("\(apparentTemperature, specifier: "%.0f")°")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Spacer()
+
+                    HStack(spacing: 6) {
+                        Image(systemName: snapshot.condition.systemImageName(
+                            isNight: entry.isNight
+                        ))
+                            .font(.title2)
+
+                        Text(snapshot.condition.localizedDisplayName)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .foregroundStyle(.secondary)
+                }
+
+                HStack(alignment: .top, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("widget.humidity")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+
+                        if let humidity = snapshot.humidity {
+                            Text("\(humidity)%")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        } else {
+                            Text("--%")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    VStack(alignment: .center, spacing: 2) {
+                        Text("widget.rainfall")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+
+                        if let rain = snapshot.rain {
+                            Text("\(rain, specifier: "%.1f") mm")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        } else {
+                            Text("-- mm")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("widget.wind")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+
+                        if let direction = snapshot.windDirection,
+                           let speed = snapshot.windSpeed {
+                            Text("\(direction) \(speed, specifier: "%.1f") m/s")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                        } else if let speed = snapshot.windSpeed {
+                            Text("\(speed, specifier: "%.1f") m/s")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        } else if let direction = snapshot.windDirection {
+                            Text(direction)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        } else {
+                            Text("--")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            }
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: .topLeading
+            )
+        } else {
+            VStack(spacing: 8) {
+                Image(systemName: "cloud.fill")
+                    .font(.title)
+
+                Text("widget.no_weather_data")
+                    .font(.caption)
+            }
+            .foregroundStyle(.secondary)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity
+            )
+        }
+    }
+}
+
 struct DPIPWidgetsEntryView : View {
     @Environment(\.widgetFamily) private var family
 
@@ -233,6 +403,9 @@ struct DPIPWidgetsEntryView : View {
         switch family {
         case .systemSmall:
             SmallCurrentWeatherView(entry: entry)
+
+        case .systemMedium:
+            MediumCurrentWeatherView(entry: entry)
 
         default:
             SmallCurrentWeatherView(entry: entry)
@@ -260,7 +433,10 @@ struct DPIPWidgets: Widget {
                     .background()
             }
         }
-        .supportedFamilies([.systemSmall])
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium
+        ])
         .configurationDisplayName("widget.current_weather")
         .description("widget.current_weather_description")
     }
@@ -270,39 +446,116 @@ struct DPIPWidgets_Previews: PreviewProvider {
     private static let previewEntry = DPIPWidgetEntry(
         date: .now,
         snapshot: CurrentWeatherWidgetSnapshot(
-            schemaVersion: 5,
+            schemaVersion: 7,
             sourceIdentifier: "current-location",
-            regionCode: "660",
+            regionCode: "407",
             regionName: "西屯區",
-            observationTime: 0,
+            observationTime: Int(Date().timeIntervalSince1970),
             stationName: "西屯",
             weather: "晴",
             weatherCode: 100,
             condition: .clear,
-            isNight: true,
+            isNight: false,
             nextDayNightTransitionTime: 1_789_562_700,
             calibratedTimeOffsetMilliseconds: 0,
-            temperature: 28.4,
+            temperature: 28.0,
             humidity: 76,
-            rain: 0
+            rain: 0.0,
+            windDirection: "北北西",
+            windSpeed: 1.3,
+            apparentTemperature: 30.2
         ),
-        isStale: true,
-        isNight: true
+        isStale: false,
+        isNight: false
     )
+
+    private static let missingOptionalDataEntry = DPIPWidgetEntry(
+        date: .now,
+        snapshot: CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7,
+            sourceIdentifier: "current-location",
+            regionCode: "407",
+            regionName: "西屯區",
+            observationTime: Int(Date().timeIntervalSince1970),
+            stationName: "西屯",
+            weather: "多雲",
+            weatherCode: 200,
+            condition: .cloudy,
+            isNight: false,
+            nextDayNightTransitionTime: 1_789_562_700,
+            calibratedTimeOffsetMilliseconds: 0,
+            temperature: 28.0,
+            humidity: 76,
+            rain: 0.0,
+            windDirection: nil,
+            windSpeed: nil,
+            apparentTemperature: nil
+        ),
+        isStale: false,
+        isNight: false
+    )
+
+    @ViewBuilder
+    private static func previewView(
+        entry: DPIPWidgetEntry
+    ) -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            DPIPWidgetsEntryView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
+        } else {
+            DPIPWidgetsEntryView(entry: entry)
+                .padding()
+                .background()
+        }
+    }
 
     static var previews: some View {
         Group {
-            if #available(iOSApplicationExtension 17.0, *) {
-                DPIPWidgetsEntryView(entry: previewEntry)
-                    .containerBackground(.fill.tertiary, for: .widget)
-            } else {
-                DPIPWidgetsEntryView(entry: previewEntry)
-                    .padding()
-                    .background()
-            }
+            previewView(entry: previewEntry)
+                .previewDisplayName("Small")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemSmall)
+                )
+
+            previewView(entry: previewEntry)
+                .previewDisplayName("Medium")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: missingOptionalDataEntry)
+                .previewDisplayName("Medium — Missing Optional Data")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: previewEntry)
+                .environment(\.locale, Locale(identifier: "en"))
+                .previewDisplayName("Medium — English")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: previewEntry)
+                .environment(\.locale, Locale(identifier: "ja"))
+                .previewDisplayName("Medium — Japanese")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: previewEntry)
+                .environment(\.locale, Locale(identifier: "ko"))
+                .previewDisplayName("Medium — Korean")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: previewEntry)
+                .environment(\.locale, Locale(identifier: "zh-Hans"))
+                .previewDisplayName("Medium — Simplified Chinese")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
         }
-        .previewContext(
-            WidgetPreviewContext(family: .systemSmall)
-        )
     }
 }
