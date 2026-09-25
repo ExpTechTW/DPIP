@@ -169,21 +169,6 @@ def fit(text: str, room: int) -> str:
     return text[: cut if cut > 0 else room - 20].rstrip() + "\n…"
 
 
-def budget(body: str, hashes: bool) -> str:
-    """Drops the short commit hashes, from entries only.
-
-    Line by line rather than over the whole note: the snapshot notice at the top
-    names the commit it was cut from, and a blanket substitution ate it —
-    "取自 main 的。未經審查" is a sentence with its subject removed.
-    """
-    if hashes:
-        return body
-    return "\n".join(
-        re.sub(r"\s*`[0-9a-f]{7,8}`", "", line) if line.startswith("- ") else line
-        for line in body.splitlines()
-    )
-
-
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     dry_run = "--dry-run" in sys.argv
@@ -200,20 +185,12 @@ def main() -> int:
     colour = PRERELEASE_COLOUR if release["prerelease"] else RELEASE_COLOUR
     body = to_discord(release["body"])
 
-    # One embed per category, because a whole note does not fit in one: an
-    # embed description stops at 4,096 characters and a message at 6,000, and
-    # 26w34c needs 6,231 once the guild's platform emoji are in (they cost 58
-    # characters an entry against 2 for the unicode pair).
-    #
-    # When it still will not fit, the short commit hashes go before any entry
-    # does. Losing a hash costs a click on the release page that is linked at
-    # the bottom anyway; losing an entry means a change shipped and nobody was
-    # told, which is the one thing this message exists to prevent.
-    # The hashes go before any entry does. Losing a hash costs a click on the
-    # release page linked at the bottom; losing an entry means a change shipped
-    # and nobody was told, which is the one thing this message exists to
-    # prevent. `26w34c` needs 6,231 characters with the guild's platform emoji
-    # in (58 an entry against 2 for the unicode pair) and 5,651 without hashes.
+    # A whole note does not always fit: an embed description stops at 4,096
+    # characters, and 26w34c needs 6,231 once the guild's platform emoji are in
+    # (58 characters an entry against 2 for the unicode pair). Then only entries
+    # are cut, evenly between the categories ([share]); every entry that is
+    # posted keeps its short commit hash, so each one still leads to the change
+    # it describes.
     title_text = release["name"] or tag
     footer = "測試版" if release["prerelease"] else "正式版"
 
@@ -223,27 +200,22 @@ def main() -> int:
     # two fixes to a number nobody had checked.
     heading = f"# {title_text}"
 
-    for hashes in (True, False):
-        parts = sections(budget(body, hashes))
-        intro = " ".join(parts[0][1]).strip("_ ") if parts and not parts[0][0] else ""
-        header = f"{heading}\n-# {intro}" if intro else heading
-        if intro:
-            parts = parts[1:]
+    parts = sections(body)
+    intro = " ".join(parts[0][1]).strip("_ ") if parts and not parts[0][0] else ""
+    header = f"{heading}\n-# {intro}" if intro else heading
+    if intro:
+        parts = parts[1:]
 
-        # One embed, so the ceiling is a description's 4,096 and not a message's
-        # 6,000. Measured from the strings rather than reserved as a round
-        # number: a guess of 400 against a true 240 came straight out of the
-        # changelog, and nobody would have known which entries it cost.
-        overhead = (
-            len(header)
-            + len(link)
-            + sum(len(f"\n\n### {name}\n") for name, _ in parts)
-        )
-        room = DESCRIPTION_LIMIT - overhead
-        if sum(len(i) + 1 for _, items in parts for i in items) <= room:
-            break
-
-    kept = share(parts, room)
+    # One embed, so the ceiling is a description's 4,096 and not a message's
+    # 6,000. Measured from the strings rather than reserved as a round
+    # number: a guess of 400 against a true 240 came straight out of the
+    # changelog, and nobody would have known which entries it cost.
+    overhead = (
+        len(header)
+        + len(link)
+        + sum(len(f"\n\n### {name}\n") for name, _ in parts)
+    )
+    kept = share(parts, DESCRIPTION_LIMIT - overhead)
 
     blocks = [header]
     for (name, items), shown in zip(parts, kept):
@@ -272,7 +244,7 @@ def main() -> int:
         total = sum(len(items) for _, items in parts)
         print(
             f"\n描述 {len(embeds[0]['description'])} / {DESCRIPTION_LIMIT}"
-            f"，條目 {shown}/{total}，commit hash {'保留' if hashes else '捨棄'}",
+            f"，條目 {shown}/{total}",
             file=sys.stderr,
         )
         return 0

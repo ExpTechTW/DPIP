@@ -66,14 +66,17 @@ void main() {
     expect(text, contains('修正換行的更新日誌條目在發布時被從中間截斷'));
   });
 
-  test('hashes are dropped before any entry is', () {
-    // The order matters: a hash costs a click on the link at the bottom, a
-    // dropped entry means a change shipped and nobody was told.
-    final full = description(payload(short: true));
-    final tight = description(payload());
+  test('a cut drops entries, never the hash of an entry that is posted', () {
+    // The full emoji overflow the limit, so entries are cut; each one still
+    // leads to the change it describes.
+    final text = description(payload());
+    final entries = text.split('\n').where((line) => line.startsWith('- '));
 
-    expect(full, contains('`c5fdbd31`'));
-    expect(tight, isNot(contains('`c5fdbd31`')));
+    expect(text, contains('… ('));
+    expect(entries, isNotEmpty);
+    for (final entry in entries) {
+      expect(entry, matches(RegExp(r'`[0-9a-f]{7,8}`')), reason: entry);
+    }
   });
 
   test('a cut is split evenly between the categories', () {
