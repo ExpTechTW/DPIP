@@ -2,22 +2,22 @@
   "sourceLanguage" : "en",
   "strings" : {
     "-- mm" : {
-
+      "shouldTranslate" : false
     },
     "--%" : {
-
+      "shouldTranslate" : false
     },
     "--°" : {
-
+      "shouldTranslate" : false
     },
     "%.0f°" : {
-
+      "shouldTranslate" : false
     },
     "%.1f mm" : {
-
+      "shouldTranslate" : false
     },
     "%lld%%" : {
-
+      "shouldTranslate" : false
     },
     "weather.clear" : {
       "comment" : "Localized current weather condition for clear skies.",
