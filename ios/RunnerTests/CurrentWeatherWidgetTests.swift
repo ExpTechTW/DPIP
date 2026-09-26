@@ -985,34 +985,314 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
     }
 }
 
-final class CurrentWeatherWidgetConditionTests: XCTestCase {
+final class WidgetWeatherConditionTests: XCTestCase {
+    func testWeatherCodesMapToSharedPresentationConditions() {
+        let expected: [(Int, WidgetWeatherCondition)] = [
+            (100, .clear),
+            (200, .cloudy),
+            (300, .overcast),
+            (205, .fog),
+            (206, .rain),
+            (208, .snow),
+            (211, .rain),
+            (214, .thunderstorm),
+            (217, .thunderstorm),
+            (203, .thunder),
+            (204, .thunder),
+            (219, .thunder),
+            (207, .sleet),
+            (212, .sleet),
+            (213, .hail),
+            (216, .hail),
+            (218, .hail),
+            (215, .snow),
+        ]
+
+        for (weatherCode, condition) in expected {
+            XCTAssertEqual(
+                WidgetWeatherCondition(
+                    weatherCode: weatherCode,
+                    weather: "raw text must not override a known code"
+                ),
+                condition,
+                "weatherCode=\(weatherCode)"
+            )
+        }
+    }
+
+    func testRawWeatherFallbackClassifiesWithoutBecomingDisplayText() {
+        let expected: [(String, WidgetWeatherCondition)] = [
+            ("午後雷雨", .thunderstorm),
+            ("雷雪", .snow),
+            ("雷雹", .hail),
+            ("冰雹", .hail),
+            ("雷聲", .thunder),
+            ("雨雪", .sleet),
+            ("降雪", .snow),
+            ("有雨", .rain),
+            ("濃霧", .fog),
+            ("晴", .clear),
+            ("多雲", .cloudy),
+            ("陰", .overcast),
+            ("API 原始描述", .unknown),
+        ]
+
+        for (weather, condition) in expected {
+            let mapped = WidgetWeatherCondition(
+                weatherCode: 0,
+                weather: weather
+            )
+            XCTAssertEqual(mapped, condition, "weather=\(weather)")
+            XCTAssertNotEqual(mapped.displayNameLocalizationKey, weather)
+            XCTAssertTrue(mapped.displayNameLocalizationKey.hasPrefix("weather."))
+        }
+    }
+
+    func testEveryPresentationConditionHasItsOwnLocalizationKey() {
+        let expected: [(WidgetWeatherCondition, String)] = [
+            (.clear, "weather.clear"),
+            (.cloudy, "weather.cloudy"),
+            (.overcast, "weather.overcast"),
+            (.fog, "weather.fog"),
+            (.rain, "weather.rain"),
+            (.sleet, "weather.sleet"),
+            (.snow, "weather.snow"),
+            (.hail, "weather.hail"),
+            (.thunder, "weather.thunder"),
+            (.thunderstorm, "weather.thunderstorm"),
+            (.unknown, "weather.unknown"),
+        ]
+
+        XCTAssertEqual(expected.count, WidgetWeatherCondition.allCases.count)
+        for (condition, key) in expected {
+            XCTAssertEqual(condition.displayNameLocalizationKey, key)
+        }
+    }
+
     func testClearAndCloudyUseDayNightSymbols() {
         XCTAssertEqual(
-            CurrentWeatherWidgetCondition.clear.systemImageName(isNight: false),
+            WidgetWeatherCondition.clear.systemImageName(isNight: false),
             "sun.max.fill"
         )
         XCTAssertEqual(
-            CurrentWeatherWidgetCondition.clear.systemImageName(isNight: true),
+            WidgetWeatherCondition.clear.systemImageName(isNight: true),
             "moon.stars.fill"
         )
         XCTAssertEqual(
-            CurrentWeatherWidgetCondition.cloudy.systemImageName(isNight: false),
+            WidgetWeatherCondition.cloudy.systemImageName(isNight: false),
             "cloud.sun.fill"
         )
         XCTAssertEqual(
-            CurrentWeatherWidgetCondition.cloudy.systemImageName(isNight: true),
+            WidgetWeatherCondition.cloudy.systemImageName(isNight: true),
             "cloud.moon.fill"
         )
     }
 
-    func testRainSymbolDoesNotDependOnDayNight() {
-        XCTAssertEqual(
-            CurrentWeatherWidgetCondition.rain.systemImageName(isNight: false),
-            "cloud.rain.fill"
+    func testPhenomenonSymbolsDoNotDependOnDayNight() {
+        let expected: [(WidgetWeatherCondition, String)] = [
+            (.overcast, "cloud.fill"),
+            (.fog, "cloud.fog.fill"),
+            (.rain, "cloud.rain.fill"),
+            (.sleet, "cloud.sleet.fill"),
+            (.snow, "cloud.snow.fill"),
+            (.hail, "cloud.hail.fill"),
+            (.thunder, "bolt.fill"),
+            (.thunderstorm, "cloud.bolt.rain.fill"),
+            (.unknown, "cloud.fill"),
+        ]
+
+        for (condition, symbol) in expected {
+            XCTAssertEqual(condition.systemImageName(isNight: false), symbol)
+            XCTAssertEqual(condition.systemImageName(isNight: true), symbol)
+        }
+    }
+
+    func testCurrentAndForecastUseSamePresentationConditionForHail() throws {
+        let current = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7,
+            sourceIdentifier: "region:407",
+            regionCode: "407",
+            regionName: "西屯區",
+            observationTime: 1_789_567_200,
+            stationName: "西屯",
+            weather: "冰雹",
+            weatherCode: 213,
+            condition: .rain,
+            isNight: false,
+            nextDayNightTransitionTime: 1_789_562_700,
+            calibratedTimeOffsetMilliseconds: 0,
+            temperature: 20,
+            humidity: 80,
+            rain: 5
         )
+        let forecast = try XCTUnwrap(ForecastWidgetPoint(
+            time: "12:00",
+            temperature: 20,
+            weather: "冰雹",
+            weatherCode: 213,
+            pop: 80
+        ))
+
+        XCTAssertEqual(current.condition, .rain)
+        XCTAssertEqual(current.presentationCondition, .hail)
+        XCTAssertEqual(forecast.presentationCondition, .hail)
         XCTAssertEqual(
-            CurrentWeatherWidgetCondition.rain.systemImageName(isNight: true),
-            "cloud.rain.fill"
+            current.presentationCondition,
+            forecast.presentationCondition
+        )
+
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: JSONEncoder().encode(current))
+                as? [String: Any]
+        )
+        XCTAssertEqual(json["schemaVersion"] as? Int, 7)
+        XCTAssertEqual(json["condition"] as? String, "rain")
+    }
+
+    func testPersistedConditionRawValuesRemainUnchanged() {
+        let conditions: [CurrentWeatherWidgetCondition] = [
+            .clear, .cloudy, .overcast, .fog, .rain, .snow,
+            .thunderstorm, .unknown,
+        ]
+        XCTAssertEqual(
+            conditions.map(\.rawValue),
+            [
+                "clear", "cloudy", "overcast", "fog", "rain", "snow",
+                "thunderstorm", "unknown",
+            ]
+        )
+    }
+
+    func testNewLocalizationKeysHaveEveryRequiredLocale() throws {
+        let catalogURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("DPIPWidgets/Localizable.xcstrings")
+        let catalog = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(contentsOf: catalogURL))
+                as? [String: Any]
+        )
+        let strings = try XCTUnwrap(catalog["strings"] as? [String: Any])
+        let expected: [String: [String: String]] = [
+            "weather.sleet": [
+                "en": "Sleet", "zh-Hant": "雨雪", "zh-Hans": "雨雪",
+                "ja": "みぞれ", "ko": "진눈깨비",
+            ],
+            "weather.hail": [
+                "en": "Hail", "zh-Hant": "冰雹", "zh-Hans": "冰雹",
+                "ja": "ひょう", "ko": "우박",
+            ],
+            "weather.thunder": [
+                "en": "Thunder", "zh-Hant": "雷電", "zh-Hans": "雷电",
+                "ja": "雷", "ko": "천둥·번개",
+            ],
+        ]
+
+        for (key, translations) in expected {
+            let item = try XCTUnwrap(strings[key] as? [String: Any])
+            let localizations = try XCTUnwrap(
+                item["localizations"] as? [String: Any]
+            )
+            XCTAssertEqual(Set(localizations.keys), Set(translations.keys), key)
+            for (locale, value) in translations {
+                let localization = try XCTUnwrap(
+                    localizations[locale] as? [String: Any]
+                )
+                let stringUnit = try XCTUnwrap(
+                    localization["stringUnit"] as? [String: Any]
+                )
+                XCTAssertEqual(stringUnit["value"] as? String, value, key)
+            }
+        }
+    }
+}
+
+final class WidgetWindDirectionTests: XCTestCase {
+    func testAllSixteenDirectionsMapFromRawValues() {
+        let expected: [(String, WidgetWindDirection)] = [
+            ("北", .north),
+            ("北北東", .northNortheast),
+            ("東北", .northeast),
+            ("東北東", .eastNortheast),
+            ("東", .east),
+            ("東南東", .eastSoutheast),
+            ("東南", .southeast),
+            ("南南東", .southSoutheast),
+            ("南", .south),
+            ("南南西", .southSouthwest),
+            ("西南", .southwest),
+            ("西南西", .westSouthwest),
+            ("西", .west),
+            ("西北西", .westNorthwest),
+            ("西北", .northwest),
+            ("北北西", .northNorthwest),
+        ]
+
+        XCTAssertEqual(
+            expected.count,
+            WidgetWindDirection.allCases.count
+        )
+
+        for (rawDirection, direction) in expected {
+            XCTAssertEqual(
+                WidgetWindDirection(
+                    rawDirection: rawDirection
+                ),
+                direction,
+                rawDirection
+            )
+        }
+    }
+
+    func testEnglishAbbreviationsAreAlsoAccepted() {
+        let expected: [(String, WidgetWindDirection)] = [
+            ("N", .north),
+            ("NNE", .northNortheast),
+            ("NE", .northeast),
+            ("ENE", .eastNortheast),
+            ("E", .east),
+            ("ESE", .eastSoutheast),
+            ("SE", .southeast),
+            ("SSE", .southSoutheast),
+            ("S", .south),
+            ("SSW", .southSouthwest),
+            ("SW", .southwest),
+            ("WSW", .westSouthwest),
+            ("W", .west),
+            ("WNW", .westNorthwest),
+            ("NW", .northwest),
+            ("NNW", .northNorthwest),
+        ]
+
+        for (rawDirection, direction) in expected {
+            XCTAssertEqual(
+                WidgetWindDirection(
+                    rawDirection: rawDirection
+                ),
+                direction
+            )
+        }
+    }
+
+    func testEveryWindDirectionHasUniqueLocalizationKey() {
+        let keys = WidgetWindDirection.allCases.map(
+            \.displayNameLocalizationKey
+        )
+
+        XCTAssertEqual(keys.count, 16)
+        XCTAssertEqual(Set(keys).count, 16)
+        XCTAssertTrue(
+            keys.allSatisfy {
+                $0.hasPrefix("wind.direction.")
+            }
+        )
+    }
+
+    func testUnknownWindDirectionReturnsNil() {
+        XCTAssertNil(
+            WidgetWindDirection(
+                rawDirection: "unknown-direction"
+            )
         )
     }
 }

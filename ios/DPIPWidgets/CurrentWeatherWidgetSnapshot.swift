@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
     case clear
@@ -9,6 +10,126 @@ enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
     case snow
     case fog
     case unknown
+}
+
+enum WidgetWeatherCondition: CaseIterable, Equatable, Sendable {
+    case clear
+    case cloudy
+    case overcast
+    case fog
+    case rain
+    case sleet
+    case snow
+    case hail
+    case thunder
+    case thunderstorm
+    case unknown
+
+    init(weatherCode: Int, weather: String) {
+        switch weatherCode % 100 {
+        case 1, 2, 5:
+            self = .fog
+            return
+        case 3, 4, 19:
+            self = .thunder
+            return
+        case 6, 11:
+            self = .rain
+            return
+        case 7, 12:
+            self = .sleet
+            return
+        case 8, 9, 10, 15:
+            self = .snow
+            return
+        case 13, 16, 18:
+            self = .hail
+            return
+        case 14, 17:
+            self = .thunderstorm
+            return
+        default:
+            break
+        }
+
+        switch weatherCode / 100 {
+        case 1:
+            self = .clear
+        case 2:
+            self = .cloudy
+        case 3:
+            self = .overcast
+        default:
+            self = Self.fallbackCondition(weather: weather)
+        }
+    }
+
+    private static func fallbackCondition(weather: String) -> Self {
+        if weather.contains("雷"), weather.contains("雨") {
+            return .thunderstorm
+        }
+        if weather.contains("雹") {
+            return .hail
+        }
+        if weather.contains("雨"), weather.contains("雪") {
+            return .sleet
+        }
+        if weather.contains("雪") {
+            return .snow
+        }
+        if weather.contains("雷") {
+            return .thunder
+        }
+        if weather.contains("雨") {
+            return .rain
+        }
+        if weather.contains("霧")
+            || weather.contains("靄")
+            || weather.contains("霾") {
+            return .fog
+        }
+        if weather.contains("晴") {
+            return .clear
+        }
+        if weather.contains("多雲") {
+            return .cloudy
+        }
+        if weather.contains("陰") {
+            return .overcast
+        }
+        return .unknown
+    }
+
+    var localizedDisplayName: LocalizedStringKey {
+        LocalizedStringKey(displayNameLocalizationKey)
+    }
+
+    var displayNameLocalizationKey: String {
+        switch self {
+        case .clear:
+            return "weather.clear"
+        case .cloudy:
+            return "weather.cloudy"
+        case .overcast:
+            return "weather.overcast"
+        case .rain:
+            return "weather.rain"
+        case .sleet:
+            return "weather.sleet"
+        case .hail:
+            return "weather.hail"
+        case .thunder:
+            return "weather.thunder"
+        case .thunderstorm:
+            return "weather.thunderstorm"
+        case .snow:
+            return "weather.snow"
+        case .fog:
+            return "weather.fog"
+        case .unknown:
+            return "weather.unknown"
+        }
+    }
 
     func systemImageName(isNight: Bool) -> String {
         switch self {
@@ -28,6 +149,15 @@ enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
         case .rain:
             return "cloud.rain.fill"
 
+        case .sleet:
+            return "cloud.sleet.fill"
+
+        case .hail:
+            return "cloud.hail.fill"
+
+        case .thunder:
+            return "bolt.fill"
+
         case .thunderstorm:
             return "cloud.bolt.rain.fill"
 
@@ -39,6 +169,105 @@ enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
 
         case .unknown:
             return "cloud.fill"
+        }
+    }
+}
+
+enum WidgetWindDirection: CaseIterable, Equatable, Sendable {
+    case north
+    case northNortheast
+    case northeast
+    case eastNortheast
+    case east
+    case eastSoutheast
+    case southeast
+    case southSoutheast
+    case south
+    case southSouthwest
+    case southwest
+    case westSouthwest
+    case west
+    case westNorthwest
+    case northwest
+    case northNorthwest
+
+    init?(rawDirection: String) {
+        switch rawDirection.trimmingCharacters(in: .whitespacesAndNewlines) {
+        case "北", "N":
+            self = .north
+        case "北北東", "NNE":
+            self = .northNortheast
+        case "東北", "NE":
+            self = .northeast
+        case "東北東", "ENE":
+            self = .eastNortheast
+        case "東", "E":
+            self = .east
+        case "東南東", "ESE":
+            self = .eastSoutheast
+        case "東南", "SE":
+            self = .southeast
+        case "南南東", "SSE":
+            self = .southSoutheast
+        case "南", "S":
+            self = .south
+        case "南南西", "SSW":
+            self = .southSouthwest
+        case "西南", "SW":
+            self = .southwest
+        case "西南西", "WSW":
+            self = .westSouthwest
+        case "西", "W":
+            self = .west
+        case "西北西", "WNW":
+            self = .westNorthwest
+        case "西北", "NW":
+            self = .northwest
+        case "北北西", "NNW":
+            self = .northNorthwest
+        default:
+            return nil
+        }
+    }
+
+    var localizedDisplayName: LocalizedStringKey {
+        LocalizedStringKey(displayNameLocalizationKey)
+    }
+
+    var displayNameLocalizationKey: String {
+        switch self {
+        case .north:
+            return "wind.direction.n"
+        case .northNortheast:
+            return "wind.direction.nne"
+        case .northeast:
+            return "wind.direction.ne"
+        case .eastNortheast:
+            return "wind.direction.ene"
+        case .east:
+            return "wind.direction.e"
+        case .eastSoutheast:
+            return "wind.direction.ese"
+        case .southeast:
+            return "wind.direction.se"
+        case .southSoutheast:
+            return "wind.direction.sse"
+        case .south:
+            return "wind.direction.s"
+        case .southSouthwest:
+            return "wind.direction.ssw"
+        case .southwest:
+            return "wind.direction.sw"
+        case .westSouthwest:
+            return "wind.direction.wsw"
+        case .west:
+            return "wind.direction.w"
+        case .westNorthwest:
+            return "wind.direction.wnw"
+        case .northwest:
+            return "wind.direction.nw"
+        case .northNorthwest:
+            return "wind.direction.nnw"
         }
     }
 }
@@ -71,6 +300,20 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
     let windDirection: String?
     let windSpeed: Double?
     let apparentTemperature: Double?
+
+    var presentationCondition: WidgetWeatherCondition {
+        WidgetWeatherCondition(weatherCode: weatherCode, weather: weather)
+    }
+
+    var presentationWindDirection: WidgetWindDirection? {
+        guard let windDirection else {
+            return nil
+        }
+
+        return WidgetWindDirection(
+            rawDirection: windDirection
+        )
+    }
 
     private enum CodingKeys: String, CodingKey {
         case schemaVersion
