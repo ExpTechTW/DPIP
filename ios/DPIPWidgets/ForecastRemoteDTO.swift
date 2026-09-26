@@ -34,6 +34,6 @@ struct ForecastRemoteDTO: Decodable, Sendable {
             [UsablePoint].self,
             forKey: .forecast
         )
-        points = Array(forecast.compactMap(\.point).prefix(4))
+        points = Array(forecast.compactMap(\.point).prefix(5))
     }
 }

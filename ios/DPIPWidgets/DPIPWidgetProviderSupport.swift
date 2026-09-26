@@ -1,5 +1,17 @@
 import Foundation
 import WidgetKit
+
+enum ForecastWidgetFamilyPolicy {
+    static func supportsForecast(_ family: WidgetFamily) -> Bool {
+        switch family {
+        case .systemMedium, .systemLarge:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 #if DEBUG
 import OSLog
 
@@ -168,7 +180,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         // Always reload after the refresh attempt. Failed refreshes leave the
         // same-location cache untouched, so this also provides SWR behavior.
         var snapshot = loadSnapshot(target)
-        if family == .systemLarge,
+        if ForecastWidgetFamilyPolicy.supportsForecast(family),
            let current = snapshot,
            target.matches(snapshot: current) {
             await refreshForecast(target, current.regionCode)
@@ -184,7 +196,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         )
         let reloadDate = deviceNow.addingTimeInterval(refreshInterval)
         let forecast: ForecastWidgetSnapshot?
-        if family == .systemLarge,
+        if ForecastWidgetFamilyPolicy.supportsForecast(family),
            let snapshot,
            target.matches(snapshot: snapshot) {
             forecast = loadForecast(
@@ -268,7 +280,7 @@ struct DPIPWidgetProviderDependencies: Sendable {
         at date: Date,
         family: WidgetFamily
     ) -> ForecastWidgetSnapshot? {
-        guard family == .systemLarge,
+        guard ForecastWidgetFamilyPolicy.supportsForecast(family),
               let currentSnapshot,
               target.matches(snapshot: currentSnapshot) else { return nil }
         return loadForecast(target, currentSnapshot.regionCode, date)
