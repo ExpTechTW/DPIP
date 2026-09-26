@@ -595,6 +595,8 @@ private struct LargeCurrentWeatherView: View {
                                     }
 
                                     Text("\(windSpeed, specifier: "%.1f") m/s")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
                                 }
                             } else if let windDirection = snapshot.windDirection {
                                 Text(windDirection)
