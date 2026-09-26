@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
-import 'package:dpip/features/home/presentation/widgets/weather_sky/solar_time.dart';
+import 'package:dpip/core/weather/solar_time.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The solar ephemeris is what decides whether the backdrop looks like noon,

@@ -16,6 +16,13 @@ import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:flutter/foundation.dart';
 
+typedef RealtimeWeatherLoadedCallback = Future<void> Function(
+  String regionCode,
+  WeatherRealtime weather,
+);
+
+typedef RealtimeWeatherInvalidatedCallback = Future<void> Function();
+
 /// Fetches nearest-station realtime weather, the township hourly forecast, and
 /// the next-hour rain trend for the home sheet, following the selected
 /// [RegionStore] township. 全國 has no point weather — [areaCode] is null and
@@ -32,6 +39,8 @@ class HomeWeatherController extends ChangeNotifier {
     this._regions,
     this._directory, {
     this.gpsFix,
+    this.onRealtimeLoaded,
+    this.onRealtimeInvalidated,
   }) {
     _regions.addListener(_sync);
     _sync();
@@ -42,8 +51,12 @@ class HomeWeatherController extends ChangeNotifier {
   final RegionStore _regions;
   final TownDirectory _directory;
 
+  bool _hasSyncedRegion = false;
+
   /// Live GPS fix for the debug log; null when unavailable.
   final Future<GpsFix?> Function()? gpsFix;
+  final RealtimeWeatherLoadedCallback? onRealtimeLoaded;
+  final RealtimeWeatherInvalidatedCallback? onRealtimeInvalidated;
 
   WeatherRealtime? _weather;
   String? _weatherCode;
@@ -54,6 +67,7 @@ class HomeWeatherController extends ChangeNotifier {
   Failure? _forecastFailure;
   Failure? _hourTrendFailure;
   String? _loadedCode;
+  int _requestGeneration = 0;
 
   /// The latest realtime observation, or null before the first load / at sea.
   WeatherRealtime? get weather => _weather;
@@ -98,14 +112,27 @@ class HomeWeatherController extends ChangeNotifier {
 
   void _sync() {
     final code = areaCode;
-    if (code == _loadedCode) return;
+
+    if (_hasSyncedRegion && code == _loadedCode) {
+      return;
+    }
+
+    final callback = onRealtimeInvalidated;
+    if (callback != null) {
+      unawaited(callback());
+    }
+
+    _hasSyncedRegion = true;
     _loadedCode = code;
+
     final town = code == null ? null : _directory.byCode(code);
     if (town == null || code == null) {
+      _requestGeneration += 1;
       _weather = null;
       _weatherCode = null;
       _forecast = null;
       _hourTrend = null;
+      _loading = false;
       _failure = null;
       _forecastFailure = null;
       _hourTrendFailure = null;
@@ -116,6 +143,8 @@ class HomeWeatherController extends ChangeNotifier {
   }
 
   Future<void> _load(String code, double lat, double lng) async {
+    final requestGeneration = ++_requestGeneration;
+
     _loading = true;
     _failure = null;
     _forecastFailure = null;
@@ -133,15 +162,24 @@ class HomeWeatherController extends ChangeNotifier {
     final realtime = await realtimeFuture;
     final forecast = await forecastFuture;
     final hourTrend = await hourTrendFuture;
-    // Drop a superseded response if the user switched area mid-flight.
-    if (_loadedCode != code) return;
+    // Region equality alone cannot distinguish two requests for the same area,
+    // or A1 from a later A2 after an A → B → A sequence. Only the most recent
+    // generation may mutate any state or publish a Widget snapshot.
+    if (requestGeneration != _requestGeneration) return;
 
     _loading = false;
     realtime.when(
       ok: (value) {
         _weather = value;
         _weatherCode = value == null ? null : code;
-        if (value != null) unawaited(_logRealtime(code, gpsFuture, value));
+        if (value != null) {
+          unawaited(_logRealtime(code, gpsFuture, value));
+
+          final callback = onRealtimeLoaded;
+          if (callback != null) {
+            unawaited(callback(code, value));
+          }
+        }
       },
       err: (failure) {
         _failure = failure;
@@ -193,6 +231,7 @@ class HomeWeatherController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _requestGeneration += 1;
     _regions.removeListener(_sync);
     super.dispose();
   }

@@ -20,9 +20,13 @@ abstract final class AppTime {
   AppTime._();
 
   static ServerClock? _clock;
+  static Future<void>? _syncInFlight;
 
   /// Wires the shared calibrated clock. Called once at bootstrap.
-  static void install(ServerClock clock) => _clock = clock;
+  static void install(ServerClock clock) {
+    _clock = clock;
+    _syncInFlight = null;
+  }
 
   /// Calibrated current time in UTC (device time until the first sync).
   static DateTime get utc => _clock?.now() ?? DateTime.now().toUtc();
@@ -39,6 +43,12 @@ abstract final class AppTime {
   /// Whether the clock has completed at least one NTP sync.
   static bool get isSynced => _clock?.isSynced ?? false;
 
+  /// The correction added to device time to obtain calibrated time.
+  ///
+  /// A positive value means the device clock is behind the server; a negative
+  /// value means it is ahead. Before the first sync the correction is zero.
+  static Duration get calibratedTimeOffset => _clock?.offset ?? Duration.zero;
+
   /// Re-expresses a timestamp minted by the **device** clock in calibrated
   /// time, so it can be compared with [utc].
   ///
@@ -51,8 +61,27 @@ abstract final class AppTime {
   /// Before the first sync the correction is zero and this is the identity, as
   /// it should be: with no calibration the device clock is all there is.
   static DateTime fromDevice(DateTime deviceStamp) =>
-      deviceStamp.toUtc().add(_clock?.offset ?? Duration.zero);
+      deviceStamp.toUtc().add(calibratedTimeOffset);
 
   /// Forces an immediate resync (best-effort; no-op before [install]).
-  static Future<void> sync() async => _clock?.sync();
+  ///
+  /// Concurrent callers share the same attempt. In particular, a Widget
+  /// publish that arrives while bootstrap's initial sync is pending must wait
+  /// for that attempt instead of launching a second NTP request.
+  static Future<void> sync() {
+    final clock = _clock;
+    if (clock == null) return Future<void>.value();
+
+    final pending = _syncInFlight;
+    if (pending != null) return pending;
+
+    late final Future<void> sync;
+    sync = clock.sync().whenComplete(() {
+      if (identical(_syncInFlight, sync)) {
+        _syncInFlight = null;
+      }
+    });
+    _syncInFlight = sync;
+    return sync;
+  }
 }
