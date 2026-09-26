@@ -10,6 +10,10 @@ struct ForecastWidgetPoint: Codable, Equatable, Sendable {
     /// Probability of precipitation in percent. Invalid/missing PoP is nil.
     let pop: Int?
 
+    var presentationCondition: WidgetWeatherCondition {
+        WidgetWeatherCondition(weatherCode: weatherCode, weather: weather)
+    }
+
     init?(time: String, temperature: Double, weather: String,
           weatherCode: Int, pop: Int?) {
         guard Self.isValidClockLabel(time), temperature.isFinite,
@@ -79,7 +83,7 @@ struct ForecastWidgetSnapshot: Codable, Sendable {
             sourceIdentifier: sourceIdentifier
         ), WidgetResolvedWeatherLocationValidation.isValidRegionCode(regionCode),
               updateTime > 0, receivedAt > 0,
-              (1...4).contains(points.count) else { return nil }
+              (1...5).contains(points.count) else { return nil }
         if case .saved(let code) = address, code != regionCode { return nil }
         self.schemaVersion = Self.schemaVersion
         self.sourceIdentifier = sourceIdentifier
