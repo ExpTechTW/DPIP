@@ -5,8 +5,8 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/services.dart';
 
-/// Native allowlist key. This reserves a file only; no forecast producer exists.
-enum WidgetSnapshotKind { weatherForecast, currentWeather }
+/// Native allowlist key for versioned Widget shared data.
+enum WidgetSnapshotKind { weatherForecast, currentWeather, locationCatalog }
 
 /// Writes an already encoded, versioned JSON snapshot for a future widget.
 /// The caller owns its schema; this boundary owns delivery and persistence.
