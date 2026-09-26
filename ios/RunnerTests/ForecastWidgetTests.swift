@@ -3,17 +3,18 @@ import WidgetKit
 import XCTest
 
 final class ForecastRemoteDTOTests: XCTestCase {
-    func testDecodesFirstFourUsablePointsInAPIOrderAcrossMidnight() throws {
+    func testDecodesFirstFiveUsablePointsInAPIOrderAcrossMidnight() throws {
         let dto = try forecastDTO(
-            times: ["bad", "23:00", "00:00", "01:00", "02:00", "03:00"]
+            times: ["bad", "23:00", "00:00", "01:00", "02:00", "03:00", "04:00"]
         )
         XCTAssertEqual(dto.updateTime, 1_790_336_400_000)
         XCTAssertEqual(dto.points.map(\.time),
-                       ["23:00", "00:00", "01:00", "02:00"])
+                       ["23:00", "00:00", "01:00", "02:00", "03:00"])
     }
 
-    func testFewerThanFourAndEmptyForecast() throws {
-        XCTAssertEqual(try forecastDTO(times: ["12:00"]).points.count, 1)
+    func testFewerThanFiveUsablePointsRemainUnchanged() throws {
+        XCTAssertEqual(try forecastDTO(times: ["12:00", "13:00"]).points.map(\.time),
+                       ["12:00", "13:00"])
         XCTAssertTrue(try forecastDTO(times: []).points.isEmpty)
     }
 
@@ -118,6 +119,24 @@ final class ForecastClientTests: XCTestCase {
 }
 
 final class ForecastWidgetSnapshotTests: XCTestCase {
+    func testAcceptsFivePointsAndRejectsMoreThanFive() {
+        XCTAssertNotNil(forecastSnapshot(times: [
+            "10:00", "11:00", "12:00", "13:00", "14:00",
+        ]))
+        let sixPoints = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00"]
+            .map {
+                ForecastWidgetPoint(time: $0, temperature: 22,
+                                    weather: "晴", weatherCode: 100,
+                                    pop: 20)!
+            }
+        XCTAssertNil(ForecastWidgetSnapshot(
+            sourceIdentifier: "region:407", regionCode: "407",
+            updateTime: 1_790_336_400_000,
+            receivedAt: 1_790_337_060_000,
+            points: sixPoints
+        ))
+    }
+
     func testSchemaV1RoundTripRetainsIdentityAndMillisecondTimes() throws {
         let original = forecastSnapshot()
         let data = try JSONEncoder().encode(original)
@@ -129,7 +148,7 @@ final class ForecastWidgetSnapshotTests: XCTestCase {
         XCTAssertEqual(decoded.updateTime, 1_790_336_400_000)
         XCTAssertEqual(decoded.receivedAt, 1_790_337_060_000)
         XCTAssertEqual(decoded.points.map(\.time),
-                       ["23:00", "00:00", "01:00", "02:00"])
+                       ["23:00", "00:00", "01:00", "02:00", "03:00"])
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data)
             as? [String: Any])
         let point = try XCTUnwrap((json["points"] as? [[String: Any]])?.first)
@@ -244,30 +263,76 @@ final class ForecastWidgetSnapshotStoreTests: XCTestCase {
 }
 
 final class ForecastWidgetProviderTests: XCTestCase {
-    func testOnlyLargeRefreshesAndSnapshotPathIsCacheOnly() async {
+    func testForecastFamilyPolicySupportsOnlyMediumAndLarge() {
+        XCTAssertFalse(ForecastWidgetFamilyPolicy.supportsForecast(.systemSmall))
+        XCTAssertTrue(ForecastWidgetFamilyPolicy.supportsForecast(.systemMedium))
+        XCTAssertTrue(ForecastWidgetFamilyPolicy.supportsForecast(.systemLarge))
+        XCTAssertFalse(ForecastWidgetFamilyPolicy.supportsForecast(.systemExtraLarge))
+    }
+
+    func testSmallDoesNotRefreshForecast() async {
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let state = ForecastPlannerState(current: currentSnapshot(target: target))
         let planner = makePlanner(state: state)
         _ = await planner.plan(for: target, family: .systemSmall)
-        _ = await planner.plan(for: target, family: .systemMedium)
         XCTAssertEqual(state.forecastRefreshCount, 0)
-        _ = await planner.plan(for: target, family: .systemLarge)
+        XCTAssertTrue(state.requestedRegions.isEmpty)
+    }
+
+    func testMediumAndLargeEachRefreshForecast() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let state = ForecastPlannerState(current: currentSnapshot(target: target))
+        let planner = makePlanner(state: state)
+        _ = await planner.plan(for: target, family: .systemMedium)
         XCTAssertEqual(state.forecastRefreshCount, 1)
         XCTAssertEqual(state.requestedRegions, ["407"])
+        _ = await planner.plan(for: target, family: .systemLarge)
+        XCTAssertEqual(state.forecastRefreshCount, 2)
+        XCTAssertEqual(state.requestedRegions, ["407", "407"])
+    }
+
+    func testMediumSnapshotReadsMatchingCacheWithoutNetworkRequest() {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target),
+            forecast: forecastSnapshot(
+                updateTime: milliseconds("2026-09-25T07:10:00Z"),
+                receivedAt: milliseconds("2026-09-25T07:21:00Z"))
+        )
+        let planner = makePlanner(state: state)
         let dependencies = DPIPWidgetProviderDependencies(
             loadSnapshot: { state.loadCurrent($0) },
             timelinePlanner: planner,
             loadForecast: { state.loadForecast($0, $1, $2) }
         )
-        _ = dependencies.snapshot(for: target)
-        _ = dependencies.forecastSnapshot(
+        let forecast = dependencies.forecastSnapshot(
             for: target, currentSnapshot: state.loadCurrent(target),
-            at: instant("2026-09-25T07:21:00Z"), family: .systemLarge
+            at: instant("2026-09-25T07:21:00Z"), family: .systemMedium
         )
-        XCTAssertEqual(state.forecastRefreshCount, 1)
+        XCTAssertNotNil(forecast)
+        XCTAssertEqual(state.forecastRefreshCount, 0)
     }
 
-    func testForecastFailureKeepsCurrentAndValidCacheFallback() async {
+    func testMediumIndependentlyRefreshesAndAttachesForecastWithoutLarge() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let refreshed = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T07:10:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:21:00Z"))
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target),
+            forecastAfterRefresh: refreshed
+        )
+
+        let plan = await makePlanner(state: state).plan(
+            for: target, family: .systemMedium
+        )
+
+        XCTAssertEqual(state.forecastRefreshCount, 1)
+        XCTAssertEqual(state.requestedRegions, ["407"])
+        XCTAssertEqual(plan.forecast?.updateTime, refreshed.updateTime)
+    }
+
+    func testMediumForecastFailureKeepsCurrentAndValidCacheFallback() async {
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let state = ForecastPlannerState(
             current: currentSnapshot(target: target),
@@ -276,7 +341,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
                 receivedAt: milliseconds("2026-09-25T07:21:00Z"))
         )
         let plan = await makePlanner(state: state).plan(
-            for: target, family: .systemLarge
+            for: target, family: .systemMedium
         )
         XCTAssertEqual(plan.snapshot?.regionCode, "407")
         XCTAssertNotNil(plan.forecast)
@@ -288,7 +353,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
         XCTAssertEqual(plan.snapshot?.stationName, "station")
     }
 
-    func testExpiredAndMismatchedCacheNeverAttaches() async {
+    func testMediumRejectsExpiredAndMismatchedCache() async {
         let target = WidgetLocationTarget.currentLocation
         let current = currentSnapshot(target: target, regionCode: "242")
         let state = ForecastPlannerState(
@@ -299,7 +364,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
                 receivedAt: milliseconds("2026-09-25T07:21:00Z"))
         )
         let regionMismatch = await makePlanner(state: state).plan(
-            for: target, family: .systemLarge
+            for: target, family: .systemMedium
         )
         XCTAssertNil(regionMismatch.forecast)
         state.forecast = forecastSnapshot(
@@ -307,7 +372,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
             updateTime: milliseconds("2026-09-25T07:10:00Z"),
             receivedAt: milliseconds("2026-09-25T07:21:00Z"))
         let sourceMismatch = await makePlanner(state: state).plan(
-            for: target, family: .systemLarge
+            for: target, family: .systemMedium
         )
         XCTAssertNil(sourceMismatch.forecast)
         state.forecast = forecastSnapshot(
@@ -318,8 +383,28 @@ final class ForecastWidgetProviderTests: XCTestCase {
             state: state, now: instant("2026-09-25T07:40:00Z")
         )
         let expired = await latePlanner.plan(for: target,
-                                             family: .systemLarge)
+                                             family: .systemMedium)
         XCTAssertNil(expired.forecast)
+    }
+
+    func testLargeForecastFallbackAndExpiryBehaviorRemainsUnchanged() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target),
+            forecast: forecastSnapshot(
+                updateTime: milliseconds("2026-09-25T07:10:00Z"),
+                receivedAt: milliseconds("2026-09-25T07:21:00Z"))
+        )
+
+        let plan = await makePlanner(state: state).plan(
+            for: target, family: .systemLarge
+        )
+
+        let expiry = instant("2026-09-25T07:40:00Z")
+        XCTAssertEqual(state.forecastRefreshCount, 1)
+        XCTAssertNotNil(plan.forecast)
+        XCTAssertTrue(plan.states.contains { $0.date == expiry })
+        XCTAssertNil(plan.forecast(at: expiry))
     }
 
     func testLateCurrentLocationResponseForAIsNotWrittenAfterB() async {
@@ -390,12 +475,15 @@ private final class ForecastPlannerState: @unchecked Sendable {
     private let lock = NSLock()
     private var storedCurrent: CurrentWeatherWidgetSnapshot?
     private var storedForecast: ForecastWidgetSnapshot?
+    private let forecastAfterRefresh: ForecastWidgetSnapshot?
     private var regions: [String] = []
 
     init(current: CurrentWeatherWidgetSnapshot?,
-         forecast: ForecastWidgetSnapshot? = nil) {
+         forecast: ForecastWidgetSnapshot? = nil,
+         forecastAfterRefresh: ForecastWidgetSnapshot? = nil) {
         storedCurrent = current
         storedForecast = forecast
+        self.forecastAfterRefresh = forecastAfterRefresh
     }
 
     var current: CurrentWeatherWidgetSnapshot? {
@@ -428,7 +516,12 @@ private final class ForecastPlannerState: @unchecked Sendable {
 
     func refreshForecast(_ target: WidgetLocationTarget,
                          _ regionCode: String) async {
-        lock.withLock { regions.append(regionCode) }
+        lock.withLock {
+            regions.append(regionCode)
+            if let forecastAfterRefresh {
+                storedForecast = forecastAfterRefresh
+            }
+        }
     }
 }
 
@@ -475,14 +568,15 @@ private func forecastSnapshot(
     sourceIdentifier: String = "region:407",
     regionCode: String = "407",
     updateTime: Int64 = 1_790_336_400_000,
-    receivedAt: Int64 = 1_790_337_060_000
+    receivedAt: Int64 = 1_790_337_060_000,
+    times: [String] = ["23:00", "00:00", "01:00", "02:00", "03:00"]
 ) -> ForecastWidgetSnapshot {
     ForecastWidgetSnapshot(
         sourceIdentifier: sourceIdentifier,
         regionCode: regionCode,
         updateTime: updateTime,
         receivedAt: receivedAt,
-        points: ["23:00", "00:00", "01:00", "02:00"].map {
+        points: times.map {
             ForecastWidgetPoint(time: $0, temperature: 22,
                                 weather: "晴", weatherCode: 100,
                                 pop: 20)!
