@@ -92,6 +92,7 @@ void main() {
     );
 
     final snapshot = createCurrentWeatherWidgetSnapshot(
+      sourceIdentifier: 'current-location',
       regionCode: '660',
       regionName: '西屯區',
       weather: weather,
@@ -100,7 +101,8 @@ void main() {
       calibratedTimeOffsetMilliseconds: -300_000,
     );
 
-    expect(snapshot.schemaVersion, 4);
+    expect(snapshot.schemaVersion, 5);
+    expect(snapshot.sourceIdentifier, 'current-location');
     expect(snapshot.regionCode, '660');
     expect(snapshot.regionName, '西屯區');
     expect(snapshot.observationTime, 1789398000);
@@ -118,7 +120,8 @@ void main() {
     final json = jsonEncode(snapshot.toJson());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
-    expect(decoded['schemaVersion'], 4);
+    expect(decoded['schemaVersion'], 5);
+    expect(decoded['sourceIdentifier'], 'current-location');
     expect(decoded['regionCode'], '660');
     expect(decoded['condition'], 'thunderstorm');
     expect(decoded['isNight'], isFalse);
@@ -129,6 +132,7 @@ void main() {
 
   test('serializes condition name and preserves nullable weather values', () {
     const snapshot = CurrentWeatherWidgetSnapshot(
+      sourceIdentifier: 'current-location',
       regionCode: '660',
       regionName: '西屯區',
       observationTime: 1789398000,
@@ -151,7 +155,8 @@ void main() {
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
     expect(decoded, {
-      'schemaVersion': 4,
+      'schemaVersion': 5,
+      'sourceIdentifier': 'current-location',
       'regionCode': '660',
       'regionName': '西屯區',
       'observationTime': 1789398000,

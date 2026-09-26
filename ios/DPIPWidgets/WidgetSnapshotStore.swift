@@ -53,4 +53,66 @@ struct WidgetSnapshotStore {
             from: data
         )
     }
+
+    func currentWeatherSnapshotURL(
+        for sourceIdentifier: String
+    ) -> URL? {
+        guard let address = CurrentWeatherSnapshotAddress(
+            sourceIdentifier: sourceIdentifier
+        ) else {
+            return nil
+        }
+
+        guard let appGroupContainerURL =
+            FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier:
+                    appGroupIdentifier
+            )
+        else {
+            return nil
+        }
+
+        return appGroupContainerURL
+            .appendingPathComponent(
+                "WidgetSnapshots",
+                isDirectory: true
+            )
+            .appendingPathComponent(
+                "current-weather",
+                isDirectory: true
+            )
+            .appendingPathComponent(address.filename)
+    }
+
+    func loadCurrentWeatherSnapshot(
+        for target: WidgetLocationTarget
+    ) -> CurrentWeatherWidgetSnapshot? {
+        guard let sourceIdentifier = target.sourceIdentifier else {
+            return nil
+        }
+
+        if let url = currentWeatherSnapshotURL(
+            for: sourceIdentifier
+        ),
+           let data = try? Data(contentsOf: url),
+           let snapshot = try? JSONDecoder().decode(
+               CurrentWeatherWidgetSnapshot.self,
+               from: data
+           ),
+           target.matches(snapshot: snapshot)
+        {
+            return snapshot
+        }
+
+        // Temporary migration fallback:
+        // older app versions wrote one global current-weather.json.
+        guard
+            let legacySnapshot = loadCurrentWeatherSnapshot(),
+            target.matches(snapshot: legacySnapshot)
+        else {
+            return nil
+        }
+
+        return legacySnapshot
+    }
 }

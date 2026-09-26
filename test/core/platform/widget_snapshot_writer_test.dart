@@ -40,6 +40,29 @@ void main() {
     },
   );
 
+  test('writes current weather with a source identifier without exposing a file path', () async {
+    final writer = IosWidgetSnapshotWriter(
+      channel: channel,
+      isSupportedPlatform: true,
+    );
+
+    const json = '{"schemaVersion":5}';
+
+    final result = await writer.write(
+      kind: WidgetSnapshotKind.currentWeather,
+      json: json,
+      sourceIdentifier: 'region:220',
+    );
+
+    expect(result.isOk, isTrue);
+    expect(calls.single.method, 'write');
+    expect(calls.single.arguments, {
+      'kind': 'currentWeather',
+      'json': json,
+      'sourceIdentifier': 'region:220',
+    });
+  });
+
   test('unsupported platform does not call the native channel', () async {
     final writer = IosWidgetSnapshotWriter(
       channel: channel,
@@ -185,6 +208,7 @@ void main() {
         channel,
         (_) async => throw PlatformException(code: entry.key),
       );
+
       final writer = IosWidgetSnapshotWriter(
         channel: channel,
         isSupportedPlatform: true,
@@ -200,31 +224,28 @@ void main() {
         entry.value,
       );
     });
-
-    test(
-      'writes the location catalog kind without exposing a file path',
-      () async {
-        final writer = IosWidgetSnapshotWriter(
-          channel: channel,
-          isSupportedPlatform: true,
-        );
-
-        const json = '{"schemaVersion":1,"locations":[]}';
-
-        final result = await writer.write(
-          kind: WidgetSnapshotKind.locationCatalog,
-          json: json,
-        );
-
-        expect(result.isOk, isTrue);
-        expect(calls.single.method, 'write');
-        expect(calls.single.arguments, {
-          'kind': 'locationCatalog',
-          'json': json,
-        });
-      },
-    );
   }
+
+  test(
+    'writes the location catalog kind without exposing a file path',
+    () async {
+      final writer = IosWidgetSnapshotWriter(
+        channel: channel,
+        isSupportedPlatform: true,
+      );
+
+      const json = '{"schemaVersion":1,"locations":[]}';
+
+      final result = await writer.write(
+        kind: WidgetSnapshotKind.locationCatalog,
+        json: json,
+      );
+
+      expect(result.isOk, isTrue);
+      expect(calls.single.method, 'write');
+      expect(calls.single.arguments, {'kind': 'locationCatalog', 'json': json});
+    },
+  );
 }
 
 final class _ThrowingMethodChannel extends MethodChannel {
