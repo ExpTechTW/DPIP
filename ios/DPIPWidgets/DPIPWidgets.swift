@@ -5,7 +5,14 @@ import Intents
 struct DPIPWidgetProvider: IntentTimelineProvider {
     typealias Intent = WeatherWidgetConfigurationIntent
     private let staleAfter: TimeInterval = 30 * 60
-    private let snapshotStore = WidgetSnapshotStore()
+    private let dependencies: DPIPWidgetProviderDependencies
+
+    init(
+        dependencies: DPIPWidgetProviderDependencies =
+            DPIPWidgetProviderRuntime.shared
+    ) {
+        self.dependencies = dependencies
+    }
 
     private func snapshot(
         for configuration: WeatherWidgetConfigurationIntent
@@ -14,9 +21,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             identifier: configuration.location?.identifier
         )
 
-        return snapshotStore.loadCurrentWeatherSnapshot(
-            for: target
-        )
+        return dependencies.snapshot(for: target)
     }
 
     func placeholder(in context: Context) -> DPIPWidgetEntry {
@@ -57,31 +62,50 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
         in context: Context,
         completion: @escaping (Timeline<DPIPWidgetEntry>) -> Void
     ) {
-        let deviceNow = Date()
-        let snapshot = snapshot(for: configuration)
-
-        let entries = CurrentWeatherWidgetTimeline.states(
-            snapshot: snapshot,
-            deviceNow: deviceNow,
-            staleAfter: staleAfter
+        let target = WidgetLocationTarget(
+            identifier: configuration.location?.identifier
         )
-            .map { state in
+
+        #if DEBUG
+        WidgetWeatherRefreshDiagnostics.log(
+            "getTimeline target="
+                + WidgetWeatherRefreshDiagnostics.targetIdentifier(target)
+        )
+        switch target {
+        case .saved(let regionCode):
+            WidgetWeatherRefreshDiagnostics.log(
+                "target=saved region=\(regionCode)"
+            )
+        case .currentLocation:
+            WidgetWeatherRefreshDiagnostics.log(
+                "target=current-location nativeRefresh=enabled "
+                    + "cacheReload=enabled"
+            )
+        case .invalid:
+            WidgetWeatherRefreshDiagnostics.log("target=invalid")
+        }
+        #endif
+
+        Task {
+            let plan = await dependencies.timelinePlanner.plan(
+                for: target
+            )
+            let entries = plan.states.map { state in
                 DPIPWidgetEntry(
                     date: state.date,
-                    snapshot: snapshot,
+                    snapshot: plan.snapshot,
                     isStale: state.isStale,
                     isNight: state.isNight
                 )
             }
 
-        completion(
-            Timeline(
-                entries: entries,
-                // The app owns refreshes. This timeline projects only the
-                // stale deadline and one solar transition in the snapshot.
-                policy: .never
+            completion(
+                Timeline(
+                    entries: entries,
+                    policy: .after(plan.reloadDate)
+                )
             )
-        )
+        }
     }
 }
 
@@ -104,11 +128,20 @@ struct DPIPWidgetsEntryView : View {
             VStack(alignment: .leading) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(snapshot.regionName)
-                            .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .layoutPriority(1)
+                        HStack(spacing: 4) {
+                            Text(snapshot.regionName)
+                                .font(.headline)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                                .layoutPriority(1)
+
+                            if snapshot.sourceIdentifier == "current-location" {
+                                Image(systemName: "location.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize()
+                            }
+                        }
 
                         Text(observationDate, style: .time)
                             .lineLimit(1)

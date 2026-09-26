@@ -1,6 +1,6 @@
 import Foundation
 
-enum WidgetLocationTarget: Equatable {
+enum WidgetLocationTarget: Equatable, Sendable {
     case currentLocation
     case saved(regionCode: String)
     case invalid(identifier: String)

@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 @testable import Runner
 
@@ -52,25 +53,39 @@ final class WidgetLocationIntentTests: XCTestCase {
         XCTAssertEqual(options.first?.displayString, "所在地")
     }
 
-    func testCatalogLocationsPreserveSavedOrder() {
-        let catalog = WidgetLocationCatalog(
-            schemaVersion: 1,
-            locations: [
-                WidgetLocationCatalogLocation(
-                    regionCode: "220",
-                    displayName: "板橋區",
-                    administrativeAreaName: "新北市",
-                    latitude: 25.0096156,
-                    longitude: 121.4592358
-                ),
-                WidgetLocationCatalogLocation(
-                    regionCode: "302",
-                    displayName: "竹北市",
-                    administrativeAreaName: "新竹縣",
-                    latitude: 24.8395807,
-                    longitude: 121.0040235
-                )
-            ]
+    func testDefaultLocationOptionIsExplicitCurrentLocation() {
+        let option = makeCurrentWidgetLocationOption(
+            displayString: "所在地"
+        )
+
+        XCTAssertEqual(option.identifier, "current-location")
+        XCTAssertEqual(option.displayString, "所在地")
+    }
+
+    func testCatalogLocationsPreserveSavedOrder() throws {
+        let firstLocation = try XCTUnwrap(
+            WidgetLocationCatalogLocation(
+                regionCode: "220",
+                displayName: "板橋區",
+                administrativeAreaName: "新北市",
+                latitude: 25.0096156,
+                longitude: 121.4592358
+            )
+        )
+        let secondLocation = try XCTUnwrap(
+            WidgetLocationCatalogLocation(
+                regionCode: "302",
+                displayName: "竹北市",
+                administrativeAreaName: "新竹縣",
+                latitude: 24.8395807,
+                longitude: 121.0040235
+            )
+        )
+        let catalog = try XCTUnwrap(
+            WidgetLocationCatalog(
+                schemaVersion: 1,
+                locations: [firstLocation, secondLocation]
+            )
         )
 
         let options = makeWidgetLocationOptions(
@@ -92,6 +107,26 @@ final class WidgetLocationIntentTests: XCTestCase {
                 WidgetLocationOption(
                     identifier: "region:302",
                     displayString: "竹北市 — 新竹縣"
+                )
+            ]
+        )
+    }
+
+    func testMalformedCatalogStillYieldsCurrentLocationOnly() {
+        let malformedCatalog = WidgetLocationCatalog.decode(
+            Data(#"{"schemaVersion":1,"locations":[{}]}"#.utf8)
+        )
+
+        XCTAssertNil(malformedCatalog)
+        XCTAssertEqual(
+            makeWidgetLocationOptions(
+                from: malformedCatalog,
+                currentLocationDisplayString: "Current Location"
+            ),
+            [
+                WidgetLocationOption(
+                    identifier: "current-location",
+                    displayString: "Current Location"
                 )
             ]
         )
