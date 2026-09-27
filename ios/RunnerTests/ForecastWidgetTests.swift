@@ -3,13 +3,13 @@ import WidgetKit
 import XCTest
 
 final class ForecastRemoteDTOTests: XCTestCase {
-    func testDecodesFirstFiveUsablePointsInAPIOrderAcrossMidnight() throws {
+    func testDecodesAllUsablePointsInAPIOrderAcrossMidnight() throws {
         let dto = try forecastDTO(
             times: ["bad", "23:00", "00:00", "01:00", "02:00", "03:00", "04:00"]
         )
         XCTAssertEqual(dto.updateTime, 1_790_336_400_000)
         XCTAssertEqual(dto.points.map(\.time),
-                       ["23:00", "00:00", "01:00", "02:00", "03:00"])
+                       ["23:00", "00:00", "01:00", "02:00", "03:00", "04:00"])
     }
 
     func testFewerThanFiveUsablePointsRemainUnchanged() throws {
@@ -42,6 +42,115 @@ final class ForecastRemoteDTOTests: XCTestCase {
         """.utf8)
         let dto = try JSONDecoder().decode(ForecastRemoteDTO.self, from: data)
         XCTAssertEqual(dto.points.map(\.pop), [nil, nil, nil, 50])
+    }
+
+    func testIncompleteMiddlePointIsSkippedWithoutLosingLaterHours() throws {
+        let data = Data("""
+        {"updateTime":1790336400000,"forecast":[
+          {"time":"09:00","temperature":20,"weather":"晴","weatherCode":100},
+          {"time":"10:00","temperature":21,"weather":"晴"},
+          {"time":"11:00","temperature":22,"weather":"晴","weatherCode":100},
+          {"time":"12:00","temperature":23,"weather":"晴","weatherCode":100},
+          {"time":"13:00","temperature":24,"weather":"晴","weatherCode":100},
+          {"time":"14:00","temperature":25,"weather":"晴","weatherCode":100}
+        ]}
+        """.utf8)
+        let dto = try JSONDecoder().decode(ForecastRemoteDTO.self, from: data)
+        let selected = ForecastWidgetSelection.upcomingPoints(
+            dto.points, at: instant("2026-09-25T00:30:00Z"), limit: 5
+        )
+        XCTAssertEqual(selected.map(\.time),
+                       ["09:00", "11:00", "12:00", "13:00", "14:00"])
+        XCTAssertNil(selected[0].pop)
+    }
+
+    func testMissingRequiredWeatherAndWhitespaceWeatherAreSkipped() throws {
+        let data = Data("""
+        {"updateTime":1790336400000,"forecast":[
+          {"time":"09:00","temperature":20,"weather":"   ","weatherCode":100},
+          {"time":"10:00","temperature":21,"weatherCode":100},
+          {"time":"11:00","weather":"晴","weatherCode":100},
+          {"time":"12:00","temperature":22,"weather":"晴","weatherCode":100}
+        ]}
+        """.utf8)
+        let dto = try JSONDecoder().decode(ForecastRemoteDTO.self, from: data)
+        XCTAssertEqual(dto.points.map(\.time), ["12:00"])
+    }
+}
+
+final class ForecastWidgetSelectionTests: XCTestCase {
+    func testOrdersClockLabelsByTaipeiFutureDistanceAcrossMidnight() {
+        let points = forecastPoints(times: [
+            "01:00", "23:00", "02:00", "00:00",
+        ])
+        let selected = ForecastWidgetSelection.upcomingPoints(
+            points, at: instant("2026-09-25T14:30:00Z"), limit: 5
+        )
+        XCTAssertEqual(selected.map(\.time),
+                       ["23:00", "00:00", "01:00", "02:00"])
+    }
+
+    func testExpiredHourIsNotTomorrowButMidnightHourIsUpcoming() {
+        let selected = ForecastWidgetSelection.upcomingPoints(
+            forecastPoints(times: ["09:00", "11:00", "10:00"]),
+            at: instant("2026-09-25T02:30:00Z"), limit: 5
+        )
+        XCTAssertEqual(selected.map(\.time), ["11:00"])
+        XCTAssertEqual(ForecastWidgetSelection.minutesAhead(
+            for: "00:00", at: instant("2026-09-25T15:30:00Z")
+        ), 30)
+        XCTAssertNil(ForecastWidgetSelection.minutesAhead(
+            for: "09:00", at: instant("2026-09-25T02:30:00Z")
+        ))
+        XCTAssertEqual(ForecastWidgetSelection.minutesAhead(
+            for: "22:30", at: instant("2026-09-25T02:30:00Z")
+        ), 12 * 60)
+        XCTAssertNil(ForecastWidgetSelection.minutesAhead(
+            for: "22:31", at: instant("2026-09-25T02:30:00Z")
+        ))
+    }
+
+    func testSelectionUsesTaipeiEvenWhenDeviceTimezoneChanges() {
+        let original = NSTimeZone.default
+        defer { NSTimeZone.default = original }
+        let date = instant("2026-09-25T15:30:00Z")
+        for timezone in ["America/Los_Angeles", "Pacific/Auckland"] {
+            NSTimeZone.default = TimeZone(identifier: timezone)!
+            XCTAssertEqual(ForecastWidgetSelection.minutesAhead(
+                for: "00:00", at: date
+            ), 30)
+        }
+    }
+
+    func testKeepsOnlyUsableUpcomingPointsAndDoesNotCreatePlaceholders() {
+        let points = forecastPoints(times: ["08:00", "11:00", "12:00"])
+        let selected = ForecastWidgetSelection.upcomingPoints(
+            points, at: instant("2026-09-25T02:30:00Z"), limit: 5
+        )
+        XCTAssertEqual(selected.map(\.time), ["11:00", "12:00"])
+    }
+
+    func testSelectsNearestFiveFromMoreThanFiveValidPoints() {
+        let points = forecastPoints(times: [
+            "16:00", "13:00", "11:00", "15:00", "12:00", "14:00", "10:00",
+        ])
+        let selected = ForecastWidgetSelection.upcomingPoints(
+            points, at: instant("2026-09-25T01:30:00Z"), limit: 5
+        )
+        XCTAssertEqual(selected.map(\.time),
+                       ["10:00", "11:00", "12:00", "13:00", "14:00"])
+    }
+
+    func testMissingPoPDoesNotRemoveAnUpcomingPoint() {
+        let point = ForecastWidgetPoint(
+            time: "11:00", temperature: 22, weather: "晴",
+            weatherCode: 100, pop: nil
+        )!
+        let selected = ForecastWidgetSelection.upcomingPoints(
+            [point], at: instant("2026-09-25T02:30:00Z"), limit: 5
+        )
+        XCTAssertEqual(selected.count, 1)
+        XCTAssertNil(selected[0].pop)
     }
 }
 
@@ -119,7 +228,7 @@ final class ForecastClientTests: XCTestCase {
 }
 
 final class ForecastWidgetSnapshotTests: XCTestCase {
-    func testAcceptsFivePointsAndRejectsMoreThanFive() {
+    func testSnapshotRetainsMoreThanFivePointsButRejectsEmpty() {
         XCTAssertNotNil(forecastSnapshot(times: [
             "10:00", "11:00", "12:00", "13:00", "14:00",
         ]))
@@ -129,11 +238,17 @@ final class ForecastWidgetSnapshotTests: XCTestCase {
                                     weather: "晴", weatherCode: 100,
                                     pop: 20)!
             }
-        XCTAssertNil(ForecastWidgetSnapshot(
+        XCTAssertNotNil(ForecastWidgetSnapshot(
             sourceIdentifier: "region:407", regionCode: "407",
             updateTime: 1_790_336_400_000,
             receivedAt: 1_790_337_060_000,
             points: sixPoints
+        ))
+        XCTAssertNil(ForecastWidgetSnapshot(
+            sourceIdentifier: "region:407", regionCode: "407",
+            updateTime: 1_790_336_400_000,
+            receivedAt: 1_790_337_060_000,
+            points: []
         ))
     }
 
@@ -268,6 +383,22 @@ final class ForecastWidgetProviderTests: XCTestCase {
         XCTAssertTrue(ForecastWidgetFamilyPolicy.supportsForecast(.systemMedium))
         XCTAssertTrue(ForecastWidgetFamilyPolicy.supportsForecast(.systemLarge))
         XCTAssertFalse(ForecastWidgetFamilyPolicy.supportsForecast(.systemExtraLarge))
+    }
+
+    func testMediumAndLargeUseTheSameVisibleSelection() {
+        let forecast = forecastSnapshot(times: [
+            "09:00", "13:00", "11:00", "15:00", "12:00", "14:00",
+        ])
+        let date = instant("2026-09-25T02:30:00Z")
+        let medium = ForecastWidgetFamilyPolicy.visiblePoints(
+            in: forecast, at: date, family: .systemMedium
+        )
+        let large = ForecastWidgetFamilyPolicy.visiblePoints(
+            in: forecast, at: date, family: .systemLarge
+        )
+        XCTAssertEqual(medium, large)
+        XCTAssertEqual(medium.map(\.time),
+                       ["11:00", "12:00", "13:00", "14:00", "15:00"])
     }
 
     func testSmallDoesNotRefreshForecast() async {
@@ -429,6 +560,30 @@ final class ForecastWidgetProviderTests: XCTestCase {
         XCTAssertNil(state.forecast)
     }
 
+    func testRefreshStoresAllValidPointsForTimelineSelection() async throws {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let state = ForecastPlannerState(current: currentSnapshot(target: target))
+        let dto = try forecastDTO(times: [
+            "14:00", "16:00", "18:00", "17:00", "19:00", "20:00", "21:00",
+        ])
+        let date = instant("2026-09-25T07:21:00Z")
+        let service = ForecastWidgetRefreshService(
+            fetch: { _ in dto },
+            loadCurrent: { state.loadCurrent($0) },
+            savedIsResolved: { _ in true },
+            write: { snapshot, _ in state.forecast = snapshot; return true },
+            now: { date }
+        )
+
+        await service.refresh(target: target, regionCode: "407")
+
+        let stored = try XCTUnwrap(state.forecast)
+        XCTAssertEqual(stored.points.count, 7)
+        XCTAssertEqual(ForecastWidgetFamilyPolicy.visiblePoints(
+            in: stored, at: date, family: .systemMedium
+        ).map(\.time), ["16:00", "17:00", "18:00", "19:00", "20:00"])
+    }
+
     func testUnresolvedSavedTargetNeverStartsForecastRequest() async {
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let state = ForecastPlannerState(current: currentSnapshot(target: target))
@@ -582,6 +737,13 @@ private func forecastSnapshot(
                                 pop: 20)!
         }
     )!
+}
+
+private func forecastPoints(times: [String]) -> [ForecastWidgetPoint] {
+    times.map {
+        ForecastWidgetPoint(time: $0, temperature: 22,
+                            weather: "晴", weatherCode: 100, pop: 20)!
+    }
 }
 
 private func currentSnapshot(target: WidgetLocationTarget,

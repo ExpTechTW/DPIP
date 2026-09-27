@@ -1,7 +1,7 @@
 import Foundation
 
 /// The narrow v5 township forecast response. Point labels are clock labels,
-/// never dates; usable points retain their API order.
+/// never dates; all usable points retain their API order.
 struct ForecastRemoteDTO: Decodable, Sendable {
     /// API publication time, Unix milliseconds.
     let updateTime: Int64
@@ -34,6 +34,6 @@ struct ForecastRemoteDTO: Decodable, Sendable {
             [UsablePoint].self,
             forKey: .forecast
         )
-        points = Array(forecast.compactMap(\.point).prefix(5))
+        points = forecast.compactMap(\.point)
     }
 }
