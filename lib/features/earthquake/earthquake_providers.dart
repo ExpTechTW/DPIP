@@ -2,6 +2,7 @@ import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
+import 'package:dpip/core/storage/ml_model_store.dart';
 import 'package:dpip/core/storage/trem_station_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -13,6 +14,7 @@ import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
+import 'package:dpip/features/earthquake/data/ml_intensity_service.dart';
 import 'package:dpip/features/earthquake/data/monitor_demo.dart';
 import 'package:dpip/features/earthquake/data/rts_box_grid_source.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
@@ -21,6 +23,7 @@ import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/seismic_travel_time_source.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_repository.dart';
+import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
@@ -52,6 +55,13 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   // Held by the 強震監視器 while it is on screen: only then does the RTS feed
   // need every frame, rather than the alerting ones the stream's sleep sends.
   final rtsLiveDemand = RtsLiveDemand();
+  // ML v1 township estimates. Nothing is fetched or built here: the monitor
+  // calls `prepare` the first time it opens.
+  final mlIntensity = MlIntensityService(
+    client: deps.apiClient,
+    store: MlModelStore(deps.database.durable),
+    now: () => AppTime.utc,
+  );
 
   // Bundled CWA P/S travel-time table (asset load, not network) — loaded once
   // here and shared as a `Future` (mirrors `Future<TownBoundaries>` in
@@ -124,5 +134,6 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     Provider<Future<RtsBoxGrid>>.value(value: boxGrid),
     Provider<TremStationRepository>.value(value: tremStations),
     Provider<RtsLiveDemand>.value(value: rtsLiveDemand),
+    Provider<MlIntensityEstimator>.value(value: mlIntensity),
   ];
 }

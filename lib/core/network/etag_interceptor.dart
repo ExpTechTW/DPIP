@@ -74,6 +74,9 @@ class EtagInterceptor extends Interceptor {
     // The station directory keeps its own ETag in the durable store, which has
     // to see the 304 itself — this cache would answer it with a 200 first.
     if (path == ApiPaths.tremStations) return true;
+    // An ML model: 14.7 MB inflated, kept compressed by its own store — a copy
+    // here would only push the map's tiles out of the byte budget.
+    if (path.endsWith('.onnx')) return true;
     if (path.startsWith(ApiPaths.location)) return true;
     // getNotify + setNotify — token-keyed, must not stick in SQLite.
     return path.startsWith(ApiPaths.notify);

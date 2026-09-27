@@ -12,6 +12,7 @@ import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
+import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -122,6 +123,7 @@ class _MapPageState extends State<MapPage> {
       boxGrid: context.read<Future<RtsBoxGrid>>(),
       townDirectory: context.read<TownDirectory>(),
       liveDemand: context.read<RtsLiveDemand>(),
+      mlIntensity: context.read<MlIntensityEstimator>(),
     ),
     TemperatureMapLayer(context.read<MeteorWeatherRepository>()),
     HumidityMapLayer(context.read<MeteorWeatherRepository>()),

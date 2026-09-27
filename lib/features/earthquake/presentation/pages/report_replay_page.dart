@@ -27,7 +27,7 @@ import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
-import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
+import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
@@ -470,6 +470,22 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// The township directory, for the whole-island estimated-shaking tint.
   late final TownDirectory _directory = context.read<TownDirectory>();
 
+  /// Its centroids, for the formula until the model is ready — built once.
+  Map<String, geo.LatLng>? _centroids;
+
+  /// ML v1 township estimates, downloaded the first time a monitor opens.
+  late final MlIntensityEstimator? _mlIntensity = context
+      .read<MlIntensityEstimator?>();
+
+  /// Loads the model and repaints the wash from it once it is ready.
+  Future<void> _prepareModel() async {
+    final model = _mlIntensity;
+    if (model == null || model.ready) return;
+    if (!await model.prepare() || !mounted) return;
+    final controller = _controller;
+    if (controller != null && _ready) await _updateAreaFill(controller);
+  }
+
   /// The EEW id/serial combo the town/county fill is currently tinted for —
   /// recomputing the 368-town estimate every tick is wasteful when nothing
   /// changed, so the fill only updates when this key does.
@@ -531,6 +547,7 @@ class _ReplayMapState extends State<_ReplayMap> {
     );
     _gsi.addListener(_onGsiChanged);
     widget.rts.addListener(_onRts);
+    unawaited(_prepareModel());
     widget.eew.addListener(_onEewChange);
     widget.tick.addListener(_onTick);
     widget.travelTimeTable.then((table) {
@@ -884,8 +901,9 @@ class _ReplayMapState extends State<_ReplayMap> {
   }
 
   /// Tints the whole island by estimated shaking while an EEW alert is up —
-  /// the legacy monitor's county/town fill behaviour, driven by the same
-  /// [`EewEstimator.areaPga`] math. The base style's own `town` fill layer is
+  /// the legacy monitor's county/town fill behaviour, from the same township
+  /// levels the live monitor uses ([eewTownLevels]: ML v1 once it is loaded,
+  /// the attenuation formula until then). The base style's own `town` fill layer is
   /// recoloured with a `match` on each township's `CODE`, so the felt-intensity
   /// wash reads over the base map without a second geometry source; when the
   /// alerts clear the wash is cleared. The county fill underneath stays the
@@ -904,7 +922,11 @@ class _ReplayMapState extends State<_ReplayMap> {
     final selected = alerts.isEmpty
         ? null
         : alerts[widget.eewIndex % alerts.length];
-    final key = selected == null ? null : '${selected.id}:${selected.serial}';
+    final model = _mlIntensity;
+    // The model arriving mid-replay repaints the same serial from its levels.
+    final key = selected == null
+        ? null
+        : '${selected.id}:${selected.serial}:${model?.ready ?? false}';
     if (key == _fillEewKey) return;
     _fillEewKey = key;
 
@@ -932,19 +954,19 @@ class _ReplayMapState extends State<_ReplayMap> {
         return;
       }
 
-      final eew = selected;
-      final estimate = EewEstimator.areaPga(
-        epicenter: eew.info.latlng,
-        depth: eew.info.depth,
-        mag: eew.info.magnitude,
-        regionCentroids: {
+      final estimate = await eewTownLevels(
+        selected.info,
+        model: model,
+        centroids: _centroids ??= {
           for (final town in _directory.all)
             town.code: geo.LatLng(town.lat, town.lng),
         },
       );
+      // A newer alert, serial or the model itself took over while this one
+      // was being scored — its own update paints, not this stale one.
+      if (!mounted || key != _fillEewKey) return;
       final entries = <Object>[];
-      estimate.regions.forEach((code, region) {
-        final level = Intensity.toScale(region.i);
+      estimate.levels.forEach((code, level) {
         if (level > 0) {
           entries.add(int.parse(code));
           entries.add(IntensityColors.discrete(level).toHexRgb());

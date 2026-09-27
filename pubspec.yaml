@@ -23,6 +23,10 @@ dependencies:
   # pre-rewrite app shipped this package; the rewrite dropped it.
   awesome_notifications_fcm: ^0.12.0
   cupertino_icons: ^1.0.8
+  # SHA-256 pins the downloaded ML intensity model to the exact file the
+  # golden tests were recorded against (lib/features/earthquake/data/
+  # ml_intensity_service.dart). Already in the lock through the SDK tooling.
+  crypto: ^3.0.6
   dio: ^5.10.0
   # Firebase pinned deliberately — a newer major bumps the min iOS target and
   # breaks older-device compatibility. Do not upgrade without checking that.
@@ -191,6 +195,7 @@ flutter:
     - assets/weather/particles/
     - assets/weather/sky/
     - assets/location.json.gz
+    - assets/eew_points.json
     - assets/map/town_boundaries.bin.gz
     - assets/travel_time.json.gz
     - assets/astro/
