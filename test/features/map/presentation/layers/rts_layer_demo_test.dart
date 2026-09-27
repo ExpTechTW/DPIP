@@ -100,13 +100,22 @@ class _StaticSource<T> extends RealtimeSource<T> {
 }
 
 /// A small real station directory so GeoJSON features actually get built.
+/// TWD001 stands in box 1 and TWD004 in box 2 (see `grid` below): an
+/// alerting reading there is what lights that box.
 class _Stations implements TremStationRepository {
-  @override
-  Future<Result<Map<String, SeismicStation>>> stations() async => const Ok({
-    'TWD001': SeismicStation(id: 'TWD001', latitude: 25.03, longitude: 121.56),
+  static const _directory = {
+    'TWD001': SeismicStation(id: 'TWD001', latitude: 23.5, longitude: 121.5),
     'TWD002': SeismicStation(id: 'TWD002', latitude: 23.8, longitude: 121.0),
     'TWD003': SeismicStation(id: 'TWD003', latitude: 24.5, longitude: 121.3),
-  });
+    'TWD004': SeismicStation(id: 'TWD004', latitude: 25.5, longitude: 121.9),
+  };
+
+  @override
+  Future<Map<String, SeismicStation>?> saved() async => _directory;
+
+  @override
+  Future<Result<Map<String, SeismicStation>>> refresh() async =>
+      const Ok(_directory);
 }
 
 Eew _alert({
@@ -230,6 +239,12 @@ void main() {
         feature as Map<String, dynamic>,
   ];
 
+  // What the station source holds now. The dots are drawn again once the box
+  // grid resolves (a lit event declutters them), so only the latest push is
+  // the scene on the map.
+  List<Map<String, dynamic>> stationsOnMap(_RecordingController controller) =>
+      featuresOf([controller.rtsPushes.last]);
+
   test('a clean, closed scene reaches all three map sources', () async {
     // A just-published event: origin a few seconds before "now" (the layer
     // measures elapsed against AppTime.utc — device clock in tests).
@@ -240,21 +255,10 @@ void main() {
     final built = await _build(
       rts: Rts(
         time: origin.millisecondsSinceEpoch,
-        box: {'1': 4, '2': 3},
-        station: {
-          'TWD001': const RtsStation(
-            pga: 40,
-            pgv: 8,
-            intensityRaw: 4.0,
-            intensity: 4.0,
-            alert: true,
-          ),
-          'TWD002': const RtsStation(
-            pga: 10,
-            pgv: 2,
-            intensityRaw: 1.5,
-            intensity: 1.5,
-          ),
+        stations: {
+          'TWD004': const RtsStation(intensity: 3.0, alert: true),
+          'TWD001': const RtsStation(pga: 40, intensity: 4.0, alert: true),
+          'TWD002': const RtsStation(pga: 10, intensity: 1.5),
         },
       ),
       alerts: [_alert(origin: origin)],
@@ -287,9 +291,9 @@ void main() {
       reason: 'the untouched far box must stay drawn',
     );
 
-    // Station dots: both live stations are present as features…
-    final dots = featuresOf(controller.rtsPushes);
-    expect(dots, hasLength(2));
+    // Station dots: every live station is present as a feature…
+    final dots = stationsOnMap(controller);
+    expect(dots, hasLength(3));
     // …and each carries the shake values the layer re-publishes.
     for (final dot in dots) {
       final i = dot['properties']['i'] as num;
@@ -304,15 +308,9 @@ void main() {
     final built = await _build(
       rts: Rts(
         time: original.millisecondsSinceEpoch,
-        box: {'1': 4, '2': 3},
-        station: {
-          'TWD001': const RtsStation(
-            pga: 40,
-            pgv: 8,
-            intensityRaw: 4.0,
-            intensity: 4.0,
-            alert: true,
-          ),
+        stations: {
+          'TWD004': const RtsStation(intensity: 3.0, alert: true),
+          'TWD001': const RtsStation(pga: 40, intensity: 4.0, alert: true),
         },
       ),
       alerts: const [],
@@ -349,15 +347,9 @@ void main() {
       final built = await _build(
         rts: Rts(
           time: origin.millisecondsSinceEpoch,
-          box: {'1': 4, '2': 3},
-          station: {
-            'TWD001': const RtsStation(
-              pga: 40,
-              pgv: 8,
-              intensityRaw: 4.0,
-              intensity: 4.0,
-              alert: true,
-            ),
+          stations: {
+            'TWD004': const RtsStation(intensity: 3.0, alert: true),
+            'TWD001': const RtsStation(pga: 40, intensity: 4.0, alert: true),
           },
         ),
         alerts: const [],
@@ -395,15 +387,9 @@ void main() {
     final built = await _build(
       rts: Rts(
         time: origin.millisecondsSinceEpoch,
-        box: {'1': 4, '2': 3},
-        station: const {
-          'TWD001': RtsStation(
-            pga: 40,
-            pgv: 8,
-            intensityRaw: 4.0,
-            intensity: 4.0,
-            alert: true,
-          ),
+        stations: const {
+          'TWD004': RtsStation(intensity: 3.0, alert: true),
+          'TWD001': RtsStation(pga: 40, intensity: 4.0, alert: true),
         },
       ),
       alerts: [_alert(origin: origin)],
@@ -432,15 +418,8 @@ void main() {
     final built = await _build(
       rts: Rts(
         time: origin.millisecondsSinceEpoch,
-        box: {'1': 4},
-        station: const {
-          'TWD001': RtsStation(
-            pga: 40,
-            pgv: 8,
-            intensityRaw: 4.0,
-            intensity: 4.0,
-            alert: true,
-          ),
+        stations: const {
+          'TWD001': RtsStation(pga: 40, intensity: 4.0, alert: true),
         },
       ),
       alerts: [_alert(origin: origin)],
@@ -497,39 +476,20 @@ void main() {
       final built = await _build(
         rts: Rts(
           time: origin.millisecondsSinceEpoch,
-          box: {'1': 4},
-          station: const {
+          stations: const {
             // Shaking and alerting — must stay, badged with its discrete
             // reading (matching the legacy badge's number, minus the square).
-            'TWD001': RtsStation(
-              pga: 40,
-              pgv: 8,
-              intensityRaw: 4.0,
-              intensity: 4.0,
-              alert: true,
-            ),
+            'TWD001': RtsStation(pga: 40, intensity: 4.0, alert: true),
             // Calm and not alerting — must drop out entirely, or a big event
             // paints the whole island in identical dots and buries where the
             // shaking actually is.
-            'TWD002': RtsStation(
-              pga: 0,
-              pgv: 0,
-              intensityRaw: 0.0,
-              intensity: 0.0,
-              alert: false,
-            ),
+            'TWD002': RtsStation(pga: 0, intensity: 0.0, alert: false),
             // Alerting but reading a flat 0 — stays on the map (unlike
             // TWD002) but as a plain grey dot, not a numbered badge: the
             // legacy monitor's separate `intensity0` layer painted exactly
             // this case grey rather than the continuous ramp's near-zero
             // pale colour.
-            'TWD003': RtsStation(
-              pga: 0,
-              pgv: 0,
-              intensityRaw: 0.0,
-              intensity: 0.0,
-              alert: true,
-            ),
+            'TWD003': RtsStation(pga: 0, intensity: 0.0, alert: true),
           },
         ),
         alerts: const [],
@@ -540,7 +500,7 @@ void main() {
       await built.layer.render(controller);
       await pumpEventQueue();
 
-      final drawn = featuresOf(controller.rtsPushes);
+      final drawn = stationsOnMap(controller);
       expect(
         drawn,
         hasLength(2),
@@ -559,7 +519,7 @@ void main() {
   );
 
   test(
-    'the sort key follows the alert-aware reading, not the raw sensor value',
+    'a dot sorts on its own reading, so the stronger draws on top',
     () async {
       final origin = DateTime.now().toUtc().subtract(
         const Duration(seconds: 5),
@@ -567,30 +527,11 @@ void main() {
       final built = await _build(
         rts: Rts(
           time: origin.millisecondsSinceEpoch,
-          box: {'1': 4},
-          station: const {
-            // Alerting: the broadcast discrete reading (6.0, a high badge)
-            // far outranks this station's own, much lower raw sensor value
-            // (-1.0) — the badge must draw above TWD002 regardless, so its
-            // sort key has to track the discrete reading, not the raw one.
-            'TWD001': RtsStation(
-              pga: 40,
-              pgv: 8,
-              intensityRaw: -1.0,
-              intensity: 6.0,
-              alert: true,
-            ),
-            // Not alerting: sorts on its own raw value, same as always.
-            'TWD002': RtsStation(
-              pga: 20,
-              pgv: 4,
-              intensityRaw: 3.0,
-              intensity: 0.0,
-              alert: false,
-            ),
+          stations: const {
+            'TWD001': RtsStation(pga: 40, intensity: 4.5, alert: true),
+            'TWD002': RtsStation(pga: 20, intensity: 1.0),
           },
         ),
-        alerts: const [],
         table: table,
         grid: grid,
       );
@@ -598,12 +539,14 @@ void main() {
       await built.layer.render(controller);
       await pumpEventQueue();
 
-      final drawn = featuresOf(controller.rtsPushes);
-      final byLabel = {
-        for (final f in drawn) (f['properties']! as Map)['label']: f,
+      final drawn = stationsOnMap(controller);
+      final sortOf = {
+        for (final f in drawn)
+          ((f['properties']! as Map)['label'] as String).split('\n').first:
+              (f['properties']! as Map)['sort'],
       };
-      expect(byLabel['TWD001\n-1.0']!['properties']['sort'], 6.0);
-      expect(byLabel['TWD002\n3.0']!['properties']['sort'], 3.0);
+      expect(sortOf['TWD001'], 4.5);
+      expect(sortOf['TWD002'], 1.0);
     },
   );
 

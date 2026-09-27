@@ -97,7 +97,10 @@ class _StaticSource<T> extends RealtimeSource<T> {
 
 class _EmptyStations implements TremStationRepository {
   @override
-  Future<Result<Map<String, SeismicStation>>> stations() async =>
+  Future<Map<String, SeismicStation>?> saved() async => null;
+
+  @override
+  Future<Result<Map<String, SeismicStation>>> refresh() async =>
       const Ok(<String, SeismicStation>{});
 }
 

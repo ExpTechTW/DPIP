@@ -14,7 +14,9 @@ import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/rts_alert_tracker.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
+import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -118,6 +120,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     required Future<SeismicTravelTimeTable> travelTimeTable,
     required Future<RtsBoxGrid> boxGrid,
     required TownDirectory townDirectory,
+    RtsLiveDemand? liveDemand,
     // Not initializing formals: Dart has no private *named* parameter, and
     // these fields must stay private.
     // ignore: prefer_initializing_formals
@@ -127,6 +130,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
        // ignore: prefer_initializing_formals
        _boxGridFuture = boxGrid,
        // ignore: prefer_initializing_formals
+       _liveDemand = liveDemand,
+       // ignore: prefer_initializing_formals
        _townDirectory = townDirectory;
 
   final RealtimeNotifier<Rts> _feed;
@@ -135,6 +140,15 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   final Future<SeismicTravelTimeTable> _travelTimeTable;
   final Future<RtsBoxGrid> _boxGridFuture;
   final TownDirectory _townDirectory;
+
+  /// Held while the monitor is on screen, so the feed sends every frame
+  /// rather than only the alerting ones (see [RtsLiveDemand]).
+  final RtsLiveDemand? _liveDemand;
+  bool _holdingLive = false;
+
+  /// The boxes each frame lights — shared logic with the replay page, fed
+  /// from [_feed] here.
+  final RtsAlertTracker _alerts = RtsAlertTracker();
 
   /// Township centroids, keyed by code — built once from the bundled
   /// directory, which does not change while the app runs. Rebuilding it per
@@ -206,6 +220,9 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _eewSourceEmpty = true;
   bool _stationsFetching = false;
   int _stationRetries = 0;
+
+  /// Whether this activation has asked the server for the current directory.
+  bool _stationsRefreshed = false;
   SeismicTravelTimeTable? _travelTime;
   Timer? _eewTicker;
 
@@ -269,7 +286,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   @override
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
+    _holdLive(_surfaceVisible);
     await _ensureStations();
+    // The frame already in hand, lit against whatever is placed so far —
+    // the feed will not notify again just because the layer attached.
+    _alerts.track(_feed.state);
     await removeMonitorLayers(controller, _ids);
     // The whole stack — sources, layers, badge icons, and the order they mount
     // in — is [addMonitorLayers], shared with the report replay map. The
@@ -307,8 +328,23 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     });
     _boxGridFuture.then((grid) {
       _boxGrid = grid;
-      unawaited(_pushBox());
+      _alerts.place(grid: grid);
+      // Placing the grid can light boxes the frame in hand already implied,
+      // which also changes how the station dots are drawn (a lit event
+      // declutters them) — so the whole update goes again, not just the box.
+      _lastSent = null;
+      unawaited(_pushUpdate());
     });
+  }
+
+  /// Takes or lets go of the feed's live speed. Only while the monitor is the
+  /// active layer *and* its surface can be seen: a monitor behind another tab
+  /// needs the alerting frames only, which the sleeping stream still sends.
+  void _holdLive(bool hold) {
+    final demand = _liveDemand;
+    if (demand == null || hold == _holdingLive) return;
+    _holdingLive = hold;
+    hold ? demand.hold() : demand.release();
   }
 
   void _startEewTicker() {
@@ -332,7 +368,10 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     });
   }
 
-  void _onFeed() => unawaited(_pushUpdate());
+  void _onFeed() {
+    _alerts.track(_feed.state);
+    unawaited(_pushUpdate());
+  }
 
   void _onEew() => unawaited(_pushEew());
 
@@ -346,6 +385,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   @override
   void onSurfaceVisibility(bool visible) {
     _surfaceVisible = visible;
+    if (_controller != null) _holdLive(visible);
     if (visible) {
       // One catch-up on the visible edge: the skipped uploads left the map at
       // whatever second it was hidden on.
@@ -436,9 +476,9 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   Map<String, dynamic> _eewGeoJson() =>
       eewWaveGeoJson(_eew.state.data ?? const [], _travelTime, AppTime.utc);
 
-  /// Updates the box-grid overlay: a large event the feed reports at
-  /// box-grid resolution (`rts.box` non-empty) draws the coloured grid cells
-  /// *alongside* the per-station dots (not a replacement) — the box only
+  /// Updates the box-grid overlay: a frame with alerting stations lights the
+  /// boxes they stand in (see [RtsAlertTracker]) and draws those coloured grid
+  /// cells *alongside* the per-station dots (not a replacement) — the box only
   /// covers the areas the event actually triggered, so stations outside it
   /// still carry live detail.
   Future<void> _pushBox() async {
@@ -447,7 +487,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     if (controller == null || !_added || !_surfaceVisible || grid == null) {
       return;
     }
-    final hasBox = (_feed.state.data?.box.isNotEmpty) ?? false;
+    final hasBox = _alerts.alerting;
     try {
       if (hasBox) {
         final (geoJson, signature) = _boxGeoJson(grid);
@@ -465,7 +505,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     }
   }
 
-  /// One polygon per box id present in the live feed's `rts.box`, joined
+  /// One polygon per box the latest frame lights, joined
   /// against the static [grid] for its geometry — dropping any box the
   /// S-wave has already fully swept past (see [_isBoxFullyCovered]) so it
   /// stops blinking instead of blinking forever once it's no longer live
@@ -476,14 +516,13 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// since a ring is a function of its id alone. [_pushBox] compares it
   /// against what the map already holds.
   (Map<String, dynamic>, String) _boxGeoJson(RtsBoxGrid grid) {
-    final box = _feed.state.data?.box ?? const {};
+    final box = _alerts.areas.boxes;
     final alerts = _eew.state.data ?? const <Eew>[];
     final now = AppTime.utc;
     final features = <Map<String, dynamic>>[];
     final signature = StringBuffer();
     for (final entry in box.entries) {
-      final id = int.tryParse(entry.key);
-      final ring = id == null ? null : grid.rings[id];
+      final ring = grid.rings[entry.key];
       if (ring == null) continue;
       if (_travelTime != null &&
           _isBoxFullyCovered(ring, alerts, _travelTime!, now)) {
@@ -561,7 +600,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       final controller = _controller;
       if (controller == null || !_added) return;
       try {
-        final hasBox = (_feed.state.data?.box.isNotEmpty) ?? false;
+        final hasBox = _alerts.alerting;
         if (hasBox) {
           _boxVisible = !_boxVisible;
           await controller.setLayerVisibility(_ids.boxLine, _boxVisible);
@@ -710,6 +749,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
 
   @override
   Future<void> clear(MapLibreMapController controller) async {
+    _holdLive(false);
+    // The next activation asks the server again — "once each time the monitor
+    // opens".
+    _stationsRefreshed = false;
+    _stationRetries = 0;
     if (_listening) {
       _feed.removeListener(_onFeed);
       _listening = false;
@@ -740,46 +784,58 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     _fillEewKey = null;
   }
 
-  /// Loads the station directory, retrying (bounded) on failure — a transient
-  /// fault would otherwise leave every dot dropped (blank monitor) for the whole
-  /// activation, since the feed carries only per-id intensities, not positions.
+  /// Places the stations: the copy saved on this device at once, then — once
+  /// per activation — the server's current list, revalidated with its ETag.
+  ///
+  /// The saved copy is what lets the monitor draw the moment it opens, and on
+  /// a connection too poor to fetch anything; the refresh is retried (bounded)
+  /// only while there is nothing at all to draw, since a directory in hand is
+  /// already a working monitor.
   Future<void> _ensureStations() async {
-    if (_stations.isNotEmpty ||
-        _stationsFetching ||
-        _stationRetries >= _maxStationRetries) {
-      return;
+    if (_stationsFetching) return;
+    if (_stations.isEmpty) {
+      final saved = await _stationRepository.saved();
+      if (saved != null && _stations.isEmpty) _useStations(saved);
     }
+    if (_stationsRefreshed || _stationRetries >= _maxStationRetries) return;
     _stationsFetching = true;
     _stationRetries++;
     try {
-      final directory = (await _stationRepository.stations()).valueOrNull;
+      final directory = (await _stationRepository.refresh()).valueOrNull;
       if (directory != null && directory.isNotEmpty) {
-        _stations = directory;
+        _useStations(directory);
+        _stationsRefreshed = true;
         _stationRetries = 0;
+      } else if (_stations.isNotEmpty) {
+        // The saved copy stands; asking again every frame buys nothing.
+        _stationsRefreshed = true;
       }
     } finally {
       _stationsFetching = false;
     }
   }
 
+  void _useStations(Map<String, SeismicStation> directory) {
+    _stations = directory;
+    _alerts.place(stations: directory);
+    // The dots on the map were placed against the old directory.
+    _lastSent = null;
+  }
+
   Map<String, dynamic> _geoJson() {
-    final live = _feed.state.data?.station ?? const <String, RtsStation>{};
-    // Large event: the feed also carries box-grid data. The legacy monitor
+    final live = _feed.state.data?.stations ?? const <String, RtsStation>{};
+    // Large event: alerting stations light the box grid. The legacy monitor
     // decluttered to just the stations that registered something and badged
     // each with its discrete reading — ported here as a circular badge (see
     // [MonitorLayerIds.stationBadge]), never a shape swap: the dot underneath
     // is still the same circle, the badge is just a fuller one drawn over it.
-    final hasBox = (_feed.state.data?.box.isNotEmpty) ?? false;
+    final hasBox = _alerts.alerting;
     final features = <Map<String, dynamic>>[];
     for (final entry in live.entries) {
       final station = _stations[entry.key];
       if (station == null) continue;
       final data = entry.value;
-      // The value actually shown — an alerting station's badge/colour come
-      // from the broadcast discrete reading, not its own raw sensor value,
-      // exactly like the legacy monitor's `alert ? I : i` split.
-      final effective = data.alert ? data.intensity : data.intensityRaw;
-      final level = Intensity.toScale(effective);
+      final level = Intensity.toScale(data.intensity);
       // A calm, non-alerting 0 would otherwise paper the whole island in
       // identical dots while the shaking area gets lost in the crowd.
       if (hasBox && level == 0 && !data.alert) continue;
@@ -790,14 +846,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           'coordinates': [station.longitude, station.latitude],
         },
         'properties': {
-          'i': data.intensityRaw,
-          // Sort key for both the dot and the badge layer — must track
-          // [effective], not the raw sensor value: an alerting station's
-          // badge can show a discrete reading well above (or below) its own
-          // instantaneous `i`, and a sort key stuck on `i` let a lower badge
-          // draw over a higher one the moment the two diverged on a refresh.
-          'sort': effective,
-          'label': '${entry.key}\n${data.intensityRaw.toStringAsFixed(1)}',
+          'i': data.intensity,
+          // Sort key for both the dot and the badge layer, so a stronger
+          // reading always draws over a weaker one.
+          'sort': data.intensity,
+          'label': '${entry.key}\n${data.intensity.toStringAsFixed(1)}',
           'icon': hasBox && level > 0
               ? monitorBadgeIcon(level, dark: _dark)
               : '',

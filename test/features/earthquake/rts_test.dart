@@ -1,69 +1,75 @@
+/// The `rts.v1` frame, as the TREM stream and the v3 archive both send it.
+///
+/// The case that matters is the one a strict model gets wrong: a station that
+/// has not measured anything yet is sent without `pga`, and `alert` is sent
+/// only as `1` and only while alerting. A model that required either would
+/// reject the whole frame — every station on the monitor — over one new
+/// sensor, and it would do so exactly when a big event brings stations in.
+library;
+
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('Rts.fromJson', () {
-    test('maps stations (i/I wire names), time, and empty box/int', () {
-      final rts = Rts.fromJson({
-        'station': {
-          '2012144': {'pga': 2.79, 'pgv': 0.52, 'i': -2.9, 'I': -3},
-        },
-        'box': <String, dynamic>{},
-        'int': <dynamic>[],
-        'time': 1783968266383,
-      });
-
-      expect(rts.time, 1783968266383);
-      expect(rts.station, hasLength(1));
-      final station = rts.station['2012144']!;
-      expect(station.pga, 2.79);
-      expect(station.pgv, 0.52);
-      expect(station.intensityRaw, -2.9); // wire 'i'
-      expect(station.intensity, -3.0); // wire 'I'
-      expect(station.alert, false);
-      expect(rts.box, isEmpty);
-      expect(rts.intensities, isEmpty);
+  test('reads a live frame: hex ids, i, pga, alert and ts', () {
+    final rts = Rts.fromJson({
+      'source': 'core-tnn1',
+      'ts': 1790537637000,
+      'stations': {
+        '117825C': {'i': -0.1, 'pga': 0.51},
+        '11DFDBC': {'i': 4.6, 'pga': 38.2, 'alert': 1},
+      },
+      'eq': <dynamic>[],
     });
 
-    test('coerces an integer intensity float (JSON `i: -3`) to double', () {
-      final rts = Rts.fromJson({
-        'station': {
-          'x': {'pga': 3, 'pgv': 1, 'i': -3, 'I': -3},
-        },
-        'time': 1,
-      });
-      expect(rts.station['x']!.intensityRaw, -3.0);
-      expect(rts.station['x']!.pga, 3.0);
+    expect(rts.time, 1790537637000);
+    expect(rts.stations.keys, ['117825C', '11DFDBC']);
+    expect(rts.stations['117825C']!.intensity, -0.1);
+    expect(rts.stations['117825C']!.pga, 0.51);
+    expect(rts.stations['117825C']!.alert, isFalse);
+    expect(rts.stations['11DFDBC']!.alert, isTrue);
+  });
+
+  test('a station with no pga yet still decodes, and keeps the frame', () {
+    final rts = Rts.fromJson({
+      'ts': 1,
+      'stations': {
+        'NEW': {'i': -3.0},
+        'OLD': {'i': 1.2, 'pga': 2.0},
+      },
     });
 
-    test('decodes a triggered station alert flag (wire 0/1 int)', () {
-      final rts = Rts.fromJson({
-        'station': {
-          'alerted': {'pga': 30, 'pgv': 12, 'i': 4.8, 'I': 4.2, 'alert': 1},
-          'calm': {'pga': 2, 'pgv': 1, 'i': 2.0, 'I': 1.9, 'alert': 0},
-        },
-        'time': 1,
-      });
-      expect(rts.station['alerted']!.alert, isTrue);
-      expect(rts.station['calm']!.alert, isFalse);
+    expect(rts.stations, hasLength(2));
+    expect(rts.stations['NEW']!.pga, 0.0);
+  });
+
+  test('an integer intensity on the wire (`i: -3`) reads as a double', () {
+    final rts = Rts.fromJson({
+      'ts': 1,
+      'stations': {
+        'x': {'i': -3, 'pga': 3},
+      },
     });
 
-    test('round-trips symmetrically through toJson', () {
-      final rts = Rts.fromJson({
-        'station': {
-          'x': {'pga': 1.0, 'pgv': 2.0, 'i': 3.0, 'I': 4},
-        },
-        'time': 123,
-      });
-      expect(Rts.fromJson(rts.toJson()), rts);
+    expect(rts.stations['x']!.intensity, -3.0);
+    expect(rts.stations['x']!.pga, 3.0);
+  });
+
+  test('an empty frame falls back to defaults', () {
+    final rts = Rts.fromJson({'ts': 5});
+
+    expect(rts.stations, isEmpty);
+    expect(rts.time, 5);
+  });
+
+  test('round-trips through toJson', () {
+    final rts = Rts.fromJson({
+      'ts': 123,
+      'stations': {
+        'x': {'i': 3.0, 'pga': 1.0, 'alert': 1},
+      },
     });
 
-    test('missing fields fall back to defaults (robust live feed)', () {
-      final rts = Rts.fromJson({'time': 5});
-      expect(rts.station, isEmpty);
-      expect(rts.box, isEmpty);
-      expect(rts.intensities, isEmpty);
-      expect(rts.time, 5);
-    });
+    expect(Rts.fromJson(rts.toJson()), rts);
   });
 }

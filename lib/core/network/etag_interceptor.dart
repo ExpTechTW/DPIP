@@ -27,9 +27,10 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 ///
 /// For everything else, **ETag is the only validator** — `Cache-Control` /
 /// `no-store` are ignored; a `200` without an ETag is not written. Streaming
-/// (SSE) is skipped. High-churn / unique-URL GETs (EEW, RTS, device location,
-/// notify) are never cached. Requires Dio `validateStatus` to accept 304 (set
-/// in `createDio`).
+/// (SSE) is skipped. High-churn / unique-URL GETs (EEW, device location,
+/// notify) are never cached, and neither is the seismic station directory,
+/// whose ETag lives in its own durable store. Requires Dio `validateStatus` to
+/// accept 304 (set in `createDio`).
 class EtagInterceptor extends Interceptor {
   EtagInterceptor(this._store, {this._usage});
 
@@ -69,7 +70,10 @@ class EtagInterceptor extends Interceptor {
 
   /// Paths that must never enter the ETag store (live / unique / personal).
   static bool isUncacheablePath(String path) {
-    if (path == ApiPaths.eew || path == ApiPaths.rts) return true;
+    if (path == ApiPaths.eew) return true;
+    // The station directory keeps its own ETag in the durable store, which has
+    // to see the 304 itself — this cache would answer it with a 200 first.
+    if (path == ApiPaths.tremStations) return true;
     if (path.startsWith(ApiPaths.location)) return true;
     // getNotify + setNotify — token-keyed, must not stick in SQLite.
     return path.startsWith(ApiPaths.notify);

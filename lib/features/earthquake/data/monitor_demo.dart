@@ -26,7 +26,6 @@ import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
-import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
@@ -238,29 +237,29 @@ class DemoEewSource extends RealtimeSource<List<Eew>> {
   }
 }
 
-/// Polls a ~1 Hz synthetic RTS snapshot: every station shakes according to the
+/// Polls a ~1 Hz synthetic RTS frame: every station shakes according to the
 /// demo event's attenuation (with a little jitter so the dots move), and the
-/// detection boxes nearest the epicentre light up.
+/// stations near the epicentre alert — which is what lights the detection
+/// boxes on the monitor, exactly as a real frame's alerting stations do.
 class DemoRtsSource extends RealtimeSource<Rts> {
-  DemoRtsSource({required this.stations, required this.grid}) {
+  DemoRtsSource({required this.stations}) {
     _tick = Timer.periodic(const Duration(seconds: 1), (_) => _update());
     _init();
   }
 
   final TremStationRepository stations;
-  final Future<RtsBoxGrid> grid;
 
   Timer? _tick;
   bool _ready = false;
   Map<String, SeismicStation> _directory = const {};
-  RtsBoxGrid? _boxes;
   Rts _latest = const Rts();
 
   Future<void> _init() async {
-    final directory = (await stations.stations()).valueOrNull ?? const {};
-    final boxes = await grid;
+    final directory =
+        (await stations.refresh()).valueOrNull ??
+        await stations.saved() ??
+        const {};
     _directory = directory;
-    _boxes = boxes;
     _ready = true;
     _update();
   }
@@ -278,37 +277,12 @@ class DemoRtsSource extends RealtimeSource<Rts> {
         user: LatLng(station.latitude, station.longitude),
       );
       final i = est.i + _jitter(id, now);
-      stations[id] = RtsStation(
-        pga: i,
-        pgv: i,
-        intensityRaw: i,
-        intensity: i,
-        alert: i >= 4,
-      );
+      stations[id] = RtsStation(intensity: i, pga: i, alert: i >= 4);
     });
 
-    // Boxes within ~120 km of the epicentre, brighter the closer they are —
-    // the same `Rts.box` shape a large event's feed carries, so the map's
-    // box-grid overlay draws them.
-    final box = <String, dynamic>{};
-    _boxes?.rings.forEach((id, ring) {
-      var lat = 0.0;
-      var lng = 0.0;
-      for (final point in ring.take(4)) {
-        lat += point[1];
-        lng += point[0];
-      }
-      lat /= 4;
-      lng /= 4;
-      final dist = MonitorDemo.epicenter.distanceTo(LatLng(lat, lng)) / 1000;
-      if (dist < 120) {
-        box['$id'] = (6 - dist / 30).clamp(1, 6).round();
-      }
-    });
-
-    _latest = Rts(station: stations, box: box, time: now);
+    _latest = Rts(stations: stations, time: now);
     Log.debug(
-      'monitor demo rts → ${stations.length} stations, ${box.length} boxes, '
+      'monitor demo rts → ${stations.length} stations, '
       'mag=${MonitorDemo.magnitude}',
     );
   }

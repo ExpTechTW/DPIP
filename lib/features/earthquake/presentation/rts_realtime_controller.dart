@@ -15,12 +15,8 @@ class RtsRealtimeController extends RealtimeNotifier<Rts> {
   /// The latest shaking snapshot, or null before the first arrives.
   Rts? get rts => state.data;
 
-  /// Live station intensities keyed by station id; empty before any snapshot.
-  Map<String, RtsStation> get stations => state.data?.station ?? const {};
-
-  /// Live box-grid intensities keyed by box id (as a string); only non-empty
-  /// for a large event the feed reports at box-grid resolution.
-  Map<String, dynamic> get box => state.data?.box ?? const {};
+  /// Live station readings keyed by hex device id; empty before any frame.
+  Map<String, RtsStation> get stations => state.data?.stations ?? const {};
 
   /// Current feed freshness.
   RealtimeStatus get status => state.status;

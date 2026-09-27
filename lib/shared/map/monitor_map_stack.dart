@@ -138,9 +138,9 @@ const List<Object> monitorBadgeIconSize = [
   1.7,
 ];
 
-/// Higher effective intensity draws on top (dot, badge and label all key off
-/// this) — reads `sort`, the alert-aware value the badge is actually drawn
-/// from, not the raw `i`. Stations without a `sort` sink.
+/// Higher intensity draws on top (dot, badge and label all key off this) —
+/// reads `sort`, the reading the badge is drawn from. Stations without a
+/// `sort` sink.
 const List<Object> monitorSortKey = [
   'coalesce',
   ['get', 'sort'],

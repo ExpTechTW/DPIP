@@ -2,6 +2,8 @@ import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
+import 'package:dpip/core/storage/trem_station_store.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
@@ -22,6 +24,7 @@ import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
+import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
@@ -41,7 +44,14 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   final eewSpokenAnnouncement = EewSpokenAnnouncementSettings(deps.settings);
   final repository = EewRepositoryImpl(api, cwaOnly: () => eewCwaOnly.enabled);
   final reports = ReportRepositoryImpl(api);
-  final tremStations = TremStationRepositoryImpl(deps.apiClient);
+  final tremStations = TremStationRepositoryImpl(
+    deps.apiClient,
+    TremStationStore(deps.database.durable),
+    now: () => AppTime.utc,
+  );
+  // Held by the 強震監視器 while it is on screen: only then does the RTS feed
+  // need every frame, rather than the alerting ones the stream's sleep sends.
+  final rtsLiveDemand = RtsLiveDemand();
 
   // Bundled CWA P/S travel-time table (asset load, not network) — loaded once
   // here and shared as a `Future` (mirrors `Future<TownBoundaries>` in
@@ -73,13 +83,13 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   deps.realtimeService.register(eewChannel);
   final eewController = EewRealtimeController(eewChannel);
 
-  // Live RTS over SSE (`/api/v2/trem/rts?sse=1`) — continuous ~1 Hz; the source
-  // uses event-recency liveness, so a silent-but-open link ages to stale.
-  // The demo flag swaps in a synthetic snapshot generator the same way.
+  // Live RTS: the `trem.rts.v1` topic of the TREM stream — every frame while
+  // the monitor holds [rtsLiveDemand], only the alerting ones otherwise. The
+  // demo flag swaps in a synthetic frame generator the same way.
   final rtsSource = kMonitorDemoEnabled
-      ? DemoRtsSource(stations: tremStations, grid: boxGrid)
-            as RealtimeSource<Rts>
-      : RtsRealtimeSource(api.openRtsSse) as RealtimeSource<Rts>;
+      ? DemoRtsSource(stations: tremStations) as RealtimeSource<Rts>
+      : RtsRealtimeSource(api.openTremSse, demand: rtsLiveDemand)
+            as RealtimeSource<Rts>;
   final rtsChannel = RealtimeChannel<Rts>(
     source: rtsSource,
     clock: deps.serverClock,
@@ -113,5 +123,6 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     Provider<Future<SeismicTravelTimeTable>>.value(value: travelTimeTable),
     Provider<Future<RtsBoxGrid>>.value(value: boxGrid),
     Provider<TremStationRepository>.value(value: tremStations),
+    Provider<RtsLiveDemand>.value(value: rtsLiveDemand),
   ];
 }

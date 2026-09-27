@@ -49,6 +49,7 @@ import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/core/astro/tle_store.dart';
+import 'package:dpip/core/storage/trem_station_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/storage/app_database.dart';
@@ -590,6 +591,7 @@ Future<void> _createDurableSchema(SqliteDatabase db) async {
   await SettingsStore.createSchema(db);
   await LogStore.createSchema(db);
   await TleStore.createSchema(db);
+  await TremStationStore.createSchema(db);
   await MeshStore.createSchema(db);
 }
 

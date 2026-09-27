@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
@@ -8,8 +6,8 @@ import 'package:dpip/core/network/sse_event.dart';
 
 /// Earthquake endpoints on the region-aware [ApiClient].
 ///
-/// `rts` / `eew` fail over across the LB regions (tpe1, khh1); `report` /
-/// `report/{id}` across the Core regions (tyo1, tnn1) — the redundancy is a
+/// The live feeds fail over across the LB regions (tpe1, khh1); reports and
+/// the replay archives across the Core regions (tyo1, tnn1) — the redundancy is a
 /// transport property carried by [ApiTier], not a module boundary. Returns raw
 /// decoded JSON; the repository maps it to domain models.
 class EarthquakeApi {
@@ -17,54 +15,39 @@ class EarthquakeApi {
 
   final ApiClient _client;
 
-  /// Latest real-time station (RTS) shaking data (one-shot snapshot).
+  /// Opens the **TREM stream** carrying the RTS frames — one Server-Sent Events
+  /// connection whose frames are named for their topic (`event: trem.rts.v1`)
+  /// and carry base64-gzipped `rts.v1` JSON. No token: the public topics are
+  /// anonymous.
   ///
-  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts`
-  Future<dynamic> getRtsRealtime() => _client.get(ApiTier.lbApi, ApiPaths.rts);
+  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v1/trem/sse?topics=trem.rts.v1[&mode=live]`
+  ///
+  /// [live] asks for every frame (~2 Hz). Without it the server is in its
+  /// sleep mode and sends only the frames in which a station is alerting — the
+  /// only ones anybody not watching the monitor needs, at a fraction of the
+  /// traffic. A fresh stream per call, so the source reconnects by calling
+  /// again and reads [live] anew each time.
+  Stream<SseEvent> openTremSse({required bool live}) => HttpSseClient(_client)
+      .connect(
+        ApiTier.lbApi,
+        ApiPaths.tremSse,
+        query: {'topics': rtsTopic, if (live) 'mode': 'live'},
+      );
 
-  /// Opens the **live** RTS feed as a Server-Sent Events stream — the transport
-  /// the realtime channel runs on. A continuous ~1 Hz snapshot stream.
-  ///
-  /// `https://api.lb-{tpe1,khh1}.exptech.dev/api/v2/trem/rts?sse=1&compress=1`
-  ///
-  /// `compress=1` streams the payload as `event: g` (base64-gzipped JSON, the
-  /// same JSON [getRtsRealtime] returns) — decompressed in the realtime source.
-  /// A fresh stream per call, so the source can reconnect by calling again.
-  Stream<SseEvent> openRtsSse() => HttpSseClient(_client).connect(
-    ApiTier.lbApi,
-    ApiPaths.rts,
-    query: const {'sse': 1, 'compress': 1},
-  );
+  /// The TREM stream topic carrying RTS frames; also each frame's event name.
+  static const String rtsTopic = 'trem.rts.v1';
 
-  /// Historical RTS snapshot at [seconds] (Unix seconds) — same shape as
-  /// [getRtsRealtime], for replaying past shaking instead of the live feed.
+  /// The archived `rts.v1` frame at [seconds] (Unix seconds, ten digits) —
+  /// the same JSON the live topic carries, for replaying past shaking.
   ///
-  /// **`legacyApi`, not `lbApi`:** verified by comparing responses at several
-  /// offsets (2026-08-08) — `api.lb-{tpe1,khh1}` silently **ignores**
-  /// `{seconds}` and returns the live snapshot regardless (its `time` matches
-  /// the plain `/rts` response exactly, for every offset tried); only `api-1`
-  /// actually returns a payload whose `time` tracks the requested second. A
-  /// same-tier guess from `getEewAt`'s working case would have been wrong here.
+  /// `https://api.core-{tnn1,tyo1}.exptech.dev/api/v3/trem/rts/{seconds}`
   ///
-  /// `https://api-1.exptech.dev/api/v2/trem/rts/{seconds}`
-  Future<dynamic> getRtsAt(int seconds) async {
-    final data = await _client.get(
-      ApiTier.legacyApi,
-      '${ApiPaths.rts}/$seconds',
-    );
-    // Verified 2026-08-09: unlike every other endpoint here (including the
-    // bare `/trem/rts` and `/trem/station` on this same host), api-1 serves
-    // *this* route's body as `text/plain`, so Dio's default transformer
-    // doesn't auto-decode it — the caller gets a raw JSON string instead of
-    // a Map. Decode it here so this method's return shape matches the rest
-    // of [EarthquakeApi] regardless of the host's content-type quirk.
-    //
-    // Inline on purpose, not an isolate: the snapshot is ~5 KB (~111
-    // stations, re-measured 2026-08-24 against api-1), so the decode is tens
-    // of microseconds even at replay's 1 Hz — an isolate spawn would cost
-    // more than it saves.
-    return data is String ? jsonDecode(data) : data;
-  }
+  /// A second not archived yet — or no longer kept — answers 404. Each region
+  /// archives the network on its own, and a second that has just passed can be
+  /// on one region and not yet on the other.
+  Future<Map<String, dynamic>> getRtsAt(int seconds) async =>
+      (await _client.get(ApiTier.coreApi, '${ApiPaths.rtsArchive}/$seconds'))
+          as Map<String, dynamic>;
 
   /// Latest EEW list (one-shot snapshot).
   ///

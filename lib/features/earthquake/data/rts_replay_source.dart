@@ -8,8 +8,8 @@ import 'package:dpip/features/earthquake/domain/rts.dart';
 
 /// Replays the RTS feed at a fixed point in the past — a plain **polling**
 /// source (not SSE): each [fetch] asks [EarthquakeApi.getRtsAt] for the
-/// snapshot at the current second of [clock], which ticks 1:1 with real time
-/// from its start instant. Everything else (the channel, state model,
+/// archived frame at the current second of [clock], which ticks 1:1 with real
+/// time from its start instant. Everything else (the channel, state model,
 /// staleness) is the same spine the live [RtsRealtimeSource] uses — a replay
 /// session just points it at a different source.
 class RtsReplaySource extends RealtimeSource<Rts> {
@@ -24,16 +24,15 @@ class RtsReplaySource extends RealtimeSource<Rts> {
   @override
   Future<Result<Rts>> fetch() => guardResult(() async {
     final seconds = clock.now().millisecondsSinceEpoch ~/ 1000;
-    final json = await _api.getRtsAt(seconds);
-    return Rts.fromJson(json as Map<String, dynamic>);
+    return Rts.fromJson(await _api.getRtsAt(seconds));
   }, shouldLog: (failure) => !isIgnorableFailure(failure));
 
-  /// A 404 is the ordinary shape of an old replay, not a fault: RTS snapshots
-  /// are retained for far less time than the EEW history, so an event old
-  /// enough (0403, say) still has alerts to replay and no shaking left to draw.
-  /// Counted as a failure it would be one crash report and one log line **per
-  /// second** for the whole session — the poll runs at 1 Hz, which never trips
-  /// `Log`'s repeat suppression (8 within 5s).
+  /// A 404 is the ordinary shape of an old replay, not a fault: the archive
+  /// keeps RTS for far less time than the EEW history, so an event old enough
+  /// still has alerts to replay and no shaking left to draw. Counted as a
+  /// failure it would be one crash report and one log line **per second** for
+  /// the whole session — the poll runs at 1 Hz, which never trips `Log`'s
+  /// repeat suppression (8 within 5s).
   @override
   bool isIgnorableFailure(Failure failure) => failure is NotFoundFailure;
 

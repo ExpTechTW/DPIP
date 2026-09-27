@@ -30,8 +30,15 @@ abstract final class ApiPaths {
   /// Live EEW feed (with `?sse=1&compress=1` for the stream).
   static const String eew = '/api/v2/eq/eew';
 
-  /// Live RTS feed (with `?sse=1&compress=1` for the stream).
-  static const String rts = '/api/v2/trem/rts';
+  /// The TREM stream: one Server-Sent Events connection carrying every topic
+  /// named in `?topics=` (`trem.rts.v1`, …), each frame named for its topic.
+  static const String tremSse = '/api/v1/trem/sse';
+
+  /// Archived `rts.v1` snapshots, one per second: `/api/v3/trem/rts/{seconds}`.
+  static const String rtsArchive = '/api/v3/trem/rts';
+
+  /// The seismic station directory — CSV, revalidated with its ETag.
+  static const String tremStations = '/resource/station';
 
   /// Device location registration — `/api/v2/location/{platform}/{token}/…`.
   static const String location = '/api/v2/location/';

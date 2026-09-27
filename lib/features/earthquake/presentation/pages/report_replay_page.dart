@@ -36,6 +36,7 @@ import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
 import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
+import 'package:dpip/features/earthquake/domain/rts_alert_tracker.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -83,6 +84,10 @@ class ReportReplayPage extends StatefulWidget {
 
 class _ReportReplayPageState extends State<ReportReplayPage> {
   late final ReplaySession _session;
+
+  /// The boxes each replayed frame lights — the same logic the live monitor
+  /// runs, fed from this session.
+  final RtsAlertTracker _alerts = RtsAlertTracker();
 
   /// Bumped on a fixed cadence so the displayed clock, the EEW countdown, and
   /// the box-coverage check keep advancing independent of whether a poll
@@ -274,6 +279,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                 travelTimeTable: context.read<Future<SeismicTravelTimeTable>>(),
                 boxGrid: context.read<Future<RtsBoxGrid>>(),
                 rts: _session.rts,
+                alerts: _alerts,
                 eew: _session.eew,
                 tick: _tick,
                 clock: _session.clock,
@@ -397,6 +403,7 @@ class _ReplayMap extends StatefulWidget {
     required this.travelTimeTable,
     required this.boxGrid,
     required this.rts,
+    required this.alerts,
     required this.eew,
     required this.tick,
     required this.clock,
@@ -413,6 +420,9 @@ class _ReplayMap extends StatefulWidget {
   /// state; the box overlay doesn't render until it's ready.
   final Future<RtsBoxGrid> boxGrid;
   final RtsRealtimeController rts;
+
+  /// Lit areas, owned by the page and fed here on every frame.
+  final RtsAlertTracker alerts;
   final EewRealtimeController eew;
   final ValueNotifier<int> tick;
   final ReplayClock clock;
@@ -437,6 +447,7 @@ class _ReplayMapState extends State<_ReplayMap> {
   MapLibreMapController? _controller;
   Map<String, SeismicStation> _stations = const {};
   bool _stationsFetching = false;
+  bool _stationsRefreshed = false;
   bool _ready = false;
   SeismicTravelTimeTable? _travelTimeTable;
   RtsBoxGrid? _boxGrid;
@@ -514,6 +525,9 @@ class _ReplayMapState extends State<_ReplayMap> {
     widget.boxGrid.then((grid) {
       if (!mounted) return;
       _boxGrid = grid;
+      widget.alerts.place(grid: grid);
+      // Lit boxes also declutter the station dots, so both redraw.
+      unawaited(_updateRts());
       unawaited(_updateBox());
     });
   }
@@ -575,7 +589,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       final controller = _controller;
       if (controller == null || !_ready) return;
       try {
-        final hasBox = widget.rts.box.isNotEmpty;
+        final hasBox = widget.alerts.alerting;
         if (hasBox) {
           _boxVisible = !_boxVisible;
           await controller.setLayerVisibility(_ids.boxLine, _boxVisible);
@@ -711,20 +725,36 @@ class _ReplayMapState extends State<_ReplayMap> {
     _syncBasemapOverlays();
   }
 
-  /// Loads the station directory once; the RTS feed carries only per-id
-  /// intensities, so dots can't be placed until this resolves.
+  /// Places the stations: the copy saved on this device, then once the
+  /// server's current list; the RTS feed carries only per-id readings, so dots
+  /// can't be placed until one of them resolves.
+  ///
+  /// The live directory stands in for the one in force at the time of the
+  /// event — the network keeps no history of it — so a station since moved is
+  /// drawn where it is now, and one since retired is not drawn at all.
   Future<void> _ensureStations() async {
-    if (_stations.isNotEmpty || _stationsFetching) return;
+    if (_stationsFetching || _stationsRefreshed) return;
     _stationsFetching = true;
     try {
-      final directory = (await widget.stationRepository.stations()).valueOrNull;
-      if (directory != null && directory.isNotEmpty) _stations = directory;
+      if (_stations.isEmpty) {
+        final saved = await widget.stationRepository.saved();
+        if (saved != null) _useStations(saved);
+      }
+      final directory = (await widget.stationRepository.refresh()).valueOrNull;
+      if (directory != null && directory.isNotEmpty) _useStations(directory);
+      _stationsRefreshed = _stations.isNotEmpty;
     } finally {
       _stationsFetching = false;
     }
   }
 
+  void _useStations(Map<String, SeismicStation> directory) {
+    _stations = directory;
+    widget.alerts.place(stations: directory);
+  }
+
   void _onRts() {
+    widget.alerts.track(widget.rts.state);
     unawaited(_updateRts());
     unawaited(_updateBox());
   }
@@ -760,7 +790,7 @@ class _ReplayMapState extends State<_ReplayMap> {
     final controller = _controller;
     final grid = _boxGrid;
     if (controller == null || !_ready || grid == null) return;
-    final hasBox = widget.rts.box.isNotEmpty;
+    final hasBox = widget.alerts.alerting;
     if (!hasBox) return;
     final (:geoJson, :signature) = _boxGeoJson(grid);
     // This runs at the page's 5 Hz tick as well as on every poll, and the
@@ -918,23 +948,19 @@ class _ReplayMapState extends State<_ReplayMap> {
   }
 
   Map<String, dynamic> _rtsGeoJson() {
-    // Large event: the feed also carries box-grid data. The legacy monitor
+    // Large event: alerting stations light the box grid. The legacy monitor
     // decluttered to just the stations that registered something and badged
     // each with its discrete reading — ported here as a circular badge (see
     // [MonitorLayerIds.stationBadge]), never a shape swap: the dot underneath is
     // still the same circle, the badge is just a fuller circle drawn over it.
-    final hasBox = widget.rts.box.isNotEmpty;
+    final hasBox = widget.alerts.alerting;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final features = <Map<String, dynamic>>[];
     for (final entry in widget.rts.stations.entries) {
       final station = _stations[entry.key];
       if (station == null) continue;
       final data = entry.value;
-      // The value actually shown — an alerting station's badge/colour come
-      // from the broadcast discrete reading, not its own raw sensor value,
-      // exactly like the legacy monitor's `alert ? I : i` split.
-      final effective = data.alert ? data.intensity : data.intensityRaw;
-      final level = Intensity.toScale(effective);
+      final level = Intensity.toScale(data.intensity);
       // A calm, non-alerting 0 would otherwise paper the whole island in
       // identical dots while the shaking area gets lost in the crowd.
       if (hasBox && level == 0 && !data.alert) continue;
@@ -945,11 +971,11 @@ class _ReplayMapState extends State<_ReplayMap> {
           'coordinates': [station.longitude, station.latitude],
         },
         'properties': {
-          'i': data.intensityRaw,
-          // Sort key for both the dot and the badge layer — see
-          // [monitorSortKey] for why this must be [effective], not the raw `i`.
-          'sort': effective,
-          'label': '${entry.key}\n${data.intensityRaw.toStringAsFixed(1)}',
+          'i': data.intensity,
+          // Sort key for both the dot and the badge layer, so a stronger
+          // reading always draws over a weaker one.
+          'sort': data.intensity,
+          'label': '${entry.key}\n${data.intensity.toStringAsFixed(1)}',
           'icon': hasBox && level > 0
               ? monitorBadgeIcon(level, dark: dark)
               : '',
@@ -982,9 +1008,8 @@ class _ReplayMapState extends State<_ReplayMap> {
     final now = widget.clock.now();
     final features = <Map<String, dynamic>>[];
     final signature = StringBuffer();
-    for (final entry in widget.rts.box.entries) {
-      final id = int.tryParse(entry.key);
-      final ring = id == null ? null : grid.rings[id];
+    for (final entry in widget.alerts.areas.boxes.entries) {
+      final ring = grid.rings[entry.key];
       if (ring == null) continue;
       if (table != null && _isBoxFullyCovered(ring, table, now)) continue;
       signature
