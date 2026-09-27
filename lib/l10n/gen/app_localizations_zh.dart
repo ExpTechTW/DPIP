@@ -1830,7 +1830,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return '延遲 $value s';
+    return '延遲 $value ms';
   }
 
   @override
@@ -5127,7 +5127,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String monitorDelay(String value) {
-    return '延迟 $value s';
+    return '延迟 $value ms';
   }
 
   @override
@@ -8424,7 +8424,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String monitorDelay(String value) {
-    return '延遲 $value s';
+    return '延遲 $value ms';
   }
 
   @override
@@ -11721,7 +11721,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String monitorDelay(String value) {
-    return '延遲 $value s';
+    return '延遲 $value ms';
   }
 
   @override

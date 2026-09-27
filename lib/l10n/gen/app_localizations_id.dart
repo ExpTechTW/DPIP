@@ -1877,7 +1877,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return 'Latensi $value s';
+    return 'Latensi $value ms';
   }
 
   @override

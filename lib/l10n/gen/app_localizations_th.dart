@@ -1868,7 +1868,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return 'หน่วงเวลา $value s';
+    return 'หน่วงเวลา $value ms';
   }
 
   @override

@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} 명",
   "lightningLegendCc": "구름 사이 · {minutes}분 이내",
   "meshtasticSendHint": "브로드캐스트할 메시지",
-  "monitorDelay": "지연 {value} s",
+  "monitorDelay": "지연 {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

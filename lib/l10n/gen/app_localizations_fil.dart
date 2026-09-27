@@ -1883,7 +1883,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return 'Pagkaantala $value s';
+    return 'Pagkaantala $value ms';
   }
 
   @override

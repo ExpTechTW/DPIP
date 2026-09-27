@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} คน",
   "lightningLegendCc": "เมฆสู่เมฆ · {minutes} นาที",
   "meshtasticSendHint": "ข้อความที่จะส่ง",
-  "monitorDelay": "หน่วงเวลา {value} s",
+  "monitorDelay": "หน่วงเวลา {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

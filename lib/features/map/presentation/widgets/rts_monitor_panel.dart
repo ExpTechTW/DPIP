@@ -1,7 +1,7 @@
 /// The 強震監視器 overlay UI: the active EEW alert as a card (tap to cycle
 /// through more than one, same as the report replay page's map overlay) above
 /// a bottom freshness strip showing the feed status, the snapshot time, and the
-/// live latency (s). The intensity legend lives on the scaffold via
+/// live latency (ms). The intensity legend lives on the scaffold via
 /// [MapLayer.buildLegend].
 library;
 
@@ -322,7 +322,7 @@ class _EewAlert extends StatelessWidget {
 }
 
 /// A compact bottom card: status dot + title + the snapshot time, then the live
-/// latency in seconds (or the feed status word when not live). While an EEW
+/// latency in milliseconds (or the feed status word when not live). While an EEW
 /// alert is active it turns red-on-`errorContainer` as a whole — the legacy
 /// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
 /// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so the
@@ -374,9 +374,7 @@ class _StatusBar extends StatelessWidget {
     ) = switch (state.status) {
       RealtimeStatus.live => (
         Colors.green,
-        delayMs == null
-            ? l10n.monitorWaiting
-            : l10n.monitorDelay((delayMs / 1000).toStringAsFixed(1)),
+        delayMs == null ? l10n.monitorWaiting : l10n.monitorDelay('$delayMs'),
         _delayColor(delayMs),
       ),
       RealtimeStatus.stale => (Colors.amber, l10n.feedStale, colors.tertiary),

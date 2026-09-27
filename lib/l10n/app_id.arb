@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} orang",
   "lightningLegendCc": "Awan–awan · {minutes} mnt",
   "meshtasticSendHint": "Pesan untuk disiarkan",
-  "monitorDelay": "Latensi {value} s",
+  "monitorDelay": "Latensi {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

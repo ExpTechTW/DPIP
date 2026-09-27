@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} 人",
   "lightningLegendCc": "雲間 · {minutes} 分內",
   "meshtasticSendHint": "要廣播的訊息",
-  "monitorDelay": "延遲 {value} s",
+  "monitorDelay": "延遲 {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

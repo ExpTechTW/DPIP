@@ -3576,10 +3576,10 @@ abstract class AppLocalizations {
   /// **'Message to broadcast'**
   String get meshtasticSendHint;
 
-  /// RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in seconds — pre-formatted to one decimal, e.g. "0.3"
+  /// RTS monitor latency: how far behind the latest frame is (calibrated now minus the frame timestamp), in whole milliseconds, e.g. "320"
   ///
   /// In en, this message translates to:
-  /// **'Delay {value} s'**
+  /// **'Delay {value} ms'**
   String monitorDelay(String value);
 
   /// Negative value in the disaster-map detail sheet
