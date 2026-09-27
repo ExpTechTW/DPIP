@@ -65,6 +65,7 @@ import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
+import 'package:dpip/shared/widgets/intensity_ranking_card.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -85,8 +86,8 @@ class ReportReplayPage extends StatefulWidget {
 class _ReportReplayPageState extends State<ReportReplayPage> {
   late final ReplaySession _session;
 
-  /// The boxes each replayed frame lights — the same logic the live monitor
-  /// runs, fed from this session.
+  /// The boxes each replayed frame lights and the minute-long township
+  /// ranking — the same logic the live monitor runs, fed from this session.
   final RtsAlertTracker _alerts = RtsAlertTracker();
 
   /// Bumped on a fixed cadence so the displayed clock, the EEW countdown, and
@@ -331,6 +332,18 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                           },
                         ),
                       ),
+                      ListenableBuilder(
+                        listenable: _session.rts,
+                        builder: (context, _) {
+                          final towns = context.read<TownDirectory>();
+                          return IntensityRankingCard(
+                            entries: [
+                              for (final row in _alerts.ranking(towns.byCode))
+                                (name: row.name, level: row.level),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -421,7 +434,8 @@ class _ReplayMap extends StatefulWidget {
   final Future<RtsBoxGrid> boxGrid;
   final RtsRealtimeController rts;
 
-  /// Lit areas, owned by the page and fed here on every frame.
+  /// Lit areas and the ranking, owned by the page (which shows the ranking)
+  /// and fed here on every frame.
   final RtsAlertTracker alerts;
   final EewRealtimeController eew;
   final ValueNotifier<int> tick;

@@ -132,6 +132,7 @@
   },
   "locationBannerFix": "設定を開く",
   "mapLegendExpand": "凡例",
+  "monitorIntensityRanking": "各地の震度順位",
   "eewNone": "現在、緊急地震速報はありません",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "津波情報・津波警報",

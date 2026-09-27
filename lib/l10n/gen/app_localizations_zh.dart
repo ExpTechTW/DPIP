@@ -318,6 +318,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLegendExpand => '圖例';
 
   @override
+  String get monitorIntensityRanking => '各地震度排行';
+
+  @override
   String get eewNone => '目前沒有地震速報';
 
   @override
@@ -3610,6 +3613,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapLegendExpand => '图例';
+
+  @override
+  String get monitorIntensityRanking => '各地震度排行';
 
   @override
   String get eewNone => '当前没有地震预警';
@@ -6906,6 +6912,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLegendExpand => '圖例';
 
   @override
+  String get monitorIntensityRanking => '各地震度排行';
+
+  @override
   String get eewNone => '目前沒有地震速報';
 
   @override
@@ -10198,6 +10207,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapLegendExpand => '圖例';
+
+  @override
+  String get monitorIntensityRanking => '各地震度排行';
 
   @override
   String get eewNone => '目前沒有地震速報';

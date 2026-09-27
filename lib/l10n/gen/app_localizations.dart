@@ -696,6 +696,12 @@ abstract class AppLocalizations {
   /// **'Legend'**
   String get mapLegendExpand;
 
+  /// Title of the monitor map's list of the townships that shook hardest in the last minute.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity ranking'**
+  String get monitorIntensityRanking;
+
   /// Calm state of the earthquake monitor when the live feed reports no alert
   ///
   /// In en, this message translates to:

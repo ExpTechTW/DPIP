@@ -248,6 +248,9 @@ abstract class RasterTimelineLayer implements MapLayer {
   Widget buildMapOverlay(BuildContext context) => const SizedBox.shrink();
 
   @override
+  Widget? buildLegendAccessory(BuildContext context) => null;
+
+  @override
   bool get overlayFollowsCamera => true;
 
   @override
