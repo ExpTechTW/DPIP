@@ -1,7 +1,7 @@
 import Foundation
 
 struct ForecastWidgetPoint: Codable, Equatable, Sendable {
-    /// API-supplied HH:mm label only; no date or hour offset is inferred.
+    /// API-supplied HH:mm label only; no date or hour offset is persisted.
     let time: String
     /// Forecast air temperature in degrees Celsius.
     let temperature: Double
@@ -16,8 +16,8 @@ struct ForecastWidgetPoint: Codable, Equatable, Sendable {
 
     init?(time: String, temperature: Double, weather: String,
           weatherCode: Int, pop: Int?) {
-        guard Self.isValidClockLabel(time), temperature.isFinite,
-              !weather.isEmpty else {
+        guard Self.minutesSinceMidnight(time) != nil, temperature.isFinite,
+              !weather.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return nil
         }
         self.time = time
@@ -54,14 +54,15 @@ struct ForecastWidgetPoint: Codable, Equatable, Sendable {
         self = point
     }
 
-    private static func isValidClockLabel(_ value: String) -> Bool {
+    static func minutesSinceMidnight(_ value: String) -> Int? {
         let bytes = Array(value.utf8)
         guard bytes.count == 5, bytes[2] == 58,
               [0, 1, 3, 4].allSatisfy({ (48...57).contains(bytes[$0]) })
-        else { return false }
+        else { return nil }
         let hour = Int(bytes[0] - 48) * 10 + Int(bytes[1] - 48)
         let minute = Int(bytes[3] - 48) * 10 + Int(bytes[4] - 48)
-        return hour < 24 && minute < 60
+        guard hour < 24 && minute < 60 else { return nil }
+        return hour * 60 + minute
     }
 }
 
@@ -83,7 +84,7 @@ struct ForecastWidgetSnapshot: Codable, Sendable {
             sourceIdentifier: sourceIdentifier
         ), WidgetResolvedWeatherLocationValidation.isValidRegionCode(regionCode),
               updateTime > 0, receivedAt > 0,
-              (1...5).contains(points.count) else { return nil }
+              !points.isEmpty else { return nil }
         if case .saved(let code) = address, code != regionCode { return nil }
         self.schemaVersion = Self.schemaVersion
         self.sourceIdentifier = sourceIdentifier
