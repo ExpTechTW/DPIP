@@ -17,6 +17,7 @@ import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_alert_tracker.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_mark.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -378,7 +379,25 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     unawaited(_pushUpdate());
   }
 
-  void _onEew() => unawaited(_pushEew());
+  /// Whether an EEW is out on a live feed — which decides which stations the
+  /// monitor draws (see [rtsStationMark]).
+  bool get _eewActive =>
+      _eew.state.status == RealtimeStatus.live &&
+      (_eew.state.data?.isNotEmpty ?? false);
+
+  /// The [_eewActive] the station dots on the map were drawn for.
+  bool _dotsDrawnForEew = false;
+
+  void _onEew() {
+    // An alert arriving or leaving changes which stations are drawn, not just
+    // the wavefront — the dots go again, and the update ends with the EEW.
+    if (_eewActive != _dotsDrawnForEew) {
+      _lastSent = null;
+      unawaited(_pushUpdate());
+    } else {
+      unawaited(_pushEew());
+    }
+  }
 
   /// Whether the hosting surface can currently be seen. The feeds keep
   /// polling either way — they are safety feeds and the monitor panel's
@@ -843,21 +862,20 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
 
   Map<String, dynamic> _geoJson() {
     final live = _feed.state.data?.stations ?? const <String, RtsStation>{};
-    // Large event: alerting stations light the box grid. The legacy monitor
-    // decluttered to just the stations that registered something and badged
-    // each with its discrete reading — ported here as a circular badge (see
-    // [MonitorLayerIds.stationBadge]), never a shape swap: the dot underneath
-    // is still the same circle, the badge is just a fuller one drawn over it.
-    final hasBox = _alerts.alerting;
+    final eventLit = _alerts.alerting;
+    final eewActive = _eewActive;
+    _dotsDrawnForEew = eewActive;
     final features = <Map<String, dynamic>>[];
     for (final entry in live.entries) {
       final station = _stations[entry.key];
       if (station == null) continue;
       final data = entry.value;
-      final level = Intensity.toScale(data.intensity);
-      // A calm, non-alerting 0 would otherwise paper the whole island in
-      // identical dots while the shaking area gets lost in the crowd.
-      if (hasBox && level == 0 && !data.alert) continue;
+      final mark = rtsStationMark(
+        data,
+        eventLit: eventLit,
+        eewActive: eewActive,
+      );
+      if (mark == null) continue;
       features.add({
         'type': 'Feature',
         'geometry': {
@@ -865,19 +883,17 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           'coordinates': [station.longitude, station.latitude],
         },
         'properties': {
-          'i': data.intensity,
+          'i': mark.colorValue,
           // Sort key for both the dot and the badge layer, so a stronger
           // reading always draws over a weaker one.
           'sort': data.intensity,
           'label': '${entry.key}\n${data.intensity.toStringAsFixed(1)}',
-          'icon': hasBox && level > 0
-              ? monitorBadgeIcon(level, dark: _dark)
+          // The badge is a fuller circle drawn over the same dot, never a
+          // shape swap (see [MonitorLayerIds.stationBadge]).
+          'icon': mark.kind == RtsStationMarkKind.badge
+              ? monitorBadgeIcon(mark.level, dark: _dark)
               : '',
-          // Only reachable when `alert` is true (the filter above already
-          // dropped a calm zero) — an alerting station reading a flat 0
-          // stays grey rather than a badge, matching the legacy monitor's
-          // separate `intensity0` layer.
-          'grey': hasBox && level == 0 ? 1 : 0,
+          'grey': mark.kind == RtsStationMarkKind.grey ? 1 : 0,
         },
       });
     }
