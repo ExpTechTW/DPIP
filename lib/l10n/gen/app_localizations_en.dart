@@ -1872,7 +1872,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return 'Delay $value s';
+    return 'Delay $value ms';
   }
 
   @override

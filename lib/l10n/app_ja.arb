@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} 人",
   "lightningLegendCc": "雲間 · {minutes} 分以内",
   "meshtasticSendHint": "送信するメッセージ",
-  "monitorDelay": "遅延 {value} s",
+  "monitorDelay": "遅延 {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

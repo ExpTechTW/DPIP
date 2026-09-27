@@ -1758,7 +1758,7 @@
   "reportDetailEpicenter": "Epicenter",
   "meshtasticVoltage": "Voltage",
   "@monitorDelay": {
-    "description": "RTS monitor latency: how far behind the latest snapshot is (calibrated now minus the snapshot timestamp), in seconds — pre-formatted to one decimal, e.g. \"0.3\"",
+    "description": "RTS monitor latency: how far behind the latest frame is (calibrated now minus the frame timestamp), in whole milliseconds, e.g. \"320\"",
     "placeholders": {
       "value": {
         "type": "String"
@@ -2522,7 +2522,7 @@
   "@dataEarthquakeSubtitle": {
     "description": "Subtitle under the Earthquake tile on the Data hub"
   },
-  "monitorDelay": "Delay {value} s",
+  "monitorDelay": "Delay {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} katao",
   "lightningLegendCc": "Ulap–ulap · {minutes} min",
   "meshtasticSendHint": "Mensaheng ipapadala",
-  "monitorDelay": "Pagkaantala {value} s",
+  "monitorDelay": "Pagkaantala {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

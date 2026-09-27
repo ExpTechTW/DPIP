@@ -1873,7 +1873,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return 'Độ trễ $value s';
+    return 'Độ trễ $value ms';
   }
 
   @override

@@ -1842,7 +1842,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return '지연 $value s';
+    return '지연 $value ms';
   }
 
   @override

@@ -914,7 +914,7 @@
   "shelterCapacityValue": "{n} người",
   "lightningLegendCc": "Mây–mây · {minutes} phút",
   "meshtasticSendHint": "Tin nhắn để phát",
-  "monitorDelay": "Độ trễ {value} s",
+  "monitorDelay": "Độ trễ {value} ms",
   "@meshtasticFirmware": {
     "description": "Firmware version"
   },

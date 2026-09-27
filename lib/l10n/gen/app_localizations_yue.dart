@@ -1830,7 +1830,7 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String monitorDelay(String value) {
-    return '延遲 $value s';
+    return '延遲 $value ms';
   }
 
   @override
