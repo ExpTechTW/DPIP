@@ -83,9 +83,9 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(IntensityLegend), findsOneWidget);
-    // The continuous instrumental scale runs down to −3, which the discrete
+    // The continuous instrumental scale runs down to 0, which the discrete
     // felt scale has no row for — so this is the mode, not just "a legend".
-    expect(find.text('-3'), findsOneWidget);
+    expect(find.text('0'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.expand_less));
     await _settle(tester);
@@ -100,7 +100,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.legend_toggle));
     await _settle(tester);
-    expect(find.text('-3'), findsOneWidget);
+    expect(find.text('0'), findsOneWidget);
 
     hasEew.value = true;
     await _settle(tester);
@@ -112,8 +112,8 @@ void main() {
       reason: 'the mode swap must not collapse the legend back to the chip',
     );
     // Now the discrete felt scale: 6⁺ exists here and nowhere on the
-    // instrumental ramp, whose lowest rows (−3) are gone.
+    // instrumental ramp, whose bottom row (0) is gone.
     expect(find.text('6⁺'), findsOneWidget);
-    expect(find.text('-3'), findsNothing);
+    expect(find.text('0'), findsNothing);
   });
 }
