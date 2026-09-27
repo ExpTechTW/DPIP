@@ -265,6 +265,7 @@
 				ForecastRemoteDTO.swift,
 				ForecastWidgetExpiry.swift,
 				ForecastWidgetRefreshService.swift,
+				ForecastWidgetSelection.swift,
 				ForecastWidgetSnapshot.swift,
 				ForecastWidgetSnapshotStore.swift,
 				SavedCurrentWeatherWidgetRefreshService.swift,

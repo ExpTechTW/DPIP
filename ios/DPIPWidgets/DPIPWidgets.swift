@@ -144,40 +144,9 @@ private func forecastIsNight(
     isCurrentlyNight: Bool,
     nextTransitionTime: Int
 ) -> Bool {
-    let parts = pointTime.split(separator: ":")
-    guard parts.count == 2,
-          let hour = Int(parts[0]),
-          let minute = Int(parts[1]),
-          (0...23).contains(hour),
-          (0...59).contains(minute)
-    else {
-        return isCurrentlyNight
-    }
-
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(identifier: "Asia/Taipei")!
-
-    let currentComponents = calendar.dateComponents(
-        [.hour, .minute],
-        from: entryDate
-    )
-
-    guard let currentHour = currentComponents.hour,
-          let currentMinute = currentComponents.minute
-    else {
-        return isCurrentlyNight
-    }
-
-    let currentMinutes = currentHour * 60 + currentMinute
-    let forecastMinutes = hour * 60 + minute
-
-    var minutesAhead = forecastMinutes - currentMinutes
-
-    if minutesAhead < 0 {
-        minutesAhead += 24 * 60
-    }
-
-    guard minutesAhead <= 12 * 60 else {
+    guard let minutesAhead = ForecastWidgetSelection.minutesAhead(
+        for: pointTime, at: entryDate
+    ) else {
         return isCurrentlyNight
     }
 
@@ -392,7 +361,7 @@ private struct MediumCurrentWeatherView: View {
                    !forecast.points.isEmpty {
                     HourlyForecastSection(
                         forecast: forecast,
-                        compact: true,
+                        family: .systemMedium,
                         entryDate: entry.date,
                         isCurrentlyNight: entry.isNight,
                         nextTransitionTime: snapshot.nextDayNightTransitionTime
@@ -513,7 +482,7 @@ private struct LargeCurrentWeatherView: View {
                    !forecast.points.isEmpty {
                     HourlyForecastSection(
                         forecast: forecast,
-                        compact: false,
+                        family: .systemLarge,
                         entryDate: entry.date,
                         isCurrentlyNight: entry.isNight,
                         nextTransitionTime: snapshot.nextDayNightTransitionTime
@@ -697,36 +666,36 @@ private struct HourlyForecastPointView: View {
 
 private struct HourlyForecastSection: View {
     let forecast: ForecastWidgetSnapshot
-    let compact: Bool
+    let family: WidgetFamily
 
     let entryDate: Date
     let isCurrentlyNight: Bool
     let nextTransitionTime: Int
 
     var body: some View {
-        VStack(
-            alignment: .leading,
-            spacing: compact ? 4 : 12
-        ) {
-            HStack(
-                alignment: .top,
-                spacing: compact ? 4 : 8
+        let points = ForecastWidgetFamilyPolicy.visiblePoints(
+            in: forecast, at: entryDate, family: family
+        )
+        let compact = family == .systemMedium
+        if !points.isEmpty {
+            VStack(
+                alignment: .leading,
+                spacing: compact ? 4 : 12
             ) {
-                ForEach(
-                    Array(forecast.points.enumerated()),
-                    id: \.offset
-                ) { _, point in
-                    HourlyForecastPointView(
-                        point: point,
-                        compact: compact,
-                        entryDate: entryDate,
-                        isCurrentlyNight: isCurrentlyNight,
-                        nextTransitionTime: nextTransitionTime
-                    )
-                        .frame(
-                            maxWidth: .infinity,
-                            alignment: .center
+                HStack(
+                    alignment: .top,
+                    spacing: compact ? 4 : 8
+                ) {
+                    ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+                        HourlyForecastPointView(
+                            point: point,
+                            compact: compact,
+                            entryDate: entryDate,
+                            isCurrentlyNight: isCurrentlyNight,
+                            nextTransitionTime: nextTransitionTime
                         )
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
             }
         }
