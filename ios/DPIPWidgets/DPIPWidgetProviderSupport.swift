@@ -10,6 +10,17 @@ enum ForecastWidgetFamilyPolicy {
             return false
         }
     }
+
+    static func visiblePoints(
+        in forecast: ForecastWidgetSnapshot,
+        at date: Date,
+        family: WidgetFamily
+    ) -> [ForecastWidgetPoint] {
+        guard supportsForecast(family) else { return [] }
+        return ForecastWidgetSelection.upcomingPoints(
+            forecast.points, at: date, limit: 5
+        )
+    }
 }
 
 #if DEBUG
