@@ -9,6 +9,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
+import 'package:flutter/foundation.dart' show protected;
 
 /// How a source decides an SSE feed is currently "alive", given that a poll
 /// channel measures freshness from the last successful [RealtimeSource.fetch].
@@ -57,8 +58,8 @@ class SseLiveness {
 ///
 /// Subclasses supply the feed specifics ([decode] plus
 /// [RealtimeSource.timestampOf]/[RealtimeSource.sameData]); the connection
-/// factory and liveness policy come through the constructor. A future
-/// continuous feed (RTS) reuses this with [SseLiveness.eventRecency].
+/// factory, liveness policy and payload event name come through the
+/// constructor. A continuous feed (RTS) uses [SseLiveness.eventRecency].
 abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   SseRealtimeSource({
     required this._connect,
@@ -66,6 +67,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     Elapsed? elapsed,
     Future<void> Function(Duration delay)? delay,
     this._label = 'sse',
+    this._payloadEvent = 'g',
   }) : _elapsed = elapsed ?? SystemElapsed(),
        _delay = delay ?? _defaultDelay;
 
@@ -78,10 +80,18 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   final Future<void> Function(Duration delay) _delay;
   final String _label;
 
+  /// The event name whose `data:` is a base64-gzipped payload: `g` under the
+  /// LB feeds' `compress=1`, the topic itself (`trem.rts.v1`) on the TREM
+  /// stream, which compresses every topic frame and names each for its topic.
+  final String _payloadEvent;
+
   /// The default server reconnect hint, refined by any `retry:` frame.
   Duration _serverRetry = const Duration(seconds: 3);
 
   StreamSubscription<SseEvent>? _subscription;
+
+  /// The connection [renew] opened, until it speaks and takes over.
+  StreamSubscription<SseEvent>? _pending;
   bool _started = false;
   bool _connected = false;
   bool _hasSnapshot = false;
@@ -119,16 +129,27 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   /// full copy of every frame fewer — on the UI isolate, every second.
   T decodeBytes(Uint8List utf8Json) => decode(utf8.decode(utf8Json));
 
+  /// What a connected feed with nothing fresh to report stands for — or null
+  /// (the default), when that silence is itself the fault the liveness policy
+  /// exists to catch.
+  ///
+  /// A feed the server only speaks on when something happens (the TREM
+  /// stream's sleep mode sends an RTS frame only while a station is alerting)
+  /// returns its calm value here: its silence *is* the answer, and reading it
+  /// as a dead feed would age a healthy connection to offline between events.
+  T? get quiet => null;
+
   @override
   Future<Result<T>> fetch() async {
     if (_disposed) {
       return const Err(NetworkFailure('SSE source disposed'));
     }
     _ensureStarted();
-    if (_connected && _hasSnapshot && _isFresh) {
-      return Ok(_latest as T);
-    }
-    return Err(NetworkFailure('$_label SSE not connected'));
+    if (!_connected) return Err(NetworkFailure('$_label SSE not connected'));
+    if (_hasSnapshot && _isFresh) return Ok(_latest as T);
+    final quiet = this.quiet;
+    if (quiet != null) return Ok(quiet);
+    return Err(NetworkFailure('$_label SSE has nothing fresh'));
   }
 
   /// Whether the buffered payload counts as fresh under the liveness policy.
@@ -150,6 +171,8 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     if (_disposed || _paused) return;
     _paused = true;
     _generation++; // orphan any backoff still counting down
+    _pending?.cancel();
+    _pending = null;
     _subscription?.cancel();
     _subscription = null;
     _connected = false;
@@ -178,6 +201,10 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     if (_disposed || _paused) return;
     _connected = false;
     _hasSnapshot = false;
+    // A fresh connection reads the current parameters anyway, so a handover
+    // still in flight has nothing left to deliver.
+    _pending?.cancel();
+    _pending = null;
     // Belt and braces: the generation guard should mean there is never a live
     // subscription here, but the assignment below would orphan one silently
     // rather than fail, and an orphaned SSE socket is exactly the kind of leak
@@ -185,13 +212,61 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     _subscription?.cancel();
     _subscription = _connect().listen(
       _onEvent,
-      onError: (Object error, StackTrace stackTrace) {
-        Log.warning('[$_label] SSE connection error: $error');
-        _onClosed();
-      },
+      onError: _onError,
       onDone: _onClosed,
       cancelOnError: true,
     );
+  }
+
+  /// Swaps the connection for a fresh one without a gap — for a subclass whose
+  /// connection parameters just changed (the RTS stream's mode).
+  ///
+  /// The new connection opens *alongside* the current one and takes over on
+  /// its first frame (the server's greeting), so the feed never drops to
+  /// nothing while the swap is in flight. If it fails before then, the swap
+  /// falls back to an ordinary reconnect: the old connection still carries the
+  /// old parameters, and keeping it would leave the change quietly unapplied.
+  ///
+  /// Before the first [fetch], or while paused, there is nothing to swap —
+  /// the next open reads the new parameters on its own.
+  @protected
+  void renew() {
+    if (_disposed || _paused || !_started) return;
+    _pending?.cancel();
+    final pending = _connect().listen(null, cancelOnError: true);
+    _pending = pending;
+    pending
+      ..onData((event) {
+        _pending = null;
+        // A reconnect the old connection's loss had queued would only replace
+        // this one.
+        _generation++;
+        _subscription?.cancel();
+        _subscription = pending;
+        pending
+          ..onData(_onEvent)
+          ..onError(_onError)
+          ..onDone(_onClosed);
+        _onEvent(event);
+      })
+      ..onError((Object error, StackTrace _) {
+        Log.warning('[$_label] SSE handover failed: $error');
+        _abandonHandover(pending);
+      })
+      ..onDone(() => _abandonHandover(pending));
+  }
+
+  void _abandonHandover(StreamSubscription<SseEvent> pending) {
+    if (!identical(_pending, pending)) return;
+    _pending = null;
+    _generation++; // the reconnect below supersedes any already queued
+    _subscription?.cancel();
+    _onClosed();
+  }
+
+  void _onError(Object error, StackTrace _) {
+    Log.warning('[$_label] SSE connection error: $error');
+    _onClosed();
   }
 
   void _onEvent(SseEvent event) {
@@ -200,14 +275,14 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     _attempt = 0; // the connection is delivering — reset the backoff
     final retry = event.retry;
     if (retry != null) _serverRetry = retry;
-    // A payload arrives either as the default event (plain JSON) or, under the
-    // `compress=1` flag, as `event: g` whose data is base64-gzipped JSON —
-    // decompressed here at the application layer.
-    if (event.name == _compressedEvent || event.isDefault) {
+    // A payload arrives either as the default event (plain JSON) or as the
+    // payload event, whose data is base64-gzipped JSON — decompressed here at
+    // the application layer.
+    if (event.name == _payloadEvent || event.isDefault) {
       try {
         // Metadata-only frames carry no payload: skipped before decoding on
         // either path, exactly as the empty-string check did.
-        if (event.name == _compressedEvent) {
+        if (event.name == _payloadEvent) {
           final bytes = gzip.decode(base64.decode(event.data.trim()));
           if (bytes.isEmpty) return;
           _latest = decodeBytes(
@@ -224,12 +299,18 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
         Log.handle(error, stackTrace, '[$_label] SSE decode');
       }
     } else if (event.name == 'info') {
-      Log.debug('[$_label] SSE served by ${event.data}');
+      // The TREM stream's greeting lists what it would not grant under
+      // `denied` — a topic this source is waiting on that will never arrive.
+      if (event.data.contains('"denied"')) {
+        Log.warning('[$_label] SSE refused a topic: ${event.data}');
+      } else {
+        Log.debug('[$_label] SSE served by ${event.data}');
+      }
+    } else if (event.name == 'unsubscribed' || event.name == 'close') {
+      // The server says why it dropped a topic, or the stream, only here.
+      Log.warning('[$_label] SSE ${event.name}: ${event.data}');
     }
   }
-
-  /// ExpTech's `compress=1` streams the payload as `event: g` (base64 gzip).
-  static const String _compressedEvent = 'g';
 
   void _onClosed() {
     _subscription = null;
@@ -260,6 +341,8 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   @override
   void dispose() {
     _disposed = true;
+    _pending?.cancel();
+    _pending = null;
     _subscription?.cancel();
     _subscription = null;
   }

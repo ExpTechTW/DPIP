@@ -27,6 +27,9 @@ class _TestSseSource extends SseRealtimeSource<String> {
          label: 'test',
        );
 
+  /// Exposes the protected swap to the tests.
+  void swap() => renew();
+
   @override
   String decode(String data) {
     if (data == 'bad') throw const FormatException('bad');
@@ -339,4 +342,90 @@ void main() {
       );
     });
   });
+
+  group('SseRealtimeSource — renew (a change of connection parameters)', () {
+    test(
+      'a swap that fails before its greeting falls back to a reconnect',
+      () async {
+        final h = _Harness();
+        await h.source.fetch();
+        h.current.add(const SseEvent(data: 'a'));
+        await pumpEventQueue();
+        final old = h.current;
+
+        h.source.swap();
+        final pending = h.current;
+        await pending.close();
+        await pumpEventQueue();
+
+        // The old connection carries the old parameters: keeping it would leave
+        // the change quietly unapplied, so it goes and a reconnect is queued.
+        expect(old.hasListener, isFalse);
+        expect(h.delays, hasLength(1));
+        h.delays.single.complete();
+        await pumpEventQueue();
+        expect(h.connects, hasLength(3));
+      },
+    );
+
+    test('a swap before the first fetch opens nothing', () async {
+      final h = _Harness();
+      h.source.swap();
+      expect(h.connects, isEmpty);
+    });
+
+    test('a swap orphans a reconnect the old connection had queued', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      await h.current.close();
+      await pumpEventQueue();
+      expect(h.delays, hasLength(1), reason: 'a reconnect is waiting');
+
+      h.source.swap();
+      h.current.add(const SseEvent(name: 'info', data: '{}'));
+      await pumpEventQueue();
+      h.delays.single.complete();
+      await pumpEventQueue();
+
+      expect(h.connects, hasLength(2), reason: 'no third, stray connection');
+    });
+  });
+
+  group('SseRealtimeSource — named payload event', () {
+    test(
+      'a topic-named frame is read when that is the payload event',
+      () async {
+        final connects = <StreamController<SseEvent>>[];
+        final source = _TopicSource(
+          connect: () {
+            final c = StreamController<SseEvent>();
+            connects.add(c);
+            return c.stream;
+          },
+        );
+        await source.fetch();
+        final packed = base64.encode(gzip.encode(utf8.encode('shaken')));
+        connects.last
+          ..add(SseEvent(name: 'g', data: packed))
+          ..add(const SseEvent(name: 'trem.other.v1', data: 'x'));
+        await pumpEventQueue();
+        expect((await source.fetch()).isOk, isFalse, reason: 'not its topic');
+
+        connects.last.add(SseEvent(name: 'trem.rts.v1', data: packed));
+        await pumpEventQueue();
+        expect((await source.fetch()).valueOrNull, 'shaken');
+      },
+    );
+  });
+}
+
+class _TopicSource extends SseRealtimeSource<String> {
+  _TopicSource({required super.connect})
+    : super(label: 'topic', payloadEvent: 'trem.rts.v1');
+
+  @override
+  String decode(String data) => data;
+
+  @override
+  DateTime? timestampOf(String value) => null;
 }
