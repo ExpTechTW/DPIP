@@ -291,9 +291,10 @@ void main() {
       reason: 'the untouched far box must stay drawn',
     );
 
-    // Station dots: every live station is present as a feature…
+    // Station dots: with an EEW out only the alerting stations are drawn —
+    // the calm TWD002 is left off, as TREM-Lite leaves it off…
     final dots = stationsOnMap(controller);
-    expect(dots, hasLength(3));
+    expect(dots, hasLength(2));
     // …and each carries the shake values the layer re-publishes.
     for (final dot in dots) {
       final i = dot['properties']['i'] as num;
@@ -466,54 +467,63 @@ void main() {
     expect(controller.belowOf('rts-eew-s-fill'), landLayerId);
   });
 
-  test(
-    'a large event declutters to shaking stations, badged with the discrete '
-    'reading on a circle — legacy behaviour, ported without the square badge',
-    () async {
-      final origin = DateTime.now().toUtc().subtract(
-        const Duration(seconds: 5),
-      );
-      final built = await _build(
-        rts: Rts(
-          time: origin.millisecondsSinceEpoch,
-          stations: const {
-            // Shaking and alerting — must stay, badged with its discrete
-            // reading (matching the legacy badge's number, minus the square).
-            'TWD001': RtsStation(pga: 40, intensity: 4.0, alert: true),
-            // Calm and not alerting — must drop out entirely, or a big event
-            // paints the whole island in identical dots and buries where the
-            // shaking actually is.
-            'TWD002': RtsStation(pga: 0, intensity: 0.0, alert: false),
-            // Alerting but reading a flat 0 — stays on the map (unlike
-            // TWD002) but as a plain grey dot, not a numbered badge: the
-            // legacy monitor's separate `intensity0` layer painted exactly
-            // this case grey rather than the continuous ramp's near-zero
-            // pale colour.
-            'TWD003': RtsStation(pga: 0, intensity: 0.0, alert: true),
-          },
-        ),
-        alerts: const [],
-        table: table,
-        grid: grid,
-      );
-      final controller = _RecordingController();
-      await built.layer.render(controller);
-      await pumpEventQueue();
+  // TREM-Lite's station rules (see `rts_station_mark.dart`): an alerting
+  // station in a lit event wears its intensity badge; everything else is a
+  // dot — and only once an EEW is out are the non-alerting stations left off.
+  const eventStations = {
+    // Alerting and shaking: always the badge.
+    'TWD001': RtsStation(pga: 40, intensity: 4.0, alert: true),
+    // Calm and not alerting.
+    'TWD002': RtsStation(pga: 0, intensity: 0.3),
+    // Alerting but reading a flat 0.
+    'TWD003': RtsStation(pga: 0, intensity: 0.0, alert: true),
+  };
 
-      final drawn = stationsOnMap(controller);
-      expect(
-        drawn,
-        hasLength(2),
-        reason: 'the calm, non-alerting station must be decluttered away',
-      );
-      final byLabel = {
-        for (final f in drawn) (f['properties']! as Map)['label']: f,
-      };
+  Future<Map<Object?, Map<String, dynamic>>> drawEvent(List<Eew> alerts) async {
+    final origin = DateTime.now().toUtc().subtract(const Duration(seconds: 5));
+    final built = await _build(
+      rts: Rts(time: origin.millisecondsSinceEpoch, stations: eventStations),
+      alerts: alerts,
+      table: table,
+      grid: grid,
+    );
+    final controller = _RecordingController();
+    await built.layer.render(controller);
+    await pumpEventQueue();
+    return {
+      for (final f in stationsOnMap(controller))
+        (f['properties']! as Map)['label']: f,
+    };
+  }
+
+  test(
+    'without an EEW nothing is hidden: calm stations stay as dots',
+    () async {
+      final byLabel = await drawEvent(const []);
+
+      expect(byLabel.keys, hasLength(3), reason: 'no station is left off');
       // The badge carries the number — the plain "id\nreading" label is
       // untouched, so the station is never left unidentified.
       expect(byLabel['TWD001\n4.0']!['properties']['icon'], 'circle-4');
-      expect(byLabel['TWD001\n4.0']!['properties']['grey'], 0);
+      expect(byLabel['TWD002\n0.3']!['properties']['icon'], '');
+      expect(byLabel['TWD002\n0.3']!['properties']['i'], 0.3);
+      // Alerting at 0 with no EEW: a dot at level 0, not the grey marker.
+      expect(byLabel['TWD003\n0.0']!['properties']['grey'], 0);
       expect(byLabel['TWD003\n0.0']!['properties']['icon'], '');
+    },
+  );
+
+  test(
+    'with an EEW out only alerting stations are drawn, a flat 0 grey',
+    () async {
+      final byLabel = await drawEvent([
+        _alert(
+          origin: DateTime.now().toUtc().subtract(const Duration(seconds: 5)),
+        ),
+      ]);
+
+      expect(byLabel.keys, isNot(contains('TWD002\n0.3')));
+      expect(byLabel['TWD001\n4.0']!['properties']['icon'], 'circle-4');
       expect(byLabel['TWD003\n0.0']!['properties']['grey'], 1);
     },
   );
