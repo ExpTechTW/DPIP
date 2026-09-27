@@ -130,7 +130,7 @@ void main() {
     final dio = dioWith(adapter);
     const urls = [
       'https://api.lb-tpe1.exptech.dev/api/v2/eq/eew',
-      'https://api.lb-tpe1.exptech.dev/api/v2/trem/rts',
+      'https://static.core-tnn1.exptech.dev/resource/station',
       'https://api.core-tnn1.exptech.dev/api/v2/location/1/tok/1.0/25,121',
       'https://api.core-tnn1.exptech.dev/api/v2/notify/tok',
       'https://api.core-tnn1.exptech.dev/api/v2/notify/tok/eew/1',

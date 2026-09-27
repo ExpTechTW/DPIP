@@ -31,10 +31,11 @@
 | 類別.方法 | 路徑 | 層級 | 主機（容錯順序 = 選定區域優先） |
 |---|---|---|---|
 | `EarthquakeApi.openEewSse` | `/api/v2/eq/eew?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `EarthquakeApi.openRtsSse` | `/api/v2/trem/rts?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `EarthquakeApi.getRtsRealtime` | `/api/v2/trem/rts` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `EarthquakeApi.openTremSse` | `/api/v1/trem/sse?topics=trem.rts.v1[&mode=live]` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `EarthquakeApi.getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `EarthquakeApi.getEewAt` | `/api/v2/eq/eew/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EarthquakeApi.getRtsAt` | `/api/v3/trem/rts/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `TremStationRepositoryImpl.refresh` | `/resource/station` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
@@ -43,17 +44,34 @@
 > 區間、`startTime`/`endTime` 為 **`YYYY-MM-DD`（Asia/Taipei 當日）**、可選
 > `city`/`cityMinInt`/`cityMaxInt`。`loc` 與經緯度篩選已移除。伺服器會把非正規
 > query **302** 到 canonical（參數字母序、去掉預設值）以利 ETag／快取。
-> `getEewAt` 是**歷史回放**（時間軸），tier 為 `coreApi`。
+> `getEewAt` / `getRtsAt` 是**歷史回放**（時間軸），tier 為 `coreApi`。
+> `getRtsAt` 的 `{sec}` 必須是 10 位數的 Unix 秒；剛過去的一兩分鐘可能只有一個
+> 區域歸檔好（實測 now−30 s：tnn1 200、tyo1 404），所以 404 是常態而非故障。
 
-> **即時串流走 SSE（gzip 壓縮），不是輪詢。** `?sse=1` 把端點切換成
+> **測站清單 `/resource/station` 是 CSV**（`Content-Type` 卻標成 JSON）：
+> `loc_code,id,lat,lon,floor,code,net,time,work`，`id` 是 RTS 用的 hex 裝置 id、
+> `code` 是鄉鎮代碼。每個區域的 nginx 各自產生弱 ETag（同檔不同值），帶
+> `If-None-Match` 回 **304**。App 自己帶驗證器、把最後一份成功的清單連同 ETag
+> 存進 `dpip.db` 的 `trem_station`（不是 HTTP 快取，那個會被系統清掉），
+> 開強震監視器時先畫存著的、再問一次伺服器。
+
+> **即時串流走 SSE（gzip 壓縮），不是輪詢。** EEW：`?sse=1` 把端點切換成
 > `text/event-stream`；再加 `&compress=1`，payload 會以 `event: g` 事件送出，其
-> `data:` 是 **base64 的 gzip**（解開後就是純 GET 的同一份 JSON，模型不變），由**應用層**
-> 在 `sse_realtime_source.dart` 解壓 —— 對 ~1 Hz 的 RTS 特別省流量。改為在變動時
-> 推送，而非每秒拉取。EEW（`openEewSse`）與 RTS（`openRtsSse`）都已上線走 SSE；
-> `getEewRealtime` / `getRtsRealtime` 保留為一次性快照。傳輸、緩衝與重連都藏在
-> `RealtimeSource` seam 後面（`core/realtime/sse_realtime_source.dart`）——
-> channel、過期分類器與生命週期都不變。EEW 是**突發型**（地震之間靜默 → 存活判定用
-> 「連線開著」）；RTS 是**連續型**（約 1 Hz → 存活判定用「最近有事件」）。
+> `data:` 是 **base64 的 gzip**（解開後就是純 GET 的同一份 JSON），由**應用層**在
+> `sse_realtime_source.dart` 解壓。`getEewRealtime` 保留為一次性快照。
+>
+> RTS 走 **TREM 串流** `/api/v1/trem/sse?topics=…`：一條連線可以帶多個 topic，
+> 每則事件以 topic 為名（`event: trem.rts.v1`），`data:` 一律是 base64 的 gzip，
+> 內容是 `rts.v1` JSON（`{ts, stations:{<hex id>:{i, pga?, alert?}}, eq}`，**沒有**
+> v2 的 `box`／`int`／`I`／`pgv` —— 由前端從 alert 測站推算）。連線一開先送
+> `retry:` 與 `event: info`（列出允許與 `denied` 的 topic）。不帶 `mode=live`
+> 時是**睡眠模式**：只送有測站 alert 的幀；App 只在強震監視器顯示時要
+> `mode=live`，換模式時先連新的、收到招呼才斷舊的。不要訂 `trem.eew.v1`
+> —— 那是 TREM 自己的 EEW，不是 CWA 的。
+>
+> 傳輸、緩衝與重連都藏在 `RealtimeSource` seam 後面 —— channel、過期分類器與
+> 生命週期都不變。EEW 是**突發型**（地震之間靜默 → 存活判定用「連線開著」）；
+> RTS live 時是**連續型**（約 2 Hz → 「最近有事件」），睡眠時靜默就是「平靜」。
 
 ## 沒多活備援 (single host, no failover)
 
@@ -228,12 +246,10 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 
 | 類別.方法 | 路徑 | 層級 | 使用處 |
 |---|---|---|---|
-| `TremStationRepositoryImpl.stations` | `/api/v1/trem/station` | `legacyApi` | 強震監視器測站 |
 | `EventApi.getHistoryList` | `/api/v1/dpip/history/list` | `legacyApi` | 事件頁（全國） |
 | `EventApi.getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | 事件頁（鄉鎮） |
 | `EventApi.getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | 首頁拖盤收起（全國生效中） |
 | `EventApi.getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | 首頁拖盤收起（鄉鎮生效中） |
-| `EarthquakeApi.getRtsAt` | `/api/v2/trem/rts/{sec}` | `legacyApi` | 強震波形回放（時間軸） |
 
 `/api/v1/dpip/event/{id}` 存在於 `api-1`，但 App 裡**沒有任何方法呼叫它** ——
 先前這裡列的 `getEvent` 並不存在於程式碼中。

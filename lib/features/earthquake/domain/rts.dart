@@ -4,41 +4,42 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'rts.freezed.dart';
 part 'rts.g.dart';
 
-/// A real-time station (RTS / TREM) shaking snapshot — the live intensity of
-/// every reporting seismic station, plus any triggered area intensities.
+/// One frame of the TREM real-time station network — `rts.v1`, the payload of
+/// the live `trem.rts.v1` topic and of the `/api/v3/trem/rts/{seconds}`
+/// archive alike, so live and replay decode through the one model.
 ///
-/// This is the payload the RTS feed streams (`/api/v2/trem/rts?sse=1`, the same
-/// JSON the plain GET returns). It is a continuous ~1 Hz feed, so the realtime
-/// source keys freshness off event recency (not [time], to stay clock-skew
-/// immune); [time] is the snapshot's server instant, kept for display. `box` /
-/// `intensities` stay flexibly typed (empty while calm) until the RTS map
-/// consumes them.
+/// It carries only what each station measured. The detection boxes and the
+/// per-township levels the old v2 feed computed server-side (`box`, `int`) are
+/// not on the wire any more: they are derived from the alerting stations on
+/// the client (see `rts_alert_areas.dart`), which is also where the station
+/// directory that places them lives.
+///
+/// [time] is the frame's server instant in milliseconds (`ts`), kept for
+/// display; the live source keys freshness off event recency instead, so a
+/// clock skew between server and device cannot reclassify a live feed. The
+/// wire's `eq` list (quakes the network itself picked) is not read yet.
 @freezed
 abstract class Rts with _$Rts {
   const factory Rts({
-    @Default(<String, RtsStation>{}) Map<String, RtsStation> station,
-    @Default(<String, dynamic>{}) Map<String, dynamic> box,
-    @JsonKey(name: 'int') @Default(<dynamic>[]) List<dynamic> intensities,
-    @Default(0) int time,
+    @Default(<String, RtsStation>{}) Map<String, RtsStation> stations,
+    @JsonKey(name: 'ts') @Default(0) int time,
   }) = _Rts;
 
   factory Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 }
 
-/// One station's live shaking: peak ground acceleration / velocity and its
-/// intensity as both the raw float ([intensityRaw], wire `i`) and the decayed
-/// intensity ([intensity], wire `I`), plus whether the station is in its
-/// triggered state ([alert]).
+/// One station's reading in a frame, keyed in [Rts.stations] by its hex
+/// device id: the continuous JMA [intensity] (wire `i`; negative while calm,
+/// `-3` with no signal), the peak ground acceleration [pga] in gal, and
+/// whether the network has it [alert]ing.
 @freezed
 abstract class RtsStation with _$RtsStation {
   const factory RtsStation({
+    @JsonKey(name: 'i') @Default(0.0) double intensity,
+    // Left off the wire until the station has measured anything at all — a
+    // required field would reject the whole frame over one new station.
     @Default(0.0) double pga,
-    @Default(0.0) double pgv,
-    @JsonKey(name: 'i') @Default(0.0) double intensityRaw,
-    @JsonKey(name: 'I') @Default(0.0) double intensity,
-    // The wire carries the trigger flag as 0/1 (absent while calm) — decode it
-    // like the other API bools, or a triggered station would throw on parse
-    // and drop the whole snapshot right when the big-event data matters most.
+    // Sent only as `1`, and only while alerting.
     @JsonKey(fromJson: boolishInt, toJson: intFromBool)
     @Default(false)
     bool alert,

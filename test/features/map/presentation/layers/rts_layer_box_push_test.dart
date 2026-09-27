@@ -1,8 +1,10 @@
-/// Pins how often [RtsMapLayer] re-uploads a large event's detection boxes.
+/// Pins how often [RtsMapLayer] re-uploads a large event's detection boxes —
+/// and that the boxes come from the frame's alerting stations, now that the
+/// feed no longer sends them.
 ///
 /// The wavefront ticker repaints at display rate while an alert is live and
 /// ends every tick with a box push. The grid it draws only changes when the
-/// feed's box set changes or the S wave sweeps a box out, so every other tick
+/// lit box set changes or the S wave sweeps a box out, so every other tick
 /// used to serialise the same polygons, ship them across the platform channel
 /// and make MapLibre re-tile them — sixty times a second, during an
 /// earthquake. The guard is on the *content*: an identical collection is not
@@ -83,11 +85,24 @@ class _MutableSource extends RealtimeSource<Rts> {
   bool sameData(Rts? a, Rts? b) => a == b;
 }
 
-class _EmptyStations implements TremStationRepository {
+/// One station, standing inside the box below.
+class _OneStation implements TremStationRepository {
+  static const _directory = {
+    'A1': SeismicStation(id: 'A1', latitude: 23.55, longitude: 121.55),
+  };
+
   @override
-  Future<Result<Map<String, SeismicStation>>> stations() async =>
-      const Ok(<String, SeismicStation>{});
+  Future<Map<String, SeismicStation>?> saved() async => _directory;
+
+  @override
+  Future<Result<Map<String, SeismicStation>>> refresh() async =>
+      const Ok(_directory);
 }
+
+Rts _alerting(double intensity) => Rts(
+  time: 1,
+  stations: {'A1': RtsStation(intensity: intensity, alert: true)},
+);
 
 /// A square box around Hualien — four corners, `[lng, lat]`, then closed.
 const List<List<double>> _ring = [
@@ -102,7 +117,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('an unchanged box collection is uploaded once, not per tick', () async {
-    final source = _MutableSource()..data = const Rts(box: {'7': 4});
+    final source = _MutableSource()..data = _alerting(3.6);
     final rtsChannel = RealtimeChannel<Rts>(
       source: source,
       clock: _FakeClock(DateTime.utc(2026, 8, 12, 12)),
@@ -123,7 +138,7 @@ void main() {
     await eewChannel.refreshNow();
     final layer = RtsMapLayer(
       RealtimeNotifier<Rts>(rtsChannel),
-      _EmptyStations(),
+      _OneStation(),
       eew: RealtimeNotifier<List<Eew>>(eewChannel),
       travelTimeTable: Future<SeismicTravelTimeTable>.value(
         const SeismicTravelTimeTable({
@@ -153,7 +168,7 @@ void main() {
     );
 
     // A genuinely different set is.
-    source.data = const Rts(box: {'7': 6});
+    source.data = _alerting(5.2);
     await rtsChannel.refreshNow();
     await pumpEventQueue();
     expect(

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Rts {
 
- Map<String, RtsStation> get station; Map<String, dynamic> get box;@JsonKey(name: 'int') List<dynamic> get intensities; int get time;
+ Map<String, RtsStation> get stations;@JsonKey(name: 'ts') int get time;
 /// Create a copy of Rts
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $RtsCopyWith<Rts> get copyWith => _$RtsCopyWithImpl<Rts>(this as Rts, _$identity
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Rts&&const DeepCollectionEquality().equals(other.station, station)&&const DeepCollectionEquality().equals(other.box, box)&&const DeepCollectionEquality().equals(other.intensities, intensities)&&(identical(other.time, time) || other.time == time));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Rts&&const DeepCollectionEquality().equals(other.stations, stations)&&(identical(other.time, time) || other.time == time));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(station),const DeepCollectionEquality().hash(box),const DeepCollectionEquality().hash(intensities),time);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(stations),time);
 
 @override
 String toString() {
-  return 'Rts(station: $station, box: $box, intensities: $intensities, time: $time)';
+  return 'Rts(stations: $stations, time: $time)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $RtsCopyWith<$Res>  {
   factory $RtsCopyWith(Rts value, $Res Function(Rts) _then) = _$RtsCopyWithImpl;
 @useResult
 $Res call({
- Map<String, RtsStation> station, Map<String, dynamic> box,@JsonKey(name: 'int') List<dynamic> intensities, int time
+ Map<String, RtsStation> stations,@JsonKey(name: 'ts') int time
 });
 
 
@@ -66,12 +66,10 @@ class _$RtsCopyWithImpl<$Res>
 
 /// Create a copy of Rts
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? station = null,Object? box = null,Object? intensities = null,Object? time = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? stations = null,Object? time = null,}) {
   return _then(Rts(
-station: null == station ? _self.station : station // ignore: cast_nullable_to_non_nullable
-as Map<String, RtsStation>,box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,intensities: null == intensities ? _self.intensities : intensities // ignore: cast_nullable_to_non_nullable
-as List<dynamic>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+stations: null == stations ? _self.stations : stations // ignore: cast_nullable_to_non_nullable
+as Map<String, RtsStation>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -157,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<dynamic> intensities,  int time)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, RtsStation> stations, @JsonKey(name: 'ts')  int time)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Rts() when $default != null:
-return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
+return $default(_that.stations,_that.time);case _:
   return orElse();
 
 }
@@ -178,10 +176,10 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<dynamic> intensities,  int time)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, RtsStation> stations, @JsonKey(name: 'ts')  int time)  $default,) {final _that = this;
 switch (_that) {
 case _Rts():
-return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
+return $default(_that.stations,_that.time);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +196,10 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, RtsStation> station,  Map<String, dynamic> box, @JsonKey(name: 'int')  List<dynamic> intensities,  int time)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, RtsStation> stations, @JsonKey(name: 'ts')  int time)?  $default,) {final _that = this;
 switch (_that) {
 case _Rts() when $default != null:
-return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
+return $default(_that.stations,_that.time);case _:
   return null;
 
 }
@@ -213,31 +211,17 @@ return $default(_that.station,_that.box,_that.intensities,_that.time);case _:
 @JsonSerializable()
 
 class _Rts implements Rts {
-  const _Rts({ Map<String, RtsStation> station = const <String, RtsStation>{},  Map<String, dynamic> box = const <String, dynamic>{}, @JsonKey(name: 'int')  List<dynamic> intensities = const <dynamic>[], this.time = 0}): _station = station,_box = box,_intensities = intensities;
+  const _Rts({ Map<String, RtsStation> stations = const <String, RtsStation>{}, @JsonKey(name: 'ts') this.time = 0}): _stations = stations;
   factory _Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 
- final  Map<String, RtsStation> _station;
-@override@JsonKey() Map<String, RtsStation> get station {
-  if (_station is EqualUnmodifiableMapView) return _station;
+ final  Map<String, RtsStation> _stations;
+@override@JsonKey() Map<String, RtsStation> get stations {
+  if (_stations is EqualUnmodifiableMapView) return _stations;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_station);
+  return EqualUnmodifiableMapView(_stations);
 }
 
- final  Map<String, dynamic> _box;
-@override@JsonKey() Map<String, dynamic> get box {
-  if (_box is EqualUnmodifiableMapView) return _box;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_box);
-}
-
- final  List<dynamic> _intensities;
-@override@JsonKey(name: 'int') List<dynamic> get intensities {
-  if (_intensities is EqualUnmodifiableListView) return _intensities;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_intensities);
-}
-
-@override@JsonKey() final  int time;
+@override@JsonKey(name: 'ts') final  int time;
 
 /// Create a copy of Rts
 /// with the given fields replaced by the non-null parameter values.
@@ -252,16 +236,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Rts&&const DeepCollectionEquality().equals(other._station, _station)&&const DeepCollectionEquality().equals(other._box, _box)&&const DeepCollectionEquality().equals(other._intensities, _intensities)&&(identical(other.time, time) || other.time == time));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Rts&&const DeepCollectionEquality().equals(other._stations, _stations)&&(identical(other.time, time) || other.time == time));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_station),const DeepCollectionEquality().hash(_box),const DeepCollectionEquality().hash(_intensities),time);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_stations),time);
 
 @override
 String toString() {
-  return 'Rts(station: $station, box: $box, intensities: $intensities, time: $time)';
+  return 'Rts(stations: $stations, time: $time)';
 }
 
 
@@ -272,7 +256,7 @@ abstract mixin class _$RtsCopyWith<$Res> implements $RtsCopyWith<$Res> {
   factory _$RtsCopyWith(_Rts value, $Res Function(_Rts) _then) = __$RtsCopyWithImpl;
 @override @useResult
 $Res call({
- Map<String, RtsStation> station, Map<String, dynamic> box,@JsonKey(name: 'int') List<dynamic> intensities, int time
+ Map<String, RtsStation> stations,@JsonKey(name: 'ts') int time
 });
 
 
@@ -289,12 +273,10 @@ class __$RtsCopyWithImpl<$Res>
 
 /// Create a copy of Rts
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? station = null,Object? box = null,Object? intensities = null,Object? time = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? stations = null,Object? time = null,}) {
   return _then(_Rts(
-station: null == station ? _self._station : station // ignore: cast_nullable_to_non_nullable
-as Map<String, RtsStation>,box: null == box ? _self._box : box // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,intensities: null == intensities ? _self._intensities : intensities // ignore: cast_nullable_to_non_nullable
-as List<dynamic>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
+stations: null == stations ? _self._stations : stations // ignore: cast_nullable_to_non_nullable
+as Map<String, RtsStation>,time: null == time ? _self.time : time // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -306,7 +288,7 @@ as int,
 /// @nodoc
 mixin _$RtsStation {
 
- double get pga; double get pgv;@JsonKey(name: 'i') double get intensityRaw;@JsonKey(name: 'I') double get intensity;@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool get alert;
+@JsonKey(name: 'i') double get intensity; double get pga;@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool get alert;
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -319,16 +301,16 @@ $RtsStationCopyWith<RtsStation> get copyWith => _$RtsStationCopyWithImpl<RtsStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsStation&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.pgv, pgv) || other.pgv == pgv)&&(identical(other.intensityRaw, intensityRaw) || other.intensityRaw == intensityRaw)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.alert, alert) || other.alert == alert));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsStation&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.alert, alert) || other.alert == alert));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,pga,pgv,intensityRaw,intensity,alert);
+int get hashCode => Object.hash(runtimeType,intensity,pga,alert);
 
 @override
 String toString() {
-  return 'RtsStation(pga: $pga, pgv: $pgv, intensityRaw: $intensityRaw, intensity: $intensity, alert: $alert)';
+  return 'RtsStation(intensity: $intensity, pga: $pga, alert: $alert)';
 }
 
 
@@ -339,7 +321,7 @@ abstract mixin class $RtsStationCopyWith<$Res>  {
   factory $RtsStationCopyWith(RtsStation value, $Res Function(RtsStation) _then) = _$RtsStationCopyWithImpl;
 @useResult
 $Res call({
- double pga, double pgv,@JsonKey(name: 'i') double intensityRaw,@JsonKey(name: 'I') double intensity,@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool alert
+@JsonKey(name: 'i') double intensity, double pga,@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool alert
 });
 
 
@@ -356,12 +338,10 @@ class _$RtsStationCopyWithImpl<$Res>
 
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,Object? alert = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? intensity = null,Object? pga = null,Object? alert = null,}) {
   return _then(RtsStation(
-pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
-as double,pgv: null == pgv ? _self.pgv : pgv // ignore: cast_nullable_to_non_nullable
-as double,intensityRaw: null == intensityRaw ? _self.intensityRaw : intensityRaw // ignore: cast_nullable_to_non_nullable
-as double,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
+intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
+as double,pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
 as double,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -448,10 +428,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  double intensity, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'i')  double intensity,  double pga, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RtsStation() when $default != null:
-return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.alert);case _:
+return $default(_that.intensity,_that.pga,_that.alert);case _:
   return orElse();
 
 }
@@ -469,10 +449,10 @@ return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.ale
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  double intensity, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'i')  double intensity,  double pga, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)  $default,) {final _that = this;
 switch (_that) {
 case _RtsStation():
-return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.alert);case _:
+return $default(_that.intensity,_that.pga,_that.alert);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -489,10 +469,10 @@ return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.ale
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double pga,  double pgv, @JsonKey(name: 'i')  double intensityRaw, @JsonKey(name: 'I')  double intensity, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'i')  double intensity,  double pga, @JsonKey(fromJson: boolishInt, toJson: intFromBool)  bool alert)?  $default,) {final _that = this;
 switch (_that) {
 case _RtsStation() when $default != null:
-return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.alert);case _:
+return $default(_that.intensity,_that.pga,_that.alert);case _:
   return null;
 
 }
@@ -504,13 +484,11 @@ return $default(_that.pga,_that.pgv,_that.intensityRaw,_that.intensity,_that.ale
 @JsonSerializable()
 
 class _RtsStation implements RtsStation {
-  const _RtsStation({this.pga = 0.0, this.pgv = 0.0, @JsonKey(name: 'i') this.intensityRaw = 0.0, @JsonKey(name: 'I') this.intensity = 0.0, @JsonKey(fromJson: boolishInt, toJson: intFromBool) this.alert = false});
+  const _RtsStation({@JsonKey(name: 'i') this.intensity = 0.0, this.pga = 0.0, @JsonKey(fromJson: boolishInt, toJson: intFromBool) this.alert = false});
   factory _RtsStation.fromJson(Map<String, dynamic> json) => _$RtsStationFromJson(json);
 
+@override@JsonKey(name: 'i') final  double intensity;
 @override@JsonKey() final  double pga;
-@override@JsonKey() final  double pgv;
-@override@JsonKey(name: 'i') final  double intensityRaw;
-@override@JsonKey(name: 'I') final  double intensity;
 @override@JsonKey(fromJson: boolishInt, toJson: intFromBool) final  bool alert;
 
 /// Create a copy of RtsStation
@@ -526,16 +504,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsStation&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.pgv, pgv) || other.pgv == pgv)&&(identical(other.intensityRaw, intensityRaw) || other.intensityRaw == intensityRaw)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.alert, alert) || other.alert == alert));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsStation&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.alert, alert) || other.alert == alert));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,pga,pgv,intensityRaw,intensity,alert);
+int get hashCode => Object.hash(runtimeType,intensity,pga,alert);
 
 @override
 String toString() {
-  return 'RtsStation(pga: $pga, pgv: $pgv, intensityRaw: $intensityRaw, intensity: $intensity, alert: $alert)';
+  return 'RtsStation(intensity: $intensity, pga: $pga, alert: $alert)';
 }
 
 
@@ -546,7 +524,7 @@ abstract mixin class _$RtsStationCopyWith<$Res> implements $RtsStationCopyWith<$
   factory _$RtsStationCopyWith(_RtsStation value, $Res Function(_RtsStation) _then) = __$RtsStationCopyWithImpl;
 @override @useResult
 $Res call({
- double pga, double pgv,@JsonKey(name: 'i') double intensityRaw,@JsonKey(name: 'I') double intensity,@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool alert
+@JsonKey(name: 'i') double intensity, double pga,@JsonKey(fromJson: boolishInt, toJson: intFromBool) bool alert
 });
 
 
@@ -563,12 +541,10 @@ class __$RtsStationCopyWithImpl<$Res>
 
 /// Create a copy of RtsStation
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? pga = null,Object? pgv = null,Object? intensityRaw = null,Object? intensity = null,Object? alert = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? intensity = null,Object? pga = null,Object? alert = null,}) {
   return _then(_RtsStation(
-pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
-as double,pgv: null == pgv ? _self.pgv : pgv // ignore: cast_nullable_to_non_nullable
-as double,intensityRaw: null == intensityRaw ? _self.intensityRaw : intensityRaw // ignore: cast_nullable_to_non_nullable
-as double,intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
+intensity: null == intensity ? _self.intensity : intensity // ignore: cast_nullable_to_non_nullable
+as double,pga: null == pga ? _self.pga : pga // ignore: cast_nullable_to_non_nullable
 as double,alert: null == alert ? _self.alert : alert // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
