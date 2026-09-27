@@ -211,7 +211,7 @@ CircleLayerProperties monitorDotProps({double opacity = 1}) =>
           1,
         ],
         IntensityColors.discrete(0).toHexRgb(),
-        InstrumentalIntensityColors.mapLibreInterpolate,
+        InstrumentalIntensityColors.mapLibreExpression,
       ],
       circleRadius: monitorDotRadius,
       circleStrokeColor: monitorDotStroke,

@@ -3,7 +3,8 @@
 ///
 /// Two modes, one per scale in `intensity_colors.dart`:
 ///  - [IntensityLegendMode.rts] — the real-time monitor's **continuous**
-///    instrumental intensity, one −3 → 7 gradient bar (7 at the top).
+///    instrumental intensity, one 0 → 7 gradient bar (7 at the top), drawn
+///    from the same table as the station dots.
 ///  - [IntensityLegendMode.eew] — the **discrete** felt-intensity scale
 ///    (1 → 7, with 5/6 split), stacked cells (7 at the top).
 library;
@@ -43,13 +44,20 @@ class IntensityLegend extends StatelessWidget {
         : _eewScale(labelStyle);
   }
 
-  /// Continuous instrumental scale as one gradient bar, 7 (top) → −3 (bottom),
+  /// Continuous instrumental scale as one gradient bar, 7 (top) → 0 (bottom),
   /// with labels spread evenly alongside it.
+  ///
+  /// It stops at 0 because the dots do: every reading at or below 0 is the
+  /// same darkest blue, so the bar's bottom stands for all of them. Sampled
+  /// every 0.1 of `i`, top → bottom, so the bar holds each colour a dot can
+  /// take at the height of its reading.
   Widget _rtsScale(TextStyle? labelStyle) {
-    const labels = ['7', '6', '5', '4', '3', '2', '1', '0', '-1', '-2', '-3'];
-    // Gradient runs top → bottom, so the colours descend 7 → −3 (ramp reversed).
-    final colors = InstrumentalIntensityColors.ramp.reversed.toList();
-    final height = _cell * colors.length;
+    const labels = ['7', '6', '5', '4', '3', '2', '1', '0'];
+    final colors = [
+      for (var tenth = 70; tenth >= 0; tenth--)
+        InstrumentalIntensityColors.of(tenth / 10),
+    ];
+    final height = _cell * labels.length;
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,

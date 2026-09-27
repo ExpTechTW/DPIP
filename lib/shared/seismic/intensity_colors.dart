@@ -1,16 +1,15 @@
-/// The two Central Weather Administration seismic-intensity colour scales, as a
-/// single source of truth so the map's station dots and the legend can never
-/// drift apart. Ported verbatim (same hex values) from the legacy palette.
+/// The two seismic-intensity colour scales, as a single source of truth so the
+/// map's station dots and the legend can never drift apart. The discrete one is
+/// CWA's published scale, ported verbatim from the legacy palette.
 ///
 ///  - [InstrumentalIntensityColors] — the **continuous** instrumental intensity
-///    `i` (−3 → 7) shown by the real-time monitor's station dots: a blue → cyan
-///    → green → yellow → orange → red → purple ramp. Fractional values
-///    interpolate between the integer stops on the map.
+///    `i` shown by the real-time monitor's station dots: rts-image-go's
+///    101-step blue → green → yellow → red table, as TREM-Lite draws it.
 ///  - [IntensityColors] — the **discrete** felt-intensity scale (震度 0 → 7, with
 ///    5 and 6 split into 弱/強, indexed 0 → 9) used by 震度 reports and EEW.
 ///
-/// The literals below are the *standard-vision* CWA palette; each one is routed
-/// through `.vision` at its definition, so the whole scale is recoloured when a
+/// The literals below are the *standard-vision* palettes; each one is routed
+/// through the colour-vision transform, so the whole scale is recoloured when a
 /// colour-vision correction is on. The user has accepted that these then stop
 /// matching CWA's published colours — a scale whose steps collapse into one
 /// another is worse than one that is off-spec. The transform sits **here**, at
@@ -25,40 +24,201 @@ import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:flutter/material.dart';
 
-/// Continuous instrumental-intensity colours, one stop per integer `i` in
-/// −3 → 7 (ascending).
+/// The real-time monitor's station dots, coloured by the continuous
+/// instrumental intensity `i` — rts-image-go's station table, the colours
+/// TREM-Lite draws, so the two monitors show the same reading the same way.
+///
+/// Two steps, as there:
+///  1. `i` moves onto the table's own scale, −3 → 7 with green at 0: every
+///     `i ≤ 0` is the darkest blue, `0 < i ≤ 1` runs blue → green, and above 1
+///     green (at 1) runs to dark red (at 7).
+///  2. That value is looked up in 0.1 steps, rounded half away from zero (Go's
+///     `math.Round`, and MapLibre's `round`), clamped to the table's ends.
 abstract final class InstrumentalIntensityColors {
-  /// The colour stops, ascending from `i = -3` to `i = 7`, corrected for the
-  /// current colour-vision setting.
-  static List<(int level, Color color)> get stops => [
-    (-3, const Color(0xFF0005D0).vision),
-    (-2, const Color(0xFF004BF8).vision),
-    (-1, const Color(0xFF009EF8).vision),
-    (0, const Color(0xFF79E5FD).vision),
-    (1, const Color(0xFF49E9AD).vision),
-    (2, const Color(0xFF44FA34).vision),
-    (3, const Color(0xFFBEFF0C).vision),
-    (4, const Color(0xFFFFF000).vision),
-    (5, const Color(0xFFFF9300).vision),
-    (6, const Color(0xFFFC5235).vision),
-    (7, const Color(0xFFB720E9).vision),
-  ];
+  /// The colour for reading [i], corrected for the current colour-vision
+  /// setting — the same one [mapLibreExpression] paints a dot with.
+  static Color of(double i) => _corrected[_index(i)];
 
-  /// The stop colours only, ascending `i = -3 → 7` — e.g. a legend gradient.
-  static List<Color> get ramp => [for (final (_, color) in stops) color];
+  /// Where [i] lands on the table's −3 → 7 scale (step 1 above).
+  static double tableScale(double i) {
+    if (i <= 0) return -3;
+    if (i <= 1) return -3 + 3 * i;
+    return 7 * (i - 1) / 6;
+  }
 
-  /// A MapLibre `interpolate` expression colouring a feature by its numeric `i`
-  /// property across [stops], so the dots draw from the same definition as the
-  /// legend. Linear between stops; clamps to the end colours outside −3 → 7.
+  static int _index(double i) =>
+      ((tableScale(i) * 10).round() + _offset).clamp(0, _table.length - 1);
+
+  /// Table index of the scale's −3.0 — `round(scale × 10) + 30`.
+  static const int _offset = 30;
+
+  /// A MapLibre expression colouring a feature by its numeric `i` property
+  /// exactly as [of] does: the same scale in the expression language, then a
+  /// `step` over integer tenths so every stop compares exactly.
   ///
-  /// The hex is written from an already-corrected [stops] colour — `toHexRgb`
-  /// stays a pure converter, so the expression carries exactly one transform.
-  static List<Object> get mapLibreInterpolate => [
-    'interpolate',
-    const ['linear'],
-    const ['get', 'i'],
-    for (final (level, color) in stops) ...[level, color.toHexRgb()],
+  /// The hex is written from the already-corrected table — `toHexRgb` stays a
+  /// pure converter, so the expression carries exactly one transform.
+  static List<Object> get mapLibreExpression {
+    const i = ['get', 'i'];
+    final colors = _corrected;
+    return [
+      'step',
+      [
+        'round',
+        [
+          '*',
+          [
+            'case',
+            ['<=', i, 0],
+            -3,
+            ['<=', i, 1],
+            [
+              '+',
+              -3,
+              ['*', 3, i],
+            ],
+            [
+              '/',
+              [
+                '*',
+                7,
+                ['-', i, 1],
+              ],
+              6,
+            ],
+          ],
+          10,
+        ],
+      ],
+      colors.first.toHexRgb(),
+      for (var n = 1; n < colors.length; n++) ...[
+        n - _offset,
+        colors[n].toHexRgb(),
+      ],
+    ];
+  }
+
+  /// rts-image-go's `resource/color.json`: one colour per 0.1 of the table's
+  /// scale, −3.0 → 7.0.
+  static const List<Color> _table = [
+    Color(0xFF0000CD),
+    Color(0xFF0007D1),
+    Color(0xFF000ED6),
+    Color(0xFF0015DA),
+    Color(0xFF001CDF),
+    Color(0xFF0024E3),
+    Color(0xFF002BE7),
+    Color(0xFF0032EC),
+    Color(0xFF0039F0),
+    Color(0xFF0040F5),
+    Color(0xFF0048FA),
+    Color(0xFF0055EE),
+    Color(0xFF0063E3),
+    Color(0xFF0070D8),
+    Color(0xFF007ECD),
+    Color(0xFF008CC2),
+    Color(0xFF0099B7),
+    Color(0xFF00A7AC),
+    Color(0xFF00B4A1),
+    Color(0xFF00C296),
+    Color(0xFF00D08B),
+    Color(0xFF06D482),
+    Color(0xFF0CD879),
+    Color(0xFF12DC71),
+    Color(0xFF19E068),
+    Color(0xFF1FE460),
+    Color(0xFF25E958),
+    Color(0xFF2CED4F),
+    Color(0xFF32F147),
+    Color(0xFF38F53E),
+    Color(0xFF3FFA36),
+    Color(0xFF4BFA31),
+    Color(0xFF58FA2D),
+    Color(0xFF64FB29),
+    Color(0xFF71FB25),
+    Color(0xFF7DFC21),
+    Color(0xFF8AFC1C),
+    Color(0xFF97FD18),
+    Color(0xFFA3FD14),
+    Color(0xFFB0FE10),
+    Color(0xFFBDFF0C),
+    Color(0xFFC3FE0A),
+    Color(0xFFCAFE09),
+    Color(0xFFD0FE08),
+    Color(0xFFD7FE07),
+    Color(0xFFDEFF05),
+    Color(0xFFE4FE04),
+    Color(0xFFEBFF03),
+    Color(0xFFF1FE02),
+    Color(0xFFF8FF01),
+    Color(0xFFFFFF00),
+    Color(0xFFFEFB00),
+    Color(0xFFFEF800),
+    Color(0xFFFEF400),
+    Color(0xFFFEF100),
+    Color(0xFFFFEE00),
+    Color(0xFFFEEA00),
+    Color(0xFFFFE700),
+    Color(0xFFFEE300),
+    Color(0xFFFFE000),
+    Color(0xFFFFDD00),
+    Color(0xFFFED500),
+    Color(0xFFFECD00),
+    Color(0xFFFEC500),
+    Color(0xFFFEBE00),
+    Color(0xFFFFB600),
+    Color(0xFFFEAE00),
+    Color(0xFFFFA700),
+    Color(0xFFFE9F00),
+    Color(0xFFFF9700),
+    Color(0xFFFF9000),
+    Color(0xFFFE8800),
+    Color(0xFFFE8000),
+    Color(0xFFFE7900),
+    Color(0xFFFE7100),
+    Color(0xFFFF6A00),
+    Color(0xFFFE6200),
+    Color(0xFFFF5A00),
+    Color(0xFFFE5300),
+    Color(0xFFFF4B00),
+    Color(0xFFFF4400),
+    Color(0xFFFE3D00),
+    Color(0xFFFD3600),
+    Color(0xFFFC2F00),
+    Color(0xFFFB2800),
+    Color(0xFFFA2100),
+    Color(0xFFF91B00),
+    Color(0xFFF81400),
+    Color(0xFFF70D00),
+    Color(0xFFF60600),
+    Color(0xFFF50000),
+    Color(0xFFEE0000),
+    Color(0xFFE60000),
+    Color(0xFFDF0000),
+    Color(0xFFD70000),
+    Color(0xFFD00000),
+    Color(0xFFC80000),
+    Color(0xFFC00000),
+    Color(0xFFB90000),
+    Color(0xFFB10000),
+    Color(0xFFAA0000),
   ];
+
+  /// [_table] under the current setting, rebuilt only when that setting
+  /// moves — [of] runs per station, per frame.
+  static List<Color>? _cache;
+  static ColorVision? _cachedFor;
+
+  static List<Color> get _corrected {
+    final vision = AppColorVision.current;
+    if (_cachedFor != vision || _cache == null) {
+      _cachedFor = vision;
+      _cache = [
+        for (final color in _table) ColorVisionFilter.transform(color, vision),
+      ];
+    }
+    return _cache!;
+  }
 }
 
 /// Discrete felt-intensity colours, keyed by the scale index 0 → 9 (0 grey, then
