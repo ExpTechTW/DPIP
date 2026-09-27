@@ -23,6 +23,7 @@
 /// | `dpip.db`            | `logs`              | diagnostics |
 /// | `dpip.db`            | `tle`               | orbital data|
 /// | `dpip.db`            | `trem_station`      | seismic net |
+/// | `dpip.db`            | `ml_model`          | seismic net |
 /// | `dpip.db`            | `mesh_messages`     | meshtastic  |
 /// | `dpip.db`            | `mesh_channels`     | meshtastic  |
 /// | `dpip.db`            | `mesh_reads`        | meshtastic  |

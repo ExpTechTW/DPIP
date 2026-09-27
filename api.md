@@ -267,6 +267,13 @@ ETag 重新驗證。
 | `ServerStatusApi.getStatus` | `https://status.exptech.dev/api/ds/query`（**POST**，Grafana datasource query；伺服器狀態頁） |
 | `CloudflareStatusApi.getComponents` | `https://www.cloudflarestatus.com/api/v2/components.json`（Cloudflare 元件狀態） |
 | `HasteApi.upload` | `https://haste.exptech.dev/api/pastes`（**POST**，上傳 App 日誌；回應的 `key` 組成 `https://haste.exptech.dev/<key>`） |
+| `MlIntensityService._download` | `https://exptechtw.github.io/TREM-Lite/models/intensity_ml_v1.onnx`，失敗再試 `https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@main/packages/core/static/models/intensity_ml_v1.onnx`（ML v1 震度模型，14.7 MB、gzip 傳輸約 2.3 MB） |
+
+> **ML v1 模型目前沒有 ExpTech 主機提供**（`static.core-{tnn1,tyo1}` 都是 404），
+> 所以從 TREM-Lite 發布的位置下載，並以 SHA-256 釘住檔案：jsDelivr 跟著
+> `main`，同名重訓的模型會被拒絕。第一次開強震監視器時下載，gzip 壓縮後存在
+> `dpip.db` 的 `ml_model`，之後不再連網。檔案一旦放上 `static.core-{region}`，
+> 改用 `coreStatic` 層級即可。
 
 > **衛星 TLE 目前不打網路。** `TleSource` 有一條遠端更新路徑（`TleFetcher`），
 > 但正式碼沒有接線（`fetch` 為 null），實際只讀打包在 `assets/astro/` 的元素集。

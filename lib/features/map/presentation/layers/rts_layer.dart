@@ -12,7 +12,7 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
-import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
+import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_alert_tracker.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
@@ -29,7 +29,6 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show MapColors, countyFillLayerId, townFillLayerId;
 import 'package:dpip/shared/map/monitor_map_stack.dart';
-import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
@@ -123,6 +122,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     required Future<RtsBoxGrid> boxGrid,
     required TownDirectory townDirectory,
     RtsLiveDemand? liveDemand,
+    MlIntensityEstimator? mlIntensity,
     // Not initializing formals: Dart has no private *named* parameter, and
     // these fields must stay private.
     // ignore: prefer_initializing_formals
@@ -133,6 +133,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
        _boxGridFuture = boxGrid,
        // ignore: prefer_initializing_formals
        _liveDemand = liveDemand,
+       // ignore: prefer_initializing_formals
+       _mlIntensity = mlIntensity,
        // ignore: prefer_initializing_formals
        _townDirectory = townDirectory;
 
@@ -147,6 +149,23 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// rather than only the alerting ones (see [RtsLiveDemand]).
   final RtsLiveDemand? _liveDemand;
   bool _holdingLive = false;
+
+  /// ML v1 township estimates; the formula colours the island until it loads.
+  final MlIntensityEstimator? _mlIntensity;
+
+  /// Loads the model — downloading it the first time the monitor ever opens —
+  /// and repaints the wash from it once it is ready.
+  Future<void> _prepareModel() async {
+    final model = _mlIntensity;
+    if (model == null || model.ready) return;
+    if (!await model.prepare()) return;
+    final controller = _controller;
+    if (controller == null || !_added) return;
+    final live =
+        _eew.state.status == RealtimeStatus.live &&
+        (_eew.state.data?.isNotEmpty ?? false);
+    if (live) await _updateAreaFill(controller, _eew.state.data!);
+  }
 
   /// The boxes each frame lights and the minute-long township ranking — shared
   /// logic with the replay page, fed from [_feed] here.
@@ -292,6 +311,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   Future<void> render(MapLibreMapController controller) async {
     _controller = controller;
     _holdLive(_surfaceVisible);
+    unawaited(_prepareModel());
     await _ensureStations();
     // The frame already in hand, lit against whatever is placed so far —
     // the feed will not notify again just because the layer attached.
@@ -653,8 +673,9 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   }
 
   /// Tints the whole island by estimated shaking while [alerts] is non-empty
-  /// — the legacy monitor's county/town fill behaviour, driven by the same
-  /// [EewEstimator.areaPga] math the replay page uses. The base style's own
+  /// — the legacy monitor's county/town fill behaviour, from the same
+  /// township levels the replay page uses ([eewTownLevels]: ML v1 once it is
+  /// loaded, the attenuation formula until then). The base style's own
   /// `town` fill layer is recoloured with a `match` on each township's
   /// `CODE`, so the felt-intensity wash reads over the base map without a
   /// second geometry source; when the alerts clear the wash is cleared. The
@@ -677,9 +698,16 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final selected = alerts.isEmpty
         ? null
         : alerts[eewIndex.value % alerts.length];
-    final key = selected == null ? null : '${selected.id}:${selected.serial}';
+    final model = _mlIntensity;
+    // The model arriving mid-alert repaints the same serial from its levels.
+    final key = selected == null
+        ? null
+        : '${selected.id}:${selected.serial}:${model?.ready ?? false}';
     if (key == _fillEewKey) return;
     _fillEewKey = key;
+    if (selected != null && !(model?.ready ?? true)) {
+      unawaited(_prepareModel());
+    }
 
     final baseFill = MapColors.of(_dark ? Brightness.dark : Brightness.light)
         .fill;
@@ -706,19 +734,19 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         return;
       }
 
-      final eew = selected;
-      final estimate = EewEstimator.areaPga(
-        epicenter: eew.info.latlng,
-        depth: eew.info.depth,
-        mag: eew.info.magnitude,
-        regionCentroids: _centroids ??= {
+      final estimate = await eewTownLevels(
+        selected.info,
+        model: model,
+        centroids: _centroids ??= {
           for (final town in _townDirectory.all)
             town.code: geo.LatLng(town.lat, town.lng),
         },
       );
+      // A newer alert, serial or the model itself took over while this one
+      // was being scored — its own update paints, not this stale one.
+      if (key != _fillEewKey) return;
       final entries = <Object>[];
-      estimate.regions.forEach((code, region) {
-        final level = Intensity.toScale(region.i);
+      estimate.levels.forEach((code, level) {
         if (level > 0) {
           entries.add(int.parse(code));
           entries.add(IntensityColors.discrete(level).toHexRgb());
