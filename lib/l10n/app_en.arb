@@ -407,6 +407,10 @@
     "description": "The radio rejected the channel write"
   },
   "mapLegendExpand": "Legend",
+  "monitorIntensityRanking": "Intensity ranking",
+  "@monitorIntensityRanking": {
+    "description": "Title of the monitor map's list of the townships that shook hardest in the last minute."
+  },
   "eewNone": "No active earthquake early warning",
   "typhoonTyNo": "TY {no}",
   "notifyOptTsunamiAll": "Tsunami advisories and warnings",

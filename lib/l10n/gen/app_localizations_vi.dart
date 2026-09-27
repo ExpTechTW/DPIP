@@ -325,6 +325,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLegendExpand => 'Chú giải';
 
   @override
+  String get monitorIntensityRanking => 'Xếp hạng cường độ theo khu vực';
+
+  @override
   String get eewNone => 'Hiện không có cảnh báo sớm động đất';
 
   @override

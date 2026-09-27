@@ -325,6 +325,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLegendExpand => 'Legenda';
 
   @override
+  String get monitorIntensityRanking => 'Peringkat intensitas';
+
+  @override
   String get eewNone => 'Tidak ada peringatan dini gempa aktif';
 
   @override

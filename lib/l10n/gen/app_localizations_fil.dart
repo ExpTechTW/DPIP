@@ -327,6 +327,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLegendExpand => 'Alamat';
 
   @override
+  String get monitorIntensityRanking => 'Ranggo ng intensity';
+
+  @override
   String get eewNone => 'Walang aktibong maagang babala sa lindol';
 
   @override

@@ -326,6 +326,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLegendExpand => 'Legend';
 
   @override
+  String get monitorIntensityRanking => 'Intensity ranking';
+
+  @override
   String get eewNone => 'No active earthquake early warning';
 
   @override

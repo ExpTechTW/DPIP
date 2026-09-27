@@ -322,6 +322,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLegendExpand => '凡例';
 
   @override
+  String get monitorIntensityRanking => '各地の震度順位';
+
+  @override
   String get eewNone => '現在、緊急地震速報はありません';
 
   @override

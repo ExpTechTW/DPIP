@@ -1356,9 +1356,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: CollapsibleMapLegend(
-                key: ValueKey(_active.id),
-                legend: _active.buildLegend(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CollapsibleMapLegend(
+                    key: ValueKey(_active.id),
+                    legend: _active.buildLegend(context),
+                  ),
+                  ?_active.buildLegendAccessory(context),
+                ],
               ),
             ),
           ),

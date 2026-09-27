@@ -33,6 +33,7 @@ import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
+import 'package:dpip/shared/widgets/intensity_ranking_card.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -146,8 +147,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   final RtsLiveDemand? _liveDemand;
   bool _holdingLive = false;
 
-  /// The boxes each frame lights — shared logic with the replay page, fed
-  /// from [_feed] here.
+  /// The boxes each frame lights and the minute-long township ranking — shared
+  /// logic with the replay page, fed from [_feed] here.
   final RtsAlertTracker _alerts = RtsAlertTracker();
 
   /// Township centroids, keyed by code — built once from the bundled
@@ -163,6 +164,9 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _added = false;
   RealtimeStatus? _appliedStatus;
   RtsBoxGrid? _boxGrid;
+
+  /// Bumped on every feed notification, so the ranking card rebuilds with it.
+  final ValueNotifier<int> _rankingTick = ValueNotifier(0);
 
   /// Brightness captured from the last context-bearing call ([buildLegend] /
   /// [buildSheet]) — the render/data-push methods get no `BuildContext`, but
@@ -370,6 +374,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
 
   void _onFeed() {
     _alerts.track(_feed.state);
+    _rankingTick.value++;
     unawaited(_pushUpdate());
   }
 
@@ -737,6 +742,20 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       child: IntensityLegend(mode: IntensityLegendMode.rts),
     );
   }
+
+  /// The 震度排行 under the legend — each township's peak over the last
+  /// minute (TREM-Lite's bottom-right list), rebuilt with the feed.
+  @override
+  Widget buildLegendAccessory(BuildContext context) =>
+      ValueListenableBuilder<int>(
+        valueListenable: _rankingTick,
+        builder: (context, _, _) => IntensityRankingCard(
+          entries: [
+            for (final row in _alerts.ranking(_townDirectory.byCode))
+              (name: row.name, level: row.level),
+          ],
+        ),
+      );
 
   /// [render]/the data-push methods get no `BuildContext`, but the intensity
   /// icons come in light/dark artwork and the area fill needs the base

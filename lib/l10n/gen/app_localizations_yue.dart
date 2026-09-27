@@ -318,6 +318,9 @@ class AppLocalizationsYue extends AppLocalizations {
   String get mapLegendExpand => '圖例';
 
   @override
+  String get monitorIntensityRanking => '各地震度排行';
+
+  @override
   String get eewNone => '而家冇地震速報';
 
   @override

@@ -136,6 +136,15 @@ abstract interface class MapLayer {
   /// compact — the map must stay readable beside the layer switcher.
   Widget buildLegend(BuildContext context);
 
+  /// Live readout stacked under the legend, top-left — null when the layer has
+  /// none (the default).
+  ///
+  /// For a panel that belongs beside the key but is not part of it, such as
+  /// the monitor's intensity ranking. It stays visible while the legend is
+  /// collapsed, follows it down as it expands instead of being covered, and
+  /// sits under the sheet like the legend does.
+  Widget? buildLegendAccessory(BuildContext context);
+
   /// Optional chrome to the left of the layer switcher (top-right).
   ///
   /// Use for layer-specific toggles (e.g. typhoon overlay menu). Default is
@@ -314,6 +323,9 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   Widget buildLegend(BuildContext context) => const SizedBox.shrink();
+
+  @override
+  Widget? buildLegendAccessory(BuildContext context) => null;
 
   @override
   Widget buildTopTrailingChrome(
