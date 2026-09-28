@@ -138,14 +138,18 @@ struct DPIPWidgetEntry: TimelineEntry {
     }
 }
 
+/// - Parameter calibratedDate: a calibrated instant, never a WidgetKit entry
+///   date. `nextTransitionTime` is published in the calibrated domain, so
+///   subtracting a device-clock date here would yield the calibration offset
+///   rather than the time remaining.
 private func forecastIsNight(
     pointTime: String,
-    entryDate: Date,
+    calibratedDate: Date,
     isCurrentlyNight: Bool,
     nextTransitionTime: Int
 ) -> Bool {
     guard let minutesAhead = ForecastWidgetSelection.minutesAhead(
-        for: pointTime, at: entryDate
+        for: pointTime, at: calibratedDate
     ) else {
         return isCurrentlyNight
     }
@@ -155,7 +159,7 @@ private func forecastIsNight(
     )
 
     let minutesUntilTransition =
-        transitionDate.timeIntervalSince(entryDate) / 60
+        transitionDate.timeIntervalSince(calibratedDate) / 60
 
     guard minutesUntilTransition >= 0 else {
         return isCurrentlyNight
@@ -285,6 +289,10 @@ private struct MediumCurrentWeatherView: View {
                 timeIntervalSince1970: TimeInterval(snapshot.observationTime)
             )
 
+            let calibratedDate = CurrentWeatherWidgetTimeCalibration(
+                snapshot: snapshot
+            ).calibratedDate(fromDeviceDate: entry.date)
+
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline) {
                     HStack(spacing: 4) {
@@ -362,7 +370,7 @@ private struct MediumCurrentWeatherView: View {
                     HourlyForecastSection(
                         forecast: forecast,
                         family: .systemMedium,
-                        entryDate: entry.date,
+                        calibratedDate: calibratedDate,
                         isCurrentlyNight: entry.isNight,
                         nextTransitionTime: snapshot.nextDayNightTransitionTime
                     )
@@ -403,6 +411,10 @@ private struct LargeCurrentWeatherView: View {
                 timeIntervalSince1970:
                     TimeInterval(snapshot.nextDayNightTransitionTime)
             )
+
+            let calibratedDate = CurrentWeatherWidgetTimeCalibration(
+                snapshot: snapshot
+            ).calibratedDate(fromDeviceDate: entry.date)
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
@@ -483,14 +495,9 @@ private struct LargeCurrentWeatherView: View {
                     HourlyForecastSection(
                         forecast: forecast,
                         family: .systemLarge,
-                        entryDate: entry.date,
+                        calibratedDate: calibratedDate,
                         isCurrentlyNight: entry.isNight,
                         nextTransitionTime: snapshot.nextDayNightTransitionTime
-                    )
-
-                    let forecastUpdateDate = Date(
-                        timeIntervalSince1970:
-                            TimeInterval(forecast.updateTime) / 1000
                     )
                 }
 
@@ -619,14 +626,14 @@ private struct HourlyForecastPointView: View {
     let point: ForecastWidgetPoint
     let compact: Bool
 
-    let entryDate: Date
+    let calibratedDate: Date
     let isCurrentlyNight: Bool
     let nextTransitionTime: Int
 
     var body: some View {
         let isNight = forecastIsNight(
             pointTime: point.time,
-            entryDate: entryDate,
+            calibratedDate: calibratedDate,
             isCurrentlyNight: isCurrentlyNight,
             nextTransitionTime: nextTransitionTime
         )
@@ -668,13 +675,15 @@ private struct HourlyForecastSection: View {
     let forecast: ForecastWidgetSnapshot
     let family: WidgetFamily
 
-    let entryDate: Date
+    /// Calibrated, not the WidgetKit entry date: API clock labels are Taipei
+    /// wall-clock readings of calibrated time.
+    let calibratedDate: Date
     let isCurrentlyNight: Bool
     let nextTransitionTime: Int
 
     var body: some View {
         let points = ForecastWidgetFamilyPolicy.visiblePoints(
-            in: forecast, at: entryDate, family: family
+            in: forecast, at: calibratedDate, family: family
         )
         let compact = family == .systemMedium
         if !points.isEmpty {
@@ -690,7 +699,7 @@ private struct HourlyForecastSection: View {
                         HourlyForecastPointView(
                             point: point,
                             compact: compact,
-                            entryDate: entryDate,
+                            calibratedDate: calibratedDate,
                             isCurrentlyNight: isCurrentlyNight,
                             nextTransitionTime: nextTransitionTime
                         )
