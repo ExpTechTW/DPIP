@@ -955,6 +955,13 @@ private struct FailingSnapshotCoordinator:
     ) throws -> T {
         throw SnapshotCoordinationTestError.failed
     }
+
+    func coordinate<T>(
+        deletingItemAt url: URL,
+        _ accessor: (URL) throws -> T
+    ) throws -> T {
+        throw SnapshotCoordinationTestError.failed
+    }
 }
 
 private final class BlockingFirstSnapshotCoordinator:
@@ -984,6 +991,13 @@ private final class BlockingFirstSnapshotCoordinator:
             firstAccessGate.wait()
         }
         return try accessor(url)
+    }
+
+    func coordinate<T>(
+        deletingItemAt url: URL,
+        _ accessor: (URL) throws -> T
+    ) throws -> T {
+        try accessor(url)
     }
 
     func releaseFirstAccess() {
