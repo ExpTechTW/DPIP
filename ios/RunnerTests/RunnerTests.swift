@@ -102,7 +102,7 @@ final class RunnerTests: XCTestCase {
     XCTAssertEqual(stored["regionCode"] as? String, "110")
   }
 
-  func testSnapshotClearIsIdempotent() throws {
+  func testSnapshotClearRemovesEveryCurrentWeatherSnapshot() throws {
     let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: container) }
     let kind = try WidgetSnapshotFile.kind("currentWeather")
@@ -135,8 +135,23 @@ final class RunnerTests: XCTestCase {
 
     try WidgetSnapshotFile.clear(kind, in: container)
     XCTAssertFalse(FileManager.default.fileExists(atPath: legacyTarget.path))
+    XCTAssertFalse(FileManager.default.fileExists(atPath: perLocationTarget.path))
+
+    // The ordering sidecars went with them. Had one survived, it would claim a
+    // committed snapshot that is no longer on disk, and every write from here
+    // on would fail `invalidOrderingState` — a cleared widget that can never
+    // be republished.
+    XCTAssertNoThrow(
+      try WidgetSnapshotFile.replace(
+        data,
+        kind: kind,
+        sourceIdentifier: "region:220",
+        in: container
+      )
+    )
     XCTAssertTrue(FileManager.default.fileExists(atPath: perLocationTarget.path))
 
+    try WidgetSnapshotFile.clear(kind, in: container)
     XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
   }
 }
