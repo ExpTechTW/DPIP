@@ -24,6 +24,11 @@ class PermissionSettingsChannel(private val context: Context) :
     companion object {
         const val NAME = "com.exptech.dpip/permission_settings"
         private const val TAG = "PermissionSettings"
+        private val nativeDndChannelSettingsManufacturers = setOf(
+            "google",
+            "sony",
+            "motorola",
+        )
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -71,7 +76,13 @@ class PermissionSettingsChannel(private val context: Context) :
         result.success(openNotificationChannelSettings(channelId))
     }
 
+    private fun usesNativeDndChannelSettings() =
+        Build.MANUFACTURER.lowercase() in nativeDndChannelSettingsManufacturers
+
     private fun openNotificationChannelSettings(channelId: String): String {
+        if (!usesNativeDndChannelSettings()) {
+            return openNotificationSettings()
+        }
         try {
             context.startActivity(
                 Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
