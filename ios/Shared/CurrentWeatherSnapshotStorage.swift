@@ -223,6 +223,32 @@ struct CurrentWeatherSnapshotStorage: Sendable {
         }
     }
 
+    /// Removes every per-target snapshot together with its ordering sidecar.
+    ///
+    /// Ordering first, snapshots second, and the order is not cosmetic. A
+    /// sidecar that outlives its snapshot claims a committed fingerprint that
+    /// is no longer on disk, and `reconcile` fails closed on that pairing — so
+    /// a half-finished removal in the other order leaves `beginWrite` throwing
+    /// `invalidOrderingState` forever, and the widget could never be published
+    /// again. A snapshot that outlives its sidecar is merely adopted.
+    ///
+    /// Uncoordinated, like the removal it replaces: a clear that races a write
+    /// is ambiguous whichever way it resolves, and both outcomes — a surviving
+    /// stale snapshot, or a discarded fresh one — are recoverable by the next
+    /// refresh.
+    func removeAll() throws {
+        try removeDirectory(at: orderingDirectoryURL)
+        try removeDirectory(at: snapshotDirectoryURL)
+    }
+
+    private func removeDirectory(at url: URL) throws {
+        do {
+            try FileManager.default.removeItem(at: url)
+        } catch let error as CocoaError where error.code == .fileNoSuchFile {
+            // Nothing written yet, or already cleared.
+        }
+    }
+
     private var snapshotDirectoryURL: URL {
         containerURL
             .appendingPathComponent(
