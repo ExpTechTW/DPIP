@@ -18,7 +18,8 @@ struct ForecastWidgetSnapshotStore: Sendable {
     func load(
         for target: WidgetLocationTarget,
         regionCode: String,
-        at date: Date
+        at date: Date,
+        calibratedTimeOffsetMilliseconds: Int = 0
     ) -> ForecastWidgetSnapshot? {
         guard let url = snapshotURL(for: target),
               let attributes = try? FileManager.default.attributesOfItem(
@@ -34,7 +35,12 @@ struct ForecastWidgetSnapshotStore: Sendable {
               ),
               snapshot.sourceIdentifier == target.sourceIdentifier,
               snapshot.regionCode == regionCode,
-              ForecastWidgetExpiry.isUsable(snapshot, at: date)
+              ForecastWidgetExpiry.isUsable(
+                  snapshot,
+                  at: date,
+                  calibratedTimeOffsetMilliseconds:
+                      calibratedTimeOffsetMilliseconds
+              )
         else { return nil }
         return snapshot
     }
