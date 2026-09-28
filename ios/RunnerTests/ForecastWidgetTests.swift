@@ -317,6 +317,26 @@ final class ForecastWidgetExpiryTests: XCTestCase {
         XCTAssertEqual(ForecastWidgetExpiry.date(for: snapshot), expected)
         XCTAssertFalse(ForecastWidgetExpiry.isUsable(snapshot, at: expected))
     }
+
+    func testPublicationAndReceiveDeadlinesUseTheSameClockDomain() {
+        let deviceAhead = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T07:10:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:26:00Z")
+        )
+        XCTAssertEqual(ForecastWidgetExpiry.date(
+            for: deviceAhead,
+            calibratedTimeOffsetMilliseconds: -300_000
+        ), instant("2026-09-25T07:45:00Z"))
+
+        let deviceBehind = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T07:40:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:45:00Z")
+        )
+        XCTAssertEqual(ForecastWidgetExpiry.date(
+            for: deviceBehind,
+            calibratedTimeOffsetMilliseconds: 300_000
+        ), instant("2026-09-25T07:55:00Z"))
+    }
 }
 
 final class ForecastWidgetSnapshotStoreTests: XCTestCase {
@@ -375,6 +395,30 @@ final class ForecastWidgetSnapshotStoreTests: XCTestCase {
         XCTAssertNil(store.load(for: target, regionCode: "407",
                                 at: instant("2026-09-25T07:21:00Z")))
     }
+
+    func testCacheExpiryUsesCalibratedPublicationWithDeviceClockOffset() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let snapshot = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T07:10:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:26:00Z")
+        )
+        try store.write(snapshot, for: target)
+
+        XCTAssertNotNil(store.load(
+            for: target, regionCode: "407",
+            at: instant("2026-09-25T07:42:00Z"),
+            calibratedTimeOffsetMilliseconds: -300_000
+        ))
+        XCTAssertNil(store.load(
+            for: target, regionCode: "407",
+            at: instant("2026-09-25T07:45:00Z"),
+            calibratedTimeOffsetMilliseconds: -300_000
+        ))
+    }
 }
 
 final class ForecastWidgetProviderTests: XCTestCase {
@@ -399,6 +443,41 @@ final class ForecastWidgetProviderTests: XCTestCase {
         XCTAssertEqual(medium, large)
         XCTAssertEqual(medium.map(\.time),
                        ["11:00", "12:00", "13:00", "14:00", "15:00"])
+    }
+
+    func testSelectionUsesCalibratedTaipeiTimeWithDeviceClockOffset() {
+        let deviceDate = instant("2026-09-25T02:30:00Z") // 10:30 Taipei
+        let current = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7,
+            sourceIdentifier: "region:407",
+            regionCode: "407",
+            regionName: "測試地區",
+            observationTime: Int(deviceDate.timeIntervalSince1970) - 3_600,
+            stationName: "station",
+            weather: "晴",
+            weatherCode: 100,
+            condition: .clear,
+            isNight: false,
+            nextDayNightTransitionTime: 0,
+            calibratedTimeOffsetMilliseconds: 3_600_000,
+            temperature: 22,
+            humidity: 50,
+            rain: 0
+        )
+        let calibratedDate = CurrentWeatherWidgetTimeCalibration(
+            snapshot: current
+        ).calibratedDate(fromDeviceDate: deviceDate) // 11:30 Taipei
+        let forecast = forecastSnapshot(
+            updateTime: milliseconds("2026-09-24T00:00:00Z"),
+            times: ["10:00", "11:00", "12:00"]
+        )
+
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            let selected = ForecastWidgetFamilyPolicy.visiblePoints(
+                in: forecast, at: calibratedDate, family: family
+            )
+            XCTAssertEqual(selected.map(\.time), ["12:00"])
+        }
     }
 
     func testSmallDoesNotRefreshForecast() async {
