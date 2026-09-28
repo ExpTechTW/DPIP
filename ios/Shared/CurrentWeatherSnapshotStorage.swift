@@ -24,6 +24,21 @@ protocol CurrentWeatherSnapshotCoordinating: Sendable {
         writingItemAt url: URL,
         _ accessor: (URL) throws -> T
     ) throws -> T
+
+    /// Coordinates a deletion, which is not the same claim as a replacement.
+    ///
+    /// `.forDeleting` is what tells a presenter the item is going away rather
+    /// than changing, and it is the option `removeAll` needs on a whole
+    /// directory: a delete claim on a directory conflicts with a write claim
+    /// on anything inside it, which is what makes clearing atomic against a
+    /// `beginWrite` or `replace` already in flight for one of its snapshots.
+    /// Declared here rather than defaulted in an extension on purpose — a
+    /// default would let a test double inherit real coordination it never
+    /// performs, and the resulting green test would say nothing.
+    func coordinate<T>(
+        deletingItemAt url: URL,
+        _ accessor: (URL) throws -> T
+    ) throws -> T
 }
 
 struct CurrentWeatherSnapshotFileCoordinator:
@@ -33,13 +48,28 @@ struct CurrentWeatherSnapshotFileCoordinator:
         writingItemAt url: URL,
         _ accessor: (URL) throws -> T
     ) throws -> T {
+        try coordinate(url, options: .forReplacing, accessor)
+    }
+
+    func coordinate<T>(
+        deletingItemAt url: URL,
+        _ accessor: (URL) throws -> T
+    ) throws -> T {
+        try coordinate(url, options: .forDeleting, accessor)
+    }
+
+    private func coordinate<T>(
+        _ url: URL,
+        options: NSFileCoordinator.WritingOptions,
+        _ accessor: (URL) throws -> T
+    ) throws -> T {
         let coordinator = NSFileCoordinator(filePresenter: nil)
         var coordinationError: NSError?
         var accessorResult: Result<T, Error>?
 
         coordinator.coordinate(
             writingItemAt: url,
-            options: .forReplacing,
+            options: options,
             error: &coordinationError
         ) { coordinatedURL in
             accessorResult = Result {
@@ -232,13 +262,21 @@ struct CurrentWeatherSnapshotStorage: Sendable {
     /// `invalidOrderingState` forever, and the widget could never be published
     /// again. A snapshot that outlives its sidecar is merely adopted.
     ///
-    /// Uncoordinated, like the removal it replaces: a clear that races a write
-    /// is ambiguous whichever way it resolves, and both outcomes — a surviving
-    /// stale snapshot, or a discarded fresh one — are recoverable by the next
-    /// refresh.
+    /// Both removals happen inside one delete claim on the snapshot directory,
+    /// and that particular item is the point. Every writer coordinates on a
+    /// snapshot file, which is a descendant, so a claim here conflicts with all
+    /// of them; the ordering sidecars are written inside those same claims and
+    /// are never coordinated on their own, so nothing but this containment
+    /// protects them. Clearing the ordering directory under its own claim would
+    /// have serialised against no one and could delete a sidecar in the middle
+    /// of the three-step commit `replace` performs.
     func removeAll() throws {
-        try removeDirectory(at: orderingDirectoryURL)
-        try removeDirectory(at: snapshotDirectoryURL)
+        try coordinator.coordinate(
+            deletingItemAt: snapshotDirectoryURL
+        ) { coordinatedSnapshots in
+            try removeDirectory(at: orderingDirectoryURL)
+            try removeDirectory(at: coordinatedSnapshots)
+        }
     }
 
     private func removeDirectory(at url: URL) throws {
