@@ -11,14 +11,17 @@ enum ForecastWidgetFamilyPolicy {
         }
     }
 
+    /// - Parameter calibratedDate: a calibrated instant, never a WidgetKit
+    ///   entry date. Point labels are Taipei wall-clock readings of calibrated
+    ///   time, so a device-clock date shifts the selection by the offset.
     static func visiblePoints(
         in forecast: ForecastWidgetSnapshot,
-        at date: Date,
+        at calibratedDate: Date,
         family: WidgetFamily
     ) -> [ForecastWidgetPoint] {
         guard supportsForecast(family) else { return [] }
         return ForecastWidgetSelection.upcomingPoints(
-            forecast.points, at: date, limit: 5
+            forecast.points, at: calibratedDate, limit: 5
         )
     }
 }
