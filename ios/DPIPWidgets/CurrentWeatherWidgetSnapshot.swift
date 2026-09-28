@@ -350,6 +350,8 @@ struct CurrentWeatherWidgetSnapshot: Codable, Sendable {
     let regionCode: String
     let regionName: String
 
+    /// Source observation time, Unix seconds. Widget views show this value so
+    /// an old observation cannot appear fresh after a new timeline render.
     let observationTime: Int
 
     let stationName: String
