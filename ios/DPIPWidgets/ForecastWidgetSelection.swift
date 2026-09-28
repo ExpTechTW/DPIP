@@ -6,14 +6,22 @@ enum ForecastWidgetSelection {
     private static let maximumFutureMinutes = 12 * 60
     private static let taipei = TimeZone(identifier: "Asia/Taipei")!
 
-    static func minutesAhead(for clockLabel: String, at date: Date) -> Int? {
+    /// - Parameter calibratedDate: a calibrated instant. A label is a Taipei
+    ///   wall-clock reading of calibrated time, so a device-clock date would
+    ///   shift the selection by the calibration offset.
+    static func minutesAhead(
+        for clockLabel: String,
+        at calibratedDate: Date
+    ) -> Int? {
         guard let forecastMinutes = ForecastWidgetPoint.minutesSinceMidnight(
             clockLabel
         ) else { return nil }
 
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = taipei
-        let current = calendar.dateComponents([.hour, .minute], from: date)
+        let current = calendar.dateComponents(
+            [.hour, .minute], from: calibratedDate
+        )
         guard let hour = current.hour, let minute = current.minute else {
             return nil
         }
@@ -29,13 +37,15 @@ enum ForecastWidgetSelection {
 
     static func upcomingPoints(
         _ points: [ForecastWidgetPoint],
-        at date: Date,
+        at calibratedDate: Date,
         limit: Int
     ) -> [ForecastWidgetPoint] {
         guard limit > 0 else { return [] }
         return Array(points.enumerated().compactMap { index, point
             -> (index: Int, distance: Int, point: ForecastWidgetPoint)? in
-            guard let distance = minutesAhead(for: point.time, at: date) else {
+            guard let distance = minutesAhead(
+                for: point.time, at: calibratedDate
+            ) else {
                 return nil
             }
             return (index, distance, point)
