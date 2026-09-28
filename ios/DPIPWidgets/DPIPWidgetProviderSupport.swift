@@ -89,8 +89,13 @@ struct DPIPWidgetTimelinePlan: Sendable {
     let reloadDate: Date
 
     func forecast(at date: Date) -> ForecastWidgetSnapshot? {
-        guard let forecast,
-              ForecastWidgetExpiry.isUsable(forecast, at: date) else {
+        guard let forecast, let snapshot,
+              ForecastWidgetExpiry.isUsable(
+                  forecast,
+                  at: date,
+                  calibratedTimeOffsetMilliseconds:
+                      snapshot.calibratedTimeOffsetMilliseconds
+              ) else {
             return nil
         }
         return forecast
@@ -224,8 +229,12 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         } else {
             forecast = nil
         }
-        if let forecast {
-            let expiry = ForecastWidgetExpiry.date(for: forecast)
+        if let forecast, let snapshot {
+            let expiry = ForecastWidgetExpiry.date(
+                for: forecast,
+                calibratedTimeOffsetMilliseconds:
+                    snapshot.calibratedTimeOffsetMilliseconds
+            )
             if expiry > deviceNow, expiry < reloadDate,
                !states.contains(where: { $0.date == expiry }) {
                 states.append(CurrentWeatherWidgetTimeline.state(
@@ -335,8 +344,14 @@ enum DPIPWidgetProviderRuntime {
         }
         let loadForecast: DPIPWidgetTimelinePlanner.LoadForecast = {
             target, regionCode, date in
-            forecastStore?.load(
-                for: target, regionCode: regionCode, at: date
+            guard let current = loadSnapshot(target),
+                  current.regionCode == regionCode else { return nil }
+            return forecastStore?.load(
+                for: target,
+                regionCode: regionCode,
+                at: date,
+                calibratedTimeOffsetMilliseconds:
+                    current.calibratedTimeOffsetMilliseconds
             )
         }
         let forecastClient = ForecastClient()

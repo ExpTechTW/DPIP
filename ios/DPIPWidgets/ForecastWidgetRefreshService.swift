@@ -41,7 +41,10 @@ struct ForecastWidgetRefreshService: Sendable {
         // Recheck after await: a Current Location request for A may complete
         // after the current-weather snapshot has moved to township B.
         guard matchesCurrent(target: target, regionCode: regionCode),
-              isResolved(target), !response.points.isEmpty else { return }
+              isResolved(target), !response.points.isEmpty,
+              let current = loadCurrent(target),
+              target.matches(snapshot: current),
+              current.regionCode == regionCode else { return }
         let receivedAt = Int64(now().timeIntervalSince1970 * 1_000)
         guard let snapshot = ForecastWidgetSnapshot(
             sourceIdentifier: target.sourceIdentifier ?? "",
@@ -49,7 +52,12 @@ struct ForecastWidgetRefreshService: Sendable {
             updateTime: response.updateTime,
             receivedAt: receivedAt,
             points: response.points
-        ), ForecastWidgetExpiry.isUsable(snapshot, at: now()) else { return }
+        ), ForecastWidgetExpiry.isUsable(
+            snapshot,
+            at: now(),
+            calibratedTimeOffsetMilliseconds:
+                current.calibratedTimeOffsetMilliseconds
+        ) else { return }
         _ = try? write(snapshot, target)
     }
 
