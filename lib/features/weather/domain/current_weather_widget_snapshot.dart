@@ -13,6 +13,12 @@ enum CurrentWeatherWidgetCondition {
   unknown,
 }
 
+/// Cross-platform Widget payload; keep its fields aligned with the Swift DTO.
+///
+/// Weather text and code preserve the source observation. [condition] is the
+/// coarse, versioned semantic value; native presentation derives a finer
+/// glyph from the code (and uses the text only when the code cannot classify
+/// the observation), without expanding this persisted enum for every icon.
 final class CurrentWeatherWidgetSnapshot {
   const CurrentWeatherWidgetSnapshot({
     this.schemaVersion = 7,
@@ -46,8 +52,13 @@ final class CurrentWeatherWidgetSnapshot {
 
   final String stationName;
 
+  /// Original CWB label, retained for display/fallback when a code is unknown.
   final String weather;
+
+  /// Original numeric CWB code; its suffix supports finer icon selection.
   final int weatherCode;
+
+  /// Coarse persisted classification shared with the native snapshot schema.
   final CurrentWeatherWidgetCondition condition;
   final bool isNight;
 

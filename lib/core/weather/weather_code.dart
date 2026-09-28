@@ -1,7 +1,12 @@
 /// Pure semantic classification for CWB weather-condition codes.
 library;
 
-/// The weather meaning shared by Flutter visuals and platform transports.
+/// Coarse weather meaning shared by behavior and platform transports.
+///
+/// Presentation can refine a condition using the CWB code suffix, so this
+/// intentionally has fewer cases than the available weather glyphs. For
+/// example, hail, sleet, and lightning-only codes can share a broad condition
+/// while still receiving distinct presentation icons.
 enum WeatherCondition {
   clear,
   cloudy,
@@ -13,10 +18,13 @@ enum WeatherCondition {
   unknown,
 }
 
-/// Weather-code suffix → weather phenomenon.
+/// Weather-code suffix → broad semantic phenomenon.
 ///
-/// The phenomenon wins over the family sky: `106` is rain even though it is
-/// in the clear-sky family. This is the authoritative suffix classification.
+/// The last two digits (`code % 100`) identify the phenomenon; the hundreds
+/// family (`code ~/ 100`) supplies the plain sky only when there is no
+/// phenomenon suffix. Thus `106` is rain even though it is in the clear-sky
+/// family. These broad meanings intentionally do not enumerate every visual
+/// precipitation variant.
 const Map<int, WeatherCondition> _phenomenonCondition = {
   1: WeatherCondition.fog, // 有霾
   2: WeatherCondition.fog, // 有靄
