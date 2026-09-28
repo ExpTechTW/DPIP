@@ -196,6 +196,7 @@
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
+				ForecastSnapshotLocation.swift,
 				WidgetLocationCatalog.swift,
 				NativeLog.swift,
 			);
@@ -206,6 +207,7 @@
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
+				ForecastSnapshotLocation.swift,
 				NativeLog.swift,
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
@@ -215,6 +217,7 @@
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
+				ForecastSnapshotLocation.swift,
 				WidgetLocationCatalog.swift,
 				NativeLog.swift,
 			);
