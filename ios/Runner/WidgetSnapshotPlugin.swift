@@ -148,13 +148,15 @@ enum WidgetSnapshotFile {
     }
   }
 
-  /// Removes everything `write` could have produced for this kind.
+  /// Removes everything that could be on disk for this kind — which is more
+  /// than `write` puts there, because the widget extension caches too.
   ///
-  /// The `switch` mirrors `snapshotURL(kind:sourceIdentifier:in:)` on purpose.
-  /// Current weather stopped being one file per kind when it became one file
-  /// per target, and for a while only the write path knew that: this removed
-  /// the single legacy file, found nothing, reported success, and left every
-  /// per-target snapshot on disk for the widget to keep drawing.
+  /// Current weather and hourly forecast both stopped being one file per kind
+  /// when they became one file per target, and for a while only the write paths
+  /// knew it: this removed the single legacy file, found nothing, reported
+  /// success, and left every per-target snapshot on disk for the widget to keep
+  /// drawing. Neither per-target layout is named here; each is owned by the
+  /// type that writes it, and this only asks that type to empty itself.
   static func clear(_ kind: WidgetSnapshotKind, in container: URL) throws {
     let directory = container.appendingPathComponent("WidgetSnapshots", isDirectory: true)
     do {
@@ -166,7 +168,13 @@ enum WidgetSnapshotFile {
         // exactly what would stay on screen after everything else was cleared.
         try remove(directory.appendingPathComponent(kind.filename))
 
-      case .weatherForecast, .locationCatalog:
+      case .weatherForecast:
+        try ForecastSnapshotLocation.removeAll(in: container)
+        // And the pre-per-target file, for the same reason current weather
+        // clears its own: the widget still falls back to it.
+        try remove(directory.appendingPathComponent(kind.filename))
+
+      case .locationCatalog:
         try remove(directory.appendingPathComponent(kind.filename))
       }
     } catch {

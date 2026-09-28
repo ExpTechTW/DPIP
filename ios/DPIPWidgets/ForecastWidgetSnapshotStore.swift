@@ -10,9 +10,8 @@ struct ForecastWidgetSnapshotStore: Sendable {
               let address = CurrentWeatherSnapshotAddress(
                   sourceIdentifier: source
               ) else { return nil }
-        return containerURL
-            .appendingPathComponent("WidgetSnapshots", isDirectory: true)
-            .appendingPathComponent("hourly-forecast", isDirectory: true)
+        return ForecastSnapshotLocation
+            .directoryURL(in: containerURL)
             .appendingPathComponent(address.filename)
     }
 
