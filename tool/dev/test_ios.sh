@@ -43,7 +43,30 @@ fi
 # layout or a specific OS version.
 destination="${DPIP_IOS_SIMULATOR:-}"
 if [[ -n $destination ]]; then
-  destination="platform=iOS Simulator,name=$destination"
+  if [[ $destination =~ ^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$ ]]; then
+    destination="platform=iOS Simulator,id=$destination"
+  else
+    # A name alone makes xcodebuild assume OS=latest, even when that device
+    # exists only on an older installed runtime. Resolve its actual UDID.
+    udid="$(xcrun simctl list devices available --json | python3 -c '
+import json
+import sys
+
+devices = [
+    device
+    for runtime in json.load(sys.stdin)["devices"].values()
+    for device in runtime
+    if device["name"] == sys.argv[1]
+]
+booted = next((device for device in devices if device["state"] == "Booted"), None)
+print((booted or devices[0])["udid"] if devices else "")
+' "$destination")"
+    if [[ -z $udid ]]; then
+      printf '\n  No available iOS simulator named %s.\n\n' "$destination" >&2
+      exit 1
+    fi
+    destination="platform=iOS Simulator,id=$udid"
+  fi
 else
   # `    iPhone 17 Pro (UDID) (Shutdown)` — the parenthesised field is the UDID.
   udid="$(xcrun simctl list devices available |
