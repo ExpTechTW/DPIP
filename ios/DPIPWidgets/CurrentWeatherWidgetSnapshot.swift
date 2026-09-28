@@ -1,6 +1,10 @@
 import Foundation
 import SwiftUI
 
+/// Coarse condition stored in the cross-platform snapshot contract.
+///
+/// Keep this semantic enum independent of the finer presentation variants
+/// below; a platform-specific symbol choice does not redefine the CWB meaning.
 enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
     case clear
     case cloudy
@@ -69,6 +73,12 @@ enum CurrentWeatherWidgetCondition: String, Decodable, Sendable {
     }
 }
 
+/// Widget-only presentation classification, refined beyond the persisted
+/// condition so SF Symbols can distinguish hail, sleet, and lightning alone.
+///
+/// This is intentionally derived from the source code/text instead of encoded
+/// into the snapshot: SwiftUI uses SF Symbols, while Flutter uses its bundled
+/// Material Symbols subset, and those icon sets need not share glyph mappings.
 enum WidgetWeatherCondition: CaseIterable, Equatable, Sendable {
     case clear
     case cloudy
@@ -83,6 +93,8 @@ enum WidgetWeatherCondition: CaseIterable, Equatable, Sendable {
     case unknown
 
     init(weatherCode: Int, weather: String) {
+        // The suffix identifies a phenomenon across CWB families; consult the
+        // hundreds family next, and text only if neither code part classifies it.
         switch weatherCode % 100 {
         case 1, 2, 5:
             self = .fog
@@ -122,6 +134,8 @@ enum WidgetWeatherCondition: CaseIterable, Equatable, Sendable {
     }
 
     private static func fallbackCondition(weather: String) -> Self {
+        // API text is less structured than the numeric code, so use it only
+        // when neither a recognized suffix nor a recognized family applies.
         if weather.contains("雷"), weather.contains("雨") {
             return .thunderstorm
         }
