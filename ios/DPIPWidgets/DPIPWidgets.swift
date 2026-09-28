@@ -172,6 +172,8 @@ private func forecastIsNight(
     return !isCurrentlyNight
 }
 
+// All weather families show the source observation time beside current weather.
+// Using the WidgetKit entry or render time would make stale data look fresh.
 private struct SmallCurrentWeatherView: View {
     let entry: DPIPWidgetEntry
 

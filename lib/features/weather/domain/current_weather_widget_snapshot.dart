@@ -48,6 +48,7 @@ final class CurrentWeatherWidgetSnapshot {
   final String regionCode;
   final String regionName;
 
+  /// Source weather observation time, Unix seconds; not snapshot publish time.
   final int observationTime;
 
   final String stationName;
