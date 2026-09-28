@@ -148,15 +148,37 @@ enum WidgetSnapshotFile {
     }
   }
 
+  /// Removes everything `write` could have produced for this kind.
+  ///
+  /// The `switch` mirrors `snapshotURL(kind:sourceIdentifier:in:)` on purpose.
+  /// Current weather stopped being one file per kind when it became one file
+  /// per target, and for a while only the write path knew that: this removed
+  /// the single legacy file, found nothing, reported success, and left every
+  /// per-target snapshot on disk for the widget to keep drawing.
   static func clear(_ kind: WidgetSnapshotKind, in container: URL) throws {
     let directory = container.appendingPathComponent("WidgetSnapshots", isDirectory: true)
-    let snapshot = directory.appendingPathComponent(kind.filename)
     do {
-      try FileManager.default.removeItem(at: snapshot)
-    } catch let error as CocoaError where error.code == .fileNoSuchFile {
-      // Clearing an absent snapshot is intentionally idempotent.
+      switch kind {
+      case .currentWeather:
+        try CurrentWeatherSnapshotStorage(containerURL: container).removeAll()
+        // And the pre-per-target file. WidgetSnapshotStore still reads it as a
+        // migration fallback, so on a device upgraded across that change it is
+        // exactly what would stay on screen after everything else was cleared.
+        try remove(directory.appendingPathComponent(kind.filename))
+
+      case .weatherForecast, .locationCatalog:
+        try remove(directory.appendingPathComponent(kind.filename))
+      }
     } catch {
       throw WidgetSnapshotError.writeFailed
+    }
+  }
+
+  private static func remove(_ url: URL) throws {
+    do {
+      try FileManager.default.removeItem(at: url)
+    } catch let error as CocoaError where error.code == .fileNoSuchFile {
+      // Clearing an absent snapshot is intentionally idempotent.
     }
   }
 
