@@ -185,14 +185,21 @@ EOF
     fi
   fi
 
-  # 4. `Platform:` is optional, but a typo in it silently drops the tag from
-  #    the release note rather than failing anywhere.
+  # 4. `Platform:` is required once there are changelog entries. The release
+  #    note marks every entry with its platforms, and a missing trailer used to
+  #    mean "both" in silence — so a change that was Android-only but never
+  #    said so shipped marked for iOS as well. `all` is a decision; leaving the
+  #    trailer out is not one, so it fails here, where whoever wrote the commit
+  #    sees it.
   platform="$(printf '%s\n' "$body" | sed -n 's/^[Pp]latform: *//p' | head -n 1)"
-  if [ -n "$platform" ]; then
+  if [ -n "$entries" ] && [ -z "$platform" ]; then
+    note "Platform: is required with changelog entries — 'all', 'android' or 'ios'"
+    bad=1
+  elif [ -n "$platform" ]; then
     case "$(printf '%s' "$platform" | tr '[:upper:]' '[:lower:]')" in
-    android | ios) ;;
+    all | android | ios) ;;
     *)
-      note "Platform: must be 'android' or 'ios' (omit it when a change affects both) — got '$platform'"
+      note "Platform: must be 'all', 'android' or 'ios' — got '$platform'"
       bad=1
       ;;
     esac

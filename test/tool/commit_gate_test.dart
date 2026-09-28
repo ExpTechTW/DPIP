@@ -46,6 +46,7 @@ void main() {
     test('a user-facing change with both required languages', () {
       _accepts(
         'feat(map): overlay radar echo\n\n'
+        'Platform: all\n\n'
         'New(zh-Hant): 地圖可以疊加雷達回波\n'
         'New(en-US): the map can overlay radar echo\n',
       );
@@ -54,6 +55,7 @@ void main() {
     test('several entries across several categories', () {
       _accepts(
         'perf(changelog): fetch one page at a time\n\n'
+        'Platform: all\n\n'
         'Optimization(zh-Hant): 甲\nOptimization(en-US): a\n'
         'Fix(zh-Hant): 乙\nFix(en-US): b\n',
       );
@@ -62,6 +64,7 @@ void main() {
     test('an optional language, without pairing it into every category', () {
       _accepts(
         'fix(changelog): show one language\n\n'
+        'Platform: all\n\n'
         'Fix(zh-Hant): 甲\nFix(en-US): a\nFix(ja-JP): あ\n',
       );
     });
@@ -76,7 +79,16 @@ void main() {
       _accepts(
         'perf(changelog): fetch one page at a time and hide snapshots by '
         'default (#528)\n\n'
+        'Platform: all\n\n'
         'Optimization(zh-Hant): 甲\nOptimization(en-US): a\n',
+      );
+    });
+
+    test('a change on one platform, naming it', () {
+      _accepts(
+        'fix(notify): stop the crash when Android 14 starts the service\n\n'
+        'Platform: android\n\n'
+        'Fix(zh-Hant): 甲\nFix(en-US): a\n',
       );
     });
   });
@@ -157,11 +169,20 @@ void main() {
       );
     });
 
-    test('a platform trailer that is neither android nor ios', () {
+    test('entries without a platform trailer', () {
+      // Left out, it used to mean "both" in silence, and a change on one
+      // platform that never said so shipped marked for the other too.
+      _rejects(
+        'fix(map): x\n\nFix(zh-Hant): 甲\nFix(en-US): a\n',
+        'Platform: is required with changelog entries',
+      );
+    });
+
+    test('a platform trailer that is not all, android or ios', () {
       // A typo silently drops the tag from the note rather than failing.
       _rejects(
         'fix(map): x\n\nPlatform: andriod\n\nFix(zh-Hant): 甲\nFix(en-US): a\n',
-        "must be 'android' or 'ios'",
+        "must be 'all', 'android' or 'ios'",
       );
     });
   });

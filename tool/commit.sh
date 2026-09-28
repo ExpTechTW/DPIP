@@ -260,7 +260,7 @@ heading 'The message you are about to write'
 cat <<'SHAPE'
     <type>(<scope>): <english summary, imperative, ≤72, no full stop>
 
-    Platform: android|ios          ← only when it affects one platform
+    Platform: all|android|ios      ← required with changelog entries
 
     <Category>(zh-Hant): <一行，講使用者感覺得到的結果>
     <Category>(en-US): <the same line, in English>

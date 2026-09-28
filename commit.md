@@ -39,7 +39,7 @@ stage、不會 fetch、不改任何檔案 —— 但它會把「現在提交會�
 | staged / unstaged / untracked 各是什麼 | 未追蹤的檔案 CI 看不到 —— 少 stage 一個新檔案，只會在 runner 上失敗 |
 | 有沒有 stage 到不該進版控的東西 | `build/`、`.dart_tool/`、`build_info.g.dart` |
 | 這次改動碰到哪些 feature 與範圍 | 挑 `<scope>`；跨太多區就不要寫 scope |
-| 是不是只碰單一平台 | 提醒你補 `Platform:` trailer |
+| 是不是只碰單一平台 | 提醒你 `Platform:` 該寫 `android` 或 `ios`，而不是 `all` |
 | ARB 只改了一部分 | 少一個語系的 key 會無聲退回英文 |
 | 訊息格式的樣板與三個會無聲失敗的規則 | 條目數對不齊、忘了寫 `Category` 行、署名 |
 | 現有 commit 過不過 gate | 過不了只能 rebase，越早知道越便宜 |
@@ -147,6 +147,8 @@ feat(mesh): show the radio's own packet counters
 ```
 feat(map): overlay radar echo on the map
 
+Platform: all
+
 New(zh-Hant): 地圖可以疊加雷達回波
 New(en-US): the map can overlay radar echo
 ```
@@ -204,7 +206,7 @@ New(zh-Hant): 地圖可以疊加雷達回波
 
 ## 平台
 
-只影響單一平台的變更加一行 trailer，放在說明**之前**：
+**有更新日誌條目的 commit 一定要寫 `Platform:`**，放在說明**之前**：
 
 ```
 fix(notify): stop the crash when Android 14 starts the service
@@ -214,8 +216,12 @@ Platform: android
 Android 14 requires a foregroundServiceType on every start…
 ```
 
-- 只接受 `android` 或 `ios`（gate 會擋拼錯的——拼錯只會讓圖示無聲消失）
-- **兩個平台都影響就不要加**
+- 只接受 `all`、`android`、`ios`：兩個平台都影響寫 `all`，只影響一個就寫那一個
+- **沒寫或寫錯都會被擋下**：commit-msg hook 與 CI 的 gate（`tool/check/commits.sh`）直接
+  報錯，`tool/release/notes.sh` 遇到沒寫的 commit 也會中止，不產生更新日誌。以前「不寫
+  就是兩個平台」，只影響一個平台卻忘了寫的改動就會被標成兩個都有；`all` 是明確的判斷，
+  不寫不是，所以不寫就報錯
+- 沒有條目的 commit（`docs`、`ci`、`chore` 等）不需要寫，寫了也會檢查值
 - 更新日誌會在該項前面放對應的平台圖示
 
 ---
@@ -264,6 +270,7 @@ git commit
 
 ## 禁止（gate 會擋）
 
+- **有條目卻沒寫 `Platform:`**，或寫了 `all`、`android`、`ios` 以外的值
 - **`Co-Authored-By:`** 任何形式
 - **任何工具署名**：`Generated with`、🤖、agent 名稱、模型名稱
 
@@ -291,6 +298,8 @@ Fix(en-US): fix the app crashing on the first earthquake alert after an
 ```
 perf(changelog): fetch one page at a time
 
+Platform: all
+
 Optimization(zh-Hant): 更新日誌改成捲到底再載入下一頁，開啟快很多
 Optimization(en-US): the changelog loads a page at a time and opens faster
 Fix(zh-Hant): 修正某一頁載入失敗會清空整個清單
@@ -303,6 +312,8 @@ Fix(en-US): a failed page no longer clears the list already on screen
 
 ```
 fix(changelog): show one language instead of both
+
+Platform: all
 
 Fix(zh-Hant): 更新日誌不再中英文一起顯示
 Fix(en-US): the changelog no longer shows both languages at once
@@ -352,7 +363,7 @@ ci: cache the Swift package resolution
 | **快照** `26w33a` | 上一個 tag 到現在 | 讀的人已經有前一個了，只需要增量 |
 | **正式版** `26.1` | **上一個正式版**到現在 | 從 `26.1` 升到 `26.2` 的人一個快照都沒看過，只給增量等於只告訴他一小部分 |
 
-**每一則條目都會標上平台圖示**——只影響一個平台就標一個，兩個都影響就兩個都標。
+**每一則條目都會標上平台圖示**，依 `Platform:` 而定——只影響一個平台就標一個，`all` 兩個都標。
 只標單平台的話，其餘每一行都變成「兩個平台都有」和「沒有人說」分不出來，而那是
 兩件不同的事。
 

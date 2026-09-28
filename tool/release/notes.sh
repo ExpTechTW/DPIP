@@ -112,17 +112,29 @@ range="${since:+$since..}HEAD"
 
 # Which platforms an entry applies to, always stated.
 #
-# A `Platform:` trailer narrows it to one; without a trailer the change is on
-# both, and both icons are drawn. Marking only the single-platform entries
-# leaves every other line ambiguous — the reader cannot tell "applies to both"
-# from "nobody said", and those are different claims.
+# Every commit with an entry names them in a `Platform:` trailer — `all`, or
+# the one it narrows to — and the commit gate (tool/check/commits.sh) rejects
+# one that does not. Marking only the single-platform entries would leave
+# every other line ambiguous: the reader cannot tell "applies to both" from
+# "nobody said", and those are different claims. So one without a trailer, or
+# with a value this does not know, stops the note rather than being marked
+# for both.
 platform_tag() {
-  case "$(git log -1 --format=%b "$1" |
+  local platform
+  platform="$(git log -1 --format=%b "$1" |
     sed -n 's/^[Pp]latform: *\([a-zA-Z]*\).*/\1/p' | head -n 1 |
-    tr '[:upper:]' '[:lower:]')" in
+    tr '[:upper:]' '[:lower:]')"
+  case "$platform" in
+  all) printf '%s %s ' "$TAG_ANDROID" "$TAG_IOS" ;;
   android) printf '%s ' "$TAG_ANDROID" ;;
   ios) printf '%s ' "$TAG_IOS" ;;
-  *) printf '%s %s ' "$TAG_ANDROID" "$TAG_IOS" ;;
+  *)
+    local why="no Platform: trailer"
+    [ -z "$platform" ] || why="an unknown Platform: $platform"
+    printf 'notes.sh: %s has changelog entries but %s — see commit.md, 平台\n' \
+      "$(git log -1 --format=%h "$1")" "$why" >&2
+    return 1
+    ;;
   esac
 }
 
