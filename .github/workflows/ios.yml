@@ -3,9 +3,21 @@ name: Build iOS
 # Pull requests only. A push to `main` is handled by release.yml,
 # which builds the signed, uploadable artifact — running this as well would
 # spend a second runner producing an unsigned one nobody installs.
+#
+# Every pull request, not only the ones targeting `main`. A stacked branch
+# opens its pull request against the layer below it, so `branches: [main]`
+# silently excluded exactly the reviews that most needed a compiler: the ones
+# where only the top of the stack is ever read against `main`. Four iOS-only
+# commits reached review that way without Swift being built once.
 on:
   pull_request:
-    branches: ["main"]
+
+# One in-flight run per ref; a new push cancels the previous run. This matters
+# more now that the trigger is every pull request: restacking a five-deep chain
+# pushes five branches at once, and each one wants a macOS runner.
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   changes:
@@ -65,6 +77,14 @@ jobs:
         run: |
           bash tool/dev/deps.sh
           bash tool/dev/codegen.sh
+
+      # Before the device build, because it is the step that can fail on
+      # something a reviewer would have had to catch by eye. It builds the
+      # Runner scheme, which depends on DPIPWidgetsExtension, so the widget
+      # target and its SwiftUI views are compiled here as well — nothing else
+      # in this repository compiles them.
+      - name: Test (ios/RunnerTests)
+        run: bash tool/dev/test_ios.sh
 
       - name: Build iOS App and create IPA
         run: |
