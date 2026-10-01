@@ -119,11 +119,22 @@ range="${since:+$since..}HEAD"
 # "nobody said", and those are different claims. So one without a trailer, or
 # with a value this does not know, stops the note rather than being marked
 # for both.
+#
+# Except history: the trailer became required at PLATFORM_REQUIRED_SINCE, and
+# main is never rewritten, so every commit already on it by then stays without
+# one. For those an absent trailer meant what it meant when they were written —
+# both platforms — or the first release after the rule could never be noted.
+PLATFORM_REQUIRED_SINCE=c193f41f5a97608b3f8df81d16586e414a944211
+
 platform_tag() {
   local platform
   platform="$(git log -1 --format=%b "$1" |
     sed -n 's/^[Pp]latform: *\([a-zA-Z]*\).*/\1/p' | head -n 1 |
     tr '[:upper:]' '[:lower:]')"
+  if [ -z "$platform" ] &&
+    git merge-base --is-ancestor "$1" "$PLATFORM_REQUIRED_SINCE" 2>/dev/null; then
+    platform=all
+  fi
   case "$platform" in
   all) printf '%s %s ' "$TAG_ANDROID" "$TAG_IOS" ;;
   android) printf '%s ' "$TAG_ANDROID" ;;
