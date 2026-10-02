@@ -20,6 +20,7 @@ import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -58,6 +59,7 @@ class SharedDeps {
     required this.townDirectory,
     required this.townBoundaries,
     required this.regionStore,
+    required this.widgetLocationCatalogCoordinator,
     required this.locationService,
     required this.deviceLocationReporter,
     required this.backgroundLocation,
@@ -116,6 +118,9 @@ class SharedDeps {
 
   /// App-wide Home region selection (also provided).
   final RegionStore regionStore;
+
+  /// Synchronizes DPIP's saved locations into the Widget App Group catalog.
+  final WidgetLocationCatalogCoordinator widgetLocationCatalogCoordinator;
 
   /// GPS → current township resolver (geolocator).
   final LocationService locationService;

@@ -6,6 +6,7 @@ import WidgetKit
 enum WidgetSnapshotKind: String {
   case weatherForecast
   case currentWeather
+  case locationCatalog
 
   var filename: String {
     switch self {
@@ -13,15 +14,19 @@ enum WidgetSnapshotKind: String {
       return "weather-forecast.json"
     case .currentWeather:
       return "current-weather.json"
+    case .locationCatalog:
+      return "location-catalog.json"
     }
   }
 
-  var widgetKind: String {
+  var widgetKind: String? {
     switch self {
     case .weatherForecast:
       return "DPIPWidgets"
     case .currentWeather:
       return "DPIPWidgets"
+    case .locationCatalog:
+      return nil
     }
   }
 }
@@ -144,8 +149,10 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
 
       do {
         try WidgetSnapshotFile.replace(data, kind: kind, in: container)
-        WidgetCenter.shared.reloadTimelines(ofKind: kind.widgetKind)
-        DispatchQueue.main.async { result(nil) }
+          if let widgetKind = kind.widgetKind {
+            WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
+          };
+          DispatchQueue.main.async { result(nil) }
       } catch {
         DispatchQueue.main.async { result(self.flutterError(.writeFailed)) }
       }
@@ -182,7 +189,9 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
 
       do {
         try WidgetSnapshotFile.clear(kind, in: container)
-        WidgetCenter.shared.reloadTimelines(ofKind: kind.widgetKind)
+          if let widgetKind = kind.widgetKind {
+            WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
+          }
         DispatchQueue.main.async { result(nil) }
       } catch {
         DispatchQueue.main.async { result(self.flutterError(.writeFailed)) }
