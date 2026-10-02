@@ -1,0 +1,462 @@
+import Foundation
+import XCTest
+
+final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
+    func testDecodesSchemaVersionFourSnapshot() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 4,
+              "regionCode": "660",
+              "regionName": "西屯區",
+              "observationTime": 1789567200,
+              "stationName": "西屯",
+              "weather": "晴",
+              "weatherCode": 100,
+              "condition": "clear",
+              "isNight": true,
+              "nextDayNightTransitionTime": 1789562700,
+              "calibratedTimeOffsetMilliseconds": -300000,
+              "temperature": 28.5,
+              "humidity": null,
+              "rain": 0.0
+            }
+            """
+        )
+
+        XCTAssertEqual(snapshot.schemaVersion, 4)
+        XCTAssertEqual(snapshot.regionCode, "660")
+        XCTAssertEqual(snapshot.regionName, "西屯區")
+        XCTAssertEqual(snapshot.observationTime, 1_789_567_200)
+        XCTAssertEqual(snapshot.stationName, "西屯")
+        XCTAssertEqual(snapshot.weather, "晴")
+        XCTAssertEqual(snapshot.weatherCode, 100)
+        XCTAssertEqual(snapshot.condition, .clear)
+        XCTAssertTrue(snapshot.isNight)
+        XCTAssertEqual(snapshot.nextDayNightTransitionTime, 1_789_562_700)
+        XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, -300_000)
+        XCTAssertEqual(snapshot.temperature, 28.5)
+        XCTAssertNil(snapshot.humidity)
+        XCTAssertEqual(snapshot.rain, 0)
+    }
+
+    func testDecodesSchemaVersionThreeSnapshotWithZeroCalibration() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 3,
+              "regionCode": "660",
+              "regionName": "西屯區",
+              "observationTime": 1789567200,
+              "stationName": "西屯",
+              "weather": "晴",
+              "weatherCode": 100,
+              "condition": "clear",
+              "isNight": true,
+              "nextDayNightTransitionTime": 1789562700,
+              "temperature": null,
+              "humidity": null,
+              "rain": null
+            }
+            """
+        )
+
+        XCTAssertTrue(snapshot.isNight)
+        XCTAssertEqual(snapshot.nextDayNightTransitionTime, 1_789_562_700)
+        XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 0)
+        XCTAssertNil(snapshot.temperature)
+        XCTAssertNil(snapshot.humidity)
+        XCTAssertNil(snapshot.rain)
+    }
+
+    func testDecodesSchemaVersionTwoSnapshotWithLegacyDefaults() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 2,
+              "regionCode": "660",
+              "regionName": "西屯區",
+              "observationTime": 1789567200,
+              "stationName": "西屯",
+              "weather": "晴",
+              "weatherCode": 100,
+              "condition": "clear",
+              "temperature": null,
+              "humidity": null,
+              "rain": null
+            }
+            """
+        )
+
+        XCTAssertFalse(snapshot.isNight)
+        XCTAssertEqual(snapshot.nextDayNightTransitionTime, 0)
+        XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 0)
+    }
+
+    func testSchemaVersionFourRequiresCalibration() {
+        XCTAssertThrowsError(
+            try decode(
+                """
+                {
+                  "schemaVersion": 4,
+                  "regionCode": "660",
+                  "regionName": "西屯區",
+                  "observationTime": 1789567200,
+                  "stationName": "西屯",
+                  "weather": "晴",
+                  "weatherCode": 100,
+                  "condition": "clear",
+                  "isNight": false,
+                  "nextDayNightTransitionTime": 1789562700,
+                  "temperature": null,
+                  "humidity": null,
+                  "rain": null
+                }
+                """
+            )
+        )
+    }
+
+    func testUnknownConditionDecodesAsUnknown() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 3,
+              "regionCode": "660",
+              "regionName": "西屯區",
+              "observationTime": 1789567200,
+              "stationName": "西屯",
+              "weather": "未知",
+              "weatherCode": 999,
+              "condition": "future-condition",
+              "isNight": false,
+              "nextDayNightTransitionTime": 0,
+              "temperature": null,
+              "humidity": null,
+              "rain": null
+            }
+            """
+        )
+
+        XCTAssertEqual(snapshot.condition, .unknown)
+    }
+
+    private func decode(_ json: String) throws -> CurrentWeatherWidgetSnapshot {
+        try JSONDecoder().decode(
+            CurrentWeatherWidgetSnapshot.self,
+            from: Data(json.utf8)
+        )
+    }
+}
+
+final class CurrentWeatherWidgetConditionTests: XCTestCase {
+    func testEveryConditionHasItsOwnLocalizationKey() {
+        let expected: [(CurrentWeatherWidgetCondition, String)] = [
+            (.clear, "weather.clear"),
+            (.cloudy, "weather.cloudy"),
+            (.overcast, "weather.overcast"),
+            (.rain, "weather.rain"),
+            (.thunderstorm, "weather.thunderstorm"),
+            (.snow, "weather.snow"),
+            (.fog, "weather.fog"),
+            (.unknown, "weather.unknown"),
+        ]
+
+        for (condition, key) in expected {
+            XCTAssertEqual(condition.displayNameLocalizationKey, key)
+        }
+    }
+
+    func testClearAndCloudyUseDayNightSymbols() {
+        XCTAssertEqual(
+            CurrentWeatherWidgetCondition.clear.systemImageName(isNight: false),
+            "sun.max.fill"
+        )
+        XCTAssertEqual(
+            CurrentWeatherWidgetCondition.clear.systemImageName(isNight: true),
+            "moon.stars.fill"
+        )
+        XCTAssertEqual(
+            CurrentWeatherWidgetCondition.cloudy.systemImageName(isNight: false),
+            "cloud.sun.fill"
+        )
+        XCTAssertEqual(
+            CurrentWeatherWidgetCondition.cloudy.systemImageName(isNight: true),
+            "cloud.moon.fill"
+        )
+    }
+
+    func testRainSymbolDoesNotDependOnDayNight() {
+        XCTAssertEqual(
+            CurrentWeatherWidgetCondition.rain.systemImageName(isNight: false),
+            "cloud.rain.fill"
+        )
+        XCTAssertEqual(
+            CurrentWeatherWidgetCondition.rain.systemImageName(isNight: true),
+            "cloud.rain.fill"
+        )
+    }
+}
+
+final class CurrentWeatherWidgetTimelineTests: XCTestCase {
+    private let staleAfter: TimeInterval = 30 * 60
+
+    func testDayToNightBeforeStale() {
+        let now = date(10_000)
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_200
+            ),
+            deviceNow: now,
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 10_000, isStale: false, isNight: false),
+                state(at: 11_200, isStale: false, isNight: true),
+                state(at: 11_800, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testDeviceClockAheadUsesNegativeOffsetForScheduling() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_200,
+                offsetMilliseconds: -300_000
+            ),
+            deviceNow: date(10_300),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 10_300, isStale: false, isNight: false),
+                state(at: 11_500, isStale: false, isNight: true),
+                state(at: 12_100, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testDeviceClockBehindUsesPositiveOffsetForScheduling() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_200,
+                offsetMilliseconds: 300_000
+            ),
+            deviceNow: date(9_700),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 9_700, isStale: false, isNight: false),
+                state(at: 10_900, isStale: false, isNight: true),
+                state(at: 11_500, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testStaleBoundaryUsesCalibratedTime() {
+        let state = CurrentWeatherWidgetTimeline.state(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 0,
+                offsetMilliseconds: -300_000
+            ),
+            at: date(12_100),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertTrue(state.isStale)
+    }
+
+    func testStaleBeforeDayToNightTransition() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 8_800,
+                isNight: false,
+                transitionTime: 11_200
+            ),
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 10_000, isStale: false, isNight: false),
+                state(at: 10_600, isStale: true, isNight: false),
+                state(at: 11_200, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testNightToDayTransition() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: true,
+                transitionTime: 11_200
+            ),
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertTrue(states[0].isNight)
+        XCTAssertFalse(states[1].isNight)
+        XCTAssertFalse(states[2].isNight)
+    }
+
+    func testEqualStaleAndTransitionDatesAreDeduplicatedAndCombined() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_800
+            ),
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 10_000, isStale: false, isNight: false),
+                state(at: 11_800, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testPastTransitionAffectsNowWithoutSchedulingPastDate() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 9_999
+            ),
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(states.map(\.date), [date(10_000), date(11_800)])
+        XCTAssertTrue(states[0].isNight)
+        XCTAssertFalse(states[0].isStale)
+    }
+
+    func testAlreadyStaleSnapshotIsStaleAtNow() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 8_000,
+                isNight: false,
+                transitionTime: 0
+            ),
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [state(at: 10_000, isStale: true, isNight: false)]
+        )
+    }
+
+    func testZeroTransitionUsesSnapshotStateWithoutSolarEntry() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: true,
+                transitionTime: 0
+            ),
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [
+                state(at: 10_000, isStale: false, isNight: true),
+                state(at: 11_800, isStale: true, isNight: true),
+            ]
+        )
+    }
+
+    func testNoSnapshotProducesOneEmptyState() {
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: nil,
+            deviceNow: date(10_000),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertEqual(
+            states,
+            [state(at: 10_000, isStale: false, isNight: false)]
+        )
+    }
+
+    func testSnapshotStateAfterTransitionUsesDateAwareNightValue() {
+        let state = CurrentWeatherWidgetTimeline.state(
+            snapshot: snapshot(
+                observationTime: 10_000,
+                isNight: false,
+                transitionTime: 11_200
+            ),
+            at: date(11_201),
+            staleAfter: staleAfter
+        )
+
+        XCTAssertTrue(state.isNight)
+        XCTAssertFalse(state.isStale)
+    }
+
+    private func snapshot(
+        observationTime: Int,
+        isNight: Bool,
+        transitionTime: Int,
+        offsetMilliseconds: Int = 0
+    ) -> CurrentWeatherWidgetSnapshot {
+        CurrentWeatherWidgetSnapshot(
+            schemaVersion: 4,
+            regionCode: "660",
+            regionName: "西屯區",
+            observationTime: observationTime,
+            stationName: "西屯",
+            weather: "晴",
+            weatherCode: 100,
+            condition: .clear,
+            isNight: isNight,
+            nextDayNightTransitionTime: transitionTime,
+            calibratedTimeOffsetMilliseconds: offsetMilliseconds,
+            temperature: 28,
+            humidity: 76,
+            rain: 0
+        )
+    }
+
+    private func state(
+        at timestamp: TimeInterval,
+        isStale: Bool,
+        isNight: Bool
+    ) -> CurrentWeatherWidgetTimelineState {
+        CurrentWeatherWidgetTimelineState(
+            date: date(timestamp),
+            isStale: isStale,
+            isNight: isNight
+        )
+    }
+
+    private func date(_ timestamp: TimeInterval) -> Date {
+        Date(timeIntervalSince1970: timestamp)
+    }
+}

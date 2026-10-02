@@ -6,12 +6,45 @@ import 'package:dpip/features/home/presentation/home_active_events_controller.da
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/features/weather/domain/current_weather_widget_sync.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
+import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+
+typedef CurrentWeatherWidgetPublish = Future<void> Function({
+  required String regionCode,
+  required WeatherRealtime weather,
+});
+
+typedef CurrentWeatherWidgetClear = Future<void> Function();
+
+/// Adapts the home controller callback to the iOS Widget coordinator.
+@visibleForTesting
+RealtimeWeatherLoadedCallback? createCurrentWeatherWidgetCallback({
+  required TargetPlatform platform,
+  required CurrentWeatherWidgetPublish publish,
+}) {
+  if (platform != TargetPlatform.iOS) return null;
+
+  return (regionCode, weather) =>
+      publish(regionCode: regionCode, weather: weather);
+}
+
+@visibleForTesting
+RealtimeWeatherInvalidatedCallback?
+createCurrentWeatherWidgetInvalidatedCallback({
+  required TargetPlatform platform,
+  required CurrentWeatherWidgetClear clear,
+}) {
+  if (platform != TargetPlatform.iOS) return null;
+
+  return clear;
+}
 
 /// Home providers: sheet-extent chrome, tab-reset, map hand-offs, weather
 /// (header + forecast), and active-events (collapsed sheet) — the latter reads
@@ -22,13 +55,27 @@ List<SingleChildWidget> homeProviders() => [
   ChangeNotifierProvider(create: (_) => MapCameraHandoff()),
   ChangeNotifierProvider(create: (_) => MapStationHandoff()),
   ChangeNotifierProvider<HomeWeatherController>(
-    create: (context) => HomeWeatherController(
-      context.read<MeteorWeatherRepository>(),
-      context.read<RainHourTrendRepository>(),
-      context.read<RegionStore>(),
-      context.read<TownDirectory>(),
-      gpsFix: context.read<LocationService>().currentFix,
-    ),
+    create: (context) {
+      final regions = context.read<RegionStore>();
+      final directory = context.read<TownDirectory>();
+      final widgetSync = context.read<CurrentWeatherWidgetSync>();
+
+      return HomeWeatherController(
+        context.read<MeteorWeatherRepository>(),
+        context.read<RainHourTrendRepository>(),
+        regions,
+        directory,
+        gpsFix: context.read<LocationService>().currentFix,
+        onRealtimeLoaded: createCurrentWeatherWidgetCallback(
+          platform: defaultTargetPlatform,
+          publish: widgetSync.publish,
+        ),
+        onRealtimeInvalidated: createCurrentWeatherWidgetInvalidatedCallback(
+          platform: defaultTargetPlatform,
+          clear: widgetSync.clear,
+        ),
+      );
+    },
   ),
   ChangeNotifierProvider<HomeActiveEventsController>(
     create: (context) => HomeActiveEventsController(
