@@ -10,6 +10,8 @@ struct CurrentWeatherRemoteDTO: Decodable, Sendable {
     let temperature: Double?
     let humidity: Int?
     let rain: Double?
+    let windDirection: String?
+    let windSpeed: Double?
 
     var condition: CurrentWeatherWidgetCondition {
         currentWeatherWidgetCondition(for: weatherCode)
@@ -31,6 +33,7 @@ struct CurrentWeatherRemoteDTO: Decodable, Sendable {
         let temperature: Double?
         let humidity: Int?
         let rain: Double?
+        let wind: Wind
 
         private enum CodingKeys: String, CodingKey {
             case weather
@@ -38,6 +41,7 @@ struct CurrentWeatherRemoteDTO: Decodable, Sendable {
             case temperature
             case humidity
             case rain
+            case wind
         }
 
         init(from decoder: Decoder) throws {
@@ -57,6 +61,7 @@ struct CurrentWeatherRemoteDTO: Decodable, Sendable {
                 from: container,
                 forKey: .rain
             )
+            wind = try container.decode(Wind.self, forKey: .wind)
         }
 
         private static func decodeNullableDouble(
@@ -88,6 +93,34 @@ struct CurrentWeatherRemoteDTO: Decodable, Sendable {
         }
     }
 
+    private struct Wind: Decodable, Sendable {
+        let direction: String?
+        let speed: Double?
+
+        private enum CodingKeys: String, CodingKey {
+            case direction
+            case speed
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            direction = try container.decodeIfPresent(
+                String.self,
+                forKey: .direction
+            )
+
+            guard let value = try container.decodeIfPresent(
+                Double.self,
+                forKey: .speed
+            ) else {
+                speed = nil
+                return
+            }
+
+            speed = value == -99 ? nil : value
+        }
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let station = try container.decode(Station.self, forKey: .station)
@@ -100,6 +133,8 @@ struct CurrentWeatherRemoteDTO: Decodable, Sendable {
         temperature = data.temperature
         humidity = data.humidity
         rain = data.rain
+        windDirection = data.wind.direction
+        windSpeed = data.wind.speed
     }
 }
 

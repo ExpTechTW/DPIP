@@ -285,7 +285,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
         }
 
         return CurrentWeatherWidgetSnapshot(
-            schemaVersion: 5,
+            schemaVersion: 7,
             sourceIdentifier: target.sourceIdentifier,
             regionCode: regionCode,
             regionName: "測試地區",

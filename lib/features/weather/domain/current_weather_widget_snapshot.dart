@@ -1,4 +1,5 @@
 import 'package:dpip/core/weather/weather_code.dart';
+import 'package:dpip/features/weather/domain/apparent_temperature.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 
 enum CurrentWeatherWidgetCondition {
@@ -12,9 +13,15 @@ enum CurrentWeatherWidgetCondition {
   unknown,
 }
 
+/// Cross-platform Widget payload; keep its fields aligned with the Swift DTO.
+///
+/// Weather text and code preserve the source observation. [condition] is the
+/// coarse, versioned semantic value; native presentation derives a finer
+/// glyph from the code (and uses the text only when the code cannot classify
+/// the observation), without expanding this persisted enum for every icon.
 final class CurrentWeatherWidgetSnapshot {
   const CurrentWeatherWidgetSnapshot({
-    this.schemaVersion = 5,
+    this.schemaVersion = 7,
     required this.sourceIdentifier,
     required this.regionCode,
     required this.regionName,
@@ -29,6 +36,9 @@ final class CurrentWeatherWidgetSnapshot {
     this.temperature,
     this.humidity,
     this.rain,
+    this.windDirection,
+    this.windSpeed,
+    this.apparentTemperature,
   });
 
   final int schemaVersion;
@@ -38,12 +48,18 @@ final class CurrentWeatherWidgetSnapshot {
   final String regionCode;
   final String regionName;
 
+  /// Source weather observation time, Unix seconds; not snapshot publish time.
   final int observationTime;
 
   final String stationName;
 
+  /// Original CWB label, retained for display/fallback when a code is unknown.
   final String weather;
+
+  /// Original numeric CWB code; its suffix supports finer icon selection.
   final int weatherCode;
+
+  /// Coarse persisted classification shared with the native snapshot schema.
   final CurrentWeatherWidgetCondition condition;
   final bool isNight;
 
@@ -61,6 +77,9 @@ final class CurrentWeatherWidgetSnapshot {
   final double? temperature;
   final int? humidity;
   final double? rain;
+  final String? windDirection;
+  final double? windSpeed;
+  final double? apparentTemperature;
 
   Map<String, Object?> toJson() {
     return {
@@ -79,6 +98,9 @@ final class CurrentWeatherWidgetSnapshot {
       'temperature': temperature,
       'humidity': humidity,
       'rain': rain,
+      'windDirection': windDirection,
+      'windSpeed': windSpeed,
+      'apparentTemperature': apparentTemperature,
     };
   }
 }
@@ -120,5 +142,12 @@ CurrentWeatherWidgetSnapshot createCurrentWeatherWidgetSnapshot({
     temperature: weather.data.temperature,
     humidity: weather.data.humidity,
     rain: weather.data.rain,
+    windDirection: weather.data.wind.direction,
+    windSpeed: weather.data.wind.speed,
+    apparentTemperature: currentApparentTemperature(
+      temperature: weather.data.temperature,
+      humidity: weather.data.humidity,
+      windSpeed: weather.data.wind.speed,
+    ),
   );
 }

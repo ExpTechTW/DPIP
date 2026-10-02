@@ -3,7 +3,8 @@ import Foundation
 enum CurrentWeatherWidgetTestFixtures {
     static func observation(
         stationName: String = "西屯測站",
-        time: Int = 1_710_900_000
+        time: Int = 1_710_900_000,
+        windSpeed: String = "1.5"
     ) throws -> CurrentWeatherRemoteDTO {
         let data = Data(
             """
@@ -15,7 +16,11 @@ enum CurrentWeatherWidgetTestFixtures {
                 "weatherCode": 100,
                 "temperature": 28.5,
                 "humidity": 70,
-                "rain": 0
+                "rain": 0,
+                "wind": {
+                  "direction": "南南西",
+                  "speed": \(windSpeed)
+                }
               }
             }
             """.utf8
@@ -52,7 +57,7 @@ enum CurrentWeatherWidgetTestFixtures {
         sourceIdentifier: String,
         regionCode: String,
         regionName: String = "舊快取",
-        schemaVersion: Int = 5
+        schemaVersion: Int = 7
     ) -> CurrentWeatherWidgetSnapshot {
         CurrentWeatherWidgetSnapshot(
             schemaVersion: schemaVersion,

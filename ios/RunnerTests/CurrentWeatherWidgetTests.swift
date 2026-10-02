@@ -21,7 +21,11 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
                 "temperature": 28.5,
                 "humidity": 70,
                 "rain": 0.0,
-                "wind": { "speed": 1.5, "beaufort": 1 },
+                "wind": {
+                  "direction": "南南西",
+                  "speed": 1.5,
+                  "beaufort": 1
+                },
                 "gust": { "speed": 3.0, "beaufort": 2 }
               }
             }
@@ -36,6 +40,8 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
         XCTAssertEqual(weather.temperature, 28.5)
         XCTAssertEqual(weather.humidity, 70)
         XCTAssertEqual(weather.rain, 0)
+        XCTAssertEqual(weather.windDirection, "南南西")
+        XCTAssertEqual(weather.windSpeed, 1.5)
     }
 
     func testDecodesValidRainResponse() throws {
@@ -56,13 +62,16 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
             validJSON(
                 temperature: "-99",
                 humidity: "-99",
-                rain: "-99"
+                rain: "-99",
+                wind: #"{ "direction": "北", "speed": -99 }"#
             )
         )
 
         XCTAssertNil(weather.temperature)
         XCTAssertNil(weather.humidity)
         XCTAssertNil(weather.rain)
+        XCTAssertEqual(weather.windDirection, "北")
+        XCTAssertNil(weather.windSpeed)
     }
 
     func testMissingOptionalKeysDecodeAsNil() throws {
@@ -73,7 +82,8 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
               "time": 1789567200,
               "data": {
                 "weather": "晴",
-                "weatherCode": 100
+                "weatherCode": 100,
+                "wind": {}
               }
             }
             """
@@ -82,6 +92,8 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
         XCTAssertNil(weather.temperature)
         XCTAssertNil(weather.humidity)
         XCTAssertNil(weather.rain)
+        XCTAssertNil(weather.windDirection)
+        XCTAssertNil(weather.windSpeed)
     }
 
     func testExplicitNullOptionalValuesDecodeAsNil() throws {
@@ -89,13 +101,16 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
             validJSON(
                 temperature: "null",
                 humidity: "null",
-                rain: "null"
+                rain: "null",
+                wind: #"{ "direction": null, "speed": null }"#
             )
         )
 
         XCTAssertNil(weather.temperature)
         XCTAssertNil(weather.humidity)
         XCTAssertNil(weather.rain)
+        XCTAssertNil(weather.windDirection)
+        XCTAssertNil(weather.windSpeed)
     }
 
     func testIntegerJSONValuesDecodeAsDouble() throws {
@@ -270,7 +285,8 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
         weatherCode: Int? = 100,
         temperature: String = "28.5",
         humidity: String = "70",
-        rain: String = "0.0"
+        rain: String = "0.0",
+        wind: String = #"{ "direction": "東", "speed": 2.5 }"#
     ) -> String {
         let weatherField = weather.map { #""weather": "\#($0)","# } ?? ""
         let weatherCodeField = weatherCode.map {
@@ -286,14 +302,93 @@ final class CurrentWeatherRemoteDTOTests: XCTestCase {
             \(weatherCodeField)
             "temperature": \(temperature),
             "humidity": \(humidity),
-            "rain": \(rain)
+            "rain": \(rain),
+            "wind": \(wind)
           }
         }
         """
     }
 }
 
+final class CurrentApparentTemperatureTests: XCTestCase {
+    func testMatchesFixedCWAFormulaParityVectors() {
+        // Project goldens from the published formula, shared with Dart tests.
+        let vectors: [(Double, Int, Double, Double)] = [
+            (30, 80, 2, 33.9659458296072),
+            (12, 65, 1.2, 10.820012239693988),
+            (25, 60, 0, 27.089955502470914),
+            (25, 60, 8, 21.889955502470915),
+            (32, 10, 2, 30.227599518688184),
+            (32, 95, 2, 38.28219542753772),
+            (-5, 70, 3, -9.26026582286526),
+            (20, 0, 1, 17.450000000000003),
+            (20, 100, 1, 22.114536136797756),
+        ]
+
+        for (temperature, humidity, windSpeed, expected) in vectors {
+            let actual = currentApparentTemperature(
+                temperature: temperature,
+                humidity: humidity,
+                windSpeed: windSpeed
+            )
+            XCTAssertEqual(actual ?? .nan, expected, accuracy: 1e-9)
+        }
+    }
+
+    func testRejectsMissingAndInvalidInputs() {
+        XCTAssertNil(currentApparentTemperature(temperature: nil, humidity: 60, windSpeed: 1))
+        XCTAssertNil(currentApparentTemperature(temperature: 25, humidity: nil, windSpeed: 1))
+        XCTAssertNil(currentApparentTemperature(temperature: 25, humidity: 60, windSpeed: nil))
+        for humidity in [-1, 101] {
+            XCTAssertNil(currentApparentTemperature(temperature: 25, humidity: humidity, windSpeed: 1))
+        }
+        XCTAssertNil(currentApparentTemperature(temperature: 25, humidity: 60, windSpeed: -0.1))
+        for nonFinite in [Double.nan, .infinity, -.infinity] {
+            XCTAssertNil(currentApparentTemperature(temperature: nonFinite, humidity: 60, windSpeed: 1))
+            XCTAssertNil(currentApparentTemperature(temperature: 25, humidity: 60, windSpeed: nonFinite))
+        }
+        XCTAssertNil(currentApparentTemperature(temperature: -237.700000001, humidity: 100, windSpeed: 1))
+    }
+}
+
 final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
+    func testDecodesSchemaVersionSevenSnapshot() throws {
+        let encoded = try JSONEncoder().encode(makeSnapshot())
+        let snapshot = try JSONDecoder().decode(CurrentWeatherWidgetSnapshot.self, from: encoded)
+        XCTAssertEqual(snapshot.schemaVersion, 7)
+        XCTAssertEqual(snapshot.apparentTemperature, 31.39512521394631)
+    }
+    func testDecodesSchemaVersionSixSnapshot() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 6,
+              "sourceIdentifier": "region:220",
+              "regionCode": "220",
+              "regionName": "板橋區",
+              "observationTime": 1789567200,
+              "stationName": "板橋",
+              "weather": "晴",
+              "weatherCode": 100,
+              "condition": "clear",
+              "isNight": false,
+              "nextDayNightTransitionTime": 1789562700,
+              "calibratedTimeOffsetMilliseconds": 0,
+              "temperature": 28.5,
+              "humidity": 70,
+              "rain": 0.0,
+              "windDirection": "南南西",
+              "windSpeed": 1.5
+            }
+            """
+        )
+
+        XCTAssertEqual(snapshot.schemaVersion, 6)
+        XCTAssertEqual(snapshot.windDirection, "南南西")
+        XCTAssertEqual(snapshot.windSpeed, 1.5)
+        XCTAssertNil(snapshot.apparentTemperature)
+    }
+
     func testDecodesSchemaVersionFiveSnapshot() throws {
         let snapshot = try decode(
             """
@@ -320,6 +415,9 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.schemaVersion, 5)
         XCTAssertEqual(snapshot.sourceIdentifier, "region:220")
         XCTAssertEqual(snapshot.regionCode, "220")
+        XCTAssertNil(snapshot.windDirection)
+        XCTAssertNil(snapshot.windSpeed)
+        XCTAssertNil(snapshot.apparentTemperature)
     }
 
     func testSchemaVersionFiveRequiresSourceIdentifier() {
@@ -352,7 +450,7 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             try decode(
                 """
                 {
-                  "schemaVersion": 6,
+                  "schemaVersion": 8,
                   "sourceIdentifier": "region:220",
                   "regionCode": "220",
                   "regionName": "板橋區",
@@ -410,6 +508,7 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.temperature, 28.5)
         XCTAssertNil(snapshot.humidity)
         XCTAssertEqual(snapshot.rain, 0)
+        XCTAssertNil(snapshot.apparentTemperature)
     }
 
     func testDecodesSchemaVersionThreeSnapshotWithZeroCalibration() throws {
@@ -439,6 +538,7 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         XCTAssertNil(snapshot.temperature)
         XCTAssertNil(snapshot.humidity)
         XCTAssertNil(snapshot.rain)
+        XCTAssertNil(snapshot.apparentTemperature)
     }
 
     func testDecodesSchemaVersionTwoSnapshotWithLegacyDefaults() throws {
@@ -463,6 +563,24 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         XCTAssertFalse(snapshot.isNight)
         XCTAssertEqual(snapshot.nextDayNightTransitionTime, 0)
         XCTAssertEqual(snapshot.calibratedTimeOffsetMilliseconds, 0)
+        XCTAssertNil(snapshot.apparentTemperature)
+    }
+
+    func testDecodesSchemaVersionOneWithNilApparentTemperature() throws {
+        let snapshot = try decode(
+            """
+            {
+              "schemaVersion": 1,
+              "regionCode": "660",
+              "regionName": "西屯區",
+              "observationTime": 1789567200,
+              "stationName": "西屯",
+              "weather": "晴",
+              "weatherCode": 100
+            }
+            """
+        )
+        XCTAssertNil(snapshot.apparentTemperature)
     }
 
     func testSchemaVersionFourRequiresCalibration() {
@@ -521,13 +639,16 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
     }
 
     private func makeSnapshot(
-        schemaVersion: Int = 5,
+        schemaVersion: Int = 7,
         sourceIdentifier: String? = "region:100",
         regionCode: String = "100",
         condition: CurrentWeatherWidgetCondition = .clear,
         temperature: Double? = 28.5,
         humidity: Int? = 70,
-        rain: Double? = 0
+        rain: Double? = 0,
+        windDirection: String? = "南南西",
+        windSpeed: Double? = 1.5,
+        apparentTemperature: Double? = 31.39512521394631
     ) -> CurrentWeatherWidgetSnapshot {
         CurrentWeatherWidgetSnapshot(
             schemaVersion: schemaVersion,
@@ -544,13 +665,16 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             calibratedTimeOffsetMilliseconds: -5_000,
             temperature: temperature,
             humidity: humidity,
-            rain: rain
+            rain: rain,
+            windDirection: windDirection,
+            windSpeed: windSpeed,
+            apparentTemperature: apparentTemperature
         )
     }
 
-    func testEncodesSchemaVersionFiveWithAllFields() throws {
+    func testEncodesSchemaVersionSevenWithAllFields() throws {
         let snapshot = CurrentWeatherWidgetSnapshot(
-            schemaVersion: 5,
+            schemaVersion: 7,
             sourceIdentifier: "region:100",
             regionCode: "100",
             regionName: "中正區",
@@ -564,7 +688,10 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             calibratedTimeOffsetMilliseconds: -5_000,
             temperature: 28.5,
             humidity: 70,
-            rain: 0
+            rain: 0,
+            windDirection: "南南西",
+            windSpeed: 1.5,
+            apparentTemperature: 31.39512521394631
         )
 
         let data = try JSONEncoder().encode(snapshot)
@@ -575,9 +702,9 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             ) as? [String: Any]
         )
 
-        XCTAssertEqual(json.count, 15)
+        XCTAssertEqual(json.count, 18)
 
-        XCTAssertEqual(json["schemaVersion"] as? Int, 5)
+        XCTAssertEqual(json["schemaVersion"] as? Int, 7)
         XCTAssertEqual(
             json["sourceIdentifier"] as? String,
             "region:100"
@@ -634,13 +761,26 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             json["rain"] as? Double,
             0
         )
+        XCTAssertEqual(
+            json["windDirection"] as? String,
+            "南南西"
+        )
+        XCTAssertEqual(
+            json["windSpeed"] as? Double,
+            1.5
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(json["apparentTemperature"] as? Double),
+            31.39512521394631,
+            accuracy: 1e-9
+        )
     }
 
     func testEncodingPreservesExplicitNullWeatherValues()
         throws
     {
         let snapshot = CurrentWeatherWidgetSnapshot(
-            schemaVersion: 5,
+            schemaVersion: 7,
             sourceIdentifier: "region:100",
             regionCode: "100",
             regionName: "中正區",
@@ -654,7 +794,9 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             calibratedTimeOffsetMilliseconds: 0,
             temperature: nil,
             humidity: nil,
-            rain: nil
+            rain: nil,
+            windDirection: nil,
+            windSpeed: nil
         )
 
         let data = try JSONEncoder().encode(snapshot)
@@ -665,22 +807,30 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             ) as? [String: Any]
         )
 
-        XCTAssertEqual(json.count, 15)
+        XCTAssertEqual(json.count, 18)
 
         XCTAssertTrue(json["temperature"] is NSNull)
         XCTAssertTrue(json["humidity"] is NSNull)
         XCTAssertTrue(json["rain"] is NSNull)
+        XCTAssertTrue(json["windDirection"] is NSNull)
+        XCTAssertTrue(json["windSpeed"] is NSNull)
+        XCTAssertTrue(json["apparentTemperature"] is NSNull)
+        let decoded = try JSONDecoder().decode(
+            CurrentWeatherWidgetSnapshot.self,
+            from: data
+        )
+        XCTAssertNil(decoded.apparentTemperature)
     }
 
-    func testSchemaVersionFourCannotBeEncoded() {
-        let snapshot = makeSnapshot(schemaVersion: 4)
+    func testSchemaVersionFiveCannotBeEncoded() {
+        let snapshot = makeSnapshot(schemaVersion: 5)
 
         XCTAssertThrowsError(
             try JSONEncoder().encode(snapshot)
         )
     }
 
-    func testSchemaVersionFiveWithoutSourceIdentifierCannotBeEncoded() {
+    func testSchemaVersionSevenWithoutSourceIdentifierCannotBeEncoded() {
         let snapshot = makeSnapshot(sourceIdentifier: nil)
 
         XCTAssertThrowsError(
@@ -688,7 +838,7 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         )
     }
 
-    func testSchemaVersionFiveRejectsMalformedSourceIdentifiers() {
+    func testSchemaVersionSevenRejectsMalformedSourceIdentifiers() {
         let malformedSourceIdentifiers = [
             "",
             "region:",
@@ -733,7 +883,7 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         )
     }
 
-    func testEncodedSchemaVersionFiveContainsExactlyContractKeys() throws {
+    func testEncodedSchemaVersionSevenContainsExactlyContractKeys() throws {
         let data = try JSONEncoder().encode(makeSnapshot())
         let json = try XCTUnwrap(
             JSONSerialization.jsonObject(with: data)
@@ -758,6 +908,9 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
                 "temperature",
                 "humidity",
                 "rain",
+                "windDirection",
+                "windSpeed",
+                "apparentTemperature",
             ])
         )
     }
@@ -777,9 +930,9 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         )
     }
 
-    func testSchemaVersionFiveRoundTripPreservesAllFields() throws {
+    func testSchemaVersionSevenRoundTripPreservesAllFields() throws {
         let original = CurrentWeatherWidgetSnapshot(
-            schemaVersion: 5,
+            schemaVersion: 7,
             sourceIdentifier: "region:407",
             regionCode: "407",
             regionName: "西屯區",
@@ -793,7 +946,10 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
             calibratedTimeOffsetMilliseconds: -300_000,
             temperature: 27.5,
             humidity: 83,
-            rain: 12.5
+            rain: 12.5,
+            windDirection: "北北東",
+            windSpeed: 4.25,
+            apparentTemperature: 30.123456789
         )
 
         let encoded = try JSONEncoder().encode(original)
@@ -823,6 +979,9 @@ final class CurrentWeatherWidgetSnapshotTests: XCTestCase {
         XCTAssertEqual(decoded.temperature, original.temperature)
         XCTAssertEqual(decoded.humidity, original.humidity)
         XCTAssertEqual(decoded.rain, original.rain)
+        XCTAssertEqual(decoded.windDirection, original.windDirection)
+        XCTAssertEqual(decoded.windSpeed, original.windSpeed)
+        XCTAssertEqual(decoded.apparentTemperature, original.apparentTemperature)
     }
 }
 
@@ -871,6 +1030,318 @@ final class CurrentWeatherWidgetConditionTests: XCTestCase {
         XCTAssertEqual(
             CurrentWeatherWidgetCondition.rain.systemImageName(isNight: true),
             "cloud.rain.fill"
+        )
+    }
+}
+
+final class WidgetWeatherConditionTests: XCTestCase {
+    func testWeatherCodesMapToSharedPresentationConditions() {
+        let expected: [(Int, WidgetWeatherCondition)] = [
+            (100, .clear),
+            (200, .cloudy),
+            (300, .overcast),
+            (205, .fog),
+            (206, .rain),
+            (208, .snow),
+            (211, .rain),
+            (214, .thunderstorm),
+            (217, .thunderstorm),
+            (203, .thunder),
+            (204, .thunder),
+            (219, .thunder),
+            (207, .sleet),
+            (212, .sleet),
+            (213, .hail),
+            (216, .hail),
+            (218, .hail),
+            (215, .snow),
+        ]
+
+        for (weatherCode, condition) in expected {
+            XCTAssertEqual(
+                WidgetWeatherCondition(
+                    weatherCode: weatherCode,
+                    weather: "raw text must not override a known code"
+                ),
+                condition,
+                "weatherCode=\(weatherCode)"
+            )
+        }
+    }
+
+    func testRawWeatherFallbackClassifiesWithoutBecomingDisplayText() {
+        let expected: [(String, WidgetWeatherCondition)] = [
+            ("午後雷雨", .thunderstorm),
+            ("雷雪", .snow),
+            ("雷雹", .hail),
+            ("冰雹", .hail),
+            ("雷聲", .thunder),
+            ("雨雪", .sleet),
+            ("降雪", .snow),
+            ("有雨", .rain),
+            ("濃霧", .fog),
+            ("晴", .clear),
+            ("多雲", .cloudy),
+            ("陰", .overcast),
+            ("API 原始描述", .unknown),
+        ]
+
+        for (weather, condition) in expected {
+            let mapped = WidgetWeatherCondition(
+                weatherCode: 0,
+                weather: weather
+            )
+            XCTAssertEqual(mapped, condition, "weather=\(weather)")
+            XCTAssertNotEqual(mapped.displayNameLocalizationKey, weather)
+            XCTAssertTrue(mapped.displayNameLocalizationKey.hasPrefix("weather."))
+        }
+    }
+
+    func testEveryPresentationConditionHasItsOwnLocalizationKey() {
+        let expected: [(WidgetWeatherCondition, String)] = [
+            (.clear, "weather.clear"),
+            (.cloudy, "weather.cloudy"),
+            (.overcast, "weather.overcast"),
+            (.fog, "weather.fog"),
+            (.rain, "weather.rain"),
+            (.sleet, "weather.sleet"),
+            (.snow, "weather.snow"),
+            (.hail, "weather.hail"),
+            (.thunder, "weather.thunder"),
+            (.thunderstorm, "weather.thunderstorm"),
+            (.unknown, "weather.unknown"),
+        ]
+
+        XCTAssertEqual(expected.count, WidgetWeatherCondition.allCases.count)
+        for (condition, key) in expected {
+            XCTAssertEqual(condition.displayNameLocalizationKey, key)
+        }
+    }
+
+    func testClearAndCloudyUseDayNightSymbols() {
+        XCTAssertEqual(
+            WidgetWeatherCondition.clear.systemImageName(isNight: false),
+            "sun.max.fill"
+        )
+        XCTAssertEqual(
+            WidgetWeatherCondition.clear.systemImageName(isNight: true),
+            "moon.stars.fill"
+        )
+        XCTAssertEqual(
+            WidgetWeatherCondition.cloudy.systemImageName(isNight: false),
+            "cloud.sun.fill"
+        )
+        XCTAssertEqual(
+            WidgetWeatherCondition.cloudy.systemImageName(isNight: true),
+            "cloud.moon.fill"
+        )
+    }
+
+    func testPhenomenonSymbolsDoNotDependOnDayNight() {
+        let expected: [(WidgetWeatherCondition, String)] = [
+            (.overcast, "cloud.fill"),
+            (.fog, "cloud.fog.fill"),
+            (.rain, "cloud.rain.fill"),
+            (.sleet, "cloud.sleet.fill"),
+            (.snow, "cloud.snow.fill"),
+            (.hail, "cloud.hail.fill"),
+            (.thunder, "bolt.fill"),
+            (.thunderstorm, "cloud.bolt.rain.fill"),
+            (.unknown, "cloud.fill"),
+        ]
+
+        for (condition, symbol) in expected {
+            XCTAssertEqual(condition.systemImageName(isNight: false), symbol)
+            XCTAssertEqual(condition.systemImageName(isNight: true), symbol)
+        }
+    }
+
+    func testCurrentAndForecastUseSamePresentationConditionForHail() throws {
+        let current = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7,
+            sourceIdentifier: "region:407",
+            regionCode: "407",
+            regionName: "西屯區",
+            observationTime: 1_789_567_200,
+            stationName: "西屯",
+            weather: "冰雹",
+            weatherCode: 213,
+            condition: .rain,
+            isNight: false,
+            nextDayNightTransitionTime: 1_789_562_700,
+            calibratedTimeOffsetMilliseconds: 0,
+            temperature: 20,
+            humidity: 80,
+            rain: 5
+        )
+        let forecast = try XCTUnwrap(ForecastWidgetPoint(
+            time: "12:00",
+            temperature: 20,
+            weather: "冰雹",
+            weatherCode: 213,
+            pop: 80
+        ))
+
+        XCTAssertEqual(current.condition, .rain)
+        XCTAssertEqual(current.presentationCondition, .hail)
+        XCTAssertEqual(forecast.presentationCondition, .hail)
+        XCTAssertEqual(
+            current.presentationCondition,
+            forecast.presentationCondition
+        )
+
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: JSONEncoder().encode(current))
+                as? [String: Any]
+        )
+        XCTAssertEqual(json["schemaVersion"] as? Int, 7)
+        XCTAssertEqual(json["condition"] as? String, "rain")
+    }
+
+    func testPersistedConditionRawValuesRemainUnchanged() {
+        let conditions: [CurrentWeatherWidgetCondition] = [
+            .clear, .cloudy, .overcast, .fog, .rain, .snow,
+            .thunderstorm, .unknown,
+        ]
+        XCTAssertEqual(
+            conditions.map(\.rawValue),
+            [
+                "clear", "cloudy", "overcast", "fog", "rain", "snow",
+                "thunderstorm", "unknown",
+            ]
+        )
+    }
+
+    func testNewLocalizationKeysHaveEveryRequiredLocale() throws {
+        let catalogURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("DPIPWidgets/Localizable.xcstrings")
+        let catalog = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(contentsOf: catalogURL))
+                as? [String: Any]
+        )
+        let strings = try XCTUnwrap(catalog["strings"] as? [String: Any])
+        let expected: [String: [String: String]] = [
+            "weather.sleet": [
+                "en": "Sleet", "zh-Hant": "雨雪", "zh-Hans": "雨雪",
+                "ja": "みぞれ", "ko": "진눈깨비",
+            ],
+            "weather.hail": [
+                "en": "Hail", "zh-Hant": "冰雹", "zh-Hans": "冰雹",
+                "ja": "ひょう", "ko": "우박",
+            ],
+            "weather.thunder": [
+                "en": "Thunder", "zh-Hant": "雷電", "zh-Hans": "雷电",
+                "ja": "雷", "ko": "천둥·번개",
+            ],
+        ]
+
+        for (key, translations) in expected {
+            let item = try XCTUnwrap(strings[key] as? [String: Any])
+            let localizations = try XCTUnwrap(
+                item["localizations"] as? [String: Any]
+            )
+            XCTAssertEqual(Set(localizations.keys), Set(translations.keys), key)
+            for (locale, value) in translations {
+                let localization = try XCTUnwrap(
+                    localizations[locale] as? [String: Any]
+                )
+                let stringUnit = try XCTUnwrap(
+                    localization["stringUnit"] as? [String: Any]
+                )
+                XCTAssertEqual(stringUnit["value"] as? String, value, key)
+            }
+        }
+    }
+}
+
+final class WidgetWindDirectionTests: XCTestCase {
+    func testAllSixteenDirectionsMapFromRawValues() {
+        let expected: [(String, WidgetWindDirection)] = [
+            ("北", .north),
+            ("北北東", .northNortheast),
+            ("東北", .northeast),
+            ("東北東", .eastNortheast),
+            ("東", .east),
+            ("東南東", .eastSoutheast),
+            ("東南", .southeast),
+            ("南南東", .southSoutheast),
+            ("南", .south),
+            ("南南西", .southSouthwest),
+            ("西南", .southwest),
+            ("西南西", .westSouthwest),
+            ("西", .west),
+            ("西北西", .westNorthwest),
+            ("西北", .northwest),
+            ("北北西", .northNorthwest),
+        ]
+
+        XCTAssertEqual(
+            expected.count,
+            WidgetWindDirection.allCases.count
+        )
+
+        for (rawDirection, direction) in expected {
+            XCTAssertEqual(
+                WidgetWindDirection(
+                    rawDirection: rawDirection
+                ),
+                direction,
+                rawDirection
+            )
+        }
+    }
+
+    func testEnglishAbbreviationsAreAlsoAccepted() {
+        let expected: [(String, WidgetWindDirection)] = [
+            ("N", .north),
+            ("NNE", .northNortheast),
+            ("NE", .northeast),
+            ("ENE", .eastNortheast),
+            ("E", .east),
+            ("ESE", .eastSoutheast),
+            ("SE", .southeast),
+            ("SSE", .southSoutheast),
+            ("S", .south),
+            ("SSW", .southSouthwest),
+            ("SW", .southwest),
+            ("WSW", .westSouthwest),
+            ("W", .west),
+            ("WNW", .westNorthwest),
+            ("NW", .northwest),
+            ("NNW", .northNorthwest),
+        ]
+
+        for (rawDirection, direction) in expected {
+            XCTAssertEqual(
+                WidgetWindDirection(
+                    rawDirection: rawDirection
+                ),
+                direction
+            )
+        }
+    }
+
+    func testEveryWindDirectionHasUniqueLocalizationKey() {
+        let keys = WidgetWindDirection.allCases.map(
+            \.displayNameLocalizationKey
+        )
+
+        XCTAssertEqual(keys.count, 16)
+        XCTAssertEqual(Set(keys).count, 16)
+        XCTAssertTrue(
+            keys.allSatisfy {
+                $0.hasPrefix("wind.direction.")
+            }
+        )
+    }
+
+    func testUnknownWindDirectionReturnsNil() {
+        XCTAssertNil(
+            WidgetWindDirection(
+                rawDirection: "unknown-direction"
+            )
         )
     }
 }
@@ -1341,7 +1812,11 @@ final class CurrentWeatherClientTests: XCTestCase {
             "weatherCode": 100,
             "temperature": 30.6,
             "humidity": 66,
-            "rain": 0
+            "rain": 0,
+            "wind": {
+              "direction": "西北",
+              "speed": 3.25
+            }
           }
         }
         """
@@ -1383,6 +1858,8 @@ final class CurrentWeatherClientTests: XCTestCase {
         XCTAssertEqual(weather.temperature, 30.6)
         XCTAssertEqual(weather.humidity, 66)
         XCTAssertEqual(weather.rain, 0)
+        XCTAssertEqual(weather.windDirection, "西北")
+        XCTAssertEqual(weather.windSpeed, 3.25)
     }
 
     func testFetchReturnsNilForStructurallyEmptyObjects() async throws {
@@ -1855,7 +2332,7 @@ final class WidgetResolvedWeatherLocationTests: XCTestCase {
 }
 
 final class CurrentWeatherWidgetSnapshotFactoryTests: XCTestCase {
-    func testCreatesSchemaFiveSnapshotFromResolvedInputs() throws {
+    func testCreatesSchemaSevenSnapshotFromResolvedInputs() throws {
         let observation = try makeObservation()
 
         let location = try XCTUnwrap(
@@ -1882,7 +2359,7 @@ final class CurrentWeatherWidgetSnapshotFactoryTests: XCTestCase {
                 time: time
             )
 
-        XCTAssertEqual(snapshot.schemaVersion, 5)
+        XCTAssertEqual(snapshot.schemaVersion, 7)
         XCTAssertEqual(
             snapshot.sourceIdentifier,
             "region:100"
@@ -1915,9 +2392,71 @@ final class CurrentWeatherWidgetSnapshotFactoryTests: XCTestCase {
         XCTAssertEqual(snapshot.temperature, 28.5)
         XCTAssertEqual(snapshot.humidity, 70)
         XCTAssertEqual(snapshot.rain, 0)
+        XCTAssertEqual(snapshot.windDirection, "南南西")
+        XCTAssertEqual(snapshot.windSpeed, 1.5)
+        XCTAssertEqual(
+            try XCTUnwrap(snapshot.apparentTemperature),
+            31.39512521394631,
+            accuracy: 1e-9
+        )
     }
 
-    private func makeObservation() throws
+    func testCreatesSnapshotWithNilWindValues() throws {
+        let observation = try makeObservation(wind: "{}")
+        let location = try XCTUnwrap(
+            WidgetResolvedWeatherLocation(
+                address: .saved(regionCode: "100"),
+                regionCode: "100",
+                regionName: "中正區",
+                latitude: 25.0324,
+                longitude: 121.5199
+            )
+        )
+
+        let snapshot = CurrentWeatherWidgetSnapshotFactory.make(
+            observation: observation,
+            location: location,
+            time: .init(
+                calibratedNowUnixMilliseconds: 1_789_567_500_000,
+                calibratedTimeOffsetMilliseconds: 0
+            )
+        )
+
+        XCTAssertNil(snapshot.windDirection)
+        XCTAssertNil(snapshot.windSpeed)
+        XCTAssertNil(snapshot.apparentTemperature)
+    }
+
+    func testMissingApparentInputDoesNotFailSnapshotGeneration() throws {
+        let cases: [(String, String, String)] = [
+            ("null", "70", #"{ "speed": 1.5 }"#),
+            ("28.5", "null", #"{ "speed": 1.5 }"#),
+            ("28.5", "70", "{}"),
+        ]
+        let location = CurrentWeatherWidgetTestFixtures.resolvedLocation()
+
+        for (temperature, humidity, wind) in cases {
+            let observation = try makeObservation(
+                temperature: temperature,
+                humidity: humidity,
+                wind: wind
+            )
+            let snapshot = CurrentWeatherWidgetSnapshotFactory.make(
+                observation: observation,
+                location: location,
+                time: CurrentWeatherWidgetTestFixtures.snapshotTime()
+            )
+            XCTAssertEqual(snapshot.schemaVersion, 7)
+            XCTAssertNil(snapshot.apparentTemperature)
+        }
+    }
+
+    private func makeObservation(
+        temperature: String = "28.5",
+        humidity: String = "70",
+        wind: String =
+            #"{ "direction": "南南西", "speed": 1.5 }"#
+    ) throws
         -> CurrentWeatherRemoteDTO
     {
         let json = """
@@ -1929,9 +2468,10 @@ final class CurrentWeatherWidgetSnapshotFactoryTests: XCTestCase {
           "data": {
             "weather": "晴",
             "weatherCode": 100,
-            "temperature": 28.5,
-            "humidity": 70,
-            "rain": 0
+            "temperature": \(temperature),
+            "humidity": \(humidity),
+            "rain": 0,
+            "wind": \(wind)
           }
         }
         """
