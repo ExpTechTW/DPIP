@@ -161,6 +161,9 @@ jobs:
       - name: Build info
         run: bash tool/check/build_info.sh
 
+      - name: Widget township resources
+        run: bash tool/check/widget_township_resources.sh
+
       - name: Codegen is up to date
         run: |
           bash tool/dev/codegen.sh

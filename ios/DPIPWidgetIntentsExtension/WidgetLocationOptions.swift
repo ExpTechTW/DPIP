@@ -5,13 +5,21 @@ struct WidgetLocationOption: Equatable {
     let displayString: String
 }
 
+func makeCurrentWidgetLocationOption(
+    displayString: String
+) -> WidgetLocationOption {
+    WidgetLocationOption(
+        identifier: "current-location",
+        displayString: displayString
+    )
+}
+
 func makeWidgetLocationOptions(
     from catalog: WidgetLocationCatalog?,
     currentLocationDisplayString: String
 ) -> [WidgetLocationOption] {
     var options = [
-        WidgetLocationOption(
-            identifier: "current-location",
+        makeCurrentWidgetLocationOption(
             displayString: currentLocationDisplayString
         )
     ]

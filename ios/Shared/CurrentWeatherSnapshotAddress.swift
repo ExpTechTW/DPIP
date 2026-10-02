@@ -1,4 +1,4 @@
-enum CurrentWeatherSnapshotAddress: Equatable {
+enum CurrentWeatherSnapshotAddress: Equatable, Sendable {
     case currentLocation
     case saved(regionCode: String)
 

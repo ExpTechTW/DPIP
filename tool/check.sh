@@ -36,7 +36,8 @@ cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 # Five of these finish in under a quarter of a second and are run every time:
 # hashing their inputs would cost as much as running them, and a cache that
 # saves nothing is a cache that can only be wrong.
-for gate in tooling l10n pubspec_lock notification_sounds build_info; do
+for gate in tooling l10n pubspec_lock notification_sounds build_info \
+  widget_township_resources; do
   step "check/$gate"
   "tool/check/$gate.sh"
 done

@@ -69,16 +69,40 @@ enum WidgetSnapshotFile {
     return data
   }
 
+  @discardableResult
   static func replace(
     _ data: Data,
     kind: WidgetSnapshotKind,
     sourceIdentifier: String? = nil,
-    in container: URL
-  ) throws {
-    let destination: URL
-
+    in container: URL,
+    currentWeatherWriteToken: CurrentWeatherSnapshotWriteToken? = nil
+  ) throws -> CurrentWeatherSnapshotWriteResult {
     do {
-      destination = try snapshotURL(
+      if kind == .currentWeather {
+        guard
+          let sourceIdentifier,
+          let address = CurrentWeatherSnapshotAddress(
+            sourceIdentifier: sourceIdentifier
+          )
+        else {
+          throw WidgetSnapshotError.invalidPayload
+        }
+
+        let storage = CurrentWeatherSnapshotStorage(
+          containerURL: container
+        )
+        let token = try currentWeatherWriteToken
+          ?? storage.beginWrite(for: address)
+        guard token.address == address else {
+          throw WidgetSnapshotError.invalidPayload
+        }
+        return try storage.replace(
+          data,
+          using: token
+        )
+      }
+
+      let destination = try snapshotURL(
         kind: kind,
         sourceIdentifier: sourceIdentifier,
         in: container
@@ -93,6 +117,30 @@ enum WidgetSnapshotFile {
         to: destination,
         options: .atomic
       )
+      return .written
+    } catch let error as WidgetSnapshotError {
+      throw error
+    } catch {
+      throw WidgetSnapshotError.writeFailed
+    }
+  }
+
+  static func beginCurrentWeatherWrite(
+    sourceIdentifier: String?,
+    in container: URL
+  ) throws -> CurrentWeatherSnapshotWriteToken {
+    do {
+      guard
+        let sourceIdentifier,
+        let address = CurrentWeatherSnapshotAddress(
+          sourceIdentifier: sourceIdentifier
+        )
+      else {
+        throw WidgetSnapshotError.invalidPayload
+      }
+      return try CurrentWeatherSnapshotStorage(
+        containerURL: container
+      ).beginWrite(for: address)
     } catch let error as WidgetSnapshotError {
       throw error
     } catch {
@@ -133,12 +181,9 @@ enum WidgetSnapshotFile {
         throw WidgetSnapshotError.invalidPayload
       }
 
-      return directory
-        .appendingPathComponent(
-          "current-weather",
-          isDirectory: true
-        )
-        .appendingPathComponent(address.filename)
+      return CurrentWeatherSnapshotStorage(
+        containerURL: container
+      ).snapshotURL(for: address)
 
     case .weatherForecast:
       return directory.appendingPathComponent(
@@ -198,24 +243,44 @@ public final class WidgetSnapshotPlugin: NSObject, FlutterPlugin {
       return
     }
 
-    writeQueue.async {
-      // An absent key or a profile without this entitlement must fail closed.
-      guard let group = Bundle.main.object(forInfoDictionaryKey: "DPIPWidgetAppGroupIdentifier") as? String,
-        let container = FileManager.default.containerURL(
-          forSecurityApplicationGroupIdentifier: group)
-      else {
-        DispatchQueue.main.async { result(self.flutterError(.appGroupUnavailable)) }
-        return
-      }
+    // Reserve current-weather ordering at MethodChannel request entry, before
+    // the Runner write queue can delay this request behind unrelated files.
+    guard let group = Bundle.main.object(
+      forInfoDictionaryKey: "DPIPWidgetAppGroupIdentifier"
+    ) as? String,
+      let container = FileManager.default.containerURL(
+        forSecurityApplicationGroupIdentifier: group)
+    else {
+      result(flutterError(.appGroupUnavailable))
+      return
+    }
 
+    let currentWeatherWriteToken: CurrentWeatherSnapshotWriteToken?
+    do {
+      currentWeatherWriteToken = kind == .currentWeather
+        ? try WidgetSnapshotFile.beginCurrentWeatherWrite(
+            sourceIdentifier: sourceIdentifier,
+            in: container
+          )
+        : nil
+    } catch let error as WidgetSnapshotError {
+      result(flutterError(error))
+      return
+    } catch {
+      result(flutterError(.writeFailed))
+      return
+    }
+
+    writeQueue.async {
       do {
-        try WidgetSnapshotFile.replace(
+        let writeResult = try WidgetSnapshotFile.replace(
           data,
           kind: kind,
           sourceIdentifier: sourceIdentifier,
-          in: container
+          in: container,
+          currentWeatherWriteToken: currentWeatherWriteToken
         )
-        if let widgetKind = kind.widgetKind {
+        if writeResult == .written, let widgetKind = kind.widgetKind {
           WidgetCenter.shared.reloadTimelines(ofKind: widgetKind)
         }
         DispatchQueue.main.async { result(nil) }
