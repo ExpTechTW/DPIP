@@ -10,6 +10,7 @@ enum DefaultMapLayer {
   lightning,
   typhoon,
   monitor,
+  tsunami,
   temperature,
   humidity,
   pressure,
