@@ -13,7 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('id is exactly the member name for every layer', () {
-    expect(DefaultMapLayer.values, hasLength(12));
+    expect(DefaultMapLayer.values, hasLength(13));
     for (final layer in DefaultMapLayer.values) {
       expect(layer.id, layer.name, reason: layer.name);
     }
