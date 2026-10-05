@@ -301,7 +301,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get meshtasticSilent => '무음';
 
   @override
-  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
+  String get mapLayerCategoryEarthquake => '지진과 쓰나미';
 
   @override
   String get mapLayerSatelliteB12 => '히마와리 오존(B12)';

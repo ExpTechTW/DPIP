@@ -117,7 +117,7 @@
   "reportFilterDateEndNote": "วันสิ้นสุด: 24:00 ของวันนั้น（ไทเป）",
   "meshtasticSilent": "เงียบ",
   "reportFilterSortMagnitude": "ขนาด",
-  "mapLayerCategoryEarthquake": "Earthquakes & tsunami",
+  "mapLayerCategoryEarthquake": "แผ่นดินไหวและสึนามิ",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
   "restroomCategoryOther": "อื่น ๆ",
   "@meshtasticRegionConfirm": {
