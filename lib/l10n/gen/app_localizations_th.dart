@@ -305,7 +305,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticSilent => 'เงียบ';
 
   @override
-  String get mapLayerCategoryEarthquake => 'แผ่นดินไหว';
+  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
 
   @override
   String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';
@@ -3377,4 +3377,44 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get eewSpokenAnnouncementOff => 'ปิด';
+
+  @override
+  String get mapLayerTsunami => 'Tsunami';
+
+  @override
+  String get tsunamiLegendEpicenter => 'Earthquake epicentre';
+
+  @override
+  String get tsunamiEarthquake => 'Source earthquake';
+
+  @override
+  String get tsunamiPredictions => 'Predicted arrival time and wave height';
+
+  @override
+  String get tsunamiObservations => 'Observed tsunami by station';
+
+  @override
+  String get tsunamiBandOver3m => 'Over 3 m';
+
+  @override
+  String get tsunamiBand1To3m => '1-3 m';
+
+  @override
+  String get tsunamiBand30cmTo1m => '0.3-1 m';
+
+  @override
+  String get tsunamiBandUnder30cm => 'Under 0.3 m';
+
+  @override
+  String get tsunamiEmpty => 'No tsunami bulletin has been issued';
+
+  @override
+  String tsunamiReportNumber(int n) {
+    return 'Report $n';
+  }
+
+  @override
+  String tsunamiWaveHeightCm(int cm) {
+    return '$cm cm';
+  }
 }

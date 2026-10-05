@@ -6,7 +6,10 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 
 /// The seven groups the overlays fall into, in display order.
 enum MapLayerCategory {
-  /// Seismic-monitor events (RTS).
+  /// Seismic-monitor events and the CWA tsunami bulletins — both come from the
+  /// seismology side of CWA, and a tsunami bulletin is triggered by an
+  /// earthquake, so the two share a group rather than giving one row its own
+  /// header.
   earthquake,
 
   /// Ground-radar imagery.
@@ -48,7 +51,7 @@ MapLayerCategory categoryOf(String layerId) {
     return MapLayerCategory.forecast;
   }
   return switch (layerId) {
-    'monitor' => MapLayerCategory.earthquake,
+    'monitor' || 'tsunami' => MapLayerCategory.earthquake,
     'typhoon' => MapLayerCategory.typhoon,
     'temperature' ||
     'humidity' ||

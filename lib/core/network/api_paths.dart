@@ -45,4 +45,7 @@ abstract final class ApiPaths {
 
   /// Push notification config — `/api/v2/notify/{token}/…`.
   static const String notify = '/api/v2/notify/';
+
+  /// CWA tsunami bulletins — the index, and `/{id}` for one bulletin.
+  static const String tsunami = '/api/v1/cwa/tsunami';
 }

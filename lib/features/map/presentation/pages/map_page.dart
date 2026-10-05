@@ -30,8 +30,10 @@ import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
+import 'package:dpip/features/map/presentation/layers/tsunami_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_forecast_layer.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
+import 'package:dpip/features/tsunami/domain/tsunami_repository.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
@@ -130,6 +132,7 @@ class _MapPageState extends State<MapPage> {
     PressureMapLayer(context.read<MeteorWeatherRepository>()),
     WindMapLayer(context.read<MeteorWeatherRepository>()),
     RainMapLayer(context.read<MeteorRainRepository>()),
+    TsunamiMapLayer(context.read<TsunamiRepository>()),
     DisasterMapLayer(context.read<DisasterMapRepository>()),
     MeshNodeMapLayer(
       context.read<MeshNodeStore>(),
