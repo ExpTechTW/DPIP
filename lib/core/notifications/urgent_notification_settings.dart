@@ -28,8 +28,12 @@ class UrgentNotificationChannelStatus {
 }
 
 class UrgentNotificationStatus {
-  const UrgentNotificationStatus(this.channels);
+  const UrgentNotificationStatus({
+    required this.channelSettingsSupported,
+    required this.channels,
+  });
 
+  final bool channelSettingsSupported;
   final List<UrgentNotificationChannelStatus> channels;
 
   bool get allBypass =>
@@ -54,9 +58,14 @@ class UrgentNotificationSettings {
         'urgentNotificationChannelStatus',
         {'channelIds': keys},
       );
-      return UrgentNotificationStatus([
-        for (final key in keys) _parse(key, response?[key]),
-      ]);
+      final rawChannels = response?['channels'];
+      final channels = rawChannels is Map<Object?, Object?>
+          ? rawChannels
+          : null;
+      return UrgentNotificationStatus(
+        channelSettingsSupported: response?['supportsChannelSettings'] == true,
+        channels: [for (final key in keys) _parse(key, channels?[key])],
+      );
     } on PlatformException catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'urgent notification channel status');
       return _unavailable(keys);
@@ -111,9 +120,10 @@ class UrgentNotificationSettings {
   }
 
   UrgentNotificationStatus _unavailable(List<String> keys) =>
-      UrgentNotificationStatus([
-        for (final key in keys) _unavailableChannel(key),
-      ]);
+      UrgentNotificationStatus(
+        channelSettingsSupported: false,
+        channels: [for (final key in keys) _unavailableChannel(key)],
+      );
 
   UrgentNotificationChannelStatus _unavailableChannel(String key) =>
       UrgentNotificationChannelStatus(

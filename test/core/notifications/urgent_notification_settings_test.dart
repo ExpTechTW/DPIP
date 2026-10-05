@@ -38,15 +38,18 @@ void main() {
       final ids = (call.arguments as Map<Object?, Object?>)['channelIds']!;
       expect(ids, NotificationChannels.urgentChannelKeys.toList());
       return {
-        'eew_alert-important-v2': {
-          'id': 'native-eew-alert-channel',
-          'name': 'Major EEW',
-          'bypassesDnd': true,
-        },
-        'eew-important-v2': {
-          'id': 'eew-important-v2',
-          'name': 'Major earthquake alert',
-          'bypassesDnd': false,
+        'supportsChannelSettings': true,
+        'channels': {
+          'eew_alert-important-v2': {
+            'id': 'native-eew-alert-channel',
+            'name': 'Major EEW',
+            'bypassesDnd': true,
+          },
+          'eew-important-v2': {
+            'id': 'eew-important-v2',
+            'name': 'Major earthquake alert',
+            'bypassesDnd': false,
+          },
         },
       };
     });
@@ -54,6 +57,7 @@ void main() {
     final status = await UrgentNotificationSettings(channel).status();
 
     expect(status.allBypass, isFalse);
+    expect(status.channelSettingsSupported, isTrue);
     expect(
       status.channels.first.state,
       UrgentNotificationChannelState.bypasses,
@@ -75,6 +79,22 @@ void main() {
     );
   });
 
+  test(
+    'reports when the native settings destination is not supported',
+    () async {
+      messenger.setMockMethodCallHandler(channel, (_) async {
+        return {
+          'supportsChannelSettings': false,
+          'channels': <String, Object?>{},
+        };
+      });
+
+      final status = await UrgentNotificationSettings(channel).status();
+
+      expect(status.channelSettingsSupported, isFalse);
+    },
+  );
+
   test('platform failures become unavailable states', () async {
     messenger.setMockMethodCallHandler(channel, (_) async {
       throw PlatformException(code: 'unavailable');
@@ -83,6 +103,7 @@ void main() {
     final status = await UrgentNotificationSettings(channel).status();
 
     expect(status.allBypass, isFalse);
+    expect(status.channelSettingsSupported, isFalse);
     expect(
       status.channels.every(
         (channel) =>
@@ -98,10 +119,13 @@ void main() {
       messenger.setMockMethodCallHandler(channel, (call) async {
         if (call.method == 'urgentNotificationChannelStatus') {
           return {
-            'eew_alert-important-v2': {
-              'id': 'native-eew-alert-channel',
-              'name': 'Major EEW',
-              'bypassesDnd': true,
+            'supportsChannelSettings': true,
+            'channels': {
+              'eew_alert-important-v2': {
+                'id': 'native-eew-alert-channel',
+                'name': 'Major EEW',
+                'bypassesDnd': true,
+              },
             },
           };
         }
