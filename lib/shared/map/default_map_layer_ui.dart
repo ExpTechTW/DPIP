@@ -19,6 +19,7 @@ extension DefaultMapLayerUi on DefaultMapLayer {
     DefaultMapLayer.lightning => Icons.bolt_outlined,
     DefaultMapLayer.typhoon => Icons.cyclone_outlined,
     DefaultMapLayer.monitor => Icons.sensors_outlined,
+    DefaultMapLayer.tsunami => Icons.tsunami_outlined,
     DefaultMapLayer.temperature => Icons.thermostat_outlined,
     DefaultMapLayer.humidity => Icons.water_drop_outlined,
     DefaultMapLayer.pressure => Icons.compress,
@@ -35,6 +36,7 @@ extension DefaultMapLayerUi on DefaultMapLayer {
     DefaultMapLayer.lightning => Icons.bolt,
     DefaultMapLayer.typhoon => Icons.cyclone,
     DefaultMapLayer.monitor => Icons.sensors,
+    DefaultMapLayer.tsunami => Icons.tsunami,
     DefaultMapLayer.temperature => Icons.thermostat,
     DefaultMapLayer.humidity => Icons.water_drop,
     DefaultMapLayer.pressure => Icons.compress,
@@ -51,6 +53,9 @@ extension DefaultMapLayerUi on DefaultMapLayer {
     DefaultMapLayer.lightning => l10n.mapNavLightning,
     DefaultMapLayer.typhoon => l10n.mapNavTyphoon,
     DefaultMapLayer.monitor => l10n.mapNavEarthquake,
+    // The map layer's own name, not a new mapNav key: the picker shows the
+    // same row the in-map switcher does.
+    DefaultMapLayer.tsunami => l10n.mapLayerTsunami,
     DefaultMapLayer.temperature => l10n.mapNavTemperature,
     DefaultMapLayer.humidity => l10n.mapNavHumidity,
     DefaultMapLayer.pressure => l10n.mapNavPressure,
