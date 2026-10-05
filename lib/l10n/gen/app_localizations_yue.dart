@@ -298,7 +298,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get meshtasticSilent => '已靜默';
 
   @override
-  String get mapLayerCategoryEarthquake => '地震';
+  String get mapLayerCategoryEarthquake => '地震與海嘯';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
@@ -3302,4 +3302,44 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get eewSpokenAnnouncementOff => '關閉';
+
+  @override
+  String get mapLayerTsunami => '海嘯警報';
+
+  @override
+  String get tsunamiLegendEpicenter => '地震震央';
+
+  @override
+  String get tsunamiEarthquake => '地震資訊';
+
+  @override
+  String get tsunamiPredictions => '預估海嘯到達時間及波高';
+
+  @override
+  String get tsunamiObservations => '各地觀測到的海嘯';
+
+  @override
+  String get tsunamiBandOver3m => '超過 3 公尺';
+
+  @override
+  String get tsunamiBand1To3m => '1～3 公尺';
+
+  @override
+  String get tsunamiBand30cmTo1m => '0.3～1 公尺';
+
+  @override
+  String get tsunamiBandUnder30cm => '小於 0.3 公尺';
+
+  @override
+  String get tsunamiEmpty => '目前沒有海嘯警報';
+
+  @override
+  String tsunamiReportNumber(int n) {
+    return '第 $n 報';
+  }
+
+  @override
+  String tsunamiWaveHeightCm(int cm) {
+    return '$cm 公分';
+  }
 }

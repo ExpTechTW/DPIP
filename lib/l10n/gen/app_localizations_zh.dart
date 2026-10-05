@@ -298,7 +298,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get meshtasticSilent => '已靜默';
 
   @override
-  String get mapLayerCategoryEarthquake => '地震';
+  String get mapLayerCategoryEarthquake => '地震與海嘯';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
@@ -3302,6 +3302,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get eewSpokenAnnouncementOff => '关闭';
+
+  @override
+  String get mapLayerTsunami => '海嘯警報';
+
+  @override
+  String get tsunamiLegendEpicenter => '地震震央';
+
+  @override
+  String get tsunamiEarthquake => '地震資訊';
+
+  @override
+  String get tsunamiPredictions => '預估海嘯到達時間及波高';
+
+  @override
+  String get tsunamiObservations => '各地觀測到的海嘯';
+
+  @override
+  String get tsunamiBandOver3m => '超過 3 公尺';
+
+  @override
+  String get tsunamiBand1To3m => '1～3 公尺';
+
+  @override
+  String get tsunamiBand30cmTo1m => '0.3～1 公尺';
+
+  @override
+  String get tsunamiBandUnder30cm => '小於 0.3 公尺';
+
+  @override
+  String get tsunamiEmpty => '目前沒有海嘯警報';
+
+  @override
+  String tsunamiReportNumber(int n) {
+    return '第 $n 報';
+  }
+
+  @override
+  String tsunamiWaveHeightCm(int cm) {
+    return '$cm 公分';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3595,7 +3635,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get meshtasticSilent => '已静默';
 
   @override
-  String get mapLayerCategoryEarthquake => '地震';
+  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
@@ -6599,6 +6639,46 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get eewSpokenAnnouncementOff => '关闭';
+
+  @override
+  String get mapLayerTsunami => 'Tsunami';
+
+  @override
+  String get tsunamiLegendEpicenter => 'Earthquake epicentre';
+
+  @override
+  String get tsunamiEarthquake => 'Source earthquake';
+
+  @override
+  String get tsunamiPredictions => 'Predicted arrival time and wave height';
+
+  @override
+  String get tsunamiObservations => 'Observed tsunami by station';
+
+  @override
+  String get tsunamiBandOver3m => 'Over 3 m';
+
+  @override
+  String get tsunamiBand1To3m => '1-3 m';
+
+  @override
+  String get tsunamiBand30cmTo1m => '0.3-1 m';
+
+  @override
+  String get tsunamiBandUnder30cm => 'Under 0.3 m';
+
+  @override
+  String get tsunamiEmpty => 'No tsunami bulletin has been issued';
+
+  @override
+  String tsunamiReportNumber(int n) {
+    return 'Report $n';
+  }
+
+  @override
+  String tsunamiWaveHeightCm(int cm) {
+    return '$cm cm';
+  }
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -6892,7 +6972,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get meshtasticSilent => '已靜默';
 
   @override
-  String get mapLayerCategoryEarthquake => '地震';
+  String get mapLayerCategoryEarthquake => '地震與海嘯';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
@@ -9896,6 +9976,46 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get eewSpokenAnnouncementOff => '關閉';
+
+  @override
+  String get mapLayerTsunami => '海嘯警報';
+
+  @override
+  String get tsunamiLegendEpicenter => '地震震央';
+
+  @override
+  String get tsunamiEarthquake => '地震資訊';
+
+  @override
+  String get tsunamiPredictions => '預估海嘯到達時間及波高';
+
+  @override
+  String get tsunamiObservations => '各地觀測到的海嘯';
+
+  @override
+  String get tsunamiBandOver3m => '超過 3 公尺';
+
+  @override
+  String get tsunamiBand1To3m => '1～3 公尺';
+
+  @override
+  String get tsunamiBand30cmTo1m => '0.3～1 公尺';
+
+  @override
+  String get tsunamiBandUnder30cm => '小於 0.3 公尺';
+
+  @override
+  String get tsunamiEmpty => '目前沒有海嘯警報';
+
+  @override
+  String tsunamiReportNumber(int n) {
+    return '第 $n 報';
+  }
+
+  @override
+  String tsunamiWaveHeightCm(int cm) {
+    return '$cm 公分';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -10189,7 +10309,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get meshtasticSilent => '已靜默';
 
   @override
-  String get mapLayerCategoryEarthquake => '地震';
+  String get mapLayerCategoryEarthquake => '地震與海嘯';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
@@ -13193,4 +13313,44 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get eewSpokenAnnouncementOff => '關閉';
+
+  @override
+  String get mapLayerTsunami => '海嘯警報';
+
+  @override
+  String get tsunamiLegendEpicenter => '地震震央';
+
+  @override
+  String get tsunamiEarthquake => '地震資訊';
+
+  @override
+  String get tsunamiPredictions => '預估海嘯到達時間及波高';
+
+  @override
+  String get tsunamiObservations => '各地觀測到的海嘯';
+
+  @override
+  String get tsunamiBandOver3m => '超過 3 公尺';
+
+  @override
+  String get tsunamiBand1To3m => '1～3 公尺';
+
+  @override
+  String get tsunamiBand30cmTo1m => '0.3～1 公尺';
+
+  @override
+  String get tsunamiBandUnder30cm => '小於 0.3 公尺';
+
+  @override
+  String get tsunamiEmpty => '目前沒有海嘯警報';
+
+  @override
+  String tsunamiReportNumber(int n) {
+    return '第 $n 報';
+  }
+
+  @override
+  String tsunamiWaveHeightCm(int cm) {
+    return '$cm 公分';
+  }
 }
