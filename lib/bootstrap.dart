@@ -74,6 +74,7 @@ import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
 import 'package:dpip/features/bug_tracker/bug_tracker_providers.dart';
 import 'package:dpip/features/status/status_providers.dart';
+import 'package:dpip/features/tsunami/tsunami_providers.dart';
 import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/firebase_options.dart';
@@ -454,6 +455,7 @@ Future<void> bootstrap() async {
         ...weatherProviders(deps),
         ...disasterMapProviders(deps),
         ...typhoonProviders(deps),
+        ...tsunamiProviders(deps),
         ...eventsProviders(deps),
         ...changelogProviders(deps),
         ...notificationProviders(deps),

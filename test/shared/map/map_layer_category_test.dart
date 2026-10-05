@@ -10,6 +10,14 @@ void main() {
       expect(categoryOf('monitor'), MapLayerCategory.earthquake);
     });
 
+    test('tsunami bulletins share the seismology group', () {
+      // The group header reads 「地震與海嘯」 for exactly this reason: a tsunami
+      // bulletin is issued off an earthquake, and the two are one product family
+      // at CWA. A tsunami row under a header saying only 「地震」 would read as a
+      // misfiled alert.
+      expect(categoryOf('tsunami'), MapLayerCategory.earthquake);
+    });
+
     test('typhoon is its own group', () {
       expect(categoryOf('typhoon'), MapLayerCategory.typhoon);
     });

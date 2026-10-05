@@ -117,7 +117,7 @@
   "reportFilterDateEndNote": "종료일: 당일 24:00（타이베이）",
   "meshtasticSilent": "무음",
   "reportFilterSortMagnitude": "규모",
-  "mapLayerCategoryEarthquake": "지진",
+  "mapLayerCategoryEarthquake": "Earthquakes & tsunami",
   "mapLayerSatelliteB12": "히마와리 오존(B12)",
   "restroomCategoryOther": "기타",
   "@meshtasticRegionConfirm": {
@@ -2006,5 +2006,63 @@
   "moreSectionAccessibility": "접근성",
   "eewSpokenAnnouncementOn": "켜기",
   "eewSpokenAnnouncementOnDescription": "예상 진도를 음성으로 먼저 안내한 뒤 경보음이 울립니다. 그만큼 경보음이 늦어집니다.",
-  "eewSpokenAnnouncementOff": "끄기"
+  "eewSpokenAnnouncementOff": "끄기",
+  "mapLayerTsunami": "Tsunami",
+  "@mapLayerTsunami": {
+    "description": "Tsunami feature string: mapLayerTsunami"
+  },
+  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "@tsunamiLegendEpicenter": {
+    "description": "Tsunami feature string: tsunamiLegendEpicenter"
+  },
+  "tsunamiEarthquake": "Source earthquake",
+  "@tsunamiEarthquake": {
+    "description": "Tsunami feature string: tsunamiEarthquake"
+  },
+  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "@tsunamiPredictions": {
+    "description": "Tsunami feature string: tsunamiPredictions"
+  },
+  "tsunamiObservations": "Observed tsunami by station",
+  "@tsunamiObservations": {
+    "description": "Tsunami feature string: tsunamiObservations"
+  },
+  "tsunamiBandOver3m": "Over 3 m",
+  "@tsunamiBandOver3m": {
+    "description": "Tsunami feature string: tsunamiBandOver3m"
+  },
+  "tsunamiBand1To3m": "1-3 m",
+  "@tsunamiBand1To3m": {
+    "description": "Tsunami feature string: tsunamiBand1To3m"
+  },
+  "tsunamiBand30cmTo1m": "0.3-1 m",
+  "@tsunamiBand30cmTo1m": {
+    "description": "Tsunami feature string: tsunamiBand30cmTo1m"
+  },
+  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "@tsunamiBandUnder30cm": {
+    "description": "Tsunami feature string: tsunamiBandUnder30cm"
+  },
+  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "@tsunamiEmpty": {
+    "description": "Tsunami feature string: tsunamiEmpty"
+  },
+  "tsunamiReportNumber": "Report {n}",
+  "@tsunamiReportNumber": {
+    "description": "Tsunami feature string: tsunamiReportNumber",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "tsunamiWaveHeightCm": "{cm} cm",
+  "@tsunamiWaveHeightCm": {
+    "description": "Tsunami feature string: tsunamiWaveHeightCm",
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  }
 }

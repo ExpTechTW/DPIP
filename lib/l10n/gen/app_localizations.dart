@@ -663,7 +663,7 @@ abstract class AppLocalizations {
   /// Section title in map overlay lists: the seismic-monitor overlays
   ///
   /// In en, this message translates to:
-  /// **'Earthquake'**
+  /// **'Earthquakes & tsunami'**
   String get mapLayerCategoryEarthquake;
 
   /// Himawari ozone-band channel (B12, 9.6 µm) layer name
@@ -6419,6 +6419,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off'**
   String get eewSpokenAnnouncementOff;
+
+  /// Tsunami feature string: mapLayerTsunami
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami'**
+  String get mapLayerTsunami;
+
+  /// Tsunami feature string: tsunamiLegendEpicenter
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake epicentre'**
+  String get tsunamiLegendEpicenter;
+
+  /// Tsunami feature string: tsunamiEarthquake
+  ///
+  /// In en, this message translates to:
+  /// **'Source earthquake'**
+  String get tsunamiEarthquake;
+
+  /// Tsunami feature string: tsunamiPredictions
+  ///
+  /// In en, this message translates to:
+  /// **'Predicted arrival time and wave height'**
+  String get tsunamiPredictions;
+
+  /// Tsunami feature string: tsunamiObservations
+  ///
+  /// In en, this message translates to:
+  /// **'Observed tsunami by station'**
+  String get tsunamiObservations;
+
+  /// Tsunami feature string: tsunamiBandOver3m
+  ///
+  /// In en, this message translates to:
+  /// **'Over 3 m'**
+  String get tsunamiBandOver3m;
+
+  /// Tsunami feature string: tsunamiBand1To3m
+  ///
+  /// In en, this message translates to:
+  /// **'1-3 m'**
+  String get tsunamiBand1To3m;
+
+  /// Tsunami feature string: tsunamiBand30cmTo1m
+  ///
+  /// In en, this message translates to:
+  /// **'0.3-1 m'**
+  String get tsunamiBand30cmTo1m;
+
+  /// Tsunami feature string: tsunamiBandUnder30cm
+  ///
+  /// In en, this message translates to:
+  /// **'Under 0.3 m'**
+  String get tsunamiBandUnder30cm;
+
+  /// Tsunami feature string: tsunamiEmpty
+  ///
+  /// In en, this message translates to:
+  /// **'No tsunami bulletin has been issued'**
+  String get tsunamiEmpty;
+
+  /// Tsunami feature string: tsunamiReportNumber
+  ///
+  /// In en, this message translates to:
+  /// **'Report {n}'**
+  String tsunamiReportNumber(int n);
+
+  /// Tsunami feature string: tsunamiWaveHeightCm
+  ///
+  /// In en, this message translates to:
+  /// **'{cm} cm'**
+  String tsunamiWaveHeightCm(int cm);
 }
 
 class _AppLocalizationsDelegate
