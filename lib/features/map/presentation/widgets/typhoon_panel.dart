@@ -16,6 +16,7 @@ import 'package:dpip/features/typhoon/domain/storm_circle.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_intensity.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/selectable_pill.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -374,7 +375,7 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
                               runSpacing: AppSpacing.xs,
                               children: [
                                 for (final o in options)
-                                  _CyclonePill(
+                                  SelectablePill(
                                     label: o.label,
                                     selected: o.key == selectedKey,
                                     onTap: () => layer.selectCyclone(o.key),
@@ -502,62 +503,6 @@ class _BulletinState extends State<_Bulletin> with SheetExtentFlag<_Bulletin> {
         fontWeight: FontWeight.w600,
         fontFeatures: const [FontFeature.tabularFigures()],
       );
-}
-
-/// One storm in the sheet's cyclone selector — a quiet pill that marks the
-/// focused storm and switches on tap. Only rendered when more than one storm
-/// is active, so a single-storm season shows no chrome at all.
-class _CyclonePill extends StatelessWidget {
-  const _CyclonePill({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.lg),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: selected
-                ? colors.primaryContainer.withValues(alpha: 0.55)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppSpacing.lg),
-            border: Border.all(
-              color: selected
-                  ? Colors.transparent
-                  : colors.outlineVariant.withValues(alpha: 0.5),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.xs + 1,
-            ),
-            child: Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: selected
-                    ? colors.onPrimaryContainer
-                    : colors.onSurfaceVariant,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 /// Low-key CWA serial badge (TY 4 / TD 14) on the sheet hero — the storm's
