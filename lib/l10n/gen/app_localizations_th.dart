@@ -305,7 +305,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get meshtasticSilent => 'เงียบ';
 
   @override
-  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
+  String get mapLayerCategoryEarthquake => 'แผ่นดินไหวและสึนามิ';
 
   @override
   String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';

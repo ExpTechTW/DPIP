@@ -302,7 +302,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get meshtasticSilent => 'サイレント';
 
   @override
-  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
+  String get mapLayerCategoryEarthquake => '地震と津波';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり オゾン(B12)';
