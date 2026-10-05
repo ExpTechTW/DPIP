@@ -34,7 +34,10 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
   /// The product whose purchase is currently in flight, if any.
   String? purchasingId;
 
-  /// Products owned this session (a bought subscription / restored purchase).
+  /// Subscriptions owned this session (a fresh or restored purchase).
+  ///
+  /// One-time tips are consumables, so completing one must not make its product
+  /// unavailable for the rest of the page session.
   final Set<String> purchasedIds = {};
 
   /// Whether any purchase is mid-flight — the whole grid disables while one is.
@@ -58,7 +61,10 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Starts buying [product]; the purchase stream drives the rest.
   Future<void> buy(SponsorProduct product) async {
-    if (isBusy || purchasedIds.contains(product.id)) return;
+    if (isBusy ||
+        (product.isSubscription && purchasedIds.contains(product.id))) {
+      return;
+    }
     purchasingId = product.id;
     notifyListeners();
     try {
@@ -111,7 +117,12 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
 
   void _onPurchase(SponsorPurchase purchase) {
     var notified = false;
-    if (purchase.isSuccess) purchasedIds.add(purchase.productId);
+    final isSubscription = subscriptions.any(
+      (product) => product.id == purchase.productId,
+    );
+    if (purchase.isSuccess && isSubscription) {
+      purchasedIds.add(purchase.productId);
+    }
     // Clear the in-flight marker once this product settles (success, error, or
     // cancel) — a still-pending update keeps it busy.
     if (purchase.isSettled && purchasingId == purchase.productId) {

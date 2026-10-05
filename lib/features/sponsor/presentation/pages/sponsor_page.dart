@@ -187,7 +187,8 @@ class _SectionTitle extends StatelessWidget {
 }
 
 /// One product row — icon, title, description, and a trailing price button that
-/// becomes a spinner while buying and a check once owned.
+/// becomes a spinner while buying. Owned subscriptions show a check; completed
+/// one-time tips return to the price so they can be purchased again.
 class _ProductCard extends StatelessWidget {
   const _ProductCard({required this.controller, required this.product});
 
@@ -201,7 +202,8 @@ class _ProductCard extends StatelessWidget {
     final colors = theme.colorScheme;
 
     final purchasing = controller.purchasingId == product.id;
-    final purchased = controller.purchasedIds.contains(product.id);
+    final purchased =
+        product.isSubscription && controller.purchasedIds.contains(product.id);
     final disabled = (controller.isBusy && !purchasing) || purchased;
     final sub = product.isSubscription;
     final priceText = sub ? l10n.sponsorPerMonth(product.price) : product.price;
