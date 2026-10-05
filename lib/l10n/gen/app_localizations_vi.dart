@@ -305,7 +305,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get meshtasticSilent => 'Im lặng';
 
   @override
-  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
+  String get mapLayerCategoryEarthquake => 'Động đất và sóng thần';
 
   @override
   String get mapLayerSatelliteB12 => 'Himawari Ozone (B12)';

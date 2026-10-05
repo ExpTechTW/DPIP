@@ -3635,7 +3635,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get meshtasticSilent => '已静默';
 
   @override
-  String get mapLayerCategoryEarthquake => 'Earthquakes & tsunami';
+  String get mapLayerCategoryEarthquake => '地震与海啸';
 
   @override
   String get mapLayerSatelliteB12 => 'ひまわり 臭氧(B12)';
