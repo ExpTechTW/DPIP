@@ -29,7 +29,10 @@ UrgentNotificationChannelStatus _channel(
 
 Widget _urgentSection(List<UrgentNotificationChannelStatus> channels) =>
     UrgentNotificationSection(
-      status: UrgentNotificationStatus(channels),
+      status: UrgentNotificationStatus(
+        channelSettingsSupported: true,
+        channels: channels,
+      ),
       title: 'Major alerts in Do Not Disturb',
       description: 'Choose which channels may interrupt.',
       loadingChannelId: null,

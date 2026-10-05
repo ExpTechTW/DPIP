@@ -42,11 +42,14 @@ const _stillNeeded =
 
 void main() {
   group('urgentUnchangedHint', () {
-    final status = UrgentNotificationStatus([
-      _channel('eew', UrgentNotificationChannelState.doesNotBypass),
-      _channel('tsunami', UrgentNotificationChannelState.bypasses),
-      _channel('storm', UrgentNotificationChannelState.missing),
-    ]);
+    final status = UrgentNotificationStatus(
+      channelSettingsSupported: true,
+      channels: [
+        _channel('eew', UrgentNotificationChannelState.doesNotBypass),
+        _channel('tsunami', UrgentNotificationChannelState.bypasses),
+        _channel('storm', UrgentNotificationChannelState.missing),
+      ],
+    );
 
     test('nothing was opened, or nothing was read', () {
       expect(urgentUnchangedHint(null, status), isNull);
@@ -104,20 +107,23 @@ void main() {
       matching: find.byType(PermissionRow),
     );
 
-    final mixed = UrgentNotificationStatus([
-      _channel(
-        'eew',
-        UrgentNotificationChannelState.doesNotBypass,
-        name: 'EEW',
-      ),
-      _channel(
-        'tsunami',
-        UrgentNotificationChannelState.bypasses,
-        name: 'Tsunami',
-      ),
-      _channel('storm', UrgentNotificationChannelState.missing),
-      _channel('flood', UrgentNotificationChannelState.unavailable),
-    ]);
+    final mixed = UrgentNotificationStatus(
+      channelSettingsSupported: true,
+      channels: [
+        _channel(
+          'eew',
+          UrgentNotificationChannelState.doesNotBypass,
+          name: 'EEW',
+        ),
+        _channel(
+          'tsunami',
+          UrgentNotificationChannelState.bypasses,
+          name: 'Tsunami',
+        ),
+        _channel('storm', UrgentNotificationChannelState.missing),
+        _channel('flood', UrgentNotificationChannelState.unavailable),
+      ],
+    );
 
     testWidgets('lists only the channels the system actually has', (
       tester,
@@ -138,15 +144,40 @@ void main() {
     testWidgets('renders nothing when no channel is present', (tester) async {
       await pump(
         tester,
-        status: UrgentNotificationStatus([
-          _channel('storm', UrgentNotificationChannelState.missing),
-          _channel('flood', UrgentNotificationChannelState.unavailable),
-        ]),
+        status: UrgentNotificationStatus(
+          channelSettingsSupported: true,
+          channels: [
+            _channel('storm', UrgentNotificationChannelState.missing),
+            _channel('flood', UrgentNotificationChannelState.unavailable),
+          ],
+        ),
       );
 
       expect(find.byType(ExpansionTile), findsNothing);
       expect(find.byType(PermissionRow), findsNothing);
     });
+
+    testWidgets(
+      'renders nothing when native channel settings are unsupported',
+      (tester) async {
+        await pump(
+          tester,
+          status: UrgentNotificationStatus(
+            channelSettingsSupported: false,
+            channels: [
+              _channel(
+                'eew',
+                UrgentNotificationChannelState.doesNotBypass,
+                name: 'EEW',
+              ),
+            ],
+          ),
+        );
+
+        expect(find.byType(ExpansionTile), findsNothing);
+        expect(find.byType(PermissionRow), findsNothing);
+      },
+    );
 
     testWidgets('only an unsettled channel offers its settings', (
       tester,
@@ -171,18 +202,21 @@ void main() {
     ) async {
       await pump(
         tester,
-        status: UrgentNotificationStatus([
-          _channel(
-            'eew',
-            UrgentNotificationChannelState.doesNotBypass,
-            name: 'EEW',
-          ),
-          _channel(
-            'storm',
-            UrgentNotificationChannelState.doesNotBypass,
-            name: 'Storm',
-          ),
-        ]),
+        status: UrgentNotificationStatus(
+          channelSettingsSupported: true,
+          channels: [
+            _channel(
+              'eew',
+              UrgentNotificationChannelState.doesNotBypass,
+              name: 'EEW',
+            ),
+            _channel(
+              'storm',
+              UrgentNotificationChannelState.doesNotBypass,
+              name: 'Storm',
+            ),
+          ],
+        ),
         loadingChannelId: 'storm',
       );
 
@@ -202,18 +236,21 @@ void main() {
     ) async {
       await pump(
         tester,
-        status: UrgentNotificationStatus([
-          _channel(
-            'eew',
-            UrgentNotificationChannelState.doesNotBypass,
-            name: 'EEW',
-          ),
-          _channel(
-            'storm',
-            UrgentNotificationChannelState.doesNotBypass,
-            name: 'Storm',
-          ),
-        ]),
+        status: UrgentNotificationStatus(
+          channelSettingsSupported: true,
+          channels: [
+            _channel(
+              'eew',
+              UrgentNotificationChannelState.doesNotBypass,
+              name: 'EEW',
+            ),
+            _channel(
+              'storm',
+              UrgentNotificationChannelState.doesNotBypass,
+              name: 'Storm',
+            ),
+          ],
+        ),
         unchangedChannelId: 'eew',
       );
 

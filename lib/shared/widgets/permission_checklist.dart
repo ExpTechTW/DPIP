@@ -592,7 +592,8 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             onGrant: _grantCritical,
           ),
         ],
-        if (Platform.isAndroid && _urgent != null) ...[
+        if (Platform.isAndroid &&
+            _urgent?.channelSettingsSupported == true) ...[
           const SizedBox(height: AppSpacing.sm),
           UrgentNotificationSection(
             status: _urgent!,
@@ -916,7 +917,9 @@ class UrgentNotificationSection extends StatelessWidget {
     final channels = status.channels
         .where((channel) => channel.channelId != null && channel.name != null)
         .toList(growable: false);
-    if (channels.isEmpty) return const SizedBox.shrink();
+    if (!status.channelSettingsSupported || channels.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     // A channel that still follows Do Not Disturb is only visible once the
     // section is open, and collapsed is how it starts — so the header carries

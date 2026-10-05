@@ -59,7 +59,12 @@ class PermissionSettingsChannel(private val context: Context) :
                 )
             }
         }
-        result.success(statuses)
+        result.success(
+            mapOf(
+                "supportsChannelSettings" to usesNativeDndChannelSettings(),
+                "channels" to statuses,
+            ),
+        )
     }
 
     private fun openNotificationChannelSettings(call: MethodCall, result: MethodChannel.Result) {
