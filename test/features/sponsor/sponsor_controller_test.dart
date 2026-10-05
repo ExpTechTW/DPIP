@@ -106,35 +106,32 @@ void main() {
     },
   );
 
-  test(
-    'a purchased update records ownership and clears the in-flight marker',
-    () async {
-      final repo = _FakeSponsorRepository(const Ok([_sub]));
-      final controller = SponsorController(repo);
-      await controller.load();
-      await controller.buy(_sub);
+  test('a purchased subscription records ownership and clears the in-flight marker', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]));
+    final controller = SponsorController(repo);
+    await controller.load();
+    await controller.buy(_sub);
 
-      repo.emit(
-        const SponsorPurchase(
-          productId: 's_donation75',
-          status: SponsorPurchaseStatus.pending,
-        ),
-      );
-      await _settle();
-      expect(controller.isBusy, isTrue);
+    repo.emit(
+      const SponsorPurchase(
+        productId: 's_donation75',
+        status: SponsorPurchaseStatus.pending,
+      ),
+    );
+    await _settle();
+    expect(controller.isBusy, isTrue);
 
-      repo.emit(
-        const SponsorPurchase(
-          productId: 's_donation75',
-          status: SponsorPurchaseStatus.purchased,
-        ),
-      );
-      await _settle();
+    repo.emit(
+      const SponsorPurchase(
+        productId: 's_donation75',
+        status: SponsorPurchaseStatus.purchased,
+      ),
+    );
+    await _settle();
 
-      expect(controller.purchasedIds, contains('s_donation75'));
-      expect(controller.purchasingId, isNull);
-    },
-  );
+    expect(controller.purchasedIds, contains('s_donation75'));
+    expect(controller.purchasingId, isNull);
+  });
 
   test('a canceled update just clears the in-flight marker', () async {
     final repo = _FakeSponsorRepository(const Ok([_sub]));

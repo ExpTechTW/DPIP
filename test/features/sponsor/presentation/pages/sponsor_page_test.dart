@@ -155,6 +155,31 @@ void main() {
     expect(find.byType(InlineLoading), findsNothing);
   });
 
+  testWidgets('a completed one-time tip remains available to buy again', (
+    tester,
+  ) async {
+    final repository = _SponsorRepository();
+    await _pump(tester, repository);
+
+    await tester.tap(find.text('Coffee'));
+    await tester.pump();
+    repository.updates.add(
+      const SponsorPurchase(
+        productId: 'coffee',
+        status: SponsorPurchaseStatus.purchased,
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(InlineLoading), findsNothing);
+    expect(find.byIcon(Icons.check_circle), findsNothing);
+    expect(find.text(r'$0.99'), findsOneWidget);
+
+    await tester.tap(find.text('Coffee'));
+    await tester.pump();
+    expect(repository.bought, ['coffee', 'coffee']);
+  });
+
   testWidgets('a store that refuses to start clears the busy state', (
     tester,
   ) async {
