@@ -63,38 +63,29 @@ const vec3 kSunColor = vec3(0.59, 0.55, 0.61);
 /// below, so no constant is needed.
 const float kSurfaceAlpha = 0.6;
 
-// Bilinear fetch — samplers bind NEAREST, and the two buffers must be
-// filtered identically or the reassembled sum tears at texel edges. Two
-// copies because SkSL rejects samplers as function parameters.
-vec4 fieldPosTex(vec2 uv) {
-  vec2 texel = 1.0 / iResolution;
-  vec2 p = uv * iResolution - 0.5;
-  vec2 f = fract(p);
-  vec2 base = (floor(p) + 0.5) * texel;
-  vec4 a = texture(iFieldPos, base);
-  vec4 b = texture(iFieldPos, base + vec2(texel.x, 0.0));
-  vec4 c = texture(iFieldPos, base + vec2(0.0, texel.y));
-  vec4 d = texture(iFieldPos, base + texel);
-  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-}
-
-vec4 fieldNegTex(vec2 uv) {
-  vec2 texel = 1.0 / iResolution;
-  vec2 p = uv * iResolution - 0.5;
-  vec2 f = fract(p);
-  vec2 base = (floor(p) + 0.5) * texel;
-  vec4 a = texture(iFieldNeg, base);
-  vec4 b = texture(iFieldNeg, base + vec2(texel.x, 0.0));
-  vec4 c = texture(iFieldNeg, base + vec2(0.0, texel.y));
-  vec4 d = texture(iFieldNeg, base + texel);
-  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-}
-
 void main() {
   vec2 uv = FlutterFragCoord().xy / iResolution;
 
-  vec3 pos = fieldPosTex(uv).rgb;
-  vec3 neg = fieldNegTex(uv).rgb;
+  // Bilinear fetch — samplers bind NEAREST, and the two buffers must be
+  // filtered identically or the reassembled sum tears at texel edges. The
+  // address is the same for both, so it is built once; SkSL rejects samplers
+  // as function parameters, which is why the eight taps sit here together.
+  vec2 texel = 1.0 / iResolution;
+  vec2 st = uv * iResolution - 0.5;
+  vec2 f = fract(st);
+  vec2 base = (floor(st) + 0.5) * texel;
+  vec2 dx = vec2(texel.x, 0.0);
+  vec2 dy = vec2(0.0, texel.y);
+  vec3 pos = mix(
+    mix(texture(iFieldPos, base), texture(iFieldPos, base + dx), f.x),
+    mix(texture(iFieldPos, base + dy), texture(iFieldPos, base + texel), f.x),
+    f.y
+  ).rgb;
+  vec3 neg = mix(
+    mix(texture(iFieldNeg, base), texture(iFieldNeg, base + dx), f.x),
+    mix(texture(iFieldNeg, base + dy), texture(iFieldNeg, base + texel), f.x),
+    f.y
+  ).rgb;
 
   // `if (texColor.a < 0.01) return;` then the metaball cut — the threshold is
   // far above the early-out, so one test covers both.

@@ -24,14 +24,7 @@ Map<String, dynamic> circleFeature(
   double radiusMetres, {
   int steps = 64,
   Map<String, dynamic> properties = const {},
-}) => {
-  'type': 'Feature',
-  'geometry': {
-    'type': 'LineString',
-    'coordinates': _ring(center, radiusMetres, steps),
-  },
-  'properties': properties,
-};
+}) => _lineFeature(_ring(center, radiusMetres, steps), properties);
 
 /// A GeoJSON `Feature` (closed `Polygon` geometry) tracing the same circle as
 /// [circleFeature], for a `FillLayerProperties` translucent disc under the
@@ -41,11 +34,41 @@ Map<String, dynamic> circleFillFeature(
   double radiusMetres, {
   int steps = 64,
   Map<String, dynamic> properties = const {},
-}) => {
+}) => _fillFeature(_ring(center, radiusMetres, steps), properties);
+
+/// Appends an outline ring and, when [fillProperties] is set, the disc under
+/// it. The S wave draws both every tick; one ring serves the pair instead of
+/// solving the same vertices twice.
+void addCircleFeatures(
+  List<Map<String, dynamic>> features,
+  LatLng center,
+  double radiusMetres, {
+  int steps = 64,
+  Map<String, dynamic>? fillProperties,
+  required Map<String, dynamic> lineProperties,
+}) {
+  final ring = _ring(center, radiusMetres, steps);
+  if (fillProperties != null) features.add(_fillFeature(ring, fillProperties));
+  features.add(_lineFeature(ring, lineProperties));
+}
+
+Map<String, dynamic> _lineFeature(
+  List<List<double>> ring,
+  Map<String, dynamic> properties,
+) => {
+  'type': 'Feature',
+  'geometry': {'type': 'LineString', 'coordinates': ring},
+  'properties': properties,
+};
+
+Map<String, dynamic> _fillFeature(
+  List<List<double>> ring,
+  Map<String, dynamic> properties,
+) => {
   'type': 'Feature',
   'geometry': {
     'type': 'Polygon',
-    'coordinates': [_ring(center, radiusMetres, steps)],
+    'coordinates': [ring],
   },
   'properties': properties,
 };
@@ -76,7 +99,7 @@ List<List<double>> _ring(LatLng center, double radiusMetres, int steps) {
   final cosLat1 = math.cos(lat1);
   return [
     for (final (sinTheta, cosTheta) in _bearings(steps))
-      _vertex(sinLat1, cosLat1, lat1, lon1, sinD, cosD, sinTheta, cosTheta),
+      _vertex(sinLat1, cosLat1, lon1, sinD, cosD, sinTheta, cosTheta),
   ];
 }
 
@@ -85,16 +108,17 @@ List<List<double>> _ring(LatLng center, double radiusMetres, int steps) {
 List<double> _vertex(
   double sinLat1,
   double cosLat1,
-  double lat1,
   double lon1,
   double sinD,
   double cosD,
   double sinTheta,
   double cosTheta,
 ) {
-  final lat2 = math.asin(sinLat1 * cosD + cosLat1 * sinD * cosTheta);
+  // sin(asin(x)) = x on [-1, 1], which is the whole range a ring vertex
+  // can take, so the latitude sine does not need a second trig call.
+  final sinLat2 = sinLat1 * cosD + cosLat1 * sinD * cosTheta;
+  final lat2 = math.asin(sinLat2);
   final lon2 =
-      lon1 +
-      math.atan2(sinTheta * sinD * cosLat1, cosD - sinLat1 * math.sin(lat2));
+      lon1 + math.atan2(sinTheta * sinD * cosLat1, cosD - sinLat1 * sinLat2);
   return [lon2 * 180.0 / math.pi, lat2 * 180.0 / math.pi];
 }

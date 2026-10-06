@@ -81,6 +81,56 @@ class LatLng {
   String toString() => 'LatLng($latitude, $longitude)';
 }
 
+/// `origin.distanceTo(point) <= metres`, with the origin terms computed once.
+///
+/// [contains] evaluates the same haversine `a` as [LatLng.distanceTo] and
+/// compares it with `sin²(metres / 2R)`. That drops the per-point `sqrt` and
+/// `atan2` that only exist to turn `a` back into metres. A radius of at least
+/// half the earth's circumference contains every point — [LatLng.distanceTo]
+/// cannot return more than that either. On the exact boundary the two can
+/// disagree by a fraction of a nanometre, and only by reporting "just
+/// outside".
+final class DistanceWithin {
+  DistanceWithin(LatLng origin, double metres)
+    : latitude = origin.latitude,
+      _longitude = origin.longitude,
+      _cosLat = math.cos(degToRad(origin.latitude)),
+      _none = metres < 0,
+      _all = metres >= _halfCircumference,
+      _limit = _chordLimit(metres);
+
+  static const double _earthRadius = 6378137.0;
+
+  /// The most [LatLng.distanceTo] can return: half a turn of the sphere.
+  static const double _halfCircumference = _earthRadius * math.pi;
+
+  final double latitude;
+  final double _longitude;
+  final double _cosLat;
+  final bool _none;
+  final bool _all;
+  final double _limit;
+
+  static double _chordLimit(double metres) {
+    if (metres < 0 || metres >= _halfCircumference) return 0;
+    final s = math.sin(metres / (2 * _earthRadius));
+    return s * s;
+  }
+
+  bool contains(double pointLat, double pointLng) {
+    if (_none) return false;
+    if (_all) return true;
+    final dLat = degToRad(pointLat - latitude);
+    final dLng = degToRad(pointLng - _longitude);
+    final sinHalfLat = math.sin(dLat / 2);
+    final sinHalfLng = math.sin(dLng / 2);
+    final a =
+        sinHalfLat * sinHalfLat +
+        _cosLat * math.cos(degToRad(pointLat)) * sinHalfLng * sinHalfLng;
+    return a <= _limit;
+  }
+}
+
 /// Maps a single GeoJSON `[lng, lat]` pair to a [LatLng] (mind the axis order).
 LatLng latLngFromPair(List<dynamic> pair) =>
     LatLng((pair[1] as num).toDouble(), (pair[0] as num).toDouble());

@@ -83,12 +83,11 @@ float heightAt(vec3 p) { return texture(iHeight, sphereUv(p)).r; }
 /// pole ends up where the observer actually sees it. The second is the
 /// libration: the Moon rocks a few degrees each month, showing a little around
 /// each limb in turn, and iLibration is the selenographic point facing Earth —
-/// so this brings that point to the centre of the disc.
-vec3 toMoonFrame(vec3 v) {
-  float cr = cos(iNorthRoll), sr = sin(iNorthRoll);
+/// so this brings that point to the centre of the disc. The six angles are
+/// uniforms; the caller computes each once and every vector shares them.
+vec3 toMoonFrame(vec3 v, float cr, float sr, float cl, float sl, float cb,
+                 float sb) {
   vec3 r = vec3(cr * v.x - sr * v.y, sr * v.x + cr * v.y, v.z);
-  float cl = cos(iLibration.x), sl = sin(iLibration.x);
-  float cb = cos(iLibration.y), sb = sin(iLibration.y);
   float ex = -sl * r.x + cl * r.z;
   return vec3(cl * r.x + sl * r.z, cb * r.y + sb * ex, cb * ex - sb * r.y);
 }
@@ -116,7 +115,12 @@ void main() {
   // the *eye* into it, rather than rotating a tangent basis back out of it,
   // keeps one frame in play: dot products are rotation-invariant, so the
   // shading is identical and there is no half-transformed vector to get wrong.
-  vec3 surf = toMoonFrame(view);
+  // The six angles are uniforms — one sin/cos pair each, shared by the
+  // surface, the sun and the eye.
+  float cr = cos(iNorthRoll), sr = sin(iNorthRoll);
+  float cl = cos(iLibration.x), sl = sin(iLibration.x);
+  float cb = cos(iLibration.y), sb = sin(iLibration.y);
+  vec3 surf = toMoonFrame(view, cr, sr, cl, sl, cb, sb);
   vec3 albedo = texture(iColor, sphereUv(surf)).rgb;
 
   // Relief: sample the elevation along two tangents of the sphere and tilt the
@@ -138,12 +142,14 @@ void main() {
   // frame. θ = 0 puts it behind the Moon (new) and θ = π in front (full);
   // in between, its in-plane direction is the bright limb's screen bearing —
   // measured from straight up, clockwise, so x = sin and y = cos.
+  float sp = sin(iPhase), cp = cos(iPhase);
+  float sLimb = sin(iLimb), cLimb = cos(iLimb);
   vec3 sun = toMoonFrame(normalize(vec3(
-    sin(iPhase) * sin(iLimb),
-    sin(iPhase) * cos(iLimb),
-    -cos(iPhase)
-  )));
-  vec3 eye = toMoonFrame(vec3(0.0, 0.0, 1.0));
+    sp * sLimb,
+    sp * cLimb,
+    -cp
+  )), cr, sr, cl, sl, cb, sb);
+  vec3 eye = toMoonFrame(vec3(0.0, 0.0, 1.0), cr, sr, cl, sl, cb, sb);
 
   float mu0 = dot(n, sun);   // cos(incidence)
   float mu = dot(n, eye);    // cos(emission)
