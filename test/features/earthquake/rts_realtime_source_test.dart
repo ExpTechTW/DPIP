@@ -7,12 +7,15 @@
 /// earthquake. Live, silence is a fault, and a source that kept answering calm
 /// would present a frozen feed as a quiet one. And the switch between them has
 /// to reach the server: a change of speed that never reopened the connection
-/// would leave the monitor on alert-only frames while it is on screen.
+/// would leave the monitor on alert-only frames while it is on screen. A
+/// frame that does not decode must throw: reading it as an empty station map
+/// would paint the island calm while it is shaking.
 library;
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -188,6 +191,21 @@ void main() {
       expect(next.hasListener, isTrue);
       source.dispose();
     });
+  });
+
+  test('a frame that is not the station map is not read as calm', () {
+    final source = RtsRealtimeSource(
+      ({required live}) => const Stream<SseEvent>.empty(),
+      demand: RtsLiveDemand(),
+    );
+
+    expect(() => source.decode(''), throwsFormatException);
+    expect(() => source.decode('[]'), throwsA(isA<TypeError>()));
+    expect(
+      () => source.decodeBytes(Uint8List.fromList([0xff])),
+      throwsFormatException,
+    );
+    source.dispose();
   });
 
   test('timestampOf is null → event-recency freshness, not payload age', () {

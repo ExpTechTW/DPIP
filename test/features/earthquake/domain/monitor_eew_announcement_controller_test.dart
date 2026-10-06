@@ -173,4 +173,42 @@ void main() {
       controller.dispose();
     },
   );
+
+  test('leaving the monitor stops speech and a second leave is a no-op', () {
+    final speech = _FakeSpeech();
+    final controller = MonitorEewAnnouncementController(
+      speech,
+      ForegroundEewAnnouncementGate(),
+      (_) async => (scale: 4, isLocal: true),
+    );
+    controller.setActive(true);
+    controller.setActive(false);
+    controller.setActive(false);
+
+    expect(speech.stops, 1);
+    controller.dispose();
+  });
+
+  test(
+    'a speech failure while the report is still current stops playback',
+    () async {
+      final speech = _FakeSpeech();
+      final controller = MonitorEewAnnouncementController(
+        speech,
+        ForegroundEewAnnouncementGate(),
+        (_) async => (scale: 4, isLocal: true),
+        speechTimeout: Duration.zero,
+      );
+      controller.setActive(true);
+      controller.update(
+        _live(_alert(1)),
+        languageTag: 'zh-TW',
+        format: (_) => '所在地預估震度，四級。',
+      );
+      await _flush();
+
+      expect(speech.stops, greaterThanOrEqualTo(2));
+      controller.dispose();
+    },
+  );
 }

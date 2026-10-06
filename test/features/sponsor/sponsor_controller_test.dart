@@ -6,6 +6,7 @@ import 'package:dpip/features/sponsor/domain/sponsor_product.dart';
 import 'package:dpip/features/sponsor/domain/sponsor_purchase.dart';
 import 'package:dpip/features/sponsor/domain/sponsor_repository.dart';
 import 'package:dpip/features/sponsor/presentation/sponsor_controller.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _sub = SponsorProduct(
@@ -31,7 +32,10 @@ class _FakeSponsorRepository implements SponsorRepository {
   _FakeSponsorRepository(this.result);
 
   Result<List<SponsorProduct>> result;
+  bool buyStarts = true;
   bool restoreAvailable = true;
+  Object? buyThrow;
+  Completer<bool>? buyGate;
   final List<String> bought = [];
   final StreamController<SponsorPurchase> _updates =
       StreamController<SponsorPurchase>.broadcast();
@@ -45,9 +49,13 @@ class _FakeSponsorRepository implements SponsorRepository {
   Stream<SponsorPurchase> purchases() => _updates.stream;
 
   @override
-  Future<bool> buy(SponsorProduct product) async {
+  Future<bool> buy(SponsorProduct product) {
     bought.add(product.id);
-    return true;
+    final gate = buyGate;
+    if (gate != null) return gate.future;
+    final error = buyThrow;
+    if (error != null) return Future<bool>.error(error);
+    return Future<bool>.value(buyStarts);
   }
 
   @override
@@ -151,5 +159,83 @@ void main() {
     final controller = SponsorController(repo);
 
     expect(await controller.restore(), isFalse);
+    controller.dispose();
+  });
+
+  test('a second buy and an already-owned product are ignored', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub, _oneTime]))
+      ..buyGate = Completer<bool>();
+    final controller = SponsorController(repo);
+    await controller.load();
+
+    final first = controller.buy(_sub);
+    await controller.buy(_oneTime);
+    expect(repo.bought, ['s_donation75']);
+
+    repo.buyGate!.complete(false);
+    await first;
+    expect(controller.purchasingId, isNull);
+
+    controller.purchasedIds.add(_oneTime.id);
+    await controller.buy(_oneTime);
+    expect(repo.bought, ['s_donation75']);
+    controller.dispose();
+  });
+
+  test('a store error clears the in-flight marker', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]))
+      ..buyThrow = StateError('store');
+    final controller = SponsorController(repo);
+    await controller.load();
+    FlutterErrorDetails? reported;
+    final previous = FlutterError.onError;
+    FlutterError.onError = (details) => reported = details;
+    try {
+      await controller.buy(_sub);
+    } finally {
+      FlutterError.onError = previous;
+    }
+    expect(reported?.exception, isA<StateError>());
+    expect(controller.purchasingId, isNull);
+    controller.dispose();
+  });
+
+  testWidgets(
+    'the launch watchdog and a resume both give up on a stuck purchase',
+    (tester) async {
+      final repo = _FakeSponsorRepository(const Ok([_sub]));
+      final controller = SponsorController(repo);
+      await controller.load();
+      controller.didChangeAppLifecycleState(AppLifecycleState.inactive);
+      await controller.buy(_sub);
+      expect(controller.purchasingId, 's_donation75');
+
+      await tester.pump(const Duration(seconds: 8));
+      expect(controller.purchasingId, isNull);
+
+      await controller.buy(_sub);
+      controller.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(controller.purchasingId, isNull);
+      controller.dispose();
+    },
+  );
+
+  test('a purchase that arrives for another product still notifies', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]));
+    final controller = SponsorController(repo);
+    await controller.load();
+    var notices = 0;
+    controller.addListener(() => notices++);
+    repo.emit(
+      const SponsorPurchase(
+        productId: 'donation100',
+        status: SponsorPurchaseStatus.purchased,
+      ),
+    );
+    await _settle();
+    expect(controller.purchasedIds, contains('donation100'));
+    expect(notices, greaterThan(0));
+    controller.dispose();
   });
 }

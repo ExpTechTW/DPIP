@@ -130,6 +130,18 @@ void main() {
     expect(store.savedCodes, ['100', '200']);
   });
 
+  test(
+    'replaceSaved swaps a code and refuses a missing or duplicate one',
+    () async {
+      final store = await makeStore(['100', '200']);
+      expect(store.replaceSaved('missing', '300'), isFalse);
+      expect(store.replaceSaved('100', '100'), isTrue);
+      expect(store.replaceSaved('100', '200'), isFalse);
+      expect(store.replaceSaved('100', '300'), isTrue);
+      expect(store.savedCodes, ['300', '200']);
+    },
+  );
+
   test('select / next / previous stay in range', () async {
     final store = await makeStore(['100']); // count 3
     store.select(0);

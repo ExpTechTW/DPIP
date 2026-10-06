@@ -4,6 +4,7 @@ import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
+import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -179,6 +180,60 @@ void main() {
     );
     expect(chrome, isNot(isA<SizedBox>()));
     expect(chrome, isA<SatelliteStyleMenu>());
+  });
+
+  testWidgets('the reference menu toggles borders, labels, and relief', (
+    tester,
+  ) async {
+    useTallSurface(tester);
+    final layer = SatelliteMapLayer(
+      _FakeSatelliteRepository(),
+      channel: SatelliteChannel.truecolor,
+      referenceOutline: testReferenceOutline(),
+    );
+    final labels = ValueNotifier(true);
+    final terrain = ValueNotifier(true);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topRight,
+            child: SatelliteReferenceMenu(
+              layer: layer,
+              showTownLabels: labels,
+              onShowTownLabelsChanged: (value) => labels.value = value,
+              showTerrain: terrain,
+              onShowTerrainChanged: (value) => terrain.value = value,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(MapChipButton), findsOneWidget);
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pumpAndSettle();
+
+    final l10n = await loadL10n();
+    expect(find.text(l10n.mapOverlaySectionReference), findsOneWidget);
+    final outline = find.widgetWithText(
+      MapMenuToggleRow,
+      l10n.radarGlobalOutline,
+    );
+    tester.widget<MapMenuToggleRow>(outline).onTap();
+    await tester.pump();
+    expect(layer.showGlobalOutline, isFalse);
+
+    final labelRow = find.widgetWithText(MapMenuToggleRow, l10n.mapTownLabels);
+    tester.widget<MapMenuToggleRow>(labelRow).onTap();
+    await tester.pump();
+    expect(labels.value, isFalse);
+
+    await tester.tap(find.byType(MapChipButton));
+    await tester.pump();
   });
 
   testWidgets('setStyle rejects temperature styles on a reflectance band', (

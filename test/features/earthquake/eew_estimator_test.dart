@@ -9,7 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// but nothing verified it — a silent arithmetic regression here produces a
 /// wrong intensity or wrong P/S arrival second with no crash. These pin the
 /// current outputs at tight tolerance so any change to the arithmetic fails CI
-/// loudly. Update a golden only with a deliberate, reviewed reason.
+/// loudly. The discrete level is what the card and the fallback wash paint, so
+/// a known distance is also pinned to one CWA level, and a quake that is too
+/// far, too small, or too deep must fall off that scale rather than keep the
+/// near-field colour. Update a golden only with a deliberate, reviewed reason.
 void main() {
   const epicenter = LatLng(23.5, 121.5);
   const tol = 1e-9;
@@ -73,6 +76,65 @@ void main() {
     test('Intensity.fromPga', () {
       expect(Intensity.fromPga(50), closeTo(4.097940008672037, tol));
       expect(Intensity.fromPga(0.5), closeTo(0.09794000867203767, tol));
+    });
+
+    test('a known distance and magnitude lands on one CWA level', () {
+      // The same two observers the continuous goldens pin: ~24 km at M6.5 is
+      // 5強, ~171 km at M6.0 is 2級. A scale that drifted would recolour the
+      // card and the fallback wash together.
+      final near = EewEstimator.locationInfo(
+        mag: 6.5,
+        depth: 8,
+        epicenter: epicenter,
+        user: const LatLng(23.7, 121.5),
+      );
+      final far = EewEstimator.locationInfo(
+        mag: 6.0,
+        depth: 10,
+        epicenter: epicenter,
+        user: const LatLng(25.03, 121.56),
+      );
+      expect(Intensity.toScale(near.i), 6);
+      expect(Intensity.toScale(far.i), 2);
+    });
+
+    test('too far, too small, or too deep drops off the scale', () {
+      final distant = EewEstimator.locationInfo(
+        mag: 5,
+        depth: 10,
+        epicenter: epicenter,
+        user: const LatLng(0, 0),
+      );
+      final tiny = EewEstimator.locationInfo(
+        mag: 1,
+        depth: 10,
+        epicenter: epicenter,
+        user: epicenter,
+      );
+      final shallow = EewEstimator.locationInfo(
+        mag: 6.5,
+        depth: 10,
+        epicenter: epicenter,
+        user: const LatLng(23.7, 121.5),
+      );
+      final deep = EewEstimator.locationInfo(
+        mag: 6.5,
+        depth: 300,
+        epicenter: epicenter,
+        user: const LatLng(23.7, 121.5),
+      );
+
+      expect(Intensity.toScale(distant.i), 0);
+      expect(Intensity.toScale(tiny.i), 0);
+      expect(Intensity.toScale(deep.i), lessThan(Intensity.toScale(shallow.i)));
+      expect(deep.dist, greaterThan(shallow.dist));
+    });
+
+    test('the shallow and deep velocity models meet at 40 km', () {
+      final at = EewEstimator.waveTime(40, 100);
+      final below = EewEstimator.waveTime(41, 100);
+      expect(at.p, isNot(below.p));
+      expect(at.s, closeTo(at.p * 1.7320508075688772, 1e-6));
     });
   });
 }

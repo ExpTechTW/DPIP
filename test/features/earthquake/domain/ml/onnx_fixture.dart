@@ -62,11 +62,13 @@ List<int> onnxNode(
   String op,
   List<String> inputs,
   String output, {
+  String? secondOutput,
   String domain = '',
   List<List<int>> attrs = const [],
 }) => _bytes(1, [
   for (final input in inputs) ...onnxString(1, input),
   ...onnxString(2, output),
+  if (secondOutput != null) ...onnxString(2, secondOutput),
   ...onnxString(4, op),
   if (domain.isNotEmpty) ...onnxString(7, domain),
   for (final a in attrs) ...a,
@@ -120,23 +122,78 @@ List<int> _trees({String firstMode = 'BRANCH_LT'}) => onnxNode(
 
 /// The model described above, with [extra] nodes appended to its graph.
 Uint8List testModel({List<List<int>>? extra, String firstMode = 'BRANCH_LT'}) =>
-    Uint8List.fromList(
-      _bytes(
-        7,
-        [
-          _trees(firstMode: firstMode),
-          onnxNode('Add', ['forest', 'c'], 'PGA'),
-          onnxNode(
-            'Gather',
-            ['features', 'idx'],
-            'M',
-            attrs: [_attr('axis', i: 1)],
-          ),
-          onnxNode('Exp', ['M'], 'PGV'),
-          ...?extra,
-          _floatConst('c', 0.1),
-          _intConst('idx', 0),
-          _bytes(11, onnxString(1, 'features')),
-        ].expand((e) => e).toList(),
+    onnxModel([
+      _trees(firstMode: firstMode),
+      onnxNode('Add', ['forest', 'c'], 'PGA'),
+      onnxNode(
+        'Gather',
+        ['features', 'idx'],
+        'M',
+        attrs: [_attr('axis', i: 1)],
       ),
-    );
+      onnxNode('Exp', ['M'], 'PGV'),
+      ...?extra,
+      _floatConst('c', 0.1),
+      _intConst('idx', 0),
+      _bytes(11, onnxString(1, 'features')),
+    ]);
+
+/// An ONNX ModelProto whose only field is a graph made of [parts].
+Uint8List onnxModel(List<List<int>> parts) =>
+    Uint8List.fromList(_bytes(7, parts.expand((part) => part).toList()));
+
+List<int> onnxAttr(
+  String name, {
+  int? i,
+  String? s,
+  List<double> floats = const [],
+  List<int> ints = const [],
+  List<String> strings = const [],
+}) => _attr(name, i: i, s: s, floats: floats, ints: ints, strings: strings);
+
+List<int> onnxFloatConst(String name, double value) => _floatConst(name, value);
+
+List<int> onnxIntConst(String name, int value) => _intConst(name, value);
+
+List<int> onnxInput(String name) => _bytes(11, onnxString(1, name));
+
+Uint8List _f32(List<double> values) {
+  final data = ByteData(values.length * 4);
+  for (var i = 0; i < values.length; i++) {
+    data.setFloat32(i * 4, values[i], Endian.little);
+  }
+  return data.buffer.asUint8List();
+}
+
+/// Attribute floats as one packed length-delimited field, not repeated fixed32.
+List<int> onnxPackedFloatAttr(String name, List<double> values) =>
+    _bytes(5, [...onnxString(1, name), ..._bytes(7, _f32(values))]);
+
+/// Attribute ints as one packed varint field.
+List<int> onnxPackedIntAttr(String name, List<int> values) => _bytes(5, [
+  ...onnxString(1, name),
+  ..._bytes(8, values.expand(_varint).toList()),
+]);
+
+/// FLOAT initializer stored only in raw_data.
+List<int> onnxRawFloatTensor(String name, List<double> values) => _bytes(5, [
+  ..._int(2, 1),
+  ...onnxString(8, name),
+  ..._bytes(9, _f32(values)),
+]);
+
+/// INT64 initializer stored as packed varints.
+List<int> onnxPackedIntTensor(String name, List<int> values) => _bytes(5, [
+  ..._int(2, 7),
+  ...onnxString(8, name),
+  ..._bytes(7, values.expand(_varint).toList()),
+]);
+
+List<int> onnxTypedTensor(String name, int dataType) =>
+    _bytes(5, [..._int(2, dataType), ...onnxString(8, name)]);
+
+/// A field with an unsupported protobuf wire type, so the reader must stop.
+List<int> onnxBadWire() => _key(99, 3);
+
+/// A fixed64 field. The reader skips it; the model never stores one.
+List<int> onnxFixed64() => [..._key(99, 1), 0, 0, 0, 0, 0, 0, 0, 0];

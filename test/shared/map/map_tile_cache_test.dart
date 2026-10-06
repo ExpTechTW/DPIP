@@ -911,4 +911,193 @@ void main() {
       expect(nativeMemory, isEmpty);
     },
   );
+
+  String tileAt(int i) =>
+      'https://static.exptech.dev/api/v2/tiles/radar/f/7/$i/1.webp';
+
+  void traceOn() {
+    MapTileCache.traceEnabled = true;
+    addTearDown(() => MapTileCache.traceEnabled = false);
+  }
+
+  test('a network fill names its bytes when tracing is on', () async {
+    traceOn();
+    await cache.install(memoryBytes: 2 * 1024 * 1024);
+    const url = 'https://static.exptech.dev/api/v2/tiles/radar/1/2/3/4.webp';
+    await fromNative('putBatch', {
+      'entries': [
+        {
+          'url': url,
+          'data': Uint8List.fromList([1, 2, 3, 4]),
+          'contentType': 'image/webp',
+        },
+      ],
+    });
+    expect(await store.readBytes(url), isNotNull);
+  });
+
+  test('put stores a tile url and ignores anything else', () async {
+    await cache.install();
+    await cache.put('http://%', Uint8List.fromList([1]));
+    await cache.put('https://example.com/nope.png', Uint8List.fromList([2]));
+    await cache.put(terrainUrl, Uint8List.fromList([9]));
+    expect((await store.readBytes(terrainUrl))?.bytes, Uint8List.fromList([9]));
+    expect((await store.stats()).rows, 1);
+  });
+
+  test('cancel and evict trace the patterns they were given', () async {
+    traceOn();
+    await cache.install();
+    await cache.cancelFetches(urlContains: const ['radar']);
+    await cache.evict(const ['radar']);
+    await cache.evict(const []);
+    expect(
+      nativeCalls.map((call) => call.method),
+      containsAll(['cancelPendingFetches', 'evictTiles']),
+    );
+  });
+
+  test(
+    'warm stops before the probe when the caller already moved on',
+    () async {
+      traceOn();
+      await cache.install();
+      const url =
+          'https://static.exptech.dev/api/v2/tiles/radar/skip/2/3/4.webp';
+      final result = await cache.warm([url], shouldContinue: () => false);
+      expect(result.injected, 0);
+      expect(
+        nativeCalls.where((call) => call.method == 'filterMissing'),
+        isEmpty,
+      );
+    },
+  );
+
+  test('a warm of tiles native already holds injects nothing', () async {
+    traceOn();
+    await cache.install();
+    const url = 'https://static.exptech.dev/api/v2/tiles/radar/hot/2/3/4.webp';
+    nativeMemory[url] = Uint8List.fromList([1]);
+    final result = await cache.warm([url]);
+    expect(result.injected, 0);
+    expect(result.resident, {url});
+  });
+
+  test(
+    'warm stops before L2 when the caller moves on after the probe',
+    () async {
+      traceOn();
+      await cache.install();
+      const held =
+          'https://static.exptech.dev/api/v2/tiles/radar/held/2/3/4.webp';
+      const miss =
+          'https://static.exptech.dev/api/v2/tiles/radar/miss/2/3/4.webp';
+      nativeMemory[held] = Uint8List.fromList([1]);
+      var seen = 0;
+      final result = await cache.warm([
+        held,
+        miss,
+      ], shouldContinue: () => ++seen < 4);
+      expect(result.injected, 0);
+      expect(result.resident, {held});
+      expect(
+        nativeCalls.where((call) => call.method == 'injectTiles'),
+        isEmpty,
+      );
+    },
+  );
+
+  test('a probe that is cancelled mid-sweep keeps the unprobed tail', () async {
+    traceOn();
+    await cache.install();
+    final urls = [for (var i = 0; i < 400; i++) tileAt(i)];
+    var seen = 0;
+    final before = await cache.warm(urls, shouldContinue: () => ++seen < 2);
+    expect(before.injected, 0);
+
+    seen = 0;
+    final after = await cache.warm(urls, shouldContinue: () => ++seen < 3);
+    expect(after.injected, 0);
+  });
+
+  test('a cold warm and a long probe pause between native messages', () async {
+    traceOn();
+    await cache.install();
+    final urls = [for (var i = 0; i < 1537; i++) tileAt(i)];
+    final result = await cache.warm(urls);
+    expect(result.injected, 0);
+    expect(result.resident, isEmpty);
+  });
+
+  test('an L2 hit is injected and traced without fill mode', () async {
+    traceOn();
+    await cache.install();
+    const url = 'https://static.exptech.dev/api/v2/tiles/radar/disk/2/3/4.webp';
+    await store.writeBytes(
+      url,
+      etag: 'disk',
+      bytes: Uint8List.fromList([4, 5]),
+      contentType: 'image/webp',
+    );
+    final result = await cache.warm([url]);
+    expect(result.injected, 1);
+    expect(result.resident, {url});
+  });
+
+  test(
+    'a throwing continue is reported and the warm returns what is resident',
+    () async {
+      traceOn();
+      await cache.install();
+      const url =
+          'https://static.exptech.dev/api/v2/tiles/radar/boom/2/3/4.webp';
+      nativeMemory[url] = Uint8List.fromList([1]);
+      // The first check sits outside the try. The probe's check is inside it.
+      var seen = 0;
+      final result = await cache.warm(
+        [url],
+        shouldContinue: () {
+          if (++seen > 1) throw StateError('moved on');
+          return true;
+        },
+      );
+      expect(result.injected, 0);
+      expect(result.resident, {url});
+    },
+  );
+
+  test(
+    'injection pauses between slices once four messages have gone out',
+    () async {
+      traceOn();
+      await cache.install(memoryBytes: 8 * 1024 * 1024);
+      final urls = [for (var i = 0; i < 97; i++) tileAt(i)];
+      await store.writeBytesBatch([
+        for (final url in urls)
+          (
+            url: url,
+            etag: url,
+            bytes: Uint8List.fromList([1]),
+            contentType: 'image/webp',
+            size: 1,
+          ),
+      ]);
+      final plain = await cache.warm(urls);
+      expect(plain.injected, 97);
+
+      final more = [for (var i = 100; i < 196; i++) tileAt(i)];
+      await store.writeBytesBatch([
+        for (final url in more)
+          (
+            url: url,
+            etag: url,
+            bytes: Uint8List.fromList([2]),
+            contentType: 'image/webp',
+            size: 1,
+          ),
+      ]);
+      final filled = await cache.warm(more, fillUntil: 0.9);
+      expect(filled.injected, 96);
+    },
+  );
 }

@@ -142,4 +142,21 @@ void main() {
     expect(ColorVision.fromToken(null), ColorVision.none);
     expect(ColorVision.fromToken('nonsense'), ColorVision.none);
   });
+
+  test('a vision cache rebuilds when the setting changes and when dropped', () {
+    var builds = 0;
+    final cache = VisionCache<int>(() => ++builds);
+    expect(cache.isStale, isTrue);
+    expect(cache.value, 1);
+    expect(cache.value, 1);
+    expect(cache.isStale, isFalse);
+
+    AppColorVision.install(ColorVision.protan);
+    addTearDown(() => AppColorVision.install(ColorVision.none));
+    expect(cache.isStale, isTrue);
+    expect(cache.value, 2);
+    cache.invalidate();
+    expect(cache.isStale, isTrue);
+    expect(cache.value, 3);
+  });
 }

@@ -167,4 +167,19 @@ void main() {
       expect(s.stopInMinutes, isNull);
     });
   });
+
+  test('a dry hour and the placeholder are a full sixty minutes', () {
+    final dry = RainHourTrend.dry(startUtc: DateTime.utc(2026, 1, 1, 0, 0, 30));
+    expect(dry.startSecond % 60, 0);
+    expect(dry.mm, everyElement(0));
+    expect(dry.isDry, isTrue);
+
+    final shaped = RainHourTrend.placeholder(startSecond: 120);
+    expect(shaped.startSecond, 120);
+    expect(shaped.mm, hasLength(60));
+    expect(shaped.mm[28], greaterThan(shaped.mm[0]));
+
+    expect(RainHourTrend.dry().mm, hasLength(60));
+    expect(RainHourTrend.placeholder().mm, hasLength(60));
+  });
 }

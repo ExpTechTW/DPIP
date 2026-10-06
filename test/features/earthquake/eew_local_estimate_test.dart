@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_estimator.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -41,9 +42,33 @@ void main() {
       expect(estimate.intensity, closeTo(1.953358110252971, 1e-9));
       expect(estimate.scale, Intensity.toScale(estimate.intensity));
       expect(estimate.scale, 2); // 1.95 → CWA 2級
+      expect(estimate.scale, 2);
       expect(estimate.sArrivalSeconds, greaterThan(0));
+      final again = estimateLocalShaking(eew(), const LatLng(25.03, 121.56));
+      expect(identical(again, estimate), isTrue);
     },
   );
+
+  test('too far is level 0, and without a table the arrival is analytic', () {
+    final user = const LatLng(0, 0);
+    final estimate = estimateLocalShaking(eew(mag: 4, depth: 20), user);
+    final epicentral = epicenter.distanceTo(user) / 1000;
+
+    expect(estimate.scale, 0);
+    expect(
+      estimate.sArrivalSeconds,
+      EewEstimator.waveTime(20, epicentral).s.round(),
+    );
+  });
+
+  test('the same place shakes less when the focus is deep', () {
+    const user = LatLng(23.7, 121.5);
+    final shallow = estimateLocalShaking(eew(mag: 6.5, depth: 10), user);
+    final deep = estimateLocalShaking(eew(mag: 6.5, depth: 300), user);
+
+    expect(shallow.scale, greaterThan(deep.scale));
+    expect(deep.distanceKm, greaterThan(shallow.distanceKm));
+  });
 
   test('near observer — PGV branch kicks in above 4.5', () {
     final estimate = estimateLocalShaking(

@@ -1,8 +1,13 @@
+import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
+import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
+import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../storage/memory_db.dart';
 import 'fake_mesh_service.dart';
 
 void main() {
@@ -221,5 +226,129 @@ void main() {
 
       expect(posted, isEmpty);
     });
+
+    test('an empty display name is announced as the node id', () async {
+      final (_, service) = await makeAlerts({'meshtastic.notifyNodes': true});
+      await linkReadyAndSettled(service);
+      service.nodes.add(const MeshNode(num: 0x10, displayName: ''));
+      await settle();
+      expect(posted.single.body, '0x10');
+    });
+
+    test('a burst window expires after a minute', () async {
+      final (_, service) = await makeAlerts({'meshtastic.notifyNodes': true});
+      await linkReadyAndSettled(service);
+      for (var i = 1; i <= 3; i++) {
+        service.nodes.add(node(i));
+      }
+      await settle();
+      expect(posted, hasLength(3));
+
+      clock = clock.add(const Duration(minutes: 2));
+      service.nodes.add(node(4));
+      await settle();
+      expect(posted, hasLength(4));
+    });
+
+    test('an error clears the settle window', () async {
+      final (_, service) = await makeAlerts({'meshtastic.notifyNodes': true});
+      await linkReadyAndSettled(service);
+      service.connections.add(
+        const MeshConnectionStatus(state: MeshConnectionState.error),
+      );
+      await settle();
+      service.nodes.add(node(8));
+      await settle();
+      expect(posted, isEmpty);
+    });
+  });
+
+  test('binary messages are recorded by the chat, not announced', () async {
+    final (_, service) = await makeAlerts();
+    service.messages.add(
+      MeshMessage(
+        from: 1,
+        channel: 0,
+        text: '00 ff',
+        timestamp: clock,
+        binary: true,
+      ),
+    );
+    await settle();
+    expect(posted, isEmpty);
+  });
+
+  test('the toggles persist', () async {
+    final (alerts, _) = await makeAlerts();
+    await alerts.setMessagesEnabled(enabled: false);
+    await alerts.setNodesEnabled(enabled: true);
+    expect(alerts.messagesEnabled, isFalse);
+    expect(alerts.nodesEnabled, isTrue);
+    alerts.dispose();
+  });
+
+  test('a remembered channel name beats an empty radio slot', () async {
+    final db = openMemoryDb();
+    addTearDown(db.close);
+    await MeshStore.createSchema(db);
+    final store = MeshStore(db);
+    await store.writeChannels({2: 'DPIP'});
+
+    posted = [];
+    final service = FakeMeshService()
+      ..channels = const [
+        MeshChannel(index: 2, name: '', psk: [1], enabled: true),
+      ];
+    final alerts = MeshAlerts(
+      service,
+      SettingsStore.inMemory(),
+      store: store,
+      post: (alert) async => posted.add(alert),
+      now: () => clock,
+    )..start();
+    addTearDown(alerts.dispose);
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+
+    service.messages.add(message('hello', channel: 2));
+    await settle();
+    expect(posted.single.title, 'Meshtastic - DPIP');
+  });
+
+  test('the OS post succeeds and a rejection is swallowed', () async {
+    // macOS uses the plugin's empty implementation, which never calls the
+    // channel. The permissions-page test uses this same seam.
+    AwesomeNotificationsPlatform.operatingSystem = 'ios';
+    AwesomeNotificationsPlatform.resetInstance();
+    addTearDown(() {
+      AwesomeNotificationsPlatform.operatingSystem = 'macos';
+      AwesomeNotificationsPlatform.resetInstance();
+    });
+
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    const channel = MethodChannel('awesome_notifications');
+    var calls = 0;
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method != 'createNewNotification') return null;
+      calls++;
+      if (calls == 1) throw PlatformException(code: 'notify');
+      return true;
+    });
+    addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+
+    final service = FakeMeshService();
+    final settings = SettingsStore.inMemory();
+    final alerts = MeshAlerts(service, settings, now: () => clock)..start();
+    addTearDown(alerts.dispose);
+    alerts.setForeground(foreground: false);
+
+    service.messages.add(message('one'));
+    await settle();
+    service.messages.add(
+      message('two', at: clock.add(const Duration(seconds: 1))),
+    );
+    await settle();
+    expect(calls, 2);
+    expect(settings.getBool(SettingKeys.meshNotifyMessages), isNull);
   });
 }

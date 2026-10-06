@@ -117,4 +117,46 @@ void main() {
     expect(content?.payload?['channel'], 'tsunami-important-v2');
     expect(content?.payload?['id'], '5');
   });
+
+  test('a nested numeric field is read as text', () {
+    final content = _content({
+      'content': '{"channelKey": "eq-v2", "title": 7, "body": 8, "id": -5}',
+    });
+    expect(content?.title, '7');
+    expect(content?.body, '8');
+    expect(content?.id, -5);
+    expect(content?.payload?['id'], '-5');
+  });
+
+  test('nested content that is not an object is ignored', () {
+    expect(
+      _content({'content': '[1, 2]'}, title: 'T', body: 'B')?.channelKey,
+      'announcement-general-v2',
+    );
+    expect(
+      _content({'content': ''}, title: 'T', body: 'B')?.channelKey,
+      'announcement-general-v2',
+    );
+    expect(
+      _content({'content': '{'}, title: 'T', body: 'B')?.channelKey,
+      'announcement-general-v2',
+    );
+  });
+
+  test('an id outside the signed 32-bit range is dropped', () {
+    expect(
+      _content({'id': '2147483647'}, title: 'T', body: 'B')?.id,
+      2147483647,
+    );
+    expect(
+      _content({'id': '-2147483648'}, title: 'T', body: 'B')?.id,
+      -2147483648,
+    );
+    expect(_content({'id': '2147483648'}, title: 'T', body: 'B')?.id, 0);
+    expect(_content({'id': 'nope'}, title: 'T', body: 'B')?.id, 0);
+    expect(
+      _content({'content': '{"title":"T","body":"B","id":2147483648}'})?.id,
+      0,
+    );
+  });
 }

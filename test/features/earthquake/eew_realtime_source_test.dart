@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// A source with a never-emitting connection: these tests exercise the pure
 /// mapping ([EewRealtimeSource.decode]) and freshness overrides, not the
 /// transport (covered by `test/core/realtime/sse_realtime_source_test.dart`).
+/// An empty list is calm; a body that is not a list of alerts must throw,
+/// because treating it as no alert would clear one that is still in progress.
 EewRealtimeSource _source({bool cwaOnly = false}) => EewRealtimeSource(
   () => const Stream<SseEvent>.empty(),
   cwaOnly: () => cwaOnly,
@@ -143,6 +145,17 @@ void main() {
           'flipping the same closure (mirroring EewCwaOnlySettings.enabled '
           'changing) must be reflected on the very next decode',
     );
+  });
+
+  test('a payload that is not a list of alerts is not turned into none', () {
+    // An empty list is the calm answer. A truncated or reshaped body is not:
+    // swallowing it would clear a live alert.
+    expect(() => _source().decode(''), throwsFormatException);
+    expect(
+      () => _source().decode('{"author":"cwa"}'),
+      throwsA(isA<TypeError>()),
+    );
+    expect(() => _source().decode('[{}]'), throwsA(anything));
   });
 
   test('timestampOf is null → the channel uses connection/fetch-freshness', () {
