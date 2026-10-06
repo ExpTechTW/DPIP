@@ -3,6 +3,8 @@
 /// epicentre in the sea.
 library;
 
+import 'dart:math' as math;
+
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +18,45 @@ void main() {
     expect(moved.hashCode, LatLng(moved.latitude, moved.longitude).hashCode);
     expect(moved == taipei, isFalse);
     expect(moved.toString(), contains('LatLng('));
+  });
+
+  test('a fixed-origin disc matches distanceTo except on the boundary', () {
+    const origin = LatLng(23.5, 121.5);
+    final random = math.Random(1);
+    for (var i = 0; i < 200; i++) {
+      final point = LatLng(
+        origin.latitude + random.nextDouble() * 8 - 4,
+        origin.longitude + random.nextDouble() * 8 - 4,
+      );
+      final metres = origin.distanceTo(point);
+      // A millimetre either side of the radius is far past the nanometre
+      // the chord test can drift by, and well inside a map pixel.
+      expect(
+        DistanceWithin(
+          origin,
+          metres + 0.001,
+        ).contains(point.latitude, point.longitude),
+        isTrue,
+      );
+      expect(
+        DistanceWithin(
+          origin,
+          metres - 0.001,
+        ).contains(point.latitude, point.longitude),
+        isFalse,
+      );
+    }
+    expect(
+      DistanceWithin(origin, -1).contains(origin.latitude, origin.longitude),
+      isFalse,
+    );
+    expect(
+      DistanceWithin(origin, 0).contains(origin.latitude, origin.longitude),
+      isTrue,
+    );
+    // Half the earth's circumference is the most distanceTo can return, so
+    // anything at least that large contains every point.
+    expect(DistanceWithin(origin, 6378137 * math.pi).contains(0, 0), isTrue);
   });
 
   test('GeoJSON pairs are longitude first, and a missing ring is empty', () {

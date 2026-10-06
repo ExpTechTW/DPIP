@@ -185,13 +185,25 @@ class WeatherSkyPainter extends CustomPainter {
     ui.FragmentShader shader, [
     BlendMode blend = BlendMode.srcOver,
   ]) {
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()
-        ..shader = shader
-        ..blendMode = blend,
-    );
+    // `drawRect` copies the paint into the display list, so one paint can
+    // serve every full-screen pass. A fresh one per layer was a short-lived
+    // object on every animated frame.
+    _layerPaint
+      ..shader = shader
+      ..blendMode = blend;
+    canvas.drawRect(Offset.zero & size, _layerPaint);
   }
+
+  static final Paint _layerPaint = Paint();
+  static final Paint _flatSky = Paint()..color = const Color(0xFF3F6DAE);
+  static final Paint _gradientSky = Paint()..filterQuality = FilterQuality.low;
+  static final Paint _rainPaint = Paint()..blendMode = BlendMode.plus;
+  static final Paint _snowPaint = Paint();
+
+  /// Bilinear on the way up is what softens the quarter-res sun.
+  static final Paint _sunBlit = Paint()
+    ..filterQuality = FilterQuality.low
+    ..blendMode = BlendMode.plus;
 
   // --- sky ----------------------------------------------------------------
   // A pure vertical gradient of the fixed LUT column, so it is precomputed on
@@ -202,10 +214,7 @@ class WeatherSkyPainter extends CustomPainter {
     if (gradient == null) {
       // The very first frame lands before the readback — a flat sky instead of
       // a flash of whatever sits behind the backdrop.
-      canvas.drawRect(
-        Offset.zero & size,
-        Paint()..color = const Color(0xFF3F6DAE),
-      );
+      canvas.drawRect(Offset.zero & size, _flatSky);
       return;
     }
     canvas.drawImageRect(
@@ -217,7 +226,7 @@ class WeatherSkyPainter extends CustomPainter {
         gradient.height.toDouble(),
       ),
       Offset.zero & size,
-      Paint()..filterQuality = FilterQuality.low,
+      _gradientSky,
     );
   }
 
@@ -511,7 +520,7 @@ class WeatherSkyPainter extends CustomPainter {
       batch.colors,
       BlendMode.modulate,
       null,
-      Paint()..blendMode = BlendMode.plus,
+      _rainPaint,
     );
   }
 
@@ -550,7 +559,7 @@ class WeatherSkyPainter extends CustomPainter {
       batch.colors,
       BlendMode.modulate,
       null,
-      Paint(),
+      _snowPaint,
     );
   }
 
@@ -688,10 +697,7 @@ class WeatherSkyPainter extends CustomPainter {
       _sunFlare!,
       Offset.zero & quarter,
       Offset.zero & size,
-      Paint()
-        // Bilinear on the way up is what softens it.
-        ..filterQuality = FilterQuality.low
-        ..blendMode = BlendMode.plus,
+      _sunBlit,
     );
   }
 

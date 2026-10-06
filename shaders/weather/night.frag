@@ -146,20 +146,30 @@ void main() {
   // --- star field (sampled, per-cell animation) --------------------------
   // The baked texture holds bright-cell world [0,4]; the field repeats on the
   // same 4-cell cycle, so `fract` wraps exactly.
+  //
+  // Empty texels are exactly 0 (the bake returns 0 off a star). Multiplying
+  // by that 0 is a no-op, so the hash and the sin that build a star's phase
+  // run only where that channel actually drew something. The horizon weight
+  // is the same gate: below it every term is scaled by zero.
   vec4 field = texture(iStarField, fract(coord / 4.0));
 
-  vec2 cell4 = floor(coord / 4.0);
-  vec2 cell8 = floor(coord / 8.0);
-  vec2 cell16 = floor(coord / 16.0);
-
-  // Bright pass: the glow rides the twinkle gate, the core star the shimmer.
-  col += vec3(0.74, 0.74, 0.74) *
-         (field.r * shimmer(cell4, 4.0) + field.g * twinkle(cell4)) *
-         horizonFade;
-  col += vec3(0.97, 0.85, 0.80) * field.b * shimmer(cell8, 8.0) *
-         horizonFade;
-  col += vec3(0.85, 0.90, 1.00) * field.a * shimmer(cell16, 16.0) *
-         horizonFade;
+  if (horizonFade > 0.0) {
+    float bright = 0.0;
+    if (field.r > 0.0 || field.g > 0.0) {
+      vec2 cell4 = floor(coord / 4.0);
+      if (field.r > 0.0) bright += field.r * shimmer(cell4, 4.0);
+      if (field.g > 0.0) bright += field.g * twinkle(cell4);
+    }
+    col += vec3(0.74, 0.74, 0.74) * bright * horizonFade;
+    if (field.b > 0.0) {
+      col += vec3(0.97, 0.85, 0.80) * field.b *
+          shimmer(floor(coord / 8.0), 8.0) * horizonFade;
+    }
+    if (field.a > 0.0) {
+      col += vec3(0.85, 0.90, 1.00) * field.a *
+          shimmer(floor(coord / 16.0), 16.0) * horizonFade;
+    }
+  }
 
   col *= alpha;
   float a = clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0);

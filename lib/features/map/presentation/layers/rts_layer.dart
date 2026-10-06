@@ -61,29 +61,20 @@ Map<String, dynamic> eewWaveGeoJson(
     if (table != null && !elapsed.isNegative) {
       final radius = table.waveRadius(info.depth, elapsed);
       if (radius.p > 0) {
-        features.add(
-          circleFeature(
-            info.latlng,
-            radius.p * 1000,
-            properties: const {'type': 'p-line'},
-          ),
+        addCircleFeatures(
+          features,
+          info.latlng,
+          radius.p * 1000,
+          lineProperties: const {'type': 'p-line'},
         );
       }
       if (radius.s > 0) {
-        final metres = radius.s * 1000;
-        features.add(
-          circleFillFeature(
-            info.latlng,
-            metres,
-            properties: const {'type': 's-fill'},
-          ),
-        );
-        features.add(
-          circleFeature(
-            info.latlng,
-            metres,
-            properties: const {'type': 's-line'},
-          ),
+        addCircleFeatures(
+          features,
+          info.latlng,
+          radius.s * 1000,
+          fillProperties: const {'type': 's-fill'},
+          lineProperties: const {'type': 's-line'},
         );
       }
     }
@@ -98,6 +89,8 @@ Map<String, dynamic> eewWaveGeoJson(
   }
   return {'type': 'FeatureCollection', 'features': features};
 }
+
+typedef _SWaveCover = ({double metres, geo.DistanceWithin reach});
 
 /// A realtime [MapLayer]: subscribes to the live RTS feed and repaints the
 /// station dots (coloured by raw intensity `i`) on every ~1 Hz snapshot, and to
@@ -563,15 +556,15 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final box = _alerts.areas.boxes;
     final alerts = _eew.state.data ?? const <Eew>[];
     final now = AppTime.utc;
+    final covers = _travelTime == null
+        ? const <_SWaveCover>[]
+        : _sWaveCovers(alerts, _travelTime!, now);
     final features = <Map<String, dynamic>>[];
     final signature = StringBuffer();
     for (final entry in box.entries) {
       final ring = grid.rings[entry.key];
       if (ring == null) continue;
-      if (_travelTime != null &&
-          _isBoxFullyCovered(ring, alerts, _travelTime!, now)) {
-        continue;
-      }
+      if (_isBoxFullyCovered(ring, covers)) continue;
       signature
         ..write(entry.key)
         ..write(':')
@@ -598,17 +591,16 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// it past the radius is outside it without the trig.
   static const double _metresPerLatDegree = 6378137 * math.pi / 180;
 
-  /// Whether every corner of [ring] is already within some active alert's
-  /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
-  /// dropped a detection box from the map (not just its blink) the instant
-  /// the wavefront had fully swept past it, since by then it's a stale
-  /// reading rather than live shaking data.
-  bool _isBoxFullyCovered(
-    List<List<double>> ring,
+  /// One active alert's S-wave disc. Built once per tick and shared by every
+  /// box: the radius does not depend on the box, and the haversine test
+  /// ([geo.DistanceWithin]) keeps the epicentre's cosine instead of
+  /// reallocating a coordinate per corner.
+  List<_SWaveCover> _sWaveCovers(
     List<Eew> alerts,
     SeismicTravelTimeTable table,
     DateTime now,
   ) {
+    final covers = <_SWaveCover>[];
     for (final eew in alerts) {
       final info = eew.info;
       final elapsed = now.difference(
@@ -617,16 +609,30 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       if (elapsed.isNegative) continue;
       final radiusKm = table.waveRadius(info.depth, elapsed).s;
       if (radiusKm <= 0) continue;
-      final epicenter = info.latlng;
-      final radiusMetres = radiusKm * 1000;
+      final metres = radiusKm * 1000;
+      covers.add((
+        metres: metres,
+        reach: geo.DistanceWithin(info.latlng, metres),
+      ));
+    }
+    return covers;
+  }
+
+  /// Whether every corner of [ring] is already within some active alert's
+  /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
+  /// dropped a detection box from the map (not just its blink) the instant
+  /// the wavefront had fully swept past it, since by then it's a stale
+  /// reading rather than live shaking data.
+  bool _isBoxFullyCovered(List<List<double>> ring, List<_SWaveCover> covers) {
+    for (final cover in covers) {
       final allCornersCovered = ring.take(4).every((point) {
         final lat = point[1];
         // Exact reject: meridional distance is a lower bound on the geodesic.
-        if ((lat - epicenter.latitude).abs() * _metresPerLatDegree >
-            radiusMetres) {
+        if ((lat - cover.reach.latitude).abs() * _metresPerLatDegree >
+            cover.metres) {
           return false;
         }
-        return epicenter.distanceTo(geo.LatLng(lat, point[0])) <= radiusMetres;
+        return cover.reach.contains(lat, point[0]);
       });
       if (allCornersCovered) return true;
     }

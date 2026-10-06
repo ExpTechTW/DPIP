@@ -407,6 +407,8 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   }
 }
 
+typedef _SWaveCover = ({double radiusKm, geo.DistanceWithin reach});
+
 /// The map surface: RTS station dots + EEW epicentre/P-S wave circles, on the
 /// app's shared [BaseMap]. Own MapLibre source/layer setup — a slimmed port of
 /// `RtsMapLayer`'s station rendering plus new wave-circle rendering, since
@@ -1052,12 +1054,15 @@ class _ReplayMapState extends State<_ReplayMap> {
   ) {
     final table = _travelTimeTable;
     final now = widget.clock.now();
+    final covers = table == null
+        ? const <_SWaveCover>[]
+        : _sWaveCovers(table, now);
     final features = <Map<String, dynamic>>[];
     final signature = StringBuffer();
     for (final entry in widget.alerts.areas.boxes.entries) {
       final ring = grid.rings[entry.key];
       if (ring == null) continue;
-      if (table != null && _isBoxFullyCovered(ring, table, now)) continue;
+      if (_isBoxFullyCovered(ring, covers)) continue;
       signature
         ..write(entry.key)
         ..write(':')
@@ -1084,16 +1089,10 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// exact.
   static const double _kmPerDegreeLatitude = 111.3;
 
-  /// Whether every corner of [ring] is already within some active alert's
-  /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
-  /// dropped a detection box from the map (not just its blink) the instant
-  /// the wavefront had fully swept past it, since by then it's a stale
-  /// reading rather than live shaking data.
-  bool _isBoxFullyCovered(
-    List<List<double>> ring,
-    SeismicTravelTimeTable table,
-    DateTime now,
-  ) {
+  /// One active alert's S-wave disc, shared by every box this tick. The
+  /// radius does not depend on the box.
+  List<_SWaveCover> _sWaveCovers(SeismicTravelTimeTable table, DateTime now) {
+    final covers = <_SWaveCover>[];
     for (final eew in widget.eew.alerts) {
       final info = eew.info;
       final elapsed = now.difference(
@@ -1102,7 +1101,21 @@ class _ReplayMapState extends State<_ReplayMap> {
       if (elapsed.isNegative) continue;
       final radiusKm = table.waveRadius(info.depth, elapsed).s;
       if (radiusKm <= 0) continue;
-      final epicenter = info.latlng;
+      covers.add((
+        radiusKm: radiusKm,
+        reach: geo.DistanceWithin(info.latlng, radiusKm * 1000),
+      ));
+    }
+    return covers;
+  }
+
+  /// Whether every corner of [ring] is already within some active alert's
+  /// S-wave radius — ported from the legacy monitor's `checkBoxSkip`, which
+  /// dropped a detection box from the map (not just its blink) the instant
+  /// the wavefront had fully swept past it, since by then it's a stale
+  /// reading rather than live shaking data.
+  bool _isBoxFullyCovered(List<List<double>> ring, List<_SWaveCover> covers) {
+    for (final cover in covers) {
       final allCornersCovered = ring.take(4).every((point) {
         // Exact bounding reject before the haversine: the great-circle
         // distance is never shorter than the meridional (latitude-only)
@@ -1111,12 +1124,11 @@ class _ReplayMapState extends State<_ReplayMap> {
         // true km/°, so this can only under-estimate that leg — it never
         // rejects a corner the haversine would have accepted. This runs
         // 4 × boxes × alerts at 5 Hz, and most corners fail here.
-        if ((point[1] - epicenter.latitude).abs() * _kmPerDegreeLatitude >
-            radiusKm) {
+        if ((point[1] - cover.reach.latitude).abs() * _kmPerDegreeLatitude >
+            cover.radiusKm) {
           return false;
         }
-        return epicenter.distanceTo(geo.LatLng(point[1], point[0])) / 1000 <=
-            radiusKm;
+        return cover.reach.contains(point[1], point[0]);
       });
       if (allCornersCovered) return true;
     }
@@ -1142,25 +1154,20 @@ class _ReplayMapState extends State<_ReplayMap> {
       if (table != null && !elapsed.isNegative) {
         final radius = table.waveRadius(info.depth, elapsed);
         if (radius.p > 0) {
-          features.add(
-            circleFeature(
-              center,
-              radius.p * 1000,
-              properties: const {'type': 'p-line'},
-            ),
+          addCircleFeatures(
+            features,
+            center,
+            radius.p * 1000,
+            lineProperties: const {'type': 'p-line'},
           );
         }
         if (radius.s > 0) {
-          final metres = radius.s * 1000;
-          features.add(
-            circleFillFeature(
-              center,
-              metres,
-              properties: const {'type': 's-fill'},
-            ),
-          );
-          features.add(
-            circleFeature(center, metres, properties: const {'type': 's-line'}),
+          addCircleFeatures(
+            features,
+            center,
+            radius.s * 1000,
+            fillProperties: const {'type': 's-fill'},
+            lineProperties: const {'type': 's-line'},
           );
         }
       }
