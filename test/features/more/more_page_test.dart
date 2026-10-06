@@ -13,6 +13,7 @@ import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
@@ -39,6 +40,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher_platform_interface/link.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 /// A changelog repository whose releases call resolves with no notes: the
 /// version card's contributor fetch then settles (to an empty strip) without
@@ -136,20 +139,53 @@ GoRouter _router(List<String> visited) => GoRouter(
             return const SizedBox.shrink();
           },
         ),
+        GoRoute(
+          path: AppRoutes.regionSelectPath,
+          name: AppRoutes.regionSelect,
+          builder: (_, state) {
+            final query = state.uri.queryParameters.entries
+                .map((entry) => '${entry.key}=${entry.value}')
+                .join('&');
+            visited.add('region:$query');
+            return const SizedBox.shrink();
+          },
+        ),
+        for (final (name, path) in _namedRoutes)
+          GoRoute(
+            path: path,
+            name: name,
+            builder: (_, _) {
+              visited.add(name);
+              return const SizedBox.shrink();
+            },
+          ),
       ],
     ),
   ],
 );
+
+const _namedRoutes = <(String, String)>[
+  (AppRoutes.defaultMapLayer, AppRoutes.defaultMapLayerPath),
+  (AppRoutes.eewSource, AppRoutes.eewSourcePath),
+  (AppRoutes.meshtastic, AppRoutes.meshtasticPath),
+  (AppRoutes.experimental, AppRoutes.experimentalPath),
+  (AppRoutes.bugTracker, AppRoutes.bugTrackerPath),
+  (AppRoutes.developer, AppRoutes.developerPath),
+  (AppRoutes.sponsor, AppRoutes.sponsorPath),
+  (AppRoutes.serverStatus, AppRoutes.serverStatusPath),
+];
 
 Future<void> _pump(
   WidgetTester tester,
   GoRouter router, {
   MeshUnread? unread,
   ChangelogRepository changelog = const _EmptyChangelogRepository(),
+  TownDirectory towns = const TownDirectory({}),
+  Size size = const Size(800, 4000),
 }) async {
   // Tall enough that every group lays out and hit-tests inside the viewport —
   // a row past the bottom edge takes taps that silently miss.
-  tester.view.physicalSize = const Size(800, 4000);
+  tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
@@ -166,7 +202,7 @@ Future<void> _pump(
         ),
         ChangeNotifierProvider(create: (_) => ExperimentalSettings(settings)),
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
-        Provider(create: (_) => const TownDirectory({})),
+        Provider<TownDirectory>(create: (_) => towns),
         ChangeNotifierProvider(create: (_) => unread ?? MeshUnread(null)),
         // The status card wears the same dot as the More tab.
         ChangeNotifierProvider(create: (_) => EndpointHealthMonitor()),
@@ -606,4 +642,270 @@ void main() {
     );
     expect(skeleton, findsNWidgets(3));
   });
+
+  testWidgets('saved regions expand, edit, delete, and fill the cap', (
+    tester,
+  ) async {
+    final visited = <String>[];
+    final router = _router(visited);
+    const zhongzheng = Town(
+      code: '6300500',
+      city: '臺北',
+      town: '中正',
+      lat: 25.03,
+      lng: 121.51,
+      cityLevel: '市',
+      townLevel: '區',
+    );
+    await _pump(
+      tester,
+      router,
+      towns: const TownDirectory({'6300500': zhongzheng}),
+    );
+    await tester.tap(find.widgetWithText(ListTile, 'Saved regions'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('No saved regions yet'), findsOneWidget);
+    tester
+        .widget<TextButton>(find.widgetWithText(TextButton, 'Add a region'))
+        .onPressed!();
+    await tester.pumpAndSettle();
+    expect(visited, ['region:returnToMore=1']);
+    router.pop();
+    await tester.pumpAndSettle();
+
+    final store = tester.element(find.byType(MorePage)).read<RegionStore>();
+    store.addSaved('6300500');
+    store.addSaved('unknown');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ListTile, 'Saved regions'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('中正區'), findsOneWidget);
+    expect(find.text('unknown'), findsOneWidget);
+
+    tester.widget<ListTile>(find.widgetWithText(ListTile, '中正區')).onTap!();
+    await tester.pumpAndSettle();
+    expect(find.text('臺北市 中正區'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ListTile, 'Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('臺北市 中正區'), findsNothing);
+
+    tester.widget<ListTile>(find.widgetWithText(ListTile, 'unknown')).onTap!();
+    await tester.pumpAndSettle();
+    expect(find.text('unknown'), findsWidgets);
+    await tester.tap(find.widgetWithText(ListTile, 'Edit'));
+    await tester.pumpAndSettle();
+    expect(visited.last, 'region:replace=unknown&returnToMore=1');
+    router.pop();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(ListTile, 'Saved regions'));
+    await tester.pump(const Duration(milliseconds: 200));
+    tester.widget<ListTile>(find.widgetWithText(ListTile, '中正區')).onTap!();
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ListTile, 'Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('中正區'), findsNothing);
+
+    store.addSaved('6300500');
+    store.addSaved('second');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ListTile, 'Saved regions'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('3/3 selected'), findsOneWidget);
+    expect(find.text('Add a region'), findsNothing);
+  });
+
+  testWidgets('display and mesh rows follow their settings into their pages', (
+    tester,
+  ) async {
+    final visited = <String>[];
+    await _pump(tester, _router(visited));
+    final page = tester.element(find.byType(MorePage));
+    await page.read<EewCwaOnlySettings>().setEnabled(false);
+    await page.read<EewSpokenAnnouncementSettings>().setEnabled(true);
+    await page.read<ExperimentalSettings>().unlock();
+    await tester.pump();
+
+    expect(find.text('All sources'), findsOneWidget);
+    expect(find.text('On'), findsWidgets);
+
+    Future<void> leave() async {
+      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+      navigator.pop();
+      await tester.pumpAndSettle();
+    }
+
+    for (final (label, route) in <(String, String)>[
+      ('Default map layer', AppRoutes.defaultMapLayer),
+      ('EEW source', AppRoutes.eewSource),
+      ('Meshtastic', AppRoutes.meshtastic),
+      ('Experimental features', AppRoutes.experimental),
+      ('Changelog', AppRoutes.changelog),
+      ('Bug reports', AppRoutes.bugTracker),
+      ('Debug info', AppRoutes.developer),
+    ]) {
+      visited.clear();
+      await tester.ensureVisible(find.widgetWithText(ListTile, label));
+      await tester.tap(find.widgetWithText(ListTile, label));
+      await tester.pumpAndSettle();
+      expect(visited, [route], reason: label);
+      await leave();
+    }
+
+    visited.clear();
+    await tester.tap(find.text('Server status'));
+    await tester.pumpAndSettle();
+    expect(visited, [AppRoutes.serverStatus]);
+  });
+
+  testWidgets('external rows open, and a refused launch says so', (
+    tester,
+  ) async {
+    final launcher = _RecordingLauncher();
+    final previous = UrlLauncherPlatform.instance;
+    UrlLauncherPlatform.instance = launcher;
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    final visited = <String>[];
+    await _pump(tester, _router(visited));
+
+    await tester.tap(find.text('Discord community'));
+    await tester.pump();
+    expect(launcher.launched, ['https://exptech.com.tw/dc']);
+
+    await tester.tap(find.text('Announcements'));
+    await tester.pump();
+    expect(launcher.launched, contains('https://announcement.exptech.com.tw/'));
+
+    await tester.ensureVisible(find.text('Terms of Service'));
+    await tester.tap(find.text('Terms of Service'));
+    await tester.pump();
+    expect(launcher.launched, contains('https://exptech.com.tw/tos'));
+
+    launcher.fail = true;
+    await tester.ensureVisible(find.text('Discord community'));
+    await tester.tap(find.text('Discord community'));
+    await tester.pump();
+    expect(find.text("Couldn't open the link"), findsOneWidget);
+
+    launcher.fail = false;
+    visited.clear();
+    await tester.tap(find.text('Support DPIP'));
+    await tester.pumpAndSettle();
+    expect(visited, [AppRoutes.sponsor]);
+  });
+
+  testWidgets('the license row opens Flutter\'s license page', (tester) async {
+    await _pump(tester, _router([]));
+    await tester.ensureVisible(
+      find.widgetWithText(ListTile, 'Open-source licenses'),
+    );
+    await tester.tap(find.widgetWithText(ListTile, 'Open-source licenses'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(LicensePage), findsOneWidget);
+  });
+
+  testWidgets('cancelling the diagnostics dump clears its spinner', (
+    tester,
+  ) async {
+    await _pump(tester, _router([]));
+    await tester.ensureVisible(
+      find.widgetWithText(ListTile, 'Dump debug info and logs'),
+    );
+    await tester.tap(find.widgetWithText(ListTile, 'Dump debug info and logs'));
+    await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsWidgets);
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('a narrow version card folds extra avatars and opens a profile', (
+    tester,
+  ) async {
+    final launcher = _RecordingLauncher();
+    final previous = UrlLauncherPlatform.instance;
+    UrlLauncherPlatform.instance = launcher;
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    AppBuild.debugSet(
+      label: '26.1',
+      code: 426000100,
+      platformVersion: '26.1.0',
+    );
+    addTearDown(() => AppBuild.debugSet(label: 'dev', code: 0));
+
+    final logins = List.generate(20, (i) => String.fromCharCode(97 + i));
+    final notes = [
+      ReleaseNote(
+        tagName: '26.1',
+        name: '26.1',
+        prerelease: false,
+        publishedAt: DateTime.utc(2026, 9, 1),
+        body: logins.map((login) => '- note — @$login').join('\n'),
+      ),
+    ];
+    await _pump(
+      tester,
+      _router([]),
+      changelog: _NotesChangelogRepository(notes),
+    );
+    await tester.pump();
+    expect(find.text('26.1.0'), findsOneWidget);
+    expect(find.textContaining(RegExp(r'^\+\d+$')), findsOneWidget);
+    tester
+        .widget<GestureDetector>(
+          find
+              .ancestor(
+                of: find.text('A'),
+                matching: find.byType(GestureDetector),
+              )
+              .first,
+        )
+        .onTap!();
+    await tester.pump();
+    expect(launcher.launched, ['https://github.com/a']);
+  });
+
+  testWidgets('a launcher that declines still tells the user', (tester) async {
+    final launcher = _RecordingLauncher()..refuse = true;
+    final previous = UrlLauncherPlatform.instance;
+    UrlLauncherPlatform.instance = launcher;
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    await _pump(tester, _router([]));
+    await tester.tap(find.text('Discord community'));
+    await tester.pump();
+    expect(find.text("Couldn't open the link"), findsOneWidget);
+  });
+}
+
+class _RecordingLauncher extends UrlLauncherPlatform {
+  final launched = <String>[];
+  bool fail = false;
+  bool refuse = false;
+
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> canLaunch(String url) async => !fail;
+
+  @override
+  Future<bool> launch(
+    String url, {
+    required bool useSafariVC,
+    required bool useWebView,
+    required bool enableJavaScript,
+    required bool enableDomStorage,
+    required bool universalLinksOnly,
+    required Map<String, String> headers,
+    String? webOnlyWindowName,
+  }) async {
+    if (fail) throw StateError('no browser');
+    if (refuse) return false;
+    launched.add(url);
+    return true;
+  }
 }

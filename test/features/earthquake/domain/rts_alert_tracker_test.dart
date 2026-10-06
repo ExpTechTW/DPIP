@@ -95,6 +95,20 @@ void main() {
     expect(tracker.ranking(_townOf), isEmpty);
   });
 
+  test('the same live frame is lit again without counting twice', () {
+    final frame = _alerting(4.0, 1000);
+    final tracker = RtsAlertTracker()
+      ..place(stations: _stations, grid: _grid)
+      ..track(_state(frame));
+    expect(tracker.stations, _stations);
+
+    tracker.place();
+    tracker.track(_state(frame));
+
+    expect(tracker.areas.boxes, {1: 4});
+    expect(tracker.ranking(_townOf), hasLength(1));
+  });
+
   test('reset forgets the window', () {
     final tracker = RtsAlertTracker()
       ..place(stations: _stations, grid: _grid)

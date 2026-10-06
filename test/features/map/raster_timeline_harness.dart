@@ -92,7 +92,7 @@ class EmptyWeatherRepository implements MeteorWeatherRepository {
 /// warmed, and which were abandoned — so they are asserted directly rather than
 /// inferred from controller traffic.
 abstract class FakeRasterFrameSource implements RasterFrameSource {
-  FakeRasterFrameSource(this._frames);
+  FakeRasterFrameSource(List<String> frames) : _frames = frames;
 
   final List<String> _frames;
 

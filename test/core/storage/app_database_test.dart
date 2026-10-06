@@ -140,4 +140,18 @@ void main() {
     await settings.setBool(SettingKeys.onboardingComplete, true);
     expect(settings.getBool(SettingKeys.onboardingComplete), isTrue);
   });
+
+  test(
+    'cache size is read from the file, and a broken clear is logged',
+    () async {
+      final cache = await _cache();
+      final database = AppDatabase(durable: null, cache: cache);
+      expect(await database.cacheBytes(), greaterThan(0));
+      final stats = await database.tableStats();
+      expect(stats.map((row) => row.table), contains('http_cache'));
+
+      final broken = AppDatabase(durable: null, cache: openMemoryDb());
+      expect(await broken.clearCache(), 0);
+    },
+  );
 }

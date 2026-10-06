@@ -197,4 +197,47 @@ void main() {
 
     monitor.dispose();
   });
+
+  test(
+    'attention is the states a person can fix, and start is idempotent',
+    () async {
+      Future<LocationStatus> current() async => LocationStatus.denied;
+      final location = _ProbeLocation(_directory(), current);
+      final monitor = LocationMonitor(
+        location: location,
+        reporter: reporter,
+        regions: regions,
+      );
+      monitor.start();
+      monitor.start();
+      await pumpEventQueue();
+
+      expect(monitor.status, LocationStatus.denied);
+      expect(monitor.needsAttention, isTrue);
+      expect(await monitor.openSettings(), isTrue);
+
+      monitor.dispose();
+    },
+  );
+}
+
+class _ProbeLocation extends LocationService {
+  // LocationService's directory argument is a private field formal, so this
+  // test cannot name it as a super parameter.
+  // ignore: use_super_parameters
+  _ProbeLocation(
+    TownDirectory directory,
+    Future<LocationStatus> Function() status,
+  ) : super(
+        directory,
+        isAvailable: () async => false,
+        fix: () async => null,
+        status: status,
+      );
+
+  @override
+  Stream<bool> serviceEnabledStream() => Stream<bool>.error(StateError('off'));
+
+  @override
+  Future<bool> openSettings() async => true;
 }

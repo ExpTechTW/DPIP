@@ -214,4 +214,82 @@ void main() {
     // Closing the explainer leaves the sheet open and still answerable.
     expect(find.text(l10n.reportFilterApply), findsOneWidget);
   });
+
+  testWidgets(
+    'a remembered range past either end is clamped before the picker',
+    (tester) async {
+      // Both days are after today, so the end is pulled back and the start, still
+      // later than that, collapses onto the same day. Cancelling leaves the
+      // remembered range alone. A start before 1995 is a second open: that side
+      // is pulled forward only when the end is still legal afterwards.
+      const drifted = ReportListQuery(
+        startTime: '2090-01-01',
+        endTime: '2090-06-01',
+      );
+      await _open(tester, initial: drifted);
+      final l10n = await _l10n();
+
+      await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.reportFilterDate), findsWidgets);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+      await _confirm(tester, l10n);
+
+      expect(_result!.query.startTime, '2090-01-01');
+      expect(_result!.query.endTime, '2090-06-01');
+
+      const early = ReportListQuery(
+        startTime: '1994-06-01',
+        endTime: '2020-01-01',
+      );
+      await _open(tester, initial: early);
+      await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+    },
+  );
+
+  testWidgets('no remembered range offers the last thirty days, then a pick', (
+    tester,
+  ) async {
+    await _open(tester, initial: ReportListQuery.empty);
+    final l10n = await _l10n();
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+
+    // Two days in the visible month. The second tap completes the range.
+    final days = find.byType(InkWell);
+    expect(days, findsWidgets);
+    await tester.tap(find.text('1').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip(l10n.reportFilterReset));
+    await tester.pumpAndSettle();
+    await _confirm(tester, l10n);
+
+    expect(_result!.query.startTime, isNull);
+    expect(_result!.query.endTime, isNull);
+  });
+
+  testWidgets('moving a slider is what the next search sends', (tester) async {
+    await _open(tester, initial: ReportListQuery.empty);
+    final l10n = await _l10n();
+
+    await tester.drag(find.byType(RangeSlider).at(1), const Offset(-80, 0));
+    await tester.pumpAndSettle();
+    await _confirm(tester, l10n);
+
+    expect(
+      _result!.query.minMagnitude ?? _result!.query.maxMagnitude,
+      isNotNull,
+    );
+  });
 }

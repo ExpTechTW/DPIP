@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
@@ -167,4 +170,166 @@ void main() {
     expect(controller.messages, isEmpty);
     expect(await store.messages(), isEmpty);
   });
+
+  test('an empty log is already clear', () async {
+    final (controller, _, _) = await makeController();
+    controller.clearMessages();
+    expect(controller.messages, isEmpty);
+    controller.dispose();
+  });
+
+  test('a null store dedups in memory and has no metrics', () async {
+    db = openMemoryDb();
+    final service = FakeMeshService();
+    final controller = MeshChatController(
+      service,
+      MeshLink(service, SettingsStore.inMemory()),
+      null,
+    );
+    addTearDown(controller.dispose);
+    service.messages.add(message('same', seconds: 1));
+    service.messages.add(message('same', seconds: 1));
+    service.messages.add(
+      MeshMessage(
+        from: 1,
+        channel: 0,
+        text: '00 ff',
+        timestamp: DateTime.utc(2026, 1, 1, 0, 0, 2),
+        binary: true,
+      ),
+    );
+    await settle();
+    expect(controller.messages, hasLength(2));
+    expect(controller.messages.first.binary, isTrue);
+    expect(await controller.metricsHistory(), isEmpty);
+    expect(await controller.send('   '), isNull);
+    expect(controller.messages, hasLength(2));
+  });
+
+  test('scan reports devices once, and names the failure', () async {
+    final (controller, service, _) = await makeController();
+    service.scanResults = const [
+      MeshDevice(id: 'a', name: 'Porch'),
+      MeshDevice(id: 'a', name: 'Porch again'),
+      MeshDevice(id: 'b', name: 'Roof'),
+    ];
+    await controller.startScan();
+    expect(controller.scanning, isFalse);
+    expect(controller.devices.map((d) => d.id), ['a', 'b']);
+    expect(controller.scanError, isNull);
+
+    final errored = _ScriptedScan(
+      Stream<MeshDevice>.error(StateError('adapter off')),
+    );
+    final errorController = MeshChatController(
+      errored,
+      MeshLink(errored, SettingsStore.inMemory()),
+      null,
+    );
+    addTearDown(errorController.dispose);
+    await errorController.startScan();
+    expect(errorController.scanError, 'adapter off');
+    expect(errorController.scanning, isFalse);
+
+    final generic = _ScriptedScan(Stream<MeshDevice>.error(Exception('boom')));
+    final genericController = MeshChatController(
+      generic,
+      MeshLink(generic, SettingsStore.inMemory()),
+      null,
+    );
+    addTearDown(genericController.dispose);
+    await genericController.startScan();
+    expect(genericController.scanError, contains('boom'));
+  });
+
+  test('stopping a scan does not wait for it to finish', () async {
+    db = openMemoryDb();
+    final hung = _ScriptedScan(StreamController<MeshDevice>().stream);
+    final controller = MeshChatController(
+      hung,
+      MeshLink(hung, SettingsStore.inMemory()),
+      null,
+    );
+    addTearDown(controller.dispose);
+    unawaited(controller.startScan());
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.scanning, isTrue);
+    await controller.stopScan();
+    expect(controller.scanning, isFalse);
+  });
+
+  test('connect shows the in-flight id, then disconnects', () async {
+    db = openMemoryDb();
+    final gated = _GatedConnect();
+    final settings = SettingsStore.inMemory();
+    final link = MeshLink(gated, settings);
+    final controller = MeshChatController(gated, link, null);
+    addTearDown(() {
+      controller.dispose();
+      link.dispose();
+    });
+    const device = MeshDevice(id: 'radio-1', name: 'Porch');
+    final connecting = controller.connect(device);
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.connectingId, 'radio-1');
+    gated.gate.complete();
+    expect(await connecting, isNull);
+    expect(controller.connectingId, isNull);
+    expect(await controller.disconnect(), isNull);
+  });
+
+  test(
+    'channel names are remembered and unchanged names are not rewritten',
+    () async {
+      final (controller, service, store) = await makeController();
+      service.channels = const [
+        MeshChannel(index: 0, name: '', psk: [1], enabled: true),
+        MeshChannel(index: 2, name: 'DPIP', psk: [1], enabled: true),
+      ];
+      service.connections.add(
+        const MeshConnectionStatus(state: MeshConnectionState.connected),
+      );
+      await settle();
+      expect(controller.channelNames, {2: 'DPIP'});
+
+      service.connections.add(
+        const MeshConnectionStatus(state: MeshConnectionState.connected),
+      );
+      await settle();
+      expect(controller.channelNames, {2: 'DPIP'});
+
+      service.channels = const [
+        MeshChannel(index: 2, name: 'Town', psk: [1], enabled: true),
+      ];
+      service.connections.add(
+        const MeshConnectionStatus(state: MeshConnectionState.disconnected),
+      );
+      await settle();
+      expect(controller.channelNames[2], 'Town');
+      expect((await store.readChannels())[2], 'Town');
+
+      controller.markVisible(2);
+      expect(controller.unreadDividerTs(2), isNull);
+    },
+  );
+}
+
+class _ScriptedScan extends FakeMeshService {
+  _ScriptedScan(this._scan);
+
+  final Stream<MeshDevice> _scan;
+
+  @override
+  Stream<MeshDevice> scanForDevices({Duration timeout = Duration.zero}) =>
+      _scan;
+}
+
+class _GatedConnect extends FakeMeshService {
+  final gate = Completer<void>();
+
+  @override
+  Future<Result<void>> connectToId(String id) async {
+    await gate.future;
+    return super.connectToId(id);
+  }
 }

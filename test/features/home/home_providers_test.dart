@@ -1,9 +1,37 @@
+/// `homeProviders` is a list of lazy create closures. Nothing in the list
+/// runs until a widget reads the controller, so a test has to ask for each
+/// one or the closures stay uncovered.
+library;
+
+import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/location_status.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/home/home_providers.dart';
+import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
+import 'package:dpip/features/home/presentation/home_reset_signal.dart';
+import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/features/weather/domain/current_weather_widget_sync.dart';
+import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
+import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
+import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('iOS callback forwards region and weather to Widget publish', () async {
     final weather = _weather();
     String? publishedRegionCode;
@@ -78,6 +106,58 @@ void main() {
       expect(callback, isNull, reason: '$platform must not clear iOS Widgets');
     }
   });
+
+  testWidgets('each home provider builds its controller', (tester) async {
+    final store = RegionStore(SettingsStore.inMemory());
+    const directory = TownDirectory({});
+    final location = LocationService(
+      directory,
+      isAvailable: () async => false,
+      fix: () async => null,
+      lastKnown: () async => null,
+      status: () async => LocationStatus.denied,
+    );
+
+    late HomeSheetExtent extent;
+    late HomeResetSignal reset;
+    late MapCameraHandoff camera;
+    late MapStationHandoff stations;
+    late HomeWeatherController weather;
+    late HomeActiveEventsController events;
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<CurrentWeatherWidgetSync>.value(value: _WidgetSync()),
+          Provider<MeteorWeatherRepository>.value(value: _Weather()),
+          Provider<RainHourTrendRepository>.value(value: _Hours()),
+          ChangeNotifierProvider<RegionStore>.value(value: store),
+          Provider<TownDirectory>.value(value: directory),
+          Provider<LocationService>.value(value: location),
+          Provider<EventRepository>.value(value: _Events()),
+          ...homeProviders(),
+        ],
+        child: Builder(
+          builder: (context) {
+            extent = context.read<HomeSheetExtent>();
+            reset = context.read<HomeResetSignal>();
+            camera = context.read<MapCameraHandoff>();
+            stations = context.read<MapStationHandoff>();
+            weather = context.read<HomeWeatherController>();
+            events = context.read<HomeActiveEventsController>();
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
+
+    expect(extent.value, HomeSheetExtent.rest);
+    expect(weather.areaCode, isNull);
+    expect(events.events, isEmpty);
+    reset.fire();
+    expect(camera.homeBounds, isNull);
+    expect(stations, isNotNull);
+  });
 }
 
 Future<void> _unusedPublish({
@@ -107,3 +187,44 @@ WeatherRealtime _weather() => WeatherRealtime(
     gust: WeatherWind(speed: 3, beaufort: 2),
   ),
 );
+
+class _WidgetSync implements CurrentWeatherWidgetSync {
+  @override
+  Future<void> publish({
+    required String regionCode,
+    required WeatherRealtime weather,
+  }) async {}
+
+  @override
+  Future<void> clear() async {}
+}
+
+class _Weather implements MeteorWeatherRepository {
+  @override
+  Future<Result<WeatherRealtime?>> realtime(double lat, double lng) async =>
+      const Ok(null);
+
+  @override
+  Future<Result<WeatherForecast>> forecast(String code) async =>
+      Ok(const WeatherForecast(updateTime: 0, forecast: []));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError(invocation.memberName.toString());
+}
+
+class _Hours implements RainHourTrendRepository {
+  @override
+  Future<Result<RainHourTrend>> hourTrend(String code) async =>
+      Ok(RainHourTrend.dry(startUtc: DateTime.utc(2026, 1, 15)));
+}
+
+class _Events implements EventRepository {
+  @override
+  Future<Result<List<Event>>> events({String? regionCode}) async =>
+      const Ok([]);
+
+  @override
+  Future<Result<List<Event>>> activeEvents({String? regionCode}) async =>
+      const Ok([]);
+}

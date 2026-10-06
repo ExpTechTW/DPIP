@@ -67,6 +67,7 @@ const _quake = EewInfo(
 );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   final model = testModel();
   final modelSha = sha256.convert(model).toString();
   late _Adapter adapter;
@@ -212,4 +213,43 @@ void main() {
       );
     },
   );
+
+  test('ready flips only after the worker is up', () async {
+    adapter = _Adapter((_) => _bytes(model));
+    final ml = service();
+    addTearDown(ml.dispose);
+
+    expect(ml.ready, isFalse);
+    expect(await ml.prepare(), isTrue);
+    expect(ml.ready, isTrue);
+  });
+
+  test('the bundled township points are the ones the model scores', () async {
+    final points = await loadMlTownPoints();
+    expect(points.codes, isNotEmpty);
+    expect(points.latitudes.length, points.codes.length);
+    expect(points.longitudes.length, points.codes.length);
+  });
+
+  test('a non-finite quake is a failed score, not a thrown alert', () async {
+    adapter = _Adapter((_) => _bytes(model));
+    final ml = service();
+    addTearDown(ml.dispose);
+    await ml.prepare();
+
+    expect(
+      await ml.townLevels(
+        const EewInfo(
+          time: 0,
+          longitude: 121,
+          latitude: 23.5,
+          depth: 10,
+          magnitude: double.nan,
+          location: '',
+          max: 5,
+        ),
+      ),
+      isNull,
+    );
+  });
 }

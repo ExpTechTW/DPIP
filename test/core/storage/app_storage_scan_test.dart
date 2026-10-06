@@ -1,4 +1,5 @@
 import 'package:dpip/core/storage/app_storage_scan.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -181,8 +182,13 @@ void main() {
       expect(formatBytes(0), '0 B');
       expect(formatBytes(512), '512 B');
       expect(formatBytes(1024), '1.0 KB');
+      expect(formatBytes(1536), '1.5 KB');
+      expect(formatBytes(12 * 1024), '12 KB');
       expect(formatBytes(5 * 1024 * 1024), '5.0 MB');
       expect(formatBytes(700 * 1024 * 1024), '700 MB');
+      expect(formatBytes(1024 * 1024 * 1024), '1.0 GB');
+      expect(formatBytes(10 * 1024 * 1024 * 1024), '10 GB');
+      expect(formatBytes(1024 * 1024 * 1024 * 1024), '1.0 TB');
     });
   });
 
@@ -194,5 +200,182 @@ void main() {
       );
       expect(entry.shortPath, 'tmp/main.dart.dill');
     });
+
+    test('a single path component is its own name', () {
+      const entry = StorageEntry(path: 'orphan.db', bytes: 1);
+      expect(entry.shortPath, 'orphan.db');
+      expect(entry.name, 'orphan.db');
+    });
   });
+
+  group('storageBreakdown extra buckets', () {
+    StorageScan scan({
+      required int totalBytes,
+      List<StorageEntry> dirs = const [],
+      List<StorageEntry> files = const [],
+    }) => StorageScan(totalBytes: totalBytes, dirs: dirs, files: files);
+
+    test('location track, mapbox and URLCache each get their own slice', () {
+      final slices = storageBreakdown(
+        scan(
+          totalBytes: 90,
+          dirs: const [StorageEntry(path: '/caches', bytes: 90)],
+          files: const [
+            StorageEntry(path: '/caches/location_track.db', bytes: 20),
+            StorageEntry(path: '/caches/location_track.db-wal', bytes: 5),
+            StorageEntry(path: '/caches/mapbox/cache.db', bytes: 30),
+            StorageEntry(path: '/caches/URLCache/x', bytes: 15),
+          ],
+        ),
+      );
+      expect(slices.firstWhere((s) => s.label == 'Location track').bytes, 25);
+      expect(slices.firstWhere((s) => s.label == 'MapLibre').bytes, 30);
+      expect(
+        slices.firstWhere((s) => s.label == 'System HTTP cache').bytes,
+        15,
+      );
+      expect(slices.firstWhere((s) => s.label == 'caches (other)').bytes, 20);
+    });
+
+    test('a file outside every directory is still counted, and a '
+        'fully consumed directory disappears', () {
+      final slices = storageBreakdown(
+        scan(
+          totalBytes: 80,
+          dirs: const [StorageEntry(path: '/caches', bytes: 10)],
+          files: const [
+            StorageEntry(path: '/elsewhere/location_track.db', bytes: 40),
+            StorageEntry(path: '/caches/http_etag_cache.db', bytes: 10),
+          ],
+        ),
+      );
+      expect(slices.firstWhere((s) => s.label == 'Location track').bytes, 40);
+      expect(
+        slices.firstWhere((s) => s.label == 'ETag cache (SQLite)').bytes,
+        10,
+      );
+      expect(slices.any((s) => s.label.startsWith('caches')), isFalse);
+      expect(slices.firstWhere((s) => s.label == 'Other').bytes, 30);
+    });
+
+    test('directories that share a name merge into one slice', () {
+      final slices = storageBreakdown(
+        scan(
+          totalBytes: 30,
+          dirs: const [
+            StorageEntry(path: '/a/tmp', bytes: 10),
+            StorageEntry(path: '/b/tmp', bytes: 20),
+          ],
+        ),
+      );
+      expect(slices.single.label, 'tmp');
+      expect(slices.single.bytes, 30);
+    });
+  });
+
+  group('StorageScanner', () {
+    TestWidgetsFlutterBinding.ensureInitialized();
+
+    const channel = MethodChannel('com.exptech.dpip/storage_scan');
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+    tearDown(() => messenger.setMockMethodCallHandler(channel, null));
+
+    test(
+      'parses directories and files, and treats a missing total as zero',
+      () async {
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          expect(call.method, 'scan');
+          return <String, Object?>{
+            'dirs': [
+              {'path': '/caches', 'bytes': 12},
+            ],
+            'files': [
+              {'path': '/caches/note.txt', 'bytes': 3.0},
+            ],
+          };
+        });
+        final scan = await const StorageScanner().scan();
+        expect(scan.totalBytes, 0);
+        expect(scan.dirs.single.path, '/caches');
+        expect(scan.dirs.single.bytes, 12);
+        expect(scan.files.single.bytes, 3);
+      },
+    );
+
+    test('a null payload is an empty scan', () async {
+      messenger.setMockMethodCallHandler(channel, (call) async => null);
+      final scan = await const StorageScanner().scan();
+      expect(scan.totalBytes, 0);
+      expect(scan.dirs, isEmpty);
+      expect(scan.files, isEmpty);
+    });
+
+    test('a row that is not a map becomes an empty scan', () async {
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        return <String, Object?>{
+          'totalBytes': 4,
+          'dirs': [1],
+        };
+      });
+      final scan = await const StorageScanner().scan();
+      expect(scan.totalBytes, 0);
+      expect(scan.dirs, isEmpty);
+    });
+
+    test(
+      'a missing plugin and a thrown error both become an empty scan',
+      () async {
+        messenger.setMockMethodCallHandler(channel, null);
+        final missing = await const StorageScanner().scan();
+        expect(missing.dirs, isEmpty);
+
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          throw PlatformException(code: 'scan');
+        });
+        final failed = await const StorageScanner().scan();
+        expect(failed.files, isEmpty);
+
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          throw StateError('scan');
+        });
+        final other = await const StorageScanner().scan();
+        expect(other.totalBytes, 0);
+      },
+    );
+
+    test('configure and the clears succeed, ignore a missing plugin, and '
+        'swallow a platform error', () async {
+      const scanner = StorageScanner();
+      for (final method in ['configure', 'clearSystemHttpCache', 'clearTmp']) {
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          expect(call.method, method);
+          return null;
+        });
+        await _invoke(scanner, method);
+
+        messenger.setMockMethodCallHandler(channel, null);
+        await _invoke(scanner, method);
+
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          throw PlatformException(code: method);
+        });
+        await _invoke(scanner, method);
+
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          throw StateError(method);
+        });
+        await _invoke(scanner, method);
+      }
+    });
+  });
+}
+
+Future<void> _invoke(StorageScanner scanner, String method) {
+  return switch (method) {
+    'configure' => scanner.configure(),
+    'clearSystemHttpCache' => scanner.clearSystemHttpCache(),
+    _ => scanner.clearTmp(),
+  };
 }

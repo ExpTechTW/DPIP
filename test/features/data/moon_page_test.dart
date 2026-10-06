@@ -8,6 +8,7 @@
 library;
 
 import 'package:dpip/core/astro/moon_phase.dart';
+import 'package:dpip/core/astro/moon_rise_set.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -67,12 +68,51 @@ Future<void> _pumpPage(WidgetTester tester, RegionStore regions) async {
     ),
   );
   // The shader and the NASA maps load asynchronously; the rest of the page
-  // does not wait on them, which is the point of pumping rather than settling.
+  // does not wait on them.
   await tester.pump();
+}
+
+/// The globe's shader compiles on the real clock. It has to be the first page
+/// mounted in this file: the decoded maps are cached in the page, and a load
+/// started by an earlier test resumes in that test's zone.
+Future<void> _awaitGlobe(WidgetTester tester) async {
+  for (var i = 0; i < 40; i++) {
+    final painted = tester
+        .widgetList<CustomPaint>(find.byType(CustomPaint))
+        .any((paint) => paint.painter.runtimeType.toString() == '_MoonPainter');
+    if (painted) return;
+    if (find.textContaining('moon shader:').evaluate().isNotEmpty) return;
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 500)),
+    );
+    await tester.pump();
+  }
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('the globe paints, and a new phase asks for a repaint', (
+    tester,
+  ) async {
+    await _pumpPage(tester, await _regions(currentCode: '100'));
+    await _awaitGlobe(tester);
+    expect(find.textContaining('moon shader:'), findsNothing);
+
+    CustomPainter moon() => tester
+        .widgetList<CustomPaint>(find.byType(CustomPaint))
+        .map((paint) => paint.painter)
+        .where((painter) => painter.runtimeType.toString() == '_MoonPainter')
+        .single!;
+
+    final before = moon();
+    expect(before.shouldRepaint(before), isFalse);
+
+    final timeline = tester.widget<MapTimeline>(find.byType(MapTimeline));
+    timeline.onSelected(timeline.selectedIndex + 12);
+    await tester.pump();
+    expect(moon().shouldRepaint(before), isTrue);
+  });
 
   testWidgets('opens on today and offers no jump-to-now', (tester) async {
     await _pumpPage(tester, await _regions(currentCode: '100'));
@@ -201,5 +241,96 @@ void main() {
     expect(after, isNot(before));
     expect(find.text(after), findsOneWidget);
     expect(find.text(before), findsNothing);
+  });
+
+  testWidgets('the calendar can leave the month it opened on', (tester) async {
+    await _pumpPage(tester, await _regions(currentCode: '100'));
+    await tester.tap(find.byTooltip('Previous month'));
+    await tester.pump();
+    expect(find.byType(MoonCalendar), findsOneWidget);
+  });
+
+  testWidgets('the starfield does not repaint itself', (tester) async {
+    await _pumpPage(tester, await _regions(currentCode: '100'));
+    final stars = tester
+        .widgetList<CustomPaint>(find.byType(CustomPaint))
+        .map((paint) => paint.painter)
+        .where(
+          (painter) => painter.runtimeType.toString() == '_StarfieldPainter',
+        )
+        .single!;
+    expect(stars.shouldRepaint(stars), isFalse);
+  });
+
+  testWidgets('a polar day with no rise or set says which one it is', (
+    tester,
+  ) async {
+    const lat = 64.1466;
+    const lng = -21.9426;
+    final directory = TownDirectory.fromJson({
+      '64': {
+        'city': '雷克雅維克',
+        'town': '市中心',
+        'lat': lat,
+        'lng': lng,
+        'cityLevel': '',
+        'townLevel': '',
+      },
+    });
+    final regions = await _regions(currentCode: '64');
+    tester.view.physicalSize = const Size(800, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<TownDirectory>.value(value: directory),
+          ChangeNotifierProvider<RegionStore>.value(value: regions),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('en'),
+          home: MoonPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final timeline = tester.widget<MapTimeline>(find.byType(MapTimeline));
+    var above = false;
+    var below = false;
+    for (var index = 0; index < timeline.frames.length; index += 12) {
+      final frame = timeline.frames[index];
+      // The page dates a rise/set by Taipei's calendar day, then evaluates
+      // that day at the observer.
+      final local = AppTime.taipei(frame.time);
+      final events = MoonRiseSet.of(
+        DateTime.utc(
+          local.year,
+          local.month,
+          local.day,
+        ).subtract(const Duration(hours: 8)),
+        latitude: lat,
+        longitude: lng,
+      );
+      if (!events.isCircumpolar) continue;
+      final up = MoonRiseSet.aboveHorizon(
+        frame.time,
+        latitude: lat,
+        longitude: lng,
+      );
+      timeline.onSelected(index);
+      await tester.pump();
+      if (up) {
+        expect(find.text('Up all day'), findsWidgets);
+        above = true;
+      } else {
+        expect(find.text('None today'), findsWidgets);
+        below = true;
+      }
+      if (above && below) break;
+    }
+    expect(above || below, isTrue, reason: 'a polar day in the window');
   });
 }

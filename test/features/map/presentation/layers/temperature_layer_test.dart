@@ -10,6 +10,8 @@
 library;
 
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
@@ -188,5 +190,57 @@ void main() {
     expect(legend.stops, layer.colorStops);
     expect(legend.unit, '°C');
     expect(legend.banded, isFalse);
+  });
+
+  test(
+    'a nearby tap selects the station; a miss and an empty one do not',
+    () async {
+      final layer = TemperatureMapLayer(FakeStationWeatherRepository());
+      final map = RecordingMapController();
+      await layer.render(map);
+
+      await layer.onMapTap(const LatLng(22.62, 120.31), map);
+      expect(layer.selection.value, isNull);
+
+      await layer.onMapTap(const LatLng(0, 0), map);
+      expect(layer.selection.value, isNull);
+
+      await layer.onMapTap(const LatLng(25.04, 121.51), map);
+      expect(layer.selection.value, stationFullId);
+      expect(layer.stationName(stationFullId), '測站一');
+      expect(layer.stationSubtitle(stationFullId), '臺北市 · 中正區');
+      expect(layer.stationName('missing'), 'missing');
+      expect(layer.stationSubtitle('missing'), isNull);
+      expect(layer.bottomChromeFraction, StationSheet.peekExtent);
+
+      final before = layer.selectionRevision.value;
+      layer.selectFeature(stationFullId);
+      expect(layer.selectionRevision.value, before + 1);
+
+      layer.close();
+      expect(layer.selection.value, isNull);
+      await layer.clear(map);
+      expect(map.calls, contains('removeSource:wx-temperature-src'));
+    },
+  );
+
+  testWidgets('the sheet names the station a tap selected', (tester) async {
+    final layer = TemperatureMapLayer(FakeStationWeatherRepository());
+    final map = RecordingMapController();
+    await layer.render(map);
+    await layer.onMapTap(const LatLng(25.04, 121.51), map);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('zh', 'TW'),
+        home: Scaffold(
+          body: Builder(builder: (context) => layer.buildSheet(context)),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('測站一'), findsOneWidget);
   });
 }

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dpip/core/network/etag_cache_store.dart';
@@ -538,5 +540,124 @@ void main() {
       ],
     );
     expect(await store.readJson('https://example.test/broken'), isNull);
+  });
+
+  test('a zero budget deletes the row a write just stored', () async {
+    final capped = EtagCacheStore(db, maxBytes: 0);
+    await capped.write('https://x/gone', etag: 'e', body: '{"a":1}');
+    expect(await capped.read('https://x/gone'), isNull);
+  });
+
+  test('compact vacuums after a clear', () async {
+    await store.write('https://x/a', etag: 'e', body: '{"a":1}');
+    await store.clear();
+    await store.compact();
+    expect((await store.stats()).rows, 0);
+  });
+
+  test('a file-backed open applies the pager pragmas', () async {
+    final dir = await Directory.systemTemp.createTemp('etag-cache');
+    addTearDown(() => dir.delete(recursive: true));
+    final fileDb = EtagCacheStore.open(path: '${dir.path}/cache.db');
+    addTearDown(fileDb.close);
+    await EtagCacheStore.createSchema(fileDb);
+    final fileStore = EtagCacheStore(fileDb);
+    await fileStore.write('https://x/file', etag: 'e', body: '{"ok":true}');
+    expect((await fileStore.read('https://x/file'))?.body, '{"ok":true}');
+  });
+
+  test('a fat gzipped json body is inflated off the caller', () async {
+    // A short repeating sequence collapses under gzip. Full-width bytes do not.
+    final random = Random(1);
+    final raw = Uint8List(24 * 1024);
+    for (var i = 0; i < raw.length; i++) {
+      raw[i] = random.nextInt(256);
+    }
+    final packed = Uint8List.fromList(gzip.encode(raw));
+    expect(packed.length, greaterThan(16 * 1024));
+    await db.execute(
+      'INSERT INTO http_cache (key, etag, kind, body, size, time) '
+      'VALUES (?, ?, ?, ?, ?, ?)',
+      ['https://x/fat', '"f"', EtagCacheStore.kindJson, packed, raw.length, 1],
+    );
+    // The blob is not JSON. Inflating it still takes the large-body path,
+    // and a corrupt entry reads as a miss.
+    expect(await store.readJson('https://x/fat'), isNull);
+  });
+
+  test('a fat binary is gzipped and inflated off the caller', () async {
+    // Repeating bytes are large enough for the encode hop and small enough
+    // on disk that the read stays on the caller.
+    final raw = Uint8List(80 * 1024);
+    await store.writeBytes(
+      'https://x/blob',
+      etag: 'b',
+      bytes: raw,
+      contentType: 'application/octet-stream',
+    );
+    expect((await store.readBytes('https://x/blob'))?.bytes, raw);
+
+    // Random bytes do not shrink, so a stored gzip of them stays above the
+    // threshold that moves inflation off the caller.
+    final random = Random(2);
+    final fat = Uint8List(80 * 1024);
+    for (var i = 0; i < fat.length; i++) {
+      fat[i] = random.nextInt(256);
+    }
+    final packed = Uint8List.fromList(gzip.encode(fat));
+    expect(packed.length, greaterThan(64 * 1024));
+    await db.execute(
+      'INSERT OR REPLACE INTO http_cache '
+      '(key, etag, kind, body, size, time) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        'https://x/packed',
+        'p',
+        EtagCacheStore.kindBinaryGzip,
+        packed,
+        fat.length,
+        1,
+      ],
+    );
+    expect((await store.readBytes('https://x/packed'))?.bytes, fat);
+  });
+
+  test('already-packed bytes are stored raw', () async {
+    final zstd = Uint8List.fromList([0x28, 0xb5, 0x2f, 0xfd, 1, 2, 3, 4]);
+    expect(
+      EtagCacheStore.shouldGzipBinary(zstd, 'application/octet-stream'),
+      isFalse,
+    );
+    await store.writeBytes(
+      'https://x/zstd',
+      etag: 'z',
+      bytes: zstd,
+      contentType: 'application/octet-stream',
+    );
+    expect((await store.readBytes('https://x/zstd'))?.bytes, zstd);
+  });
+
+  test('a batch wider than one query is read in chunks', () async {
+    await store.write('https://x/0', etag: 'e', body: '{"n":0}');
+    final urls = [for (var i = 0; i < 401; i++) 'https://x/$i'];
+    final hits = await store.readBytesBatch(urls);
+    expect(hits, isEmpty);
+    final jsonHits = await store.readJson('https://x/0');
+    expect(jsonHits?.data, {'n': 0});
+  });
+
+  test('touching more keys than one statement flushes in chunks', () async {
+    final payload = Uint8List.fromList([1, 2, 3, 4]);
+    final urls = [for (var i = 0; i < 70; i++) 'https://x/t$i'];
+    for (final url in urls) {
+      await store.writeBytes(
+        url,
+        etag: 'e',
+        bytes: payload,
+        contentType: 'application/octet-stream',
+      );
+    }
+    expect((await store.readBytesBatch(urls)).length, 70);
+    await Future.wait([store.touch(urls.first), store.touch(urls.last)]);
+    expect((await store.stats()).rows, 70);
   });
 }

@@ -41,7 +41,37 @@ const String _meshtasticServiceUuid = '6ba1b218-15a8-461f-9fa8-5dcae273eafd';
 /// Channel slots every Meshtastic radio reports (`MAX_NUM_CHANNELS`).
 /// Production impl: talks BLE to a Meshtastic radio.
 class MeshtasticClientImpl implements MeshtasticService {
+  MeshtasticClientImpl({
+    mesh.MeshtasticClient? client,
+    Future<bool> Function()? debugBluetoothSupported,
+    Stream<BluetoothAdapterState>? debugAdapterStates,
+    Duration debugAdapterTimeout = const Duration(seconds: 8),
+    List<BluetoothDevice> Function()? debugConnectedDevices,
+    Future<List<BluetoothDevice>> Function(List<Guid>)? debugSystemDevices,
+    // `client` stays public. `this._client` would hide the seam from tests,
+    // and the field is reassigned the first time the radio is created.
+    // ignore: prefer_initializing_formals
+  }) : _client = client,
+       _bluetoothSupported = debugBluetoothSupported,
+       _adapterStates = debugAdapterStates,
+       _adapterTimeout = debugAdapterTimeout,
+       _connectedDevices = debugConnectedDevices,
+       _systemDevices = debugSystemDevices;
+
   mesh.MeshtasticClient? _client;
+  final Future<bool> Function()? _bluetoothSupported;
+  final Stream<BluetoothAdapterState>? _adapterStates;
+  final Duration _adapterTimeout;
+  final List<BluetoothDevice> Function()? _connectedDevices;
+  final Future<List<BluetoothDevice>> Function(List<Guid>)? _systemDevices;
+
+  /// How long a channel write waits for the radio to read the slot back.
+  ///
+  /// Eight seconds in production: a managed-mode radio never replies, and
+  /// that silence is the signal. Tests shorten it so the timeout branch does
+  /// not wait out the real window.
+  @visibleForTesting
+  Duration channelConfirmTimeout = const Duration(seconds: 8);
   bool _initialized = false;
   int? _cachedSdk;
   bool _logBridgeInstalled = false;
@@ -54,25 +84,29 @@ class MeshtasticClientImpl implements MeshtasticService {
       StreamController<MeshTraffic>.broadcast();
   final MeshTrafficCounter _counter = MeshTrafficCounter();
 
+  bool _rxHooked = false;
+
   mesh.MeshtasticClient get _c {
     _installLogBridge();
     final existing = _client;
-    if (existing != null) return existing;
+    final client =
+        existing ?? mesh.MeshtasticClient(now: () => AppTime.utc.toLocal());
     // Every timestamp the transport stamps comes from the calibrated clock,
     // not the device's. The 24-hour retention window and the chart axes are
     // computed against `AppTime`, so a device clock that is off by three hours
     // would file each reading three hours out of place — the retention would
     // drop rows that are not old yet, and "last reading" would show the
     // offset instead of the age.
-    final created = mesh.MeshtasticClient(now: () => AppTime.utc.toLocal());
-    _client = created;
-    // Counted here, from one permanent subscription — not inside the mapped
-    // public streams, which run once per listener (and not at all when nobody
-    // is listening).
-    // Never cancelled: the client lives as long as the app does, and the
-    // counters are session totals.
-    created.packetStream.listen(_countRx);
-    return created;
+    _client = client;
+    if (!_rxHooked) {
+      _rxHooked = true;
+      // Counted here, from one permanent subscription — not inside the mapped
+      // public streams, which run once per listener (and not at all when
+      // nobody is listening). Never cancelled: the client lives as long as
+      // the app does, and the counters are session totals.
+      client.packetStream.listen(_countRx);
+    }
+    return client;
   }
 
   void _countRx(mesh.MeshPacketWrapper packet) {
@@ -164,7 +198,9 @@ class MeshtasticClientImpl implements MeshtasticService {
       // bluetoothConnect/bluetoothScan as permanently denied, so it always
       // throws there. Permissions are handled above; do its remaining
       // environment checks here.
-      if (!await FlutterBluePlus.isSupported) {
+      final supported =
+          await (_bluetoothSupported?.call() ?? FlutterBluePlus.isSupported);
+      if (!supported) {
         Log.warning('meshtastic initialize: bluetooth not supported');
         return const Err(
           UnexpectedFailure('Bluetooth is not supported on this device'),
@@ -235,9 +271,9 @@ class MeshtasticClientImpl implements MeshtasticService {
     // falsely reports Bluetooth off.
     final BluetoothAdapterState state;
     try {
-      state = await FlutterBluePlus.adapterState
+      state = await (_adapterStates ?? FlutterBluePlus.adapterState)
           .firstWhere((s) => s != BluetoothAdapterState.unknown)
-          .timeout(const Duration(seconds: 8));
+          .timeout(_adapterTimeout);
     } on TimeoutException {
       Log.warning('meshtastic initialize: adapter state never settled');
       return const UnexpectedFailure(
@@ -343,7 +379,8 @@ class MeshtasticClientImpl implements MeshtasticService {
   }
 
   Future<void> _dropOurLink(String id) async {
-    for (final device in FlutterBluePlus.connectedDevices) {
+    for (final device
+        in _connectedDevices?.call() ?? FlutterBluePlus.connectedDevices) {
       if (device.remoteId.toString() != id) continue;
       Log.info('meshtastic connect: dropping our stale link to $id');
       try {
@@ -356,17 +393,17 @@ class MeshtasticClientImpl implements MeshtasticService {
 
   @override
   Future<MeshLinkOwner> linkOwner(String deviceId) async {
-    if (FlutterBluePlus.connectedDevices.any(
-      (d) => d.remoteId.toString() == deviceId,
-    )) {
+    final ours = _connectedDevices?.call() ?? FlutterBluePlus.connectedDevices;
+    if (ours.any((d) => d.remoteId.toString() == deviceId)) {
       return MeshLinkOwner.thisApp;
     }
     try {
       // Both platforms report links opened by *any* app here (iOS needs the
       // service filter for privacy; Android ignores it).
-      final system = await FlutterBluePlus.systemDevices([
-        Guid(_meshtasticServiceUuid),
-      ]);
+      final serviceIds = [Guid(_meshtasticServiceUuid)];
+      final system =
+          await (_systemDevices?.call(serviceIds) ??
+              FlutterBluePlus.systemDevices(serviceIds));
       final held = system.any((d) => d.remoteId.toString() == deviceId);
       if (held) {
         Log.warning('meshtastic: $deviceId is already held by another app');
@@ -853,9 +890,7 @@ class MeshtasticClientImpl implements MeshtasticService {
         mesh.AdminMessage(getChannelRequest: index + 1),
         wantResponse: true,
       );
-      final written = await confirmation.future.timeout(
-        const Duration(seconds: 8),
-      );
+      final written = await confirmation.future.timeout(channelConfirmTimeout);
       if (written.settings.name != spec.name ||
           !_samePsk(written.settings.psk, spec.psk)) {
         Log.warning('meshtastic channel: slot $index did not take the write');

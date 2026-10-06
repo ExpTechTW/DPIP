@@ -251,4 +251,104 @@ void main() {
     expect(tpe1.state, EndpointState.down);
     expect(health.summary, EndpointState.down);
   });
+
+  test('hostsFor names every tier from the current region order', () {
+    final client = clientWith(_FakeAdapter((_, _) => _json('{}', 200)));
+    expect(
+      client.hostsFor(ApiTier.lbStatic).first,
+      'https://static.lb-tpe1.exptech.dev',
+    );
+    expect(
+      client.hostsFor(ApiTier.coreStatic).first,
+      startsWith('https://static.core-'),
+    );
+    expect(client.hostsFor(ApiTier.coreStaticExclusive), [
+      'https://static.core-tnn1.exptech.dev',
+    ]);
+    expect(client.hostsFor(ApiTier.legacyApi), ['https://api-1.exptech.dev']);
+  });
+
+  test('post and absolute helpers return the decoded body', () async {
+    final adapter = _FakeAdapter((_, options) {
+      expect(options.method, 'POST');
+      return _json('{"posted":true}', 200);
+    });
+    final client = clientWith(adapter);
+    expect(await client.post(ApiTier.lbApi, '/x', data: {'a': 1}), {
+      'posted': true,
+    });
+    expect(
+      await client.postAbsolute('https://status.example/q', data: const {}),
+      {'posted': true},
+    );
+  });
+
+  test('getBytes keeps the body and the etag', () async {
+    final adapter = _FakeAdapter(
+      (_, _) => ResponseBody.fromBytes(
+        [9, 8, 7],
+        200,
+        headers: {
+          Headers.contentTypeHeader: ['application/octet-stream'],
+          'etag': ['"tile"'],
+        },
+      ),
+    );
+    final payload = await clientWith(adapter).getBytes(ApiTier.lbApi, '/t');
+    expect(payload.bytes, [9, 8, 7]);
+    expect(payload.etag, '"tile"');
+  });
+
+  test('a certificate failure is not failed over', () async {
+    final adapter = _FakeAdapter((call, options) {
+      throw DioException(
+        requestOptions: options,
+        type: DioExceptionType.badCertificate,
+      );
+    });
+    await expectLater(
+      () => clientWith(adapter).request(ApiTier.lbApi, '/x'),
+      throwsA(isA<DioException>()),
+    );
+    expect(adapter.hits, hasLength(1));
+  });
+
+  test('openStream returns the byte stream and can be cancelled', () async {
+    final adapter = _FakeAdapter(
+      (_, _) => ResponseBody(Stream.value(Uint8List.fromList([1, 2])), 200),
+    );
+    final opened = await clientWith(adapter).openStream(ApiTier.lbApi, '/sse');
+    expect(await opened.stream.fold<int>(0, (n, chunk) => n + chunk.length), 2);
+    opened.cancel();
+    expect(adapter.hits, hasLength(1));
+  });
+
+  test('a stream 5xx fails over and a 4xx does not', () async {
+    final health = EndpointHealthMonitor();
+    final failing = _FakeAdapter(
+      (call, _) =>
+          ResponseBody(Stream.value(Uint8List(0)), call == 1 ? 503 : 200),
+    );
+    final opened = await monitoredClient(
+      failing,
+      health,
+    ).openStream(ApiTier.lbApi, '/sse');
+    expect(failing.hits, hasLength(2));
+    opened.cancel();
+    expect(
+      health
+          .of(EndpointService.other, ApiTier.lbApi, 'api.lb-tpe1.exptech.dev')!
+          .consecutiveFailures,
+      1,
+    );
+
+    final clientError = _FakeAdapter(
+      (_, _) => ResponseBody(Stream.value(Uint8List(0)), 404),
+    );
+    await expectLater(
+      () => clientWith(clientError).openStream(ApiTier.lbApi, '/sse'),
+      throwsA(isA<DioException>()),
+    );
+    expect(clientError.hits, hasLength(1));
+  });
 }
