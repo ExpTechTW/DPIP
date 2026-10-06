@@ -63,14 +63,13 @@ android {
         versionName = dpipVersionName
 
         // Flutter ≥3.35 auto-sets release abiFilters to its 3 supported
-        // architectures (union with whatever defaultConfig declares), so the
-        // map SDK's libmaplibre.so gets copied for ABI-less engines too. Clear
-        // and pin to arm64-v8a: minSdk 26 means no armv7-era devices, and
-        // x86_64 is emulator-only (debug builds, which keep all ABIs). This
-        // drops the dead libmaplibre.so copies (~18MB uncompressed).
+        // architectures (union with whatever defaultConfig declares).
+        // Keep only ARM64 devices and x86_64 emulators.
+        // armeabi-v7a and x86 are intentionally unsupported.
+        // This also drops unused libmaplibre.so copies (~18MB uncompressed).
         ndk {
             abiFilters.clear()
-            abiFilters.addAll(listOf("arm64-v8a"))
+            abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
         }
     }
 
@@ -86,13 +85,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            // defaultConfig keeps release artifacts arm64-only, but Android
-            // emulators on Intel/AMD hosts need Flutter's x86_64 engine.
-            ndk {
-                abiFilters.add("x86_64")
-            }
-        }
         release {
             signingConfig =
                 if (keystorePropertiesFile.exists()) {
