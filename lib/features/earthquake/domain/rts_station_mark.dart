@@ -36,8 +36,11 @@ enum RtsStationMarkKind {
 /// One station's mark: its [kind], its discrete [level] (0–9), and the value
 /// its dot is coloured by — the continuous reading, or the discrete level for
 /// a station counted into a lit event.
-typedef RtsStationMark =
-    ({RtsStationMarkKind kind, int level, double colorValue});
+typedef RtsStationMark = ({
+  RtsStationMarkKind kind,
+  int level,
+  double colorValue,
+});
 
 /// The mark for [reading], or null when it is not drawn at all.
 ///
@@ -58,10 +61,9 @@ RtsStationMark? rtsStationMark(
       );
     }
     return (
-      kind:
-          eewActive && reading.intensity >= 0.2
-              ? RtsStationMarkKind.grey
-              : RtsStationMarkKind.dot,
+      kind: eewActive && reading.intensity >= 0.2
+          ? RtsStationMarkKind.grey
+          : RtsStationMarkKind.dot,
       level: 0,
       colorValue: 0,
     );
