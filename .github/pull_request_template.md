@@ -6,6 +6,9 @@
   送出之前跑 `tool/commit.sh --push` —— CI 跑的就是同一份，在本機失敗比在 CI
   失敗快得多，而且 `.githooks/pre-push` 本來就會替你跑一次。
 
+  標題與描述的格式見 pr.md：標題用英文 Conventional Commits（type(scope): …），
+  描述用中文詳細紀錄，並引用相關 issue。
+
   **這份描述不會被任何 gate 檢查，也不會進 main。** 被檢查的是分支上每一則
   commit 訊息，進 main 的也是它們 —— 這個 repo 只開放 rebase 合併。所以要寫給
   未來的人看的東西，寫在 commit 訊息裡，不是這裡。

@@ -14,6 +14,7 @@ other files point here, and this file points at them.
 | **[DESIGN.md](DESIGN.md)** | Design tokens, colour, spacing, motion, typography, icons, localization, shared components |
 | **[api.md](api.md)** | API endpoints, the region map, and which tier each one lives on |
 | **[commit.md](commit.md)** | Commit format, in full (中文) |
+| **[pr.md](pr.md)** | Pull request title and description format (中文) |
 | **[README.md](README.md)** | What DPIP is, for people who do not work on it |
 | this file | Toolchain, running, verification, versions |
 
