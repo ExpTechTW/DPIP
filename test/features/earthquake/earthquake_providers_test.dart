@@ -33,6 +33,8 @@ import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
+import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -310,6 +312,11 @@ void main() {
       townDirectory: towns,
       townBoundaries: Future<TownBoundaries>.value(_oneTown()),
       regionStore: regionStore,
+      widgetLocationCatalogCoordinator: WidgetLocationCatalogCoordinator(
+        regionStore,
+        towns,
+        IosWidgetSnapshotWriter(isSupportedPlatform: false),
+      ),
       locationService: location,
       deviceLocationReporter: reporter,
       backgroundLocation: BackgroundLocationService(
