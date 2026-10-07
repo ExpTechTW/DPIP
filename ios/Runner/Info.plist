@@ -41,6 +41,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>MLNIdeographicFontFamilyName</key>
 	<string>PingFang TC</string>
 	<key>NSAppTransportSecurity</key>

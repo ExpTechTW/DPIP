@@ -40,6 +40,10 @@ import UserNotifications
       with: registry.registrar(forPlugin: "BackgroundExecutionPlugin")!)
     WidgetSnapshotPlugin.register(with: registry.registrar(forPlugin: "WidgetSnapshotPlugin")!)
     NativeLogPlugin.register(with: registry.registrar(forPlugin: "NativeLogPlugin")!)
+    #if DEBUG
+    EEWLiveActivityPlugin.register(
+      with: registry.registrar(forPlugin: "EEWLiveActivityPlugin")!)
+    #endif
 
     // Re-post the launch notification the plugins just missed.
     //
