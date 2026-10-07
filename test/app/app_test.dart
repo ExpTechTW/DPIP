@@ -31,6 +31,8 @@ import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
+import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
@@ -154,8 +156,10 @@ void main() {
 SharedDeps _deps(SettingsStore settings) {
   final regions = RegionSelection(settings);
   final mesh = FakeMeshService();
+  const townDirectory = TownDirectory({});
+  final regionStore = RegionStore(settings);
   final location = LocationService(
-    const TownDirectory({}),
+    townDirectory,
     isAvailable: () async => false,
     fix: () async => null,
     lastKnown: () async => null,
@@ -179,9 +183,14 @@ SharedDeps _deps(SettingsStore settings) {
     serverClock: clock,
     realtimeService: RealtimeService(clock, ticker: _Ticker()),
     notificationService: notifications,
-    townDirectory: const TownDirectory({}),
+    townDirectory: townDirectory,
     townBoundaries: Future<TownBoundaries>.value(_boundaries()),
-    regionStore: RegionStore(settings),
+    regionStore: regionStore,
+    widgetLocationCatalogCoordinator: WidgetLocationCatalogCoordinator(
+      regionStore,
+      townDirectory,
+      IosWidgetSnapshotWriter(isSupportedPlatform: false),
+    ),
     locationService: location,
     deviceLocationReporter: reporter,
     backgroundLocation: BackgroundLocationService(
