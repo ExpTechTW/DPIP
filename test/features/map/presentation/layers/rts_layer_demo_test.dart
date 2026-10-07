@@ -470,13 +470,16 @@ void main() {
   // TREM-Lite's station rules (see `rts_station_mark.dart`): an alerting
   // station in a lit event wears its intensity badge; everything else is a
   // dot — and only once an EEW is out are the non-alerting stations left off.
+  // Grey is the narrow band from 0.2 up to, but not including, level 1.
   const eventStations = {
     // Alerting and shaking: always the badge.
     'TWD001': RtsStation(pga: 40, intensity: 4.0, alert: true),
     // Calm and not alerting.
     'TWD002': RtsStation(pga: 0, intensity: 0.3),
-    // Alerting but reading a flat 0.
+    // Alerting but reading a flat 0: a dot, even while an EEW is out.
     'TWD003': RtsStation(pga: 0, intensity: 0.0, alert: true),
+    // Alerting inside the grey band.
+    'TWD004': RtsStation(pga: 1, intensity: 0.3, alert: true),
   };
 
   Future<Map<Object?, Map<String, dynamic>>> drawEvent(List<Eew> alerts) async {
@@ -501,7 +504,7 @@ void main() {
     () async {
       final byLabel = await drawEvent(const []);
 
-      expect(byLabel.keys, hasLength(3), reason: 'no station is left off');
+      expect(byLabel.keys, hasLength(4), reason: 'no station is left off');
       // The badge carries the number — the plain "id\nreading" label is
       // untouched, so the station is never left unidentified.
       expect(byLabel['TWD001\n4.0']!['properties']['icon'], 'circle-4');
@@ -510,11 +513,13 @@ void main() {
       // Alerting at 0 with no EEW: a dot at level 0, not the grey marker.
       expect(byLabel['TWD003\n0.0']!['properties']['grey'], 0);
       expect(byLabel['TWD003\n0.0']!['properties']['icon'], '');
+      expect(byLabel['TWD004\n0.3']!['properties']['grey'], 0);
+      expect(byLabel['TWD004\n0.3']!['properties']['icon'], '');
     },
   );
 
   test(
-    'with an EEW out only alerting stations are drawn, a flat 0 grey',
+    'with an EEW out only alerting stations are drawn, grey from 0.2',
     () async {
       final byLabel = await drawEvent([
         _alert(
@@ -524,7 +529,8 @@ void main() {
 
       expect(byLabel.keys, isNot(contains('TWD002\n0.3')));
       expect(byLabel['TWD001\n4.0']!['properties']['icon'], 'circle-4');
-      expect(byLabel['TWD003\n0.0']!['properties']['grey'], 1);
+      expect(byLabel['TWD003\n0.0']!['properties']['grey'], 0);
+      expect(byLabel['TWD004\n0.3']!['properties']['grey'], 1);
     },
   );
 
