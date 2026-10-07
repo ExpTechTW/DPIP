@@ -108,6 +108,13 @@
 		EBD0CEACA5C57FA4948682B7 /* CurrentWeatherWidgetSnapshotWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B840E208BA7F71D7AA787CD /* CurrentWeatherWidgetSnapshotWriter.swift */; };
 		EFC526F4C8EFA7517C766E95 /* ForecastWidgetSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238235236BC1A9B17B75A67C /* ForecastWidgetSelection.swift */; };
 		F3BC5F2663935A0CF6DCB4A4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D70E5CCEA46A49349D6E800 /* Foundation.framework */; };
+		EEA100000000000000000001 /* Shared/EEWActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA100000000000000000003 /* Shared/EEWActivityAttributes.swift */; };
+		EEA100000000000000000002 /* Shared/EEWActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA100000000000000000003 /* Shared/EEWActivityAttributes.swift */; };
+		EEA100000000000000000004 /* EEWLiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA100000000000000000005 /* EEWLiveActivityManager.swift */; };
+		EEA100000000000000000006 /* EEWLiveActivityPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA100000000000000000007 /* EEWLiveActivityPlugin.swift */; };
+		EEA200000000000000000001 /* Shared/EEWPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA200000000000000000003 /* Shared/EEWPresentation.swift */; };
+		EEA200000000000000000002 /* Shared/EEWPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA200000000000000000003 /* Shared/EEWPresentation.swift */; };
+		EEA200000000000000000004 /* EEWPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA200000000000000000005 /* EEWPresentationTests.swift */; };
 		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */; };
 		F56D5186166227E46D96919D /* info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* info.aiff */; };
@@ -303,6 +310,11 @@
 		E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000002 /* ForecastWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastWidgetTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetHTTPTimeSourceTests.swift; sourceTree = "<group>"; };
+		EEA100000000000000000003 /* Shared/EEWActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/EEWActivityAttributes.swift; sourceTree = "<group>"; };
+		EEA100000000000000000005 /* EEWLiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EEWLiveActivityManager.swift; sourceTree = "<group>"; };
+		EEA100000000000000000007 /* EEWLiveActivityPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EEWLiveActivityPlugin.swift; sourceTree = "<group>"; };
+		EEA200000000000000000003 /* Shared/EEWPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/EEWPresentation.swift; sourceTree = "<group>"; };
+		EEA200000000000000000005 /* EEWPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EEWPresentationTests.swift; sourceTree = "<group>"; };
 		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
 		F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTownshipResolverTests.swift; sourceTree = "<group>"; };
 		F715E0DC85C56822D8A35131 /* SavedCurrentWeatherWidgetRefreshService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SavedCurrentWeatherWidgetRefreshService.swift; path = DPIPWidgets/SavedCurrentWeatherWidgetRefreshService.swift; sourceTree = "<group>"; };
@@ -345,6 +357,8 @@
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
+				EEWActivityAttributes.swift,
+				EEWPresentation.swift,
 				ForecastSnapshotLocation.swift,
 				NativeLog.swift,
 				WidgetLocationCatalog.swift,
@@ -431,6 +445,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotStorage.swift,
+				EEWActivityAttributes.swift,
+				EEWPresentation.swift,
 			);
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 		};
@@ -591,6 +607,7 @@
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				EEA200000000000000000005 /* EEWPresentationTests.swift */,
 				28A000000000000000000001 /* WidgetSNTPClientTests.swift */,
 				28A000000000000000000002 /* WidgetServerClockTests.swift */,
 				4F1000000000000000000001 /* WidgetCurrentLocationClientTests.swift */,
@@ -634,6 +651,8 @@
 			isa = PBXGroup;
 			children = (
 				270FCE9B305CD066003D1E62 /* Shared */,
+				EEA100000000000000000003 /* Shared/EEWActivityAttributes.swift */,
+				EEA200000000000000000003 /* Shared/EEWPresentation.swift */,
 				272EFB373057247600B78F5D /* DPIPWidgetsExtension.entitlements */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
@@ -679,6 +698,8 @@
 				AA0000000000000000000E01 /* ScreenWakePlugin.swift */,
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
+				EEA100000000000000000005 /* EEWLiveActivityManager.swift */,
+				EEA100000000000000000007 /* EEWLiveActivityPlugin.swift */,
 				AA0000000000000000000D01 /* DeviceInfoPlugin.swift */,
 				NL0G00000000000000000001 /* NativeLogPlugin.swift */,
 				IMSV00000000000000000001 /* ImageSaverPlugin.swift */,
@@ -1107,6 +1128,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEA100000000000000000002 /* Shared/EEWActivityAttributes.swift in Sources */,
+				EEA200000000000000000002 /* Shared/EEWPresentation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1129,6 +1152,7 @@
 				4F4000000000000000000002 /* WidgetRefreshTestSupport.swift in Sources */,
 				4F5000000000000000000002 /* CurrentWeatherWidgetTestFixtures.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
+				EEA200000000000000000004 /* EEWPresentationTests.swift in Sources */,
 				D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */,
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
 				27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */,
@@ -1206,6 +1230,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEA100000000000000000001 /* Shared/EEWActivityAttributes.swift in Sources */,
+				EEA200000000000000000001 /* Shared/EEWPresentation.swift in Sources */,
+				EEA100000000000000000004 /* EEWLiveActivityManager.swift in Sources */,
+				EEA100000000000000000006 /* EEWLiveActivityPlugin.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				AA0000000000000000000C02 /* CompassPlugin.swift in Sources */,
 				ACCE10000000000000000002 /* AccelerometerPlugin.swift in Sources */,
