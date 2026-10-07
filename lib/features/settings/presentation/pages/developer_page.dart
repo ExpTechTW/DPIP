@@ -16,6 +16,7 @@ import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/eew_live_activity.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
@@ -54,6 +55,10 @@ class _DeveloperPageState extends State<DeveloperPage> {
   List<TableStat>? _tables;
   bool _clearing = false;
   bool _clearingTrack = false;
+  final EewLiveActivity _eewLiveActivity = const EewLiveActivity();
+  EewLiveActivityStatus? _eewStatus;
+  bool _eewBusy = false;
+  String? _eewError;
 
   /// Version-row taps toward the experimental unlock. Deliberately not
   /// persisted — a fresh app start re-arms the easter egg.
@@ -85,6 +90,43 @@ class _DeveloperPageState extends State<DeveloperPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    if (kDebugMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refreshEewStatus());
+    }
+  }
+
+  Future<void> _refreshEewStatus() async {
+    try {
+      final status = await _eewLiveActivity.getStatus();
+      if (!mounted) return;
+      setState(() {
+        _eewStatus = status;
+        _eewError = null;
+      });
+    } on PlatformException catch (error) {
+      if (!mounted) return;
+      setState(() => _eewError = error.message ?? error.code);
+    }
+  }
+
+  Future<void> _runEewMock(
+    Future<EewLiveActivityStatus> Function() action,
+  ) async {
+    if (_eewBusy) return;
+    setState(() {
+      _eewBusy = true;
+      _eewError = null;
+    });
+    try {
+      final status = await action();
+      if (!mounted) return;
+      setState(() => _eewStatus = status);
+    } on PlatformException catch (error) {
+      if (!mounted) return;
+      setState(() => _eewError = error.message ?? error.code);
+    } finally {
+      if (mounted) setState(() => _eewBusy = false);
+    }
   }
 
   /// Empties the cache **and** the accounting that describes it.
@@ -305,6 +347,99 @@ class _DeveloperPageState extends State<DeveloperPage> {
           : ListView(
               padding: const EdgeInsets.only(bottom: AppSpacing.xl),
               children: [
+                if (kDebugMode) ...[
+                  // l10n-ignore: developer-only mock controls, deliberately untranslated
+                  const SectionHeader('EEW Live Activity · TEST / 測試'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
+                    child: Text(
+                      _eewError ??
+                          (_eewStatus == null
+                              ? 'Checking Live Activity support…'
+                              : !_eewStatus!.supported
+                              ? 'Unavailable (requires iOS 16.1+)'
+                              : !_eewStatus!.enabled
+                              ? 'Disabled in iOS settings'
+                              : _eewStatus!.active
+                              ? 'Mock active · report ${_eewStatus!.reportNo}'
+                                    '${_eewStatus!.waveArrived ? ' · wave arrived' : ''}'
+                              : 'Ready for a local mock'),
+                    ),
+                  ),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.xs,
+                    children: [
+                      OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.enabled != true ||
+                                _eewStatus?.active == true
+                            ? null
+                            : () => _runEewMock(_eewLiveActivity.mockStart),
+                        child: const Text('Start Mock EEW'),
+                      ),
+                      OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.enabled != true ||
+                                _eewStatus?.active == true
+                            ? null
+                            : () => _runEewMock(
+                                _eewLiveActivity.mockStartGeneric,
+                              ),
+                        child: const Text('Start Generic Mock EEW'),
+                      ),
+                      OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.active != true ||
+                                _eewStatus?.generic == true ||
+                                _eewStatus?.waveArrived == true
+                            ? null
+                            : () => _runEewMock(
+                                () => _eewLiveActivity.mockUpdate(2),
+                              ),
+                        child: const Text('Update → Report 2'),
+                      ),
+                      OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.active != true ||
+                                _eewStatus?.generic == true ||
+                                _eewStatus?.waveArrived == true
+                            ? null
+                            : () => _runEewMock(
+                                () => _eewLiveActivity.mockUpdate(4),
+                              ),
+                        child: const Text('Update → Report 4'),
+                      ),
+                      OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.active != true ||
+                                _eewStatus?.generic == true ||
+                                _eewStatus?.waveArrived == true
+                            ? null
+                            : () =>
+                                  _runEewMock(_eewLiveActivity.mockWaveArrived),
+                        child: const Text('Mark Wave Arrived'),
+                      ),
+                      OutlinedButton(
+                        onPressed: _eewBusy || _eewStatus?.active != true
+                            ? null
+                            : () => _runEewMock(_eewLiveActivity.mockEnd),
+                        child: const Text('End Activity'),
+                      ),
+                      TextButton(
+                        onPressed: _eewBusy ? null : _refreshEewStatus,
+                        child: const Text('Refresh status'),
+                      ),
+                    ],
+                  ),
+                ],
                 for (var i = 0; i < sections.length; i++) ...[
                   SectionHeader(sections[i].title),
                   for (final field in sections[i].fields)
