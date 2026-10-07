@@ -19,7 +19,7 @@ RtsStationMark? _mark(
 void main() {
   const calm = RtsStation(intensity: 0.4);
   const shaking = RtsStation(intensity: 4.6, alert: true);
-  const alertingZero = RtsStation(intensity: 0.2, alert: true);
+  const alertingThreshold = RtsStation(intensity: 0.2, alert: true);
 
   test('without an EEW every station is drawn, calm ones by their reading', () {
     for (final lit in [false, true]) {
@@ -47,15 +47,27 @@ void main() {
     }
   });
 
-  test('an alerting station reading 0 is grey only while an EEW is out', () {
-    final quiet = _mark(alertingZero, eventLit: true);
-    expect(quiet?.kind, RtsStationMarkKind.dot);
-    expect(quiet?.colorValue, 0);
-
+  test('only an EEW reading at least 0.2 becomes a grey dot', () {
     expect(
-      _mark(alertingZero, eventLit: true, eewActive: true)?.kind,
+      _mark(alertingThreshold, eventLit: true)?.kind,
+      RtsStationMarkKind.dot,
+    );
+    expect(
+      _mark(alertingThreshold, eventLit: true, eewActive: true)?.kind,
       RtsStationMarkKind.grey,
     );
+
+    for (final intensity in [0.19, 0.0, -0.1]) {
+      expect(
+        _mark(
+          RtsStation(intensity: intensity, alert: true),
+          eventLit: true,
+          eewActive: true,
+        )?.kind,
+        RtsStationMarkKind.dot,
+        reason: 'intensity: $intensity',
+      );
+    }
   });
 
   test('an alerting station outside any lit box is an ordinary dot', () {

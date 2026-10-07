@@ -8,7 +8,8 @@
 /// | station                          | no EEW            | EEW out           |
 /// |----------------------------------|-------------------|-------------------|
 /// | alerting, box lit, level > 0     | intensity badge   | intensity badge   |
-/// | alerting, box lit, level 0       | dot at level 0    | grey dot          |
+/// | alerting, box lit, 0.2 ≤ i < 0.5 | dot at level 0    | grey dot          |
+/// | alerting, box lit, i < 0.2       | dot at level 0    | dot at level 0     |
 /// | anything else                    | dot at its `i`    | not drawn         |
 ///
 /// Without an EEW nothing is hidden: the whole network stays on the map, so a
@@ -27,18 +28,16 @@ enum RtsStationMarkKind {
   /// The discrete-intensity badge for [RtsStationMark.level].
   badge,
 
-  /// A grey dot: an alerting station that reads 0 while an EEW is out.
+  /// A grey dot: an alerting station in a lit event with an active EEW and
+  /// intensity at least 0.2 but below discrete level 1.
   grey,
 }
 
 /// One station's mark: its [kind], its discrete [level] (0–9), and the value
 /// its dot is coloured by — the continuous reading, or the discrete level for
 /// a station counted into a lit event.
-typedef RtsStationMark = ({
-  RtsStationMarkKind kind,
-  int level,
-  double colorValue,
-});
+typedef RtsStationMark =
+    ({RtsStationMarkKind kind, int level, double colorValue});
 
 /// The mark for [reading], or null when it is not drawn at all.
 ///
@@ -59,7 +58,10 @@ RtsStationMark? rtsStationMark(
       );
     }
     return (
-      kind: eewActive ? RtsStationMarkKind.grey : RtsStationMarkKind.dot,
+      kind:
+          eewActive && reading.intensity >= 0.2
+              ? RtsStationMarkKind.grey
+              : RtsStationMarkKind.dot,
       level: 0,
       colorValue: 0,
     );
