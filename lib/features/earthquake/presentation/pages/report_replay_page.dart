@@ -63,7 +63,7 @@ import 'package:dpip/shared/map/map_style.dart'
     show MapColors, countyFillLayerId, townFillLayerId, townLabelLayerId;
 import 'package:dpip/shared/map/monitor_map_stack.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
-import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/intensity_ranking_card.dart';
@@ -297,42 +297,55 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FrostedSurface(
-                        borderRadius: AppRadius.large,
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () => context.pop(),
-                        ),
+                      // Back and legend share one row, and both are the
+                      // shared [MapChipButton] so the whole top edge — back,
+                      // legend, and the base-map chip on the right — is one
+                      // height. A bare [IconButton] back was the tallest thing
+                      // on screen (its padded tap target is 48px) and read as
+                      // a different app's control sitting next to ours.
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MapChipButton(
+                            icon: Icons.arrow_back,
+                            tooltip: MaterialLocalizations.of(context)
+                                .backButtonTooltip,
+                            active: false,
+                            onTap: () => context.pop(),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          // The replay surface is the 強震監視器 frozen in time —
+                          // the same intensity legend the live monitor carries,
+                          // switching to the EEW felt-scale while an alert is up
+                          // (the legacy monitor did exactly this on active EEW).
+                          //
+                          // Collapsible, and collapsed to a chip to start with,
+                          // exactly as [MapScaffold] mounts every layer's legend:
+                          // this page is a full-screen map too, and an
+                          // eleven-row scale pinned open covers the north-west
+                          // corner of the island for the whole replay. The wrap
+                          // sits *outside* the mode swap on purpose — an alert
+                          // arriving mid-replay changes the scale being shown,
+                          // not whether the user asked to see it.
+                          CollapsibleMapLegend(
+                            legend: ListenableBuilder(
+                              listenable: _session.eew,
+                              builder: (context, _) {
+                                final hasEew = _session.eew.alerts.isNotEmpty;
+                                return MapLegendCard(
+                                  child: IntensityLegend(
+                                    mode: hasEew
+                                        ? IntensityLegendMode.eew
+                                        : IntensityLegendMode.rts,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      // The replay surface is the 強震監視器 frozen in time —
-                      // the same intensity legend the live monitor carries,
-                      // switching to the EEW felt-scale while an alert is up
-                      // (the legacy monitor did exactly this on active EEW).
-                      //
-                      // Collapsible, and collapsed to a chip to start with,
-                      // exactly as [MapScaffold] mounts every layer's legend:
-                      // this page is a full-screen map too, and an eleven-row
-                      // scale pinned open covers the north-west corner of the
-                      // island for the whole replay. The wrap sits *outside*
-                      // the mode swap on purpose — an alert arriving mid-replay
-                      // changes the scale being shown, not whether the user
-                      // asked to see it.
-                      CollapsibleMapLegend(
-                        legend: ListenableBuilder(
-                          listenable: _session.eew,
-                          builder: (context, _) {
-                            final hasEew = _session.eew.alerts.isNotEmpty;
-                            return MapLegendCard(
-                              child: IntensityLegend(
-                                mode: hasEew
-                                    ? IntensityLegendMode.eew
-                                    : IntensityLegendMode.rts,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
                       ListenableBuilder(
                         listenable: _session.rts,
                         builder: (context, _) {
