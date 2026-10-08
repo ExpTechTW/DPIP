@@ -145,8 +145,11 @@ void main() {
 
   test('the RTS demo shakes the refreshed directory', () {
     fakeAsync((async) {
+      // Keep frame timestamps in the same time domain as the periodic timer.
+      final start = DateTime.utc(2026, 10, 8);
       final source = DemoRtsSource(
         stations: _Stations(refreshDirectory: const Ok({'A': _station})),
+        clock: async.getClock(start).now,
       );
       async.elapse(Duration.zero);
 
@@ -154,6 +157,7 @@ void main() {
       source.fetch().then((result) => frame = result.valueOrNull!);
       async.elapse(Duration.zero);
       expect(frame.stations, contains('A'));
+      expect(frame.time, start.millisecondsSinceEpoch);
       expect(source.timestampOf(frame), isNull);
 
       async.elapse(const Duration(seconds: 1));
@@ -161,6 +165,7 @@ void main() {
       source.fetch().then((result) => later = result.valueOrNull!);
       async.elapse(Duration.zero);
       expect(later.time, isNot(frame.time));
+      expect(later.time - frame.time, 1000);
       source.dispose();
     });
   });
