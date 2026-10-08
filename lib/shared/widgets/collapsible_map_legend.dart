@@ -7,6 +7,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/material.dart';
 
 /// Wraps a layer's [legend] body. Remount with a new [Key] (e.g. layer id) to
@@ -46,6 +47,12 @@ class _CollapsibleMapLegendState extends State<CollapsibleMapLegend> {
 }
 
 /// Compact frosted control that reveals the legend.
+///
+/// Literally the shared [MapChipButton]: on the replay page this chip sits in
+/// the same top row as that page's back button and the base-map chip, and a
+/// legend of its own chrome was 4px shorter than the chips beside it — a
+/// difference small enough to look like a mistake rather than a choice. One
+/// widget means the row cannot drift apart again.
 class _Chip extends StatelessWidget {
   const _Chip({required this.tooltip, required this.onTap});
 
@@ -54,43 +61,12 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Tooltip(
-      message: tooltip,
-      child: FrostedSurface(
-        borderRadius: AppRadius.small,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: AppRadius.small,
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.legend_toggle,
-                    size: 18,
-                    color: colors.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    tooltip,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+    return MapChipButton(
+      icon: Icons.legend_toggle,
+      label: tooltip,
+      tooltip: tooltip,
+      active: false,
+      onTap: onTap,
     );
   }
 }
