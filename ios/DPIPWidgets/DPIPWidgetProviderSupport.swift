@@ -1,15 +1,20 @@
 import Foundation
 #if DEBUG
-import OSLog
 
 enum WidgetWeatherRefreshDiagnostics {
-    private static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier ?? "com.exptech.dpip",
-        category: "WidgetWeatherRefresh"
-    )
-
+    /// The widget process exits before the in-app log is opened. This buffer
+    /// is what that launch imports.
     static func log(_ message: String) {
-        logger.debug("\(message, privacy: .public)")
+        // This file is also compiled into the test host. Skip the app-group
+        // write there; a real widget refresh does not carry that environment.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+            return
+        }
+        FileNativeLog.appGroup()?.record(
+            level: .debug,
+            tag: "WidgetWeatherRefresh",
+            message: message
+        )
     }
 
     static func targetIdentifier(_ target: WidgetLocationTarget) -> String {

@@ -41,6 +41,8 @@
 		A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */; };
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
+		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
+		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
 		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
 		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
@@ -161,6 +163,8 @@
 		A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/rain.aiff; sourceTree = "<group>"; };
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
+		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
+		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
@@ -191,6 +195,7 @@
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
 				WidgetLocationCatalog.swift,
+				NativeLog.swift,
 			);
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 		};
@@ -199,6 +204,7 @@
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
+				NativeLog.swift,
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 		};
@@ -208,6 +214,7 @@
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
 				WidgetLocationCatalog.swift,
+				NativeLog.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
@@ -350,6 +357,7 @@
 				D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */,
 				27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */,
 				27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */,
+				NL0G00000000000000000003 /* NativeLogTests.swift */,
 				270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */,
 				270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */,
 				E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */,
@@ -415,6 +423,7 @@
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
 				AA0000000000000000000D01 /* DeviceInfoPlugin.swift */,
+				NL0G00000000000000000001 /* NativeLogPlugin.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */,
@@ -695,6 +704,7 @@
 				D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */,
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
 				27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */,
+				NL0G00000000000000000004 /* NativeLogTests.swift in Sources */,
 				270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */,
 				27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */,
 				D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */,
@@ -716,6 +726,7 @@
 				AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */,
 				AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */,
 				AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */,
+				NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */,

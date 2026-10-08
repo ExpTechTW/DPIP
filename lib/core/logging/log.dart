@@ -193,6 +193,27 @@ abstract final class Log {
   static void error(String message, [Object? error, StackTrace? stackTrace]) =>
       talker.error(message, error, stackTrace);
 
+  /// Writes [message] at [time], the instant the event happened.
+  ///
+  /// Native background and widget code capture that instant on their own
+  /// clock and hand it over when the app opens. [level] is a [LogLevel]
+  /// name; a name this process does not know is recorded as `info`, matching
+  /// a stored line whose level cannot be read back.
+  static void at({
+    required DateTime time,
+    required String level,
+    required String message,
+  }) {
+    final logLevel = LogLevel.values.firstWhere(
+      (candidate) => candidate.name == level,
+      orElse: () => LogLevel.info,
+    );
+    final key = TalkerKey.fromLogLevel(logLevel);
+    talker.logCustom(
+      TalkerLog(message, time: time, key: key, logLevel: logLevel),
+    );
+  }
+
   /// Records a caught exception (without a message) and forwards it to the
   /// [crashSink], if one is set, as a non-fatal report.
   static void handle(Object error, [StackTrace? stackTrace, String? message]) {
