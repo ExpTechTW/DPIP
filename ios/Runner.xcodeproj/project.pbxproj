@@ -229,7 +229,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WeatherWidgetConfiguration.intentdefinition,
-				WeatherWidgetConfiguration.intentdefinition.xcstrings,
+				WeatherWidgetConfiguration.xcstrings,
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 		};
@@ -244,7 +244,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WeatherWidgetConfiguration.intentdefinition,
-				WeatherWidgetConfiguration.intentdefinition.xcstrings,
+				WeatherWidgetConfiguration.xcstrings,
 			);
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 		};
