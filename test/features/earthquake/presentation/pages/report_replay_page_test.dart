@@ -598,16 +598,19 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       expect(find.text('花蓮縣'), findsNothing);
 
+      // Settle, never a bare pump: the menu opens on an animation, so one
+      // frame leaves every row mid-flight and a tap lands wherever it was
+      // passing.
       await tester.tap(find.byTooltip('Township names'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Detailed map'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Terrain relief'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Township names'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Township names'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       platform.lookEast();
       await tester.pump();
