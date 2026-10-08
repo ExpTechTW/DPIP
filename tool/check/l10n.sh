@@ -264,10 +264,19 @@ PY
   fi
 fi
 
+# Native SiriKit metadata is independent of Flutter ARBs. Validate its matching
+# string table, referenced IDs, project locales and placeholders on Linux too.
+if intent_violations=$(python3 tool/check/intent_localization.py); then
+  :
+else
+  report "Native Intent localization failed:"
+  printf '%s\n' "$intent_violations"
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo ""
   echo "Localization violations found — see DESIGN.md → Localization."
   exit 1
 fi
 
-echo "l10n OK — ARB locales in parity; no hardcoded UI strings."
+echo "l10n OK — ARB locales in parity; no hardcoded UI strings; native Intent tables valid."
