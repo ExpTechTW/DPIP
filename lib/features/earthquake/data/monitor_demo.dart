@@ -242,12 +242,14 @@ class DemoEewSource extends RealtimeSource<List<Eew>> {
 /// stations near the epicentre alert — which is what lights the detection
 /// boxes on the monitor, exactly as a real frame's alerting stations do.
 class DemoRtsSource extends RealtimeSource<Rts> {
-  DemoRtsSource({required this.stations}) {
+  DemoRtsSource({required this.stations, DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now {
     _tick = Timer.periodic(const Duration(seconds: 1), (_) => _update());
     _init();
   }
 
   final TremStationRepository stations;
+  final DateTime Function() _clock;
 
   Timer? _tick;
   bool _ready = false;
@@ -266,7 +268,7 @@ class DemoRtsSource extends RealtimeSource<Rts> {
 
   void _update() {
     if (!_ready) return;
-    final now = DateTime.now().toUtc().millisecondsSinceEpoch;
+    final now = _clock().toUtc().millisecondsSinceEpoch;
 
     final stations = <String, RtsStation>{};
     _directory.forEach((id, station) {
