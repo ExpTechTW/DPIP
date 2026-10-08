@@ -29,6 +29,7 @@ import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
+import 'package:dpip/features/tsunami/domain/tsunami_repository.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
@@ -102,6 +103,8 @@ class _DisasterRepo extends _Silent implements DisasterMapRepository {
   @override
   void cancelTilePrefetch() {}
 }
+
+class _TsunamiRepo extends _Silent implements TsunamiRepository {}
 
 class _TremRepo extends _Silent implements TremStationRepository {}
 
@@ -223,6 +226,7 @@ void main() {
           Provider<MeteorRainRepository>.value(value: _RainRepo()),
           Provider<MeteorTyphoonRepository>.value(value: _TyphoonRepo()),
           Provider<DisasterMapRepository>.value(value: _DisasterRepo()),
+          Provider<TsunamiRepository>.value(value: _TsunamiRepo()),
           Provider<TremStationRepository>.value(value: _TremRepo()),
           ChangeNotifierProvider<RealtimeNotifier<Rts>>.value(value: rts),
           ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>.value(value: eew),
@@ -301,6 +305,7 @@ void main() {
         'rain',
         'dpm',
         'meshtastic',
+        'tsunami',
       },
     );
     expect(find.text(l10n.mapLayerRadar), findsWidgets);
