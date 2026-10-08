@@ -10,6 +10,7 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/logging/native_log_import.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
@@ -224,6 +225,9 @@ Future<void> bootstrap() async {
   // the in-memory history used to lose.
   final logStore = durable == null ? null : LogStore(durable);
   if (logStore != null) Log.persistTo(logStore);
+  // Widget and background code can log while this isolate does not exist.
+  // The handoff clears the native file only after that read succeeds.
+  unawaited(importNativeLogs());
   final regions = RegionSelection(settings);
   final experimental = ExperimentalSettings(settings);
   final locale = LocaleController(settings);

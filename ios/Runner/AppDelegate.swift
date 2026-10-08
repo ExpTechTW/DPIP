@@ -39,6 +39,7 @@ import UserNotifications
     BackgroundExecutionPlugin.register(
       with: registry.registrar(forPlugin: "BackgroundExecutionPlugin")!)
     WidgetSnapshotPlugin.register(with: registry.registrar(forPlugin: "WidgetSnapshotPlugin")!)
+    NativeLogPlugin.register(with: registry.registrar(forPlugin: "NativeLogPlugin")!)
 
     // Re-post the launch notification the plugins just missed.
     //
