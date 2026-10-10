@@ -28,6 +28,14 @@ abstract class Rts with _$Rts {
   factory Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 }
 
+/// Whether two frames are the same — what a feed's `sameData` asks once a
+/// second. `==` alone compares every station before the timestamp, a pass
+/// over the whole map that allocates an entry per station, for frames that
+/// almost always differ in `ts` anyway. The timestamp goes first: same answer,
+/// and the deep comparison runs only for two frames stamped the same instant.
+bool sameRtsFrame(Rts? a, Rts? b) =>
+    identical(a, b) || (a != null && b != null && a.time == b.time && a == b);
+
 /// One station's reading in a frame, keyed in [Rts.stations] by its hex
 /// device id: the continuous JMA [intensity] (wire `i`; negative while calm,
 /// `-3` with no signal), the peak ground acceleration [pga] in gal, and
