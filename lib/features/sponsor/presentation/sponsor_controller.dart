@@ -26,6 +26,7 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
   final SponsorRepository _repository;
   StreamSubscription<SponsorPurchase>? _sub;
   Timer? _purchaseWatchdog;
+  bool _didRestoreSubscriptions = false;
 
   SponsorStatus status = SponsorStatus.loading;
   List<SponsorProduct> subscriptions = const [];
@@ -57,6 +58,24 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
       err: (_) => status = SponsorStatus.error,
     );
     notifyListeners();
+
+    // Ask the store for active subscriptions once after the catalogue is known.
+    // Restored updates then replace their price buttons with owned checkmarks.
+    if (status == SponsorStatus.ready &&
+        subscriptions.isNotEmpty &&
+        !_didRestoreSubscriptions) {
+      _didRestoreSubscriptions = true;
+      try {
+        await _repository.restore();
+      } catch (error) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            context: ErrorDescription('restore sponsor subscriptions'),
+          ),
+        );
+      }
+    }
   }
 
   /// Starts buying [product]; the purchase stream drives the rest.
