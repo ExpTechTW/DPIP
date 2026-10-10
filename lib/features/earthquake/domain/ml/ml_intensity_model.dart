@@ -57,11 +57,33 @@ final class _EpicenterTrig {
 
 /// Writes the feature row for an epicentre and a target point into [rows] at
 /// [at]: worked out in f64, then rounded to f32 by the list.
-///
+void mlFeatures(
+  Float32List rows,
+  int at, {
+  required double magnitude,
+  required double depth,
+  required double evLat,
+  required double evLon,
+  required double targetLat,
+  required double targetLon,
+}) {
+  _mlFeatures(
+    rows,
+    at,
+    magnitude: magnitude,
+    depth: depth,
+    evLat: evLat,
+    evLon: evLon,
+    targetLat: targetLat,
+    targetLon: targetLon,
+  );
+}
+
 /// [epicenter], when the caller is scoring many targets of one quake, is the
 /// epicentre trig already evaluated for that quake. Omitting it computes the
-/// same values inline, so a single call is unchanged.
-void mlFeatures(
+/// same values inline, so a single call is unchanged. The type stays private:
+/// a public signature cannot name it.
+void _mlFeatures(
   Float32List rows,
   int at, {
   required double magnitude,
@@ -199,7 +221,7 @@ class MlPointPredictor {
       depthSquared: depth * depth,
     );
     for (var i = 0; i < n; i++) {
-      mlFeatures(
+      _mlFeatures(
         _rows,
         i * mlFeatureCount,
         magnitude: magnitude,
