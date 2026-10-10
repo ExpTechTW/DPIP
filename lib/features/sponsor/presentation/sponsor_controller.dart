@@ -35,14 +35,35 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
   /// The product whose purchase is currently in flight, if any.
   String? purchasingId;
 
-  /// Subscriptions owned this session (a fresh or restored purchase).
+  /// Subscriptions bought in this page session.
   ///
-  /// One-time tips are consumables, so completing one must not make its product
-  /// unavailable for the rest of the page session.
+  /// A purchase that just completed is certainly running, so this is the only
+  /// state allowed to refuse a second buy. One-time tips never land here: they
+  /// are consumables, and completing one must not make it unavailable for the
+  /// rest of the session.
   final Set<String> purchasedIds = {};
+
+  /// Subscriptions the store replayed through a restore.
+  ///
+  /// Kept apart from [purchasedIds] because a restore does not say a
+  /// subscription is still running: StoreKit 1 hands back the whole transaction
+  /// history, expired auto-renewals included. So a restored id marks its row as
+  /// owned but must never block buying — treating it as current would leave a
+  /// lapsed supporter looking at a checkmark with no way to subscribe again.
+  final Set<String> restoredIds = {};
 
   /// Whether any purchase is mid-flight — the whole grid disables while one is.
   bool get isBusy => purchasingId != null;
+
+  /// Whether [product]'s row reads as owned: a check instead of a price.
+  bool isOwned(SponsorProduct product) =>
+      product.isSubscription &&
+      (purchasedIds.contains(product.id) || restoredIds.contains(product.id));
+
+  /// Whether buying [product] must be refused. Only a subscription bought in
+  /// this session counts — see [restoredIds] for why a restored one does not.
+  bool isBuyBlocked(SponsorProduct product) =>
+      product.isSubscription && purchasedIds.contains(product.id);
 
   /// (Re)loads the catalogue from the store.
   Future<void> load() async {
@@ -59,15 +80,21 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
     );
     notifyListeners();
 
-    // Ask the store for active subscriptions once after the catalogue is known.
-    // Restored updates then replace their price buttons with owned checkmarks.
+    // Ask the store for past subscriptions once after the catalogue is known;
+    // restored updates then mark their rows as owned.
     if (status == SponsorStatus.ready &&
         subscriptions.isNotEmpty &&
         !_didRestoreSubscriptions) {
+      // Latched before the await so a reload cannot fire a second restore
+      // alongside this one, and released again when the attempt fails: a store
+      // that was unreachable on the first load must still be asked on a retry,
+      // or the page spends the rest of its life never knowing about a
+      // subscription.
       _didRestoreSubscriptions = true;
       try {
-        await _repository.restore();
+        if (!await _repository.restore()) _didRestoreSubscriptions = false;
       } catch (error) {
+        _didRestoreSubscriptions = false;
         FlutterError.reportError(
           FlutterErrorDetails(
             exception: error,
@@ -80,10 +107,7 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Starts buying [product]; the purchase stream drives the rest.
   Future<void> buy(SponsorProduct product) async {
-    if (isBusy ||
-        (product.isSubscription && purchasedIds.contains(product.id))) {
-      return;
-    }
+    if (isBusy || isBuyBlocked(product)) return;
     purchasingId = product.id;
     notifyListeners();
     try {
@@ -136,11 +160,11 @@ class SponsorController extends ChangeNotifier with WidgetsBindingObserver {
 
   void _onPurchase(SponsorPurchase purchase) {
     var notified = false;
-    final isSubscription = subscriptions.any(
-      (product) => product.id == purchase.productId,
-    );
-    if (purchase.isSuccess && isSubscription) {
-      purchasedIds.add(purchase.productId);
+    if (purchase.isSuccess && purchase.isSubscription) {
+      final owned = purchase.status == SponsorPurchaseStatus.restored
+          ? restoredIds
+          : purchasedIds;
+      owned.add(purchase.productId);
     }
     // Clear the in-flight marker once this product settles (success, error, or
     // cancel) — a still-pending update keeps it busy.

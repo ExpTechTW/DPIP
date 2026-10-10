@@ -459,6 +459,23 @@ void main() {
     expect(iap.completed, isEmpty);
   });
 
+  test('a purchase update classifies itself from the product id, so an update '
+      'that arrives before any catalogue load is still typed', () async {
+    final iap = _FakeIAP();
+    final repo = InAppPurchaseSponsorRepository(iap);
+    final events = <SponsorPurchase>[];
+    repo.purchases().listen(events.add);
+
+    // No products() call, so nothing is staged in the repository's details map.
+    iap.emit([
+      _purchase(productID: 's_donation75', status: PurchaseStatus.restored),
+      _purchase(productID: 'donation100', status: PurchaseStatus.purchased),
+    ]);
+    await _settle();
+
+    expect(events.map((e) => e.isSubscription).toList(), [true, false]);
+  });
+
   test(
     'every store status maps to its own domain status, one to one',
     () async {

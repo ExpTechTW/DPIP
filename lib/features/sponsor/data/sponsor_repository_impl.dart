@@ -104,10 +104,17 @@ class InAppPurchaseSponsorRepository implements SponsorRepository {
         SponsorPurchase(
           productId: purchase.productID,
           status: _mapStatus(purchase.status),
+          isSubscription: _isSubscriptionId(purchase.productID),
         ),
       );
     }
   }
+
+  /// Whether a store product id is a subscription, by the `s_` prefix
+  /// [_catalogIds] is written to. The id is the only thing available when a
+  /// purchase update arrives — the store can deliver one before, or without,
+  /// a [products] call — so the prefix classifies both a product and an update.
+  bool _isSubscriptionId(String id) => id.startsWith('s_');
 
   /// Trims a store title's trailing app-name suffix, e.g. `Monthly (DPIP)`.
   SponsorProduct _toDomain(ProductDetails p) {
@@ -119,7 +126,7 @@ class InAppPurchaseSponsorRepository implements SponsorRepository {
       description: p.description,
       price: p.price,
       rawPrice: p.rawPrice,
-      isSubscription: p.id.startsWith('s_'),
+      isSubscription: _isSubscriptionId(p.id),
     );
   }
 
