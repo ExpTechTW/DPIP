@@ -180,8 +180,20 @@ feed that is `stale`/`offline` must never be presented as current.
 
 the `ServerClock` corrects device time via real **SNTP**
 (`ntp_time_source.dart` → `flutter_ntp`, UDP/123, `time.exptech.com.tw` primary
-/ `time.apple.com` backup — not an HTTP endpoint), anchored to a monotonic
-clock so a device-clock or timezone change can't move it (only a resync does).
+/ `time.apple.com` backup), anchored to a monotonic clock so a device-clock or
+timezone change can't move it (only a resync does).
+
+When both SNTP hosts fail, `fallback_time_source.dart` drops to
+`https://api.lb.exptech.dev/ntp` (`http_time_source.dart`; the iOS widget
+mirrors it in `WidgetHTTPTimeSource.swift`) — corporate Wi-Fi, hotel and campus
+networks block UDP/123, and there the alternative is no calibration at all. The
+order is precision, not preference: SNTP resolves "now" to about a millisecond,
+one HTTPS round trip only to ±RTT/2. This is the one bare host the repository
+requests, because a clock reading has no region to pin; the body is never
+trusted on its own but checked against the Cloudflare-stamped `Date` header of
+the same response, which is what catches a backend whose own clock is wrong —
+see [api.md](api.md) for the 15.7-second measurement that made the check
+necessary.
 `RealtimeService` resyncs it every 60s (paused in background, resynced on
 resume). Read corrected time anywhere via the global `AppTime` facade
 (`AppTime.utc` / `AppTime.utc8`, the fixed-offset Taipei wall clock) — never

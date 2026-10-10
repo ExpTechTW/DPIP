@@ -20,11 +20,39 @@
 > 真正的呼叫是一個參數化的 `MeteorSnapshotApi` 加上兩個專用類別。帶著類別名，
 > 一次 grep 就能證實或推翻這張表的任何一列。
 >
-> **對時不是 HTTP 端點。** App 的時鐘使用真正的 **SNTP**
+> **對時優先走 SNTP，HTTP `/ntp` 只是退路。** App 的時鐘使用真正的 **SNTP**
 > （`flutter_ntp`，UDP/123），對 `time.exptech.com.tw`（主）/
-> `time.apple.com`（備），而非 `/ntp` HTTP 呼叫 —— 見
-> `core/realtime/ntp_time_source.dart` 與 `app_time.dart`（`AppTime.utc` /
-> `AppTime.utc8`）。
+> `time.apple.com`（備）—— 見 `core/realtime/ntp_time_source.dart` 與
+> `app_time.dart`（`AppTime.utc` / `AppTime.utc8`）。
+>
+> 兩台都失敗才改打 **`https://api.lb.exptech.dev/ntp`**
+> （`core/realtime/http_time_source.dart`，iOS widget 的對應實作是
+> `WidgetHTTPTimeSource.swift`），因為企業 Wi-Fi、飯店與校園網路常擋掉
+> UDP/123，而那時唯一的替代品是完全不校時。順序是精度而非偏好：SNTP 的
+> RFC 5905 交換約到毫秒，單趟 HTTPS 只到 ±RTT/2（實測 ±150 ms）。
+>
+> **這是全 repo 唯一使用 bare host 的地方。** `ApiTier` 流量刻意不用（見下方
+> 「多活備援」與 `api_region.dart`），因為區域選擇與容錯要由 App 掌握；但對時
+> 沒有區域可選，沒有東西要 pin、也沒有 per-region 容錯要保留，而 bare name 正
+> 是 Cloudflare 用**有效憑證**（`CN=*.lb.exptech.dev`，Google Trust Services）
+> 終結的那一個。
+>
+> **`/ntp` 的 body 不可盲信，要用它自己的 `Date` header 驗證。** body 是後端的
+> 時鐘，而後端的時鐘不一定對：這個名字後面的四台 `lb-*` 當中，撰寫時 `lb-2`
+> 與 `lb-4` 都慢 15.7 秒，而且兩台數值一致 —— 跨主機取多數也抓不到。
+>
+> 能抓到的是同一個回應的 `Date` header：這台在 Cloudflare 後面，`Date` 由
+> **edge** 蓋，跟哪一台後端回應無關,所以每個回應都能自我檢查 —— body 與自己的
+> `Date` 差超過 2 秒就是壞後端（或凍結的快取），直接丟棄,不需要知道它來自哪
+> 個節點。（來回超過 1.5 秒也丟棄，因為 offset 估計的誤差隨 RTT 成長。）
+>
+> 連續 30 次取樣都落在自己 header 的 910 ms 內，所以這個名字目前確實會導到正
+> 常的後端 —— 而上面那條檢查的作用，就是讓這件事不必靠 App 去假設。全部被拒
+> 就維持舊 anchor：裝上 15 秒誤差比不校時更糟。
+>
+> （`time.exptech.com.tw`，也就是 SNTP 的主機，同樣回應 `/ntp`，但它提供的憑證
+> 是 `CN=tpe-1.lb.exptech.dev` 且已於 2026-03-13 過期，HTTPS 連不上；而且它的
+> `Date` 由同一台機器上的 openresty 蓋，無法自我驗證。所以不用它。）
 
 ## 多活備援 (multi-active)
 
@@ -253,6 +281,19 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 
 `/api/v1/dpip/event/{id}` 存在於 `api-1`，但 App 裡**沒有任何方法呼叫它** ——
 先前這裡列的 `getEvent` 並不存在於程式碼中。
+
+### 對時 `/ntp`（SNTP 的退路，**不走 `ApiClient`**）
+
+| 路徑 | 主機 | 回應 |
+|---|---|---|
+| `/ntp` | `api.lb.exptech.dev`（**HTTPS only**；全 repo 唯一的 bare host） | Unix **毫秒**純文字，帶小數（`1791607233513.399`） |
+
+不是 `ApiTier`，所以沒有區域容錯；也刻意不經過 `ApiClient` —— 它的
+absolute-URL 路徑都會過 `EtagInterceptor`，而快取一個對時回應比不對時更糟。
+Dart 用裸 `HttpClient`、Swift 用 `URLSession` +
+`reloadIgnoringLocalAndRemoteCacheData`，兩邊都送 `Cache-Control: no-store`。
+
+為何用 bare host、以及為何每個回應都要拿 `Date` header 驗證，見上方「對時」段落。
 
 ## 外部（第三方，無區域）
 

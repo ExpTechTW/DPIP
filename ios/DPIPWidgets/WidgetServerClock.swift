@@ -21,6 +21,43 @@ enum WidgetServerClockError: Error, Equatable {
     case timedOut
 }
 
+/// Tries each `WidgetServerTimeSource` in order and returns the first success.
+///
+/// Order is precision, not preference: `WidgetSNTPClient` first because its
+/// RFC 5905 exchange resolves "now" to about a millisecond, then
+/// `WidgetHTTPTimeSource` for the networks that block UDP/123, where one HTTPS
+/// round trip gets within hundreds of milliseconds. A later source is consulted
+/// only when every earlier one failed, so the accurate path is never traded away
+/// for the reachable one.
+///
+/// Cancellation is not a failure to fall through from — `getTimeline` being torn
+/// down should stop the chain, not send it on to the next host — so it
+/// propagates instead of advancing, exactly as `WidgetSNTPClient` does across
+/// its own hosts.
+struct WidgetFallbackServerTimeSource: WidgetServerTimeSource {
+    private let sources: [any WidgetServerTimeSource]
+
+    init(_ sources: [any WidgetServerTimeSource]) {
+        self.sources = sources
+    }
+
+    func serverTimeUnixMilliseconds() async throws -> Int64 {
+        var lastError: Error = WidgetSNTPError.allHostsFailed
+        for source in sources {
+            do {
+                return try await source.serverTimeUnixMilliseconds()
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch WidgetSNTPError.cancelled {
+                throw CancellationError()
+            } catch {
+                lastError = error
+            }
+        }
+        throw lastError
+    }
+}
+
 struct WidgetTaskServerClockTimeout: WidgetServerClockTimeoutRunning {
     func serverTimeUnixMilliseconds(
         from source: any WidgetServerTimeSource,
@@ -65,10 +102,23 @@ actor WidgetServerClock {
         deviceClock: any WidgetWallTimeSource = WidgetSystemWallTimeSource(),
         monotonicClock: any WidgetMonotonicTimeSource =
             WidgetSystemMonotonicTimeSource(),
-        serverTimeSource: any WidgetServerTimeSource = WidgetSNTPClient(),
+        // HTTP `/ntp` sits behind SNTP, not beside it: it is an order of
+        // magnitude less precise, and is only reached on networks that block
+        // UDP/123, where the alternative is no calibration at all.
+        serverTimeSource: any WidgetServerTimeSource =
+            WidgetFallbackServerTimeSource([
+                WidgetSNTPClient(),
+                WidgetHTTPTimeSource(),
+            ]),
         timeoutRunner: any WidgetServerClockTimeoutRunning =
             WidgetTaskServerClockTimeout(),
-        synchronizationTimeout: TimeInterval = 8
+        // Covers the whole chain, not one request: SNTP's primary→backup
+        // fallback is 2 hosts × 3s, and the HTTP stage behind it adds 2s more.
+        // Ten leaves headroom over that 8s worst case, and is only ever spent
+        // when UDP/123 is blocked outright — the case the HTTP stage exists
+        // for. A first-host success still returns in under 3s, which is what
+        // getTimeline sees in the common path.
+        synchronizationTimeout: TimeInterval = 10
     ) {
         self.deviceClock = deviceClock
         self.monotonicClock = monotonicClock

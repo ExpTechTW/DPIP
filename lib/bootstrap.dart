@@ -38,6 +38,8 @@ import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
+import 'package:dpip/core/realtime/fallback_time_source.dart';
+import 'package:dpip/core/realtime/http_time_source.dart';
 import 'package:dpip/core/realtime/ntp_time_source.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
@@ -271,10 +273,14 @@ Future<void> bootstrap() async {
   // anchored to a monotonic clock, exposed globally via `AppTime` and resynced
   // every 60s by the realtime service. The initial sync is fire-and-forget so it
   // never delays launch (until it lands, the clock reads device time).
+  //
+  // HTTP `/ntp` sits behind SNTP, not beside it: it is an order of magnitude
+  // less precise, and is only reached on networks that block UDP/123, where the
+  // alternative is no calibration at all.
   final serverClock = ServerClock(
     const SystemClock(),
     SystemElapsed(),
-    NtpTimeSource(),
+    FallbackServerTimeSource([NtpTimeSource(), HttpTimeSource()]),
   );
   AppTime.install(serverClock);
   AppTime.sync().ignore();

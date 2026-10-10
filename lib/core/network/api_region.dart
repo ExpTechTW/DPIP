@@ -42,7 +42,15 @@ enum CoreRegion {
 ///
 /// Only concrete, region-pinned hosts are ever used; the DNS-balanced bare
 /// hosts (`api.lb.exptech.dev`, `api.core.exptech.dev`) are deliberately never
-/// requested so region selection and failover stay under app control.
+/// requested **for tiered traffic**, so region selection and failover stay
+/// under app control.
+///
+/// One request outside this enum does use a bare host: the HTTP time fallback
+/// in `core/realtime/http_time_source.dart` asks
+/// `https://api.lb.exptech.dev/ntp`. It is not an [ApiTier] request at all —
+/// a clock reading has no region to select, so there is nothing for the app to
+/// pin and no per-region failover to preserve, and the bare name is the one
+/// Cloudflare terminates with a valid certificate.
 enum ApiTier {
   /// LB API — multi-active across [LbRegion]s (`api.lb-{tpe1,khh1}`).
   lbApi,
