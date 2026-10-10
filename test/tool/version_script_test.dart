@@ -116,7 +116,13 @@ void main() {
     // thing, and neither wants the patch: `v26.2.1` is the full version (the
     // label), but the train — and the card's leading number — is `26.2`. A
     // two-part label (`26.1`) already is its own train.
-    const tag = 'v26.2.1-test-temp';
+    //
+    // version.sh keeps the highest `v[0-9]*` tag on HEAD. A checkout that
+    // already is a release — `v26.3` points at that commit — would otherwise
+    // beat a lower temporary tag, and this test would be reading the real
+    // release. The fixture sorts above any release this repository will cut,
+    // so the three-part rule is what gets checked either way.
+    const tag = 'v9999.0.1-test-temp';
     addTearDown(() {
       Process.runSync('git', ['tag', '-d', tag]);
     });
@@ -129,7 +135,7 @@ void main() {
     ]);
     expect(result.exitCode, 0, reason: result.stderr.toString());
     final v = jsonDecode(result.stdout.toString()) as Map<String, Object?>;
-    expect(v['label'], '26.2.1-test-temp');
-    expect(v['train'], '26.2');
+    expect(v['label'], '9999.0.1-test-temp');
+    expect(v['train'], '9999.0');
   });
 }
