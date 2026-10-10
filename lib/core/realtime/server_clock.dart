@@ -52,10 +52,15 @@ class ServerClock implements Clock {
   Duration get offset =>
       _isSynced ? now().difference(_device.now().toUtc()) : Duration.zero;
 
-  /// Re-anchors calibrated time from the server, bounded by [timeout] (long
-  /// enough to cover the primary→backup NTP fallback). Keeps the last anchor
-  /// (and logs) on failure.
-  Future<void> sync({Duration timeout = const Duration(seconds: 8)}) async {
+  /// Re-anchors calibrated time from the server, bounded by [timeout]. Keeps
+  /// the last anchor (and logs) on failure.
+  ///
+  /// The default has to cover the whole chain, not one request: SNTP's
+  /// primary→backup fallback is 2 hosts × 3s, and the HTTP `/ntp` stage behind
+  /// it adds 2s more. Ten seconds leaves headroom over that 8s worst case, and
+  /// is only ever spent when UDP/123 is blocked outright — the case the HTTP
+  /// stage exists for. A first-host success still returns in under 3s.
+  Future<void> sync({Duration timeout = const Duration(seconds: 10)}) async {
     try {
       final result = await _source.serverTimeMs().timeout(timeout);
       final serverMs = result.valueOrNull;

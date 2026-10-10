@@ -62,6 +62,7 @@
 		E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */; };
 		E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */; };
 		E9F000000000000000000001 /* ForecastWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F000000000000000000002 /* ForecastWidgetTests.swift */; };
+		E9F000000000000000000011 /* WidgetHTTPTimeSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */; };
 		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */; };
 		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
@@ -185,6 +186,7 @@
 		E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
 		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000002 /* ForecastWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastWidgetTests.swift; sourceTree = "<group>"; };
+		E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetHTTPTimeSourceTests.swift; sourceTree = "<group>"; };
 		F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTownshipResolverTests.swift; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
@@ -281,6 +283,7 @@
 				SavedCurrentWeatherWidgetRefreshService.swift,
 				SavedWidgetLocationResolver.swift,
 				WidgetCurrentLocationClient.swift,
+				WidgetHTTPTimeSource.swift,
 				WidgetLocationTarget.swift,
 				WidgetResolvedWeatherLocation.swift,
 				WidgetServerClock.swift,
@@ -377,6 +380,7 @@
 				E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */,
 				F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */,
 				E9F000000000000000000002 /* ForecastWidgetTests.swift */,
+				E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */,
 				F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */,
 			);
 			path = RunnerTests;
@@ -727,6 +731,7 @@
 				E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */,
 				F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */,
 				E9F000000000000000000001 /* ForecastWidgetTests.swift in Sources */,
+				E9F000000000000000000011 /* WidgetHTTPTimeSourceTests.swift in Sources */,
 				F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
