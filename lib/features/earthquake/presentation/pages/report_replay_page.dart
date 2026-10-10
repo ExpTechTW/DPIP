@@ -507,8 +507,10 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// countdown, and the box-coverage check). The ring is real polygon
   /// geometry ([circleFeature]), not a `circle-radius` paint property MapLibre
   /// can tween on its own, so this is what stands between a silky-smooth
-  /// expansion and a visibly stepped one. Cheap to run unconditionally: a calm
-  /// [_updateEew] is a same-run early return, same as [_setupBlink]'s tick.
+  /// expansion and a visibly stepped one. Runs only while there is something
+  /// to draw or to clear ([_syncWavefrontTicker]): most of a replay has no
+  /// alert up, and sixty idle wakeups a second kept a phone's CPU from ever
+  /// settling for the whole of it.
   Timer? _wavefrontTicker;
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
@@ -583,7 +585,7 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (active) {
       if (_ready) {
         _setupBlink();
-        _startWavefrontTicker();
+        _syncWavefrontTicker();
       }
     } else {
       _blinkTimer?.cancel();
@@ -608,12 +610,29 @@ class _ReplayMapState extends State<_ReplayMap> {
     super.dispose();
   }
 
-  void _startWavefrontTicker() {
-    _wavefrontTicker?.cancel();
-    _wavefrontTicker = Timer.periodic(
-      const Duration(milliseconds: 16),
-      (_) => unawaited(_updateEew()),
-    );
+  /// Whether [_updateEew] has anything to do: an alert to draw, or rings and
+  /// a fill still on the map to clear.
+  bool get _wavefrontWanted => widget.eew.alerts.isNotEmpty || !_eewSourceEmpty;
+
+  /// Starts the wavefront ticker when the visible map has an alert to draw.
+  /// It stops itself on the first tick with nothing left to draw or clear —
+  /// the tick that used to return at once in [_updateEew] — so the clearing
+  /// write when an alert leaves still lands, and a write that failed mid
+  /// style-reload is still retried.
+  void _syncWavefrontTicker() {
+    if (!_active || !_ready || !_wavefrontWanted) {
+      _wavefrontTicker?.cancel();
+      _wavefrontTicker = null;
+      return;
+    }
+    _wavefrontTicker ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
+      if (!_wavefrontWanted) {
+        _wavefrontTicker?.cancel();
+        _wavefrontTicker = null;
+        return;
+      }
+      unawaited(_updateEew());
+    });
   }
 
   /// Toggles the detection boxes and the epicentre cross every second while
@@ -794,6 +813,7 @@ class _ReplayMapState extends State<_ReplayMap> {
   bool _dotsDrawnForEew = false;
 
   void _onEewChange() {
+    _syncWavefrontTicker();
     if (widget.eew.alerts.isNotEmpty != _dotsDrawnForEew) {
       unawaited(_updateRts());
     }

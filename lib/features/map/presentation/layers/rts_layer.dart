@@ -232,7 +232,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// map turns that into a boolean test.
   ///
   /// Only the *empty* case is guarded. While an alert is live the wavefront
-  /// geometry is a function of the calibrated clock, so every 200 ms tick
+  /// geometry is a function of the calibrated clock, so every wavefront tick
   /// genuinely differs and must still be sent.
   bool _eewSourceEmpty = true;
   bool _stationsFetching = false;
@@ -262,7 +262,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// property MapLibre can tween on its own, so *this* is what stands between
   /// a silky-smooth expansion and a visibly stepped one. Each push is small
   /// (two ~64-point rings), so the extra platform-channel traffic is cheap —
-  /// and it only runs at all while an alert is actually live.
+  /// and it only runs at all while an alert is actually live
+  /// ([_syncEewTicker]).
   static const Duration _eewTick = Duration(milliseconds: 16);
   static const int _maxStationRetries = 8;
   static const double _liveOpacity = 1.0;
@@ -338,7 +339,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       _eew.addListener(_onEew);
       _eewListening = true;
     }
-    _startEewTicker();
+    _syncEewTicker();
     _setupBlink();
     _travelTimeTable.then((table) {
       _travelTime = table;
@@ -365,24 +366,28 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     hold ? demand.hold() : demand.release();
   }
 
-  void _startEewTicker() {
-    _eewTicker?.cancel();
-    _eewTicker = Timer.periodic(_eewTick, (_) {
-      // Only repaint while an alert is actually up — a calm feed needs no
-      // platform churn, and the `_onEew` listener already clears the source
-      // the moment an alert leaves.
-      final live =
-          _eew.state.status == RealtimeStatus.live &&
-          (_eew.state.data?.isNotEmpty ?? false);
-      if (live) {
-        unawaited(_pushEew());
-        // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
-        // tick even between RTS polls, so it has to be re-evaluated here
-        // too — not just on [_onFeed] — or a box stops blinking only
-        // whenever the next poll happens to land, well after the wavefront
-        // actually crossed it.
-        unawaited(_pushBox());
-      }
+  /// Runs the wavefront ticker exactly while it has something to draw: the
+  /// layer on a visible map with an alert live. Before, it ran at display rate
+  /// for as long as the layer was attached and its body returned at once
+  /// while calm — sixty idle wakeups a second that kept a phone's CPU from
+  /// ever settling. Every change to the alert set or its status arrives
+  /// through [_onEew], which re-syncs this, and the clearing write when an
+  /// alert leaves is [_onEew]'s own push, never the ticker's.
+  void _syncEewTicker() {
+    if (!_added || !_surfaceVisible || !_eewActive) {
+      _eewTicker?.cancel();
+      _eewTicker = null;
+      return;
+    }
+    _eewTicker ??= Timer.periodic(_eewTick, (_) {
+      if (!_eewActive) return;
+      unawaited(_pushEew());
+      // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
+      // tick even between RTS polls, so it has to be re-evaluated here
+      // too — not just on [_onFeed] — or a box stops blinking only
+      // whenever the next poll happens to land, well after the wavefront
+      // actually crossed it.
+      unawaited(_pushBox());
     });
   }
 
@@ -402,6 +407,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _dotsDrawnForEew = false;
 
   void _onEew() {
+    _syncEewTicker();
     // An alert arriving or leaving changes which stations are drawn, not just
     // the wavefront — the dots go again, and the update ends with the EEW.
     if (_eewActive != _dotsDrawnForEew) {
@@ -415,7 +421,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// Whether the hosting surface can currently be seen. The feeds keep
   /// polling either way — they are safety feeds and the monitor panel's
   /// freshness depends on them — but re-uploading a full station GeoJSON at
-  /// 1 Hz (and the EEW wavefront at 5 Hz) to a map that sits behind another
+  /// 1 Hz (and the EEW wavefront at display rate) to a map that sits behind another
   /// tab is a platform-channel serialisation nobody can see.
   bool _surfaceVisible = true;
 
@@ -429,14 +435,14 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       _lastSent = null;
       _appliedStatus = null;
       if (_added) {
-        _startEewTicker();
+        _syncEewTicker();
         _setupBlink();
         unawaited(_pushUpdate());
       }
     } else {
-      // The 5 Hz wavefront ticker stops outright — during a live alert in
-      // the background it was five timer wakeups a second for uploads the
-      // gate above was already discarding.
+      // The wavefront ticker stops outright — during a live alert in the
+      // background it was sixty timer wakeups a second for uploads the gate
+      // above was already discarding.
       _eewTicker?.cancel();
       _eewTicker = null;
       _blinkTimer?.cancel();
