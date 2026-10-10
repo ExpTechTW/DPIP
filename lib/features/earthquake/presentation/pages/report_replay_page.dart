@@ -507,8 +507,10 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// countdown, and the box-coverage check). The ring is real polygon
   /// geometry ([circleFeature]), not a `circle-radius` paint property MapLibre
   /// can tween on its own, so this is what stands between a silky-smooth
-  /// expansion and a visibly stepped one. Cheap to run unconditionally: a calm
-  /// [_updateEew] is a same-run early return, same as [_setupBlink]'s tick.
+  /// expansion and a visibly stepped one. Runs only while there is something
+  /// to draw or to clear ([_syncWavefrontTicker]): most of a replay has no
+  /// alert up, and sixty idle wakeups a second kept a phone's CPU from ever
+  /// settling for the whole of it.
   Timer? _wavefrontTicker;
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
@@ -583,7 +585,7 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (active) {
       if (_ready) {
         _setupBlink();
-        _startWavefrontTicker();
+        _syncWavefrontTicker();
       }
     } else {
       _blinkTimer?.cancel();
@@ -608,12 +610,29 @@ class _ReplayMapState extends State<_ReplayMap> {
     super.dispose();
   }
 
-  void _startWavefrontTicker() {
-    _wavefrontTicker?.cancel();
-    _wavefrontTicker = Timer.periodic(
-      const Duration(milliseconds: 16),
-      (_) => unawaited(_updateEew()),
-    );
+  /// Whether [_updateEew] has anything to do: an alert to draw, or rings and
+  /// a fill still on the map to clear.
+  bool get _wavefrontWanted => widget.eew.alerts.isNotEmpty || !_eewSourceEmpty;
+
+  /// Starts the wavefront ticker when the visible map has an alert to draw.
+  /// It stops itself on the first tick with nothing left to draw or clear —
+  /// the tick that used to return at once in [_updateEew] — so the clearing
+  /// write when an alert leaves still lands, and a write that failed mid
+  /// style-reload is still retried.
+  void _syncWavefrontTicker() {
+    if (!_active || !_ready || !_wavefrontWanted) {
+      _wavefrontTicker?.cancel();
+      _wavefrontTicker = null;
+      return;
+    }
+    _wavefrontTicker ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
+      if (!_wavefrontWanted) {
+        _wavefrontTicker?.cancel();
+        _wavefrontTicker = null;
+        return;
+      }
+      unawaited(_updateEew());
+    });
   }
 
   /// Toggles the detection boxes and the epicentre cross every second while
@@ -794,6 +813,7 @@ class _ReplayMapState extends State<_ReplayMap> {
   bool _dotsDrawnForEew = false;
 
   void _onEewChange() {
+    _syncWavefrontTicker();
     if (widget.eew.alerts.isNotEmpty != _dotsDrawnForEew) {
       unawaited(_updateRts());
     }
@@ -838,18 +858,20 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (controller == null || !_ready || grid == null) return;
     final hasBox = widget.alerts.alerting;
     if (!hasBox) return;
-    final (:geoJson, :signature) = _boxGeoJson(grid);
+    final (boxes, signature) = _survivingBoxes(grid);
     // This runs at the page's 5 Hz tick as well as on every poll, and the
     // feature set only changes when the feed does or the S-wave sweeps
-    // past a box — a handful of times per event. The same set was being
-    // re-serialised and re-uploaded a few times a second in between.
+    // past a box — a handful of times per event. The signature is everything
+    // the geometry depends on, so the collection is built only when it
+    // differs. The same set was being re-serialised and re-uploaded a few
+    // times a second in between.
     if (signature == _boxSignature) return;
     // Claimed before the await, not after: two in-flight writes land on the
     // platform channel in call order, so the later call's set is the one the
     // source ends up holding — and it must be the one recorded here.
     _boxSignature = signature;
     try {
-      await controller.setGeoJsonSource(_ids.boxSource, geoJson);
+      await controller.setGeoJsonSource(_ids.boxSource, _boxCollection(boxes));
     } catch (_) {
       // Source/layer not on the map yet (mid style-reload) — the next update
       // retries; the claim is dropped because the write never landed.
@@ -859,7 +881,7 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   /// The feature set [_ids.boxSource] last received — the box ids that survived
   /// the coverage check with their intensities, in feed order (see
-  /// [_boxGeoJson]). Null whenever the source has just been (re)created, so
+  /// [_survivingBoxes]). Null whenever the source has just been (re)created, so
   /// the first upload after a style load always lands.
   String? _boxSignature;
 
@@ -1044,20 +1066,19 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// stops blinking instead of blinking forever once it's no longer live
   /// information.
   ///
-  /// Also returns a [signature] of the set — every surviving box id and its
+  /// Returned with their signature — every surviving box id and its
   /// intensity, in order — cheap enough to build on every call and exact
   /// enough that an equal signature means an identical upload: a box's
   /// geometry is a function of its id alone (the static grid), so id +
-  /// intensity is everything the feature carries.
-  ({Map<String, dynamic> geoJson, String signature}) _boxGeoJson(
-    RtsBoxGrid grid,
-  ) {
+  /// intensity is everything the feature carries. The collection itself is
+  /// built only when that signature changes (see [_boxCollection]).
+  (List<(int, List<List<double>>)>, String) _survivingBoxes(RtsBoxGrid grid) {
     final table = _travelTimeTable;
     final now = widget.clock.now();
     final covers = table == null
         ? const <_SWaveCover>[]
         : _sWaveCovers(table, now);
-    final features = <Map<String, dynamic>>[];
+    final surviving = <(int, List<List<double>>)>[];
     final signature = StringBuffer();
     for (final entry in widget.alerts.areas.boxes.entries) {
       final ring = grid.rings[entry.key];
@@ -1068,20 +1089,29 @@ class _ReplayMapState extends State<_ReplayMap> {
         ..write(':')
         ..write(entry.value)
         ..write(';');
-      features.add({
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [ring],
-        },
-        'properties': {'i': entry.value},
-      });
+      surviving.add((entry.value, ring));
     }
-    return (
-      geoJson: {'type': 'FeatureCollection', 'features': features},
-      signature: signature.toString(),
-    );
+    return (surviving, signature.toString());
   }
+
+  /// The collection for the boxes [_survivingBoxes] kept. Built only when
+  /// their signature differs from what the map holds.
+  static Map<String, dynamic> _boxCollection(
+    List<(int, List<List<double>>)> boxes,
+  ) => {
+    'type': 'FeatureCollection',
+    'features': [
+      for (final (level, ring) in boxes)
+        {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [ring],
+          },
+          'properties': {'i': level},
+        },
+    ],
+  };
 
   /// Kilometres per degree of latitude along a meridian, rounded *down* from
   /// the 111.3195 km/° of [geo.LatLng.distanceTo]'s sphere. See
@@ -1115,8 +1145,14 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// the wavefront had fully swept past it, since by then it's a stale
   /// reading rather than live shaking data.
   bool _isBoxFullyCovered(List<List<double>> ring, List<_SWaveCover> covers) {
+    // The first four points are the box's corners (the fifth closes the ring).
+    // An index loop rather than `take(4).every(…)`: the same short-circuit,
+    // without an iterable and a closure per box per alert per tick.
+    final corners = ring.length < 4 ? ring.length : 4;
     for (final cover in covers) {
-      final allCornersCovered = ring.take(4).every((point) {
+      var allCornersCovered = true;
+      for (var k = 0; k < corners; k++) {
+        final point = ring[k];
         // Exact bounding reject before the haversine: the great-circle
         // distance is never shorter than the meridional (latitude-only)
         // leg, so a corner whose latitude gap alone exceeds the radius
@@ -1125,11 +1161,12 @@ class _ReplayMapState extends State<_ReplayMap> {
         // rejects a corner the haversine would have accepted. This runs
         // 4 × boxes × alerts at 5 Hz, and most corners fail here.
         if ((point[1] - cover.reach.latitude).abs() * _kmPerDegreeLatitude >
-            cover.radiusKm) {
-          return false;
+                cover.radiusKm ||
+            !cover.reach.contains(point[1], point[0])) {
+          allCornersCovered = false;
+          break;
         }
-        return cover.reach.contains(point[1], point[0]);
-      });
+      }
       if (allCornersCovered) return true;
     }
     return false;
@@ -1340,7 +1377,7 @@ class _EewAlertCard extends StatelessWidget {
 /// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
 /// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so it
 /// reads as urgent even collapsed, not just the card above it.
-class _ReplayStatusBar extends StatelessWidget {
+class _ReplayStatusBar extends StatefulWidget {
   const _ReplayStatusBar({
     required this.clock,
     required this.second,
@@ -1357,11 +1394,30 @@ class _ReplayStatusBar extends StatelessWidget {
   final EewRealtimeController eew;
 
   @override
+  State<_ReplayStatusBar> createState() => _ReplayStatusBarState();
+}
+
+class _ReplayStatusBarState extends State<_ReplayStatusBar> {
+  /// One subscription for the life of the bar. Building a fresh
+  /// [Listenable.merge] inside the per-second clock builder attached and
+  /// detached both feeds on every tick.
+  late Listenable _feeds = Listenable.merge([widget.rts, widget.eew]);
+
+  @override
+  void didUpdateWidget(covariant _ReplayStatusBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.rts, widget.rts) ||
+        !identical(oldWidget.eew, widget.eew)) {
+      _feeds = Listenable.merge([widget.rts, widget.eew]);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<int>(
-      valueListenable: second,
+      valueListenable: widget.second,
       builder: (context, _, _) => ListenableBuilder(
-        listenable: Listenable.merge([rts, eew]),
+        listenable: _feeds,
         builder: (context, _) => _buildContent(context),
       ),
     );
@@ -1374,23 +1430,23 @@ class _ReplayStatusBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final taipeiTime = AppTime.taipei(clock.now());
+    final taipeiTime = AppTime.taipei(widget.clock.now());
     final timeText = _clockFormat.format(taipeiTime);
 
     // RTS snapshots age out of the server long before the EEW history does, so
     // an old enough event replays as alerts over a map with no shaking on it.
     // That feed is not broken and saying "連線中斷" reads as a broken app —
     // the replay is running, there is just nothing recorded that far back.
-    final (Color dot, String? statusWord) = rts.isMissingHistory
+    final (Color dot, String? statusWord) = widget.rts.isMissingHistory
         ? (Colors.orange, l10n.feedReplaying)
-        : switch (rts.status) {
+        : switch (widget.rts.status) {
             RealtimeStatus.live => (Colors.green, null),
             RealtimeStatus.stale => (Colors.amber, l10n.feedStale),
             RealtimeStatus.offline => (Colors.red, l10n.feedOffline),
             RealtimeStatus.connecting => (Colors.grey, l10n.feedConnecting),
           };
 
-    final alertCount = eew.alerts.length;
+    final alertCount = widget.eew.alerts.length;
     final hasActiveEew = alertCount > 0;
     final onTint = hasActiveEew ? colors.onErrorContainer : null;
 

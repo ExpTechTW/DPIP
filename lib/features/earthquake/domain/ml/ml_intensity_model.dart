@@ -39,6 +39,22 @@ const double _d2r = math.pi / 180;
 const List<double> _pgaBounds = [0.8, 2.5, 8, 25, 80, 140, 250, 440, 800];
 const List<double> _pgvBounds = [0.2, 0.7, 1.9, 5.7, 15, 30, 50, 80, 140];
 
+/// Epicentre terms that do not depend on the target. One quake is scored at
+/// every township, and these four values are the same for all of them.
+final class _EpicenterTrig {
+  const _EpicenterTrig({
+    required this.p1,
+    required this.sinP1,
+    required this.cosP1,
+    required this.depthSquared,
+  });
+
+  final double p1;
+  final double sinP1;
+  final double cosP1;
+  final double depthSquared;
+}
+
 /// Writes the feature row for an epicentre and a target point into [rows] at
 /// [at]: worked out in f64, then rounded to f32 by the list.
 void mlFeatures(
@@ -51,17 +67,47 @@ void mlFeatures(
   required double targetLat,
   required double targetLon,
 }) {
-  final p1 = evLat * _d2r;
+  _mlFeatures(
+    rows,
+    at,
+    magnitude: magnitude,
+    depth: depth,
+    evLat: evLat,
+    evLon: evLon,
+    targetLat: targetLat,
+    targetLon: targetLon,
+  );
+}
+
+/// [epicenter], when the caller is scoring many targets of one quake, is the
+/// epicentre trig already evaluated for that quake. Omitting it computes the
+/// same values inline, so a single call is unchanged. The type stays private:
+/// a public signature cannot name it.
+void _mlFeatures(
+  Float32List rows,
+  int at, {
+  required double magnitude,
+  required double depth,
+  required double evLat,
+  required double evLon,
+  required double targetLat,
+  required double targetLon,
+  _EpicenterTrig? epicenter,
+}) {
+  final p1 = epicenter?.p1 ?? evLat * _d2r;
+  final sinP1 = epicenter?.sinP1 ?? math.sin(p1);
+  final cosP1 = epicenter?.cosP1 ?? math.cos(p1);
+  final depthSquared = epicenter?.depthSquared ?? depth * depth;
   final p2 = targetLat * _d2r;
   final dl = (targetLon - evLon) * _d2r;
   final s1 = math.sin((p2 - p1) / 2);
   final s2 = math.sin(dl / 2);
-  final a = s1 * s1 + math.cos(p1) * math.cos(p2) * (s2 * s2);
+  final a = s1 * s1 + cosP1 * math.cos(p2) * (s2 * s2);
   final dist = 2 * _earthKm * math.asin(math.sqrt(a));
-  final lnR = math.log(math.max(math.sqrt(dist * dist + depth * depth), 3));
+  final lnR = math.log(math.max(math.sqrt(dist * dist + depthSquared), 3));
   final az = math.atan2(
     math.sin(dl) * math.cos(p2),
-    math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl),
+    cosP1 * math.sin(p2) - sinP1 * math.cos(p2) * math.cos(dl),
   );
   rows[at] = magnitude;
   rows[at + 1] = depth;
@@ -167,8 +213,15 @@ class MlPointPredictor {
       if (!value.isFinite) throw ArgumentError('non-finite quake parameter');
     }
     final n = length;
+    final p1 = latitude * _d2r;
+    final epicenter = _EpicenterTrig(
+      p1: p1,
+      sinP1: math.sin(p1),
+      cosP1: math.cos(p1),
+      depthSquared: depth * depth,
+    );
     for (var i = 0; i < n; i++) {
-      mlFeatures(
+      _mlFeatures(
         _rows,
         i * mlFeatureCount,
         magnitude: magnitude,
@@ -177,6 +230,7 @@ class MlPointPredictor {
         evLon: longitude,
         targetLat: latitudes[i],
         targetLon: longitudes[i],
+        epicenter: epicenter,
       );
     }
     final prediction = model.predict(_rows, n);

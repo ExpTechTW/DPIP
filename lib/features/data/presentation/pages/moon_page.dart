@@ -216,6 +216,24 @@ class _MoonPageState extends State<MoonPage> {
     return (_nextFull, _nextNew);
   }
 
+  /// The day's moonrise and moonset, remembered for the day and place it was
+  /// solved for. A timeline scrub rebuilds the page for every frame the finger
+  /// crosses, and the timeline's two-hour steps cross a day boundary only
+  /// every twelfth one — each solve is some three hundred evaluations of the
+  /// lunar series, for an answer that depends on nothing but the day and the
+  /// township.
+  (DateTime, double, double)? _riseSetKey;
+  MoonRiseSet? _riseSet;
+
+  MoonRiseSet _riseSetOf(DateTime day, double latitude, double longitude) {
+    final key = (day, latitude, longitude);
+    if (key != _riseSetKey) {
+      _riseSetKey = key;
+      _riseSet = MoonRiseSet.of(day, latitude: latitude, longitude: longitude);
+    }
+    return _riseSet!;
+  }
+
   /// Jumps to [day] (Taipei wall time) keeping the time of day, so stepping
   /// through the calendar compares like with like.
   void _selectDay(DateTime day) {
@@ -239,14 +257,14 @@ class _MoonPageState extends State<MoonPage> {
     final local = _selectedLocal;
     final riseSet = town == null
         ? null
-        : MoonRiseSet.of(
+        : _riseSetOf(
             DateTime.utc(
               local.year,
               local.month,
               local.day,
             ).subtract(_taiwanOffset),
-            latitude: town.lat,
-            longitude: town.lng,
+            town.lat,
+            town.lng,
           );
     final orientation = town == null
         ? null

@@ -232,7 +232,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// map turns that into a boolean test.
   ///
   /// Only the *empty* case is guarded. While an alert is live the wavefront
-  /// geometry is a function of the calibrated clock, so every 200 ms tick
+  /// geometry is a function of the calibrated clock, so every wavefront tick
   /// genuinely differs and must still be sent.
   bool _eewSourceEmpty = true;
   bool _stationsFetching = false;
@@ -262,7 +262,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// property MapLibre can tween on its own, so *this* is what stands between
   /// a silky-smooth expansion and a visibly stepped one. Each push is small
   /// (two ~64-point rings), so the extra platform-channel traffic is cheap —
-  /// and it only runs at all while an alert is actually live.
+  /// and it only runs at all while an alert is actually live
+  /// ([_syncEewTicker]).
   static const Duration _eewTick = Duration(milliseconds: 16);
   static const int _maxStationRetries = 8;
   static const double _liveOpacity = 1.0;
@@ -338,7 +339,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       _eew.addListener(_onEew);
       _eewListening = true;
     }
-    _startEewTicker();
+    _syncEewTicker();
     _setupBlink();
     _travelTimeTable.then((table) {
       _travelTime = table;
@@ -365,24 +366,28 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     hold ? demand.hold() : demand.release();
   }
 
-  void _startEewTicker() {
-    _eewTicker?.cancel();
-    _eewTicker = Timer.periodic(_eewTick, (_) {
-      // Only repaint while an alert is actually up — a calm feed needs no
-      // platform churn, and the `_onEew` listener already clears the source
-      // the moment an alert leaves.
-      final live =
-          _eew.state.status == RealtimeStatus.live &&
-          (_eew.state.data?.isNotEmpty ?? false);
-      if (live) {
-        unawaited(_pushEew());
-        // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
-        // tick even between RTS polls, so it has to be re-evaluated here
-        // too — not just on [_onFeed] — or a box stops blinking only
-        // whenever the next poll happens to land, well after the wavefront
-        // actually crossed it.
-        unawaited(_pushBox());
-      }
+  /// Runs the wavefront ticker exactly while it has something to draw: the
+  /// layer on a visible map with an alert live. Before, it ran at display rate
+  /// for as long as the layer was attached and its body returned at once
+  /// while calm — sixty idle wakeups a second that kept a phone's CPU from
+  /// ever settling. Every change to the alert set or its status arrives
+  /// through [_onEew], which re-syncs this, and the clearing write when an
+  /// alert leaves is [_onEew]'s own push, never the ticker's.
+  void _syncEewTicker() {
+    if (!_added || !_surfaceVisible || !_eewActive) {
+      _eewTicker?.cancel();
+      _eewTicker = null;
+      return;
+    }
+    _eewTicker ??= Timer.periodic(_eewTick, (_) {
+      if (!_eewActive) return;
+      unawaited(_pushEew());
+      // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
+      // tick even between RTS polls, so it has to be re-evaluated here
+      // too — not just on [_onFeed] — or a box stops blinking only
+      // whenever the next poll happens to land, well after the wavefront
+      // actually crossed it.
+      unawaited(_pushBox());
     });
   }
 
@@ -402,6 +407,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   bool _dotsDrawnForEew = false;
 
   void _onEew() {
+    _syncEewTicker();
     // An alert arriving or leaving changes which stations are drawn, not just
     // the wavefront — the dots go again, and the update ends with the EEW.
     if (_eewActive != _dotsDrawnForEew) {
@@ -415,7 +421,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// Whether the hosting surface can currently be seen. The feeds keep
   /// polling either way — they are safety feeds and the monitor panel's
   /// freshness depends on them — but re-uploading a full station GeoJSON at
-  /// 1 Hz (and the EEW wavefront at 5 Hz) to a map that sits behind another
+  /// 1 Hz (and the EEW wavefront at display rate) to a map that sits behind another
   /// tab is a platform-channel serialisation nobody can see.
   bool _surfaceVisible = true;
 
@@ -429,14 +435,14 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       _lastSent = null;
       _appliedStatus = null;
       if (_added) {
-        _startEewTicker();
+        _syncEewTicker();
         _setupBlink();
         unawaited(_pushUpdate());
       }
     } else {
-      // The 5 Hz wavefront ticker stops outright — during a live alert in
-      // the background it was five timer wakeups a second for uploads the
-      // gate above was already discarding.
+      // The wavefront ticker stops outright — during a live alert in the
+      // background it was sixty timer wakeups a second for uploads the gate
+      // above was already discarding.
       _eewTicker?.cancel();
       _eewTicker = null;
       _blinkTimer?.cancel();
@@ -527,10 +533,24 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final hasBox = _alerts.alerting;
     try {
       if (hasBox) {
-        final (geoJson, signature) = _boxGeoJson(grid);
+        final (boxes, signature) = _survivingBoxes(grid);
         if (signature != _boxOnMap) {
-          await controller.setGeoJsonSource(_ids.boxSource, geoJson);
+          // Claimed before the await, not after: the wavefront ticker calls
+          // this every frame, and a tick landing while the write was in
+          // flight used to upload the same collection again. Two writes land
+          // on the platform channel in call order, so the later call's set is
+          // the one the source ends up holding — and it is the one recorded.
           _boxOnMap = signature;
+          try {
+            await controller.setGeoJsonSource(
+              _ids.boxSource,
+              _boxCollection(boxes),
+            );
+          } catch (_) {
+            // The write never landed, so nothing is known to be there.
+            _boxOnMap = null;
+            rethrow;
+          }
         }
       }
       if (hasBox != _boxVisible) {
@@ -548,18 +568,18 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// stops blinking instead of blinking forever once it's no longer live
   /// information.
   ///
-  /// Also returns the collection's signature — the surviving ids with their
+  /// Returned with their signature — the surviving ids with their
   /// intensities, in order — which is everything the geometry depends on,
   /// since a ring is a function of its id alone. [_pushBox] compares it
   /// against what the map already holds.
-  (Map<String, dynamic>, String) _boxGeoJson(RtsBoxGrid grid) {
+  (List<(int, List<List<double>>)>, String) _survivingBoxes(RtsBoxGrid grid) {
     final box = _alerts.areas.boxes;
     final alerts = _eew.state.data ?? const <Eew>[];
     final now = AppTime.utc;
     final covers = _travelTime == null
         ? const <_SWaveCover>[]
         : _sWaveCovers(alerts, _travelTime!, now);
-    final features = <Map<String, dynamic>>[];
+    final surviving = <(int, List<List<double>>)>[];
     final signature = StringBuffer();
     for (final entry in box.entries) {
       final ring = grid.rings[entry.key];
@@ -570,20 +590,30 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         ..write(':')
         ..write(entry.value)
         ..write(',');
-      features.add({
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [ring],
-        },
-        'properties': {'i': entry.value},
-      });
+      surviving.add((entry.value, ring));
     }
-    return (
-      {'type': 'FeatureCollection', 'features': features},
-      signature.toString(),
-    );
+    return (surviving, signature.toString());
   }
+
+  /// The collection for the boxes [_survivingBoxes] kept — built only when
+  /// their signature differs from what the map holds, which during an alert is
+  /// a handful of times against sixty checks a second.
+  static Map<String, dynamic> _boxCollection(
+    List<(int, List<List<double>>)> boxes,
+  ) => {
+    'type': 'FeatureCollection',
+    'features': [
+      for (final (level, ring) in boxes)
+        {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [ring],
+          },
+          'properties': {'i': level},
+        },
+    ],
+  };
 
   /// Metres per degree of latitude on the sphere [geo.LatLng.distanceTo]
   /// measures on — the great-circle distance between two points is never less
@@ -624,16 +654,23 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// the wavefront had fully swept past it, since by then it's a stale
   /// reading rather than live shaking data.
   bool _isBoxFullyCovered(List<List<double>> ring, List<_SWaveCover> covers) {
+    // The first four points are the box's corners (the fifth closes the ring).
+    // An index loop rather than `take(4).every(…)`: the same short-circuit,
+    // without an iterable and a closure per box per alert per frame.
+    final corners = ring.length < 4 ? ring.length : 4;
     for (final cover in covers) {
-      final allCornersCovered = ring.take(4).every((point) {
+      var allCornersCovered = true;
+      for (var k = 0; k < corners; k++) {
+        final point = ring[k];
         final lat = point[1];
         // Exact reject: meridional distance is a lower bound on the geodesic.
         if ((lat - cover.reach.latitude).abs() * _metresPerLatDegree >
-            cover.metres) {
-          return false;
+                cover.metres ||
+            !cover.reach.contains(lat, point[0])) {
+          allCornersCovered = false;
+          break;
         }
-        return cover.reach.contains(lat, point[0]);
-      });
+      }
       if (allCornersCovered) return true;
     }
     return false;
