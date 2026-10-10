@@ -127,18 +127,39 @@ class StarCatalog {
   /// A J2000 position precessed to the equinox of date.
   static Equatorial precess(double ra, double dec, DateTime utc) {
     final years = julianCenturies(utc) * 100;
-    final a = ra * degrees;
-    final d = dec * degrees;
+    final factors = _precessFactors[(ra, dec)] ??= _PrecessFactors(ra, dec);
     return Equatorial(
       rightAscension: turn(
-        a +
-            (3.07496 + 1.33621 * math.sin(a) * math.tan(d)) *
-                years *
-                15 /
-                3600 *
-                degrees,
+        factors.a + factors.raTerm * years * 15 / 3600 * degrees,
       ),
-      declination: d + 20.0431 * math.cos(a) * years / 3600 * degrees,
+      declination: factors.d + factors.decTerm * years / 3600 * degrees,
     );
   }
+}
+
+/// sin/cos/tan of one J2000 position. The chart precesses every star on every
+/// frame, and these three depend only on the catalogue coordinates.
+final Map<(double, double), _PrecessFactors> _precessFactors = {};
+
+final class _PrecessFactors {
+  _PrecessFactors(double ra, double dec) {
+    // The same locals the inline formula used, so the multiplies stay in the
+    // same order and the cached terms are bitwise identical.
+    final aRad = ra * degrees;
+    final dRad = dec * degrees;
+    a = aRad;
+    d = dRad;
+    raTerm = 3.07496 + 1.33621 * math.sin(aRad) * math.tan(dRad);
+    decTerm = 20.0431 * math.cos(aRad);
+  }
+
+  late final double a;
+  late final double d;
+
+  /// `(3.07496 + 1.33621·sin a·tan d)`, multiplied by years in the same order
+  /// as the inline formula.
+  late final double raTerm;
+
+  /// `20.0431·cos a`, multiplied by years in the same order as the inline formula.
+  late final double decTerm;
 }
