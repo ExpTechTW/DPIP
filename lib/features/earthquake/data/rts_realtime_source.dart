@@ -93,6 +93,9 @@ class RtsRealtimeSource extends SseRealtimeSource<Rts> {
   DateTime? timestampOf(Rts value) => null;
 
   @override
+  bool sameData(Rts? a, Rts? b) => sameRtsFrame(a, b);
+
+  @override
   void dispose() {
     _demand.removeListener(_onDemand);
     _sleepTimer?.cancel();
