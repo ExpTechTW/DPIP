@@ -325,7 +325,18 @@ class _MapTimelineState extends State<MapTimeline> {
 
   /// The frame under the scrubber right now — follows the live scroll so the
   /// label tracks the drag before it settles.
-  late int _liveIndex = widget.selectedIndex;
+  ///
+  /// A notifier, not a [setState]: crossing a cell used to rebuild every
+  /// visible tick. The header and the two ticks whose emphasis changed are
+  /// the only things that depend on it. The ruler itself rebuilds when the
+  /// frame set, the theme, or which tick is "now" changes.
+  late final ValueNotifier<int> _live = ValueNotifier(widget.selectedIndex);
+  int get _liveIndex => _live.value;
+
+  /// The "now" frame [_Tick] colours were built against. Recomputed on every
+  /// parent build and on every crossed cell; a change rebuilds the ruler
+  /// because the era colours are part of the tick set.
+  int? _paintedNowIndex;
   bool _snapping = false;
   bool _scrubbing = false;
   int _snapGeneration = 0;
@@ -357,7 +368,7 @@ class _MapTimelineState extends State<MapTimeline> {
     final framesChanged = !identical(oldWidget.frames, widget.frames);
     if (framesChanged) _cacheLabels();
     if (framesChanged || (widget.selectedIndex != _liveIndex && !_snapping)) {
-      _liveIndex = widget.selectedIndex.clamp(0, widget.frames.length - 1);
+      _live.value = widget.selectedIndex.clamp(0, widget.frames.length - 1);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _centreOn(_liveIndex, animate: false);
       });
@@ -369,6 +380,7 @@ class _MapTimelineState extends State<MapTimeline> {
     _settleTimer?.cancel();
     _snapGeneration++;
     _scroll.dispose();
+    _live.dispose();
     super.dispose();
   }
 
@@ -429,7 +441,7 @@ class _MapTimelineState extends State<MapTimeline> {
               'scroll-select from=$_liveIndex to=$centred '
               'offset=${_scroll.offset.toStringAsFixed(1)}',
         );
-        setState(() => _liveIndex = centred);
+        _publishLiveIndex(centred);
         // Compare against [_liveIndex] (before the update), never
         // [widget.selectedIndex]: the parent keeps that prop stale on purpose
         // (no setState during scrub). Guarding on the prop stuck the map on
@@ -444,13 +456,30 @@ class _MapTimelineState extends State<MapTimeline> {
             'index=$centred live=$_liveIndex',
       );
       if (centred != _liveIndex) {
-        setState(() => _liveIndex = centred);
+        _publishLiveIndex(centred);
         widget.onSelected(centred);
       }
       _centreOn(centred, animate: true);
       _scheduleSettled();
     }
     return false;
+  }
+
+  /// Moves the scrubber index. The ruler's ticks stay mounted; only the
+  /// header and the emphasis of the two cells involved update. When the
+  /// clock has crossed into another frame, the era colours are a different
+  /// set and the ruler rebuilds, which is what a parent rebuild used to do
+  /// on every cell.
+  void _publishLiveIndex(int index) {
+    final nowIndex = nowFrameIndex(widget.frames, now: AppTime.utc);
+    if (nowIndex != _paintedNowIndex) {
+      setState(() {
+        _live.value = index;
+        _paintedNowIndex = nowIndex;
+      });
+      return;
+    }
+    _live.value = index;
   }
 
   Widget _buildEraTime(
@@ -536,7 +565,7 @@ class _MapTimelineState extends State<MapTimeline> {
     // clock resyncs on foreground, so returning from the background moves the
     // marker to the real now instead of the device clock's guess.
     final nowIndex = nowFrameIndex(widget.frames, now: AppTime.utc);
-    final era = _eraOf(_liveIndex, nowIndex);
+    _paintedNowIndex = nowIndex;
     final labelStep = (48 / widget.itemExtent).ceil();
     // The three era colours once per build, not once per tick: `_eraColor`
     // runs the colour-vision transform (a linear-light round trip when a
@@ -556,43 +585,49 @@ class _MapTimelineState extends State<MapTimeline> {
         // Left: 觀測 (label) over the selected date; right: the big time with
         // its era label (現在/歷史/未來) + HH:mm. FittedBox keeps the row on
         // one line on narrow screens instead of overflowing.
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Column(
+        ValueListenableBuilder<int>(
+          valueListenable: _live,
+          builder: (context, liveIndex, _) {
+            final era = _eraOf(liveIndex, nowIndex);
+            return FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.caption ?? l10n.mapTimelineObserved,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: colors.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (widget.dataTime case final dataTime?)
-                    Text(
-                      l10n.mapTimelineDataTime(_data.format(dataTime)),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colors.tertiary,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.caption ?? l10n.mapTimelineObserved,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  Text(
-                    _dates[_liveIndex],
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+                      if (widget.dataTime case final dataTime?)
+                        Text(
+                          l10n.mapTimelineDataTime(_data.format(dataTime)),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.tertiary,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      Text(
+                        _dates[liveIndex],
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(width: AppSpacing.md),
+                  _buildEraTime(context, theme, colors, era),
                 ],
               ),
-              const SizedBox(width: AppSpacing.md),
-              _buildEraTime(context, theme, colors, era),
-            ],
-          ),
+            );
+          },
         ),
         const SizedBox(height: AppSpacing.xs),
         SizedBox(
@@ -606,34 +641,37 @@ class _MapTimelineState extends State<MapTimeline> {
                   // ListView.builder (not a Row) so a week of frames only ever
                   // builds the ~dozens of ticks on screen. itemExtent keeps the
                   // centring math: offset `i * itemExtent` centres frame `i`.
-                  return NotificationListener<ScrollNotification>(
-                    onNotification: _onScroll,
-                    child: ListView.builder(
-                      controller: _scroll,
-                      scrollDirection: Axis.horizontal,
-                      physics: const _ScrubPhysics(),
-                      // A tick is a hairline and a label — cheaper to repaint
-                      // than to composite, and the whole ruler moves together
-                      // when scrubbed, so per-child layers would all be
-                      // invalidated at once anyway. Nothing here holds state
-                      // worth keeping alive off screen either: [_Tick] is
-                      // stateless and rebuilt from `frames` on demand.
-                      addRepaintBoundaries: false,
-                      addAutomaticKeepAlives: false,
-                      padding: EdgeInsets.symmetric(horizontal: pad),
-                      itemExtent: widget.itemExtent,
-                      itemCount: widget.frames.length,
-                      itemBuilder: (context, i) => _Tick(
-                        width: widget.itemExtent,
-                        label: i % labelStep == 0 ? _times[i] : null,
-                        labelColor: switch (_eraOf(i, nowIndex)) {
-                          TimelineEra.past => eraColors.past,
-                          TimelineEra.now => eraColors.now,
-                          TimelineEra.future => eraColors.future,
-                        },
-                        emphasised: i == _liveIndex,
-                        colors: colors,
-                        textStyle: theme.textTheme.labelSmall,
+                  return _TickEmphasis(
+                    live: _live,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: _onScroll,
+                      child: ListView.builder(
+                        controller: _scroll,
+                        scrollDirection: Axis.horizontal,
+                        physics: const _ScrubPhysics(),
+                        // A tick is a hairline and a label — cheaper to repaint
+                        // than to composite, and the whole ruler moves together
+                        // when scrubbed, so per-child layers would all be
+                        // invalidated at once anyway. Nothing here holds state
+                        // worth keeping alive off screen either: [_Tick] is
+                        // stateless and rebuilt from `frames` on demand.
+                        addRepaintBoundaries: false,
+                        addAutomaticKeepAlives: false,
+                        padding: EdgeInsets.symmetric(horizontal: pad),
+                        itemExtent: widget.itemExtent,
+                        itemCount: widget.frames.length,
+                        itemBuilder: (context, i) => _Tick(
+                          width: widget.itemExtent,
+                          label: i % labelStep == 0 ? _times[i] : null,
+                          labelColor: switch (_eraOf(i, nowIndex)) {
+                            TimelineEra.past => eraColors.past,
+                            TimelineEra.now => eraColors.now,
+                            TimelineEra.future => eraColors.future,
+                          },
+                          emphasised: _TickEmphasis.of(context, i),
+                          colors: colors,
+                          textStyle: theme.textTheme.labelSmall,
+                        ),
                       ),
                     ),
                   );
@@ -690,6 +728,52 @@ Color _eraColor(TimelineEra era, Brightness brightness) => switch (era) {
   TimelineEra.future =>
     brightness == Brightness.dark ? _futureDark : _futureLight,
 };
+
+/// Which tick is under the scrubber, without rebuilding the ruler.
+///
+/// The list is the [child], so an index change updates this model and the
+/// two ticks that gained or lost emphasis. Every other tick keeps the
+/// element it was built with.
+class _TickEmphasis extends StatelessWidget {
+  const _TickEmphasis({required this.live, required this.child});
+
+  final ValueListenable<int> live;
+  final Widget child;
+
+  static bool of(BuildContext context, int index) {
+    final model = InheritedModel.inheritFrom<_TickEmphasisModel>(
+      context,
+      aspect: index,
+    );
+    return model?.index == index;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<int>(
+      valueListenable: live,
+      builder: (context, index, child) =>
+          _TickEmphasisModel(index: index, child: child!),
+      child: child,
+    );
+  }
+}
+
+class _TickEmphasisModel extends InheritedModel<int> {
+  const _TickEmphasisModel({required this.index, required super.child});
+
+  final int index;
+
+  @override
+  bool updateShouldNotify(_TickEmphasisModel oldWidget) =>
+      index != oldWidget.index;
+
+  @override
+  bool updateShouldNotifyDependent(
+    _TickEmphasisModel oldWidget,
+    Set<int> dependencies,
+  ) => dependencies.contains(index) || dependencies.contains(oldWidget.index);
+}
 
 /// One ruler tick — a mark plus an optional time [label] beneath it.
 class _Tick extends StatelessWidget {
