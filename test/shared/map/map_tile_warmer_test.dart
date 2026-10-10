@@ -19,6 +19,27 @@ class _NoHosts extends ApiClient {
   List<String> hostsFor(ApiTier tier) => const [];
 }
 
+class _OneHost extends ApiClient {
+  _OneHost() : super(Dio(), RegionSelection(SettingsStore.inMemory()));
+
+  @override
+  List<String> hostsFor(ApiTier tier) => const ['https://static.example'];
+}
+
+class _BoomCache extends _Cache {
+  _BoomCache(super.store);
+
+  @override
+  Future<TileWarmResult> warm(
+    List<String> urls, {
+    double fillUntil = 0,
+    bool refreshResident = false,
+    bool Function()? shouldContinue,
+  }) async {
+    throw StateError('warm failed');
+  }
+}
+
 class _Cache extends MapTileCache {
   _Cache(super.store);
 
@@ -57,8 +78,10 @@ void main() {
   late MapTileWarmer warmer;
 
   setUp(() async {
+    MapTileCache.traceEnabled = true;
     final db = openMemoryDb();
     addTearDown(db.close);
+    addTearDown(() => MapTileCache.traceEnabled = false);
     await EtagCacheStore.createSchema(db);
     cache = _Cache(EtagCacheStore(db));
     warmer = MapTileWarmer(cache, settleDelay: Duration.zero);
@@ -148,4 +171,53 @@ void main() {
       expect(cache.evicted, isEmpty);
     },
   );
+
+  test(
+    'prepare returns an empty result when there is nothing to inject',
+    () async {
+      final idle = await MapTileWarmer(null)
+          .prepareUrls(const ['https://example/a.png']);
+      expect(idle.injected, 0);
+      expect(idle.resident, isEmpty);
+
+      final none = await warmer.prepareUrls(const []);
+      expect(none.injected, 0);
+
+      final prepared = await warmer.prepareUrls(const [
+        'https://example/now.png',
+      ]);
+      expect(prepared.injected, 1);
+      expect(prepared.resident, {'https://example/now.png'});
+    },
+  );
+
+  test('a region host is prefixed onto the viewport tile paths', () async {
+    await warmer.warmViewport(
+      client: _OneHost(),
+      tier: ApiTier.lbStatic,
+      pathFor: (z, x, y) => '/$z/$x/$y.png',
+      south: 24,
+      west: 120.5,
+      north: 25,
+      east: 121.5,
+      zoom: 8,
+      immediate: true,
+    );
+    expect(cache.evicted, isEmpty);
+  });
+
+  test('a warm that throws is logged and does not wedge the queue', () async {
+    final db = openMemoryDb();
+    addTearDown(db.close);
+    await EtagCacheStore.createSchema(db);
+    final boom = MapTileWarmer(
+      _BoomCache(EtagCacheStore(db)),
+      settleDelay: Duration.zero,
+    );
+    await expectLater(
+      boom.warmUrls(const ['https://example/bad.png'], immediate: true),
+      throwsStateError,
+    );
+    await boom.abandon(const ['https://example/']);
+  });
 }

@@ -3,6 +3,8 @@
 /// the user cannot open.
 library;
 
+import 'dart:async';
+
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
@@ -71,10 +73,16 @@ class _Weather implements MeteorWeatherRepository {
 
   Result<Map<String, WeatherStation>> stationsResult;
   Result<WeatherSnapshot> latestResult;
+  Completer<void>? holdStations;
+  bool explode = false;
 
   @override
-  Future<Result<Map<String, WeatherStation>>> stations() async =>
-      stationsResult;
+  Future<Result<Map<String, WeatherStation>>> stations() async {
+    final hold = holdStations;
+    if (hold != null) await hold.future;
+    if (explode) throw StateError('stations exploded');
+    return stationsResult;
+  }
 
   @override
   Future<Result<WeatherSnapshot>> latest() async => latestResult;
@@ -282,6 +290,9 @@ void main() {
     await tester.tap(find.text(l10n.weatherRankingLowest));
     await tester.pumpAndSettle();
     expect(find.text('18.0 °C'), findsOneWidget);
+    await tester.tap(find.text(l10n.weatherRankingHighest));
+    await tester.pumpAndSettle();
+    expect(find.text('32.4 °C'), findsOneWidget);
 
     await tester.ensureVisible(find.text(l10n.weatherRankingMergeCounty));
     await tester.tap(find.text(l10n.weatherRankingMergeCounty));
@@ -297,6 +308,9 @@ void main() {
 
     await _openTab(tester, l10n.mapLayerHumidity);
     expect(find.text('80 %'), findsOneWidget);
+
+    await tester.tap(find.text(l10n.weatherRankingMergeTown));
+    await tester.pumpAndSettle();
 
     await _openTab(tester, l10n.mapLayerPressure);
     expect(find.text('1013.2 hPa'), findsOneWidget);
@@ -321,8 +335,73 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.weatherRankingMergeTown).hitTestable());
     await tester.pumpAndSettle();
-
-    await tester.drag(find.byType(ListView).last, const Offset(0, 200));
+    await tester.tap(find.text(l10n.weatherRankingMergeCounty).hitTestable());
     await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.reportFilterOrderDesc).hitTestable());
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('a reload keeps the list up until the next snapshot arrives', (
+    tester,
+  ) async {
+    final weather = _Weather(_catalogue(), _weatherSnap());
+    await _pump(
+      tester,
+      weather: weather,
+      rain: _Rain(_catalogue(), _rainSnap()),
+    );
+    expect(find.text('12.5 mm'), findsOneWidget);
+
+    weather.holdStations = Completer<void>();
+    final pending = tester
+        .widget<RefreshIndicator>(find.byType(RefreshIndicator).first)
+        .onRefresh();
+    await tester.pump();
+    expect(find.text('12.5 mm'), findsOneWidget);
+
+    weather.holdStations!.complete();
+    await pending;
+    await tester.pumpAndSettle();
+    expect(find.text('12.5 mm'), findsOneWidget);
+  });
+
+  testWidgets('a thrown load is the same retry surface as a failed result', (
+    tester,
+  ) async {
+    final weather = _Weather(_catalogue(), _weatherSnap())..explode = true;
+    await _pump(
+      tester,
+      weather: weather,
+      rain: _Rain(_catalogue(), _rainSnap()),
+    );
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.commonFetchFailed), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('tabs with nothing to rank say so instead of an empty column', (
+    tester,
+  ) async {
+    WeatherObservation blank(String id) =>
+        WeatherObservation(id: id, weatherCode: 100, temperature: 20);
+    await _pump(
+      tester,
+      weather: _Weather(
+        _catalogue(),
+        Ok(
+          WeatherSnapshot(
+            time: 1_700_000_000,
+            stations: [blank('A'), blank('B')],
+          ),
+        ),
+      ),
+      rain: _Rain(_catalogue(), _rainSnap()),
+      tab: WeatherRankingTab.humidity,
+    );
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.weatherRankingEmpty), findsOneWidget);
+
+    await _openTab(tester, l10n.weatherRankingTempExtremes);
+    expect(find.text(l10n.weatherRankingEmpty), findsOneWidget);
   });
 }

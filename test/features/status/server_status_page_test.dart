@@ -15,12 +15,15 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher_platform_interface/link.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 void main() {
   Widget wrap(
     ServerStatusRepository repo, {
     EndpointHealthMonitor? health,
     CloudflareStatusRepository? cloudflare,
+    Key? pageKey,
   }) {
     final cloudflareRepo =
         cloudflare ?? _FakeCloudflareRepository(Ok(_okCloudflare()));
@@ -33,7 +36,7 @@ void main() {
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const ServerStatusPage(),
+        home: ServerStatusPage(key: pageKey),
       ),
     );
   }
@@ -281,6 +284,149 @@ void main() {
     // Radar rows exist in both Core tables; TYO1's radar cell is 不支援.
     expect(find.text(l10n.endpointServiceRadar), findsNWidgets(2));
   });
+
+  testWidgets('a high error rate is degraded, and a blank host is a dash', (
+    tester,
+  ) async {
+    final status = ServerStatus(
+      recordedAt: DateTime.utc(2026, 8, 1, 12, 30),
+      down: const StatusMetric(value: 0),
+      errorRate: const StatusMetric(value: 0.2),
+      latency: const StatusMetric(value: 20, instance: ''),
+    );
+    await tester.pumpWidget(wrap(_FakeRepository(Ok(status))));
+    await tester.pumpAndSettle();
+
+    final l10n = l10nOf(tester);
+    expect(find.text(l10n.serverStatusDegraded), findsOneWidget);
+    expect(find.text('0.2%'), findsOneWidget);
+    expect(find.text('—'), findsWidgets);
+  });
+
+  testWidgets('one blip is degraded and a clean probe is healthy', (
+    tester,
+  ) async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    tester.view.physicalSize = const Size(800, 5000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    final degraded = EndpointHealthMonitor()
+      ..failure(
+        ApiTier.lbApi,
+        'https://api.lb-tpe1.exptech.dev',
+        '/api/v2/eq/eew',
+      );
+    await tester.pumpWidget(
+      wrap(_FakeRepository(Ok(okStatus())), health: degraded),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.endpointHealthDegraded), findsOneWidget);
+    expect(find.byIcon(Icons.warning_amber_rounded), findsWidgets);
+
+    final healthy = EndpointHealthMonitor()
+      ..success(
+        ApiTier.lbApi,
+        'https://api.lb-tpe1.exptech.dev',
+        '/api/v2/eq/eew',
+      );
+    await tester.pumpWidget(
+      wrap(_FakeRepository(Ok(okStatus())), health: healthy),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.endpointHealthOk), findsOneWidget);
+  });
+
+  testWidgets('cloudflare names partial, major, unknown, and an empty list', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 8000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final now = DateTime.utc(2026, 8, 18, 3);
+    CloudflareStatus status(List<CloudflareComponent> components) =>
+        CloudflareStatus(recordedAt: now, components: components);
+
+    var pumps = 0;
+    Future<void> show(CloudflareStatus cloudflare) async {
+      await tester.pumpWidget(
+        wrap(
+          _FakeRepository(Ok(okStatus())),
+          cloudflare: _FakeCloudflareRepository(Ok(cloudflare)),
+          pageKey: ValueKey(pumps++),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await show(status(const []));
+    final l10n = l10nOf(tester);
+    expect(find.text(l10n.serverStatusCloudflareNone), findsOneWidget);
+
+    await show(
+      status([
+        CloudflareComponent(
+          name: 'Taipei - (TPE)',
+          state: CloudflareComponentState.partialOutage,
+          updatedAt: now,
+        ),
+        CloudflareComponent(
+          name: 'Kaohsiung City - (KHH)',
+          state: CloudflareComponentState.majorOutage,
+          updatedAt: now,
+        ),
+        CloudflareComponent(
+          name: 'Somewhere',
+          state: CloudflareComponentState.unknown,
+          updatedAt: now,
+        ),
+      ]),
+    );
+    expect(find.text(l10n.serverStatusCloudflarePartial), findsOneWidget);
+    expect(find.text(l10n.serverStatusCloudflareMajor), findsOneWidget);
+    expect(find.text(l10n.serverStatusCloudflareUnknown), findsOneWidget);
+    expect(find.byIcon(Icons.error), findsWidgets);
+    expect(find.byIcon(Icons.help_outline), findsWidgets);
+  });
+
+  testWidgets('a dashboard link the OS refuses is a snackbar, not a crash', (
+    tester,
+  ) async {
+    final previous = UrlLauncherPlatform.instance;
+    UrlLauncherPlatform.instance = _DecliningLauncher();
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    await tester.pumpWidget(wrap(_FakeRepository(Ok(okStatus()))));
+    await tester.pumpAndSettle();
+    final l10n = l10nOf(tester);
+
+    await tester.tap(find.text(l10n.serverStatusWebUrl));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text(l10n.moreLinkOpenFailed), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _DecliningLauncher extends UrlLauncherPlatform {
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> canLaunch(String url) async => false;
+
+  @override
+  Future<bool> launch(
+    String url, {
+    required bool useSafariVC,
+    required bool useWebView,
+    required bool enableJavaScript,
+    required bool enableDomStorage,
+    required bool universalLinksOnly,
+    required Map<String, String> headers,
+    String? webOnlyWindowName,
+  }) async => false;
 }
 
 AppLocalizations l10nOf(WidgetTester tester) =>

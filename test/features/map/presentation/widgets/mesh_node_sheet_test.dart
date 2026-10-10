@@ -14,14 +14,25 @@ void main() {
 
   var clock = DateTime.utc(2026, 1, 1, 12);
 
-  MeshNode node(int num, {double snr = 0, int? battery}) => MeshNode(
+  MeshNode node(
+    int num, {
+    double snr = 0,
+    int? battery,
+    String name = 'repeater',
+    bool viaMqtt = false,
+    int? hops,
+    double? lat = 24.0,
+    double? lng = 121.6,
+  }) => MeshNode(
     num: num,
-    displayName: 'repeater',
+    displayName: name,
     batteryLevel: battery,
     lastHeard: clock,
-    latitude: 24.0,
-    longitude: 121.6,
+    latitude: lat,
+    longitude: lng,
     snr: snr,
+    viaMqtt: viaMqtt,
+    hopsAway: hops,
   );
 
   Future<(MeshNodeStore, FakeMeshService)> makeStore() async {
@@ -35,23 +46,29 @@ void main() {
     return (store, service);
   }
 
-  Widget wrap(MeshNodeStore store, {bool connected = true, int cooldown = 0}) =>
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: MeshNodeSheet(
-            store: store,
-            selected: ValueNotifier(1),
-            selectionRevision: ValueNotifier(0),
-            routeState: ValueNotifier(const MeshRouteState.none()),
-            connected: ValueNotifier(connected),
-            traceCooldown: ValueNotifier(cooldown),
-            onTraceRoute: (_) {},
-            onClose: () {},
-          ),
-        ),
-      );
+  Widget wrap(
+    MeshNodeStore store, {
+    bool connected = true,
+    int cooldown = 0,
+    ValueNotifier<int?>? selected,
+    ValueNotifier<MeshRouteState>? route,
+  }) => MaterialApp(
+    locale: const Locale('en'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: Scaffold(
+      body: MeshNodeSheet(
+        store: store,
+        selected: selected ?? ValueNotifier(1),
+        selectionRevision: ValueNotifier(0),
+        routeState: route ?? ValueNotifier(const MeshRouteState.none()),
+        connected: ValueNotifier(connected),
+        traceCooldown: ValueNotifier(cooldown),
+        onTraceRoute: (_) {},
+        onClose: () {},
+      ),
+    ),
+  );
 
   testWidgets('no trends until two distinct readings exist', (tester) async {
     final (store, service) = await makeStore();
@@ -156,6 +173,113 @@ void main() {
     expect(find.text('Trace route 12'), findsOneWidget);
     expect(find.text('Radio limits this to once every 30 s'), findsOneWidget);
     // Let the store's debounced persist fire.
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  testWidgets('nothing selected asks for a tap', (tester) async {
+    final (store, _) = await makeStore();
+    await tester.pumpWidget(wrap(store, selected: ValueNotifier<int?>(null)));
+    await tester.pump();
+    expect(find.text('Tap a node for details'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  testWidgets('mqtt, hops, a nameless id, and distance all read on the sheet', (
+    tester,
+  ) async {
+    final (store, service) = await makeStore();
+    final selected = ValueNotifier<int?>(1);
+    service.nodes
+      ..add(node(0x1234, name: 'mine', lat: 25, lng: 121))
+      ..add(node(1, name: '', viaMqtt: true, hops: 0, lat: 25.001, lng: 121));
+    await tester.pump();
+    await tester.pumpWidget(wrap(store, selected: selected));
+    await tester.pump();
+
+    expect(find.text('0x1'), findsWidgets);
+    expect(find.text('Via MQTT (internet)'), findsOneWidget);
+    expect(find.text('Direct'), findsOneWidget);
+    expect(find.textContaining(' m'), findsOneWidget);
+
+    service.nodes.add(
+      node(1, name: '', viaMqtt: true, hops: 3, lat: 25.02, lng: 121),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('3 hops'), findsOneWidget);
+    expect(find.textContaining('km'), findsOneWidget);
+
+    service.nodes.add(node(1, name: '', hops: 3, lat: 26, lng: 121));
+    await tester.pump();
+    await tester.pump();
+    expect(find.textContaining('111'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  testWidgets('a flat signal trend still draws', (tester) async {
+    final (store, service) = await makeStore();
+    service.nodes.add(node(1, snr: -6, battery: 80));
+    clock = clock.add(const Duration(minutes: 2));
+    service.nodes.add(node(1, snr: -6, battery: 79));
+    await tester.pump();
+    await tester.pumpWidget(wrap(store));
+    await tester.pump();
+    expect(find.text('Signal trend (SNR)'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2, milliseconds: 100));
+  });
+
+  testWidgets('trace results, failures, and an in-flight probe all say so', (
+    tester,
+  ) async {
+    final (store, service) = await makeStore();
+    service.nodes.add(node(1));
+    await tester.pump();
+    final route = ValueNotifier<MeshRouteState>(
+      const MeshRouteState(
+        result: MeshRoute(
+          towards: [MeshRouteHop(num: 9), MeshRouteHop(num: 1)],
+          back: [],
+          target: 1,
+        ),
+      ),
+    );
+    await tester.pumpWidget(wrap(store, route: route));
+    await tester.pump();
+    expect(find.text('Direct — no relays between'), findsOneWidget);
+
+    route.value = const MeshRouteState(
+      result: MeshRoute(
+        towards: [
+          MeshRouteHop(num: 9),
+          MeshRouteHop(num: 8),
+          MeshRouteHop(num: 1),
+        ],
+        back: [],
+        target: 1,
+      ),
+    );
+    await tester.pump();
+    expect(find.text('1 hops'), findsOneWidget);
+
+    route.value = const MeshRouteState(failed: true);
+    await tester.pump();
+    expect(
+      find.text('No reply — out of range or on another channel key'),
+      findsOneWidget,
+    );
+
+    route.value = const MeshRouteState(failed: true, reason: 'busy');
+    await tester.pump();
+    expect(find.text('busy'), findsOneWidget);
+
+    route.value = const MeshRouteState(result: MeshRoute.none());
+    await tester.pump();
+    expect(find.text('Unreadable reply'), findsOneWidget);
+
+    route.value = const MeshRouteState(target: 1);
+    await tester.pump();
+    expect(find.text('Tracing…'), findsOneWidget);
     await tester.pump(const Duration(seconds: 2, milliseconds: 100));
   });
 }

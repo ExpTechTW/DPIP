@@ -24,6 +24,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher_platform_interface/link.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 class _BugRepository implements BugRepository {
   Result<List<BugThread>> next = const Ok([]);
@@ -49,6 +51,7 @@ BugThread _thread(
   required int activity,
   List<String> tags = const [],
   String body = 'body',
+  String authorAvatar = '',
 }) => BugThread(
   id: id,
   title: title,
@@ -56,7 +59,7 @@ BugThread _thread(
   body: body,
   author: id,
   authorName: 'author $id',
-  authorAvatar: '',
+  authorAvatar: authorAvatar,
   createdAt: DateTime.utc(2026, 1, id),
   messageCount: replies,
   lastMessageId: activity,
@@ -271,4 +274,142 @@ void main() {
     expect(find.text('Heading • bold link'), findsOneWidget);
     expect(find.textContaining('https://'), findsNothing);
   });
+
+  testWidgets('a selected tag comes off, and last activity sorts back', (
+    tester,
+  ) async {
+    final repository = _BugRepository()
+      ..next = Ok([
+        _thread(
+          1,
+          title: 'many replies',
+          replies: 99,
+          activity: 10,
+          tags: ['android'],
+        ),
+        _thread(
+          2,
+          title: 'latest reply',
+          replies: 1,
+          activity: 20,
+          tags: ['android'],
+        ),
+      ]);
+    await _pump(tester, repository);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    await tester.tap(find.text('android').first);
+    await tester.pump();
+    await tester.tap(find.text('android').first);
+    await tester.pump();
+    expect(find.text('many replies'), findsOneWidget);
+    expect(find.text('latest reply'), findsOneWidget);
+
+    await tester.tap(
+      find.widgetWithText(ChoiceChip, l10n.bugTrackerSortMostDiscussed),
+    );
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ChoiceChip, l10n.bugTrackerSortLast));
+    await tester.pump();
+    expect(
+      tester
+          .widgetList<Text>(find.byType(Text))
+          .map((w) => w.data)
+          .where((s) => s == 'many replies' || s == 'latest reply'),
+      ['latest reply', 'many replies'],
+    );
+  });
+
+  testWidgets('pull to refresh asks the mirror again', (tester) async {
+    final repository = _BugRepository()
+      ..next = Ok([_thread(1, title: 'open', replies: 0, activity: 1)]);
+    await _pump(tester, repository);
+    expect(repository.calls, 1);
+
+    await tester
+        .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+        .onRefresh();
+    await tester.pump();
+    expect(repository.calls, greaterThan(1));
+  });
+
+  testWidgets('an author avatar is requested, and a bad one does not crash', (
+    tester,
+  ) async {
+    final repository = _BugRepository()
+      ..next = Ok([
+        _thread(
+          1,
+          title: 'with a face',
+          replies: 0,
+          activity: 1,
+          authorAvatar: 'https://cdn.example/a.png',
+        ),
+      ]);
+    await _pump(tester, repository);
+    await tester.pump();
+    expect(find.text('with a face'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a Discord link the OS refuses explains that, either way', (
+    tester,
+  ) async {
+    final repository = _BugRepository()
+      ..next = Ok([_thread(1, title: 'open', replies: 0, activity: 1)]);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    final previous = UrlLauncherPlatform.instance;
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    UrlLauncherPlatform.instance = _DecliningLauncher();
+    await _pump(tester, repository);
+    await tester.tap(find.text(l10n.bugTrackerGoToDiscord));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text(l10n.moreLinkOpenFailed), findsOneWidget);
+
+    UrlLauncherPlatform.instance = _ThrowingLauncher();
+    await tester.tap(find.text(l10n.bugTrackerGoToDiscord));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text(l10n.moreLinkOpenFailed), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _DecliningLauncher extends UrlLauncherPlatform {
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> canLaunch(String url) async => false;
+
+  @override
+  Future<bool> launch(
+    String url, {
+    required bool useSafariVC,
+    required bool useWebView,
+    required bool enableJavaScript,
+    required bool enableDomStorage,
+    required bool universalLinksOnly,
+    required Map<String, String> headers,
+    String? webOnlyWindowName,
+  }) async => false;
+}
+
+class _ThrowingLauncher extends _DecliningLauncher {
+  @override
+  Future<bool> launch(
+    String url, {
+    required bool useSafariVC,
+    required bool useWebView,
+    required bool enableJavaScript,
+    required bool enableDomStorage,
+    required bool universalLinksOnly,
+    required Map<String, String> headers,
+    String? webOnlyWindowName,
+  }) async {
+    throw StateError('no browser');
+  }
 }

@@ -50,4 +50,64 @@ void main() {
     expect(find.text('Fewer blank tiles'), findsOneWidget);
     expect(find.byIcon(Icons.map_outlined), findsOneWidget);
   });
+
+  testWidgets('a technical card shows its details and its stat rows', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('en'),
+        home: Scaffold(
+          body: TechnicalHighlightGroup(
+            cards: [
+              ReleaseHighlightCard(
+                id: 'cache',
+                icon: 'query_stats',
+                title: {'en': 'Cache'},
+                body: {'en': 'Tiles stay on disk.'},
+                details: [
+                  HighlightDetail(
+                    key: {'en': 'Store'},
+                    value: {'en': 'SQLite'},
+                  ),
+                  HighlightDetail(
+                    key: {'en': 'Budget'},
+                    value: {'en': '48 MB'},
+                  ),
+                ],
+                stats: [
+                  HighlightStat(value: {'en': '350'}, label: {'en': 'MiB'}),
+                  HighlightStat(value: {'en': '12'}, label: {'en': 'frames'}),
+                ],
+              ),
+              ReleaseHighlightCard(
+                id: 'numbers',
+                icon: 'query_stats',
+                title: {'en': 'Numbers only'},
+                stats: [
+                  HighlightStat(value: {'en': '2'}, label: {'en': 'radios'}),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Collapsed tiles keep the rows out of the tree. Open both so the
+    // spacer between a body and its stats, and a stats-only card, both build.
+    await tester.tap(find.text('Cache'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Numbers only'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tiles stay on disk.'), findsOneWidget);
+    expect(find.text('SQLite'), findsOneWidget);
+    expect(find.text('48 MB'), findsOneWidget);
+    expect(find.text('350'), findsOneWidget);
+    expect(find.text('MiB'), findsOneWidget);
+    expect(find.text('frames'), findsOneWidget);
+    expect(find.text('radios'), findsOneWidget);
+    expect(find.byIcon(Icons.query_stats_outlined), findsWidgets);
+  });
 }
