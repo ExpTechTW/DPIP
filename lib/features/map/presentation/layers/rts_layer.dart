@@ -533,10 +533,24 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final hasBox = _alerts.alerting;
     try {
       if (hasBox) {
-        final (geoJson, signature) = _boxGeoJson(grid);
+        final (boxes, signature) = _survivingBoxes(grid);
         if (signature != _boxOnMap) {
-          await controller.setGeoJsonSource(_ids.boxSource, geoJson);
+          // Claimed before the await, not after: the wavefront ticker calls
+          // this every frame, and a tick landing while the write was in
+          // flight used to upload the same collection again. Two writes land
+          // on the platform channel in call order, so the later call's set is
+          // the one the source ends up holding — and it is the one recorded.
           _boxOnMap = signature;
+          try {
+            await controller.setGeoJsonSource(
+              _ids.boxSource,
+              _boxCollection(boxes),
+            );
+          } catch (_) {
+            // The write never landed, so nothing is known to be there.
+            _boxOnMap = null;
+            rethrow;
+          }
         }
       }
       if (hasBox != _boxVisible) {
@@ -554,18 +568,18 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// stops blinking instead of blinking forever once it's no longer live
   /// information.
   ///
-  /// Also returns the collection's signature — the surviving ids with their
+  /// Returned with their signature — the surviving ids with their
   /// intensities, in order — which is everything the geometry depends on,
   /// since a ring is a function of its id alone. [_pushBox] compares it
   /// against what the map already holds.
-  (Map<String, dynamic>, String) _boxGeoJson(RtsBoxGrid grid) {
+  (List<(int, List<List<double>>)>, String) _survivingBoxes(RtsBoxGrid grid) {
     final box = _alerts.areas.boxes;
     final alerts = _eew.state.data ?? const <Eew>[];
     final now = AppTime.utc;
     final covers = _travelTime == null
         ? const <_SWaveCover>[]
         : _sWaveCovers(alerts, _travelTime!, now);
-    final features = <Map<String, dynamic>>[];
+    final surviving = <(int, List<List<double>>)>[];
     final signature = StringBuffer();
     for (final entry in box.entries) {
       final ring = grid.rings[entry.key];
@@ -576,20 +590,30 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         ..write(':')
         ..write(entry.value)
         ..write(',');
-      features.add({
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [ring],
-        },
-        'properties': {'i': entry.value},
-      });
+      surviving.add((entry.value, ring));
     }
-    return (
-      {'type': 'FeatureCollection', 'features': features},
-      signature.toString(),
-    );
+    return (surviving, signature.toString());
   }
+
+  /// The collection for the boxes [_survivingBoxes] kept — built only when
+  /// their signature differs from what the map holds, which during an alert is
+  /// a handful of times against sixty checks a second.
+  static Map<String, dynamic> _boxCollection(
+    List<(int, List<List<double>>)> boxes,
+  ) => {
+    'type': 'FeatureCollection',
+    'features': [
+      for (final (level, ring) in boxes)
+        {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [ring],
+          },
+          'properties': {'i': level},
+        },
+    ],
+  };
 
   /// Metres per degree of latitude on the sphere [geo.LatLng.distanceTo]
   /// measures on — the great-circle distance between two points is never less
@@ -630,16 +654,23 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// the wavefront had fully swept past it, since by then it's a stale
   /// reading rather than live shaking data.
   bool _isBoxFullyCovered(List<List<double>> ring, List<_SWaveCover> covers) {
+    // The first four points are the box's corners (the fifth closes the ring).
+    // An index loop rather than `take(4).every(…)`: the same short-circuit,
+    // without an iterable and a closure per box per alert per frame.
+    final corners = ring.length < 4 ? ring.length : 4;
     for (final cover in covers) {
-      final allCornersCovered = ring.take(4).every((point) {
+      var allCornersCovered = true;
+      for (var k = 0; k < corners; k++) {
+        final point = ring[k];
         final lat = point[1];
         // Exact reject: meridional distance is a lower bound on the geodesic.
         if ((lat - cover.reach.latitude).abs() * _metresPerLatDegree >
-            cover.metres) {
-          return false;
+                cover.metres ||
+            !cover.reach.contains(lat, point[0])) {
+          allCornersCovered = false;
+          break;
         }
-        return cover.reach.contains(lat, point[0]);
-      });
+      }
       if (allCornersCovered) return true;
     }
     return false;
