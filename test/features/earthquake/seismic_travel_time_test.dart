@@ -119,6 +119,24 @@ void main() {
     );
   });
 
+  test('an exact midpoint keeps the earlier tabulated depth', () {
+    const shallow = [(p: 2.0, r: 10.0, s: 4.0)];
+    const deep = [(p: 9.0, r: 10.0, s: 18.0)];
+    const ordered = SeismicTravelTimeTable({0: shallow, 10: deep});
+    // 5 km is equally far from 0 and 10. The walk keeps the earlier key.
+    expect(ordered.pWaveTime(5, 10), 2000);
+
+    // Insertion order is not depth order. A tie must still keep the key the
+    // walk saw first, which is 10 here, not the smaller depth.
+    const reversed = SeismicTravelTimeTable({10: deep, 0: shallow});
+    expect(reversed.pWaveTime(5, 10), 9000);
+    expect(
+      reversed.pWaveTime(4, 10),
+      2000,
+      reason: '4 km is strictly nearer 0',
+    );
+  });
+
   test('travel time uses the first row when the distance is inside it', () {
     const table = SeismicTravelTimeTable({
       10: [(p: 1.5, r: 20, s: 3)],
