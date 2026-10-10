@@ -17,11 +17,93 @@ import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class AlmanacPage extends StatelessWidget {
+class AlmanacPage extends StatefulWidget {
   const AlmanacPage({super.key});
 
+  @override
+  State<AlmanacPage> createState() => _AlmanacPageState();
+}
+
+class _AlmanacPageState extends State<AlmanacPage> {
   static final DateFormat _date = DateFormat('yyyy/MM/dd');
   static final DateFormat _stamp = DateFormat('yyyy/MM/dd HH:mm');
+
+  /// The eclipse lists stay valid only while [AppTime.utc] is still before
+  /// the first eclipse begins. Past that instant the search cursor moves
+  /// and the next frame can name a different eclipse, so the cache stops
+  /// rather than painting the old one. An empty search is not held: the
+  /// window slides forward with the clock and a later instant can find one.
+  List<Eclipse>? _lunar;
+  DateTime? _lunarFrom;
+  DateTime? _lunarUntil;
+  List<Eclipse>? _solar;
+  double? _solarLat;
+  double? _solarLng;
+  DateTime? _solarFrom;
+  DateTime? _solarUntil;
+
+  List<Eclipse> _lunarEclipses(DateTime now) {
+    final cached = _lunar;
+    final from = _lunarFrom;
+    final until = _lunarUntil;
+    if (cached != null &&
+        from != null &&
+        until != null &&
+        !now.isBefore(from) &&
+        now.isBefore(until)) {
+      return cached;
+    }
+    final list = <Eclipse>[];
+    var cursor = now;
+    for (var i = 0; i < 3; i++) {
+      final eclipse = Eclipses.nextLunar(cursor, withinDays: 800);
+      if (eclipse == null) break;
+      list.add(eclipse);
+      cursor = eclipse.peak.add(const Duration(days: 20));
+    }
+    _lunar = list;
+    _lunarFrom = now;
+    _lunarUntil = list.isEmpty ? now : (list.first.begins ?? now);
+    return list;
+  }
+
+  List<Eclipse> _solarEclipses(
+    DateTime now,
+    double latitude,
+    double longitude,
+  ) {
+    final cached = _solar;
+    final from = _solarFrom;
+    final until = _solarUntil;
+    if (cached != null &&
+        _solarLat == latitude &&
+        _solarLng == longitude &&
+        from != null &&
+        until != null &&
+        !now.isBefore(from) &&
+        now.isBefore(until)) {
+      return cached;
+    }
+    final list = <Eclipse>[];
+    var cursor = now;
+    for (var i = 0; i < 2; i++) {
+      final eclipse = Eclipses.nextSolar(
+        cursor,
+        latitude: latitude,
+        longitude: longitude,
+        withinDays: 4000,
+      );
+      if (eclipse == null) break;
+      list.add(eclipse);
+      cursor = eclipse.peak.add(const Duration(days: 20));
+    }
+    _solar = list;
+    _solarLat = latitude;
+    _solarLng = longitude;
+    _solarFrom = now;
+    _solarUntil = list.isEmpty ? now : (list.first.begins ?? now);
+    return list;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,31 +111,10 @@ class AlmanacPage extends StatelessWidget {
     final town = observerTown(context);
     final now = AppTime.utc;
     final lunar = LunisolarCalendar.of(now);
-
-    final lunarEclipses = <Eclipse>[];
-    var cursor = now;
-    for (var i = 0; i < 3; i++) {
-      final eclipse = Eclipses.nextLunar(cursor, withinDays: 800);
-      if (eclipse == null) break;
-      lunarEclipses.add(eclipse);
-      cursor = eclipse.peak.add(const Duration(days: 20));
-    }
-
-    final solarEclipses = <Eclipse>[];
-    if (town != null) {
-      cursor = now;
-      for (var i = 0; i < 2; i++) {
-        final eclipse = Eclipses.nextSolar(
-          cursor,
-          latitude: town.lat,
-          longitude: town.lng,
-          withinDays: 4000,
-        );
-        if (eclipse == null) break;
-        solarEclipses.add(eclipse);
-        cursor = eclipse.peak.add(const Duration(days: 20));
-      }
-    }
+    final lunarEclipses = _lunarEclipses(now);
+    final solarEclipses = town == null
+        ? const <Eclipse>[]
+        : _solarEclipses(now, town.lat, town.lng);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.almanacTitle)),
