@@ -396,15 +396,39 @@ class _RainRankingPanel extends StatefulWidget {
 class _RainRankingPanelState extends State<_RainRankingPanel> {
   RainInterval _interval = RainInterval.now;
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
+  /// Same identity cache as [_WeatherMetricPanelState._ranked]: a tab swipe
+  /// rebuilds this panel, and sorting every rain gauge again for the same
+  /// snapshot is the stutter. A refresh replaces the maps, so identity is
+  /// the right key.
+  List<RankedObservation>? _rankedCache;
+  Map<String, WeatherStation>? _rankedStations;
+  RainSnapshot? _rankedSnapshot;
+  RainInterval? _rankedInterval;
+
+  List<RankedObservation> _ranked() {
+    final cached = _rankedCache;
+    if (cached != null &&
+        identical(_rankedStations, widget.stations) &&
+        identical(_rankedSnapshot, widget.snapshot) &&
+        _rankedInterval == _interval) {
+      return cached;
+    }
     final ranked = rankRain(
       stations: widget.stations,
       snapshot: widget.snapshot,
       interval: _interval,
     );
+    _rankedStations = widget.stations;
+    _rankedSnapshot = widget.snapshot;
+    _rankedInterval = _interval;
+    return _rankedCache = ranked;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final ranked = _ranked();
     final time = _formatSnapshotTime(widget.snapshot.time);
 
     return RefreshIndicator(
@@ -439,7 +463,7 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
             ),
           ),
           Expanded(
-            child: ListView(
+            child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.fromLTRB(
                 0,
@@ -447,37 +471,38 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
                 0,
                 _rankingBottomPad(context),
               ),
-              children: [
-                if (ranked.isEmpty)
-                  SizedBox(
+              // Off-screen gauges are not built. The ranked order and the
+              // labels of the rows that are on screen stay the same.
+              itemCount: ranked.isEmpty ? 1 : ranked.length,
+              itemBuilder: (context, index) {
+                if (ranked.isEmpty) {
+                  return SizedBox(
                     height: 240,
                     child: EmptyView(
                       icon: Icons.umbrella_outlined,
                       message: l10n.weatherRankingEmpty,
                     ),
-                  )
-                else
-                  ...List.generate(ranked.length, (index) {
-                    final item = ranked[index];
-                    final label = item.value == item.value.roundToDouble()
-                        ? '${item.value.toStringAsFixed(0)} mm'
-                        : '${item.value.toStringAsFixed(1)} mm';
-                    return WeatherRankingRow(
-                      rank: index + 1,
-                      item: item,
-                      merge: RankingMerge.none,
-                      valueLabel: label,
-                      fraction: ranked.first.value == 0
-                          ? 0
-                          : item.value / ranked.first.value,
-                      onTap: () => _openStationOnMap(
-                        context,
-                        layerId: widget.mapLayerId,
-                        item: item,
-                      ),
-                    );
-                  }),
-              ],
+                  );
+                }
+                final item = ranked[index];
+                final label = item.value == item.value.roundToDouble()
+                    ? '${item.value.toStringAsFixed(0)} mm'
+                    : '${item.value.toStringAsFixed(1)} mm';
+                return WeatherRankingRow(
+                  rank: index + 1,
+                  item: item,
+                  merge: RankingMerge.none,
+                  valueLabel: label,
+                  fraction: ranked.first.value == 0
+                      ? 0
+                      : item.value / ranked.first.value,
+                  onTap: () => _openStationOnMap(
+                    context,
+                    layerId: widget.mapLayerId,
+                    item: item,
+                  ),
+                );
+              },
             ),
           ),
         ],
