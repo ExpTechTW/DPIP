@@ -186,7 +186,10 @@ final class WidgetServerClockTests: XCTestCase {
         XCTAssertFalse(succeeded)
         XCTAssertFalse(hasSynchronized)
         XCTAssertEqual(callCount, 0)
-        XCTAssertEqual(timeouts, [8])
+        // The default covers the whole source chain, not one request: SNTP's
+        // primary→backup fallback is 2 hosts × 3s, and the HTTP `/ntp` stage
+        // behind it adds 2s more.
+        XCTAssertEqual(timeouts, [10])
     }
 
     func testOuterTimeoutPreservesExistingAnchor() async {
