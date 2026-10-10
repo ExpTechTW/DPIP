@@ -87,6 +87,19 @@ void main() {
       );
     });
 
+    test('puts the newer model cycle first when valid times tie', () {
+      expect(
+        FrameTileApi.windFramesFromList([
+          {'t': 1783360200, 'c': 1783339200},
+          {'t': 1783360200, 'c': 1783360800},
+        ]),
+        [
+          '1783360200@1783360800',
+          '1783360200@1783339200',
+        ],
+      );
+    });
+
     test('rejects a row without either timestamp', () {
       expect(
         () => FrameTileApi.windFramesFromList([
