@@ -280,6 +280,77 @@ struct DPIPWidgetTimelinePlanner: Sendable {
     }
 }
 
+/// In-memory presentation only; never passed to a cache writer or planner.
+struct DPIPWidgetSnapshotContent: Sendable {
+    let snapshot: CurrentWeatherWidgetSnapshot?
+    let forecast: ForecastWidgetSnapshot?
+}
+
+enum DPIPWidgetGalleryPreview {
+    /// Use a complete sample, rather than attaching invented forecast values
+    /// to a real observation. Also used by Canvas and WidgetKit placeholders.
+    static func sample(at date: Date) -> DPIPWidgetSnapshotContent {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Taipei")!
+        let hour = calendar.component(.hour, from: date)
+        let isNight = hour < 6 || hour >= 18
+        let transition = calendar.nextDate(
+            after: date,
+            matching: DateComponents(hour: isNight ? 6 : 18, minute: 0),
+            matchingPolicy: .nextTime
+        )!
+        let nextHour = calendar.dateInterval(of: .hour, for: date)!.end
+        let conditions: [(String, Int, Double, Int)] = [
+            ("晴", 100, 28, 0),
+            ("多雲", 200, 28, 10),
+            ("多雲", 200, 27, 20),
+            ("多雲有雨", 206, 27, 60),
+            ("多雲有雨", 206, 26, 60),
+        ]
+        let points = conditions.enumerated().map { index, value in
+            let pointDate = nextHour.addingTimeInterval(Double(index) * 3_600)
+            let pointHour = calendar.component(.hour, from: pointDate)
+            return ForecastWidgetPoint(
+                time: String(format: "%02d:00", pointHour),
+                temperature: value.2,
+                weather: value.0,
+                weatherCode: value.1,
+                pop: value.3
+            )!
+        }
+        let milliseconds = Int64(date.timeIntervalSince1970 * 1_000)
+        return DPIPWidgetSnapshotContent(
+            snapshot: CurrentWeatherWidgetSnapshot(
+                schemaVersion: 7,
+                sourceIdentifier: "region:407",
+                regionCode: "407",
+                regionName: String(localized: "widget.preview_location"),
+                observationTime: Int(date.timeIntervalSince1970),
+                stationName: "西屯",
+                weather: "晴",
+                weatherCode: 100,
+                condition: .clear,
+                isNight: isNight,
+                nextDayNightTransitionTime: Int(transition.timeIntervalSince1970),
+                calibratedTimeOffsetMilliseconds: 0,
+                temperature: 28,
+                humidity: 76,
+                rain: 0,
+                windDirection: "北北西",
+                windSpeed: 1.3,
+                apparentTemperature: 30
+            ),
+            forecast: ForecastWidgetSnapshot(
+                sourceIdentifier: "region:407",
+                regionCode: "407",
+                updateTime: milliseconds,
+                receivedAt: milliseconds,
+                points: points
+            )
+        )
+    }
+}
+
 struct DPIPWidgetProviderDependencies: Sendable {
     typealias LoadSnapshot = DPIPWidgetTimelinePlanner.LoadSnapshot
     typealias LoadForecast = DPIPWidgetTimelinePlanner.LoadForecast
@@ -300,6 +371,40 @@ struct DPIPWidgetProviderDependencies: Sendable {
         for target: WidgetLocationTarget
     ) -> CurrentWeatherWidgetSnapshot? {
         loadSnapshot(target)
+    }
+
+    /// WidgetKit snapshots remain cache-only. The gallery fallback is selected
+    /// here, outside getTimeline's planner and all persistence dependencies.
+    func snapshotContent(
+        for target: WidgetLocationTarget,
+        at date: Date,
+        family: WidgetFamily,
+        isPreview: Bool
+    ) -> DPIPWidgetSnapshotContent {
+        let current = snapshot(for: target)
+        let forecast = forecastSnapshot(
+            for: target, currentSnapshot: current, at: date, family: family
+        )
+        let cached = DPIPWidgetSnapshotContent(snapshot: current, forecast: forecast)
+        guard isPreview, ForecastWidgetFamilyPolicy.supportsForecast(family),
+              target.sourceIdentifier != nil else { return cached }
+
+        if let current, target.matches(snapshot: current), let forecast,
+           forecast.sourceIdentifier == target.sourceIdentifier,
+           forecast.regionCode == current.regionCode,
+           ForecastWidgetExpiry.isUsable(
+               forecast, at: date,
+               calibratedTimeOffsetMilliseconds:
+                   current.calibratedTimeOffsetMilliseconds
+           ), !ForecastWidgetFamilyPolicy.visiblePoints(
+               in: forecast,
+               at: CurrentWeatherWidgetTimeCalibration(snapshot: current)
+                   .calibratedDate(fromDeviceDate: date),
+               family: family
+           ).isEmpty {
+            return cached
+        }
+        return DPIPWidgetGalleryPreview.sample(at: date)
     }
 
     func forecastSnapshot(
