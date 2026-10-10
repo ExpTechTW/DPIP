@@ -95,6 +95,17 @@ class MlIntensityWorker {
   }
 }
 
+/// A tight [Uint8List] is returned as-is. A view into a larger buffer is
+/// copied, so the bytes [MlIntensityModel.parse] reads match [Uint8List.fromList].
+Uint8List _inflated(List<int> decoded) {
+  if (decoded is Uint8List &&
+      decoded.offsetInBytes == 0 &&
+      decoded.lengthInBytes == decoded.buffer.lengthInBytes) {
+    return decoded;
+  }
+  return Uint8List.fromList(decoded);
+}
+
 Future<void> _main(
   (SendPort, TransferableTypedData, bool, Float64List, Float64List) args,
 ) async {
@@ -102,7 +113,9 @@ Future<void> _main(
   final MlPointPredictor predictor;
   try {
     final bytes = transferred.materialize().asUint8List();
-    final onnx = gzipped ? Uint8List.fromList(gzip.decode(bytes)) : bytes;
+    // gzip.decode already owns the inflated buffer. fromList copied the
+    // whole 14.7 MB model a second time before parse ever saw it.
+    final onnx = gzipped ? _inflated(gzip.decode(bytes)) : bytes;
     predictor = MlPointPredictor(
       MlIntensityModel.parse(onnx),
       latitudes,
