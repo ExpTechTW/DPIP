@@ -810,14 +810,27 @@ class EtagCacheStore {
   static Map<String, Uint8List> _gunzipAllSync(Map<String, Uint8List> blobs) =>
       {
         for (final entry in blobs.entries)
-          entry.key: Uint8List.fromList(gzip.decode(entry.value)),
+          entry.key: _inflated(gzip.decode(entry.value)),
       };
 
   static Future<Uint8List> _gunzip(Uint8List blob) async {
     if (blob.length > _isolateThreshold) {
-      return Isolate.run(() => Uint8List.fromList(gzip.decode(blob)));
+      return Isolate.run(() => _inflated(gzip.decode(blob)));
     }
-    return Uint8List.fromList(gzip.decode(blob));
+    return _inflated(gzip.decode(blob));
+  }
+
+  /// [gzip.decode] already returns the inflated bytes. Copying them again
+  /// doubled the allocation of every cached tile. A view into a larger buffer
+  /// is still copied, so what callers read — length and contents — matches
+  /// [Uint8List.fromList].
+  static Uint8List _inflated(List<int> decoded) {
+    if (decoded is Uint8List &&
+        decoded.offsetInBytes == 0 &&
+        decoded.lengthInBytes == decoded.buffer.lengthInBytes) {
+      return decoded;
+    }
+    return Uint8List.fromList(decoded);
   }
 
   /// Whether to *try* an outer gzip for this binary payload.
