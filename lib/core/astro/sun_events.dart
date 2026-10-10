@@ -126,21 +126,30 @@ class SunEvents {
     required double longitude,
     Duration window = const Duration(hours: 24),
   }) {
-    final observer = Observer(latitude: latitude, longitude: longitude);
-    RiseSet at(double altitude) => RiseSet.solve(
+    // One scan for all six thresholds: each comes back exactly as its own
+    // solve would, but the Sun's position and altitude at every step are
+    // worked out once instead of six times.
+    final [
+      day,
+      civil,
+      nautical,
+      astronomical,
+      goldenTop,
+      goldenFloor,
+    ] = RiseSet.solveAll(
       from: from,
-      observer: observer,
+      observer: Observer(latitude: latitude, longitude: longitude),
       track: SunEphemeris.track,
-      horizon: (_) => altitude,
+      horizons: [
+        (_) => sunHorizon,
+        (_) => civilTwilight,
+        (_) => nauticalTwilight,
+        (_) => astronomicalTwilight,
+        (_) => goldenHourTop,
+        (_) => goldenHourBottom,
+      ],
       window: window,
     );
-
-    final day = at(sunHorizon);
-    final civil = at(civilTwilight);
-    final nautical = at(nauticalTwilight);
-    final astronomical = at(astronomicalTwilight);
-    final goldenTop = at(goldenHourTop);
-    final goldenFloor = at(goldenHourBottom);
 
     return SunEvents(
       rise: day.rise,
