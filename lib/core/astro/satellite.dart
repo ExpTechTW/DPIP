@@ -310,6 +310,14 @@ class Sgp4 {
     _qoms24 = qoms24;
     _theta = cosInclination;
     _beta0 = beta0;
+    // Constant for the element set. propagate() used to recompute them on
+    // every minute of a pass search.
+    _cosArgPerigee = math.cos(elements.argumentOfPerigee);
+    _sinMeanAnomaly0 = math.sin(elements.meanAnomaly);
+    _cosMeanAnomaly0 = math.cos(elements.meanAnomaly);
+    _sinInclination = math.sin(elements.inclination);
+    _xiToFourth = math.pow(_xi, 4);
+    _meanAnomalyDragBase = math.pow(1 + _eta * _cosMeanAnomaly0, 3);
   }
 
   final TleSet elements;
@@ -331,6 +339,12 @@ class Sgp4 {
   late final double _qoms24;
   late final double _theta;
   late final double _beta0;
+  late final double _cosArgPerigee;
+  late final double _sinMeanAnomaly0;
+  late final double _cosMeanAnomaly0;
+  late final double _sinInclination;
+  late final num _xiToFourth;
+  late final num _meanAnomalyDragBase;
 
   /// The satellite's TEME state at [utc].
   SatelliteState at(DateTime utc) =>
@@ -346,17 +360,16 @@ class Sgp4 {
     final perigeeDf = elements.argumentOfPerigee + _perigeeDot * t;
     final nodeDf = elements.rightAscensionOfNode + _nodeDot * t;
 
-    final deltaPerigee =
-        elements.bstar * _c3 * math.cos(elements.argumentOfPerigee) * t;
+    final deltaPerigee = elements.bstar * _c3 * _cosArgPerigee * t;
     final deltaMean = e0 > 1e-4
         ? -2 /
               3 *
               _qoms24 *
               elements.bstar *
-              math.pow(_xi, 4) /
+              _xiToFourth /
               (e0 * _eta) *
               (math.pow(1 + _eta * math.cos(meanAnomalyDf), 3) -
-                  math.pow(1 + _eta * math.cos(elements.meanAnomaly), 3))
+                  _meanAnomalyDragBase)
         : 0.0;
 
     final meanAnomaly = meanAnomalyDf + deltaPerigee + deltaMean;
@@ -375,9 +388,7 @@ class Sgp4 {
     final eccentricity =
         e0 -
         elements.bstar * _c4 * t -
-        elements.bstar *
-            _c5 *
-            (math.sin(meanAnomaly) - math.sin(elements.meanAnomaly));
+        elements.bstar * _c5 * (math.sin(meanAnomaly) - _sinMeanAnomaly0);
     final a =
         _semiMajorAxis *
         math.pow(
@@ -417,12 +428,12 @@ class Sgp4 {
     final xll =
         temp *
         _a30 *
-        math.sin(elements.inclination) /
+        _sinInclination /
         (8 * _k2) *
         axn *
         (3 + 5 * _theta) /
         (1 + _theta);
-    final aynl = temp * _a30 * math.sin(elements.inclination) / (4 * _k2);
+    final aynl = temp * _a30 * _sinInclination / (4 * _k2);
     final ayn = eccentricity * math.sin(perigee) + aynl;
 
     // Kepler's equation for (E + ω).
