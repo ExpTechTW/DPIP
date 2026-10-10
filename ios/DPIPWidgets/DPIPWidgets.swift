@@ -14,22 +14,17 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
         self.dependencies = dependencies
     }
 
-    private func snapshot(
-        for configuration: WeatherWidgetConfigurationIntent
-    ) -> CurrentWeatherWidgetSnapshot? {
-        let target = WidgetLocationTarget(
-            identifier: configuration.location?.identifier
-        )
-
-        return dependencies.snapshot(for: target)
-    }
-
     func placeholder(in context: Context) -> DPIPWidgetEntry {
-        DPIPWidgetEntry(
-            date: .now,
-            snapshot: nil,
+        let date = Date.now
+        let content = ForecastWidgetFamilyPolicy.supportsForecast(context.family)
+            ? DPIPWidgetGalleryPreview.sample(at: date)
+            : DPIPWidgetSnapshotContent(snapshot: nil, forecast: nil)
+        return DPIPWidgetEntry(
+            date: date,
+            snapshot: content.snapshot,
             isStale: false,
-            isNight: false,
+            isNight: content.snapshot?.isNight ?? false,
+            forecast: content.forecast
         )
     }
 
@@ -38,11 +33,18 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
         in context: Context,
         completion: @escaping (DPIPWidgetEntry) -> Void
     ) {
-        let snapshot = snapshot(for: configuration)
         let deviceNow = Date.now
         let target = WidgetLocationTarget(
             identifier: configuration.location?.identifier
         )
+
+        let content = dependencies.snapshotContent(
+            for: target,
+            at: deviceNow,
+            family: context.family,
+            isPreview: context.isPreview
+        )
+        let snapshot = content.snapshot
 
         let state = CurrentWeatherWidgetTimeline.state(
             snapshot: snapshot,
@@ -55,12 +57,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             snapshot: snapshot,
             isStale: state.isStale,
             isNight: state.isNight,
-            forecast: dependencies.forecastSnapshot(
-                for: target,
-                currentSnapshot: snapshot,
-                at: deviceNow,
-                family: context.family
-            )
+            forecast: content.forecast
         )
 
         completion(entry)
@@ -768,98 +765,30 @@ struct DPIPWidgets: Widget {
 struct DPIPWidgets_Previews: PreviewProvider {
     private static let previewNow = Date()
 
-    private static let previewTransitionTime = Int(
-        previewNow
-            .addingTimeInterval(6 * 60 * 60)
-            .timeIntervalSince1970
-    )
-
-    private static let previewForecast = ForecastWidgetSnapshot(
-        sourceIdentifier: "current-location",
-        regionCode: "407",
-
-        updateTime: 1_790_316_445_925,
-        receivedAt: 1_790_316_600_000,
-
-        points: [
-            ForecastWidgetPoint(
-                time: "01:00",
-                temperature: 26.0,
-                weather: "晴",
-                weatherCode: 100,
-                pop: 0
-            )!,
-            ForecastWidgetPoint(
-                time: "02:00",
-                temperature: 26.0,
-                weather: "多雲",
-                weatherCode: 200,
-                pop: 10
-            )!,
-            ForecastWidgetPoint(
-                time: "03:00",
-                temperature: 25.0,
-                weather: "多雲有雨",
-                weatherCode: 206,
-                pop: 60
-            )!,
-            ForecastWidgetPoint(
-                time: "04:00",
-                temperature: 25.0,
-                weather: "多雲有雷雨",
-                weatherCode: 214,
-                pop: 80
-            )!,
-            ForecastWidgetPoint(
-                time: "05:00",
-                temperature: 24.0,
-                weather: "多雲有霧",
-                weatherCode: 205,
-                pop: 20
-            )!,
-        ]    )
+    private static let previewContent = DPIPWidgetGalleryPreview.sample(at: previewNow)
 
     private static let previewEntry = DPIPWidgetEntry(
         date: previewNow,
-        snapshot: CurrentWeatherWidgetSnapshot(
-            schemaVersion: 7,
-            sourceIdentifier: "current-location",
-            regionCode: "407",
-            regionName: "西屯區",
-            observationTime: Int(previewNow.timeIntervalSince1970),
-            stationName: "西屯",
-            weather: "晴",
-            weatherCode: 100,
-            condition: .clear,
-            isNight: true,
-            nextDayNightTransitionTime: previewTransitionTime,
-            calibratedTimeOffsetMilliseconds: 0,
-            temperature: 28.0,
-            humidity: 76,
-            rain: 0.0,
-            windDirection: "北北西",
-            windSpeed: 1.3,
-            apparentTemperature: 30.2
-        ),
+        snapshot: previewContent.snapshot,
         isStale: false,
-        isNight: true,
-        forecast: previewForecast
+        isNight: previewContent.snapshot?.isNight ?? false,
+        forecast: previewContent.forecast
     )
 
     private static let missingOptionalDataEntry = DPIPWidgetEntry(
-        date: .now,
+        date: previewNow,
         snapshot: CurrentWeatherWidgetSnapshot(
             schemaVersion: 7,
-            sourceIdentifier: "current-location",
+            sourceIdentifier: "region:407",
             regionCode: "407",
-            regionName: "西屯區",
-            observationTime: Int(Date().timeIntervalSince1970),
+            regionName: String(localized: "widget.preview_location"),
+            observationTime: Int(previewNow.timeIntervalSince1970),
             stationName: "西屯",
             weather: "多雲",
             weatherCode: 200,
             condition: .cloudy,
-            isNight: false,
-            nextDayNightTransitionTime: 1_789_562_700,
+            isNight: previewContent.snapshot!.isNight,
+            nextDayNightTransitionTime: previewContent.snapshot!.nextDayNightTransitionTime,
             calibratedTimeOffsetMilliseconds: 0,
             temperature: 28.0,
             humidity: 76,
@@ -869,8 +798,8 @@ struct DPIPWidgets_Previews: PreviewProvider {
             apparentTemperature: nil,
         ),
         isStale: false,
-        isNight: false,
-        forecast: previewForecast
+        isNight: previewContent.snapshot!.isNight,
+        forecast: previewContent.forecast
     )
 
     @ViewBuilder

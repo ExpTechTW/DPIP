@@ -698,6 +698,269 @@ final class ForecastWidgetProviderTests: XCTestCase {
     }
 }
 
+final class ForecastWidgetGalleryPreviewTests: XCTestCase {
+    private let date = instant("2026-09-25T07:21:00Z") // 15:21 Taipei
+    private let target = WidgetLocationTarget.saved(regionCode: "407")
+
+    func testFirstGalleryPreviewWithoutForecastUsesCompleteSampleForMediumAndLarge() throws {
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            let state = ForecastPlannerState(current: currentSnapshot(target: target))
+            let content = dependencies(state).snapshotContent(
+                for: target, at: date, family: family, isPreview: true
+            )
+            let current = try XCTUnwrap(content.snapshot)
+            let forecast = try XCTUnwrap(content.forecast)
+            // Both sides come from the sample; no real observation is mixed in.
+            XCTAssertEqual(current.temperature, 28)
+            XCTAssertEqual(current.apparentTemperature, 30)
+            XCTAssertNotEqual(current.stationName, "station")
+            XCTAssertEqual(current.sourceIdentifier, forecast.sourceIdentifier)
+            XCTAssertEqual(current.regionCode, forecast.regionCode)
+            XCTAssertEqual(current.observationTime, Int(date.timeIntervalSince1970))
+            XCTAssertEqual(forecast.updateTime, Int64(date.timeIntervalSince1970 * 1_000))
+            XCTAssertEqual(ForecastWidgetFamilyPolicy.visiblePoints(
+                in: forecast, at: date, family: family
+            ).map(\.time), ["16:00", "17:00", "18:00", "19:00", "20:00"])
+            XCTAssertEqual(state.forecastRefreshCount, 0)
+            XCTAssertNil(state.forecast)
+            XCTAssertEqual(state.current?.temperature, 22)
+        }
+    }
+
+    func testGalleryWithoutAnyWeatherCacheStillHasCompleteSample() {
+        let content = dependencies(ForecastPlannerState(current: nil)).snapshotContent(
+            for: target, at: date, family: .systemMedium, isPreview: true
+        )
+        XCTAssertNotNil(content.snapshot)
+        XCTAssertEqual(content.forecast?.points.count, 5)
+    }
+
+    func testGalleryPrefersMatchingValidForecastCacheForBothFamilies() {
+        let forecast = freshForecast(times: ["16:00", "17:00"])
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target), forecast: forecast
+        )
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            let content = dependencies(state).snapshotContent(
+                for: target, at: date, family: family, isPreview: true
+            )
+            XCTAssertEqual(content.snapshot?.stationName, "station")
+            XCTAssertEqual(content.snapshot?.temperature, 22)
+            XCTAssertEqual(content.forecast?.points, forecast.points)
+            XCTAssertEqual(content.forecast?.updateTime, forecast.updateTime)
+        }
+        XCTAssertEqual(state.forecastRefreshCount, 0)
+    }
+
+    func testGalleryWithExpiredForecastUsesWholeSample() {
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target),
+            forecast: forecastSnapshot(
+                updateTime: milliseconds("2026-09-25T06:00:00Z"),
+                receivedAt: milliseconds("2026-09-25T06:00:00Z"),
+                times: ["16:00"]
+            )
+        )
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            let content = dependencies(state).snapshotContent(
+                for: target, at: date, family: family, isPreview: true
+            )
+            XCTAssertEqual(content.snapshot?.temperature, 28)
+            XCTAssertEqual(content.forecast?.points.count, 5)
+        }
+    }
+
+    func testGalleryWithFreshCacheButNoVisibleHoursUsesWholeSample() {
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target),
+            forecast: freshForecast(times: ["13:00", "14:00"])
+        )
+        let content = dependencies(state).snapshotContent(
+            for: target, at: date, family: .systemMedium, isPreview: true
+        )
+        XCTAssertEqual(content.snapshot?.temperature, 28)
+        XCTAssertEqual(content.forecast?.points.count, 5)
+    }
+
+    func testSmallGalleryRemainsCacheOnlyWithAndWithoutCurrentWeather() {
+        for current in [currentSnapshot(target: target), nil] {
+            let state = ForecastPlannerState(current: current, forecast: freshForecast())
+            let content = dependencies(state).snapshotContent(
+                for: target, at: date, family: .systemSmall, isPreview: true
+            )
+            XCTAssertEqual(content.snapshot?.temperature, current?.temperature)
+            XCTAssertEqual(content.snapshot?.stationName, current?.stationName)
+            XCTAssertNil(content.forecast)
+            XCTAssertEqual(state.forecastRefreshCount, 0)
+        }
+    }
+
+    func testSampleNeverAppearsInNormalSnapshotsOrTimelinePlans() async {
+        for current in [currentSnapshot(target: target), nil] {
+            for family: WidgetFamily in [.systemMedium, .systemLarge] {
+                let state = ForecastPlannerState(current: current)
+                let deps = dependencies(state)
+                let gallery = deps.snapshotContent(
+                    for: target, at: date, family: family, isPreview: true
+                )
+                XCTAssertEqual(gallery.forecast?.points.count, 5)
+                let normal = deps.snapshotContent(
+                    for: target, at: date, family: family, isPreview: false
+                )
+                XCTAssertEqual(normal.snapshot?.temperature, current?.temperature)
+                XCTAssertNil(normal.forecast)
+                let plan = await deps.timelinePlanner.plan(for: target, family: family)
+                XCTAssertEqual(plan.snapshot?.temperature, current?.temperature)
+                XCTAssertNil(plan.forecast)
+                for entry in plan.states {
+                    XCTAssertNil(plan.forecast(at: entry.date))
+                }
+            }
+        }
+    }
+
+    func testLocationSwitchRejectsPreviousTownshipAndSavedTargetForecasts() {
+        let currentTarget = WidgetLocationTarget.currentLocation
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: currentTarget, regionCode: "242"),
+            forecast: freshForecast(source: "current-location", region: "407")
+        )
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            let content = dependencies(state).snapshotContent(
+                for: currentTarget, at: date, family: family, isPreview: true
+            )
+            // A complete labelled sample replaces both halves, never town B
+            // weather plus town A forecast.
+            XCTAssertNotEqual(content.snapshot?.stationName, "station")
+            XCTAssertEqual(content.snapshot?.sourceIdentifier, "region:407")
+            XCTAssertEqual(content.snapshot?.sourceIdentifier, content.forecast?.sourceIdentifier)
+            state.forecast = freshForecast(source: "region:242", region: "242")
+            let wrongSource = dependencies(state).snapshotContent(
+                for: currentTarget, at: date, family: family, isPreview: true
+            )
+            XCTAssertNotEqual(wrongSource.snapshot?.stationName, "station")
+            state.forecast = freshForecast(source: "current-location", region: "242")
+            let matching = dependencies(state).snapshotContent(
+                for: currentTarget, at: date, family: family, isPreview: true
+            )
+            XCTAssertEqual(matching.snapshot?.regionCode, "242")
+            XCTAssertEqual(matching.snapshot?.stationName, "station")
+            XCTAssertEqual(matching.forecast?.regionCode, "242")
+            state.forecast = freshForecast(source: "current-location", region: "407")
+        }
+    }
+
+    func testInvalidTargetDoesNotGainSampleOrOtherLocationData() {
+        let content = dependencies(ForecastPlannerState(current: nil)).snapshotContent(
+            for: .invalid(identifier: "bad"), at: date,
+            family: .systemMedium, isPreview: true
+        )
+        XCTAssertNil(content.snapshot)
+        XCTAssertNil(content.forecast)
+    }
+
+    func testRelativePreviewHoursAcrossDayAndMidnightIgnoreDeviceTimezone() throws {
+        let original = NSTimeZone.default
+        defer { NSTimeZone.default = original }
+        let cases: [(String, [String], Bool)] = [
+            ("2026-09-25T00:30:00Z", ["09:00", "10:00", "11:00", "12:00", "13:00"], false),
+            ("2026-09-25T07:21:00Z", ["16:00", "17:00", "18:00", "19:00", "20:00"], false),
+            ("2026-09-25T12:30:00Z", ["21:00", "22:00", "23:00", "00:00", "01:00"], true),
+            ("2026-09-25T15:59:59Z", ["00:00", "01:00", "02:00", "03:00", "04:00"], true),
+            ("2026-09-25T16:00:00Z", ["01:00", "02:00", "03:00", "04:00", "05:00"], true),
+        ]
+        for zone in ["Asia/Taipei", "America/Los_Angeles", "Pacific/Kiritimati"] {
+            NSTimeZone.default = TimeZone(identifier: zone)!
+            for (instantString, expected, night) in cases {
+                let now = instant(instantString)
+                let content = DPIPWidgetGalleryPreview.sample(at: now)
+                let current = try XCTUnwrap(content.snapshot)
+                let forecast = try XCTUnwrap(content.forecast)
+                XCTAssertEqual(current.isNight, night)
+                XCTAssertGreaterThan(Double(current.nextDayNightTransitionTime), now.timeIntervalSince1970)
+                XCTAssertTrue(ForecastWidgetExpiry.isUsable(forecast, at: now))
+                for family: WidgetFamily in [.systemMedium, .systemLarge] {
+                    XCTAssertEqual(ForecastWidgetFamilyPolicy.visiblePoints(
+                        in: forecast, at: now, family: family
+                    ).map(\.time), expected, "\(zone) / \(instantString)")
+                }
+            }
+        }
+    }
+
+    func testGallerySampleNeverWritesToPersistentStorage() throws {
+        let container = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: container, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: container) }
+        let store = WidgetSnapshotStore(containerURL: container)
+        let forecasts = ForecastWidgetSnapshotStore(containerURL: container)
+        let current = currentSnapshot(target: target)
+        _ = try CurrentWeatherWidgetTestFixtures.seed(
+            current, at: .saved(regionCode: "407"), containerURL: container
+        )
+        let deps = DPIPWidgetProviderDependencies(
+            loadSnapshot: { store.loadCurrentWeatherSnapshot(for: $0) },
+            timelinePlanner: dependencies(ForecastPlannerState(current: nil)).timelinePlanner,
+            loadForecast: { forecasts.load(for: $0, regionCode: $1, at: $2) }
+        )
+        // Include a stale cache file as well as the initially absent cache.
+        for stale in [false, true] {
+            if stale {
+                try forecasts.write(forecastSnapshot(
+                    updateTime: milliseconds("2026-09-25T06:00:00Z"),
+                    receivedAt: milliseconds("2026-09-25T06:00:00Z")
+                ), for: target)
+            }
+            let before = try persistedFiles(in: container)
+            for family: WidgetFamily in [.systemMedium, .systemLarge] {
+                let content = deps.snapshotContent(
+                    for: target, at: date, family: family, isPreview: true
+                )
+                XCTAssertEqual(content.forecast?.points.count, 5)
+                XCTAssertEqual(content.snapshot?.temperature, 28)
+            }
+            XCTAssertEqual(try persistedFiles(in: container), before)
+        }
+    }
+
+    private func persistedFiles(in directory: URL) throws -> [String: Data] {
+        let urls = FileManager.default.enumerator(
+            at: directory, includingPropertiesForKeys: [.isRegularFileKey]
+        )!.allObjects as! [URL]
+        return try Dictionary(uniqueKeysWithValues: urls.filter {
+            try $0.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile == true
+        }.map { ($0.path, try Data(contentsOf: $0)) })
+    }
+
+    private func dependencies(_ state: ForecastPlannerState) -> DPIPWidgetProviderDependencies {
+        let now = date
+        return DPIPWidgetProviderDependencies(
+            loadSnapshot: { state.loadCurrent($0) },
+            timelinePlanner: DPIPWidgetTimelinePlanner(
+                staleAfter: 30 * 60, refreshInterval: 20 * 60,
+                loadSnapshot: { state.loadCurrent($0) },
+                refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
+                loadForecast: { state.loadForecast($0, $1, $2) },
+                refreshForecast: { await state.refreshForecast($0, $1) },
+                now: { now }
+            ),
+            loadForecast: { state.loadForecast($0, $1, $2) }
+        )
+    }
+
+    private func freshForecast(
+        source: String = "region:407", region: String = "407",
+        times: [String] = ["16:00", "17:00", "18:00", "19:00", "20:00"]
+    ) -> ForecastWidgetSnapshot {
+        forecastSnapshot(
+            sourceIdentifier: source, regionCode: region,
+            updateTime: Int64(date.timeIntervalSince1970 * 1_000),
+            receivedAt: Int64(date.timeIntervalSince1970 * 1_000), times: times
+        )
+    }
+}
+
 private final class ForecastCallCounter: @unchecked Sendable {
     private let lock = NSLock()
     private var value = 0

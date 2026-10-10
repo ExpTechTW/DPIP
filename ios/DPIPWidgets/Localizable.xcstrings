@@ -625,6 +625,42 @@
         }
       }
     },
+    "widget.preview_location" : {
+      "comment" : "Example location label for a complete Widget Gallery sample; never a real observation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sample Location"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビュー地点"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "미리보기 위치"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "预览地点"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "預覽地點"
+          }
+        }
+      }
+    },
     "widget.rainfall" : {
       "extractionState" : "manual",
       "localizations" : {
