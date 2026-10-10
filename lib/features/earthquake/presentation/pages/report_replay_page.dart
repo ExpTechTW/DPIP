@@ -1377,7 +1377,7 @@ class _EewAlertCard extends StatelessWidget {
 /// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
 /// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so it
 /// reads as urgent even collapsed, not just the card above it.
-class _ReplayStatusBar extends StatelessWidget {
+class _ReplayStatusBar extends StatefulWidget {
   const _ReplayStatusBar({
     required this.clock,
     required this.second,
@@ -1394,11 +1394,30 @@ class _ReplayStatusBar extends StatelessWidget {
   final EewRealtimeController eew;
 
   @override
+  State<_ReplayStatusBar> createState() => _ReplayStatusBarState();
+}
+
+class _ReplayStatusBarState extends State<_ReplayStatusBar> {
+  /// One subscription for the life of the bar. Building a fresh
+  /// [Listenable.merge] inside the per-second clock builder attached and
+  /// detached both feeds on every tick.
+  late Listenable _feeds = Listenable.merge([widget.rts, widget.eew]);
+
+  @override
+  void didUpdateWidget(covariant _ReplayStatusBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.rts, widget.rts) ||
+        !identical(oldWidget.eew, widget.eew)) {
+      _feeds = Listenable.merge([widget.rts, widget.eew]);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<int>(
-      valueListenable: second,
+      valueListenable: widget.second,
       builder: (context, _, _) => ListenableBuilder(
-        listenable: Listenable.merge([rts, eew]),
+        listenable: _feeds,
         builder: (context, _) => _buildContent(context),
       ),
     );
@@ -1411,23 +1430,23 @@ class _ReplayStatusBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final taipeiTime = AppTime.taipei(clock.now());
+    final taipeiTime = AppTime.taipei(widget.clock.now());
     final timeText = _clockFormat.format(taipeiTime);
 
     // RTS snapshots age out of the server long before the EEW history does, so
     // an old enough event replays as alerts over a map with no shaking on it.
     // That feed is not broken and saying "連線中斷" reads as a broken app —
     // the replay is running, there is just nothing recorded that far back.
-    final (Color dot, String? statusWord) = rts.isMissingHistory
+    final (Color dot, String? statusWord) = widget.rts.isMissingHistory
         ? (Colors.orange, l10n.feedReplaying)
-        : switch (rts.status) {
+        : switch (widget.rts.status) {
             RealtimeStatus.live => (Colors.green, null),
             RealtimeStatus.stale => (Colors.amber, l10n.feedStale),
             RealtimeStatus.offline => (Colors.red, l10n.feedOffline),
             RealtimeStatus.connecting => (Colors.grey, l10n.feedConnecting),
           };
 
-    final alertCount = eew.alerts.length;
+    final alertCount = widget.eew.alerts.length;
     final hasActiveEew = alertCount > 0;
     final onTint = hasActiveEew ? colors.onErrorContainer : null;
 
