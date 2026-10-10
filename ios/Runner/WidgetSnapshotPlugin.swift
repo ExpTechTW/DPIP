@@ -148,15 +148,45 @@ enum WidgetSnapshotFile {
     }
   }
 
+  /// Removes everything that could be on disk for this kind — which is more
+  /// than `write` puts there, because the widget extension caches too.
+  ///
+  /// Current weather and hourly forecast both stopped being one file per kind
+  /// when they became one file per target, and for a while only the write paths
+  /// knew it: this removed the single legacy file, found nothing, reported
+  /// success, and left every per-target snapshot on disk for the widget to keep
+  /// drawing. Neither per-target layout is named here; each is owned by the
+  /// type that writes it, and this only asks that type to empty itself.
   static func clear(_ kind: WidgetSnapshotKind, in container: URL) throws {
     let directory = container.appendingPathComponent("WidgetSnapshots", isDirectory: true)
-    let snapshot = directory.appendingPathComponent(kind.filename)
     do {
-      try FileManager.default.removeItem(at: snapshot)
-    } catch let error as CocoaError where error.code == .fileNoSuchFile {
-      // Clearing an absent snapshot is intentionally idempotent.
+      switch kind {
+      case .currentWeather:
+        try CurrentWeatherSnapshotStorage(containerURL: container).removeAll()
+        // And the pre-per-target file. WidgetSnapshotStore still reads it as a
+        // migration fallback, so on a device upgraded across that change it is
+        // exactly what would stay on screen after everything else was cleared.
+        try remove(directory.appendingPathComponent(kind.filename))
+
+      case .weatherForecast:
+        try ForecastSnapshotLocation.removeAll(in: container)
+        // And the pre-per-target file, for the same reason current weather
+        // clears its own: the widget still falls back to it.
+        try remove(directory.appendingPathComponent(kind.filename))
+
+      case .locationCatalog:
+        try remove(directory.appendingPathComponent(kind.filename))
+      }
     } catch {
       throw WidgetSnapshotError.writeFailed
+    }
+  }
+
+  private static func remove(_ url: URL) throws {
+    do {
+      try FileManager.default.removeItem(at: url)
+    } catch let error as CocoaError where error.code == .fileNoSuchFile {
+      // Clearing an absent snapshot is intentionally idempotent.
     }
   }
 

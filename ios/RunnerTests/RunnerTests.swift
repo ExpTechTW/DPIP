@@ -102,7 +102,7 @@ final class RunnerTests: XCTestCase {
     XCTAssertEqual(stored["regionCode"] as? String, "110")
   }
 
-  func testSnapshotClearIsIdempotent() throws {
+  func testSnapshotClearRemovesEveryCurrentWeatherSnapshot() throws {
     let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     defer { try? FileManager.default.removeItem(at: container) }
     let kind = try WidgetSnapshotFile.kind("currentWeather")
@@ -135,7 +135,57 @@ final class RunnerTests: XCTestCase {
 
     try WidgetSnapshotFile.clear(kind, in: container)
     XCTAssertFalse(FileManager.default.fileExists(atPath: legacyTarget.path))
+    XCTAssertFalse(FileManager.default.fileExists(atPath: perLocationTarget.path))
+
+    // The ordering sidecars went with them. Had one survived, it would claim a
+    // committed snapshot that is no longer on disk, and every write from here
+    // on would fail `invalidOrderingState` — a cleared widget that can never
+    // be republished.
+    XCTAssertNoThrow(
+      try WidgetSnapshotFile.replace(
+        data,
+        kind: kind,
+        sourceIdentifier: "region:220",
+        in: container
+      )
+    )
     XCTAssertTrue(FileManager.default.fileExists(atPath: perLocationTarget.path))
+
+    try WidgetSnapshotFile.clear(kind, in: container)
+    XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
+  }
+
+  func testSnapshotClearRemovesTheWidgetsForecastCache() throws {
+    let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    defer { try? FileManager.default.removeItem(at: container) }
+    let kind = try WidgetSnapshotFile.kind("weatherForecast")
+    let data = try WidgetSnapshotFile.payload("{\"schemaVersion\":1}")
+    let directory = container.appendingPathComponent("WidgetSnapshots")
+    let legacyTarget = directory.appendingPathComponent("weather-forecast.json")
+
+    XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
+
+    try FileManager.default.createDirectory(
+      at: directory,
+      withIntermediateDirectories: true
+    )
+    try data.write(to: legacyTarget, options: .atomic)
+
+    // Written by ForecastWidgetSnapshotStore, in the extension. The app never
+    // puts a file here, which is why clearing used to walk past it: a forecast
+    // survived "clear" and the widget went on drawing it.
+    let cache = ForecastSnapshotLocation.directoryURL(in: container)
+    let cached = cache.appendingPathComponent("region-220.json")
+    try FileManager.default.createDirectory(
+      at: cache,
+      withIntermediateDirectories: true
+    )
+    try data.write(to: cached, options: .atomic)
+
+    try WidgetSnapshotFile.clear(kind, in: container)
+    XCTAssertFalse(FileManager.default.fileExists(atPath: legacyTarget.path))
+    XCTAssertFalse(FileManager.default.fileExists(atPath: cached.path))
+    XCTAssertFalse(FileManager.default.fileExists(atPath: cache.path))
 
     XCTAssertNoThrow(try WidgetSnapshotFile.clear(kind, in: container))
   }

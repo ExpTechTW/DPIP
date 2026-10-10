@@ -84,6 +84,30 @@ final class CurrentWeatherSnapshotStorageTests: XCTestCase {
         XCTAssertTrue(isDirectory.boolValue)
     }
 
+    func testSchemaSevenApparentTemperatureSurvivesStorageRoundTrip() throws {
+        let address = CurrentWeatherSnapshotAddress.saved(regionCode: "407")
+        let token = try storage.beginWrite(for: address)
+        XCTAssertEqual(
+            try storage.replace(
+                snapshotData(
+                    sourceIdentifier: "region:407",
+                    regionCode: "407",
+                    observationTime: 100,
+                    apparentTemperature: 27.089955502470914
+                ),
+                using: token
+            ),
+            .written
+        )
+        let cached = try cachedSnapshot(for: address)
+        XCTAssertEqual(cached.schemaVersion, 7)
+        XCTAssertEqual(
+            try XCTUnwrap(cached.apparentTemperature),
+            27.089955502470914,
+            accuracy: 1e-9
+        )
+    }
+
     func testNewerObservationTimeWins() throws {
         let address = CurrentWeatherSnapshotAddress.saved(
             regionCode: "407"
@@ -858,11 +882,12 @@ final class CurrentWeatherSnapshotStorageTests: XCTestCase {
         sourceIdentifier: String,
         regionCode: String,
         regionName: String = "西屯區",
-        observationTime: Int
+        observationTime: Int,
+        apparentTemperature: Double? = nil
     ) -> Data {
         try! JSONEncoder().encode(
             CurrentWeatherWidgetSnapshot(
-                schemaVersion: 5,
+                schemaVersion: 7,
                 sourceIdentifier: sourceIdentifier,
                 regionCode: regionCode,
                 regionName: regionName,
@@ -876,7 +901,8 @@ final class CurrentWeatherSnapshotStorageTests: XCTestCase {
                 calibratedTimeOffsetMilliseconds: 0,
                 temperature: 25,
                 humidity: 60,
-                rain: 0
+                rain: 0,
+                apparentTemperature: apparentTemperature
             )
         )
     }
@@ -929,6 +955,13 @@ private struct FailingSnapshotCoordinator:
     ) throws -> T {
         throw SnapshotCoordinationTestError.failed
     }
+
+    func coordinate<T>(
+        deletingItemAt url: URL,
+        _ accessor: (URL) throws -> T
+    ) throws -> T {
+        throw SnapshotCoordinationTestError.failed
+    }
 }
 
 private final class BlockingFirstSnapshotCoordinator:
@@ -958,6 +991,13 @@ private final class BlockingFirstSnapshotCoordinator:
             firstAccessGate.wait()
         }
         return try accessor(url)
+    }
+
+    func coordinate<T>(
+        deletingItemAt url: URL,
+        _ accessor: (URL) throws -> T
+    ) throws -> T {
+        try accessor(url)
     }
 
     func releaseFirstAccess() {
@@ -1189,7 +1229,7 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
     }
 
     private func makeSnapshot(
-        schemaVersion: Int = 5,
+        schemaVersion: Int = 7,
         sourceIdentifier: String,
         regionCode: String,
         regionName: String = "西屯區"

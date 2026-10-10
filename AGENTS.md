@@ -47,6 +47,7 @@ tool/dev/analyze.sh
 |---|---|
 | Start the app | `tool/run.sh` (see [Running](#running)) |
 | Run the tests | `tool/dev/test.sh` |
+| Run the Swift tests (macOS only) | `tool/dev/test_ios.sh` — `ios/RunnerTests`, which `tool/dev/test.sh` cannot reach |
 | Test coverage, into `coverage/` | `tool/dev/coverage.sh` (see [Coverage](#coverage)) |
 | Format + analyze | `tool/dev/analyze.sh` |
 | Reformat in place | `tool/dev/format.sh` |
@@ -223,12 +224,17 @@ tool/check/tooling.sh
 tool/dev/analyze.sh
 tool/dev/codegen.sh          # then git diff --exit-code
 tool/dev/test.sh
+tool/dev/test_ios.sh         # only if you touched ios/ — macOS, and slow
 ```
 
 The bash gates need only bash and python3, so they fail fast without the
 toolchain. `.github/workflows/ci.yml` must stay green;
 `android.yml` / `ios.yml` build artifacts and `review.yml` adds an automated PR
 review.
+
+`ios.yml` also runs `ios/RunnerTests`, and it is the only thing that compiles
+the widget extension — so a change under `ios/` is unverified until that job
+goes green, whatever `ci.yml` says about the Dart side.
 
 Safety-critical seismic maths is pinned by golden tests
 (`test/features/earthquake/eew_estimator_test.dart`). If you change the EEW
