@@ -275,15 +275,37 @@ class RiseSet {
     required HorizonAltitude horizon,
     Duration window = const Duration(hours: 24),
     Duration step = const Duration(minutes: 10),
+  }) => solveAll(
+    from: from,
+    observer: observer,
+    track: track,
+    horizons: [horizon],
+    window: window,
+    step: step,
+  ).single;
+
+  /// [solve] against several horizons at once — one per returned [RiseSet],
+  /// in the same order.
+  ///
+  /// Each answer is exactly what [solve] gives for that horizon alone: the
+  /// sampling instants are the same, and so is every height (the body's
+  /// altitude less that horizon). What is shared is what does not depend on
+  /// the horizon — the body's position and altitude at each step, and the
+  /// transit — so the Sun's six twilight thresholds cost one scan, not six.
+  static List<RiseSet> solveAll({
+    required DateTime from,
+    required Observer observer,
+    required SkyTrack track,
+    required List<HorizonAltitude> horizons,
+    Duration window = const Duration(hours: 24),
+    Duration step = const Duration(minutes: 10),
   }) {
-    double above(DateTime at) {
-      final position = track(at);
-      return observer.lookAt(position, at).altitude - horizon(position);
-    }
+    final n = horizons.length;
 
     DateTime bisect(
       DateTime low,
       DateTime high,
+      HorizonAltitude horizon,
       bool Function(double) isBelow,
     ) {
       var lo = low;
@@ -292,7 +314,10 @@ class RiseSet {
         final mid = lo.add(
           Duration(microseconds: hi.difference(lo).inMicroseconds ~/ 2),
         );
-        if (isBelow(above(mid))) {
+        final position = track(mid);
+        final height =
+            observer.lookAt(position, mid).altitude - horizon(position);
+        if (isBelow(height)) {
           lo = mid;
         } else {
           hi = mid;
@@ -301,28 +326,40 @@ class RiseSet {
       return hi;
     }
 
-    DateTime? rise;
-    DateTime? set;
+    final rise = List<DateTime?>.filled(n, null);
+    final set = List<DateTime?>.filled(n, null);
     DateTime? transit;
 
     final stepMinutes = step.inMinutes;
     var previousAt = from;
-    var previousHeight = above(from);
-    var previousHourAngle = observer.hourAngle(track(from), from);
-    final startsAbove = !previousHeight.isNegative;
+    var position = track(from);
+    var altitude = observer.lookAt(position, from).altitude;
+    final previousHeight = [
+      for (final horizon in horizons) altitude - horizon(position),
+    ];
+    var previousHourAngle = observer.hourAngle(position, from);
+    final startsAbove = [
+      for (final height in previousHeight) !height.isNegative,
+    ];
 
     for (var m = stepMinutes; m <= window.inMinutes; m += stepMinutes) {
       final at = from.add(Duration(minutes: m));
-      final height = above(at);
-      if (previousHeight.isNegative && !height.isNegative) {
-        rise ??= bisect(previousAt, at, (h) => h.isNegative);
-      } else if (!previousHeight.isNegative && height.isNegative) {
-        set ??= bisect(previousAt, at, (h) => !h.isNegative);
+      position = track(at);
+      altitude = observer.lookAt(position, at).altitude;
+      for (var k = 0; k < n; k++) {
+        final height = altitude - horizons[k](position);
+        final previous = previousHeight[k];
+        if (previous.isNegative && !height.isNegative) {
+          rise[k] ??= bisect(previousAt, at, horizons[k], (h) => h.isNegative);
+        } else if (!previous.isNegative && height.isNegative) {
+          set[k] ??= bisect(previousAt, at, horizons[k], (h) => !h.isNegative);
+        }
+        previousHeight[k] = height;
       }
       // Upper transit is the hour angle passing through zero. Taken on the
       // signed hour angle, so the wrap from +π to -π (lower transit) is not
       // mistaken for it.
-      final currentHourAngle = observer.hourAngle(track(at), at);
+      final currentHourAngle = observer.hourAngle(position, at);
       if (transit == null &&
           previousHourAngle < 0 &&
           currentHourAngle >= 0 &&
@@ -342,15 +379,17 @@ class RiseSet {
         transit = hi;
       }
       previousAt = at;
-      previousHeight = height;
       previousHourAngle = currentHourAngle;
     }
 
-    return RiseSet(
-      rise: rise,
-      transit: transit,
-      set: set,
-      startsAbove: startsAbove,
-    );
+    return [
+      for (var k = 0; k < n; k++)
+        RiseSet(
+          rise: rise[k],
+          transit: transit,
+          set: set[k],
+          startsAbove: startsAbove[k],
+        ),
+    ];
   }
 }
