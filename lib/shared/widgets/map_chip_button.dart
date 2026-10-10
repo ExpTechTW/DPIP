@@ -45,6 +45,13 @@ class MapChipButton extends StatelessWidget {
   /// Shared dropdown chrome for overlay menus: rounded card on
   /// [ColorScheme.surfaceContainerHigh], hairline border, soft shadow, and
   /// inset rows ([AppSpacing.sm] gutters) so hover highlights stay rounded.
+  ///
+  /// Every caller pairs this with `MenuAnchor(animated: true)`. That flag
+  /// defaults to **false** in the framework, which is why the overlay menus
+  /// used to pop in with no transition at all while the layer switcher's
+  /// `showModalBottomSheet` slid up — the same tap felt like it belonged to
+  /// two different apps. With it on, the panel grows out of the chip and fades
+  /// in over the framework's 500ms opening curve.
   static MenuStyle menuStyle(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return MenuStyle(

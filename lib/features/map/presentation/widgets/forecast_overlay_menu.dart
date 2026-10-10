@@ -57,6 +57,7 @@ class ForecastOverlayMenu extends StatelessWidget {
         final showRelief = showTerrain.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
+          animated: true,
           style: MapChipButton.menuStyle(context),
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.tune,

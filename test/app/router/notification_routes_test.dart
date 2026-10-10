@@ -2,6 +2,7 @@ import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
+import 'package:dpip/features/map/presentation/layers/tsunami_layer.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -79,7 +80,7 @@ void main() {
       routeForNotificationChannel('report-general-v2'),
       AppRoutes.earthquake,
     );
-    expect(routeForNotificationChannel('tsunami-important-v2'), AppRoutes.home);
+    expect(routeForNotificationChannel('tsunami-important-v2'), AppRoutes.map);
     expect(
       routeForNotificationChannel('announcement-general-v2'),
       AppRoutes.home,
@@ -384,8 +385,8 @@ void main() {
   });
 
   // Half of an EEW tap's destination is the route; the other half is which of
-  // the map's fourteen overlays it lands on. Routing alone would drop the user
-  // on whatever the session was last looking at.
+  // the map's overlays it lands on. Routing alone would drop the user on
+  // whatever the session was last looking at.
   test('an EEW tap asks the map for 強震監視器, before it navigates', () {
     final order = <String>[];
     void record(
@@ -407,6 +408,25 @@ void main() {
     expect(order, ['layer:$monitorMapLayerId', 'go:${AppRoutes.map}']);
   });
 
+  test('a tsunami tap asks the map for the tsunami overlay', () {
+    final order = <String>[];
+    void record(
+      String name, {
+      Map<String, String> pathParameters = const {},
+      Map<String, dynamic> queryParameters = const {},
+      String? fragment,
+      Object? extra,
+    }) => order.add('go:$name');
+
+    routeNotificationTap(
+      const NotificationTap(channelKey: 'tsunami-important-v2'),
+      navigate: record,
+      focusMapLayer: (layerId) => order.add('layer:$layerId'),
+    );
+
+    expect(order, ['layer:$tsunamiMapLayerId', 'go:${AppRoutes.map}']);
+  });
+
   test('a channel with no overlay of its own leaves the map alone', () {
     final focused = <String>[];
     routeNotificationTap(
@@ -423,12 +443,14 @@ void main() {
     expect(focused, isEmpty);
   });
 
-  // The id is a literal in `app/router` because that layer must not import a
-  // feature's presentation code. This is what keeps the literal honest.
+  // The ids are literals in `app/router` because that layer must not import a
+  // feature's presentation code. This is what keeps the literals honest.
   test('every mapped overlay id is one the map actually offers', () {
     expect(RtsMapLayer.layerId, monitorMapLayerId);
-    for (final id in notificationChannelMapLayers.values) {
-      expect(id, monitorMapLayerId);
-    }
+    expect(TsunamiMapLayer.layerId, tsunamiMapLayerId);
+    expect(notificationChannelMapLayers.values.toSet(), {
+      monitorMapLayerId,
+      tsunamiMapLayerId,
+    });
   });
 }

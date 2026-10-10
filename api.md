@@ -231,6 +231,33 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 > 乃至完全不帶參數，回應一律是 `"range":"24h"` 且為 24 筆逐時資料。App 送出的參數
 > 是對的，是後端尚未實作 —— 在後端補上之前，「7 天」等同 24 小時。
 
+### 海嘯 CWA tsunami —— core 雙區
+
+兩支端點都是**索引 + 詳情**：索引只有事件摘要與 `id`，詳情才是內文與
+`data.area`。**時間單位是 Unix 毫秒**（`sent`、`validUntil`、以及 area 內各自的
+時間），與氣象家族的秒不同、也不經差量編碼 —— 直接當 13 位數毫秒用。
+
+**`data.area` 是位置式陣列，欄位數隨 `data.type` 改變**：`predict` 五欄
+`[地區, 沿岸範圍, 預估浪高, 抵達時間, 顏色]`、`observe` 六欄
+`[測站代碼, 測站名, 觀測浪高, 觀測時間, 經度, 緯度]`。用錯分支不會拋錯，只會把
+海岸範圍當成測站名；`observe` 的經緯度**可以整組是 `null`**（2024-04-03 的
+臺中港就是），所以地圖只畫有座標的那幾筆。解碼與判斷都在
+`TsunamiReport.decode`。
+
+**索引 `reports` 是最新在前，且會混入往年事件** —— `no`（`113003`）才是同一個
+事件的鍵，`rep`（`第3報`）是該事件內的第幾報。事件的**最後一報通常是「海嘯警報
+解除」**（`observe`、只有實測），所以「只读最新一報」等於看不到預估；列表與報告
+選擇器因此都以**最新事件的整個事件**為單位（`TsunamiBulletin.newestEvent`）。
+
+| 類別.方法 | 路徑 | 層級 |
+|---|---|---|
+| `TsunamiApi.getReports` | `/api/v1/cwa/tsunami` | `coreApi` |
+| `TsunamiApi.getReport` | `/api/v1/cwa/tsunami/{id}` | `coreApi` |
+
+> `coreApi`（多活）而非 `coreExclusiveApi`：`core-tyo1` 與 `core-tnn1` 實測都回
+> 200（索引與詳情皆然，2026-10-05），所以它跟著區域容錯，沒有理由只釘在 tnn1。
+> 沒有 ETag，因此每次都由 App 重新抓取 —— 只在圖層開啟時抓，索引與內文都小。
+
 ### 裝置與通知 —— `core-tnn1`
 
 | 類別.方法 | 路徑 | 層級 |

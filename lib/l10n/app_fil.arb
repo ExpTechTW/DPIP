@@ -117,7 +117,7 @@
   "reportFilterDateEndNote": "End day: through 24:00（Taipei）",
   "meshtasticSilent": "Tahimik",
   "reportFilterSortMagnitude": "Magnitude",
-  "mapLayerCategoryEarthquake": "Lindol",
+  "mapLayerCategoryEarthquake": "Lindol at tsunami",
   "mapLayerSatelliteB12": "Himawari Ozone (B12)",
   "restroomCategoryOther": "Iba pa",
   "@meshtasticRegionConfirm": {
@@ -2006,5 +2006,63 @@
   "moreSectionAccessibility": "Accessibility",
   "eewSpokenAnnouncementOn": "Naka-on",
   "eewSpokenAnnouncementOnDescription": "Babasahin muna nang malakas ang tinatayang intensidad bago tumunog ang babala — kaya naaantala ito nang kasinghaba ng pangungusap.",
-  "eewSpokenAnnouncementOff": "Naka-off"
+  "eewSpokenAnnouncementOff": "Naka-off",
+  "mapLayerTsunami": "Tsunami",
+  "@mapLayerTsunami": {
+    "description": "Tsunami feature string: mapLayerTsunami"
+  },
+  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "@tsunamiLegendEpicenter": {
+    "description": "Tsunami feature string: tsunamiLegendEpicenter"
+  },
+  "tsunamiEarthquake": "Source earthquake",
+  "@tsunamiEarthquake": {
+    "description": "Tsunami feature string: tsunamiEarthquake"
+  },
+  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "@tsunamiPredictions": {
+    "description": "Tsunami feature string: tsunamiPredictions"
+  },
+  "tsunamiObservations": "Observed tsunami by station",
+  "@tsunamiObservations": {
+    "description": "Tsunami feature string: tsunamiObservations"
+  },
+  "tsunamiBandOver3m": "Over 3 m",
+  "@tsunamiBandOver3m": {
+    "description": "Tsunami feature string: tsunamiBandOver3m"
+  },
+  "tsunamiBand1To3m": "1-3 m",
+  "@tsunamiBand1To3m": {
+    "description": "Tsunami feature string: tsunamiBand1To3m"
+  },
+  "tsunamiBand30cmTo1m": "0.3-1 m",
+  "@tsunamiBand30cmTo1m": {
+    "description": "Tsunami feature string: tsunamiBand30cmTo1m"
+  },
+  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "@tsunamiBandUnder30cm": {
+    "description": "Tsunami feature string: tsunamiBandUnder30cm"
+  },
+  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "@tsunamiEmpty": {
+    "description": "Tsunami feature string: tsunamiEmpty"
+  },
+  "tsunamiReportNumber": "Report {n}",
+  "@tsunamiReportNumber": {
+    "description": "Tsunami feature string: tsunamiReportNumber",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "tsunamiWaveHeightCm": "{cm} cm",
+  "@tsunamiWaveHeightCm": {
+    "description": "Tsunami feature string: tsunamiWaveHeightCm",
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -119,7 +119,7 @@
   "reportFilterDateEndNote": "結束日：當日 24:00（台北時間）",
   "meshtasticSilent": "已靜默",
   "reportFilterSortMagnitude": "規模",
-  "mapLayerCategoryEarthquake": "地震",
+  "mapLayerCategoryEarthquake": "地震與海嘯",
   "mapLayerSatelliteB12": "ひまわり 臭氧(B12)",
   "restroomCategoryOther": "其他",
   "@meshtasticRegionConfirm": {
@@ -2006,5 +2006,63 @@
   "moreSectionAccessibility": "無障礙",
   "eewSpokenAnnouncementOn": "開啟",
   "eewSpokenAnnouncementOnDescription": "會先讀出預估震度，之後先播警示音——即係警示音會遲咗一句嘢咁耐。",
-  "eewSpokenAnnouncementOff": "關閉"
+  "eewSpokenAnnouncementOff": "關閉",
+  "mapLayerTsunami": "海嘯警報",
+  "@mapLayerTsunami": {
+    "description": "Tsunami feature string: mapLayerTsunami"
+  },
+  "tsunamiLegendEpicenter": "地震震央",
+  "@tsunamiLegendEpicenter": {
+    "description": "Tsunami feature string: tsunamiLegendEpicenter"
+  },
+  "tsunamiEarthquake": "地震資訊",
+  "@tsunamiEarthquake": {
+    "description": "Tsunami feature string: tsunamiEarthquake"
+  },
+  "tsunamiPredictions": "預估海嘯到達時間及波高",
+  "@tsunamiPredictions": {
+    "description": "Tsunami feature string: tsunamiPredictions"
+  },
+  "tsunamiObservations": "各地觀測到的海嘯",
+  "@tsunamiObservations": {
+    "description": "Tsunami feature string: tsunamiObservations"
+  },
+  "tsunamiBandOver3m": "超過 3 公尺",
+  "@tsunamiBandOver3m": {
+    "description": "Tsunami feature string: tsunamiBandOver3m"
+  },
+  "tsunamiBand1To3m": "1～3 公尺",
+  "@tsunamiBand1To3m": {
+    "description": "Tsunami feature string: tsunamiBand1To3m"
+  },
+  "tsunamiBand30cmTo1m": "0.3～1 公尺",
+  "@tsunamiBand30cmTo1m": {
+    "description": "Tsunami feature string: tsunamiBand30cmTo1m"
+  },
+  "tsunamiBandUnder30cm": "小於 0.3 公尺",
+  "@tsunamiBandUnder30cm": {
+    "description": "Tsunami feature string: tsunamiBandUnder30cm"
+  },
+  "tsunamiEmpty": "目前沒有海嘯警報",
+  "@tsunamiEmpty": {
+    "description": "Tsunami feature string: tsunamiEmpty"
+  },
+  "tsunamiReportNumber": "第 {n} 報",
+  "@tsunamiReportNumber": {
+    "description": "Tsunami feature string: tsunamiReportNumber",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "tsunamiWaveHeightCm": "{cm} 公分",
+  "@tsunamiWaveHeightCm": {
+    "description": "Tsunami feature string: tsunamiWaveHeightCm",
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  }
 }

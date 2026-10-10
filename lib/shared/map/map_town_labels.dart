@@ -114,6 +114,7 @@ class MapBasemapMenu extends StatelessWidget {
       listenable: Listenable.merge([showTownLabels, showTerrain, ?gsi]),
       builder: (context, _) => MenuAnchor(
         alignmentOffset: const Offset(0, 4),
+        animated: true,
         style: MapChipButton.menuStyle(context),
         builder: (context, controller, _) => MapChipButton(
           icon: Icons.tune,

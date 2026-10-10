@@ -833,6 +833,7 @@ class _MeshNodeMenu extends StatelessWidget {
             !excludeMqtt || !showTownLabels.value || !showTerrain.value;
         return MenuAnchor(
           alignmentOffset: const Offset(0, 4),
+          animated: true,
           style: MapChipButton.menuStyle(context),
           builder: (context, controller, _) => MapChipButton(
             icon: Icons.tune,

@@ -108,12 +108,19 @@ const Map<String, String> notificationChannelMapLayers = {
   'eew-general-v2': monitorMapLayerId,
   'eew-silence-v2': monitorMapLayerId,
   'eq-v2': monitorMapLayerId,
+  'tsunami-important-v2': tsunamiMapLayerId,
+  'tsunami-general-v2': tsunamiMapLayerId,
+  'tsunami-silent-v2': tsunamiMapLayerId,
 };
 
 /// `RtsMapLayer.id` — 強震監視器. A literal because `app/router` must not import
 /// a feature's presentation layer; `notification_routes_test` pins the two
 /// together.
 const String monitorMapLayerId = 'monitor';
+
+/// `TsunamiMapLayer.id` — 海嘯警報. Literal for the same reason as
+/// [monitorMapLayerId].
+const String tsunamiMapLayerId = 'tsunami';
 
 /// The payload key naming the item a tap should open.
 const String notificationTargetKey = 'reportId';
@@ -216,10 +223,12 @@ const Map<String, String> notificationChannelRoutes = {
   'weather_minor-general-v2': AppRoutes.home, // 需要 ID
   'evacuation_major-important-v2': AppRoutes.home, // 需要 ID
   'evacuation_minor-general-v2': AppRoutes.home, // 需要 ID
-  // 海嘯 — same, until a tsunami screen exists.
-  'tsunami-important-v2': AppRoutes.home, // 需要 ID
-  'tsunami-general-v2': AppRoutes.home, // 需要 ID
-  'tsunami-silent-v2': AppRoutes.home, // 需要 ID
+  // 海嘯 — the tsunami overlay, where the bulletin and its coastal readings
+  // are. Same reasoning as the 地震速報 row above: the map tab keeps whichever
+  // overlay the session last used, so the route alone is not a destination.
+  'tsunami-important-v2': AppRoutes.map,
+  'tsunami-general-v2': AppRoutes.map,
+  'tsunami-silent-v2': AppRoutes.map,
   // LoRa 網狀網路
   'mesh_message': AppRoutes.meshtastic,
   'mesh_node': AppRoutes.meshtastic,
