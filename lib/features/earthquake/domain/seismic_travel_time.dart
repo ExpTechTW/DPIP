@@ -13,9 +13,23 @@ class SeismicTravelTimeTable {
   /// Travel-time rows for each tabulated focal depth (km).
   final Map<int, List<TravelTimeRow>> rowsByDepth;
 
-  int _closestDepth(double depth) => rowsByDepth.keys.reduce(
-    (a, b) => (b - depth).abs() < (a - depth).abs() ? b : a,
-  );
+  /// The tabulated depth nearest [depth].
+  ///
+  /// The bundled table has 106 keys. A linear reduce walked all of them on
+  /// every radius and every arrival. Keys that never decrease — the loaded
+  /// table, and any fixture written in order — are found by binary search.
+  /// A tie keeps the earlier key, which is what the reduce did (`<`, not
+  /// `<=`). An unsorted map keeps the walk, because the winner of a tie is
+  /// then the first key in iteration order, not the smaller depth.
+  int _closestDepth(double depth) {
+    final index = _depthIndexOf(this);
+    if (!index.sorted) {
+      return index.keys.reduce(
+        (a, b) => (b - depth).abs() < (a - depth).abs() ? b : a,
+      );
+    }
+    return _closestSortedDepth(index.keys, depth);
+  }
 
   /// P/S wave-front radii (km) and the S arrival time (s) for an event at
   /// [depth] (km) whose origin was [elapsed] ago.
@@ -81,6 +95,52 @@ double _component(TravelTimeRow row, int component) => switch (component) {
   _p => row.p,
   _ => row.s,
 };
+
+/// Depth keys in map iteration order, and whether that order never decreases.
+///
+/// Cached per table: the lists are the loaded asset or a const fixture, not
+/// something a caller mutates. Same assumption as [_orders].
+final Expando<_DepthIndex> _depthIndexes = Expando<_DepthIndex>();
+
+_DepthIndex _depthIndexOf(SeismicTravelTimeTable table) =>
+    _depthIndexes[table] ??= _DepthIndex(table.rowsByDepth.keys);
+
+final class _DepthIndex {
+  _DepthIndex(Iterable<int> depths)
+    : keys = List<int>.of(depths, growable: false),
+      sorted = _neverDecreases(depths);
+
+  final List<int> keys;
+  final bool sorted;
+
+  static bool _neverDecreases(Iterable<int> depths) {
+    int? previous;
+    for (final depth in depths) {
+      if (previous != null && depth < previous) return false;
+      previous = depth;
+    }
+    return true;
+  }
+}
+
+/// Closest key in a non-decreasing list. A tie keeps the earlier key.
+int _closestSortedDepth(List<int> keys, double depth) {
+  var lo = 0;
+  var hi = keys.length;
+  while (lo < hi) {
+    final mid = (lo + hi) >> 1;
+    if (keys[mid] < depth) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  if (lo <= 0) return keys.first;
+  if (lo >= keys.length) return keys.last;
+  final before = keys[lo - 1];
+  final after = keys[lo];
+  return (after - depth).abs() < (before - depth).abs() ? after : before;
+}
 
 /// Whether P, S and R never decrease. Cached per row list: the check is a
 /// full pass, and the lists are the loaded table (or a const test fixture),
