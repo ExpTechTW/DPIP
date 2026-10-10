@@ -115,6 +115,15 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   bool _added = false;
   bool _listening = false;
 
+  /// Whether the map tab is the one on screen. Packets keep arriving either
+  /// way; uploading a GeoJSON nobody can see does not.
+  bool _surfaceVisible = true;
+
+  /// Signature of the feature collection currently on the source. A packet
+  /// that does not change a drawn property — position, label, online, mqtt,
+  /// direct, selection — is not serialised again.
+  String? _drawnOnMap;
+
   /// The tapped node, or null. A [ValueNotifier] because the sheet is a widget
   /// and this class is not — the scaffold rebuilds it from this.
   final ValueNotifier<int?> _selected = ValueNotifier<int?>(null);
@@ -212,10 +221,12 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
     _controller = controller;
     _watchLink();
     await _removeFromMap(controller);
-    await controller.addSource(
-      _sourceId,
-      GeojsonSourceProperties(data: _geoJson()),
-    );
+    final drawn = _geoJson();
+    final signature = _drawnSignature();
+    await controller.addSource(_sourceId, GeojsonSourceProperties(data: drawn));
+    // The collection just added, not a later store snapshot: the signature
+    // and the bytes have to name the same set.
+    _drawnOnMap = signature;
     await controller.addCircleLayer(
       _sourceId,
       _circleId,
@@ -251,6 +262,7 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   /// intermediate frames were never visible anyway, because the flood itself
   /// was what the frame rate was being spent on.
   void _onNodes() {
+    if (!_surfaceVisible) return;
     if (_pushQueued) return;
     _pushQueued = true;
     _pushTimer = Timer(const Duration(milliseconds: 250), () {
@@ -518,14 +530,64 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   @override
   double get bottomChromeFraction => MeshNodeSheet.peekExtent;
 
+  @override
+  void onSurfaceVisibility(bool visible) {
+    _surfaceVisible = visible;
+    if (!visible) return;
+    // One catch-up. Packets that arrived on another tab changed the store
+    // and were not uploaded; if they did not change the drawn set this is
+    // a signature compare and nothing crosses the platform channel.
+    if (_added) unawaited(_push());
+  }
+
   Future<void> _push() async {
     final controller = _controller;
-    if (controller == null || !_added) return;
+    if (controller == null || !_added || !_surfaceVisible) return;
+    final signature = _drawnSignature();
+    if (signature == _drawnOnMap) return;
+    // Claimed before the await: two overlapping pushes land in call order,
+    // and the later collection is the one the source keeps.
+    _drawnOnMap = signature;
     try {
       await controller.setGeoJsonSource(_sourceId, _geoJson());
     } catch (_) {
       // The style can reload underneath us; the next render re-adds.
+      // The write never landed, so the claim is dropped.
+      _drawnOnMap = null;
     }
+  }
+
+  /// Everything [_geoJson] puts in a feature, in the same node order. Equal
+  /// signatures are equal collections: the label is a pure function of the
+  /// name, battery, SNR and hop count, and the dot of online / mqtt / direct
+  /// / selection.
+  String _drawnSignature() {
+    final selected = _selected.value;
+    final signature = StringBuffer();
+    for (final node in _store.positioned) {
+      signature
+        ..write(node.num)
+        ..write('|')
+        ..write(node.longitude)
+        ..write('|')
+        ..write(node.latitude)
+        ..write('|')
+        ..write(node.displayName)
+        ..write('|')
+        ..write(node.batteryLevel)
+        ..write('|')
+        ..write(node.snr)
+        ..write('|')
+        ..write(node.hopsAway)
+        ..write('|')
+        ..write(_store.isOnline(node) ? 1 : 0)
+        ..write('|')
+        ..write(node.viaMqtt ? 1 : 0)
+        ..write('|')
+        ..write(node.num == selected ? 1 : 0)
+        ..write(';');
+    }
+    return signature.toString();
   }
 
   Map<String, dynamic> _geoJson() {
@@ -715,6 +777,7 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   }
 
   Future<void> _removeFromMap(MapLibreMapController controller) async {
+    _drawnOnMap = null;
     if (!_added) return;
     _added = false;
     for (final layerId in [_labelId, _circleId]) {
@@ -798,6 +861,7 @@ class MeshNodeMapLayer with MapLayerDefaults implements MapLayer {
   void onStyleReset() {
     _added = false;
     _controller = null;
+    _drawnOnMap = null;
   }
 }
 
