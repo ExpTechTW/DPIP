@@ -113,6 +113,39 @@ void main() {
     expect(find.text('Saved'), findsOneWidget);
   });
 
+  testWidgets(
+    'a megabyte of traffic is labelled in MB, including the tooltip',
+    (tester) async {
+      const mb = 1024 * 1024;
+      await tester.pumpWidget(
+        wrap(
+          NetworkUsageChart(
+            history: [
+              for (var h = 0; h < 24; h++)
+                usage(
+                  h,
+                  down: h == 0 ? 2 * mb : 0,
+                  saved: h == 0 ? mb * 3 ~/ 2 : 0,
+                ),
+            ],
+            week: [for (var i = 0; i < 28; i++) usage(i * 6)],
+          ),
+        ),
+      );
+
+      final data = tester.widget<BarChart>(find.byType(BarChart)).data;
+      final touch = data.barTouchData.touchTooltipData;
+      expect(touch.getTooltipColor(data.barGroups.first), isNotNull);
+
+      final group = data.barGroups.first;
+      final item = touch.getTooltipItem(group, 0, group.barRods.first, 0);
+      expect(item, isNotNull);
+      expect(item!.text, contains('MB'));
+      expect(item.text, contains('↓ 2 MB'));
+      expect(item.text, contains('Saved 1.5 MB'));
+    },
+  );
+
   testWidgets('switching to Saved plots only the green series', (tester) async {
     await pumpChart(tester);
     await tapSegment<NetworkChartMode>(tester, 'Saved');

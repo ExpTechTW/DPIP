@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/meshtastic/domain/dpip_mesh.dart';
@@ -5,6 +7,7 @@ import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fake_mesh_service.dart';
@@ -26,6 +29,11 @@ void main() {
 
   void emit(FakeMeshService service, MeshConnectionState state) =>
       service.connections.add(MeshConnectionStatus(state: state));
+
+  // start() registers an app-lifecycle listener on the binding. A test that
+  // leaves it there makes the next test's lifecycle transitions drive a dead
+  // link, and that link's retry timer is then pending in the new test.
+  void own(MeshLink link) => addTearDown(link.dispose);
 
   Future<void> settle() => Future<void>.delayed(Duration.zero);
 
@@ -86,6 +94,7 @@ void main() {
         'meshtastic.deviceName': 'YuYu_7d70',
       });
       link.start();
+      own(link);
       await settle();
 
       expect(service.connectedIds, ['AA:BB']);
@@ -95,6 +104,7 @@ void main() {
     test('does nothing without a saved radio', () async {
       final (link, service) = await makeLink();
       link.start();
+      own(link);
       await settle();
 
       expect(service.connectCalls, 0);
@@ -106,6 +116,7 @@ void main() {
     test('schedules a reconnect after an unexpected drop', () async {
       final (link, service) = await makeLink();
       link.start();
+      own(link);
       await link.attach(device);
       emit(service, MeshConnectionState.connected);
       await settle();
@@ -118,6 +129,7 @@ void main() {
     test('ignores the disconnect the transport emits mid-connect', () async {
       final (link, service) = await makeLink();
       link.start();
+      own(link);
       // A connect that reports `disconnected` while it is running — which the
       // transport does, because it tears down any previous link first.
       service.connectResults = const [Ok(null)];
@@ -132,6 +144,7 @@ void main() {
     test('does not reconnect after the user detached', () async {
       final (link, service) = await makeLink();
       link.start();
+      own(link);
       await link.attach(device);
       await link.detach();
 
@@ -150,6 +163,7 @@ void main() {
         ..region = 'TW'
         ..ensureChannelResult = const Ok(2);
       link.start();
+      own(link);
       await link.attach(device);
 
       emit(service, MeshConnectionState.connected);
@@ -171,6 +185,7 @@ void main() {
             MeshChannelNoSlotFailure('The radio has no free channel slot'),
           );
         link.start();
+        own(link);
         await link.attach(device);
 
         emit(service, MeshConnectionState.connected);
@@ -185,6 +200,7 @@ void main() {
       final (link, service) = await makeLink();
       service.region = 'UNSET';
       link.start();
+      own(link);
       await link.attach(device);
 
       emit(service, MeshConnectionState.connected);
@@ -197,6 +213,7 @@ void main() {
       final (link, service) = await makeLink();
       service.region = 'EU_868';
       link.start();
+      own(link);
       await link.attach(device);
 
       emit(service, MeshConnectionState.connected);
@@ -214,6 +231,7 @@ void main() {
       final (link, service) = await makeLink();
       service.region = 'TW';
       link.start();
+      own(link);
       await link.attach(device);
       emit(service, MeshConnectionState.connected);
       await settle();
@@ -225,4 +243,137 @@ void main() {
       expect(link.provision, MeshProvisionState.idle);
     });
   });
+
+  test('a saved name finds the radio after its id rotates', () async {
+    final (link, service) = await makeLink({
+      'meshtastic.deviceId': 'AA:BB',
+      'meshtastic.deviceName': 'YuYu_7d70',
+    });
+    service
+      ..connectResults = const [
+        Err(UnexpectedFailure('unknown peripheral')),
+        Ok(null),
+      ]
+      ..scanResults = const [MeshDevice(id: 'CC:DD', name: 'YuYu_7d70')];
+    link.start();
+    own(link);
+    await settle();
+
+    expect(service.connectedIds, contains('CC:DD'));
+    expect(settings.getString(SettingKeys.meshDeviceId), 'CC:DD');
+    expect(link.lastError, isNull);
+  });
+
+  test('a connect that finds nothing records why', () async {
+    final (link, service) = await makeLink({
+      'meshtastic.deviceId': 'AA:BB',
+      'meshtastic.deviceName': 'YuYu_7d70',
+    });
+    service
+      ..connectResults = const [Err(UnexpectedFailure('gone'))]
+      ..scanResults = const [];
+    link.start();
+    own(link);
+    await settle();
+    expect(link.lastError, 'gone');
+  });
+
+  test('a scan that throws still records the connect error', () async {
+    final service = _ThrowingScan()
+      ..connectResults = const [Err(UnexpectedFailure('gone'))];
+    settings = SettingsStore.inMemory({
+      'meshtastic.deviceId': 'AA:BB',
+      'meshtastic.deviceName': 'YuYu_7d70',
+    });
+    final link = MeshLink(service, settings)..start();
+    own(link);
+    await settle();
+    expect(link.lastError, 'gone');
+  });
+
+  testWidgets('resuming reconnects instead of waiting out the backoff', (
+    tester,
+  ) async {
+    final (link, service) = await makeLink();
+    link.start();
+    await link.attach(device);
+    emit(service, MeshConnectionState.connected);
+    await tester.pump();
+
+    final before = service.connectCalls;
+    _resume(tester);
+    await tester.pump();
+    expect(service.connectCalls, before);
+
+    emit(service, MeshConnectionState.disconnected);
+    service.isConnected = false;
+    await tester.pump();
+    expect(link.willRetry, isTrue);
+
+    _resume(tester);
+    await tester.pump();
+    expect(service.connectCalls, greaterThan(before));
+    link.dispose();
+  });
+
+  testWidgets('applying a region reconnects after the reboot grace', (
+    tester,
+  ) async {
+    final (link, service) = await makeLink();
+    service.region = 'EU_868';
+    link.start();
+    await link.attach(device);
+    emit(service, MeshConnectionState.connected);
+    await tester.pump();
+
+    expect(await link.applyRegion(), isNull);
+    expect(link.willRetry, isTrue);
+    service.isConnected = false;
+    final calls = service.connectCalls;
+    await tester.pump(const Duration(seconds: 12));
+    expect(service.connectCalls, greaterThan(calls));
+    link.dispose();
+  });
+
+  testWidgets('a connect that never returns is given up', (tester) async {
+    final service = _HangingConnect();
+    settings = SettingsStore.inMemory({
+      'meshtastic.deviceId': 'AA:BB',
+      'meshtastic.deviceName': 'YuYu_7d70',
+    });
+    final link = MeshLink(service, settings)..start();
+    await tester.pump();
+    expect(link.lastError, isNull);
+
+    await tester.pump(const Duration(seconds: 50));
+    expect(link.willRetry, isTrue);
+    link.dispose();
+  });
+}
+
+void _resume(WidgetTester tester) {
+  // The listener's state machine is resumed → inactive → hidden → paused,
+  // and the way back is paused → hidden → inactive → resumed.
+  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+  tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+}
+
+class _ThrowingScan extends FakeMeshService {
+  @override
+  Stream<MeshDevice> scanForDevices({Duration timeout = Duration.zero}) =>
+      Stream<MeshDevice>.error(StateError('scan failed'));
+}
+
+class _HangingConnect extends FakeMeshService {
+  final gate = Completer<Result<void>>();
+
+  @override
+  Future<Result<void>> connectToId(String id) {
+    connectCalls++;
+    return gate.future;
+  }
 }

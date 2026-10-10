@@ -192,7 +192,13 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
 
   Future<void> _reload() async {
     final next = _load();
-    setState(() => _future = next);
+    // A block, not an arrow: the assignment expression's value is the future,
+    // and `setState` rejects a callback that returns one — in debug that throw
+    // lands before the frame is even marked dirty, so pull-to-refresh never
+    // rebuilds.
+    setState(() {
+      _future = next;
+    });
     await next;
   }
 

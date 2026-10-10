@@ -162,4 +162,40 @@ void main() {
     expect(find.text(l10n.homeRainTrendScattered), findsOneWidget);
     expect(trends.calls, 2);
   });
+
+  testWidgets('light rain that lasts, and heavy rain that stops', (
+    tester,
+  ) async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    final trends = _Trend();
+
+    await _pump(tester, trends: trends, trend: _series(8, wetUntil: 60));
+    expect(find.text(l10n.homeRainTrendLightSustained), findsOneWidget);
+
+    await _pump(tester, trends: trends, trend: _series(20, wetUntil: 20));
+    expect(find.text(l10n.homeRainTrendHeavyStopping(20)), findsOneWidget);
+  });
+
+  testWidgets('minutes before the forecast window are a narrow no-data band', (
+    tester,
+  ) async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    final trends = _Trend();
+    // AppTime is the device clock until a sync is installed. Put the hour
+    // two minutes ahead of that clock so the chart has a head it cannot plot.
+    final start = DateTime.now().toUtc().add(const Duration(minutes: 2));
+    final trend = RainHourTrend(
+      startSecond: start.millisecondsSinceEpoch ~/ 1000,
+      mm: [for (var i = 0; i < 60; i++) i < 20 ? 8.0 : 0],
+    );
+
+    await _pump(tester, trends: trends, trend: trend, reveal: 1);
+    expect(find.text(l10n.homeRainTrendNoData), findsWidgets);
+    expect(find.byType(RotatedBox), findsWidgets);
+
+    // Same series again: the chart state is kept, and the repaint conditions
+    // after the data identity all have to be read.
+    await _pump(tester, trends: trends, trend: trend, reveal: 1);
+    expect(find.text(l10n.homeRainTrendLightStopping(20)), findsOneWidget);
+  });
 }

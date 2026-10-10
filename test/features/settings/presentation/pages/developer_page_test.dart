@@ -15,6 +15,9 @@ import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/features/settings/presentation/pages/developer_page.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+
+import '../../../../core/storage/memory_db.dart';
+
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 // ignore: depend_on_referenced_packages
@@ -246,4 +249,146 @@ void main() {
     expect(find.text('Cache cleared'), findsOneWidget);
     expect(calls, contains('storage:clearSystemHttpCache'));
   });
+
+  testWidgets('storage rows, the usage chart, and copy all', (tester) async {
+    tester.view.physicalSize = _tall;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final durable = openMemoryDb();
+    final cacheDb = openMemoryDb();
+    addTearDown(durable.close);
+    addTearDown(cacheDb.close);
+    await EtagCacheStore.createSchema(durable);
+    await NetworkUsageStore.createSchema(durable);
+    await durable.execute(
+      'CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT)',
+    );
+    await durable.execute("INSERT INTO notes (body) VALUES ('hello')");
+    await cacheDb.execute('CREATE TABLE blobs (id INTEGER PRIMARY KEY)');
+    await cacheDb.execute('INSERT INTO blobs (id) VALUES (1)');
+
+    final store = SettingsStore.inMemory();
+    final etag = EtagCacheStore(durable);
+    final usage = NetworkUsageStore(durable);
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider(create: (_) => NotificationService(store)),
+          Provider.value(
+            value: AppDatabase(durable: durable, cache: cacheDb),
+          ),
+          Provider(
+            create: (_) => BackgroundLocationService(
+              platform: 0,
+              version: '1',
+              channel: _bg,
+            ),
+          ),
+          Provider<EtagCacheStore?>.value(value: etag),
+          Provider<NetworkUsageStore?>.value(value: usage),
+          Provider<MapTileCache?>.value(value: MapTileCache(etag)),
+          ChangeNotifierProvider.value(value: ExperimentalSettings(store)),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const DeveloperPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('notes'), findsOneWidget);
+    expect(find.text('blobs'), findsOneWidget);
+    expect(
+      find.text('No traffic recorded yet — use the app and come back.'),
+      findsOneWidget,
+    );
+
+    final messenger = tester.binding.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'Clipboard.setData') return null;
+      return null;
+    });
+    addTearDown(
+      () => messenger.setMockMethodCallHandler(SystemChannels.platform, null),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_all_outlined));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Copied to clipboard'), findsOneWidget);
+  });
+
+  testWidgets('a cache clear and a track clear that throw stay on the page', (
+    tester,
+  ) async {
+    tester.view.physicalSize = _tall;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final db = openMemoryDb();
+    addTearDown(db.close);
+    await EtagCacheStore.createSchema(db);
+    final store = SettingsStore.inMemory();
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider(create: (_) => NotificationService(store)),
+          Provider.value(value: const AppDatabase(durable: null, cache: null)),
+          Provider<BackgroundLocationService>.value(value: _ThrowingTrack()),
+          Provider<EtagCacheStore?>.value(value: _ThrowingCache(db)),
+          Provider<NetworkUsageStore?>.value(value: null),
+          Provider<MapTileCache?>.value(value: null),
+          ChangeNotifierProvider.value(value: ExperimentalSettings(store)),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const DeveloperPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    await tester.ensureVisible(find.text('Clear location track'));
+    await tester.tap(find.text('Clear location track'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.widgetWithText(TextButton, 'Clear location track'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Location track cleared'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Clear cache'));
+    await tester.tap(find.text('Clear cache'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.widgetWithText(TextButton, 'Clear cache'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Cache cleared'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _ThrowingCache extends EtagCacheStore {
+  _ThrowingCache(super.db);
+
+  @override
+  Future<void> clear() async {
+    throw StateError('clear failed');
+  }
+}
+
+class _ThrowingTrack extends BackgroundLocationService {
+  _ThrowingTrack() : super(platform: 0, version: '1', channel: _bg);
+
+  @override
+  Future<void> clearTrack() async {
+    throw StateError('track');
+  }
 }

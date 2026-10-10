@@ -24,6 +24,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher_platform_interface/link.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 class _FakeRepository implements ChangelogRepository {
   _FakeRepository(this.notes);
@@ -213,6 +215,121 @@ void main() {
     expect(find.byType(AlertDialog), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('a check that throws is swallowed the same way', (tester) async {
+    await _pump(tester, version: '3.2.0', repository: _ThrowingRepository());
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a tag without a v is still spoken as a version', (tester) async {
+    await _pump(
+      tester,
+      version: '3.2.0',
+      repository: _FakeRepository([_note('3.2.2', pre: false, build: 1030)]),
+    );
+    expect(find.text('Version v3.2.2 is out.'), findsOneWidget);
+  });
+
+  testWidgets('Play Store and sideload builds name their own button', (
+    tester,
+  ) async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await _pump(tester, version: '3.2.0', source: InstallSource.playStore);
+    expect(find.text(l10n.updateOpenPlayStore), findsOneWidget);
+
+    await _pump(tester, version: '3.2.0', source: InstallSource.github);
+    expect(find.text(l10n.updateDownload), findsOneWidget);
+
+    await _pump(tester, version: '3.2.0', source: InstallSource.unknown);
+    expect(find.text(l10n.updateDownload), findsOneWidget);
+
+    await _pump(tester, version: '3.2.0', source: InstallSource.development);
+    expect(find.text(l10n.updateDownload), findsOneWidget);
+  });
+
+  testWidgets('dismissing the dialog is not an update and not a changelog', (
+    tester,
+  ) async {
+    await _pump(tester, version: '3.2.0');
+    await tester.tapAt(const Offset(8, 8));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('a store the OS will not open is logged, not thrown', (
+    tester,
+  ) async {
+    final previous = UrlLauncherPlatform.instance;
+    UrlLauncherPlatform.instance = _DecliningLauncher();
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    await _pump(tester, version: '3.2.0', source: InstallSource.github);
+    await tester.tap(find.text('Download'));
+    await tester.pump();
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a store open that throws is logged, not thrown', (tester) async {
+    final previous = UrlLauncherPlatform.instance;
+    UrlLauncherPlatform.instance = _ThrowingLauncher();
+    addTearDown(() => UrlLauncherPlatform.instance = previous);
+
+    await _pump(tester, version: '3.2.0', source: InstallSource.playStore);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await tester.tap(find.text(l10n.updateOpenPlayStore));
+    await tester.pump();
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+}
+
+class _ThrowingRepository implements ChangelogRepository {
+  @override
+  Future<Result<List<ReleaseNote>>> releases({int page = 1}) async {
+    throw StateError('changelog down');
+  }
+
+  @override
+  Future<Result<Uint8List>> avatarBytes(String login) async =>
+      const Err(UnexpectedFailure('no network'));
+}
+
+class _DecliningLauncher extends UrlLauncherPlatform {
+  @override
+  LinkDelegate? get linkDelegate => null;
+
+  @override
+  Future<bool> canLaunch(String url) async => false;
+
+  @override
+  Future<bool> launch(
+    String url, {
+    required bool useSafariVC,
+    required bool useWebView,
+    required bool enableJavaScript,
+    required bool enableDomStorage,
+    required bool universalLinksOnly,
+    required Map<String, String> headers,
+    String? webOnlyWindowName,
+  }) async => false;
+}
+
+class _ThrowingLauncher extends _DecliningLauncher {
+  @override
+  Future<bool> launch(
+    String url, {
+    required bool useSafariVC,
+    required bool useWebView,
+    required bool enableJavaScript,
+    required bool enableDomStorage,
+    required bool universalLinksOnly,
+    required Map<String, String> headers,
+    String? webOnlyWindowName,
+  }) async {
+    throw StateError('no browser');
+  }
 }
 
 class _FailingRepository implements ChangelogRepository {
