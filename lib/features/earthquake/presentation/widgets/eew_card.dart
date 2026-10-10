@@ -94,6 +94,14 @@ class EewCardContent extends StatefulWidget {
 }
 
 class _EewCardContentState extends State<EewCardContent> with SecondTicker {
+  /// Also stopped behind another tab: the earthquake page and the replay stay
+  /// mounted when the user switches away, and a Timer is not a Ticker, so the
+  /// countdown went on rebuilding there once a second for the whole alert.
+  /// Reading [TickerMode] makes it a dependency, so switching back re-syncs
+  /// and snaps the countdown to the present at once.
+  @override
+  bool get secondTickerActive => TickerMode.valuesOf(context).enabled;
+
   /// The CWA P/S travel-time table once it resolves — the countdown settles on
   /// the table's arrival time the moment it loads (see [estimateLocalShaking]).
   SeismicTravelTimeTable? _table;
