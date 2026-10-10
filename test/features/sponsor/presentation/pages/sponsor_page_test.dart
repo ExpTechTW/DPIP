@@ -46,7 +46,9 @@ class _SponsorRepository implements SponsorRepository {
   Result<List<SponsorProduct>> next = const Ok([_monthly, _coffee]);
   bool buyStarted = true;
   bool restoreStarted = true;
+  SponsorPurchase? restoredPurchase;
   int loads = 0;
+  int restores = 0;
   final List<String> bought = [];
 
   @override
@@ -65,7 +67,12 @@ class _SponsorRepository implements SponsorRepository {
   }
 
   @override
-  Future<bool> restore() async => restoreStarted;
+  Future<bool> restore() async {
+    restores++;
+    final restored = restoredPurchase;
+    if (restored != null) updates.add(restored);
+    return restoreStarted;
+  }
 
   @override
   void dispose() => updates.close();
@@ -123,6 +130,26 @@ void main() {
     expect(find.text('Coffee'), findsOneWidget);
     expect(find.text(l10n.sponsorPerMonth(r'$2.99')), findsOneWidget);
     expect(find.text(r'$0.99'), findsOneWidget);
+  });
+
+  testWidgets('an active subscription replaces its price with a checkmark', (
+    tester,
+  ) async {
+    final repository = _SponsorRepository()
+      ..restoredPurchase = const SponsorPurchase(
+        productId: 'monthly',
+        status: SponsorPurchaseStatus.restored,
+      );
+    await _pump(tester, repository);
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(repository.restores, 1);
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.text(l10n.sponsorPerMonth(r'$2.99')), findsNothing);
+
+    await tester.tap(find.text('Monthly support'));
+    await tester.pump();
+    expect(repository.bought, isEmpty);
   });
 
   testWidgets('a purchase disables its siblings until it settles', (
