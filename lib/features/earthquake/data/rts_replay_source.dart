@@ -41,4 +41,7 @@ class RtsReplaySource extends RealtimeSource<Rts> {
   /// would immediately (and wrongly) read as stale.
   @override
   DateTime? timestampOf(Rts value) => null;
+
+  @override
+  bool sameData(Rts? a, Rts? b) => sameRtsFrame(a, b);
 }
