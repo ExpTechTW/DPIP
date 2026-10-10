@@ -34,6 +34,7 @@ class _FakeSponsorRepository implements SponsorRepository {
   Result<List<SponsorProduct>> result;
   bool buyStarts = true;
   bool restoreAvailable = true;
+  int restores = 0;
   Object? buyThrow;
   Completer<bool>? buyGate;
   final List<String> bought = [];
@@ -59,7 +60,10 @@ class _FakeSponsorRepository implements SponsorRepository {
   }
 
   @override
-  Future<bool> restore() async => restoreAvailable;
+  Future<bool> restore() async {
+    restores++;
+    return restoreAvailable;
+  }
 
   @override
   void dispose() => _updates.close();
@@ -80,6 +84,26 @@ void main() {
     expect(controller.status, SponsorStatus.ready);
     expect(controller.subscriptions.map((p) => p.id), ['s_donation75']);
     expect(controller.oneTime.map((p) => p.id), ['donation100']);
+    expect(repo.restores, 1);
+  });
+
+  test('load only restores active subscriptions once', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]));
+    final controller = SponsorController(repo);
+
+    await controller.load();
+    repo.emit(
+      const SponsorPurchase(
+        productId: 's_donation75',
+        status: SponsorPurchaseStatus.restored,
+      ),
+    );
+    await _settle();
+    await controller.load();
+
+    expect(repo.restores, 1);
+    expect(controller.purchasedIds, contains('s_donation75'));
+    controller.dispose();
   });
 
   test('load surfaces a failure as the error status', () async {
@@ -106,35 +130,32 @@ void main() {
     },
   );
 
-  test(
-    'a purchased update records ownership and clears the in-flight marker',
-    () async {
-      final repo = _FakeSponsorRepository(const Ok([_sub]));
-      final controller = SponsorController(repo);
-      await controller.load();
-      await controller.buy(_sub);
+  test('a purchased subscription records ownership and clears the in-flight marker', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]));
+    final controller = SponsorController(repo);
+    await controller.load();
+    await controller.buy(_sub);
 
-      repo.emit(
-        const SponsorPurchase(
-          productId: 's_donation75',
-          status: SponsorPurchaseStatus.pending,
-        ),
-      );
-      await _settle();
-      expect(controller.isBusy, isTrue);
+    repo.emit(
+      const SponsorPurchase(
+        productId: 's_donation75',
+        status: SponsorPurchaseStatus.pending,
+      ),
+    );
+    await _settle();
+    expect(controller.isBusy, isTrue);
 
-      repo.emit(
-        const SponsorPurchase(
-          productId: 's_donation75',
-          status: SponsorPurchaseStatus.purchased,
-        ),
-      );
-      await _settle();
+    repo.emit(
+      const SponsorPurchase(
+        productId: 's_donation75',
+        status: SponsorPurchaseStatus.purchased,
+      ),
+    );
+    await _settle();
 
-      expect(controller.purchasedIds, contains('s_donation75'));
-      expect(controller.purchasingId, isNull);
-    },
-  );
+    expect(controller.purchasedIds, contains('s_donation75'));
+    expect(controller.purchasingId, isNull);
+  });
 
   test('a canceled update just clears the in-flight marker', () async {
     final repo = _FakeSponsorRepository(const Ok([_sub]));
@@ -162,7 +183,7 @@ void main() {
     controller.dispose();
   });
 
-  test('a second buy and an already-owned product are ignored', () async {
+  test('a second buy and an already-owned subscription are ignored', () async {
     final repo = _FakeSponsorRepository(const Ok([_sub, _oneTime]))
       ..buyGate = Completer<bool>();
     final controller = SponsorController(repo);
@@ -176,8 +197,8 @@ void main() {
     await first;
     expect(controller.purchasingId, isNull);
 
-    controller.purchasedIds.add(_oneTime.id);
-    await controller.buy(_oneTime);
+    controller.purchasedIds.add(_sub.id);
+    await controller.buy(_sub);
     expect(repo.bought, ['s_donation75']);
     controller.dispose();
   });
@@ -221,21 +242,24 @@ void main() {
     },
   );
 
-  test('a purchase that arrives for another product still notifies', () async {
-    final repo = _FakeSponsorRepository(const Ok([_sub]));
-    final controller = SponsorController(repo);
-    await controller.load();
-    var notices = 0;
-    controller.addListener(() => notices++);
-    repo.emit(
-      const SponsorPurchase(
-        productId: 'donation100',
-        status: SponsorPurchaseStatus.purchased,
-      ),
-    );
-    await _settle();
-    expect(controller.purchasedIds, contains('donation100'));
-    expect(notices, greaterThan(0));
-    controller.dispose();
-  });
+  test(
+    'a subscription purchase that arrives separately still notifies',
+    () async {
+      final repo = _FakeSponsorRepository(const Ok([_sub, _oneTime]));
+      final controller = SponsorController(repo);
+      await controller.load();
+      var notices = 0;
+      controller.addListener(() => notices++);
+      repo.emit(
+        const SponsorPurchase(
+          productId: 's_donation75',
+          status: SponsorPurchaseStatus.purchased,
+        ),
+      );
+      await _settle();
+      expect(controller.purchasedIds, contains('s_donation75'));
+      expect(notices, greaterThan(0));
+      controller.dispose();
+    },
+  );
 }
