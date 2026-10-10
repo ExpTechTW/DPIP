@@ -858,18 +858,20 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (controller == null || !_ready || grid == null) return;
     final hasBox = widget.alerts.alerting;
     if (!hasBox) return;
-    final (:geoJson, :signature) = _boxGeoJson(grid);
+    final (boxes, signature) = _survivingBoxes(grid);
     // This runs at the page's 5 Hz tick as well as on every poll, and the
     // feature set only changes when the feed does or the S-wave sweeps
-    // past a box — a handful of times per event. The same set was being
-    // re-serialised and re-uploaded a few times a second in between.
+    // past a box — a handful of times per event. The signature is everything
+    // the geometry depends on, so the collection is built only when it
+    // differs. The same set was being re-serialised and re-uploaded a few
+    // times a second in between.
     if (signature == _boxSignature) return;
     // Claimed before the await, not after: two in-flight writes land on the
     // platform channel in call order, so the later call's set is the one the
     // source ends up holding — and it must be the one recorded here.
     _boxSignature = signature;
     try {
-      await controller.setGeoJsonSource(_ids.boxSource, geoJson);
+      await controller.setGeoJsonSource(_ids.boxSource, _boxCollection(boxes));
     } catch (_) {
       // Source/layer not on the map yet (mid style-reload) — the next update
       // retries; the claim is dropped because the write never landed.
@@ -879,7 +881,7 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   /// The feature set [_ids.boxSource] last received — the box ids that survived
   /// the coverage check with their intensities, in feed order (see
-  /// [_boxGeoJson]). Null whenever the source has just been (re)created, so
+  /// [_survivingBoxes]). Null whenever the source has just been (re)created, so
   /// the first upload after a style load always lands.
   String? _boxSignature;
 
@@ -1064,20 +1066,19 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// stops blinking instead of blinking forever once it's no longer live
   /// information.
   ///
-  /// Also returns a [signature] of the set — every surviving box id and its
+  /// Returned with their signature — every surviving box id and its
   /// intensity, in order — cheap enough to build on every call and exact
   /// enough that an equal signature means an identical upload: a box's
   /// geometry is a function of its id alone (the static grid), so id +
-  /// intensity is everything the feature carries.
-  ({Map<String, dynamic> geoJson, String signature}) _boxGeoJson(
-    RtsBoxGrid grid,
-  ) {
+  /// intensity is everything the feature carries. The collection itself is
+  /// built only when that signature changes (see [_boxCollection]).
+  (List<(int, List<List<double>>)>, String) _survivingBoxes(RtsBoxGrid grid) {
     final table = _travelTimeTable;
     final now = widget.clock.now();
     final covers = table == null
         ? const <_SWaveCover>[]
         : _sWaveCovers(table, now);
-    final features = <Map<String, dynamic>>[];
+    final surviving = <(int, List<List<double>>)>[];
     final signature = StringBuffer();
     for (final entry in widget.alerts.areas.boxes.entries) {
       final ring = grid.rings[entry.key];
@@ -1088,20 +1089,29 @@ class _ReplayMapState extends State<_ReplayMap> {
         ..write(':')
         ..write(entry.value)
         ..write(';');
-      features.add({
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [ring],
-        },
-        'properties': {'i': entry.value},
-      });
+      surviving.add((entry.value, ring));
     }
-    return (
-      geoJson: {'type': 'FeatureCollection', 'features': features},
-      signature: signature.toString(),
-    );
+    return (surviving, signature.toString());
   }
+
+  /// The collection for the boxes [_survivingBoxes] kept. Built only when
+  /// their signature differs from what the map holds.
+  static Map<String, dynamic> _boxCollection(
+    List<(int, List<List<double>>)> boxes,
+  ) => {
+    'type': 'FeatureCollection',
+    'features': [
+      for (final (level, ring) in boxes)
+        {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [ring],
+          },
+          'properties': {'i': level},
+        },
+    ],
+  };
 
   /// Kilometres per degree of latitude along a meridian, rounded *down* from
   /// the 111.3195 km/° of [geo.LatLng.distanceTo]'s sphere. See
@@ -1135,8 +1145,14 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// the wavefront had fully swept past it, since by then it's a stale
   /// reading rather than live shaking data.
   bool _isBoxFullyCovered(List<List<double>> ring, List<_SWaveCover> covers) {
+    // The first four points are the box's corners (the fifth closes the ring).
+    // An index loop rather than `take(4).every(…)`: the same short-circuit,
+    // without an iterable and a closure per box per alert per tick.
+    final corners = ring.length < 4 ? ring.length : 4;
     for (final cover in covers) {
-      final allCornersCovered = ring.take(4).every((point) {
+      var allCornersCovered = true;
+      for (var k = 0; k < corners; k++) {
+        final point = ring[k];
         // Exact bounding reject before the haversine: the great-circle
         // distance is never shorter than the meridional (latitude-only)
         // leg, so a corner whose latitude gap alone exceeds the radius
@@ -1145,11 +1161,12 @@ class _ReplayMapState extends State<_ReplayMap> {
         // rejects a corner the haversine would have accepted. This runs
         // 4 × boxes × alerts at 5 Hz, and most corners fail here.
         if ((point[1] - cover.reach.latitude).abs() * _kmPerDegreeLatitude >
-            cover.radiusKm) {
-          return false;
+                cover.radiusKm ||
+            !cover.reach.contains(point[1], point[0])) {
+          allCornersCovered = false;
+          break;
         }
-        return cover.reach.contains(point[1], point[0]);
-      });
+      }
       if (allCornersCovered) return true;
     }
     return false;
