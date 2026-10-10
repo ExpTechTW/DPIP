@@ -35,6 +35,7 @@ class _FakeSponsorRepository implements SponsorRepository {
   bool buyStarts = true;
   bool restoreAvailable = true;
   int restores = 0;
+  Object? restoreThrow;
   Object? buyThrow;
   Completer<bool>? buyGate;
   final List<String> bought = [];
@@ -62,6 +63,8 @@ class _FakeSponsorRepository implements SponsorRepository {
   @override
   Future<bool> restore() async {
     restores++;
+    final error = restoreThrow;
+    if (error != null) throw error;
     return restoreAvailable;
   }
 
@@ -87,7 +90,8 @@ void main() {
     expect(repo.restores, 1);
   });
 
-  test('load only restores active subscriptions once', () async {
+  test('load restores subscriptions once, and a restored one reads as owned '
+      'without closing the row', () async {
     final repo = _FakeSponsorRepository(const Ok([_sub]));
     final controller = SponsorController(repo);
 
@@ -96,15 +100,99 @@ void main() {
       const SponsorPurchase(
         productId: 's_donation75',
         status: SponsorPurchaseStatus.restored,
+        isSubscription: true,
       ),
     );
     await _settle();
     await controller.load();
 
     expect(repo.restores, 1);
-    expect(controller.purchasedIds, contains('s_donation75'));
+    expect(controller.restoredIds, contains('s_donation75'));
+    expect(controller.isOwned(_sub), isTrue);
+    // A restore replays expired auto-renewals too, so it must not be the reason
+    // a lapsed supporter cannot subscribe again.
+    expect(controller.isBuyBlocked(_sub), isFalse);
+    expect(controller.purchasedIds, isEmpty);
     controller.dispose();
   });
+
+  test('a restored subscription can still be bought again', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]));
+    final controller = SponsorController(repo);
+    await controller.load();
+    repo.emit(
+      const SponsorPurchase(
+        productId: 's_donation75',
+        status: SponsorPurchaseStatus.restored,
+        isSubscription: true,
+      ),
+    );
+    await _settle();
+
+    await controller.buy(_sub);
+
+    expect(repo.bought, ['s_donation75']);
+    controller.dispose();
+  });
+
+  test('a restore the store refused is asked again on the next load', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]))
+      ..restoreAvailable = false;
+    final controller = SponsorController(repo);
+
+    await controller.load();
+    expect(repo.restores, 1);
+
+    repo.restoreAvailable = true;
+    await controller.load();
+    expect(repo.restores, 2);
+
+    // Once it is accepted, a reload does not ask a third time.
+    await controller.load();
+    expect(repo.restores, 2);
+    controller.dispose();
+  });
+
+  test('a restore that throws is reported and asked again', () async {
+    final repo = _FakeSponsorRepository(const Ok([_sub]))
+      ..restoreThrow = StateError('store exploded');
+    final controller = SponsorController(repo);
+    final errors = <FlutterErrorDetails>[];
+    final previous = FlutterError.onError;
+    FlutterError.onError = errors.add;
+    addTearDown(() => FlutterError.onError = previous);
+
+    await controller.load();
+    expect(errors, hasLength(1));
+    expect(controller.status, SponsorStatus.ready);
+
+    repo.restoreThrow = null;
+    await controller.load();
+    expect(repo.restores, 2);
+    controller.dispose();
+  });
+
+  test(
+    'a purchase update is typed by itself, not by the loaded catalogue',
+    () async {
+      final repo = _FakeSponsorRepository(const Ok([_sub]));
+      final controller = SponsorController(repo);
+
+      // Before any load, so the catalogue is empty — the store can deliver an
+      // unfinished transaction this early.
+      repo.emit(
+        const SponsorPurchase(
+          productId: 's_donation75',
+          status: SponsorPurchaseStatus.purchased,
+          isSubscription: true,
+        ),
+      );
+      await _settle();
+
+      expect(controller.purchasedIds, contains('s_donation75'));
+      controller.dispose();
+    },
+  );
 
   test('load surfaces a failure as the error status', () async {
     final repo = _FakeSponsorRepository(const Err(NetworkFailure('offline')));
@@ -140,6 +228,7 @@ void main() {
       const SponsorPurchase(
         productId: 's_donation75',
         status: SponsorPurchaseStatus.pending,
+        isSubscription: true,
       ),
     );
     await _settle();
@@ -149,6 +238,7 @@ void main() {
       const SponsorPurchase(
         productId: 's_donation75',
         status: SponsorPurchaseStatus.purchased,
+        isSubscription: true,
       ),
     );
     await _settle();
@@ -167,6 +257,7 @@ void main() {
       const SponsorPurchase(
         productId: 's_donation75',
         status: SponsorPurchaseStatus.canceled,
+        isSubscription: true,
       ),
     );
     await _settle();
@@ -254,6 +345,7 @@ void main() {
         const SponsorPurchase(
           productId: 's_donation75',
           status: SponsorPurchaseStatus.purchased,
+          isSubscription: true,
         ),
       );
       await _settle();

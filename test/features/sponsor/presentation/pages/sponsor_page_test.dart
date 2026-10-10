@@ -132,13 +132,13 @@ void main() {
     expect(find.text(r'$0.99'), findsOneWidget);
   });
 
-  testWidgets('an active subscription replaces its price with a checkmark', (
-    tester,
-  ) async {
+  testWidgets('a restored subscription shows a checkmark and can still be '
+      'subscribed to again', (tester) async {
     final repository = _SponsorRepository()
       ..restoredPurchase = const SponsorPurchase(
         productId: 'monthly',
         status: SponsorPurchaseStatus.restored,
+        isSubscription: true,
       );
     await _pump(tester, repository);
 
@@ -147,9 +147,36 @@ void main() {
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.text(l10n.sponsorPerMonth(r'$2.99')), findsNothing);
 
+    // The store's restore replays expired auto-renewals as well, so the row
+    // stays live: a supporter whose subscription lapsed must be able to start
+    // it again.
     await tester.tap(find.text('Monthly support'));
     await tester.pump();
-    expect(repository.bought, isEmpty);
+    expect(repository.bought, ['monthly']);
+  });
+
+  testWidgets('a subscription bought in this session closes its row', (
+    tester,
+  ) async {
+    final repository = _SponsorRepository();
+    await _pump(tester, repository);
+
+    await tester.tap(find.text('Monthly support'));
+    await tester.pump();
+    repository.updates.add(
+      const SponsorPurchase(
+        productId: 'monthly',
+        status: SponsorPurchaseStatus.purchased,
+        isSubscription: true,
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+
+    await tester.tap(find.text('Monthly support'));
+    await tester.pump();
+    expect(repository.bought, ['monthly']);
   });
 
   testWidgets('a purchase disables its siblings until it settles', (
@@ -174,6 +201,7 @@ void main() {
       const SponsorPurchase(
         productId: 'monthly',
         status: SponsorPurchaseStatus.purchased,
+        isSubscription: true,
       ),
     );
     await tester.pump();
@@ -194,6 +222,7 @@ void main() {
       const SponsorPurchase(
         productId: 'coffee',
         status: SponsorPurchaseStatus.purchased,
+        isSubscription: false,
       ),
     );
     await tester.pump();
@@ -234,6 +263,7 @@ void main() {
       const SponsorPurchase(
         productId: 'coffee',
         status: SponsorPurchaseStatus.error,
+        isSubscription: false,
       ),
     );
     await tester.pump();
