@@ -1207,7 +1207,29 @@ typedef _LocalIntensityResult = ({
 /// name. A same-county-but-different-township station is never close
 /// enough to substitute — 花蓮縣, say, runs the whole east coast, so a lone
 /// reading up at 秀林鄉和平 says nothing about 西寶.
+///
+/// Cached per report, town and directory. The page rebuilds the section for
+/// reasons that do not change any of the three — a sheet drag, a map camera —
+/// and [TownDirectory.nearest] walks the county's stations each time.
+final Expando<Map<String, _LocalIntensityResult?>> _localIntensityCache =
+    Expando<Map<String, _LocalIntensityResult?>>();
+
 _LocalIntensityResult? _nearestFeltIntensity(
+  EarthquakeReport report,
+  Town town,
+  TownDirectory directory,
+) {
+  final cache = _localIntensityCache[report] ??= {};
+  // Null is a real answer ("this township has no felt reading"), so the key's
+  // presence is the hit, not the value.
+  final key = '${identityHashCode(directory)}:${town.code}';
+  if (cache.containsKey(key)) return cache[key];
+  final result = _resolveNearestFeltIntensity(report, town, directory);
+  cache[key] = result;
+  return result;
+}
+
+_LocalIntensityResult? _resolveNearestFeltIntensity(
   EarthquakeReport report,
   Town town,
   TownDirectory directory,
