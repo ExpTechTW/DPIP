@@ -13,6 +13,7 @@ import 'package:dpip/features/tsunami/domain/tsunami_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/material.dart';
@@ -255,6 +256,7 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
         lineWidth: 10,
         lineOpacity: 1,
       ),
+      belowLayerId: townFillLayerId,
       sourceLayer: _areaSourceLayer,
       enableInteraction: false,
     );
