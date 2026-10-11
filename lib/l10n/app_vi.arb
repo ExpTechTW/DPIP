@@ -102,9 +102,9 @@
   "weatherRankingMergeTown": "Xã/trấn",
   "mapLayerMonitor": "Giám sát địa chấn",
   "moreYoutube": "YouTube",
-  "moreThreads": "DPIP Threads",
-  "moreInstagram": "DPIP Instagram",
-  "moreFacebook": "DPIP Facebook",
+  "moreThreads": "Threads chính thức của DPIP",
+  "moreInstagram": "Instagram chính thức của DPIP",
+  "moreFacebook": "Trang Facebook chính thức của DPIP",
   "sponsorSubscriptions": "Gói đăng ký",
   "typhoonValueLon": "{lon}°E",
   "skyTime": "Thời gian bầu trời",
@@ -2010,27 +2010,27 @@
   "eewSpokenAnnouncementOn": "Bật",
   "eewSpokenAnnouncementOnDescription": "Cường độ dự kiến được đọc lên trước, sau đó mới phát âm báo động — nên âm báo động chậm lại đúng bằng thời lượng câu đọc.",
   "eewSpokenAnnouncementOff": "Tắt",
-  "mapLayerTsunami": "Tsunami",
+  "mapLayerTsunami": "Cảnh báo sóng thần",
   "@mapLayerTsunami": {
     "description": "Tsunami feature string: mapLayerTsunami"
   },
-  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "tsunamiLegendEpicenter": "Tâm chấn động đất",
   "@tsunamiLegendEpicenter": {
     "description": "Tsunami feature string: tsunamiLegendEpicenter"
   },
-  "tsunamiEarthquake": "Source earthquake",
+  "tsunamiEarthquake": "Trận động đất gây ra",
   "@tsunamiEarthquake": {
     "description": "Tsunami feature string: tsunamiEarthquake"
   },
-  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "tsunamiPredictions": "Thời gian dự kiến sóng đến và chiều cao sóng",
   "@tsunamiPredictions": {
     "description": "Tsunami feature string: tsunamiPredictions"
   },
-  "tsunamiObservations": "Observed tsunami by station",
+  "tsunamiObservations": "Sóng thần quan trắc theo trạm",
   "@tsunamiObservations": {
     "description": "Tsunami feature string: tsunamiObservations"
   },
-  "tsunamiBandOver3m": "Over 3 m",
+  "tsunamiBandOver3m": "Trên 3 m",
   "@tsunamiBandOver3m": {
     "description": "Tsunami feature string: tsunamiBandOver3m"
   },
@@ -2042,15 +2042,15 @@
   "@tsunamiBand30cmTo1m": {
     "description": "Tsunami feature string: tsunamiBand30cmTo1m"
   },
-  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "tsunamiBandUnder30cm": "Dưới 0.3 m",
   "@tsunamiBandUnder30cm": {
     "description": "Tsunami feature string: tsunamiBandUnder30cm"
   },
-  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "tsunamiEmpty": "Hiện chưa có bản tin sóng thần nào được phát hành",
   "@tsunamiEmpty": {
     "description": "Tsunami feature string: tsunamiEmpty"
   },
-  "tsunamiReportNumber": "Report {n}",
+  "tsunamiReportNumber": "Bản tin {n}",
   "@tsunamiReportNumber": {
     "description": "Tsunami feature string: tsunamiReportNumber",
     "placeholders": {

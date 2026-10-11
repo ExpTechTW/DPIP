@@ -102,9 +102,9 @@
   "weatherRankingMergeTown": "ตำบล",
   "mapLayerMonitor": "เครื่องตรวจแผ่นดินไหว",
   "moreYoutube": "YouTube",
-  "moreThreads": "DPIP Threads",
-  "moreInstagram": "DPIP Instagram",
-  "moreFacebook": "DPIP Facebook",
+  "moreThreads": "Threads ทางการของ DPIP",
+  "moreInstagram": "Instagram ทางการของ DPIP",
+  "moreFacebook": "เพจ Facebook ทางการของ DPIP",
   "sponsorSubscriptions": "แบบสมัครสมาชิก",
   "typhoonValueLon": "{lon}°E",
   "skyTime": "เวลาท้องฟ้า",
@@ -2010,27 +2010,27 @@
   "eewSpokenAnnouncementOn": "เปิด",
   "eewSpokenAnnouncementOnDescription": "อ่านออกเสียงความรุนแรงที่คาดการณ์ก่อน แล้วจึงส่งเสียงเตือน ซึ่งทำให้เสียงเตือนช้าลงตามความยาวของประโยค",
   "eewSpokenAnnouncementOff": "ปิด",
-  "mapLayerTsunami": "Tsunami",
+  "mapLayerTsunami": "เตือนภัยสึนามิ",
   "@mapLayerTsunami": {
     "description": "Tsunami feature string: mapLayerTsunami"
   },
-  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "tsunamiLegendEpicenter": "ศูนย์กลางแผ่นดินไหว",
   "@tsunamiLegendEpicenter": {
     "description": "Tsunami feature string: tsunamiLegendEpicenter"
   },
-  "tsunamiEarthquake": "Source earthquake",
+  "tsunamiEarthquake": "แผ่นดินไหวต้นเหตุ",
   "@tsunamiEarthquake": {
     "description": "Tsunami feature string: tsunamiEarthquake"
   },
-  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "tsunamiPredictions": "เวลาที่คาดว่าจะมาถึงและความสูงของคลื่น",
   "@tsunamiPredictions": {
     "description": "Tsunami feature string: tsunamiPredictions"
   },
-  "tsunamiObservations": "Observed tsunami by station",
+  "tsunamiObservations": "สึนามิที่ตรวจวัดได้ตามสถานี",
   "@tsunamiObservations": {
     "description": "Tsunami feature string: tsunamiObservations"
   },
-  "tsunamiBandOver3m": "Over 3 m",
+  "tsunamiBandOver3m": "มากกว่า 3 m",
   "@tsunamiBandOver3m": {
     "description": "Tsunami feature string: tsunamiBandOver3m"
   },
@@ -2042,15 +2042,15 @@
   "@tsunamiBand30cmTo1m": {
     "description": "Tsunami feature string: tsunamiBand30cmTo1m"
   },
-  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "tsunamiBandUnder30cm": "น้อยกว่า 0.3 m",
   "@tsunamiBandUnder30cm": {
     "description": "Tsunami feature string: tsunamiBandUnder30cm"
   },
-  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "tsunamiEmpty": "ยังไม่มีการออกประกาศสึนามิ",
   "@tsunamiEmpty": {
     "description": "Tsunami feature string: tsunamiEmpty"
   },
-  "tsunamiReportNumber": "Report {n}",
+  "tsunamiReportNumber": "รายงาน {n}",
   "@tsunamiReportNumber": {
     "description": "Tsunami feature string: tsunamiReportNumber",
     "placeholders": {

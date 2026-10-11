@@ -276,13 +276,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get moreYoutube => 'YouTube';
 
   @override
-  String get moreThreads => 'DPIP Threads';
+  String get moreThreads => 'Threads resmi DPIP';
 
   @override
-  String get moreInstagram => 'DPIP Instagram';
+  String get moreInstagram => 'Instagram resmi DPIP';
 
   @override
-  String get moreFacebook => 'DPIP Facebook';
+  String get moreFacebook => 'Halaman Facebook resmi DPIP';
 
   @override
   String get sponsorSubscriptions => 'Langganan';
@@ -3409,22 +3409,22 @@ class AppLocalizationsId extends AppLocalizations {
   String get eewSpokenAnnouncementOff => 'Nonaktif';
 
   @override
-  String get mapLayerTsunami => 'Tsunami';
+  String get mapLayerTsunami => 'Peringatan tsunami';
 
   @override
-  String get tsunamiLegendEpicenter => 'Earthquake epicentre';
+  String get tsunamiLegendEpicenter => 'Episentrum gempa';
 
   @override
-  String get tsunamiEarthquake => 'Source earthquake';
+  String get tsunamiEarthquake => 'Gempa sumber';
 
   @override
-  String get tsunamiPredictions => 'Predicted arrival time and wave height';
+  String get tsunamiPredictions => 'Perkiraan waktu tiba dan tinggi gelombang';
 
   @override
-  String get tsunamiObservations => 'Observed tsunami by station';
+  String get tsunamiObservations => 'Tsunami teramati per stasiun';
 
   @override
-  String get tsunamiBandOver3m => 'Over 3 m';
+  String get tsunamiBandOver3m => 'Lebih dari 3 m';
 
   @override
   String get tsunamiBand1To3m => '1-3 m';
@@ -3433,14 +3433,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get tsunamiBand30cmTo1m => '0.3-1 m';
 
   @override
-  String get tsunamiBandUnder30cm => 'Under 0.3 m';
+  String get tsunamiBandUnder30cm => 'Kurang dari 0.3 m';
 
   @override
-  String get tsunamiEmpty => 'No tsunami bulletin has been issued';
+  String get tsunamiEmpty => 'Belum ada buletin tsunami yang diterbitkan';
 
   @override
   String tsunamiReportNumber(int n) {
-    return 'Report $n';
+    return 'Laporan $n';
   }
 
   @override

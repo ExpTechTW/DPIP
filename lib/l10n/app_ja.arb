@@ -102,9 +102,9 @@
   "weatherRankingMergeTown": "町村",
   "mapLayerMonitor": "強震モニタ",
   "moreYoutube": "YouTube",
-  "moreThreads": "DPIP Threads",
-  "moreInstagram": "DPIP Instagram",
-  "moreFacebook": "DPIP Facebook",
+  "moreThreads": "DPIP 公式 Threads",
+  "moreInstagram": "DPIP 公式 Instagram",
+  "moreFacebook": "DPIP 公式 Facebook ページ",
   "sponsorSubscriptions": "サブスクリプション",
   "typhoonValueLon": "東経 {lon} 度",
   "skyTime": "空の時刻",
@@ -2010,47 +2010,47 @@
   "eewSpokenAnnouncementOn": "オン",
   "eewSpokenAnnouncementOnDescription": "予想震度を音声で読み上げてから警報音を鳴らします。その分、警報音は読み上げの長さだけ遅れます。",
   "eewSpokenAnnouncementOff": "オフ",
-  "mapLayerTsunami": "Tsunami",
+  "mapLayerTsunami": "津波警報",
   "@mapLayerTsunami": {
     "description": "Tsunami feature string: mapLayerTsunami"
   },
-  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "tsunamiLegendEpicenter": "震央",
   "@tsunamiLegendEpicenter": {
     "description": "Tsunami feature string: tsunamiLegendEpicenter"
   },
-  "tsunamiEarthquake": "Source earthquake",
+  "tsunamiEarthquake": "地震情報",
   "@tsunamiEarthquake": {
     "description": "Tsunami feature string: tsunamiEarthquake"
   },
-  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "tsunamiPredictions": "予想される津波の到達時刻と高さ",
   "@tsunamiPredictions": {
     "description": "Tsunami feature string: tsunamiPredictions"
   },
-  "tsunamiObservations": "Observed tsunami by station",
+  "tsunamiObservations": "各地で観測された津波",
   "@tsunamiObservations": {
     "description": "Tsunami feature string: tsunamiObservations"
   },
-  "tsunamiBandOver3m": "Over 3 m",
+  "tsunamiBandOver3m": "3 m 超",
   "@tsunamiBandOver3m": {
     "description": "Tsunami feature string: tsunamiBandOver3m"
   },
-  "tsunamiBand1To3m": "1-3 m",
+  "tsunamiBand1To3m": "1〜3 m",
   "@tsunamiBand1To3m": {
     "description": "Tsunami feature string: tsunamiBand1To3m"
   },
-  "tsunamiBand30cmTo1m": "0.3-1 m",
+  "tsunamiBand30cmTo1m": "0.3〜1 m",
   "@tsunamiBand30cmTo1m": {
     "description": "Tsunami feature string: tsunamiBand30cmTo1m"
   },
-  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "tsunamiBandUnder30cm": "0.3 m 未満",
   "@tsunamiBandUnder30cm": {
     "description": "Tsunami feature string: tsunamiBandUnder30cm"
   },
-  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "tsunamiEmpty": "現在、津波に関する情報はありません",
   "@tsunamiEmpty": {
     "description": "Tsunami feature string: tsunamiEmpty"
   },
-  "tsunamiReportNumber": "Report {n}",
+  "tsunamiReportNumber": "第 {n} 報",
   "@tsunamiReportNumber": {
     "description": "Tsunami feature string: tsunamiReportNumber",
     "placeholders": {

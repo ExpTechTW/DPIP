@@ -276,13 +276,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get moreYoutube => 'YouTube';
 
   @override
-  String get moreThreads => 'DPIP Threads';
+  String get moreThreads => 'Threads ทางการของ DPIP';
 
   @override
-  String get moreInstagram => 'DPIP Instagram';
+  String get moreInstagram => 'Instagram ทางการของ DPIP';
 
   @override
-  String get moreFacebook => 'DPIP Facebook';
+  String get moreFacebook => 'เพจ Facebook ทางการของ DPIP';
 
   @override
   String get sponsorSubscriptions => 'แบบสมัครสมาชิก';
@@ -3388,22 +3388,22 @@ class AppLocalizationsTh extends AppLocalizations {
   String get eewSpokenAnnouncementOff => 'ปิด';
 
   @override
-  String get mapLayerTsunami => 'Tsunami';
+  String get mapLayerTsunami => 'เตือนภัยสึนามิ';
 
   @override
-  String get tsunamiLegendEpicenter => 'Earthquake epicentre';
+  String get tsunamiLegendEpicenter => 'ศูนย์กลางแผ่นดินไหว';
 
   @override
-  String get tsunamiEarthquake => 'Source earthquake';
+  String get tsunamiEarthquake => 'แผ่นดินไหวต้นเหตุ';
 
   @override
-  String get tsunamiPredictions => 'Predicted arrival time and wave height';
+  String get tsunamiPredictions => 'เวลาที่คาดว่าจะมาถึงและความสูงของคลื่น';
 
   @override
-  String get tsunamiObservations => 'Observed tsunami by station';
+  String get tsunamiObservations => 'สึนามิที่ตรวจวัดได้ตามสถานี';
 
   @override
-  String get tsunamiBandOver3m => 'Over 3 m';
+  String get tsunamiBandOver3m => 'มากกว่า 3 m';
 
   @override
   String get tsunamiBand1To3m => '1-3 m';
@@ -3412,14 +3412,14 @@ class AppLocalizationsTh extends AppLocalizations {
   String get tsunamiBand30cmTo1m => '0.3-1 m';
 
   @override
-  String get tsunamiBandUnder30cm => 'Under 0.3 m';
+  String get tsunamiBandUnder30cm => 'น้อยกว่า 0.3 m';
 
   @override
-  String get tsunamiEmpty => 'No tsunami bulletin has been issued';
+  String get tsunamiEmpty => 'ยังไม่มีการออกประกาศสึนามิ';
 
   @override
   String tsunamiReportNumber(int n) {
-    return 'Report $n';
+    return 'รายงาน $n';
   }
 
   @override
