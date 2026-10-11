@@ -102,9 +102,9 @@
   "weatherRankingMergeTown": "Bayan",
   "mapLayerMonitor": "Seismic Monitor",
   "moreYoutube": "YouTube",
-  "moreThreads": "DPIP Threads",
-  "moreInstagram": "DPIP Instagram",
-  "moreFacebook": "DPIP Facebook",
+  "moreThreads": "Opisyal na DPIP Threads",
+  "moreInstagram": "Opisyal na DPIP Instagram",
+  "moreFacebook": "Opisyal na DPIP Facebook page",
   "sponsorSubscriptions": "Mga subscription",
   "typhoonValueLon": "{lon}°E",
   "skyTime": "Oras ng langit",
@@ -2010,27 +2010,27 @@
   "eewSpokenAnnouncementOn": "Naka-on",
   "eewSpokenAnnouncementOnDescription": "Babasahin muna nang malakas ang tinatayang intensidad bago tumunog ang babala — kaya naaantala ito nang kasinghaba ng pangungusap.",
   "eewSpokenAnnouncementOff": "Naka-off",
-  "mapLayerTsunami": "Tsunami",
+  "mapLayerTsunami": "Babala sa tsunami",
   "@mapLayerTsunami": {
     "description": "Tsunami feature string: mapLayerTsunami"
   },
-  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "tsunamiLegendEpicenter": "Episentro ng lindol",
   "@tsunamiLegendEpicenter": {
     "description": "Tsunami feature string: tsunamiLegendEpicenter"
   },
-  "tsunamiEarthquake": "Source earthquake",
+  "tsunamiEarthquake": "Lindol na pinagmulan",
   "@tsunamiEarthquake": {
     "description": "Tsunami feature string: tsunamiEarthquake"
   },
-  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "tsunamiPredictions": "Tinatayang oras ng pagdating at taas ng alon",
   "@tsunamiPredictions": {
     "description": "Tsunami feature string: tsunamiPredictions"
   },
-  "tsunamiObservations": "Observed tsunami by station",
+  "tsunamiObservations": "Tsunami na naobserbahan sa bawat istasyon",
   "@tsunamiObservations": {
     "description": "Tsunami feature string: tsunamiObservations"
   },
-  "tsunamiBandOver3m": "Over 3 m",
+  "tsunamiBandOver3m": "Higit sa 3 m",
   "@tsunamiBandOver3m": {
     "description": "Tsunami feature string: tsunamiBandOver3m"
   },
@@ -2042,15 +2042,15 @@
   "@tsunamiBand30cmTo1m": {
     "description": "Tsunami feature string: tsunamiBand30cmTo1m"
   },
-  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "tsunamiBandUnder30cm": "Mas mababa sa 0.3 m",
   "@tsunamiBandUnder30cm": {
     "description": "Tsunami feature string: tsunamiBandUnder30cm"
   },
-  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "tsunamiEmpty": "Walang inilabas na bulletin ng tsunami sa ngayon",
   "@tsunamiEmpty": {
     "description": "Tsunami feature string: tsunamiEmpty"
   },
-  "tsunamiReportNumber": "Report {n}",
+  "tsunamiReportNumber": "Ulat {n}",
   "@tsunamiReportNumber": {
     "description": "Tsunami feature string: tsunamiReportNumber",
     "placeholders": {

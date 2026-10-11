@@ -102,9 +102,9 @@
   "weatherRankingMergeTown": "향진",
   "mapLayerMonitor": "실시간 지진 모니터",
   "moreYoutube": "YouTube",
-  "moreThreads": "DPIP Threads",
-  "moreInstagram": "DPIP Instagram",
-  "moreFacebook": "DPIP Facebook",
+  "moreThreads": "DPIP 공식 Threads",
+  "moreInstagram": "DPIP 공식 Instagram",
+  "moreFacebook": "DPIP 공식 Facebook 페이지",
   "sponsorSubscriptions": "구독",
   "typhoonValueLon": "{lon}°E",
   "skyTime": "하늘 시각",
@@ -2010,47 +2010,47 @@
   "eewSpokenAnnouncementOn": "켜기",
   "eewSpokenAnnouncementOnDescription": "예상 진도를 음성으로 먼저 안내한 뒤 경보음이 울립니다. 그만큼 경보음이 늦어집니다.",
   "eewSpokenAnnouncementOff": "끄기",
-  "mapLayerTsunami": "Tsunami",
+  "mapLayerTsunami": "지진해일 경보",
   "@mapLayerTsunami": {
     "description": "Tsunami feature string: mapLayerTsunami"
   },
-  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "tsunamiLegendEpicenter": "지진 진앙",
   "@tsunamiLegendEpicenter": {
     "description": "Tsunami feature string: tsunamiLegendEpicenter"
   },
-  "tsunamiEarthquake": "Source earthquake",
+  "tsunamiEarthquake": "발생 지진",
   "@tsunamiEarthquake": {
     "description": "Tsunami feature string: tsunamiEarthquake"
   },
-  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "tsunamiPredictions": "예상 도달 시각 및 파고",
   "@tsunamiPredictions": {
     "description": "Tsunami feature string: tsunamiPredictions"
   },
-  "tsunamiObservations": "Observed tsunami by station",
+  "tsunamiObservations": "관측소별 관측된 지진해일",
   "@tsunamiObservations": {
     "description": "Tsunami feature string: tsunamiObservations"
   },
-  "tsunamiBandOver3m": "Over 3 m",
+  "tsunamiBandOver3m": "3 m 초과",
   "@tsunamiBandOver3m": {
     "description": "Tsunami feature string: tsunamiBandOver3m"
   },
-  "tsunamiBand1To3m": "1-3 m",
+  "tsunamiBand1To3m": "1~3 m",
   "@tsunamiBand1To3m": {
     "description": "Tsunami feature string: tsunamiBand1To3m"
   },
-  "tsunamiBand30cmTo1m": "0.3-1 m",
+  "tsunamiBand30cmTo1m": "0.3~1 m",
   "@tsunamiBand30cmTo1m": {
     "description": "Tsunami feature string: tsunamiBand30cmTo1m"
   },
-  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "tsunamiBandUnder30cm": "0.3 m 미만",
   "@tsunamiBandUnder30cm": {
     "description": "Tsunami feature string: tsunamiBandUnder30cm"
   },
-  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "tsunamiEmpty": "현재 발표된 지진해일 정보가 없습니다",
   "@tsunamiEmpty": {
     "description": "Tsunami feature string: tsunamiEmpty"
   },
-  "tsunamiReportNumber": "Report {n}",
+  "tsunamiReportNumber": "제 {n} 보",
   "@tsunamiReportNumber": {
     "description": "Tsunami feature string: tsunamiReportNumber",
     "placeholders": {

@@ -102,9 +102,9 @@
   "weatherRankingMergeTown": "Kecamatan",
   "mapLayerMonitor": "Monitor Seismik",
   "moreYoutube": "YouTube",
-  "moreThreads": "DPIP Threads",
-  "moreInstagram": "DPIP Instagram",
-  "moreFacebook": "DPIP Facebook",
+  "moreThreads": "Threads resmi DPIP",
+  "moreInstagram": "Instagram resmi DPIP",
+  "moreFacebook": "Halaman Facebook resmi DPIP",
   "sponsorSubscriptions": "Langganan",
   "typhoonValueLon": "{lon}°E",
   "skyTime": "Waktu langit",
@@ -2010,27 +2010,27 @@
   "eewSpokenAnnouncementOn": "Aktif",
   "eewSpokenAnnouncementOnDescription": "Intensitas perkiraan dibacakan lebih dulu, lalu suara peringatan diputar — sehingga suara itu tertunda selama kalimatnya.",
   "eewSpokenAnnouncementOff": "Nonaktif",
-  "mapLayerTsunami": "Tsunami",
+  "mapLayerTsunami": "Peringatan tsunami",
   "@mapLayerTsunami": {
     "description": "Tsunami feature string: mapLayerTsunami"
   },
-  "tsunamiLegendEpicenter": "Earthquake epicentre",
+  "tsunamiLegendEpicenter": "Episentrum gempa",
   "@tsunamiLegendEpicenter": {
     "description": "Tsunami feature string: tsunamiLegendEpicenter"
   },
-  "tsunamiEarthquake": "Source earthquake",
+  "tsunamiEarthquake": "Gempa sumber",
   "@tsunamiEarthquake": {
     "description": "Tsunami feature string: tsunamiEarthquake"
   },
-  "tsunamiPredictions": "Predicted arrival time and wave height",
+  "tsunamiPredictions": "Perkiraan waktu tiba dan tinggi gelombang",
   "@tsunamiPredictions": {
     "description": "Tsunami feature string: tsunamiPredictions"
   },
-  "tsunamiObservations": "Observed tsunami by station",
+  "tsunamiObservations": "Tsunami teramati per stasiun",
   "@tsunamiObservations": {
     "description": "Tsunami feature string: tsunamiObservations"
   },
-  "tsunamiBandOver3m": "Over 3 m",
+  "tsunamiBandOver3m": "Lebih dari 3 m",
   "@tsunamiBandOver3m": {
     "description": "Tsunami feature string: tsunamiBandOver3m"
   },
@@ -2042,15 +2042,15 @@
   "@tsunamiBand30cmTo1m": {
     "description": "Tsunami feature string: tsunamiBand30cmTo1m"
   },
-  "tsunamiBandUnder30cm": "Under 0.3 m",
+  "tsunamiBandUnder30cm": "Kurang dari 0.3 m",
   "@tsunamiBandUnder30cm": {
     "description": "Tsunami feature string: tsunamiBandUnder30cm"
   },
-  "tsunamiEmpty": "No tsunami bulletin has been issued",
+  "tsunamiEmpty": "Belum ada buletin tsunami yang diterbitkan",
   "@tsunamiEmpty": {
     "description": "Tsunami feature string: tsunamiEmpty"
   },
-  "tsunamiReportNumber": "Report {n}",
+  "tsunamiReportNumber": "Laporan {n}",
   "@tsunamiReportNumber": {
     "description": "Tsunami feature string: tsunamiReportNumber",
     "placeholders": {

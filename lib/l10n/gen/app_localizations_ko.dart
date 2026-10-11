@@ -272,13 +272,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreYoutube => 'YouTube';
 
   @override
-  String get moreThreads => 'DPIP Threads';
+  String get moreThreads => 'DPIP 공식 Threads';
 
   @override
-  String get moreInstagram => 'DPIP Instagram';
+  String get moreInstagram => 'DPIP 공식 Instagram';
 
   @override
-  String get moreFacebook => 'DPIP Facebook';
+  String get moreFacebook => 'DPIP 공식 Facebook 페이지';
 
   @override
   String get sponsorSubscriptions => '구독';
@@ -3334,38 +3334,38 @@ class AppLocalizationsKo extends AppLocalizations {
   String get eewSpokenAnnouncementOff => '끄기';
 
   @override
-  String get mapLayerTsunami => 'Tsunami';
+  String get mapLayerTsunami => '지진해일 경보';
 
   @override
-  String get tsunamiLegendEpicenter => 'Earthquake epicentre';
+  String get tsunamiLegendEpicenter => '지진 진앙';
 
   @override
-  String get tsunamiEarthquake => 'Source earthquake';
+  String get tsunamiEarthquake => '발생 지진';
 
   @override
-  String get tsunamiPredictions => 'Predicted arrival time and wave height';
+  String get tsunamiPredictions => '예상 도달 시각 및 파고';
 
   @override
-  String get tsunamiObservations => 'Observed tsunami by station';
+  String get tsunamiObservations => '관측소별 관측된 지진해일';
 
   @override
-  String get tsunamiBandOver3m => 'Over 3 m';
+  String get tsunamiBandOver3m => '3 m 초과';
 
   @override
-  String get tsunamiBand1To3m => '1-3 m';
+  String get tsunamiBand1To3m => '1~3 m';
 
   @override
-  String get tsunamiBand30cmTo1m => '0.3-1 m';
+  String get tsunamiBand30cmTo1m => '0.3~1 m';
 
   @override
-  String get tsunamiBandUnder30cm => 'Under 0.3 m';
+  String get tsunamiBandUnder30cm => '0.3 m 미만';
 
   @override
-  String get tsunamiEmpty => 'No tsunami bulletin has been issued';
+  String get tsunamiEmpty => '현재 발표된 지진해일 정보가 없습니다';
 
   @override
   String tsunamiReportNumber(int n) {
-    return 'Report $n';
+    return '제 $n 보';
   }
 
   @override

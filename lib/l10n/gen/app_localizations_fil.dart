@@ -278,13 +278,13 @@ class AppLocalizationsFil extends AppLocalizations {
   String get moreYoutube => 'YouTube';
 
   @override
-  String get moreThreads => 'DPIP Threads';
+  String get moreThreads => 'Opisyal na DPIP Threads';
 
   @override
-  String get moreInstagram => 'DPIP Instagram';
+  String get moreInstagram => 'Opisyal na DPIP Instagram';
 
   @override
-  String get moreFacebook => 'DPIP Facebook';
+  String get moreFacebook => 'Opisyal na DPIP Facebook page';
 
   @override
   String get sponsorSubscriptions => 'Mga subscription';
@@ -3415,22 +3415,23 @@ class AppLocalizationsFil extends AppLocalizations {
   String get eewSpokenAnnouncementOff => 'Naka-off';
 
   @override
-  String get mapLayerTsunami => 'Tsunami';
+  String get mapLayerTsunami => 'Babala sa tsunami';
 
   @override
-  String get tsunamiLegendEpicenter => 'Earthquake epicentre';
+  String get tsunamiLegendEpicenter => 'Episentro ng lindol';
 
   @override
-  String get tsunamiEarthquake => 'Source earthquake';
+  String get tsunamiEarthquake => 'Lindol na pinagmulan';
 
   @override
-  String get tsunamiPredictions => 'Predicted arrival time and wave height';
+  String get tsunamiPredictions =>
+      'Tinatayang oras ng pagdating at taas ng alon';
 
   @override
-  String get tsunamiObservations => 'Observed tsunami by station';
+  String get tsunamiObservations => 'Tsunami na naobserbahan sa bawat istasyon';
 
   @override
-  String get tsunamiBandOver3m => 'Over 3 m';
+  String get tsunamiBandOver3m => 'Higit sa 3 m';
 
   @override
   String get tsunamiBand1To3m => '1-3 m';
@@ -3439,14 +3440,14 @@ class AppLocalizationsFil extends AppLocalizations {
   String get tsunamiBand30cmTo1m => '0.3-1 m';
 
   @override
-  String get tsunamiBandUnder30cm => 'Under 0.3 m';
+  String get tsunamiBandUnder30cm => 'Mas mababa sa 0.3 m';
 
   @override
-  String get tsunamiEmpty => 'No tsunami bulletin has been issued';
+  String get tsunamiEmpty => 'Walang inilabas na bulletin ng tsunami sa ngayon';
 
   @override
   String tsunamiReportNumber(int n) {
-    return 'Report $n';
+    return 'Ulat $n';
   }
 
   @override
