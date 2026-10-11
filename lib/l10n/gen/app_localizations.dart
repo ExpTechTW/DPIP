@@ -606,6 +606,24 @@ abstract class AppLocalizations {
   /// **'YouTube'**
   String get moreYoutube;
 
+  /// More-menu link to the DPIP Threads account
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP Threads'**
+  String get moreThreads;
+
+  /// More-menu link to the DPIP Instagram account
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP Instagram'**
+  String get moreInstagram;
+
+  /// More-menu link to the DPIP Facebook page
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP Facebook'**
+  String get moreFacebook;
+
   /// Support page section header for recurring subscription tiers
   ///
   /// In en, this message translates to:

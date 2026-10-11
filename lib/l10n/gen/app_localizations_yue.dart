@@ -269,6 +269,15 @@ class AppLocalizationsYue extends AppLocalizations {
   String get moreYoutube => 'YouTube';
 
   @override
+  String get moreThreads => 'DPIP 官方 Threads';
+
+  @override
+  String get moreInstagram => 'DPIP 官方 Instagram';
+
+  @override
+  String get moreFacebook => 'DPIP Facebook 粉專';
+
+  @override
   String get sponsorSubscriptions => '訂閱制';
 
   @override

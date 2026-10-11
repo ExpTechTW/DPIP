@@ -272,6 +272,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get moreYoutube => 'YouTube';
 
   @override
+  String get moreThreads => 'DPIP Threads';
+
+  @override
+  String get moreInstagram => 'DPIP Instagram';
+
+  @override
+  String get moreFacebook => 'DPIP Facebook';
+
+  @override
   String get sponsorSubscriptions => '구독';
 
   @override

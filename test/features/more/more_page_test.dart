@@ -782,6 +782,22 @@ void main() {
     await tester.pump();
     expect(launcher.launched, contains('https://exptech.com.tw/tos'));
 
+    // The social accounts carry their own handles, not the org landing page.
+    for (final (label, url) in <(String, String)>[
+      ('DPIP Threads', 'https://www.threads.com/@dpip_tw'),
+      ('DPIP Instagram', 'https://www.instagram.com/dpip_tw/'),
+      (
+        'DPIP Facebook',
+        'https://www.facebook.com/profile.php?id=61591688176499',
+      ),
+    ]) {
+      launcher.launched.clear();
+      await tester.ensureVisible(find.text(label));
+      await tester.tap(find.text(label));
+      await tester.pump();
+      expect(launcher.launched, [url], reason: label);
+    }
+
     launcher.fail = true;
     await tester.ensureVisible(find.text('Discord community'));
     await tester.tap(find.text('Discord community'));
