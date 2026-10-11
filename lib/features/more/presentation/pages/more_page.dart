@@ -241,6 +241,29 @@ class MorePage extends StatelessWidget {
                   host: 'youtube.com/@exptechtw',
                   url: 'https://www.youtube.com/@exptechtw',
                 ),
+                // Social accounts, right under YouTube — the same 官方/粉專
+                // distinction the accounts make against fan pages. Material has
+                // no Threads or Instagram glyph (and the house rule is built-in
+                // Icons only), so the @ stands in for the handle and the camera
+                // for the photo feed.
+                _MoreLinkTile(
+                  icon: Icons.alternate_email_outlined,
+                  title: l10n.moreThreads,
+                  host: 'threads.com/@dpip_tw',
+                  url: 'https://www.threads.com/@dpip_tw',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.photo_camera_outlined,
+                  title: l10n.moreInstagram,
+                  host: 'instagram.com/dpip_tw',
+                  url: 'https://www.instagram.com/dpip_tw/',
+                ),
+                _MoreLinkTile(
+                  icon: Icons.facebook_outlined,
+                  title: l10n.moreFacebook,
+                  host: 'facebook.com/profile.php?id=61591688176499',
+                  url: 'https://www.facebook.com/profile.php?id=61591688176499',
+                ),
                 _MoreLinkTile(
                   icon: Icons.groups_outlined,
                   title: l10n.moreGithub,

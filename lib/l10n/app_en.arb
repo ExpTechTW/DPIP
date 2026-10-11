@@ -307,6 +307,18 @@
   },
   "mapLayerMonitor": "Seismic Monitor",
   "moreYoutube": "YouTube",
+  "moreThreads": "DPIP Threads",
+  "moreInstagram": "DPIP Instagram",
+  "moreFacebook": "DPIP Facebook",
+  "@moreThreads": {
+    "description": "More-menu link to the DPIP Threads account"
+  },
+  "@moreInstagram": {
+    "description": "More-menu link to the DPIP Instagram account"
+  },
+  "@moreFacebook": {
+    "description": "More-menu link to the DPIP Facebook page"
+  },
   "sponsorSubscriptions": "Subscriptions",
   "@homeForecastWind": {
     "description": "Wind direction string and Beaufort force for the selected hour",
