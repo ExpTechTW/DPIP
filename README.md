@@ -36,7 +36,7 @@ DPIP（Disaster Prevention Information Platform）是臺灣本土團隊開發的
 | **多語言** | 介面支援 11 種語言 |
 
 > [!NOTE]
-> 這個儲存庫正在進行架構重寫（feature-first 分層，見 [ARCHITECTURE.md](ARCHITECTURE.md)）。`main` 上的每一次提交都會發布一個快照版本，快照未經完整審查。想要穩定版本請從商店安裝。
+> 這個儲存庫正在進行架構重寫（feature-first 分層，見 [ARCHITECTURE.md](ARCHITECTURE.md)）。推上 `main` 的變更裡有使用者看得到的修改時，會發布一個快照版本，快照未經完整審查。想要穩定版本請從商店安裝。
 
 ## 資料來源
 

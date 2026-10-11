@@ -1,8 +1,10 @@
 name: Build iOS
 
-# Pull requests only. A push to `main` is handled by release.yml,
-# which builds the signed, uploadable artifact — running this as well would
-# spend a second runner producing an unsigned one nobody installs.
+# Pull requests, and the pushes to `main` that publish no snapshot. A push
+# that does is handled by release.yml, which builds the signed, uploadable
+# artifact — running this as well would spend a second runner producing an
+# unsigned one nobody installs. One that does not would otherwise be built by
+# nothing at all.
 #
 # Every pull request, not only the ones targeting `main`. A stacked branch
 # opens its pull request against the layer below it, so `branches: [main]`
@@ -11,6 +13,8 @@ name: Build iOS
 # commits reached review that way without Swift being built once.
 on:
   pull_request:
+  push:
+    branches: [main]
 
 # One in-flight run per ref; a new push cancels the previous run. This matters
 # more now that the trigger is every pull request: restacking a five-deep chain
@@ -26,8 +30,14 @@ jobs:
       contents: read
     outputs:
       ios: ${{ steps.filter.outputs.ios }}
+      release: ${{ steps.release.outputs.builds }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          # A push reads its own commit messages below: full history, without
+          # the file contents nothing here looks at.
+          fetch-depth: ${{ github.event_name == 'push' && '0' || '1' }}
+          filter: ${{ github.event_name == 'push' && 'blob:none' || '' }}
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -38,9 +48,28 @@ jobs:
               - 'lib/**'
               - 'pubspec.yaml'
 
+      # Whether release.yml builds this push, for the job below. It publishes
+      # a snapshot only when a commit since the last tag carries a changelog
+      # entry; asked here of the push's own commits, which are always within
+      # that range. So "yes" here is always "yes" there, and a push this
+      # answers "no" for is built here — at worst by both, never by neither.
+      - name: Does release.yml build this push
+        id: release
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if bash tool/release/notes.sh --any "$BEFORE..$GITHUB_SHA"; then
+            echo "builds=true" >> "$GITHUB_OUTPUT"
+            echo "this push brings a changelog entry: release.yml builds it"
+          else
+            echo "builds=false" >> "$GITHUB_OUTPUT"
+            echo "no changelog entry in this push: no snapshot, so it is built here"
+          fi
+
   iOS:
     needs: changes
-    if: ${{ needs.changes.outputs.ios == 'true' }}
+    if: ${{ needs.changes.outputs.ios == 'true' && needs.changes.outputs.release != 'true' }}
     runs-on: macos-latest
     permissions:
       contents: read
