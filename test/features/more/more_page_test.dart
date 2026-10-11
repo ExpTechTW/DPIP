@@ -786,10 +786,7 @@ void main() {
     for (final (label, url) in <(String, String)>[
       ('DPIP Threads', 'https://www.threads.com/@dpip_tw'),
       ('DPIP Instagram', 'https://www.instagram.com/dpip_tw/'),
-      (
-        'DPIP Facebook',
-        'https://www.facebook.com/profile.php?id=61591688176499',
-      ),
+      ('DPIP Facebook', 'https://exptech.com.tw/dpip_tw_FB'),
     ]) {
       launcher.launched.clear();
       await tester.ensureVisible(find.text(label));

@@ -261,8 +261,8 @@ class MorePage extends StatelessWidget {
                 _MoreLinkTile(
                   icon: Icons.facebook_outlined,
                   title: l10n.moreFacebook,
-                  host: 'facebook.com/profile.php?id=61591688176499',
-                  url: 'https://www.facebook.com/profile.php?id=61591688176499',
+                  host: 'exptech.com.tw/dpip_tw_FB',
+                  url: 'https://exptech.com.tw/dpip_tw_FB',
                 ),
                 _MoreLinkTile(
                   icon: Icons.groups_outlined,
