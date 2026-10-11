@@ -1,5 +1,7 @@
 import Foundation
 import WidgetKit
+import SwiftUI
+import UIKit
 import XCTest
 
 final class ForecastRemoteDTOTests: XCTestCase {
@@ -201,6 +203,21 @@ final class ForecastClientTests: XCTestCase {
             XCTFail("Expected HTTP error")
         } catch let error as ForecastClientError {
             XCTAssertEqual(error, .httpStatus(503))
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    func testTimeoutFailsWithoutWaitingForWallTime() async {
+        ForecastMockURLProtocol.handler = { request in
+            XCTAssertEqual(request.timeoutInterval, 6)
+            throw URLError(.timedOut)
+        }
+        do {
+            _ = try await client.fetch(regionCode: "407")
+            XCTFail("Expected timeout")
+        } catch let error as URLError {
+            XCTAssertEqual(error.code, .timedOut)
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -622,9 +639,14 @@ final class ForecastWidgetProviderTests: XCTestCase {
         let state = ForecastPlannerState(
             current: currentSnapshot(target: target, regionCode: "407"))
         let gate = AsyncOperationGate()
+        let fetchStarted = expectation(description: "Forecast fetch started")
         let dto = try! forecastDTO(times: ["23:00"])
         let service = ForecastWidgetRefreshService(
-            fetch: { _ in await gate.wait(); return dto },
+            fetch: { _ in
+                fetchStarted.fulfill()
+                await gate.wait()
+                return dto
+            },
             loadCurrent: { state.loadCurrent($0) },
             savedIsResolved: { _ in true },
             write: { snapshot, _ in state.forecast = snapshot; return true },
@@ -632,8 +654,9 @@ final class ForecastWidgetProviderTests: XCTestCase {
         )
         let task = Task { await service.refresh(target: target,
                                                 regionCode: "407") }
-        while !(await gate.hasStarted) { await Task.yield() }
+        await fulfillment(of: [fetchStarted], timeout: 5)
         state.current = currentSnapshot(target: target, regionCode: "242")
+        // Release even after expectation timeout; open also covers a late waiter.
         await gate.open()
         await task.value
         XCTAssertNil(state.forecast)
@@ -1037,7 +1060,11 @@ private final class ForecastPlannerState: @unchecked Sendable {
         guard let forecast,
               forecast.sourceIdentifier == target.sourceIdentifier,
               forecast.regionCode == regionCode,
-              ForecastWidgetExpiry.isUsable(forecast, at: date) else {
+              ForecastWidgetExpiry.isUsable(
+                  forecast, at: date,
+                  calibratedTimeOffsetMilliseconds:
+                      current?.calibratedTimeOffsetMilliseconds ?? 0
+              ) else {
             return nil
         }
         return forecast
@@ -1121,7 +1148,8 @@ private func forecastPoints(times: [String]) -> [ForecastWidgetPoint] {
 }
 
 private func currentSnapshot(target: WidgetLocationTarget,
-                             regionCode: String = "407")
+                             regionCode: String = "407",
+                             offset: Int = 0)
     -> CurrentWeatherWidgetSnapshot {
     CurrentWeatherWidgetSnapshot(
         schemaVersion: 7,
@@ -1136,7 +1164,7 @@ private func currentSnapshot(target: WidgetLocationTarget,
         condition: .clear,
         isNight: false,
         nextDayNightTransitionTime: 0,
-        calibratedTimeOffsetMilliseconds: 0,
+        calibratedTimeOffsetMilliseconds: offset,
         temperature: 22,
         humidity: 50,
         rain: 0
@@ -1149,4 +1177,529 @@ private func instant(_ string: String) -> Date {
 
 private func milliseconds(_ string: String) -> Int64 {
     Int64(instant(string).timeIntervalSince1970 * 1_000)
+}
+
+// Explicit Release intervals keep these regressions independent of the DEBUG
+// runtime cadence. Every async boundary and clock is controlled by the test.
+final class ForecastExpiryRegressionTests: XCTestCase {
+    private let target = WidgetLocationTarget.saved(regionCode: "407")
+    private let initial = instant("2026-09-25T07:21:00Z")
+
+    func testExpiryBeforeNormalReloadRequestsTwoMinuteLeadAndKeepsExpiryEntry() async {
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            let plan = await planner(forecast: cached()).plan(for: target, family: family)
+            XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:38:00Z"))
+            XCTAssertEqual(plan.states.map(\.date), [
+                initial, instant("2026-09-25T07:40:00Z"), instant("2026-09-25T07:51:00Z"),
+            ])
+            XCTAssertNotNil(plan.forecast(at: initial))
+            XCTAssertNil(plan.forecast(at: instant("2026-09-25T07:40:00Z")))
+        }
+    }
+
+    func testExpiryAfterRequestedReloadStillSuppliesSafetyEntry() async {
+        let plan = await planner(forecast: cached(publication: "2026-09-25T07:20:00Z"))
+            .plan(for: target, family: .systemLarge)
+        XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:41:00Z"))
+        XCTAssertTrue(plan.states.contains { $0.date == instant("2026-09-25T07:50:00Z") })
+        XCTAssertNil(plan.forecast(at: instant("2026-09-25T07:50:00Z")))
+    }
+
+    func testDelayedWidgetKitReloadSelectsExpiryStateAndPreservesCurrentWeather() async throws {
+        let plan = await planner(forecast: cached(publication: "2026-09-25T07:20:00Z"))
+            .plan(for: target, family: .systemMedium)
+        // Simulate WidgetKit keeping this timeline past reload eligibility.
+        let delayed = instant("2026-09-25T07:50:30Z")
+        let selected = try XCTUnwrap(plan.states.last { $0.date <= delayed })
+        XCTAssertEqual(selected.date, instant("2026-09-25T07:50:00Z"))
+        XCTAssertNil(plan.forecast(at: selected.date))
+        XCTAssertNil(plan.forecast(at: delayed))
+        XCTAssertEqual(plan.snapshot?.temperature, 22)
+        XCTAssertFalse(selected.isStale)
+    }
+
+    func testNearExpiryUsesFiveMinuteFloorInsteadOfImmediateRetry() async {
+        let plan = await planner(forecast: cached(publication: "2026-09-25T06:52:00Z"))
+            .plan(for: target, family: .systemMedium)
+        XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:26:00Z"))
+        XCTAssertTrue(plan.states.contains { $0.date == instant("2026-09-25T07:22:00Z") })
+        XCTAssertNil(plan.forecast(at: instant("2026-09-25T07:22:00Z")))
+    }
+
+    func testMissingAndExpiredForecastKeepNormalCadenceAndCurrentWeather() async {
+        for forecast in [nil, cached(publication: "2026-09-25T06:50:00Z")] {
+            let plan = await planner(forecast: forecast).plan(for: target, family: .systemMedium)
+            XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:41:00Z"))
+            XCTAssertNil(plan.forecast)
+            XCTAssertEqual(plan.snapshot?.stationName, "station")
+        }
+    }
+
+    func testSmallKeepsNormalTimelineAndNeverRequestsForecast() async {
+        let state = ForecastPlannerState(current: currentSnapshot(target: target), forecast: cached())
+        let plan = await DPIPWidgetTimelinePlanner(
+            staleAfter: 30 * 60, refreshInterval: 20 * 60,
+            loadSnapshot: { state.loadCurrent($0) },
+            refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
+            loadForecast: { state.loadForecast($0, $1, $2) },
+            refreshForecast: { await state.refreshForecast($0, $1) },
+            now: { self.initial }
+        ).plan(for: target, family: .systemSmall)
+        XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:41:00Z"))
+        XCTAssertEqual(plan.states, CurrentWeatherWidgetTimeline.states(
+            snapshot: plan.snapshot, deviceNow: initial, staleAfter: 30 * 60
+        ))
+        XCTAssertNil(plan.forecast)
+        XCTAssertEqual(state.forecastRefreshCount, 0)
+    }
+
+    func testDebugCadenceIsNotLengthenedByReleaseFloor() {
+        XCTAssertEqual(ForecastWidgetExpiry.requestedReloadDate(
+            now: initial, normalReloadDate: initial.addingTimeInterval(60),
+            expiry: initial.addingTimeInterval(30)
+        ), initial.addingTimeInterval(60))
+    }
+
+    func testMidnightRolloverUsesReceiptHourAndRetainsExpirySafety() async {
+        let now = instant("2026-09-25T15:50:00Z") // 23:50 Taipei
+        let forecast = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T15:40:00Z"),
+            receivedAt: milliseconds("2026-09-25T15:50:00Z"),
+            times: ["00:00", "01:00"]
+        )
+        let plan = await planner(forecast: forecast, now: now)
+            .plan(for: target, family: .systemLarge)
+        XCTAssertEqual(plan.reloadDate, instant("2026-09-25T15:58:00Z"))
+        XCTAssertNotNil(plan.forecast(at: now))
+        XCTAssertTrue(plan.states.contains { $0.date == instant("2026-09-25T16:00:00Z") })
+        XCTAssertNil(plan.forecast(at: instant("2026-09-25T16:00:00Z")))
+        let entry = makeEntry(plan: plan, date: now)
+        XCTAssertEqual(entry.upcomingForecastPoints(for: .systemLarge).map(\.time),
+                       ["00:00", "01:00"])
+    }
+
+    func testPositiveAndNegativeClockOffsetsShiftReloadAndExpiryTogether() async {
+        for offset in [-300_000, 300_000] {
+            let seconds = Double(offset) / 1_000
+            let deviceNow = initial.addingTimeInterval(-seconds)
+            let forecast = forecastSnapshot(
+                updateTime: milliseconds("2026-09-25T07:10:00Z"),
+                receivedAt: Int64(deviceNow.timeIntervalSince1970 * 1_000),
+                times: ["16:00", "17:00"]
+            )
+            let plan = await planner(forecast: forecast, now: deviceNow, offset: offset)
+                .plan(for: target, family: .systemMedium)
+            let expiry = instant("2026-09-25T07:40:00Z").addingTimeInterval(-seconds)
+            XCTAssertEqual(plan.reloadDate, expiry.addingTimeInterval(-120))
+            XCTAssertTrue(plan.states.contains { $0.date == expiry })
+            XCTAssertNotNil(plan.forecast(at: expiry.addingTimeInterval(-1)))
+            XCTAssertNil(plan.forecast(at: expiry))
+            XCTAssertEqual(makeEntry(plan: plan, date: deviceNow)
+                .upcomingForecastPoints(for: .systemMedium).map(\.time), ["16:00", "17:00"])
+        }
+    }
+
+    func testExpiryCoincidingWithStaleStateIsNotDuplicated() async {
+        let now = instant("2026-09-25T07:21:00Z")
+        let forecast = cached(publication: "2026-09-25T07:21:00Z")
+        let plan = await planner(forecast: forecast, now: now)
+            .plan(for: target, family: .systemLarge)
+        let expiry = instant("2026-09-25T07:51:00Z")
+        XCTAssertEqual(plan.states.filter { $0.date == expiry }.count, 1)
+        XCTAssertTrue(plan.states.last!.isStale)
+        XCTAssertNil(plan.forecast(at: expiry))
+    }
+
+    func testForecastTimeoutAndHTTPFailureKeepCacheUntilExpiryThenSuccessfulRefreshRestoresIt() async throws {
+        for error: Error in [URLError(.timedOut), ForecastClientError.httpStatus(503)] {
+            let clock = TestWallClock(milliseconds: milliseconds("2026-09-25T07:21:00Z"))
+            let state = ForecastPlannerState(current: currentSnapshot(target: target), forecast: cached())
+            let service = ForecastWidgetRefreshService(
+                fetch: { _ in throw error },
+                loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
+                write: { snapshot, _ in state.forecast = snapshot; return true },
+                now: { clock.now() }
+            )
+            let failedPlanner = DPIPWidgetTimelinePlanner(
+                staleAfter: 30 * 60, refreshInterval: 20 * 60,
+                loadSnapshot: { state.loadCurrent($0) },
+                refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
+                loadForecast: { state.loadForecast($0, $1, $2) },
+                refreshForecast: { await service.refresh(target: $0, regionCode: $1) },
+                now: { clock.now() }
+            )
+            let before = await failedPlanner.plan(for: target, family: .systemMedium)
+            XCTAssertEqual(before.forecast?.updateTime, cached().updateTime)
+            clock.set(milliseconds: milliseconds("2026-09-25T07:40:00Z"))
+            let after = await failedPlanner.plan(for: target, family: .systemMedium)
+            XCTAssertNil(after.forecast)
+            XCTAssertEqual(after.snapshot?.temperature, 22)
+            XCTAssertEqual(after.reloadDate, instant("2026-09-25T08:00:00Z"))
+
+            let dto = try refreshedDTO(publication: "2026-09-25T07:35:00Z")
+            let success = ForecastWidgetRefreshService(
+                fetch: { _ in dto },
+                loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
+                write: { snapshot, _ in state.forecast = snapshot; return true },
+                now: { clock.now() }
+            )
+            await success.refresh(target: target, regionCode: "407")
+            let restored = await failedPlanner.plan(for: target, family: .systemMedium)
+            XCTAssertEqual(restored.forecast?.updateTime, dto.updateTime)
+            XCTAssertEqual(makeEntry(plan: restored, date: clock.now())
+                .upcomingForecastPoints(for: .systemMedium).map(\.time), ["16:00", "17:00"])
+        }
+    }
+
+    func testExpiredPublicationIsRejectedWithoutOverwritingCache() async throws {
+        for offset in [-300_000, 0, 300_000] {
+            let state = ForecastPlannerState(
+                current: currentSnapshot(target: target, offset: offset), forecast: cached()
+            )
+            let dto = try refreshedDTO(publication: "2026-09-25T06:51:00Z")
+            let service = ForecastWidgetRefreshService(
+                fetch: { _ in dto },
+                loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
+                write: { snapshot, _ in state.forecast = snapshot; return true },
+                now: { self.initial.addingTimeInterval(-Double(offset) / 1_000) }
+            )
+            await service.refresh(target: target, regionCode: "407")
+            XCTAssertEqual(state.forecast?.updateTime, cached().updateTime)
+        }
+    }
+
+    func testSamePublicationReceivedAcrossHourCannotResurrectExpiredCache() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let first = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T07:45:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:59:00Z"), times: ["16:00", "17:00"]
+        )
+        XCTAssertTrue(try store.write(first, for: target))
+        let repeated = forecastSnapshot(
+            updateTime: first.updateTime, receivedAt: milliseconds("2026-09-25T08:01:00Z"),
+            times: ["16:00", "17:00"]
+        )
+        XCTAssertFalse(try store.write(repeated, for: target))
+        XCTAssertEqual(store.load(for: target, regionCode: "407",
+                                  at: instant("2026-09-25T07:59:30Z"))?.receivedAt, first.receivedAt)
+        XCTAssertNil(store.load(for: target, regionCode: "407",
+                                at: instant("2026-09-25T08:01:00Z")))
+        let newer = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T08:00:00Z"),
+            receivedAt: repeated.receivedAt, times: ["17:00"]
+        )
+        XCTAssertTrue(try store.write(newer, for: target))
+        XCTAssertEqual(store.load(for: target, regionCode: "407",
+                                  at: instant("2026-09-25T08:01:00Z"))?.updateTime, newer.updateTime)
+    }
+
+    func testMissingAndInvalidDiskCacheKeepCurrentWithoutForecast() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let current = currentSnapshot(target: target)
+        let planner = DPIPWidgetTimelinePlanner(
+            staleAfter: 30 * 60, refreshInterval: 20 * 60,
+            loadSnapshot: { _ in current },
+            refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
+            loadForecast: { store.load(for: $0, regionCode: $1, at: $2) },
+            now: { self.initial }
+        )
+        let missing = await planner.plan(for: target, family: .systemLarge)
+        XCTAssertNil(missing.forecast)
+        XCTAssertEqual(missing.snapshot?.temperature, 22)
+        let url = try XCTUnwrap(store.snapshotURL(for: target))
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
+                                                 withIntermediateDirectories: true)
+        try Data(#"{"schemaVersion":1,"points":[]}"#.utf8).write(to: url)
+        let invalid = await planner.plan(for: target, family: .systemLarge)
+        XCTAssertNil(invalid.forecast)
+        XCTAssertEqual(invalid.snapshot?.temperature, 22)
+    }
+
+    func testLocationChangeDuringForecastAwaitRechecksPlannerSnapshotAndCache() async throws {
+        let currentTarget = WidgetLocationTarget.currentLocation
+        let state = ForecastPlannerState(current: currentSnapshot(target: currentTarget))
+        let dto = try refreshedDTO(publication: "2026-09-25T07:10:00Z")
+        let gate = AsyncOperationGate()
+        let fetchStarted = expectation(description: "Forecast fetch started")
+        let service = ForecastWidgetRefreshService(
+            fetch: { _ in
+                fetchStarted.fulfill()
+                await gate.wait()
+                return dto
+            },
+            loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
+            write: { snapshot, _ in state.forecast = snapshot; return true },
+            now: { self.initial }
+        )
+        let planner = DPIPWidgetTimelinePlanner(
+            staleAfter: 30 * 60, refreshInterval: 20 * 60,
+            loadSnapshot: { state.loadCurrent($0) },
+            refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
+            loadForecast: { state.loadForecast($0, $1, $2) },
+            refreshForecast: { await service.refresh(target: $0, regionCode: $1) },
+            now: { self.initial }
+        )
+        let task = Task { await planner.plan(for: currentTarget, family: .systemLarge) }
+        await fulfillment(of: [fetchStarted], timeout: 5)
+        state.current = currentSnapshot(target: currentTarget, regionCode: "242")
+        // Release even after expectation timeout; open also covers a late waiter.
+        await gate.open()
+        let plan = await task.value
+        XCTAssertEqual(plan.snapshot?.regionCode, "242")
+        XCTAssertNil(state.forecast)
+        XCTAssertNil(plan.forecast)
+    }
+
+    func testDisplayRejectsNoUpcomingExpiredAndWrongLocationForecasts() {
+        let forecasts = [
+            cached(times: ["14:00", "15:00"]),
+            cached(publication: "2026-09-25T06:50:00Z"),
+            forecastSnapshot(sourceIdentifier: "region:242", regionCode: "242"),
+        ]
+        for forecast in forecasts {
+            let entry = DPIPWidgetEntry(date: initial, snapshot: currentSnapshot(target: target),
+                                        isStale: false, isNight: false, forecast: forecast)
+            for family: WidgetFamily in [.systemMedium, .systemLarge, .systemSmall] {
+                XCTAssertTrue(entry.upcomingForecastPoints(for: family).isEmpty)
+            }
+        }
+    }
+
+    private func cached(publication: String = "2026-09-25T07:10:00Z",
+                        times: [String] = ["16:00", "17:00"]) -> ForecastWidgetSnapshot {
+        forecastSnapshot(updateTime: milliseconds(publication),
+                         receivedAt: Int64(initial.timeIntervalSince1970 * 1_000), times: times)
+    }
+
+    private func planner(forecast: ForecastWidgetSnapshot?, now: Date? = nil,
+                         offset: Int = 0) -> DPIPWidgetTimelinePlanner {
+        let date = now ?? initial
+        let current = currentSnapshot(target: target, offset: offset)
+        return DPIPWidgetTimelinePlanner(
+            staleAfter: 30 * 60, refreshInterval: 20 * 60,
+            loadSnapshot: { _ in current },
+            refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
+            loadForecast: { target, region, date in
+                guard let forecast, forecast.sourceIdentifier == target.sourceIdentifier,
+                      forecast.regionCode == region,
+                      ForecastWidgetExpiry.isUsable(forecast, at: date,
+                          calibratedTimeOffsetMilliseconds: offset) else { return nil }
+                return forecast
+            },
+            now: { date }
+        )
+    }
+
+    private func makeEntry(plan: DPIPWidgetTimelinePlan, date: Date) -> DPIPWidgetEntry {
+        DPIPWidgetEntry(date: date, snapshot: plan.snapshot, isStale: false, isNight: false,
+                        forecast: plan.forecast(at: date))
+    }
+
+    private func refreshedDTO(publication: String) throws -> ForecastRemoteDTO {
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(
+            with: forecastJSON(times: ["16:00", "17:00"])
+        ) as? [String: Any])
+        json["updateTime"] = milliseconds(publication)
+        return try JSONDecoder().decode(ForecastRemoteDTO.self,
+                                         from: JSONSerialization.data(withJSONObject: json))
+    }
+}
+
+@MainActor
+final class ForecastUnavailablePresentationTests: XCTestCase {
+    private let date = instant("2026-09-25T07:21:00Z")
+    private let locales = ["en", "zh-Hant", "zh-Hans", "ja", "ko"]
+
+    func testMediumAndLargeUnavailableSectionFitsAllLocalesAndLargestText() throws {
+        let current = currentSnapshot(target: .saved(regionCode: "407"))
+        let entry = DPIPWidgetEntry(date: date, snapshot: current, isStale: false, isNight: false)
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            for locale in locales {
+                for size: DynamicTypeSize in [.large, .accessibility5] {
+                    let section = HourlyForecastSection(
+                        entry: entry, family: family, calibratedDate: date,
+                        isCurrentlyNight: false, nextTransitionTime: 0,
+                        localizationBundle: Bundle(for: Self.self)
+                    )
+                    .environment(\.locale, Locale(identifier: locale))
+                    .environment(\.dynamicTypeSize, size)
+                    let host = UIHostingController(rootView: section)
+                    let fitting = host.sizeThatFits(in: CGSize(width: 300, height: 1_000))
+                    XCTAssertGreaterThan(fitting.height, 10, "Missing unavailable text: \(locale)")
+                    XCTAssertLessThanOrEqual(fitting.height, 34, "Unavailable state must remain compact")
+                    XCTAssertLessThanOrEqual(fitting.width, 300)
+                }
+            }
+        }
+    }
+
+    func testUnavailableStringsExistInEverySupportedLocale() throws {
+        let expected = [
+            "en": ["Hourly forecast unavailable", "No forecast"],
+            "zh-Hant": ["每小時預報暫無資料", "暫無預報"],
+            "zh-Hans": ["暂无逐小时预报", "暂无预报"],
+            "ja": ["時間別予報は利用できません", "予報なし"],
+            "ko": ["시간별 예보를 이용할 수 없습니다", "예보 없음"],
+        ]
+        let bundle = Bundle(for: Self.self)
+        for locale in locales {
+            let path = try XCTUnwrap(bundle.path(forResource: locale, ofType: "lproj"))
+            let localized = try XCTUnwrap(Bundle(path: path))
+            for (index, key) in ["widget.hourly_forecast_unavailable", "widget.forecast_unavailable"].enumerated() {
+                XCTAssertEqual(localized.localizedString(forKey: key, value: nil, table: nil),
+                               expected[locale]![index])
+            }
+        }
+    }
+
+    func testSmallForecastSectionStaysEmpty() {
+        let entry = DPIPWidgetEntry(
+            date: date, snapshot: currentSnapshot(target: .saved(regionCode: "407")),
+            isStale: false, isNight: false
+        )
+        let host = UIHostingController(rootView: HourlyForecastSection(
+            entry: entry, family: .systemSmall, calibratedDate: date,
+            isCurrentlyNight: false, nextTransitionTime: 0
+        ))
+        XCTAssertEqual(host.sizeThatFits(in: CGSize(width: 300, height: 1_000)).height, 0)
+    }
+
+    func testUnavailableAndRestoredWidgetsRenderInLightDarkAndLargerText() throws {
+        let current = currentSnapshot(target: .saved(regionCode: "407"))
+        let available = forecastSnapshot(
+            updateTime: milliseconds("2026-09-25T07:10:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:21:00Z"), times: ["16:00", "17:00"]
+        )
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            for scheme: ColorScheme in [.light, .dark] {
+                for size: DynamicTypeSize in [.large, .accessibility5] {
+                    for forecast in [nil, available] {
+                        let entry = DPIPWidgetEntry(
+                            date: date, snapshot: current, isStale: false, isNight: false,
+                            forecast: forecast
+                        )
+                        let contentSize = CGSize(width: 338, height: family == .systemMedium ? 158 : 354)
+                        let widget = family == .systemMedium
+                            ? AnyView(MediumCurrentWeatherView(entry: entry, localizationBundle: Bundle(for: Self.self)))
+                            : AnyView(LargeCurrentWeatherView(entry: entry, localizationBundle: Bundle(for: Self.self)))
+                        let view = widget
+                            .environment(\.locale, Locale(identifier: "zh-Hant"))
+                            .environment(\.dynamicTypeSize, size)
+                            .environment(\.colorScheme, scheme)
+                            .frame(width: contentSize.width, height: contentSize.height, alignment: .topLeading)
+                            .padding(16)
+                            .background(scheme == .dark ? Color.black : Color.white)
+                        let host = UIHostingController(rootView: view)
+                        if #available(iOS 16.4, *) {
+                            host.safeAreaRegions = []
+                        }
+                        host.view.frame = CGRect(origin: .zero, size: CGSize(
+                            width: contentSize.width + 32, height: contentSize.height + 32
+                        ))
+                        host.view.backgroundColor = .clear
+                        host.view.setNeedsLayout()
+                        host.view.layoutIfNeeded()
+                        let image = UIGraphicsImageRenderer(size: host.view.bounds.size).image { _ in
+                            host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+                        }
+                        XCTAssertNotNil(image.cgImage)
+                        let name = "\(family)-\(scheme)-\(size)-\(forecast == nil ? "unavailable" : "forecast")"
+                        let attachment = XCTAttachment(image: image)
+                        attachment.name = name
+                        attachment.lifetime = .keepAlways
+                        add(attachment)
+                    }
+                }
+            }
+        }
+    }
+
+    func testAccessibilityForecastRowFitsFullTimeNegativeTemperatureAndProbability() throws {
+        for size: DynamicTypeSize in [.accessibility1, .accessibility3, .accessibility5] {
+            for probability: Int? in [nil, 0, 100] {
+                let point = try XCTUnwrap(ForecastWidgetPoint(
+                    time: "16:00", temperature: -20, weather: "雷雨", weatherCode: 319, pop: probability
+                ))
+                let row = AccessibleForecastPointView(point: point, isNight: false)
+                    .environment(\.dynamicTypeSize, size)
+                    // With an unconstrained ideal width, no parent frame can
+                    // mask truncation of the time or either numeric value.
+                    .fixedSize(horizontal: true, vertical: true)
+                let host = UIHostingController(rootView: row)
+                if #available(iOS 16.4, *) { host.safeAreaRegions = [] }
+                let fitting = host.sizeThatFits(in: CGSize(width: 300, height: 1_000))
+                XCTAssertLessThanOrEqual(fitting.width, 300,
+                    "Forecast row clips at \(size), probability=\(String(describing: probability))")
+            }
+        }
+    }
+
+    func testAccessibilityContentFitsWithoutVerticalCompression() throws {
+        // Measure the ideal height, before the fixed widget frame can hide
+        // overflow. Include four hours and full observations, unlike the
+        // minimal render fixture, to exercise both forecast and detail rows.
+        let current = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407",
+            regionName: "臺中市西屯區", observationTime: Int(date.timeIntervalSince1970),
+            stationName: "臺中氣象觀測站", weather: "雷雨", weatherCode: 319,
+            condition: .thunderstorm, isNight: false,
+            nextDayNightTransitionTime: Int(date.addingTimeInterval(3_600).timeIntervalSince1970),
+            calibratedTimeOffsetMilliseconds: 0, temperature: 32, humidity: 100,
+            rain: 123.4, windDirection: "NE", windSpeed: 12.3, apparentTemperature: 38
+        )
+        let available = try XCTUnwrap(ForecastWidgetSnapshot(
+            sourceIdentifier: "current-location", regionCode: "407",
+            updateTime: milliseconds("2026-09-25T07:10:00Z"),
+            receivedAt: milliseconds("2026-09-25T07:21:00Z"),
+            points: ["16:00", "17:00", "18:00", "19:00"].map {
+                ForecastWidgetPoint(time: $0, temperature: -20, weather: "晴", weatherCode: 100, pop: 100)!
+            }
+        ))
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            for locale in locales {
+                for size: DynamicTypeSize in [.accessibility1, .accessibility3, .accessibility5] {
+                    for forecast in [nil, available] {
+                        let entry = DPIPWidgetEntry(date: date, snapshot: current,
+                                                   isStale: false, isNight: false, forecast: forecast)
+                        let widget = family == .systemMedium
+                            ? AnyView(MediumCurrentWeatherView(entry: entry, localizationBundle: Bundle(for: Self.self)))
+                            : AnyView(LargeCurrentWeatherView(entry: entry, localizationBundle: Bundle(for: Self.self)))
+                        let view = widget
+                            .environment(\.locale, Locale(identifier: locale))
+                            .environment(\.dynamicTypeSize, size)
+                            .fixedSize(horizontal: false, vertical: true)
+                        let host = UIHostingController(rootView: view)
+                        if #available(iOS 16.4, *) { host.safeAreaRegions = [] }
+                        let fitting = host.sizeThatFits(in: CGSize(width: 300, height: 1_000))
+                        let limit: CGFloat = family == .systemMedium ? 158 : 354
+                        XCTAssertGreaterThan(fitting.height, 50)
+                        XCTAssertLessThanOrEqual(fitting.height, limit,
+                            "Content clips: \(family) \(locale) \(size) forecast=\(forecast != nil)")
+                        XCTAssertLessThanOrEqual(fitting.width, 300)
+                        if size == .accessibility5, ["en", "zh-Hant"].contains(locale) {
+                            let render = UIHostingController(rootView: view
+                                .frame(width: 300, height: limit, alignment: .topLeading)
+                                .padding(16).background(Color.white)
+                                .environment(\.colorScheme, .light))
+                            if #available(iOS 16.4, *) { render.safeAreaRegions = [] }
+                            render.view.frame = CGRect(x: 0, y: 0, width: 332, height: limit + 32)
+                            render.view.setNeedsLayout()
+                            render.view.layoutIfNeeded()
+                            let image = UIGraphicsImageRenderer(size: render.view.bounds.size).image { _ in
+                                render.view.drawHierarchy(in: render.view.bounds, afterScreenUpdates: true)
+                            }
+                            let attachment = XCTAttachment(image: image)
+                            attachment.name = "full-observations-\(family)-\(locale)-AX5-\(forecast == nil ? "unavailable" : "forecast")"
+                            attachment.lifetime = .keepAlways
+                            add(attachment)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

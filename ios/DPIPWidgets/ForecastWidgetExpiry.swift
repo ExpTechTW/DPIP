@@ -27,6 +27,23 @@ enum ForecastWidgetExpiry {
         ).addingTimeInterval(-offset)
     }
 
+    /// All dates are in the device clock domain. Bound the lead to two
+    /// minutes and requests to at least five minutes apart in Release.
+    /// A shorter configured interval (DEBUG) keeps its existing cadence.
+    /// If expiry is too close, prefer the request floor over a retry loop;
+    /// the independently supplied expiry entry removes the predictions.
+    static func requestedReloadDate(
+        now: Date,
+        normalReloadDate: Date,
+        expiry: Date
+    ) -> Date {
+        guard expiry > now else { return normalReloadDate }
+        let interval = max(0, normalReloadDate.timeIntervalSince(now))
+        let earliest = now.addingTimeInterval(min(5 * 60, interval))
+        let beforeExpiry = expiry.addingTimeInterval(-min(2 * 60, interval))
+        return min(normalReloadDate, max(earliest, beforeExpiry))
+    }
+
     static func isUsable(
         _ snapshot: ForecastWidgetSnapshot,
         at deviceDate: Date,
