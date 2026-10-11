@@ -161,7 +161,7 @@ jobs:
       # precise key costs one full download on a dependency change and is
       # correct every time.
       - name: Cache pub packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
@@ -182,7 +182,7 @@ jobs:
       # main saved here and stored a fresh ~880 MB copy of its own.
       - name: Cache Swift packages
         if: matrix.platform == 'ios'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
@@ -388,7 +388,7 @@ jobs:
         if: always() && matrix.platform == 'ios'
         run: rm -rf "$RUNNER_TEMP/private_keys"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: dpip-${{ matrix.platform }}
           path: DPIP-*.*
@@ -404,7 +404,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           path: artifacts
           merge-multiple: true

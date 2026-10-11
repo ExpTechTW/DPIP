@@ -28,7 +28,7 @@ jobs:
       ios: ${{ steps.filter.outputs.ios }}
     steps:
       - uses: actions/checkout@v5
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -101,7 +101,7 @@ jobs:
           zip -qr DPIP.ipa Payload
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: DPIP-iOS
           path: |
