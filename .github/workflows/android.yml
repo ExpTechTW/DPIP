@@ -16,7 +16,7 @@ jobs:
       android: ${{ steps.filter.outputs.android }}
     steps:
       - uses: actions/checkout@v5
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -94,7 +94,7 @@ jobs:
         run: bash tool/dev/build.sh android
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: DPIP-Android-Release
           path: build/app/outputs/flutter-apk/*.apk
