@@ -782,17 +782,49 @@ final class ForecastWidgetGalleryPreviewTests: XCTestCase {
         XCTAssertEqual(content.forecast?.points.count, 5)
     }
 
-    func testSmallGalleryRemainsCacheOnlyWithAndWithoutCurrentWeather() {
-        for current in [currentSnapshot(target: target), nil] {
-            let state = ForecastPlannerState(current: current, forecast: freshForecast())
+    func testSmallGalleryKeepsMatchingCurrentWeatherAndNeverGainsForecast() {
+        let state = ForecastPlannerState(
+            current: currentSnapshot(target: target), forecast: freshForecast()
+        )
+        let content = dependencies(state).snapshotContent(
+            for: target, at: date, family: .systemSmall, isPreview: true
+        )
+        XCTAssertEqual(content.snapshot?.temperature, 22)
+        XCTAssertEqual(content.snapshot?.stationName, "station")
+        XCTAssertNil(content.forecast)
+        XCTAssertEqual(state.forecastRefreshCount, 0)
+    }
+
+    func testSmallGalleryWithoutMatchingCurrentWeatherUsesSampleWithoutForecast() {
+        let currentTarget = WidgetLocationTarget.currentLocation
+        let states = [
+            ForecastPlannerState(current: nil),
+            // A cached snapshot for a different location must not be shown.
+            ForecastPlannerState(current: currentSnapshot(target: target)),
+        ]
+        for (index, state) in states.enumerated() {
+            let requested = index == 0 ? target : currentTarget
             let content = dependencies(state).snapshotContent(
-                for: target, at: date, family: .systemSmall, isPreview: true
+                for: requested, at: date, family: .systemSmall, isPreview: true
             )
-            XCTAssertEqual(content.snapshot?.temperature, current?.temperature)
-            XCTAssertEqual(content.snapshot?.stationName, current?.stationName)
+            XCTAssertEqual(content.snapshot?.temperature, 28)
+            XCTAssertEqual(content.snapshot?.sourceIdentifier, "region:407")
+            XCTAssertNotEqual(content.snapshot?.stationName, "station")
             XCTAssertNil(content.forecast)
             XCTAssertEqual(state.forecastRefreshCount, 0)
         }
+    }
+
+    func testSmallSampleStaysOutOfNormalSnapshotsAndInvalidTargets() {
+        let normal = dependencies(ForecastPlannerState(current: nil)).snapshotContent(
+            for: target, at: date, family: .systemSmall, isPreview: false
+        )
+        XCTAssertNil(normal.snapshot)
+        let invalid = dependencies(ForecastPlannerState(current: nil)).snapshotContent(
+            for: .invalid(identifier: "bad"), at: date,
+            family: .systemSmall, isPreview: true
+        )
+        XCTAssertNil(invalid.snapshot)
     }
 
     func testSampleNeverAppearsInNormalSnapshotsOrTimelinePlans() async {

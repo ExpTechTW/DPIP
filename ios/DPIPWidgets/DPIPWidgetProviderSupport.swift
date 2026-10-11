@@ -386,8 +386,17 @@ struct DPIPWidgetProviderDependencies: Sendable {
             for: target, currentSnapshot: current, at: date, family: family
         )
         let cached = DPIPWidgetSnapshotContent(snapshot: current, forecast: forecast)
-        guard isPreview, ForecastWidgetFamilyPolicy.supportsForecast(family),
-              target.sourceIdentifier != nil else { return cached }
+        guard isPreview, target.sourceIdentifier != nil else { return cached }
+
+        // Small has no forecast: only the current-weather half needs a sample,
+        // and only when the cache holds nothing for this target.
+        guard ForecastWidgetFamilyPolicy.supportsForecast(family) else {
+            if let current, target.matches(snapshot: current) { return cached }
+            return DPIPWidgetSnapshotContent(
+                snapshot: DPIPWidgetGalleryPreview.sample(at: date).snapshot,
+                forecast: nil
+            )
+        }
 
         if let current, target.matches(snapshot: current), let forecast,
            forecast.sourceIdentifier == target.sourceIdentifier,

@@ -16,9 +16,12 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
 
     func placeholder(in context: Context) -> DPIPWidgetEntry {
         let date = Date.now
-        let content = ForecastWidgetFamilyPolicy.supportsForecast(context.family)
-            ? DPIPWidgetGalleryPreview.sample(at: date)
-            : DPIPWidgetSnapshotContent(snapshot: nil, forecast: nil)
+        let sample = DPIPWidgetGalleryPreview.sample(at: date)
+        let content = DPIPWidgetSnapshotContent(
+            snapshot: sample.snapshot,
+            forecast: ForecastWidgetFamilyPolicy.supportsForecast(context.family)
+                ? sample.forecast : nil
+        )
         return DPIPWidgetEntry(
             date: date,
             snapshot: content.snapshot,
