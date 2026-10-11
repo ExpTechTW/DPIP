@@ -68,6 +68,8 @@ struct ForecastWidgetSnapshotStore: Sendable {
             result = Result {
                 // A late response for an older API publication cannot replace
                 // a newer same-region forecast in this target's cache.
+                // Receiving the same publication again must not move its
+                // first-receipt hour boundary and resurrect expired values.
                 let existingAttributes = try? FileManager.default.attributesOfItem(
                     atPath: coordinatedURL.path
                 )
@@ -81,7 +83,7 @@ struct ForecastWidgetSnapshotStore: Sendable {
                        from: existingData
                    ), existing.sourceIdentifier == snapshot.sourceIdentifier,
                    existing.regionCode == snapshot.regionCode,
-                   existing.updateTime > snapshot.updateTime {
+                   existing.updateTime >= snapshot.updateTime {
                     return false
                 }
                 try data.write(to: coordinatedURL, options: .atomic)

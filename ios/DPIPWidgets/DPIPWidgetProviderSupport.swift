@@ -218,7 +218,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
             deviceNow: deviceNow,
             staleAfter: staleAfter
         )
-        let reloadDate = deviceNow.addingTimeInterval(refreshInterval)
+        var reloadDate = deviceNow.addingTimeInterval(refreshInterval)
         let forecast: ForecastWidgetSnapshot?
         if ForecastWidgetFamilyPolicy.supportsForecast(family),
            let snapshot,
@@ -235,7 +235,14 @@ struct DPIPWidgetTimelinePlanner: Sendable {
                 calibratedTimeOffsetMilliseconds:
                     snapshot.calibratedTimeOffsetMilliseconds
             )
-            if expiry > deviceNow, expiry < reloadDate,
+            reloadDate = ForecastWidgetExpiry.requestedReloadDate(
+                now: deviceNow,
+                normalReloadDate: reloadDate,
+                expiry: expiry
+            )
+            // Reload eligibility is not an execution guarantee. Supply the
+            // expiry state even when it falls after the requested reload.
+            if expiry > deviceNow,
                !states.contains(where: { $0.date == expiry }) {
                 states.append(CurrentWeatherWidgetTimeline.state(
                     snapshot: snapshot,
