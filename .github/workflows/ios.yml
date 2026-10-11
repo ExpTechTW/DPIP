@@ -66,9 +66,16 @@ jobs:
           # DerivedData is never consulted for packages and caching it stored
           # nothing. Losing this directory is what makes a launch print fifteen
           # "Fetching from … (cached)" lines and cost 19-32 s.
+          #
+          # The DerivedData line is release.yml's, whose xcodebuild archive does
+          # clone there; nothing in this job writes it. It is listed so the two
+          # lists match line for line: a cache entry's version is a hash of these
+          # paths, and only an identical list lets this job restore the entry
+          # main saved instead of storing a fresh ~880 MB copy per pull request.
           path: |
             ~/Library/Caches/org.swift.swiftpm
             build/ios/SourcePackages
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-

@@ -170,12 +170,23 @@ jobs:
       # (there is no Podfile). Uncached, every release re-clones and rebuilds
       # every package before the app's own code is even compiled — on the
       # runner that bills at ten times the Linux rate.
+      #
+      # Both clone directories, because the build below uses both: Flutter's
+      # step clones into build/ios/SourcePackages (it always passes
+      # -clonedSourcePackagesDirPath), and the xcodebuild archive after it,
+      # which does not, clones into DerivedData.
+      #
+      # The list is ios.yml's, line for line, and has to stay that way. A cache
+      # entry's version is a hash of these paths, so a different list is a
+      # different cache under the same key: every pull request missed the one
+      # main saved here and stored a fresh ~880 MB copy of its own.
       - name: Cache Swift packages
         if: matrix.platform == 'ios'
         uses: actions/cache@v4
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
+            build/ios/SourcePackages
             ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
