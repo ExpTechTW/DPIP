@@ -330,6 +330,8 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
     func testWeatherAndClockStartBeforeEitherCompletes() async throws {
         let weatherGate = AsyncOperationGate()
         let clockGate = AsyncOperationGate()
+        let weatherStarted = expectation(description: "Weather fetch started")
+        let clockStarted = expectation(description: "Clock synchronization started")
         let observation = try makeObservation()
         let writer = CurrentWeatherSnapshotWriterSpy()
         let resolver = try makeResolver(codes: ["242"])
@@ -343,10 +345,12 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
             },
             pipeline: CurrentWeatherWidgetRefreshPipeline(
                 fetchWeather: { _, _ in
+                    weatherStarted.fulfill()
                     await weatherGate.wait()
                     return observation
                 },
                 synchronizeClock: {
+                    clockStarted.fulfill()
                     await clockGate.wait()
                     return self.makeSnapshotTime()
                 },
@@ -362,18 +366,11 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
                 target: .saved(regionCode: "242")
             )
         }
-        for _ in 0..<200 {
-            if await weatherGate.hasStarted,
-               await clockGate.hasStarted {
-                break
-            }
-            await Task.yield()
-        }
+        await fulfillment(of: [weatherStarted, clockStarted], timeout: 5)
 
-        let weatherStarted = await weatherGate.hasStarted
-        let clockStarted = await clockGate.hasStarted
-        XCTAssertTrue(weatherStarted)
-        XCTAssertTrue(clockStarted)
+        // Keep both operations blocked until startup is verified, and release
+        // both gates even after a timeout so the refresh task can finish.
+        XCTAssertEqual(writer.writeCount, 0)
         await weatherGate.open()
         await clockGate.open()
         let result = await refresh.value
