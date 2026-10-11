@@ -40,5 +40,7 @@
 - [ ] **一個 commit 一件事**（這條 gate 驗不了，靠自己和 review）
 - [ ] `mise exec -- flutter analyze` 與 `mise exec -- flutter test` 通過
 - [ ] 新的使用者可見字串都走 `AppLocalizations`，沒有寫死
+- [ ] CI 全部通過（`gh pr checks`：每一項都是 pass 或 skipped）—— 沒過不能合併，
+      見 [pr.md](../pr.md#合併條件ci-全過)
 - [ ] 有 UI 變更的話：用的是 `AppSpacing` / `AppRadius` / `AppMotion`，
       深色模式看過，文字對比度可接受
