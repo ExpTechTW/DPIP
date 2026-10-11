@@ -68,6 +68,22 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
   static const String _areaSourceLayer = 'tsunami';
   static const String _areaLayerId = 'tsunami-areas';
 
+  /// Coast line width by zoom. A fixed pixel width is a hairline once the map
+  /// is close enough to read a district name, so it widens with the zoom.
+  static const List<Object> _areaLineWidth = [
+    Expressions.interpolate,
+    ['linear'],
+    [Expressions.zoom],
+    5,
+    6.0,
+    8,
+    20.0,
+    11,
+    24.0,
+    14,
+    36.0,
+  ];
+
   /// The legacy cadence: a half-second tick, line shown for six ticks of eight.
   static const Duration _blinkTick = Duration(milliseconds: 500);
   static const int _blinkCycle = 8;
@@ -253,7 +269,7 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
       _areaLayerId,
       LineLayerProperties(
         lineColor: _areaColorExpression(bands),
-        lineWidth: 10,
+        lineWidth: _areaLineWidth,
         lineOpacity: 1,
       ),
       belowLayerId: landLayerId,
@@ -288,7 +304,7 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
             _areaLayerId,
             LineLayerProperties(
               lineColor: color,
-              lineWidth: 10,
+              lineWidth: _areaLineWidth,
               lineOpacity: _blinkStep < _blinkVisible ? 1 : 0,
             ),
           )
