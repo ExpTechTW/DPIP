@@ -1,4 +1,7 @@
-# Every commit on main is a snapshot; every tag is a release.
+# A push to main that brings a changelog entry is a snapshot; every tag is a
+# release. A push whose snapshot note would be empty — no commit since the last
+# tag carrying an entry — publishes nothing, and android.yml and ios.yml build it
+# instead. Run by hand, a snapshot is published regardless.
 #
 # The three values a build carries come from `tool/release/version.sh` and nowhere
 # else — no human edits a version, and `pubspec.yaml`'s stays a placeholder for
@@ -30,6 +33,7 @@ jobs:
       code: ${{ steps.ordinal.outputs.code }}
       date: ${{ steps.v.outputs.date }}
       prerelease: ${{ steps.v.outputs.prerelease }}
+      publish: ${{ steps.changelog.outputs.publish }}
     steps:
       # Full history: the label counts this week's commits and the train reads
       # the newest tag. A shallow clone has neither.
@@ -70,8 +74,8 @@ jobs:
       #
       # **Equal** on a tag means this commit was already published as a
       # snapshot. That is not an accident, it is the normal shape of a release:
-      # every push to main publishes, so by the time anyone can tag a commit it
-      # has already spent its number, and both uploads below run for a snapshot
+      # every push to main with a changelog entry publishes, so by the time
+      # anyone can tag a commit it has usually already spent its number, and both uploads below run for a snapshot
       # exactly as they do for a release. `v26.1` only shipped because its
       # commit never went out as a snapshot; on `v26.2` (`d2b4664b`, carrying
       # both `26w35g` and `v26.2`) the tag run computed the snapshot's own
@@ -118,8 +122,28 @@ jobs:
           fi
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
 
+      # Nothing a user would see: the snapshot's note would say so and nothing
+      # else, and the stores would get a build that changes nothing. A push to
+      # main only — a tag is a release, and run by hand, someone asked for one.
+      # The next push that does bring an entry publishes these commits too,
+      # since its note runs from the same tag.
+      - name: Anything to publish
+        id: changelog
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = branch ] && [ "$EVENT" = push ] &&
+            ! bash tool/release/notes.sh --any; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::no commit since $(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo 'the first') carries a changelog entry — no snapshot; android.yml and ios.yml build this push"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     needs: version
+    # `publish`, which needs this, is skipped with it.
+    if: needs.version.outputs.publish == 'true'
     strategy:
       # Independent: one store failing must not stop the other shipping.
       fail-fast: false
