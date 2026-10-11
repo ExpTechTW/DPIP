@@ -100,9 +100,23 @@ EOF
 # `mise exec` re-reads mise.toml every time, which is the whole point: this is
 # the only place in the repo that names the toolchain, so there is one line to
 # get wrong instead of one per script.
+#
+# Git's own variables are cleared for the toolchain. A hook runs with
+# `GIT_DIR` set — in a linked worktree it always is — and the Flutter tool works
+# out its own version by running git inside the SDK: with `GIT_DIR` inherited
+# that git reads *this* repository instead, so Flutter announced itself as
+# `2.5.501-0.0.pre` from DPIP's oldest tag and every `pub get` in a pre-push
+# from a worktree failed to resolve.
+#
+# A subshell's `unset`, not `env -u`: `env` runs binaries only, so it would
+# step past a `mise` shell function, which is how the tool tests stand it in.
 pinned() {
   require_mise
-  mise exec -- "$@"
+  (
+    unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR \
+      GIT_OBJECT_DIRECTORY GIT_PREFIX
+    mise exec -- "$@"
+  )
 }
 
 # A step banner, so a script that runs four commands says which one failed.
