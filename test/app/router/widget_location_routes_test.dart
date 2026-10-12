@@ -32,6 +32,15 @@ void main() {
   WidgetLocationLink? parse(String value) =>
       WidgetLocationLink.parse(Uri.parse('dpip:///home?widgetLocation=$value'));
 
+  test('saved identifiers accept exactly three ASCII digits', () {
+    for (final code in ['000', '100', '242', '407', '999']) {
+      expect(parse('region%3A$code')?.identifier, 'region:$code');
+    }
+    for (final code in ['1', '10', '1000', '10000', '٤٠٧', '४०७', '４０７']) {
+      expect(parse('region%3A$code'), isNull, reason: code);
+    }
+  });
+
   test('percent decoding selects the saved region by code after reorder', () {
     final link = parse('region%3A407')!;
     regions.reorderSaved(0, 1);

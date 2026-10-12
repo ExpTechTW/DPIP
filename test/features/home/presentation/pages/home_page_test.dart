@@ -16,6 +16,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
@@ -41,6 +42,7 @@ import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/navigation/widget_location_link.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +54,159 @@ import 'package:provider/single_child_widget.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  group('Widget location requests', () {
+    testWidgets('changed codes and repeated taps each fetch exactly once', (
+      tester,
+    ) async {
+      final home = _WidgetHomeHarness(tester);
+      final requests = WidgetLocationRequests();
+      addTearDown(requests.dispose);
+      // A cold request is consumed after Home builds, never during build.
+      requests.request(_link('region:407'));
+      expect(home.store.selectedIndex, 0);
+      await tester.pumpWidget(home.app(requests));
+      await _flush(tester);
+      home.expectRequests(['407']);
+
+      requests.request(_link('region:242'));
+      expect(home.store.selectedCode, '407');
+      home.expectRequests(['407']);
+      await _flush(tester);
+      expect(home.store.selectedCode, '242');
+      home.expectRequests(['407', '242']);
+
+      for (var tap = 0; tap < 2; tap++) {
+        requests.request(_link('region:242'));
+        await _flush(tester);
+        home.expectRequests(['407', '242', ...List.filled(tap + 1, '242')]);
+      }
+      expect(requests.takePending(), isNull);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('current and saved areas with the same code refresh once', (
+      tester,
+    ) async {
+      final home = _WidgetHomeHarness(tester);
+      final requests = WidgetLocationRequests();
+      addTearDown(requests.dispose);
+      await tester.pumpWidget(home.app(requests));
+      for (final identifier in [
+        'region:407',
+        'current-location',
+        'region:407',
+        'current-location',
+      ]) {
+        final before = home.weather.codes.length;
+        requests.request(_link(identifier));
+        await _flush(tester);
+        expect(home.store.selectedCode, '407');
+        expect(
+          home.store.selected,
+          identifier == 'current-location'
+              ? isA<CurrentArea>()
+              : isA<SavedArea>(),
+        );
+        home.expectRequests(List.filled(before + 1, '407'));
+      }
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets(
+      'invalid and deleted targets leave selection and weather alone',
+      (tester) async {
+        final home = _WidgetHomeHarness(tester);
+        final requests = WidgetLocationRequests();
+        addTearDown(requests.dispose);
+        await tester.pumpWidget(home.app(requests));
+        requests.request(_link('region:242'));
+        await _flush(tester);
+        final deleted = _link('region:407');
+        home.store.removeSaved('407');
+        for (final link in [
+          deleted,
+          _link('region:999'), // Saved, but missing from the directory.
+          _link('region:302'), // Not saved.
+          WidgetLocationLink.parse(Uri.parse('/home?widgetLocation=bad')),
+        ]) {
+          requests.request(link);
+          await _flush(tester);
+          expect(home.store.selectedCode, '242');
+          home.expectRequests(['242']);
+          expect(requests.takePending(), isNull);
+        }
+        expect(home.store.savedCodes, ['242', '999']);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+
+    testWidgets(
+      'updates detach old listeners and consume only the latest source',
+      (tester) async {
+        final home = _WidgetHomeHarness(tester);
+        final first = WidgetLocationRequests();
+        final second = WidgetLocationRequests();
+        addTearDown(first.dispose);
+        addTearDown(second.dispose);
+        await tester.pumpWidget(home.app(first));
+        final state = tester.state(find.byType(HomePage));
+        // A callback from the old source is already queued when it is replaced.
+        final oldLink = _link('region:407');
+        first.request(oldLink);
+        second.request(_link('region:242'));
+        await tester.pumpWidget(home.app(second));
+        await _flush(tester);
+        expect(tester.state(find.byType(HomePage)), same(state));
+        expect(first.takePending(), same(oldLink));
+        home.expectRequests(['242']);
+
+        // Updating with the same source must not subscribe a second time.
+        await tester.pumpWidget(home.app(second));
+        second.request(_link('region:242'));
+        await _flush(tester);
+        home.expectRequests(['242', '242']);
+
+        await tester.pumpWidget(home.app(null));
+        final detached = _link('region:407');
+        second.request(detached);
+        await _flush(tester);
+        expect(second.takePending(), same(detached));
+        home.expectRequests(['242', '242']);
+
+        first.request(_link('region:407'));
+        await tester.pumpWidget(home.app(first));
+        await _flush(tester);
+        home.expectRequests(['242', '242', '407']);
+        await tester.pumpWidget(const SizedBox());
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('disposal drops a queued callback and removes the listener', (
+      tester,
+    ) async {
+      final home = _WidgetHomeHarness(tester);
+      final requests = WidgetLocationRequests();
+      addTearDown(requests.dispose);
+      await tester.pumpWidget(home.app(requests));
+      final queued = _link('region:407');
+      requests.request(queued);
+      await tester.pumpWidget(home.app(null, showHome: false));
+      expect(requests.takePending(), same(queued));
+      home.expectRequests([]);
+
+      final afterDispose = _link('region:242');
+      requests.request(afterDispose);
+      await tester.pump();
+      expect(requests.takePending(), same(afterDispose));
+      home.expectRequests([]);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+  });
 
   test('resolveBackdrop keeps a forced look off the live channels', () {
     const wind = WeatherWind();
@@ -232,8 +387,10 @@ List<SingleChildWidget> _providers({
   required HomeSheetExtent extent,
   required HomeResetSignal reset,
   required MapCameraHandoff handoff,
+  TownDirectory directory = const TownDirectory({}),
+  MeteorWeatherRepository weather = const _Weather(),
+  RainHourTrendRepository? hours,
 }) {
-  const directory = TownDirectory({});
   final events = _Events();
   final clock = _Clock();
   return [
@@ -260,8 +417,8 @@ List<SingleChildWidget> _providers({
     Provider<EventRepository>.value(value: events),
     ChangeNotifierProvider(
       create: (_) => HomeWeatherController(
-        const _Weather(),
-        _Hours(),
+        weather,
+        hours ?? _Hours(),
         store,
         directory,
         gpsFix: () async => null,
@@ -288,6 +445,111 @@ List<SingleChildWidget> _providers({
       ),
     ),
   ];
+}
+
+WidgetLocationLink _link(String identifier) => WidgetLocationLink.parse(
+  Uri(path: '/home', queryParameters: {'widgetLocation': identifier}),
+)!;
+
+class _WidgetHomeHarness {
+  _WidgetHomeHarness(WidgetTester tester) {
+    tester.view.physicalSize = const Size(800, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final previous = MapLibrePlatform.createInstance;
+    MapLibrePlatform.createInstance = () => _MapPlatform();
+    addTearDown(() => MapLibrePlatform.createInstance = previous);
+    final settings = SettingsStore.inMemory();
+    store = RegionStore(settings)
+      ..addSaved('407')
+      ..addSaved('242')
+      ..addSaved('999')
+      ..setCurrentCode('407')
+      ..select(0);
+    final experimental = ExperimentalSettings(settings);
+    final extent = HomeSheetExtent();
+    final reset = HomeResetSignal();
+    final handoff = MapCameraHandoff();
+    for (final notifier in [store, experimental, extent, reset, handoff]) {
+      addTearDown(notifier.dispose);
+    }
+    providers = _providers(
+      store: store,
+      experimental: experimental,
+      extent: extent,
+      reset: reset,
+      handoff: handoff,
+      directory: TownDirectory.fromJson({
+        for (final (code, lat, lng) in [
+          ('407', 24.0, 121.0),
+          ('242', 25.0, 122.0),
+        ])
+          code: {
+            'city': 'Test',
+            'town': code,
+            'lat': lat,
+            'lng': lng,
+            'cityLevel': '市',
+            'townLevel': '區',
+          },
+      }),
+      weather: weather,
+      hours: hours,
+    );
+  }
+
+  late final RegionStore store;
+  late final List<SingleChildWidget> providers;
+  final weather = _RecordingWeather();
+  final hours = _RecordingHours();
+
+  Widget app(WidgetLocationRequests? requests, {bool showHome = true}) =>
+      MultiProvider(
+        providers: providers,
+        child: MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: showHome
+              ? HomePage(widgetLocationRequests: requests)
+              : const SizedBox(),
+        ),
+      );
+
+  void expectRequests(List<String> codes) {
+    expect(weather.codes, codes, reason: 'forecast requests');
+    expect(hours.codes, codes, reason: 'rain trend requests');
+    expect(weather.coordinates, [
+      for (final code in codes) code == '407' ? (24.0, 121.0) : (25.0, 122.0),
+    ], reason: 'realtime requests use the selected township coordinates');
+  }
+}
+
+class _RecordingWeather extends _Weather {
+  final codes = <String>[];
+  final coordinates = <(double, double)>[];
+
+  @override
+  Future<Result<WeatherRealtime?>> realtime(double lat, double lng) {
+    coordinates.add((lat, lng));
+    return super.realtime(lat, lng);
+  }
+
+  @override
+  Future<Result<WeatherForecast>> forecast(String code) {
+    codes.add(code);
+    return super.forecast(code);
+  }
+}
+
+class _RecordingHours extends _Hours {
+  final codes = <String>[];
+
+  @override
+  Future<Result<RainHourTrend>> hourTrend(String code) {
+    codes.add(code);
+    return super.hourTrend(code);
+  }
 }
 
 class _Clock implements Clock {

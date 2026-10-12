@@ -242,11 +242,13 @@ void main() {
       expect(find.byType(HomePage).hitTestable(), findsOneWidget);
       expect(regions.selectedCode, '242');
       expect(weather.codes.last, '242');
+      final beforeChangedCode = weather.codes.length;
       await tap('region%3A407');
       expect(regions.selectedCode, '407');
+      expect(weather.codes.skip(beforeChangedCode), ['407']);
       final before = weather.codes.length;
       await tap('region%3A407');
-      expect(weather.codes.length, greaterThan(before));
+      expect(weather.codes.skip(before), ['407']);
       expect(weather.codes.last, '407');
 
       // All three platform requests arrive before Home's post-frame consumer.
@@ -289,16 +291,26 @@ void main() {
       expect(weather.codes.length, afterNotification);
 
       regions.setCurrentCode('242');
+      final beforeSameCode = weather.codes.length;
       await tap('current-location');
       expect(regions.selectedIndex, 1);
       expect(regions.selectedCode, '242');
       expect(weather.codes.last, '242');
+      expect(weather.codes.skip(beforeSameCode), ['242']);
+      await tap('region%3A242');
+      expect(regions.selectedIndex, 3);
+      expect(weather.codes.skip(beforeSameCode), ['242', '242']);
+      await tap('current-location');
+      expect(regions.selectedIndex, 1);
+      expect(weather.codes.skip(beforeSameCode), ['242', '242', '242']);
       regions.removeSaved('407');
+      final beforeInvalid = weather.codes.length;
       await tap('region%3A407');
       expect(regions.selectedIndex, 1);
       expect(regions.savedCodes, ['242']);
       await tap('bad');
       expect(regions.selectedIndex, 1);
+      expect(weather.codes.length, beforeInvalid);
       expect(tester.takeException(), isNull);
       appRouter.go('/nowhere');
       await tester.pump();
