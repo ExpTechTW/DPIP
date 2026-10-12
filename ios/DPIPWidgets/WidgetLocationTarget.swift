@@ -29,6 +29,9 @@ enum WidgetLocationTarget: Equatable, Sendable {
 }
 
 extension WidgetLocationTarget {
+    // This literal is independent of configuration and always a valid URL.
+    private static let homeURL = URL(string: "dpip:///home")!
+
     /// The configured target survives missing/expired weather. Never derive a
     /// navigation destination from a cached observation's region.
     var widgetURL: URL {
@@ -40,12 +43,17 @@ extension WidgetLocationTarget {
            WidgetLocationTarget(identifier: identifier) == self {
             var allowed = CharacterSet.urlQueryAllowed
             allowed.remove(charactersIn: ":&=+?#%")
-            components.percentEncodedQuery = "widgetLocation="
-                + identifier.addingPercentEncoding(
-                    withAllowedCharacters: allowed
-                )!
+            if let encoded = identifier.addingPercentEncoding(
+                withAllowedCharacters: allowed
+            ) {
+                components.percentEncodedQuery = "widgetLocation=" + encoded
+            }
         }
-        return components.url!
+        return Self.widgetURL(from: components)
+    }
+
+    static func widgetURL(from components: URLComponents) -> URL {
+        components.url ?? homeURL
     }
 
     var sourceIdentifier: String? {

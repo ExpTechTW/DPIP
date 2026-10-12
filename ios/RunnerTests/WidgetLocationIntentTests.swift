@@ -35,6 +35,34 @@ final class WidgetLocationIntentTests: XCTestCase {
         }
     }
 
+    func testWidgetURLFallsBackWhenComponentsCannotFormURL() {
+        var components = URLComponents()
+        components.scheme = "dpip"
+        components.host = ""
+        // An authority requires an absolute path; this cannot form a URL.
+        components.path = "home"
+        components.queryItems = [URLQueryItem(name: "widgetLocation", value: "region:407")]
+        XCTAssertNil(components.url)
+        XCTAssertEqual(WidgetLocationTarget.widgetURL(from: components).absoluteString,
+                       "dpip:///home")
+    }
+
+    func testWidgetURLRejectsMalformedCodesAndQueryInjection() throws {
+        for code in ["", "10", "1000", "４０７", "٤٠٧", "407\n",
+                     "407&other=242", "407+242", "407?#%", "../407", "台北"] {
+            for target in [WidgetLocationTarget.saved(regionCode: code),
+                           WidgetLocationTarget(identifier: "region:" + code)] {
+                let url = target.widgetURL
+                XCTAssertEqual(url.absoluteString, "dpip:///home", code)
+                let components = try XCTUnwrap(URLComponents(
+                    url: url, resolvingAgainstBaseURL: false
+                ))
+                XCTAssertNil(components.queryItems, code)
+                XCTAssertNil(components.fragment, code)
+            }
+        }
+    }
+
     func testEntryURLIgnoresAnotherLocationsCachedWeather() {
         let entry = DPIPWidgetEntry(
             date: Date(timeIntervalSince1970: 0),

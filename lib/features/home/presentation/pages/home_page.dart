@@ -90,6 +90,8 @@ class _HomePageState extends State<HomePage> {
       final weather = context.read<HomeWeatherController>();
       final previousCode = regions.selectedCode;
       final selected = request.select(regions, context.read<TownDirectory>());
+      // A changed code already loads through HomeWeatherController's listener.
+      // Same-code taps (including current ↔ saved) need an explicit refresh.
       if (selected && previousCode == regions.selectedCode) {
         unawaited(weather.refresh());
       }

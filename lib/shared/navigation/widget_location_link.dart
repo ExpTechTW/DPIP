@@ -32,6 +32,7 @@ final class WidgetLocationLink {
     final values = uri.queryParametersAll[queryKey];
     if (values == null || values.length != 1) return null;
     final identifier = values.single;
+    // Match WidgetLocationCatalogLocation: exactly three ASCII digits.
     if (identifier != 'current-location' &&
         !RegExp(r'^region:[0-9]{3}$').hasMatch(identifier)) {
       return null;
