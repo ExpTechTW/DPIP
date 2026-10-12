@@ -1,4 +1,5 @@
 import Foundation
+import WidgetKit
 import XCTest
 @testable import Runner
 
@@ -43,6 +44,50 @@ final class WidgetLocationIntentTests: XCTestCase {
         )
         XCTAssertEqual(entry.widgetURL.absoluteString,
                        "dpip:///home?widgetLocation=region%3A407")
+    }
+
+    func testForecastExpiryDoesNotChangeConfiguredNavigationTarget() throws {
+        let date = Date(timeIntervalSince1970: 1_789_567_200)
+        let sample = DPIPWidgetGalleryPreview.sample(at: date)
+        let forecast = try XCTUnwrap(sample.forecast)
+        let expiry = ForecastWidgetExpiry.date(for: forecast)
+        for target: WidgetLocationTarget in [.currentLocation, .saved(regionCode: "242")] {
+            for family: WidgetFamily in [.systemMedium, .systemLarge] {
+                let available = DPIPWidgetEntry(
+                    date: date, snapshot: sample.snapshot,
+                    isStale: false, isNight: false, forecast: sample.forecast,
+                    locationTarget: target
+                )
+                let expired = DPIPWidgetEntry(
+                    date: expiry, snapshot: sample.snapshot,
+                    isStale: true, isNight: false, forecast: sample.forecast,
+                    locationTarget: target
+                )
+                XCTAssertFalse(available.upcomingForecastPoints(for: family).isEmpty)
+                XCTAssertTrue(expired.upcomingForecastPoints(for: family).isEmpty)
+                XCTAssertEqual(available.widgetURL, target.widgetURL)
+                XCTAssertEqual(expired.widgetURL, target.widgetURL)
+            }
+        }
+    }
+
+    func testGallerySampleDoesNotDetermineConfiguredNavigationTarget() {
+        let date = Date(timeIntervalSince1970: 1_789_567_200)
+        let sample = DPIPWidgetGalleryPreview.sample(at: date)
+        for target: WidgetLocationTarget in [.currentLocation, .saved(regionCode: "242")] {
+            for family: WidgetFamily in [.systemSmall, .systemMedium, .systemLarge] {
+                let entry = DPIPWidgetEntry(
+                    date: date, snapshot: sample.snapshot,
+                    isStale: false, isNight: false,
+                    forecast: ForecastWidgetFamilyPolicy.supportsForecast(family)
+                        ? sample.forecast : nil,
+                    locationTarget: target
+                )
+                XCTAssertEqual(entry.snapshot?.sourceIdentifier, "region:407")
+                XCTAssertEqual(entry.widgetURL, target.widgetURL)
+                XCTAssertNotEqual(entry.widgetURL, WidgetLocationTarget.saved(regionCode: "407").widgetURL)
+            }
+        }
     }
 
     private func makeSnapshot(
