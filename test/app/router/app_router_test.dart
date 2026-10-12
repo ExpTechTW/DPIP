@@ -4,6 +4,7 @@ library;
 
 import 'package:dio/dio.dart';
 import 'package:dpip/app/router/app_router.dart';
+import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
@@ -246,6 +248,45 @@ void main() {
       await tap('region%3A407');
       expect(weather.codes.length, greaterThan(before));
       expect(weather.codes.last, '407');
+
+      // All three platform requests arrive before Home's post-frame consumer.
+      // Only the last target may update selection and start a weather request.
+      await tap('region%3A242');
+      final beforeBurst = weather.codes.length;
+      for (final identifier in [
+        'region%3A407',
+        'region%3A242',
+        'region%3A407',
+      ]) {
+        await appRouter.routeInformationProvider.didPushRouteInformation(
+          RouteInformation(
+            uri: Uri.parse('dpip:///home?widgetLocation=$identifier'),
+          ),
+        );
+      }
+      expect(regions.selectedCode, '242');
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+      expect(regions.selectedCode, '407');
+      expect(weather.codes.skip(beforeBurst), ['407']);
+
+      // An ordinary notification navigation arriving before consumption must
+      // neither erase the configured target nor cause a second consumption.
+      await appRouter.routeInformationProvider.didPushRouteInformation(
+        RouteInformation(
+          uri: Uri.parse('dpip:///home?widgetLocation=region%3A242'),
+        ),
+      );
+      routeNotificationTap(const NotificationTap(channelKey: 'unknown'));
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+      expect(appRouter.state.uri.path, '/home');
+      expect(regions.selectedCode, '242');
+      final afterNotification = weather.codes.length;
+      await tester.pump();
+      expect(weather.codes.length, afterNotification);
 
       regions.setCurrentCode('242');
       await tap('current-location');

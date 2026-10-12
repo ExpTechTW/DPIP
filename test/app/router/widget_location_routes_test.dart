@@ -1,4 +1,6 @@
 import 'package:dpip/app/router/widget_location_routes.dart';
+import 'package:dpip/app/router/notification_routes.dart';
+import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -114,6 +116,44 @@ void main() {
           isNull,
         );
       }
+    },
+  );
+
+  test(
+    'EEW navigation keeps its map destination while a Widget is pending',
+    () {
+      final routes = WidgetLocationRoutes();
+      routes.redirect(
+        onboardingComplete: true,
+        uri: Uri.parse('dpip:///home?widgetLocation=region%3A407'),
+      );
+      final order = <String>[];
+      routeNotificationTap(
+        const NotificationTap(channelKey: 'eew_alert-important-v2'),
+        focusMapLayer: (layer) => order.add(layer),
+        navigate:
+            (
+              name, {
+              Map<String, String> pathParameters = const {},
+              Map<String, dynamic> queryParameters = const {},
+              String? fragment,
+              Object? extra,
+            }) {
+              order.add(name);
+              expect(
+                routes.redirect(
+                  onboardingComplete: true,
+                  uri: Uri.parse('/map'),
+                ),
+                isNull,
+              );
+            },
+      );
+      expect(order, ['monitor', 'map']);
+      expect(routes.takePending()!.select(regions, directory), isTrue);
+      expect(regions.selectedCode, '407');
+      expect(routes.takePending(), isNull);
+      expect(order.last, 'map');
     },
   );
 }
