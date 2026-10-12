@@ -1,8 +1,11 @@
 import 'dart:ui' show ImageFilter;
+import 'dart:async';
 
 import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
@@ -21,6 +24,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
+import 'package:dpip/shared/navigation/widget_location_link.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart'
     show mapChromeBlursBackdrop;
@@ -39,7 +43,9 @@ import 'package:provider/provider.dart';
 /// swipe anywhere pages the area (`RegionSwipeArea`); a tap on the exposed map
 /// opens the full map tab.
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.widgetLocationRequests});
+
+  final WidgetLocationRequests? widgetLocationRequests;
 
   /// This page's branch index in the shell.
   static const int tabIndex = 0;
@@ -49,6 +55,51 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _widgetRequestScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.widgetLocationRequests?.addListener(_queueWidgetRequest);
+    _queueWidgetRequest();
+  }
+
+  @override
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.widgetLocationRequests != widget.widgetLocationRequests) {
+      oldWidget.widgetLocationRequests?.removeListener(_queueWidgetRequest);
+      widget.widgetLocationRequests?.addListener(_queueWidgetRequest);
+    }
+    _queueWidgetRequest();
+  }
+
+  void _queueWidgetRequest() {
+    if (_widgetRequestScheduled || widget.widgetLocationRequests == null) {
+      return;
+    }
+    _widgetRequestScheduled = true;
+    // RegionStore and weather notify listeners. Consume after the route's
+    // build, and drop an older callback if another Widget tap overtook it.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _widgetRequestScheduled = false;
+      if (!mounted) return;
+      final request = widget.widgetLocationRequests?.takePending();
+      if (request == null) return;
+      final regions = context.read<RegionStore>();
+      final weather = context.read<HomeWeatherController>();
+      final previousCode = regions.selectedCode;
+      final selected = request.select(regions, context.read<TownDirectory>());
+      if (selected && previousCode == regions.selectedCode) {
+        unawaited(weather.refresh());
+      }
+      Log.debug(
+        'WidgetLocation target=${request.identifier} applied=$selected '
+        'selectedIndex=${regions.selectedIndex} selectedCode=${regions.selectedCode}',
+      );
+    });
+  }
+
   final DraggableScrollableController _sheet = DraggableScrollableController();
   HomeSheetExtent? _extent;
   HomeResetSignal? _resetSignal;
@@ -135,6 +186,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    widget.widgetLocationRequests?.removeListener(_queueWidgetRequest);
     _visibleTab?.removeListener(_syncTabVisibility);
     _resetSignal?.removeListener(_resetSheet);
     _sheet.dispose();

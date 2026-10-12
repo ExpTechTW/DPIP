@@ -60,7 +60,8 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             snapshot: snapshot,
             isStale: state.isStale,
             isNight: state.isNight,
-            forecast: content.forecast
+            forecast: content.forecast,
+            locationTarget: target
         )
 
         completion(entry)
@@ -106,7 +107,8 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
                     snapshot: plan.snapshot,
                     isStale: state.isStale,
                     isNight: state.isNight,
-                    forecast: plan.forecast(at: state.date)
+                    forecast: plan.forecast(at: state.date),
+                    locationTarget: target
                 )
             }
 
@@ -117,43 +119,6 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
                 )
             )
         }
-    }
-}
-
-struct DPIPWidgetEntry: TimelineEntry {
-    let date: Date
-    let snapshot: CurrentWeatherWidgetSnapshot?
-    let isStale: Bool
-    let isNight: Bool
-    let forecast: ForecastWidgetSnapshot?
-
-    init(date: Date, snapshot: CurrentWeatherWidgetSnapshot?,
-         isStale: Bool, isNight: Bool,
-         forecast: ForecastWidgetSnapshot? = nil) {
-        self.date = date
-        self.snapshot = snapshot
-        self.isStale = isStale
-        self.isNight = isNight
-        self.forecast = forecast
-    }
-
-    /// Fail closed at the display boundary as well as the cache boundary.
-    /// Current weather remains usable independently of forecast availability.
-    func upcomingForecastPoints(for family: WidgetFamily) -> [ForecastWidgetPoint] {
-        guard let snapshot, let forecast,
-              forecast.sourceIdentifier == snapshot.sourceIdentifier,
-              forecast.regionCode == snapshot.regionCode,
-              ForecastWidgetExpiry.isUsable(
-                  forecast, at: date,
-                  calibratedTimeOffsetMilliseconds:
-                      snapshot.calibratedTimeOffsetMilliseconds
-              ) else { return [] }
-        let calibratedDate = CurrentWeatherWidgetTimeCalibration(
-            snapshot: snapshot
-        ).calibratedDate(fromDeviceDate: date)
-        return ForecastWidgetFamilyPolicy.visiblePoints(
-            in: forecast, at: calibratedDate, family: family
-        )
     }
 }
 
@@ -985,11 +950,11 @@ struct DPIPWidgets: Widget {
         ) { entry in
             if #available(iOS 17.0, *) {
                 DPIPWidgetsEntryView(entry: entry)
-                    .widgetURL(URL(string: "dpip:///home"))
+                    .widgetURL(entry.widgetURL)
                     .containerBackground(.fill.tertiary, for: .widget)
             } else {
                 DPIPWidgetsEntryView(entry: entry)
-                    .widgetURL(URL(string: "dpip:///home"))
+                    .widgetURL(entry.widgetURL)
                     .padding()
                     .background()
             }

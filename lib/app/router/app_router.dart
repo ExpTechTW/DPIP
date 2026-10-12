@@ -1,4 +1,5 @@
 import 'package:dpip/app/shell/main_shell.dart';
+import 'package:dpip/app/router/widget_location_routes.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
@@ -53,6 +54,7 @@ import 'package:provider/provider.dart';
 /// user held on the welcome page by a failed launch would stay there all
 /// session even after the completion flag came back.
 final OnboardingRefreshSignal onboardingRefresh = OnboardingRefreshSignal();
+final WidgetLocationRoutes _widgetLocationRoutes = WidgetLocationRoutes();
 
 final class OnboardingRefreshSignal extends ChangeNotifier {
   void fire() => notifyListeners();
@@ -75,10 +77,10 @@ final GoRouter appRouter = GoRouter(
   // finishing onboarding (which flips the flag) lets a goNamed(home) through.
   redirect: (context, state) {
     final complete = context.read<OnboardingStore>().isComplete;
-    final atOnboarding = state.matchedLocation == AppRoutes.onboardingPath;
-    if (!complete && !atOnboarding) return AppRoutes.onboardingPath;
-    if (complete && atOnboarding) return AppRoutes.homePath;
-    return null;
+    return _widgetLocationRoutes.redirect(
+      onboardingComplete: complete,
+      uri: state.uri,
+    );
   },
   routes: [
     GoRoute(
@@ -90,7 +92,12 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state, navigationShell) =>
           MainShell(navigationShell: navigationShell),
       branches: [
-        _branch(AppRoutes.homePath, AppRoutes.home, (_, _) => const HomePage()),
+        _branch(
+          AppRoutes.homePath,
+          AppRoutes.home,
+          (_, _) =>
+              HomePage(widgetLocationRequests: _widgetLocationRoutes.requests),
+        ),
         _branch(
           AppRoutes.eventsPath,
           AppRoutes.events,
