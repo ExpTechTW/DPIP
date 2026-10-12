@@ -29,6 +29,25 @@ enum WidgetLocationTarget: Equatable, Sendable {
 }
 
 extension WidgetLocationTarget {
+    /// The configured target survives missing/expired weather. Never derive a
+    /// navigation destination from a cached observation's region.
+    var widgetURL: URL {
+        var components = URLComponents()
+        components.scheme = "dpip"
+        components.host = ""
+        components.path = "/home"
+        if let identifier = sourceIdentifier,
+           WidgetLocationTarget(identifier: identifier) == self {
+            var allowed = CharacterSet.urlQueryAllowed
+            allowed.remove(charactersIn: ":&=+?#%")
+            components.percentEncodedQuery = "widgetLocation="
+                + identifier.addingPercentEncoding(
+                    withAllowedCharacters: allowed
+                )!
+        }
+        return components.url!
+    }
+
     var sourceIdentifier: String? {
         switch self {
         case .currentLocation:

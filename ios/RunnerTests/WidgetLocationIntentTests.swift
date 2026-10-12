@@ -3,6 +3,48 @@ import XCTest
 @testable import Runner
 
 final class WidgetLocationIntentTests: XCTestCase {
+    func testWidgetURLsEncodeConfiguredTargets() throws {
+        let cases: [(WidgetLocationTarget, String)] = [
+            (.currentLocation, "dpip:///home?widgetLocation=current-location"),
+            (.saved(regionCode: "407"), "dpip:///home?widgetLocation=region%3A407"),
+            (.saved(regionCode: "242"), "dpip:///home?widgetLocation=region%3A242"),
+            (.invalid(identifier: "region:bad&other=407"), "dpip:///home"),
+            (.saved(regionCode: "４０７"), "dpip:///home")
+        ]
+        for (target, expected) in cases {
+            XCTAssertEqual(target.widgetURL.absoluteString, expected)
+            let components = try XCTUnwrap(URLComponents(
+                url: target.widgetURL, resolvingAgainstBaseURL: false
+            ))
+            if let identifier = components.queryItems?.first?.value {
+                XCTAssertEqual(WidgetLocationTarget(identifier: identifier), target)
+            }
+        }
+    }
+
+    func testEntryURLUsesConfigurationWithoutWeather() {
+        for target: WidgetLocationTarget in [.currentLocation, .saved(regionCode: "407")] {
+            for stale in [false, true] {
+                let entry = DPIPWidgetEntry(
+                    date: Date(timeIntervalSince1970: 0), snapshot: nil,
+                    isStale: stale, isNight: false, locationTarget: target
+                )
+                XCTAssertEqual(entry.widgetURL, target.widgetURL)
+            }
+        }
+    }
+
+    func testEntryURLIgnoresAnotherLocationsCachedWeather() {
+        let entry = DPIPWidgetEntry(
+            date: Date(timeIntervalSince1970: 0),
+            snapshot: makeSnapshot(sourceIdentifier: "region:242", regionCode: "242"),
+            isStale: true, isNight: false,
+            locationTarget: .saved(regionCode: "407")
+        )
+        XCTAssertEqual(entry.widgetURL.absoluteString,
+                       "dpip:///home?widgetLocation=region%3A407")
+    }
+
     private func makeSnapshot(
         sourceIdentifier: String?,
         regionCode: String,

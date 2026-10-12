@@ -272,6 +272,7 @@
 				CurrentWeatherWidgetSnapshotFactory.swift,
 				CurrentWeatherWidgetRefreshPipeline.swift,
 				CurrentWeatherWidgetSnapshotWriter.swift,
+				DPIPWidgetEntry.swift,
 				DPIPWidgetProviderSupport.swift,
 				DPIPWidgets.swift,
 				Localizable.xcstrings,

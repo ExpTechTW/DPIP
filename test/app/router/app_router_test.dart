@@ -63,6 +63,12 @@ import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
+import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
+import 'package:dpip/features/weather/domain/weather_forecast.dart';
+import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
@@ -172,6 +178,148 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
   });
+
+  for (final complete in [true, false]) {
+    testWidgets('Widget cold, warm and repeated taps (onboarded=$complete)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final previous = MapLibrePlatform.createInstance;
+      MapLibrePlatform.createInstance = () => _MapPlatform();
+      addTearDown(() => MapLibrePlatform.createInstance = previous);
+      final directory = TownDirectory.fromJson({
+        for (final code in ['407', '242'])
+          code: {
+            'city': 'Test',
+            'town': code,
+            'lat': 24.0,
+            'lng': 121.0,
+            'cityLevel': '市',
+            'townLevel': '區',
+          },
+      });
+      final deps = _deps(complete: complete, directory: directory);
+      final regions = deps.regionStore
+        ..addSaved('407')
+        ..addSaved('242');
+      final weather = _WidgetWeather();
+      appRouter.go('dpip:///home?widgetLocation=region%3A407');
+      await tester.pumpWidget(_widgetRouterApp(deps, weather));
+      await tester.pump();
+      await tester.pump();
+      if (!complete) {
+        expect(find.byType(OnboardingPage), findsOneWidget);
+        expect(regions.selectedIndex, 0);
+        await deps.onboarding.complete();
+        appRouter.goNamed('home');
+        await tester.pump();
+        await tester.pump();
+      }
+      expect(find.byType(HomePage).hitTestable(), findsOneWidget);
+      expect(regions.selectedCode, '407');
+      expect(weather.codes.last, '407');
+      expect(appRouter.state.uri.toString(), '/home');
+
+      Future<void> tap(String identifier) async {
+        await appRouter.routeInformationProvider.didPushRouteInformation(
+          RouteInformation(
+            uri: Uri.parse('dpip:///home?widgetLocation=$identifier'),
+          ),
+        );
+        await tester.pump();
+        await tester.pump();
+        await tester.pump();
+      }
+
+      appRouter.go('/events');
+      await tester.pump();
+      await tester.pump();
+      await tap('region%3A242');
+      expect(find.byType(HomePage).hitTestable(), findsOneWidget);
+      expect(regions.selectedCode, '242');
+      expect(weather.codes.last, '242');
+      await tap('region%3A407');
+      expect(regions.selectedCode, '407');
+      final before = weather.codes.length;
+      await tap('region%3A407');
+      expect(weather.codes.length, greaterThan(before));
+      expect(weather.codes.last, '407');
+
+      regions.setCurrentCode('242');
+      await tap('current-location');
+      expect(regions.selectedIndex, 1);
+      expect(regions.selectedCode, '242');
+      expect(weather.codes.last, '242');
+      regions.removeSaved('407');
+      await tap('region%3A407');
+      expect(regions.selectedIndex, 1);
+      expect(regions.savedCodes, ['242']);
+      await tap('bad');
+      expect(regions.selectedIndex, 1);
+      expect(tester.takeException(), isNull);
+      appRouter.go('/nowhere');
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    });
+  }
+}
+
+Widget _widgetRouterApp(SharedDeps deps, _WidgetWeather weather) =>
+    MultiProvider(
+      providers: [
+        ...coreProviders(deps),
+        ...changelogProviders(deps),
+        Provider<ChangelogRepository>.value(value: _Notes()),
+        ...eventsProviders(deps),
+        Provider<EventRepository>.value(value: _Events()),
+        ...weatherProviders(deps),
+        Provider<RadarRepository>.value(value: _Radar()),
+        ...homeProviders(),
+        ChangeNotifierProvider<HomeWeatherController>(
+          create: (_) => HomeWeatherController(
+            weather,
+            _WidgetRain(),
+            deps.regionStore,
+            deps.townDirectory,
+          ),
+        ),
+        _eew(),
+        Provider<Future<SeismicTravelTimeTable>>.value(
+          value: Future.value(const SeismicTravelTimeTable({})),
+        ),
+      ],
+      child: MaterialApp.router(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: appRouter,
+      ),
+    );
+
+class _WidgetWeather implements MeteorWeatherRepository {
+  final codes = <String>[];
+  @override
+  Future<Result<WeatherRealtime?>> realtime(
+    double latitude,
+    double longitude,
+  ) async => const Ok(null);
+  @override
+  Future<Result<WeatherForecast>> forecast(String code) async {
+    codes.add(code);
+    return Ok(WeatherForecast(updateTime: 0, forecast: const []));
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _WidgetRain implements RainHourTrendRepository {
+  @override
+  Future<Result<RainHourTrend>> hourTrend(String code) async =>
+      Ok(RainHourTrend(startSecond: 0, mm: List.filled(60, 0)));
 }
 
 void _walk(List<RouteBase> routes, BuildContext context, List<Widget> built) {
@@ -218,14 +366,14 @@ ChangeNotifierProvider<RealtimeNotifier<List<Eew>>> _eew() =>
       ),
     );
 
-SharedDeps _deps({required bool complete}) {
+SharedDeps _deps({required bool complete, TownDirectory? directory}) {
   final settings = SettingsStore.inMemory();
   if (complete) {
     settings.setBool(SettingKeys.onboardingComplete, true);
   }
   final regions = RegionSelection(settings);
   final mesh = FakeMeshService();
-  const townDirectory = TownDirectory({});
+  final townDirectory = directory ?? const TownDirectory({});
   final regionStore = RegionStore(settings)..select(0);
   final location = LocationService(
     townDirectory,
