@@ -11,6 +11,7 @@ class EewLiveActivityStatus {
     required this.reportNo,
     required this.waveArrived,
     this.generic = false,
+    this.delayedAlertStatus,
   });
 
   final bool supported;
@@ -19,6 +20,7 @@ class EewLiveActivityStatus {
   final int? reportNo;
   final bool waveArrived;
   final bool generic;
+  final String? delayedAlertStatus;
 
   factory EewLiveActivityStatus.fromMap(Map<Object?, Object?> raw) =>
       EewLiveActivityStatus(
@@ -28,6 +30,7 @@ class EewLiveActivityStatus {
         reportNo: raw['reportNo'] as int?,
         waveArrived: raw['waveArrived'] == true,
         generic: raw['generic'] == true,
+        delayedAlertStatus: raw['delayedAlertStatus'] as String?,
       );
 }
 
@@ -45,6 +48,10 @@ class EewLiveActivity {
   Future<EewLiveActivityStatus> mockUpdate(int reportNo) =>
       _invoke('mockUpdate', {'reportNo': reportNo});
   Future<EewLiveActivityStatus> mockWaveArrived() => _invoke('mockWaveArrived');
+  Future<EewLiveActivityStatus> mockWaveArrivedWithAlert() =>
+      _invoke('mockWaveArrivedWithAlert');
+  Future<EewLiveActivityStatus> mockScheduleDelayedArrivalAlert() =>
+      _invoke('mockScheduleDelayedArrivalAlert');
   Future<EewLiveActivityStatus> mockEnd() => _invoke('mockEnd');
 
   Future<EewLiveActivityStatus> _invoke(

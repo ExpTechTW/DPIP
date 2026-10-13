@@ -428,6 +428,34 @@ class _DeveloperPageState extends State<DeveloperPage> {
                         child: const Text('Mark Wave Arrived'),
                       ),
                       OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.enabled != true ||
+                                _eewStatus?.active != true ||
+                                _eewStatus?.generic == true ||
+                                _eewStatus?.waveArrived == true
+                            ? null
+                            : () => _runEewMock(
+                                _eewLiveActivity.mockWaveArrivedWithAlert,
+                              ),
+                        child: const Text('Mark Wave Arrived + Alert'),
+                      ),
+                      OutlinedButton(
+                        onPressed:
+                            _eewBusy ||
+                                _eewStatus?.enabled != true ||
+                                _eewStatus?.active != true ||
+                                _eewStatus?.generic == true ||
+                                _eewStatus?.waveArrived == true ||
+                                _eewStatus?.delayedAlertStatus == 'Scheduled'
+                            ? null
+                            : () => _runEewMock(
+                                _eewLiveActivity
+                                    .mockScheduleDelayedArrivalAlert,
+                              ),
+                        child: const Text('Test Delayed Arrival Alert (8s)'),
+                      ),
+                      OutlinedButton(
                         onPressed: _eewBusy || _eewStatus?.active != true
                             ? null
                             : () => _runEewMock(_eewLiveActivity.mockEnd),
@@ -439,6 +467,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
                       ),
                     ],
                   ),
+                  if (_eewStatus?.delayedAlertStatus case final status?)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                      ),
+                      child: Text('Delayed alert QA: $status'),
+                    ),
                 ],
                 for (var i = 0; i < sections.length; i++) ...[
                   SectionHeader(sections[i].title),

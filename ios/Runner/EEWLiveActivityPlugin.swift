@@ -34,6 +34,12 @@ public final class EEWLiveActivityPlugin: NSObject, FlutterPlugin {
                 case "mockStartGeneric":
                     try manager.startGeneric()
                     result(manager.status)
+                case "mockWaveArrivedWithAlert":
+                    try await manager.markWaveArrivedWithAlert()
+                    result(manager.status)
+                case "mockScheduleDelayedArrivalAlert":
+                    try manager.scheduleDelayedArrivalAlert()
+                    result(manager.status)
                 #endif
                 case "mockUpdate":
                     guard let arguments = call.arguments as? [String: Any],

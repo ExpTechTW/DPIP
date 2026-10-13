@@ -73,6 +73,8 @@
 		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */; };
 		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
+		EEA300000000000000000001 /* EEWLiveActivityAlerts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = EEA300000000000000000002 /* EEWLiveActivityAlerts.xcstrings */; };
+		EEA300000000000000000003 /* EEWLiveActivityManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA300000000000000000004 /* EEWLiveActivityManagerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -202,6 +204,8 @@
 		F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTownshipResolverTests.swift; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
+		EEA300000000000000000002 /* EEWLiveActivityAlerts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = EEWLiveActivityAlerts.xcstrings; sourceTree = "<group>"; };
+		EEA300000000000000000004 /* EEWLiveActivityManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EEWLiveActivityManagerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -381,6 +385,7 @@
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				EEA300000000000000000004 /* EEWLiveActivityManagerTests.swift */,
 				EEA200000000000000000005 /* EEWPresentationTests.swift */,
 				28A000000000000000000001 /* WidgetSNTPClientTests.swift */,
 				28A000000000000000000002 /* WidgetServerClockTests.swift */,
@@ -463,6 +468,7 @@
 				AA0000000000000000000E01 /* ScreenWakePlugin.swift */,
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
+				EEA300000000000000000002 /* EEWLiveActivityAlerts.xcstrings */,
 				EEA100000000000000000005 /* EEWLiveActivityManager.swift */,
 				EEA100000000000000000007 /* EEWLiveActivityPlugin.swift */,
 				AA0000000000000000000D01 /* DeviceInfoPlugin.swift */,
@@ -667,6 +673,7 @@
 				DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				EEA300000000000000000001 /* EEWLiveActivityAlerts.xcstrings in Resources */,
 				522508B9301F863A006148C2 /* InfoPlist.strings in Resources */,
 				AE92AD9862B7A721B0924557 /* Sounds/eew.aiff in Resources */,
 				17BD5D769AA990E7EE681203 /* Sounds/eew_alert.aiff in Resources */,
@@ -746,6 +753,7 @@
 				4F4000000000000000000002 /* WidgetRefreshTestSupport.swift in Sources */,
 				4F5000000000000000000002 /* CurrentWeatherWidgetTestFixtures.swift in Sources */,
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
+				EEA300000000000000000003 /* EEWLiveActivityManagerTests.swift in Sources */,
 				EEA200000000000000000004 /* EEWPresentationTests.swift in Sources */,
 				D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */,
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
