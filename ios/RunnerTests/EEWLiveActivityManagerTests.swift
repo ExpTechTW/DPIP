@@ -192,7 +192,7 @@ final class EEWLiveActivityManagerTests: XCTestCase {
 
     func testBackgroundExpirationCancelsAndEndsTaskOnce() async throws {
         let gate = DelayGate()
-        var expire: (() -> Void)?
+        var expire: (@Sendable () -> Void)?
         var ended = 0
         let completed = expectation(description: "background task ended")
         var submissions = 0
@@ -205,14 +205,16 @@ final class EEWLiveActivityManagerTests: XCTestCase {
         )
         try scheduler.schedule { submissions += 1 }
         await fulfillment(of: [gate.entered], timeout: 2)
-        expire?()
+        let expiration = try XCTUnwrap(expire)
+        await Task.detached { expiration() }.value
+        await fulfillment(of: [completed], timeout: 2)
         gate.release()
-        await fulfillment(of: [gate.finished, completed], timeout: 2)
+        await fulfillment(of: [gate.finished], timeout: 2)
         XCTAssertEqual(scheduler.status, .expired)
         XCTAssertEqual(submissions, 0)
         XCTAssertEqual(ended, 1)
         scheduler.cancel()
-        expire?()
+        expiration()
         XCTAssertEqual(ended, 1)
     }
 

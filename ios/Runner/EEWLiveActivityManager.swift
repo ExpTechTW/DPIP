@@ -230,12 +230,12 @@ final class EEWDelayedArrivalAlertQA {
         case expired = "Expired / Unable to execute"
     }
 
-    typealias Begin = (@escaping () -> Void) -> (() -> Void)?
+    typealias Begin = @MainActor (@escaping @Sendable () -> Void) -> (@MainActor () -> Void)?
     typealias Wait = () async throws -> Void
 
     private struct Pending {
         let id: UUID
-        let finishBackgroundTask: () -> Void
+        let finishBackgroundTask: @MainActor () -> Void
         let task: Task<Void, Never>
     }
 
@@ -245,16 +245,18 @@ final class EEWDelayedArrivalAlertQA {
     private(set) var status = Status.idle
 
     init(
-        begin: @escaping Begin = { expired in
-            let application = UIApplication.shared
-            let identifier = application.beginBackgroundTask(withName: "EEWDelayedArrivalAlertQA", expirationHandler: expired)
-            guard identifier != .invalid else { return nil }
-            return { application.endBackgroundTask(identifier) }
-        },
+        begin: Begin? = nil,
         wait: @escaping Wait = { try await Task.sleep(nanoseconds: 8_000_000_000) }
     ) {
-        self.begin = begin
+        self.begin = begin ?? Self.beginBackgroundTask
         self.wait = wait
+    }
+
+    private static func beginBackgroundTask(expired: @escaping @Sendable () -> Void) -> (@MainActor () -> Void)? {
+        let application = UIApplication.shared
+        let identifier = application.beginBackgroundTask(withName: "EEWDelayedArrivalAlertQA", expirationHandler: expired)
+        guard identifier != .invalid else { return nil }
+        return { application.endBackgroundTask(identifier) }
     }
 
     func schedule(execute: @escaping () async throws -> Void) throws {
