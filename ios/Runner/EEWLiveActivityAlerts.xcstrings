@@ -1,0 +1,78 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "eew.alert.title": {
+      "comment": "Debug-only local EEW arrival alert; always identify this as a test.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TEST · Earthquake Early Warning"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試 · 地震速報"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试 · 地震预警"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テスト · 緊急地震速報"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테스트 · 지진 조기 경보"
+          }
+        }
+      }
+    },
+    "eew.alert.arrived": {
+      "comment": "Debug-only local EEW arrival alert; always identify this as a test.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mock seismic wave arrived. This is a developer test."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模擬地震波已抵達。此為開發測試。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模拟地震波已抵达。此为开发测试。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "模擬地震波が到達しました。これは開発用テストです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모의 지진파가 도착했습니다. 개발용 테스트입니다."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
