@@ -33,6 +33,16 @@ cd "$(repo_root)"
 step 'format + analyze'
 cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 
+# Windows is for local development. The shell-based test suite and
+# code-generation checks are validated by Linux CI.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    step 'Windows development checks passed'
+    note 'Full tests, coverage and codegen validation run in Linux CI.'
+    exit 0
+    ;;
+esac
+
 # Five of these finish in under a quarter of a second and are run every time:
 # hashing their inputs would cost as much as running them, and a cache that
 # saves nothing is a cache that can only be wrong.
