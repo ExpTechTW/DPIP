@@ -75,6 +75,8 @@
 		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
 		EEA300000000000000000001 /* EEWLiveActivityAlerts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = EEA300000000000000000002 /* EEWLiveActivityAlerts.xcstrings */; };
 		EEA300000000000000000003 /* EEWLiveActivityManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA300000000000000000004 /* EEWLiveActivityManagerTests.swift */; };
+		EEA400000000000000000001 /* Shared/EEWIslandLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA400000000000000000003 /* Shared/EEWIslandLayout.swift */; };
+		EEA400000000000000000002 /* Shared/EEWIslandLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA400000000000000000003 /* Shared/EEWIslandLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -206,6 +208,7 @@
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
 		EEA300000000000000000002 /* EEWLiveActivityAlerts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = EEWLiveActivityAlerts.xcstrings; sourceTree = "<group>"; };
 		EEA300000000000000000004 /* EEWLiveActivityManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EEWLiveActivityManagerTests.swift; sourceTree = "<group>"; };
+		EEA400000000000000000003 /* Shared/EEWIslandLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/EEWIslandLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -237,6 +240,7 @@
 				CurrentWeatherSnapshotStorage.swift,
 				EEWActivityAttributes.swift,
 				EEWPresentation.swift,
+				EEWIslandLayout.swift,
 				ForecastSnapshotLocation.swift,
 				WidgetLocationCatalog.swift,
 				NativeLog.swift,
@@ -324,6 +328,7 @@
 				CurrentWeatherSnapshotStorage.swift,
 				EEWActivityAttributes.swift,
 				EEWPresentation.swift,
+				EEWIslandLayout.swift,
 			);
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 		};
@@ -430,6 +435,7 @@
 				270FCE9B305CD066003D1E62 /* Shared */,
 				EEA100000000000000000003 /* Shared/EEWActivityAttributes.swift */,
 				EEA200000000000000000003 /* Shared/EEWPresentation.swift */,
+				EEA400000000000000000003 /* Shared/EEWIslandLayout.swift */,
 				272EFB373057247600B78F5D /* DPIPWidgetsExtension.entitlements */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
@@ -731,6 +737,7 @@
 			files = (
 				EEA100000000000000000002 /* Shared/EEWActivityAttributes.swift in Sources */,
 				EEA200000000000000000002 /* Shared/EEWPresentation.swift in Sources */,
+				EEA400000000000000000002 /* Shared/EEWIslandLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -778,6 +785,7 @@
 			files = (
 				EEA100000000000000000001 /* Shared/EEWActivityAttributes.swift in Sources */,
 				EEA200000000000000000001 /* Shared/EEWPresentation.swift in Sources */,
+				EEA400000000000000000001 /* Shared/EEWIslandLayout.swift in Sources */,
 				EEA100000000000000000004 /* EEWLiveActivityManager.swift in Sources */,
 				EEA100000000000000000006 /* EEWLiveActivityPlugin.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
