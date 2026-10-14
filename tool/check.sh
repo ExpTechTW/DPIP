@@ -37,7 +37,6 @@ cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
     step 'Windows development checks passed'
-    note 'Full tests, coverage and codegen validation run in Linux CI.'
     exit 0
     ;;
 esac
