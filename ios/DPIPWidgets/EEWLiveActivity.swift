@@ -3,36 +3,6 @@ import SwiftUI
 import WidgetKit
 
 @available(iOS 16.1, *)
-private enum EEWIntensityColor {
-    static func color(for intensity: Int) -> Color {
-        switch intensity {
-        case 0:
-            return Color(red: 158 / 255, green: 158 / 255, blue: 158 / 255)
-        case 1:
-            return Color(red: 0 / 255, green: 50 / 255, blue: 100 / 255)
-        case 2:
-            return Color(red: 0 / 255, green: 100 / 255, blue: 200 / 255)
-        case 3:
-            return Color(red: 30 / 255, green: 150 / 255, blue: 50 / 255)
-        case 4:
-            return Color(red: 255 / 255, green: 200 / 255, blue: 0 / 255)
-        case 5:
-            return Color(red: 255 / 255, green: 150 / 255, blue: 0 / 255)
-        case 6:
-            return Color(red: 255 / 255, green: 100 / 255, blue: 0 / 255)
-        case 7:
-            return Color(red: 255 / 255, green: 0 / 255, blue: 0 / 255)
-        case 8:
-            return Color(red: 192 / 255, green: 0 / 255, blue: 0 / 255)
-        case 9:
-            return Color(red: 150 / 255, green: 0 / 255, blue: 200 / 255)
-        default:
-            return Color(red: 158 / 255, green: 158 / 255, blue: 158 / 255)
-        }
-    }
-}
-
-@available(iOS 16.1, *)
 struct EEWLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: EEWActivityAttributes.self) { context in
@@ -55,33 +25,14 @@ struct EEWLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .center, spacing: 8) {
-                        EEWPrimarySummary(state: context.state)
+                        EEWPrimarySummary(state: context.state, island: true)
                         EEWExpandedEventDetails(state: context.state)
                     }
                     .padding(.top, 4)
                     .foregroundStyle(.white)
                 }
             } compactLeading: {
-                HStack(spacing: 4) {
-                    Image(systemName: "waveform.path.ecg")
-                        .foregroundStyle(.red)
-                        .accessibilityHidden(true)
-                    if let intensity = context.state.estimatedLocalIntensity {
-                        EEWIntensityValue(intensity: intensity, compact: true)
-                            .accessibilityLabel(Text("eew.intensity.local"))
-                            .accessibilityValue(EEWIntensityValue.text(intensity, spoken: true))
-                    } else {
-                        // The same severity slot uses report maximum when local data is absent.
-                        EEWIntensityValue(intensity: EEWPresentation.intensity(for: context.state), compact: true)
-                            .accessibilityLabel(Text("eew.intensity.max"))
-                            .accessibilityValue(EEWIntensityValue.text(EEWPresentation.intensity(for: context.state), spoken: true))
-                    }
-                    EEWTestBadge()
-                }
-                .font(.caption.bold())
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
+                EEWCompactIntensity(state: context.state)
             } compactTrailing: {
                 EEWCompactArrival(state: context.state)
                     .font(.caption.bold())
@@ -127,8 +78,10 @@ private struct EEWEventHeading: View {
                 .foregroundStyle(.red)
                 .accessibilityHidden(true)
             // A single text flow shares compression instead of truncating title/source separately.
-            Text("\(Text("eew.title").fontWeight(.semibold))\(Text(verbatim: " · " + provider).foregroundColor(.secondary))")
-                .layoutPriority(1)
+            Text(
+                "\(Text("eew.title").fontWeight(.semibold))\(Text(verbatim: " · " + provider).foregroundColor(.secondary))"
+            )
+            .layoutPriority(1)
         }
         .font(.caption)
         .foregroundStyle(.primary)
@@ -143,6 +96,7 @@ private struct EEWEventHeading: View {
 @available(iOS 16.1, *)
 private struct EEWPrimarySummary: View {
     let state: EEWActivityAttributes.ContentState
+    var island = false
 
     var body: some View {
         // Each optional field falls back independently; missing personalization
@@ -174,7 +128,7 @@ private struct EEWPrimarySummary: View {
                     .minimumScaleFactor(0.8)
                     // The live countdown supplies this label to VoiceOver.
                     .accessibilityHidden(!state.waveArrived && state.estimatedSArrivalAt != nil)
-                EEWArrivalView(state: state)
+                EEWArrivalView(state: state, island: island)
                     .frame(minHeight: 52)
             }
             .frame(maxWidth: .infinity, alignment: .center)
@@ -240,9 +194,10 @@ private struct EEWEventDetailText {
     }
 
     var full: String {
-        epicenterMagnitude + " · " + String(
-            format: "%@ %.0f km",
-            NSLocalizedString("eew.depth", comment: "Earthquake depth"), state.depthKm)
+        epicenterMagnitude + " · "
+            + String(
+                format: "%@ %.0f km",
+                NSLocalizedString("eew.depth", comment: "Earthquake depth"), state.depthKm)
     }
 }
 
@@ -283,6 +238,13 @@ private struct EEWIntensityValue: View {
 
     var body: some View { Self.text(intensity, compact: compact) }
 
+    static func badgeText(_ intensity: Int) -> Text {
+        let content = EEWPresentation.intensityText(intensity, compact: true)
+        // Omit only the unit. Localized weak/strong labels remain indivisible.
+        if let level = content.level { return Text(level, format: .number) }
+        return text(intensity, compact: true)
+    }
+
     static func text(_ intensity: Int, compact: Bool = false, spoken: Bool = false) -> Text {
         let content = EEWPresentation.intensityText(intensity, compact: compact, spoken: spoken)
         if let level = content.level {
@@ -295,6 +257,7 @@ private struct EEWIntensityValue: View {
 @available(iOS 16.1, *)
 private struct EEWArrivalView: View {
     let state: EEWActivityAttributes.ContentState
+    var island = false
 
     var body: some View {
         switch EEWPresentation.arrival(for: state) {
@@ -305,7 +268,7 @@ private struct EEWArrivalView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         case .countdown(let arrival):
-            EEWCountdown(arrival: arrival)
+            EEWCountdown(arrival: arrival, island: island)
                 .font(.system(size: 42, weight: .bold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -322,7 +285,7 @@ private struct EEWArrivalView: View {
 @available(iOS 16.1, *)
 private struct EEWCountdown: View {
     let arrival: Date
-    var alignment: TextAlignment = .center
+    var island = false
 
     var body: some View {
         // Compatibility fallback: this Apple timer keeps updating in the system
@@ -337,10 +300,33 @@ private struct EEWCountdown: View {
         let timer = Text(timerInterval: now...max(arrival, now), countsDown: true, showsHours: false)
         timer
             .monospacedDigit()
-            .multilineTextAlignment(alignment)
-            .foregroundStyle(.primary)
+            .multilineTextAlignment(.center)
+            .foregroundStyle(island ? Color.white : Color.primary)
             .accessibilityLabel(Text("eew.arrival.estimated"))
             .accessibilityValue(timer)
+    }
+}
+
+@available(iOS 16.1, *)
+private struct EEWCompactIntensity: View {
+    let state: EEWActivityAttributes.ContentState
+
+    var body: some View {
+        EEWIslandWidthReader { limited in
+            EEWIslandIntensityPresentation(
+                intensity: EEWPresentation.intensity(for: state), limitedInWidth: limited
+            ) {
+                EEWIntensityValue.badgeText(EEWPresentation.intensity(for: state))
+            } testBadge: {
+                EEWTestBadge()
+            }
+        }
+        .font(.caption.bold())
+        .foregroundStyle(.white)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(LocalizedStringKey(EEWPresentation.intensityLabel(for: state))))
+        .accessibilityValue(EEWIntensityValue.text(EEWPresentation.intensity(for: state), spoken: true))
+        .accessibilityHint(Text("eew.test.spoken"))
     }
 }
 
@@ -349,22 +335,59 @@ private struct EEWCompactArrival: View {
     let state: EEWActivityAttributes.ContentState
 
     var body: some View {
+        EEWIslandWidthReader { limited in
+            EEWIslandFittingView(limitedInWidth: limited) {
+                arrival
+            } compact: {
+                arrival.font(.caption2.bold())
+            } fallback: {
+                EEWIslandArrivalSymbol(state: state)
+            }
+        }
+    }
+
+    @ViewBuilder private var arrival: some View {
         switch EEWPresentation.arrival(for: state) {
         case .arrived:
             Text("eew.arrived.short")
                 .accessibilityLabel(Text("eew.arrival.estimated"))
                 .accessibilityValue(Text("eew.arrived.short"))
-                .lineLimit(1)
         case .countdown(let arrival):
-            EEWCountdown(arrival: arrival)
-                // Timer Text otherwise claims all proposed width in the Island.
-                .frame(width: 40, alignment: .trailing)
+            EEWIslandTimerEnvelope(sample: EEWPresentation.islandTimerSample(for: state, now: .now)) {
+                EEWCountdown(arrival: arrival, island: true)
+            }
         case .unavailable:
-            Image(systemName: "clock.badge.questionmark")
-                .foregroundStyle(.secondary)
-                .accessibilityLabel(Text("eew.arrival.estimated"))
-                .accessibilityValue(Text("eew.unavailable"))
+            EEWIslandArrivalSymbol(state: state)
         }
+    }
+}
+
+@available(iOS 16.1, *)
+private struct EEWIslandArrivalSymbol: View {
+    let state: EEWActivityAttributes.ContentState
+
+    var body: some View {
+        Image(systemName: EEWPresentation.islandArrivalSymbol(for: state))
+            .resizable()
+            .scaledToFit()
+            .frame(maxWidth: 14, maxHeight: 14)
+            .foregroundStyle(EEWPresentation.arrival(for: state) == .unavailable ? .secondary : .primary)
+            // Preserve live countdown semantics for VoiceOver even if the visible
+            // slot can only fit a clock. Never announce this as an arrived state.
+            .accessibilityRepresentation {
+                switch EEWPresentation.arrival(for: state) {
+                case .countdown(let arrival):
+                    EEWCountdown(arrival: arrival, island: true)
+                case .arrived:
+                    Text("eew.arrived.short")
+                        .accessibilityLabel(Text("eew.arrival.estimated"))
+                        .accessibilityValue(Text("eew.arrived.short"))
+                case .unavailable:
+                    Text("eew.unavailable")
+                        .accessibilityLabel(Text("eew.arrival.estimated"))
+                        .accessibilityValue(Text("eew.unavailable"))
+                }
+            }
     }
 }
 
@@ -373,29 +396,53 @@ private struct EEWMinimalView: View {
     let state: EEWActivityAttributes.ContentState
 
     var body: some View {
-        VStack(spacing: 1) {
-            switch EEWPresentation.arrival(for: state) {
-            case .arrived:
-                Image(systemName: "checkmark")
-                    .accessibilityLabel(Text("eew.arrival.estimated"))
-                    .accessibilityValue(Text("eew.arrived.short"))
-            case .countdown(let arrival):
-                EEWCountdown(arrival: arrival, alignment: .center)
-                    .font(.caption2.bold())
-                    .minimumScaleFactor(0.8)
-                    .frame(width: 32)
-            case .unavailable:
-                Image(systemName: "waveform.path.ecg")
-                    .foregroundStyle(.red)
-                    .accessibilityLabel(Text("eew.arrival.estimated"))
-                    .accessibilityValue(Text("eew.unavailable"))
+        EEWIslandWidthReader { limited in
+            EEWIslandFittingView(limitedInWidth: limited) {
+                HStack(spacing: 4) {
+                    EEWIslandIntensityBadge(intensity: EEWPresentation.intensity(for: state), dense: true) {
+                        EEWIntensityValue.badgeText(EEWPresentation.intensity(for: state))
+                    }
+                    arrival
+                }
+            } compact: {
+                // A limited-width hint does not justify discarding a timer that
+                // actually fits. Minimal already uses the smallest approved font.
+                arrival
+            } fallback: {
+                EEWIslandArrivalSymbol(state: state)
             }
         }
         .font(.caption.bold())
         .foregroundStyle(.white)
-        .lineLimit(1)
+        .accessibilityRepresentation {
+            HStack {
+                EEWIntensityValue.text(EEWPresentation.intensity(for: state), spoken: true)
+                    .accessibilityLabel(Text(LocalizedStringKey(EEWPresentation.intensityLabel(for: state))))
+                    .accessibilityValue(EEWIntensityValue.text(EEWPresentation.intensity(for: state), spoken: true))
+                arrival
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityHint(Text("eew.test.spoken"))
+        }
         .accessibilityElement(children: .combine)
         .accessibilityHint(Text("eew.test.spoken"))
+    }
+
+    @ViewBuilder private var arrival: some View {
+        switch EEWPresentation.arrival(for: state) {
+        case .countdown(let arrival):
+            EEWIslandTimerEnvelope(sample: EEWPresentation.islandTimerSample(for: state, now: .now)) {
+                EEWCountdown(arrival: arrival, island: true)
+            }
+            .font(.caption2.bold())
+        case .arrived:
+            EEWIslandArrivalSymbol(state: state)
+        case .unavailable:
+            Image(systemName: "waveform.path.ecg")
+                .foregroundStyle(.red)
+                .accessibilityLabel(Text("eew.arrival.estimated"))
+                .accessibilityValue(Text("eew.unavailable"))
+        }
     }
 }
 
