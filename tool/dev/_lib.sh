@@ -147,6 +147,22 @@ step() { printf '\n\033[1m▸ %s\033[0m\n' "$*" >&2; }
 # clean` cannot reach it, and it is per-clone.
 cache_dir() { printf '%s/dpip-checks' "$(git rev-parse --git-dir)"; }
 
+# A portable SHA-256 command. macOS provides `shasum`, while Git Bash on
+# Windows may provide only `sha256sum`. Prefer `shasum` when available to
+# preserve the existing behavior; fall back to `sha256sum` otherwise.
+# Fail explicitly if neither utility exists, rather than silently skipping
+# content-hash cache validation.
+sha256() {
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256
+  elif command -v sha256sum >/dev/null 2>&1; then
+    sha256sum
+  else
+    printf 'error: no SHA-256 utility found\n' >&2
+    return 127
+  fi
+}
+
 # A hash of every tracked and every untracked-but-not-ignored file under the
 # given paths — contents *and* names, so a rename or a deletion also invalidates.
 # Measured at 0.09 s over 793 files.
@@ -154,7 +170,7 @@ cache_key() {
   local files
   files="$(git ls-files -co --exclude-standard -- "$@" | LC_ALL=C sort)"
   [[ -z $files ]] && { printf 'empty'; return; }
-  printf '%s' "$files" | tr '\n' '\0' | xargs -0 shasum -a 256 |
+  printf '%s' "$files" | tr '\n' '\0' | xargs -0 sha256 |
     shasum -a 256 | cut -d' ' -f1
 }
 
