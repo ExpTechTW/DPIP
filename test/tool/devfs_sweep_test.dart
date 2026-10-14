@@ -74,7 +74,11 @@ List<String> namesIn(Directory home) {
     '${home.path}/Library/Developer/CoreSimulator/Devices/DEV-1/data'
     '/Containers/Data/Application/APP-1/tmp',
   );
-  return tmp.listSync().map((e) => e.path.split('/').last).toList()..sort();
+  return tmp
+      .listSync()
+      .map((e) => e.path.split(Platform.pathSeparator).last)
+      .toList()
+    ..sort();
 }
 
 void main() {
