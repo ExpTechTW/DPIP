@@ -17,7 +17,7 @@ import sys
 def validate(root):
     """Return actionable violations; locales come from the Xcode project."""
     errors = []
-    project = (root / "ios/Runner.xcodeproj/project.pbxproj").read_text()
+    project = (root / "ios/Runner.xcodeproj/project.pbxproj").read_text(encoding="utf-8")
     regions = re.search(r"knownRegions\s*=\s*\((.*?)\);", project, re.S)
     development = re.search(r"developmentRegion\s*=\s*([^;]+);", project)
     if not regions or not development:
@@ -37,7 +37,7 @@ def validate(root):
             model = plistlib.loads(definition.read_bytes())
             # Use the definition's stem, matching Apple's metadata loader.
             catalog_path = definition.with_suffix(".xcstrings")
-            catalog = json.loads(catalog_path.read_text())
+            catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
         except (OSError, ValueError, plistlib.InvalidFileException) as error:
             errors.append(f"{label}: cannot load matching Intent/catalog ({error})")
             continue
