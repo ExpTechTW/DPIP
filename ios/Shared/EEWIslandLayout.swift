@@ -7,21 +7,10 @@ struct EEWIslandWidthReader<Content: View>: View {
     @ViewBuilder let content: (Bool) -> Content
 
     var body: some View {
-        if #available(iOS 27.0, *) {
-            EEWLimitedIslandWidthReader(content: content)
-        } else {
-            content(false)
-        }
+        // CI's iOS 26 SDK has no Dynamic Island width environment key.
+        // Let ViewThatFits measure the host's proposal on every supported SDK.
+        content(false)
     }
-}
-
-// Keep the property wrapper itself out of the earlier-OS view's stored properties.
-@available(iOS 27.0, *)
-private struct EEWLimitedIslandWidthReader<Content: View>: View {
-    @Environment(\.isDynamicIslandLimitedInWidth) private var limitedInWidth
-    @ViewBuilder let content: (Bool) -> Content
-
-    var body: some View { content(limitedInWidth) }
 }
 
 @available(iOS 16.1, *)

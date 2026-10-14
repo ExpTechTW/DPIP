@@ -346,18 +346,14 @@ final class EEWPresentationTests: XCTestCase {
 
     @MainActor
     func testWidthReaderHasWorkingCompatibleContent() {
-        // Run on both iOS 27 and an earlier runtime. Old systems must never
-        // instantiate the property wrapper for the iOS 27 environment key.
         let content = EEWIslandWidthReader { _ in Text(verbatim: "EEW") }
         XCTAssertGreaterThan(measured(content, width: 200).width, 0)
     }
 
     @MainActor
-    func testIOS27WidthReaderUsesHostEnvironment() {
-        guard #available(iOS 27.0, *) else { return }
-        // Apple's key is read-only; it cannot be injected with .environment.
-        // The ordinary test host supplies false. True/false adaptive behavior
-        // is exercised separately at the fitting container's input boundary.
+    func testWidthReaderUsesCompatibleFittingPath() {
+        // Every SDK uses false; narrow proposals still select smaller candidates
+        // through ViewThatFits, as exercised by the fitting tests above.
         let content = EEWIslandWidthReader { limited in
             Color.red.frame(width: limited ? 8 : 40, height: 8)
         }
