@@ -80,7 +80,15 @@ EOF
   # is identical either way.
   local owned
   owned="$(cd "$root" && mise where flutter 2>/dev/null || true)"
-  if [[ -z $owned || $resolved != "$owned"/* ]]; then
+
+  # Git Bash receives Windows paths with backslashes from mise. Normalize both
+  # sides before checking containment; otherwise a valid child path is rejected
+  # because the POSIX glob below only matches `/` separators.
+  local resolved_norm="${resolved//\\//}"
+  local owned_norm="${owned//\\//}"
+  resolved_norm="${resolved_norm%/}"
+  owned_norm="${owned_norm%/}"
+  if [[ -z $owned || ${resolved_norm,,} != "${owned_norm,,}"/* ]]; then
     printf '\n  flutter resolves to %s\n' "$resolved" >&2
     printf '  which is not inside mise (%s).\n\n' "${owned:-not installed}" >&2
     printf '  Run `mise install` from %s.\n\n' "$root" >&2
