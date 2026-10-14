@@ -153,11 +153,16 @@ sha256() {
 # given paths — contents *and* names, so a rename or a deletion also invalidates.
 # Measured at 0.09 s over 793 files.
 cache_key() {
-  local files
+  local files path digest
   files="$(git ls-files -co --exclude-standard -- "$@" | LC_ALL=C sort)"
   [[ -z $files ]] && { printf 'empty'; return; }
-  printf '%s' "$files" | tr '\n' '\0' | xargs -0 sha256 |
-    shasum -a 256 | cut -d' ' -f1
+
+  # Do not pass `sha256` through xargs: shell functions are not available in
+  # xargs' child process on Git Bash. Hash each path in this shell instead.
+  while IFS= read -r path; do
+    digest="$(sha256 <"$path" | cut -d' ' -f1)" || return
+    printf '%s  %s\n' "$digest" "$path"
+  done <<< "$files" | sha256 | cut -d' ' -f1
 }
 
 # What each cached step reads. Anything a step's result depends on has to be in
