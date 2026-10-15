@@ -1884,7 +1884,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get regionAddButton => '地域を追加';
 
   @override
-  String get regionSearchHint => '都道府県・市区を検索';
+  String get regionSearchHint => '県市・町村を検索';
 
   @override
   String get regionSearchEmpty => '一致する地域がありません';
@@ -1894,6 +1894,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get regionSearchTownEmpty => '該当する町村がありません';
+
+  @override
+  String get regionSearchTownsHeader => '町村';
 
   @override
   String get displaySettings => '表示';

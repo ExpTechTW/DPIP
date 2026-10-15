@@ -3657,13 +3657,13 @@ abstract class AppLocalizations {
   /// No description provided for @regionSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search counties and cities'**
+  /// **'Search counties, cities and townships'**
   String get regionSearchHint;
 
   /// No description provided for @regionSearchEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No matching counties or cities'**
+  /// **'No matching counties, cities or townships'**
   String get regionSearchEmpty;
 
   /// No description provided for @regionSearchTownHint.
@@ -3677,6 +3677,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No matching townships'**
   String get regionSearchTownEmpty;
+
+  /// Section header above the township matches listed under the county/city matches when searching on the first page of the region picker
+  ///
+  /// In en, this message translates to:
+  /// **'Townships'**
+  String get regionSearchTownsHeader;
 
   /// Display-settings menu entry and page title (theme mode)
   ///

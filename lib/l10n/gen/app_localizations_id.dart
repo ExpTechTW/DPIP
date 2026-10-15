@@ -1921,16 +1921,20 @@ class AppLocalizationsId extends AppLocalizations {
   String get regionAddButton => 'Tambah wilayah';
 
   @override
-  String get regionSearchHint => 'Cari kabupaten dan kota';
+  String get regionSearchHint => 'Cari kabupaten, kota, atau kecamatan';
 
   @override
-  String get regionSearchEmpty => 'Tidak ada kabupaten/kota yang cocok';
+  String get regionSearchEmpty =>
+      'Tidak ada kabupaten/kota atau kecamatan yang cocok';
 
   @override
   String get regionSearchTownHint => 'Cari kecamatan';
 
   @override
   String get regionSearchTownEmpty => 'Tidak ada kecamatan yang cocok';
+
+  @override
+  String get regionSearchTownsHeader => 'Kecamatan';
 
   @override
   String get displaySettings => 'Tampilan';

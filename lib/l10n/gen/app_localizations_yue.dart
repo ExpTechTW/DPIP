@@ -1872,16 +1872,19 @@ class AppLocalizationsYue extends AppLocalizations {
   String get regionAddButton => '新增地區';
 
   @override
-  String get regionSearchHint => '搜尋縣市';
+  String get regionSearchHint => '搜尋縣市或鄉鎮';
 
   @override
-  String get regionSearchEmpty => '搵唔到符合嘅縣市';
+  String get regionSearchEmpty => '搵唔到符合嘅縣市或鄉鎮';
 
   @override
   String get regionSearchTownHint => '搜尋鄉鎮';
 
   @override
   String get regionSearchTownEmpty => '搵唔到符合嘅鄉鎮';
+
+  @override
+  String get regionSearchTownsHeader => '鄉鎮';
 
   @override
   String get displaySettings => '顯示設定';
