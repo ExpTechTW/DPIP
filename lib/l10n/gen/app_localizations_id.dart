@@ -3538,4 +3538,8 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get eewCancelledNotice =>
       'Lembaga penerbit telah membatalkan peringatan ini';
+
+  @override
+  String get eewFeedDown =>
+      'Koneksi peringatan gempa terputus — menyambungkan ulang…';
 }

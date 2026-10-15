@@ -9,9 +9,11 @@
 ///
 /// Gated on feed liveness as well as alert presence: a stale/offline feed's
 /// alerts may no longer describe the current situation, and a safety feed that
-/// aged out must never present its last snapshot as now. Calm state (no alert,
-/// or an unverified feed) renders nothing at all, so the sheet's ordinary layout
-/// is untouched outside an earthquake.
+/// aged out must never present its last snapshot as now — so a stale/offline
+/// feed shows [EewFeedDownNotice] instead of any alert, and never nothing,
+/// which would read as calm. Calm (a live feed with no alert, or one still
+/// making its first connection) renders nothing at all, so the sheet's
+/// ordinary layout is untouched outside an earthquake.
 ///
 /// A cancelled alert is shown as cancelled — a neutral card with no severity
 /// border, no local estimate and no countdown — and only while nothing still
@@ -39,6 +41,7 @@ import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/eew_cancelled_notice.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
+import 'package:dpip/shared/widgets/eew_feed_down_notice.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -60,6 +63,7 @@ class HomeEewSection extends StatelessWidget {
       // answer flips.
       context.select<RealtimeNotifier<List<Eew>>, bool>((controller) {
         final state = controller.state;
+        if (EewFeedDownNotice.isDown(state.status)) return true;
         final alerts = state.data;
         return state.status == RealtimeStatus.live &&
             alerts != null &&
@@ -71,9 +75,13 @@ class HomeEewSection extends StatelessWidget {
     final controller = context.watch<RealtimeNotifier<List<Eew>>>();
     final state = controller.state;
     final alerts = state.data;
-    // No alert, or a feed that has aged past live — render nothing. This keeps
-    // the stale case from ever masquerading as a current alert on the home
-    // surface (the monitor page shows the freshness banner instead).
+    // A feed that has aged past live never shows its alerts — the stale case
+    // must not masquerade as a current alert — but it does not go quiet
+    // either: calm renders nothing, so a silent dead feed would read as calm.
+    if (EewFeedDownNotice.isDown(state.status)) {
+      return EewFeedDownNotice(status: state.status);
+    }
+    // No alert — render nothing.
     if (state.status != RealtimeStatus.live ||
         alerts == null ||
         alerts.isEmpty) {

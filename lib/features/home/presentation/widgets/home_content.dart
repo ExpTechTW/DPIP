@@ -447,7 +447,8 @@ class HomeContent extends StatelessWidget {
                       if (expanded) ...[
                         const HomeEewSection(),
                         // The section renders nothing when calm — only reserve
-                        // the gap below it while an alert is actually showing,
+                        // the gap below it while an alert (or the notice that
+                        // the feed is down) is actually showing,
                         // or a calm dashboard gains an extra empty lg here on
                         // top of the one already before this section.
                         if (HomeEewSection.isActive(context))

@@ -31,6 +31,7 @@ import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/alert_cycle_chip.dart';
+import 'package:dpip/shared/widgets/eew_feed_down_notice.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:flutter/material.dart';
@@ -363,13 +364,15 @@ class _EewAlert extends StatelessWidget {
 }
 
 /// A compact bottom card: status dot + title + the snapshot time, then the live
-/// latency in milliseconds (or the feed status word when not live). While an EEW
-/// alert is active it turns red-on-`errorContainer` as a whole — the legacy
-/// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
-/// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so the
-/// strip reads as urgent even collapsed, not just the card above it. A
-/// cancelled alert does not count: the strip goes back to calm the moment
-/// nothing still in progress is left.
+/// latency in milliseconds (or the feed status word when not live) — and,
+/// under that, a line saying the EEW feed is down whenever it is stale or
+/// offline, since the dot and the latency describe the RTS feed alone. While
+/// an EEW alert is active it turns red-on-`errorContainer` as a whole — the
+/// legacy monitor's `MorphingSheet` did the same (`borderColor`/
+/// `backgroundColor` on `activeEew.isNotEmpty`, binary rather than scaled by
+/// severity) — so the strip reads as urgent even collapsed, not just the card
+/// above it. A cancelled alert does not count: the strip goes back to calm the
+/// moment nothing still in progress is left.
 class _StatusBar extends StatelessWidget {
   const _StatusBar({required this.state, required this.eew});
 
@@ -430,6 +433,11 @@ class _StatusBar extends StatelessWidget {
     };
 
     final onTint = hasActiveEew ? colors.onErrorContainer : null;
+    // The strip names the RTS feed's state only; the EEW feed has one of its
+    // own, and with it down the empty space above the strip — no alert card
+    // — would otherwise read as "no earthquake".
+    final eewStatus = eew.state.status;
+    final eewDown = EewFeedDownNotice.isDown(eewStatus);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -449,44 +457,54 @@ class _StatusBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          LegendDot(color: dot),
-          const SizedBox(width: AppSpacing.sm),
-          // Yields to the trailing readouts so a long locale or large text scale
-          // ellipsises the title instead of overflowing the row.
-          Expanded(
-            child: Text(
-              l10n.mapLayerMonitor,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: onTint,
+          Row(
+            children: [
+              LegendDot(color: dot),
+              const SizedBox(width: AppSpacing.sm),
+              // Yields to the trailing readouts so a long locale or large text scale
+              // ellipsises the title instead of overflowing the row.
+              Expanded(
+                child: Text(
+                  l10n.mapLayerMonitor,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: onTint,
+                  ),
+                ),
               ),
-            ),
+              if (dataTime != null) ...[
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  dataTime,
+                  maxLines: 1,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: onTint ?? colors.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ],
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                trailing,
+                maxLines: 1,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: onTint ?? trailingColor,
+                  fontWeight: FontWeight.w600,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
           ),
-          if (dataTime != null) ...[
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              dataTime,
-              maxLines: 1,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: onTint ?? colors.onSurfaceVariant,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
+          if (eewDown) ...[
+            const SizedBox(height: AppSpacing.xs),
+            EewFeedDownNotice.inline(status: eewStatus),
           ],
-          const SizedBox(width: AppSpacing.sm),
-          Text(
-            trailing,
-            maxLines: 1,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: onTint ?? trailingColor,
-              fontWeight: FontWeight.w600,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
         ],
       ),
     );

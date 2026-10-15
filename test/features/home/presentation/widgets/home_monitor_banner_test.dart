@@ -5,6 +5,7 @@ import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
+import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -229,5 +230,37 @@ void main() {
 
     expect(find.text('花蓮縣'), findsOneWidget);
     expect(find.text('宜蘭縣'), findsNothing);
+  });
+
+  testWidgets('a feed aged past live fills the slot with a feed-down notice, '
+      'not its alert and not nothing', (tester) async {
+    final elapsed = _FakeElapsed();
+    final offline = RealtimeChannel<List<Eew>>(
+      source: _StaticSource([_alert()]),
+      clock: _FakeClock(DateTime.utc(2026, 8, 12, 12)),
+      elapsed: elapsed,
+      ticker: _FakeTicker(),
+      config: RealtimeConfig.eew,
+      label: 'test-eew-offline',
+    );
+    addTearDown(offline.dispose);
+    // An alert was up, then nothing for longer than the give-up threshold.
+    await offline.refreshNow();
+    elapsed.value = const Duration(seconds: 30);
+    offline.recomputeStatus();
+    final notifier = RealtimeNotifier<List<Eew>>(offline);
+    expect(notifier.state.status, RealtimeStatus.offline);
+
+    await tester.pumpWidget(_wrap(notifier, MapCameraHandoff()));
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(HomeMonitorBanner)),
+    );
+    expect(find.text(l10n.eewFeedDown), findsOneWidget);
+    expect(find.text('臺東縣'), findsNothing);
+    expect(find.byType(InkWell), findsNothing);
+    expect(
+      tester.getSize(find.byType(HomeMonitorBanner)).height,
+      greaterThan(0),
+    );
   });
 }

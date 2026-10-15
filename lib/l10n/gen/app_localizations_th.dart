@@ -3517,4 +3517,8 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get eewCancelledNotice =>
       'หน่วยงานผู้ออกประกาศได้ยกเลิกการแจ้งเตือนนี้แล้ว';
+
+  @override
+  String get eewFeedDown =>
+      'การเชื่อมต่อการแจ้งเตือนแผ่นดินไหวขาดหาย กำลังเชื่อมต่อใหม่…';
 }

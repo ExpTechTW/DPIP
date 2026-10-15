@@ -2092,5 +2092,6 @@
   "locationTrackLegendOlder": "Mas luma",
   "locationTrackLegendLatest": "Pinakabagong lokasyon",
   "eewCancelled": "Kinansela",
-  "eewCancelledNotice": "Kinansela ng naglabas na ahensya ang alertong ito"
+  "eewCancelledNotice": "Kinansela ng naglabas na ahensya ang alertong ito",
+  "eewFeedDown": "Naputol ang koneksyon sa babala sa lindol — kumokonekta muli…"
 }

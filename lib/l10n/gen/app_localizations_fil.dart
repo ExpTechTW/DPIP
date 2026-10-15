@@ -3545,4 +3545,8 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get eewCancelledNotice =>
       'Kinansela ng naglabas na ahensya ang alertong ito';
+
+  @override
+  String get eewFeedDown =>
+      'Naputol ang koneksyon sa babala sa lindol — kumokonekta muli…';
 }

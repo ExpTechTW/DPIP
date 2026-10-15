@@ -3461,4 +3461,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get eewCancelledNotice => '발표 기관이 이 경보를 취소했습니다';
+
+  @override
+  String get eewFeedDown => '지진 속보 연결이 끊겼습니다. 다시 연결하는 중…';
 }
