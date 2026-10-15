@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "Ilapat ang “{preset}”?",
   "notifyPresetConfirmBody": "Magbabago ang bawat channel sa ibaba para tumugma rito, at papalitan ang mga setting na isa-isa mong pinili.",
   "notifyPresetApply": "Ilapat",
-  "notifyPresetApplying": "Inilalapat…"
+  "notifyPresetApplying": "Inilalapat…",
+  "onboardingNotifyTitle": "Iyong mga alerto",
+  "onboardingNotifyBody": "Pumili ng panimulang setting. Maaari mong ayusin ang bawat channel sa Mga setting ng notipikasyon anumang oras, at bawat opsyon ay nananatiling may emergency na alerto sa lindol.",
+  "onboardingNotifySkip": "Laktawan muna"
 }

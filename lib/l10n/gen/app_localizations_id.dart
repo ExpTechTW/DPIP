@@ -3588,4 +3588,14 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => 'Menerapkan…';
+
+  @override
+  String get onboardingNotifyTitle => 'Peringatan Anda';
+
+  @override
+  String get onboardingNotifyBody =>
+      'Pilih titik awal. Anda dapat menyesuaikan setiap saluran di Pengaturan notifikasi kapan saja, dan setiap pilihan tetap menyalakan peringatan gempa darurat.';
+
+  @override
+  String get onboardingNotifySkip => 'Lewati dulu';
 }

@@ -3595,4 +3595,14 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => 'Inilalapat…';
+
+  @override
+  String get onboardingNotifyTitle => 'Iyong mga alerto';
+
+  @override
+  String get onboardingNotifyBody =>
+      'Pumili ng panimulang setting. Maaari mong ayusin ang bawat channel sa Mga setting ng notipikasyon anumang oras, at bawat opsyon ay nananatiling may emergency na alerto sa lindol.';
+
+  @override
+  String get onboardingNotifySkip => 'Laktawan muna';
 }

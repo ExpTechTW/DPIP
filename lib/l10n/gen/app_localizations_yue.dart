@@ -3484,4 +3484,13 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => '套用緊…';
+
+  @override
+  String get onboardingNotifyTitle => '通知偏好';
+
+  @override
+  String get onboardingNotifyBody => '揀一個起點先，之後隨時可以喺「通知設定」逐項調整。每個選項都會保留地震速報。';
+
+  @override
+  String get onboardingNotifySkip => '跳過，遲啲先設定';
 }

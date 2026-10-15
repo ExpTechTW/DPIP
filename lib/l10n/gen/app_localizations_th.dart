@@ -3566,4 +3566,14 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => 'กำลังใช้…';
+
+  @override
+  String get onboardingNotifyTitle => 'การแจ้งเตือนของคุณ';
+
+  @override
+  String get onboardingNotifyBody =>
+      'เลือกจุดเริ่มต้นก่อน คุณปรับแต่ละช่องได้ทุกเมื่อใน “การตั้งค่าการแจ้งเตือน” และทุกตัวเลือกยังคงรับการเตือนแผ่นดินไหวฉุกเฉิน';
+
+  @override
+  String get onboardingNotifySkip => 'ข้ามไปก่อน';
 }

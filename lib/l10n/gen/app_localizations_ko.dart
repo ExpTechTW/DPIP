@@ -3508,4 +3508,14 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => '적용하는 중…';
+
+  @override
+  String get onboardingNotifyTitle => '알림 받기';
+
+  @override
+  String get onboardingNotifyBody =>
+      '먼저 시작점을 골라 주세요. 각 채널은 언제든 \'알림 설정\'에서 조정할 수 있으며, 어떤 옵션이든 긴급 지진 경보는 계속 받습니다.';
+
+  @override
+  String get onboardingNotifySkip => '나중에 설정';
 }

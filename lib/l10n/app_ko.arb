@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "‘{preset}’을(를) 적용할까요?",
   "notifyPresetConfirmBody": "아래의 모든 채널이 이 조합으로 바뀌며, 채널별로 고른 설정은 대체됩니다.",
   "notifyPresetApply": "적용",
-  "notifyPresetApplying": "적용하는 중…"
+  "notifyPresetApplying": "적용하는 중…",
+  "onboardingNotifyTitle": "알림 받기",
+  "onboardingNotifyBody": "먼저 시작점을 골라 주세요. 각 채널은 언제든 '알림 설정'에서 조정할 수 있으며, 어떤 옵션이든 긴급 지진 경보는 계속 받습니다.",
+  "onboardingNotifySkip": "나중에 설정"
 }

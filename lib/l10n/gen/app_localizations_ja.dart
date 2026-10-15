@@ -3506,4 +3506,14 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => '適用しています…';
+
+  @override
+  String get onboardingNotifyTitle => '通知の受け取り方';
+
+  @override
+  String get onboardingNotifyBody =>
+      'まずは出発点を選んでください。各チャンネルは「通知設定」でいつでも個別に調整でき、どの選択肢でも緊急地震速報は受け取れます。';
+
+  @override
+  String get onboardingNotifySkip => 'あとで設定する';
 }

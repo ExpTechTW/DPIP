@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "Áp dụng “{preset}”?",
   "notifyPresetConfirmBody": "Mọi kênh bên dưới sẽ đổi theo thiết lập này, thay thế các cài đặt bạn đã chọn từng mục.",
   "notifyPresetApply": "Áp dụng",
-  "notifyPresetApplying": "Đang áp dụng…"
+  "notifyPresetApplying": "Đang áp dụng…",
+  "onboardingNotifyTitle": "Cảnh báo của bạn",
+  "onboardingNotifyBody": "Hãy chọn một điểm bắt đầu. Bạn có thể tinh chỉnh từng kênh trong Cài đặt thông báo bất cứ lúc nào, và mọi lựa chọn đều giữ cảnh báo động đất khẩn cấp.",
+  "onboardingNotifySkip": "Để sau"
 }

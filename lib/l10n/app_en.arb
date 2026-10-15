@@ -4318,5 +4318,17 @@
   "notifyPresetApplying": "Applying…",
   "@notifyPresetApplying": {
     "description": "Shown (and announced) while a notification preset is being saved"
+  },
+  "onboardingNotifyTitle": "Your alerts",
+  "@onboardingNotifyTitle": {
+    "description": "Onboarding step title: choosing a notification preset"
+  },
+  "onboardingNotifyBody": "Pick a starting point. You can fine-tune each channel in Notification settings at any time, and every option keeps earthquake early warnings on.",
+  "@onboardingNotifyBody": {
+    "description": "Onboarding step body: the choice is a starting point, adjustable later; EEW stays on in every option"
+  },
+  "onboardingNotifySkip": "Skip for now",
+  "@onboardingNotifySkip": {
+    "description": "Onboarding: finish without applying a notification preset after a failed attempt"
   }
 }

@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "Terapkan “{preset}”?",
   "notifyPresetConfirmBody": "Setiap saluran di bawah akan diubah mengikutinya, menggantikan pengaturan yang Anda pilih satu per satu.",
   "notifyPresetApply": "Terapkan",
-  "notifyPresetApplying": "Menerapkan…"
+  "notifyPresetApplying": "Menerapkan…",
+  "onboardingNotifyTitle": "Peringatan Anda",
+  "onboardingNotifyBody": "Pilih titik awal. Anda dapat menyesuaikan setiap saluran di Pengaturan notifikasi kapan saja, dan setiap pilihan tetap menyalakan peringatan gempa darurat.",
+  "onboardingNotifySkip": "Lewati dulu"
 }
