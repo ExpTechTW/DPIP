@@ -92,8 +92,11 @@ import UserNotifications
 /// Answers iOS for pushes that no plugin will answer for.
 ///
 /// The app's pushes are published straight to APNs by AWS SNS — no FCM, no
-/// `mutable-content`, no Notification Service Extension. awesome_notifications
-/// cannot render such a push: its own README requires all three. That is why
+/// `mutable-content`, and so no Notification Service Extension that renders.
+/// awesome_notifications cannot render such a push: its own README requires
+/// all three. (`ios/NotificationService` is an extension, but it only records
+/// that a push arrived and returns it untouched — it renders nothing, and runs
+/// only once the backend sets `mutable-content`.) That is why
 /// they arrive correctly in the background — awesome is bypassed entirely and
 /// iOS presents `aps` itself — and vanish in the foreground, where Apple hands
 /// the decision to whatever holds the notification-centre delegate.

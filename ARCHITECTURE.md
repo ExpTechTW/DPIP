@@ -284,6 +284,15 @@ and `DeviceRegistration` reports once more whenever the stored token changes
 and once a day without a successful report — a device that never moves would
 otherwise never tell the server its new token.
 
+**Delivery breadcrumbs (iOS).** `ios/NotificationService` is a Notification
+Service Extension that records one line per push it sees — the alert's id, its
+channel and the APNs request id, never the text — into the app group's native
+log ring, which bootstrap drains into `Log` (`importNativeLogs`). It hands the
+content back unchanged within 200 ms whatever the write does. **iOS runs it
+only for a push whose `aps` has `"mutable-content": 1`** alongside an alert;
+until the backend sets that field, the extension is installed and never
+started, and pushes behave exactly as before.
+
 ## LoRa mesh
 
 the off-grid path. Three layers, each with
