@@ -88,6 +88,21 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_name"/>
+        <!-- Where a system-rendered push lands when its channel is unknown.
+             A push carrying an FCM `notification` block can be drawn without
+             the app ever running — firebase-messaging delegates it to Google
+             Play services on Android 10+ unless delegation is turned off — and
+             that renderer resolves `android_channel_id` against the plain-key
+             channels PlainChannels mirrors. A push naming a channel this build
+             never created (an old id, a typo, one added server-side first)
+             otherwise goes to FCM's own "Miscellaneous" channel at default
+             importance with the system sound. The general announcement channel
+             is the honest fallback: that is what an unrecognised message is.
+             Must stay a real key from notification_channels.dart;
+             fcm_default_channel_test.dart pins it. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="announcement-general-v2"/>
         <meta-data
             android:name="com.exptech.dpip.default_notification_icon"
             android:resource="@drawable/ic_stat_name"/>
