@@ -22,9 +22,19 @@ concurrency:
   group: release
   cancel-in-progress: false
 
+# None unless a job asks. The repository's default token can write, and two of
+# the three jobs here only read: one of them is the job that holds the signing
+# keys and the store credentials, and runs every dependency the build pulls in.
+permissions: {}
+
 jobs:
   version:
     runs-on: ubuntu-latest
+    # Read: the checkout, and the release list the ordinal guard compares
+    # against. A token that can only read is shown published releases and not
+    # drafts — which is the set the guard means by "published".
+    permissions:
+      contents: read
     outputs:
       label: ${{ steps.v.outputs.label }}
       train: ${{ steps.v.outputs.train }}
@@ -156,6 +166,10 @@ jobs:
           - platform: ios
             runs-on: macos-latest
     runs-on: ${{ matrix.runs-on }}
+    # Read, for the checkout. The uploads authenticate with their own store
+    # credentials, not with this token.
+    permissions:
+      contents: read
     steps:
       # Full history: tool/release/build_info.sh counts commits and reads tags.
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -433,6 +447,7 @@ jobs:
   publish:
     needs: [version, build]
     runs-on: ubuntu-latest
+    # Write: it pushes the snapshot tag and creates the release.
     permissions:
       contents: write
     steps:
