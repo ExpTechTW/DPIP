@@ -3534,6 +3534,18 @@ abstract class AppLocalizations {
   /// **'Data {time}'**
   String mapTimelineDataTime(String time);
 
+  /// Screen-reader label of the map timeline scrubber, which is announced as an adjustable slider
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get mapTimelineSemanticsLabel;
+
+  /// Screen-reader value of the map timeline slider for one frame: its era word (Past/Now/Future), its time label and its date, e.g. Past 07:10, 2026/07/13
+  ///
+  /// In en, this message translates to:
+  /// **'{era} {time}, {date}'**
+  String mapTimelineSemanticsValue(String era, String time, String date);
+
   /// Radar scan-range overlay toggle in the map's radar overlay menu.
   ///
   /// In en, this message translates to:

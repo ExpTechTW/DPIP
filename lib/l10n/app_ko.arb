@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "깊이",
   "mapTimelineDataTime": "데이터 시간 {time}",
+  "mapTimelineSemanticsLabel": "타임라인",
+  "mapTimelineSemanticsValue": "{era} {time}, {date}",
   "radarScanRange": "스캔 범위 표시",
   "meshtasticHopLimit": "홉 제한",
   "@meshtasticUptime": {

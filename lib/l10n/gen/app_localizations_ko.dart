@@ -1816,6 +1816,14 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get mapTimelineSemanticsLabel => '타임라인';
+
+  @override
+  String mapTimelineSemanticsValue(String era, String time, String date) {
+    return '$era $time, $date';
+  }
+
+  @override
   String get radarScanRange => '스캔 범위 표시';
 
   @override

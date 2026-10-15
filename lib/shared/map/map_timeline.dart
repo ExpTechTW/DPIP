@@ -301,14 +301,49 @@ class _MapTimelineState extends State<MapTimeline> {
   /// The big time label: the selected instant, or — when the layer's frames
   /// each cover a period — the range that instant starts, so "21:00" is read
   /// as "21:00–22:00" rather than a point measurement.
-  String get _bigLabel {
-    final start = _times[_liveIndex];
+  String get _bigLabel => _labelFor(_liveIndex);
+
+  String _labelFor(int index) {
+    final start = _times[index];
     final period = widget.framePeriod;
     if (period == null) return start;
-    final end = _time.format(
-      widget.frames[_liveIndex].time.toLocal().add(period),
-    );
+    final end = _time.format(widget.frames[index].time.toLocal().add(period));
     return '$start – $end';
+  }
+
+  /// What a screen reader announces for frame [index]: its era, the same time
+  /// label the header shows, and its date — "Past 07:10, 2026/07/13".
+  String _semanticValue(AppLocalizations l10n, int index, int nowIndex) =>
+      l10n.mapTimelineSemanticsValue(
+        _eraWord(l10n, _eraOf(index, nowIndex)),
+        _labelFor(index),
+        _dates[index],
+      );
+
+  static String _eraWord(AppLocalizations l10n, TimelineEra era) =>
+      switch (era) {
+        TimelineEra.past => l10n.mapTimelinePast,
+        TimelineEra.now => l10n.mapTimelineNow,
+        TimelineEra.future => l10n.mapTimelineFuture,
+      };
+
+  /// Moves the selection one frame by [delta] — the slider's increase and
+  /// decrease actions, the only way a screen-reader user can scrub, since the
+  /// ruler itself is a drag target with nothing to focus.
+  ///
+  /// Goes through the same scroll a finger would: the jump emits the usual
+  /// start / update / end notifications, so [_onScroll] reports the frame and
+  /// the scrub settles through its quiet window exactly as after a short
+  /// fling. Only when the ruler has not laid out yet is the frame reported
+  /// directly.
+  void _step(int delta) {
+    final target = (_liveIndex + delta).clamp(0, widget.frames.length - 1);
+    if (target == _liveIndex) return;
+    _centreOn(target, animate: false);
+    if (_liveIndex != target) {
+      _publishLiveIndex(target);
+      widget.onSelected(target);
+    }
   }
 
   @override
@@ -504,15 +539,10 @@ class _MapTimelineState extends State<MapTimeline> {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(switch (era) {
-                TimelineEra.past => AppLocalizations.of(
-                  context,
-                ).mapTimelinePast,
-                TimelineEra.now => AppLocalizations.of(context).mapTimelineNow,
-                TimelineEra.future => AppLocalizations.of(
-                  context,
-                ).mapTimelineFuture,
-              }, style: theme.textTheme.titleMedium?.copyWith(color: color)),
+              Text(
+                _eraWord(AppLocalizations.of(context), era),
+                style: theme.textTheme.titleMedium?.copyWith(color: color),
+              ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 _bigLabel,
@@ -630,68 +660,103 @@ class _MapTimelineState extends State<MapTimeline> {
           },
         ),
         const SizedBox(height: AppSpacing.xs),
-        SizedBox(
-          height: _rulerHeight,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final pad = (constraints.maxWidth - widget.itemExtent) / 2;
-                  // ListView.builder (not a Row) so a week of frames only ever
-                  // builds the ~dozens of ticks on screen. itemExtent keeps the
-                  // centring math: offset `i * itemExtent` centres frame `i`.
-                  return _TickEmphasis(
-                    live: _live,
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: _onScroll,
-                      child: ListView.builder(
-                        controller: _scroll,
-                        scrollDirection: Axis.horizontal,
-                        physics: const _ScrubPhysics(),
-                        // A tick is a hairline and a label — cheaper to repaint
-                        // than to composite, and the whole ruler moves together
-                        // when scrubbed, so per-child layers would all be
-                        // invalidated at once anyway. Nothing here holds state
-                        // worth keeping alive off screen either: [_Tick] is
-                        // stateless and rebuilt from `frames` on demand.
-                        addRepaintBoundaries: false,
-                        addAutomaticKeepAlives: false,
-                        padding: EdgeInsets.symmetric(horizontal: pad),
-                        itemExtent: widget.itemExtent,
-                        itemCount: widget.frames.length,
-                        itemBuilder: (context, i) => _Tick(
-                          width: widget.itemExtent,
-                          label: i % labelStep == 0 ? _times[i] : null,
-                          labelColor: switch (_eraOf(i, nowIndex)) {
-                            TimelineEra.past => eraColors.past,
-                            TimelineEra.now => eraColors.now,
-                            TimelineEra.future => eraColors.future,
-                          },
-                          emphasised: _TickEmphasis.of(context, i),
-                          colors: colors,
-                          textStyle: theme.textTheme.labelSmall,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              // Fixed centre scrubber.
-              IgnorePointer(
-                child: Container(
-                  width: 2.5,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: colors.primary,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        // One adjustable node in place of a strip of tick labels: a screen
+        // reader focuses "timeline, Past 07:10", and swiping up / down steps a
+        // frame. The ruler's own semantics — dozens of time labels and a
+        // horizontal scroll — would leave nothing to adjust.
+        ValueListenableBuilder<int>(
+          valueListenable: _live,
+          builder: (context, liveIndex, ruler) {
+            final last = widget.frames.length - 1;
+            return Semantics(
+              container: true,
+              slider: true,
+              label: l10n.mapTimelineSemanticsLabel,
+              value: _semanticValue(l10n, liveIndex, nowIndex),
+              increasedValue: liveIndex < last
+                  ? _semanticValue(l10n, liveIndex + 1, nowIndex)
+                  : null,
+              decreasedValue: liveIndex > 0
+                  ? _semanticValue(l10n, liveIndex - 1, nowIndex)
+                  : null,
+              onIncrease: liveIndex < last ? () => _step(1) : null,
+              onDecrease: liveIndex > 0 ? () => _step(-1) : null,
+              child: ExcludeSemantics(child: ruler),
+            );
+          },
+          child: _buildRuler(theme, colors, nowIndex, labelStep, eraColors),
         ),
       ],
+    );
+  }
+
+  Widget _buildRuler(
+    ThemeData theme,
+    ColorScheme colors,
+    int nowIndex,
+    int labelStep,
+    ({Color past, Color now, Color future}) eraColors,
+  ) {
+    return SizedBox(
+      height: _rulerHeight,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final pad = (constraints.maxWidth - widget.itemExtent) / 2;
+              // ListView.builder (not a Row) so a week of frames only ever
+              // builds the ~dozens of ticks on screen. itemExtent keeps the
+              // centring math: offset `i * itemExtent` centres frame `i`.
+              return _TickEmphasis(
+                live: _live,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: _onScroll,
+                  child: ListView.builder(
+                    controller: _scroll,
+                    scrollDirection: Axis.horizontal,
+                    physics: const _ScrubPhysics(),
+                    // A tick is a hairline and a label — cheaper to repaint
+                    // than to composite, and the whole ruler moves together
+                    // when scrubbed, so per-child layers would all be
+                    // invalidated at once anyway. Nothing here holds state
+                    // worth keeping alive off screen either: [_Tick] is
+                    // stateless and rebuilt from `frames` on demand.
+                    addRepaintBoundaries: false,
+                    addAutomaticKeepAlives: false,
+                    padding: EdgeInsets.symmetric(horizontal: pad),
+                    itemExtent: widget.itemExtent,
+                    itemCount: widget.frames.length,
+                    itemBuilder: (context, i) => _Tick(
+                      width: widget.itemExtent,
+                      label: i % labelStep == 0 ? _times[i] : null,
+                      labelColor: switch (_eraOf(i, nowIndex)) {
+                        TimelineEra.past => eraColors.past,
+                        TimelineEra.now => eraColors.now,
+                        TimelineEra.future => eraColors.future,
+                      },
+                      emphasised: _TickEmphasis.of(context, i),
+                      colors: colors,
+                      textStyle: theme.textTheme.labelSmall,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          // Fixed centre scrubber.
+          IgnorePointer(
+            child: Container(
+              width: 2.5,
+              height: 28,
+              decoration: BoxDecoration(
+                color: colors.primary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

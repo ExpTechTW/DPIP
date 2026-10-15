@@ -1846,6 +1846,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get mapTimelineSemanticsLabel => 'Timeline';
+
+  @override
+  String mapTimelineSemanticsValue(String era, String time, String date) {
+    return '$era $time, $date';
+  }
+
+  @override
   String get radarScanRange => 'Show scan range';
 
   @override

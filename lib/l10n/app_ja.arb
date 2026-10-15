@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "深さ",
   "mapTimelineDataTime": "データ時刻 {time}",
+  "mapTimelineSemanticsLabel": "タイムライン",
+  "mapTimelineSemanticsValue": "{era} {time}、{date}",
   "radarScanRange": "走査範囲を表示",
   "meshtasticHopLimit": "ホップ数上限",
   "@meshtasticUptime": {

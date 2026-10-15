@@ -2498,6 +2498,25 @@
     "description": "More-menu link to the ExpTech announcements website"
   },
   "mapTimelineDataTime": "Data {time}",
+  "mapTimelineSemanticsLabel": "Timeline",
+  "@mapTimelineSemanticsLabel": {
+    "description": "Screen-reader label of the map timeline scrubber, which is announced as an adjustable slider"
+  },
+  "mapTimelineSemanticsValue": "{era} {time}, {date}",
+  "@mapTimelineSemanticsValue": {
+    "description": "Screen-reader value of the map timeline slider for one frame: its era word (Past/Now/Future), its time label and its date, e.g. Past 07:10, 2026/07/13",
+    "placeholders": {
+      "era": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "radarScanRange": "Show scan range",
   "@mapLayerQpesums": {
     "description": "Name of the QPESUMS next-1-hour precipitation forecast layer in the layer picker"

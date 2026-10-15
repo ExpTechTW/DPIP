@@ -1804,6 +1804,14 @@ class AppLocalizationsYue extends AppLocalizations {
   }
 
   @override
+  String get mapTimelineSemanticsLabel => '時間軸';
+
+  @override
+  String mapTimelineSemanticsValue(String era, String time, String date) {
+    return '$era $time，$date';
+  }
+
+  @override
   String get radarScanRange => '顯示掃描範圍';
 
   @override

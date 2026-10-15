@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "Lalim",
   "mapTimelineDataTime": "Oras ng data {time}",
+  "mapTimelineSemanticsLabel": "Timeline",
+  "mapTimelineSemanticsValue": "{era} {time}, {date}",
   "radarScanRange": "Ipakita ang saklaw ng pag-scan",
   "meshtasticHopLimit": "Hop limit",
   "@meshtasticUptime": {
