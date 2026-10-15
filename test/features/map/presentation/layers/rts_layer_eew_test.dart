@@ -33,6 +33,31 @@ Eew _alert({
 );
 
 void main() {
+  test('a cancelled alert draws neither rings nor a cross', () {
+    final origin = DateTime.utc(2026, 1, 1);
+    final live = _alert(id: 'live', origin: origin);
+    final geo = eewWaveGeoJson(
+      [
+        _alert(id: 'gone', origin: origin, longitude: 120).copyWith(status: 3),
+        live,
+      ],
+      _table,
+      origin.add(const Duration(seconds: 5)),
+    );
+    final features = geo['features'] as List;
+    // Only the live alert's three ring features and its cross.
+    expect(features, hasLength(4));
+    final cross = features.singleWhere((f) => f['properties']['type'] == 'x');
+    expect(cross['geometry']['coordinates'], [121.5, 23.5]);
+
+    final onlyCancelled = eewWaveGeoJson(
+      [live.copyWith(status: 2)],
+      _table,
+      origin.add(const Duration(seconds: 5)),
+    );
+    expect(onlyCancelled['features'], isEmpty);
+  });
+
   test('no alerts renders an empty collection', () {
     final geo = eewWaveGeoJson(const [], _table, DateTime.utc(2026, 1, 1));
     expect(geo['features'], isEmpty);

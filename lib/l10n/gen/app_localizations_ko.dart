@@ -3455,4 +3455,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => '마지막 위치';
+
+  @override
+  String get eewCancelled => '취소됨';
+
+  @override
+  String get eewCancelledNotice => '발표 기관이 이 경보를 취소했습니다';
 }

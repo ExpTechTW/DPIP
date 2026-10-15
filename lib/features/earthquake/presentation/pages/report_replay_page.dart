@@ -332,7 +332,8 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                             legend: ListenableBuilder(
                               listenable: _session.eew,
                               builder: (context, _) {
-                                final hasEew = _session.eew.alerts.isNotEmpty;
+                                final hasEew =
+                                    _session.eew.alerts.hasUncancelled;
                                 return MapLegendCard(
                                   child: IntensityLegend(
                                     mode: hasEew
@@ -625,7 +626,9 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   /// Whether [_updateEew] has anything to do: an alert to draw, or rings and
   /// a fill still on the map to clear.
-  bool get _wavefrontWanted => widget.eew.alerts.isNotEmpty || !_eewSourceEmpty;
+  /// A cancelled alert has no wavefront, so it alone does not want one.
+  bool get _wavefrontWanted =>
+      widget.eew.alerts.hasUncancelled || !_eewSourceEmpty;
 
   /// Starts the wavefront ticker when the visible map has an alert to draw.
   /// It stops itself on the first tick with nothing left to draw or clear —
@@ -666,7 +669,7 @@ class _ReplayMapState extends State<_ReplayMap> {
           await controller.setLayerVisibility(_ids.boxLine, false);
         }
 
-        final hasEew = widget.eew.alerts.isNotEmpty;
+        final hasEew = widget.eew.alerts.hasUncancelled;
         if (hasEew) {
           _epicenterVisible = !_epicenterVisible;
           await controller.setLayerVisibility(
@@ -827,7 +830,7 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   void _onEewChange() {
     _syncWavefrontTicker();
-    if (widget.eew.alerts.isNotEmpty != _dotsDrawnForEew) {
+    if (widget.eew.alerts.hasUncancelled != _dotsDrawnForEew) {
       unawaited(_updateRts());
     }
   }
@@ -918,7 +921,9 @@ class _ReplayMapState extends State<_ReplayMap> {
     if (_eewUpdating) return;
     _eewUpdating = true;
     try {
-      final empty = widget.eew.alerts.isEmpty;
+      // A cancelled alert draws nothing (see [_eewGeoJson]), so a set of only
+      // cancelled alerts clears the overlay the way an empty one does.
+      final empty = !widget.eew.alerts.hasUncancelled;
       // Nothing to draw and nothing drawn — skip the per-tick round trip.
       if (empty && _eewSourceEmpty) return;
       try {
@@ -956,9 +961,11 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// churn isn't, so a repeat is skipped.
   Future<void> _updateAreaFill(MapLibreMapController controller) async {
     final alerts = widget.eew.alerts;
-    final selected = alerts.isEmpty
+    final shown = alerts.isEmpty
         ? null
         : alerts[widget.eewIndex % alerts.length];
+    // The card is showing a cancelled alert: there is no shaking to tint.
+    final selected = shown == null || shown.isCancelled ? null : shown;
     final model = _mlIntensity;
     // The model arriving mid-replay repaints the same serial from its levels.
     final key = selected == null
@@ -1035,7 +1042,7 @@ class _ReplayMapState extends State<_ReplayMap> {
 
   Map<String, dynamic> _rtsGeoJson() {
     final eventLit = widget.alerts.alerting;
-    final eewActive = widget.eew.alerts.isNotEmpty;
+    final eewActive = widget.eew.alerts.hasUncancelled;
     _dotsDrawnForEew = eewActive;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final features = <Map<String, dynamic>>[];
@@ -1136,7 +1143,7 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// radius does not depend on the box.
   List<_SWaveCover> _sWaveCovers(SeismicTravelTimeTable table, DateTime now) {
     final covers = <_SWaveCover>[];
-    for (final eew in widget.eew.alerts) {
+    for (final eew in widget.eew.alerts.uncancelled) {
       final info = eew.info;
       final elapsed = now.difference(
         DateTime.fromMillisecondsSinceEpoch(info.time, isUtc: true),
@@ -1194,7 +1201,9 @@ class _ReplayMapState extends State<_ReplayMap> {
     final table = _travelTimeTable;
     final now = widget.clock.now();
     final features = <Map<String, dynamic>>[];
-    for (final eew in widget.eew.alerts) {
+    // A cancelled alert draws nothing: its rings would show a wave the agency
+    // has just said is not coming.
+    for (final eew in widget.eew.alerts.uncancelled) {
       final info = eew.info;
       final center = info.latlng;
       final elapsed = now.difference(

@@ -71,4 +71,71 @@ void main() {
       expect(withAgency('').isJma, isFalse);
     });
   });
+
+  group('Eew.kind reads the wire status', () {
+    Eew withStatus(int status, {String author = 'cwa'}) =>
+        Eew.fromJson({...wire, 'status': status, 'author': author});
+
+    test('0 is an ordinary 預警 report', () {
+      expect(withStatus(0).kind, EewReportKind.forecast);
+      expect(withStatus(0).isCancelled, isFalse);
+      expect(withStatus(0).isWarning, isFalse);
+    });
+
+    test('1 is the agency\'s public 警報', () {
+      expect(withStatus(1).kind, EewReportKind.warning);
+      expect(withStatus(1).isWarning, isTrue);
+      expect(withStatus(1).isCancelled, isFalse);
+    });
+
+    test('3 is a CWA cancel and 2 the event server\'s cancel code', () {
+      expect(withStatus(3).isCancelled, isTrue);
+      expect(withStatus(2, author: 'nied').isCancelled, isTrue);
+      expect(withStatus(2).kind, EewReportKind.cancelled);
+    });
+
+    test('an unknown code never reads as a cancel — a misread code must '
+        'leave an alert up, not hide one', () {
+      for (final status in [-1, 4, 9, 255]) {
+        expect(withStatus(status).kind, EewReportKind.forecast);
+        expect(withStatus(status).isCancelled, isFalse);
+      }
+    });
+
+    test('a final report is not a cancel', () {
+      final last = Eew.fromJson({...wire, 'status': 0, 'final': 1});
+      expect(last.isFinal, isTrue);
+      expect(last.isCancelled, isFalse);
+    });
+  });
+
+  group('Eew.eventKey', () {
+    test('is one key per agency event, across serials and spellings', () {
+      final a = Eew.fromJson({...wire, 'serial': 1});
+      final b = Eew.fromJson({...wire, 'serial': 5, 'author': 'CWA'});
+      expect(a.eventKey, b.eventKey);
+    });
+
+    test('keeps two agencies\' same-numbered events apart', () {
+      final cwa = Eew.fromJson(wire);
+      final nied = Eew.fromJson({...wire, 'author': 'nied'});
+      expect(cwa.eventKey, isNot(nied.eventKey));
+    });
+  });
+
+  group('cancel filter', () {
+    final live = Eew.fromJson({...wire, 'id': 'live', 'status': 0});
+    final cancelled = Eew.fromJson({...wire, 'id': 'gone', 'status': 3});
+
+    test('uncancelled keeps order and drops only the cancelled', () {
+      expect([cancelled, live].uncancelled, [live]);
+      expect([live, cancelled, live].uncancelled, [live, live]);
+    });
+
+    test('hasUncancelled is false for a set of only cancelled alerts', () {
+      expect([cancelled].hasUncancelled, isFalse);
+      expect([cancelled, live].hasUncancelled, isTrue);
+      expect(const <Eew>[].hasUncancelled, isFalse);
+    });
+  });
 }

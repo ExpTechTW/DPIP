@@ -12,6 +12,10 @@
 /// aged out must never present its last snapshot as now. Calm state (no alert,
 /// or an unverified feed) renders nothing at all, so the sheet's ordinary layout
 /// is untouched outside an earthquake.
+///
+/// A cancelled alert is shown as cancelled — a neutral card with no severity
+/// border, no local estimate and no countdown — and only while nothing still
+/// in progress outranks it.
 library;
 
 import 'dart:async';
@@ -33,6 +37,7 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/widgets/eew_cancelled_notice.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +79,13 @@ class HomeEewSection extends StatelessWidget {
         alerts.isEmpty) {
       return const SizedBox.shrink();
     }
-    return _EewSectionBody(alert: alerts.first);
+    // An alert still in progress outranks a cancelled one; a cancelled card
+    // shows only when nothing else is left to warn about.
+    final alert = alerts.firstWhere(
+      (alert) => !alert.isCancelled,
+      orElse: () => alerts.first,
+    );
+    return _EewSectionBody(alert: alert);
   }
 }
 
@@ -158,7 +169,11 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
         ? null
         : context.read<TownDirectory>().byCode(code);
     final observer = _fix ?? (town == null ? null : LatLng(town.lat, town.lng));
-    final estimate = observer == null
+    // A cancelled event has no shaking to estimate and no wave to count down
+    // to — computing one would put a number on screen for an earthquake the
+    // agency has just said is not happening.
+    final cancelled = widget.alert.isCancelled;
+    final estimate = observer == null || cancelled
         ? null
         : estimateLocalShaking(widget.alert, observer, table: _table);
 
@@ -183,7 +198,9 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
         // among unrelated sections — it needs to stand out on its own, so it
         // keeps the severity border the map monitor's card also carries.
         side: BorderSide(
-          color: IntensityColors.discrete(maxIntensity.colorLevel),
+          color: cancelled
+              ? colors.outline
+              : IntensityColors.discrete(maxIntensity.colorLevel),
           width: 2,
         ),
       ),
@@ -195,9 +212,11 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
             Row(
               children: [
                 Icon(
-                  Icons.warning_amber_outlined,
+                  cancelled
+                      ? Icons.cancel_outlined
+                      : Icons.warning_amber_outlined,
                   size: 18,
-                  color: colors.error,
+                  color: cancelled ? colors.onSurfaceVariant : colors.error,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -229,11 +248,14 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                IntensityBadge(
-                  label: maxIntensity.label,
-                  color: IntensityColors.discrete(maxIntensity.colorLevel),
-                  size: 32,
-                ),
+                if (cancelled)
+                  const EewCancelledTag()
+                else
+                  IntensityBadge(
+                    label: maxIntensity.label,
+                    color: IntensityColors.discrete(maxIntensity.colorLevel),
+                    size: 32,
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -246,7 +268,10 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
                 color: colors.onSurfaceVariant,
               ),
             ),
-            if (estimate != null) ...[
+            if (cancelled) ...[
+              const SizedBox(height: AppSpacing.sm),
+              const EewCancelledNotice(),
+            ] else if (estimate != null) ...[
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [

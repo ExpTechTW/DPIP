@@ -2090,5 +2090,7 @@
   "locationTrackCleared": "이동 경로를 지웠습니다",
   "locationTrackLegendNewer": "최근",
   "locationTrackLegendOlder": "이전",
-  "locationTrackLegendLatest": "마지막 위치"
+  "locationTrackLegendLatest": "마지막 위치",
+  "eewCancelled": "취소됨",
+  "eewCancelledNotice": "발표 기관이 이 경보를 취소했습니다"
 }

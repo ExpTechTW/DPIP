@@ -2090,5 +2090,7 @@
   "locationTrackCleared": "已清除軌跡",
   "locationTrackLegendNewer": "較新",
   "locationTrackLegendOlder": "較舊",
-  "locationTrackLegendLatest": "最新位置"
+  "locationTrackLegendLatest": "最新位置",
+  "eewCancelled": "已取消",
+  "eewCancelledNotice": "發布單位已取消此速報"
 }

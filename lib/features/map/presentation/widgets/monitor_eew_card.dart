@@ -3,7 +3,8 @@
 /// its tile styling (`EewEstimateTile`), so the map overlay's numbers and
 /// colours can never drift from the monitor's. The S-wave countdown ticks
 /// against the calibrated [AppTime] clock, pauses while the map tab is not the
-/// selected branch, and stops on dispose.
+/// selected branch, and stops on dispose. A cancelled report shows as
+/// cancelled: a neutral border, a 已取消 tag, and no estimate or countdown.
 ///
 /// Lives in this feature (not `features/earthquake`) because the layering gate
 /// forbids `features/map` importing another feature's presentation; the home
@@ -28,6 +29,7 @@ import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/widgets/eew_cancelled_notice.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +147,10 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
         ? null
         : context.read<TownDirectory>().byCode(code);
     final observer = _fix ?? (town == null ? null : LatLng(town.lat, town.lng));
-    final estimate = observer == null
+    // A cancelled event has no shaking to estimate and no wave to count down
+    // to — the card says it was cancelled instead.
+    final cancelled = widget.alert.isCancelled;
+    final estimate = observer == null || cancelled
         ? null
         : estimateLocalShaking(widget.alert, observer, table: _table);
 
@@ -170,7 +175,9 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
         // calm/low reading stays close to the neutral outline it replaces,
         // a severe one is unmistakable before you even read the number.
         side: BorderSide(
-          color: IntensityColors.discrete(maxIntensity.colorLevel),
+          color: cancelled
+              ? colors.outline
+              : IntensityColors.discrete(maxIntensity.colorLevel),
           width: 2,
         ),
       ),
@@ -198,11 +205,14 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
                     widget.trailing!,
                   ],
                   const SizedBox(width: AppSpacing.sm),
-                  IntensityBadge(
-                    label: maxIntensity.label,
-                    color: IntensityColors.discrete(maxIntensity.colorLevel),
-                    size: 32,
-                  ),
+                  if (cancelled)
+                    const EewCancelledTag()
+                  else
+                    IntensityBadge(
+                      label: maxIntensity.label,
+                      color: IntensityColors.discrete(maxIntensity.colorLevel),
+                      size: 32,
+                    ),
                 ],
               ),
               const SizedBox(height: AppSpacing.xs),
@@ -215,7 +225,10 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
                   color: colors.onSurfaceVariant,
                 ),
               ),
-              if (estimate != null) ...[
+              if (cancelled) ...[
+                const SizedBox(height: AppSpacing.sm),
+                const EewCancelledNotice(),
+              ] else if (estimate != null) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [

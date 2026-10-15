@@ -340,6 +340,69 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('a cancelled alert shows as cancelled, with no estimate or '
+      'countdown even where a township is selected', (tester) async {
+    final setup = await _liveNotifier([_alert().copyWith(status: 3)]);
+    final store = await _store();
+    store.addSaved('6300100');
+    store.select(2);
+    final directory = TownDirectory(const {
+      '6300100': Town(
+        code: '6300100',
+        city: '臺北',
+        town: '中正',
+        lat: 25.03,
+        lng: 121.52,
+        cityLevel: '市',
+        townLevel: '區',
+      ),
+    });
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: _providers(
+          setup.notifier,
+          store,
+          directory: directory,
+          travelTimes: Future.value(_table()),
+          child: const Scaffold(body: HomeEewSection()),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('花蓮縣'), findsOneWidget);
+    expect(find.text('Cancelled'), findsOneWidget);
+    expect(
+      find.text('The issuing agency cancelled this alert'),
+      findsOneWidget,
+    );
+    expect(find.text('S-wave'), findsNothing);
+    expect(find.text('Estimated at my location'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('an alert still in progress outranks a cancelled one', (
+    tester,
+  ) async {
+    final setup = await _liveNotifier([
+      _alert().copyWith(id: 'gone', status: 3),
+      _alert().copyWith(
+        id: 'live',
+        info: _alert().info.copyWith(location: '臺東縣'),
+      ),
+    ]);
+    final store = await _store();
+    await tester.pumpWidget(_wrap(setup.notifier, store));
+
+    expect(find.text('臺東縣'), findsOneWidget);
+    expect(find.text('花蓮縣'), findsNothing);
+    expect(find.text('Cancelled'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('a fix that arrives after dispose does not rebuild', (
     tester,
   ) async {

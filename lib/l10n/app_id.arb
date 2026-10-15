@@ -2090,5 +2090,7 @@
   "locationTrackCleared": "Jejak dihapus",
   "locationTrackLegendNewer": "Lebih baru",
   "locationTrackLegendOlder": "Lebih lama",
-  "locationTrackLegendLatest": "Posisi terakhir"
+  "locationTrackLegendLatest": "Posisi terakhir",
+  "eewCancelled": "Dibatalkan",
+  "eewCancelledNotice": "Lembaga penerbit telah membatalkan peringatan ini"
 }

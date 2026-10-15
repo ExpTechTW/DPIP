@@ -15,6 +15,12 @@
 /// EEW cards elsewhere in the app already use, so this reads as "a card that
 /// happens to sit up here," not a raw coloured bar glued to the top of the
 /// screen.
+///
+/// A cancelled alert keeps the banner up for as long as it stays in the list,
+/// but on neutral surface colours with 已取消 in place of the report number:
+/// the user who saw the warning arrive needs to see it withdrawn, and a
+/// banner that simply vanished would read the same as one that ran its
+/// course.
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
@@ -65,8 +71,14 @@ class HomeMonitorBanner extends StatelessWidget {
 
     final eew = context.watch<RealtimeNotifier<List<Eew>>>();
     final alerts = eew.state.data ?? const <Eew>[];
-    final ink = colors.onErrorContainer;
-    final alert = alerts.first;
+    // An alert still in progress outranks a cancelled one; the banner turns
+    // neutral and says 已取消 only when nothing else is left to warn about.
+    final alert = alerts.firstWhere(
+      (alert) => !alert.isCancelled,
+      orElse: () => alerts.first,
+    );
+    final cancelled = alert.isCancelled;
+    final ink = cancelled ? colors.onSurface : colors.onErrorContainer;
 
     return IgnorePointer(
       ignoring: dismiss > 0.5,
@@ -80,7 +92,9 @@ class HomeMonitorBanner extends StatelessWidget {
               vertical: AppSpacing.xs,
             ),
             child: Material(
-              color: colors.errorContainer,
+              color: cancelled
+                  ? colors.surfaceContainerHighest
+                  : colors.errorContainer,
               // Higher than the card language elsewhere uses — this one
               // genuinely overlaps the gold support bar underneath it (see
               // Home's overlap stack), so the shadow needs to read as real
@@ -116,7 +130,9 @@ class HomeMonitorBanner extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.warning_amber_rounded,
+                          cancelled
+                              ? Icons.cancel_outlined
+                              : Icons.warning_amber_rounded,
                           size: 16,
                           color: ink,
                         ),
@@ -137,7 +153,9 @@ class HomeMonitorBanner extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              l10n.eewSerial(alert.serial),
+                              cancelled
+                                  ? l10n.eewCancelled
+                                  : l10n.eewSerial(alert.serial),
                               maxLines: 1,
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: ink.withValues(alpha: 0.8),

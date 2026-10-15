@@ -47,7 +47,8 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// [table] may be null while the bundled asset is still loading: the cross
 /// still renders, the rings wait for the table. A report whose origin is in the
 /// future (a clock skew or a just-published event) renders the cross only —
-/// never a wavefront that hasn't started.
+/// never a wavefront that hasn't started. A cancelled alert renders nothing at
+/// all: its rings would show a wave the agency has just said is not coming.
 Map<String, dynamic> eewWaveGeoJson(
   List<Eew> alerts,
   SeismicTravelTimeTable? table,
@@ -55,6 +56,7 @@ Map<String, dynamic> eewWaveGeoJson(
 ) {
   final features = <Map<String, dynamic>>[];
   for (final eew in alerts) {
+    if (eew.isCancelled) continue;
     final info = eew.info;
     final elapsed = now.difference(
       DateTime.fromMillisecondsSinceEpoch(info.time, isUtc: true),
@@ -310,7 +312,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   @override
   double get bottomChromeFraction {
     // A live alert raises the sheet: the EEW cards sit above the status strip,
-    // so a deliberate framing must leave room for the whole stack.
+    // so a deliberate framing must leave room for the whole stack. A cancelled
+    // alert still has its card up, so it counts here too.
     final live =
         _eew.state.status == RealtimeStatus.live &&
         (_eew.state.data?.isNotEmpty ?? false);
@@ -416,11 +419,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     unawaited(_pushUpdate());
   }
 
-  /// Whether an EEW is out on a live feed — which decides which stations the
-  /// monitor draws (see [rtsStationMark]).
+  /// Whether an EEW still in progress is out on a live feed — which decides
+  /// which stations the monitor draws (see [rtsStationMark]) and whether the
+  /// wavefront ticker runs. A cancelled alert is not one: it has no wavefront.
   bool get _eewActive =>
       _eew.state.status == RealtimeStatus.live &&
-      (_eew.state.data?.isNotEmpty ?? false);
+      (_eew.state.data?.hasUncancelled ?? false);
 
   /// The [_eewActive] the station dots on the map were drawn for.
   bool _dotsDrawnForEew = false;
@@ -509,14 +513,17 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
 
   /// Repaints the EEW overlay. An alert is only current while its feed is live;
   /// a stale/offline EEW feed's last snapshot must never be presented as an
-  /// expanding wavefront, so anything not live renders nothing.
+  /// expanding wavefront, so anything not live renders nothing. Nor does a
+  /// cancelled alert (see [eewWaveGeoJson]), so a set of only cancelled
+  /// alerts clears the overlay the same way calm does.
   Future<void> _pushEew() async {
     final controller = _controller;
     if (controller == null || !_added || !_surfaceVisible) return;
-    final live =
+    final listed =
         _eew.state.status == RealtimeStatus.live &&
         (_eew.state.data?.isNotEmpty ?? false);
-    await _updateAreaFill(controller, live ? _eew.state.data! : const []);
+    await _updateAreaFill(controller, listed ? _eew.state.data! : const []);
+    final live = _eewActive;
     // Nothing to draw and nothing drawn — the overwhelmingly common case.
     if (!live && _eewSourceEmpty) return;
     try {
@@ -590,7 +597,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// against what the map already holds.
   (List<(int, List<List<double>>)>, String) _survivingBoxes(RtsBoxGrid grid) {
     final box = _alerts.areas.boxes;
-    final alerts = _eew.state.data ?? const <Eew>[];
+    // A cancelled alert's wave sweeps nothing: its boxes stay live readings.
+    final alerts = (_eew.state.data ?? const <Eew>[]).uncancelled;
     final now = AppTime.utc;
     final covers = _travelTime == null
         ? const <_SWaveCover>[]
@@ -712,10 +720,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
           await controller.setLayerVisibility(_ids.boxLine, false);
         }
 
-        final hasEew =
-            _eew.state.status == RealtimeStatus.live &&
-            (_eew.state.data?.isNotEmpty ?? false);
-        if (hasEew) {
+        if (_eewActive) {
           _epicenterVisible = !_epicenterVisible;
           await controller.setLayerVisibility(
             _ids.eewEpicenter,
@@ -745,6 +750,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// With two simultaneous quakes this must use whichever alert [eewIndex]
   /// currently selects (the same one the monitor card is showing), not just
   /// the newest — the ground tint and the card are one choice, not two.
+  /// A cancelled selection clears the wash, the same as no alert.
   /// Recomputed only when *that* alert's id/serial changes — cheap to check,
   /// but the 368-town estimate + platform write isn't, so a repeat is
   /// skipped. Keying on the selected alert alone (not the whole set) means
@@ -754,9 +760,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     MapLibreMapController controller,
     List<Eew> alerts,
   ) async {
-    final selected = alerts.isEmpty
+    final shown = alerts.isEmpty
         ? null
         : alerts[eewIndex.value % alerts.length];
+    // The card is showing a cancelled alert: there is no shaking to tint.
+    final selected = shown == null || shown.isCancelled ? null : shown;
     final model = _mlIntensity;
     // The model arriving mid-alert repaints the same serial from its levels.
     final key = selected == null

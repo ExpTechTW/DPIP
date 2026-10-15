@@ -16,6 +16,10 @@
 /// the hazard overlays use; the countdown ticks against the calibrated
 /// [AppTime] clock (or the caller's own — the replay page passes its
 /// [ReplayClock]), so the seconds are right even if the device clock drifts.
+///
+/// A cancelled report keeps its header and epicentre line but trades the
+/// intensity badge for a 已取消 tag and the estimate tiles for a notice — a
+/// withdrawn event has no shaking to estimate and nothing to count down to.
 library;
 
 import 'dart:async';
@@ -34,6 +38,7 @@ import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
+import 'package:dpip/shared/widgets/eew_cancelled_notice.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +150,10 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
         ? null
         : context.read<TownDirectory>().byCode(code);
     final observer = _fix ?? (town == null ? null : LatLng(town.lat, town.lng));
-    final estimate = observer == null
+    // A cancelled event has no shaking to estimate and no wave to count down
+    // to — the card says it was cancelled instead.
+    final cancelled = widget.eew.isCancelled;
+    final estimate = observer == null || cancelled
         ? null
         : estimateLocalShaking(widget.eew, observer, table: _table);
 
@@ -166,12 +174,16 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
       children: [
         Row(
           children: [
-            Icon(Icons.warning_amber_rounded, size: 15, color: colors.error),
+            Icon(
+              cancelled ? Icons.cancel_outlined : Icons.warning_amber_rounded,
+              size: 15,
+              color: cancelled ? colors.onSurfaceVariant : colors.error,
+            ),
             const SizedBox(width: 4),
             Text(
               'EEW',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: colors.error,
+                color: cancelled ? colors.onSurfaceVariant : colors.error,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.4,
               ),
@@ -202,11 +214,14 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
               widget.trailing!,
               const SizedBox(width: AppSpacing.sm),
             ],
-            IntensityBadge(
-              label: maxIntensity.label,
-              color: IntensityColors.discrete(maxIntensity.colorLevel),
-              size: 32,
-            ),
+            if (cancelled)
+              const EewCancelledTag()
+            else
+              IntensityBadge(
+                label: maxIntensity.label,
+                color: IntensityColors.discrete(maxIntensity.colorLevel),
+                size: 32,
+              ),
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -235,7 +250,10 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
             ),
           ],
         ),
-        if (estimate != null) ...[
+        if (cancelled) ...[
+          const SizedBox(height: AppSpacing.sm),
+          const EewCancelledNotice(),
+        ] else if (estimate != null) ...[
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [

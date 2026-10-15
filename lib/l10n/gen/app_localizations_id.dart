@@ -3531,4 +3531,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => 'Posisi terakhir';
+
+  @override
+  String get eewCancelled => 'Dibatalkan';
+
+  @override
+  String get eewCancelledNotice =>
+      'Lembaga penerbit telah membatalkan peringatan ini';
 }

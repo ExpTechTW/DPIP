@@ -268,4 +268,31 @@ void main() {
       reason: 'cleared stays cleared without further uploads',
     );
   });
+
+  test(
+    'a feed of only cancelled alerts draws nothing, like a calm one',
+    () async {
+      final eewElapsed = _FakeElapsed();
+      final built = await _build(
+        alerts: [_alert().copyWith(status: 3)],
+        eewElapsed: eewElapsed,
+      );
+      final controller = _EewRecordingController();
+      expect(built.eewChannel.state.status, RealtimeStatus.live);
+
+      await built.layer.render(controller);
+      await pumpEventQueue();
+      for (var i = 0; i < 5; i++) {
+        built.rtsElapsed.advance(const Duration(seconds: 1));
+        built.rtsChannel.recomputeStatus();
+        await pumpEventQueue();
+      }
+
+      expect(
+        controller.eewPushes,
+        isEmpty,
+        reason: 'a cancelled alert has no wavefront to draw',
+      );
+    },
+  );
 }

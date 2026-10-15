@@ -30,11 +30,11 @@ class _FakeSpeech implements SpeechService {
   void dispose() {}
 }
 
-Eew _alert(int serial) => Eew(
+Eew _alert(int serial, {String id = 'event', int status = 0}) => Eew(
   agency: 'CWA',
-  id: 'event',
+  id: id,
   serial: serial,
-  status: 0,
+  status: status,
   isFinal: false,
   info: const EewInfo(
     time: 0,
@@ -211,4 +211,110 @@ void main() {
       controller.dispose();
     },
   );
+
+  group('cancelled reports', () {
+    test('a cancelled report is never announced', () async {
+      final speech = _FakeSpeech();
+      final controller = MonitorEewAnnouncementController(
+        speech,
+        ForegroundEewAnnouncementGate(),
+        (_) async => (scale: 4, isLocal: true),
+      );
+      controller.setActive(true);
+      controller.update(
+        _live(_alert(1, status: 3)),
+        languageTag: 'zh-TW',
+        format: (_) => 'should not be said',
+      );
+      await _flush();
+
+      expect(speech.spoken, isEmpty);
+      expect(speech.stops, 0);
+      controller.dispose();
+    });
+
+    test('a cancel for the alert being spoken cuts the phrase off and '
+        'releases the held warning', () async {
+      final speech = _FakeSpeech();
+      final gate = ForegroundEewAnnouncementGate();
+      final controller = MonitorEewAnnouncementController(
+        speech,
+        gate,
+        (_) async => (scale: 4, isLocal: true),
+      );
+      controller.setActive(true);
+      controller.update(
+        _live(_alert(1)),
+        languageTag: 'zh-TW',
+        format: (_) => '震度四級',
+      );
+      await _flush();
+      var displayed = false;
+      await gate.submit(() async => displayed = true);
+      final stopsBefore = speech.stops;
+
+      controller.update(
+        _live(_alert(2, status: 3)),
+        languageTag: 'zh-TW',
+        format: (_) => 'should not be said',
+      );
+      await _flush();
+
+      expect(speech.spoken, ['zh-TW:震度四級']);
+      expect(speech.stops, greaterThan(stopsBefore));
+      expect(displayed, isTrue);
+      controller.dispose();
+    });
+
+    test('a cancel for the spoken event stops it even while another alert '
+        'stays up, and the other is not re-announced', () async {
+      final speech = _FakeSpeech();
+      final controller = MonitorEewAnnouncementController(
+        speech,
+        ForegroundEewAnnouncementGate(),
+        (alert) async => (scale: alert.serial, isLocal: true),
+      );
+      controller.setActive(true);
+      controller.update(
+        RealtimeState(
+          status: RealtimeStatus.live,
+          data: [_alert(1, id: 'b')],
+        ),
+        languageTag: 'zh-TW',
+        format: (estimate) => 'b${estimate.scale}',
+      );
+      await _flush();
+      controller.update(
+        RealtimeState(
+          status: RealtimeStatus.live,
+          data: [
+            _alert(2, id: 'a'),
+            _alert(1, id: 'b'),
+          ],
+        ),
+        languageTag: 'zh-TW',
+        format: (estimate) => 'a${estimate.scale}',
+      );
+      await _flush();
+      expect(speech.spoken, ['zh-TW:b1', 'zh-TW:a2']);
+      final stopsBefore = speech.stops;
+
+      controller.update(
+        RealtimeState(
+          status: RealtimeStatus.live,
+          data: [
+            _alert(3, id: 'a', status: 3),
+            _alert(1, id: 'b'),
+          ],
+        ),
+        languageTag: 'zh-TW',
+        format: (estimate) => 'again${estimate.scale}',
+      );
+      await _flush();
+
+      expect(speech.stops, greaterThan(stopsBefore));
+      expect(speech.spoken, ['zh-TW:b1', 'zh-TW:a2']);
+      controller.dispose();
+    });
+  });
 }
