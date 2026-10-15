@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -67,6 +69,8 @@ class _RecordingChannel implements RealtimeChannelBase {
   void recomputeStatus() => log.add('$id:recompute');
   @override
   Future<void> refreshNow() async => log.add('$id:refresh');
+  @override
+  void networkChanged() => log.add('$id:network');
   @override
   void dispose() => log.add('$id:dispose');
 }
@@ -154,5 +158,52 @@ void main() {
     await Future<void>.value();
     expect(source.calls, greaterThanOrEqualTo(1), reason: 'immediate resync');
     expect(ticker.startCount, 1, reason: 'periodic sync restarted');
+  });
+
+  group('network changes', () {
+    late StreamController<void> changes;
+
+    setUp(() {
+      changes = StreamController<void>();
+      service = RealtimeService(
+        ServerClock(_FixedClock(), _FakeElapsed(), source),
+        ticker: ticker,
+        networkChanges: changes.stream,
+      );
+      log.clear();
+      service.register(a);
+      service.register(b);
+    });
+
+    test('each change reaches every channel once started', () async {
+      service.startAll();
+      log.clear();
+      changes.add(null);
+      await pumpEventQueue();
+      expect(log, ['a:network', 'b:network']);
+    });
+
+    test('nothing listens before startAll', () {
+      expect(changes.hasListener, isFalse);
+      service.startAll();
+      expect(changes.hasListener, isTrue);
+    });
+
+    test('a change after an interruption still reaches the channels', () async {
+      // Behind a notification shade the socket is kept on purpose; a change of
+      // network is exactly what kills it, so the shade must not mute this.
+      service.startAll();
+      service.onInterrupted();
+      log.clear();
+      changes.add(null);
+      await pumpEventQueue();
+      expect(log, ['a:network', 'b:network']);
+    });
+
+    test('dispose stops listening', () {
+      service.startAll();
+      service.dispose();
+      expect(changes.hasListener, isFalse);
+    });
   });
 }

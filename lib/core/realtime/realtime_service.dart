@@ -12,18 +12,26 @@ import 'package:dpip/core/realtime/ticker.dart';
 /// [onBackground] directly (the `AppLifecycleListener` adapter lives in
 /// `realtime_lifecycle.dart`) and the resync cadence via an injected [Ticker].
 class RealtimeService {
+  /// [networkChanges] fires once per real change of the device's network
+  /// (production: `NetworkChanges.stream` from `core/platform/`); each event is
+  /// fanned out to every channel from [startAll] until [dispose]. Null — tests,
+  /// and any platform without the channel — means connections are left to
+  /// notice a dead network through their own silence limit.
   RealtimeService(
     this._clock, {
     this._ticker = const SystemTicker(),
     this._clockSyncInterval = const Duration(seconds: 60),
+    this._networkChanges,
   });
 
   final ServerClock _clock;
   final Ticker _ticker;
   final Duration _clockSyncInterval;
+  final Stream<void>? _networkChanges;
   final List<RealtimeChannelBase> _channels = [];
 
   TickerHandle? _clockSyncHandle;
+  StreamSubscription<void>? _networkSubscription;
 
   /// The shared corrected clock (also each channel's injected `Clock`).
   ServerClock get clock => _clock;
@@ -51,6 +59,20 @@ class RealtimeService {
       }
     }
     _startClockSync();
+    _networkSubscription ??= _networkChanges?.listen(
+      (_) => _onNetworkChanged(),
+    );
+  }
+
+  /// The device moved to a different network: every channel's source gets the
+  /// chance to replace a connection bound to the old one. Not gated on the
+  /// lifecycle — a source paused for the background ignores it itself, and
+  /// one merely interrupted (a notification shade) is holding a socket that
+  /// the change has just killed.
+  void _onNetworkChanged() {
+    for (final channel in _channels) {
+      channel.networkChanged();
+    }
   }
 
   /// App went to background: pause every channel (stop polling, keep state),
@@ -97,6 +119,8 @@ class RealtimeService {
   /// Disposes every channel and stops the resync ticker.
   void dispose() {
     _stopClockSync();
+    _networkSubscription?.cancel();
+    _networkSubscription = null;
     for (final channel in _channels) {
       channel.dispose();
     }

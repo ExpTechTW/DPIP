@@ -176,8 +176,13 @@ event-recency. Neither trusts an open socket on its own: the servers write a
 that receives nothing at all for `sseSilenceLimit` (2.2 × the ping interval,
 `sse_client.dart`) is half-open — a handover or NAT timeout that never sent a
 FIN — so the source answers `Err` and replaces it, and silence never reads as
-calm. Reconnect backoff is jittered ±50 % so a region's audience does not
-reconnect in lockstep. `RealtimeService` + `AppLifecycleListener`
+calm. A change of network (`core/platform/network_changes.dart`: Android's
+default-network callback, iOS's `NWPathMonitor`) is fanned out by
+`RealtimeService` to every source, and an SSE source drops its connection at
+once and reopens after a random 1–2 s settle with its backoff reset, rather
+than waiting out the silence limit; the backoff itself is jittered ±50 % so a
+region's audience does not reconnect in lockstep. `RealtimeService` +
+`AppLifecycleListener`
 pause polling on background and resume (recompute status → resync clock →
 refetch) on foreground; background alerting is push's job. A safety-critical
 feed that is `stale`/`offline` must never be presented as current.
