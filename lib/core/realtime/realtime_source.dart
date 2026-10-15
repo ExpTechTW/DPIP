@@ -57,6 +57,21 @@ abstract class RealtimeSource<T> {
   /// so the channel ages the feed with its ordinary logic.
   void resume() {}
 
+  /// The device's network changed underneath the app — Wi-Fi to cellular, one
+  /// Wi-Fi to another, offline to online.
+  ///
+  /// A poll source needs nothing here: its next request goes out on whatever
+  /// network is current. A **connection-holding** source is different, because
+  /// its socket is bound to the network it was opened on. When that network
+  /// goes, the socket rarely says so: no FIN arrives, and the connection just
+  /// stops delivering until something notices. Overriding this lets the source
+  /// replace it at once instead of waiting out its own silence limit.
+  ///
+  /// Called whether or not the app is in the foreground; a source that has
+  /// released its transport for the background simply ignores it, because
+  /// resuming opens a fresh connection anyway.
+  void networkChanged() {}
+
   /// Releases any transport the source holds (e.g. an open SSE connection). A
   /// poll source is stateless per [fetch] and uses this no-op default; a
   /// connection-holding source (SSE) overrides it. The channel calls this from

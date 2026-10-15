@@ -40,6 +40,7 @@
 		9F74F772B6E8760DD47AB2FE /* Sounds/normal.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B916667D1B2356583B174E80 /* Sounds/normal.aiff */; };
 		A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */; };
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
+		AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000H01 /* NetworkPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
 		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
 		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
@@ -166,6 +167,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/rain.aiff; sourceTree = "<group>"; };
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
+		AA0000000000000000000H01 /* NetworkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
@@ -446,6 +448,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				AA0000000000000000000C01 /* CompassPlugin.swift */,
+				AA0000000000000000000H01 /* NetworkPlugin.swift */,
 				AA0000000000000000000E01 /* ScreenWakePlugin.swift */,
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
@@ -753,6 +756,7 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				AA0000000000000000000C02 /* CompassPlugin.swift in Sources */,
+				AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */,
 				AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */,
 				AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */,
 				AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */,

@@ -1,5 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Network changes (NetworkChannel): a normal permission, granted at
+         install, that the default-network callback requires. Declared here
+         rather than left to whichever plugin's manifest happens to merge it. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Notifications (awesome_notifications): vibrate, wake the screen for
          critical alerts, and reschedule after a reboot. -->

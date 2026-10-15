@@ -278,6 +278,47 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     _attempt = 0;
   }
 
+  /// Replaces the connection after a change of network, with the backoff
+  /// reset and after a short random settle of 1–2 s.
+  ///
+  /// The current connection is dropped at once rather than trusted until the
+  /// new one is up: it was bound to the old network, and the common cases — a
+  /// handover to cellular, a drop to no network at all — leave it dead without
+  /// any error to say so. Answering `Err` for the second or two until the new
+  /// connection speaks is honest; answering from the old one would claim a
+  /// liveness nothing is backing.
+  ///
+  /// The settle is for the new network, whose routes and DNS are often not
+  /// usable in the first instant, and for the server: a cell handover moves a
+  /// whole area's phones at once, and a fixed delay would bring them all back
+  /// in the same instant. A further change inside the settle restarts it.
+  ///
+  /// Before the first [fetch], or while paused for the background, there is
+  /// nothing to replace — the next open is on the new network anyway.
+  @override
+  void networkChanged() {
+    if (_disposed || _paused || !_started) return;
+    Log.info('[$_label] network changed — replacing the SSE connection');
+    _generation++; // a backoff counting down belongs to the old network
+    _attempt = 0;
+    _pending?.cancel();
+    _pending = null;
+    _subscription?.cancel();
+    _subscription = null;
+    _connected = false;
+    _hasSnapshot = false;
+    _lastByteMark = null;
+    final generation = _generation;
+    _delay(_networkSettleDelay()).then((_) {
+      if (_disposed || generation != _generation) return;
+      _openConnection();
+    });
+  }
+
+  /// 1–2 s, uniformly at random, to the millisecond.
+  Duration _networkSettleDelay() =>
+      Duration(milliseconds: 1000 + _random.nextInt(1000));
+
   void _ensureStarted() {
     if (_started || _disposed || _paused) return;
     _started = true;

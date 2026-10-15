@@ -40,6 +40,11 @@ abstract interface class RealtimeChannelBase {
   /// Forces an immediate poll, completing when a poll result has landed.
   Future<void> refreshNow();
 
+  /// Tells the source the device's network changed, so a held-open connection
+  /// bound to the old one can be replaced (see
+  /// [RealtimeSource.networkChanged]). Polling itself is unaffected.
+  void networkChanged();
+
   /// Cancels polling and closes the stream.
   void dispose();
 }
@@ -158,6 +163,12 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
   Future<void> refreshNow() async {
     _recompute();
     await _fetch();
+  }
+
+  @override
+  void networkChanged() {
+    if (_disposed) return;
+    _source.networkChanged();
   }
 
   @override

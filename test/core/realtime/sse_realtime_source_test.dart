@@ -572,6 +572,105 @@ void main() {
     });
   });
 
+  group('SseRealtimeSource — network change', () {
+    test(
+      'drops the connection at once and reopens after a 1–2 s settle',
+      () async {
+        final h = _Harness();
+        await h.source.fetch();
+        h.current.add(const SseEvent(data: 'a'));
+        await pumpEventQueue();
+        final old = h.current;
+
+        h.random.next = 0.25;
+        h.source.networkChanged();
+        expect(old.hasListener, isFalse, reason: 'bound to the old network');
+        expect(
+          (await h.source.fetch()).isOk,
+          isFalse,
+          reason:
+              'nothing vouches for the feed until the new connection speaks',
+        );
+        expect(h.waits.single, const Duration(milliseconds: 1250));
+        expect(h.connects, hasLength(1), reason: 'not before the settle');
+
+        h.delays.single.complete();
+        await pumpEventQueue();
+        expect(h.connects, hasLength(2));
+        h.current.add(const SseEvent(data: 'b'));
+        await pumpEventQueue();
+        expect((await h.source.fetch()).valueOrNull, 'b');
+      },
+    );
+
+    test('the settle spans 1 to 2 seconds', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      h.random.next = 0;
+      h.source.networkChanged();
+      h.random.next = 0.9999;
+      h.source.networkChanged();
+      expect(h.waits, const [
+        Duration(seconds: 1),
+        Duration(milliseconds: 1999),
+      ]);
+    });
+
+    test('resets the backoff and orphans the one counting down', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      await h.dropAndReconnect();
+      await h.dropAndReconnect();
+      await h.current.close(); // a third drop: its backoff is now 3s
+      await pumpEventQueue();
+      expect(h.connects, hasLength(3));
+
+      h.source.networkChanged();
+      h.delays[h.delays.length - 2].complete(); // the old backoff fires late
+      await pumpEventQueue();
+      expect(
+        h.connects,
+        hasLength(3),
+        reason: 'it belonged to the old network',
+      );
+
+      h.delays.last.complete(); // the settle
+      await pumpEventQueue();
+      expect(h.connects, hasLength(4));
+
+      // The new connection fails before speaking: back to the first step.
+      h.random.next = 0.5;
+      await h.current.close();
+      await pumpEventQueue();
+      expect(h.waits.last, const Duration(seconds: 1));
+    });
+
+    test('changes in quick succession open one connection', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      h.source
+        ..networkChanged() // Wi-Fi lost
+        ..networkChanged(); // cellular up
+      for (final delay in h.delays) {
+        delay.complete();
+      }
+      await pumpEventQueue();
+      expect(h.connects, hasLength(2));
+      expect(h.connects.where((c) => c.hasListener), hasLength(1));
+    });
+
+    test('is ignored before the first fetch and while paused', () async {
+      final h = _Harness();
+      h.source.networkChanged();
+      expect(h.delays, isEmpty);
+
+      await h.source.fetch();
+      h.source.pause();
+      h.source.networkChanged();
+      expect(h.delays, isEmpty, reason: 'resuming opens a fresh one anyway');
+    });
+  });
+
   group('SseRealtimeSource — named payload event', () {
     test(
       'a topic-named frame is read when that is the payload event',

@@ -17,6 +17,7 @@ import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/platform/install_source.dart';
+import 'package:dpip/core/platform/network_changes.dart';
 import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
 import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/core/network/dio_client.dart';
@@ -303,7 +304,13 @@ Future<void> bootstrap() async {
   );
   AppTime.install(serverClock);
   AppTime.sync().ignore();
-  final realtimeService = RealtimeService(serverClock);
+  // Network changes reach the realtime spine so a feed's held-open connection
+  // is replaced as soon as the network it was bound to goes, instead of when
+  // its silence limit runs out.
+  final realtimeService = RealtimeService(
+    serverClock,
+    networkChanges: NetworkChanges.stream,
+  );
 
   // Push: best-effort and off the first frame — a missing push environment or
   // slow FCM registration must never gate launch. The token is only consumed

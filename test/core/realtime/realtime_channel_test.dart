@@ -70,6 +70,11 @@ class _FakeSource extends RealtimeSource<int> {
 
   @override
   bool isIgnorableFailure(Failure failure) => ignorable?.call(failure) ?? false;
+
+  int networkChanges = 0;
+
+  @override
+  void networkChanged() => networkChanges++;
 }
 
 /// Flushes pending microtasks so broadcast emissions and unawaited fetches land.
@@ -352,5 +357,15 @@ void main() {
 
     expect(source.fetchCount, fetches);
     expect(events.length, emissions);
+  });
+
+  test('a network change reaches the source, never after dispose', () async {
+    channel.start();
+    channel.networkChanged();
+    expect(source.networkChanges, 1);
+
+    channel.dispose();
+    channel.networkChanged();
+    expect(source.networkChanges, 1);
   });
 }
