@@ -313,26 +313,36 @@ jobs:
       # the GitHub release, the AAB is the only thing Play accepts.
       - name: Build
         env:
-          # Only the label: gradle takes its versionCode from Flutter's
-          # `--build-number` above, so there is one source for it rather than
-          # two that can disagree.
+          # Only the label under a name the build reads: gradle takes its
+          # versionCode from Flutter's `--build-number` below, so there is one
+          # source for it rather than two that can disagree.
           DPIP_LABEL: ${{ needs.version.outputs.label }}
+          # The rest under names nothing in the build reads, for the same
+          # reason. They are in the environment at all so the script expands
+          # them itself: a `${{ }}` in a `run:` is pasted into its text before
+          # bash parses it, which leaves every value one quote away from being
+          # read as code. These come from git and nobody types them, but the
+          # habit costs nothing, and it is the one every step here follows.
+          RELEASE_TRAIN: ${{ needs.version.outputs.train }}
+          RELEASE_CODE: ${{ needs.version.outputs.code }}
+          RELEASE_DATE: ${{ needs.version.outputs.date }}
+          RELEASE_PRERELEASE: ${{ needs.version.outputs.prerelease }}
         run: |
           # One number for both stores — see tool/release/version.sh for why they can
           # be aligned. It is also what the release advertises and what the
           # update check compares, so nothing anywhere has to translate.
-          COMMON="--build-name=${{ needs.version.outputs.train }} \
-                  --build-number=${{ needs.version.outputs.code }} \
-                  --dart-define=DPIP_LABEL=${{ needs.version.outputs.label }} \
-                  --dart-define=DPIP_CODE=${{ needs.version.outputs.code }} \
-                  --dart-define=DPIP_TRAIN=${{ needs.version.outputs.train }} \
-                  --dart-define=DPIP_DATE=${{ needs.version.outputs.date }} \
-                  --dart-define=DPIP_PRERELEASE=${{ needs.version.outputs.prerelease }}"
+          COMMON="--build-name=$RELEASE_TRAIN \
+                  --build-number=$RELEASE_CODE \
+                  --dart-define=DPIP_LABEL=$DPIP_LABEL \
+                  --dart-define=DPIP_CODE=$RELEASE_CODE \
+                  --dart-define=DPIP_TRAIN=$RELEASE_TRAIN \
+                  --dart-define=DPIP_DATE=$RELEASE_DATE \
+                  --dart-define=DPIP_PRERELEASE=$RELEASE_PRERELEASE"
           if [ "${{ matrix.platform }}" = "android" ]; then
             bash tool/dev/build.sh android $COMMON
             bash tool/dev/build.sh bundle $COMMON
             mv build/app/outputs/flutter-apk/app-release.apk \
-               "DPIP-${{ needs.version.outputs.label }}.apk"
+               "DPIP-$DPIP_LABEL.apk"
           else
             # Two steps rather than `flutter build ipa`. Flutter passes
             # `-allowProvisioningUpdates` but never the App Store Connect
@@ -359,7 +369,7 @@ jobs:
             if [ -z "$ipa" ]; then
               echo "::error::export produced no .ipa"; ls -R "$RUNNER_TEMP/ipa" || true; exit 1
             fi
-            mv "$ipa" "DPIP-${{ needs.version.outputs.label }}.ipa"
+            mv "$ipa" "DPIP-$DPIP_LABEL.ipa"
           fi
 
       # Resolved at run time, not hardcoded: the directory carries the AGP task
@@ -477,15 +487,19 @@ jobs:
           # a rate-limited release produced a note that credited nobody and said
           # nothing about why.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Through the environment rather than pasted into the script, as in
+          # `Build`.
+          RELEASE_LABEL: ${{ needs.version.outputs.label }}
+          RELEASE_CODE: ${{ needs.version.outputs.code }}
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             bash tool/release/notes.sh \
-              "${{ needs.version.outputs.label }}" \
-              "${{ needs.version.outputs.code }}" --release > NOTES.md
+              "$RELEASE_LABEL" \
+              "$RELEASE_CODE" --release > NOTES.md
           else
             bash tool/release/notes.sh \
-              "${{ needs.version.outputs.label }}" \
-              "${{ needs.version.outputs.code }}" > NOTES.md
+              "$RELEASE_LABEL" \
+              "$RELEASE_CODE" > NOTES.md
           fi
           cat NOTES.md
 
@@ -493,6 +507,8 @@ jobs:
         id: publish
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_LABEL: ${{ needs.version.outputs.label }}
+          RELEASE_PRERELEASE: ${{ needs.version.outputs.prerelease }}
         run: |
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             tag="${GITHUB_REF_NAME}"
@@ -503,14 +519,14 @@ jobs:
             # An earlier `snapshot/` prefix put the tags somewhere the counter
             # did not look, so every run computed `a` and this step died on a
             # tag that already existed.
-            tag="${{ needs.version.outputs.label }}"
+            tag="$RELEASE_LABEL"
             git tag "$tag"
             git push origin "$tag"
           fi
           gh release create "$tag" \
-            --title "${{ needs.version.outputs.label }}" \
+            --title "$RELEASE_LABEL" \
             --notes-file NOTES.md \
-            --prerelease="${{ needs.version.outputs.prerelease }}" \
+            --prerelease="$RELEASE_PRERELEASE" \
             artifacts/*
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
@@ -537,6 +553,7 @@ jobs:
           # Without it the release lookup runs unauthenticated, at 60 requests
           # an hour shared across everything on this runner's IP.
           GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.publish.outputs.tag }}
         run: |
           if [ -z "${DISCORD_WEBHOOK:-}" ]; then
             echo "::notice::DISCORD_WEBHOOK is not set — nothing announced"
@@ -545,5 +562,5 @@ jobs:
           # A warning, not a failure. The build is published and the artifacts
           # are downloadable by the time this runs; turning the job red over an
           # announcement would say the release did not happen.
-          python3 tool/release/discord.py "${{ steps.publish.outputs.tag }}" ||
+          python3 tool/release/discord.py "$RELEASE_TAG" ||
             echo "::warning::Discord announcement failed — the release itself is fine"

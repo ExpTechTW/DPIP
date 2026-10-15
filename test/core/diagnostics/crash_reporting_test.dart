@@ -83,11 +83,17 @@ void main() {
       final workflow = File(
         '${Directory.current.path}/.github/workflows/release.yml',
       ).readAsStringSync();
+      // Through the step's environment, not pasted into the script: the
+      // workflow keeps every `${{ }}` out of `run:` text.
       expect(
         workflow,
         contains(
-          r'--dart-define=DPIP_PRERELEASE=${{ needs.version.outputs.prerelease }}',
+          r'RELEASE_PRERELEASE: ${{ needs.version.outputs.prerelease }}',
         ),
+      );
+      expect(
+        workflow,
+        contains(r'--dart-define=DPIP_PRERELEASE=$RELEASE_PRERELEASE'),
       );
       // And that output is false for a tag, which is what production ships.
       expect(
