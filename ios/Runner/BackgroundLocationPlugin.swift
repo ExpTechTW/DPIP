@@ -14,8 +14,9 @@ import UIKit
 ///   • **visit monitoring** — cheaply catches "settled into a new place".
 /// All three run off the low-power cell/Wi-Fi subsystem (no continuous GPS), and
 /// `kCLLocationAccuracyKilometer` — still far finer than township targeting —
-/// keeps energy minimal. Every trigger funnels into one report path that POSTs
-/// and re-centres the region. Config is persisted to `UserDefaults`, so a
+/// keeps energy minimal. Every trigger funnels into one path that re-centres the
+/// region and hands the fix to `LocationReportSender`, which keeps it until the
+/// server has confirmed it. Config is persisted to `UserDefaults`, so a
 /// terminated relaunch re-arms everything in `register(with:)`.
 ///
 /// `allowsBackgroundLocationUpdates` requires the `location` background mode and
@@ -25,24 +26,14 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
 
   private let manager = CLLocationManager()
   private let defaults = UserDefaults.standard
+  private let sender = LocationReportSender.shared
 
-  private static let enabledKey = "dpip.bgloc.enabled"
-  private static let tokenKey = "dpip.bgloc.token"
-  private static let versionKey = "dpip.bgloc.version"
-  private static let platformKey = "dpip.bgloc.platform"
-  private static let lastLatKey = "dpip.bgloc.lastLat"
-  private static let lastLngKey = "dpip.bgloc.lastLng"
-  // Diagnostics only — none of this drives behaviour. "Tried at T and failed"
-  // is what separates "never fired" from "fires but cannot reach the server",
-  // and neither was previously distinguishable from the outside.
-  private static let lastReportAtKey = "dpip.bgloc.lastReportAt"
-  private static let lastReportOkKey = "dpip.bgloc.lastReportOk"
-  private static let lastReportCodeKey = "dpip.bgloc.lastReportCode"
+  private static let enabledKey = LocationReportStore.enabledKey
+  private static let tokenKey = LocationReportStore.tokenKey
+  private static let versionKey = LocationReportStore.versionKey
+  private static let platformKey = LocationReportStore.platformKey
   private static let regionId = "dpip.bg.region"
   private static let regionRadius: CLLocationDistance = 250
-  // Skip a report within this distance of the last one, so SLC + region + visit
-  // firing for the same move don't produce duplicate POSTs.
-  private static let reportThresholdM: CLLocationDistance = 150
 
   /// Callers waiting on an "upgrade to Always" prompt — see `requestAlways`.
   private var alwaysWaiters: [FlutterResult] = []
@@ -92,6 +83,9 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       defaults.set(token, forKey: Self.tokenKey)
       defaults.set(version, forKey: Self.versionKey)
       defaults.set(platform, forKey: Self.platformKey)
+      // A fix that has been waiting for a token — or for this one, after the
+      // last was replaced — goes out now, under the token just stored.
+      sender.retryPending("start")
       manager.requestAlwaysAuthorization()
       // Only arm once Always is granted; arming before the async authorization
       // resolves silently fails. locationManagerDidChangeAuthorization arms it
@@ -105,6 +99,7 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
     case "stop":
       defaults.set(false, forKey: Self.enabledKey)
       stopMonitoring()
+      sender.discardPending("background reporting stopped")
       result(nil)
     case "diagnostics":
       result(diagnostics())
@@ -136,9 +131,12 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
   /// The Dart side reads a missing key as null, which is the same thing.
   private func diagnostics() -> [String: Any] {
     let status = manager.authorizationStatus
-    let regionArmed = manager.monitoredRegions.contains { $0.identifier == Self.regionId }
+    let region = manager.monitoredRegions.first { $0.identifier == Self.regionId }
+    let regionArmed = region != nil
     let always = status == .authorizedAlways
-    let lastReportAt = defaults.double(forKey: Self.lastReportAtKey)
+    let store = sender.store
+    let lastAttemptAt = defaults.double(forKey: LocationReportStore.lastAttemptAtKey)
+    let pending = store.pending
 
     var out: [String: Any] = [
       "enabled": defaults.bool(forKey: Self.enabledKey),
@@ -159,16 +157,29 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
         "\(manager.monitoredRegions.count) region(s) monitored",
         manager.allowsBackgroundLocationUpdates
           ? "background updates allowed" : "background updates NOT allowed",
+        pending.map {
+          "fix pending since \(Int(Date().timeIntervalSince($0.since)))s, \($0.failures) failed"
+        } ?? "nothing pending",
       ].joined(separator: ", "),
     ]
-    if lastReportAt != 0 {
-      out["lastReportAt"] = Int(lastReportAt * 1000)
-      out["lastReportOk"] = defaults.bool(forKey: Self.lastReportOkKey)
-      out["lastReportCode"] = defaults.integer(forKey: Self.lastReportCodeKey)
+    // Attempt and success apart, the same keys Android uses: a device whose
+    // last attempt failed can still have delivered an hour ago, and one whose
+    // last attempt succeeded may have been failing for a day before it.
+    if lastAttemptAt != 0 {
+      out["lastAttemptAt"] = Int(lastAttemptAt * 1000)
+      out["lastAttemptOk"] = defaults.bool(forKey: LocationReportStore.lastAttemptOkKey)
+      out["lastAttemptCode"] = defaults.integer(forKey: LocationReportStore.lastAttemptCodeKey)
     }
-    if defaults.object(forKey: Self.lastLatKey) != nil {
-      out["centreLat"] = defaults.double(forKey: Self.lastLatKey)
-      out["centreLng"] = defaults.double(forKey: Self.lastLngKey)
+    if let lastSuccessAt = store.lastSuccessAt {
+      out["lastSuccessAt"] = Int(lastSuccessAt.timeIntervalSince1970 * 1000)
+      out["lastSuccessCode"] = defaults.integer(forKey: LocationReportStore.lastSuccessCodeKey)
+    }
+    // Where the region really sits, read back from Core Location. The stored
+    // point is the last *delivered* fix now, which a failed report leaves
+    // behind while the region moves on.
+    if let centre = (region as? CLCircularRegion)?.center {
+      out["centreLat"] = centre.latitude
+      out["centreLng"] = centre.longitude
     }
     return out
   }
@@ -273,6 +284,7 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       manager.authorizationStatus == .authorizedAlways
     else { return }
     startMonitoring()
+    sender.retryPending("relaunch")
   }
 
   // MARK: - CLLocationManagerDelegate
@@ -311,7 +323,10 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
   }
 
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    // Best-effort — SLC / region / visits keep running.
+    // Best-effort — SLC / region / visits keep running. The wake itself is
+    // still a moment to send a fix that is waiting.
+    guard defaults.bool(forKey: Self.enabledKey) else { return }
+    sender.retryPending("wake without a fix")
   }
 
   private func process(_ coordinate: CLLocationCoordinate2D) {
@@ -319,27 +334,15 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       return
     }
     recenterRegion(coordinate)
-    // Before the distance gate on purpose. `shouldReport` exists to spare the
+    // Before the distance gate on purpose. The gate exists to spare the
     // server, and the local track has no server to spare — dropping a fix the
     // OS took the trouble to deliver, because a report would have been too
     // soon, would put holes in the history for a reason that has nothing to do
     // with it.
     LocationTrackStore.shared.record(
       latitude: coordinate.latitude, longitude: coordinate.longitude)
-    guard shouldReport(coordinate) else { return }
-    report(coordinate)
-    defaults.set(coordinate.latitude, forKey: Self.lastLatKey)
-    defaults.set(coordinate.longitude, forKey: Self.lastLngKey)
-  }
-
-  // De-dup: skip a report within `reportThresholdM` of the last reported point.
-  private func shouldReport(_ coordinate: CLLocationCoordinate2D) -> Bool {
-    guard defaults.object(forKey: Self.lastLatKey) != nil else { return true }
-    let last = CLLocation(
-      latitude: defaults.double(forKey: Self.lastLatKey),
-      longitude: defaults.double(forKey: Self.lastLngKey))
-    let now = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-    return now.distance(from: last) >= Self.reportThresholdM
+    // The distance gate, the pending fix and the retries are the sender's.
+    sender.process(coordinate)
   }
 
   private func recenterRegion(_ coordinate: CLLocationCoordinate2D) {
@@ -352,41 +355,5 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
     region.notifyOnEntry = false
     region.notifyOnExit = true
     manager.startMonitoring(for: region)
-  }
-
-  private func report(_ coordinate: CLLocationCoordinate2D) {
-    guard
-      let token = defaults.string(forKey: Self.tokenKey),
-      let version = defaults.string(forKey: Self.versionKey)
-    else { return }
-    let platform = defaults.integer(forKey: Self.platformKey)
-    // coreExclusiveApi is tnn1-only (no failover) — matches ApiTier.coreExclusiveApi.
-    let urlString =
-      "https://api.core-tnn1.exptech.dev/api/v2/location/\(platform)/\(token)/\(version)/\(coordinate.latitude),\(coordinate.longitude)"
-    guard let url = URL(string: urlString) else { return }
-
-    // A short-lived background task so the GET can finish after a background
-    // relaunch (the wake window is brief); cancel it if the window closes first.
-    var task = UIBackgroundTaskIdentifier.invalid
-    let dataTask = URLSession.shared.dataTask(with: url) { [weak self] _, response, _ in
-      let code = (response as? HTTPURLResponse)?.statusCode ?? -1
-      if let defaults = self?.defaults {
-        defaults.set(Date().timeIntervalSince1970, forKey: Self.lastReportAtKey)
-        defaults.set((200..<300).contains(code), forKey: Self.lastReportOkKey)
-        defaults.set(code, forKey: Self.lastReportCodeKey)
-      }
-      if task != .invalid {
-        UIApplication.shared.endBackgroundTask(task)
-        task = .invalid
-      }
-    }
-    task = UIApplication.shared.beginBackgroundTask {
-      dataTask.cancel()
-      if task != .invalid {
-        UIApplication.shared.endBackgroundTask(task)
-        task = .invalid
-      }
-    }
-    dataTask.resume()
   }
 }
