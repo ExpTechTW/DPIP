@@ -1,5 +1,7 @@
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/stale_if_error.dart';
 
 /// DPIP disaster-event (事件) endpoints — **API v1**, still on the legacy host.
 ///
@@ -23,17 +25,24 @@ class EventApi {
   /// Nationwide event history, newest first.
   ///
   /// `https://api-1.exptech.dev/api/v1/dpip/history/list`
-  Future<List<dynamic>> getHistoryList() async =>
-      (await _client.get(_tier, '/api/v1/dpip/history/list') as List?) ??
-      const [];
+  ///
+  /// History is stale-if-error ([ApiClientStaleIfError.getOrSaved]): offline,
+  /// the list saved last time comes back marked as a saved copy. Past notices
+  /// stay true; the marker tells the reader newer ones may be missing.
+  Future<Fetched<List<dynamic>>> getHistoryList() =>
+      _history('/api/v1/dpip/history/list');
 
   /// Event history affecting the township [region] (a 3-digit code), newest
-  /// first.
+  /// first. Stale-if-error, like [getHistoryList].
   ///
   /// `https://api-1.exptech.dev/api/v1/dpip/history/{region}`
-  Future<List<dynamic>> getHistoryRegion(String region) async =>
-      (await _client.get(_tier, '/api/v1/dpip/history/$region') as List?) ??
-      const [];
+  Future<Fetched<List<dynamic>>> getHistoryRegion(String region) =>
+      _history('/api/v1/dpip/history/$region');
+
+  Future<Fetched<List<dynamic>>> _history(String path) async {
+    final fetched = await _client.getOrSaved(_tier, path);
+    return (data: fetched.data as List? ?? const [], stale: fetched.stale);
+  }
 
   /// Nationwide *active* events, newest first.
   ///

@@ -54,11 +54,11 @@ ResponseBody _json(String body, int status) => ResponseBody.fromString(
 /// four near-identical test bodies.
 final Map<String, (Future<List<dynamic>> Function(EventApi), String)> _calls = {
   'getHistoryList': (
-    (api) => api.getHistoryList(),
+    (api) async => (await api.getHistoryList()).data,
     '/api/v1/dpip/history/list',
   ),
   'getHistoryRegion': (
-    (api) => api.getHistoryRegion('063'),
+    (api) async => (await api.getHistoryRegion('063')).data,
     '/api/v1/dpip/history/063',
   ),
   'getRealtimeList': (

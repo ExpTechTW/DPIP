@@ -63,6 +63,23 @@ void main() {
     expect(find.text('03:04'), findsNWidgets(2));
   });
 
+  testWidgets('saved history is listed under a banner, never as current', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      _Repo(
+        Ok([
+          _event('1', 'Quake'),
+        ], stale: const Staleness(failure: NetworkFailure('offline'))),
+      ),
+    );
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text('Quake'), findsOneWidget);
+    expect(find.text(l10n.freshnessSavedCopyUnknownAge), findsOneWidget);
+    expect(find.text(l10n.commonFetchFailed), findsNothing);
+  });
+
   testWidgets('an empty feed is not an error', (tester) async {
     await _pump(tester, _Repo(const Ok([])));
     expect(find.byIcon(Icons.inbox_outlined), findsOneWidget);

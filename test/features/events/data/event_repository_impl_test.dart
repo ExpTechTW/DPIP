@@ -3,6 +3,8 @@
 /// does.
 library;
 
+import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/events/data/event_api.dart';
 import 'package:dpip/features/events/data/event_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,16 +15,18 @@ class _Api implements EventApi {
   var historyAll = false;
   var realtimeAll = false;
 
+  Staleness? stale;
+
   @override
-  Future<List<dynamic>> getHistoryList() async {
+  Future<Fetched<List<dynamic>>> getHistoryList() async {
     historyAll = true;
-    return [_event('h-all', 20), 'skip'];
+    return (data: [_event('h-all', 20), 'skip'], stale: stale);
   }
 
   @override
-  Future<List<dynamic>> getHistoryRegion(String region) async {
+  Future<Fetched<List<dynamic>>> getHistoryRegion(String region) async {
     historyRegion = region;
-    return [_event('h-town', 10)];
+    return (data: <dynamic>[_event('h-town', 10)], stale: stale);
   }
 
   @override
@@ -72,6 +76,25 @@ void main() {
       expect(townHistory.valueOrNull!.single.id, 'h-town');
       expect(active.valueOrNull!.single.id, 'r-all');
       expect(townActive.valueOrNull!.single.id, 'r-town');
+    },
+  );
+
+  test(
+    'saved history keeps its marker; active events never have one',
+    () async {
+      final since = DateTime.utc(2026, 10, 16, 1);
+      final api = _Api()
+        ..stale = Staleness(
+          failure: const NetworkFailure('down'),
+          since: since,
+        );
+      final repo = EventRepositoryImpl(api);
+
+      final history = await repo.events(regionCode: '710');
+      final active = await repo.activeEvents();
+
+      expect((history as Ok).stale?.since, since);
+      expect((active as Ok).stale, isNull);
     },
   );
 }

@@ -13,11 +13,14 @@ class EventRepositoryImpl implements EventRepository {
 
   @override
   Future<Result<List<Event>>> events({String? regionCode}) =>
-      guardResult(() async {
+      guardFetched(() async {
         final raw = regionCode == null
             ? await _api.getHistoryList()
             : await _api.getHistoryRegion(regionCode);
-        return parseEvents(raw, regionCode: regionCode);
+        return (
+          data: parseEvents(raw.data, regionCode: regionCode),
+          stale: raw.stale,
+        );
       });
 
   @override
