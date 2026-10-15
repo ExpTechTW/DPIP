@@ -9,6 +9,7 @@ import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/diagnostics/crash_reporting.dart';
 import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
+import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_api.dart';
@@ -498,6 +499,15 @@ Future<void> bootstrap() async {
     '(durable+settings ${durableMs}ms, cache ${cacheMs}ms, '
     'tiles ${tileMs}ms, towns ${townMs}ms, version ${versionMs}ms)',
   );
+  // The same numbers, kept as numbers for a prerelease's launch summary
+  // (core/diagnostics/startup_report.dart). Absolute for `durable` and
+  // `ready`; the rest are the waits above.
+  StartupMarks.mark('durable', durableMs);
+  StartupMarks.mark('cache_wait', cacheMs);
+  StartupMarks.mark('tiles_wait', tileMs);
+  StartupMarks.mark('towns_wait', townMs);
+  StartupMarks.mark('version_wait', versionMs);
+  StartupMarks.mark('ready', Log.sinceStartMs);
   runApp(
     DpipApp(
       deps: deps,

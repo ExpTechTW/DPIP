@@ -129,7 +129,10 @@ for a prerelease and, because the SDK remembers the switch across launches,
 turns it off again on every production launch. `ReportingCrashSink` then
 drops transport failures, repeats, and anything past eight reports a session.
 Only errors and explicitly set keys are sent — never `Log` lines, some of which
-carry coordinates.
+carry coordinates. A profile or release prerelease also files one launch
+summary per session (`startup_report.dart`): the bootstrap phase marks plus
+20 s of frame timings taken while Home or the map tab is on screen, as a single
+non-fatal `StartupPerformanceReport` with the numbers in custom keys.
 
 ## State management
 
