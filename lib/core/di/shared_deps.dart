@@ -1,4 +1,5 @@
 import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
@@ -62,6 +63,7 @@ class SharedDeps {
     required this.widgetLocationCatalogCoordinator,
     required this.locationService,
     required this.deviceLocationReporter,
+    this.deviceRegistration,
     required this.backgroundLocation,
     required this.locationMonitor,
     required this.permissionHealth,
@@ -128,6 +130,11 @@ class SharedDeps {
   /// Distance-triggered device-location reporter (foreground). Started by the
   /// service host after GPS permission is granted.
   final DeviceLocationReporter deviceLocationReporter;
+
+  /// Re-registers the push token with the backend when it changes and once a
+  /// day. Optional so a test that never reaches the services host need not
+  /// build one; bootstrap always does.
+  final DeviceRegistration? deviceRegistration;
 
   /// Native background device-location reporting (terminated/background). The
   /// terminated-state counterpart to [deviceLocationReporter].

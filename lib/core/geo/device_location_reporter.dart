@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -30,11 +31,18 @@ import 'package:dpip/core/settings/settings_store.dart';
 /// a fresh one — otherwise foreground reporting would stay dead until relaunch.
 ///
 /// Foreground only; the app-closed case is the native background-location task.
+///
+/// [reportNow] sends one fix through the same gates for a caller with no move
+/// to report — `DeviceRegistration`, re-registering a push token. Requests go
+/// out one at a time, each re-checking the throttle after the one before it,
+/// so a registration and a move that arrive together cost one request rather
+/// than a request and a 429.
 class DeviceLocationReporter {
   DeviceLocationReporter({
     required this._positions,
     required this._onMoved,
     required this._settings,
+    this._onReported,
     this.minUploadInterval = const Duration(seconds: 60),
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
@@ -43,6 +51,12 @@ class DeviceLocationReporter {
   final Future<bool> Function(GpsFix fix) _onMoved;
   final SettingsStore _settings;
   final DateTime Function() _now;
+
+  /// Called after every report the server answered with a 2xx.
+  final Future<void> Function()? _onReported;
+
+  /// The request before this one; the next waits for it.
+  Future<void> _queue = Future<void>.value();
 
   /// Minimum gap between `/v2/location` POSTs.
   final Duration minUploadInterval;
@@ -100,7 +114,19 @@ class DeviceLocationReporter {
     // when the server report fails or is skipped for a missing push token /
     // throttle window.
     if (!_fixes.isClosed) _fixes.add(fix);
+    await _send(fix);
+  }
 
+  /// Reports [fix] now, subject to the same throttle as a move. Never throws.
+  Future<ReportOutcome> reportNow(GpsFix fix) => _send(fix);
+
+  Future<ReportOutcome> _send(GpsFix fix) {
+    final attempt = _queue.then((_) => _attempt(fix));
+    _queue = attempt.then((_) {});
+    return attempt;
+  }
+
+  Future<ReportOutcome> _attempt(GpsFix fix) async {
     final nowMs = _now().toUtc().millisecondsSinceEpoch;
     final lastMs = _settings.getInt(SettingKeys.deviceLocationUpdatedAtMs);
     // `nowMs - lastMs >= 0` is not redundant: the stored stamp survives a
@@ -114,19 +140,37 @@ class DeviceLocationReporter {
     if (since != null &&
         since >= 0 &&
         since < minUploadInterval.inMilliseconds) {
-      return; // silent — no API, no log
+      return ReportOutcome.throttled; // silent — no API, no log
     }
 
     try {
       final attempted = await _onMoved(fix);
-      if (attempted) {
-        await _settings.setInt(SettingKeys.deviceLocationUpdatedAtMs, nowMs);
-      }
+      if (!attempted) return ReportOutcome.noToken;
+      await _settings.setInt(SettingKeys.deviceLocationUpdatedAtMs, nowMs);
     } catch (error, stackTrace) {
       // Cool down after hard failures (incl. HTTP 429) so we don't retry-storm.
       await _settings.setInt(SettingKeys.deviceLocationUpdatedAtMs, nowMs);
       Log.handle(error, stackTrace, 'updateDeviceLocation');
+      return _isFinal(error) ? ReportOutcome.rejected : ReportOutcome.failed;
     }
+    try {
+      await _onReported?.call();
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'updateDeviceLocation: onReported');
+    }
+    return ReportOutcome.sent;
+  }
+
+  /// A client error the same request would meet again. 408 and 429 are the
+  /// two that mean "not now" instead.
+  static bool _isFinal(Object error) {
+    if (error is! DioException) return false;
+    final status = error.response?.statusCode;
+    return status != null &&
+        status >= 400 &&
+        status < 500 &&
+        status != 408 &&
+        status != 429;
   }
 
   /// Stops reporting; safe to [start] again.
@@ -140,4 +184,22 @@ class DeviceLocationReporter {
     stop();
     _fixes.close();
   }
+}
+
+/// What happened to one report.
+enum ReportOutcome {
+  /// The server answered with a 2xx.
+  sent,
+
+  /// Inside the one-a-minute window — not attempted.
+  throttled,
+
+  /// No push token yet — not attempted.
+  noToken,
+
+  /// Refused for good: a 4xx other than 408 or 429.
+  rejected,
+
+  /// No answer, a 5xx, a 408 or a 429 — worth trying again later.
+  failed,
 }

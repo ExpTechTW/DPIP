@@ -82,6 +82,9 @@ class _FakeNotificationService implements NotificationService {
   String? get token => null;
 
   @override
+  Stream<String> get tokenChanges => const Stream<String>.empty();
+
+  @override
   ForegroundEewAnnouncementGate get foregroundEewGate =>
       throw UnimplementedError();
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -214,5 +215,91 @@ void main() {
 
     expect(seen, [(lat: 23.5, lng: 120.4)]);
     await positions.close();
+  });
+
+  group('reportNow', () {
+    DioException http(int status) => DioException(
+      requestOptions: RequestOptions(path: '/v2/location'),
+      response: Response<void>(
+        requestOptions: RequestOptions(path: '/v2/location'),
+        statusCode: status,
+      ),
+      type: DioExceptionType.badResponse,
+    );
+
+    test('says what happened, and only a 2xx counts as reported', () async {
+      var t = DateTime.utc(2024, 1, 1);
+      Object? failure;
+      var token = true;
+      var reported = 0;
+      final reporter = DeviceLocationReporter(
+        positions: () => const Stream.empty(),
+        settings: await settings(),
+        now: () => t,
+        onReported: () async => reported++,
+        onMoved: (fix) async {
+          final error = failure;
+          if (error != null) throw error;
+          return token;
+        },
+      );
+      const fix = (lat: 25.0, lng: 121.0);
+      Future<ReportOutcome> next() {
+        t = t.add(const Duration(minutes: 2));
+        return reporter.reportNow(fix);
+      }
+
+      expect(await reporter.reportNow(fix), ReportOutcome.sent);
+      expect(reported, 1);
+      expect(await reporter.reportNow(fix), ReportOutcome.throttled);
+
+      token = false;
+      expect(await next(), ReportOutcome.noToken);
+      token = true;
+
+      for (final (status, outcome) in [
+        (400, ReportOutcome.rejected),
+        (404, ReportOutcome.rejected),
+        (408, ReportOutcome.failed),
+        (429, ReportOutcome.failed),
+        (500, ReportOutcome.failed),
+      ]) {
+        failure = http(status);
+        expect(await next(), outcome, reason: '$status');
+      }
+      failure = DioException(
+        requestOptions: RequestOptions(path: '/v2/location'),
+        type: DioExceptionType.connectionError,
+      );
+      expect(await next(), ReportOutcome.failed);
+      failure = StateError('boom');
+      expect(await next(), ReportOutcome.failed);
+      expect(reported, 1);
+    });
+
+    test('a report and a move arriving together send one request', () async {
+      final positions = StreamController<GpsFix>();
+      final gate = Completer<void>();
+      var calls = 0;
+      final reporter = DeviceLocationReporter(
+        positions: () => positions.stream,
+        settings: await settings(),
+        now: () => DateTime.utc(2024, 1, 1),
+        onMoved: (fix) async {
+          calls++;
+          await gate.future;
+          return true;
+        },
+      )..start();
+
+      positions.add((lat: 25.0, lng: 121.0));
+      await pumpEventQueue();
+      final registration = reporter.reportNow((lat: 25.0, lng: 121.0));
+      gate.complete();
+
+      expect(await registration, ReportOutcome.throttled);
+      expect(calls, 1);
+      await positions.close();
+    });
   });
 }

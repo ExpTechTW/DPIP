@@ -196,6 +196,20 @@ abstract final class SettingKeys {
     'location.deviceLocationUpdatedAtMs',
   );
 
+  /// SHA-256 of the last push token a `/v2/location` report was answered for
+  /// with a 2xx — a hash, because the token itself is already stored under
+  /// [pushToken]. See `DeviceRegistration`.
+  static const SettingKey<String> registeredTokenHash = SettingKey<String>._(
+    'location.registeredTokenHash',
+  );
+
+  /// When a `/v2/location` report from the app last got a 2xx (calibrated UTC
+  /// millis). Unlike [deviceLocationUpdatedAtMs] this is never written for a
+  /// failure, so it can say how stale the server's record is.
+  static const SettingKey<int> deviceReportedAtMs = SettingKey<int>._(
+    'location.deviceReportedAtMs',
+  );
+
   /// The radio `MeshLink` keeps reconnecting to (BLE id), and its name for
   /// display. Their presence *is* the intent to stay connected — removed by
   /// `MeshLink.detach()`, which is the only thing that stops reconnection.

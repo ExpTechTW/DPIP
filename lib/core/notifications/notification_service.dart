@@ -63,6 +63,14 @@ class NotificationService {
   /// The last push token, or null before registration.
   String? get token => _settings.getString(SettingKeys.pushToken);
 
+  final StreamController<String> _tokenChanges =
+      StreamController<String>.broadcast();
+
+  /// The token, each time a **different** one is stored — the first one
+  /// included. The backend only learns a token from a location report, so a
+  /// new one has to be reported; nothing else would until the device moved.
+  Stream<String> get tokenChanges => _tokenChanges.stream;
+
   /// Whether the OS has granted notification permission.
   Future<bool> isAllowed() => AwesomeNotifications().isNotificationAllowed();
 
@@ -534,8 +542,13 @@ class NotificationService {
   Future<void> _storeToken(String token, {required bool isApns}) async {
     if (token.isEmpty) return;
     if (isApns != Platform.isIOS) return;
+    final changed = token != this.token;
     await _settings.setString(SettingKeys.pushToken, token);
     Log.debug('Push token stored (${isApns ? 'APNs' : 'FCM'})');
+    if (changed) {
+      Log.info('push token changed');
+      _tokenChanges.add(token);
+    }
   }
 
   /// The APNs device token, read from the iOS side that receives it.
