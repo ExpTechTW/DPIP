@@ -403,6 +403,26 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('of several alerts, the card shows the most relevant one, not '
+      'the feed\'s first', (tester) async {
+    final setup = await _liveNotifier([
+      _alert().copyWith(
+        id: 'weak',
+        info: _alert().info.copyWith(location: '宜蘭縣', max: 2),
+      ),
+      _alert().copyWith(
+        id: 'strong',
+        info: _alert().info.copyWith(location: '臺東縣', max: 6),
+      ),
+    ]);
+    final store = await _store();
+    await tester.pumpWidget(_wrap(setup.notifier, store));
+
+    expect(find.text('臺東縣'), findsOneWidget);
+    expect(find.text('宜蘭縣'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('a fix that arrives after dispose does not rebuild', (
     tester,
   ) async {

@@ -16,7 +16,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Eew {
 
-@JsonKey(name: 'author') String get agency; String get id; int get serial; int get status;@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) bool get isFinal;@JsonKey(name: 'eq') EewInfo get info;
+@JsonKey(name: 'author') String get agency; String get id; int get serial; int get status;@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) bool get isFinal;@JsonKey(name: 'eq') EewInfo get info;/// When this report was issued (Unix ms, server-stamped) — the top-level
+/// `time`, as opposed to the origin in [EewInfo.time]. Null when a payload
+/// leaves it out; the newest-report ordering then falls back to origin.
+@JsonKey(name: 'time') int? get reportTime;
 /// Create a copy of Eew
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +32,16 @@ $EewCopyWith<Eew> get copyWith => _$EewCopyWithImpl<Eew>(this as Eew, _$identity
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info)&&(identical(other.reportTime, reportTime) || other.reportTime == reportTime));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,agency,id,serial,status,isFinal,info);
+int get hashCode => Object.hash(runtimeType,agency,id,serial,status,isFinal,info,reportTime);
 
 @override
 String toString() {
-  return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info)';
+  return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info, reportTime: $reportTime)';
 }
 
 
@@ -49,7 +52,7 @@ abstract mixin class $EewCopyWith<$Res>  {
   factory $EewCopyWith(Eew value, $Res Function(Eew) _then) = _$EewCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'author') String agency, String id, int serial, int status,@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) bool isFinal,@JsonKey(name: 'eq') EewInfo info
+@JsonKey(name: 'author') String agency, String id, int serial, int status,@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) bool isFinal,@JsonKey(name: 'eq') EewInfo info,@JsonKey(name: 'time') int? reportTime
 });
 
 
@@ -66,7 +69,7 @@ class _$EewCopyWithImpl<$Res>
 
 /// Create a copy of Eew
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? agency = null,Object? id = null,Object? serial = null,Object? status = null,Object? isFinal = null,Object? info = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? agency = null,Object? id = null,Object? serial = null,Object? status = null,Object? isFinal = null,Object? info = null,Object? reportTime = freezed,}) {
   return _then(Eew(
 agency: null == agency ? _self.agency : agency // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
@@ -74,7 +77,8 @@ as String,serial: null == serial ? _self.serial : serial // ignore: cast_nullabl
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as int,isFinal: null == isFinal ? _self.isFinal : isFinal // ignore: cast_nullable_to_non_nullable
 as bool,info: null == info ? _self.info : info // ignore: cast_nullable_to_non_nullable
-as EewInfo,
+as EewInfo,reportTime: freezed == reportTime ? _self.reportTime : reportTime // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 /// Create a copy of Eew
@@ -168,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'author')  String agency,  String id,  int serial,  int status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)  bool isFinal, @JsonKey(name: 'eq')  EewInfo info)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'author')  String agency,  String id,  int serial,  int status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)  bool isFinal, @JsonKey(name: 'eq')  EewInfo info, @JsonKey(name: 'time')  int? reportTime)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Eew() when $default != null:
-return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_that.info);case _:
+return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_that.info,_that.reportTime);case _:
   return orElse();
 
 }
@@ -189,10 +193,10 @@ return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'author')  String agency,  String id,  int serial,  int status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)  bool isFinal, @JsonKey(name: 'eq')  EewInfo info)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'author')  String agency,  String id,  int serial,  int status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)  bool isFinal, @JsonKey(name: 'eq')  EewInfo info, @JsonKey(name: 'time')  int? reportTime)  $default,) {final _that = this;
 switch (_that) {
 case _Eew():
-return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_that.info);case _:
+return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_that.info,_that.reportTime);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +213,10 @@ return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'author')  String agency,  String id,  int serial,  int status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)  bool isFinal, @JsonKey(name: 'eq')  EewInfo info)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'author')  String agency,  String id,  int serial,  int status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)  bool isFinal, @JsonKey(name: 'eq')  EewInfo info, @JsonKey(name: 'time')  int? reportTime)?  $default,) {final _that = this;
 switch (_that) {
 case _Eew() when $default != null:
-return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_that.info);case _:
+return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_that.info,_that.reportTime);case _:
   return null;
 
 }
@@ -224,7 +228,7 @@ return $default(_that.agency,_that.id,_that.serial,_that.status,_that.isFinal,_t
 @JsonSerializable()
 
 class _Eew implements Eew {
-  const _Eew({@JsonKey(name: 'author') required this.agency, required this.id, required this.serial, required this.status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) required this.isFinal, @JsonKey(name: 'eq') required this.info});
+  const _Eew({@JsonKey(name: 'author') required this.agency, required this.id, required this.serial, required this.status, @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) required this.isFinal, @JsonKey(name: 'eq') required this.info, @JsonKey(name: 'time') this.reportTime});
   factory _Eew.fromJson(Map<String, dynamic> json) => _$EewFromJson(json);
 
 @override@JsonKey(name: 'author') final  String agency;
@@ -233,6 +237,10 @@ class _Eew implements Eew {
 @override final  int status;
 @override@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) final  bool isFinal;
 @override@JsonKey(name: 'eq') final  EewInfo info;
+/// When this report was issued (Unix ms, server-stamped) — the top-level
+/// `time`, as opposed to the origin in [EewInfo.time]. Null when a payload
+/// leaves it out; the newest-report ordering then falls back to origin.
+@override@JsonKey(name: 'time') final  int? reportTime;
 
 /// Create a copy of Eew
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info)&&(identical(other.reportTime, reportTime) || other.reportTime == reportTime));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,agency,id,serial,status,isFinal,info);
+int get hashCode => Object.hash(runtimeType,agency,id,serial,status,isFinal,info,reportTime);
 
 @override
 String toString() {
-  return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info)';
+  return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info, reportTime: $reportTime)';
 }
 
 
@@ -267,7 +275,7 @@ abstract mixin class _$EewCopyWith<$Res> implements $EewCopyWith<$Res> {
   factory _$EewCopyWith(_Eew value, $Res Function(_Eew) _then) = __$EewCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'author') String agency, String id, int serial, int status,@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) bool isFinal,@JsonKey(name: 'eq') EewInfo info
+@JsonKey(name: 'author') String agency, String id, int serial, int status,@JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool) bool isFinal,@JsonKey(name: 'eq') EewInfo info,@JsonKey(name: 'time') int? reportTime
 });
 
 
@@ -284,7 +292,7 @@ class __$EewCopyWithImpl<$Res>
 
 /// Create a copy of Eew
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? agency = null,Object? id = null,Object? serial = null,Object? status = null,Object? isFinal = null,Object? info = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? agency = null,Object? id = null,Object? serial = null,Object? status = null,Object? isFinal = null,Object? info = null,Object? reportTime = freezed,}) {
   return _then(_Eew(
 agency: null == agency ? _self.agency : agency // ignore: cast_nullable_to_non_nullable
 as String,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
@@ -292,7 +300,8 @@ as String,serial: null == serial ? _self.serial : serial // ignore: cast_nullabl
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as int,isFinal: null == isFinal ? _self.isFinal : isFinal // ignore: cast_nullable_to_non_nullable
 as bool,info: null == info ? _self.info : info // ignore: cast_nullable_to_non_nullable
-as EewInfo,
+as EewInfo,reportTime: freezed == reportTime ? _self.reportTime : reportTime // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

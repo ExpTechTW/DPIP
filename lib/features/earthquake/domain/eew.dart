@@ -21,6 +21,11 @@ abstract class Eew with _$Eew {
     @JsonKey(name: 'final', fromJson: boolishInt, toJson: intFromBool)
     required bool isFinal,
     @JsonKey(name: 'eq') required EewInfo info,
+
+    /// When this report was issued (Unix ms, server-stamped) — the top-level
+    /// `time`, as opposed to the origin in [EewInfo.time]. Null when a payload
+    /// leaves it out; the newest-report ordering then falls back to origin.
+    @JsonKey(name: 'time') int? reportTime,
   }) = _Eew;
 
   factory Eew.fromJson(Map<String, dynamic> json) => _$EewFromJson(json);

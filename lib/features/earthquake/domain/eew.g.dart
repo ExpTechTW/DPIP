@@ -15,6 +15,7 @@ _Eew _$EewFromJson(Map<String, dynamic> json) => _Eew(
   status: (json['status'] as num).toInt(),
   isFinal: boolishInt(json['final']),
   info: EewInfo.fromJson(json['eq'] as Map<String, dynamic>),
+  reportTime: (json['time'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$EewToJson(_Eew instance) => <String, dynamic>{
@@ -24,6 +25,7 @@ Map<String, dynamic> _$EewToJson(_Eew instance) => <String, dynamic>{
   'status': instance.status,
   'final': intFromBool(instance.isFinal),
   'eq': instance.info.toJson(),
+  'time': instance.reportTime,
 };
 
 _EewInfo _$EewInfoFromJson(Map<String, dynamic> json) => _EewInfo(
