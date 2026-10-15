@@ -438,9 +438,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     );
   }
 
-  // Background ("Always"): only meaningful after foreground is granted; on
-  // Android 11+ and on iOS after "While Using" it lives only in Settings, so
-  // this almost always ends in the dialog rather than a prompt.
+  // Background ("Always"): only meaningful after foreground is granted. The
+  // system offers it in place — iOS's "Change to Always Allow" prompt, Android
+  // 11+'s own location page — and only once that has been used up does this
+  // end in the dialog that sends the user to Settings.
   Future<void> _grantBackground() {
     final location = context.read<LocationService>();
     final l10n = AppLocalizations.of(context);

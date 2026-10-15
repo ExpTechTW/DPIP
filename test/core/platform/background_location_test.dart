@@ -37,6 +37,27 @@ void main() {
     });
   });
 
+  test('requestAlways answers with the status the user ended on', () async {
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      calls.add(call);
+      return 'always';
+    });
+
+    expect(await BackgroundLocationService.requestAlways(channel), 'always');
+    expect(calls.single.method, 'requestAlways');
+  });
+
+  test('requestAlways is null where nothing can answer', () async {
+    messenger.setMockMethodCallHandler(channel, null);
+    expect(await BackgroundLocationService.requestAlways(channel), isNull);
+
+    messenger.setMockMethodCallHandler(
+      channel,
+      (_) async => throw PlatformException(code: 'boom'),
+    );
+    expect(await BackgroundLocationService.requestAlways(channel), isNull);
+  });
+
   test('stop invokes the stop method', () async {
     final service = BackgroundLocationService(
       platform: 0,

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:provider/provider.dart';
 
 Widget _wrap(Widget child, {TextScaler? textScaler}) => MaterialApp(
@@ -242,9 +243,20 @@ void main() {
       AwesomeNotificationsPlatform.resetInstance();
     });
 
-    Widget host({ValueChanged<PermissionState>? onChanged}) {
+    Widget host({
+      ValueChanged<PermissionState>? onChanged,
+      ph.PermissionStatus alwaysAnswer = ph.PermissionStatus.permanentlyDenied,
+    }) {
       final notifications = NotificationService(SettingsStore.inMemory());
-      final location = LocationService(const TownDirectory({}));
+      final location = LocationService(
+        const TownDirectory({}),
+        requestAlways: () async {
+          if (alwaysAnswer == ph.PermissionStatus.granted) {
+            geo.permission = LocationPermission.always;
+          }
+          return alwaysAnswer;
+        },
+      );
       return MultiProvider(
         providers: [
           Provider.value(value: notifications),
@@ -365,6 +377,26 @@ void main() {
       await tester.tap(find.text('Cancel'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
+    });
+
+    testWidgets('an in-app Always grant needs no trip to Settings', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 1600);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      geo.permission = LocationPermission.whileInUse;
+      await tester.pumpWidget(host(alwaysAnswer: ph.PermissionStatus.granted));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.tap(find.text('Grant').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Grant it in Settings'), findsNothing);
+      expect(geo.permission, LocationPermission.always);
     });
   });
 }

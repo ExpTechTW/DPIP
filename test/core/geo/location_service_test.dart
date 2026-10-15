@@ -8,6 +8,7 @@ import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 TownDirectory _dir() => TownDirectory.fromJson({
   '100': {
@@ -293,27 +294,6 @@ void _platformCases() {
       expect(await location.backgroundGranted(), isFalse);
       geo.checkError = null;
 
-      geo.permission = LocationPermission.always;
-      expect(await location.requestBackground(), PermissionOutcome.granted);
-      geo.permission = LocationPermission.deniedForever;
-      expect(
-        await location.requestBackground(),
-        PermissionOutcome.needsSettings,
-      );
-      geo
-        ..permission = LocationPermission.whileInUse
-        ..afterRequest = LocationPermission.always;
-      expect(await location.requestBackground(), PermissionOutcome.granted);
-      geo
-        ..permission = LocationPermission.whileInUse
-        ..afterRequest = LocationPermission.whileInUse;
-      expect(
-        await location.requestBackground(),
-        PermissionOutcome.needsSettings,
-      );
-      geo.throwRequest = true;
-      expect(await location.requestBackground(), PermissionOutcome.denied);
-
       messenger.setMockMethodCallHandler(settingsChannel, (call) async {
         expect(call.method, 'openAppSettings');
         return true;
@@ -323,6 +303,122 @@ void _platformCases() {
         throw PlatformException(code: 'settings');
       });
       expect(await location.openSettings(), isFalse);
+    });
+
+    group('requestBackground', () {
+      late List<String> asked;
+      late ph.PermissionStatus answer;
+
+      setUp(() {
+        asked = [];
+        answer = ph.PermissionStatus.granted;
+      });
+
+      // Records each in-app "Always" request and lands it on [answer], the way
+      // the OS would.
+      LocationService location() => LocationService(
+        _dir(),
+        requestAlways: () async {
+          asked.add('always');
+          if (answer == ph.PermissionStatus.granted) {
+            geo.permission = LocationPermission.always;
+          }
+          return answer;
+        },
+      );
+
+      test('already Always asks nothing', () async {
+        geo.permission = LocationPermission.always;
+        expect(await location().requestBackground(), PermissionOutcome.granted);
+        expect(asked, isEmpty);
+      });
+
+      test('a permanent refusal goes straight to Settings', () async {
+        geo.permission = LocationPermission.deniedForever;
+        expect(
+          await location().requestBackground(),
+          PermissionOutcome.needsSettings,
+        );
+        expect(asked, isEmpty);
+      });
+
+      test(
+        'While Using is upgraded in the app, not through Settings',
+        () async {
+          geo.permission = LocationPermission.whileInUse;
+          expect(
+            await location().requestBackground(),
+            PermissionOutcome.granted,
+          );
+          expect(asked, ['always']);
+        },
+      );
+
+      test('keeping While Using after the prompt means Settings', () async {
+        geo.permission = LocationPermission.whileInUse;
+        for (final refused in [
+          ph.PermissionStatus.permanentlyDenied,
+          ph.PermissionStatus.denied,
+          ph.PermissionStatus.limited,
+        ]) {
+          answer = refused;
+          expect(
+            await location().requestBackground(),
+            PermissionOutcome.needsSettings,
+            reason: '$refused',
+          );
+        }
+      });
+
+      test('a restricted device is not sent to Settings', () async {
+        geo.permission = LocationPermission.whileInUse;
+        answer = ph.PermissionStatus.restricted;
+        expect(await location().requestBackground(), PermissionOutcome.denied);
+      });
+
+      test('foreground is requested first, on its own', () async {
+        geo
+          ..permission = LocationPermission.denied
+          ..afterRequest = LocationPermission.whileInUse;
+        expect(await location().requestBackground(), PermissionOutcome.granted);
+        expect(geo.requestCalls, 1);
+        expect(asked, ['always']);
+      });
+
+      test('a refused foreground stops before asking for Always', () async {
+        geo
+          ..permission = LocationPermission.denied
+          ..afterRequest = LocationPermission.denied;
+        expect(await location().requestBackground(), PermissionOutcome.denied);
+        geo
+          ..permission = LocationPermission.denied
+          ..afterRequest = LocationPermission.deniedForever;
+        expect(
+          await location().requestBackground(),
+          PermissionOutcome.needsSettings,
+        );
+        expect(asked, isEmpty);
+      });
+
+      test('a foreground grant that already is Always stops there', () async {
+        // Android 9 and older: one location permission, no background split.
+        geo
+          ..permission = LocationPermission.denied
+          ..afterRequest = LocationPermission.always;
+        expect(await location().requestBackground(), PermissionOutcome.granted);
+        expect(asked, isEmpty);
+      });
+
+      test('a failing plugin is a refusal, not a crash', () async {
+        geo.permission = LocationPermission.whileInUse;
+        final failing = LocationService(
+          _dir(),
+          requestAlways: () async => throw StateError('plugin'),
+        );
+        expect(await failing.requestBackground(), PermissionOutcome.denied);
+        geo.checkError = StateError('permission');
+        expect(await location().requestBackground(), PermissionOutcome.denied);
+      });
     });
 
     test('service and position streams forward the plugin', () async {
@@ -355,6 +451,7 @@ class _FakeGeolocator extends GeolocatorPlatform {
   Position? lastKnown;
   Position? current;
   int currentCalls = 0;
+  int requestCalls = 0;
   final statuses = StreamController<ServiceStatus>();
   final positions = StreamController<Position>();
 
@@ -373,6 +470,7 @@ class _FakeGeolocator extends GeolocatorPlatform {
 
   @override
   Future<LocationPermission> requestPermission() async {
+    requestCalls++;
     if (throwRequest) throw StateError('request');
     final next = afterRequest;
     if (next != null) permission = next;

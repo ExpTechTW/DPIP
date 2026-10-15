@@ -20,8 +20,9 @@ import 'package:flutter/services.dart';
 /// construction; only the push token varies per call.
 ///
 /// Caveat the caller must respect: background delivery needs **"Always"
-/// location** granted (gate [start] on it — the geofence/SLC can't prompt); iOS
-/// requests Always from its plugin.
+/// location** granted (gate [start] on it — the geofence/SLC can't prompt). On
+/// iOS the in-app upgrade to Always also runs through this plugin — see
+/// [requestAlways].
 ///
 /// Best-effort: a platform failure is logged, never thrown, so it can't block
 /// launch, and a missing channel (e.g. in tests / unsupported platform) is a
@@ -31,13 +32,40 @@ class BackgroundLocationService {
     required this._platform,
     required this._version,
     MethodChannel? channel,
-  }) : _channel =
-           channel ??
-           const MethodChannel('com.exptech.dpip/background_location');
+  }) : _channel = channel ?? _defaultChannel;
+
+  static const MethodChannel _defaultChannel = MethodChannel(
+    'com.exptech.dpip/background_location',
+  );
 
   final int _platform;
   final String _version;
   final MethodChannel _channel;
+
+  /// **iOS only.** Asks Core Location to upgrade "While Using" to "Always" on
+  /// the plugin's long-lived location manager, and answers with the
+  /// authorization the user actually ends on: `always`, `whenInUse`,
+  /// `denied`, `restricted` or `notDetermined`.
+  ///
+  /// The answer arrives only once the user has chosen — the native side waits
+  /// for the system prompt to go away — or, when iOS will not show the prompt
+  /// (it offers the upgrade once per install), after a short grace period with
+  /// the unchanged status. Null when the channel is missing or failed.
+  ///
+  /// Static because the caller is `LocationService`, which has no reporting
+  /// session to hang it off; the channel is the same one.
+  static Future<String?> requestAlways([
+    MethodChannel channel = _defaultChannel,
+  ]) async {
+    try {
+      return await channel.invokeMethod<String>('requestAlways');
+    } on MissingPluginException {
+      return null;
+    } on PlatformException catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'background location requestAlways');
+      return null;
+    }
+  }
 
   /// Enables background reporting bound to the device push [token].
   Future<void> start(String token) async {
