@@ -23,6 +23,7 @@ import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
+import 'package:dpip/shared/map/map_connectivity.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/meshtastic/data/dpip_mesh_gateway_impl.dart';
@@ -249,6 +250,9 @@ Future<void> bootstrap() async {
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final endpointHealth = EndpointHealthMonitor();
   final apiClient = ApiClient(dio, regions, endpointHealth);
+  // The app's requests recovering is the cue for Android's MapLibre to retry
+  // the tiles it gave up on while the network was gone — see [MapConnectivity].
+  MapConnectivity.instance.watch(endpointHealth);
   // MapLibre asks Dart for every ExpTech tile before it asks the network, so
   // this must be bound before the first map is built.
   final mapTileCache = cache == null
