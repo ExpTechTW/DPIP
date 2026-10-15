@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
@@ -30,6 +31,7 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show MapColors, countyFillLayerId, townFillLayerId;
 import 'package:dpip/shared/map/monitor_map_stack.dart';
+import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
@@ -120,6 +122,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     RtsLiveDemand? liveDemand,
     MlIntensityEstimator? mlIntensity,
     RtsStationEncoder? stationEncoder,
+    Future<RenderTier>? renderTier,
     // Not initializing formals: Dart has no private *named* parameter, and
     // these fields must stay private.
     // ignore: prefer_initializing_formals
@@ -135,7 +138,19 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
        // ignore: prefer_initializing_formals
        _stationEncoder = stationEncoder,
        // ignore: prefer_initializing_formals
-       _townDirectory = townDirectory;
+       _townDirectory = townDirectory {
+    // A low-end phone redraws the rings at a lower rate (see
+    // [wavefrontTick]). Until the probe answers — and when no probe is
+    // given — the rings run at full rate, never degraded on a guess.
+    renderTier?.then((tier) {
+      final tick = wavefrontTick(tier);
+      if (tick == _eewTick) return;
+      _eewTick = tick;
+      _eewTicker?.cancel();
+      _eewTicker = null;
+      _syncEewTicker();
+    });
+  }
 
   final RealtimeNotifier<Rts> _feed;
   final TremStationRepository _stationRepository;
@@ -283,8 +298,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// a silky-smooth expansion and a visibly stepped one. Each push is small
   /// (two ~64-point rings), so the extra platform-channel traffic is cheap —
   /// and it only runs at all while an alert is actually live
-  /// ([_syncEewTicker]).
-  static const Duration _eewTick = Duration(milliseconds: 16);
+  /// ([_syncEewTicker]). A low-end phone runs it slower — see [wavefrontTick].
+  Duration _eewTick = wavefrontTick(RenderTier.high);
   static const int _maxStationRetries = 8;
   static const double _liveOpacity = 1.0;
   static const double _staleOpacity = 0.35;
@@ -452,7 +467,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// mid-write — would otherwise hold the flag forever and freeze the rings
   /// for the rest of an alert, which is far worse than the backlog the flag
   /// exists to prevent.
-  static final int _eewTickMaxSkips =
+  int get _eewTickMaxSkips =>
       const Duration(seconds: 1).inMicroseconds ~/ _eewTick.inMicroseconds;
 
   void _onFeed() {

@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
@@ -161,7 +162,11 @@ Future<
     _FakeElapsed rtsElapsed,
   })
 >
-_build({required List<Eew> alerts, required _FakeElapsed eewElapsed}) async {
+_build({
+  required List<Eew> alerts,
+  required _FakeElapsed eewElapsed,
+  Future<RenderTier>? renderTier,
+}) async {
   final rtsElapsed = _FakeElapsed();
   final rtsChannel = _channel<Rts>(const Rts(), RealtimeConfig.rts, rtsElapsed);
   await rtsChannel.refreshNow();
@@ -184,6 +189,7 @@ _build({required List<Eew> alerts, required _FakeElapsed eewElapsed}) async {
       ),
       boxGrid: Future<RtsBoxGrid>.value(const RtsBoxGrid({})),
       townDirectory: const TownDirectory({}),
+      renderTier: renderTier,
     ),
     eewChannel: eewChannel,
     rtsChannel: rtsChannel,
@@ -317,11 +323,16 @@ void main() {
 
   group('the wavefront ticker', () {
     /// Renders a live alert inside [async] and returns the layer, settled.
-    RtsMapLayer attach(FakeAsync async, _EewRecordingController controller) {
+    RtsMapLayer attach(
+      FakeAsync async,
+      _EewRecordingController controller, {
+      RenderTier? tier,
+    }) {
       late RtsMapLayer layer;
       _build(
         alerts: [_alert()],
         eewElapsed: _FakeElapsed(),
+        renderTier: tier == null ? null : Future.value(tier),
       ).then((built) => layer = built.layer);
       async.flushMicrotasks();
       layer.render(controller);
@@ -371,6 +382,36 @@ void main() {
           hasLength(before + 2),
           reason: 'a lost platform call must not freeze the rings for good',
         );
+        layer.clear(controller);
+        async.flushMicrotasks();
+      });
+    });
+
+    test('a low-end phone redraws the rings five times a second', () {
+      fakeAsync((async) {
+        final controller = _EewRecordingController();
+        final layer = attach(async, controller, tier: RenderTier.low);
+
+        final before = controller.eewPushes.length;
+        async.elapse(const Duration(seconds: 1));
+        expect(controller.eewPushes, hasLength(before + 5));
+        layer.clear(controller);
+        async.flushMicrotasks();
+      });
+    });
+
+    test('a low-end phone still gives up on a lost write after a second', () {
+      fakeAsync((async) {
+        final controller = _SlowEewController();
+        final layer = attach(async, controller, tier: RenderTier.low);
+
+        controller.gate = Completer<void>(); // never completed
+        final before = controller.eewPushes.length;
+        // A write at 200 ms, five skipped ticks behind it, a write at 1400.
+        async.elapse(const Duration(milliseconds: 1300));
+        expect(controller.eewPushes, hasLength(before + 1));
+        async.elapse(const Duration(milliseconds: 100));
+        expect(controller.eewPushes, hasLength(before + 2));
         layer.clear(controller);
         async.flushMicrotasks();
       });

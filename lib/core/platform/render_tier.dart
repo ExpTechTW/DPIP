@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/platform/device_info.dart';
 
 /// How much GPU/CPU a device can spend on decorative animation.
@@ -32,4 +33,23 @@ RenderTier renderTierFor(DeviceDetails device, {bool? isAndroid}) {
     return RenderTier.high;
   }
   return totalMb < 4096 ? RenderTier.low : RenderTier.high;
+}
+
+/// This device's [RenderTier], probed once per process and shared.
+///
+/// The probe is a platform call, and more than one surface wants its answer —
+/// asking again per map, per replay, would pay the round trip each time for a
+/// value that cannot change while the app runs. A probe that fails answers
+/// [RenderTier.high], for the reason [renderTierFor] gives.
+Future<RenderTier> deviceRenderTier() => _deviceTier ??= _probeDeviceTier();
+
+Future<RenderTier>? _deviceTier;
+
+Future<RenderTier> _probeDeviceTier() async {
+  try {
+    return renderTierFor(await DeviceInfoService.load());
+  } catch (error) {
+    Log.warning('Device tier probe failed, keeping full quality: $error');
+    return RenderTier.high;
+  }
 }
