@@ -725,6 +725,8 @@ class EtagCacheStore {
   /// just fetched and keep what nobody has touched in weeks. Monotonicity is
   /// the only property this key actually needs.
   int _lruStamp() {
+    // wall-clock: a sequence key, only ever compared with other rows' keys —
+    // see above.
     final now = DateTime.now().millisecondsSinceEpoch;
     if (now > _lastStamp) _lastStamp = now;
     return _lastStamp;

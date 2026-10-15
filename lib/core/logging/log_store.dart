@@ -74,6 +74,10 @@ class LogStore {
     DateTime Function()? now,
     Duration flushInterval = const Duration(seconds: 3),
     int flushAt = 64,
+    // wall-clock: every line is stamped in device time — by Talker, or by the
+    // native side when it hands its lines over — so retention measures against
+    // the same clock. The row cap is what keeps a clock change from emptying
+    // the table.
   }) : _now = now ?? DateTime.now,
        _flushInterval = flushInterval,
        _flushAt = flushAt;

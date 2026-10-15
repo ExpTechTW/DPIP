@@ -14,6 +14,8 @@ abstract interface class Clock {
 class SystemClock implements Clock {
   const SystemClock();
 
+  // wall-clock: this is the device clock, by name — what [ServerClock]
+  // corrects, and what a caller asks for when it means device time.
   @override
   DateTime now() => DateTime.now();
 }

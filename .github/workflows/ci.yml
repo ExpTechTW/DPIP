@@ -125,6 +125,11 @@ jobs:
       - name: Storage gate
         run: bash tool/check/storage.sh
 
+      # Wall-clock gate — every DateTime.now() in lib/ says why the device
+      # clock is the right one. See ARCHITECTURE.md → Calibrated time.
+      - name: Wall-clock gate
+        run: bash tool/check/wall_clock.sh
+
       # Every channel sound must resolve, or the channel is rejected on device.
       - name: Notification-sound gate
         run: bash tool/check/notification_sounds.sh

@@ -44,6 +44,9 @@ class DeviceLocationReporter {
     this._onReported,
     this.minUploadInterval = const Duration(seconds: 60),
     DateTime Function()? now,
+    // wall-clock: the throttle stamp is written and compared by this class
+    // alone, so it only has to agree with itself; a stamp a clock change left
+    // in the future is handled in [_handle].
   }) : _now = now ?? DateTime.now;
 
   final Stream<GpsFix> Function() _positions;

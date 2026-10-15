@@ -371,6 +371,8 @@ class LocationService {
   /// any age passes. Same convention as `staleness.dart`.
   static bool _isFresh(DateTime timestamp) {
     final calibrated = AppTime.utc.difference(AppTime.fromDevice(timestamp));
+    // wall-clock: the fix's age by the clock that stamped it, kept beside the
+    // calibrated age on purpose (see above).
     final byDevice = DateTime.now().toUtc().difference(timestamp.toUtc());
     if (calibrated.isNegative || byDevice.isNegative) return false;
     final age = calibrated > byDevice ? calibrated : byDevice;

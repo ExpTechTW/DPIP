@@ -29,6 +29,7 @@ abstract final class AppTime {
   }
 
   /// Calibrated current time in UTC (device time until the first sync).
+  // wall-clock: the fallback before [install] — nothing calibrated exists yet.
   static DateTime get utc => _clock?.now() ?? DateTime.now().toUtc();
 
   /// Calibrated current time at Taiwan's fixed +8 offset.

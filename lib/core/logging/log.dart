@@ -230,6 +230,8 @@ abstract final class Log {
   /// its own 24-hour retention (see [LogStore]); this only trims what Talker
   /// holds for the current session.
   static void pruneOlderThan(Duration age) {
+    // wall-clock: Talker stamps its history with the device clock, so the
+    // cutoff has to come from the same one.
     final cutoff = DateTime.now().subtract(age);
     talker.history.removeWhere((entry) => entry.time.isBefore(cutoff));
   }

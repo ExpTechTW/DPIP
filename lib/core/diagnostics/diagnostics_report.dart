@@ -105,6 +105,8 @@ String _lastAttempt(Map<String, Object?> d) {
   final at = d['lastAttemptAt'] ?? d['lastReportAt'];
   if (at is! int) return 'never';
   final when = DateTime.fromMillisecondsSinceEpoch(at);
+  // wall-clock: the native background task stamps this with the device
+  // clock, so its age is measured by the same one. Likewise below.
   final age = DateTime.now().difference(when);
   final ok = (d['lastAttemptOk'] ?? d['lastReportOk']) == true;
   final code = d['lastAttemptCode'] ?? d['lastReportCode'];
@@ -117,6 +119,7 @@ String _lastSuccess(Map<String, Object?> d) {
   final at = d['lastSuccessAt'] ?? fallback;
   if (at is! int) return 'never';
   final code = d['lastSuccessCode'] ?? d['lastReportCode'];
+  // wall-clock: a native-task stamp, in device time.
   return '${_age(DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(at)))} '
       'ago${code is int ? ' · $code' : ''}';
 }
@@ -127,6 +130,7 @@ String _throttled(Map<String, Object?> d) {
   if (count is! int || count == 0) return 'none';
   final at = d['lastThrottledAt'];
   if (at is! int) return '$count';
+  // wall-clock: a native-task stamp, in device time.
   final age = DateTime.now().difference(
     DateTime.fromMillisecondsSinceEpoch(at),
   );
@@ -137,6 +141,7 @@ String _nextAlarm(Map<String, Object?> d) {
   final at = d['nextAlarmAt'];
   if (at is! int) return '—';
   final remaining = DateTime.fromMillisecondsSinceEpoch(at)
+      // wall-clock: the OS alarm scheduler's own time, in device time.
       .difference(DateTime.now());
   if (remaining.isNegative) return 'due (OS may deliver it late)';
   return 'in ${_age(remaining)}';
@@ -145,6 +150,7 @@ String _nextAlarm(Map<String, Object?> d) {
 String _relativeTime(Object? value, {required String absent}) {
   if (value is! int) return absent;
   final delta = DateTime.fromMillisecondsSinceEpoch(value)
+      // wall-clock: every value passed here is a native stamp, device time.
       .difference(DateTime.now());
   return delta.isNegative ? '${_age(-delta)} ago' : 'in ${_age(delta)}';
 }
@@ -176,6 +182,7 @@ String _watchdogRepairs(Map<String, Object?> d) {
 String _lastGeofenceTransition(Map<String, Object?> d) {
   final at = d['lastGeofenceTransitionAt'];
   if (at is! int) return 'never';
+  // wall-clock: a native-task stamp, in device time.
   final age = DateTime.now().difference(
     DateTime.fromMillisecondsSinceEpoch(at),
   );

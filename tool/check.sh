@@ -43,10 +43,10 @@ for gate in workflows workflow_security tooling l10n pubspec_lock \
   "tool/check/$gate.sh"
 done
 
-# These two walk every .dart file in lib/ and take 5.9 s and 2.2 s, which is
-# most of what is left once the toolchain steps are cached. Both read lib/ and
-# nothing else, so the key is narrow and invalidates exactly when it should.
-for gate in layering storage; do
+# These walk every .dart file in lib/ and take 5.9 s, 2.2 s and 0.5 s, which
+# is most of what is left once the toolchain steps are cached. Each reads lib/
+# and nothing else, so the key is narrow and invalidates exactly when it should.
+for gate in layering storage wall_clock; do
   step "check/$gate"
   cached "$gate" "$(cache_key lib "tool/check/$gate.sh")" "tool/check/$gate.sh"
 done
