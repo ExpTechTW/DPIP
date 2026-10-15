@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "套用「{preset}」？",
   "notifyPresetConfirmBody": "下方每個頻道都會改為這個組合，取代你逐項調整的設定。",
   "notifyPresetApply": "套用",
-  "notifyPresetApplying": "正在套用…"
+  "notifyPresetApplying": "正在套用…",
+  "onboardingNotifyTitle": "通知偏好",
+  "onboardingNotifyBody": "先選一個起點，之後隨時可以在「通知設定」中逐項調整。每個選項都會保留地震速報。",
+  "onboardingNotifySkip": "略過，之後再設定"
 }

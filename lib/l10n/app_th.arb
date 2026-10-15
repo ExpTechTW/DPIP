@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "ใช้ “{preset}” หรือไม่",
   "notifyPresetConfirmBody": "ทุกช่องด้านล่างจะเปลี่ยนตามชุดนี้ แทนที่การตั้งค่าที่คุณเลือกไว้ทีละช่อง",
   "notifyPresetApply": "ใช้",
-  "notifyPresetApplying": "กำลังใช้…"
+  "notifyPresetApplying": "กำลังใช้…",
+  "onboardingNotifyTitle": "การแจ้งเตือนของคุณ",
+  "onboardingNotifyBody": "เลือกจุดเริ่มต้นก่อน คุณปรับแต่ละช่องได้ทุกเมื่อใน “การตั้งค่าการแจ้งเตือน” และทุกตัวเลือกยังคงรับการเตือนแผ่นดินไหวฉุกเฉิน",
+  "onboardingNotifySkip": "ข้ามไปก่อน"
 }

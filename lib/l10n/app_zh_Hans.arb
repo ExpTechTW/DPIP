@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "应用“{preset}”？",
   "notifyPresetConfirmBody": "下方每个频道都会改成这个组合，取代你逐项调整的设置。",
   "notifyPresetApply": "应用",
-  "notifyPresetApplying": "正在应用…"
+  "notifyPresetApplying": "正在应用…",
+  "onboardingNotifyTitle": "通知偏好",
+  "onboardingNotifyBody": "先选一个起点，之后随时可以在“通知设置”中逐项调整。每个选项都会保留地震预警。",
+  "onboardingNotifySkip": "跳过，稍后再设置"
 }

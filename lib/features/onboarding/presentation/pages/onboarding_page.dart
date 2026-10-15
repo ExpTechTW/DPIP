@@ -1,10 +1,12 @@
-/// First-launch onboarding: intro → terms → permissions, shown until completed.
+/// First-launch onboarding: intro → terms → permissions → notification preset,
+/// shown until completed.
 library;
 
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_intro.dart';
+import 'package:dpip/features/onboarding/presentation/widgets/onboarding_notify_presets.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permissions.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_terms.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -13,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-/// Hosts the three onboarding steps in a swipe-locked pager (navigation is via
+/// Hosts the four onboarding steps in a swipe-locked pager (navigation is via
 /// each step's action), with progress dots and a back affordance. Finishing
 /// marks onboarding complete, and the router redirect then lets Home through.
 class OnboardingPage extends StatefulWidget {
@@ -24,7 +26,7 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  static const int _pageCount = 3;
+  static const int _pageCount = 4;
 
   final PageController _controller = PageController();
   int _index = 0;
@@ -73,7 +75,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   children: [
                     OnboardingIntroPage(onNext: () => _go(1)),
                     OnboardingTermsPage(onAccept: () => _go(2)),
-                    OnboardingPermissionsPage(onFinish: _finish),
+                    OnboardingPermissionsPage(onFinish: () => _go(3)),
+                    OnboardingNotifyPresetsPage(onFinish: _finish),
                   ],
                 ),
               ),

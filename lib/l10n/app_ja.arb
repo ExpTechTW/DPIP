@@ -2106,5 +2106,8 @@
   "notifyPresetConfirmTitle": "「{preset}」を適用しますか？",
   "notifyPresetConfirmBody": "下の各チャンネルがこの組み合わせに変わり、個別に選んだ設定は置き換えられます。",
   "notifyPresetApply": "適用",
-  "notifyPresetApplying": "適用しています…"
+  "notifyPresetApplying": "適用しています…",
+  "onboardingNotifyTitle": "通知の受け取り方",
+  "onboardingNotifyBody": "まずは出発点を選んでください。各チャンネルは「通知設定」でいつでも個別に調整でき、どの選択肢でも緊急地震速報は受け取れます。",
+  "onboardingNotifySkip": "あとで設定する"
 }

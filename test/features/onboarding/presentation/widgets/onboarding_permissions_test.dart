@@ -204,7 +204,7 @@ void main() {
     final l10n = AppLocalizations.of(
       tester.element(find.byType(OnboardingPermissionsPage)),
     );
-    await tester.tap(find.text(l10n.onboardingStart));
+    await tester.tap(find.text(l10n.onboardingNext));
     await tester.pumpAndSettle();
 
     expect(finished, isTrue);
@@ -230,7 +230,7 @@ void main() {
         final l10n = AppLocalizations.of(
           tester.element(find.byType(OnboardingPermissionsPage)),
         );
-        await tester.tap(find.text(l10n.onboardingStart));
+        await tester.tap(find.text(l10n.onboardingNext));
         await tester.pumpAndSettle();
 
         expect(find.text(l10n.onboardingSkipTitle), findsOneWidget);
@@ -254,7 +254,7 @@ void main() {
       final l10n = AppLocalizations.of(
         tester.element(find.byType(OnboardingPermissionsPage)),
       );
-      await tester.tap(find.text(l10n.onboardingStart));
+      await tester.tap(find.text(l10n.onboardingNext));
       await tester.pumpAndSettle();
       expect(find.text(l10n.onboardingSkipTitle), findsOneWidget);
 
@@ -284,7 +284,7 @@ void main() {
     final l10n = AppLocalizations.of(
       tester.element(find.byType(OnboardingPermissionsPage)),
     );
-    await tester.tap(find.text(l10n.onboardingStart));
+    await tester.tap(find.text(l10n.onboardingNext));
     await tester.pumpAndSettle();
     expect(find.text(l10n.onboardingSkipTitle), findsOneWidget);
 

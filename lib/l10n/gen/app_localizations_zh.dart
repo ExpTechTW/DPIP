@@ -3484,6 +3484,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => '正在套用…';
+
+  @override
+  String get onboardingNotifyTitle => '通知偏好';
+
+  @override
+  String get onboardingNotifyBody => '先選一個起點，之後隨時可以在「通知設定」中逐項調整。每個選項都會保留地震速報。';
+
+  @override
+  String get onboardingNotifySkip => '略過，之後再設定';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6962,6 +6971,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get notifyPresetApplying => '正在应用…';
+
+  @override
+  String get onboardingNotifyTitle => '通知偏好';
+
+  @override
+  String get onboardingNotifyBody => '先选一个起点，之后随时可以在“通知设置”中逐项调整。每个选项都会保留地震预警。';
+
+  @override
+  String get onboardingNotifySkip => '跳过，稍后再设置';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10441,6 +10459,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get notifyPresetApplying => '正在套用…';
+
+  @override
+  String get onboardingNotifyTitle => '通知偏好';
+
+  @override
+  String get onboardingNotifyBody => '先選一個起點，之後隨時可以在「通知設定」中逐項調整。每個選項都會保留地震速報。';
+
+  @override
+  String get onboardingNotifySkip => '略過，之後再設定';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13920,4 +13947,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get notifyPresetApplying => '正在套用…';
+
+  @override
+  String get onboardingNotifyTitle => '通知偏好';
+
+  @override
+  String get onboardingNotifyBody => '先選一個起點，之後隨時可以在「通知設定」中逐項調整。每個選項都會保留地震速報。';
+
+  @override
+  String get onboardingNotifySkip => '略過，之後再設定';
 }

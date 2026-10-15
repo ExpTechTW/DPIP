@@ -29,7 +29,7 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage> {
   /// The last state the checklist reported — what [_finish] reads.
   PermissionState? _state;
 
-  /// Finishes onboarding — but if a permission that makes localized alerts work
+  /// Leaves this step — but if a permission that makes localized alerts work
   /// (notifications or location) is still missing, confirm first. We *can't*
   /// require them (App Store 5.1.2(i) / 4.5.4 forbid gating the app on a
   /// permission), so this is a strong nudge, never a block; a persistent in-app
@@ -68,7 +68,9 @@ class _OnboardingPermissionsPageState extends State<OnboardingPermissionsPage> {
     return OnboardingScaffold(
       requireScrollToEnd: false,
       actionBuilder: (context, _) =>
-          OnboardingCta(label: l10n.onboardingStart, onPressed: _finish),
+          // Not the last step: the notification preset follows, and needs
+          // these grants in place before it writes anything.
+          OnboardingCta(label: l10n.onboardingNext, onPressed: _finish),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

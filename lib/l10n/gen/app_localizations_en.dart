@@ -3572,4 +3572,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => 'Applying…';
+
+  @override
+  String get onboardingNotifyTitle => 'Your alerts';
+
+  @override
+  String get onboardingNotifyBody =>
+      'Pick a starting point. You can fine-tune each channel in Notification settings at any time, and every option keeps earthquake early warnings on.';
+
+  @override
+  String get onboardingNotifySkip => 'Skip for now';
 }

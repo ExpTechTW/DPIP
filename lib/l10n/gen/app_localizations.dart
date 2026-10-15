@@ -6743,6 +6743,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applying…'**
   String get notifyPresetApplying;
+
+  /// Onboarding step title: choosing a notification preset
+  ///
+  /// In en, this message translates to:
+  /// **'Your alerts'**
+  String get onboardingNotifyTitle;
+
+  /// Onboarding step body: the choice is a starting point, adjustable later; EEW stays on in every option
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a starting point. You can fine-tune each channel in Notification settings at any time, and every option keeps earthquake early warnings on.'**
+  String get onboardingNotifyBody;
+
+  /// Onboarding: finish without applying a notification preset after a failed attempt
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get onboardingNotifySkip;
 }
 
 class _AppLocalizationsDelegate

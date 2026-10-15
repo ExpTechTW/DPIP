@@ -3576,4 +3576,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get notifyPresetApplying => 'Đang áp dụng…';
+
+  @override
+  String get onboardingNotifyTitle => 'Cảnh báo của bạn';
+
+  @override
+  String get onboardingNotifyBody =>
+      'Hãy chọn một điểm bắt đầu. Bạn có thể tinh chỉnh từng kênh trong Cài đặt thông báo bất cứ lúc nào, và mọi lựa chọn đều giữ cảnh báo động đất khẩn cấp.';
+
+  @override
+  String get onboardingNotifySkip => 'Để sau';
 }
