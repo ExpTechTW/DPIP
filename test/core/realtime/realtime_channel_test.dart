@@ -73,6 +73,12 @@ class _FakeSource extends RealtimeSource<int> {
 
   int networkChanges = 0;
 
+  /// What [servingFallback] reports for the next fetch's answer.
+  bool fallback = false;
+
+  @override
+  bool get servingFallback => fallback;
+
   @override
   void networkChanged() => networkChanges++;
 }
@@ -368,4 +374,90 @@ void main() {
     channel.networkChanged();
     expect(source.networkChanges, 1);
   });
+
+  group('fallback answers', () {
+    test('are shown but never live', () async {
+      source
+        ..next = const Ok(7)
+        ..fallback = true;
+      channel.start();
+      await pump();
+      expect(channel.state.status, RealtimeStatus.stale);
+      expect(channel.state.data, 7, reason: 'shown, not blanked');
+
+      ticker.fire(); // every later poll answered the same way
+      await pump();
+      expect(channel.state.status, RealtimeStatus.stale);
+    });
+
+    test('a repeat keeps the time its snapshot first arrived', () async {
+      final value = [1];
+      final fallbackSource = _ListSource()
+        ..next = Ok(value)
+        ..fallback = true;
+      final listChannel = RealtimeChannel<List<int>>(
+        source: fallbackSource,
+        clock: clock,
+        elapsed: elapsed,
+        ticker: ticker,
+        config: RealtimeConfig.eew,
+      );
+      addTearDown(listChannel.dispose);
+      listChannel.start();
+      await pump();
+      final first = listChannel.state.dataTime;
+
+      clock.current = clock.current.add(const Duration(seconds: 5));
+      await listChannel.refreshNow(); // the same snapshot again
+      expect(listChannel.state.dataTime, first);
+
+      fallbackSource.next = Ok([1]); // a new snapshot, equal content
+      await listChannel.refreshNow();
+      expect(listChannel.state.dataTime, clock.current);
+    });
+
+    test('the feed is live again the moment its own path answers', () async {
+      source
+        ..next = const Ok(7)
+        ..fallback = true;
+      channel.start();
+      await pump();
+      expect(channel.state.status, RealtimeStatus.stale);
+
+      source
+        ..next = const Ok(8)
+        ..fallback = false;
+      await channel.refreshNow();
+      expect(channel.state.status, RealtimeStatus.live);
+      expect(channel.state.data, 8);
+    });
+
+    test('age to offline once the fallback stops answering too', () async {
+      source
+        ..next = const Ok(7)
+        ..fallback = true;
+      channel.start();
+      await pump();
+
+      source.next = const Err(TimeoutFailure('down'));
+      elapsed.advance(const Duration(seconds: 11));
+      ticker.fire();
+      await pump();
+      expect(channel.state.status, RealtimeStatus.offline);
+    });
+  });
+}
+
+class _ListSource extends RealtimeSource<List<int>> {
+  Result<List<int>> next = const Ok([]);
+  bool fallback = false;
+
+  @override
+  Future<Result<List<int>>> fetch() async => next;
+
+  @override
+  bool get servingFallback => fallback;
+
+  @override
+  DateTime? timestampOf(List<int> value) => null;
 }

@@ -74,7 +74,8 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   final boxGrid = const RtsBoxGridSource().load();
 
   // Live EEW over SSE (`/api/v2/eq/eew?sse=1`) — bursty, connection-open
-  // liveness. Debug runs with `DPIP_DEMO_MONITOR=1` swap in a synthetic alert
+  // liveness, with the one-shot GET polled as a flagged fallback while the
+  // stream is down. Debug runs with `DPIP_DEMO_MONITOR=1` swap in a synthetic alert
   // instead (see monitor_demo.dart) — its parameters are read from the newest
   // real earthquake report, so the 強震監視器 shows a plausible wavefront
   // without waiting for a live event.
@@ -82,8 +83,11 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
       ? DemoEewSource(reports) as RealtimeSource<List<Eew>>
       : kStartupEewDemoEnabled
       ? StartupEewDemoSource() as RealtimeSource<List<Eew>>
-      : EewRealtimeSource(api.openEewSse, cwaOnly: () => eewCwaOnly.enabled)
-            as RealtimeSource<List<Eew>>;
+      : EewRealtimeSource(
+          api.openEewSse,
+          cwaOnly: () => eewCwaOnly.enabled,
+          poll: api.getEewRealtime,
+        ) as RealtimeSource<List<Eew>>;
   final eewChannel = RealtimeChannel<List<Eew>>(
     source: eewSource,
     clock: deps.serverClock,

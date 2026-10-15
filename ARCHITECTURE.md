@@ -181,8 +181,13 @@ default-network callback, iOS's `NWPathMonitor`) is fanned out by
 `RealtimeService` to every source, and an SSE source drops its connection at
 once and reopens after a random 1–2 s settle with its backoff reset, rather
 than waiting out the silence limit; the backoff itself is jittered ±50 % so a
-region's audience does not reconnect in lockstep. `RealtimeService` +
-`AppLifecycleListener`
+region's audience does not reconnect in lockstep. While the EEW stream is down
+(past a 3 s grace), its source polls the one-shot GET every 10 s through the
+same decode and agency filters and answers from that snapshot, flagged as a
+fallback (`RealtimeSource.servingFallback`): the channel shows it but never
+classifies it better than `stale` (`classifyStatus(fallback:)`), since a
+snapshot every ten seconds cannot keep `live`'s promise, and polling stops the
+moment the stream answers. `RealtimeService` + `AppLifecycleListener`
 pause polling on background and resume (recompute status → resync clock →
 refetch) on foreground; background alerting is push's job. A safety-critical
 feed that is `stale`/`offline` must never be presented as current.

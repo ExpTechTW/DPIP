@@ -14,11 +14,20 @@ import 'package:dpip/core/realtime/realtime_state.dart';
 /// A negative [age] (data timestamped in the future — a clock anomaly) is treated
 /// as **not current**: the classifier fails toward [RealtimeStatus.stale] rather
 /// than presenting possibly-bad data as live.
+///
+/// [fallback] marks data delivered by a feed's secondary path — an SSE feed
+/// answering from a periodic REST snapshot while its stream reconnects. Such
+/// data is real and recent, so it is shown rather than blanked, but it is at
+/// best [RealtimeStatus.stale], never [RealtimeStatus.live]: `live` promises
+/// that a change reaches the screen within the feed's own latency, and a
+/// snapshot taken every few seconds cannot keep that promise however fresh the
+/// last one was. It still ages to offline on the same schedule.
 RealtimeStatus classifyStatus({
   required Duration? age,
   required Duration sinceStart,
   required Duration staleAfter,
   required Duration offlineAfter,
+  bool fallback = false,
 }) {
   if (age == null) {
     return sinceStart <= offlineAfter
@@ -26,7 +35,9 @@ RealtimeStatus classifyStatus({
         : RealtimeStatus.offline;
   }
   if (age.isNegative) return RealtimeStatus.stale;
-  if (age <= staleAfter) return RealtimeStatus.live;
+  if (age <= staleAfter) {
+    return fallback ? RealtimeStatus.stale : RealtimeStatus.live;
+  }
   if (age <= offlineAfter) return RealtimeStatus.stale;
   return RealtimeStatus.offline;
 }
