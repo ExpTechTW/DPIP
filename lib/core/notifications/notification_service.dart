@@ -689,8 +689,13 @@ NotificationContent? contentFromData(
       (data['channel'] as String?) ??
       nestedField('channelKey') ??
       _fallbackChannelKey;
-  final id =
-      _asNotificationId(data['id']) ?? _asNotificationId(nested?['id']) ?? 0;
+  final id = _resolveNotificationId(
+    flat: data['id'],
+    nested: nested?['id'],
+    channelKey: channelKey,
+    title: title,
+    body: body,
+  );
   final idText = (data['id'] as String?) ?? nestedField('id');
   return NotificationContent(
     id: id,
@@ -722,23 +727,96 @@ Map<String, dynamic>? _nestedContent(Map<String, dynamic> data) {
   }
 }
 
-/// Coerces a payload id to the form awesome accepts.
+/// [data] as `createNotificationFromJsonData` should receive it: the same
+/// payload, with `content.id` replaced by one awesome will accept.
+///
+/// The terminated-app path hands the producer's payload to awesome whole, and
+/// awesome's own `createNotification` throws on an id outside the signed
+/// 32-bit range — which `createNotificationFromJsonData` catches and turns into
+/// a bare `false`. The producer's id is 40 bits wide, so on that path an
+/// oversized id was not a collision but a push that never appeared. A missing
+/// id fails the same way (awesome requires one), and gets the same derived id
+/// [contentFromData] gives it.
+///
+/// `content` comes back as a decoded map, which awesome accepts as readily as
+/// the JSON string. Anything without a usable `content` object is returned
+/// untouched: there is no id to fix, and awesome rejects it either way.
+Map<String, dynamic> jsonDataWithNotificationId(Map<String, dynamic> data) {
+  final content = switch (data['content']) {
+    final Map<dynamic, dynamic> map => Map<String, dynamic>.from(map),
+    _ => _nestedContent(data),
+  };
+  if (content == null) return data;
+  String? text(Object? value) => switch (value) {
+    final String s => s,
+    final int i => i.toString(),
+    _ => null,
+  };
+  content['id'] = _resolveNotificationId(
+    flat: data['id'],
+    nested: content['id'],
+    channelKey: text(content['channelKey']) ?? text(data['channel']),
+    title: text(content['title']) ?? text(data['title']),
+    body: text(content['body']) ?? text(data['body']),
+  );
+  return {...data, 'content': content};
+}
+
+/// The notification id for a push, always one awesome accepts.
+///
+/// [flat] wins over [nested], matching every other field [contentFromData]
+/// reads. With neither, the id is derived from what the notification says, so
+/// the same alert sent twice still replaces itself rather than stacking.
+int _resolveNotificationId({
+  required Object? flat,
+  required Object? nested,
+  required String? channelKey,
+  required String? title,
+  required String? body,
+}) =>
+    _asNotificationId(flat) ??
+    _asNotificationId(nested) ??
+    _stableId('${channelKey ?? ''}\n${title ?? ''}\n${body ?? ''}');
+
+/// Maps a payload id into the positive signed 31-bit range awesome accepts.
 ///
 /// awesome validates ids against the **signed 32-bit** range and throws —
 /// killing the whole notification — on anything wider. The producer computes
 /// its id as a 40-bit hex slice (`parseInt(md5slice, 16)`), so oversized ids
-/// are the common case, not the edge: they are treated as absent and the
-/// notification renders with id 0, replacing whatever came before it.
-int? _asNotificationId(Object? value) {
-  final parsed = switch (value) {
-    final int v => v,
-    final String s => int.tryParse(s),
-    _ => null,
-  };
-  if (parsed == null || parsed < -0x80000000 || parsed > 0x7FFFFFFF) {
-    return null;
+/// are the common case, not the edge.
+///
+/// They used to be treated as absent and fall back to a fixed id, which made
+/// every such push share one slot in the shade: an EEW, a 震度速報 and a
+/// weather alert arriving together each replaced the one before, and only the
+/// last survived. Keeping the low 31 bits instead keeps what the id is *for* —
+/// one alert, one slot, the same slot when the same alert is resent — and the
+/// producer's ids are hash slices, so their low bits are as well spread as the
+/// whole. Positive, so a server alert can never land on the negative ids the
+/// test notifications reserve for themselves.
+///
+/// A non-numeric id is hashed rather than dropped, for the same reason.
+int? _asNotificationId(Object? value) => switch (value) {
+  final int v => v & 0x7FFFFFFF,
+  final String s when s.isEmpty => null,
+  final String s => switch (int.tryParse(s)) {
+    final int v => v & 0x7FFFFFFF,
+    null => _stableId(s),
+  },
+  _ => null,
+};
+
+/// A deterministic positive 31-bit id for [text] — 32-bit FNV-1a over its
+/// UTF-8 bytes, masked.
+///
+/// Not `String.hashCode`: nothing promises that is the same in the background
+/// isolate that draws a push and the next process that replaces it, and a
+/// notification id that moves between them is two notifications.
+int _stableId(String text) {
+  var hash = 0x811C9DC5;
+  for (final byte in utf8.encode(text)) {
+    hash = ((hash ^ byte) * 0x01000193) & 0xFFFFFFFF;
   }
-  return parsed;
+  return hash & 0x7FFFFFFF;
 }
 
 /// Fires when awesome accepts a notification, before it is shown.
@@ -787,16 +865,23 @@ Future<void> onNotificationDisplayed(ReceivedNotification notification) async {
 /// than a hand-built [NotificationContent]: at that point there is no engine
 /// state to rely on, and the payload is already in awesome's own wire format
 /// (the server sends a `content` object with `channelKey`), so handing it over
-/// whole is both shorter and closer to what the sender meant.
+/// whole is both shorter and closer to what the sender meant. Only its id is
+/// rewritten first — see [jsonDataWithNotificationId].
 @pragma('vm:entry-point')
 Future<void> onFcmSilentData(FcmSilentData silentData) async {
   final data = silentData.data;
   if (data == null || data.isEmpty) return;
 
   if (silentData.createdLifeCycle == NotificationLifeCycle.Terminated) {
-    await AwesomeNotifications().createNotificationFromJsonData(
-      data.cast<String, dynamic>(),
+    final created = await AwesomeNotifications().createNotificationFromJsonData(
+      jsonDataWithNotificationId(data.cast<String, dynamic>()),
     );
+    // awesome reports every rejection on this path as a bare `false` — an
+    // invalid payload, an unknown channel, a refused permission — and with the
+    // app not running nothing else would ever say the push was lost.
+    if (!created) {
+      Log.warning('push: terminated-app notification was not created');
+    }
     return;
   }
 

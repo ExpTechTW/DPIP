@@ -56,11 +56,11 @@ void main() {
     expect(content?.id, 305419896);
   });
 
-  test('an oversized id is dropped instead of killing the notification', () {
+  test('an oversized id keeps its low 31 bits instead of being dropped', () {
     // The producer's id is `parseInt(md5.slice(0, 10), 16)` — up to 40 bits,
-    // routinely wider than the signed 32-bit range awesome validates. Before
-    // the clamp this threw out of createNotification and the foreground push
-    // simply never rendered.
+    // routinely wider than the signed 32-bit range awesome validates. Treating
+    // that as "no id" gave every such push the same fallback slot, so three
+    // different alerts arriving together left only the last one in the shade.
     final content = _content(
       {
         'content':
@@ -70,13 +70,62 @@ void main() {
       body: '花蓮縣近海',
     );
 
-    expect(content?.id, 0, reason: 'out of 32-bit range → treated as absent');
+    expect(content?.id, 0xF12345678 & 0x7FFFFFFF);
     expect(
       content?.channelKey,
       'eq-v2',
       reason: 'the rest of the payload still applies',
     );
     expect(content?.title, '地震速報');
+    // The tap still carries what the producer sent, not the folded id.
+    expect(content?.payload?['id'], '${0xF12345678}');
+  });
+
+  test('different oversized alerts get different shade slots', () {
+    // The three ids a real burst produced — an EEW, a 震度速報 and a weather
+    // alert — every one of them outside 32 bits.
+    const ids = [0xA1B2C3D4E5, 0x0F00BA9876, 0x9C8D7E6F50];
+    final resolved = {
+      for (final id in ids) _content({'id': '$id'}, title: 'T', body: 'B')!.id,
+    };
+
+    expect(resolved, hasLength(ids.length));
+    expect(resolved, everyElement(inInclusiveRange(1, 0x7FFFFFFF)));
+  });
+
+  test('the same alert sent twice resolves to the same slot', () {
+    final first = _content({'id': '${0xA1B2C3D4E5}'}, title: 'T', body: 'B');
+    final again = _content({'id': '${0xA1B2C3D4E5}'}, title: 'T', body: 'B');
+
+    expect(first?.id, again?.id);
+  });
+
+  test('a missing or non-numeric id is derived, never a shared default', () {
+    final eew = _content(
+      {'channel': 'eew-important-v2'},
+      title: '速報',
+      body: 'A',
+    );
+    final report = _content(
+      {'channel': 'int_report-general-v2'},
+      title: '震度',
+      body: 'B',
+    );
+    final named = _content({'id': 'eq-2026-1016'}, title: 'T', body: 'B');
+
+    expect(eew?.id, isNot(report?.id));
+    expect(eew?.id, isPositive);
+    expect(report?.id, isPositive);
+    expect(named?.id, isPositive);
+    // Derived from the text, so the same alert resent replaces itself.
+    expect(
+      _content({'channel': 'eew-important-v2'}, title: '速報', body: 'A')?.id,
+      eew?.id,
+    );
+    expect(
+      _content({'id': 'eq-2026-1016'}, title: 'X', body: 'Y')?.id,
+      named?.id,
+    );
   });
 
   test('flat keys win where both shapes exist', () {
@@ -124,7 +173,9 @@ void main() {
     });
     expect(content?.title, '7');
     expect(content?.body, '8');
-    expect(content?.id, -5);
+    // Folded to positive: negative ids belong to test notifications, and a
+    // server alert must never be able to replace one or be replaced by it.
+    expect(content?.id, -5 & 0x7FFFFFFF);
     expect(content?.payload?['id'], '-5');
   });
 
@@ -143,20 +194,78 @@ void main() {
     );
   });
 
-  test('an id outside the signed 32-bit range is dropped', () {
+  test('every id lands in the positive 31-bit range', () {
+    int? id(Object value) => _content({'id': value}, title: 'T', body: 'B')?.id;
+
+    expect(id('2147483647'), 2147483647);
+    expect(id('42'), 42);
+    expect(id('2147483649'), 1);
+    expect(id('-1'), 0x7FFFFFFF);
+    expect(id('${0xFFFFFFFFFF}'), 0x7FFFFFFF);
+    expect(id('nope'), isPositive);
+    // Wider than 64 bits: not an int at all, so it is hashed like any text.
+    expect(id('123456789012345678901234567890'), isPositive);
     expect(
-      _content({'id': '2147483647'}, title: 'T', body: 'B')?.id,
-      2147483647,
+      _content({'content': '{"title":"T","body":"B","id":2147483649}'})?.id,
+      1,
     );
-    expect(
-      _content({'id': '-2147483648'}, title: 'T', body: 'B')?.id,
-      -2147483648,
-    );
-    expect(_content({'id': '2147483648'}, title: 'T', body: 'B')?.id, 0);
-    expect(_content({'id': 'nope'}, title: 'T', body: 'B')?.id, 0);
-    expect(
-      _content({'content': '{"title":"T","body":"B","id":2147483648}'})?.id,
-      0,
-    );
+  });
+
+  group('jsonDataWithNotificationId', () {
+    test('folds an oversized content id the terminated path would reject', () {
+      final data = jsonDataWithNotificationId({
+        'content':
+            '{"id": ${0xF12345678}, "channelKey": "eq-v2", "body": "測試"}',
+      });
+
+      final content = data['content'] as Map<String, dynamic>;
+      expect(content['id'], 0xF12345678 & 0x7FFFFFFF);
+      expect(content['channelKey'], 'eq-v2');
+      expect(content['body'], '測試');
+    });
+
+    test('gives a content with no id one derived from what it says', () {
+      Map<String, dynamic> content(String body) =>
+          jsonDataWithNotificationId({
+                'content': '{"channelKey": "eq-v2", "body": "$body"}',
+              })['content']
+              as Map<String, dynamic>;
+
+      expect(content('A')['id'], isPositive);
+      expect(content('A')['id'], content('A')['id']);
+      expect(content('A')['id'], isNot(content('B')['id']));
+    });
+
+    test('a flat id wins, as it does for every other field', () {
+      final data = jsonDataWithNotificationId({
+        'id': '7',
+        'content': '{"id": 9, "channelKey": "eq-v2"}',
+      });
+
+      expect((data['content'] as Map<String, dynamic>)['id'], 7);
+      expect(data['id'], '7');
+    });
+
+    test('accepts content that already arrived decoded', () {
+      final data = jsonDataWithNotificationId({
+        'content': <dynamic, dynamic>{'id': 0xF12345678, 'channelKey': 'eq-v2'},
+      });
+
+      expect(
+        (data['content'] as Map<String, dynamic>)['id'],
+        0xF12345678 & 0x7FFFFFFF,
+      );
+    });
+
+    test('leaves a payload with no usable content alone', () {
+      for (final data in <Map<String, dynamic>>[
+        {},
+        {'content': '{not json'},
+        {'content': '[1, 2]'},
+        {'channel': 'eq-v2', 'title': 'T'},
+      ]) {
+        expect(jsonDataWithNotificationId(data), same(data));
+      }
+    });
   });
 }
