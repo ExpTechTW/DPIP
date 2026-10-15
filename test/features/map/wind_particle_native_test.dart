@@ -1,5 +1,4 @@
 import 'package:dpip/features/map/presentation/layers/wind_particle_native.dart';
-import 'package:dpip/features/map/presentation/layers/wind_particle_sim.dart';
 import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,55 +32,6 @@ Uint8List _wnd1({int width = 4, int height = 3, String model = 'ecmwf'}) {
 }
 
 void main() {
-  group('the tuning wire', () {
-    test('carries every curve the simulation defines', () {
-      final tuning = windParticleTuning();
-      expect(tuning['zoomLo'], kWindZoomLo);
-      expect(tuning['zoomHi'], kWindZoomHi);
-      expect(tuning['particlesLo'], kWindParticles.$1);
-      expect(tuning['particlesHi'], kWindParticles.$2);
-      for (var i = 0; i < kWindLineWidths.length; i++) {
-        expect(tuning['lineWidthZ${i + 3}'], kWindLineWidths[i]);
-      }
-      expect(tuning['particleWidth'], kWindParticleWidth);
-      expect(tuning['speedFactorLo'], kWindSpeedFactor.$1);
-      expect(tuning['speedFactorHi'], kWindSpeedFactor.$2);
-      expect(tuning['fadeOpacityLo'], kWindFadeOpacity.$1);
-      expect(tuning['fadeOpacityHi'], kWindFadeOpacity.$2);
-      expect(tuning['dropRate'], kWindDropRate);
-      expect(tuning['densityCalm'], kWindDensityCalm);
-      expect(tuning['densityStrong'], kWindDensityStrong);
-      expect(tuning['speedScale'], kWindSpeedScale);
-    });
-
-    test('sends endpoints, never a per-zoom evaluation', () {
-      final tuning = windParticleTuning();
-      // Every curve must arrive as its two ends. A single value would mean
-      // Dart evaluated it — which puts a platform call on the camera path and
-      // leaves two copies of the curve to drift apart.
-      for (final base in const ['particles', 'speedFactor', 'fadeOpacity']) {
-        expect(tuning, contains('${base}Lo'), reason: base);
-        expect(tuning, contains('${base}Hi'), reason: base);
-        expect(
-          tuning.containsKey(base),
-          isFalse,
-          reason: '$base must not be pre-evaluated',
-        );
-      }
-    });
-
-    test('every value is finite — a NaN would silently stop the field', () {
-      for (final entry in windParticleTuning().entries) {
-        expect(entry.value.isFinite, isTrue, reason: entry.key);
-      }
-    });
-
-    test('the point size scales with the device pixel ratio', () {
-      expect(windParticleTuning(pixelRatio: 3)['pixelRatio'], 3);
-      expect(windParticleTuning()['pixelRatio'], 1);
-    });
-  });
-
   group('the field wire', () {
     test('hands over the undecoded body and the header beside it', () {
       final bytes = _wnd1();
@@ -150,7 +100,6 @@ void main() {
   group('platform support', () {
     WindParticleNative build(TargetPlatform platform) => WindParticleNative(
       field: ValueNotifier<WindField?>(null),
-      interacting: ValueNotifier<bool>(false),
       platform: platform,
     );
 
@@ -188,28 +137,10 @@ void main() {
   group('render-loop gating', () {
     final field = WindField.fromWnd1(_wnd1());
 
-    test('runs only for a visible decoded field with a stable camera', () {
-      expect(
-        windParticleShouldPlay(visible: true, interacting: false, field: field),
-        isTrue,
-      );
-      expect(
-        windParticleShouldPlay(visible: true, interacting: true, field: field),
-        isFalse,
-        reason: 'camera gestures pause GPU state and prevent projection jumps',
-      );
-      expect(
-        windParticleShouldPlay(
-          visible: false,
-          interacting: false,
-          field: field,
-        ),
-        isFalse,
-      );
-      expect(
-        windParticleShouldPlay(visible: true, interacting: false, field: null),
-        isFalse,
-      );
+    test('runs for a visible decoded field, gestures or not', () {
+      expect(windParticleShouldPlay(visible: true, field: field), isTrue);
+      expect(windParticleShouldPlay(visible: false, field: field), isFalse);
+      expect(windParticleShouldPlay(visible: true, field: null), isFalse);
     });
   });
 }

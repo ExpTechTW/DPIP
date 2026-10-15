@@ -1,6 +1,5 @@
 /// A wind-forecast layer names its model, caps the camera at the published
-/// grid, and draws the shared speed legend. A gesture flags the particle
-/// field as interacting for the whole finger-down.
+/// grid, and draws the shared speed legend.
 library;
 
 import 'package:dpip/core/error/failure.dart';
@@ -32,9 +31,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   for (final model in WindForecastModel.values) {
-    testWidgets('${model.key} identity, zoom cap, legend, and gesture flag', (
-      tester,
-    ) async {
+    testWidgets('${model.key} identity, zoom cap, and legend', (tester) async {
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
       final layer = WindForecastMapLayer(
         _WindRepo(),
@@ -48,11 +45,6 @@ void main() {
       expect(layer.rasterBelowLayerId, townLabelLayerId);
       expect(layer.overlayFollowsCamera, isFalse);
       expect(layer.field.value, isNull);
-      expect(layer.interacting.value, isFalse);
-      layer.onMapGestureStart();
-      expect(layer.interacting.value, isTrue);
-      layer.onMapGestureEnd();
-      expect(layer.interacting.value, isFalse);
 
       await tester.pumpWidget(
         MaterialApp(

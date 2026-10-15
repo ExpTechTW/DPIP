@@ -721,29 +721,29 @@ packages:
     dependency: "direct main"
     description:
       path: maplibre_gl
-      ref: "48bce744277a96a5ed5d062f9f632dbfa06e797f"
-      resolved-ref: "48bce744277a96a5ed5d062f9f632dbfa06e797f"
+      ref: a368208e5c2c6262ba43a883da2f0768f1376c60
+      resolved-ref: a368208e5c2c6262ba43a883da2f0768f1376c60
       url: "https://github.com/ExpTechTW/flutter-maplibre-gl.git"
     source: git
-    version: "0.26.2"
+    version: "0.27.1"
   maplibre_gl_platform_interface:
     dependency: "direct main"
     description:
       path: maplibre_gl_platform_interface
-      ref: "48bce744277a96a5ed5d062f9f632dbfa06e797f"
-      resolved-ref: "48bce744277a96a5ed5d062f9f632dbfa06e797f"
+      ref: a368208e5c2c6262ba43a883da2f0768f1376c60
+      resolved-ref: a368208e5c2c6262ba43a883da2f0768f1376c60
       url: "https://github.com/ExpTechTW/flutter-maplibre-gl.git"
     source: git
-    version: "0.26.2"
+    version: "0.27.1"
   maplibre_gl_web:
     dependency: "direct overridden"
     description:
       path: maplibre_gl_web
-      ref: "48bce744277a96a5ed5d062f9f632dbfa06e797f"
-      resolved-ref: "48bce744277a96a5ed5d062f9f632dbfa06e797f"
+      ref: a368208e5c2c6262ba43a883da2f0768f1376c60
+      resolved-ref: a368208e5c2c6262ba43a883da2f0768f1376c60
       url: "https://github.com/ExpTechTW/flutter-maplibre-gl.git"
     source: git
-    version: "0.26.2"
+    version: "0.27.1"
   markdown:
     dependency: "direct main"
     description:
