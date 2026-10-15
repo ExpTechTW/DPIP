@@ -12,6 +12,39 @@
 #
 # For the full list of action inputs/outputs and the four comment-posting modes
 # (sticky / incremental), see action.yml at the repo root.
+#
+# ── Threat model ────────────────────────────────────────────────────────────
+#
+# This is the one workflow here that runs with secrets on a pull request from
+# a fork — `pull_request_target` and `issue_comment` both run in the base
+# repository's context, with its secrets and a token that can write. So it is
+# the one place a stranger's code and a credential can meet, and everything
+# below exists to keep them apart:
+#
+#   - What runs is the base branch's copy of this file, never the pull
+#     request's. A PR cannot edit its own reviewer.
+#   - Nothing checks out or executes the pull request. The action checks out
+#     the *base* and fetches the head commit as git objects only
+#     (`git fetch origin pull/<n>/head`): the diff is read, never built,
+#     installed, sourced or run. Never add a step that checks out
+#     `github.event.pull_request.head.*`, runs a script or a package manager
+#     from the PR, or restores a cache it could have written — any of them
+#     turns this file into remote code execution holding the LLM key.
+#   - Every piece of third-party code that does run is pinned: the action to a
+#     commit, and the CLI it installs from npm to an exact version. The
+#     action's own default for that is `latest`, which would hand these
+#     secrets to whoever publishes the next release, unreviewed.
+#   - The token can read the repository and write pull-request comments, and
+#     nothing else (`permissions:` on the job; the workflow default is none).
+#   - Re-review by comment is limited to members, owners and collaborators.
+#
+# What it does not stop: the diff is text an LLM reads, with tools that can
+# read files in the checkout, so a hostile pull request can steer what the
+# review says. That is accepted — the review is advisory and blocks nothing.
+# The action's own checkout persists the job token for its `git fetch`, on
+# disk and within reach of those tools, which is why "Allow GitHub Actions to
+# create and approve pull requests" must stay off in Settings → Actions: with
+# it on, a leaked token could approve.
 
 name: OpenCodeReview PR Review
 
@@ -54,21 +87,26 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  # Use pull_request_target instead of pull_request so that secrets are
-  # available even for PRs from forks. This is safe because the reusable
-  # action only reads the diff and does not execute any code from the PR.
-  pull_request_target:
+  # pull_request_target rather than pull_request so that secrets are available
+  # for PRs from forks — a fork's `pull_request` run is handed none. Safe only
+  # as long as the threat model at the top of this file holds, which is also
+  # why the workflow lint is told to accept it here and nowhere else.
+  pull_request_target: # zizmor: ignore[dangerous-triggers] — see the threat model above
     types: [opened, synchronize, reopened]
   issue_comment:
     types: [created]
 
-permissions:
-  contents: read
-  pull-requests: write
+# None by default; the one job asks for exactly what it uses.
+permissions: {}
 
 jobs:
   code-review:
     runs-on: ubuntu-latest
+    # Read the repository (the action checks out the base and fetches the
+    # head's objects) and post the review. Nothing else.
+    permissions:
+      contents: read
+      pull-requests: write
     # A backstop, not the cap. The review itself is capped at 15 minutes on its
     # own step, where a timeout can be swallowed; a job-level timeout cannot be,
     # and would fail the check. This only catches something wedging outside the
@@ -137,8 +175,18 @@ jobs:
         id: review
         continue-on-error: true
         timeout-minutes: 15
-        uses: alibaba/open-code-review@main
+        # A commit, not `main`: this code runs holding the secrets below, and a
+        # branch is whatever was pushed to it last.
+        #
+        # `ocr_version` is the CLI the action installs from npm, which is the
+        # code actually handed the LLM key. Left out, the action installs
+        # `latest`, and pinning the action would pin nothing. Dependabot moves
+        # the `uses:` line and cannot see that one, so it sits directly below,
+        # where a Dependabot diff shows it: bump the two together, to the npm
+        # release matching the action's tag.
+        uses: alibaba/open-code-review@fabbdb296b0d97e2140ada8d54ca7d6d6d1d7ad4 # v1.12.13
         with:
+          ocr_version: 1.12.13
           llm_url: ${{ secrets.OCR_LLM_URL }}
           llm_auth_token: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
           llm_model: ${{ secrets.OCR_LLM_MODEL }}
@@ -158,9 +206,13 @@ jobs:
       # otherwise look identical from outside: one green check either way.
       - name: Say so if the review did not run
         if: steps.review.outcome != 'success'
+        # Through the environment rather than spliced into the script, like
+        # every value in a workflow that holds secrets.
+        env:
+          OUTCOME: ${{ steps.review.outcome }}
         run: |
           printf '::warning::the code review did not complete (%s). ' \
-            "${{ steps.review.outcome }}"
+            "$OUTCOME"
           printf 'This check is advisory and stays green on purpose, so nothing '
           printf 'is blocked — but this pull request has not been reviewed. '
           printf 'Comment /open-code-review to try again.\n'
