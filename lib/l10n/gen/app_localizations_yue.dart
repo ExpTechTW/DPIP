@@ -634,6 +634,44 @@ class AppLocalizationsYue extends AppLocalizations {
   String get feedOffline => '連接中斷';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return '連唔到網絡・顯示緊 $age前嘅資料';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '連唔到網絡・顯示緊之前儲存嘅資料';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分鐘',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 個鐘',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 日',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => '重播緊';
 
   @override

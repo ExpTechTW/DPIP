@@ -54,6 +54,7 @@ void main() {
       'body',
       'size',
       'time',
+      'fetched',
     });
     expect(
       (await legacy.get('SELECT COUNT(*) AS n FROM http_cache'))['n'],
@@ -65,6 +66,65 @@ void main() {
     await migrated.write('https://x/v2', etag: '2', body: '{"ok":true}');
     expect((await migrated.read('https://x/v2'))?.body, '{"ok":true}');
   });
+
+  test(
+    'an existing v2 table gains fetched in place, keeping its rows',
+    () async {
+      final v2 = openMemoryDb();
+      addTearDown(v2.close);
+      await v2.executeMultiple(
+        'CREATE TABLE http_cache ('
+        'key TEXT PRIMARY KEY, etag TEXT NOT NULL, content_type TEXT, '
+        'kind INTEGER NOT NULL, body BLOB NOT NULL, size INTEGER NOT NULL, '
+        'time INTEGER NOT NULL);'
+        'CREATE INDEX http_cache_time ON http_cache(time)',
+      );
+      final before = EtagCacheStore(v2);
+      // Written by the pre-column store shape: no fetched value to give.
+      await v2.execute(
+        'INSERT INTO http_cache (key, etag, kind, body, size, time) '
+        'VALUES (?, ?, ?, ?, ?, ?)',
+        [
+          'https://x/old',
+          '1',
+          EtagCacheStore.kindJson,
+          utf8.encode('[1]'),
+          3,
+          1,
+        ],
+      );
+
+      await EtagCacheStore.createSchema(v2);
+
+      final columns = {
+        for (final row in await v2.getAll('PRAGMA table_info(http_cache)'))
+          row['name'],
+      };
+      expect(columns, contains('fetched'));
+      final old = await before.readJson('https://x/old');
+      expect(old?.data, [1], reason: 'a column, not a drop');
+      expect(old?.fetchedAt, isNull, reason: 'its age was never recorded');
+      // Idempotent: a second open does not try to add it again.
+      await EtagCacheStore.createSchema(v2);
+    },
+  );
+
+  test(
+    'a JSON write records when the server sent it; a 304 moves it',
+    () async {
+      final sent = DateTime.utc(2026, 10, 16, 1);
+      await store.write('https://x/r', etag: '1', body: '[]', fetchedAt: sent);
+      expect((await store.readJson('https://x/r'))?.fetchedAt, sent);
+
+      final confirmed = sent.add(const Duration(hours: 3));
+      await store.markFetched('https://x/r', confirmed);
+      expect((await store.readJson('https://x/r'))?.fetchedAt, confirmed);
+
+      // A miss is a no-op, not a throw.
+      await store.markFetched('https://x/none', confirmed);
+      expect(await store.readJson('https://x/none'), isNull);
+    },
+  );
 
   Future<void> setTime(String url, int time) =>
       db.execute('UPDATE http_cache SET time = ? WHERE key = ?', [time, url]);

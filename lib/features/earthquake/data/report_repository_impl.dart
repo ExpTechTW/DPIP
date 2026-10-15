@@ -20,7 +20,7 @@ class ReportRepositoryImpl implements ReportRepository {
     int limit = 30,
     int page = 1,
     ReportListQuery query = ReportListQuery.empty,
-  }) => guardResult(() async {
+  }) => guardFetched(() async {
     final raw = await _api.getReportList(
       limit: limit,
       page: page,
@@ -38,7 +38,7 @@ class ReportRepositoryImpl implements ReportRepository {
       cityMinInt: query.cityMinInt,
       cityMaxInt: query.cityMaxInt,
     );
-    return parseReportList(raw);
+    return (data: parseReportList(raw.data), stale: raw.stale);
   });
 
   @override

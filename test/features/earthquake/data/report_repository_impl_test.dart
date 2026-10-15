@@ -4,6 +4,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
@@ -18,9 +19,10 @@ class _Api implements EarthquakeApi {
   final dynamic reportBody;
   ReportListQuery? seen;
   Object? error;
+  Staleness? stale;
 
   @override
-  Future<List<dynamic>> getReportList({
+  Future<Fetched<List<dynamic>>> getReportList({
     int limit = 50,
     int page = 1,
     int? minIntensity,
@@ -53,7 +55,7 @@ class _Api implements EarthquakeApi {
       cityMinInt: cityMinInt,
       cityMaxInt: cityMaxInt,
     );
-    return listBody;
+    return (data: listBody, stale: stale);
   }
 
   @override
@@ -157,4 +159,15 @@ void main() {
       expect((await repo.get('115032')).failureOrNull, isA<TimeoutFailure>());
     },
   );
+
+  test('a saved page keeps its marker on the way up', () async {
+    final since = DateTime.utc(2026, 10, 16, 1);
+    final api = _Api([_row('115032')], null)
+      ..stale = Staleness(failure: const NetworkFailure('down'), since: since);
+
+    final result = await ReportRepositoryImpl(api).list();
+
+    expect(result.valueOrNull!.single.id, '115032');
+    expect((result as Ok).stale?.since, since);
+  });
 }

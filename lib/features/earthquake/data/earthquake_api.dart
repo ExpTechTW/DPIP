@@ -1,8 +1,10 @@
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/core/network/sse_event.dart';
+import 'package:dpip/core/network/stale_if_error.dart';
 
 /// Earthquake endpoints on the region-aware [ApiClient].
 ///
@@ -84,7 +86,12 @@ class EarthquakeApi {
   ///
   /// [startTime] / [endTime] are `YYYY-MM-DD` (Asia/Taipei). Defaults and
   /// unknown keys are stripped server-side (302 to a canonical query).
-  Future<List<dynamic>> getReportList({
+  ///
+  /// Stale-if-error ([ApiClientStaleIfError.getOrSaved]): offline, the page
+  /// saved last time comes back marked as a saved copy. Past reports do not
+  /// change, so an old page is still a true one — it may only be missing the
+  /// newest, which the marker tells the reader.
+  Future<Fetched<List<dynamic>>> getReportList({
     int limit = 50,
     int page = 1,
     int? minIntensity,
@@ -120,11 +127,12 @@ class EarthquakeApi {
       'cityMinInt': ?cityMinInt,
       'cityMaxInt': ?cityMaxInt,
     };
-    return (await _client.get(
+    final fetched = await _client.getOrSaved(
       ApiTier.coreApi,
       '/api/v2/eq/report',
       query: query,
-    )) as List<dynamic>;
+    );
+    return (data: fetched.data as List<dynamic>, stale: fetched.stale);
   }
 
   /// Full earthquake report by [reportId] (includes area `list`).

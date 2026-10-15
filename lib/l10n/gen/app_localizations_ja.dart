@@ -638,6 +638,44 @@ class AppLocalizationsJa extends AppLocalizations {
   String get feedOffline => '接続が切断されました';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return '接続できません・$age前のデータを表示中';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '接続できません・保存済みのデータを表示中';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count分',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count時間',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count日',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => '再生中';
 
   @override

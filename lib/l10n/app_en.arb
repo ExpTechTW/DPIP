@@ -847,6 +847,46 @@
   },
   "moreSectionLinks": "Links",
   "feedOffline": "Connection lost",
+  "freshnessSavedCopy": "Can't connect · showing data from {age} ago",
+  "freshnessSavedCopyUnknownAge": "Can't connect · showing saved data",
+  "durationMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "durationHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+  "durationDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@durationDays": {
+    "description": "A duration in whole days, used inside other sentences (e.g. how old saved data is)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@durationHours": {
+    "description": "A duration in whole hours, used inside other sentences (e.g. how old saved data is)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@durationMinutes": {
+    "description": "A duration in whole minutes, used inside other sentences (e.g. how old saved data is)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@freshnessSavedCopyUnknownAge": {
+    "description": "Banner over a list shown from a saved copy whose age is unknown, because the server could not be reached"
+  },
+  "@freshnessSavedCopy": {
+    "description": "Banner over a list shown from the copy saved last time because the server could not be reached; {age} is a duration such as '5 minutes' (durationMinutes/Hours/Days)",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
   "feedReplaying": "Replaying",
   "mapLayerStyleBd": "Dvorak BD",
   "@mapLayerSatelliteB09": {

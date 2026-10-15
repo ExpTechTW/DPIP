@@ -49,6 +49,7 @@ class CachedJson {
     required this.etag,
     required this.data,
     required this.size,
+    this.fetchedAt,
   });
 
   final String etag;
@@ -56,6 +57,11 @@ class CachedJson {
 
   /// Wire bytes the original download cost — what a 304 reports as saved.
   final int size;
+
+  /// When the server last confirmed this body (a `200`, or a `304` for a
+  /// request that asked to track it) in calibrated time; null for an entry
+  /// stored before that was recorded. See [EtagCacheStore.markFetched].
+  final DateTime? fetchedAt;
 }
 
 class CachedResponse {
@@ -247,7 +253,18 @@ class EtagCacheStore {
       return;
     }
     await _createV2Schema(db);
+    // Added to v2 in place rather than by a drop: the column is optional, and
+    // throwing away a 350 MB tile cache to gain it would be a poor trade.
+    if (columns.isNotEmpty && !columns.contains(_fetchedColumn)) {
+      await db.execute(
+        'ALTER TABLE $_table ADD COLUMN $_fetchedColumn INTEGER',
+      );
+    }
   }
+
+  /// When the server last confirmed a JSON body (ms epoch, calibrated time);
+  /// NULL for binary rows and for rows written before it existed.
+  static const String _fetchedColumn = 'fetched';
 
   static Future<void> _createV2Schema(SqliteDatabase db) async {
     await db.executeMultiple(
@@ -258,7 +275,8 @@ class EtagCacheStore {
       'kind INTEGER NOT NULL, '
       'body BLOB NOT NULL, '
       'size INTEGER NOT NULL, '
-      'time INTEGER NOT NULL);'
+      'time INTEGER NOT NULL, '
+      '$_fetchedColumn INTEGER);'
       'CREATE INDEX IF NOT EXISTS ${_table}_time ON $_table(time)',
     );
   }
@@ -340,10 +358,14 @@ class EtagCacheStore {
       } else {
         data = const Utf8Decoder().fuse(const JsonDecoder()).convert(blob);
       }
+      final fetched = (row[_fetchedColumn] as num?)?.toInt();
       return CachedJson(
         etag: row['etag'] as String,
         data: data,
         size: (row['size'] as num).toInt(),
+        fetchedAt: fetched == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(fetched, isUtc: true),
       );
     } catch (_) {
       // A corrupt entry reads as a miss: the interceptor then rejects the
@@ -596,13 +618,32 @@ class EtagCacheStore {
     return _flushTouches();
   }
 
+  /// Records that the server has just confirmed the JSON entry for [url]
+  /// unchanged (a `304`) at [at], calibrated time. Best-effort; a miss is a
+  /// no-op.
+  ///
+  /// Separate from the LRU `time`, which a mere read bumps too: a saved copy
+  /// shown offline is labelled with how old it is, and that age runs from the
+  /// last time the server vouched for it, not from the last time anyone asked.
+  Future<void> markFetched(String url, DateTime at) async {
+    try {
+      await _db.execute(
+        'UPDATE $_table SET $_fetchedColumn = ? WHERE key = ?',
+        [at.millisecondsSinceEpoch, url],
+      );
+    } catch (_) {}
+  }
+
   /// Stores a JSON [body] for [url] under [etag]. Best-effort.
+  ///
+  /// [fetchedAt] is when the server sent it, calibrated — see [markFetched].
   Future<void> write(
     String url, {
     required String etag,
     required String body,
     String? contentType,
     int size = 0,
+    DateTime? fetchedAt,
   }) async {
     try {
       // Light gzip on a worker isolate so large JSON writes don't jank the UI
@@ -620,6 +661,7 @@ class EtagCacheStore {
         kind: kindJson,
         body: blob,
         size: size,
+        fetchedAt: fetchedAt,
       );
     } catch (_) {}
   }
@@ -698,12 +740,22 @@ class EtagCacheStore {
     required int kind,
     required Uint8List body,
     required int size,
+    DateTime? fetchedAt,
   }) async {
     await _db.execute(
       'INSERT OR REPLACE INTO $_table '
-      '(key, etag, content_type, kind, body, size, time) '
-      'VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [url, etag, contentType, kind, body, size, _lruStamp()],
+      '(key, etag, content_type, kind, body, size, time, $_fetchedColumn) '
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        url,
+        etag,
+        contentType,
+        kind,
+        body,
+        size,
+        _lruStamp(),
+        fetchedAt?.millisecondsSinceEpoch,
+      ],
     );
     await _noteWrite(body.length, 1);
   }
@@ -851,8 +903,8 @@ class EtagCacheStore {
 
   Future<Map<String, Object?>?> _queryRow(String url) async {
     final row = await _db.getOptional(
-      'SELECT key, etag, content_type, kind, body, size FROM $_table '
-      'WHERE key = ? LIMIT 1',
+      'SELECT key, etag, content_type, kind, body, size, $_fetchedColumn '
+      'FROM $_table WHERE key = ? LIMIT 1',
       [url],
     );
     if (row == null) return null;

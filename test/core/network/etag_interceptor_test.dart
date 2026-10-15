@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/network/dio_client.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
+import 'package:dpip/core/network/stale_if_error.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite_async/sqlite_async.dart';
 
@@ -214,6 +215,72 @@ void main() {
       offline.calls,
       1,
       reason: 'network was attempted before falling back',
+    );
+  });
+
+  group('stale-if-error', () {
+    const url = 'https://api.core-tnn1.exptech.dev/api/v2/eq/report?limit=30';
+
+    Future<void> prime() async {
+      await dioWith(_FakeAdapter(body: '[{"id":"a"}]', etag: 'v1'))
+          .get<dynamic>(url);
+      await settle();
+    }
+
+    test('an opted-in GET is offered the saved body and still fails', () async {
+      await prime();
+      final optIn = StaleIfError();
+
+      await expectLater(
+        dioWith(_NetworkDownAdapter())
+            .get<dynamic>(url, options: optIn.options),
+        throwsA(isA<DioException>()),
+        reason: 'the failure must reach the region client, which may fail over',
+      );
+      expect(optIn.saved?.data, [
+        {'id': 'a'},
+      ]);
+      expect(optIn.saved?.fetchedAt, isNotNull);
+    });
+
+    test('a GET that did not opt in is never answered from cache', () async {
+      await prime();
+      await expectLater(
+        dioWith(_NetworkDownAdapter()).get<dynamic>(url),
+        throwsA(isA<DioException>()),
+      );
+    });
+
+    test('a 5xx is covered, a 404 is not', () async {
+      await prime();
+      final serverError = StaleIfError();
+      await expectLater(
+        dioWith(_StatusAdapter(503))
+            .get<dynamic>(url, options: serverError.options),
+        throwsA(isA<DioException>()),
+      );
+      expect(serverError.saved, isNotNull);
+
+      final gone = StaleIfError();
+      await expectLater(
+        dioWith(_StatusAdapter(404)).get<dynamic>(url, options: gone.options),
+        throwsA(isA<DioException>()),
+      );
+      expect(gone.saved, isNull, reason: 'a 404 is an answer, not an outage');
+    });
+
+    test(
+      'an opted-in 304 records that the server vouched for the copy',
+      () async {
+        final old = DateTime.utc(2000);
+        await store.write(url, etag: 'v1', body: '[]', fetchedAt: old);
+
+        await dioWith(_FakeAdapter(body: '[]', etag: 'v1'))
+            .get<dynamic>(url, options: StaleIfError().options);
+        await settle();
+
+        expect((await store.readJson(url))?.fetchedAt?.isAfter(old), isTrue);
+      },
     );
   });
 

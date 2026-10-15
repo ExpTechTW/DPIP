@@ -634,6 +634,44 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feedOffline => '連線中斷';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return '無法連線・顯示 $age前的資料';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '無法連線・顯示先前儲存的資料';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分鐘',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小時',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => '重播中';
 
   @override
@@ -4131,6 +4169,44 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get feedOffline => '连接中断';
+
+  @override
+  String freshnessSavedCopy(String age) {
+    return '无法连接・显示 $age前的数据';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '无法连接・显示先前保存的数据';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分钟',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小时',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get feedReplaying => '重播中';
@@ -7631,6 +7707,44 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get feedOffline => '連接中斷';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return '連唔到網絡・顯示緊 $age前嘅資料';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '連唔到網絡・顯示緊之前儲存嘅資料';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分鐘',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 個鐘',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 日',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => '重播中';
 
   @override
@@ -11128,6 +11242,44 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get feedOffline => '連線中斷';
+
+  @override
+  String freshnessSavedCopy(String age) {
+    return '無法連線・顯示 $age前的資料';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '無法連線・顯示先前儲存的資料';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 分鐘',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 小時',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 天',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get feedReplaying => '重播中';

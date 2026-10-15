@@ -644,6 +644,45 @@ class AppLocalizationsTh extends AppLocalizations {
   String get feedOffline => 'การเชื่อมต่อขาดหาย';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return 'เชื่อมต่อไม่ได้ · แสดงข้อมูลเมื่อ $ageที่แล้ว';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge =>
+      'เชื่อมต่อไม่ได้ · แสดงข้อมูลที่บันทึกไว้';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count นาที',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ชั่วโมง',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count วัน',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => 'กำลังเล่นซ้ำ';
 
   @override

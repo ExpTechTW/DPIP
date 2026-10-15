@@ -19,6 +19,7 @@ import 'package:flutter_test/flutter_test.dart';
 class _FakeReportRepository implements ReportRepository {
   final List<({int limit, int page, ReportListQuery query})> calls = [];
   Failure? nextError;
+  Staleness? nextStale;
   List<PartialEarthquakeReport> nextPage = const [];
 
   @override
@@ -30,7 +31,7 @@ class _FakeReportRepository implements ReportRepository {
     calls.add((limit: limit, page: page, query: query));
     final error = nextError;
     if (error != null) return Err(error);
-    return Ok(nextPage);
+    return Ok(nextPage, stale: nextStale);
   }
 
   @override
@@ -188,5 +189,69 @@ void main() {
 
     expect(repository.calls.length, callsDuringLoad);
     await reloadFuture;
+  });
+
+  group('staleness', () {
+    final since = DateTime.utc(2026, 10, 16, 1);
+    final saved = Staleness(
+      failure: const NetworkFailure('down'),
+      since: since,
+    );
+
+    test('a fresh page is current', () async {
+      repository.nextPage = _page(3);
+      await controller.reload();
+      expect(controller.staleness, isNull);
+    });
+
+    test('a saved first page is shown, and marked', () async {
+      repository
+        ..nextPage = _page(3)
+        ..nextStale = saved;
+      await controller.reload();
+      expect(controller.items, hasLength(3));
+      expect(controller.failure, isNull);
+      expect(controller.staleness?.since, since);
+    });
+
+    test(
+      'a failed refresh leaves the rows, marked since they loaded',
+      () async {
+        repository.nextPage = _page(3);
+        await controller.reload();
+        repository.nextError = const NetworkFailure('down');
+        await controller.reload();
+
+        expect(controller.items, hasLength(3), reason: 'rows stay on screen');
+        expect(controller.staleness, isNotNull);
+        expect(controller.staleness!.failure, isA<NetworkFailure>());
+        expect(controller.staleness!.since, isNotNull);
+      },
+    );
+
+    test('the next fresh reload clears the mark', () async {
+      repository
+        ..nextPage = _page(3)
+        ..nextStale = saved;
+      await controller.reload();
+      repository.nextStale = null;
+      await controller.reload();
+      expect(controller.staleness, isNull);
+    });
+
+    test('a saved later page marks the whole list', () async {
+      repository.nextPage = _page(ReportListController.pageSize);
+      await controller.reload();
+      repository.nextStale = saved;
+      await controller.loadMore();
+      expect(controller.staleness?.since, since);
+    });
+
+    test('a failure with nothing on screen is an error, not a mark', () async {
+      repository.nextError = const NetworkFailure('down');
+      await controller.reload();
+      expect(controller.failure, isNotNull);
+      expect(controller.staleness, isNull);
+    });
   });
 }

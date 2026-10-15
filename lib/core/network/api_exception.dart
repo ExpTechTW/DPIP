@@ -19,9 +19,21 @@ import 'package:dpip/core/logging/log.dart';
 Future<Result<T>> guardResult<T>(
   Future<T> Function() body, {
   bool Function(Failure failure)? shouldLog,
+}) => guardFetched(
+  () async => (data: await body(), stale: null),
+  shouldLog: shouldLog,
+);
+
+/// [guardResult] for a body that may answer with a saved copy: its
+/// [Fetched.stale] marker is carried onto the [Ok], so the repository above it
+/// cannot drop it on the way to the screen.
+Future<Result<T>> guardFetched<T>(
+  Future<Fetched<T>> Function() body, {
+  bool Function(Failure failure)? shouldLog,
 }) async {
   try {
-    return Ok(await body());
+    final fetched = await body();
+    return Ok(fetched.data, stale: fetched.stale);
   } catch (error, stackTrace) {
     // Silent failures are the worst kind: the UI shows its error state and
     // nothing else records WHY. One line per failure, here at the single

@@ -637,6 +637,44 @@ class AppLocalizationsKo extends AppLocalizations {
   String get feedOffline => '연결이 끊어졌습니다';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return '연결할 수 없음 · $age 전 데이터 표시 중';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge => '연결할 수 없음 · 저장된 데이터 표시 중';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count분',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count시간',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count일',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => '재생 중';
 
   @override
