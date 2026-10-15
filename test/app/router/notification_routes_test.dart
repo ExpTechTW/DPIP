@@ -453,4 +453,36 @@ void main() {
       tsunamiMapLayerId,
     });
   });
+
+  group('the iOS Settings link', () {
+    test('opens the notification settings page over whatever is open', () {
+      final pushed = <String>[];
+      routeNotificationSettingsLink(
+        onboardingComplete: true,
+        push: pushed.add,
+        currentRouteName: () => AppRoutes.map,
+      );
+      expect(pushed, [AppRoutes.notifySettings]);
+    });
+
+    test('does not stack a second copy of the page', () {
+      final pushed = <String>[];
+      routeNotificationSettingsLink(
+        onboardingComplete: true,
+        push: pushed.add,
+        currentRouteName: () => AppRoutes.notifySettings,
+      );
+      expect(pushed, isEmpty);
+    });
+
+    test('waits for onboarding to finish', () {
+      final pushed = <String>[];
+      routeNotificationSettingsLink(
+        onboardingComplete: false,
+        push: pushed.add,
+        currentRouteName: () => AppRoutes.onboarding,
+      );
+      expect(pushed, isEmpty);
+    });
+  });
 }
