@@ -255,3 +255,35 @@ String _unmapped(String? channelKey) {
   Log.warning('Notification channel not mapped to a route: $channelKey');
   return AppRoutes.home;
 }
+
+/// The slice of the router the iOS Settings link needs — [GoRouter.pushNamed].
+typedef NotificationSettingsNavigator = void Function(String name);
+
+/// Opens the notification settings page for the "DPIP Notification Settings"
+/// row in iOS Settings → DPIP → Notifications.
+///
+/// Pushed rather than gone to, so Back returns to whatever the user was doing
+/// — iOS sends them here mid-session as readily as at launch. Not pushed again
+/// when the page is already on top, because a second tap on the row should
+/// land on the same page, not stack another copy over it. Not opened at all
+/// before onboarding is finished: the router would send it straight back to
+/// onboarding, which is the page the user is already on.
+///
+/// [push] and [currentRouteName] are injectable for tests; they default to
+/// the app router.
+void routeNotificationSettingsLink({
+  required bool onboardingComplete,
+  NotificationSettingsNavigator? push,
+  String? Function()? currentRouteName,
+}) {
+  if (!onboardingComplete) {
+    Log.info('Notification settings link: onboarding not finished, ignored');
+    return;
+  }
+  final current = (currentRouteName ?? () => appRouter.state.name)();
+  if (current == AppRoutes.notifySettings) {
+    Log.info('Notification settings link: already on the page');
+    return;
+  }
+  (push ?? (name) => appRouter.pushNamed<void>(name))(AppRoutes.notifySettings);
+}

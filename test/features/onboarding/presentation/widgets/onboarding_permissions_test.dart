@@ -30,6 +30,7 @@ import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/notification_settings_link.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permissions.dart';
@@ -87,6 +88,9 @@ class _FakeNotificationService implements NotificationService {
   @override
   ForegroundEewAnnouncementGate get foregroundEewGate =>
       throw UnimplementedError();
+
+  @override
+  NotificationSettingsLink get settingsLink => throw UnimplementedError();
 }
 
 /// As above: every [LocationService] member is stubbed explicitly.

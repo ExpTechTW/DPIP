@@ -10,6 +10,7 @@ import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/notifications/notification_samples.dart';
+import 'package:dpip/core/notifications/notification_settings_link.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/notifications/retired_channels.dart';
@@ -39,12 +40,18 @@ class NotificationService {
   NotificationService(
     this._settings, {
     ForegroundEewAnnouncementGate? foregroundEewGate,
-  }) : foregroundEewGate =
-           foregroundEewGate ?? ForegroundEewAnnouncementGate() {
+    NotificationSettingsLink? settingsLink,
+  }) : foregroundEewGate = foregroundEewGate ?? ForegroundEewAnnouncementGate(),
+       settingsLink = settingsLink ?? NotificationSettingsLink() {
     _foregroundEewGate = this.foregroundEewGate;
   }
 
   final SettingsStore _settings;
+
+  /// The link back into the app from iOS Settings → DPIP → Notifications.
+  /// Requested here, alongside the permission it depends on; routed by the
+  /// app layer, which owns the page it opens.
+  final NotificationSettingsLink settingsLink;
 
   /// Sequences foreground EEW speech before the notification channel sound.
   /// Background and terminated delivery bypass this object entirely.
@@ -119,6 +126,10 @@ class NotificationService {
       onNotificationDisplayedMethod: onNotificationDisplayed,
     );
     await _initMessaging(channels);
+    // Every launch, not only on a fresh grant: an install that allowed
+    // notifications before this existed never passes through
+    // [requestPermission] again.
+    unawaited(settingsLink.provide());
   }
 
   /// One line per launch saying whether push actually came up.
@@ -164,7 +175,10 @@ class NotificationService {
   Future<PermissionOutcome> requestPermission() async {
     final already = await AwesomeNotifications().isNotificationAllowed();
     Log.info('permission: notifications, already allowed = $already');
-    if (already) return PermissionOutcome.granted;
+    if (already) {
+      unawaited(settingsLink.provide());
+      return PermissionOutcome.granted;
+    }
 
     // Ask the plugin to prompt **only** when iOS has not decided yet.
     //
@@ -203,6 +217,10 @@ class NotificationService {
           },
         );
     Log.info('permission: notifications request -> $granted');
+    // awesome's permission list cannot ask for the iOS Settings row, so it is
+    // requested as soon as there is a grant for it to ride on.
+    if (granted) unawaited(settingsLink.provide());
+
     if (granted) {
       // Permission is usually granted well after launch (onboarding) — by then
       // the launch-time token fetch may have found no APNs token yet. Retry now

@@ -61,6 +61,8 @@ import UserNotifications
       with: registry.registrar(forPlugin: "BackgroundExecutionPlugin")!)
     WidgetSnapshotPlugin.register(with: registry.registrar(forPlugin: "WidgetSnapshotPlugin")!)
     NativeLogPlugin.register(with: registry.registrar(forPlugin: "NativeLogPlugin")!)
+    NotificationSettingsLinkPlugin.register(
+      with: registry.registrar(forPlugin: "NotificationSettingsLinkPlugin")!)
 
     // Re-post the launch notification the plugins just missed.
     //
@@ -183,5 +185,16 @@ final class NotificationDelegateProxy: NSObject, UNUserNotificationCenterDelegat
     }
     wrapped.userNotificationCenter?(
       center, didReceive: response, withCompletionHandler: completionHandler)
+  }
+
+  /// The "DPIP Notification Settings" row in iOS Settings — which exists
+  /// because `NotificationSettingsLinkPlugin` asked for it, so this one is
+  /// ours. Not forwarded: awesome (0.12.1) does not implement it, and a
+  /// wrapped delegate that one day did would open the page a second time.
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    openSettingsFor notification: UNNotification?
+  ) {
+    NotificationSettingsLinkPlugin.request()
   }
 }

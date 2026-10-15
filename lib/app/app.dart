@@ -208,6 +208,15 @@ class _AppServicesHostState extends State<_AppServicesHost>
         stagger: const Duration(milliseconds: 250),
       );
       NotificationTaps.drainPending();
+      // The iOS Settings link, including a tap that launched the app — after
+      // the first frame for the same reason as the drain above.
+      unawaited(
+        widget.notificationService.settingsLink.listen(
+          () => routeNotificationSettingsLink(
+            onboardingComplete: widget.onboarding.isComplete,
+          ),
+        ),
+      );
       // Permissions belong to onboarding — only run the permission-dependent
       // setup once it's complete (immediately for returning users).
       if (widget.onboarding.isComplete) _onReady();
@@ -313,6 +322,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
   @override
   void dispose() {
     NotificationTaps.onTap = null;
+    widget.notificationService.settingsLink.stop();
     widget.onboarding.removeListener(_onOnboardingChanged);
     unawaited(_tokenChanges?.cancel());
     widget.deviceRegistration?.dispose();

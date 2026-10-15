@@ -16,6 +16,7 @@ import 'package:awesome_notifications/awesome_notifications_platform_interface.d
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/notification_settings_link.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -311,6 +312,38 @@ void main() {
     });
     await onNotificationCreated(createdNote);
     await onNotificationDisplayed(createdNote);
+  });
+
+  test('a grant asks iOS for the Settings link, a refusal does not', () async {
+    const linkChannel = MethodChannel('test/settings_link');
+    var provides = 0;
+    messenger.setMockMethodCallHandler(linkChannel, (call) async {
+      if (call.method == 'provide') provides++;
+      return true;
+    });
+    addTearDown(() => messenger.setMockMethodCallHandler(linkChannel, null));
+    final service = NotificationService(
+      SettingsStore.inMemory(),
+      settingsLink: NotificationSettingsLink(channel: linkChannel, isIOS: true),
+    );
+    addTearDown(service.foregroundEewGate.dispose);
+
+    alertStatus = 'notDetermined';
+    requestResult = false;
+    expect(await service.requestPermission(), PermissionOutcome.needsSettings);
+    await _settle();
+    expect(provides, 0);
+
+    requestResult = true;
+    expect(await service.requestPermission(), PermissionOutcome.granted);
+    await _settle();
+    expect(provides, 1);
+
+    // Already allowed — an install from before the link existed.
+    allowed = true;
+    expect(await service.requestPermission(), PermissionOutcome.granted);
+    await _settle();
+    expect(provides, 2);
   });
 
   testWidgets('a prompt that never answers falls back to settings', (
