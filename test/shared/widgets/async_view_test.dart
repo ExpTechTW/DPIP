@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
+import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -137,5 +139,88 @@ void main() {
     pending.complete(const Ok(2));
     await tester.pumpAndSettle();
     expect(find.text('v 2'), findsOneWidget);
+  });
+
+  group('a saved copy', () {
+    // Ages are built from AppTime, the clock the banner measures them with.
+    testWidgets('renders under a banner with its age, never as current', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<int>(
+            future: () => Future.value(
+              Ok(
+                5,
+                stale: Staleness(
+                  failure: const NetworkFailure('No connection'),
+                  since: AppTime.utc.subtract(const Duration(minutes: 20)),
+                ),
+              ),
+            ),
+            builder: (_, value) => ListView(children: [Text('v $value')]),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('v 5'), findsOneWidget);
+      expect(
+        find.text("Can't connect · showing data from 20 minutes ago"),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('of unknown age still says it is saved', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<int>(
+            future: () => Future.value(
+              const Ok(
+                5,
+                stale: Staleness(failure: NetworkFailure('No connection')),
+              ),
+            ),
+            builder: (_, value) => Text('v $value'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text("Can't connect · showing saved data"), findsOneWidget);
+    });
+
+    testWidgets('keeps its banner while a refresh is in flight', (
+      tester,
+    ) async {
+      final refresh = ChangeNotifier();
+      addTearDown(refresh.dispose);
+      var calls = 0;
+      final pending = Completer<Result<int>>();
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<int>(
+            refreshSignal: refresh,
+            future: () => calls++ == 0
+                ? Future.value(
+                    const Ok(
+                      5,
+                      stale: Staleness(failure: NetworkFailure('down')),
+                    ),
+                  )
+                : pending.future,
+            builder: (_, value) => Text('v $value'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      refresh.notifyListeners();
+      await tester.pump();
+      expect(find.text('v 5'), findsOneWidget);
+      expect(find.byType(FreshnessBanner), findsOneWidget);
+
+      pending.complete(const Ok(6));
+      await tester.pumpAndSettle();
+      expect(find.text('v 6'), findsOneWidget);
+      expect(find.byType(FreshnessBanner), findsNothing);
+    });
   });
 }

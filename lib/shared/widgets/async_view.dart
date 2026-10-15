@@ -3,12 +3,16 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
+import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 
 /// Renders a one-shot `Future<Result<T>>` to the async-state contract:
 /// waiting → loading, [Ok] → [builder] (or [empty] when [isEmpty]), [Err] →
 /// error with "couldn't load data, please try again" and a **retry** button.
+/// An [Ok] that is a saved copy ([Ok.stale] — the source was unreachable)
+/// renders like any other, under a [FreshnessBanner] saying how old it is:
+/// shown, but never as current.
 /// Pairs with the repository `Result` contract so a feature never hand-rolls a
 /// `FutureBuilder` that drops the error case into a blank screen.
 ///
@@ -73,6 +77,10 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
   /// news you already had.
   T? _loaded;
 
+  /// Whether [_loaded] is a saved copy, so it keeps its banner while a
+  /// refresh is in flight.
+  Staleness? _loadedStale;
+
   @override
   void initState() {
     super.initState();
@@ -112,16 +120,31 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
 
   /// The success UI for [value] — the empty state when [AsyncView.isEmpty] says
   /// so, else the caller's builder.
-  Widget _content(BuildContext context, T value) {
+  Widget _content(BuildContext context, T value, Staleness? stale) {
     _loaded = value;
-    if (widget.isEmpty?.call(value) ?? false) {
-      return widget.empty?.call(context) ??
-          EmptyView(
-            icon: Icons.inbox_outlined,
-            message: AppLocalizations.of(context).commonEmpty,
-          );
-    }
-    return widget.builder(context, value);
+    _loadedStale = stale;
+    final content = (widget.isEmpty?.call(value) ?? false)
+        ? widget.empty?.call(context) ??
+              EmptyView(
+                icon: Icons.inbox_outlined,
+                message: AppLocalizations.of(context).commonEmpty,
+              )
+        : widget.builder(context, value);
+    if (stale == null) return content;
+    final banner = FreshnessBanner.saved(staleness: stale);
+    // Most hosts give this view a bounded box and a scrollable builder, which
+    // needs the rest of the height; one laid out in a column of its own sizes
+    // to its content instead.
+    return LayoutBuilder(
+      builder: (context, constraints) => constraints.hasBoundedHeight
+          ? Column(
+              children: [
+                banner,
+                Expanded(child: content),
+              ],
+            )
+          : Column(mainAxisSize: MainAxisSize.min, children: [banner, content]),
+    );
   }
 
   @override
@@ -135,7 +158,9 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           final previous = _loaded;
-          if (previous != null) return _content(context, previous);
+          if (previous != null) {
+            return _content(context, previous, _loadedStale);
+          }
           return widget.loading?.call(context) ?? const LoadingView();
         }
         // Repositories return Result and don't throw; a raw error here is
@@ -144,7 +169,7 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
           return ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry);
         }
         return switch (snapshot.data!) {
-          Ok(:final value) => _content(context, value),
+          Ok(:final value, :final stale) => _content(context, value, stale),
           Err(:final failure) =>
             widget.error?.call(context, failure, _retry) ??
                 ErrorView(headline: l10n.commonFetchFailed, onRetry: _retry),
