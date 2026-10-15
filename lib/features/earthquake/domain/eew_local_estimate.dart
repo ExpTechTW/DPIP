@@ -9,14 +9,14 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 /// Derived purely from [EewEstimator] so the alert card's numbers are the same
 /// golden-pinned math the map's hazard overlays use — never a second,
 /// hand-rolled approximation. [distanceKm] is hypocentral (surface + depth);
-/// [sArrivalSeconds] is the estimated S-wave travel time from the origin, so
-/// arrival = origin + this many seconds.
+/// [sArrival] is the estimated S-wave travel time from the origin, so
+/// arrival = origin + [sArrival] (see [SWaveCountdown]).
 class EewLocalEstimate {
   const EewLocalEstimate({
     required this.distanceKm,
     required this.intensity,
     required this.scale,
-    required this.sArrivalSeconds,
+    required this.sArrival,
   });
 
   /// Hypocentral distance in kilometres.
@@ -28,8 +28,68 @@ class EewLocalEstimate {
   /// Discrete CWA felt intensity (0–9, see [Intensity.toScale]).
   final int scale;
 
-  /// Estimated S-wave travel time in seconds from the earthquake origin.
-  final int sArrivalSeconds;
+  /// Estimated S-wave travel time from the earthquake origin, to the
+  /// millisecond.
+  ///
+  /// Never rounded to a whole second: it used to be, and the cards then
+  /// truncated what was left with `inSeconds` on a tick that was not aligned
+  /// to anything, so "arrived" could show up to a second early or late
+  /// depending on where the rounding and the tick happened to fall. Rounding
+  /// is the display's business, once, at the edge ([SWaveCountdown]).
+  final Duration sArrival;
+}
+
+/// One observer's S-wave arrival as a countdown — the single place the
+/// "arrived" instant and the seconds shown are decided, so every card counts
+/// the same way.
+class SWaveCountdown {
+  const SWaveCountdown(this.arrival);
+
+  /// The countdown to [estimate]'s arrival for [eew].
+  factory SWaveCountdown.of(Eew eew, EewLocalEstimate estimate) =>
+      SWaveCountdown(
+        DateTime.fromMillisecondsSinceEpoch(
+          eew.info.time,
+          isUtc: true,
+        ).add(estimate.sArrival),
+      );
+
+  /// When the S wave reaches the observer.
+  final DateTime arrival;
+
+  /// Whether the S wave has arrived at [now] — true from the computed instant
+  /// itself onwards, never a moment later.
+  bool arrivedAt(DateTime now) => !now.isBefore(arrival);
+
+  /// Whole seconds left at [now], rounded **up**: a countdown reads 1 until
+  /// the instant of arrival and 0 only from it. Rounding down would read 0 for
+  /// the last second while the wave was still on its way.
+  int secondsLeftAt(DateTime now) {
+    final left = arrival.difference(now).inMicroseconds;
+    if (left <= 0) return 0;
+    return (left + _microsPerSecond - 1) ~/ _microsPerSecond;
+  }
+
+  /// How long after [now] [secondsLeftAt] next changes — the instant a
+  /// display has to redraw to stay exact — or null once arrived, when it
+  /// never changes again.
+  Duration? untilNextChangeAt(DateTime now) {
+    final left = arrival.difference(now).inMicroseconds;
+    if (left <= 0) return null;
+    final intoSecond = left % _microsPerSecond;
+    return Duration(
+      microseconds: intoSecond == 0 ? _microsPerSecond : intoSecond,
+    );
+  }
+
+  static const int _microsPerSecond = 1000000;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SWaveCountdown && other.arrival == arrival;
+
+  @override
+  int get hashCode => arrival.hashCode;
 }
 
 /// Estimates local shaking for [eew] at [user].
@@ -39,7 +99,8 @@ class EewLocalEstimate {
 /// and skip the estimate entirely when no location is resolvable (全國 or a
 /// 所在地 with no GPS fix) rather than inventing a default.
 ///
-/// [sArrivalSeconds] comes from the **CWA travel-time table** ([table], the
+/// [EewLocalEstimate.sArrival] comes from the **CWA travel-time table**
+/// ([table], the
 /// same source the map's wave circles use) when it has resolved — the legacy
 /// app's `sWaveTimeByDistance` query, matched on **epicentral** distance so
 /// "arrived" and the wave front on the map agree. Until the table loads (a
@@ -93,13 +154,13 @@ EewLocalEstimate _estimate(
   // distance — the same table the map's wave circles use, so "arrived" and the
   // wave front on the map agree (legacy's `sWaveTimeByDistance`).
   final epicentral = eew.info.latlng.distanceTo(user) / 1000;
-  final sArrivalSeconds = table == null
-      ? EewEstimator.waveTime(eew.info.depth, epicentral).s.round()
-      : (table.sWaveTime(eew.info.depth, epicentral) / 1000).round();
+  final sArrivalMs = table == null
+      ? EewEstimator.waveTime(eew.info.depth, epicentral).s * 1000
+      : table.sWaveTime(eew.info.depth, epicentral);
   return EewLocalEstimate(
     distanceKm: location.dist,
     intensity: location.i,
     scale: Intensity.toScale(location.i),
-    sArrivalSeconds: sArrivalSeconds,
+    sArrival: Duration(milliseconds: sArrivalMs.round()),
   );
 }

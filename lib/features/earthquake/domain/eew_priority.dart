@@ -23,22 +23,15 @@ class RankedEew {
   /// always null for a cancelled alert, which has none.
   final EewLocalEstimate? estimate;
 
-  /// When the S wave reaches the observer, or null without an [estimate].
-  DateTime? get arrival {
+  /// The S wave's arrival at the observer, or null without an [estimate].
+  SWaveCountdown? get countdown {
     final estimate = this.estimate;
-    if (estimate == null) return null;
-    return DateTime.fromMillisecondsSinceEpoch(
-      alert.info.time,
-      isUtc: true,
-    ).add(Duration(seconds: estimate.sArrivalSeconds));
+    return estimate == null ? null : SWaveCountdown.of(alert, estimate);
   }
 
   /// Whether the S wave has reached the observer by [now]. False when that is
   /// unknown.
-  bool arrivedAt(DateTime now) {
-    final arrival = this.arrival;
-    return arrival != null && !now.isBefore(arrival);
-  }
+  bool arrivedAt(DateTime now) => countdown?.arrivedAt(now) ?? false;
 }
 
 /// [alerts] most-relevant first, for an observer at [observer] (null when

@@ -117,6 +117,18 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
   /// centroid. Falls back to the centroid when no fix is available.
   LatLng? _fix;
 
+  /// The countdown the last build showed — what the ticks are aligned to.
+  SWaveCountdown? _countdown;
+
+  @override
+  DateTime secondTickerNow() => widget.clock?.call() ?? AppTime.utc;
+
+  /// Redraw exactly when the seconds shown change — on whole seconds before
+  /// the arrival, not of the clock — so "arrived" lands on the instant.
+  @override
+  Duration secondTickerDelay(DateTime now) =>
+      _countdown?.untilNextChangeAt(now) ?? super.secondTickerDelay(now);
+
   @override
   void initState() {
     super.initState();
@@ -159,15 +171,15 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
 
     final originUtc = DateTime.fromMillisecondsSinceEpoch(info.time);
     final maxIntensity = Intensity.displayForReport(info.max, originUtc);
-    final now = widget.clock?.call() ?? AppTime.utc;
-    final remaining = estimate == null
+    final now = secondTickerNow();
+    final countdown = estimate == null
         ? null
-        : originUtc
-              .add(Duration(seconds: estimate.sArrivalSeconds))
-              .difference(now)
-              .inSeconds;
-
-    final arrived = remaining != null && remaining <= 0;
+        : SWaveCountdown.of(widget.eew, estimate);
+    if (countdown != _countdown) {
+      _countdown = countdown;
+      realignSecondTicker();
+    }
+    final arrived = countdown != null && countdown.arrivedAt(now);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -271,7 +283,7 @@ class _EewCardContentState extends State<EewCardContent> with SecondTicker {
                   label: l10n.eewSWave,
                   value: arrived
                       ? l10n.eewArrived
-                      : l10n.eewCountdown(remaining ?? 0),
+                      : l10n.eewCountdown(countdown?.secondsLeftAt(now) ?? 0),
                   background: EewEstimateTile.alertRed(),
                   foreground: Colors.white,
                 ),

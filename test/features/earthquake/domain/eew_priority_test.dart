@@ -66,7 +66,7 @@ void main() {
       observer: _taipei,
     );
     expect(ranked.single.estimate, isNull);
-    expect(ranked.single.arrival, isNull);
+    expect(ranked.single.countdown, isNull);
   });
 
   test('with an observer, an S wave still on its way outranks a stronger one '
