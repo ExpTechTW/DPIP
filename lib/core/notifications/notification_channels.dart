@@ -470,8 +470,11 @@ enum NotificationBehaviour {
   ///
   /// That caveat is the whole difference from [overrides] and it is not
   /// cosmetic. awesome maps importance to an iOS interruption level in
-  /// `NotificationBuilder.setImportance` — High/Max become `.timeSensitive`,
-  /// Default becomes `.active` — and only the `.critical` level a
+  /// `NotificationBuilder.setImportance` — High/Max become `.timeSensitive`
+  /// (which iOS honours only because the Runner entitlements carry
+  /// `usernotifications.time-sensitive`; without it the level silently drops
+  /// to `.active` and a Focus holds the alert), Default becomes `.active` —
+  /// and only the `.critical` level a
   /// `criticalAlerts` channel gets bypasses the mute switch. The code that
   /// attaches the sound is otherwise the *same branch* for both, so a channel
   /// in this tier is not missing its sound on a muted phone: the sound is
