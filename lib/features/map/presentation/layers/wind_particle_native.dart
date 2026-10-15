@@ -2,10 +2,8 @@
 library;
 
 import 'dart:async';
-import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/features/map/presentation/layers/wind_particle_sim.dart';
 import 'package:dpip/features/weather/domain/wind_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -25,21 +23,14 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// but the same pass is where map content belongs, and one wire feeds both.
 ///
 /// This class owns only the *conversation* with that renderer — when to add it,
-/// what to upload, when to let it run. The simulation itself is gone from Dart;
-/// [WindParticleSim] survives as the numeric oracle the native shaders are
-/// checked against, not as something that runs in production.
+/// what to upload, when to let it run. Every number the renderer draws with is
+/// native; `wind_particle_sim.dart` is their reference, not a source.
 class WindParticleNative {
-  WindParticleNative({
-    required this.field,
-    required this.interacting,
-    TargetPlatform? platform,
-  }) : _platform = platform ?? defaultTargetPlatform;
+  WindParticleNative({required this.field, TargetPlatform? platform})
+    : _platform = platform ?? defaultTargetPlatform;
 
   /// The grid to animate; null while the timeline moves or before it arrives.
   final ValueListenable<WindField?> field;
-
-  /// Whether a finger is on the map.
-  final ValueListenable<bool> interacting;
 
   final TargetPlatform _platform;
 
@@ -81,13 +72,9 @@ class WindParticleNative {
     if (!isSupported || _unavailable) return;
     _controller = controller;
     field.addListener(_onFieldChanged);
-    interacting.addListener(_onInteractingChanged);
     _enqueue(() async {
       await controller.addWindParticleLayer();
       _added = true;
-      await controller.setWindParticleTuning(
-        windParticleTuning(pixelRatio: _devicePixelRatio()),
-      );
       await _pushField(controller);
       await _pushPlaying(controller);
     });
@@ -96,7 +83,6 @@ class WindParticleNative {
   /// Releases the native layer. Safe to call when nothing was ever added.
   Future<void> detach() async {
     field.removeListener(_onFieldChanged);
-    interacting.removeListener(_onInteractingChanged);
     final controller = _controller;
     _controller = null;
     if (!_added || controller == null) {
@@ -128,8 +114,6 @@ class WindParticleNative {
     });
   }
 
-  void _onInteractingChanged() => _sync();
-
   void _sync() {
     final controller = _controller;
     if (controller == null) return;
@@ -145,16 +129,15 @@ class WindParticleNative {
     await controller.setWindParticleField(payload);
   }
 
-  /// The animation runs only when there is something to animate, someone to
-  /// see it, and the camera is stable. Pausing during a gesture prevents a
-  /// state pair sampled under different projections from becoming a streak;
-  /// native clears its trail buffers before resuming.
+  /// The animation runs only when there is something to animate and someone
+  /// to see it.
+  ///
+  /// Not paused for gestures. Native keeps the field in the viewport as it was
+  /// when the camera last settled and carries that with the map, so a pan or
+  /// a pinch moves the trails instead of wiping them — and pausing would hand
+  /// back the blank map and the regrowth that are the thing being avoided.
   Future<void> _pushPlaying(MapLibreMapController controller) async {
-    final want = windParticleShouldPlay(
-      visible: _visible,
-      interacting: interacting.value,
-      field: _uploaded,
-    );
+    final want = windParticleShouldPlay(visible: _visible, field: _uploaded);
     if (want == _playing) return;
     _playing = want;
     await controller.setWindParticlePlaying(want);
@@ -187,50 +170,8 @@ class WindParticleNative {
 @visibleForTesting
 bool windParticleShouldPlay({
   required bool visible,
-  required bool interacting,
   required WindField? field,
-}) => visible && !interacting && field?.source != null;
-
-/// The display scale the point size is expressed in.
-///
-/// `pointSize` is tuned in logical pixels, but `gl_PointSize` is in physical
-/// ones — on a 3x phone an unconverted value draws the field a third of its
-/// intended weight, which reads as "the wind is faint today" rather than as a
-/// bug. Read from the dispatcher rather than a `BuildContext` because the layer
-/// attaches from a controller callback, where there is no element to look up.
-double _devicePixelRatio() {
-  final views = ui.PlatformDispatcher.instance.views;
-  return views.isEmpty ? 1 : views.first.devicePixelRatio;
-}
-
-/// The zoom curves as their endpoints, in the wire's shape.
-///
-/// Sent whole so the numbers keep one home. Evaluating them per zoom in Dart
-/// would put a platform call on the camera path — the exact per-frame traffic
-/// this design exists to remove — and would leave two copies of the curve to
-/// drift apart. `wind_particle_sim.dart` stays their definition; this is a
-/// projection of it.
-Map<String, double> windParticleTuning({double pixelRatio = 1}) => {
-  'zoomLo': kWindZoomLo,
-  'zoomHi': kWindZoomHi,
-  'particlesLo': kWindParticles.$1,
-  'particlesHi': kWindParticles.$2,
-  'lineWidthZ3': kWindLineWidths[0],
-  'lineWidthZ4': kWindLineWidths[1],
-  'lineWidthZ5': kWindLineWidths[2],
-  'lineWidthZ6': kWindLineWidths[3],
-  'lineWidthZ7': kWindLineWidths[4],
-  'particleWidth': kWindParticleWidth,
-  'speedFactorLo': kWindSpeedFactor.$1,
-  'speedFactorHi': kWindSpeedFactor.$2,
-  'fadeOpacityLo': kWindFadeOpacity.$1,
-  'fadeOpacityHi': kWindFadeOpacity.$2,
-  'dropRate': kWindDropRate,
-  'densityCalm': kWindDensityCalm,
-  'densityStrong': kWindDensityStrong,
-  'speedScale': kWindSpeedScale,
-  'pixelRatio': pixelRatio,
-};
+}) => visible && field?.source != null;
 
 /// One wind field in the wire's shape, or null when it carries no payload.
 ///
