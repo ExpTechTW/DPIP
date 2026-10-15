@@ -43,6 +43,8 @@
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
 		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
 		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
+		LR0S00000000000000000002 /* LocationReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000001 /* LocationReportSender.swift */; };
+		LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000003 /* LocationReportSenderTests.swift */; };
 		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
 		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
@@ -167,6 +169,8 @@
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
+		LR0S00000000000000000001 /* LocationReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSender.swift; sourceTree = "<group>"; };
+		LR0S00000000000000000003 /* LocationReportSenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSenderTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
@@ -378,6 +382,7 @@
 				27CACC3D305C64AA0046F79C /* WidgetLocationIntentTests.swift */,
 				27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */,
 				NL0G00000000000000000003 /* NativeLogTests.swift */,
+				LR0S00000000000000000003 /* LocationReportSenderTests.swift */,
 				270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */,
 				270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */,
 				E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */,
@@ -451,6 +456,7 @@
 				797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */,
 				CAC4EF00000000000000B002 /* MapCachePlugin.swift */,
 				CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */,
+				LR0S00000000000000000001 /* LocationReportSender.swift */,
 				CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */,
 				CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */,
 				CAC4EF00000000000000D002 /* StorageScanPlugin.swift */,
@@ -727,6 +733,7 @@
 				D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
 				27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */,
 				NL0G00000000000000000004 /* NativeLogTests.swift in Sources */,
+				LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */,
 				270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */,
 				27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */,
 				D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */,
@@ -756,6 +763,7 @@
 				071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */,
 				CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */,
 				CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */,
+				LR0S00000000000000000002 /* LocationReportSender.swift in Sources */,
 				CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */,
 				CAC4EF00000000000000E101 /* WidgetSnapshotPlugin.swift in Sources */,
 				CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */,

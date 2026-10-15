@@ -8,8 +8,28 @@ import UserNotifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-
+    // Here, not in the plugin's registration: plugins register when the
+    // Flutter engine is created, and a relaunch for a finished location-report
+    // transfer may never create one.
+    LocationReportSender.shared.launch()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  /// The system relaunched the app because a location-report transfer
+  /// finished while it was not running. Anything else goes to Flutter's
+  /// plugins, as before.
+  override func application(
+    _ application: UIApplication,
+    handleEventsForBackgroundURLSession identifier: String,
+    completionHandler: @escaping () -> Void
+  ) {
+    guard identifier == LocationReportSender.sessionIdentifier else {
+      super.application(
+        application, handleEventsForBackgroundURLSession: identifier,
+        completionHandler: completionHandler)
+      return
+    }
+    LocationReportSender.shared.handleEvents(completionHandler)
   }
 
   override func applicationDidBecomeActive(_ application: UIApplication) {
