@@ -374,7 +374,9 @@ void main() {
       final source = EewRealtimeSource(
         () => stream.stream,
         cwaOnly: () => false,
-        now: () => DateTime.utc(2026, 10, 16),
+        // Half a minute after the fixtures' origin.
+        now: () =>
+            DateTime.fromMillisecondsSinceEpoch(1700000030000, isUtc: true),
       );
       addTearDown(source.dispose);
       await source.fetch(); // opens the connection
@@ -396,6 +398,33 @@ void main() {
 
       final gone = await answer(source, stream, '[]');
       expect(gone, isEmpty);
+    });
+
+    test('a connection that stays open after the server stops updating '
+        'cannot keep an alert up past its expiry', () async {
+      final stream = StreamController<SseEvent>.broadcast();
+      addTearDown(stream.close);
+      var now = DateTime.fromMillisecondsSinceEpoch(1700000030000, isUtc: true);
+      final source = EewRealtimeSource(
+        () => stream.stream,
+        cwaOnly: () => false,
+        now: () => now,
+      );
+      addTearDown(source.dispose);
+      await source.fetch();
+
+      final shown = await answer(
+        source,
+        stream,
+        frame([(id: 'a', serial: 1, status: 0)]),
+      );
+      expect(shown, hasLength(1));
+
+      // No new frame: the channel's next polls are answered from the buffer.
+      now = DateTime.fromMillisecondsSinceEpoch(1700000249000, isUtc: true);
+      expect((await source.fetch()).valueOrNull, hasLength(1));
+      now = DateTime.fromMillisecondsSinceEpoch(1700000250000, isUtc: true);
+      expect((await source.fetch()).valueOrNull, isEmpty);
     });
   });
 }
@@ -440,6 +469,10 @@ class _Fallback {
         return completer.future;
       },
       elapsed: elapsed,
+      // Thirty seconds after [_wire]'s origin time: the alerts these tests
+      // poll are an earthquake in progress, not one the expiry rule retired.
+      now: () =>
+          DateTime.fromMillisecondsSinceEpoch(1700000030000, isUtc: true),
       delay: (_) {
         final completer = Completer<void>();
         reconnects.add(completer);
