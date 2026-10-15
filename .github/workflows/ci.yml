@@ -26,6 +26,11 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
+          # Nothing here pushes, and every step after this one runs code the
+          # branch under test controls: the job token is not left in
+          # .git/config for it. The `git fetch`es below are anonymous, which a
+          # public repository allows.
+          persist-credentials: false
 
       # The commit gate first, because it is the only failure that cannot be
       # fixed by another commit. A message is immutable once pushed, so the

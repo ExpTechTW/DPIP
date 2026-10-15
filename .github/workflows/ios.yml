@@ -34,6 +34,9 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
+          # Nothing here pushes or fetches, so the job token is not left in
+          # .git/config for the steps after this one.
+          persist-credentials: false
           # A push reads its own commit messages below: full history, without
           # the file contents nothing here looks at.
           fetch-depth: ${{ github.event_name == 'push' && '0' || '1' }}
@@ -75,7 +78,10 @@ jobs:
       contents: read
 
     steps:
+      # Nothing here pushes, so the job token is not left in .git/config.
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
 
       # Flutter and Dart come from mise.toml, the same pin CI and every laptop
       # use. Not subosito/flutter-action with `channel: stable`: that resolves
