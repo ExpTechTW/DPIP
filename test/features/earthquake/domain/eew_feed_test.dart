@@ -15,6 +15,8 @@ Eew _report(
   String agency = 'cwa',
   int status = 0,
   double magnitude = 5.0,
+  double depth = 10,
+  DateTime? origin,
 }) => Eew(
   agency: agency,
   id: id,
@@ -22,10 +24,10 @@ Eew _report(
   status: status,
   isFinal: false,
   info: EewInfo(
-    time: _t0.millisecondsSinceEpoch,
+    time: (origin ?? _t0).millisecondsSinceEpoch,
     longitude: 121.5,
     latitude: 23.8,
-    depth: 10,
+    depth: depth,
     magnitude: magnitude,
     location: '花蓮縣',
     max: 4,
@@ -157,9 +159,8 @@ void main() {
       state = reduceEewFeed(state, const [], _t0.add(EewFeedState.memory));
       expect(state.trackOf(_report(3).eventKey), isNull);
       // Nothing left to hold it back: a later listing is taken as it comes.
-      state = reduceEewFeed(state, [
-        _report(2),
-      ], _t0.add(EewFeedState.memory + const Duration(seconds: 1)));
+      final later = _t0.add(EewFeedState.memory + const Duration(seconds: 1));
+      state = reduceEewFeed(state, [_report(2, origin: later)], later);
       expect(state.visible.single.serial, 2);
     });
 
@@ -168,6 +169,120 @@ void main() {
       final later = _t0.add(EewFeedState.memory * 2);
       state = reduceEewFeed(state, [_report(2)], later);
       expect(state.trackOf(_report(1).eventKey)!.firstSeen, _t0);
+    });
+  });
+
+  group('expiry backstop', () {
+    /// Lists [report] continuously from its origin and reports whether it is
+    /// still shown at [after] — the server never drops it, which is the case
+    /// the backstop exists for.
+    bool shownAt(Eew report, Duration after) {
+      final origin = DateTime.fromMillisecondsSinceEpoch(
+        report.info.time,
+        isUtc: true,
+      );
+      var state = reduceEewFeed(EewFeedState.initial, [report], origin);
+      state = reduceEewFeed(state, [report], origin.add(after));
+      return state.visible.isNotEmpty;
+    }
+
+    test('an ordinary event goes 250 s after its origin', () {
+      final report = _report(1);
+      expect(shownAt(report, const Duration(seconds: 249)), isTrue);
+      expect(shownAt(report, const Duration(seconds: 250)), isFalse);
+      expect(EewExpiry.lifetimeOf(report), EewExpiry.standard);
+    });
+
+    test('a deep, a large and a 警報 event each get 400 s', () {
+      for (final report in [
+        _report(1, depth: 150),
+        _report(1, magnitude: 6.0),
+        _report(1, status: 1),
+      ]) {
+        expect(EewExpiry.lifetimeOf(report), EewExpiry.extended);
+        expect(shownAt(report, const Duration(seconds: 399)), isTrue);
+        expect(shownAt(report, const Duration(seconds: 400)), isFalse);
+      }
+      expect(
+        EewExpiry.lifetimeOf(_report(1, depth: 149.9)),
+        EewExpiry.standard,
+      );
+      expect(
+        EewExpiry.lifetimeOf(_report(1, magnitude: 5.9)),
+        EewExpiry.standard,
+      );
+    });
+
+    test('expiry is measured from the origin, not from arrival', () {
+      // An event first heard of 200 s after its origin still goes at 250 s.
+      final report = _report(1);
+      var state = reduceEewFeed(EewFeedState.initial, [
+        report,
+      ], _t0.add(const Duration(seconds: 200)));
+      expect(state.visible, [report]);
+      state = reduceEewFeed(state, [
+        report,
+      ], _t0.add(const Duration(seconds: 250)));
+      expect(state.visible, isEmpty);
+    });
+
+    test('a cancel stays up 180 s from when it was first seen, however often '
+        'the same frame repeats', () {
+      final live = _report(1);
+      final cancel = _report(2, status: 3);
+      var state = reduceEewFeed(EewFeedState.initial, [live], _t0);
+      final seen = _t0.add(const Duration(seconds: 20));
+      state = reduceEewFeed(state, [cancel], seen);
+      for (var s = 1; s < 180; s++) {
+        state = reduceEewFeed(state, [cancel], seen.add(Duration(seconds: s)));
+        expect(state.visible, [cancel], reason: 'still up at +$s s');
+      }
+      state = reduceEewFeed(state, [
+        cancel,
+      ], seen.add(const Duration(seconds: 180)));
+      expect(state.visible, isEmpty);
+      expect(state.trackOf(cancel.eventKey)!.cancelledSince, seen);
+    });
+
+    test('an event first heard of already cancelled gets the same window', () {
+      final cancel = _report(2, status: 3);
+      var state = reduceEewFeed(EewFeedState.initial, [cancel], _t0);
+      state = reduceEewFeed(state, [
+        cancel,
+      ], _t0.add(const Duration(seconds: 179)));
+      expect(state.visible, [cancel]);
+      state = reduceEewFeed(state, [
+        cancel,
+      ], _t0.add(const Duration(seconds: 180)));
+      expect(state.visible, isEmpty);
+    });
+
+    test('an origin far in the future cannot hold an event past an hour', () {
+      final report = _report(1, origin: _t0.add(const Duration(days: 1)));
+      var state = reduceEewFeed(EewFeedState.initial, [report], _t0);
+      state = reduceEewFeed(state, [
+        report,
+      ], _t0.add(const Duration(minutes: 59)));
+      expect(state.visible, [report]);
+      state = reduceEewFeed(state, [report], _t0.add(EewExpiry.hardCap));
+      expect(state.visible, isEmpty);
+    });
+
+    test('an expired event stays remembered while it is listed, so the cap '
+        'is not re-armed by forgetting it', () {
+      final report = _report(1, origin: _t0.add(const Duration(days: 1)));
+      var state = reduceEewFeed(EewFeedState.initial, [report], _t0);
+      state = reduceEewFeed(state, [report], _t0.add(EewExpiry.hardCap * 3));
+      expect(state.visible, isEmpty);
+      expect(state.trackOf(report.eventKey)!.firstSeen, _t0);
+    });
+
+    test('a newer serial cannot bring an expired event back', () {
+      var state = reduceEewFeed(EewFeedState.initial, [_report(1)], _t0);
+      state = reduceEewFeed(state, [
+        _report(9),
+      ], _t0.add(const Duration(seconds: 300)));
+      expect(state.visible, isEmpty);
     });
   });
 }
