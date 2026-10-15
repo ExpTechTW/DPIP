@@ -1,4 +1,5 @@
 import 'package:dpip/app/shell/main_shell.dart';
+import 'package:dpip/app/router/route_params.dart';
 import 'package:dpip/app/router/widget_location_routes.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
@@ -119,17 +120,20 @@ final GoRouter appRouter = GoRouter(
                     GoRoute(
                       path: AppRoutes.earthquakeReportPath,
                       name: AppRoutes.earthquakeReport,
+                      redirect: reportRedirect,
                       builder: (_, state) => ReportDetailPage(
-                        reportId: state.pathParameters['id']!,
+                        reportId: state.pathParameters['id'] ?? '',
                       ),
                       routes: [
                         GoRoute(
                           path: AppRoutes.earthquakeReplayPath,
                           name: AppRoutes.earthquakeReplay,
+                          redirect: replayRedirect,
                           builder: (_, state) => ReportReplayPage(
-                            replayTimestamp: int.parse(
-                              state.uri.queryParameters['t']!,
-                            ),
+                            // [replayRedirect] has already turned a link
+                            // without a usable `t` away; this only keeps the
+                            // builder total.
+                            replayTimestamp: replayTimestampOf(state) ?? 0,
                           ),
                         ),
                       ],
@@ -269,8 +273,9 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: AppRoutes.regionSelectCityPath,
           name: AppRoutes.regionSelectCity,
+          redirect: regionCityRedirect,
           builder: (_, state) => RegionCityPage(
-            city: state.pathParameters['city']!,
+            city: state.pathParameters['city'] ?? '',
             replaceCode: state.uri.queryParameters['replace'],
             returnToMore: state.uri.queryParameters['returnToMore'] == '1',
           ),
@@ -312,8 +317,8 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: AppRoutes.bugThreadPath,
           name: AppRoutes.bugThread,
-          builder: (_, state) =>
-              BugThreadPage(id: int.tryParse(state.pathParameters['id']!) ?? 0),
+          redirect: bugThreadRedirect,
+          builder: (_, state) => BugThreadPage(id: bugThreadIdOf(state) ?? 0),
         ),
       ],
     ),

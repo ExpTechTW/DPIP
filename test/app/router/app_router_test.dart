@@ -75,6 +75,7 @@ import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -97,6 +98,74 @@ void main() {
     _walk(appRouter.configuration.routes, context, built);
     expect(built, isNotEmpty);
     expect(find.byType(SizedBox), findsOneWidget);
+  });
+
+  testWidgets('a malformed link reaches no builder that throws', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
+    final context = tester.element(find.byType(SizedBox));
+    final malformed = [
+      _state('/', uri: '/x/abc?t=abc&tab=%20', id: 'abc', city: ' '),
+      _state('/', uri: '/x', id: null, city: null),
+    ];
+    for (final state in malformed) {
+      final built = <Widget>[];
+      _walk(appRouter.configuration.routes, context, built, state: state);
+      expect(built, isNotEmpty);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  test('every parameterised route sends a link it cannot honour elsewhere', () {
+    final checked = <String>[];
+    void visit(List<RouteBase> routes) {
+      for (final route in routes) {
+        switch (route) {
+          case GoRoute():
+            final params = RegExp(r':(\w+)').allMatches(route.path);
+            final takesT = route.name == AppRoutes.earthquakeReplay;
+            if (params.isNotEmpty || takesT) {
+              expect(
+                route.redirect,
+                isNotNull,
+                reason: '${route.name} reads parameters a link controls',
+              );
+              final state = _state(
+                route.path,
+                uri: '/x/abc?t=abc',
+                id: 'abc',
+                city: ' ',
+              );
+              final target = route.redirect!(_NoContext(), state);
+              // A report id is free-form text, so `abc` is a fine id; every
+              // other route here must refuse the malformed value.
+              if (route.name != AppRoutes.earthquakeReport) {
+                expect(target, isNotNull, reason: route.name);
+              }
+              checked.add(route.name!);
+            }
+            visit(route.routes);
+          case StatefulShellRoute():
+            for (final branch in route.branches) {
+              visit(branch.routes);
+            }
+          default:
+            break;
+        }
+      }
+    }
+
+    visit(appRouter.configuration.routes);
+    expect(
+      checked,
+      containsAll([
+        AppRoutes.earthquakeReport,
+        AppRoutes.earthquakeReplay,
+        AppRoutes.regionSelectCity,
+        AppRoutes.bugThread,
+      ]),
+    );
   });
 
   testWidgets('an unfinished welcome stays put until the refresh fires', (
@@ -375,18 +444,23 @@ class _WidgetRain implements RainHourTrendRepository {
       Ok(RainHourTrend(startSecond: 0, mm: List.filled(60, 0)));
 }
 
-void _walk(List<RouteBase> routes, BuildContext context, List<Widget> built) {
+void _walk(
+  List<RouteBase> routes,
+  BuildContext context,
+  List<Widget> built, {
+  GoRouterState? state,
+}) {
   for (final route in routes) {
     switch (route) {
       case GoRoute():
         final builder = route.builder;
         if (builder != null) {
-          built.add(builder(context, _state(route.path)));
+          built.add(builder(context, state ?? _state(route.path)));
         }
-        _walk(route.routes, context, built);
+        _walk(route.routes, context, built, state: state);
       case StatefulShellRoute():
         for (final branch in route.branches) {
-          _walk(branch.routes, context, built);
+          _walk(branch.routes, context, built, state: state);
         }
       default:
         break;
@@ -394,16 +468,24 @@ void _walk(List<RouteBase> routes, BuildContext context, List<Widget> built) {
   }
 }
 
-GoRouterState _state(String path) => GoRouterState(
+GoRouterState _state(
+  String path, {
+  String uri = '/x/42?t=1700000000&tab=temp&replace=6300100&returnToMore=1',
+  String? id = '42',
+  String? city = 'Taipei',
+}) => GoRouterState(
   appRouter.configuration,
-  uri: Uri.parse('/x/42?t=1700000000&tab=temp&replace=6300100&returnToMore=1'),
+  uri: Uri.parse(uri),
   matchedLocation: '/x/42',
   name: path,
   path: path,
   fullPath: path,
-  pathParameters: const {'id': '42', 'city': 'Taipei'},
+  pathParameters: {'id': ?id, 'city': ?city},
   pageKey: ValueKey<String>(path),
 );
+
+/// The route-level redirects read only the state; none touches its context.
+class _NoContext extends Fake implements BuildContext {}
 
 ChangeNotifierProvider<RealtimeNotifier<List<Eew>>> _eew() =>
     ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>(
