@@ -12,6 +12,7 @@ import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/notifications/notification_samples.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/notifications/plain_channels.dart';
+import 'package:dpip/core/notifications/retired_channels.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter/foundation.dart';
@@ -438,6 +439,8 @@ class NotificationService {
     // channels this launch. Mirror the catalogue under plain keys last, after
     // every purge and re-registration above has settled.
     await PlainChannels.ensure(channels);
+    // Last, so nothing above can re-create what it deletes.
+    await RetiredChannels().sweep();
     return (total: channels.length, rejected: rejected.length);
   }
 

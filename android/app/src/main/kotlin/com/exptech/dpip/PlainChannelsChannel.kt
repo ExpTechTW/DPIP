@@ -23,6 +23,12 @@ import io.flutter.plugin.common.MethodChannel
  * NotificationManager. An existing channel is never touched — user tuning
  * survives ordinary launches, and the Dart-side catalogue-version gate is
  * what drives delete + re-create when the sound files themselves change.
+ *
+ * `list` and `delete` exist for the other end of a channel's life: the ids
+ * earlier builds created and this one dropped, which Android keeps until the
+ * app deletes them. *Which* ids are retired is decided in Dart
+ * (`RetiredChannels`), where it is tested; this side only reports what exists
+ * and deletes what it is told to.
  */
 class PlainChannelsChannel(private val context: Context) :
     MethodChannel.MethodCallHandler {
@@ -39,13 +45,40 @@ class PlainChannelsChannel(private val context: Context) :
                 result.success(ensure(channels))
             }
 
+            "list" -> result.success(manager().notificationChannels.map { it.id })
+
+            "delete" -> {
+                val ids = call.argument<List<*>>("ids")
+                if (ids == null || ids.any { it !is String || it.isBlank() }) {
+                    result.error("invalid_ids", "ids must be non-empty strings", null)
+                    return
+                }
+                result.success(delete(ids.filterIsInstance<String>()))
+            }
+
             else -> result.notImplemented()
         }
     }
 
+    private fun manager() =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    /** Deletes each of [ids] that exists; returns how many did. */
+    private fun delete(ids: List<String>): Int {
+        val manager = manager()
+        var deleted = 0
+        for (id in ids) {
+            // Checked first so a repeat run reports 0 rather than a count of
+            // deletes that did nothing — the log line says what changed.
+            if (manager.getNotificationChannel(id) == null) continue
+            manager.deleteNotificationChannel(id)
+            deleted++
+        }
+        return deleted
+    }
+
     private fun ensure(channels: List<Map<*, *>>): Int {
-        val manager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val manager = manager()
         var created = 0
         for (entry in channels) {
             val id = entry["id"] as? String ?: continue
