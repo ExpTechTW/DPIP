@@ -119,6 +119,18 @@ In-app viewer: the **App 日誌** page (More tab → `LogPage`), which replays t
 last 24 hours from the table on open, so it covers the launch that crashed
 rather than only the current one.
 
+**Crash reports leave the device from prerelease builds only** — debug,
+profile, and a release build `release.yml` stamped
+`--dart-define=DPIP_PRERELEASE=true` (a snapshot). Everything else is
+production, including a release build with no mark at all. Crashlytics is
+linked into every build with collection off by default (AndroidManifest.xml,
+Info.plist); `PrereleaseDiagnostics.start` (`core/diagnostics/`) turns it on
+for a prerelease and, because the SDK remembers the switch across launches,
+turns it off again on every production launch. `ReportingCrashSink` then
+drops transport failures, repeats, and anything past eight reports a session.
+Only errors and explicitly set keys are sent — never `Log` lines, some of which
+carry coordinates.
+
 ## State management
 
 `provider`. `bootstrap()` assembles the shared
@@ -138,8 +150,8 @@ transient/server faults (connection drop, timeout, 5xx) and logs each
 failover; a 4xx or a cancellation throws immediately (it would recur on every
 region). Pass a `CancelToken` to abort a superseded request. SSE streams go
 through `ApiClient.openStream` + `core/network/sse_client.dart`. Fatal and
-handled errors forward to an optional `CrashSink` set on `Log` (Crashlytics
-wire-up point).
+handled errors forward to the `CrashSink` set on `Log` — Crashlytics, in a
+prerelease build (see [Logging](#logging)).
 
 ## Data & errors
 

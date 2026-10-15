@@ -284,6 +284,11 @@ jobs:
       # `DPIP_LABEL` also rides in as a dart-define, which is what the app
       # itself displays on every platform.
       #
+      # `DPIP_PRERELEASE` is the only thing that lets a release-mode build send
+      # crash reports (lib/core/diagnostics/prerelease_diagnostics.dart): `true`
+      # for a snapshot, `false` for a tag. Without it a build counts as
+      # production, so leaving it out fails safe — and silences the testers.
+      #
       # Android builds twice on purpose: the APK is what a person sideloads from
       # the GitHub release, the AAB is the only thing Play accepts.
       - name: Build
@@ -301,7 +306,8 @@ jobs:
                   --dart-define=DPIP_LABEL=${{ needs.version.outputs.label }} \
                   --dart-define=DPIP_CODE=${{ needs.version.outputs.code }} \
                   --dart-define=DPIP_TRAIN=${{ needs.version.outputs.train }} \
-                  --dart-define=DPIP_DATE=${{ needs.version.outputs.date }}"
+                  --dart-define=DPIP_DATE=${{ needs.version.outputs.date }} \
+                  --dart-define=DPIP_PRERELEASE=${{ needs.version.outputs.prerelease }}"
           if [ "${{ matrix.platform }}" = "android" ]; then
             bash tool/dev/build.sh android $COMMON
             bash tool/dev/build.sh bundle $COMMON

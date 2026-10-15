@@ -7,6 +7,8 @@ import 'package:dpip/app/app.dart';
 import 'package:dpip/app/router/app_router.dart' show onboardingRefresh;
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/diagnostics/crash_reporting.dart';
+import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_api.dart';
@@ -676,7 +678,15 @@ Future<void> _initFirebase() async {
     Log.info('Firebase initialized');
   } catch (error, stackTrace) {
     Log.handle(error, stackTrace, 'Firebase init failed (push unavailable)');
+    return;
   }
+  // Every launch, production included: the SDK remembers the switch across
+  // launches, so production has to turn it off again. Errors before this point
+  // stay in the in-app log only — there is nothing to send them through yet.
+  await PrereleaseDiagnostics.start(
+    reporter: FirebaseCrashReporter(),
+    prerelease: isPrereleaseBuild(),
+  );
 }
 
 /// Initializes push after the first frame — never gate launch on FCM.

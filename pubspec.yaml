@@ -33,6 +33,14 @@ dependencies:
   # Pinned to the exact version (not `^`) so a plain `pub upgrade` can't drift
   # the minor either.
   firebase_core: 4.11.0
+  # Crash reports from snapshot and development builds only; a production build
+  # never turns collection on (lib/core/diagnostics/prerelease_diagnostics.dart).
+  # Pinned exactly, for the same reason as firebase_core: 5.2.4 is the release
+  # cut together with firebase_core 4.11.0 and asks for the same native SDK
+  # (firebase-ios-sdk 12.15.0 exact, Android BoM 34.15.0) with the same floors
+  # (iOS 15.0, minSdk 23). Every later 5.2.x requires a newer firebase_core —
+  # which is the bump the pin above exists to stop.
+  firebase_crashlytics: 5.2.4
   flutter:
     sdk: flutter
   flutter_localizations:
