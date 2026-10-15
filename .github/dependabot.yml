@@ -1,0 +1,33 @@
+# Keeps the actions in .github/workflows current. Actions only: pub and the
+# Swift packages are pinned by lockfiles a person moves on purpose, after
+# reading what changed — pubspec.yaml explains why several pins must not drift.
+#
+# Every `uses:` is a full commit SHA with the release in a trailing comment, so
+# a moved or re-pointed tag changes nothing here until a pull request says so;
+# Dependabot rewrites both the SHA and the comment.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # A release is not proposed until it has been public for a week. Most
+    # compromised releases are caught and pulled within days, so this is the
+    # window in which somebody else finds out first — rather than this
+    # repository's release job, which holds the store signing keys.
+    cooldown:
+      default-days: 7
+    # One pull request a week rather than one per action: they are reviewed
+    # together, and CI runs once for all of them.
+    groups:
+      github-actions:
+        patterns: ["*"]
+    # The summary in commit.md's format (`ci: bump …`). The commit as a whole
+    # still fails tool/check/commits.sh, on purpose: Dependabot always appends
+    # `Signed-off-by: dependabot[bot]`, and a commit here is authored by a
+    # person. Its pull request is a proposal — whoever reviews it re-commits
+    # it as their own (`git commit --amend --reset-author`, trailer removed)
+    # and force-pushes, which also makes the person who read the diff the one
+    # on record for it.
+    commit-message:
+      prefix: ci
