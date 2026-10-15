@@ -6665,6 +6665,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Earthquake alerts disconnected — reconnecting…'**
   String get eewFeedDown;
+
+  /// Notification settings: header above the preset choices
+  ///
+  /// In en, this message translates to:
+  /// **'Presets'**
+  String get notifyPresetSection;
+
+  /// Notification preset name: the recommended combination
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get notifyPresetRecommended;
+
+  /// What the recommended preset turns on (and the one thing it leaves out)
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake, weather and hazard alerts for your area, plus tsunami news and announcements — without the earthquake report that repeats the intensity report'**
+  String get notifyPresetRecommendedDescription;
+
+  /// Notification preset name: every channel at its broadest option
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get notifyPresetAll;
+
+  /// What the All preset turns on
+  ///
+  /// In en, this message translates to:
+  /// **'Everything on every channel, including earthquakes anywhere in Taiwan'**
+  String get notifyPresetAllDescription;
+
+  /// Notification preset name: only life-safety alerts
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency only'**
+  String get notifyPresetEmergencyOnly;
+
+  /// What the Emergency-only preset keeps
+  ///
+  /// In en, this message translates to:
+  /// **'Only when safety is at stake: earthquake alerts for intensity 4+ where you are, weather and hazard warnings for your area, and tsunami warnings'**
+  String get notifyPresetEmergencyOnlyDescription;
+
+  /// Notification preset name: the current settings match no preset
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get notifyPresetCustom;
+
+  /// Explains that Custom means the per-channel choices below
+  ///
+  /// In en, this message translates to:
+  /// **'Set each channel individually below'**
+  String get notifyPresetCustomDescription;
+
+  /// Confirmation title before a preset replaces custom per-channel settings
+  ///
+  /// In en, this message translates to:
+  /// **'Apply “{preset}”?'**
+  String notifyPresetConfirmTitle(String preset);
+
+  /// Confirmation body: applying the preset overwrites the per-channel choices
+  ///
+  /// In en, this message translates to:
+  /// **'Every channel below will change to match it, replacing the settings you picked one by one.'**
+  String get notifyPresetConfirmBody;
+
+  /// Confirmation button that applies a notification preset
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get notifyPresetApply;
+
+  /// Shown (and announced) while a notification preset is being saved
+  ///
+  /// In en, this message translates to:
+  /// **'Applying…'**
+  String get notifyPresetApplying;
 }
 
 class _AppLocalizationsDelegate

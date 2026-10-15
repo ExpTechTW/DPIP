@@ -1,8 +1,10 @@
-/// The notification-settings page: per-channel push filters, grouped by domain.
+/// The notification-settings page: a preset picker, then the per-channel push
+/// filters grouped by domain.
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/features/notification/presentation/notify_controller.dart';
@@ -75,7 +77,8 @@ class _NotifyView extends StatelessWidget {
   }
 }
 
-/// The grouped list of channels, one section per domain.
+/// The preset picker, then the grouped list of channels, one section per
+/// domain.
 class _NotifyList extends StatelessWidget {
   const _NotifyList({required this.controller});
 
@@ -115,20 +118,111 @@ class _NotifyList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       children: [
-        for (final (i, section) in sections.indexed) ...[
-          // Between categories, not above the first or below the last.
-          if (i > 0)
-            const Divider(
-              height: 1,
-              indent: AppSpacing.lg,
-              endIndent: AppSpacing.lg,
-            ),
+        SectionHeader(l10n.notifyPresetSection),
+        _PresetSection(controller: controller),
+        for (final section in sections) ...[
+          // Between categories — the preset picker above counts as one.
+          const Divider(
+            height: 1,
+            indent: AppSpacing.lg,
+            endIndent: AppSpacing.lg,
+          ),
           SectionHeader(section.title),
           for (final channel in section.channels)
             _ChannelTile(controller: controller, channel: channel),
         ],
       ],
     );
+  }
+}
+
+/// The presets as one radio group: the preset the settings currently are is
+/// checked — 自訂 when they are none of them — and choosing another applies it
+/// through [NotifyController.applyPreset].
+///
+/// While one is being applied it is the checked one, with a spinner in place
+/// of its icon, and the rows below fill in as the server accepts each channel;
+/// if it fails part-way, the check falls back to whatever the server ended up
+/// holding (usually 自訂) and the same snackbar as a failed channel save says
+/// so. Choosing it again resumes.
+///
+/// 自訂 is a state, not an action — there is nothing to apply — so it is only
+/// enabled while it is the checked one; otherwise a screen reader would offer
+/// a radio button that does nothing. It is reached by changing a channel.
+class _PresetSection extends StatelessWidget {
+  const _PresetSection({required this.controller});
+
+  final NotifyController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final checked = controller.applying ?? controller.preset;
+
+    return RadioGroup<NotifyPreset>(
+      groupValue: checked,
+      onChanged: (preset) {
+        if (preset != null && preset != checked) _choose(context, preset);
+      },
+      child: Column(
+        children: [
+          for (final preset in NotifyPreset.values)
+            RadioListTile<NotifyPreset>(
+              value: preset,
+              enabled:
+                  !controller.busy &&
+                  (preset != NotifyPreset.custom || checked == preset),
+              controlAffinity: ListTileControlAffinity.trailing,
+              secondary: controller.applying == preset
+                  ? Semantics(
+                      label: l10n.notifyPresetApplying,
+                      child: const InlineLoading(),
+                    )
+                  : Icon(notifyPresetIcon(preset)),
+              title: Text(notifyPresetLabel(preset, l10n)),
+              subtitle: Text(notifyPresetDescription(preset, l10n)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Applies [preset] — after a confirmation when it would replace a
+  /// hand-tuned combination, since that one cannot be brought back by tapping
+  /// another preset.
+  Future<void> _choose(BuildContext context, NotifyPreset preset) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    if (controller.preset == NotifyPreset.custom) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            l10n.notifyPresetConfirmTitle(notifyPresetLabel(preset, l10n)),
+          ),
+          content: Text(l10n.notifyPresetConfirmBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.commonCancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.notifyPresetApply),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+
+    final ok = await controller.applyPreset(preset);
+    if (!ok && context.mounted) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.notifySetFailed)));
+    }
   }
 }
 
@@ -145,7 +239,9 @@ class _ChannelTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final settings = controller.settings!;
     final saving = controller.saving == channel;
-    final busy = controller.saving != null;
+    // Locked during a preset too: its writes share this token's rate limit,
+    // and a row changed mid-preset would be overwritten a moment later.
+    final busy = controller.busy;
 
     return ListTile(
       leading: Icon(notifyChannelIcon(channel)),

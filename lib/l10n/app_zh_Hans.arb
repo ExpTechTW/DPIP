@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "最新位置",
   "eewCancelled": "已取消",
   "eewCancelledNotice": "发布单位已取消此速报",
-  "eewFeedDown": "地震速报连接中断，正在重新连接…"
+  "eewFeedDown": "地震速报连接中断，正在重新连接…",
+  "notifyPresetSection": "快速设置",
+  "notifyPresetRecommended": "推荐",
+  "notifyPresetRecommendedDescription": "本地的地震、天气与防灾警讯，以及海啸消息与公告；略过与震度速报重复的地震报告",
+  "notifyPresetAll": "全部",
+  "notifyPresetAllDescription": "每个频道都接收全部，包括全台各地的地震",
+  "notifyPresetEmergencyOnly": "仅紧急",
+  "notifyPresetEmergencyOnlyDescription": "只在关乎安全时通知：本地震度 4 以上的地震预警、本地的天气与防灾警讯，以及海啸警报",
+  "notifyPresetCustom": "自定义",
+  "notifyPresetCustomDescription": "在下方逐项调整各频道",
+  "notifyPresetConfirmTitle": "应用“{preset}”？",
+  "notifyPresetConfirmBody": "下方每个频道都会改成这个组合，取代你逐项调整的设置。",
+  "notifyPresetApply": "应用",
+  "notifyPresetApplying": "正在应用…"
 }

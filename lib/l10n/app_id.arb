@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "Posisi terakhir",
   "eewCancelled": "Dibatalkan",
   "eewCancelledNotice": "Lembaga penerbit telah membatalkan peringatan ini",
-  "eewFeedDown": "Koneksi peringatan gempa terputus — menyambungkan ulang…"
+  "eewFeedDown": "Koneksi peringatan gempa terputus — menyambungkan ulang…",
+  "notifyPresetSection": "Setelan cepat",
+  "notifyPresetRecommended": "Disarankan",
+  "notifyPresetRecommendedDescription": "Peringatan gempa, cuaca, dan bencana di area Anda, ditambah informasi tsunami dan pengumuman — tanpa laporan gempa yang mengulang laporan intensitas",
+  "notifyPresetAll": "Semua",
+  "notifyPresetAllDescription": "Semua hal di setiap saluran, termasuk gempa di mana pun di Taiwan",
+  "notifyPresetEmergencyOnly": "Darurat saja",
+  "notifyPresetEmergencyOnlyDescription": "Hanya saat menyangkut keselamatan: peringatan gempa intensitas 4 atau lebih di lokasi Anda, peringatan cuaca dan bencana di area Anda, serta peringatan tsunami",
+  "notifyPresetCustom": "Kustom",
+  "notifyPresetCustomDescription": "Atur setiap saluran satu per satu di bawah",
+  "notifyPresetConfirmTitle": "Terapkan “{preset}”?",
+  "notifyPresetConfirmBody": "Setiap saluran di bawah akan diubah mengikutinya, menggantikan pengaturan yang Anda pilih satu per satu.",
+  "notifyPresetApply": "Terapkan",
+  "notifyPresetApplying": "Menerapkan…"
 }

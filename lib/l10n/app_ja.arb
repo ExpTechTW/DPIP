@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "最新の位置",
   "eewCancelled": "取り消し",
   "eewCancelledNotice": "発表元がこの速報を取り消しました",
-  "eewFeedDown": "緊急地震速報の接続が切れています。再接続中…"
+  "eewFeedDown": "緊急地震速報の接続が切れています。再接続中…",
+  "notifyPresetSection": "プリセット",
+  "notifyPresetRecommended": "おすすめ",
+  "notifyPresetRecommendedDescription": "所在地の地震・気象・防災の警報に加え、津波情報とお知らせ。震度速報と重複する地震報告は除きます",
+  "notifyPresetAll": "すべて",
+  "notifyPresetAllDescription": "すべてのチャンネルですべて受信。台湾全域の地震も含みます",
+  "notifyPresetEmergencyOnly": "緊急のみ",
+  "notifyPresetEmergencyOnlyDescription": "安全に関わるときだけ通知：所在地の震度4以上の緊急地震速報、所在地の気象・防災の警報、津波警報",
+  "notifyPresetCustom": "カスタム",
+  "notifyPresetCustomDescription": "下で各チャンネルを個別に設定",
+  "notifyPresetConfirmTitle": "「{preset}」を適用しますか？",
+  "notifyPresetConfirmBody": "下の各チャンネルがこの組み合わせに変わり、個別に選んだ設定は置き換えられます。",
+  "notifyPresetApply": "適用",
+  "notifyPresetApplying": "適用しています…"
 }

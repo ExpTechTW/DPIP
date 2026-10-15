@@ -8,6 +8,7 @@
 library;
 
 import 'package:dpip/features/notification/domain/notify_settings.dart';
+import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/presentation/notify_labels.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -66,5 +67,21 @@ void main() {
     expect(gated, hasLength(1), reason: 'both are the "important" tier');
     expect(everything, hasLength(1), reason: 'both are the "all" tier');
     expect({off, ...gated, ...everything}, hasLength(3));
+  });
+
+  test('every preset has a name, a description and an icon of its own', () {
+    final names = {
+      for (final preset in NotifyPreset.values) notifyPresetLabel(preset, l10n),
+    };
+    final descriptions = {
+      for (final preset in NotifyPreset.values)
+        notifyPresetDescription(preset, l10n),
+    };
+    final icons = NotifyPreset.values.map(notifyPresetIcon).toSet();
+
+    expect(names, everyElement(isNotEmpty));
+    expect(names, hasLength(NotifyPreset.values.length));
+    expect(descriptions, hasLength(NotifyPreset.values.length));
+    expect(icons, hasLength(NotifyPreset.values.length));
   });
 }

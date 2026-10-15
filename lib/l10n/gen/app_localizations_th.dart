@@ -3521,4 +3521,49 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get eewFeedDown =>
       'การเชื่อมต่อการแจ้งเตือนแผ่นดินไหวขาดหาย กำลังเชื่อมต่อใหม่…';
+
+  @override
+  String get notifyPresetSection => 'การตั้งค่าด่วน';
+
+  @override
+  String get notifyPresetRecommended => 'แนะนำ';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      'การแจ้งเตือนแผ่นดินไหว สภาพอากาศ และภัยพิบัติในพื้นที่ของคุณ พร้อมข้อมูลสึนามิและประกาศ โดยไม่รวมรายงานแผ่นดินไหวที่ซ้ำกับรายงานความรุนแรง';
+
+  @override
+  String get notifyPresetAll => 'ทั้งหมด';
+
+  @override
+  String get notifyPresetAllDescription =>
+      'รับทุกอย่างในทุกช่อง รวมถึงแผ่นดินไหวทั่วไต้หวัน';
+
+  @override
+  String get notifyPresetEmergencyOnly => 'เฉพาะเหตุฉุกเฉิน';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      'แจ้งเตือนเฉพาะเมื่อเกี่ยวกับความปลอดภัย: การเตือนแผ่นดินไหวที่ความรุนแรงในพื้นที่ระดับ 4 ขึ้นไป การเตือนสภาพอากาศและภัยพิบัติในพื้นที่ของคุณ และการเตือนภัยสึนามิ';
+
+  @override
+  String get notifyPresetCustom => 'กำหนดเอง';
+
+  @override
+  String get notifyPresetCustomDescription => 'ตั้งค่าแต่ละช่องด้านล่าง';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return 'ใช้ “$preset” หรือไม่';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      'ทุกช่องด้านล่างจะเปลี่ยนตามชุดนี้ แทนที่การตั้งค่าที่คุณเลือกไว้ทีละช่อง';
+
+  @override
+  String get notifyPresetApply => 'ใช้';
+
+  @override
+  String get notifyPresetApplying => 'กำลังใช้…';
 }

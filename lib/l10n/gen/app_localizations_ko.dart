@@ -3464,4 +3464,48 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get eewFeedDown => '지진 속보 연결이 끊겼습니다. 다시 연결하는 중…';
+
+  @override
+  String get notifyPresetSection => '빠른 설정';
+
+  @override
+  String get notifyPresetRecommended => '권장';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '현재 위치의 지진·기상·재난 알림과 지진해일 정보, 공지사항. 진도 속보와 겹치는 지진 보고는 제외합니다';
+
+  @override
+  String get notifyPresetAll => '전체';
+
+  @override
+  String get notifyPresetAllDescription => '모든 채널을 전부 수신합니다. 대만 전역의 지진도 포함됩니다';
+
+  @override
+  String get notifyPresetEmergencyOnly => '긴급만';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '안전과 관련될 때만 알립니다: 현재 위치 진도 4 이상의 지진 경보, 현재 위치의 기상·재난 경보, 지진해일 경보';
+
+  @override
+  String get notifyPresetCustom => '사용자 지정';
+
+  @override
+  String get notifyPresetCustomDescription => '아래에서 채널별로 설정';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '‘$preset’을(를) 적용할까요?';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      '아래의 모든 채널이 이 조합으로 바뀌며, 채널별로 고른 설정은 대체됩니다.';
+
+  @override
+  String get notifyPresetApply => '적용';
+
+  @override
+  String get notifyPresetApplying => '적용하는 중…';
 }

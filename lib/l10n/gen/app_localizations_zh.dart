@@ -3441,6 +3441,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get eewFeedDown => '地震速報連線中斷，重新連線中…';
+
+  @override
+  String get notifyPresetSection => '快速設定';
+
+  @override
+  String get notifyPresetRecommended => '建議';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '所在地的地震、天氣與防災警訊，以及海嘯消息與公告；略過與震度速報重複的地震報告';
+
+  @override
+  String get notifyPresetAll => '全部';
+
+  @override
+  String get notifyPresetAllDescription => '每個頻道都接收全部，包含全台各地的地震';
+
+  @override
+  String get notifyPresetEmergencyOnly => '僅緊急';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '只在攸關安全時通知：所在地震度 4 以上的地震速報、所在地的天氣與防災警訊，以及海嘯警報';
+
+  @override
+  String get notifyPresetCustom => '自訂';
+
+  @override
+  String get notifyPresetCustomDescription => '在下方逐項調整各頻道';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '套用「$preset」？';
+  }
+
+  @override
+  String get notifyPresetConfirmBody => '下方每個頻道都會改成這個組合，取代你逐項調整的設定。';
+
+  @override
+  String get notifyPresetApply => '套用';
+
+  @override
+  String get notifyPresetApplying => '正在套用…';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6876,6 +6919,49 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get eewFeedDown => '地震速报连接中断，正在重新连接…';
+
+  @override
+  String get notifyPresetSection => '快速设置';
+
+  @override
+  String get notifyPresetRecommended => '推荐';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '本地的地震、天气与防灾警讯，以及海啸消息与公告；略过与震度速报重复的地震报告';
+
+  @override
+  String get notifyPresetAll => '全部';
+
+  @override
+  String get notifyPresetAllDescription => '每个频道都接收全部，包括全台各地的地震';
+
+  @override
+  String get notifyPresetEmergencyOnly => '仅紧急';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '只在关乎安全时通知：本地震度 4 以上的地震预警、本地的天气与防灾警讯，以及海啸警报';
+
+  @override
+  String get notifyPresetCustom => '自定义';
+
+  @override
+  String get notifyPresetCustomDescription => '在下方逐项调整各频道';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '应用“$preset”？';
+  }
+
+  @override
+  String get notifyPresetConfirmBody => '下方每个频道都会改成这个组合，取代你逐项调整的设置。';
+
+  @override
+  String get notifyPresetApply => '应用';
+
+  @override
+  String get notifyPresetApplying => '正在应用…';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10312,6 +10398,49 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get eewFeedDown => '地震速報連接中斷，重新連接中…';
+
+  @override
+  String get notifyPresetSection => '快速設定';
+
+  @override
+  String get notifyPresetRecommended => '建議';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '所在地的地震、天氣及防災警訊，以及海嘯消息及公告；略過與震度速報重複的地震報告';
+
+  @override
+  String get notifyPresetAll => '全部';
+
+  @override
+  String get notifyPresetAllDescription => '每個頻道均接收全部，包括全台各地的地震';
+
+  @override
+  String get notifyPresetEmergencyOnly => '僅緊急';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '只在攸關安全時通知：所在地震度 4 或以上的地震速報、所在地的天氣及防災警訊，以及海嘯警報';
+
+  @override
+  String get notifyPresetCustom => '自訂';
+
+  @override
+  String get notifyPresetCustomDescription => '在下方逐項調整各頻道';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '套用「$preset」？';
+  }
+
+  @override
+  String get notifyPresetConfirmBody => '下方每個頻道都會改為這個組合，取代你逐項調整的設定。';
+
+  @override
+  String get notifyPresetApply => '套用';
+
+  @override
+  String get notifyPresetApplying => '正在套用…';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13748,4 +13877,47 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get eewFeedDown => '地震速報連線中斷，重新連線中…';
+
+  @override
+  String get notifyPresetSection => '快速設定';
+
+  @override
+  String get notifyPresetRecommended => '建議';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '所在地的地震、天氣與防災警訊，以及海嘯消息與公告；略過與震度速報重複的地震報告';
+
+  @override
+  String get notifyPresetAll => '全部';
+
+  @override
+  String get notifyPresetAllDescription => '每個頻道都接收全部，包含全台各地的地震';
+
+  @override
+  String get notifyPresetEmergencyOnly => '僅緊急';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '只在攸關安全時通知：所在地震度 4 以上的地震速報、所在地的天氣與防災警訊，以及海嘯警報';
+
+  @override
+  String get notifyPresetCustom => '自訂';
+
+  @override
+  String get notifyPresetCustomDescription => '在下方逐項調整各頻道';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '套用「$preset」？';
+  }
+
+  @override
+  String get notifyPresetConfirmBody => '下方每個頻道都會改成這個組合，取代你逐項調整的設定。';
+
+  @override
+  String get notifyPresetApply => '套用';
+
+  @override
+  String get notifyPresetApplying => '正在套用…';
 }

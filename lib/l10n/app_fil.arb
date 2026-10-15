@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "Pinakabagong lokasyon",
   "eewCancelled": "Kinansela",
   "eewCancelledNotice": "Kinansela ng naglabas na ahensya ang alertong ito",
-  "eewFeedDown": "Naputol ang koneksyon sa babala sa lindol — kumokonekta muli…"
+  "eewFeedDown": "Naputol ang koneksyon sa babala sa lindol — kumokonekta muli…",
+  "notifyPresetSection": "Mabilisang setting",
+  "notifyPresetRecommended": "Inirerekomenda",
+  "notifyPresetRecommendedDescription": "Mga alerto sa lindol, panahon, at sakuna sa iyong lugar, kasama ang impormasyon sa tsunami at mga anunsyo — maliban sa ulat ng lindol na umuulit sa ulat ng intensidad",
+  "notifyPresetAll": "Lahat",
+  "notifyPresetAllDescription": "Lahat sa bawat channel, kasama ang mga lindol saanman sa Taiwan",
+  "notifyPresetEmergencyOnly": "Emergency lamang",
+  "notifyPresetEmergencyOnlyDescription": "Kapag may panganib lamang: mga alerto sa lindol na intensidad 4 pataas sa iyong lokasyon, mga babala sa panahon at sakuna sa iyong lugar, at mga babala sa tsunami",
+  "notifyPresetCustom": "Custom",
+  "notifyPresetCustomDescription": "Itakda ang bawat channel sa ibaba",
+  "notifyPresetConfirmTitle": "Ilapat ang “{preset}”?",
+  "notifyPresetConfirmBody": "Magbabago ang bawat channel sa ibaba para tumugma rito, at papalitan ang mga setting na isa-isa mong pinili.",
+  "notifyPresetApply": "Ilapat",
+  "notifyPresetApplying": "Inilalapat…"
 }

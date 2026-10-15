@@ -4260,5 +4260,63 @@
   "eewFeedDown": "Earthquake alerts disconnected — reconnecting…",
   "@eewFeedDown": {
     "description": "Shown on Home and in the seismic monitor's status strip while the earthquake early warning feed is disconnected or not updating, so an empty alert area is not read as all-clear"
+  },
+  "notifyPresetSection": "Presets",
+  "@notifyPresetSection": {
+    "description": "Notification settings: header above the preset choices"
+  },
+  "notifyPresetRecommended": "Recommended",
+  "@notifyPresetRecommended": {
+    "description": "Notification preset name: the recommended combination"
+  },
+  "notifyPresetRecommendedDescription": "Earthquake, weather and hazard alerts for your area, plus tsunami news and announcements — without the earthquake report that repeats the intensity report",
+  "@notifyPresetRecommendedDescription": {
+    "description": "What the recommended preset turns on (and the one thing it leaves out)"
+  },
+  "notifyPresetAll": "All",
+  "@notifyPresetAll": {
+    "description": "Notification preset name: every channel at its broadest option"
+  },
+  "notifyPresetAllDescription": "Everything on every channel, including earthquakes anywhere in Taiwan",
+  "@notifyPresetAllDescription": {
+    "description": "What the All preset turns on"
+  },
+  "notifyPresetEmergencyOnly": "Emergency only",
+  "@notifyPresetEmergencyOnly": {
+    "description": "Notification preset name: only life-safety alerts"
+  },
+  "notifyPresetEmergencyOnlyDescription": "Only when safety is at stake: earthquake alerts for intensity 4+ where you are, weather and hazard warnings for your area, and tsunami warnings",
+  "@notifyPresetEmergencyOnlyDescription": {
+    "description": "What the Emergency-only preset keeps"
+  },
+  "notifyPresetCustom": "Custom",
+  "@notifyPresetCustom": {
+    "description": "Notification preset name: the current settings match no preset"
+  },
+  "notifyPresetCustomDescription": "Set each channel individually below",
+  "@notifyPresetCustomDescription": {
+    "description": "Explains that Custom means the per-channel choices below"
+  },
+  "notifyPresetConfirmTitle": "Apply “{preset}”?",
+  "@notifyPresetConfirmTitle": {
+    "description": "Confirmation title before a preset replaces custom per-channel settings",
+    "placeholders": {
+      "preset": {
+        "type": "String",
+        "example": "Recommended"
+      }
+    }
+  },
+  "notifyPresetConfirmBody": "Every channel below will change to match it, replacing the settings you picked one by one.",
+  "@notifyPresetConfirmBody": {
+    "description": "Confirmation body: applying the preset overwrites the per-channel choices"
+  },
+  "notifyPresetApply": "Apply",
+  "@notifyPresetApply": {
+    "description": "Confirmation button that applies a notification preset"
+  },
+  "notifyPresetApplying": "Applying…",
+  "@notifyPresetApplying": {
+    "description": "Shown (and announced) while a notification preset is being saved"
   }
 }
