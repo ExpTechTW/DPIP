@@ -1,5 +1,6 @@
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/features/notification/presentation/notify_controller.dart';
@@ -13,6 +14,9 @@ class _FakeRepo implements NotifyRepository {
   bool fail = false;
   int setCalls = 0;
 
+  /// Fails only the write numbered this (1-based), when set.
+  int? failSetAt;
+
   @override
   Future<Result<NotifySettings>> fetch(String token) async =>
       fail ? const Err(NetworkFailure('boom')) : Ok(settings);
@@ -24,7 +28,7 @@ class _FakeRepo implements NotifyRepository {
     int optionIndex,
   ) async {
     setCalls++;
-    if (fail) return const Err(NetworkFailure('boom'));
+    if (fail || failSetAt == setCalls) return const Err(NetworkFailure('boom'));
     settings = settings.withChannel(channel, optionIndex);
     return Ok(settings);
   }
@@ -101,5 +105,85 @@ void main() {
     expect(ok, isFalse);
     expect(controller.settings!.optionOf(NotifyChannel.eew), 1); // unchanged
     expect(controller.saving, isNull);
+  });
+
+  group('presets', () {
+    NotifyController controller0(_FakeRepo repo) =>
+        NotifyController(repo, 'tok', presetSpacing: Duration.zero);
+
+    test('the loaded settings name the preset they match', () async {
+      final controller = controller0(_FakeRepo(_settings()));
+      expect(controller.preset, isNull, reason: 'nothing loaded yet');
+
+      await controller.load();
+
+      expect(controller.preset, NotifyPreset.custom);
+    });
+
+    test('applying adopts every echo and lands on the preset', () async {
+      final repo = _FakeRepo(_settings());
+      final controller = controller0(repo);
+      await controller.load();
+      final seen = <NotifyPreset?>[];
+      controller.addListener(() => seen.add(controller.applying));
+
+      final ok = await controller.applyPreset(NotifyPreset.emergencyOnly);
+
+      expect(ok, isTrue);
+      expect(controller.preset, NotifyPreset.emergencyOnly);
+      expect(controller.applying, isNull);
+      expect(controller.busy, isFalse);
+      // Marked as applying throughout, with a notify per accepted write.
+      expect(seen.first, NotifyPreset.emergencyOnly);
+      expect(seen.length, repo.setCalls + 2);
+    });
+
+    test('a failure part-way keeps what the server accepted', () async {
+      final repo = _FakeRepo(_settings())..failSetAt = 2;
+      final controller = controller0(repo);
+      await controller.load();
+
+      final ok = await controller.applyPreset(NotifyPreset.emergencyOnly);
+
+      expect(ok, isFalse);
+      expect(repo.setCalls, 2);
+      expect(controller.settings!.optionOf(NotifyChannel.eew), 0);
+      expect(controller.preset, NotifyPreset.custom);
+      expect(controller.applying, isNull);
+    });
+
+    test('a preset already in place sends nothing', () async {
+      final repo = _FakeRepo(_settings());
+      final controller = controller0(repo);
+      await controller.load();
+      await controller.applyPreset(NotifyPreset.all);
+      final writes = repo.setCalls;
+
+      expect(await controller.applyPreset(NotifyPreset.all), isTrue);
+      expect(repo.setCalls, writes);
+    });
+
+    test('custom has nothing to apply', () async {
+      final repo = _FakeRepo(_settings());
+      final controller = controller0(repo);
+      await controller.load();
+
+      expect(await controller.applyPreset(NotifyPreset.custom), isFalse);
+      expect(repo.setCalls, 0);
+    });
+
+    test('no write starts while a preset is being applied', () async {
+      final repo = _FakeRepo(_settings());
+      final controller = controller0(repo);
+      await controller.load();
+
+      final applying = controller.applyPreset(NotifyPreset.emergencyOnly);
+      expect(controller.busy, isTrue);
+      expect(await controller.setChannel(NotifyChannel.report, 2), isFalse);
+      expect(await controller.applyPreset(NotifyPreset.all), isFalse);
+      await applying;
+
+      expect(controller.preset, NotifyPreset.emergencyOnly);
+    });
   });
 }

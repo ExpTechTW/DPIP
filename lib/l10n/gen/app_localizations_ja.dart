@@ -3462,4 +3462,48 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eewFeedDown => '緊急地震速報の接続が切れています。再接続中…';
+
+  @override
+  String get notifyPresetSection => 'プリセット';
+
+  @override
+  String get notifyPresetRecommended => 'おすすめ';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '所在地の地震・気象・防災の警報に加え、津波情報とお知らせ。震度速報と重複する地震報告は除きます';
+
+  @override
+  String get notifyPresetAll => 'すべて';
+
+  @override
+  String get notifyPresetAllDescription => 'すべてのチャンネルですべて受信。台湾全域の地震も含みます';
+
+  @override
+  String get notifyPresetEmergencyOnly => '緊急のみ';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '安全に関わるときだけ通知：所在地の震度4以上の緊急地震速報、所在地の気象・防災の警報、津波警報';
+
+  @override
+  String get notifyPresetCustom => 'カスタム';
+
+  @override
+  String get notifyPresetCustomDescription => '下で各チャンネルを個別に設定';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '「$preset」を適用しますか？';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      '下の各チャンネルがこの組み合わせに変わり、個別に選んだ設定は置き換えられます。';
+
+  @override
+  String get notifyPresetApply => '適用';
+
+  @override
+  String get notifyPresetApplying => '適用しています…';
 }

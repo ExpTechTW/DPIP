@@ -3549,4 +3549,50 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get eewFeedDown =>
       'Naputol ang koneksyon sa babala sa lindol — kumokonekta muli…';
+
+  @override
+  String get notifyPresetSection => 'Mabilisang setting';
+
+  @override
+  String get notifyPresetRecommended => 'Inirerekomenda';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      'Mga alerto sa lindol, panahon, at sakuna sa iyong lugar, kasama ang impormasyon sa tsunami at mga anunsyo — maliban sa ulat ng lindol na umuulit sa ulat ng intensidad';
+
+  @override
+  String get notifyPresetAll => 'Lahat';
+
+  @override
+  String get notifyPresetAllDescription =>
+      'Lahat sa bawat channel, kasama ang mga lindol saanman sa Taiwan';
+
+  @override
+  String get notifyPresetEmergencyOnly => 'Emergency lamang';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      'Kapag may panganib lamang: mga alerto sa lindol na intensidad 4 pataas sa iyong lokasyon, mga babala sa panahon at sakuna sa iyong lugar, at mga babala sa tsunami';
+
+  @override
+  String get notifyPresetCustom => 'Custom';
+
+  @override
+  String get notifyPresetCustomDescription =>
+      'Itakda ang bawat channel sa ibaba';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return 'Ilapat ang “$preset”?';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      'Magbabago ang bawat channel sa ibaba para tumugma rito, at papalitan ang mga setting na isa-isa mong pinili.';
+
+  @override
+  String get notifyPresetApply => 'Ilapat';
+
+  @override
+  String get notifyPresetApplying => 'Inilalapat…';
 }

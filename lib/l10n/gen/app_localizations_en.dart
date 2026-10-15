@@ -3526,4 +3526,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eewFeedDown => 'Earthquake alerts disconnected — reconnecting…';
+
+  @override
+  String get notifyPresetSection => 'Presets';
+
+  @override
+  String get notifyPresetRecommended => 'Recommended';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      'Earthquake, weather and hazard alerts for your area, plus tsunami news and announcements — without the earthquake report that repeats the intensity report';
+
+  @override
+  String get notifyPresetAll => 'All';
+
+  @override
+  String get notifyPresetAllDescription =>
+      'Everything on every channel, including earthquakes anywhere in Taiwan';
+
+  @override
+  String get notifyPresetEmergencyOnly => 'Emergency only';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      'Only when safety is at stake: earthquake alerts for intensity 4+ where you are, weather and hazard warnings for your area, and tsunami warnings';
+
+  @override
+  String get notifyPresetCustom => 'Custom';
+
+  @override
+  String get notifyPresetCustomDescription =>
+      'Set each channel individually below';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return 'Apply “$preset”?';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      'Every channel below will change to match it, replacing the settings you picked one by one.';
+
+  @override
+  String get notifyPresetApply => 'Apply';
+
+  @override
+  String get notifyPresetApplying => 'Applying…';
 }

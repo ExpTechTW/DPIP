@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "ตำแหน่งล่าสุด",
   "eewCancelled": "ยกเลิกแล้ว",
   "eewCancelledNotice": "หน่วยงานผู้ออกประกาศได้ยกเลิกการแจ้งเตือนนี้แล้ว",
-  "eewFeedDown": "การเชื่อมต่อการแจ้งเตือนแผ่นดินไหวขาดหาย กำลังเชื่อมต่อใหม่…"
+  "eewFeedDown": "การเชื่อมต่อการแจ้งเตือนแผ่นดินไหวขาดหาย กำลังเชื่อมต่อใหม่…",
+  "notifyPresetSection": "การตั้งค่าด่วน",
+  "notifyPresetRecommended": "แนะนำ",
+  "notifyPresetRecommendedDescription": "การแจ้งเตือนแผ่นดินไหว สภาพอากาศ และภัยพิบัติในพื้นที่ของคุณ พร้อมข้อมูลสึนามิและประกาศ โดยไม่รวมรายงานแผ่นดินไหวที่ซ้ำกับรายงานความรุนแรง",
+  "notifyPresetAll": "ทั้งหมด",
+  "notifyPresetAllDescription": "รับทุกอย่างในทุกช่อง รวมถึงแผ่นดินไหวทั่วไต้หวัน",
+  "notifyPresetEmergencyOnly": "เฉพาะเหตุฉุกเฉิน",
+  "notifyPresetEmergencyOnlyDescription": "แจ้งเตือนเฉพาะเมื่อเกี่ยวกับความปลอดภัย: การเตือนแผ่นดินไหวที่ความรุนแรงในพื้นที่ระดับ 4 ขึ้นไป การเตือนสภาพอากาศและภัยพิบัติในพื้นที่ของคุณ และการเตือนภัยสึนามิ",
+  "notifyPresetCustom": "กำหนดเอง",
+  "notifyPresetCustomDescription": "ตั้งค่าแต่ละช่องด้านล่าง",
+  "notifyPresetConfirmTitle": "ใช้ “{preset}” หรือไม่",
+  "notifyPresetConfirmBody": "ทุกช่องด้านล่างจะเปลี่ยนตามชุดนี้ แทนที่การตั้งค่าที่คุณเลือกไว้ทีละช่อง",
+  "notifyPresetApply": "ใช้",
+  "notifyPresetApplying": "กำลังใช้…"
 }

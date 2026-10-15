@@ -3441,4 +3441,47 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get eewFeedDown => '地震速報連接中斷，重新連接緊…';
+
+  @override
+  String get notifyPresetSection => '快速設定';
+
+  @override
+  String get notifyPresetRecommended => '建議';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      '所在地嘅地震、天氣同防災警訊，加埋海嘯消息同公告；唔包同震度速報重複嘅地震報告';
+
+  @override
+  String get notifyPresetAll => '全部';
+
+  @override
+  String get notifyPresetAllDescription => '每個頻道都收晒全部，包括全台各地嘅地震';
+
+  @override
+  String get notifyPresetEmergencyOnly => '只限緊急';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      '淨係關乎安全先通知你：所在地震度 4 或以上嘅地震速報、所在地嘅天氣同防災警訊，同埋海嘯警報';
+
+  @override
+  String get notifyPresetCustom => '自訂';
+
+  @override
+  String get notifyPresetCustomDescription => '喺下面逐項調整各個頻道';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return '套用「$preset」？';
+  }
+
+  @override
+  String get notifyPresetConfirmBody => '下面每個頻道都會改成呢個組合，取代你逐項調整過嘅設定。';
+
+  @override
+  String get notifyPresetApply => '套用';
+
+  @override
+  String get notifyPresetApplying => '套用緊…';
 }

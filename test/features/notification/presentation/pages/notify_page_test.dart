@@ -8,6 +8,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/features/notification/presentation/notify_labels.dart';
@@ -88,6 +89,8 @@ Future<void> _pump(
 }
 
 void main() {
+  presetTests();
+
   testWidgets('no token shows the unavailable state', (tester) async {
     await _pump(tester, repo: _Repo(Ok(_settings())));
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
@@ -160,4 +163,188 @@ class _FailingSave implements NotifyRepository {
     NotifyChannel channel,
     int optionIndex,
   ) async => const Err(NetworkFailure('save failed'));
+}
+
+/// Echoes each write into the full settings, like the server does — what a
+/// preset needs to be seen landing — and can fail the write numbered
+/// [failSetAt].
+class _EchoRepo implements NotifyRepository {
+  _EchoRepo(this.settings);
+
+  NotifySettings settings;
+  int sets = 0;
+  int? failSetAt;
+
+  @override
+  Future<Result<NotifySettings>> fetch(String token) async => Ok(settings);
+
+  @override
+  Future<Result<NotifySettings>> setChannel(
+    String token,
+    NotifyChannel channel,
+    int optionIndex,
+  ) async {
+    sets++;
+    if (failSetAt == sets) return const Err(NetworkFailure('429'));
+    settings = settings.withChannel(channel, optionIndex);
+    return Ok(settings);
+  }
+}
+
+/// Every channel at its local threshold — a fresh device, which is custom.
+NotifySettings _fresh() =>
+    NotifySettings.fromWire(const [1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+NotifySettings _presetSettings(NotifyPreset preset) => NotifySettings.fromWire([
+  for (final channel in NotifyChannel.values) preset.optionFor(channel)!,
+]);
+
+Finder _presetRow(NotifyPreset preset, AppLocalizations l10n) =>
+    find.widgetWithText(
+      RadioListTile<NotifyPreset>,
+      notifyPresetLabel(preset, l10n),
+    );
+
+/// Long enough for every request of the widest preset, 2 s apart.
+const Duration _allRequests = Duration(seconds: 30);
+
+void presetTests() {
+  group('presets', () {
+    testWidgets('each preset is a radio button; custom is the checked one', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await _pump(tester, repo: _EchoRepo(_fresh()), token: 'token');
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      for (final preset in NotifyPreset.values) {
+        final checked = preset == NotifyPreset.custom;
+        expect(
+          tester.getSemantics(_presetRow(preset, l10n)),
+          isSemantics(
+            isInMutuallyExclusiveGroup: true,
+            hasCheckedState: true,
+            isChecked: checked,
+            hasEnabledState: true,
+            isEnabled: true,
+          ),
+          reason: preset.name,
+        );
+      }
+      semantics.dispose();
+    });
+
+    testWidgets('settings that match a preset check it; custom then disables', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await _pump(
+        tester,
+        repo: _EchoRepo(_presetSettings(NotifyPreset.emergencyOnly)),
+        token: 'token',
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      expect(
+        tester.getSemantics(_presetRow(NotifyPreset.emergencyOnly, l10n)),
+        isSemantics(isChecked: true),
+      );
+      // Nothing to apply, so nothing to offer a screen reader.
+      expect(
+        tester.getSemantics(_presetRow(NotifyPreset.custom, l10n)),
+        isSemantics(isChecked: false, isEnabled: false),
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('leaving custom asks first; cancelling sends nothing', (
+      tester,
+    ) async {
+      final repo = _EchoRepo(_fresh());
+      await _pump(tester, repo: repo, token: 'token');
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      await tester.tap(_presetRow(NotifyPreset.all, l10n));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.notifyPresetConfirmBody), findsOneWidget);
+
+      await tester.tap(find.text(l10n.commonCancel));
+      await tester.pumpAndSettle();
+      expect(repo.sets, 0);
+    });
+
+    testWidgets('applying fills the channels in and checks the preset', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      final repo = _EchoRepo(_fresh());
+      await _pump(tester, repo: repo, token: 'token');
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      await tester.tap(_presetRow(NotifyPreset.emergencyOnly, l10n));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.notifyPresetApply));
+      await tester.pump();
+
+      // In flight: the chosen row spins — and says so to a screen reader —
+      // and every channel row is locked.
+      final applying = tester.getSemantics(
+        _presetRow(NotifyPreset.emergencyOnly, l10n),
+      );
+      expect(applying.label, contains(l10n.notifyPresetApplying));
+      expect(applying, isSemantics(isChecked: true));
+      final eewRow = tester.widget<ListTile>(
+        find.widgetWithText(
+          ListTile,
+          notifyChannelTitle(NotifyChannel.eew, l10n),
+        ),
+      );
+      expect(eewRow.enabled, isFalse);
+
+      await tester.pump(_allRequests);
+      await tester.pumpAndSettle();
+
+      expect(NotifyPreset.matching(repo.settings), NotifyPreset.emergencyOnly);
+      expect(
+        tester
+            .widget<RadioGroup<NotifyPreset>>(
+              find.byType(RadioGroup<NotifyPreset>),
+            )
+            .groupValue,
+        NotifyPreset.emergencyOnly,
+      );
+      expect(
+        find.text(notifyOptionLabel(NotifyOptionKind.localIntensity4, l10n)),
+        findsOneWidget,
+        reason: 'the EEW row shows what the server now holds',
+      );
+      expect(find.text(l10n.notifySetFailed), findsNothing);
+      semantics.dispose();
+    });
+
+    testWidgets('a failure part-way says so and shows the real state', (
+      tester,
+    ) async {
+      final repo = _EchoRepo(_presetSettings(NotifyPreset.recommended))
+        ..failSetAt = 2;
+      await _pump(tester, repo: repo, token: 'token');
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      // From a preset, not custom: no confirmation in the way.
+      await tester.tap(_presetRow(NotifyPreset.emergencyOnly, l10n));
+      await tester.pump(_allRequests);
+      await tester.pumpAndSettle();
+
+      expect(find.text(l10n.notifySetFailed), findsOneWidget);
+      expect(repo.sets, 2);
+      expect(
+        tester
+            .widget<RadioGroup<NotifyPreset>>(
+              find.byType(RadioGroup<NotifyPreset>),
+            )
+            .groupValue,
+        NotifyPreset.custom,
+      );
+    });
+  });
 }

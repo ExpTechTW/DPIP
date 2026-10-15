@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "Vị trí mới nhất",
   "eewCancelled": "Đã hủy",
   "eewCancelledNotice": "Cơ quan phát hành đã hủy cảnh báo này",
-  "eewFeedDown": "Mất kết nối cảnh báo động đất — đang kết nối lại…"
+  "eewFeedDown": "Mất kết nối cảnh báo động đất — đang kết nối lại…",
+  "notifyPresetSection": "Thiết lập nhanh",
+  "notifyPresetRecommended": "Đề xuất",
+  "notifyPresetRecommendedDescription": "Cảnh báo động đất, thời tiết và thảm họa tại khu vực của bạn, kèm thông tin sóng thần và thông báo — bỏ báo cáo động đất trùng với báo cáo cường độ",
+  "notifyPresetAll": "Tất cả",
+  "notifyPresetAllDescription": "Nhận mọi thứ trên mọi kênh, kể cả động đất ở bất kỳ đâu tại Đài Loan",
+  "notifyPresetEmergencyOnly": "Chỉ khẩn cấp",
+  "notifyPresetEmergencyOnlyDescription": "Chỉ thông báo khi liên quan đến an toàn: cảnh báo động đất cường độ 4 trở lên tại chỗ, cảnh báo thời tiết và thảm họa tại khu vực của bạn, và cảnh báo sóng thần",
+  "notifyPresetCustom": "Tùy chỉnh",
+  "notifyPresetCustomDescription": "Đặt từng kênh riêng ở bên dưới",
+  "notifyPresetConfirmTitle": "Áp dụng “{preset}”?",
+  "notifyPresetConfirmBody": "Mọi kênh bên dưới sẽ đổi theo thiết lập này, thay thế các cài đặt bạn đã chọn từng mục.",
+  "notifyPresetApply": "Áp dụng",
+  "notifyPresetApplying": "Đang áp dụng…"
 }

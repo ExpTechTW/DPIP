@@ -2093,5 +2093,18 @@
   "locationTrackLegendLatest": "마지막 위치",
   "eewCancelled": "취소됨",
   "eewCancelledNotice": "발표 기관이 이 경보를 취소했습니다",
-  "eewFeedDown": "지진 속보 연결이 끊겼습니다. 다시 연결하는 중…"
+  "eewFeedDown": "지진 속보 연결이 끊겼습니다. 다시 연결하는 중…",
+  "notifyPresetSection": "빠른 설정",
+  "notifyPresetRecommended": "권장",
+  "notifyPresetRecommendedDescription": "현재 위치의 지진·기상·재난 알림과 지진해일 정보, 공지사항. 진도 속보와 겹치는 지진 보고는 제외합니다",
+  "notifyPresetAll": "전체",
+  "notifyPresetAllDescription": "모든 채널을 전부 수신합니다. 대만 전역의 지진도 포함됩니다",
+  "notifyPresetEmergencyOnly": "긴급만",
+  "notifyPresetEmergencyOnlyDescription": "안전과 관련될 때만 알립니다: 현재 위치 진도 4 이상의 지진 경보, 현재 위치의 기상·재난 경보, 지진해일 경보",
+  "notifyPresetCustom": "사용자 지정",
+  "notifyPresetCustomDescription": "아래에서 채널별로 설정",
+  "notifyPresetConfirmTitle": "‘{preset}’을(를) 적용할까요?",
+  "notifyPresetConfirmBody": "아래의 모든 채널이 이 조합으로 바뀌며, 채널별로 고른 설정은 대체됩니다.",
+  "notifyPresetApply": "적용",
+  "notifyPresetApplying": "적용하는 중…"
 }

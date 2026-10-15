@@ -3542,4 +3542,50 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get eewFeedDown =>
       'Koneksi peringatan gempa terputus — menyambungkan ulang…';
+
+  @override
+  String get notifyPresetSection => 'Setelan cepat';
+
+  @override
+  String get notifyPresetRecommended => 'Disarankan';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      'Peringatan gempa, cuaca, dan bencana di area Anda, ditambah informasi tsunami dan pengumuman — tanpa laporan gempa yang mengulang laporan intensitas';
+
+  @override
+  String get notifyPresetAll => 'Semua';
+
+  @override
+  String get notifyPresetAllDescription =>
+      'Semua hal di setiap saluran, termasuk gempa di mana pun di Taiwan';
+
+  @override
+  String get notifyPresetEmergencyOnly => 'Darurat saja';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      'Hanya saat menyangkut keselamatan: peringatan gempa intensitas 4 atau lebih di lokasi Anda, peringatan cuaca dan bencana di area Anda, serta peringatan tsunami';
+
+  @override
+  String get notifyPresetCustom => 'Kustom';
+
+  @override
+  String get notifyPresetCustomDescription =>
+      'Atur setiap saluran satu per satu di bawah';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return 'Terapkan “$preset”?';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      'Setiap saluran di bawah akan diubah mengikutinya, menggantikan pengaturan yang Anda pilih satu per satu.';
+
+  @override
+  String get notifyPresetApply => 'Terapkan';
+
+  @override
+  String get notifyPresetApplying => 'Menerapkan…';
 }

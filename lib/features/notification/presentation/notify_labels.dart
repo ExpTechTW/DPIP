@@ -1,7 +1,9 @@
-/// Localized titles, icons, and option labels for the notification channels —
-/// the presentation-only mapping the settings page and its option sheet share.
+/// Localized titles, icons, and option labels for the notification channels
+/// and presets — the presentation-only mapping the settings page and its
+/// sheets share.
 library;
 
+import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -57,4 +59,32 @@ IconData notifyOptionIcon(NotifyOptionKind kind) => switch (kind) {
   NotifyOptionKind.weatherLocal => Icons.notifications_outlined,
   NotifyOptionKind.tsunamiWarning => Icons.notification_important_outlined,
   NotifyOptionKind.tsunamiAll => Icons.notifications_active_outlined,
+};
+
+/// The preset's display name.
+String notifyPresetLabel(NotifyPreset preset, AppLocalizations l10n) =>
+    switch (preset) {
+      NotifyPreset.recommended => l10n.notifyPresetRecommended,
+      NotifyPreset.all => l10n.notifyPresetAll,
+      NotifyPreset.emergencyOnly => l10n.notifyPresetEmergencyOnly,
+      NotifyPreset.custom => l10n.notifyPresetCustom,
+    };
+
+/// One sentence on what the preset turns on — and, where it matters, off.
+String notifyPresetDescription(NotifyPreset preset, AppLocalizations l10n) =>
+    switch (preset) {
+      NotifyPreset.recommended => l10n.notifyPresetRecommendedDescription,
+      NotifyPreset.all => l10n.notifyPresetAllDescription,
+      NotifyPreset.emergencyOnly => l10n.notifyPresetEmergencyOnlyDescription,
+      NotifyPreset.custom => l10n.notifyPresetCustomDescription,
+    };
+
+/// The preset's leading icon — the same "how much" cue as
+/// [notifyOptionIcon], so "everything" and "only the urgent" read alike in
+/// both pickers.
+IconData notifyPresetIcon(NotifyPreset preset) => switch (preset) {
+  NotifyPreset.recommended => Icons.recommend_outlined,
+  NotifyPreset.all => Icons.notifications_active_outlined,
+  NotifyPreset.emergencyOnly => Icons.notification_important_outlined,
+  NotifyPreset.custom => Icons.edit_notifications_outlined,
 };

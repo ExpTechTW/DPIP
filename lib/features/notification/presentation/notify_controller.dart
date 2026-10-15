@@ -1,8 +1,10 @@
 /// Drives the notification-settings page: loads the server settings and applies
-/// per-channel changes.
+/// per-channel changes and presets.
 library;
 
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/features/notification/domain/notify_preset.dart';
+import 'package:dpip/features/notification/domain/notify_preset_applier.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:flutter/foundation.dart';
@@ -26,16 +28,28 @@ enum NotifyLoadStatus {
 /// each save round-trips to the server and adopts the echoed settings, so the
 /// UI can never drift from the backend. A failed save keeps the previous value
 /// and reports `false` so the page can surface it.
+///
+/// A preset goes through the very same repository call, once per channel that
+/// differs ([NotifyPresetApplier]); each echo is adopted as it arrives, so the
+/// rows below the preset fill in one by one and a failure part-way shows
+/// exactly what the server ended up holding.
 class NotifyController extends ChangeNotifier {
-  NotifyController(this._repository, this._token);
+  NotifyController(
+    NotifyRepository repository,
+    this._token, {
+    Duration presetSpacing = NotifyPresetApplier.requestSpacing,
+  }) : _repository = repository,
+       _presets = NotifyPresetApplier(repository, spacing: presetSpacing);
 
   final NotifyRepository _repository;
+  final NotifyPresetApplier _presets;
   final String? _token;
 
   NotifyLoadStatus _status = NotifyLoadStatus.loading;
   NotifySettings? _settings;
   Failure? _failure;
   NotifyChannel? _saving;
+  NotifyPreset? _applying;
   bool _disposed = false;
 
   @override
@@ -55,6 +69,20 @@ class NotifyController extends ChangeNotifier {
 
   /// The channel with a save in flight, if any (for a per-row spinner).
   NotifyChannel? get saving => _saving;
+
+  /// The preset being applied, if any (for the preset row's spinner).
+  NotifyPreset? get applying => _applying;
+
+  /// Whether any write is in flight — every row is locked meanwhile, so two
+  /// writes never race for the same token's rate limit.
+  bool get busy => _saving != null || _applying != null;
+
+  /// The preset the loaded settings are exactly — [NotifyPreset.custom] when
+  /// they are none of them — or null until loaded.
+  NotifyPreset? get preset {
+    final settings = _settings;
+    return settings == null ? null : NotifyPreset.matching(settings);
+  }
 
   /// Whether a push token exists — without one there is nothing to target.
   bool get hasToken => _token != null && _token.isNotEmpty;
@@ -90,7 +118,7 @@ class NotifyController extends ChangeNotifier {
   /// value intact.
   Future<bool> setChannel(NotifyChannel channel, int optionIndex) async {
     final current = _settings;
-    if (!hasToken || current == null) return false;
+    if (!hasToken || current == null || busy) return false;
     if (current.optionOf(channel) == optionIndex) return true;
 
     _saving = channel;
@@ -109,5 +137,39 @@ class NotifyController extends ChangeNotifier {
         return false;
       },
     );
+  }
+
+  /// Applies [preset] — every channel it covers, one request at a time.
+  /// Returns whether all of it was saved (already matching counts as success).
+  ///
+  /// A failure keeps whatever the server had accepted before it, so the rows
+  /// and the preset row both show the true state, which is usually
+  /// [NotifyPreset.custom]; calling this again resumes from there.
+  /// [NotifyPreset.custom] has nothing to apply and reports false.
+  Future<bool> applyPreset(NotifyPreset preset) async {
+    final current = _settings;
+    if (!hasToken || current == null || busy) return false;
+    if (preset == NotifyPreset.custom) return false;
+    if (NotifyPreset.matching(current) == preset) return true;
+
+    _applying = preset;
+    notifyListeners();
+    final result = await _presets.apply(
+      _token!,
+      preset,
+      current: current,
+      onProgress: (settings) {
+        if (_disposed) return;
+        _settings = settings;
+        notifyListeners();
+      },
+      // Page popped mid-apply: send nothing further. What was written stays,
+      // and reopening the page shows it as it is.
+      isCancelled: () => _disposed,
+    );
+    if (_disposed) return false;
+    _applying = null;
+    notifyListeners();
+    return result.isOk;
   }
 }

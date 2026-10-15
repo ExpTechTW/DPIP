@@ -3531,4 +3531,49 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get eewFeedDown => 'Mất kết nối cảnh báo động đất — đang kết nối lại…';
+
+  @override
+  String get notifyPresetSection => 'Thiết lập nhanh';
+
+  @override
+  String get notifyPresetRecommended => 'Đề xuất';
+
+  @override
+  String get notifyPresetRecommendedDescription =>
+      'Cảnh báo động đất, thời tiết và thảm họa tại khu vực của bạn, kèm thông tin sóng thần và thông báo — bỏ báo cáo động đất trùng với báo cáo cường độ';
+
+  @override
+  String get notifyPresetAll => 'Tất cả';
+
+  @override
+  String get notifyPresetAllDescription =>
+      'Nhận mọi thứ trên mọi kênh, kể cả động đất ở bất kỳ đâu tại Đài Loan';
+
+  @override
+  String get notifyPresetEmergencyOnly => 'Chỉ khẩn cấp';
+
+  @override
+  String get notifyPresetEmergencyOnlyDescription =>
+      'Chỉ thông báo khi liên quan đến an toàn: cảnh báo động đất cường độ 4 trở lên tại chỗ, cảnh báo thời tiết và thảm họa tại khu vực của bạn, và cảnh báo sóng thần';
+
+  @override
+  String get notifyPresetCustom => 'Tùy chỉnh';
+
+  @override
+  String get notifyPresetCustomDescription => 'Đặt từng kênh riêng ở bên dưới';
+
+  @override
+  String notifyPresetConfirmTitle(String preset) {
+    return 'Áp dụng “$preset”?';
+  }
+
+  @override
+  String get notifyPresetConfirmBody =>
+      'Mọi kênh bên dưới sẽ đổi theo thiết lập này, thay thế các cài đặt bạn đã chọn từng mục.';
+
+  @override
+  String get notifyPresetApply => 'Áp dụng';
+
+  @override
+  String get notifyPresetApplying => 'Đang áp dụng…';
 }
