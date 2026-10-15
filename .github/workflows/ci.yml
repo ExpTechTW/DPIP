@@ -95,15 +95,10 @@ jobs:
           echo "branch gate: rebased on $BASE_REF, no merge commits"
 
       # The workflows themselves, because a broken one does not fail — it is
-      # *refused*. GitHub interpolates a `run` block whole before bash sees it,
-      # so an expression error anywhere in it, comment included, kills the run
-      # before a job exists: no failing step, and the file path where the name
-      # should be. Nothing in this repository could have caught that, and it
-      # took CI down on main for a day.
+      # *refused*: an expression error kills the run before a job exists. The
+      # script says more, and pins and checksums the actionlint it runs.
       - name: Workflow gate
-        run: |
-          bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) >/dev/null
-          ./actionlint -shellcheck= .github/workflows/*.yml
+        run: bash tool/check/workflows.sh
 
       # Architecture gate — pure grep, no toolchain, fails fast.
       - name: Layering gate

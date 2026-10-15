@@ -24,7 +24,6 @@
 # Not run here, and on purpose:
 #   - `pub get`. CI installs dependencies; a developer already has them, and
 #     `check/pubspec_lock.sh` is what catches a lockfile that disagrees.
-#   - actionlint. CI downloads it; nothing pins it locally.
 #   - `check/commits.sh`. It belongs to `tool/commit.sh`, which is where you
 #     are when a commit message is the thing being decided.
 source "$(dirname "${BASH_SOURCE[0]}")/dev/_lib.sh"
@@ -33,10 +32,11 @@ cd "$(repo_root)"
 step 'format + analyze'
 cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 
-# Five of these finish in under a quarter of a second and are run every time:
+# Most of these finish in under a quarter of a second and are run every time:
 # hashing their inputs would cost as much as running them, and a cache that
-# saves nothing is a cache that can only be wrong.
-for gate in tooling l10n pubspec_lock notification_sounds build_info \
+# saves nothing is a cache that can only be wrong. `workflows` downloads its
+# linter on the first run in a clone and takes 0.06 s on every one after.
+for gate in workflows tooling l10n pubspec_lock notification_sounds build_info \
   widget_township_resources; do
   step "check/$gate"
   "tool/check/$gate.sh"
