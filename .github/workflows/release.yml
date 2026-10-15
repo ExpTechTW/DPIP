@@ -40,6 +40,8 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
+          # Nothing in this job pushes; `gh` reads its token from GH_TOKEN.
+          persist-credentials: false
 
       - id: v
         run: |
@@ -159,6 +161,10 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
+          # Nothing in this job pushes, and it is the job holding the signing
+          # keys and the store credentials: the job token is not left in
+          # .git/config beside them.
+          persist-credentials: false
 
       # Flutter/Dart come from mise.toml, the same pin ci.yml and every
       # developer use. A published build is the one that most needs to be
@@ -433,6 +439,9 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
+          # Kept, and the one place it is: `Publish` pushes the snapshot tag
+          # with `git push`. This job uploads no artifact for it to leak into.
+          persist-credentials: true
 
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
