@@ -7,9 +7,11 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/core/network/sse_event.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/sse_realtime_source.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_feed.dart';
 import 'package:flutter/foundation.dart' show listEquals;
 
 /// The live EEW feed, streamed over Server-Sent Events (`/api/v2/eq/eew?sse=1`).
@@ -44,6 +46,11 @@ import 'package:flutter/foundation.dart' show listEquals;
 /// of date, which is the truth — and the feed is `live` again only once the
 /// stream answers, at which point polling stops at once and any poll still in
 /// flight is discarded.
+///
+/// Every answer — streamed or polled — passes through [reduceEewFeed] on its
+/// way out, so what the channel publishes is never a report older than one
+/// already shown: the server a reconnect or a poll lands on may be a serial
+/// behind the one before it.
 class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   /// [connect] opens one EEW SSE connection — in production
   /// `EarthquakeApi.openEewSse`; the source calls it again to reconnect.
@@ -54,6 +61,9 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   /// [cwaOnly] is read fresh on every [decode] and every poll (a closure, not
   /// a captured bool) so toggling `EewCwaOnlySettings` takes effect on the
   /// very next event instead of needing the connection to be rebuilt.
+  ///
+  /// [now] stamps each snapshot for the reducer — the calibrated clock in
+  /// production, since it is compared with server-stamped instants.
   EewRealtimeSource(
     Stream<SseEvent> Function() connect, {
     required bool Function() cwaOnly,
@@ -61,6 +71,7 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
     Elapsed? elapsed,
     Future<void> Function(Duration delay)? delay,
     Random? random,
+    DateTime Function()? now,
   }) : this._(
          connect,
          cwaOnly,
@@ -68,6 +79,7 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
          elapsed ?? SystemElapsed(),
          delay,
          random,
+         now ?? (() => AppTime.utc),
        );
 
   EewRealtimeSource._(
@@ -77,6 +89,7 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
     this._monotonic,
     Future<void> Function(Duration delay)? delay,
     Random? random,
+    this._now,
   ) : super(
         connect: connect,
         label: 'eew',
@@ -103,6 +116,11 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   final bool Function() cwaOnly;
   final Future<List<dynamic>> Function()? _poll;
   final Elapsed _monotonic;
+  final DateTime Function() _now;
+
+  /// Survives reconnects, failovers and the switch to polling and back —
+  /// that is the point of it.
+  EewFeedState _feed = EewFeedState.initial;
 
   /// When the stream started failing, or null while it answers.
   Duration? _downSince;
@@ -125,8 +143,19 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   @override
   bool get servingFallback => _servingFallback;
 
+  /// The answer, folded through [reduceEewFeed]. The channel calls this once
+  /// a second whether or not a new frame arrived, so the fold runs on the same
+  /// snapshot repeatedly; it is idempotent for an unchanged one.
   @override
   Future<Result<List<Eew>>> fetch() async {
+    final result = await _fetchUnreduced();
+    return result.map((frame) {
+      _feed = reduceEewFeed(_feed, frame, _now());
+      return _feed.visible;
+    });
+  }
+
+  Future<Result<List<Eew>>> _fetchUnreduced() async {
     final streamed = await super.fetch();
     final poll = _poll;
     if (poll == null || _closed) return streamed;
