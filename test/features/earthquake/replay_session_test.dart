@@ -101,6 +101,7 @@ class _RecordingApiClient implements ApiClient {
     String path, {
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    Duration idleTimeout = Duration.zero,
   }) => throw UnimplementedError();
 
   @override

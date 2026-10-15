@@ -54,12 +54,27 @@ void main() {
       expect(events.map((e) => e.data), ['\n', 'a\n', '']);
     });
 
-    test('skips comment / heartbeat lines', () async {
+    test('surfaces a ping as a comment, never as a payload', () async {
+      // The servers' keep-alive. It carries nothing, but it is the only thing
+      // that tells a quiet connection from a dead one, so it has to get out.
       final events = await HttpSseClient.parse(
-        _bytes([': keep-alive\ndata: x\n\n']),
+        _bytes([': ping\n\n', ':ping 1700000000000\n\n']),
       ).toList();
-      expect(events, hasLength(1));
-      expect(events.single.data, 'x');
+      expect(events, hasLength(2));
+      expect(events.every((e) => e.isComment), isTrue);
+      expect(events.any((e) => e.isDefault), isFalse);
+      expect(events.map((e) => e.data), ['ping', 'ping 1700000000000']);
+    });
+
+    test('a comment inside a frame leaves the frame intact', () async {
+      final events = await HttpSseClient.parse(
+        _bytes(['event: g\n: keep-alive\ndata: x\n\n']),
+      ).toList();
+      expect(events, hasLength(2));
+      expect(events.first.isComment, isTrue);
+      expect(events.last.name, 'g');
+      expect(events.last.data, 'x');
+      expect(events.last.isComment, isFalse);
     });
 
     test(

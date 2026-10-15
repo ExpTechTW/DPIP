@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -322,6 +323,36 @@ void main() {
     opened.cancel();
     expect(adapter.hits, hasLength(1));
   });
+
+  test(
+    'openStream errors a stream that falls silent past idleTimeout',
+    () async {
+      // A half-open socket after a network handover sends nothing and never
+      // closes. Without a bound the stream waits on it forever.
+      final silent = StreamController<Uint8List>();
+      addTearDown(silent.close);
+      final adapter = _FakeAdapter((_, _) => ResponseBody(silent.stream, 200));
+      final opened = await clientWith(adapter).openStream(
+        ApiTier.lbApi,
+        '/sse',
+        idleTimeout: const Duration(milliseconds: 50),
+      );
+      silent.add(Uint8List.fromList([1]));
+      await expectLater(
+        opened.stream,
+        emitsInOrder([
+          isA<Uint8List>(),
+          emitsError(
+            isA<DioException>().having(
+              (e) => e.type,
+              'type',
+              DioExceptionType.receiveTimeout,
+            ),
+          ),
+        ]),
+      );
+    },
+  );
 
   test('a stream 5xx fails over and a 4xx does not', () async {
     final health = EndpointHealthMonitor();

@@ -15,12 +15,14 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _RecordingApiClient implements ApiClient {
   final List<(ApiTier, String, Map<String, dynamic>?)> getCalls = [];
   final List<(ApiTier, String, Map<String, dynamic>?)> streamCalls = [];
+  final List<Duration> idleTimeouts = [];
 
   dynamic nextGetResult;
   Object? getError;
@@ -44,8 +46,10 @@ class _RecordingApiClient implements ApiClient {
     String path, {
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    Duration idleTimeout = Duration.zero,
   }) async {
     streamCalls.add((tier, path, query));
+    idleTimeouts.add(idleTimeout);
     return StreamedResponse(
       (nextStream ?? const Stream<List<int>>.empty()).cast<Uint8List>(),
       () {},
@@ -255,6 +259,19 @@ void main() {
         expect(client.streamCalls.single.$3, {'sse': 1, 'compress': 1});
         expect(events, hasLength(1));
         expect(events.single.data, '[]');
+      },
+    );
+
+    test(
+      'both streams bound their silence by the server ping, not forever',
+      () async {
+        // A zero idle timeout is how a half-open socket used to wait out a
+        // handover indefinitely.
+        client.nextStream = _sseBody('[]');
+        await api.openEewSse().toList();
+        client.nextStream = _sseBody('x');
+        await api.openTremSse(live: false).toList();
+        expect(client.idleTimeouts, [sseSilenceLimit, sseSilenceLimit]);
       },
     );
   });

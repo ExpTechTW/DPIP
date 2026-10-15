@@ -17,6 +17,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
@@ -105,6 +106,41 @@ void main() {
         expect(result.valueOrNull?.stations, isEmpty);
       });
       async.flushMicrotasks();
+      source.dispose();
+    });
+  });
+
+  test('asleep, silence past the ping bound is a dead feed, not calm', () {
+    fakeAsync((async) {
+      final connections = _Connections();
+      final elapsed = _FakeElapsed();
+      final source = RtsRealtimeSource(
+        connections.connect,
+        demand: RtsLiveDemand(),
+        elapsed: elapsed,
+        delay: (_) => Completer<void>().future,
+      );
+
+      source.fetch();
+      connections.last.add(_info);
+      async.flushMicrotasks();
+
+      // Pings keep a sleeping stream calm however long nothing alerts.
+      elapsed.value = sseServerPingInterval;
+      connections.last.add(const SseEvent.comment('ping'));
+      async.flushMicrotasks();
+      elapsed.value = sseServerPingInterval + sseSilenceLimit;
+      source.fetch().then((result) {
+        expect(result.valueOrNull?.stations, isEmpty, reason: 'calm');
+      });
+      async.flushMicrotasks();
+
+      // A half-open socket sends no pings: past the bound it cannot vouch for
+      // calm, and it is dropped for a fresh one.
+      elapsed.value += const Duration(seconds: 1);
+      source.fetch().then((result) => expect(result.isOk, isFalse));
+      async.flushMicrotasks();
+      expect(connections.last.hasListener, isFalse);
       source.dispose();
     });
   });

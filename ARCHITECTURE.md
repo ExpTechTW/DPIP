@@ -171,7 +171,12 @@ and answers each poll from that buffer — `Ok` while connected, `Err` while
 reconnecting — so the channel/state/staleness are untouched); the `data:`
 payload is the same JSON the GET returned. A bursty feed (EEW, silent between
 events) uses connection-open liveness; a continuous feed (RTS, ~1 Hz) uses
-event-recency. `RealtimeService` + `AppLifecycleListener`
+event-recency. Neither trusts an open socket on its own: the servers write a
+`: ping` comment on an idle stream, the parser surfaces it, and a connection
+that receives nothing at all for `sseSilenceLimit` (2.2 × the ping interval,
+`sse_client.dart`) is half-open — a handover or NAT timeout that never sent a
+FIN — so the source answers `Err` and replaces it, and silence never reads as
+calm. `RealtimeService` + `AppLifecycleListener`
 pause polling on background and resume (recompute status → resync clock →
 refetch) on foreground; background alerting is push's job. A safety-critical
 feed that is `stale`/`offline` must never be presented as current.
