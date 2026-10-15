@@ -333,6 +333,71 @@ void main() {
       expect(source.servingFallback, isFalse);
     });
   });
+
+  group('fetch folds every snapshot through the report-order reducer', () {
+    String frame(List<({String id, int serial, int status})> alerts) =>
+        jsonEncode([
+          for (final a in alerts)
+            {
+              'author': 'cwa',
+              'id': a.id,
+              'serial': a.serial,
+              'status': a.status,
+              'final': 0,
+              'eq': {
+                'time': 1700000000000,
+                'lon': 121.5,
+                'lat': 24.0,
+                'depth': 10.0,
+                'mag': 5.0 + a.serial / 10,
+                'loc': '花蓮縣',
+                'max': 4,
+              },
+            },
+        ]);
+
+    Future<List<Eew>> answer(
+      EewRealtimeSource source,
+      StreamController<SseEvent> stream,
+      String data,
+    ) async {
+      stream.add(SseEvent(data: data));
+      await pumpEventQueue();
+      final result = await source.fetch();
+      return result.valueOrNull!;
+    }
+
+    test('a reconnect onto a server a report behind does not take the card '
+        'back, and a dropped event still leaves', () async {
+      final stream = StreamController<SseEvent>.broadcast();
+      addTearDown(stream.close);
+      final source = EewRealtimeSource(
+        () => stream.stream,
+        cwaOnly: () => false,
+        now: () => DateTime.utc(2026, 10, 16),
+      );
+      addTearDown(source.dispose);
+      await source.fetch(); // opens the connection
+
+      final third = await answer(
+        source,
+        stream,
+        frame([(id: 'a', serial: 3, status: 0)]),
+      );
+      expect(third.single.serial, 3);
+
+      final lagging = await answer(
+        source,
+        stream,
+        frame([(id: 'a', serial: 2, status: 0)]),
+      );
+      expect(lagging.single.serial, 3);
+      expect(lagging.single.info.magnitude, closeTo(5.3, 1e-9));
+
+      final gone = await answer(source, stream, '[]');
+      expect(gone, isEmpty);
+    });
+  });
 }
 
 class _FakeElapsed implements Elapsed {
