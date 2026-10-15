@@ -13,6 +13,8 @@
 /// dropped one is a ring that stops expanding during an earthquake.
 library;
 
+import 'dart:async';
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -30,6 +32,7 @@ import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/map/presentation/layers/rts_layer.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -50,6 +53,22 @@ class _EewRecordingController extends RecordingMapController {
   }) async {
     if (sourceId == _eewSourceId) eewPushes.add(geojson);
     calls.add('setGeoJsonSource:$sourceId');
+  }
+}
+
+/// Holds every EEW write open until [gate] completes — a phone whose map takes
+/// longer than a wavefront tick to apply a ring set.
+class _SlowEewController extends _EewRecordingController {
+  Completer<void>? gate;
+
+  @override
+  Future<void> setGeoJsonSource(
+    String sourceId,
+    Map<String, dynamic> geojson, {
+    String? promoteId,
+  }) async {
+    await super.setGeoJsonSource(sourceId, geojson, promoteId: promoteId);
+    if (sourceId == _eewSourceId) await gate?.future;
   }
 }
 
@@ -295,4 +314,79 @@ void main() {
       );
     },
   );
+
+  group('the wavefront ticker', () {
+    /// Renders a live alert inside [async] and returns the layer, settled.
+    RtsMapLayer attach(FakeAsync async, _EewRecordingController controller) {
+      late RtsMapLayer layer;
+      _build(
+        alerts: [_alert()],
+        eewElapsed: _FakeElapsed(),
+      ).then((built) => layer = built.layer);
+      async.flushMicrotasks();
+      layer.render(controller);
+      async.flushMicrotasks();
+      return layer;
+    }
+
+    test('waits for the previous write instead of queueing behind it', () {
+      fakeAsync((async) {
+        final controller = _SlowEewController();
+        final layer = attach(async, controller);
+
+        final gate = controller.gate = Completer<void>();
+        final before = controller.eewPushes.length;
+        // Fifteen 16 ms ticks while the map is still busy with one write.
+        async.elapse(const Duration(milliseconds: 16 * 15));
+        expect(
+          controller.eewPushes,
+          hasLength(before + 1),
+          reason: 'one write out, and every tick behind it skipped',
+        );
+
+        controller.gate = null;
+        gate.complete();
+        async.flushMicrotasks();
+        async.elapse(const Duration(milliseconds: 16 * 3));
+        expect(
+          controller.eewPushes,
+          hasLength(before + 4),
+          reason: 'once it lands, every tick writes again',
+        );
+        layer.clear(controller);
+        async.flushMicrotasks();
+      });
+    });
+
+    test('treats a write that never answers as lost, not slow', () {
+      fakeAsync((async) {
+        final controller = _SlowEewController();
+        final layer = attach(async, controller);
+
+        controller.gate = Completer<void>(); // never completed
+        final before = controller.eewPushes.length;
+        async.elapse(const Duration(milliseconds: 1100));
+        expect(
+          controller.eewPushes,
+          hasLength(before + 2),
+          reason: 'a lost platform call must not freeze the rings for good',
+        );
+        layer.clear(controller);
+        async.flushMicrotasks();
+      });
+    });
+
+    test('writes on every tick while the map keeps up', () {
+      fakeAsync((async) {
+        final controller = _EewRecordingController();
+        final layer = attach(async, controller);
+
+        final before = controller.eewPushes.length;
+        async.elapse(const Duration(milliseconds: 16 * 10));
+        expect(controller.eewPushes, hasLength(before + 10));
+        layer.clear(controller);
+        async.flushMicrotasks();
+      });
+    });
+  });
 }
