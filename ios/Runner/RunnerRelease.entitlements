@@ -16,6 +16,15 @@
 	     and provisioning profile must both carry it or signing fails outright. -->
 	<key>com.apple.developer.usernotifications.critical-alerts</key>
 	<true/>
+	<!-- What lets a High/Max channel through Focus and Sleep. awesome posts
+	     those as `.timeSensitive` (NotificationBuilder.setImportance), and so
+	     do pushes whose aps carries `interruption-level: time-sensitive` — but
+	     without this key iOS quietly downgrades both to `.active`, and a Focus
+	     holds the alert until the user looks. Unlike critical alerts it needs
+	     no request to Apple: the App ID only has to have the Time Sensitive
+	     Notifications capability switched on, or signing fails outright. -->
+	<key>com.apple.developer.usernotifications.time-sensitive</key>
+	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.exptech.dpip.dpip.widgets</string>
