@@ -644,6 +644,45 @@ class AppLocalizationsVi extends AppLocalizations {
   String get feedOffline => 'Mất kết nối';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return 'Không thể kết nối · đang hiển thị dữ liệu từ $age trước';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge =>
+      'Không thể kết nối · đang hiển thị dữ liệu đã lưu';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count phút',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giờ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ngày',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => 'Đang phát lại';
 
   @override

@@ -6,6 +6,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
@@ -37,7 +38,7 @@ class _FakeEarthquakeApi implements EarthquakeApi {
   Future<List<dynamic>> getEewAt(int seconds) => throw UnimplementedError();
 
   @override
-  Future<List<dynamic>> getReportList({
+  Future<Fetched<List<dynamic>>> getReportList({
     int limit = 50,
     int page = 1,
     int? minIntensity,

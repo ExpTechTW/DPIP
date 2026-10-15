@@ -647,6 +647,45 @@ class AppLocalizationsId extends AppLocalizations {
   String get feedOffline => 'Koneksi terputus';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return 'Tidak dapat terhubung · menampilkan data dari $age yang lalu';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge =>
+      'Tidak dapat terhubung · menampilkan data tersimpan';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count menit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jam',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hari',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => 'Memutar ulang';
 
   @override

@@ -16,6 +16,7 @@ import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
+import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
@@ -150,7 +151,7 @@ class _ReportListPageState extends State<ReportListPage> {
     final sections = groupReportsByTaipeiDay(c.items);
     final extra = c.loadingMore || !c.hasMore ? 1 : 0;
 
-    return ListView.builder(
+    final list = ListView.builder(
       controller: _scroll,
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
@@ -190,6 +191,16 @@ class _ReportListPageState extends State<ReportListPage> {
           child: _DaySection(day: section.day, reports: section.reports),
         );
       },
+    );
+    // Rows that are not a current answer — a saved copy, or what is left
+    // after a failed refresh — say so above the list.
+    final staleness = c.staleness;
+    if (staleness == null) return list;
+    return Column(
+      children: [
+        FreshnessBanner.saved(staleness: staleness),
+        Expanded(child: list),
+      ],
     );
   }
 }

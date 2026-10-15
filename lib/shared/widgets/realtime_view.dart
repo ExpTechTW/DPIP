@@ -1,8 +1,8 @@
-import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
+import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 
@@ -71,64 +71,9 @@ class RealtimeView<T> extends StatelessWidget {
 
     return Column(
       children: [
-        _FreshnessBanner(status: state.status),
+        FreshnessBanner.feed(status: state.status),
         Expanded(child: content),
       ],
-    );
-  }
-}
-
-/// A thin banner flagging that shown data has aged (stale) or the feed dropped
-/// (offline) — the "still showing last known data, but…" affordance.
-class _FreshnessBanner extends StatelessWidget {
-  const _FreshnessBanner({required this.status});
-
-  final RealtimeStatus status;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-
-    final (
-      Color background,
-      Color foreground,
-      IconData icon,
-      String label,
-    ) = switch (status) {
-      RealtimeStatus.offline => (
-        colors.errorContainer,
-        colors.onErrorContainer,
-        Icons.cloud_off_outlined,
-        l10n.feedOffline,
-      ),
-      _ => (
-        colors.tertiaryContainer,
-        colors.onTertiaryContainer,
-        Icons.schedule,
-        l10n.feedStale,
-      ),
-    };
-
-    return Material(
-      color: background,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.sm,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: foreground),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge
-                  ?.copyWith(color: foreground),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

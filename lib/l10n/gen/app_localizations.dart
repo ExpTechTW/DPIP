@@ -1290,6 +1290,36 @@ abstract class AppLocalizations {
   /// **'Connection lost'**
   String get feedOffline;
 
+  /// Banner over a list shown from the copy saved last time because the server could not be reached; {age} is a duration such as '5 minutes' (durationMinutes/Hours/Days)
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t connect · showing data from {age} ago'**
+  String freshnessSavedCopy(String age);
+
+  /// Banner over a list shown from a saved copy whose age is unknown, because the server could not be reached
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t connect · showing saved data'**
+  String get freshnessSavedCopyUnknownAge;
+
+  /// A duration in whole minutes, used inside other sentences (e.g. how old saved data is)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 minute} other{{count} minutes}}'**
+  String durationMinutes(int count);
+
+  /// A duration in whole hours, used inside other sentences (e.g. how old saved data is)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hour} other{{count} hours}}'**
+  String durationHours(int count);
+
+  /// A duration in whole days, used inside other sentences (e.g. how old saved data is)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String durationDays(int count);
+
   /// Status word on the replay page when the replayed instant is older than the RTS retention window: the replay is running, the server just has no shaking snapshot that far back. Never 'offline' — the feed is not broken
   ///
   /// In en, this message translates to:

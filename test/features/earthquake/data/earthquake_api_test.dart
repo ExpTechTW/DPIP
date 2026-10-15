@@ -104,7 +104,15 @@ class _RecordingApiClient implements ApiClient {
     Map<String, dynamic>? query,
     Options? options,
     CancelToken? cancelToken,
-  }) => throw UnimplementedError();
+  }) async {
+    getCalls.add((tier, path, query));
+    if (getError != null) throw getError!;
+    return Response<dynamic>(
+      requestOptions: RequestOptions(path: path),
+      statusCode: 200,
+      data: nextGetResult,
+    );
+  }
 
   @override
   List<String> hostsFor(ApiTier tier) => throw UnimplementedError();

@@ -6,6 +6,8 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/core/network/stale_if_error.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
 /// Dio interceptor implementing HTTP ETag revalidation against an
@@ -289,6 +291,12 @@ class EtagInterceptor extends Interceptor {
             if (usage != null) {
               unawaited(usage.record(down: 0, hit: true, saved: cached.size));
             }
+            // The server has just vouched for the copy: a stale-if-error
+            // request's offline label counts its age from here. Only those
+            // pay the write — nothing else reads it.
+            if (StaleIfError.of(options) != null) {
+              unawaited(_store.markFetched(url, AppTime.utc));
+            }
             handler.next(response);
             return;
           }
@@ -355,6 +363,7 @@ class EtagInterceptor extends Interceptor {
                 body: jsonBody!,
                 contentType: response.headers.value(Headers.contentTypeHeader),
                 size: down,
+                fetchedAt: AppTime.utc,
               ),
             );
           }
@@ -417,6 +426,22 @@ class EtagInterceptor extends Interceptor {
           ),
         );
         return;
+      }
+    }
+
+    // Stale-if-error, for a GET that asked for it: offer the saved body, but
+    // let the failure through — the region client may yet reach another
+    // host, and only the caller knows when every host has failed (see
+    // [StaleIfError]).
+    final staleIfError = StaleIfError.of(options);
+    if (staleIfError != null &&
+        !_isBytes(options) &&
+        options.method.toUpperCase() == 'GET' &&
+        _cacheable(options, uri) &&
+        StaleIfError.covers(err)) {
+      final cached = await _store.readJson(uri.toString());
+      if (cached != null) {
+        staleIfError.offer((data: cached.data, fetchedAt: cached.fetchedAt));
       }
     }
     handler.next(err);

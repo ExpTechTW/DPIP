@@ -2,7 +2,9 @@
 library;
 
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -38,6 +40,17 @@ class ReportListController extends ChangeNotifier {
   bool get loading => _loading;
   bool get loadingMore => _loadingMore;
   Failure? get failure => _failure;
+
+  /// Set while the rows in [items] are not a current answer, so the page can
+  /// say so instead of presenting them as current: the server could not be
+  /// reached and they are the copy saved last time, or a refresh failed and
+  /// they are what the previous load returned. Null while they are current.
+  Staleness? get staleness => _staleness;
+  Staleness? _staleness;
+
+  /// When the first page in [items] was last current (calibrated time) — the
+  /// age a failed refresh reports for the rows it leaves on screen.
+  DateTime? _currentAt;
   bool get isEmpty => !_loading && _failure == null && items.isEmpty;
 
   /// Draft differs from the last successful / in-flight query.
@@ -72,20 +85,24 @@ class ReportListController extends ChangeNotifier {
       page: 1,
       query: this.query,
     );
-    result.when(
-      ok: (page) {
+    switch (result) {
+      case Ok(value: final page, :final stale):
         items
           ..clear()
           ..addAll(page);
         _page = 1;
         _hasMore = page.length >= pageSize;
         _failure = null;
-      },
-      err: (failure) {
+        _staleness = stale;
+        _currentAt = stale == null ? AppTime.utc : stale.since;
+      case Err(:final failure):
         _failure = failure;
+        // The rows stay (see [reload]), but they are no longer current.
+        if (items.isNotEmpty) {
+          _staleness = Staleness(failure: failure, since: _currentAt);
+        }
         Log.warning('Report list reload failed: ${failure.message}');
-      },
-    );
+    }
     _loading = false;
     notifyListeners();
   }
@@ -102,18 +119,18 @@ class ReportListController extends ChangeNotifier {
       page: next,
       query: query,
     );
-    result.when(
-      ok: (page) {
+    switch (result) {
+      case Ok(value: final page, :final stale):
         items.addAll(page);
         _page = next;
         _hasMore = page.length >= pageSize;
         _failure = null;
-      },
-      err: (failure) {
+        // A saved later page makes the list as a whole a saved copy.
+        if (stale != null) _staleness ??= stale;
+      case Err(:final failure):
         // Keep existing rows; surface via log — footer can retry loadMore.
         Log.warning('Report list loadMore failed: ${failure.message}');
-      },
-    );
+    }
     _loadingMore = false;
     notifyListeners();
   }

@@ -649,6 +649,48 @@ class AppLocalizationsFil extends AppLocalizations {
   String get feedOffline => 'Nawala ang koneksyon';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return 'Hindi makakonekta · ipinapakita ang datos mula $age na ang nakalipas';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge =>
+      'Hindi makakonekta · ipinapakita ang naka-save na datos';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minuto',
+      one: '1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count oras',
+      one: '1 oras',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count araw',
+      one: '1 araw',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => 'Nire-replay';
 
   @override

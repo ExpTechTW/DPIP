@@ -27,6 +27,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
+import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -64,6 +65,7 @@ class _FixedSource implements ServerTimeSource {
 class _FakeReportRepository implements ReportRepository {
   final List<({int limit, int page, ReportListQuery query})> calls = [];
   Failure? nextError;
+  Staleness? nextStale;
   List<PartialEarthquakeReport> nextPage = const [];
 
   /// When set, the first page never arrives — the state the list is in between
@@ -81,7 +83,7 @@ class _FakeReportRepository implements ReportRepository {
     if (gate != null) return gate.future;
     final error = nextError;
     if (error != null) return Err(error);
-    return Ok(page == 1 ? nextPage : const []);
+    return Ok(page == 1 ? nextPage : const [], stale: nextStale);
   }
 
   @override
@@ -348,6 +350,35 @@ void main() {
       // rows exist and the user's own filter is hiding them.
       expect(find.text(l10n.reportListEmptyFiltered), findsOneWidget);
       expect(find.text(l10n.reportListEmpty), findsNothing);
+    });
+  });
+
+  group('offline', () {
+    testWidgets('a saved copy is listed under a banner with its age', (
+      tester,
+    ) async {
+      final repository = _FakeReportRepository()
+        ..nextPage = [_report('a', originUtc: _todayMorning)]
+        ..nextStale = Staleness(
+          failure: const NetworkFailure('No connection'),
+          since: _now.subtract(const Duration(hours: 3)),
+        );
+      await _pump(tester, repository);
+
+      expect(
+        find.text("Can't connect · showing data from 3 hours ago"),
+        findsOneWidget,
+      );
+      expect(find.byType(ErrorView), findsNothing);
+      expect(find.textContaining('花蓮縣'), findsWidgets);
+    });
+
+    testWidgets('fresh rows carry no banner', (tester) async {
+      final repository = _FakeReportRepository()
+        ..nextPage = [_report('a', originUtc: _todayMorning)];
+      await _pump(tester, repository);
+
+      expect(find.byType(FreshnessBanner), findsNothing);
     });
   });
 }

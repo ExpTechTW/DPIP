@@ -646,6 +646,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedOffline => 'Connection lost';
 
   @override
+  String freshnessSavedCopy(String age) {
+    return 'Can\'t connect · showing data from $age ago';
+  }
+
+  @override
+  String get freshnessSavedCopyUnknownAge =>
+      'Can\'t connect · showing saved data';
+
+  @override
+  String durationMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours',
+      one: '1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get feedReplaying => 'Replaying';
 
   @override
