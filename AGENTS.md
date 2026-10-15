@@ -216,6 +216,7 @@ See [commit.md](commit.md). Individually, if you want to fail faster:
 
 ```sh
 tool/check/commits.sh origin/main..HEAD
+tool/check/workflows.sh
 tool/check/layering.sh
 tool/check/l10n.sh
 tool/check/storage.sh
@@ -229,7 +230,8 @@ tool/dev/test_ios.sh         # only if you touched ios/ — macOS, and slow
 ```
 
 The bash gates need only bash and python3, so they fail fast without the
-toolchain. `.github/workflows/ci.yml` must stay green;
+toolchain. `workflows.sh` also downloads its linter, at a pinned release with a
+pinned checksum, the first time it runs in a clone. `.github/workflows/ci.yml` must stay green;
 `android.yml` / `ios.yml` build artifacts and `review.yml` adds an automated PR
 review.
 
