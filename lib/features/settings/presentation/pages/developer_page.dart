@@ -28,7 +28,7 @@ import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart' show clearAmbientCache;
 import 'package:provider/provider.dart';
 
 /// One labelled diagnostic value.
@@ -59,6 +59,21 @@ class _DeveloperPageState extends State<DeveloperPage> {
   EewLiveActivityStatus? _eewStatus;
   bool _eewBusy = false;
   String? _eewError;
+
+  bool get _canStartEewMock =>
+      !_eewBusy && _eewStatus?.enabled == true && _eewStatus?.active != true;
+
+  bool get _canEndEewMock => !_eewBusy && _eewStatus?.active == true;
+
+  bool get _canUpdateEewMock =>
+      _canEndEewMock &&
+      _eewStatus?.generic != true &&
+      _eewStatus?.waveArrived != true;
+
+  bool get _canAlertEewMock => _canUpdateEewMock && _eewStatus?.enabled == true;
+
+  bool get _canScheduleEewAlert =>
+      _canAlertEewMock && _eewStatus?.delayedAlertStatus != 'Scheduled';
 
   /// Version-row taps toward the experimental unlock. Deliberately not
   /// persisted — a fresh app start re-arms the easter egg.
@@ -106,6 +121,8 @@ class _DeveloperPageState extends State<DeveloperPage> {
     } on PlatformException catch (error) {
       if (!mounted) return;
       setState(() => _eewError = error.message ?? error.code);
+    } catch (error, stackTrace) {
+      _handleUnexpectedEewError(error, stackTrace, 'refresh status');
     }
   }
 
@@ -124,8 +141,33 @@ class _DeveloperPageState extends State<DeveloperPage> {
     } on PlatformException catch (error) {
       if (!mounted) return;
       setState(() => _eewError = error.message ?? error.code);
+    } catch (error, stackTrace) {
+      _handleUnexpectedEewError(error, stackTrace, 'mock action');
     } finally {
       if (mounted) setState(() => _eewBusy = false);
+    }
+  }
+
+  void _handleUnexpectedEewError(
+    Object error,
+    StackTrace stackTrace,
+    String operation,
+  ) {
+    Log.handle(error, stackTrace, 'dev: EEW $operation');
+    if (mounted) {
+      setState(() => _eewError = 'Unexpected EEW $operation failure: $error');
+    }
+    // Keep programming errors visible to Flutter's error handlers as well as
+    // the diagnostic log, while allowing the controls to recover for a retry.
+    if (error is Error) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'DPIP developer EEW controls',
+          context: ErrorDescription('while running EEW $operation'),
+        ),
+      );
     }
   }
 
@@ -373,19 +415,13 @@ class _DeveloperPageState extends State<DeveloperPage> {
                     runSpacing: AppSpacing.xs,
                     children: [
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.enabled != true ||
-                                _eewStatus?.active == true
+                        onPressed: !_canStartEewMock
                             ? null
                             : () => _runEewMock(_eewLiveActivity.mockStart),
                         child: const Text('Start Mock EEW'),
                       ),
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.enabled != true ||
-                                _eewStatus?.active == true
+                        onPressed: !_canStartEewMock
                             ? null
                             : () => _runEewMock(
                                 _eewLiveActivity.mockStartGeneric,
@@ -393,11 +429,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                         child: const Text('Start Generic Mock EEW'),
                       ),
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.active != true ||
-                                _eewStatus?.generic == true ||
-                                _eewStatus?.waveArrived == true
+                        onPressed: !_canUpdateEewMock
                             ? null
                             : () => _runEewMock(
                                 () => _eewLiveActivity.mockUpdate(2),
@@ -405,11 +437,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                         child: const Text('Update → Report 2'),
                       ),
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.active != true ||
-                                _eewStatus?.generic == true ||
-                                _eewStatus?.waveArrived == true
+                        onPressed: !_canUpdateEewMock
                             ? null
                             : () => _runEewMock(
                                 () => _eewLiveActivity.mockUpdate(4),
@@ -417,23 +445,14 @@ class _DeveloperPageState extends State<DeveloperPage> {
                         child: const Text('Update → Report 4'),
                       ),
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.active != true ||
-                                _eewStatus?.generic == true ||
-                                _eewStatus?.waveArrived == true
+                        onPressed: !_canUpdateEewMock
                             ? null
                             : () =>
                                   _runEewMock(_eewLiveActivity.mockWaveArrived),
                         child: const Text('Mark Wave Arrived'),
                       ),
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.enabled != true ||
-                                _eewStatus?.active != true ||
-                                _eewStatus?.generic == true ||
-                                _eewStatus?.waveArrived == true
+                        onPressed: !_canAlertEewMock
                             ? null
                             : () => _runEewMock(
                                 _eewLiveActivity.mockWaveArrivedWithAlert,
@@ -441,13 +460,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                         child: const Text('Mark Wave Arrived + Alert'),
                       ),
                       OutlinedButton(
-                        onPressed:
-                            _eewBusy ||
-                                _eewStatus?.enabled != true ||
-                                _eewStatus?.active != true ||
-                                _eewStatus?.generic == true ||
-                                _eewStatus?.waveArrived == true ||
-                                _eewStatus?.delayedAlertStatus == 'Scheduled'
+                        onPressed: !_canScheduleEewAlert
                             ? null
                             : () => _runEewMock(
                                 _eewLiveActivity
@@ -456,7 +469,7 @@ class _DeveloperPageState extends State<DeveloperPage> {
                         child: const Text('Test Delayed Arrival Alert (8s)'),
                       ),
                       OutlinedButton(
-                        onPressed: _eewBusy || _eewStatus?.active != true
+                        onPressed: !_canEndEewMock
                             ? null
                             : () => _runEewMock(_eewLiveActivity.mockEnd),
                         child: const Text('End Activity'),

@@ -6,6 +6,7 @@ library;
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -270,6 +271,41 @@ void main() {
         ),
         text: 'Mock active · report 1',
         enabled: {_update2, _update4, _arrived, _alert, _end, _refresh},
+      ),
+      (
+        name: 'unsupported but enabled retains start eligibility',
+        status: _eewStatus(supported: false),
+        text: 'Unavailable (requires iOS 16.1+)',
+        enabled: {_start, _generic, _refresh},
+      ),
+      (
+        name: 'scheduled alert after settings disabled',
+        status: _eewStatus(
+          enabled: false,
+          active: true,
+          reportNo: 1,
+          delayedAlertStatus: 'Scheduled',
+        ),
+        text: 'Disabled in iOS settings',
+        enabled: {_update2, _update4, _arrived, _end, _refresh},
+      ),
+      (
+        name: 'expired alert can be scheduled again',
+        status: _eewStatus(
+          active: true,
+          reportNo: 1,
+          delayedAlertStatus: 'Expired / Unable to execute',
+        ),
+        text: 'Mock active · report 1',
+        enabled: {
+          _update2,
+          _update4,
+          _arrived,
+          _alert,
+          _delayed,
+          _end,
+          _refresh,
+        },
       ),
       (
         name: 'active but disabled in settings',
@@ -568,6 +604,169 @@ void main() {
             isStart ? 'Ready for a local mock' : 'Mock active · report 1',
           ),
           findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    // Use the binary handler: setMockMethodCallHandler wraps thrown objects in
+    // PlatformException, which would never exercise the unexpected-error path.
+    for (final programmingError in [false, true]) {
+      for (final action in actions.entries) {
+        testWidgets(
+          '${action.key} unexpected ${programmingError ? 'Error' : 'Exception'} recovers',
+          (tester) async {
+            final error = programmingError
+                ? StateError('broken mock')
+                : Exception('unexpected mock failure');
+            final stack = StackTrace.fromString('EEW mock test stack');
+            var fail = true;
+            final methods = <String>[];
+            final isStart = action.key == _start || action.key == _generic;
+            final status = isStart
+                ? _eewStatus()
+                : _eewStatus(active: true, reportNo: 1);
+            messenger.setMockMessageHandler(_eew.name, (data) {
+              final call = _eew.codec.decodeMethodCall(data);
+              methods.add(call.method);
+              if (call.method != 'getStatus' && fail) {
+                Error.throwWithStackTrace(error, stack);
+              }
+              return Future<ByteData?>.value(
+                _eew.codec.encodeSuccessEnvelope(status),
+              );
+            });
+            await _pumpEewPage(tester);
+            final before = Log.talker.history.length;
+            await tester.tap(_eewButton(action.key));
+            await tester.pumpAndSettle();
+            expect(
+              find.text('Unexpected EEW mock action failure: $error'),
+              findsOneWidget,
+            );
+            final logged = Log.talker.history.skip(before).single;
+            expect(logged.message, 'dev: EEW mock action');
+            expect(logged.stackTrace.toString(), stack.toString());
+            expect(
+              tester.takeException(),
+              programmingError ? same(error) : isNull,
+            );
+            _expectEewButtons(
+              tester,
+              isStart
+                  ? {_start, _generic, _refresh}
+                  : {
+                      _update2,
+                      _update4,
+                      _arrived,
+                      _alert,
+                      _delayed,
+                      _end,
+                      _refresh,
+                    },
+            );
+            fail = false;
+            await tester.tap(_eewButton(action.key));
+            await tester.pumpAndSettle();
+            expect(methods, ['getStatus', action.value, action.value]);
+            expect(find.textContaining('Unexpected EEW'), findsNothing);
+            expect(
+              find.text(
+                isStart ? 'Ready for a local mock' : 'Mock active · report 1',
+              ),
+              findsOneWidget,
+            );
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
+
+      for (final initial in [false, true]) {
+        testWidgets(
+          '${initial ? 'initial status' : 'refresh'} unexpected ${programmingError ? 'Error' : 'Exception'} recovers',
+          (tester) async {
+            final error = programmingError
+                ? StateError('broken status')
+                : Exception('unexpected status failure');
+            final stack = StackTrace.fromString('EEW status test stack');
+            var fail = initial;
+            messenger.setMockMessageHandler(_eew.name, (_) {
+              if (fail) Error.throwWithStackTrace(error, stack);
+              return Future<ByteData?>.value(
+                _eew.codec.encodeSuccessEnvelope(
+                  _eewStatus(active: true, reportNo: 2),
+                ),
+              );
+            });
+            final before = Log.talker.history.length;
+            await _pumpEewPage(tester);
+            if (!initial) {
+              fail = true;
+              await tester.tap(_eewButton(_refresh));
+              await tester.pumpAndSettle();
+            }
+            expect(
+              find.text('Unexpected EEW refresh status failure: $error'),
+              findsOneWidget,
+            );
+            final logged = Log.talker.history
+                .skip(before)
+                .where((entry) => entry.message == 'dev: EEW refresh status')
+                .single;
+            expect(logged.stackTrace.toString(), stack.toString());
+            expect(
+              tester.takeException(),
+              programmingError ? same(error) : isNull,
+            );
+            _expectEewButtons(
+              tester,
+              initial
+                  ? {_refresh}
+                  : {
+                      _update2,
+                      _update4,
+                      _arrived,
+                      _alert,
+                      _delayed,
+                      _end,
+                      _refresh,
+                    },
+            );
+            fail = false;
+            await tester.tap(_eewButton(_refresh));
+            await tester.pumpAndSettle();
+            expect(find.textContaining('Unexpected EEW'), findsNothing);
+            expect(find.text('Mock active · report 2'), findsOneWidget);
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
+    }
+
+    for (final operation in ['getStatus', 'mockStart']) {
+      testWidgets('$operation unexpected exception after disposal is logged', (
+        tester,
+      ) async {
+        final pending = Completer<ByteData?>();
+        messenger.setMockMessageHandler(_eew.name, (data) {
+          final call = _eew.codec.decodeMethodCall(data);
+          return call.method == operation
+              ? pending.future
+              : Future.value(_eew.codec.encodeSuccessEnvelope(_eewStatus()));
+        });
+        await _pumpEewPage(tester);
+        if (operation == 'mockStart') {
+          await tester.tap(_eewButton(_start));
+          await tester.pump();
+        }
+        await tester.pumpWidget(const SizedBox());
+        final before = Log.talker.history.length;
+        final stack = StackTrace.fromString('disposed EEW test stack');
+        pending.completeError(Exception('disposed failure'), stack);
+        await tester.pumpAndSettle();
+        expect(
+          Log.talker.history.skip(before).single.stackTrace.toString(),
+          stack.toString(),
         );
         expect(tester.takeException(), isNull);
       });
