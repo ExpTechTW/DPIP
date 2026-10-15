@@ -102,7 +102,7 @@ PR 不需要它，例如只改文件的 PR 不會 build App。
 
 | 檢查（`gh pr checks` 顯示的名稱） | 來源 | 什麼時候跑 | 驗什麼 |
 |---|---|---|---|
-| `build` | `ci.yml` | 每個 PR | commit 訊息、分支已 rebase 到 base、workflow／layering／l10n／storage／通知音效／lockfile／tooling 各道 gate、format + analyze、codegen 是最新、完整測試（含覆蓋率上傳） |
+| `build` | `ci.yml` | 每個 PR | commit 訊息、分支已 rebase 到 base、workflow 語法／workflow 安全／layering／l10n／storage／通知音效／lockfile／tooling 各道 gate、format + analyze、codegen 是最新、完整測試（含覆蓋率上傳） |
 | `changes` | `android.yml`、`ios.yml` | 每個 PR | 判斷這個 PR 需不需要 build Android／iOS |
 | `Android` | `android.yml` | 動到 `android/`、`assets/`、`lib/`、`pubspec.yaml` | Android 能 build |
 | `iOS` | `ios.yml` | 動到 `ios/`、`assets/`、`lib/`、`pubspec.yaml` | iOS 能 build |

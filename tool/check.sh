@@ -34,10 +34,11 @@ cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 
 # Most of these finish in under a quarter of a second and are run every time:
 # hashing their inputs would cost as much as running them, and a cache that
-# saves nothing is a cache that can only be wrong. `workflows` downloads its
-# linter on the first run in a clone and takes 0.06 s on every one after.
-for gate in workflows tooling l10n pubspec_lock notification_sounds build_info \
-  widget_township_resources; do
+# saves nothing is a cache that can only be wrong. The two workflow gates
+# download their linter on the first run in a clone, and take a few hundredths
+# of a second on every run after that.
+for gate in workflows workflow_security tooling l10n pubspec_lock \
+  notification_sounds build_info widget_township_resources; do
   step "check/$gate"
   "tool/check/$gate.sh"
 done
