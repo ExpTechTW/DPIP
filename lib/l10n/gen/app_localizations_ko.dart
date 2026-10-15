@@ -1884,16 +1884,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get regionAddButton => '지역 추가';
 
   @override
-  String get regionSearchHint => '시·도 검색';
+  String get regionSearchHint => '시·도 또는 읍·면·동 검색';
 
   @override
-  String get regionSearchEmpty => '일치하는 시·도가 없습니다';
+  String get regionSearchEmpty => '일치하는 지역이 없습니다';
 
   @override
   String get regionSearchTownHint => '읍·면·동 검색';
 
   @override
   String get regionSearchTownEmpty => '일치하는 읍·면·동이 없습니다';
+
+  @override
+  String get regionSearchTownsHeader => '읍·면·동';
 
   @override
   String get displaySettings => '화면';

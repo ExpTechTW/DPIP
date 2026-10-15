@@ -1927,16 +1927,19 @@ class AppLocalizationsFil extends AppLocalizations {
   String get regionAddButton => 'Magdagdag ng rehiyon';
 
   @override
-  String get regionSearchHint => 'Maghanap ng mga lalawigan at lungsod';
+  String get regionSearchHint => 'Maghanap ng lalawigan, lungsod o bayan';
 
   @override
-  String get regionSearchEmpty => 'Walang tumugmang lalawigan o lungsod';
+  String get regionSearchEmpty => 'Walang tumugmang lalawigan, lungsod o bayan';
 
   @override
   String get regionSearchTownHint => 'Maghanap ng mga bayan';
 
   @override
   String get regionSearchTownEmpty => 'Walang tumugmang bayan';
+
+  @override
+  String get regionSearchTownsHeader => 'Mga bayan';
 
   @override
   String get displaySettings => 'Pagpapakita';

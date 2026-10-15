@@ -2572,10 +2572,14 @@
   },
   "mapLayerSatelliteWatervapor": "Himawari Water Vapour",
   "regionAddButton": "Add a region",
-  "regionSearchHint": "Search counties and cities",
-  "regionSearchEmpty": "No matching counties or cities",
+  "regionSearchHint": "Search counties, cities and townships",
+  "regionSearchEmpty": "No matching counties, cities or townships",
   "regionSearchTownHint": "Search townships",
   "regionSearchTownEmpty": "No matching townships",
+  "regionSearchTownsHeader": "Townships",
+  "@regionSearchTownsHeader": {
+    "description": "Section header above the township matches listed under the county/city matches when searching on the first page of the region picker"
+  },
   "displaySettings": "Display",
   "restroomGradePoor": "Below standard",
   "@moreSectionNotify": {

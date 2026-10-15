@@ -1912,16 +1912,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get regionAddButton => 'เพิ่มพื้นที่';
 
   @override
-  String get regionSearchHint => 'ค้นหาจังหวัดและเมือง';
+  String get regionSearchHint => 'ค้นหาจังหวัด เมือง หรือตำบล';
 
   @override
-  String get regionSearchEmpty => 'ไม่พบจังหวัดหรือเมืองที่ตรงกัน';
+  String get regionSearchEmpty => 'ไม่พบจังหวัด เมือง หรือตำบลที่ตรงกัน';
 
   @override
   String get regionSearchTownHint => 'ค้นหาตำบล';
 
   @override
   String get regionSearchTownEmpty => 'ไม่พบตำบลที่ตรงกัน';
+
+  @override
+  String get regionSearchTownsHeader => 'ตำบล';
 
   @override
   String get displaySettings => 'การแสดงผล';

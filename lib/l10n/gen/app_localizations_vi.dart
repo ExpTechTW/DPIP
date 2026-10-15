@@ -1917,16 +1917,20 @@ class AppLocalizationsVi extends AppLocalizations {
   String get regionAddButton => 'Thêm khu vực';
 
   @override
-  String get regionSearchHint => 'Tìm kiếm tỉnh và thành phố';
+  String get regionSearchHint => 'Tìm tỉnh, thành phố hoặc xã';
 
   @override
-  String get regionSearchEmpty => 'Không tìm thấy tỉnh/thành phố phù hợp';
+  String get regionSearchEmpty =>
+      'Không tìm thấy tỉnh/thành phố hoặc xã phù hợp';
 
   @override
   String get regionSearchTownHint => 'Tìm kiếm xã';
 
   @override
   String get regionSearchTownEmpty => 'Không tìm thấy xã phù hợp';
+
+  @override
+  String get regionSearchTownsHeader => 'Xã';
 
   @override
   String get displaySettings => 'Hiển thị';

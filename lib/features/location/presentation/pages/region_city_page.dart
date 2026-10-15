@@ -3,11 +3,12 @@
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/place_search.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/features/location/presentation/widgets/region_town_tile.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/material.dart';
@@ -44,13 +45,17 @@ class RegionCityPage extends StatefulWidget {
 class _RegionCityPageState extends State<RegionCityPage> {
   final _searchController = TextEditingController();
 
-  /// The townships of [RegionCityPage.city]. The directory is one immutable
-  /// instance for the app's life, so scan it once per city instead of once per
-  /// build: [build] re-runs on every keystroke and the scan walks all 368
-  /// towns, building a `cityName` string for each.
-  late List<Town> _towns = context.read<TownDirectory>().townsInCity(
-    widget.city,
-  );
+  /// The townships of [RegionCityPage.city], each with its name folded for
+  /// the filter ([foldPlaceName]). The directory is one immutable instance for
+  /// the app's life, so scan and fold once per city instead of once per build:
+  /// [build] re-runs on every keystroke and the scan walks all 368 towns,
+  /// building a `cityName` string for each.
+  late List<(Town, String)> _towns = _scan(widget.city);
+
+  List<(Town, String)> _scan(String city) => [
+    for (final town in context.read<TownDirectory>().townsInCity(city))
+      (town, foldPlaceName(town.townName)),
+  ];
 
   @override
   void didUpdateWidget(covariant RegionCityPage oldWidget) {
@@ -61,7 +66,7 @@ class _RegionCityPageState extends State<RegionCityPage> {
     // fresh one, which is what makes the scan above an optimisation and this
     // re-scan the thing that keeps it correct.
     if (oldWidget.city != widget.city) {
-      _towns = context.read<TownDirectory>().townsInCity(widget.city);
+      _towns = _scan(widget.city);
     }
   }
 
@@ -79,12 +84,15 @@ class _RegionCityPageState extends State<RegionCityPage> {
     final savedCodes = store.savedCodes;
     final query = GoRouterState.of(context).uri.queryParameters;
     final effectiveReplaceCode = widget.replaceCode ?? query['replace'];
+    final effectiveReturnToMore =
+        widget.returnToMore == true || query['returnToMore'] == '1';
 
-    final needle = _searchController.text.trim().toLowerCase();
+    // Folded like the names, so `台東` finds 臺東市 and a stray space or a
+    // full-width character from a CJK keyboard does not empty the list.
+    final needle = foldPlaceName(_searchController.text);
     final shown = [
-      for (final town in _towns)
-        if (needle.isEmpty || town.townName.toLowerCase().contains(needle))
-          town,
+      for (final (town, name) in _towns)
+        if (needle.isEmpty || name.contains(needle)) town,
     ];
 
     return Scaffold(
@@ -130,92 +138,15 @@ class _RegionCityPageState extends State<RegionCityPage> {
             )
           else
             for (final town in shown)
-              _TownTile(
+              RegionTownTile(
                 town: town,
-                saved: savedCodes.contains(town.code),
-                enabled:
-                    effectiveReplaceCode == null ||
-                    town.code == effectiveReplaceCode ||
-                    !savedCodes.contains(town.code),
-                canAdd:
-                    effectiveReplaceCode != null ||
-                    store.canSave(town.code) ||
-                    savedCodes.contains(town.code),
-                onToggle: () => _toggle(context, store, town),
+                store: store,
+                savedCodes: savedCodes,
+                replaceCode: effectiveReplaceCode,
+                returnToMore: effectiveReturnToMore,
               ),
         ],
       ),
-    );
-  }
-
-  void _toggle(BuildContext context, RegionStore store, Town town) {
-    final query = GoRouterState.of(context).uri.queryParameters;
-    final replace = widget.replaceCode ?? query['replace'];
-    final shouldReturnToMore =
-        widget.returnToMore == true || query['returnToMore'] == '1';
-    var changed = false;
-    if (replace != null) {
-      if (store.savedCodes.contains(town.code) && town.code != replace) return;
-      changed = store.replaceSaved(replace, town.code);
-    } else if (store.savedCodes.contains(town.code)) {
-      store.removeSaved(town.code);
-      changed = true;
-    } else if (!store.addSaved(town.code)) {
-      // At the cap — nothing added; explain the limit.
-      final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(content: Text(l10n.regionSelectFull(RegionStore.maxSaved))),
-        );
-    } else {
-      changed = true;
-    }
-    if (changed && shouldReturnToMore) {
-      context.goNamed(AppRoutes.more);
-    }
-  }
-}
-
-/// One township row — name, code + centroid coordinates, and a star that
-/// reflects and toggles its saved state.
-class _TownTile extends StatelessWidget {
-  const _TownTile({
-    required this.town,
-    required this.saved,
-    required this.enabled,
-    required this.canAdd,
-    required this.onToggle,
-  });
-
-  final Town town;
-  final bool saved;
-  final bool enabled;
-  final bool canAdd;
-  final VoidCallback onToggle;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    // Saved → primary star; addable → muted outline; at the cap → dimmed.
-    final starColor = !enabled
-        ? colors.onSurface.withValues(alpha: 0.3)
-        : saved
-        ? colors.primary
-        : canAdd
-        ? colors.onSurfaceVariant
-        : colors.onSurface.withValues(alpha: 0.3);
-
-    return ListTile(
-      enabled: enabled,
-      leading: const Icon(Icons.location_on_outlined),
-      title: Text(town.townName),
-      subtitle: Text(
-        '${town.code}・${town.lng.toStringAsFixed(2)}°E・'
-        '${town.lat.toStringAsFixed(2)}°N',
-      ),
-      trailing: Icon(saved ? Icons.star : Icons.star_border, color: starColor),
-      onTap: enabled ? onToggle : null,
     );
   }
 }

@@ -41,6 +41,7 @@ final _directory = TownDirectory({
   '103': _town('103', '臺北', '市', '大同'),
   '801': _town('801', '高雄', '市', '新興'),
   '973': _town('973', '花蓮', '縣', '吉安'),
+  '220': _town('220', '新北', '市', '板橋'),
 });
 
 Widget _wrap(
@@ -106,6 +107,7 @@ void main() {
     expect(find.text('臺北市'), findsOneWidget);
     expect(find.text('高雄市'), findsOneWidget);
     expect(find.text('花蓮縣'), findsOneWidget);
+    expect(find.text('新北市'), findsOneWidget);
   });
 
   testWidgets('typing in the search field narrows the city list', (
@@ -197,6 +199,88 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('city:臺北市|replace:-|returnToMore:-'), findsOneWidget);
+  });
+
+  testWidgets('台北 finds the directory\'s 臺北市', (tester) async {
+    await tester.pumpWidget(_wrap(await _store()));
+
+    await tester.enterText(find.byType(TextField), ' 台北 ');
+    await tester.pump();
+
+    expect(find.text('臺北市'), findsOneWidget);
+    expect(find.text('高雄市'), findsNothing);
+    // A city query is answered by the city; its districts are one tap away.
+    expect(find.text('臺北市 中正區'), findsNothing);
+  });
+
+  testWidgets('a township is found on the first page and saves on tap', (
+    tester,
+  ) async {
+    final store = await _store();
+    await tester.pumpWidget(_wrap(store));
+    final l10n = AppLocalizations.of(tester.element(find.byType(Scaffold)));
+
+    await tester.enterText(find.byType(TextField), '板橋');
+    await tester.pump();
+
+    expect(find.text(l10n.regionSearchEmpty), findsNothing);
+    expect(find.text(l10n.regionSearchTownsHeader), findsOneWidget);
+    // Titled with its city: two cities can share a township name.
+    expect(find.text('新北市 板橋區'), findsOneWidget);
+
+    await tester.tap(find.text('新北市 板橋區'));
+    await tester.pump();
+
+    expect(store.savedCodes, ['220']);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, '新北市 板橋區'),
+        matching: find.byIcon(Icons.star),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a township hit honours replace and returns to More', (
+    tester,
+  ) async {
+    final store = await _store(['100']);
+    final router = GoRouter(
+      initialLocation: '/?replace=100&returnToMore=1',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => MultiProvider(
+            providers: [
+              ChangeNotifierProvider<RegionStore>.value(value: store),
+              Provider<TownDirectory>.value(value: _directory),
+            ],
+            child: const RegionSelectPage(),
+          ),
+        ),
+        GoRoute(
+          name: AppRoutes.more,
+          path: '/more',
+          builder: (_, _) => const Text('more'),
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('zh', 'TW'),
+        routerConfig: router,
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField), '吉安');
+    await tester.pump();
+    await tester.tap(find.text('花蓮縣 吉安區'));
+    await tester.pumpAndSettle();
+
+    expect(store.savedCodes, ['973']);
+    expect(find.text('more'), findsOneWidget);
   });
 
   testWidgets(

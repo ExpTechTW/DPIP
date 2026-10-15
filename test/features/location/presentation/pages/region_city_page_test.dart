@@ -122,6 +122,18 @@ void main() {
     expect(find.text(l10n.regionSearchTownEmpty), findsOneWidget);
   });
 
+  testWidgets('the township filter folds spacing and full-width input', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(await _store()));
+
+    await tester.enterText(find.byType(TextField), ' 松\u3000山 ');
+    await tester.pump();
+
+    expect(find.text('松山區'), findsOneWidget);
+    expect(find.text('中正區'), findsNothing);
+  });
+
   testWidgets('replace swaps the named township and can return to More', (
     tester,
   ) async {

@@ -1916,16 +1916,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regionAddButton => 'Add a region';
 
   @override
-  String get regionSearchHint => 'Search counties and cities';
+  String get regionSearchHint => 'Search counties, cities and townships';
 
   @override
-  String get regionSearchEmpty => 'No matching counties or cities';
+  String get regionSearchEmpty => 'No matching counties, cities or townships';
 
   @override
   String get regionSearchTownHint => 'Search townships';
 
   @override
   String get regionSearchTownEmpty => 'No matching townships';
+
+  @override
+  String get regionSearchTownsHeader => 'Townships';
 
   @override
   String get displaySettings => 'Display';
