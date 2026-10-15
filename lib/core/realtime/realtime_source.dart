@@ -24,6 +24,16 @@ abstract class RealtimeSource<T> {
   /// whose default `==` is identity (e.g. `List`).
   bool sameData(T? a, T? b) => identical(a, b) || a == b;
 
+  /// Whether the payload the latest successful [fetch] returned came from a
+  /// slower, secondary path rather than the feed's own — an SSE feed answering
+  /// from a periodic REST snapshot while its stream reconnects.
+  ///
+  /// The channel reads this after every successful fetch and never lets such a
+  /// payload classify as `live` (see `classifyStatus`): it is shown, flagged
+  /// as possibly out of date, and the feed returns to `live` only when its own
+  /// path answers again. A source with a single path leaves this false.
+  bool get servingFallback => false;
+
   /// Whether a fetch failure means there is simply no data for the requested
   /// point in time, rather than a fault worth counting. The channel still
   /// records it as `lastFailure` — that is what a replay page reads to say the

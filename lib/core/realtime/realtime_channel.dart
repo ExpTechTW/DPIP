@@ -68,6 +68,9 @@ abstract interface class RealtimeChannelBase {
 ///   re-flip the feed to live after [resume].
 /// - **Emit once per real transition**: a new state is pushed only when the
 ///   observable status or payload changes, not on every 1 Hz poll.
+/// - **A fallback is never live**: data the source reports as coming from a
+///   secondary path ([RealtimeSource.servingFallback]) is kept and shown, but
+///   classifies at best as stale until the feed's own path answers again.
 class RealtimeChannel<T> implements RealtimeChannelBase {
   RealtimeChannel({
     required this._source,
@@ -107,6 +110,10 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
   /// The data's age at that last successful fetch (zero for fetch-freshness
   /// feeds like EEW; `serverNow − payloadTime` for payload-timestamped feeds).
   Duration? _ageBase;
+
+  /// Whether the current data came from the source's fallback path, which
+  /// caps its status at stale (see [RealtimeSource.servingFallback]).
+  bool _fallback = false;
 
   /// Bumped whenever polling is invalidated (pause/dispose), so a fetch that
   /// completes after the fact is discarded instead of applied.
@@ -198,6 +205,7 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
     sinceStart: _elapsed.elapsed - _startMark,
     staleAfter: _config.staleAfter,
     offlineAfter: _config.offlineAfter,
+    fallback: _fallback,
   );
 
   /// Recomputes status from elapsed time only (no network) and emits on change.
@@ -232,6 +240,13 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
               ? Duration.zero
               : now.difference(payloadTime);
           _lastSuccessMark = _elapsed.elapsed;
+          // A fallback answers every poll from its last snapshot until the
+          // next one lands, so a repeat is no newer than when it first came:
+          // it keeps that time rather than claiming this poll's.
+          final fallback = _source.servingFallback;
+          final repeat =
+              fallback && _fallback && identical(value, _current.data);
+          _fallback = fallback;
           final status = _classify();
           final changed =
               status != _current.status ||
@@ -243,8 +258,8 @@ class RealtimeChannel<T> implements RealtimeChannelBase {
           _current = RealtimeState<T>(
             status: status,
             data: value,
-            dataTime: payloadTime ?? now,
-            fetchedAt: now,
+            dataTime: repeat ? _current.dataTime : payloadTime ?? now,
+            fetchedAt: repeat ? _current.fetchedAt : now,
             consecutiveFailures: 0,
           );
           if (changed) _publish();

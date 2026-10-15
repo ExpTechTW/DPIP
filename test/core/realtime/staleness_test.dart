@@ -9,13 +9,17 @@ void main() {
   const staleAfter = Duration(seconds: 3);
   const offlineAfter = Duration(seconds: 10);
 
-  RealtimeStatus at({Duration? age, Duration sinceStart = Duration.zero}) =>
-      classifyStatus(
-        age: age,
-        sinceStart: sinceStart,
-        staleAfter: staleAfter,
-        offlineAfter: offlineAfter,
-      );
+  RealtimeStatus at({
+    Duration? age,
+    Duration sinceStart = Duration.zero,
+    bool fallback = false,
+  }) => classifyStatus(
+    age: age,
+    sinceStart: sinceStart,
+    staleAfter: staleAfter,
+    offlineAfter: offlineAfter,
+    fallback: fallback,
+  );
 
   group('classifyStatus — no data yet', () {
     test('within the connect window → connecting', () {
@@ -73,5 +77,44 @@ void main() {
         expect(at(age: const Duration(seconds: -5)), RealtimeStatus.stale);
       },
     );
+  });
+
+  group('classifyStatus — fallback data (a stream answering from a poll)', () {
+    test('fresh → stale, never live', () {
+      expect(at(age: Duration.zero, fallback: true), RealtimeStatus.stale);
+      expect(
+        at(age: const Duration(seconds: 3), fallback: true),
+        RealtimeStatus.stale,
+      );
+    });
+
+    test('ages on the same schedule past the stale window', () {
+      expect(
+        at(age: const Duration(seconds: 10), fallback: true),
+        RealtimeStatus.stale,
+      );
+      expect(
+        at(age: const Duration(seconds: 10, milliseconds: 1), fallback: true),
+        RealtimeStatus.offline,
+      );
+    });
+
+    test('negative age → stale, as without it', () {
+      expect(
+        at(age: const Duration(seconds: -5), fallback: true),
+        RealtimeStatus.stale,
+      );
+    });
+
+    test('no data yet → the same connect/offline split', () {
+      expect(
+        at(sinceStart: const Duration(seconds: 5), fallback: true),
+        RealtimeStatus.connecting,
+      );
+      expect(
+        at(sinceStart: const Duration(seconds: 11), fallback: true),
+        RealtimeStatus.offline,
+      );
+    });
   });
 }
