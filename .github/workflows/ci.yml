@@ -23,7 +23,7 @@ jobs:
     steps:
       # Full history: the commit gate walks the range this push or PR adds, and
       # a shallow clone has no base to compare against.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0
 
@@ -138,7 +138,7 @@ jobs:
       # developers run locally — one source of truth. v4 = Node 24 runtime
       # (Node 20 actions are forced onto 24 and emit deprecation warnings).
       - name: Install toolchain (mise)
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
 
       - name: Install dependencies
         run: bash tool/dev/deps.sh
@@ -199,7 +199,7 @@ jobs:
       # tokenless opt-out for public repositories, in the Codecov org settings.
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() && hashFiles('coverage/lcov.info') != '' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
         with:
           use_oidc: true
           files: coverage/lcov.info
