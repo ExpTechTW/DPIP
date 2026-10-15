@@ -403,15 +403,57 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     }
     _eewTicker ??= Timer.periodic(_eewTick, (_) {
       if (!_eewActive) return;
-      unawaited(_pushEew());
-      // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
-      // tick even between RTS polls, so it has to be re-evaluated here
-      // too — not just on [_onFeed] — or a box stops blinking only
-      // whenever the next poll happens to land, well after the wavefront
-      // actually crossed it.
-      unawaited(_pushBox());
+      if (_eewTickInFlight && _eewTicksSkipped < _eewTickMaxSkips) {
+        _eewTicksSkipped++;
+        return;
+      }
+      final generation = ++_eewTickGeneration;
+      _eewTickInFlight = true;
+      _eewTicksSkipped = 0;
+      unawaited(
+        Future.wait([
+          _pushEew(),
+          // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
+          // tick even between RTS polls, so it has to be re-evaluated here
+          // too — not just on [_onFeed] — or a box stops blinking only
+          // whenever the next poll happens to land, well after the wavefront
+          // actually crossed it.
+          _pushBox(),
+        ]).whenComplete(() {
+          // A write abandoned by [_eewTickMaxWait] must not clear the flag
+          // of the one that replaced it.
+          if (generation == _eewTickGeneration) _eewTickInFlight = false;
+        }),
+      );
     });
   }
+
+  /// Whether the last wavefront tick's writes are still on the platform
+  /// channel.
+  ///
+  /// The ticker does not wait for a write to land, and the map plugin queues
+  /// GeoJSON writes per source in call order without ever dropping a stale
+  /// one. On a phone that needs longer than a tick to apply a ring set, every
+  /// tick used to add another full set behind the last — each one older than
+  /// the clock by the time the map drew it, and the backlog growing for as
+  /// long as the alert lasted. Skipping the tick instead means the next write
+  /// is computed from the clock when it is actually sent, so the newest ring
+  /// is always the next one drawn. A phone that keeps up never sees a skip.
+  bool _eewTickInFlight = false;
+
+  /// Ticks skipped in a row behind the in-flight write.
+  int _eewTicksSkipped = 0;
+
+  /// Bumped per tick that writes, so a late completion is recognised as late.
+  int _eewTickGeneration = 0;
+
+  /// About a second of ticks: past this the in-flight write is treated as lost
+  /// rather than slow. A platform call that never answers — a map torn down
+  /// mid-write — would otherwise hold the flag forever and freeze the rings
+  /// for the rest of an alert, which is far worse than the backlog the flag
+  /// exists to prevent.
+  static final int _eewTickMaxSkips =
+      const Duration(seconds: 1).inMicroseconds ~/ _eewTick.inMicroseconds;
 
   void _onFeed() {
     _alerts.track(_feed.state);
