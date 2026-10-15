@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "Kedalaman",
   "mapTimelineDataTime": "Waktu data {time}",
+  "mapTimelineSemanticsLabel": "Linimasa",
+  "mapTimelineSemanticsValue": "{era} {time}, {date}",
   "radarScanRange": "Tampilkan jangkauan pindai",
   "meshtasticHopLimit": "Batas lompatan",
   "@meshtasticUptime": {

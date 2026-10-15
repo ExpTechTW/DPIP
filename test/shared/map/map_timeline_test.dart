@@ -3,6 +3,7 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 List<MapFrame> _frames(int n) => [
@@ -494,4 +495,71 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('the ruler is one adjustable slider for a screen reader', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final frames = _frames(10);
+    final reported = <int>[];
+    final scrubbing = <bool>[];
+    await tester.pumpWidget(
+      _wrap(
+        frames: frames,
+        selectedIndex: 5,
+        onSelected: reported.add,
+        onScrubbing: scrubbing.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final slider = find.semantics.byLabel('Timeline');
+    expect(slider, findsOne);
+    // 07:00 + 5 × 10 min. Frame 9 is "now", so frame 5 is history.
+    expect(
+      tester.getSemantics(find.byType(ListView)),
+      isNot(matchesSemantics(label: 'Timeline')),
+      reason: 'the tick labels are excluded, not a second focus target',
+    );
+    final node = slider.evaluate().single;
+    expect(node.getSemanticsData().flagsCollection.isSlider, isTrue);
+    expect(node.value, 'Past 07:50, 2026/07/13');
+    expect(node.increasedValue, 'Past 08:00, 2026/07/13');
+    expect(node.decreasedValue, 'Past 07:40, 2026/07/13');
+
+    tester.semantics.increase(slider);
+    await tester.pumpAndSettle();
+    // Past the scrub's input-quiet window, so it settles.
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(reported.last, 6);
+    expect(slider.evaluate().single.value, 'Past 08:00, 2026/07/13');
+    expect(scrubbing, [
+      true,
+      false,
+    ], reason: 'a step settles like a short fling, so a raster layer loads it');
+
+    tester.semantics.decrease(slider);
+    tester.semantics.decrease(slider);
+    await tester.pumpAndSettle();
+    expect(reported.last, 4);
+    expect(find.text('07:40'), findsWidgets);
+    expect(tester.takeException(), isNull);
+    semantics.dispose();
+  });
+
+  testWidgets('the slider stops at both ends of the frames', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      _wrap(frames: _frames(3), selectedIndex: 2, onSelected: (_) {}),
+    );
+    await tester.pumpAndSettle();
+
+    final node = find.semantics.byLabel('Timeline').evaluate().single;
+    final data = node.getSemanticsData();
+    expect(node.value, 'Now 07:20, 2026/07/13');
+    expect(data.hasAction(SemanticsAction.increase), isFalse);
+    expect(data.hasAction(SemanticsAction.decrease), isTrue);
+    expect(node.increasedValue, isEmpty);
+    semantics.dispose();
+  });
 }

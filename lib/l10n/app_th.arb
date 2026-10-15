@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "ความลึก",
   "mapTimelineDataTime": "เวลาข้อมูล {time}",
+  "mapTimelineSemanticsLabel": "ไทม์ไลน์",
+  "mapTimelineSemanticsValue": "{era} {time}, {date}",
   "radarScanRange": "แสดงขอบเขตการสแกน",
   "meshtasticHopLimit": "จำนวนฮอปสูงสุด",
   "@meshtasticUptime": {

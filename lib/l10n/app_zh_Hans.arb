@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "深度",
   "mapTimelineDataTime": "资料时间 {time}",
+  "mapTimelineSemanticsLabel": "时间轴",
+  "mapTimelineSemanticsValue": "{era} {time}，{date}",
   "radarScanRange": "显示扫描范围",
   "meshtasticHopLimit": "跳数上限",
   "@meshtasticUptime": {

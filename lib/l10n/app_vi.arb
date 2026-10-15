@@ -901,6 +901,8 @@
   },
   "reportFilterSortDepth": "Độ sâu",
   "mapTimelineDataTime": "Thời gian dữ liệu {time}",
+  "mapTimelineSemanticsLabel": "Dòng thời gian",
+  "mapTimelineSemanticsValue": "{era} {time}, {date}",
   "radarScanRange": "Hiện phạm vi quét",
   "meshtasticHopLimit": "Giới hạn hop",
   "@meshtasticUptime": {

@@ -1851,6 +1851,14 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get mapTimelineSemanticsLabel => 'Linimasa';
+
+  @override
+  String mapTimelineSemanticsValue(String era, String time, String date) {
+    return '$era $time, $date';
+  }
+
+  @override
   String get radarScanRange => 'Tampilkan jangkauan pindai';
 
   @override
