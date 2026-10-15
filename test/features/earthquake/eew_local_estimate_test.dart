@@ -43,7 +43,7 @@ void main() {
       expect(estimate.scale, Intensity.toScale(estimate.intensity));
       expect(estimate.scale, 2); // 1.95 → CWA 2級
       expect(estimate.scale, 2);
-      expect(estimate.sArrivalSeconds, greaterThan(0));
+      expect(estimate.sArrival, greaterThan(Duration.zero));
       final again = estimateLocalShaking(eew(), const LatLng(25.03, 121.56));
       expect(identical(again, estimate), isTrue);
     },
@@ -56,8 +56,10 @@ void main() {
 
     expect(estimate.scale, 0);
     expect(
-      estimate.sArrivalSeconds,
-      EewEstimator.waveTime(20, epicentral).s.round(),
+      estimate.sArrival,
+      Duration(
+        milliseconds: (EewEstimator.waveTime(20, epicentral).s * 1000).round(),
+      ),
     );
   });
 
@@ -95,17 +97,111 @@ void main() {
         table: _table,
       );
       expect(
-        estimate.sArrivalSeconds,
-        (_table.sWaveTime(depth, epicentral) / 1000).round(),
+        estimate.sArrival,
+        Duration(milliseconds: _table.sWaveTime(depth, epicentral).round()),
       );
       // The distance is the epicentral one the table's R column is defined on —
       // feeding hypocentral instead lands on a different interpolated row.
       expect(
-        (_table.sWaveTime(depth, hypocentral) / 1000).round(),
-        isNot(estimate.sArrivalSeconds),
+        Duration(milliseconds: _table.sWaveTime(depth, hypocentral).round()),
+        isNot(estimate.sArrival),
       );
     },
   );
+
+  test(
+    'the arrival keeps its milliseconds instead of rounding to a second',
+    () {
+      // A table whose S time to the observer lands mid-second: 12.34 s.
+      const table = SeismicTravelTimeTable({
+        10: [(p: 0, r: 0, s: 0), (p: 7.0, r: 40, s: 12.34)],
+      });
+      final estimate = estimateLocalShaking(
+        eew(),
+        LatLng(epicenter.latitude + 20 / 111.19492664455873, 121.5),
+        table: table,
+      );
+      expect(estimate.sArrival.inMilliseconds, closeTo(6170, 20));
+      expect(estimate.sArrival.inMilliseconds % 1000, isNot(0));
+    },
+  );
+
+  group('SWaveCountdown', () {
+    final arrival = DateTime.utc(2026, 10, 16, 3, 0, 12, 340);
+    final countdown = SWaveCountdown(arrival);
+
+    test('arrived switches exactly at the computed instant, never later', () {
+      expect(
+        countdown.arrivedAt(arrival.subtract(const Duration(microseconds: 1))),
+        isFalse,
+      );
+      expect(countdown.arrivedAt(arrival), isTrue);
+      expect(
+        countdown.arrivedAt(arrival.add(const Duration(hours: 1))),
+        isTrue,
+      );
+    });
+
+    test('seconds left round up — 1 until arrival, never 0 while inbound', () {
+      expect(
+        countdown.secondsLeftAt(
+          arrival.subtract(const Duration(milliseconds: 1)),
+        ),
+        1,
+      );
+      expect(
+        countdown.secondsLeftAt(arrival.subtract(const Duration(seconds: 1))),
+        1,
+      );
+      expect(
+        countdown.secondsLeftAt(
+          arrival.subtract(const Duration(seconds: 1, milliseconds: 1)),
+        ),
+        2,
+      );
+      expect(
+        countdown.secondsLeftAt(arrival.subtract(const Duration(seconds: 10))),
+        10,
+      );
+      expect(countdown.secondsLeftAt(arrival), 0);
+      expect(
+        countdown.secondsLeftAt(arrival.add(const Duration(seconds: 3))),
+        0,
+      );
+    });
+
+    test('the next change lands on a whole second before the arrival', () {
+      // 4.66 s out: the shown 5 becomes 4 in 0.66 s, at arrival − 4 s.
+      final now = arrival.subtract(const Duration(milliseconds: 4660));
+      final next = countdown.untilNextChangeAt(now)!;
+      expect(next, const Duration(milliseconds: 660));
+      expect(countdown.secondsLeftAt(now), 5);
+      expect(countdown.secondsLeftAt(now.add(next)), 4);
+      // On a boundary itself, the next change is a full second away.
+      final onBoundary = arrival.subtract(const Duration(seconds: 3));
+      expect(
+        countdown.untilNextChangeAt(onBoundary),
+        const Duration(seconds: 1),
+      );
+      // The last change is "arrived" itself.
+      final last = arrival.subtract(const Duration(milliseconds: 250));
+      expect(last.add(countdown.untilNextChangeAt(last)!), arrival);
+      expect(countdown.untilNextChangeAt(arrival), isNull);
+    });
+
+    test('of() adds the travel time to the origin', () {
+      final estimate = EewLocalEstimate(
+        distanceKm: 0,
+        intensity: 0,
+        scale: 0,
+        sArrival: const Duration(milliseconds: 12340),
+      );
+      expect(
+        SWaveCountdown.of(eew(), estimate).arrival,
+        DateTime.fromMillisecondsSinceEpoch(1786362612340, isUtc: true),
+      );
+    });
+  });
 }
 
 /// A CWA-style travel-time table for depths 10/30 km spanning Taiwan's extent.

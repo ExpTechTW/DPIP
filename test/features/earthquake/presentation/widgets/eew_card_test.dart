@@ -12,6 +12,8 @@ import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
+import 'package:dpip/core/models/lat_lng.dart';
+import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -246,6 +248,35 @@ void main() {
     // Still recognisably the same event.
     expect(find.text('花蓮縣'), findsOneWidget);
     expect(find.text('Report 4'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('"arrived" switches at the computed millisecond, and the '
+      'seconds before it round up', (tester) async {
+    final store = await _store();
+    final alert = _pastAlert();
+    final estimate = estimateLocalShaking(
+      alert,
+      const LatLng(24.1, 121.6),
+      table: _table,
+    );
+    final arrival = SWaveCountdown.of(alert, estimate).arrival;
+
+    Future<void> at(DateTime now) async {
+      await tester.pumpWidget(_wrap(store, eew: alert, clock: () => now));
+      await tester.pump(); // the table resolves
+    }
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await at(arrival.subtract(const Duration(milliseconds: 1)));
+    expect(find.text(l10n.eewCountdown(1)), findsOneWidget);
+    expect(find.text(l10n.eewArrived), findsNothing);
+
+    await at(arrival.subtract(const Duration(milliseconds: 1200)));
+    expect(find.text(l10n.eewCountdown(2)), findsOneWidget);
+
+    await at(arrival);
+    expect(find.text(l10n.eewArrived), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
 }

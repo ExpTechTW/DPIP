@@ -33,6 +33,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
 import 'package:dpip/features/earthquake/domain/eew_priority.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
@@ -146,6 +147,15 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
   /// the user actually is, not the selected township's centroid.
   LatLng? _fix;
 
+  /// The countdown the last build showed — what the ticks are aligned to.
+  SWaveCountdown? _countdown;
+
+  /// Redraw exactly when the seconds shown change — on whole seconds before
+  /// the arrival, not of the clock — so "arrived" lands on the instant.
+  @override
+  Duration secondTickerDelay(DateTime now) =>
+      _countdown?.untilNextChangeAt(now) ?? super.secondTickerDelay(now);
+
   @override
   void initState() {
     super.initState();
@@ -179,7 +189,7 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
     // has none — computing one would put a number on screen for an earthquake
     // the agency has just said is not happening — and ranks last, so it is
     // shown only when nothing still in progress is left.
-    final now = AppTime.utc;
+    final now = secondTickerNow();
     final primary = rankEews(
       widget.alerts,
       now: now,
@@ -193,14 +203,12 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
 
     final originUtc = DateTime.fromMillisecondsSinceEpoch(info.time);
     final maxIntensity = Intensity.displayForReport(info.max, originUtc);
-    final remaining = estimate == null
-        ? null
-        : originUtc
-              .add(Duration(seconds: estimate.sArrivalSeconds))
-              .difference(now)
-              .inSeconds;
-
-    final arrived = remaining != null && remaining <= 0;
+    final countdown = primary.countdown;
+    if (countdown != _countdown) {
+      _countdown = countdown;
+      realignSecondTicker();
+    }
+    final arrived = countdown != null && countdown.arrivedAt(now);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -303,7 +311,9 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
                       label: l10n.eewSWave,
                       value: arrived
                           ? l10n.eewArrived
-                          : l10n.eewCountdown(remaining ?? 0),
+                          : l10n.eewCountdown(
+                              countdown?.secondsLeftAt(now) ?? 0,
+                            ),
                       background: EewEstimateTile.alertRed(),
                       foreground: Colors.white,
                     ),

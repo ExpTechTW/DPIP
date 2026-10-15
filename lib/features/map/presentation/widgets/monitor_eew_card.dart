@@ -96,6 +96,15 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
   /// the user actually is, not the selected township's centroid.
   LatLng? _fix;
 
+  /// The countdown the last build showed — what the ticks are aligned to.
+  SWaveCountdown? _countdown;
+
+  /// Redraw exactly when the seconds shown change — on whole seconds before
+  /// the arrival, not of the clock — so "arrived" lands on the instant.
+  @override
+  Duration secondTickerDelay(DateTime now) =>
+      _countdown?.untilNextChangeAt(now) ?? super.secondTickerDelay(now);
+
   @override
   void initState() {
     super.initState();
@@ -156,13 +165,15 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
 
     final originUtc = DateTime.fromMillisecondsSinceEpoch(info.time);
     final maxIntensity = Intensity.displayForReport(info.max, originUtc);
-    final remaining = estimate == null
+    final now = secondTickerNow();
+    final countdown = estimate == null
         ? null
-        : originUtc
-              .add(Duration(seconds: estimate.sArrivalSeconds))
-              .difference(AppTime.utc)
-              .inSeconds;
-    final arrived = remaining != null && remaining <= 0;
+        : SWaveCountdown.of(widget.alert, estimate);
+    if (countdown != _countdown) {
+      _countdown = countdown;
+      realignSecondTicker();
+    }
+    final arrived = countdown != null && countdown.arrivedAt(now);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -246,7 +257,9 @@ class _MonitorEewCardState extends State<MonitorEewCard> with SecondTicker {
                         label: l10n.eewSWave,
                         value: arrived
                             ? l10n.eewArrived
-                            : l10n.eewCountdown(remaining ?? 0),
+                            : l10n.eewCountdown(
+                                countdown?.secondsLeftAt(now) ?? 0,
+                              ),
                         background: EewEstimateTile.alertRed(),
                         foreground: Colors.white,
                       ),
