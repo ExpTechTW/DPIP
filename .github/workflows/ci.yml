@@ -105,6 +105,12 @@ jobs:
       - name: Workflow gate
         run: bash tool/check/workflows.sh
 
+      # And what they let somebody else do: a moved tag, a token left on disk,
+      # a job with more permission than it uses, a value pasted into a script.
+      # The script says more, and pins and checksums the zizmor it runs.
+      - name: Workflow security gate
+        run: bash tool/check/workflow_security.sh
+
       # Architecture gate — pure grep, no toolchain, fails fast.
       - name: Layering gate
         run: bash tool/check/layering.sh

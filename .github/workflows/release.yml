@@ -180,18 +180,36 @@ jobs:
           # .git/config beside them.
           persist-credentials: false
 
+      # Four caches are restored below — the SDK, Gradle, pub and Swift
+      # packages — into the job that signs and ships, and the workflow lint
+      # (tool/check/workflow_security.sh) flags each one, rightly: whoever can
+      # write a cache this job restores can put code into a store build.
+      #
+      # They are kept, and each is marked as accepted, because of who that is.
+      # A run on `main` or on a tag restores only what was saved on `main` or
+      # on that tag; a pull request's caches are scoped to the pull request
+      # and are never offered here. On `main`, every workflow runs `main`'s own
+      # code, with one exception: review.yml runs in `main`'s scope on behalf
+      # of a pull request. Its threat model keeps the pull request's code from
+      # executing there, but the reviewer it runs is a third party's, and a
+      # compromised release of it could write a cache. That is the risk being
+      # accepted, and the pins in review.yml are what bound it; take these
+      # caches out rather than loosen them.
+      #
       # Flutter/Dart come from mise.toml, the same pin ci.yml and every
       # developer use. A published build is the one that most needs to be
       # reproducible, so it must not be the one tracking whatever "stable"
       # happens to mean on the day it runs.
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          cache: true # zizmor: ignore[cache-poisoning] — accepted, see above
 
       - if: matrix.platform == 'android'
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
           distribution: "temurin"
           java-version: "25"
-          cache: "gradle"
+          cache: "gradle" # zizmor: ignore[cache-poisoning] — accepted, see above
 
       # Keyed on the lockfile, so it is reused until a dependency actually
       # moves. Without it every release re-downloads the full package set —
@@ -209,6 +227,7 @@ jobs:
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          lookup-only: false # zizmor: ignore[cache-poisoning] — accepted, see above
 
       # The iOS build resolves its dependencies through Swift Package Manager
       # (there is no Podfile). Uncached, every release re-clones and rebuilds
@@ -235,6 +254,7 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
+          lookup-only: false # zizmor: ignore[cache-poisoning] — accepted, see above
 
       # The committed copy is a stub; the real values come from git. CI also
       # passes them with --dart-define below, so this is belt and braces — but
