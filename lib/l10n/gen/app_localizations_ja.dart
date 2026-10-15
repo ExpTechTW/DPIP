@@ -3459,4 +3459,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eewCancelledNotice => '発表元がこの速報を取り消しました';
+
+  @override
+  String get eewFeedDown => '緊急地震速報の接続が切れています。再接続中…';
 }

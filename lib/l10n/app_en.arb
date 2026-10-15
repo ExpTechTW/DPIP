@@ -4256,5 +4256,9 @@
   "eewCancelledNotice": "The issuing agency cancelled this alert",
   "@eewCancelledNotice": {
     "description": "Line on a cancelled earthquake early warning card, in place of the local intensity estimate and S-wave countdown"
+  },
+  "eewFeedDown": "Earthquake alerts disconnected — reconnecting…",
+  "@eewFeedDown": {
+    "description": "Shown on Home and in the seismic monitor's status strip while the earthquake early warning feed is disconnected or not updating, so an empty alert area is not read as all-clear"
   }
 }

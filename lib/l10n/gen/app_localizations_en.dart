@@ -3523,4 +3523,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eewCancelledNotice => 'The issuing agency cancelled this alert';
+
+  @override
+  String get eewFeedDown => 'Earthquake alerts disconnected — reconnecting…';
 }

@@ -197,9 +197,8 @@ void main() {
     expect(find.text('Report 2'), findsNothing);
   });
 
-  testWidgets('renders nothing when the feed has aged past live', (
-    tester,
-  ) async {
+  testWidgets('a feed aged past live hides its alert and says the feed is '
+      'down instead of going quiet', (tester) async {
     final setup = await _liveNotifier([_alert()]);
     final store = await _store();
     // Advance past the staleness threshold with no fresh contact, then
@@ -211,6 +210,58 @@ void main() {
 
     expect(setup.notifier.state.status.name, 'stale');
     expect(find.text('花蓮縣'), findsNothing);
+    expect(
+      find.text('Earthquake alerts disconnected — reconnecting…'),
+      findsOneWidget,
+    );
+
+    // Given up on: still said, never blank.
+    setup.elapsed.advance(const Duration(seconds: 20));
+    setup.channel.recomputeStatus();
+    await tester.pump();
+    await tester.pump();
+    expect(setup.notifier.state.status.name, 'offline');
+    expect(
+      find.text('Earthquake alerts disconnected — reconnecting…'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a calm feed with nothing to report shows nothing at all', (
+    tester,
+  ) async {
+    final setup = await _liveNotifier(const []);
+    final store = await _store();
+    await tester.pumpWidget(_wrap(setup.notifier, store));
+    expect(
+      find.text('Earthquake alerts disconnected — reconnecting…'),
+      findsNothing,
+    );
+    expect(tester.getSize(find.byType(HomeEewSection)), Size.zero);
+  });
+
+  testWidgets('a feed down with no alert is still active, so Home leaves '
+      'room for the notice', (tester) async {
+    final setup = await _liveNotifier(const []);
+    setup.elapsed.advance(const Duration(seconds: 30));
+    setup.channel.recomputeStatus();
+    final store = await _store();
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: _providers(
+          setup.notifier,
+          store,
+          child: Builder(
+            builder: (context) =>
+                Text(HomeEewSection.isActive(context) ? 'active' : 'idle'),
+          ),
+        ),
+      ),
+    );
+    expect(find.text('active'), findsOneWidget);
   });
 
   testWidgets('isActive matches a live alert and a tap opens the monitor', (

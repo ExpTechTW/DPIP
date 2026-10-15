@@ -2092,5 +2092,6 @@
   "locationTrackLegendOlder": "이전",
   "locationTrackLegendLatest": "마지막 위치",
   "eewCancelled": "취소됨",
-  "eewCancelledNotice": "발표 기관이 이 경보를 취소했습니다"
+  "eewCancelledNotice": "발표 기관이 이 경보를 취소했습니다",
+  "eewFeedDown": "지진 속보 연결이 끊겼습니다. 다시 연결하는 중…"
 }

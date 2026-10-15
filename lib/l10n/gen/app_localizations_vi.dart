@@ -3528,4 +3528,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get eewCancelledNotice => 'Cơ quan phát hành đã hủy cảnh báo này';
+
+  @override
+  String get eewFeedDown => 'Mất kết nối cảnh báo động đất — đang kết nối lại…';
 }

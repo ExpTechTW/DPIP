@@ -2092,5 +2092,6 @@
   "locationTrackLegendOlder": "เก่ากว่า",
   "locationTrackLegendLatest": "ตำแหน่งล่าสุด",
   "eewCancelled": "ยกเลิกแล้ว",
-  "eewCancelledNotice": "หน่วยงานผู้ออกประกาศได้ยกเลิกการแจ้งเตือนนี้แล้ว"
+  "eewCancelledNotice": "หน่วยงานผู้ออกประกาศได้ยกเลิกการแจ้งเตือนนี้แล้ว",
+  "eewFeedDown": "การเชื่อมต่อการแจ้งเตือนแผ่นดินไหวขาดหาย กำลังเชื่อมต่อใหม่…"
 }

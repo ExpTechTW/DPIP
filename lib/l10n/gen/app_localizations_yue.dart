@@ -3438,4 +3438,7 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get eewCancelledNotice => '發布單位已取消呢個速報';
+
+  @override
+  String get eewFeedDown => '地震速報連接中斷，重新連接緊…';
 }

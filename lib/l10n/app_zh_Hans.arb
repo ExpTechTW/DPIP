@@ -2092,5 +2092,6 @@
   "locationTrackLegendOlder": "较旧",
   "locationTrackLegendLatest": "最新位置",
   "eewCancelled": "已取消",
-  "eewCancelledNotice": "发布单位已取消此速报"
+  "eewCancelledNotice": "发布单位已取消此速报",
+  "eewFeedDown": "地震速报连接中断，正在重新连接…"
 }

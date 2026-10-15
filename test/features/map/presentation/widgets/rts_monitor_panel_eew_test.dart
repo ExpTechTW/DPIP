@@ -256,6 +256,11 @@ void main() {
 
     expect(find.text('Seismic Monitor'), findsOneWidget);
     expect(find.text('花蓮縣'), findsNothing);
+    expect(
+      find.text('Earthquake alerts disconnected — reconnecting…'),
+      findsNothing,
+      reason: 'a live, calm EEW feed is not down',
+    );
 
     await tester.pumpWidget(const SizedBox());
   });
@@ -360,6 +365,11 @@ void main() {
     expect(feeds.eew.state.status.name, 'stale');
     expect(find.text('Seismic Monitor'), findsOneWidget);
     expect(find.text('花蓮縣'), findsNothing);
+    // …but the strip says why the space above it is empty.
+    expect(
+      find.text('Earthquake alerts disconnected — reconnecting…'),
+      findsOneWidget,
+    );
 
     await tester.pumpWidget(const SizedBox());
   });

@@ -6659,6 +6659,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The issuing agency cancelled this alert'**
   String get eewCancelledNotice;
+
+  /// Shown on Home and in the seismic monitor's status strip while the earthquake early warning feed is disconnected or not updating, so an empty alert area is not read as all-clear
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake alerts disconnected — reconnecting…'**
+  String get eewFeedDown;
 }
 
 class _AppLocalizationsDelegate
