@@ -37,6 +37,11 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>DPIPWidgetAppGroupIdentifier</key>
 	<string>group.com.exptech.dpip.dpip.widgets</string>
+	<!-- Crashlytics is linked into every build and sends nothing unless the app
+	     turns it on. Only a snapshot or development build does that, at runtime
+	     (lib/core/diagnostics/prerelease_diagnostics.dart). -->
+	<key>FirebaseCrashlyticsCollectionEnabled</key>
+	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>

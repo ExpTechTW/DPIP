@@ -106,6 +106,13 @@
         <meta-data
             android:name="com.exptech.dpip.default_notification_icon"
             android:resource="@drawable/ic_stat_name"/>
+        <!-- Crashlytics is linked into every build and sends nothing unless the
+             app turns it on. Only a snapshot or development build does that, at
+             runtime (lib/core/diagnostics/prerelease_diagnostics.dart); a
+             production build leaves this default in force. -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
         <!-- No android:taskAffinity="" on purpose. The Flutter project template
              adds it against task hijacking (StrandHogg), which Android 11+ already
              prevents and which it only partly stops on Android 8 to 10. What it

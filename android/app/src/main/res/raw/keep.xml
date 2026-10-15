@@ -14,5 +14,14 @@
   earthquake early-warning channel among them — while the debug build, which is
   not shrunk, registered all 24. tool/check/notification_sounds.sh could not
   catch it: it reads the source tree, and the source tree is correct.
+
+  The Crashlytics switch is here for the same reason — read by name, referenced
+  by nothing. Gone, the SDK kills the process at launch; see
+  res/values/crashlytics.xml. This is the only file the shrinker reads
+  `tools:keep` from: the attribute does nothing on a values resource. And it is
+  spelled with underscores, the way the R class names it: the shrinker matches
+  `com_crashlytics_RequireBuildId`, and the dotted name the SDK looks up is
+  silently never matched.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@raw/*" />
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/*,@bool/com_crashlytics_RequireBuildId" />
