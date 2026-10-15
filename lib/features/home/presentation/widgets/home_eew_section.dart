@@ -31,7 +31,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
-import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
+import 'package:dpip/features/earthquake/domain/eew_priority.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -79,20 +79,14 @@ class HomeEewSection extends StatelessWidget {
         alerts.isEmpty) {
       return const SizedBox.shrink();
     }
-    // An alert still in progress outranks a cancelled one; a cancelled card
-    // shows only when nothing else is left to warn about.
-    final alert = alerts.firstWhere(
-      (alert) => !alert.isCancelled,
-      orElse: () => alerts.first,
-    );
-    return _EewSectionBody(alert: alert);
+    return _EewSectionBody(alerts: alerts);
   }
 }
 
 class _EewSectionBody extends StatelessWidget {
-  const _EewSectionBody({required this.alert});
+  const _EewSectionBody({required this.alerts});
 
-  final Eew alert;
+  final List<Eew> alerts;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +101,7 @@ class _EewSectionBody extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () => context.pushNamed(AppRoutes.eew),
-        child: _EewAlertCard(alert: alert),
+        child: _EewAlertCard(alerts: alerts),
       ),
     );
   }
@@ -116,10 +110,14 @@ class _EewSectionBody extends StatelessWidget {
 /// The home sheet's alert card — a condensed version of the monitor page's
 /// `EewCard`, sharing its domain math. The S-wave countdown ticks against the
 /// calibrated [AppTime] clock and stops updating on dispose.
+///
+/// Shows one alert: the most relevant of [alerts] to where the user is
+/// ([rankEews]) — re-chosen every tick, because "whose S wave has not arrived
+/// yet" changes with the clock, not with the feed.
 class _EewAlertCard extends StatefulWidget {
-  const _EewAlertCard({required this.alert});
+  const _EewAlertCard({required this.alerts});
 
-  final Eew alert;
+  final List<Eew> alerts;
 
   @override
   State<_EewAlertCard> createState() => _EewAlertCardState();
@@ -158,7 +156,6 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final info = widget.alert.info;
 
     // The observer point is the user's GPS fix when one is available, else the
     // selected township's centroid — same resolution the home weather uses.
@@ -169,13 +166,22 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
         ? null
         : context.read<TownDirectory>().byCode(code);
     final observer = _fix ?? (town == null ? null : LatLng(town.lat, town.lng));
-    // A cancelled event has no shaking to estimate and no wave to count down
-    // to — computing one would put a number on screen for an earthquake the
-    // agency has just said is not happening.
-    final cancelled = widget.alert.isCancelled;
-    final estimate = observer == null || cancelled
-        ? null
-        : estimateLocalShaking(widget.alert, observer, table: _table);
+    // The ranking estimates each alert at the observer anyway, so the chosen
+    // one's estimate is reused rather than computed twice. A cancelled event
+    // has none — computing one would put a number on screen for an earthquake
+    // the agency has just said is not happening — and ranks last, so it is
+    // shown only when nothing still in progress is left.
+    final now = AppTime.utc;
+    final primary = rankEews(
+      widget.alerts,
+      now: now,
+      observer: observer,
+      table: _table,
+    ).first;
+    final alert = primary.alert;
+    final info = alert.info;
+    final cancelled = alert.isCancelled;
+    final estimate = primary.estimate;
 
     final originUtc = DateTime.fromMillisecondsSinceEpoch(info.time);
     final maxIntensity = Intensity.displayForReport(info.max, originUtc);
@@ -183,7 +189,7 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
         ? null
         : originUtc
               .add(Duration(seconds: estimate.sArrivalSeconds))
-              .difference(AppTime.utc)
+              .difference(now)
               .inSeconds;
 
     final arrived = remaining != null && remaining <= 0;
@@ -229,7 +235,7 @@ class _EewAlertCardState extends State<_EewAlertCard> with SecondTicker {
                   ),
                 ),
                 Text(
-                  l10n.eewSerial(widget.alert.serial),
+                  l10n.eewSerial(alert.serial),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colors.onSurfaceVariant,
                   ),

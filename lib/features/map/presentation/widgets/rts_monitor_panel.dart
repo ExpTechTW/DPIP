@@ -14,11 +14,15 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/speech/speech_service.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
+import 'package:dpip/features/earthquake/domain/eew_priority.dart';
+import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
@@ -85,6 +89,15 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel>
   AppLifecycleState? _lifecycleState;
   bool _demoWarningSubmitted = false;
 
+  /// Where the listener is, for choosing which alert to speak: the OS's last
+  /// cached fix once one has been read, the selected township until then.
+  /// Speech cannot wait on a live GPS fix, and neither can the choice.
+  LatLng? _lastFix;
+
+  /// The CWA travel-time table once loaded, so the alert chosen to speak is
+  /// judged on the same arrival the cards count down to.
+  SeismicTravelTimeTable? _table;
+
   void _onData() {
     _syncAnnouncement();
     if (_visible && mounted) setState(() {});
@@ -147,6 +160,14 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel>
     final notifications = context.read<NotificationService?>();
     if (speech == null || notifications == null) return null;
     final location = context.read<LocationService>();
+    unawaited(
+      location.lastKnownFix().then((fix) {
+        if (fix != null) _lastFix = LatLng(fix.lat, fix.lng);
+      }),
+    );
+    context.read<Future<SeismicTravelTimeTable>>().then((table) {
+      _table = table;
+    });
     return MonitorEewAnnouncementController(
       speech,
       notifications.foregroundEewGate,
@@ -157,10 +178,30 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel>
         if (fix == null) {
           return (scale: alert.info.max.clamp(0, 9), isLocal: false);
         }
+        _lastFix = LatLng(fix.lat, fix.lng);
         final estimate = estimateLocalShaking(alert, LatLng(fix.lat, fix.lng));
         return (scale: estimate.scale, isLocal: true);
       },
+      // The same choice the Home card makes: the alert whose S wave is still
+      // on its way to the listener, then the strongest there, then the newest.
+      primary: (alerts) => primaryEew(
+        alerts,
+        now: AppTime.utc,
+        observer: _rankObserver(),
+        table: _table,
+      )!,
     );
+  }
+
+  /// [_lastFix], or the selected township's centroid without one.
+  LatLng? _rankObserver() {
+    final fix = _lastFix;
+    if (fix != null || !mounted) return fix;
+    final code = context.read<RegionStore>().selectedCode;
+    final town = code == null
+        ? null
+        : context.read<TownDirectory>().byCode(code);
+    return town == null ? null : LatLng(town.lat, town.lng);
   }
 
   void _syncVisibility() {

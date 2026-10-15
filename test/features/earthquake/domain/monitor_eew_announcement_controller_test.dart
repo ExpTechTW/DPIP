@@ -30,22 +30,23 @@ class _FakeSpeech implements SpeechService {
   void dispose() {}
 }
 
-Eew _alert(int serial, {String id = 'event', int status = 0}) => Eew(
-  agency: 'CWA',
-  id: id,
-  serial: serial,
-  status: status,
-  isFinal: false,
-  info: const EewInfo(
-    time: 0,
-    longitude: 121,
-    latitude: 23,
-    depth: 10,
-    magnitude: 6,
-    location: 'test',
-    max: 6,
-  ),
-);
+Eew _alert(int serial, {String id = 'event', int status = 0, int max = 6}) =>
+    Eew(
+      agency: 'CWA',
+      id: id,
+      serial: serial,
+      status: status,
+      isFinal: false,
+      info: EewInfo(
+        time: 0,
+        longitude: 121,
+        latitude: 23,
+        depth: 10,
+        magnitude: 6,
+        location: 'test',
+        max: max,
+      ),
+    );
 
 RealtimeState<List<Eew>> _live(Eew alert) =>
     RealtimeState(status: RealtimeStatus.live, data: [alert]);
@@ -314,6 +315,69 @@ void main() {
 
       expect(speech.stops, greaterThan(stopsBefore));
       expect(speech.spoken, ['zh-TW:b1', 'zh-TW:a2']);
+      controller.dispose();
+    });
+  });
+
+  group('which alert is spoken', () {
+    test(
+      'by default, the strongest of several — not the feed\'s first',
+      () async {
+        final speech = _FakeSpeech();
+        final controller = MonitorEewAnnouncementController(
+          speech,
+          ForegroundEewAnnouncementGate(),
+          (alert) async => (scale: alert.info.max, isLocal: false),
+        );
+        controller.setActive(true);
+        controller.update(
+          RealtimeState(
+            status: RealtimeStatus.live,
+            data: [
+              _alert(1, id: 'weak', max: 3),
+              _alert(1, id: 'strong'),
+            ],
+          ),
+          languageTag: 'zh-TW',
+          format: (estimate) => 'max${estimate.scale}',
+        );
+        await _flush();
+        expect(speech.spoken, ['zh-TW:max6']);
+        controller.dispose();
+      },
+    );
+
+    test('the caller\'s ranking decides when it supplies one', () async {
+      final speech = _FakeSpeech();
+      final seen = <List<String>>[];
+      final controller = MonitorEewAnnouncementController(
+        speech,
+        ForegroundEewAnnouncementGate(),
+        (alert) async => (scale: alert.info.max, isLocal: false),
+        primary: (alerts) {
+          seen.add([for (final a in alerts) a.id]);
+          return alerts.last;
+        },
+      );
+      controller.setActive(true);
+      controller.update(
+        RealtimeState(
+          status: RealtimeStatus.live,
+          data: [
+            _alert(1, id: 'gone', status: 3),
+            _alert(1, id: 'a', max: 6),
+            _alert(1, id: 'b', max: 2),
+          ],
+        ),
+        languageTag: 'zh-TW',
+        format: (estimate) => 'max${estimate.scale}',
+      );
+      await _flush();
+      // Cancelled alerts never reach the ranking.
+      expect(seen, [
+        ['a', 'b'],
+      ]);
+      expect(speech.spoken, ['zh-TW:max2']);
       controller.dispose();
     });
   });

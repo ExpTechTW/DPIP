@@ -25,9 +25,14 @@ library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/models/lat_lng.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
+import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_priority.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
@@ -71,12 +76,19 @@ class HomeMonitorBanner extends StatelessWidget {
 
     final eew = context.watch<RealtimeNotifier<List<Eew>>>();
     final alerts = eew.state.data ?? const <Eew>[];
-    // An alert still in progress outranks a cancelled one; the banner turns
-    // neutral and says 已取消 only when nothing else is left to warn about.
-    final alert = alerts.firstWhere(
-      (alert) => !alert.isCancelled,
-      orElse: () => alerts.first,
-    );
+    // The same ranking the Home card uses ([rankEews]), at the selected
+    // township — this banner resolves no GPS fix of its own. An alert still in
+    // progress outranks a cancelled one, so the banner turns neutral and says
+    // 已取消 only when nothing else is left to warn about.
+    final code = context.watch<RegionStore>().selectedCode;
+    final town = code == null
+        ? null
+        : context.read<TownDirectory>().byCode(code);
+    final alert = primaryEew(
+      alerts,
+      now: AppTime.utc,
+      observer: town == null ? null : LatLng(town.lat, town.lng),
+    )!;
     final cancelled = alert.isCancelled;
     final ink = cancelled ? colors.onSurface : colors.onErrorContainer;
 

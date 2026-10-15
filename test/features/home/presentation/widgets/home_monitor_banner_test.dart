@@ -6,6 +6,9 @@ import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
+import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/home/presentation/widgets/home_monitor_banner.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -105,6 +108,10 @@ Widget _wrap(RealtimeNotifier<List<Eew>> notifier, MapCameraHandoff handoff) =>
           value: notifier,
         ),
         ChangeNotifierProvider<MapCameraHandoff>.value(value: handoff),
+        ChangeNotifierProvider<RegionStore>(
+          create: (_) => RegionStore(SettingsStore.inMemory({})),
+        ),
+        Provider<TownDirectory>.value(value: const TownDirectory({})),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -204,5 +211,23 @@ void main() {
     expect(find.text('花蓮縣'), findsOneWidget);
     expect(find.text('臺東縣'), findsNothing);
     expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+  });
+
+  testWidgets('of several alerts, the banner names the most relevant one', (
+    tester,
+  ) async {
+    final weak = _alert().copyWith(
+      id: 'weak',
+      info: _alert().info.copyWith(location: '宜蘭縣', max: 2),
+    );
+    final strong = _alert().copyWith(
+      id: 'strong',
+      info: _alert().info.copyWith(location: '花蓮縣', max: 6),
+    );
+    final notifier = await _notifier([weak, strong]);
+    await tester.pumpWidget(_wrap(notifier, MapCameraHandoff()));
+
+    expect(find.text('花蓮縣'), findsOneWidget);
+    expect(find.text('宜蘭縣'), findsNothing);
   });
 }

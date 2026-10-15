@@ -22,6 +22,7 @@ import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -171,9 +172,17 @@ Widget _wrap(
         ChangeNotifierProvider<RealtimeNotifier<List<Eew>>>.value(value: eew),
         ChangeNotifierProvider<RegionStore>.value(value: store),
         Provider<TownDirectory>.value(value: const TownDirectory({})),
+        // A real (if tiny) table: choosing which alert to speak estimates
+        // each one at the listener's cached fix.
         Provider<Future<SeismicTravelTimeTable>>.value(
           value: Future<SeismicTravelTimeTable>.value(
-            const SeismicTravelTimeTable({}),
+            const SeismicTravelTimeTable({
+              10: [
+                (p: 0, r: 0, s: 0),
+                (p: 10, r: 50, s: 20),
+                (p: 40, r: 200, s: 80),
+              ],
+            }),
           ),
         ),
         Provider<LocationService>.value(
@@ -512,6 +521,44 @@ void main() {
       ),
     );
     await tester.pump();
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('of several alerts, the monitor speaks the most relevant one', (
+    tester,
+  ) async {
+    final settings = SettingsStore.inMemory({});
+    await settings.setBool(SettingKeys.eewSpokenAnnouncement, true);
+    final speech = _Speech();
+    final weak = _alert(id: 'weak');
+    final strong = _alert(id: 'strong');
+    final feeds = await _liveFeeds(
+      alerts: [
+        weak.copyWith(info: weak.info.copyWith(max: 2)),
+        strong.copyWith(info: strong.info.copyWith(max: 6)),
+      ],
+    );
+    await tester.pumpWidget(
+      _wrap(
+        feeds.rts,
+        feeds.eew,
+        await _store(),
+        speech: speech,
+        notifications: NotificationService(settings),
+        speechSettings: EewSpokenAnnouncementSettings(settings),
+        visibleTab: VisibleTab(MapPage.tabIndex),
+      ),
+    );
+    await tester.pump();
+
+    // No cached fix and no township: the max-intensity phrase, for the
+    // stronger alert even though the feed listed the weaker one first.
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(RtsMonitorPanel)),
+    );
+    expect(speech.spoken, [
+      'en:${l10n.eewSpokenMaxIntensity(spokenIntensityLabel(6, 'en'))}',
+    ]);
     await tester.pumpWidget(const SizedBox());
   });
 }

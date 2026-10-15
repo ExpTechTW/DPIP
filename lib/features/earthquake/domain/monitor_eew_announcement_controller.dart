@@ -14,6 +14,7 @@ import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/speech/speech_service.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_priority.dart';
 
 /// A shaking scale together with whether it is local or the max fallback.
 typedef SpokenEewEstimate = ({int scale, bool isLocal});
@@ -21,7 +22,8 @@ typedef SpokenEewEstimate = ({int scale, bool isLocal});
 /// Resolves the phrase after a local/fallback estimate has been selected.
 typedef EewSpeechFormatter = String Function(SpokenEewEstimate estimate);
 
-/// Announces each new active EEW serial while the monitor is visible.
+/// Announces each new active EEW serial while the monitor is visible — of
+/// the most relevant alert only, when several are up.
 ///
 /// Every accepted update stops the previous utterance immediately. Async
 /// estimate/speech completions carry a generation, so an obsolete report can
@@ -31,6 +33,7 @@ class MonitorEewAnnouncementController {
     this._speech,
     this._gate,
     this._estimate, {
+    Eew Function(List<Eew> alerts)? primary,
     // Android's system engine can spend several seconds starting an utterance.
     // The stock Google zh-TW voice did not finish even inside five seconds on
     // the emulator, while en-US and ja-JP did. Eight still bounds a wedged
@@ -38,12 +41,20 @@ class MonitorEewAnnouncementController {
     // playback has its own, slightly longer safety fallback in the foreground
     // gate, so a healthy slow voice never overlaps the alarm.
     this.speechTimeout = const Duration(seconds: 8),
-  });
+  }) : _primary = primary ?? _rankedFirst;
+
+  static Eew _rankedFirst(List<Eew> alerts) => primaryEew(alerts)!;
 
   final SpeechService _speech;
   final ForegroundEewAnnouncementGate _gate;
   final Future<SpokenEewEstimate> Function(Eew alert) _estimate;
   final Duration speechTimeout;
+
+  /// Picks the one alert to speak from the uncancelled ones (never empty).
+  /// The caller's [rankEews] — it alone knows where the listener is and what
+  /// time it is on the timeline being watched; the default ranks without an
+  /// observer (highest maximum intensity, then newest report).
+  final Eew Function(List<Eew> alerts) _primary;
 
   /// The highest serial announced per event ([EewIdentityX.eventKey]).
   final Map<String, int> _seenSerials = {};
@@ -97,7 +108,7 @@ class MonitorEewAnnouncementController {
       _silence();
     }
 
-    final alert = alerts.first;
+    final alert = _primary(alerts);
     final key = alert.eventKey;
     final previous = _seenSerials[key];
     if (previous != null && alert.serial <= previous) return;

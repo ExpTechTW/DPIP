@@ -137,7 +137,7 @@ void main() {
   );
 
   test(
-    'primaryAlert is the first (most relevant) alert when several are active',
+    'primaryAlert keeps the feed order between alerts that rank equally',
     () async {
       final first = _eew('first');
       final second = _eew('second');
@@ -149,6 +149,20 @@ void main() {
       expect(controller.primaryAlert, first);
     },
   );
+
+  test('primaryAlert is the most relevant alert, not the feed\'s first — a '
+      'cancelled one last, then the strongest', () async {
+    final cancelled = _eew('cancelled').copyWith(status: 3);
+    final weak = _eew('weak');
+    final strong = _eew('strong')
+        .copyWith(info: _eew('strong').info.copyWith(max: 6));
+    source.next = Ok([cancelled, weak, strong]);
+
+    await channel.refreshNow();
+    await pump();
+
+    expect(controller.primaryAlert, strong);
+  });
 
   test('isStale reflects the channel status once data has aged', () async {
     source.next = const Ok(<Eew>[]);

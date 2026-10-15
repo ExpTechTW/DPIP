@@ -31,6 +31,7 @@ import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
+import 'package:dpip/features/earthquake/domain/eew_priority.dart';
 import 'package:dpip/core/speech/speech_service.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
 import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
@@ -215,6 +216,11 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     final speech = context.read<SpeechService?>();
     if (speech == null) return null;
     final location = context.read<LocationService?>();
+    unawaited(
+      location?.lastKnownFix().then((fix) {
+        if (fix != null) _rankObserver = geo.LatLng(fix.lat, fix.lng);
+      }),
+    );
     return MonitorEewAnnouncementController(
       speech,
       // A gate of this page's own, never NotificationService's. A replay
@@ -235,8 +241,18 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
         );
         return (scale: estimate.scale, isLocal: true);
       },
+      // The live monitor's choice, judged on the replay's own timeline: an
+      // arrival is "still to come" against the replay clock, not real now.
+      primary: (alerts) => primaryEew(
+        alerts,
+        now: _session.clock.now(),
+        observer: _rankObserver,
+      )!,
     );
   }
+
+  /// The listener's last cached fix, for choosing which alert to speak.
+  geo.LatLng? _rankObserver;
 
   void _syncAnnouncement() {
     final controller = _announcement;
