@@ -29,3 +29,8 @@ analyzer:
 linter:
   rules:
     avoid_print: true
+    # Every import in lib/ is `package:dpip/…`. tool/check/layering.sh reads
+    # imports with grep and recognises only that form, so a relative import
+    # would carry a cross-layer dependency straight past it — this is what
+    # makes "the gate saw every import" true rather than merely usual.
+    always_use_package_imports: true

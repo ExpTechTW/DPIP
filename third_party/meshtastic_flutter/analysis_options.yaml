@@ -1,0 +1,12 @@
+# The app's rules, minus the one that is about the app.
+#
+# `always_use_package_imports` exists for tool/check/layering.sh, which reads
+# dpip's own imports and only sees `package:dpip/…`. This package is a vendored
+# fork whose protobuf sources are generated with relative imports; rewriting
+# them would be undone by the next regeneration and would buy the layering gate
+# nothing, since it never looks here.
+include: ../../analysis_options.yaml
+
+linter:
+  rules:
+    always_use_package_imports: false
