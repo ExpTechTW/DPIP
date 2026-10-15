@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
+import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
@@ -48,6 +52,10 @@ class _MainShellState extends State<MainShell> with RouteAware {
   /// needs the replay closed (see [_closeReplayOnBranchLeave]).
   static const int _dataBranchIndex = 3;
 
+  /// The two branches with a map on screen — see [_startupFrames].
+  static const int _homeBranchIndex = 0;
+  static const int _mapBranchIndex = 2;
+
   int? _lastIndex;
 
   /// Which branch is on screen. The branches live in an IndexedStack and stay
@@ -68,12 +76,33 @@ class _MainShellState extends State<MainShell> with RouteAware {
   final ValueNotifier<double> _navDismiss = ValueNotifier(0);
   late final HomeSheetExtent _sheetExtent;
 
+  /// The launch summary's frame window, prerelease builds only. Started here
+  /// rather than at the app's first frame because the shell is the first
+  /// screen with a map on it — onboarding has none — and it owns the one
+  /// value that says whether a map is what the user is looking at.
+  StartupFrameSampler? _startupFrames;
+
   @override
   void initState() {
     super.initState();
     _trace(() => 'init current=${widget.navigationShell.currentIndex}');
     _sheetExtent = context.read<HomeSheetExtent>()
       ..addListener(_syncNavDismiss);
+    if (isPrereleaseBuild()) {
+      // Home (its live map backdrop and the monitor banner) and the map tab
+      // are the screens a cheap phone struggles with; a frame drawn over the
+      // events list says nothing about them.
+      _startupFrames = StartupFrameSampler(
+        counting: () =>
+            _visibleTab.isOnScreen(_homeBranchIndex) ||
+            _visibleTab.isOnScreen(_mapBranchIndex),
+        onSummary: (summary) =>
+            unawaited(PrereleaseDiagnostics.reportStartup(summary)),
+      );
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _startupFrames?.start(),
+      );
+    }
   }
 
   /// Only Home dismisses the bar; every other tab keeps it (dismiss 0).
@@ -123,6 +152,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
   @override
   void dispose() {
     _trace(() => 'dispose');
+    _startupFrames?.stop();
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _sheetExtent.removeListener(_syncNavDismiss);
     _navDismiss.dispose();

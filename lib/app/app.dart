@@ -4,6 +4,7 @@ import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
@@ -202,6 +203,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
       // INFO, not DEBUG: this is the number anyone asking "why is launch slow"
       // needs, and a release log keeps DEBUG out.
       Log.info('first frame rendered ${Log.sinceStartMs} ms after start');
+      StartupMarks.mark('first_frame', Log.sinceStartMs);
       // Spread the first polls so the post-first-frame burst doesn't hammer
       // the network and UI isolate at once (EEW leads; the rest follow).
       widget.realtimeService.startAll(

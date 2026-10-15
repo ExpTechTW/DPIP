@@ -4,6 +4,7 @@ library;
 import 'dart:io';
 
 import 'package:dpip/core/diagnostics/crash_reporting.dart';
+import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/platform/device_info.dart';
 import 'package:dpip/core/platform/install_source.dart';
@@ -112,7 +113,76 @@ abstract final class PrereleaseDiagnostics {
     }
   }
 
+  static bool _startupSent = false;
+
+  /// Fewer frames than this and the percentiles describe a handful of frames,
+  /// not a launch — an app backgrounded at once, or a user who left the map.
+  static const int minStartupFrames = 60;
+
+  /// Sends one launch summary: the phase timings in [StartupMarks] and the
+  /// frame distribution in [frames].
+  ///
+  /// One report per session, as a non-fatal [StartupPerformanceReport], and
+  /// that is the whole cost. Every event is free on Crashlytics, but each one
+  /// is a row somebody has to scroll past; one per session from the snapshot
+  /// testers is a population to read percentiles from, and it groups into a
+  /// single issue because it is always raised from the same place. The
+  /// numbers ride as custom keys, which the console filters and exports, and
+  /// they stay set for the rest of the session — so a crash later in the same
+  /// session arrives saying how the launch went.
+  ///
+  /// Logged locally in every case, so a debug run shows the same line. Sent
+  /// only from a profile or release prerelease: a debug build's frames are
+  /// JIT-compiled and assertion-laden, and would drag every percentile.
+  static Future<void> reportStartup(
+    FrameSummary frames, {
+    bool debugMode = kDebugMode,
+  }) async {
+    final marks = StartupMarks.all;
+    final phases = marks.entries.map((e) => '${e.key}=${e.value}ms').join(' ');
+    Log.info('startup summary: $phases ${frames.describe()}');
+    final reporter = _reporter;
+    if (reporter == null || debugMode || _startupSent) return;
+    if (frames.frames < minStartupFrames) {
+      Log.info(
+        'startup summary not sent: ${frames.frames} frames '
+        '(< $minStartupFrames)',
+      );
+      return;
+    }
+    _startupSent = true;
+    try {
+      for (final MapEntry(:key, :value) in marks.entries) {
+        await reporter.setKey('startup_${key}_ms', value);
+      }
+      for (final MapEntry(:key, :value) in frames.keys.entries) {
+        await reporter.setKey(key, value);
+      }
+      await reporter.log('startup summary: $phases ${frames.describe()}');
+      await reporter.recordError(
+        const StartupPerformanceReport(),
+        StackTrace.current,
+        reason: frames.describe(),
+        fatal: false,
+      );
+    } catch (error) {
+      Log.warning('startup summary not sent: $error');
+    }
+  }
+
   /// Test seam.
   @visibleForTesting
-  static void debugReset() => _reporter = null;
+  static void debugReset() {
+    _reporter = null;
+    _startupSent = false;
+  }
+}
+
+/// The record a launch summary is filed under. Not a fault: a constant message
+/// and a constant call site, so every session's summary lands in one issue.
+class StartupPerformanceReport implements Exception {
+  const StartupPerformanceReport();
+
+  @override
+  String toString() => 'StartupPerformanceReport: launch timing summary';
 }
