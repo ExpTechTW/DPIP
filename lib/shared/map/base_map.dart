@@ -4,6 +4,7 @@ import 'dart:math' show Point;
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/shared/map/map_connectivity.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -288,6 +289,8 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   @override
   void dispose() {
     _trace(() => 'dispose controller=${mapTraceObject(_controller)}');
+    final controller = _controller;
+    if (controller != null) MapConnectivity.instance.detach(controller);
     _visibleTab?.removeListener(_onTabChanged);
     WidgetsBinding.instance.removeObserver(this);
     _readinessTimer?.cancel();
@@ -408,6 +411,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
           'attempt=${_mountAttempt + 1} controller=${mapTraceObject(controller)}',
     );
     widget.onMapInvalidated?.call(controller);
+    MapConnectivity.instance.detach(controller);
     _controller = null;
     _renderPaused = false;
     _readinessRetries = 0;
@@ -433,6 +437,9 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     // A remount (retry) may have superseded this element — never hand a stale
     // controller, whose native view is being torn down, to the caller.
     if (!mounted) return;
+    // Android parks every tile request while the phone reports no network —
+    // including the ones the app's own tile store would have answered.
+    MapConnectivity.instance.attach(controller, controller.forceOnlineMode);
     _syncRender();
     widget.onMapCreated?.call(controller);
   }
