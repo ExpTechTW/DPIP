@@ -221,6 +221,7 @@ tool/check/workflow_security.sh
 tool/check/layering.sh
 tool/check/l10n.sh
 tool/check/storage.sh
+tool/check/wall_clock.sh
 tool/check/pubspec_lock.sh
 tool/check/notification_sounds.sh
 tool/check/tooling.sh

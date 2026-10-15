@@ -64,5 +64,7 @@ CloudflareStatus parseCloudflareStatus(Object? body, {DateTime? at}) {
     return a.name.compareTo(b.name);
   });
 
+  // wall-clock: when this device ran the query, shown against the device's
+  // own clock; nothing compares it with a server stamp.
   return CloudflareStatus(components: kept, recordedAt: at ?? DateTime.now());
 }

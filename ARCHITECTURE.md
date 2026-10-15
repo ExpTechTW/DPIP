@@ -236,6 +236,11 @@ necessary.
 resume). Read corrected time anywhere via the global `AppTime` facade
 (`AppTime.utc` / `AppTime.utc8`, the fixed-offset Taipei wall clock) — never
 `DateTime.now()` for anything the server timestamps.
+`tool/check/wall_clock.sh` holds every device-clock read in `lib/` to that:
+each one carries `// wall-clock: <reason>`, on its line or in the comment
+directly above, saying why device time is right there — a store that only
+compares its own stamps, an OS stamp aged by the clock that made it, the clock
+being calibrated.
 
 ## Async-state UI
 

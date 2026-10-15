@@ -232,6 +232,8 @@ class EndpointHealthMonitor extends ChangeNotifier {
     );
   }
 
+  // wall-clock: when this device saw its own request succeed or fail; never
+  // compared with anything a server stamped.
   static DateTime _now() => DateTime.now();
 
   static String _hostOf(String url) {

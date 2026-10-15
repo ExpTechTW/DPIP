@@ -179,6 +179,8 @@ class HttpTimeSource implements ServerTimeSource {
       request.headers.set(HttpHeaders.cacheControlHeader, 'no-store');
       request.followRedirects = false;
 
+      // wall-clock: the device clock is what this measures against the
+      // server; the offset between the two is the result. Likewise below.
       final sentAtMs = DateTime.now().toUtc().millisecondsSinceEpoch;
       final response = await request.close();
 
@@ -197,6 +199,7 @@ class HttpTimeSource implements ServerTimeSource {
         }
         return buffer + chunk;
       });
+      // wall-clock: as for sentAtMs.
       final receivedAtMs = DateTime.now().toUtc().millisecondsSinceEpoch;
 
       // Unix milliseconds with a fractional part ("1791454316238.287"); the

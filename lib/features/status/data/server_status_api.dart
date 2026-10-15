@@ -97,6 +97,8 @@ ServerStatus parseStatus(Object? body, {DateTime? at}) {
   }
 
   return ServerStatus(
+    // wall-clock: when this device ran the query, shown against the device's
+    // own clock; nothing compares it with a server stamp.
     recordedAt: at ?? DateTime.now(),
     down: StatusMetric(value: scalar('status')),
     errorRate: StatusMetric(

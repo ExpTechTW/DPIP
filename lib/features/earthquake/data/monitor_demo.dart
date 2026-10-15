@@ -57,6 +57,7 @@ abstract final class MonitorDemo {
       _depth = _severeDepth;
       _magnitude = _severeMagnitude;
       _loaded = true;
+      // wall-clock: debug-only, and the wrong clock — see [origin].
       _origin = DateTime.now().toUtc();
       Log.debug(
         'monitor demo → severe preset: mag=$_magnitude depth=$_depth '
@@ -76,6 +77,7 @@ abstract final class MonitorDemo {
     _depth = report.depth;
     _magnitude = report.magnitude;
     _loaded = true;
+    // wall-clock: debug-only, and the wrong clock — see [origin].
     _origin = DateTime.now().toUtc();
     Log.debug(
       'monitor demo → ${report.id}: mag=$_magnitude depth=$_depth '
@@ -108,6 +110,10 @@ abstract final class MonitorDemo {
   /// When the demo event "started" — the moment the app first built an alert.
   /// Re-anchored when [load] pulls the real report, so the synthetic wavefront
   /// looks freshly started rather than a few hundred milliseconds stale.
+  // wall-clock: debug-only, and the wrong clock, left as it is for now. This
+  // stands in for a server stamp, and the EEW card ages it against
+  // AppTime.utc, so on a phone whose clock is off the demo countdown is off by
+  // as much. It should read AppTime.utc, as should the two demo sources below.
   static DateTime get origin => _origin ??= DateTime.now().toUtc();
 
   static DateTime? _origin;
@@ -129,6 +135,7 @@ class StartupEewDemoSource extends RealtimeSource<List<Eew>> {
           status: 0,
           isFinal: false,
           info: EewInfo(
+            // wall-clock: debug-only, the wrong clock — see MonitorDemo.origin.
             time: (clock ?? DateTime.now)().toUtc().millisecondsSinceEpoch,
             longitude: 121.7,
             latitude: 23.9,
@@ -243,6 +250,7 @@ class DemoEewSource extends RealtimeSource<List<Eew>> {
 /// boxes on the monitor, exactly as a real frame's alerting stations do.
 class DemoRtsSource extends RealtimeSource<Rts> {
   DemoRtsSource({required this.stations, DateTime Function()? clock})
+    // wall-clock: debug-only, the wrong clock — see MonitorDemo.origin.
     : _clock = clock ?? DateTime.now {
     _tick = Timer.periodic(const Duration(seconds: 1), (_) => _update());
     _init();

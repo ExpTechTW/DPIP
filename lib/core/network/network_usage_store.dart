@@ -99,6 +99,8 @@ class NetworkUsageStore {
     DateTime Function()? now,
     this.flushInterval = const Duration(seconds: 2),
     this.flushEvery = 64,
+    // wall-clock: buckets are keyed and swept by this one clock, and nothing
+    // in them was stamped by a server.
   }) : _now = now ?? DateTime.now;
 
   final SqliteDatabase _db;
