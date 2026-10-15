@@ -5,6 +5,7 @@ import 'package:dpip/app/router/notification_routes.dart';
 import 'package:dpip/app/theme/app_theme.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -54,6 +55,7 @@ class DpipApp extends StatelessWidget {
         regionStore: deps.regionStore,
         widgetLocationCatalogCoordinator: deps.widgetLocationCatalogCoordinator,
         deviceLocationReporter: deps.deviceLocationReporter,
+        deviceRegistration: deps.deviceRegistration,
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
         permissionHealth: deps.permissionHealth,
@@ -145,6 +147,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.regionStore,
     required this.widgetLocationCatalogCoordinator,
     required this.deviceLocationReporter,
+    required this.deviceRegistration,
     required this.backgroundLocation,
     required this.locationMonitor,
     required this.permissionHealth,
@@ -158,6 +161,7 @@ class _AppServicesHost extends StatefulWidget {
   final RegionStore regionStore;
   final WidgetLocationCatalogCoordinator widgetLocationCatalogCoordinator;
   final DeviceLocationReporter deviceLocationReporter;
+  final DeviceRegistration? deviceRegistration;
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
   final PermissionHealth permissionHealth;
@@ -172,6 +176,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     with WidgetsBindingObserver {
   late final RealtimeLifecycleObserver _observer;
   bool _ready = false;
+  StreamSubscription<String>? _tokenChanges;
 
   @override
   void initState() {
@@ -190,6 +195,9 @@ class _AppServicesHostState extends State<_AppServicesHost>
           mapCamera.request(BaseMap.taiwanBounds, layerId: layerId),
     );
     widget.onboarding.addListener(_onOnboardingChanged);
+    _tokenChanges = widget.notificationService.tokenChanges.listen(
+      (_) => _onTokenChanged(),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // INFO, not DEBUG: this is the number anyone asking "why is launch slow"
       // needs, and a release log keeps DEBUG out.
@@ -229,7 +237,10 @@ class _AppServicesHostState extends State<_AppServicesHost>
     // by a Play-services update / location toggle (neither fires boot), so a
     // warm foreground is the reliable re-arm point. (The monitor handles the
     // foreground reporter + town on resume.)
-    if (state == AppLifecycleState.resumed && _ready) _armBackground();
+    if (state == AppLifecycleState.resumed && _ready) {
+      _armBackground();
+      _register('resume');
+    }
     // Going to the background is the moment the process is most likely to be
     // killed, and the buffered log lines are exactly what would explain why.
     if (state == AppLifecycleState.paused ||
@@ -249,7 +260,29 @@ class _AppServicesHostState extends State<_AppServicesHost>
     final town = await widget.locationService.currentTown();
     if (!mounted) return;
     widget.regionStore.setCurrentCode(town?.code);
+    // After the town fix, so the registration's position is the cached one it
+    // just produced rather than a second cold GPS read. Before arming native
+    // reporting, because it is the path that works without "Always": on
+    // Android a changed token makes the native side report too, and whichever
+    // lands second inside the server's window is refused — harmlessly, the
+    // first already carried the same token and place.
+    _register('launch');
     await _armBackground();
+  }
+
+  /// A new push token reaches the server now rather than on the next move:
+  /// native reporting is re-armed with it, and the registration reports it.
+  /// Before onboarding finishes neither has been started, and [_onReady] does
+  /// both with whatever token is stored by then.
+  void _onTokenChanged() {
+    if (!_ready) return;
+    unawaited(_armBackground());
+    _register('push token changed');
+  }
+
+  void _register(String reason) {
+    final registration = widget.deviceRegistration;
+    if (registration != null) unawaited(registration.ensure(reason));
   }
 
   /// Arms native background reporting when a push token exists and background
@@ -281,6 +314,8 @@ class _AppServicesHostState extends State<_AppServicesHost>
   void dispose() {
     NotificationTaps.onTap = null;
     widget.onboarding.removeListener(_onOnboardingChanged);
+    unawaited(_tokenChanges?.cancel());
+    widget.deviceRegistration?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     widget.widgetLocationCatalogCoordinator.dispose();
     _observer.dispose();

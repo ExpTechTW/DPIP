@@ -8,6 +8,7 @@ import 'package:dpip/app/router/app_router.dart' show onboardingRefresh;
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/logging/native_log_import.dart';
@@ -339,9 +340,13 @@ Future<void> bootstrap() async {
   final appVersion = await appVersionFuture;
   final versionMs = Log.sinceStartMs - versionStart;
   final reportPlatform = Platform.isIOS ? 1 : 0;
+  // Late because the two refer to each other: the registration reports through
+  // the reporter, and the reporter tells the registration about every 2xx.
+  late final DeviceRegistration deviceRegistration;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
     settings: settings,
+    onReported: () => deviceRegistration.recordSuccess(),
     onMoved: (fix) async {
       final token = notificationService.token;
       if (token == null) return false;
@@ -367,6 +372,20 @@ Future<void> bootstrap() async {
   // breadcrumbs across process deaths; this is where they enter the log the
   // user can actually send. Unawaited: a diagnostic must never delay a launch.
   unawaited(backgroundLocation.drainBreadcrumbs());
+
+  // The backend learns the push token only from a location report, and every
+  // report above waits for a move. This reports once more when the token
+  // changes and when a day has gone by without one — see [DeviceRegistration].
+  // Started by the services host, after onboarding.
+  deviceRegistration = DeviceRegistration(
+    settings: settings,
+    token: () => notificationService.token,
+    // No prompt and no wait on a cold GPS: a fresh cached fix first, else a
+    // live one — the township is all the server needs.
+    fix: locationService.currentFix,
+    report: deviceLocationReporter.reportNow,
+    nativeLastSuccess: backgroundLocation.lastSuccessAt,
+  );
 
   // Watches the OS location toggle / permission and recovers reporting after a
   // mid-session change; drives the "fix it" banner.
@@ -420,6 +439,7 @@ Future<void> bootstrap() async {
     widgetLocationCatalogCoordinator: widgetLocationCatalogCoordinator,
     locationService: locationService,
     deviceLocationReporter: deviceLocationReporter,
+    deviceRegistration: deviceRegistration,
     backgroundLocation: backgroundLocation,
     locationMonitor: locationMonitor,
     permissionHealth: permissionHealth,

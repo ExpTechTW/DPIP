@@ -110,7 +110,15 @@ class BackgroundLocationService {
     }
   }
 
-  /// Disables background reporting.
+  /// When the native path last had a 2xx, in **device** time, or null when it
+  /// never has or cannot say.
+  Future<DateTime?> lastSuccessAt() async {
+    final at = (await diagnostics())['lastSuccessAt'];
+    return at is int
+        ? DateTime.fromMillisecondsSinceEpoch(at, isUtc: true)
+        : null;
+  }
+
   /// Writes everything the native background path recorded into the app's own
   /// log, and clears it.
   ///
@@ -176,6 +184,7 @@ class BackgroundLocationService {
     }
   }
 
+  /// Disables background reporting.
   Future<void> stop() async {
     try {
       await _channel.invokeMethod<void>('stop');

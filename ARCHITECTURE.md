@@ -240,7 +240,10 @@ key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
 APNs auth key to the Firebase console for iOS; push only works on a physical
 device; permission is requested after the first frame for now (move to
 onboarding). The push token registers through the location feature
-(`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves.
+(`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves,
+and `DeviceRegistration` reports once more whenever the stored token changes
+and once a day without a successful report — a device that never moves would
+otherwise never tell the server its new token.
 
 ## LoRa mesh
 
