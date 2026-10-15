@@ -10,6 +10,10 @@ import 'package:flutter/material.dart';
 /// a channel's settings after first creation, so [version] is bumped whenever a
 /// definition changes to force a re-create on next launch. (Adding a brand-new
 /// channel needs no bump — `initialize` creates it without touching the others.)
+///
+/// Renaming or dropping a channel is not finished here: Android keeps the old
+/// one on every upgraded device until the app deletes it, so its key goes into
+/// `RetiredChannels.keys` (`retired_channels.dart`).
 abstract final class NotificationChannels {
   const NotificationChannels._();
 
