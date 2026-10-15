@@ -13,11 +13,13 @@ import 'package:flutter/foundation.dart' show listEquals;
 /// data format is unchanged by the move to SSE.
 ///
 /// Liveness is [SseLiveness.connectionOpen] (the default): the EEW stream is
-/// **silent between earthquakes** (empirically tens of seconds with no bytes),
-/// so an open connection — not event recency — is the liveness signal; a
-/// quiet-but-connected feed stays `live` (connected, no alert) instead of aging
-/// to offline. This mirrors the previous fetch-freshness choice ([timestampOf]
-/// is null): feed liveness, not payload age, drives staleness.
+/// **silent between earthquakes** apart from the server's keep-alive pings, so
+/// an open connection that is still delivering — not event recency — is the
+/// liveness signal; a quiet-but-connected feed stays `live` (connected, no
+/// alert) instead of aging to offline, while one that has missed its pings is
+/// dropped and reconnected rather than trusted. This mirrors the previous
+/// fetch-freshness choice ([timestampOf] is null): feed liveness, not payload
+/// age, drives staleness.
 class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   /// [connect] opens one EEW SSE connection — in production
   /// `EarthquakeApi.openEewSse`; the source calls it again to reconnect.

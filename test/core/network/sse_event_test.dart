@@ -9,6 +9,15 @@ void main() {
     expect(const SseEvent(name: 'info').isDefault, isFalse);
   });
 
+  test('a comment is never the payload event', () {
+    const ping = SseEvent.comment('ping');
+    expect(ping.isComment, isTrue);
+    expect(ping.isDefault, isFalse, reason: 'unnamed, yet not a payload');
+    expect(ping.name, isNull);
+    expect(const SseEvent(data: '{}').isComment, isFalse);
+    expect(ping.toString(), 'SseEvent.comment(ping)');
+  });
+
   test('toString names the fields a log line needs', () {
     expect(
       const SseEvent(

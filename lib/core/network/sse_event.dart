@@ -10,10 +10,24 @@
 /// - [retry] is the server's reconnect hint (`retry:` in ms), used to pace
 ///   reconnection.
 ///
+/// A `:` comment line is surfaced too, as its own [SseEvent.comment]. The spec
+/// says to ignore comments, and as *content* they are ignored — [isDefault] is
+/// false, so nothing decodes one — but the servers write `: ping` on a stream
+/// with nothing else to say, and that ping is the only way a client can tell a
+/// quiet connection from one that silently died. Dropping it in the parser
+/// would leave the source blind to exactly the failure it most needs to see.
+///
 /// `id:` is not modelled: DPIP's feeds are snapshot streams (each event is the
 /// current state), so Last-Event-ID resumption is not used.
 class SseEvent {
-  const SseEvent({this.name, this.data = '', this.retry});
+  const SseEvent({this.name, this.data = '', this.retry}) : isComment = false;
+
+  /// A `:` comment line — a server keep-alive. [data] holds the text after the
+  /// colon (`ping`, `ping 1700000000000`), for logging only.
+  const SseEvent.comment([this.data = ''])
+    : name = null,
+      retry = null,
+      isComment = true;
 
   /// The `event:` type, or null for the default (unnamed) event.
   final String? name;
@@ -24,10 +38,18 @@ class SseEvent {
   /// The server's `retry:` reconnect hint, or null if the frame carried none.
   final Duration? retry;
 
+  /// Whether this is a comment line rather than a frame: proof the connection
+  /// is alive, and nothing else.
+  final bool isComment;
+
   /// Whether this is the default event that carries the feed payload (the one
-  /// the source decodes); named events (e.g. `info`) are ignored for payload.
-  bool get isDefault => name == null || name!.isEmpty || name == 'message';
+  /// the source decodes); named events (e.g. `info`) and comments are ignored
+  /// for payload.
+  bool get isDefault =>
+      !isComment && (name == null || name!.isEmpty || name == 'message');
 
   @override
-  String toString() => 'SseEvent(name: $name, data: $data, retry: $retry)';
+  String toString() => isComment
+      ? 'SseEvent.comment($data)'
+      : 'SseEvent(name: $name, data: $data, retry: $retry)';
 }

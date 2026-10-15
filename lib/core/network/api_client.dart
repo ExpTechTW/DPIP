@@ -210,18 +210,24 @@ class ApiClient {
   /// Opens a streaming GET against [tier] as a raw byte stream, trying each
   /// region host in failover order (same policy as [request]).
   ///
-  /// Built for long-lived responses (Server-Sent Events): the idle receive
-  /// timeout is **disabled** (a feed may be legitimately silent for minutes —
-  /// the EEW stream sends nothing between earthquakes), while the connect
-  /// timeout still bounds the initial handshake so a dead host fails over. The
-  /// returned [StreamedResponse.stream] ends or errors when the server closes
-  /// the connection — the caller treats that as "reconnect me". [cancel] aborts
-  /// an in-progress connection (e.g. on dispose).
+  /// Built for long-lived responses (Server-Sent Events). The client-wide 10 s
+  /// receive timeout does not apply — a feed may be legitimately silent for
+  /// minutes (the EEW stream sends nothing between earthquakes) — and is
+  /// replaced by [idleTimeout]: the longest the response may go without a
+  /// single byte before the stream errors with a receive timeout. Pass the
+  /// longest silence the server can produce on a healthy connection (its ping
+  /// cadence, with margin); zero disables it. The connect timeout still bounds
+  /// the initial handshake so a dead host fails over. The returned
+  /// [StreamedResponse.stream] ends or errors when the server closes the
+  /// connection, or when [idleTimeout] passes — the caller treats both as
+  /// "reconnect me". [cancel] aborts an in-progress connection (e.g. on
+  /// dispose).
   Future<StreamedResponse> openStream(
     ApiTier tier,
     String path, {
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    Duration idleTimeout = Duration.zero,
   }) async {
     final hosts = hostsFor(tier);
     for (var i = 0; i < hosts.length; i++) {
@@ -234,9 +240,12 @@ class ApiClient {
           options: Options(
             method: 'GET',
             responseType: ResponseType.stream,
-            // Disabled, not merged from BaseOptions' 10s: a quiet SSE feed must
-            // not be torn down mid-connection just because no bytes arrived.
-            receiveTimeout: Duration.zero,
+            // Not merged from BaseOptions' 10s: a quiet SSE feed must not be
+            // torn down for ten seconds of nothing. Dio applies this between
+            // body chunks, so it bounds silence, not the stream's length — a
+            // half-open socket (no FIN after a handover) errors out instead of
+            // waiting forever.
+            receiveTimeout: idleTimeout,
             headers: headers,
           ),
         );

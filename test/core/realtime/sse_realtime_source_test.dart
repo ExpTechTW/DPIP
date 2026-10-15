@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/sse_realtime_source.dart';
@@ -115,16 +116,86 @@ void main() {
       },
     );
 
-    test('stays Ok while the connection is open but silent', () async {
+    test('stays Ok through silence up to the limit, and no further', () async {
       final h = _Harness();
       await h.source.fetch();
       h.current.add(const SseEvent(data: 'a'));
       await pumpEventQueue();
 
-      // No further events (an EEW-quiet period) — still live because open.
-      expect((await h.source.fetch()).valueOrNull, 'a');
+      // No further events (an EEW-quiet period) — still live while the
+      // silence is one a healthy stream can produce between two pings.
+      h.elapsed.value = sseSilenceLimit;
       expect((await h.source.fetch()).valueOrNull, 'a');
       expect(h.connects, hasLength(1), reason: 'no reconnect churn while open');
+      expect(h.delays, isEmpty);
+
+      // One tick past it, the socket is presumed half-open: a handover or a
+      // NAT timeout that never sent a FIN. Not live, and replaced.
+      final old = h.current;
+      h.elapsed.value = sseSilenceLimit + const Duration(seconds: 1);
+      expect((await h.source.fetch()).isOk, isFalse, reason: 'dead, not calm');
+      expect(old.hasListener, isFalse, reason: 'the dead socket is released');
+      expect(h.delays, hasLength(1), reason: 'a reconnect is queued');
+      expect(
+        (await h.source.fetch()).isOk,
+        isFalse,
+        reason: 'still not live until the new connection speaks',
+      );
+
+      h.delays.single.complete();
+      await pumpEventQueue();
+      expect(h.connects, hasLength(2));
+      h.current.add(const SseEvent(data: 'b'));
+      await pumpEventQueue();
+      expect((await h.source.fetch()).valueOrNull, 'b');
+    });
+
+    test('a server ping keeps a quiet connection alive', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      h.current.add(const SseEvent(data: 'a'));
+      await pumpEventQueue();
+
+      // Pings land every interval; the data never changes.
+      for (var i = 1; i <= 5; i++) {
+        h.elapsed.value = sseServerPingInterval * i;
+        h.current.add(const SseEvent.comment('ping'));
+        await pumpEventQueue();
+        expect((await h.source.fetch()).valueOrNull, 'a');
+      }
+      expect(h.connects, hasLength(1));
+      expect(h.delays, isEmpty);
+    });
+
+    test('a ping is not a payload', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      h.current.add(const SseEvent.comment('ping'));
+      await pumpEventQueue();
+      expect(
+        (await h.source.fetch()).isOk,
+        isFalse,
+        reason: 'connected, but nothing to report yet',
+      );
+    });
+
+    test('a connection that opens and never speaks is replaced', () async {
+      final h = _Harness();
+      await h.source.fetch();
+      expect(h.connects, hasLength(1));
+
+      h.elapsed.value = sseSilenceLimit + const Duration(seconds: 1);
+      await h.source.fetch();
+      expect(h.connects.single.hasListener, isFalse);
+      expect(h.delays, hasLength(1));
+    });
+
+    test('the silence limit is two ping intervals and then some', () {
+      // Two, because the LB hub can push a ping out to almost two intervals
+      // after the last byte; any tighter and a healthy quiet stream is torn
+      // down. Pinned so a change to either number is a deliberate one.
+      expect(sseSilenceLimit, sseServerPingInterval * 2.2);
+      expect(const SseLiveness.connectionOpen().silenceLimit, sseSilenceLimit);
     });
 
     test('a compressed frame reaches decodeBytes, never decode', () async {
@@ -249,6 +320,30 @@ void main() {
       await pumpEventQueue();
       expect((await h.source.fetch()).valueOrNull, 'b', reason: 'refreshed');
     });
+
+    test(
+      'a frozen connection is also replaced once past the silence limit',
+      () async {
+        final h = _Harness(
+          liveness: const SseLiveness.eventRecency(
+            Duration(seconds: 2),
+            silenceLimit: Duration(seconds: 30),
+          ),
+        );
+        await h.source.fetch();
+        h.current.add(const SseEvent(data: 'a'));
+        await pumpEventQueue();
+
+        h.elapsed.value = const Duration(seconds: 30);
+        await h.source.fetch();
+        expect(h.delays, isEmpty, reason: 'stale, but not yet presumed dead');
+
+        h.elapsed.value = const Duration(seconds: 31);
+        await h.source.fetch();
+        expect(h.connects.single.hasListener, isFalse);
+        expect(h.delays, hasLength(1));
+      },
+    );
   });
 
   group('SseRealtimeSource — background pause', () {

@@ -17,7 +17,9 @@ import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 /// should be talking means trouble, and the channel ages it to stale. Asleep,
 /// the server sends a frame only while a station is alerting, so silence is
 /// the normal, calm answer: the source reports an empty frame (nothing
-/// alerting) for as long as the connection is open, instead of a failure.
+/// alerting) for as long as the connection is open and still delivering the
+/// server's pings, instead of a failure. A connection that has missed them is
+/// not calm but dead, and is reported and replaced as such.
 ///
 /// A change of speed swaps the connection without a gap (see
 /// [SseRealtimeSource.renew]). Waking is immediate — the monitor has just
@@ -74,7 +76,8 @@ class RtsRealtimeSource extends SseRealtimeSource<Rts> {
     renew();
   }
 
-  /// Asleep, a connection with nothing to say is reporting calm.
+  /// Asleep, a connection with nothing to say is reporting calm — up to the
+  /// silence limit, past which the base reports a failure without asking.
   @override
   Rts? get quiet => _live ? null : const Rts();
 

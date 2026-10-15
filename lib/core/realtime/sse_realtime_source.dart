@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
@@ -13,11 +14,18 @@ import 'package:flutter/foundation.dart' show protected;
 
 /// How a source decides an SSE feed is currently "alive", given that a poll
 /// channel measures freshness from the last successful [RealtimeSource.fetch].
+///
+/// Under either mode a connection that has received nothing at all — not a
+/// frame, not a server ping — for longer than [SseLiveness.silenceLimit] is
+/// dead, whatever it last said: the source reports a failure and replaces it.
 enum SseLivenessMode {
-  /// The connection being **open** is the liveness signal, independent of event
-  /// recency. For a **bursty** feed that is silent between events (EEW sends
-  /// nothing between earthquakes), so a quiet-but-connected feed is correctly
-  /// `live` (connected, no alert) rather than aging to offline on silence.
+  /// The connection being **open and still delivering** is the liveness
+  /// signal, independent of event recency. For a **bursty** feed that is
+  /// silent between events (EEW sends nothing between earthquakes), so a
+  /// quiet-but-connected feed is correctly `live` (connected, no alert) rather
+  /// than aging to offline on silence. "Delivering" is what the servers' pings
+  /// are for: open alone is not enough, because a socket left half-open by a
+  /// network handover stays open forever and delivers nothing.
   connectionOpen,
 
   /// A **recent event** is the liveness signal: `fetch` returns `Err` once no
@@ -26,20 +34,27 @@ enum SseLivenessMode {
   eventRecency,
 }
 
-/// Liveness policy for [SseRealtimeSource]: a [SseLivenessMode] plus the window
-/// used by [SseLivenessMode.eventRecency].
+/// Liveness policy for [SseRealtimeSource]: a [SseLivenessMode], the window
+/// used by [SseLivenessMode.eventRecency], and the silence bound both share.
 class SseLiveness {
-  const SseLiveness.connectionOpen()
+  const SseLiveness.connectionOpen({this.silenceLimit = sseSilenceLimit})
     : mode = SseLivenessMode.connectionOpen,
       window = null;
 
-  const SseLiveness.eventRecency(Duration this.window)
-    : mode = SseLivenessMode.eventRecency;
+  const SseLiveness.eventRecency(
+    Duration this.window, {
+    this.silenceLimit = sseSilenceLimit,
+  }) : mode = SseLivenessMode.eventRecency;
 
   final SseLivenessMode mode;
 
   /// The recency window for [SseLivenessMode.eventRecency]; null otherwise.
   final Duration? window;
+
+  /// How long the connection may receive nothing — no frame, no ping — before
+  /// it is treated as dead and replaced. Defaults to [sseSilenceLimit], which
+  /// is derived from the servers' ping cadence.
+  final Duration silenceLimit;
 }
 
 /// A [RealtimeSource] whose transport is a Server-Sent Events connection,
@@ -55,6 +70,13 @@ class SseLiveness {
 /// bounded backoff (capped at the server's `retry:` hint); the data format is
 /// whatever [decode] parses from each event's `data:`, i.e. the same JSON the
 /// one-shot GET returns.
+///
+/// A drop the socket never reports counts as a drop too. Every byte that
+/// arrives — a frame or a server ping — is timed, and a connection silent past
+/// [SseLiveness.silenceLimit] is cancelled and reconnected, with [fetch]
+/// answering `Err` meanwhile. Without that, a socket a network handover left
+/// half-open would read as a connected, quiet feed for as long as the app
+/// stayed open.
 ///
 /// Subclasses supply the feed specifics ([decode] plus
 /// [RealtimeSource.timestampOf]/[RealtimeSource.sameData]); the connection
@@ -122,6 +144,11 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   /// decoded elsewhere when that happens cannot bring it back.
   int _snapshotEpoch = 0;
 
+  /// When the current connection last received anything — a frame or a ping —
+  /// or, until it does, when it was opened. What [SseLiveness.silenceLimit] is
+  /// measured from.
+  Duration? _lastByteMark;
+
   /// Decodes a default-event `data:` payload into `T`. The payload is the same
   /// JSON the one-shot GET returns, so this mirrors the repository's mapping.
   T decode(String data);
@@ -160,6 +187,10 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   /// stream's sleep mode sends an RTS frame only while a station is alerting)
   /// returns its calm value here: its silence *is* the answer, and reading it
   /// as a dead feed would age a healthy connection to offline between events.
+  ///
+  /// Only while the connection is still delivering, though. Past
+  /// [SseLiveness.silenceLimit] without even a ping, [fetch] reports a failure
+  /// and never consults this — a dead socket cannot vouch for calm.
   T? get quiet => null;
 
   @override
@@ -168,11 +199,37 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
       return const Err(NetworkFailure('SSE source disposed'));
     }
     _ensureStarted();
+    if (_silentTooLong) {
+      _dropSilentConnection();
+      return Err(NetworkFailure('$_label SSE went silent'));
+    }
     if (!_connected) return Err(NetworkFailure('$_label SSE not connected'));
     if (_hasSnapshot && _isFresh) return Ok(_latest as T);
     final quiet = this.quiet;
     if (quiet != null) return Ok(quiet);
     return Err(NetworkFailure('$_label SSE has nothing fresh'));
+  }
+
+  /// Whether the open connection has gone longer than the silence limit
+  /// without receiving a byte — the signature of a half-open socket.
+  bool get _silentTooLong {
+    final mark = _lastByteMark;
+    return _subscription != null &&
+        mark != null &&
+        _elapsed.elapsed - mark > _liveness.silenceLimit;
+  }
+
+  /// Replaces a connection that stopped delivering. Cancelling raises no
+  /// `onDone`, so the reconnect is queued here, exactly as a real close would.
+  void _dropSilentConnection() {
+    final silence = _elapsed.elapsed - _lastByteMark!;
+    Log.warning(
+      '[$_label] SSE silent for ${silence.inSeconds}s '
+      '(limit ${_liveness.silenceLimit.inSeconds}s) — '
+      'treating the connection as dead and reconnecting',
+    );
+    _subscription?.cancel();
+    _onClosed();
   }
 
   /// Whether the buffered payload counts as fresh under the liveness policy.
@@ -200,6 +257,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     _subscription = null;
     _connected = false;
     _dropSnapshot();
+    _lastByteMark = null;
   }
 
   /// Re-arms the lazy open, so the channel's first post-resume `fetch` builds a
@@ -233,6 +291,9 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     // rather than fail, and an orphaned SSE socket is exactly the kind of leak
     // this class exists to avoid.
     _subscription?.cancel();
+    // Silence counts from the open: a connection that never says anything is
+    // as dead as one that stopped.
+    _lastByteMark = _elapsed.elapsed;
     _subscription = _connect().listen(
       _onEvent,
       onError: _onError,
@@ -296,6 +357,9 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     if (_disposed) return;
     _connected = true;
     _attempt = 0; // the connection is delivering — reset the backoff
+    _lastByteMark = _elapsed.elapsed;
+    // A server ping: proof the connection is alive, and nothing more.
+    if (event.isComment) return;
     final retry = event.retry;
     if (retry != null) _serverRetry = retry;
     // A payload arrives either as the default event (plain JSON) or as the

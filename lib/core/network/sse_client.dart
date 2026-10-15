@@ -5,6 +5,31 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/sse_event.dart';
 
+/// How often DPIP's SSE servers write a `: ping` comment on a stream that has
+/// nothing else to send — the LB hubs (EEW) and the TREM stream (RTS) both.
+///
+/// A fact about the servers, not a client setting: the silence limit below is
+/// derived from it, so if the servers ping more often this is the one number to
+/// change, and detection of a dead connection speeds up with it.
+const Duration sseServerPingInterval = Duration(seconds: 60);
+
+/// How long an SSE connection may deliver nothing at all — no frame, no ping —
+/// before it is treated as dead: 2.2 × [sseServerPingInterval].
+///
+/// A connection can die without closing. A network handover or a NAT mapping
+/// that times out leaves a half-open socket: no FIN, no RST, no error, just
+/// silence, and a client that reads silence as "nothing to report" shows a
+/// live, calm feed that can no longer receive an alert. The servers' pings are
+/// what make silence meaningful, so the bound is counted in pings.
+///
+/// Two intervals, not one, plus 10 %: the LB hub only checks whether a ping is
+/// due when its wait ends, and a wake that finds nothing new restarts that
+/// wait — so the gap between two bytes on a healthy stream can approach two
+/// full intervals. The 10 % covers scheduling and transit. Any tighter and a
+/// healthy quiet stream would be torn down; any looser and a dead one passes
+/// for quiet that much longer.
+const Duration sseSilenceLimit = Duration(seconds: 132);
+
 /// Opens a Server-Sent Events connection and parses its `text/event-stream`
 /// body into [SseEvent] frames — the transport seam a streaming feed sits on.
 ///
@@ -37,6 +62,11 @@ class HttpSseClient implements SseClient {
       tier,
       path,
       query: query,
+      // The transport's own backstop for a half-open socket: it errors the
+      // stream after this long without a byte, so a dead connection is
+      // replaced even while nothing is polling the source (the app sits
+      // behind a notification shade, where the socket is deliberately kept).
+      idleTimeout: sseSilenceLimit,
       headers: const {
         'Accept': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -58,9 +88,11 @@ class HttpSseClient implements SseClient {
   /// Chunk-boundary safe: `utf8.decoder` and `LineSplitter` both buffer partial
   /// input across network chunks, so a multi-byte character or a line split
   /// mid-chunk is reassembled correctly. A frame is emitted on each blank-line
-  /// delimiter; `:`-prefixed comment lines (SSE heartbeats) are skipped;
-  /// multiple `data:` lines are joined with `\n` per the spec (trailing newline
-  /// stripped). Exposed for unit testing the parser directly.
+  /// delimiter; each `:`-prefixed comment line (a server keep-alive) is emitted
+  /// at once as an [SseEvent.comment], without touching the frame being
+  /// assembled around it; multiple `data:` lines are joined with `\n` per the
+  /// spec (trailing newline stripped). Exposed for unit testing the parser
+  /// directly.
   ///
   /// Uses `utf8.decoder.bind` rather than `bytes.transform(utf8.decoder)`: Dio's
   /// response stream is a `Stream<Uint8List>` at runtime, and `Stream.transform`
@@ -88,7 +120,13 @@ class HttpSseClient implements SseClient {
         dirty = false;
         continue;
       }
-      if (line.startsWith(':')) continue; // comment / heartbeat
+      if (line.startsWith(':')) {
+        // A keep-alive: no content, but proof the connection still delivers.
+        var text = line.substring(1);
+        if (text.startsWith(' ')) text = text.substring(1);
+        yield SseEvent.comment(text);
+        continue;
+      }
       dirty = true;
       final colon = line.indexOf(':');
       final field = colon == -1 ? line : line.substring(0, colon);
