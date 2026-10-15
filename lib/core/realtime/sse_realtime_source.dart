@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dpip/core/error/failure.dart';
@@ -88,10 +89,12 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     this._liveness = const SseLiveness.connectionOpen(),
     Elapsed? elapsed,
     Future<void> Function(Duration delay)? delay,
+    Random? random,
     this._label = 'sse',
     this._payloadEvent = 'g',
   }) : _elapsed = elapsed ?? SystemElapsed(),
-       _delay = delay ?? _defaultDelay;
+       _delay = delay ?? _defaultDelay,
+       _random = random ?? Random();
 
   static Future<void> _defaultDelay(Duration d) => Future<void>.delayed(d);
 
@@ -100,6 +103,9 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   final SseLiveness _liveness;
   final Elapsed _elapsed;
   final Future<void> Function(Duration delay) _delay;
+
+  /// Spreads reconnect delays; injectable so a test can pin the spread.
+  final Random _random;
   final String _label;
 
   /// The event name whose `data:` is a base64-gzipped payload: `g` under the
@@ -453,12 +459,20 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     });
   }
 
-  /// 1s, 2s, then capped at the server's `retry:` hint (default 3s). Reset to 1s
-  /// whenever a connection delivers an event, so a transient blip recovers fast
-  /// while a sustained outage does not hammer the server.
+  /// 1s, 2s, then capped at the server's `retry:` hint (default 3s), each
+  /// spread ±50 % at random. Reset to 1s whenever a connection delivers an
+  /// event, so a transient blip recovers fast while a sustained outage does
+  /// not hammer the server.
+  ///
+  /// The spread is for the server, not this client. When a region drops, every
+  /// phone connected to it loses its stream in the same instant; on a fixed
+  /// schedule they would all come back in the same instant too, once a second
+  /// and then every three, and the region that just recovered takes the whole
+  /// audience as one spike on each beat. Jitter turns the spike into a ramp.
   Duration _backoffDelay() {
-    final base = Duration(seconds: 1 << _attempt.clamp(0, 2));
-    return base < _serverRetry ? base : _serverRetry;
+    final step = Duration(seconds: 1 << _attempt.clamp(0, 2));
+    final base = step < _serverRetry ? step : _serverRetry;
+    return base * (0.5 + _random.nextDouble());
   }
 
   @override
