@@ -18,6 +18,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -59,6 +60,7 @@ import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
 import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
+import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show MapColors, countyFillLayerId, townFillLayerId, townLabelLayerId;
@@ -540,8 +542,12 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// expansion and a visibly stepped one. Runs only while there is something
   /// to draw or to clear ([_syncWavefrontTicker]): most of a replay has no
   /// alert up, and sixty idle wakeups a second kept a phone's CPU from ever
-  /// settling for the whole of it.
+  /// settling for the whole of it. A low-end phone runs it slower — see
+  /// [wavefrontTick].
   Timer? _wavefrontTicker;
+
+  /// [_wavefrontTicker]'s interval: full rate until the device tier is known.
+  Duration _wavefrontTick = wavefrontTick(RenderTier.high);
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
   /// north, kept in sync from [BaseMap.onCameraMove].
@@ -584,6 +590,15 @@ class _ReplayMapState extends State<_ReplayMap> {
     unawaited(_prepareModel());
     widget.eew.addListener(_onEewChange);
     widget.tick.addListener(_onTick);
+    // An injected tier is a test's; the app probes the device.
+    (context.read<Future<RenderTier>?>() ?? deviceRenderTier()).then((tier) {
+      final tick = wavefrontTick(tier);
+      if (!mounted || tick == _wavefrontTick) return;
+      _wavefrontTick = tick;
+      _wavefrontTicker?.cancel();
+      _wavefrontTicker = null;
+      _syncWavefrontTicker();
+    });
     widget.travelTimeTable.then((table) {
       if (!mounted) return;
       _travelTimeTable = table;
@@ -657,7 +672,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       _wavefrontTicker = null;
       return;
     }
-    _wavefrontTicker ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
+    _wavefrontTicker ??= Timer.periodic(_wavefrontTick, (_) {
       if (!_wavefrontWanted) {
         _wavefrontTicker?.cancel();
         _wavefrontTicker = null;

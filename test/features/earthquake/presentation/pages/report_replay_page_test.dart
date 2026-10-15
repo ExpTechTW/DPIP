@@ -21,6 +21,7 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -78,6 +79,9 @@ class _MapPlatform extends MapLibrePlatform {
   var holdEew = true;
   int moves = 0;
 
+  /// Wave-front writes — one per redraw of the rings.
+  int eewWrites = 0;
+
   /// The map state completes a one-shot future the first time the platform
   /// view is created. A later rebuild of the same map must not call it again.
   bool _viewCreated = false;
@@ -125,6 +129,7 @@ class _MapPlatform extends MapLibrePlatform {
       throw StateError('box');
     }
     this.geojson[sourceId] = geojson;
+    if (sourceId.contains('eew')) eewWrites++;
     if (holdEew && sourceId.contains('eew')) {
       holdEew = false;
       await Future<void>.delayed(const Duration(milliseconds: 40));
@@ -703,6 +708,115 @@ void main() {
       realtime.dispose();
     }
   });
+
+  for (final (tier, low, high) in [
+    (RenderTier.high, 40, 70),
+    (RenderTier.low, 4, 6),
+  ]) {
+    testWidgets(
+      'a ${tier.name}-tier phone redraws the rings $low–$high a second',
+      (tester) async {
+        final settings = SettingsStore.inMemory();
+        final archive = _Archive(RegionSelection(settings))
+          ..eews = [
+            _eew(
+              agency: 'cwa',
+              id: 'cwa-1',
+              serial: 1,
+              location: '花蓮縣',
+              timeMs: _origin.millisecondsSinceEpoch,
+            ),
+          ];
+        final cwaOnly = EewCwaOnlySettings(settings);
+        final spoken = EewSpokenAnnouncementSettings(settings);
+        final realtime = RealtimeService(
+          ServerClock(_FixedClock(), _ZeroElapsed(), _FixedSource()),
+        );
+        platform.holdEew = false;
+        useSurface(tester);
+        final router = GoRouter(
+          initialLocation: '/replay',
+          routes: [
+            GoRoute(
+              path: '/replay',
+              builder: (_, _) => ReportReplayPage(
+                replayTimestamp: _origin.millisecondsSinceEpoch,
+              ),
+            ),
+          ],
+        );
+        try {
+          await tester.pumpWidget(
+            MultiProvider(
+              providers: [
+                Provider<ApiClient>.value(value: archive),
+                Provider<RealtimeService>.value(value: realtime),
+                ChangeNotifierProvider<EewCwaOnlySettings>.value(
+                  value: cwaOnly,
+                ),
+                ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(
+                  value: spoken,
+                ),
+                Provider<TremStationRepository>.value(
+                  value: _Stations(const {}),
+                ),
+                Provider<Future<SeismicTravelTimeTable>>.value(
+                  value: Future.value(
+                    const SeismicTravelTimeTable({
+                      10: [(p: 2, r: 1, s: 2), (p: 100, r: 2000, s: 100)],
+                    }),
+                  ),
+                ),
+                Provider<Future<RtsBoxGrid>>.value(
+                  value: Future.value(const RtsBoxGrid({})),
+                ),
+                Provider<TownDirectory>.value(value: const TownDirectory({})),
+                Provider<SettingsStore>.value(value: settings),
+                ChangeNotifierProvider<RegionStore>.value(
+                  value: RegionStore(settings),
+                ),
+                Provider<SpeechService>.value(value: _Speech()),
+                Provider<LocationService>.value(
+                  value: LocationService(
+                    const TownDirectory({}),
+                    isAvailable: () async => false,
+                    fix: () async => null,
+                    lastKnown: () async => null,
+                    status: () async => LocationStatus.denied,
+                  ),
+                ),
+                Provider<MlIntensityEstimator>.value(value: _Model()),
+                Provider<Future<RenderTier>?>.value(value: Future.value(tier)),
+              ],
+              child: MaterialApp.router(
+                locale: const Locale('en'),
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                routerConfig: router,
+              ),
+            ),
+          );
+          await tester.pump();
+          await tester.pump();
+          await icons(tester);
+          expect(find.text('花蓮縣'), findsOneWidget);
+
+          final before = platform.eewWrites;
+          for (var i = 0; i < 50; i++) {
+            await tester.pump(const Duration(milliseconds: 20));
+          }
+          final perSecond = platform.eewWrites - before;
+          expect(perSecond, inInclusiveRange(low, high));
+        } finally {
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pump(const Duration(milliseconds: 50));
+          cwaOnly.dispose();
+          spoken.dispose();
+          realtime.dispose();
+        }
+      },
+    );
+  }
 
   testWidgets('a hidden tab pauses the replay, and a dead feed goes stale', (
     tester,
