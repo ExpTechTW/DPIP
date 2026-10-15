@@ -154,6 +154,13 @@ and converts transport/decode errors to a typed `Failure`
 UI. `strict-casts`/`strict-raw-types` are on. Run `build_runner` after model
 changes; add a `fromJson` round-trip test.
 
+A list that is still true when old (past reports, event history) may opt into
+**stale-if-error**: its data source calls `getOrSaved` (an `ApiClient`
+extension in `core/network/stale_if_error.dart`), and when every region host
+fails the ETag cache's last body comes back as an `Ok` with `stale` set — why,
+and since when the server last vouched for it. Never for an alert feed, and
+never shown without that marker: `AsyncView` and `FreshnessBanner` render it.
+
 ## Realtime feeds
 
 live feeds (EEW now, RTS later) flow through
@@ -220,9 +227,10 @@ resume). Read corrected time anywhere via the global `AppTime` facade
 render async/realtime state through the shared
 views in `shared/widgets/`, never a hand-rolled `FutureBuilder`/`Consumer` that
 drops the error or stale case into a blank screen. `AsyncView<T>` maps a
-one-shot `Future<Result<T>>` to loading/data/empty/error (with retry);
+one-shot `Future<Result<T>>` to loading/data/empty/error (with retry), and a
+saved copy (`Ok.stale`) to data under a `FreshnessBanner` with its age;
 `RealtimeView<T>` maps a `RealtimeState<T>`, adding connecting/stale/offline and
-a freshness banner so aged safety data is never shown as current. Building
+the same banner so aged safety data is never shown as current. Building
 blocks: `LoadingView` / `ErrorView` / `EmptyView`. Template consumer:
 `features/earthquake/presentation/pages/earthquake_page.dart`.
 
