@@ -35,6 +35,10 @@ while IFS= read -r file; do
       ;;
   esac
 
+  # Only `package:dpip/…` imports are read. That is every first-party import
+  # in lib/ because the analyzer insists on it (`always_use_package_imports`
+  # in analysis_options.yaml): a relative import would otherwise walk a
+  # cross-layer dependency straight past this gate without a word.
   imports=$(grep -oE "import 'package:dpip/[^']+'" "$file" \
     | sed -E "s|import 'package:dpip/([^']+)'|\1|") || true
   [ -z "$imports" ] && continue
