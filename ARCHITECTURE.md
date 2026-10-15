@@ -251,15 +251,26 @@ blocks: `LoadingView` / `ErrorView` / `EmptyView`. Template consumer:
 
 ## Push notifications
 
-(`core/notifications/`): `firebase_messaging` owns the
-FCM/APNs transport (token + message receipt) on both platforms; `awesome_
-notifications` renders the rich per-channel notification and routes taps.
-(Legacy used `awesome_notifications_fcm`, but that plugin's iOS pod breaks the
-rewrite's newer Flutter/scene build — one FCM plugin is simpler and builds
-clean.) Keep Firebase pinned (a newer major raises the min iOS target). Backend
-sends **data** messages (`channel`/`id`/`title`/`body`); foreground + data-only
-background messages display via awesome so each honours its channel; a
-`notification`-payload message is shown by the OS. Alert categories live in
+(`core/notifications/`): `awesome_notifications_fcm` owns the
+remote-push transport (token + message receipt) on both platforms;
+`awesome_notifications` renders the rich per-channel notification and routes
+taps. `firebase_messaging` is not a dependency — upstream says the two must
+not coexist, and its jobs are covered: awesome_notifications_fcm's token
+handlers replace its refresh stream, and on iOS the app's own
+notification-centre delegate decides foreground presentation. Keep Firebase
+pinned (`firebase_core`; a newer major raises the min iOS target). The push
+token is the **raw APNs device token** on iOS, read from the app delegate
+(`ApnsTokenPlugin`), and the **FCM registration token** on Android;
+`NotificationService` stores only the platform's own kind, because the
+backend keys on it and registering the other one fails silently. Backend
+sends **data** messages (`channel`/`id`/`title`/`body`, or the same fields
+packed into a JSON `content` string); `onFcmSilentData` displays them via
+awesome so each honours its channel. A `notification`-payload message in the
+background is shown by the OS — on Android against the plain channel ids
+`PlainChannels` mirrors, so it still gets its channel's sound. On iOS, a push
+published straight to APNs is one awesome cannot present in the foreground;
+`NotificationDelegateProxy` in `AppDelegate.swift` presents it and forwards
+everything else to awesome. Alert categories live in
 `notification_channels.dart` — bump `version` when one changes so Android
 re-creates it. Permission requests go through
 `NotificationService`, which asks the plugin to prompt **only** when the OS
@@ -275,10 +286,13 @@ the app with no channels *and* no push transport. (`initialize` needs at
 least one channel, so the fallback seeds itself with the first one that is
 accepted.) `tool/check/notification_sounds.sh` catches an unresolvable
 `resource://raw/<name>` before it ships. Taps funnel through `NotificationTaps` (core carries the channel
-key; `app/` maps it to an `AppRoutes` tab). **External, not code:** upload an
-APNs auth key to the Firebase console for iOS; push only works on a physical
-device; permission is requested after the first frame for now (move to
-onboarding). The push token registers through the location feature
+key; `app/` maps it to an `AppRoutes` tab). Notification permission is asked
+for from onboarding and from 更多 → 權限檢查 (`PermissionChecklist`), never at
+launch. **External, not code:** push only works on a physical device; on
+Android, FCM registration needs the app's signing SHA-1 in the Firebase
+console; the backend publishes iOS pushes straight to APNs, so the APNs auth
+key in the Firebase console matters only to a message sent through FCM. The
+push token registers through the location feature
 (`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves,
 and `DeviceRegistration` reports once more whenever the stored token changes
 and once a day without a successful report — a device that never moves would
