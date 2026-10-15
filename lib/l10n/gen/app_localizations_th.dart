@@ -3510,4 +3510,11 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => 'ตำแหน่งล่าสุด';
+
+  @override
+  String get eewCancelled => 'ยกเลิกแล้ว';
+
+  @override
+  String get eewCancelledNotice =>
+      'หน่วยงานผู้ออกประกาศได้ยกเลิกการแจ้งเตือนนี้แล้ว';
 }

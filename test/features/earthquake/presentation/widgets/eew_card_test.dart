@@ -229,4 +229,23 @@ void main() {
     expect(find.text(l10n.eewArrived), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
+
+  testWidgets('a cancelled report says so and drops the badge, the local '
+      'estimate and the countdown', (tester) async {
+    final store = await _store();
+    await tester.pumpWidget(
+      _wrap(store, eew: _alert().copyWith(status: 3, serial: 4)),
+    );
+    final l10n = AppLocalizations.of(tester.element(find.byType(EewCard)));
+
+    expect(find.text(l10n.eewCancelled), findsOneWidget);
+    expect(find.text(l10n.eewCancelledNotice), findsOneWidget);
+    expect(find.byType(IntensityBadge), findsNothing);
+    expect(find.text(l10n.eewLocalIntensity), findsNothing);
+    expect(find.text(l10n.eewSWave), findsNothing);
+    // Still recognisably the same event.
+    expect(find.text('花蓮縣'), findsOneWidget);
+    expect(find.text('Report 4'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
 }

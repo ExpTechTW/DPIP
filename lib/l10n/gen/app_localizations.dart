@@ -6647,6 +6647,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Latest position'**
   String get locationTrackLegendLatest;
+
+  /// Tag on an earthquake early warning card once the issuing agency has cancelled the alert
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get eewCancelled;
+
+  /// Line on a cancelled earthquake early warning card, in place of the local intensity estimate and S-wave countdown
+  ///
+  /// In en, this message translates to:
+  /// **'The issuing agency cancelled this alert'**
+  String get eewCancelledNotice;
 }
 
 class _AppLocalizationsDelegate

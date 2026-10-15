@@ -45,9 +45,14 @@ class MonitorEewAnnouncementController {
   final Future<SpokenEewEstimate> Function(Eew alert) _estimate;
   final Duration speechTimeout;
 
+  /// The highest serial announced per event ([EewIdentityX.eventKey]).
   final Map<String, int> _seenSerials = {};
   bool _active = false;
   bool _hasCurrentAlert = false;
+
+  /// The event the current (or last) phrase was about — so a cancel that
+  /// lands for it mid-phrase can cut it off even while another alert stays up.
+  String? _spokenKey;
   int _generation = 0;
 
   /// Activates announcements only for the foreground, visible monitor.
@@ -58,41 +63,64 @@ class MonitorEewAnnouncementController {
     _gate.setActive(value);
     if (!value) {
       _hasCurrentAlert = false;
+      _spokenKey = null;
       unawaited(_speech.stop());
     }
   }
 
   /// Consumes a feed snapshot. Stale/offline/calm snapshots stop speech; live
   /// duplicates and older serials are ignored.
+  ///
+  /// A cancelled report is never announced, and a snapshot whose alerts are
+  /// all cancelled counts as calm: an intensity read out for an event the
+  /// agency has just withdrawn is the one thing worse than silence, so a
+  /// phrase already in flight for it is cut off.
   void update(
     RealtimeState<List<Eew>> state, {
     required String languageTag,
     required EewSpeechFormatter format,
   }) {
     if (!_active) return;
-    final alerts = state.data;
-    if (state.status != RealtimeStatus.live ||
-        alerts == null ||
-        alerts.isEmpty) {
-      if (!_hasCurrentAlert) return;
-      _hasCurrentAlert = false;
-      _generation++;
-      _gate.cancelAnnouncement();
-      unawaited(_speech.stop());
+    final all = state.data;
+    if (state.status != RealtimeStatus.live || all == null) {
+      _silence();
       return;
+    }
+    final alerts = all.uncancelled;
+    if (alerts.isEmpty) {
+      _silence();
+      return;
+    }
+    final spoken = _spokenKey;
+    if (spoken != null &&
+        all.any((alert) => alert.isCancelled && alert.eventKey == spoken)) {
+      _silence();
     }
 
     final alert = alerts.first;
-    final previous = _seenSerials[alert.id];
+    final key = alert.eventKey;
+    final previous = _seenSerials[key];
     if (previous != null && alert.serial <= previous) return;
-    _seenSerials[alert.id] = alert.serial;
+    _seenSerials[key] = alert.serial;
     _hasCurrentAlert = true;
+    _spokenKey = key;
 
     final generation = ++_generation;
     final gateGeneration = _gate.beginAnnouncement();
     unawaited(
       _announce(alert, generation, gateGeneration, languageTag, format),
     );
+  }
+
+  /// Stops whatever is being said and releases the warning sound the gate was
+  /// holding for it — a calm feed, an aged one, or a withdrawn report.
+  void _silence() {
+    if (!_hasCurrentAlert) return;
+    _hasCurrentAlert = false;
+    _spokenKey = null;
+    _generation++;
+    _gate.cancelAnnouncement();
+    unawaited(_speech.stop());
   }
 
   Future<void> _announce(
@@ -126,6 +154,7 @@ class MonitorEewAnnouncementController {
   void dispose() {
     _active = false;
     _hasCurrentAlert = false;
+    _spokenKey = null;
     _generation++;
     _gate.setActive(false);
     unawaited(_speech.stop());

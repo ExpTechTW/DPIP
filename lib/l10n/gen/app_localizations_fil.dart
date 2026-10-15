@@ -3538,4 +3538,11 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => 'Pinakabagong lokasyon';
+
+  @override
+  String get eewCancelled => 'Kinansela';
+
+  @override
+  String get eewCancelledNotice =>
+      'Kinansela ng naglabas na ahensya ang alertong ito';
 }

@@ -3522,4 +3522,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => 'Vị trí mới nhất';
+
+  @override
+  String get eewCancelled => 'Đã hủy';
+
+  @override
+  String get eewCancelledNotice => 'Cơ quan phát hành đã hủy cảnh báo này';
 }

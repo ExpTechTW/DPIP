@@ -3453,4 +3453,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => '最新の位置';
+
+  @override
+  String get eewCancelled => '取り消し';
+
+  @override
+  String get eewCancelledNotice => '発表元がこの速報を取り消しました';
 }

@@ -4248,5 +4248,13 @@
   "locationTrackLegendLatest": "Latest position",
   "@locationTrackLegendLatest": {
     "description": "Map legend row: the marker on the most recent recorded position"
+  },
+  "eewCancelled": "Cancelled",
+  "@eewCancelled": {
+    "description": "Tag on an earthquake early warning card once the issuing agency has cancelled the alert"
+  },
+  "eewCancelledNotice": "The issuing agency cancelled this alert",
+  "@eewCancelledNotice": {
+    "description": "Line on a cancelled earthquake early warning card, in place of the local intensity estimate and S-wave countdown"
   }
 }

@@ -2090,5 +2090,7 @@
   "locationTrackCleared": "履歴を消去しました",
   "locationTrackLegendNewer": "新しい",
   "locationTrackLegendOlder": "古い",
-  "locationTrackLegendLatest": "最新の位置"
+  "locationTrackLegendLatest": "最新の位置",
+  "eewCancelled": "取り消し",
+  "eewCancelledNotice": "発表元がこの速報を取り消しました"
 }

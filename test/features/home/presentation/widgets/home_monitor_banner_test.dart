@@ -169,4 +169,40 @@ void main() {
     expect(request, isNotNull);
     expect(request!.layerId, 'monitor');
   });
+
+  testWidgets('a cancelled alert stays up on neutral colours and says it was '
+      'cancelled', (tester) async {
+    final notifier = await _notifier([_alert().copyWith(status: 3)]);
+    await tester.pumpWidget(_wrap(notifier, MapCameraHandoff()));
+
+    final context = tester.element(find.byType(HomeMonitorBanner));
+    final l10n = AppLocalizations.of(context);
+    expect(find.text('臺東縣'), findsOneWidget);
+    expect(find.text(l10n.eewCancelled), findsOneWidget);
+    expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
+    final material = tester.widget<Material>(
+      find.descendant(
+        of: find.byType(HomeMonitorBanner),
+        matching: find.byType(Material),
+      ),
+    );
+    expect(material.color, isNot(Theme.of(context).colorScheme.errorContainer));
+  });
+
+  testWidgets('an alert still in progress outranks a cancelled one', (
+    tester,
+  ) async {
+    final cancelled = _alert().copyWith(id: 'gone', status: 3);
+    final live = _alert().copyWith(
+      id: 'live',
+      serial: 2,
+      info: _alert().info.copyWith(location: '花蓮縣'),
+    );
+    final notifier = await _notifier([cancelled, live]);
+    await tester.pumpWidget(_wrap(notifier, MapCameraHandoff()));
+
+    expect(find.text('花蓮縣'), findsOneWidget);
+    expect(find.text('臺東縣'), findsNothing);
+    expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+  });
 }

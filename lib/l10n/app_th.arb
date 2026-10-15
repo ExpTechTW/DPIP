@@ -2090,5 +2090,7 @@
   "locationTrackCleared": "ล้างเส้นทางแล้ว",
   "locationTrackLegendNewer": "ใหม่กว่า",
   "locationTrackLegendOlder": "เก่ากว่า",
-  "locationTrackLegendLatest": "ตำแหน่งล่าสุด"
+  "locationTrackLegendLatest": "ตำแหน่งล่าสุด",
+  "eewCancelled": "ยกเลิกแล้ว",
+  "eewCancelledNotice": "หน่วยงานผู้ออกประกาศได้ยกเลิกการแจ้งเตือนนี้แล้ว"
 }

@@ -2090,5 +2090,7 @@
   "locationTrackCleared": "Na-clear na ang ruta",
   "locationTrackLegendNewer": "Mas bago",
   "locationTrackLegendOlder": "Mas luma",
-  "locationTrackLegendLatest": "Pinakabagong lokasyon"
+  "locationTrackLegendLatest": "Pinakabagong lokasyon",
+  "eewCancelled": "Kinansela",
+  "eewCancelledNotice": "Kinansela ng naglabas na ahensya ang alertong ito"
 }

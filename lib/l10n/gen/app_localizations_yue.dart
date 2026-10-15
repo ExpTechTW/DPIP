@@ -3432,4 +3432,10 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => '最新位置';
+
+  @override
+  String get eewCancelled => '已取消';
+
+  @override
+  String get eewCancelledNotice => '發布單位已取消呢個速報';
 }

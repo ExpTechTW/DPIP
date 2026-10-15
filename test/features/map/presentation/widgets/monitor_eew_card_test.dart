@@ -16,6 +16,7 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/map/presentation/widgets/monitor_eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
+import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -213,4 +214,28 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
+
+  testWidgets('a cancelled report at the selected town shows the cancel, '
+      'not a countdown or an estimate', (tester) async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    final regions = RegionStore(SettingsStore.inMemory())
+      ..setCurrentCode('100');
+    await tester.pumpWidget(
+      _card(
+        alert: _alert(time: DateTime.now().millisecondsSinceEpoch)
+            .copyWith(status: 3),
+        table: Future.value(_table),
+        location: location(),
+        regions: regions,
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Hualien'), findsOneWidget);
+    expect(find.text(l10n.eewCancelled), findsOneWidget);
+    expect(find.text(l10n.eewCancelledNotice), findsOneWidget);
+    expect(find.byType(IntensityBadge), findsNothing);
+    expect(find.text(l10n.eewSWave), findsNothing);
+    expect(find.text(l10n.eewLocalIntensity), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 }

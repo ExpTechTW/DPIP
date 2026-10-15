@@ -220,7 +220,7 @@ class _RtsMonitorPanelState extends State<RtsMonitorPanel>
       return;
     }
     final state = widget.eew.state;
-    final alerts = state.data;
+    final alerts = state.data?.uncancelled;
     if (state.status != RealtimeStatus.live ||
         alerts == null ||
         alerts.isEmpty) {
@@ -326,7 +326,9 @@ class _EewAlert extends StatelessWidget {
 /// alert is active it turns red-on-`errorContainer` as a whole — the legacy
 /// monitor's `MorphingSheet` did the same (`borderColor`/`backgroundColor` on
 /// `activeEew.isNotEmpty`, binary rather than scaled by severity) — so the
-/// strip reads as urgent even collapsed, not just the card above it.
+/// strip reads as urgent even collapsed, not just the card above it. A
+/// cancelled alert does not count: the strip goes back to calm the moment
+/// nothing still in progress is left.
 class _StatusBar extends StatelessWidget {
   const _StatusBar({required this.state, required this.eew});
 
@@ -346,7 +348,7 @@ class _StatusBar extends StatelessWidget {
 
     final hasActiveEew =
         eew.state.status == RealtimeStatus.live &&
-        (eew.state.data?.isNotEmpty ?? false);
+        (eew.state.data?.hasUncancelled ?? false);
 
     final time = state.data?.time ?? 0;
     final hasData = time != 0;

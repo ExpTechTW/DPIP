@@ -3432,6 +3432,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get locationTrackLegendLatest => '最新位置';
+
+  @override
+  String get eewCancelled => '已取消';
+
+  @override
+  String get eewCancelledNotice => '發布單位已取消此速報';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6858,6 +6864,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get locationTrackLegendLatest => '最新位置';
+
+  @override
+  String get eewCancelled => '已取消';
+
+  @override
+  String get eewCancelledNotice => '发布单位已取消此速报';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10285,6 +10297,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get locationTrackLegendLatest => '最新位置';
+
+  @override
+  String get eewCancelled => '已取消';
+
+  @override
+  String get eewCancelledNotice => '發布單位已取消此速報';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13712,4 +13730,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get locationTrackLegendLatest => '最新位置';
+
+  @override
+  String get eewCancelled => '已取消';
+
+  @override
+  String get eewCancelledNotice => '發布單位已取消此速報';
 }

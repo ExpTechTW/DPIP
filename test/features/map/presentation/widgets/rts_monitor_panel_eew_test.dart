@@ -307,6 +307,35 @@ void main() {
     },
   );
 
+  testWidgets('a cancelled alert keeps its card but leaves the strip calm', (
+    tester,
+  ) async {
+    final feeds = await _liveFeeds(alerts: [_alert().copyWith(status: 3)]);
+    final store = await _store();
+    await tester.pumpWidget(_wrap(feeds.rts, feeds.eew, store));
+
+    expect(find.text('花蓮縣'), findsOneWidget);
+    expect(find.text('Cancelled'), findsOneWidget);
+    final strip =
+        tester
+                .widget<Container>(
+                  find.byWidgetPredicate(
+                    (widget) =>
+                        widget is Container &&
+                        widget.decoration is BoxDecoration &&
+                        (widget.decoration! as BoxDecoration).boxShadow != null,
+                  ),
+                )
+                .decoration!
+            as BoxDecoration;
+    final colors = Theme.of(tester.element(find.text('Seismic Monitor')))
+        .colorScheme;
+    expect(strip.color, colors.surface.withValues(alpha: 0.94));
+    expect(strip.border, isNull);
+
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('drops the alert cards once the EEW feed has aged past live', (
     tester,
   ) async {
