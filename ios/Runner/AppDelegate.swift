@@ -34,8 +34,10 @@ import UserNotifications
 
   override func applicationDidBecomeActive(_ application: UIApplication) {
     super.applicationDidBecomeActive(application)
-    // Re-assert: firebase_messaging's proxy can claim the delegate again from
-    // its own launch observer, and whoever is last wins.
+    // Re-assert: awesome_notifications makes itself the notification-centre
+    // delegate every time the plugin is attached to an engine — including the
+    // background engine awesome_notifications_fcm starts for a silent push —
+    // and whoever is last wins.
     NotificationDelegateProxy.shared.install()
   }
 

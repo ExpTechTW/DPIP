@@ -25,17 +25,19 @@ const String _fallbackChannelKey = 'announcement-general-v2';
 
 /// Sets up push notifications.
 ///
-/// `firebase_messaging` owns the FCM/APNs transport (token + message receipt) on
-/// both platforms, and `awesome_notifications` renders the rich per-channel
-/// notification and routes taps. (The legacy app used `awesome_notifications_fcm`
-/// on Android, but that plugin's iOS pod is incompatible with the rewrite's
-/// newer Flutter/scene lifecycle — one FCM plugin is simpler and builds cleanly.)
+/// `awesome_notifications_fcm` owns the remote-push transport (token + message
+/// receipt) on both platforms, and `awesome_notifications` renders the rich
+/// per-channel notification and routes taps. `firebase_messaging` is not a
+/// dependency — see [_initMessaging].
 ///
 /// Message flow: the backend sends **data** messages (`channel`/`id`/`title`/
-/// `body`). Foreground messages and background data-only messages are displayed
-/// via awesome so every notification honours its channel; taps funnel through
-/// [NotificationTaps]. A `notification`-payload message is displayed by the OS
-/// directly (its tap arrives via `onMessageOpenedApp`).
+/// `body`, or the same fields packed into a JSON `content` string — see
+/// [contentFromData]). [onFcmSilentData] displays them via awesome so every
+/// notification honours its channel; taps funnel through [NotificationTaps].
+/// A `notification`-payload message in the background is displayed by the OS
+/// directly, and on iOS the foreground presentation of a push sent straight to
+/// APNs is decided by the app's own notification-centre delegate
+/// (`NotificationDelegateProxy` in ios/Runner/AppDelegate.swift).
 class NotificationService {
   NotificationService(
     this._settings, {
@@ -524,38 +526,17 @@ class NotificationService {
     });
   }
 
-  /// Fetches the push token and persists it as [SettingKeys.pushToken] —
-  /// the identifier every backend registration call (`/v2/location`,
-  /// `/v2/notify`) keys on.
-  ///
-  /// **Which token, per platform, matters**: on iOS that has to be the raw
-  /// **APNs** device token, not Firebase's FCM registration token — a
-  /// different string the backend's own registration endpoints don't
-  /// recognise (confirmed live: registering with the FCM token 202'd, as a
-  /// write with no format check, but every subsequent `/v2/notify` lookup by
-  /// that same value still 401'd — the legacy app stored exactly and only the
-  /// APNs token on iOS for this reason, in `fcm.dart`). Android's backend
-  /// registration keys on the FCM token, which is `getToken()`'s value there.
-  ///
-  /// `getToken()` is still awaited on iOS (its FCM-pipeline side effects are
-  /// unrelated to which value gets persisted); only what gets *stored* differs
-  /// by platform. The APNs token needs `registerForRemoteNotifications` to have
-  /// completed first (handled by the FlutterFire app-delegate proxy) and
-  /// arrives asynchronously, so poll briefly before giving up — else `getToken`
-  /// itself throws `apns-token-not-set`. Recent iOS 16+ Simulators do provision
-  /// an APNs token (older ones return null); either way delivery still needs
-  /// the APNs auth key uploaded to the Firebase console. Best-effort: a failure
-  /// just leaves the token unset until [requestPermission] or
-  /// `onTokenRefresh` tries again.
-  /// The one place [SettingKeys.pushToken] is written.
+  /// The one place [SettingKeys.pushToken] is written — the identifier every
+  /// backend registration call (`/v2/location`, `/v2/notify`) keys on.
   ///
   /// Tokens arrive from three directions — awesome_notifications_fcm's two
-  /// handlers, firebase's refresh stream, and the launch-time fetch — and the
-  /// two kinds are **not interchangeable**: the backend keys on the raw APNs
-  /// token on iOS and the FCM registration token on Android. Registering the
-  /// wrong one is not a loud failure; it was measured to 202 on the write and
-  /// then 401 on every later lookup, which reads as "push is broken" with no
-  /// clue why.
+  /// handlers and the launch-time [_fetchToken] — and the two kinds are **not
+  /// interchangeable**: the backend keys on the raw APNs token on iOS and the
+  /// FCM registration token on Android. Registering the wrong one is not a
+  /// loud failure; it was measured to 202 on the write and then 401 on every
+  /// later lookup, which reads as "push is broken" with no clue why. (The
+  /// legacy app stored only the APNs token on iOS for this reason, in
+  /// `fcm.dart`.)
   ///
   /// So every writer states which kind it holds and this decides, instead of
   /// each caller repeating a platform test — the version that did not repeat
@@ -575,6 +556,13 @@ class NotificationService {
   /// The APNs device token, read from the iOS side that receives it.
   static const _apns = MethodChannel('com.exptech.dpip/apns_token');
 
+  /// Fetches this platform's push token and hands it to [_storeToken].
+  ///
+  /// On iOS that is the raw APNs device token, read from the app delegate
+  /// (`ApnsTokenPlugin`) and polled for a few seconds, because iOS hands it
+  /// over a moment after launch. On Android it is the FCM registration token.
+  /// Best-effort: a failure leaves the token unset until [requestPermission]
+  /// or one of awesome_notifications_fcm's token handlers supplies it.
   Future<void> _fetchToken() async {
     try {
       if (Platform.isIOS) {
