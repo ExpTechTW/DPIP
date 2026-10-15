@@ -42,6 +42,7 @@ void main() {
   var createOk = true;
   var createThrows = false;
   var created = 0;
+  Map<Object?, Object?>? lastCreated;
   var initializeFailures = 0;
   var removeFailures = 0;
   var setChannelFailures = 0;
@@ -59,6 +60,7 @@ void main() {
     createOk = true;
     createThrows = false;
     created = 0;
+    lastCreated = null;
     initializeFailures = 0;
     removeFailures = 0;
     setChannelFailures = 0;
@@ -92,6 +94,7 @@ void main() {
         case 'createNewNotification':
           if (createThrows) throw PlatformException(code: 'create');
           created++;
+          lastCreated = call.arguments as Map<Object?, Object?>?;
           return createOk;
         case 'initialize':
           initializeCalls++;
@@ -173,6 +176,25 @@ void main() {
       }),
     );
     expect(created, greaterThanOrEqualTo(2));
+  });
+
+  test('a terminated-app push with a 40-bit id is still created', () async {
+    // The producer's id is a 40-bit hash slice. Handed to awesome as-is, its
+    // own range check throws inside createNotificationFromJsonData, which
+    // swallows that into `false` — the push simply never appeared.
+    await onFcmSilentData(
+      silent({
+        'createdLifeCycle': 'Terminated',
+        'content':
+            '{"id": ${0xF12345678}, "channelKey": "eq-v2", '
+            '"title": "地震", "body": "花蓮"}',
+      }),
+    );
+
+    expect(created, 1);
+    final content = lastCreated?['content'] as Map<Object?, Object?>?;
+    expect(content?['id'], 0xF12345678 & 0x7FFFFFFF);
+    expect(content?['channelKey'], 'eq-v2');
   });
 
   test('a foreground EEW waits for the announcement, then plays', () async {
