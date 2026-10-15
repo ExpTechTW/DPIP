@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/core/network/sse_event.dart';
@@ -15,6 +16,18 @@ class _FakeElapsed implements Elapsed {
   Duration get elapsed => value;
 }
 
+/// A [Random] whose `nextDouble` the test sets — 0 is the shortest spread,
+/// just under 1 the longest.
+class _FixedRandom implements Random {
+  double next = 0.5;
+  @override
+  double nextDouble() => next;
+  @override
+  int nextInt(int max) => (next * max).floor();
+  @override
+  bool nextBool() => next >= 0.5;
+}
+
 /// A concrete [SseRealtimeSource] over `String` payloads (decode = identity),
 /// throwing on the sentinel `'bad'` so decode-failure resilience is testable.
 class _TestSseSource extends SseRealtimeSource<String> {
@@ -23,6 +36,7 @@ class _TestSseSource extends SseRealtimeSource<String> {
     SseLiveness? liveness,
     super.elapsed,
     super.delay,
+    super.random,
   }) : super(
          liveness: liveness ?? const SseLiveness.connectionOpen(),
          label: 'test',
@@ -51,6 +65,7 @@ class _BytesSseSource extends _TestSseSource {
     super.liveness,
     super.elapsed,
     super.delay,
+    super.random,
   });
 
   @override
@@ -65,18 +80,24 @@ class _Harness {
             liveness: liveness,
             elapsed: elapsed,
             delay: _delay,
+            random: random,
           )
         : _TestSseSource(
             connect: _connect,
             liveness: liveness,
             elapsed: elapsed,
             delay: _delay,
+            random: random,
           );
   }
 
   final connects = <StreamController<SseEvent>>[];
   final delays = <Completer<void>>[];
+
+  /// The duration each [delays] entry was asked to wait.
+  final waits = <Duration>[];
   final elapsed = _FakeElapsed();
+  final random = _FixedRandom();
   late final _TestSseSource source;
 
   Stream<SseEvent> _connect() {
@@ -85,10 +106,20 @@ class _Harness {
     return controller.stream;
   }
 
-  Future<void> _delay(Duration _) {
+  Future<void> _delay(Duration wait) {
     final completer = Completer<void>();
     delays.add(completer);
+    waits.add(wait);
     return completer.future;
+  }
+
+  /// Drops the current connection and lets the queued reconnect fire,
+  /// leaving the new connection open but silent.
+  Future<void> dropAndReconnect() async {
+    await current.close();
+    await pumpEventQueue();
+    delays.last.complete();
+    await pumpEventQueue();
   }
 
   StreamController<SseEvent> get current => connects.last;
@@ -269,6 +300,61 @@ void main() {
       await pumpEventQueue();
       expect((await h.source.fetch()).valueOrNull, 'b');
     });
+
+    test(
+      'backoff steps 1s, 2s, then the server hint, each spread ±50%',
+      () async {
+        final h = _Harness();
+        await h.source.fetch();
+
+        h.random.next = 0.5; // the middle of the spread: the plain schedule
+        for (var i = 0; i < 4; i++) {
+          await h.dropAndReconnect();
+        }
+        expect(h.waits, const [
+          Duration(seconds: 1),
+          Duration(seconds: 2),
+          Duration(seconds: 3), // the default `retry:` hint caps it
+          Duration(seconds: 3),
+        ]);
+
+        h.random.next = 0;
+        await h.dropAndReconnect();
+        expect(
+          h.waits.last,
+          const Duration(milliseconds: 1500),
+          reason: '-50%',
+        );
+
+        h.random.next = 0.999;
+        await h.dropAndReconnect();
+        expect(
+          h.waits.last,
+          const Duration(milliseconds: 4497),
+          reason: 'just under +50%',
+        );
+      },
+    );
+
+    test(
+      'a delivering connection resets the backoff to the first step',
+      () async {
+        final h = _Harness();
+        await h.source.fetch();
+        h.random.next = 0;
+        await h.dropAndReconnect();
+        await h.dropAndReconnect();
+        expect(h.waits, const [
+          Duration(milliseconds: 500),
+          Duration(seconds: 1),
+        ]);
+
+        h.current.add(const SseEvent(data: 'a')); // the new connection speaks
+        await pumpEventQueue();
+        await h.dropAndReconnect();
+        expect(h.waits.last, const Duration(milliseconds: 500));
+      },
+    );
 
     test('a decode failure keeps the last good payload', () async {
       final h = _Harness();
