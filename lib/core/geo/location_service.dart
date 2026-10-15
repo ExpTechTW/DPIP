@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town.dart';
@@ -7,8 +8,10 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 /// A GPS coordinate fix in decimal degrees.
 typedef GpsFix = ({double lat, double lng});
@@ -31,10 +34,12 @@ class LocationService {
     Future<GpsFix?> Function()? fix,
     Future<GpsFix?> Function()? lastKnown,
     Future<LocationStatus> Function()? status,
+    Future<ph.PermissionStatus> Function()? requestAlways,
   }) : _isAvailable = isAvailable ?? _geolocatorAvailable,
        _fix = fix ?? _geolocatorFix,
        _lastKnownFix = lastKnown ?? _geolocatorLastKnown,
-       _status = status ?? _geolocatorStatus;
+       _status = status ?? _geolocatorStatus,
+       _requestAlways = requestAlways ?? _platformRequestAlways;
 
   final TownDirectory _directory;
 
@@ -46,6 +51,10 @@ class LocationService {
   final Future<GpsFix?> Function() _fix;
   final Future<GpsFix?> Function() _lastKnownFix;
   final Future<LocationStatus> Function() _status;
+
+  /// Asks the platform to upgrade "While Using" to "Always" — see
+  /// [requestBackground].
+  final Future<ph.PermissionStatus> Function() _requestAlways;
 
   /// The combined location-availability [LocationStatus] (services + permission).
   /// Never throws — a fault degrades to [LocationStatus.denied].
@@ -64,8 +73,8 @@ class LocationService {
       .map((s) => s == ServiceStatus.enabled);
 
   /// Opens the system app-settings so the user can grant a permission that can't
-  /// be requested in-app (permanently denied, or Android 11+ background
-  /// location). Best-effort.
+  /// be requested in-app any more (permanently denied, or an "Always" upgrade
+  /// the system has already offered once). Best-effort.
   Future<bool> openSettings() async {
     Log.info('permission: opening app settings');
     return openAppSettingsPage();
@@ -129,17 +138,31 @@ class LocationService {
     }
   }
 
-  /// Best-effort escalation to background ("Always") permission — call it as a
-  /// **separate** step, only after foreground is already granted (Android 11+
-  /// rejects a bundled request).
+  /// Escalates to background ("Always") permission, in the app wherever the
+  /// platform allows it.
   ///
-  /// In-app escalation only works on Android ≤10 (and a never-yet-shown iOS
-  /// "Always" prompt). It **cannot** happen in-app on iOS once "While Using" is
-  /// granted (geolocator's `requestPermission` returns the current status
-  /// without ever calling `requestAlwaysAuthorization`) nor on Android 11+ —
-  /// there "Allow all the time" only exists in system Settings. So: try the
-  /// in-app prompt, and if that doesn't land on "Always", open Settings, where
-  /// the grant lives. Either way the caller re-checks on resume. Never throws.
+  /// Foreground comes first and as its **own** request: Android 11+ ignores a
+  /// request that bundles the two, and iOS only offers "Always" as an upgrade
+  /// of "While Using". When foreground is missing, this asks for that and
+  /// stops unless it lands.
+  ///
+  /// The upgrade is not geolocator's `requestPermission`. That call returns the
+  /// current status untouched on iOS once anything has been decided — it never
+  /// reaches `requestAlwaysAuthorization` — and on Android it puts the
+  /// background permission in the same batch as the foreground ones. Either
+  /// way the user was sent to Settings for a grant the system would have
+  /// offered in place. [_requestAlways] does it properly per platform (see
+  /// [_platformRequestAlways]): iOS shows its one-time "Change to Always
+  /// Allow" prompt, Android 11+ opens its own background-location page and
+  /// reports what the user picked there.
+  ///
+  /// Anything short of "Always" afterwards means the system will not ask
+  /// again — iOS offers the upgrade once per install, Android 11+ has just
+  /// shown its only screen for it — so it reports [PermissionOutcome.
+  /// needsSettings] and the caller explains before sending anyone there. A
+  /// restricted device (parental controls, a management profile) is
+  /// [PermissionOutcome.denied]: Settings would not let the user change it
+  /// either. Never throws.
   Future<PermissionOutcome> requestBackground() async {
     try {
       final current = await Geolocator.checkPermission();
@@ -150,17 +173,55 @@ class LocationService {
       if (current == LocationPermission.deniedForever) {
         return PermissionOutcome.needsSettings;
       }
-      if (await Geolocator.requestPermission() == LocationPermission.always) {
-        return PermissionOutcome.granted;
+      if (current != LocationPermission.whileInUse) {
+        final foreground = await requestPermission();
+        if (foreground != PermissionOutcome.granted) return foreground;
+        // Android ≤9 has no separate background permission: the foreground
+        // grant already is "Always".
+        if (await backgroundGranted()) return PermissionOutcome.granted;
       }
-      // Couldn't escalate in-app (iOS after "While Using", or Android 11+) —
-      // "Always" lives in system Settings, and the caller says so before
-      // sending anyone there.
-      return PermissionOutcome.needsSettings;
+      final answer = await _requestAlways();
+      Log.info('permission: background location request -> ${answer.name}');
+      return switch (answer) {
+        ph.PermissionStatus.granted => PermissionOutcome.granted,
+        ph.PermissionStatus.restricted => PermissionOutcome.denied,
+        _ => PermissionOutcome.needsSettings,
+      };
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'requestBackground');
       return PermissionOutcome.denied;
     }
+  }
+
+  /// The platform's own "upgrade to Always" request.
+  ///
+  /// **Android:** `permission_handler`'s `locationAlways`, which asks for
+  /// `ACCESS_BACKGROUND_LOCATION` alone — on Android 11+ the system answers
+  /// with its location-permission page, and the result comes back when the
+  /// user returns from it.
+  ///
+  /// **iOS:** the background-location plugin, *not* `permission_handler`. Its
+  /// `locationAlways` creates a fresh `CLLocationManager` per request, and
+  /// Core Location reports the current status to a new manager straight away;
+  /// the plugin reads that "While Using" as the answer and returns `denied`
+  /// within milliseconds, while the prompt is still on screen (its own source
+  /// calls this out in `LocationPermissionStrategy.m`, and
+  /// Baseflow/flutter-permission-handler#1211 measured it). Under Swift
+  /// Package Manager it is also only compiled in when the package manifest
+  /// finds `NSLocationAlwaysAndWhenInUseUsageDescription` in an Info.plist it
+  /// locates from the build's working directory — a build started from
+  /// Xcode.app has `/` there and gets a strategy that always answers denied.
+  /// The app's plugin asks on the long-lived manager that already monitors in
+  /// the background and waits for the user's actual choice.
+  static Future<ph.PermissionStatus> _platformRequestAlways() async {
+    if (!Platform.isIOS) return ph.Permission.locationAlways.request();
+    return switch (await BackgroundLocationService.requestAlways()) {
+      'always' => ph.PermissionStatus.granted,
+      'restricted' => ph.PermissionStatus.restricted,
+      // "Keep Only While Using", or a prompt iOS will not show a second time.
+      'whenInUse' || 'denied' => ph.PermissionStatus.permanentlyDenied,
+      _ => ph.PermissionStatus.denied,
+    };
   }
 
   /// A distance-filtered stream of GPS fixes — each emission is a move of at

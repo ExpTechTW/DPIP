@@ -44,6 +44,21 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
   // firing for the same move don't produce duplicate POSTs.
   private static let reportThresholdM: CLLocationDistance = 150
 
+  /// Callers waiting on an "upgrade to Always" prompt — see `requestAlways`.
+  private var alwaysWaiters: [FlutterResult] = []
+  /// Whether the app went inactive while waiting, i.e. the prompt is showing.
+  private var alwaysPromptShown = false
+  private var alwaysObservers: [NSObjectProtocol] = []
+  private var alwaysTimers: [DispatchWorkItem] = []
+  /// How long to wait for the prompt to appear before concluding iOS will not
+  /// show it. The system offers the upgrade once per install and, after that,
+  /// `requestAlwaysAuthorization` does nothing at all — no callback, no error —
+  /// so silence past this point is the only answer there will be.
+  private static let alwaysPromptGrace: TimeInterval = 2.5
+  /// Backstop for a prompt that is shown and somehow never answered, so the
+  /// Dart button awaiting this cannot stay busy forever.
+  private static let alwaysPromptCeiling: TimeInterval = 120
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(
       name: "com.exptech.dpip/background_location",
@@ -85,6 +100,8 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
         startMonitoring()
       }
       result(nil)
+    case "requestAlways":
+      requestAlways(result)
     case "stop":
       defaults.set(false, forKey: Self.enabledKey)
       stopMonitoring()
@@ -167,6 +184,75 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
     }
   }
 
+  /// Upgrades "While Using" to "Always" in the app, answering with the status
+  /// the user ends on (`describe`) once they have actually chosen.
+  ///
+  /// Owned here rather than by `permission_handler` because that plugin builds
+  /// a new `CLLocationManager` per request, and Core Location reports the
+  /// current status to every new manager immediately: the plugin takes that
+  /// "While Using" for the user's answer and replies `denied` while the prompt
+  /// is still on screen. This manager has existed since launch, so the only
+  /// callbacks it gets are real changes.
+  ///
+  /// iOS gives no callback when the user keeps "While Using", and none when it
+  /// declines to show the prompt at all, so three things end the wait: an
+  /// authorization change, the app becoming active again after the prompt took
+  /// it inactive, or the grace period passing with no prompt shown.
+  private func requestAlways(_ result: @escaping FlutterResult) {
+    let status = manager.authorizationStatus
+    guard status == .authorizedWhenInUse else {
+      result(Self.describe(status))
+      return
+    }
+    alwaysWaiters.append(result)
+    // One prompt answers every caller that asked while it was up.
+    guard alwaysWaiters.count == 1 else { return }
+
+    alwaysPromptShown = false
+    let center = NotificationCenter.default
+    let shown: (Notification) -> Void = { [weak self] _ in self?.alwaysPromptShown = true }
+    let back: (Notification) -> Void = { [weak self] _ in
+      guard let self, self.alwaysPromptShown else { return }
+      self.finishAlwaysRequest()
+    }
+    // Both the app and the scene flavour: which one UIKit posts for a system
+    // alert under the scene lifecycle is not documented, and the answer must
+    // not depend on it.
+    alwaysObservers = [
+      center.addObserver(
+        forName: UIApplication.willResignActiveNotification, object: nil, queue: .main,
+        using: shown),
+      center.addObserver(
+        forName: UIScene.willDeactivateNotification, object: nil, queue: .main, using: shown),
+      center.addObserver(
+        forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main,
+        using: back),
+      center.addObserver(
+        forName: UIScene.didActivateNotification, object: nil, queue: .main, using: back),
+    ]
+    let grace = DispatchWorkItem { [weak self] in
+      guard let self, !self.alwaysPromptShown else { return }
+      self.finishAlwaysRequest()
+    }
+    let ceiling = DispatchWorkItem { [weak self] in self?.finishAlwaysRequest() }
+    alwaysTimers = [grace, ceiling]
+    DispatchQueue.main.asyncAfter(deadline: .now() + Self.alwaysPromptGrace, execute: grace)
+    DispatchQueue.main.asyncAfter(deadline: .now() + Self.alwaysPromptCeiling, execute: ceiling)
+    manager.requestAlwaysAuthorization()
+  }
+
+  private func finishAlwaysRequest() {
+    guard !alwaysWaiters.isEmpty else { return }
+    alwaysObservers.forEach(NotificationCenter.default.removeObserver)
+    alwaysObservers = []
+    alwaysTimers.forEach { $0.cancel() }
+    alwaysTimers = []
+    let answer = Self.describe(manager.authorizationStatus)
+    let waiters = alwaysWaiters
+    alwaysWaiters = []
+    waiters.forEach { $0(answer) }
+  }
+
   private func startMonitoring() {
     manager.startMonitoringSignificantLocationChanges()
     manager.startMonitoringVisits()
@@ -192,6 +278,11 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
   // MARK: - CLLocationManagerDelegate
 
   public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    // Any move off "While Using" answers a pending upgrade request; staying on
+    // it is not an answer, because iOS may call this as the prompt goes up.
+    if manager.authorizationStatus != .authorizedWhenInUse {
+      finishAlwaysRequest()
+    }
     // Arm as soon as Always is granted (the async grant after start(), or a
     // later upgrade in Settings).
     if manager.authorizationStatus == .authorizedAlways, defaults.bool(forKey: Self.enabledKey) {
