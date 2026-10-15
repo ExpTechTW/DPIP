@@ -16,8 +16,6 @@ void main() {
     return SettingsStore.inMemory(initial);
   }
 
-  // Deterministic win — production defaults to 1-in-4.
-
   test('reports each distance-triggered move; skips identical fixes', () async {
     final positions = StreamController<GpsFix>();
     final reported = <GpsFix>[];

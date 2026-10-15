@@ -15,13 +15,12 @@ import 'package:dpip/core/settings/settings_store.dart';
 /// `LocationApi.updateDeviceLocation` POST). Consecutive identical fixes are
 /// skipped, and a report failure is logged, never thrown.
 ///
-/// Upload gates (in order):
-/// 1. **60s throttle** — keyed by [SettingKeys.deviceLocationUpdatedAtMs].
-///    Inside the window: still publish [fixes], skip API silently.
-/// 2. **1-in-4 lottery** — after the throttle clears; a miss skips without
-///    burning the stamp so a later move can try again.
-/// 3. On a fired attempt (or throw), the stamp is written — so a missing push
-///    token (`onMoved` → `false`) does not burn the window.
+/// Uploads are throttled to one per [minUploadInterval] (60 s by default),
+/// keyed by [SettingKeys.deviceLocationUpdatedAtMs]. Inside the window the fix
+/// is still published on [fixes] and the API is skipped silently; outside it,
+/// every move is reported. The stamp is written only when an upload was
+/// attempted (or threw), so a missing push token (`onMoved` → `false`) does not
+/// burn the window.
 ///
 /// The positions come from a **factory** (`Stream<GpsFix> Function()`), not a
 /// single stream instance, because geolocator's position stream *errors and
