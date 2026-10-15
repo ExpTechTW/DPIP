@@ -93,12 +93,15 @@ void main() {
     final next = AppTime.sync();
 
     expect(source.requests, hasLength(2));
+    // A step well past ServerClock.stepThreshold, so the clock adopts it as
+    // is rather than averaging it with the first — what is pinned here is
+    // only that the second sync really ran.
     source.requests.last.complete(
-      Ok(device.add(const Duration(seconds: 7)).millisecondsSinceEpoch),
+      Ok(device.add(const Duration(seconds: 60)).millisecondsSinceEpoch),
     );
     await next;
 
-    expect(AppTime.calibratedTimeOffset, const Duration(seconds: 7));
+    expect(AppTime.calibratedTimeOffset, const Duration(seconds: 60));
   });
 
   test('allows retry after a failed sync attempt', () async {
