@@ -293,5 +293,19 @@ are async and log rather than throw. Add a setting = add one `SettingKey<T>`;
 never change an existing key string without a migration. `shared_preferences`
 is **not a dependency** — nothing may import it — and only a table's owning
 store may import `sqflite`; both enforced by `tool/check/storage.sh`.
+
+The device's movement history is a third file, `location_track.db` in
+application-support, outside that split because Dart does not own it: the
+native background-location path writes it (`LocationTrackStore` on both
+platforms, every background fix, delta-encoded, 50 MB with oldest-first
+eviction) and Dart only reads it, through a read-only connection
+(`core/geo/location_track.dart`). **It never leaves the device.** Nothing
+uploads a position from it — a diagnostics dump the user sends carries only
+its fix count and size — it is excluded from backups (iOS
+`isExcludedFromBackup`, Android `allowBackup="false"`), and uninstalling the
+app or clearing its data deletes it. Recording has no switch of its own — it
+follows the background-location grant — and the map's 軌跡 layer, which shows
+it, says all of this in its sheet; its clear goes through the native side,
+never a file delete from Dart.
 - Every file starts with a doc comment; one public declaration = one clear
 responsibility.
