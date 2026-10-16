@@ -17,7 +17,8 @@ import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_alert_tracker.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
-import 'package:dpip/features/earthquake/domain/rts_station_mark.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_encoder.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_geojson.dart';
 import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
@@ -116,6 +117,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     required TownDirectory townDirectory,
     RtsLiveDemand? liveDemand,
     MlIntensityEstimator? mlIntensity,
+    RtsStationEncoder? stationEncoder,
     // Not initializing formals: Dart has no private *named* parameter, and
     // these fields must stay private.
     // ignore: prefer_initializing_formals
@@ -128,6 +130,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
        _liveDemand = liveDemand,
        // ignore: prefer_initializing_formals
        _mlIntensity = mlIntensity,
+       // ignore: prefer_initializing_formals
+       _stationEncoder = stationEncoder,
        // ignore: prefer_initializing_formals
        _townDirectory = townDirectory;
 
@@ -145,6 +149,20 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
 
   /// ML v1 township estimates; the formula colours the island until it loads.
   final MlIntensityEstimator? _mlIntensity;
+
+  /// Builds the station layer off the UI isolate for the frames it decoded
+  /// (see [_writeStations]); without one, or for any other frame, the layer
+  /// builds it here.
+  final RtsStationEncoder? _stationEncoder;
+
+  /// Bumped by every station write and every remount, so a write still
+  /// waiting on [_stationEncoder] when a newer one is made — or when the
+  /// source is mounted afresh under it — is dropped instead of landing late
+  /// with an older frame. Without the encoder every write reaches the map in
+  /// call order on its own; with it, one write waits on the worker and the
+  /// next may not (an offline feed's empty collection, a frame the worker
+  /// does not hold), so the later one could otherwise land first.
+  int _stationWrite = 0;
 
   /// Loads the model — downloading it the first time the monitor ever opens —
   /// and repaints the wash from it once it is ready.
@@ -311,6 +329,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     // the feed will not notify again just because the layer attached.
     _alerts.track(_feed.state);
     await removeMonitorLayers(controller, _ids);
+    _stationWrite++;
     // The whole stack — sources, layers, badge icons, and the order they mount
     // in — is [addMonitorLayers], shared with the report replay map. The
     // stacking rules it enforces (everything appended above the base style's
@@ -465,10 +484,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     try {
       if (!identical(payloadKey, _lastSent)) {
         _lastSent = payloadKey;
-        await controller.setGeoJsonSource(
-          _ids.stationSource,
-          offline ? monitorEmptyCollection : _geoJson(),
-        );
+        await _writeStations(controller, offline: offline, frame: data);
       }
       if (status != _appliedStatus) {
         _appliedStatus = status;
@@ -875,6 +891,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     _eewTicker = null;
     _blinkTimer?.cancel();
     _blinkTimer = null;
+    _stationWrite++;
     // The area fill tints the *base style's* county/town layers, not one of
     // this layer's own — leaving it tinted would bleed into whichever layer
     // becomes active next. [_updateAreaFill] no-ops if nothing was applied.
@@ -927,47 +944,88 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   void _useStations(Map<String, SeismicStation> directory) {
     _stations = directory;
     _alerts.place(stations: directory);
+    _stationEncoder?.placeStations(directory);
     // The dots on the map were placed against the old directory.
     _lastSent = null;
   }
 
+  /// Puts the station layer on the map: nothing while [offline], else
+  /// [frame]'s stations.
+  ///
+  /// When [_stationEncoder] holds the frame, the layer is built and encoded
+  /// on the worker and handed to MapLibre as the string, so the UI isolate
+  /// neither walks the stations nor encodes them. Otherwise it is built here,
+  /// as it always was. The flags, icons and directory are this moment's,
+  /// taken before the wait, so both ways draw the same frame the same way.
+  Future<void> _writeStations(
+    MapLibreMapController controller, {
+    required bool offline,
+    required Rts? frame,
+  }) async {
+    final write = ++_stationWrite;
+    if (offline) {
+      await controller.setGeoJsonSource(
+        _ids.stationSource,
+        monitorEmptyCollection,
+      );
+      return;
+    }
+    final eventLit = _alerts.alerting;
+    final eewActive = _eewActive;
+    final badgeIcons = _badgeIcons;
+    final stations = _stations;
+    _dotsDrawnForEew = eewActive;
+    final encoder = _stationEncoder;
+    if (encoder != null && frame != null) {
+      final encoded = await encoder.encode(
+        frame,
+        eventLit: eventLit,
+        eewActive: eewActive,
+        badgeIcons: badgeIcons,
+      );
+      if (write != _stationWrite) return;
+      if (encoded != null) {
+        await controller.setGeoJsonSourceEncoded(_ids.stationSource, encoded);
+        return;
+      }
+    }
+    await controller.setGeoJsonSource(
+      _ids.stationSource,
+      rtsStationGeoJson(
+        frame?.stations ?? const <String, RtsStation>{},
+        stations,
+        eventLit: eventLit,
+        eewActive: eewActive,
+        badgeIcons: badgeIcons,
+      ),
+    );
+  }
+
+  /// The station layer for the frame in hand, built here — what [render]
+  /// mounts the source with.
   Map<String, dynamic> _geoJson() {
-    final live = _feed.state.data?.stations ?? const <String, RtsStation>{};
     final eventLit = _alerts.alerting;
     final eewActive = _eewActive;
     _dotsDrawnForEew = eewActive;
-    final features = <Map<String, dynamic>>[];
-    for (final entry in live.entries) {
-      final station = _stations[entry.key];
-      if (station == null) continue;
-      final data = entry.value;
-      final mark = rtsStationMark(
-        data,
-        eventLit: eventLit,
-        eewActive: eewActive,
-      );
-      if (mark == null) continue;
-      features.add({
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [station.longitude, station.latitude],
-        },
-        'properties': {
-          'i': mark.colorValue,
-          // Sort key for both the dot and the badge layer, so a stronger
-          // reading always draws over a weaker one.
-          'sort': data.intensity,
-          'label': '${entry.key}\n${data.intensity.toStringAsFixed(1)}',
-          // The badge is a fuller circle drawn over the same dot, never a
-          // shape swap (see [MonitorLayerIds.stationBadge]).
-          'icon': mark.kind == RtsStationMarkKind.badge
-              ? monitorBadgeIcon(mark.level, dark: _dark)
-              : '',
-          'grey': mark.kind == RtsStationMarkKind.grey ? 1 : 0,
-        },
-      });
-    }
-    return {'type': 'FeatureCollection', 'features': features};
+    return rtsStationGeoJson(
+      _feed.state.data?.stations ?? const <String, RtsStation>{},
+      _stations,
+      eventLit: eventLit,
+      eewActive: eewActive,
+      badgeIcons: _badgeIcons,
+    );
   }
+
+  /// The badge icon id for each level 0–9, in the artwork for the brightness
+  /// last seen (see [_captureBrightness]).
+  List<String> get _badgeIcons => _dark ? _darkBadgeIcons : _lightBadgeIcons;
+
+  static final List<String> _lightBadgeIcons = List.unmodifiable([
+    for (var level = 0; level < 10; level++)
+      monitorBadgeIcon(level, dark: false),
+  ]);
+  static final List<String> _darkBadgeIcons = List.unmodifiable([
+    for (var level = 0; level < 10; level++)
+      monitorBadgeIcon(level, dark: true),
+  ]);
 }

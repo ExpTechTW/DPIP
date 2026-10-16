@@ -1,6 +1,7 @@
 /// The RTS worker isolate, run for real: a frame it decodes is the frame the
-/// UI isolate would have decoded, a frame it cannot decode costs only that
-/// frame, answers come back in the order they were asked, and a stopped
+/// UI isolate would have decoded, the station layer it builds is the one the
+/// UI isolate would have built, a frame it cannot handle costs only that
+/// request, answers come back in the order they were asked, and a stopped
 /// worker fails what it was still holding instead of leaving it waiting.
 library;
 
@@ -14,6 +15,9 @@ import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/rts_worker.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_geojson.dart';
+import 'package:dpip/features/earthquake/domain/seismic_station.dart';
+import 'package:dpip/shared/map/monitor_map_stack.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// [json] as the TREM stream sends a frame: base64 over gzip over JSON.
@@ -31,6 +35,21 @@ Map<String, dynamic> _frame(int ts, {int stations = 300}) => {
       },
   },
 };
+
+/// A directory for [_frame]'s stations, leaving every seventh one out.
+Map<String, SeismicStation> _directory({double shift = 0}) => {
+  for (var n = 0; n < 300; n++)
+    if (n % 7 != 0)
+      'S${n.toRadixString(16)}': SeismicStation(
+        id: 'S${n.toRadixString(16)}',
+        latitude: 22 + n / 100 + shift,
+        longitude: 120 + n / 150,
+      ),
+};
+
+List<String> _icons({required bool dark}) => [
+  for (var level = 0; level < 10; level++) monitorBadgeIcon(level, dark: dark),
+];
 
 void main() {
   late RtsWorker worker;
@@ -103,6 +122,106 @@ void main() {
       worker.decode(_payload(_frame(2))),
       throwsA(isA<RtsWorkerGone>()),
     );
+  });
+
+  group('station layer', () {
+    test('is what the UI isolate builds from the same frame', () async {
+      final stations = _directory();
+      worker.placeStations(stations);
+      final decoded = (await worker.decode(_payload(_frame(1))))!;
+      for (final eventLit in [false, true]) {
+        for (final eewActive in [false, true]) {
+          for (final dark in [false, true]) {
+            final encoded = await worker.encode(
+              decoded.seq,
+              eventLit: eventLit,
+              eewActive: eewActive,
+              badgeIcons: _icons(dark: dark),
+            );
+            final here = rtsStationGeoJson(
+              decoded.frame.stations,
+              stations,
+              eventLit: eventLit,
+              eewActive: eewActive,
+              badgeIcons: _icons(dark: dark),
+            );
+            expect(encoded, jsonEncode(here));
+          }
+        }
+      }
+    });
+
+    test('is placed against the directory given last', () async {
+      final decoded = (await worker.decode(_payload(_frame(1))))!;
+      Future<String?> layer() => worker.encode(
+        decoded.seq,
+        eventLit: false,
+        eewActive: false,
+        badgeIcons: _icons(dark: false),
+      );
+      expect(await layer(), jsonEncode(monitorEmptyCollection));
+
+      final moved = _directory(shift: 0.5);
+      worker.placeStations(_directory());
+      worker.placeStations(moved);
+      expect(
+        await layer(),
+        encodeRtsStationGeoJson(
+          decoded.frame.stations,
+          moved,
+          eventLit: false,
+          eewActive: false,
+          badgeIcons: _icons(dark: false),
+        ),
+      );
+    });
+
+    test('is built from the newest frames and the last one built', () async {
+      Future<String?> layer(int seq) => worker.encode(
+        seq,
+        eventLit: false,
+        eewActive: false,
+        badgeIcons: _icons(dark: false),
+      );
+      worker.placeStations(_directory());
+      final first = (await worker.decode(_payload(_frame(1))))!;
+      expect(await layer(first.seq), isNotNull);
+      final later = [
+        for (var ts = 2; ts <= 12; ts++)
+          (await worker.decode(_payload(_frame(ts))))!,
+      ];
+
+      expect(await layer(first.seq), isNotNull, reason: 'the last one built');
+      expect(await layer(later.first.seq), isNull, reason: 'let go');
+      expect(await layer(later.last.seq), isNotNull, reason: 'the newest');
+      expect(await layer(9999), isNull, reason: 'never decoded');
+    });
+
+    test('a directory it cannot write fails that request alone', () async {
+      final decoded = (await worker.decode(_payload(_frame(1))))!;
+      worker.placeStations({
+        'S1': const SeismicStation(id: 'S1', latitude: 23, longitude: 1 / 0),
+      });
+      await expectLater(
+        worker.encode(
+          decoded.seq,
+          eventLit: false,
+          eewActive: false,
+          badgeIcons: _icons(dark: false),
+        ),
+        throwsA(isA<RemoteError>()),
+      );
+      worker.placeStations(_directory());
+      expect(
+        await worker.encode(
+          decoded.seq,
+          eventLit: false,
+          eewActive: false,
+          badgeIcons: _icons(dark: false),
+        ),
+        isNotNull,
+      );
+    });
   });
 
   test('the payload decoder matches the stream source exactly', () {

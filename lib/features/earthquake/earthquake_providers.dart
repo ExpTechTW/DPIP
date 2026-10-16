@@ -29,6 +29,7 @@ import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_encoder.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
@@ -140,6 +141,9 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
     Provider<Future<RtsBoxGrid>>.value(value: boxGrid),
     Provider<TremStationRepository>.value(value: tremStations),
     Provider<RtsLiveDemand>.value(value: rtsLiveDemand),
+    // The worker the live frames are decoded on also builds the monitor's
+    // station layer from them.
+    Provider<RtsStationEncoder>.value(value: rtsWorker),
     Provider<MlIntensityEstimator>.value(value: mlIntensity),
   ];
 }
