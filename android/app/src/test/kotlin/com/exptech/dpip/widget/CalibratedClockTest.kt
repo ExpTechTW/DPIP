@@ -5,6 +5,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * The property the whole freshness story rests on: a device clock change cannot
@@ -99,6 +104,95 @@ class CalibratedClockTest {
         clock.install(serverUnixMilliseconds = 2_000_000)
         assertEquals(2_000_000L, clock.calibratedNowMilliseconds())
         assertEquals(0L, clock.anchorAgeMilliseconds())
+    }
+
+    @Test
+    fun `reads during reinstall use a complete anchor without blocking`() {
+        val monotonic = AtomicLong(0)
+        val pauseNextReading = AtomicBoolean(false)
+        val readingStarted = CountDownLatch(1)
+        val resumeReading = CountDownLatch(1)
+        val concurrentClock = CalibratedClock(
+            wallMilliseconds = { 1_000_000L },
+            monotonicMilliseconds = {
+                if (pauseNextReading.compareAndSet(true, false)) {
+                    readingStarted.countDown()
+                    check(resumeReading.await(5, TimeUnit.SECONDS)) { "Monotonic read was not resumed" }
+                }
+                monotonic.get()
+            },
+        )
+        concurrentClock.install(1_000_000L)
+        monotonic.set(3_600_000L)
+        val executor = Executors.newSingleThreadExecutor()
+        pauseNextReading.set(true)
+        val install = executor.submit { concurrentClock.install(4_600_000L) }
+        try {
+            assertTrue("Reinstall did not reach the monotonic read", readingStarted.await(5, TimeUnit.SECONDS))
+            assertTrue(concurrentClock.hasAnchor)
+            assertEquals(4_600_000L, concurrentClock.calibratedNowMilliseconds())
+            assertEquals(3_600_000L, concurrentClock.anchorAgeMilliseconds())
+            assertEquals(3_600_000L, concurrentClock.offsetMilliseconds())
+            assertEquals(WidgetSnapshotTime(4_600_000L, 3_600_000L), concurrentClock.snapshotTime())
+            assertEquals(1_030_000L, concurrentClock.deviceMillisecondsFor(4_630_000L))
+        } finally {
+            resumeReading.countDown()
+            try {
+                install.get(5, TimeUnit.SECONDS)
+            } finally {
+                executor.shutdownNow()
+                assertTrue("Reinstall thread did not stop", executor.awaitTermination(5, TimeUnit.SECONDS))
+            }
+        }
+        assertEquals(4_600_000L, concurrentClock.calibratedNowMilliseconds())
+        assertEquals(0L, concurrentClock.anchorAgeMilliseconds())
+    }
+
+    @Test
+    fun `invalidate during install leaves no anchor until a complete install is published`() {
+        val pauseNextReading = AtomicBoolean(false)
+        val readingStarted = CountDownLatch(1)
+        val resumeReading = CountDownLatch(1)
+        val concurrentClock = CalibratedClock(
+            wallMilliseconds = { 1_000_000L },
+            monotonicMilliseconds = {
+                if (pauseNextReading.compareAndSet(true, false)) {
+                    readingStarted.countDown()
+                    check(resumeReading.await(5, TimeUnit.SECONDS)) { "Monotonic read was not resumed" }
+                }
+                3_600_000L
+            },
+        )
+        concurrentClock.installAt(1_000_000L, 0L)
+        val executor = Executors.newSingleThreadExecutor()
+        pauseNextReading.set(true)
+        val install = executor.submit { concurrentClock.install(4_600_000L) }
+        try {
+            assertTrue("Install did not reach the monotonic read", readingStarted.await(5, TimeUnit.SECONDS))
+            concurrentClock.invalidate()
+            assertFalse(concurrentClock.hasAnchor)
+            assertNull(concurrentClock.anchorAgeMilliseconds())
+            assertNull(concurrentClock.calibratedNowMilliseconds())
+            assertNull(concurrentClock.offsetMilliseconds())
+            assertNull(concurrentClock.snapshotTime())
+            assertNull(concurrentClock.deviceMillisecondsFor(4_630_000L))
+        } finally {
+            resumeReading.countDown()
+            try {
+                install.get(5, TimeUnit.SECONDS)
+            } finally {
+                executor.shutdownNow()
+                assertTrue("Install thread did not stop", executor.awaitTermination(5, TimeUnit.SECONDS))
+            }
+        }
+        // The overlapping install may complete after invalidate, but it must
+        // publish both readings, never just the monotonic half of an anchor.
+        assertTrue(concurrentClock.hasAnchor)
+        assertEquals(0L, concurrentClock.anchorAgeMilliseconds())
+        assertEquals(WidgetSnapshotTime(4_600_000L, 3_600_000L), concurrentClock.snapshotTime())
+        concurrentClock.invalidate()
+        assertFalse(concurrentClock.hasAnchor)
+        assertNull(concurrentClock.snapshotTime())
     }
 
     @Test

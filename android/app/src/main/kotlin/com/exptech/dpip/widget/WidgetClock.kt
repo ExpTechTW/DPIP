@@ -36,24 +36,26 @@ class CalibratedClock(
     private val wallMilliseconds: () -> Long,
     private val monotonicMilliseconds: () -> Long,
 ) {
-    @Volatile
-    private var anchorServerMilliseconds: Long? = null
+    private data class Anchor(
+        val serverMilliseconds: Long,
+        val monotonicMilliseconds: Long,
+    )
 
+    // Publish both readings together: separate volatile fields can mix two syncs.
     @Volatile
-    private var anchorMonotonicMilliseconds: Long? = null
+    private var anchor: Anchor? = null
 
     val hasAnchor: Boolean
-        get() = anchorServerMilliseconds != null && anchorMonotonicMilliseconds != null
+        get() = anchor != null
 
     /** Milliseconds since the anchor was taken, or null when there is none. */
     fun anchorAgeMilliseconds(): Long? {
-        val anchor = anchorMonotonicMilliseconds ?: return null
-        return monotonicMilliseconds() - anchor
+        val current = anchor ?: return null
+        return monotonicMilliseconds() - current.monotonicMilliseconds
     }
 
     fun install(serverUnixMilliseconds: Long) {
-        anchorServerMilliseconds = serverUnixMilliseconds
-        anchorMonotonicMilliseconds = monotonicMilliseconds()
+        anchor = Anchor(serverUnixMilliseconds, monotonicMilliseconds())
     }
 
     /**
@@ -63,13 +65,11 @@ class CalibratedClock(
      * seconds ago" without making the fake monotonic source stateful.
      */
     internal fun installAt(serverUnixMilliseconds: Long, monotonicMilliseconds: Long) {
-        anchorServerMilliseconds = serverUnixMilliseconds
-        anchorMonotonicMilliseconds = monotonicMilliseconds
+        anchor = Anchor(serverUnixMilliseconds, monotonicMilliseconds)
     }
 
     fun invalidate() {
-        anchorServerMilliseconds = null
-        anchorMonotonicMilliseconds = null
+        anchor = null
     }
 
     /**
@@ -79,9 +79,8 @@ class CalibratedClock(
      * gets null must not decide that an observation is fresh.
      */
     fun calibratedNowMilliseconds(): Long? {
-        val server = anchorServerMilliseconds ?: return null
-        val anchor = anchorMonotonicMilliseconds ?: return null
-        return server + (monotonicMilliseconds() - anchor)
+        val current = anchor ?: return null
+        return current.serverMilliseconds + (monotonicMilliseconds() - current.monotonicMilliseconds)
     }
 
     /** Calibrated minus device wall clock, or null when unanchored. */
@@ -96,10 +95,9 @@ class CalibratedClock(
      * jump this class exists to absorb.
      */
     fun snapshotTime(): WidgetSnapshotTime? {
-        val server = anchorServerMilliseconds ?: return null
-        val anchor = anchorMonotonicMilliseconds ?: return null
+        val current = anchor ?: return null
         val wall = wallMilliseconds()
-        val calibrated = server + (monotonicMilliseconds() - anchor)
+        val calibrated = current.serverMilliseconds + (monotonicMilliseconds() - current.monotonicMilliseconds)
         return WidgetSnapshotTime(calibrated, calibrated - wall)
     }
 
