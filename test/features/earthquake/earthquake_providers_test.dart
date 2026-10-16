@@ -58,6 +58,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/features/earthquake/data/ml_intensity_service.dart';
+import 'package:dpip/features/earthquake/data/rts_worker_service.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_repository.dart';
 import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
@@ -65,6 +66,7 @@ import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_box_grid.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_encoder.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
@@ -345,7 +347,7 @@ void main() {
     );
 
     final widgets = earthquakeProviders(deps);
-    expect(widgets, hasLength(13));
+    expect(widgets, hasLength(14));
 
     await tester.pumpWidget(
       MultiProvider(providers: widgets, child: const SizedBox.shrink()),
@@ -364,6 +366,7 @@ void main() {
     expect(context.read<RealtimeNotifier<Rts>>(), same(rts));
     expect(context.read<TremStationRepository>(), isA<TremStationRepository>());
     expect(context.read<RtsLiveDemand>(), isA<RtsLiveDemand>());
+    expect(context.read<RtsStationEncoder>(), isA<RtsWorkerService>());
     expect(context.read<MlIntensityEstimator>(), isA<MlIntensityService>());
 
     // The travel-time table is decoded with Isolate.run, and that future was

@@ -1,7 +1,8 @@
 /// The lifecycle around the RTS worker: it starts on the first frame and only
 /// once, and when it cannot start or stops, the frames it was handed are still
 /// decoded and every later one goes back to the UI isolate — the path the feed
-/// took before the worker existed.
+/// took before the worker existed. The station layer is only ever answered for
+/// a frame the worker decoded; anything else is left to the monitor.
 library;
 
 import 'dart:convert';
@@ -9,6 +10,9 @@ import 'dart:io';
 
 import 'package:dpip/features/earthquake/data/rts_worker.dart';
 import 'package:dpip/features/earthquake/data/rts_worker_service.dart';
+import 'package:dpip/features/earthquake/domain/rts.dart';
+import 'package:dpip/features/earthquake/domain/rts_station_geojson.dart';
+import 'package:dpip/features/earthquake/domain/seismic_station.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String _payload(int ts) => base64.encode(
@@ -94,6 +98,68 @@ void main() {
 
     await workers.single.stopped;
     expect(service.decode(_payload(2)), isNull);
+  });
+
+  group('station layer', () {
+    const stations = {
+      'A1': SeismicStation(id: 'A1', latitude: 23.5, longitude: 121.2),
+      'B2': SeismicStation(id: 'B2', latitude: 24.1, longitude: 120.9),
+    };
+    final icons = [for (var level = 0; level < 10; level++) 'icon-$level'];
+
+    Future<String?> layerOf(RtsWorkerService service, Rts frame) => service
+        .encode(frame, eventLit: true, eewActive: false, badgeIcons: icons);
+
+    test('is built on the worker for a frame it decoded', () async {
+      final service = RtsWorkerService(spawn: spawn)
+        // Placed before the worker exists: it is handed over on start.
+        ..placeStations(stations);
+      final frame = (await service.decode(_payload(1)))!;
+
+      expect(
+        await layerOf(service, frame),
+        encodeRtsStationGeoJson(
+          frame.stations,
+          stations,
+          eventLit: true,
+          eewActive: false,
+          badgeIcons: icons,
+        ),
+      );
+      service.dispose();
+    });
+
+    test('is left to the caller for any other frame', () async {
+      final service = RtsWorkerService(spawn: spawn)..placeStations(stations);
+      final decoded = (await service.decode(_payload(1)))!;
+
+      expect(await layerOf(service, decodeRtsPayload(_payload(1))!), isNull);
+      expect(await layerOf(service, const Rts()), isNull);
+      expect(
+        await layerOf(service, decoded.copyWith()),
+        isNull,
+        reason: 'an equal frame is still not the one the worker holds',
+      );
+      service.dispose();
+    });
+
+    test('is left to the caller once the worker stops', () async {
+      final service = RtsWorkerService(spawn: spawn)..placeStations(stations);
+      final frame = (await service.decode(_payload(1)))!;
+      workers.single.dispose();
+      await workers.single.stopped;
+      await pumpEventQueue();
+
+      expect(await layerOf(service, frame), isNull);
+    });
+
+    test('is left to the caller when the worker cannot start', () async {
+      final service = RtsWorkerService(
+        spawn: () async => throw StateError('no isolates here'),
+      )..placeStations(stations);
+      final frame = (await service.decode(_payload(1)))!;
+      expect(await layerOf(service, frame), isNull);
+    });
   });
 
   test('disposed while starting, the worker is let go at once', () async {
