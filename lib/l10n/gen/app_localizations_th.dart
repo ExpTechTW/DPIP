@@ -3426,4 +3426,88 @@ class AppLocalizationsTh extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => 'เส้นทาง';
+
+  @override
+  String get mapLayerLocationTrackSubtitle =>
+      'สถานที่ที่โทรศัพท์เครื่องนี้เคยไป เก็บไว้ในเครื่องเท่านั้น';
+
+  @override
+  String get locationTrackRangeToday => 'วันนี้';
+
+  @override
+  String get locationTrackRangeWeek => '7 วัน';
+
+  @override
+  String get locationTrackRangeMonth => '30 วัน';
+
+  @override
+  String get locationTrackRangeAll => 'ทั้งหมด';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count จุด';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => 'ไม่มีบันทึกในช่วงเวลานี้';
+
+  @override
+  String get locationTrackLocalOnly =>
+      'เก็บไว้ในโทรศัพท์เครื่องนี้เท่านั้นและจะไม่ถูกอัปโหลด หากถอนการติดตั้งแอปหรือล้างข้อมูลแอป ข้อมูลจะหายไป';
+
+  @override
+  String get locationTrackEmpty => 'ยังไม่มีเส้นทาง';
+
+  @override
+  String get locationTrackEmptyBody =>
+      'เมื่ออนุญาตตำแหน่งในเบื้องหลังแล้ว โทรศัพท์เครื่องนี้จะบันทึกเส้นทางการเดินทางโดยอัตโนมัติ';
+
+  @override
+  String get locationTrackStorage => 'พื้นที่จัดเก็บ';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return 'จัดเก็บแล้ว $count จุด · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return 'จุดเก่าที่สุด: $date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return 'จุดล่าสุด: $time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      'เก็บได้สูงสุด 50 MB หรือประมาณ 3 ล้านจุดขึ้นไป หากบันทึกวันละ 100–300 จุดตามปกติ จะเก็บได้ราวหลายสิบปี เมื่อเต็มแล้วจุดที่เก่าที่สุดจะถูกลบก่อน';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return 'จุดที่ห่างกันเกิน $hours ชั่วโมงจะไม่ถูกลากเส้นเชื่อม';
+  }
+
+  @override
+  String get locationTrackClear => 'ล้างเส้นทาง';
+
+  @override
+  String get locationTrackClearConfirm =>
+      'เส้นทางทั้งหมดที่บันทึกไว้ในโทรศัพท์เครื่องนี้จะถูกลบ และไม่สามารถกู้คืนได้';
+
+  @override
+  String get locationTrackCleared => 'ล้างเส้นทางแล้ว';
+
+  @override
+  String get locationTrackLegendNewer => 'ใหม่กว่า';
+
+  @override
+  String get locationTrackLegendOlder => 'เก่ากว่า';
+
+  @override
+  String get locationTrackLegendLatest => 'ตำแหน่งล่าสุด';
 }

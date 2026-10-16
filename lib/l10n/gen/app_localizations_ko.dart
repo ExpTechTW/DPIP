@@ -3372,4 +3372,87 @@ class AppLocalizationsKo extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => '이동 경로';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => '이 기기가 다녀온 곳, 기기에만 저장';
+
+  @override
+  String get locationTrackRangeToday => '오늘';
+
+  @override
+  String get locationTrackRangeWeek => '7일';
+
+  @override
+  String get locationTrackRangeMonth => '30일';
+
+  @override
+  String get locationTrackRangeAll => '전체';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count개 지점';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => '이 기간에는 기록이 없습니다';
+
+  @override
+  String get locationTrackLocalOnly =>
+      '이 기기에만 저장되며 업로드되지 않습니다. 앱을 삭제하거나 앱 데이터를 지우면 사라집니다.';
+
+  @override
+  String get locationTrackEmpty => '아직 이동 경로가 없습니다';
+
+  @override
+  String get locationTrackEmptyBody =>
+      '백그라운드 위치를 허용하면 이 기기의 이동 경로가 자동으로 기록됩니다.';
+
+  @override
+  String get locationTrackStorage => '저장 공간';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '저장된 지점 $count개 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '가장 오래된 지점: $date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '가장 최근 지점: $time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '최대 50MB까지 보관하며, 약 300만 개 이상의 지점을 저장할 수 있습니다. 하루 100~300개 정도라면 대략 수십 년 분량입니다. 가득 차면 가장 오래된 지점부터 삭제됩니다.';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '$hours시간 넘게 떨어진 지점은 선으로 잇지 않습니다.';
+  }
+
+  @override
+  String get locationTrackClear => '이동 경로 지우기';
+
+  @override
+  String get locationTrackClearConfirm =>
+      '이 기기에 기록된 모든 이동 경로가 삭제되며 되돌릴 수 없습니다.';
+
+  @override
+  String get locationTrackCleared => '이동 경로를 지웠습니다';
+
+  @override
+  String get locationTrackLegendNewer => '최근';
+
+  @override
+  String get locationTrackLegendOlder => '이전';
+
+  @override
+  String get locationTrackLegendLatest => '마지막 위치';
 }

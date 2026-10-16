@@ -6509,6 +6509,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{cm} cm'**
   String tsunamiWaveHeightCm(int cm);
+
+  /// Map layer switcher name for the on-device movement history
+  ///
+  /// In en, this message translates to:
+  /// **'Track'**
+  String get mapLayerLocationTrack;
+
+  /// Map layer switcher subtitle for the movement-history layer; says it stays on the device
+  ///
+  /// In en, this message translates to:
+  /// **'Where this phone has been, kept on this device'**
+  String get mapLayerLocationTrackSubtitle;
+
+  /// Movement-track time range pill: since midnight today
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get locationTrackRangeToday;
+
+  /// Movement-track time range pill: the last 7 days
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get locationTrackRangeWeek;
+
+  /// Movement-track time range pill: the last 30 days
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get locationTrackRangeMonth;
+
+  /// Movement-track time range pill: the whole stored history
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get locationTrackRangeAll;
+
+  /// How many recorded points the selected range holds; count is pre-formatted with digit grouping
+  ///
+  /// In en, this message translates to:
+  /// **'{count} points'**
+  String locationTrackRangePoints(String count);
+
+  /// Shown when the selected time range holds no recorded points
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded in this period'**
+  String get locationTrackRangeEmpty;
+
+  /// Always-visible notice: the movement history is local only, never uploaded, and lost on uninstall or data clear
+  ///
+  /// In en, this message translates to:
+  /// **'Stored only on this phone and never uploaded. Uninstalling the app or clearing its data deletes it.'**
+  String get locationTrackLocalOnly;
+
+  /// Empty state headline: nothing has been recorded yet
+  ///
+  /// In en, this message translates to:
+  /// **'No track yet'**
+  String get locationTrackEmpty;
+
+  /// Empty state body: recording starts by itself once background location is allowed
+  ///
+  /// In en, this message translates to:
+  /// **'Once background location is allowed, this phone records where it goes on its own.'**
+  String get locationTrackEmptyBody;
+
+  /// Section header above what the movement history takes on disk
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get locationTrackStorage;
+
+  /// Total recorded points and the file size on disk
+  ///
+  /// In en, this message translates to:
+  /// **'{count} points stored · {size}'**
+  String locationTrackStored(String count, String size);
+
+  /// Date of the oldest point still stored
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest point: {date}'**
+  String locationTrackOldest(String date);
+
+  /// Date and time of the newest recorded point
+  ///
+  /// In en, this message translates to:
+  /// **'Latest point: {time}'**
+  String locationTrackLatest(String time);
+
+  /// Approximate capacity of the 50 MB budget (about 14 bytes a point, ~3.7 million points) and oldest-first eviction; keep it approximate
+  ///
+  /// In en, this message translates to:
+  /// **'Up to 50 MB is kept — roughly 3 million points or more. At a typical 100–300 points a day, that is on the order of decades. When it is full, the oldest points are removed first.'**
+  String get locationTrackCapacity;
+
+  /// Explains why the line breaks: fixes further apart in time than this are not joined
+  ///
+  /// In en, this message translates to:
+  /// **'Points more than {hours} hours apart are not joined by a line.'**
+  String locationTrackGapNote(int hours);
+
+  /// Button and dialog title: delete the whole on-device movement history
+  ///
+  /// In en, this message translates to:
+  /// **'Clear track'**
+  String get locationTrackClear;
+
+  /// Confirmation dialog body: deleting the movement history cannot be undone
+  ///
+  /// In en, this message translates to:
+  /// **'Every point recorded on this phone will be deleted. This cannot be undone.'**
+  String get locationTrackClearConfirm;
+
+  /// Snackbar after the movement history was deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Track cleared'**
+  String get locationTrackCleared;
+
+  /// Map legend row: the solid (newer) end of the track's age ramp
+  ///
+  /// In en, this message translates to:
+  /// **'Newer'**
+  String get locationTrackLegendNewer;
+
+  /// Map legend row: the faded (older) end of the track's age ramp
+  ///
+  /// In en, this message translates to:
+  /// **'Older'**
+  String get locationTrackLegendOlder;
+
+  /// Map legend row: the marker on the most recent recorded position
+  ///
+  /// In en, this message translates to:
+  /// **'Latest position'**
+  String get locationTrackLegendLatest;
 }
 
 class _AppLocalizationsDelegate

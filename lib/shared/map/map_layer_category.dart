@@ -29,7 +29,8 @@ enum MapLayerCategory {
   /// Geostationary-satellite imagery (Himawari infrared).
   satellite,
 
-  /// Everyday-life facilities (disaster-prevention map).
+  /// Everyday life: the disaster-prevention facilities, the mesh nodes, and
+  /// the device's own movement track.
   life,
 }
 
@@ -69,6 +70,9 @@ MapLayerCategory categoryOf(String layerId) {
     // its own: a mesh node is a thing you go and find, like an AED or a
     // shelter, and a one-item group would be a header with one row under it.
     'meshtastic' => MapLayerCategory.life,
+    // The device's own movement history: something from everyday life, kept
+    // beside the mesh nodes as the other layer drawn from on-device data.
+    'location-track' => MapLayerCategory.life,
     _ => MapLayerCategory.weather,
   };
 }

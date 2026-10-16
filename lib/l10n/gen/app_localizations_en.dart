@@ -3433,4 +3433,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => 'Track';
+
+  @override
+  String get mapLayerLocationTrackSubtitle =>
+      'Where this phone has been, kept on this device';
+
+  @override
+  String get locationTrackRangeToday => 'Today';
+
+  @override
+  String get locationTrackRangeWeek => '7 days';
+
+  @override
+  String get locationTrackRangeMonth => '30 days';
+
+  @override
+  String get locationTrackRangeAll => 'All';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count points';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => 'Nothing recorded in this period';
+
+  @override
+  String get locationTrackLocalOnly =>
+      'Stored only on this phone and never uploaded. Uninstalling the app or clearing its data deletes it.';
+
+  @override
+  String get locationTrackEmpty => 'No track yet';
+
+  @override
+  String get locationTrackEmptyBody =>
+      'Once background location is allowed, this phone records where it goes on its own.';
+
+  @override
+  String get locationTrackStorage => 'Storage';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '$count points stored · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return 'Oldest point: $date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return 'Latest point: $time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      'Up to 50 MB is kept — roughly 3 million points or more. At a typical 100–300 points a day, that is on the order of decades. When it is full, the oldest points are removed first.';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return 'Points more than $hours hours apart are not joined by a line.';
+  }
+
+  @override
+  String get locationTrackClear => 'Clear track';
+
+  @override
+  String get locationTrackClearConfirm =>
+      'Every point recorded on this phone will be deleted. This cannot be undone.';
+
+  @override
+  String get locationTrackCleared => 'Track cleared';
+
+  @override
+  String get locationTrackLegendNewer => 'Newer';
+
+  @override
+  String get locationTrackLegendOlder => 'Older';
+
+  @override
+  String get locationTrackLegendLatest => 'Latest position';
 }

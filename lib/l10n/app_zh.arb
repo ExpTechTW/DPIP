@@ -2059,5 +2059,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "軌跡",
+  "mapLayerLocationTrackSubtitle": "這支手機去過的地方，只存在本機",
+  "locationTrackRangeToday": "今天",
+  "locationTrackRangeWeek": "7 天",
+  "locationTrackRangeMonth": "30 天",
+  "locationTrackRangeAll": "全部",
+  "locationTrackRangePoints": "{count} 個點",
+  "locationTrackRangeEmpty": "這段期間沒有紀錄",
+  "locationTrackLocalOnly": "只存在這支手機上，不會上傳。解除安裝 App 或清除 App 資料後就會消失。",
+  "locationTrackEmpty": "還沒有軌跡",
+  "locationTrackEmptyBody": "允許背景位置後，這支手機會自動記錄移動軌跡。",
+  "locationTrackStorage": "儲存空間",
+  "locationTrackStored": "已儲存 {count} 個點 · {size}",
+  "locationTrackOldest": "最早一點：{date}",
+  "locationTrackLatest": "最新一點：{time}",
+  "locationTrackCapacity": "最多保留 50 MB，約可存 300 萬個點以上；以一般每天 100–300 個點估算，大約是數十年的紀錄。存滿後會先刪除最舊的點。",
+  "locationTrackGapNote": "相隔超過 {hours} 小時的點不會連線。",
+  "locationTrackClear": "清除軌跡",
+  "locationTrackClearConfirm": "這支手機上記錄的所有軌跡都會刪除，而且無法復原。",
+  "locationTrackCleared": "已清除軌跡",
+  "locationTrackLegendNewer": "較新",
+  "locationTrackLegendOlder": "較舊",
+  "locationTrackLegendLatest": "最新位置"
 }

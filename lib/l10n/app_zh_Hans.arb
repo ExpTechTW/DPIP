@@ -2067,5 +2067,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "轨迹",
+  "mapLayerLocationTrackSubtitle": "这部手机去过的地方，只存在本机",
+  "locationTrackRangeToday": "今天",
+  "locationTrackRangeWeek": "7 天",
+  "locationTrackRangeMonth": "30 天",
+  "locationTrackRangeAll": "全部",
+  "locationTrackRangePoints": "{count} 个点",
+  "locationTrackRangeEmpty": "这段期间没有记录",
+  "locationTrackLocalOnly": "只存在这部手机上，不会上传。卸载 App 或清除 App 数据后就会消失。",
+  "locationTrackEmpty": "还没有轨迹",
+  "locationTrackEmptyBody": "允许后台定位后，这部手机会自动记录移动轨迹。",
+  "locationTrackStorage": "存储空间",
+  "locationTrackStored": "已存储 {count} 个点 · {size}",
+  "locationTrackOldest": "最早一点：{date}",
+  "locationTrackLatest": "最新一点：{time}",
+  "locationTrackCapacity": "最多保留 50 MB，约可存 300 万个点以上；按一般每天 100–300 个点估算，大约是数十年的记录。存满后会先删除最旧的点。",
+  "locationTrackGapNote": "相隔超过 {hours} 小时的点不会连线。",
+  "locationTrackClear": "清除轨迹",
+  "locationTrackClearConfirm": "这部手机上记录的所有轨迹都会被删除，且无法恢复。",
+  "locationTrackCleared": "已清除轨迹",
+  "locationTrackLegendNewer": "较新",
+  "locationTrackLegendOlder": "较旧",
+  "locationTrackLegendLatest": "最新位置"
 }

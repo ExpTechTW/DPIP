@@ -2067,5 +2067,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "Jejak",
+  "mapLayerLocationTrackSubtitle": "Tempat yang pernah dikunjungi ponsel ini, hanya disimpan di perangkat",
+  "locationTrackRangeToday": "Hari ini",
+  "locationTrackRangeWeek": "7 hari",
+  "locationTrackRangeMonth": "30 hari",
+  "locationTrackRangeAll": "Semua",
+  "locationTrackRangePoints": "{count} titik",
+  "locationTrackRangeEmpty": "Tidak ada catatan pada periode ini",
+  "locationTrackLocalOnly": "Hanya disimpan di ponsel ini dan tidak pernah diunggah. Data ini hilang jika aplikasi dihapus atau datanya dibersihkan.",
+  "locationTrackEmpty": "Belum ada jejak",
+  "locationTrackEmptyBody": "Setelah lokasi latar belakang diizinkan, ponsel ini akan mencatat perjalanannya secara otomatis.",
+  "locationTrackStorage": "Penyimpanan",
+  "locationTrackStored": "{count} titik tersimpan · {size}",
+  "locationTrackOldest": "Titik terlama: {date}",
+  "locationTrackLatest": "Titik terbaru: {time}",
+  "locationTrackCapacity": "Disimpan hingga 50 MB — sekitar 3 juta titik atau lebih. Dengan rata-rata 100–300 titik per hari, itu setara dengan puluhan tahun. Jika penuh, titik terlama dihapus lebih dulu.",
+  "locationTrackGapNote": "Titik yang berjarak lebih dari {hours} jam tidak dihubungkan dengan garis.",
+  "locationTrackClear": "Hapus jejak",
+  "locationTrackClearConfirm": "Semua jejak yang tercatat di ponsel ini akan dihapus dan tidak dapat dibatalkan.",
+  "locationTrackCleared": "Jejak dihapus",
+  "locationTrackLegendNewer": "Lebih baru",
+  "locationTrackLegendOlder": "Lebih lama",
+  "locationTrackLegendLatest": "Posisi terakhir"
 }

@@ -3437,4 +3437,89 @@ class AppLocalizationsVi extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => 'Lộ trình';
+
+  @override
+  String get mapLayerLocationTrackSubtitle =>
+      'Những nơi điện thoại này đã đi qua, chỉ lưu trên máy';
+
+  @override
+  String get locationTrackRangeToday => 'Hôm nay';
+
+  @override
+  String get locationTrackRangeWeek => '7 ngày';
+
+  @override
+  String get locationTrackRangeMonth => '30 ngày';
+
+  @override
+  String get locationTrackRangeAll => 'Tất cả';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count điểm';
+  }
+
+  @override
+  String get locationTrackRangeEmpty =>
+      'Không có dữ liệu trong khoảng thời gian này';
+
+  @override
+  String get locationTrackLocalOnly =>
+      'Chỉ được lưu trên điện thoại này và không bao giờ được tải lên. Gỡ cài đặt ứng dụng hoặc xóa dữ liệu ứng dụng sẽ làm mất dữ liệu này.';
+
+  @override
+  String get locationTrackEmpty => 'Chưa có lộ trình';
+
+  @override
+  String get locationTrackEmptyBody =>
+      'Khi bạn cho phép vị trí chạy nền, điện thoại này sẽ tự động ghi lại lộ trình di chuyển.';
+
+  @override
+  String get locationTrackStorage => 'Bộ nhớ';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return 'Đã lưu $count điểm · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return 'Điểm cũ nhất: $date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return 'Điểm mới nhất: $time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      'Lưu tối đa 50 MB, tức khoảng 3 triệu điểm trở lên. Với mức thông thường 100–300 điểm mỗi ngày, con số này tương đương vài chục năm. Khi đầy, các điểm cũ nhất sẽ bị xóa trước.';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return 'Các điểm cách nhau hơn $hours giờ sẽ không được nối bằng đường.';
+  }
+
+  @override
+  String get locationTrackClear => 'Xóa lộ trình';
+
+  @override
+  String get locationTrackClearConfirm =>
+      'Toàn bộ lộ trình được ghi trên điện thoại này sẽ bị xóa và không thể hoàn tác.';
+
+  @override
+  String get locationTrackCleared => 'Đã xóa lộ trình';
+
+  @override
+  String get locationTrackLegendNewer => 'Mới hơn';
+
+  @override
+  String get locationTrackLegendOlder => 'Cũ hơn';
+
+  @override
+  String get locationTrackLegendLatest => 'Vị trí mới nhất';
 }

@@ -3447,4 +3447,88 @@ class AppLocalizationsId extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => 'Jejak';
+
+  @override
+  String get mapLayerLocationTrackSubtitle =>
+      'Tempat yang pernah dikunjungi ponsel ini, hanya disimpan di perangkat';
+
+  @override
+  String get locationTrackRangeToday => 'Hari ini';
+
+  @override
+  String get locationTrackRangeWeek => '7 hari';
+
+  @override
+  String get locationTrackRangeMonth => '30 hari';
+
+  @override
+  String get locationTrackRangeAll => 'Semua';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count titik';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => 'Tidak ada catatan pada periode ini';
+
+  @override
+  String get locationTrackLocalOnly =>
+      'Hanya disimpan di ponsel ini dan tidak pernah diunggah. Data ini hilang jika aplikasi dihapus atau datanya dibersihkan.';
+
+  @override
+  String get locationTrackEmpty => 'Belum ada jejak';
+
+  @override
+  String get locationTrackEmptyBody =>
+      'Setelah lokasi latar belakang diizinkan, ponsel ini akan mencatat perjalanannya secara otomatis.';
+
+  @override
+  String get locationTrackStorage => 'Penyimpanan';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '$count titik tersimpan · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return 'Titik terlama: $date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return 'Titik terbaru: $time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      'Disimpan hingga 50 MB — sekitar 3 juta titik atau lebih. Dengan rata-rata 100–300 titik per hari, itu setara dengan puluhan tahun. Jika penuh, titik terlama dihapus lebih dulu.';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return 'Titik yang berjarak lebih dari $hours jam tidak dihubungkan dengan garis.';
+  }
+
+  @override
+  String get locationTrackClear => 'Hapus jejak';
+
+  @override
+  String get locationTrackClearConfirm =>
+      'Semua jejak yang tercatat di ponsel ini akan dihapus dan tidak dapat dibatalkan.';
+
+  @override
+  String get locationTrackCleared => 'Jejak dihapus';
+
+  @override
+  String get locationTrackLegendNewer => 'Lebih baru';
+
+  @override
+  String get locationTrackLegendOlder => 'Lebih lama';
+
+  @override
+  String get locationTrackLegendLatest => 'Posisi terakhir';
 }

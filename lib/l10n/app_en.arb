@@ -4128,5 +4128,125 @@
         "type": "int"
       }
     }
+  },
+  "mapLayerLocationTrack": "Track",
+  "@mapLayerLocationTrack": {
+    "description": "Map layer switcher name for the on-device movement history"
+  },
+  "mapLayerLocationTrackSubtitle": "Where this phone has been, kept on this device",
+  "@mapLayerLocationTrackSubtitle": {
+    "description": "Map layer switcher subtitle for the movement-history layer; says it stays on the device"
+  },
+  "locationTrackRangeToday": "Today",
+  "@locationTrackRangeToday": {
+    "description": "Movement-track time range pill: since midnight today"
+  },
+  "locationTrackRangeWeek": "7 days",
+  "@locationTrackRangeWeek": {
+    "description": "Movement-track time range pill: the last 7 days"
+  },
+  "locationTrackRangeMonth": "30 days",
+  "@locationTrackRangeMonth": {
+    "description": "Movement-track time range pill: the last 30 days"
+  },
+  "locationTrackRangeAll": "All",
+  "@locationTrackRangeAll": {
+    "description": "Movement-track time range pill: the whole stored history"
+  },
+  "locationTrackRangePoints": "{count} points",
+  "@locationTrackRangePoints": {
+    "description": "How many recorded points the selected range holds; count is pre-formatted with digit grouping",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "locationTrackRangeEmpty": "Nothing recorded in this period",
+  "@locationTrackRangeEmpty": {
+    "description": "Shown when the selected time range holds no recorded points"
+  },
+  "locationTrackLocalOnly": "Stored only on this phone and never uploaded. Uninstalling the app or clearing its data deletes it.",
+  "@locationTrackLocalOnly": {
+    "description": "Always-visible notice: the movement history is local only, never uploaded, and lost on uninstall or data clear"
+  },
+  "locationTrackEmpty": "No track yet",
+  "@locationTrackEmpty": {
+    "description": "Empty state headline: nothing has been recorded yet"
+  },
+  "locationTrackEmptyBody": "Once background location is allowed, this phone records where it goes on its own.",
+  "@locationTrackEmptyBody": {
+    "description": "Empty state body: recording starts by itself once background location is allowed"
+  },
+  "locationTrackStorage": "Storage",
+  "@locationTrackStorage": {
+    "description": "Section header above what the movement history takes on disk"
+  },
+  "locationTrackStored": "{count} points stored · {size}",
+  "@locationTrackStored": {
+    "description": "Total recorded points and the file size on disk",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "locationTrackOldest": "Oldest point: {date}",
+  "@locationTrackOldest": {
+    "description": "Date of the oldest point still stored",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "locationTrackLatest": "Latest point: {time}",
+  "@locationTrackLatest": {
+    "description": "Date and time of the newest recorded point",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "locationTrackCapacity": "Up to 50 MB is kept — roughly 3 million points or more. At a typical 100–300 points a day, that is on the order of decades. When it is full, the oldest points are removed first.",
+  "@locationTrackCapacity": {
+    "description": "Approximate capacity of the 50 MB budget (about 14 bytes a point, ~3.7 million points) and oldest-first eviction; keep it approximate"
+  },
+  "locationTrackGapNote": "Points more than {hours} hours apart are not joined by a line.",
+  "@locationTrackGapNote": {
+    "description": "Explains why the line breaks: fixes further apart in time than this are not joined",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "locationTrackClear": "Clear track",
+  "@locationTrackClear": {
+    "description": "Button and dialog title: delete the whole on-device movement history"
+  },
+  "locationTrackClearConfirm": "Every point recorded on this phone will be deleted. This cannot be undone.",
+  "@locationTrackClearConfirm": {
+    "description": "Confirmation dialog body: deleting the movement history cannot be undone"
+  },
+  "locationTrackCleared": "Track cleared",
+  "@locationTrackCleared": {
+    "description": "Snackbar after the movement history was deleted"
+  },
+  "locationTrackLegendNewer": "Newer",
+  "@locationTrackLegendNewer": {
+    "description": "Map legend row: the solid (newer) end of the track's age ramp"
+  },
+  "locationTrackLegendOlder": "Older",
+  "@locationTrackLegendOlder": {
+    "description": "Map legend row: the faded (older) end of the track's age ramp"
+  },
+  "locationTrackLegendLatest": "Latest position",
+  "@locationTrackLegendLatest": {
+    "description": "Map legend row: the marker on the most recent recorded position"
   }
 }

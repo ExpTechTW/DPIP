@@ -8,6 +8,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/map_reference_outline_controller.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -201,6 +203,9 @@ void main() {
           ChangeNotifierProvider<MapLayerVisibilityController>.value(
             value: visibility,
           ),
+          ChangeNotifierProvider<MapLayerOrderController>.value(
+            value: MapLayerOrderController(settings),
+          ),
           ChangeNotifierProvider<MapReferenceOutlineController>.value(
             value: MapReferenceOutlineController(settings),
           ),
@@ -249,6 +254,11 @@ void main() {
             value: MeshNodeStore(FakeMeshPageService(), settings),
           ),
           Provider<MeshtasticService>.value(value: FakeMeshPageService()),
+          // No channel behind it: the track layer is never selected here, and
+          // a missing plugin is what the service already treats as a no-op.
+          Provider<BackgroundLocationService>.value(
+            value: BackgroundLocationService(platform: 0, version: 'test'),
+          ),
           ChangeNotifierProvider<MapCameraHandoff>.value(
             value: MapCameraHandoff(),
           ),
@@ -305,10 +315,47 @@ void main() {
         'rain',
         'dpm',
         'meshtastic',
+        'location-track',
         'tsunami',
       },
     );
     expect(find.text(l10n.mapLayerRadar), findsWidgets);
+  });
+
+  testWidgets('the picker lists the track under daily life', (tester) async {
+    // Tall enough that every group of the picker is on screen at once — the
+    // sheet opens at 55 % of the height and lists thirty-odd rows.
+    tester.view.physicalSize = const Size(800, 8000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await pumpPage(tester);
+    await tester.tap(find.text(l10n.mapLayerRadar).first);
+    await tester.pumpAndSettle();
+
+    double top(String text) => tester.getTopLeft(find.text(text).last).dy;
+    expect(find.text(l10n.mapLayerLocationTrack), findsOneWidget);
+    expect(
+      find.text(l10n.mapLayerLocationTrackSubtitle),
+      findsOneWidget,
+      reason: 'the picker row itself says the data stays on the device',
+    );
+    // Daily life is the last group, and the track is its last row.
+    expect(
+      top(l10n.mapLayerLocationTrack),
+      greaterThan(top(l10n.mapLayerCategoryLife)),
+    );
+    expect(
+      top(l10n.mapLayerLocationTrack),
+      greaterThan(top(l10n.mapLayerMeshtastic)),
+    );
+    for (final other in [
+      l10n.mapLayerCategoryRadar,
+      l10n.mapLayerCategoryWeather,
+      l10n.mapLayerCategoryEarthquake,
+    ]) {
+      expect(top(other), lessThan(top(l10n.mapLayerCategoryLife)));
+    }
   });
 
   testWidgets('the disaster map is the layer that starts on streets', (
