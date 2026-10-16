@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The gallery thumbnail for launchers below API 31.
+
+  `previewLayout` (a live, static layout) is what the launcher draws from API 31
+  on; below that it asks for `previewImage`, and a Widget without one shows the
+  app icon in the picker. This is a static vector of the same sample the layout
+  draws — it is not rendered from the cache and cannot be — so it uses the same
+  neutral surface and secondary ink as the rest of the Widget. The fills
+  reference the Widget's own color tokens rather than hard-coded hex, so the
+  thumbnail follows the night theme (and the API 31+ wallpaper-tinted ink)
+  exactly as the real faces do.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="88dp"
+    android:viewportWidth="250"
+    android:viewportHeight="110">
+    <path
+        android:fillColor="@color/widget_surface"
+        android:pathData="M0,0 L250,0 L250,110 L0,110 Z" />
+    <path
+        android:fillColor="@color/widget_on_surface"
+        android:pathData="M28,26 L128,26 L128,33 L28,33 Z" />
+    <path
+        android:fillColor="@color/widget_secondary"
+        android:pathData="M28,40 L92,40 L92,45 L28,45 Z" />
+    <path
+        android:fillColor="@color/widget_secondary"
+        android:pathData="M196,24 A13,13 0 1,1 195.99,24 Z" />
+    <path
+        android:fillColor="@color/widget_on_surface"
+        android:pathData="M28,62 L78,62 L78,80 L28,80 Z" />
+    <path
+        android:fillColor="@color/widget_secondary"
+        android:pathData="M28,90 A5,5 0 1,1 27.99,90 Z" />
+    <path
+        android:fillColor="@color/widget_secondary"
+        android:pathData="M38,91 L96,91 L96,97 L38,97 Z" />
+</vector>
