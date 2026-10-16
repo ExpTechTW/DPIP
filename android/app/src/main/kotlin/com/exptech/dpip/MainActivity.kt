@@ -1,5 +1,6 @@
 package com.exptech.dpip
 
+import com.exptech.dpip.widget.WidgetSnapshotChannel
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -68,5 +69,11 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(messenger, NativeLogChannel.NAME)
             .setMethodCallHandler(NativeLogChannel(applicationContext))
+
+        // The snapshot bridge for the home-screen Widget. Same channel name and
+        // protocol as iOS's WidgetSnapshotPlugin, so the Dart writer is one
+        // implementation and the platform is the only difference.
+        MethodChannel(messenger, WidgetSnapshotChannel.NAME)
+            .setMethodCallHandler(WidgetSnapshotChannel(applicationContext))
     }
 }
