@@ -115,6 +115,12 @@ Basemap、OSM 詳細街道建築與 terrain 都由 MapLibre 直接抓（app 的 
 | OSM 詳細圖資 | `/api/v1/map/gsi/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
 | terrain | `/api/v1/map/terrain/{z}/{x}/{y}.png` | `static.lb.exptech.dev` |
 
+> **App 內附一份 basemap，給沒有網路時用。** 臺灣（含離島）z0–9 加全球 z0–2，
+> 共 122 塊、1.05 MiB（`assets/map/basemap_seed/`），由 `tool/gen/basemap_seed.sh`
+> 從上表的 basemap 路徑抓下來產生。啟動時種進 tile store，但只是**退路**：
+> MapLibre 要到其中一塊時一律先問網路，網路答不出來才交出內附版本，第一次下載
+> 成功就永久取代它；server 給過的列（含 404）永遠不會被它蓋掉。
+
 > **Terrain 是 Mapbox terrain-RGB，MapLibre 原生讀得懂。** 每個像素編碼
 > `height = (R·65536 + G·256 + B)/10 − 10000` 公尺，正是 MapLibre
 > `raster-dem` 的 `encoding: 'mapbox'` —— style 直接以該 encoding 使用原始
