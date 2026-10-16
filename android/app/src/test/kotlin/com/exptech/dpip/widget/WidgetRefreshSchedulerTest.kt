@@ -35,7 +35,10 @@ class WidgetRefreshSchedulerTest {
 
     @Before
     fun setUp() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+            context,
+            WidgetSchedulingOnlyWorkerFactory.configuration(),
+        )
         workManager = WorkManager.getInstance(context)
     }
 
@@ -49,6 +52,19 @@ class WidgetRefreshSchedulerTest {
 
     private fun states(uniqueName: String): List<WorkInfo.State> =
         infos(uniqueName).map { it.state }
+
+    @Test
+    fun `recovery keeps pending manual work and feedback but a new demand still replaces it`() {
+        WidgetRefreshScheduler.scheduleOneTime(context, saved407, manual = true)
+        val manualId = infos(WidgetRefreshScheduler.sourceWorkName(saved407)).single().id
+        repeat(3) { WidgetRefreshScheduler.scheduleRecovery(context, saved407) }
+        assertEquals(manualId, infos(WidgetRefreshScheduler.sourceWorkName(saved407)).single().id)
+        assertTrue(WidgetStore.open(context).writeRefreshFeedback(
+            saved407, manualId.toString(), WidgetRefreshFeedback.Running, System.currentTimeMillis(),
+        ))
+        WidgetRefreshScheduler.scheduleOneTime(context, saved407)
+        assertTrue(manualId != infos(WidgetRefreshScheduler.sourceWorkName(saved407)).single().id)
+    }
 
     @Test
     fun `a one-time refresh is de-duplicated per source, not globally`() {
@@ -168,5 +184,28 @@ class WidgetRefreshSchedulerTest {
             "another feature's work was cancelled: $watchdogStates",
             watchdogStates.all { it != WorkInfo.State.CANCELLED },
         )
+    }
+}
+
+/**
+ * Scheduling assertions must not race an automatically started periodic worker
+ * against their fixtures (or perform real HTTP). Worker tests execute production
+ * workers explicitly through TestListenableWorkerBuilder instead.
+ */
+internal object WidgetSchedulingOnlyWorkerFactory : androidx.work.WorkerFactory() {
+    fun configuration(): androidx.work.Configuration = androidx.work.Configuration.Builder()
+        .setExecutor(androidx.work.testing.SynchronousExecutor())
+        .setWorkerFactory(this)
+        .build()
+
+    override fun createWorker(
+        appContext: Context,
+        workerClassName: String,
+        workerParameters: androidx.work.WorkerParameters,
+    ): androidx.work.ListenableWorker? {
+        if (workerClassName != WeatherWidgetRefreshWorker::class.java.name) return null
+        return object : androidx.work.Worker(appContext, workerParameters) {
+            override fun doWork(): Result = Result.success()
+        }
     }
 }

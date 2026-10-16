@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.FutureTask
 import java.util.concurrent.TimeUnit
 import org.robolectric.RobolectricTestRunner
 
@@ -44,6 +45,23 @@ class WidgetStoreTest {
     fun tearDown() {
         context.deleteDatabase(WidgetStore.DATABASE_NAME)
         WidgetLog.resetForTest()
+    }
+
+    @Test
+    fun `authority reads distinguish an empty instance table from an unavailable one`() {
+        assertEquals(WidgetInstanceReadResult.Read(emptyList()), store.readInstancesResult())
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
+            try {
+                assertEquals(WidgetInstanceReadResult.Failed, store.readInstancesResult())
+                assertEquals(WidgetInstanceReadResult.Failed, store.reconcileInstances(emptySet()))
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
+            }
+        }
+        assertEquals(WidgetInstanceReadResult.Read(emptyList()), store.readInstancesResult())
     }
 
     private fun snapshot(
@@ -285,7 +303,7 @@ class WidgetStoreTest {
         assertTrue(store.writeInstance(11, saved, "407", 1L))
         assertTrue(store.writeInstance(12, WidgetAddress.Saved("100"), "100", 1L))
 
-        assertEquals(1, store.reconcileInstances(setOf(12)))
+        assertEquals(1, (store.reconcileInstances(setOf(12)) as WidgetInstanceReadResult.Read).dropped.size)
 
         assertNull(store.readInstance(11))
         assertNotNull(store.readInstance(12))
@@ -298,7 +316,7 @@ class WidgetStoreTest {
         assertTrue(store.writeInstance(11, saved, "407", 1L))
         val token = store.beginCurrentWeatherWrite(saved)!!
 
-        assertEquals(1, store.reconcileInstances(emptySet()))
+        assertEquals(1, (store.reconcileInstances(emptySet()) as WidgetInstanceReadResult.Read).dropped.size)
 
         assertEquals(WidgetWriteResult.Superseded, commit(token))
     }
@@ -353,21 +371,25 @@ class WidgetStoreTest {
         // The older refresh is parked just before it writes its timeout, while a
         // newer one succeeds. The store serialises its methods, so whichever
         // order they arrive in, the newer generation must win.
-        val olderThread = Thread {
+        val olderWrite = FutureTask {
             older.countDown()
-            try {
-                newer.await(5, TimeUnit.SECONDS)
-            } catch (_: InterruptedException) {
-                return@Thread
-            }
-            store.writeLocationState(address, WidgetLocationDegradation.UnusableFix, 5L, 5L)
+            assertTrue("newer write must finish", newer.await(5, TimeUnit.SECONDS))
+            assertTrue(store.writeLocationState(address, WidgetLocationDegradation.UnusableFix, 5L, 5L))
         }
+        val olderThread = Thread(olderWrite)
         olderThread.start()
-        assertTrue(older.await(5, TimeUnit.SECONDS))
-
-        assertTrue(store.writeLocationState(address, null, 7L, 7L))
-        newer.countDown()
-        olderThread.join(5_000)
+        try {
+            assertTrue(older.await(5, TimeUnit.SECONDS))
+            assertTrue(store.writeLocationState(address, null, 7L, 7L))
+            newer.countDown()
+            // get propagates background assertions and exceptions to JUnit.
+            olderWrite.get(5, TimeUnit.SECONDS)
+        } finally {
+            newer.countDown()
+            olderThread.interrupt()
+            olderThread.join(5_000)
+            assertFalse("older writer must not leak into another test", olderThread.isAlive)
+        }
 
         assertNull(
             "a timeout that finished after a newer success must not surface",
@@ -376,17 +398,19 @@ class WidgetStoreTest {
 
         // And the mirror, with the roles swapped: a newer revocation must
         // survive an older success that lands afterwards.
-        val successThread = Thread {
-            try {
-                newer.await(5, TimeUnit.SECONDS)
-            } catch (_: InterruptedException) {
-                return@Thread
-            }
-            store.writeLocationState(address, null, 6L, 9L)
+        val successWrite = FutureTask {
+            assertTrue(store.writeLocationState(address, null, 6L, 9L))
         }
+        val successThread = Thread(successWrite)
         assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 8L, 8L))
         successThread.start()
-        successThread.join(5_000)
+        try {
+            successWrite.get(5, TimeUnit.SECONDS)
+        } finally {
+            successThread.interrupt()
+            successThread.join(5_000)
+            assertFalse("success writer must not leak into another test", successThread.isAlive)
+        }
 
         assertEquals(
             "an older success must not clear a newer revocation",

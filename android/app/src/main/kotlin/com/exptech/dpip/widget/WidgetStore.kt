@@ -26,6 +26,12 @@ data class WidgetWriteToken(
  */
 enum class WidgetWriteResult { Written, Superseded, Failed }
 
+/** An authority read must not turn an unavailable database into an empty store. */
+sealed interface WidgetInstanceReadResult {
+    data class Read(val instances: List<WidgetInstance>, val dropped: List<WidgetAddress> = emptyList()) : WidgetInstanceReadResult
+    data object Failed : WidgetInstanceReadResult
+}
+
 /** One desktop Widget instance's persisted choice of location. */
 data class WidgetInstance(
     val appWidgetId: Int,
@@ -334,14 +340,16 @@ class WidgetStore private constructor(
      *
      * Reconciling against `AppWidgetManager`'s live ids is what keeps a
      * force-stopped or mis-restored state from leaving a row that keeps a
-     * source fetching forever. Returns how many rows were removed.
+     * source fetching forever. Returns the surviving rows from the same
+     * transaction; a failed read or delete is not authority to cancel work.
      */
     @Synchronized
-    fun reconcileInstances(liveAppWidgetIds: Set<Int>): Int {
+    fun reconcileInstances(liveAppWidgetIds: Set<Int>): WidgetInstanceReadResult {
         return attempt("instance.reconcile", null) {
             inTransaction { database ->
                 val removed = ArrayList<WidgetAddress>()
-                for (instance in readInstances(database)) {
+                val instances = readInstances(database)
+                for (instance in instances) {
                     if (instance.appWidgetId in liveAppWidgetIds) continue
                     database.delete(
                         TABLE_INSTANCES,
@@ -355,9 +363,12 @@ class WidgetStore private constructor(
                     fence(database, WidgetSnapshotKind.CurrentWeather, address.sourceIdentifier)
                     fence(database, WidgetSnapshotKind.WeatherForecast, address.sourceIdentifier)
                 }
-                removed.size
+                WidgetInstanceReadResult.Read(
+                    instances.filter { it.appWidgetId in liveAppWidgetIds },
+                    removed,
+                )
             }
-        } ?: 0
+        } ?: WidgetInstanceReadResult.Failed
     }
 
     @Synchronized
@@ -366,9 +377,14 @@ class WidgetStore private constructor(
     }
 
     @Synchronized
-    fun readInstances(): List<WidgetInstance> = quietly("instance.list") {
-        readInstances(helper.readableDatabase)
-    } ?: emptyList()
+    fun readInstancesResult(): WidgetInstanceReadResult = quietly("instance.list") {
+        WidgetInstanceReadResult.Read(readInstances(helper.readableDatabase))
+    } ?: WidgetInstanceReadResult.Failed
+
+    /** Cache-only callers can render no data; cancellation callers use the typed read. */
+    @Synchronized
+    fun readInstances(): List<WidgetInstance> =
+        (readInstancesResult() as? WidgetInstanceReadResult.Read)?.instances ?: emptyList()
 
     /** Every address some instance still needs, de-duplicated in insertion order. */
     @Synchronized
@@ -439,11 +455,9 @@ class WidgetStore private constructor(
                 regionCode = snapshot.regionCode,
             )
 
-            // The address is no longer offerable (its town left the catalog, or
-            // the source is gone). The observation is still committed under the
-            // instance's own row, which the layout then renders as a
-            // reconfigure — refusing the write here would leave the previous
-            // town's weather on screen instead of saying the choice is gone.
+            // A town that left the catalog must not accept a late observation.
+            // Keep its durable instance choice; the layout independently checks
+            // catalog membership and asks the user to reconfigure.
             if (guard == null) return@commit WidgetWriteResult.Superseded
 
             if (existing != null && !SnapshotOrdering.shouldReplace(

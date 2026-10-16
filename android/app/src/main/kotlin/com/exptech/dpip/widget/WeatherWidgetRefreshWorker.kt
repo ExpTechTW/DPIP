@@ -21,6 +21,7 @@ class WeatherWidgetRefreshWorker(
     parameters: WorkerParameters,
 ) : Worker(context, parameters) {
     override fun doWork(): Result {
+        if (isStopped) return Result.success()
         val localOnly = inputData.getBoolean(KEY_LOCAL_ONLY, false)
         val source = inputData.getString(KEY_SOURCE)
         val manual = inputData.getBoolean(KEY_MANUAL, false)
@@ -34,7 +35,25 @@ class WeatherWidgetRefreshWorker(
             // an HTTP fetch on a screen that no longer exists.
             val requested = source?.let { WidgetAddress.fromSourceIdentifier(it) }
             val addresses = when {
-                source == null -> WidgetUpdater.addresses(applicationContext)
+                source == null -> {
+                    // Periodic/global work is also the recovery owner after a
+                    // receiver's authority read failed. Retaining a periodic job
+                    // without rechecking the launcher would poll orphan rows
+                    // forever once storage recovers. This run fetches surviving
+                    // sources itself, so do not enqueue duplicate one-time work.
+                    when (val reconciled = WidgetUpdater.reconcile(applicationContext, requestRecovery = false)) {
+                        WidgetInstanceReadResult.Failed -> {
+                            transientFailure = true
+                            emptyList()
+                        }
+                        is WidgetInstanceReadResult.Read -> {
+                            // reconcile cancelled all widget work. Do not re-arm
+                            // a local redraw after discovering an empty launcher.
+                            if (reconciled.instances.isEmpty()) return Result.success()
+                            reconciled.instances.map { it.address }.distinct()
+                        }
+                    }
+                }
                 requested == null -> {
                     WidgetLog.warning(applicationContext, "refresh for an unknown source ignored")
                     emptyList()
