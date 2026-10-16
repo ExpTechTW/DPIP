@@ -382,7 +382,10 @@ final class _RecordingWidgetSnapshotWriter implements WidgetSnapshotWriter {
   }
 
   @override
-  Future<Result<void>> clear({required WidgetSnapshotKind kind}) async {
+  Future<Result<void>> clear({
+    required WidgetSnapshotKind kind,
+    String? sourceIdentifier,
+  }) async {
     return const Ok(null);
   }
 }
@@ -412,7 +415,10 @@ final class _BlockingFirstWriteWidgetSnapshotWriter
   }
 
   @override
-  Future<Result<void>> clear({required WidgetSnapshotKind kind}) async {
+  Future<Result<void>> clear({
+    required WidgetSnapshotKind kind,
+    String? sourceIdentifier,
+  }) async {
     return const Ok(null);
   }
 }

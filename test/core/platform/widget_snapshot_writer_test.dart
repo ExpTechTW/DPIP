@@ -246,6 +246,147 @@ void main() {
       expect(calls.single.arguments, {'kind': 'locationCatalog', 'json': json});
     },
   );
+
+  group('AndroidWidgetSnapshotWriter', () {
+    test('speaks the same protocol as the iOS writer', () async {
+      final writer = AndroidWidgetSnapshotWriter(
+        channel: channel,
+        isSupportedPlatform: true,
+      );
+
+      const json = '{"schemaVersion":7}';
+
+      final result = await writer.write(
+        kind: WidgetSnapshotKind.currentWeather,
+        json: json,
+        sourceIdentifier: 'current-location',
+      );
+
+      expect(result.isOk, isTrue);
+      // One protocol, two platforms: the same method, the same keys.
+      expect(calls.single.method, 'write');
+      expect(calls.single.arguments, {
+        'kind': 'currentWeather',
+        'json': json,
+        'sourceIdentifier': 'current-location',
+      });
+    });
+
+    test('maps the platform error codes the same way', () async {
+      final writer = AndroidWidgetSnapshotWriter(
+        channel: _ThrowingMethodChannel(
+          PlatformException(code: 'invalid_payload'),
+        ),
+        isSupportedPlatform: true,
+      );
+
+      final result = await writer.write(
+        kind: WidgetSnapshotKind.currentWeather,
+        json: '{}',
+      );
+
+      expect(
+        (result.failureOrNull as WidgetSnapshotFailure).reason,
+        WidgetSnapshotFailureReason.invalidPayload,
+      );
+    });
+
+    for (final method in ['write', 'clear']) {
+      test('$method maps write_failed to writeFailed', () async {
+        messenger.setMockMethodCallHandler(
+          channel,
+          (_) async => throw PlatformException(code: 'write_failed'),
+        );
+        final writer = AndroidWidgetSnapshotWriter(
+          channel: channel,
+          isSupportedPlatform: true,
+        );
+
+        final result = method == 'write'
+            ? await writer.write(
+                kind: WidgetSnapshotKind.currentWeather,
+                json: '{}',
+              )
+            : await writer.clear(kind: WidgetSnapshotKind.currentWeather);
+
+        expect(
+          (result.failureOrNull as WidgetSnapshotFailure).reason,
+          WidgetSnapshotFailureReason.writeFailed,
+        );
+      });
+    }
+
+    test('does not call a channel on a platform it is not on', () async {
+      final writer = AndroidWidgetSnapshotWriter(
+        channel: channel,
+        isSupportedPlatform: false,
+      );
+
+      final result = await writer.clear(
+        kind: WidgetSnapshotKind.currentWeather,
+      );
+
+      expect(result.failureOrNull, isA<WidgetSnapshotFailure>());
+      expect(calls, isEmpty);
+    });
+  });
+
+  group('createWidgetSnapshotWriter', () {
+    test('answers a writer on every platform, never null', () {
+      // The wiring sites call this unconditionally: bootstrap for the location
+      // catalog and the weather providers for the current weather. On the test
+      // host — neither iOS nor Android — it must still answer a writer, whose
+      // calls fail the way an absent extension does rather than throwing.
+      expect(createWidgetSnapshotWriter(), isA<WidgetSnapshotWriter>());
+    });
+
+    test('selects the Android writer for Android', () {
+      expect(
+        createWidgetSnapshotWriter(isIOS: false, isAndroid: true),
+        isA<AndroidWidgetSnapshotWriter>(),
+      );
+    });
+
+    test('selects the iOS writer for iOS', () {
+      expect(
+        createWidgetSnapshotWriter(isIOS: true, isAndroid: false),
+        isA<IosWidgetSnapshotWriter>(),
+      );
+    });
+
+    test('prefers iOS when a build somehow reports both', () {
+      // `dart:io` cannot report both, but the branch order is a decision worth
+      // pinning: the iOS writer is the one whose storage is the App Group.
+      expect(
+        createWidgetSnapshotWriter(isIOS: true, isAndroid: true),
+        isA<IosWidgetSnapshotWriter>(),
+      );
+    });
+
+    test('answers the unsupported writer anywhere else', () {
+      expect(
+        createWidgetSnapshotWriter(isIOS: false, isAndroid: false),
+        isA<UnsupportedWidgetSnapshotWriter>(),
+      );
+    });
+
+    test(
+      'the unsupported writer reports unavailable rather than throwing',
+      () async {
+        const writer = UnsupportedWidgetSnapshotWriter();
+
+        final result = await writer.write(
+          kind: WidgetSnapshotKind.locationCatalog,
+          json: '{}',
+        );
+
+        expect(
+          (result.failureOrNull as WidgetSnapshotFailure).reason,
+          WidgetSnapshotFailureReason.unavailable,
+        );
+      },
+    );
+  });
 }
 
 final class _ThrowingMethodChannel extends MethodChannel {
