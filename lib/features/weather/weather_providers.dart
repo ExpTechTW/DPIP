@@ -37,7 +37,7 @@ List<SingleChildWidget> weatherProviders(SharedDeps deps) {
       value: CurrentWeatherWidgetCoordinator(
         deps.regionStore,
         deps.townDirectory,
-        CurrentWeatherWidgetPublisher(IosWidgetSnapshotWriter()),
+        CurrentWeatherWidgetPublisher(createWidgetSnapshotWriter()),
       ),
     ),
     Provider<RadarRepository>.value(

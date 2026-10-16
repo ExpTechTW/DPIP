@@ -330,7 +330,7 @@ Future<void> bootstrap() async {
   final townDirectory = await townDirectoryFuture;
   final townMs = Log.sinceStartMs - townStart;
   final regionStore = RegionStore(settings);
-  final widgetSnapshotWriter = IosWidgetSnapshotWriter();
+  final widgetSnapshotWriter = createWidgetSnapshotWriter();
   final widgetLocationCatalogCoordinator = WidgetLocationCatalogCoordinator(
     regionStore,
     townDirectory,

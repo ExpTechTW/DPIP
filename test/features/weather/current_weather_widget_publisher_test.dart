@@ -12,11 +12,16 @@ final class FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
   String? writtenSourceIdentifier;
   int clearCallCount = 0;
   WidgetSnapshotKind? clearedKind;
+  String? clearedSourceIdentifier;
 
   @override
-  Future<Result<void>> clear({required WidgetSnapshotKind kind}) async {
+  Future<Result<void>> clear({
+    required WidgetSnapshotKind kind,
+    String? sourceIdentifier,
+  }) async {
     clearCallCount += 1;
     clearedKind = kind;
+    clearedSourceIdentifier = sourceIdentifier;
     return const Ok(null);
   }
 
@@ -108,5 +113,15 @@ void main() {
     expect(result, isA<Ok<void>>());
     expect(writer.clearCallCount, 1);
     expect(writer.clearedKind, WidgetSnapshotKind.currentWeather);
+  });
+
+  test('a blanket clear names no source', () async {
+    final writer = FakeWidgetSnapshotWriter();
+    final publisher = CurrentWeatherWidgetPublisher(writer);
+
+    await publisher.clear();
+
+    expect(writer.clearCallCount, 1);
+    expect(writer.clearedSourceIdentifier, isNull);
   });
 }
