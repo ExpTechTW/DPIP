@@ -267,7 +267,7 @@ object WidgetUpdater {
     /**
      * Brings the stored instances and the scheduled work back in line.
      *
-     * Three things, in order:
+     * Four things, in order:
      *
      * 1. **Drop rows the launcher no longer has.** A restore, a force-stop or a
      *    launcher crash leaves rows for instances that are gone; they keep a
@@ -277,25 +277,49 @@ object WidgetUpdater {
      *    because a restore creates rows for ids the manager may not report yet,
      *    and dropping those would delete exactly what was just restored.
      * 2. **Schedule or cancel the periodic work** from the surviving rows.
-     * 3. **Redraw** whatever remains.
+     * 3. **Request recovery once per surviving source**, keeping unfinished work,
+     *    unless the calling background worker is already about to refresh them.
+     * 4. **Redraw** whatever remains.
      *
      * Doing it from the instance table rather than an in-memory counter is what
      * makes it correct after a process death, when there is no counter.
      */
-    fun reconcile(context: Context, keepIds: Set<Int> = emptySet()) {
+    fun reconcile(
+        context: Context,
+        keepIds: Set<Int> = emptySet(),
+        requestRecovery: Boolean = true,
+    ): WidgetInstanceReadResult {
         val store = WidgetStore.open(context)
         val live = liveAppWidgetIds(context).toSet() + keepIds
-        val dropped = store.reconcileInstances(live)
-        if (dropped > 0) {
-            WidgetLog.info(context, "reconcile dropped $dropped stale instances")
+        val result = store.reconcileInstances(live)
+        if (result is WidgetInstanceReadResult.Failed) {
+            // Unavailability says nothing about ownership. Keep (or establish)
+            // the bounded periodic recovery path, never spin in the receiver.
+            WidgetLog.warning(context, "reconcile failed; retaining periodic recovery")
+            WidgetRefreshScheduler.schedulePeriodic(context)
+            return result
+        }
+        result as WidgetInstanceReadResult.Read
+        if (result.dropped.isNotEmpty()) {
+            WidgetLog.info(context, "reconcile dropped ${result.dropped.size} stale instances")
         }
 
-        if (store.readInstances().isEmpty()) {
+        if (result.instances.isEmpty()) {
             WidgetRefreshScheduler.cancelAll(context)
         } else {
             WidgetRefreshScheduler.schedulePeriodic(context)
+            val addresses = result.instances.map { it.address }.distinct()
+            for (address in result.dropped.distinct()) {
+                if (address !in addresses) WidgetRefreshScheduler.cancelSource(context, address)
+            }
+            if (requestRecovery) {
+                for (address in addresses) {
+                    WidgetRefreshScheduler.scheduleRecovery(context, address)
+                }
+            }
         }
         updateAll(context)
+        return result
     }
 
     /**
