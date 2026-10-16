@@ -2,3 +2,6 @@
 tags:
   preview:
     skip: "development preview — run with: flutter test --tags preview"
+  # Timing harnesses; their numbers are the output, so they never gate a run.
+  benchmark:
+    skip: "timing benchmark — run with: tool/dev/test.sh --run-skipped --tags benchmark"
