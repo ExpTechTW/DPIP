@@ -197,6 +197,9 @@ flutter:
     - assets/location.json.gz
     - assets/eew_points.json
     - assets/map/town_boundaries.bin.gz
+    # The basemap a map with no network falls back to — Taiwan z0–9 and the
+    # world z0–2, 1.05 MiB. Built by tool/gen/basemap_seed.sh.
+    - assets/map/basemap_seed/
     - assets/travel_time.json.gz
     - assets/astro/
 

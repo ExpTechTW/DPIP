@@ -23,7 +23,10 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 /// no `If-None-Match`.
 /// A `200` is always stored under a synthetic [etagFromUrl] (server ETag is
 /// ignored — the URL already pins the content). Basemap `404` is negatively
-/// cached (empty + [negativeTileEtag]); radar/sat/DPM 404s are not.
+/// cached (empty + [negativeTileEtag]); radar/sat/DPM 404s are not. A row the
+/// app planted from its bundled basemap ([EtagCacheStore.isSeedEtag]) is not
+/// a local hit: the request goes out and a `200` (or a basemap `404`) replaces
+/// the row.
 ///
 /// For everything else, **ETag is the only validator** — `Cache-Control` /
 /// `no-store` are ignored; a `200` without an ETag is not written. Streaming
@@ -142,6 +145,9 @@ class EtagInterceptor extends Interceptor {
 
   static bool _isUrlHashEtag(String etag) => etag.startsWith('W/"u');
 
+  static bool _notSeed(String _, String etag) =>
+      !EtagCacheStore.isSeedEtag(etag);
+
   /// Best-effort transferred-byte estimate: the server's `Content-Length` when
   /// present (the compressed wire size), else the decoded body length (an upper
   /// bound — the platform strips Content-Length when it transparently gunzips).
@@ -211,8 +217,13 @@ class EtagInterceptor extends Interceptor {
 
     // Immutable tiles: URL is the key — serve SQLite hits locally. Never send
     // If-None-Match (content is pinned by the URL; revalidation is pointless).
+    //
+    // A row the app planted from its own bundle is not a hit: nothing the
+    // origin said is behind it. The request goes out and a 200 replaces the
+    // row; falling back to it when the network cannot answer is the caller's
+    // call (`MapTileCache`), because only the caller knows it wants a fallback.
     if (_isBytes(options) && isImmutableTile(uri)) {
-      final cached = await _store.readBytes(url);
+      final cached = await _store.readBytes(url, accept: _notSeed);
       if (cached != null) {
         // Hit metering lives in [EtagCacheStore.readBytes].
         handler.resolve(

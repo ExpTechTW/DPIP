@@ -90,6 +90,14 @@ class CachedBytes {
 /// Row count and stored byte size of the ETag cache (for the Debug page).
 typedef EtagCacheStats = ({int rows, int bytes});
 
+/// Decides whether a stored row may answer a read — see
+/// [EtagCacheStore.readBytesBatch]'s `accept`.
+typedef EntryFilter = bool Function(String url, String etag);
+
+/// One bundled body for [EtagCacheStore.seedBytesBatch]: a gzip member, stored
+/// as-is, or empty for a tile the origin has no content for.
+typedef SeedWrite = ({String url, Uint8List body});
+
 /// One pending binary write — the unit [EtagCacheStore.writeBytesBatch] takes.
 typedef BinaryWrite = ({
   String url,
@@ -151,6 +159,23 @@ class EtagCacheStore {
 
   /// Binary body stored as gzip-1 of the decoded bytes (PBF / MVT / …).
   static const int kindBinaryGzip = 2;
+
+  /// Marks a row that came with the app rather than from a server.
+  ///
+  /// A seeded row is a fallback, not a response: no origin ever sent it, so it
+  /// must never pass for one. Its ETag says so — never a server's, never the
+  /// URL hash an immutable download is stored under — and every reader that
+  /// treats a row as authoritative checks it (see [isSeedEtag]). The version
+  /// after the prefix is the bundle's content version, which is how a newer
+  /// bundle knows to replace an older one's rows.
+  static const String _seedEtagPrefix = 'W/"seed-';
+
+  /// The ETag rows planted from bundle [version] carry.
+  static String seedEtag(String version) => '$_seedEtagPrefix$version"';
+
+  /// Whether [etag] marks a row the app planted ([seedBytesBatch]) rather than
+  /// one a server sent.
+  static bool isSeedEtag(String etag) => etag.startsWith(_seedEtagPrefix);
 
   /// Content types that are already entropy-packed — never outer-gzip.
   /// (Vector tiles / protobuf are NOT here — raw PBF/MVT typically shrink ~40%.)
@@ -332,11 +357,17 @@ class EtagCacheStore {
   ///
   /// Reads SQLite (inflate when [kindBinaryGzip]). Every successful serve is
   /// metered once via [_usage] when wired. [touch] schedules an async last-used
-  /// bump.
-  Future<CachedBytes?> readBytes(String url, {bool touch = true}) async {
+  /// bump. A row [accept] turns down reads as a miss, before it is inflated,
+  /// touched or metered.
+  Future<CachedBytes?> readBytes(
+    String url, {
+    bool touch = true,
+    EntryFilter? accept,
+  }) async {
     try {
       final row = await _queryRow(url);
       if (row == null) return null;
+      if (accept != null && !accept(url, row['etag'] as String)) return null;
       final kind = row['kind'] as int;
       if (kind != kindBinary && kind != kindBinaryGzip) return null;
       if (touch) _scheduleTouch(url);
@@ -365,9 +396,13 @@ class EtagCacheStore {
   /// plus at most one isolate hop for the whole batch, instead of N queries and
   /// N isolate spawns. Missing URLs are simply absent from the result. Every
   /// hit is metered once, exactly as [readBytes] does.
+  ///
+  /// Rows [accept] turns down are absent too, and cost nothing past the query:
+  /// they are dropped before the inflate, the touch and the meter.
   Future<Map<String, CachedBytes>> readBytesBatch(
     List<String> urls, {
     bool touch = true,
+    EntryFilter? accept,
   }) async {
     if (urls.isEmpty) return const {};
     try {
@@ -383,6 +418,11 @@ class EtagCacheStore {
             'WHERE key IN (${List.filled(chunk.length, '?').join(',')})',
             chunk,
           ),
+        );
+      }
+      if (accept != null) {
+        rows.removeWhere(
+          (row) => !accept(row['key'] as String, row['etag'] as String),
         );
       }
       if (rows.isEmpty) return const {};
@@ -449,6 +489,105 @@ class EtagCacheStore {
       return null;
     }
   }
+
+  /// The ETag of each of [urls] that has a row, keyed by URL.
+  ///
+  /// A presence probe, not a read: no body crosses from the database, nothing
+  /// is touched (a probe is not a use) and nothing is metered. A failure reads
+  /// as "nothing stored", which is the safe answer for [seedBytesBatch]'s
+  /// caller — its writes are guarded row by row anyway.
+  Future<Map<String, String>> etagsFor(List<String> urls) async {
+    final out = <String, String>{};
+    try {
+      for (var i = 0; i < urls.length; i += _readInChunk) {
+        final end = i + _readInChunk;
+        final chunk = end < urls.length
+            ? urls.sublist(i, end)
+            : urls.sublist(i);
+        final rows = await _db.getAll(
+          'SELECT key, etag FROM $_table '
+          'WHERE key IN (${List.filled(chunk.length, '?').join(',')})',
+          chunk,
+        );
+        for (final row in rows) {
+          out[row['key'] as String] = row['etag'] as String;
+        }
+      }
+    } catch (_) {
+      return const {};
+    }
+    return out;
+  }
+
+  /// Plants bundled bodies under [etag] (a [seedEtag]) and returns how many
+  /// rows it wrote.
+  ///
+  /// **Never over a server's answer.** A row is inserted where nothing is
+  /// stored, replaced only when it is itself a seed from a *different* bundle,
+  /// and otherwise left alone. The guard is in the statements rather than in a
+  /// read beforehand, so a tile the network delivers while seeding runs still
+  /// wins: whichever of the two lands second, the network's row is the one left
+  /// standing.
+  ///
+  /// The bodies are stored exactly as given — a gzip member as
+  /// [kindBinaryGzip], an empty body as [kindBinary] — so planting inflates
+  /// and compresses nothing. `size` is 0: no download produced them, so a hit
+  /// on one saves no traffic. One statement, prepared once and run for every
+  /// row in one transaction.
+  Future<int> seedBytesBatch(
+    List<SeedWrite> rows, {
+    required String etag,
+    String contentType = 'application/octet-stream',
+  }) async {
+    if (rows.isEmpty) return 0;
+    try {
+      final now = _lruStamp();
+      var bytes = 0;
+      final written = await _db.writeTransaction((tx) async {
+        final before = await tx.get('SELECT total_changes() AS n');
+        // One plain INSERT OR REPLACE behind a NOT EXISTS, not an UPSERT — it
+        // runs on any SQLite, like [NetworkUsageStore]'s update-then-insert —
+        // and it sends each body to the database isolate once. The guard
+        // skips a key that holds a server's row or this bundle's own; the
+        // REPLACE then only ever replaces a row planted from another bundle.
+        await tx.executeBatch(
+          'INSERT OR REPLACE INTO $_table '
+          '(key, etag, content_type, kind, body, size, time) '
+          'SELECT ?, ?, ?, ?, ?, 0, ? WHERE NOT EXISTS ('
+          'SELECT 1 FROM $_table WHERE key = ? AND '
+          '(substr(etag, 1, ${_seedEtagPrefix.length}) <> ? OR etag = ?))',
+          [
+            for (final row in rows)
+              [
+                row.url,
+                etag,
+                contentType,
+                _seedKind(row.body),
+                row.body,
+                now,
+                row.url,
+                _seedEtagPrefix,
+                etag,
+              ],
+          ],
+        );
+        final after = await tx.get('SELECT total_changes() AS n');
+        return (after['n'] as num).toInt() - (before['n'] as num).toInt();
+      });
+      for (final row in rows) {
+        bytes += row.body.length;
+      }
+      // Counts every offered body, written or not: the tracker may only ever
+      // over-estimate, which costs an early sweep rather than an overrun.
+      if (written > 0) await _noteWrite(bytes, written);
+      return written;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  static int _seedKind(Uint8List body) =>
+      body.isEmpty ? kindBinary : kindBinaryGzip;
 
   /// Bumps last-used for [url] without reading the body (awaits the flush so
   /// callers that trim by LRU see the updated `time`).

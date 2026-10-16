@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -1100,4 +1102,166 @@ void main() {
       expect(filled.injected, 96);
     },
   );
+  group('planted basemap tiles', () {
+    const url = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/107/55.pbf';
+    const other = 'https://static.lb.exptech.dev/api/v1/map/tiles/7/106/55.pbf';
+    final seedEtag = EtagCacheStore.seedEtag('test');
+
+    Future<void> plant(String target, List<int> bytes) => store.seedBytesBatch([
+      (url: target, body: Uint8List.fromList(gzip.encode(bytes))),
+    ], etag: seedEtag);
+
+    late List<String> fetched;
+
+    Future<MapTileCache> withNetwork(
+      Future<Uint8List> Function(String url) answer, {
+      Duration budget = MapTileCache.defaultPlantedNetworkBudget,
+    }) async {
+      fetched = [];
+      final planted = MapTileCache(
+        store,
+        fetch: (target) {
+          fetched.add(target);
+          return answer(target);
+        },
+        plantedNetworkBudget: budget,
+      );
+      await planted.install();
+      return planted;
+    }
+
+    Future<Uint8List> offline(String _) async =>
+        throw const SocketException('Network is unreachable');
+
+    Future<Map<Object?, Object?>> demand(List<String> urls) async =>
+        (await fromNative('getBatch', {'urls': urls}))!
+            as Map<Object?, Object?>;
+
+    Object? dataOf(Map<Object?, Object?> reply, String target) =>
+        (reply[target] as Map?)?['data'];
+
+    test('the network is asked first, and its answer is served', () async {
+      await plant(url, [1, 2, 3]);
+      await withNetwork((_) async => Uint8List.fromList([7, 7]));
+
+      final reply = await demand([url]);
+
+      expect(fetched, [url]);
+      expect(dataOf(reply, url), [
+        7,
+        7,
+      ], reason: 'a planted body served as a hit would be pinned as immutable');
+    });
+
+    test('with no network, the planted body is handed over', () async {
+      await plant(url, [1, 2, 3]);
+      await withNetwork(offline);
+
+      final reply = await demand([url]);
+
+      expect(fetched, [url]);
+      expect(dataOf(reply, url), [1, 2, 3]);
+      expect((reply[url]! as Map)['etag'], seedEtag);
+    });
+
+    test('once the network failed, the next viewport does not wait', () async {
+      await plant(url, [1]);
+      await plant(other, [2]);
+      await withNetwork(offline);
+      await demand([url]);
+      fetched.clear();
+
+      final reply = await demand([other]);
+
+      expect(fetched, isEmpty);
+      expect(dataOf(reply, other), [2]);
+    });
+
+    test('a slow network gets the planted body in time, then the download '
+        'replaces it in L1', () async {
+      await plant(url, [1]);
+      final slow = Completer<Uint8List>();
+      await withNetwork(
+        (_) => slow.future,
+        budget: const Duration(milliseconds: 50),
+      );
+
+      final reply = await demand([url]);
+      expect(dataOf(reply, url), [1], reason: 'native stops waiting at 2.5 s');
+
+      slow.complete(Uint8List.fromList([7]));
+      await pumpEventQueue();
+      expect(nativeMemory[url], [7]);
+    });
+
+    test('a tile with no planted row is left to native', () async {
+      await withNetwork((_) async => Uint8List.fromList([7]));
+
+      final reply = await demand([url]);
+
+      expect(reply, isEmpty);
+      expect(fetched, isEmpty, reason: 'native downloads it as it always has');
+    });
+
+    test('a downloaded basemap tile is a plain hit', () async {
+      await store.writeBytes(
+        url,
+        etag: EtagInterceptor.etagFromUrl(Uri.parse(url)),
+        bytes: Uint8List.fromList([5]),
+      );
+      await withNetwork((_) async => Uint8List.fromList([7]));
+
+      final reply = await demand([url]);
+
+      expect(dataOf(reply, url), [5]);
+      expect(fetched, isEmpty);
+    });
+
+    test('a warm never injects a planted row', () async {
+      await plant(url, [1]);
+      final planted = await withNetwork(offline);
+
+      final result = await planted.warm([url]);
+
+      expect(result.injected, 0);
+      expect(nativeCalls.where((c) => c.method == 'injectTiles'), isEmpty);
+    });
+
+    test('once the network answers, planted bodies leave L1', () async {
+      await plant(url, [1]);
+      await withNetwork(offline);
+      await demand([url]);
+      nativeCalls.clear();
+
+      // Native reports a download: the network is back.
+      await fromNative('putBatch', {
+        'entries': [
+          {
+            'url': 'https://static.exptech.dev/api/v2/tiles/radar/1/2/3/4.webp',
+            'data': Uint8List.fromList([1]),
+            'contentType': 'image/webp',
+          },
+        ],
+      });
+      await pumpEventQueue();
+
+      final evict = nativeCalls.where((c) => c.method == 'evictTiles');
+      expect(evict, hasLength(1));
+      expect((evict.single.arguments as Map)['contains'], [
+        ApiPaths.mapTilesV1,
+      ]);
+    });
+
+    test('a demand waits for planting that is still running', () async {
+      final planting = Completer<void>();
+      final planted = await withNetwork(offline);
+      planted.servesAfter(planting.future);
+
+      final pending = demand([url]);
+      await plant(url, [4]);
+      planting.complete();
+
+      expect(dataOf(await pending, url), [4]);
+    });
+  });
 }
