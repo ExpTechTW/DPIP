@@ -417,6 +417,149 @@ void main() {
       },
     );
   });
+
+  group('SseRealtimeSource — decoded elsewhere', () {
+    late List<StreamController<SseEvent>> connects;
+    late List<Completer<void>> delays;
+    late _ElsewhereSource source;
+
+    String packed(String text) => base64.encode(gzip.encode(utf8.encode(text)));
+    void send(String text) =>
+        connects.last.add(SseEvent(name: 'g', data: packed(text)));
+
+    setUp(() {
+      connects = [];
+      delays = [];
+      source = _ElsewhereSource(
+        connect: () {
+          final c = StreamController<SseEvent>();
+          connects.add(c);
+          return c.stream;
+        },
+        delay: (_) {
+          final completer = Completer<void>();
+          delays.add(completer);
+          return completer.future;
+        },
+      );
+    });
+
+    test('a frame is the snapshot once its decode answers', () async {
+      await source.fetch();
+      send('shaken');
+      await pumpEventQueue();
+      expect(
+        source.answers.single.data,
+        packed('shaken'),
+        reason: 'handed over exactly as it arrived, base64 and all',
+      );
+      expect((await source.fetch()).isOk, isFalse, reason: 'not answered');
+
+      source.answers.single.answer.complete('shaken');
+      await pumpEventQueue();
+      expect((await source.fetch()).valueOrNull, 'shaken');
+    });
+
+    test('a late answer never replaces a newer frame', () async {
+      await source.fetch();
+      send('one');
+      send('two');
+      await pumpEventQueue();
+      source.answers[1].answer.complete('two');
+      await pumpEventQueue();
+      source.answers[0].answer.complete('one');
+      await pumpEventQueue();
+      expect((await source.fetch()).valueOrNull, 'two');
+    });
+
+    test('nor one decoded here after the worker stepped aside', () async {
+      await source.fetch();
+      send('one');
+      await pumpEventQueue();
+      source.onThisIsolate = true;
+      send('two');
+      await pumpEventQueue();
+      expect((await source.fetch()).valueOrNull, 'two');
+
+      source.answers.single.answer.complete('one');
+      await pumpEventQueue();
+      expect((await source.fetch()).valueOrNull, 'two');
+    });
+
+    test('an answer after a drop does not revive the snapshot', () async {
+      await source.fetch();
+      send('before');
+      await pumpEventQueue();
+      await connects.last.close();
+      await pumpEventQueue();
+      delays.last.complete();
+      await pumpEventQueue();
+      connects.last.add(const SseEvent(name: 'info', data: '{}'));
+      await pumpEventQueue();
+
+      source.answers.single.answer.complete('before');
+      await pumpEventQueue();
+      expect(
+        (await source.fetch()).isOk,
+        isFalse,
+        reason: 'a frame from the dropped connection is not current',
+      );
+    });
+
+    test('nor after a pause', () async {
+      await source.fetch();
+      send('before');
+      await pumpEventQueue();
+      source
+        ..pause()
+        ..resume();
+      await source.fetch();
+      connects.last.add(const SseEvent(name: 'info', data: '{}'));
+      await pumpEventQueue();
+
+      source.answers.single.answer.complete('before');
+      await pumpEventQueue();
+      expect((await source.fetch()).isOk, isFalse);
+    });
+
+    test('an empty answer is metadata, not a snapshot', () async {
+      await source.fetch();
+      send('');
+      await pumpEventQueue();
+      source.answers.single.answer.complete(null);
+      await pumpEventQueue();
+      expect((await source.fetch()).isOk, isFalse);
+    });
+
+    test('a failed decode keeps the last good snapshot', () async {
+      await source.fetch();
+      send('a');
+      send('bad');
+      await pumpEventQueue();
+      source.answers[0].answer.complete('a');
+      source.answers[1].answer.completeError(const FormatException('bad'));
+      await pumpEventQueue();
+      expect((await source.fetch()).valueOrNull, 'a');
+      expect(connects, hasLength(1), reason: 'a bad frame keeps the link');
+    });
+  });
+}
+
+/// Hands every compressed frame to a decode the test answers by hand — or,
+/// while [onThisIsolate] is set, declines and lets the source decode it.
+class _ElsewhereSource extends _TestSseSource {
+  _ElsewhereSource({required super.connect, super.delay});
+
+  final answers = <({String data, Completer<String?> answer})>[];
+  bool onThisIsolate = false;
+
+  @override
+  Future<String?>? decodeElsewhere(String data) {
+    if (onThisIsolate) return null;
+    final answer = Completer<String?>();
+    answers.add((data: data, answer: answer));
+    return answer.future;
+  }
 }
 
 class _TopicSource extends SseRealtimeSource<String> {

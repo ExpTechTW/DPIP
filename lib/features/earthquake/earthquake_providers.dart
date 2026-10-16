@@ -18,6 +18,7 @@ import 'package:dpip/features/earthquake/data/ml_intensity_service.dart';
 import 'package:dpip/features/earthquake/data/monitor_demo.dart';
 import 'package:dpip/features/earthquake/data/rts_box_grid_source.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
+import 'package:dpip/features/earthquake/data/rts_worker_service.dart';
 import 'package:dpip/features/earthquake/data/trem_station_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/seismic_travel_time_source.dart';
@@ -95,11 +96,16 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
 
   // Live RTS: the `trem.rts.v1` topic of the TREM stream — every frame while
   // the monitor holds [rtsLiveDemand], only the alerting ones otherwise. The
-  // demo flag swaps in a synthetic frame generator the same way.
+  // demo flag swaps in a synthetic frame generator the same way. Live frames
+  // are decoded on a worker isolate, started on the first one.
+  final rtsWorker = RtsWorkerService();
   final rtsSource = kMonitorDemoEnabled
       ? DemoRtsSource(stations: tremStations) as RealtimeSource<Rts>
-      : RtsRealtimeSource(api.openTremSse, demand: rtsLiveDemand)
-            as RealtimeSource<Rts>;
+      : RtsRealtimeSource(
+          api.openTremSse,
+          demand: rtsLiveDemand,
+          worker: rtsWorker,
+        ) as RealtimeSource<Rts>;
   final rtsChannel = RealtimeChannel<Rts>(
     source: rtsSource,
     clock: deps.serverClock,

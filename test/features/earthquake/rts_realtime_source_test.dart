@@ -20,6 +20,9 @@ import 'dart:typed_data';
 import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/features/earthquake/data/rts_realtime_source.dart';
+import 'package:dpip/features/earthquake/data/rts_worker.dart';
+import 'package:dpip/features/earthquake/data/rts_worker_service.dart';
+import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -206,6 +209,78 @@ void main() {
       throwsFormatException,
     );
     source.dispose();
+  });
+
+  group('on the worker isolate', () {
+    final json = {
+      'ts': 1790537637000,
+      'stations': {
+        '11DFDBC': {'i': 4.6, 'pga': 38.2, 'alert': 1},
+        '11E0C3A': {'i': -1.3},
+      },
+    };
+
+    /// The first snapshot the source answers with — real time, since the
+    /// decode is on another isolate.
+    Future<Rts?> firstSnapshot(RtsRealtimeSource source) async {
+      for (var i = 0; i < 500; i++) {
+        final result = await source.fetch();
+        if (result.isOk) return result.valueOrNull;
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      return null;
+    }
+
+    test('a frame decodes there into what it decodes to here', () async {
+      final connections = _Connections();
+      var spawned = 0;
+      final worker = RtsWorkerService(
+        spawn: () {
+          spawned++;
+          return RtsWorker.spawn();
+        },
+      );
+      final source = RtsRealtimeSource(
+        connections.connect,
+        demand: RtsLiveDemand()..hold(),
+        worker: worker,
+      );
+
+      await source.fetch();
+      connections.last.add(_frame(json));
+      final snapshot = await firstSnapshot(source);
+
+      expect(spawned, 1, reason: 'the frame went through the worker');
+      expect(snapshot, source.decode(jsonEncode(json)));
+      source.dispose();
+      worker.dispose();
+    });
+
+    test('a worker that cannot start leaves the feed decoding here', () async {
+      final connections = _Connections();
+      final worker = RtsWorkerService(
+        spawn: () async => throw StateError('no isolates here'),
+      );
+      final source = RtsRealtimeSource(
+        connections.connect,
+        demand: RtsLiveDemand()..hold(),
+        worker: worker,
+      );
+
+      await source.fetch();
+      connections.last.add(_frame(json));
+      expect(await firstSnapshot(source), source.decode(jsonEncode(json)));
+
+      final next = {...json, 'ts': 1790537638000};
+      connections.last.add(_frame(next));
+      await pumpEventQueue();
+      expect(
+        (await source.fetch()).valueOrNull?.time,
+        1790537638000,
+        reason: 'decoded on this isolate, at once',
+      );
+      source.dispose();
+    });
   });
 
   test('timestampOf is null → event-recency freshness, not payload age', () {

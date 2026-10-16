@@ -113,6 +113,15 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   T? _latest;
   Duration? _lastEventMark;
 
+  /// Arrival order of payload frames: the last number handed out, and the
+  /// number of the frame [_latest] holds. See [decodeElsewhere].
+  int _issued = 0;
+  int _taken = 0;
+
+  /// Bumped whenever the snapshot is thrown away, so a frame still being
+  /// decoded elsewhere when that happens cannot bring it back.
+  int _snapshotEpoch = 0;
+
   /// Decodes a default-event `data:` payload into `T`. The payload is the same
   /// JSON the one-shot GET returns, so this mirrors the repository's mapping.
   T decode(String data);
@@ -128,6 +137,20 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   /// only to tokenise that string a second time. Same object graph out, one
   /// full copy of every frame fewer — on the UI isolate, every second.
   T decodeBytes(Uint8List utf8Json) => decode(utf8.decode(utf8Json));
+
+  /// Decodes a payload-event frame on another isolate — [data] exactly as it
+  /// arrived, base64 and all, so not even that is undone here.
+  ///
+  /// Null, the default, decodes the frame on this isolate and at once, through
+  /// [decodeBytes]. A future that completes with null is a frame with no
+  /// payload, as an empty inflated body is on that path; one that fails is a
+  /// frame that did not decode, and the last good snapshot stands.
+  ///
+  /// The answer arrives after later events may have, so it is taken only if no
+  /// newer frame has been taken already, and only while the snapshot it would
+  /// refresh is still the current connection's: a frame decoded across a drop
+  /// or a pause must not revive a snapshot that the drop threw away.
+  Future<T?>? decodeElsewhere(String data) => null;
 
   /// What a connected feed with nothing fresh to report stands for — or null
   /// (the default), when that silence is itself the fault the liveness policy
@@ -176,7 +199,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     _subscription?.cancel();
     _subscription = null;
     _connected = false;
-    _hasSnapshot = false;
+    _dropSnapshot();
   }
 
   /// Re-arms the lazy open, so the channel's first post-resume `fetch` builds a
@@ -200,7 +223,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   void _openConnection() {
     if (_disposed || _paused) return;
     _connected = false;
-    _hasSnapshot = false;
+    _dropSnapshot();
     // A fresh connection reads the current parameters anyway, so a handover
     // still in flight has nothing left to deliver.
     _pending?.cancel();
@@ -280,20 +303,27 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     // the application layer.
     if (event.name == _payloadEvent || event.isDefault) {
       try {
+        // Numbered in arrival order, so a frame decoded elsewhere and answered
+        // late cannot replace a newer one (see [decodeElsewhere]).
+        final ticket = ++_issued;
         // Metadata-only frames carry no payload: skipped before decoding on
         // either path, exactly as the empty-string check did.
         if (event.name == _payloadEvent) {
+          final elsewhere = decodeElsewhere(event.data);
+          if (elsewhere != null) {
+            _takeWhenDecoded(elsewhere, ticket);
+            return;
+          }
           final bytes = gzip.decode(base64.decode(event.data.trim()));
           if (bytes.isEmpty) return;
-          _latest = decodeBytes(
-            bytes is Uint8List ? bytes : Uint8List.fromList(bytes),
+          _take(
+            decodeBytes(bytes is Uint8List ? bytes : Uint8List.fromList(bytes)),
+            ticket,
           );
         } else {
           if (event.data.isEmpty) return;
-          _latest = decode(event.data);
+          _take(decode(event.data), ticket);
         }
-        _hasSnapshot = true;
-        _lastEventMark = _elapsed.elapsed;
       } catch (error, stackTrace) {
         // One bad frame must not kill the connection; keep the last good data.
         Log.handle(error, stackTrace, '[$_label] SSE decode');
@@ -312,10 +342,39 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     }
   }
 
+  void _take(T value, int ticket) {
+    _taken = ticket;
+    _latest = value;
+    _hasSnapshot = true;
+    _lastEventMark = _elapsed.elapsed;
+  }
+
+  void _takeWhenDecoded(Future<T?> decoding, int ticket) {
+    final epoch = _snapshotEpoch;
+    decoding.then(
+      (value) {
+        if (value == null || _disposed) return;
+        // Overtaken by a newer frame, or answered after the snapshot it would
+        // refresh was thrown away (see [decodeElsewhere]).
+        if (ticket <= _taken || epoch != _snapshotEpoch) return;
+        _take(value, ticket);
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (_disposed) return;
+        Log.handle(error, stackTrace, '[$_label] SSE decode');
+      },
+    );
+  }
+
+  void _dropSnapshot() {
+    _hasSnapshot = false;
+    _snapshotEpoch++;
+  }
+
   void _onClosed() {
     _subscription = null;
     _connected = false;
-    _hasSnapshot = false;
+    _dropSnapshot();
     if (_disposed) return;
     _scheduleReconnect();
   }
