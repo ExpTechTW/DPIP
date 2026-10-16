@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">目前天氣</string>
+    <string name="widget_description">顯示此小工具所設定地區的目前天氣。</string>
+
+    <string name="widget_stale">較舊</string>
+    <string name="widget_no_data">尚無天氣資料</string>
+    <string name="widget_open_app">開啟 App</string>
+    <string name="widget_needs_app">開啟 App 時才會更新位置</string>
+    <string name="widget_reconfigure">地點已移除 — 請重新設定</string>
+    <string name="widget_refresh">立即更新</string>
+
+    <string name="widget_humidity">濕度</string>
+    <string name="widget_rain">雨量</string>
+    <string name="widget_wind">風</string>
+    <string name="widget_station">觀測站</string>
+    <string name="widget_sunrise">日出</string>
+    <string name="widget_sunset">日落</string>
+    <string name="widget_apparent">體感</string>
+    <string name="widget_location_disabled">定位已關閉</string>
+    <string name="widget_location_unavailable">無法取得位置</string>
+    <string name="widget_location_outside">位置不在涵蓋範圍內</string>
+    <string name="widget_current_location">目前位置</string>
+
+    <string name="widget_config_title">天氣小工具設定</string>
+    <string name="widget_config_hint">選擇小工具顯示天氣的地點。</string>
+    <string name="widget_config_empty">尚未儲存任何地點。請先開啟 App 新增地點，再回來設定。</string>
+    <string name="widget_config_needs_permission">目前位置需要定位權限；若未取得背景定位權限，小工具會顯示最後已知位置並提示開啟 App。</string>
+    <string name="widget_config_open_app">開啟 App</string>
+    <string name="widget_config_cancel">取消</string>
+
+    <string name="widget_preview_location">預覽地點</string>
+    <string name="widget_preview_weather">晴</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">10/13 14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">已儲存地點</string>
+    <string name="widget_refresh_queued">等待更新</string>
+    <string name="widget_refresh_running">更新緊…</string>
+    <string name="widget_refresh_updated">天氣已更新</string>
+    <string name="widget_refresh_failed">更新失敗</string>
+    <string name="widget_weather_clear">晴天</string>
+    <string name="widget_weather_cloudy">多雲</string>
+    <string name="widget_weather_overcast">陰天</string>
+    <string name="widget_weather_rain">雨天</string>
+    <string name="widget_weather_thunderstorm">雷暴</string>
+    <string name="widget_weather_snow">下雪</string>
+    <string name="widget_weather_fog">大霧</string>
+    <string name="widget_weather_unknown">未知</string>
+    <string name="widget_forecast_pop_description">落雨機率 %1$s</string>
+    <string name="widget_forecast_pop_unavailable">冇落雨機率資料</string>
+</resources>

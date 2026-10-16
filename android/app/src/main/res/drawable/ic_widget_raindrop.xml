@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rainfall: a filled droplet, Material's own `water_drop`, the Android
+     reading of iOS `drop.fill`. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2 C12,2 5.33,10.53 5.33,15.67 C5.33,19.36 8.31,22.33 12,22.33 C15.69,22.33 18.67,19.36 18.67,15.67 C18.67,10.53 12,2 12,2 Z" />
+</vector>

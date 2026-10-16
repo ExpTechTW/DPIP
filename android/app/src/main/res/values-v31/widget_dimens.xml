@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  API 31+ Widget tokens.
+
+  The corner radius follows the launcher instead of the fixed 20 dp in
+  `values/widget_dimens.xml`: `system_app_widget_background_radius` is the
+  radius the system gives every other widget, and a Widget that draws its own
+  corners next to theirs reads as foreign. The base value stays as the
+  pre-S fallback. There is no inner card inside the faces, so the system's
+  inner radius has nothing to apply to.
+-->
+<resources>
+    <dimen name="widget_radius">@android:dimen/system_app_widget_background_radius</dimen>
+</resources>

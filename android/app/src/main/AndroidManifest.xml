@@ -173,6 +173,62 @@
             </intent-filter>
         </receiver>
 
+        <!-- Home-screen weather Widget.
+
+             `exported="false"` on the provider: the APPWIDGET_UPDATE broadcast
+             is sent by the system, which reaches a non-exported receiver, and
+             leaving it unexported means no other app can drive this Widget's
+             updates. The configuration Activity must be exported, because the
+             launcher is what starts it. -->
+        <receiver
+            android:name=".widget.WeatherWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
+        </receiver>
+
+        <!-- Rebuilds the Widget's scheduled work and redraw after a reboot or an
+             app update; WorkManager's own work survives both, but a launcher
+             that restored instances hands back ids this process has not seen. -->
+        <receiver
+            android:name=".widget.WidgetReconcileReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Location picker, opened by the launcher when an instance is added and
+             by the Widget's own gear when it is changed. -->
+        <activity
+            android:name=".widget.WeatherWidgetConfigurationActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:theme="@style/WidgetConfigTheme">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- A device clock or timezone change re-renders and re-arms the local
+             redraw: the calibrated anchor is monotonic and unaffected, but the
+             device-side offset a scheduled redraw is expressed in is not. -->
+        <receiver
+            android:name=".widget.WidgetClockReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ProgressBar drives this drawable's level inside the launcher process. -->
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_widget_refresh"
+    android:fromDegrees="0"
+    android:toDegrees="360"
+    android:pivotX="50%"
+    android:pivotY="50%" />

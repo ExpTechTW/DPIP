@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  API 31+ Widget ink: wallpaper-tinted neutrals instead of the fixed ink in
+  `values/widget_colors.xml`.
+
+  `system_neutral1/2` are the Material You dynamic palette, so the text and
+  glyphs shift with the user's wallpaper while staying neutral — the same
+  design as the fallback, not a recolor. The surface is deliberately *not*
+  overridden here: it is translucent (`#F2…`), so the wallpaper already shows
+  through it, which is this Widget's wallpaper integration; an opaque dynamic
+  surface would lose that. Layouts and `WidgetRenderer.secondary()` both read
+  these same tokens, so the two stay consistent on every API level.
+-->
+<resources>
+    <color name="widget_on_surface">@android:color/system_neutral1_900</color>
+    <color name="widget_secondary">@android:color/system_neutral2_700</color>
+    <color name="widget_icon_tint">@android:color/system_neutral2_700</color>
+    <color name="widget_notice">@android:color/system_neutral2_700</color>
+</resources>

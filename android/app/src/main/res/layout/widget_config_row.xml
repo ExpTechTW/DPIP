@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:foreground="?attr/selectableItemBackground">
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/widget_config_section"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:paddingTop="@dimen/widget_spacing_md"
+        android:paddingBottom="@dimen/widget_spacing_md"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+        android:textColor="?attr/colorPrimary" />
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/widget_config_card"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/widget_config_gap"
+        app:cardCornerRadius="@dimen/widget_config_radius" app:cardElevation="0dp" app:strokeWidth="0dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="@dimen/widget_config_row_minimum" android:padding="@dimen/widget_padding"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:descendantFocusability="blocksDescendants">
+            <ImageView android:id="@+id/widget_config_icon"
+                android:layout_width="@dimen/widget_config_icon" android:layout_height="@dimen/widget_config_icon"
+                android:importantForAccessibility="no"
+                app:tint="?attr/colorPrimary" android:src="@drawable/ic_widget_location" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginStart="@dimen/widget_padding"
+                android:orientation="vertical">
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@android:id/text1" android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorOnSurface" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@android:id/text2" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="@dimen/widget_spacing_xs"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/widget_config_radio"
+                android:layout_width="@dimen/widget_config_touch_target" android:layout_height="@dimen/widget_config_touch_target"
+                android:clickable="false" android:focusable="false"
+                android:importantForAccessibility="no" app:useMaterialThemeColors="true" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

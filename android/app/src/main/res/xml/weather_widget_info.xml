@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Home-screen Widget metadata.
+
+  `updatePeriodMillis` is 0 on purpose. Its floor is 30 minutes and it is
+  delivered even for an app the OS has put to sleep, so using it would buy a
+  second, worse scheduler beside the WorkManager one that already owns the
+  cadence. The comment in `WidgetRefreshScheduler` records the actual contract:
+  a request of about 20 minutes, never a promise.
+
+  The resize bounds are the range the faces actually support: the 110 dp
+  minimum is the compact fallback's own box, and every layout is
+  `match_parent` with weighted rows, so the faces stretch to the maximum
+  rather than breaking. Without `minResize`/`maxResize` the launcher's
+  resize range is unbounded and the responsive-layout contract ("the widget
+  supports everything between the two") has nothing to stand on.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="110dp"
+    android:maxResizeWidth="640dp"
+    android:maxResizeHeight="480dp"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget_small"
+    android:previewLayout="@layout/widget_preview"
+    android:previewImage="@drawable/widget_preview_image"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:configure="com.exptech.dpip.widget.WeatherWidgetConfigurationActivity"
+    android:description="@string/widget_description"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:widgetFeatures="reconfigurable"
+    tools:targetApi="31" />

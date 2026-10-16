@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Native design tokens for the home-screen Widget.
+
+  Android's Widget process is not the Flutter tree: the same layout is inflated
+  by the launcher, so `Theme.of(context)`, `ColorScheme` roles and
+  `lib/app/theme/` are all out of reach. These are the Android-side equivalent
+  of the tokens in DESIGN.md — the 4 dp grid, the 20 dp radius, and a neutral
+  surface / on-surface / secondary ramp.
+
+  The palette is deliberately neutral rather than themed: the iOS Widget draws
+  on `containerBackground(.fill.tertiary)` (a translucent system fill) with
+  primary/secondary ink, so there is no brand hue and nothing that competes
+  with the content. An earlier revision used a teal-tinted surface and a filled
+  error-coloured pill; both read as "an Android widget", not the same widget on
+  another platform. This is the only place these values are stated; a layout
+  never inlines a colour. Night values live in `values-night`.
+
+  On API 31+ the ink tokens (`widget_on_surface`, `widget_secondary`,
+  `widget_icon_tint`, `widget_notice`) are overridden in `values-v31` (and
+  `values-night-v31`) with the wallpaper-tinted `system_neutral` palette, so
+  the Widget follows Material You while staying neutral. The surface keeps
+  this file's translucent value on every API level: the wallpaper shows
+  through it, which is this Widget's wallpaper integration, and an opaque
+  dynamic surface would lose that.
+-->
+<resources>
+    <!-- A translucent neutral surface, the Android reading of `.fill.tertiary`:
+         the launcher's wallpaper shows through, as DESIGN.md's glass surfaces
+         do over the weather sky. -->
+    <color name="widget_surface">#F2F2F2F7</color>
+    <color name="widget_on_surface">#FF1C1C1E</color>
+    <color name="widget_secondary">#FF6C6C70</color>
+    <color name="widget_icon_tint">#FF6C6C70</color>
+    <!-- The status notice ("Outdated", a position degradation). Secondary ink
+         with no container: an aged reading has to be legible without becoming
+         the loudest thing on the screen, which the old error pill was. -->
+    <color name="widget_notice">#FF6C6C70</color>
+</resources>

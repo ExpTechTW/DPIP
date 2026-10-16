@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Large (four-row) layout: a restatement of iOS `LargeCurrentWeatherView`
+  (`ios/DPIPWidgets/DPIPWidgets.swift`, lines 403–625) — the town and the
+  observation time, the 42 pt temperature with the apparent temperature below
+  it and the condition glyph and name opposite, five hourly columns, and the
+  detail grid: humidity / rainfall / sunrise-or-sunset on the first row and
+  wind / station on the second.
+
+  iOS composes that grid from labelled pairs; this layout states the labels
+  statically (`@string/widget_humidity`, …) and lets the renderer write only the
+  values, so a label can never be localised on one platform and hard-coded on
+  the other. The only dynamic label is the sun cell, sunrise or sunset depending
+  on the phase.
+
+  The section spacing is iOS's own: `spacing: 12` between the header, the
+  current-weather row, the forecast section and the grid, and `spacing: 14`
+  between the grid's two rows.
+
+  Two Android-only adaptations, both forced by the cell sizes a launcher
+  reports:
+
+  * The notice is its own full-width row under the header, not a weighted child
+    of the header. Sharing the header with the town left the town ~10 dp at a
+    200 dp cell — the town became an ellipsis while the notice took half the
+    width. On its own row the notice cannot touch the town's budget.
+  * The refresh target is 24 dp here, not 28, so the town
+    and the observation date still read at 200 dp. This is the one place the
+    iOS hierarchy has no room for them at all; `WidgetLayoutFitTest` measures
+    the town at that width with the real font metrics.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_padding"
+    tools:ignore="DisableBaselineAlignment,UselessLeaf,UseAppTint,UseCompoundDrawables">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+        <TextView
+            android:id="@+id/widget_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:autoSizeMaxTextSize="@dimen/widget_text_headline"
+            android:autoSizeMinTextSize="@dimen/widget_text_headline_min"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="@dimen/widget_text_headline"
+            tools:ignore="NestedWeights" />
+
+        <ImageView
+            android:id="@+id/widget_location_icon"
+            android:layout_width="@dimen/widget_icon_location"
+            android:layout_height="@dimen/widget_icon_location"
+            android:layout_marginStart="@dimen/widget_spacing_xs"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_widget_location"
+            android:visibility="gone"
+            tools:visibility="visible" />
+        </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_observation_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_spacing_xs"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/widget_secondary"
+            android:textSize="@dimen/widget_text_caption2" />
+
+        <FrameLayout
+            android:id="@+id/widget_refresh"
+            android:layout_width="@dimen/widget_icon_action_target_large"
+            android:layout_height="@dimen/widget_icon_action_target_large"
+            android:layout_marginStart="@dimen/widget_spacing_xs"
+            android:contentDescription="@string/widget_refresh"
+            android:padding="@dimen/widget_spacing_xs">
+            <ImageView
+                android:id="@+id/widget_refresh_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_refresh"
+                android:tint="@color/widget_icon_tint" />
+            <ProgressBar
+                android:id="@+id/widget_refresh_progress"
+                style="@style/Widget.RefreshProgress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- The Android-only notice: a full-width row so it never shares the
+         header's width with the town. -->
+    <TextView
+        android:id="@+id/widget_stale"
+        style="@style/Widget.Badge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_spacing_sm"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/widget_on_surface"
+                android:textSize="@dimen/widget_text_temperature" />
+
+            <TextView
+                android:id="@+id/widget_apparent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+                android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+                android:autoSizeStepGranularity="1sp"
+                android:maxLines="1"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
+
+            <!-- AT_MOST width keeps this group trailing-aligned when roomy;
+                 its weighted text receives the remaining width when narrow.
+                 The outer EXACT and inner AT_MOST budgets are not redundant. -->
+            <LinearLayout
+                tools:ignore="UselessParent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/widget_icon"
+                android:layout_width="@dimen/widget_icon_small"
+                android:layout_height="@dimen/widget_icon_small"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/widget_weather"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_spacing_sm"
+                android:autoSizeMaxTextSize="@dimen/widget_text_headline"
+                android:autoSizeMinTextSize="@dimen/widget_text_headline_min"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_headline" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_forecast_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/widget_spacing_md"
+        android:baselineAligned="false"
+        android:orientation="horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_spacing_md"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="@string/widget_humidity"
+                android:paddingTop="@dimen/widget_grid_label_inset"
+                android:ellipsize="end"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+            <TextView
+                android:id="@+id/widget_grid_humidity_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/widget_on_surface"
+                android:autoSizeMaxTextSize="@dimen/widget_text_grid_value"
+        android:autoSizeMinTextSize="@dimen/widget_text_grid_value_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:textSize="@dimen/widget_text_grid_value" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_grid_column_gap"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="@string/widget_rain"
+                android:paddingTop="@dimen/widget_grid_label_inset"
+                android:ellipsize="end"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+            <TextView
+                android:id="@+id/widget_grid_rain_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/widget_on_surface"
+                android:autoSizeMaxTextSize="@dimen/widget_text_grid_value"
+        android:autoSizeMinTextSize="@dimen/widget_text_grid_value_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:textSize="@dimen/widget_text_grid_value" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_grid_column_gap"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_grid_sun_label"
+                android:paddingTop="@dimen/widget_grid_label_inset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+            <TextView
+                android:id="@+id/widget_grid_sun_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/widget_on_surface"
+                android:autoSizeMaxTextSize="@dimen/widget_text_grid_value"
+        android:autoSizeMinTextSize="@dimen/widget_text_grid_value_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:textSize="@dimen/widget_text_grid_value" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_grid_row_gap"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="@string/widget_wind"
+                android:paddingTop="@dimen/widget_grid_label_inset"
+                android:ellipsize="end"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+            <TextView
+                android:id="@+id/widget_grid_wind_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/widget_on_surface"
+                android:autoSizeMaxTextSize="@dimen/widget_text_grid_value"
+        android:autoSizeMinTextSize="@dimen/widget_text_grid_value_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:textSize="@dimen/widget_text_grid_value" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_grid_column_gap"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="@string/widget_station"
+                android:paddingTop="@dimen/widget_grid_label_inset"
+                android:ellipsize="end"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+            <TextView
+                android:id="@+id/widget_grid_station_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/widget_on_surface"
+                android:autoSizeMaxTextSize="@dimen/widget_text_grid_value"
+        android:autoSizeMinTextSize="@dimen/widget_text_grid_value_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:textSize="@dimen/widget_text_grid_value" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

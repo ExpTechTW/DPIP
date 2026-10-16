@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The gallery preview the launcher renders before an instance exists.
+
+  With `android:previewLayout` this is the whole story: a static document that
+  renders in the launcher's process without this app running, so every value is
+  a sample string — no data-bound id appears here, and it can never show a real
+  cache entry. It mirrors `widget_small.xml` structure for structure — the town
+  beside the condition glyph and name, the observation row on its own full-width
+  line, the 42 pt temperature and the humidity/rainfall row — at the same
+  dimensions and text sizes, because a preview that shows a different design
+  from the one the user is about to place is worse than none. The refresh action is the
+  one thing left out: a static thumbnail must not promise a tap target. It is
+  not the empty face, either; the gallery shows what the widget looks like with
+  data.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_padding_small"
+    tools:ignore="DisableBaselineAlignment,UselessLeaf,UseAppTint,UseCompoundDrawables">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            tools:ignore="NestedWeights">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:autoSizeMaxTextSize="@dimen/widget_text_headline"
+                android:autoSizeMinTextSize="@dimen/widget_text_headline_min"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="@string/widget_preview_location"
+                android:textColor="@color/widget_on_surface"
+                android:textSize="@dimen/widget_text_headline"
+                tools:ignore="NestedWeights" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/widget_spacing_sm"
+            android:gravity="end"
+            android:orientation="vertical"
+            tools:ignore="NestedWeights">
+
+            <ImageView
+                android:id="@+id/widget_icon"
+                android:layout_width="@dimen/widget_icon_small"
+                android:layout_height="@dimen/widget_icon_small"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_weather_clear_day"
+                android:tint="@color/widget_icon_tint" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+                android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:includeFontPadding="false"
+                android:text="@string/widget_preview_weather"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="@string/widget_preview_time"
+        android:includeFontPadding="false"
+        android:textColor="@color/widget_secondary"
+        android:textSize="@dimen/widget_text_caption2" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:text="@string/widget_preview_temperature"
+        android:includeFontPadding="false"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="@dimen/widget_text_temperature" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_spacing_xs"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="@dimen/widget_icon_metric"
+                android:layout_height="@dimen/widget_icon_metric"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_humidity"
+                android:tint="@color/widget_icon_tint" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_metric_gap"
+                android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+                android:autoSizeMinTextSize="@dimen/widget_text_metric_min"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="@string/widget_preview_humidity"
+                tools:ignore="NestedWeights"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="@dimen/widget_icon_metric"
+                android:layout_height="@dimen/widget_icon_metric"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_raindrop"
+                android:tint="@color/widget_icon_tint" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_metric_gap"
+                android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+                android:autoSizeMinTextSize="@dimen/widget_text_metric_min"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="@string/widget_preview_rain"
+                tools:ignore="NestedWeights"
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

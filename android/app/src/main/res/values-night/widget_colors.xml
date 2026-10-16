@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Night values for the Widget tokens in `values/widget_colors.xml`. -->
+<resources>
+    <color name="widget_surface">#F21C1C1E</color>
+    <color name="widget_on_surface">#FFFFFFFF</color>
+    <color name="widget_secondary">#FF9A9AA0</color>
+    <color name="widget_icon_tint">#FF9A9AA0</color>
+    <color name="widget_notice">#FF9A9AA0</color>
+</resources>

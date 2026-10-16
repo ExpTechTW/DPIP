@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Native restatement of DPIP's 4dp grid and medium radius for the picker. -->
+<resources>
+    <dimen name="widget_config_gap">8dp</dimen>
+    <dimen name="widget_config_radius">16dp</dimen>
+    <dimen name="widget_config_icon">24dp</dimen>
+    <dimen name="widget_config_touch_target">48dp</dimen>
+    <dimen name="widget_config_row_minimum">72dp</dimen>
+</resources>

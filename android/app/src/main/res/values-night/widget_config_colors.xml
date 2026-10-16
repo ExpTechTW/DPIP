@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_config_primary">#80D4D6</color>
+    <color name="widget_config_on_primary">#003739</color>
+    <color name="widget_config_primary_container">#004F52</color>
+    <color name="widget_config_on_primary_container">#9CF1F3</color>
+    <color name="widget_config_surface">#0E1515</color>
+    <color name="widget_config_container">#1B2121</color>
+    <color name="widget_config_on_surface">#DEE4E4</color>
+    <color name="widget_config_secondary">#BEC8C8</color>
+</resources>

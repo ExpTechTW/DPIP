@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">현재 날씨</string>
+    <string name="widget_description">이 위젯에 설정된 위치의 현재 날씨를 표시합니다.</string>
+
+    <string name="widget_stale">오래된 정보</string>
+    <string name="widget_no_data">날씨 데이터 없음</string>
+    <string name="widget_open_app">앱 열기</string>
+    <string name="widget_needs_app">위치 갱신은 앱을 열었을 때만</string>
+    <string name="widget_reconfigure">위치가 삭제됨 — 다시 설정하세요</string>
+    <string name="widget_refresh">지금 업데이트</string>
+
+    <string name="widget_humidity">습도</string>
+    <string name="widget_rain">강우량</string>
+    <string name="widget_wind">바람</string>
+    <string name="widget_station">관측소</string>
+    <string name="widget_sunrise">일출</string>
+    <string name="widget_sunset">일몰</string>
+    <string name="widget_apparent">체감</string>
+    <string name="widget_location_disabled">위치가 꺼져 있습니다</string>
+    <string name="widget_location_unavailable">위치를 사용할 수 없음</string>
+    <string name="widget_location_outside">지원 지역 밖의 위치입니다</string>
+    <string name="widget_current_location">현재 위치</string>
+
+    <string name="widget_config_title">날씨 위젯 설정</string>
+    <string name="widget_config_hint">위젯에 날씨를 표시할 위치를 선택합니다.</string>
+    <string name="widget_config_empty">저장된 위치가 없습니다. 앱을 열어 위치를 추가한 뒤 다시 시도하세요.</string>
+    <string name="widget_config_needs_permission">현재 위치에는 위치 권한이 필요합니다. 백그라운드 위치가 허용되지 않으면 위젯은 마지막으로 알려진 위치를 표시하고 앱을 열도록 안내합니다.</string>
+    <string name="widget_config_open_app">앱 열기</string>
+    <string name="widget_config_cancel">취소</string>
+
+    <string name="widget_preview_location">미리보기 위치</string>
+    <string name="widget_preview_weather">맑음</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">10/13 14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">저장된 위치</string>
+    <string name="widget_refresh_queued">업데이트 대기 중</string>
+    <string name="widget_refresh_running">업데이트 중…</string>
+    <string name="widget_refresh_updated">날씨 업데이트 완료</string>
+    <string name="widget_refresh_failed">업데이트 실패</string>
+    <string name="widget_weather_clear">맑음</string>
+    <string name="widget_weather_cloudy">구름 많음</string>
+    <string name="widget_weather_overcast">흐림</string>
+    <string name="widget_weather_rain">비</string>
+    <string name="widget_weather_thunderstorm">뇌우</string>
+    <string name="widget_weather_snow">눈</string>
+    <string name="widget_weather_fog">안개</string>
+    <string name="widget_weather_unknown">알 수 없음</string>
+    <string name="widget_forecast_pop_description">강수 확률 %1$s</string>
+    <string name="widget_forecast_pop_unavailable">강수 확률 정보 없음</string>
+</resources>

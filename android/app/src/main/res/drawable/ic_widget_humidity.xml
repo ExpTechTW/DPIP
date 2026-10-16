@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Humidity: an outlined droplet, the second silhouette the small layout's
+     metric row needs so it does not read as the rainfall mark. It approximates
+     iOS `humidity` in weight, from Material's own droplet geometry. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.8"
+        android:pathData="M12,3.2 C12,3.2 6,11 6,15.4 C6,18.7 8.7,21.4 12,21.4 C15.3,21.4 18,18.7 18,15.4 C18,11 12,3.2 12,3.2 Z" />
+</vector>
