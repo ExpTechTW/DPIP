@@ -1,6 +1,7 @@
 package com.exptech.dpip.widget
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkInfo
 import androidx.work.testing.TestListenableWorkerBuilder
@@ -45,7 +46,10 @@ class WeatherWidgetRefreshWorkerTest {
         store = WidgetStore.openUncached(context)
         log = RecordingLog()
         WidgetLog.overrideSink = { log }
-        androidx.work.testing.WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        androidx.work.testing.WorkManagerTestInitHelper.initializeTestWorkManager(
+            context,
+            WidgetSchedulingOnlyWorkerFactory.configuration(),
+        )
         refresherCalls = ArrayList()
         WeatherWidgetRefreshWorker.refresher = { _, address, includeForecast, demandVersion, _ ->
             refresherCalls.add(Triple(address.sourceIdentifier, includeForecast, demandVersion))
@@ -89,8 +93,9 @@ class WeatherWidgetRefreshWorkerTest {
         }
     }
 
-    private fun worker(localOnly: Boolean, source: String? = null, manual: Boolean = false) =
+    private fun worker(localOnly: Boolean, source: String? = null, manual: Boolean = false, attempt: Int = 0) =
         TestListenableWorkerBuilder<WeatherWidgetRefreshWorker>(context)
+            .setRunAttemptCount(attempt)
             .setInputData(
                 workDataOf(
                     WeatherWidgetRefreshWorker.KEY_LOCAL_ONLY to localOnly,
@@ -99,6 +104,133 @@ class WeatherWidgetRefreshWorkerTest {
                 ),
             )
             .build()
+
+    @Test
+    fun `periodic recovery after a failed reconcile removes orphans and stops empty polling`() {
+        val address = WidgetAddress.Saved("407")
+        store.writeInstance(99, address, "407", 1L)
+        val workManager = androidx.work.WorkManager.getInstance(context)
+        val other = androidx.work.OneTimeWorkRequestBuilder<WeatherWidgetRefreshWorker>()
+            .setInitialDelay(1, TimeUnit.DAYS).build()
+        workManager.enqueueUniqueWork("other-feature", androidx.work.ExistingWorkPolicy.KEEP, other)
+        WidgetRefreshScheduler.scheduleOneTime(context, address)
+        WidgetRefreshScheduler.scheduleLocalRerender(context, 60_000)
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
+            try {
+                WidgetUpdater.reconcile(context)
+                assertEquals(
+                    WorkInfo.State.ENQUEUED,
+                    workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().state,
+                )
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
+            }
+        }
+
+        // Only the production background worker runs after the fault clears:
+        // no second receiver event or manual reconcile is available to heal it.
+        assertEquals(androidx.work.ListenableWorker.Result.success(), worker(localOnly = false).startWork().get(10, TimeUnit.SECONDS))
+
+        assertTrue("orphan weather must never be fetched", refresherCalls.isEmpty())
+        assertTrue("recovery must remove the orphan", store.readInstances().isEmpty())
+        for (name in listOf(
+            WidgetRefreshScheduler.periodicWorkName,
+            WidgetRefreshScheduler.sourceWorkName(address),
+            WidgetRefreshScheduler.localRerenderWorkName,
+        )) {
+            val work = workManager.getWorkInfosForUniqueWork(name).get()
+            assertTrue("$name must not poll an empty launcher", work.isNotEmpty() && work.all { it.state == WorkInfo.State.CANCELLED })
+        }
+        assertEquals(WorkInfo.State.ENQUEUED, workManager.getWorkInfosForUniqueWork("other-feature").get().single().state)
+    }
+
+    @Test
+    fun `background recovery refreshes only live sources once without enqueueing duplicate fetches`() {
+        val saved = WidgetAddress.Saved("407")
+        val current = WidgetAddress.CurrentLocation
+        val orphan = WidgetAddress.Saved("100")
+        for ((id, address) in listOf(11 to saved, 12 to saved, 13 to current)) {
+            store.writeInstance(id, address, null, 1L)
+            org.robolectric.Shadows.shadowOf(android.appwidget.AppWidgetManager.getInstance(context)).addBoundWidget(
+                id,
+                android.appwidget.AppWidgetProviderInfo().apply {
+                    provider = android.content.ComponentName(context, WeatherWidgetProvider::class.java)
+                },
+            )
+        }
+        store.writeInstance(99, orphan, "100", 1L)
+        WidgetRefreshScheduler.scheduleOneTime(context, orphan)
+        val workManager = androidx.work.WorkManager.getInstance(context)
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
+            try {
+                WidgetUpdater.reconcile(context)
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
+            }
+        }
+        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id
+
+        assertEquals(androidx.work.ListenableWorker.Result.success(), worker(localOnly = false).startWork().get(10, TimeUnit.SECONDS))
+
+        assertEquals(listOf("region:407", "current-location"), refresherCalls.map { it.first })
+        assertEquals(setOf(11, 12, 13), store.readInstances().map { it.appWidgetId }.toSet())
+        val periodic = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single()
+        assertEquals(periodicId, periodic.id)
+        assertEquals(WorkInfo.State.ENQUEUED, periodic.state)
+        for (address in listOf(saved, current)) {
+            assertTrue("the current run owns the refresh", workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address)).get().isEmpty())
+        }
+        assertEquals(WorkInfo.State.CANCELLED, workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(orphan)).get().single().state)
+        assertTrue(workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.allSourcesWorkName).get().isEmpty())
+    }
+
+    @Test
+    fun `authority failure retries are bounded but the next period still reconciles after recovery`() {
+        store.writeInstance(99, WidgetAddress.Saved("407"), "407", 1L)
+        val workManager = androidx.work.WorkManager.getInstance(context)
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL(
+                "CREATE TRIGGER refuse_delete BEFORE DELETE ON widget_instances " +
+                    "BEGIN SELECT RAISE(ABORT, 'temporary delete failure'); END",
+            )
+            try {
+                WidgetUpdater.reconcile(context)
+                val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id
+                for (attempt in listOf(0, 1, 2, 3, 4)) {
+                    assertEquals(
+                        "authority attempt=$attempt",
+                        if (attempt < 3) androidx.work.ListenableWorker.Result.retry()
+                        else androidx.work.ListenableWorker.Result.success(),
+                        worker(localOnly = false, attempt = attempt).startWork().get(10, TimeUnit.SECONDS),
+                    )
+                    val periodic = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single()
+                    assertEquals(periodicId, periodic.id)
+                    assertEquals(WorkInfo.State.ENQUEUED, periodic.state)
+                }
+                assertTrue("untrusted rows must not be fetched", refresherCalls.isEmpty())
+                assertEquals(listOf(99), store.readInstances().map { it.appWidgetId })
+                assertTrue(workManager.getWorkInfosByTag(WidgetRefreshScheduler.workTag).get().all {
+                    it.id == periodicId
+                })
+            } finally {
+                database.execSQL("DROP TRIGGER refuse_delete")
+            }
+        }
+        // Retry exhaustion is not a permanent escape from authority checks:
+        // the next periodic invocation heals without another receiver callback.
+        assertEquals(androidx.work.ListenableWorker.Result.success(), worker(localOnly = false).startWork().get(10, TimeUnit.SECONDS))
+        assertTrue(store.readInstances().isEmpty())
+        assertEquals(WorkInfo.State.CANCELLED, workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().state)
+        assertTrue(refresherCalls.isEmpty())
+    }
 
     @Test
     fun `a manual update reports running then its actual result without altering freshness`() {
@@ -191,6 +323,7 @@ class WeatherWidgetRefreshWorkerTest {
         seedSnapshot(observationSeconds = 1_791_454_316, transitionSeconds = 1_791_460_000)
         val result = worker(localOnly = true).startWork().get()
         assertTrue(result is androidx.work.ListenableWorker.Result.Success)
+        assertTrue("cache-only work must not invoke the refresher", refresherCalls.isEmpty())
         // No fetch was attempted, so nothing was logged about one.
         assertTrue(log.lines.none { it.contains("weather failed") })
     }
@@ -202,17 +335,46 @@ class WeatherWidgetRefreshWorkerTest {
     }
 
     @Test
-    fun `a source-scoped run leaves other sources alone`() {
-        // Both sources have instances, but only one is asked for.
-        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
-        store.writeInstance(12, WidgetAddress.Saved("100"), "100", 1L)
+    fun `failed refresh retries only below the worker attempt limit`() {
+        bindInstance(11, WidgetAddress.Saved("407"), "407", 250, 96)
+        WeatherWidgetRefreshWorker.refresher = { _, _, _, _, _ -> WidgetRefreshResult.Failed }
+        for (attempt in listOf(0, 1, 2, 3, 4)) {
+            val run = worker(localOnly = false, source = "region:407", attempt = attempt)
+            assertEquals(attempt, run.runAttemptCount)
+            assertEquals(
+                "attempt=$attempt",
+                if (attempt < 3) androidx.work.ListenableWorker.Result.retry()
+                else androidx.work.ListenableWorker.Result.success(),
+                run.doWork(),
+            )
+        }
+    }
 
-        val result = worker(localOnly = true, source = "region:100").startWork().get()
+    @Test
+    fun `non-failure refresh outcomes do not request worker retries`() {
+        bindInstance(11, WidgetAddress.Saved("407"), "407", 250, 96)
+        for (outcome in WidgetRefreshResult.entries.filter { it != WidgetRefreshResult.Failed }) {
+            WeatherWidgetRefreshWorker.refresher = { _, _, _, _, _ -> outcome }
+            assertEquals(
+                "outcome=$outcome",
+                androidx.work.ListenableWorker.Result.success(),
+                worker(localOnly = false, source = "region:407").doWork(),
+            )
+        }
+    }
 
-        assertTrue(result is androidx.work.ListenableWorker.Result.Success)
-        // A cache-only run writes nothing, so this is really about not throwing
-        // and not touching the other address's state.
-        assertNull(store.readLocationState(WidgetAddress.Saved("407")))
+    @Test
+    fun `a throwing refresher follows the same bounded worker retry policy`() {
+        bindInstance(11, WidgetAddress.Saved("407"), "407", 250, 96)
+        WeatherWidgetRefreshWorker.refresher = { _, _, _, _, _ -> throw IllegalStateException("fetch failed") }
+        assertEquals(
+            androidx.work.ListenableWorker.Result.retry(),
+            worker(localOnly = false, source = "region:407", attempt = 2).doWork(),
+        )
+        assertEquals(
+            androidx.work.ListenableWorker.Result.success(),
+            worker(localOnly = false, source = "region:407", attempt = 3).doWork(),
+        )
     }
 
     @Test
@@ -394,21 +556,37 @@ class WeatherWidgetRefreshWorkerTest {
         val inside = AtomicInteger(0)
         val maximumInside = AtomicInteger(0)
         val fetches = AtomicInteger(0)
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
         WeatherWidgetRefreshWorker.refresher = { _, _, _, _, _ ->
             val concurrent = inside.incrementAndGet()
             maximumInside.updateAndGet { current -> maxOf(current, concurrent) }
             fetches.incrementAndGet()
-            Thread.sleep(50)
-            inside.decrementAndGet()
+            try {
+                entered.countDown()
+                assertTrue("fetch was not released", release.await(10, TimeUnit.SECONDS))
+            } finally {
+                inside.decrementAndGet()
+            }
             WidgetRefreshResult.Refreshed
         }
 
-        val first = Thread { worker(localOnly = false, source = "region:407").startWork().get() }
-        val second = Thread { worker(localOnly = false, source = "region:407").startWork().get() }
-        first.start()
-        second.start()
-        first.join(10_000)
-        second.join(10_000)
+        CheckedTestThreads().use { threads ->
+            try {
+                val firstRun = worker(localOnly = false, source = "region:407")
+                val secondRun = worker(localOnly = false, source = "region:407")
+                val first = threads.start("first refresh") { firstRun.doWork() }
+                assertTrue("first fetch never entered", entered.await(10, TimeUnit.SECONDS))
+                val second = threads.start("second refresh") { secondRun.doWork() }
+                threads.awaitBlockedIn(second, WeatherWidgetRefreshWorker::class.java.name, "doWork")
+                assertEquals(1, fetches.get())
+                release.countDown()
+                threads.await(first)
+                threads.await(second)
+            } finally {
+                release.countDown()
+            }
+        }
 
         // A replacement is served rather than swallowed — the second request
         // waits for the monitor instead of being skipped — but never beside the
@@ -444,7 +622,7 @@ class WeatherWidgetRefreshWorkerTest {
                 snapshotTime = { WidgetSnapshotTime(1_791_454_400_000L, 0) },
                 fetchWeather = { _, _ ->
                     insideFetch?.countDown()
-                    release.await(10, TimeUnit.SECONDS)
+                    assertTrue("fetch was not released", release.await(10, TimeUnit.SECONDS))
                     RemoteCurrentWeather(
                         stationName = "西屯",
                         time = 1_791_454_316,
@@ -485,39 +663,40 @@ class WeatherWidgetRefreshWorkerTest {
         WeatherWidgetRefreshWorker.refresher = realRefresher(insideFetch, release, forecastRegions)
 
         val stopped = worker(localOnly = false, source = "region:407")
-        val stoppedThread = Thread { stopped.startWork().get() }
-        stoppedThread.start()
-        assertTrue(
-            "the first run must reach its fetch: ${log.lines}",
-            insideFetch.await(10, TimeUnit.SECONDS),
-        )
+        CheckedTestThreads().use { threads ->
+            try {
+                val stoppedThread = threads.start("stopped refresh") { stopped.doWork() }
+                assertTrue(
+                    "the first run must reach its fetch: ${log.lines}",
+                    insideFetch.await(10, TimeUnit.SECONDS),
+                )
 
-        // The user drags the widget taller while that run is parked: the demand is
-        // raised, and `REPLACE` stops the run and queues its replacement.
-        bindInstance(11, address, "407", widthDp = 250, heightDp = 172)
-        assertTrue(WidgetUpdater.refreshForecastDemand(context, address))
-        stopped.stop(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
-        release.countDown()
-        stoppedThread.join(10_000)
+                // Resize and replace while the original fetch is held.
+                bindInstance(11, address, "407", widthDp = 250, heightDp = 172)
+                assertTrue(WidgetUpdater.refreshForecastDemand(context, address))
+                stopped.stop(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
+                release.countDown()
+                threads.await(stoppedThread)
 
-        // The stopped run left nothing behind — no snapshot, the demand it never
-        // answered still raised, and no redraw re-armed under its own identity.
-        assertNull("a stopped run must not commit", store.readCurrentWeather(address))
-        assertTrue("a stopped run must not clear the demand", store.hasForecastDemand(address))
-        assertNull(
-            "a stopped run must not re-arm the redraw: ${log.lines}",
-            log.lines.firstOrNull { it.contains("local redraw") },
-        )
+                assertNull("a stopped run must not commit", store.readCurrentWeather(address))
+                assertTrue("a stopped run must not clear the demand", store.hasForecastDemand(address))
+                assertNull(
+                    "a stopped run must not re-arm the redraw: ${log.lines}",
+                    log.lines.firstOrNull { it.contains("local redraw") },
+                )
 
-        // The replacement is the run that answers the resize.
-        worker(localOnly = false, source = "region:407").startWork().get()
-
-        assertEquals(
-            "the resized widget's forecast must be fetched by the replacement",
-            listOf("407"),
-            forecastRegions,
-        )
-        assertEquals("407", store.readForecast(address)!!.forecast.regionCode)
+                // The replacement is the run that answers the resize.
+                worker(localOnly = false, source = "region:407").doWork()
+                assertEquals(
+                    "the resized widget's forecast must be fetched by the replacement",
+                    listOf("407"),
+                    forecastRegions,
+                )
+                assertEquals("407", store.readForecast(address)!!.forecast.regionCode)
+            } finally {
+                release.countDown()
+            }
+        }
     }
 
     @Test
@@ -543,44 +722,45 @@ class WeatherWidgetRefreshWorkerTest {
         }
 
         val stopped = worker(localOnly = false, source = "region:407")
-        val stoppedThread = Thread { stopped.startWork().get() }
-        stoppedThread.start()
-        assertTrue(
-            "the first run must reach its fetch: ${log.lines}",
-            insideFetch.await(10, TimeUnit.SECONDS),
-        )
+        CheckedTestThreads().use { threads ->
+            try {
+                val stoppedThread = threads.start("stopped refresh") { stopped.doWork() }
+                assertTrue(
+                    "the first run must reach its fetch: ${log.lines}",
+                    insideFetch.await(10, TimeUnit.SECONDS),
+                )
 
-        // The resize and its replacement arrive while the first run is parked.
-        bindInstance(11, address, "407", widthDp = 250, heightDp = 172)
-        assertTrue(WidgetUpdater.refreshForecastDemand(context, address))
-        WidgetRefreshScheduler.scheduleOneTime(context, address)
-        stopped.stop(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
+                // The resize and its replacement arrive while the first run is parked.
+                bindInstance(11, address, "407", widthDp = 250, heightDp = 172)
+                assertTrue(WidgetUpdater.refreshForecastDemand(context, address))
+                WidgetRefreshScheduler.scheduleOneTime(context, address)
+                stopped.stop(WorkInfo.STOP_REASON_CANCELLED_BY_APP)
 
-        val replacement = worker(localOnly = false, source = "region:407")
-        val replacementThread = Thread { replacement.startWork().get() }
-        replacementThread.start()
+                val replacement = worker(localOnly = false, source = "region:407")
+                val replacementThread = threads.start("replacement refresh") { replacement.doWork() }
 
-        // It is waiting on the source, not fetching beside the stopped run: it has
-        // had 300 ms to reach its refresher and has not, because the monitor is
-        // still held.
-        replacementThread.join(300)
-        assertEquals(
-            "the replacement must wait for the source, not fetch beside it",
-            1,
-            refresherEntries.get(),
-        )
+                // Observe contention at the source monitor while the first fetch holds it.
+                threads.awaitBlockedIn(replacementThread, WeatherWidgetRefreshWorker::class.java.name, "doWork")
+                assertEquals(
+                    "the replacement must wait for the source, not fetch beside it",
+                    1,
+                    refresherEntries.get(),
+                )
 
-        release.countDown()
-        stoppedThread.join(10_000)
-        replacementThread.join(10_000)
+                release.countDown()
+                threads.await(stoppedThread)
+                threads.await(replacementThread)
 
-        // Only now can the replacement have run — and it answered the resize.
-        assertEquals(2, refresherEntries.get())
-        assertEquals("the resize's forecast must be fetched", listOf("407"), forecastRegions)
-        assertFalse(
-            "the replacement's commit must clear the demand it answered",
-            store.hasForecastDemand(address),
-        )
+                assertEquals(2, refresherEntries.get())
+                assertEquals("the resize's forecast must be fetched", listOf("407"), forecastRegions)
+                assertFalse(
+                    "the replacement's commit must clear the demand it answered",
+                    store.hasForecastDemand(address),
+                )
+            } finally {
+                release.countDown()
+            }
+        }
     }
 
     @Test
