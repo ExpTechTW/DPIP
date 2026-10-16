@@ -23,18 +23,31 @@ typedef CurrentWeatherWidgetPublish = Future<void> Function({
 
 typedef CurrentWeatherWidgetClear = Future<void> Function();
 
-/// Adapts the home controller callback to the iOS Widget coordinator.
+/// Whether this platform has a home-screen Widget fed by the app's own Home
+/// selection.
+///
+/// iOS and Android both do; the writer each one is given decides how the
+/// snapshot reaches the platform, and the Home controller does not care which.
+bool _hasHomeScreenWidget(TargetPlatform platform) =>
+    platform == TargetPlatform.iOS || platform == TargetPlatform.android;
+
+/// Adapts the home controller callback to the Widget coordinator.
 @visibleForTesting
 RealtimeWeatherLoadedCallback? createCurrentWeatherWidgetCallback({
   required TargetPlatform platform,
   required CurrentWeatherWidgetPublish publish,
 }) {
-  if (platform != TargetPlatform.iOS) return null;
+  if (!_hasHomeScreenWidget(platform)) return null;
 
   return (regionCode, weather) =>
       publish(regionCode: regionCode, weather: weather);
 }
 
+/// The invalidation callback for the platform's Widget.
+///
+/// Android widgets own their location independently of Home. Even a source-
+/// scoped clear would erase a valid snapshot a desktop widget still shows, so
+/// Home invalidation must not clear Android's cache. Keep iOS's existing clear.
 @visibleForTesting
 RealtimeWeatherInvalidatedCallback?
 createCurrentWeatherWidgetInvalidatedCallback({
