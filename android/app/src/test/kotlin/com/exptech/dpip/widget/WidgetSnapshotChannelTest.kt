@@ -18,6 +18,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -89,13 +90,26 @@ class WidgetSnapshotChannelTest {
         }
 
         /** The reply is posted to the main looper, which Robolectric holds. */
-        fun await(): RecordingResult {
-            while (!done.await(20, TimeUnit.MILLISECONDS)) {
+        fun await(timeoutMilliseconds: Long = 5_000): RecordingResult {
+            val deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMilliseconds)
+            while (done.count != 0L) {
                 shadowOf(Looper.getMainLooper()).idle()
+                if (done.count == 0L) break
+                val remaining = deadline - System.nanoTime()
+                assertTrue("platform channel did not reply within ${timeoutMilliseconds}ms", remaining > 0)
+                done.await(minOf(remaining, TimeUnit.MILLISECONDS.toNanos(20)), TimeUnit.NANOSECONDS)
             }
             shadowOf(Looper.getMainLooper()).idle()
             return this
         }
+    }
+
+    @Test(timeout = 2_000)
+    fun `an unanswered platform reply fails at a bounded total deadline`() {
+        val failure = assertThrows(AssertionError::class.java) {
+            RecordingResult().await(timeoutMilliseconds = 10)
+        }
+        assertTrue(failure.message!!.contains("platform channel did not reply"))
     }
 
     private fun write(
