@@ -26,13 +26,10 @@ cd "$(repo_root)"
 
 require_mise
 
-if [[ ! -x android/gradlew ]]; then
-  cat >&2 <<'EOF'
-
-  android/gradlew is missing, so there is nothing to run lint with.
-
-EOF
-  exit 1
-fi
+# The wrapper and android/local.properties the Gradle call below needs, written
+# the way tool/dev/test_android.sh writes them — and just as missing on a
+# checkout that has never built.
+step "Configuring the Android project for Gradle"
+pinned flutter build apk --config-only
 
 exec android/gradlew -p android :app:lintDebug "$@"
