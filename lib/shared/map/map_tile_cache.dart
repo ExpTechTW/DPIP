@@ -6,7 +6,10 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -20,6 +23,10 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// the SQLite store may miss, another consumer may have displaced an entry, or
 /// native may have trimmed at its byte cap.
 typedef TileWarmResult = ({int injected, Set<String> resident});
+
+/// Downloads one tile: its body (empty when the origin says there is nothing
+/// there), or a throw when the network did not answer.
+typedef TileFetch = Future<Uint8List> Function(String url);
 
 /// Owns tile bytes for MapLibre: SQLite persistence, traffic metering, and the
 /// warm path that pushes bytes into native memory before they are needed.
@@ -44,6 +51,17 @@ typedef TileWarmResult = ({int injected, Set<String> resident});
 /// frame is about to need, and this reads them out of SQLite and injects them
 /// into native's in-process mirror. When the frame is then revealed, MapLibre
 /// resolves every tile from memory — no IPC, no SQLite, no network.
+///
+/// ## Planted rows
+/// Rows the app planted from its bundled basemap (`BasemapSeeder`,
+/// [EtagCacheStore.isSeedEtag]) are a fallback, never an answer. Native
+/// replays whatever this class hands it as an immutable 200, so serving one as
+/// a hit would pin it for the session and keep it in the store for good. A
+/// demand for one therefore goes to the network first ([fetch]), inside the
+/// same `getBatch`, and the planted body is handed over only when the network
+/// cannot supply the tile in time. The download replaces the row, so each
+/// planted tile is asked about at most until the first time the network
+/// answers. The warm path never injects one at all.
 class MapTileCache {
   /// Temporary, code-owned switch for the tile timing trace.
   ///
@@ -74,17 +92,78 @@ class MapTileCache {
   //
   // Not an initializing formal: Dart has no private *named* parameter, and the
   // field must stay private.
+  ///
+  /// [fetch] is how a demand for a planted tile asks the network first; with
+  /// none, planted rows are served only as a fallback to native's own
+  /// download failing, which this class never sees — so in practice not at
+  /// all. Bootstrap passes [fetchThrough].
   MapTileCache(
     this._store, {
     NetworkUsageStore? usage,
+    TileFetch? fetch,
+    Duration plantedNetworkBudget = defaultPlantedNetworkBudget,
     // ignore: prefer_initializing_formals
-  }) : _usage = usage;
+  }) : _usage = usage,
+       // ignore: prefer_initializing_formals
+       _fetch = fetch,
+       // ignore: prefer_initializing_formals
+       _plantedNetworkBudget = plantedNetworkBudget;
 
   final EtagCacheStore _store;
   // Not initializing formals: Dart has no private *named* parameter, and these
   // fields must stay private.
   // ignore: prefer_initializing_formals
   final NetworkUsageStore? _usage;
+  final TileFetch? _fetch;
+
+  /// A [TileFetch] through the app's own HTTP stack, so the download is
+  /// metered and stored like any other — the interceptor replaces the planted
+  /// row with it.
+  static TileFetch fetchThrough(ApiClient client) => (url) async {
+    try {
+      return (await client.getBytesAbsolute(url)).bytes;
+    } on DioException catch (error) {
+      // The origin saying "nothing here" is an answer, and the interceptor has
+      // already stored it in place of the planted row.
+      if (error.response?.statusCode == 404) return Uint8List(0);
+      rethrow;
+    }
+  };
+
+  /// How long a demand may spend asking the network about planted tiles
+  /// before it hands over the planted bodies.
+  ///
+  /// Under native's own wait for a `getBatch` answer (2.5 s on Android, 4 s
+  /// on iOS) — past it native gives up on this side and downloads the tile
+  /// itself, and an offline map would get nothing at all.
+  static const Duration defaultPlantedNetworkBudget = Duration(
+    milliseconds: 1800,
+  );
+  final Duration _plantedNetworkBudget;
+
+  /// Downloads in flight for one demand. A viewport of planted tiles is at
+  /// most a few dozen, and this is what the radio carries at once.
+  static const int _plantedFetchConcurrency = 6;
+
+  /// After a demand in which the network answered nothing, later demands hand
+  /// over planted bodies at once for this long instead of waiting out
+  /// [defaultPlantedNetworkBudget] again for each new viewport.
+  static const Duration _networkDownHold = Duration(seconds: 10);
+
+  /// Running since the network last failed every planted fetch of a demand;
+  /// null while it is believed to answer.
+  Stopwatch? _networkDownFor;
+
+  /// Planted bodies handed to native this session. Native keeps them in L1,
+  /// where a repeat request would get the planted body again without asking
+  /// this side, so they are dropped once the network is seen to answer.
+  final Set<String> _plantedInL1 = {};
+
+  /// What a demand waits for before reading the store — see [servesAfter].
+  Future<void>? _ready;
+
+  /// Ceiling on that wait. Native's own budget for the answer is 2.5 s.
+  static const Duration _readyWait = Duration(milliseconds: 500);
 
   /// Native's in-process mirror budget.
   ///
@@ -159,29 +238,211 @@ class MapTileCache {
     trace(() => 'config live-sync limit=${_bytes(_memoryLimit)}');
   }
 
+  /// Holds every demand until [ready] completes (for at most half a second).
+  ///
+  /// Bootstrap passes the basemap seeding here: the home backdrop asks for
+  /// tiles within a second of launch, and on a fresh install with no network
+  /// a demand that beat the seeding to the store would find it empty.
+  void servesAfter(Future<void> ready) {
+    final pending = ready.catchError((Object _) {});
+    _ready = pending;
+    unawaited(
+      pending.whenComplete(() {
+        if (identical(_ready, pending)) _ready = null;
+      }),
+    );
+  }
+
   /// Native asked for tile bodies — answer the ones we hold; a store miss
   /// keeps the native-download path.
   Future<List<MapLibreTile>> _onGetBatch(List<String> urls) async {
     final elapsed = Stopwatch()..start();
     final wanted = urls.where(_isTile).toList(growable: false);
     if (wanted.isEmpty) return const [];
+    final ready = _ready;
+    if (ready != null) {
+      await ready.timeout(_readyWait, onTimeout: () {});
+    }
     // Hit metering lives inside [EtagCacheStore.readBytesBatch] — never
     // double-count these serves here.
-    final hits = await _store.readBytesBatch(wanted);
+    final hits = await _store.readBytesBatch(wanted, accept: _notPlanted);
     final served = <String, MapLibreTile>{};
     for (final entry in hits.entries) {
       served[entry.key] = _tileFromCache(entry.key, entry.value);
     }
+    final planted = await _servePlanted([
+      for (final url in wanted)
+        if (!served.containsKey(url) && _mayBePlanted(url)) url,
+    ], elapsed: elapsed);
+    served.addAll(planted);
     trace(
       () =>
           'demand l1-miss=${wanted.length} '
-          'l2-hit=${served.length} l2-miss=${wanted.length - served.length} '
+          'l2-hit=${hits.length} l2-miss=${wanted.length - served.length} '
+          '${planted.isEmpty ? '' : 'planted=${planted.length} '}'
           'bytes=${_bytes(_tileBytes(served.values))} '
           'dt=${elapsed.elapsedMilliseconds}ms '
           'sample=${_urls(wanted)}',
     );
     return served.values.toList();
   }
+
+  /// Answers [candidates] that have a planted row: from the network when it
+  /// answers within [defaultPlantedNetworkBudget], from the planted body when it does
+  /// not. A candidate with no row at all is left to native's own download.
+  Future<Map<String, MapLibreTile>> _servePlanted(
+    List<String> candidates, {
+    required Stopwatch elapsed,
+  }) async {
+    if (candidates.isEmpty) return const {};
+    final etags = await _store.etagsFor(candidates);
+    final planted = [
+      for (final url in candidates)
+        if (etags[url] case final etag? when EtagCacheStore.isSeedEtag(etag))
+          url,
+    ];
+    if (planted.isEmpty) return const {};
+
+    final served = <String, MapLibreTile>{};
+    final fetch = _fetch;
+    final budget = _plantedNetworkBudget - elapsed.elapsed;
+    if (fetch != null && !_networkBelievedDown && budget > Duration.zero) {
+      served.addAll(await _fetchFresh(fetch, planted, budget));
+    }
+    final fallback = [
+      for (final url in planted)
+        if (!served.containsKey(url)) url,
+    ];
+    if (fallback.isEmpty) return served;
+    // Re-checked by the read itself: a download that replaced the row while
+    // the network was being asked is a real hit and is left to the next
+    // demand rather than served as planted.
+    final bodies = await _store.readBytesBatch(fallback, accept: _isPlanted);
+    for (final entry in bodies.entries) {
+      served[entry.key] = _tileFromCache(entry.key, entry.value);
+      _plantedInL1.add(entry.key);
+    }
+    trace(
+      () =>
+          'planted fallback=${bodies.length}/${fallback.length} '
+          'network-down=$_networkBelievedDown',
+    );
+    return served;
+  }
+
+  /// Downloads [urls] for at most [budget], returning what arrived in time.
+  ///
+  /// A download still running at the deadline is not cancelled: when it lands
+  /// the interceptor has stored it, and it is pushed into L1 over the planted
+  /// body native was handed meanwhile. Nothing new starts after the deadline.
+  Future<Map<String, MapLibreTile>> _fetchFresh(
+    TileFetch fetch,
+    List<String> urls,
+    Duration budget,
+  ) async {
+    final fresh = <String, MapLibreTile>{};
+    final late = <MapLibreTile>[];
+    var next = 0;
+    var answered = 0;
+    var expired = false;
+
+    Future<void> worker() async {
+      while (!expired && next < urls.length) {
+        final url = urls[next++];
+        final Uint8List body;
+        try {
+          body = await fetch(url);
+        } catch (_) {
+          continue;
+        }
+        answered++;
+        final tile = MapLibreTile(
+          url: url,
+          data: body,
+          contentType: 'application/octet-stream',
+          etag: EtagInterceptor.etagFromUrl(Uri.parse(url)),
+        );
+        if (expired) {
+          late.add(tile);
+        } else {
+          fresh[url] = tile;
+        }
+      }
+    }
+
+    final workers = Future.wait([
+      for (var i = 0; i < math.min(_plantedFetchConcurrency, urls.length); i++)
+        worker(),
+    ]);
+    final deadline = Completer<void>();
+    final timer = Timer(budget, () {
+      if (!deadline.isCompleted) deadline.complete();
+    });
+    unawaited(
+      workers.whenComplete(() {
+        if (!deadline.isCompleted) deadline.complete();
+      }),
+    );
+    await deadline.future;
+    timer.cancel();
+    expired = true;
+
+    if (answered > 0) {
+      _networkAnswered();
+    } else {
+      _networkDownFor = Stopwatch()..start();
+    }
+    unawaited(
+      workers.then((_) async {
+        if (late.isEmpty) return;
+        _networkAnswered();
+        await _injectNetworkRepairs(late);
+      }),
+    );
+    trace(
+      () =>
+          'planted network=${fresh.length}/${urls.length} '
+          'budget=${budget.inMilliseconds}ms',
+    );
+    return fresh;
+  }
+
+  bool get _networkBelievedDown {
+    final since = _networkDownFor;
+    if (since == null) return false;
+    if (since.elapsed < _networkDownHold) return true;
+    _networkDownFor = null;
+    return false;
+  }
+
+  /// The network answered: stop holding planted fallbacks, and drop the ones
+  /// native was handed from L1 so its next request for them reaches this side
+  /// — and the network — instead of replaying the planted body.
+  ///
+  /// One needle for the whole basemap, not one per URL: native scans every
+  /// resident entry against every needle under a lock. Real basemap entries
+  /// dropped with it come straight back from SQLite.
+  void _networkAnswered() {
+    _networkDownFor = null;
+    if (_plantedInL1.isEmpty) return;
+    _plantedInL1.clear();
+    trace(() => 'planted evict-l1');
+    unawaited(
+      evict(const [ApiPaths.mapTilesV1])
+          .catchError((Object error, StackTrace stackTrace) {
+            Log.handle(error, stackTrace, 'MapTileCache planted evict');
+          }),
+    );
+  }
+
+  /// Only the basemap is ever planted; everything else skips the probe.
+  static bool _mayBePlanted(String url) => url.contains(ApiPaths.mapTilesV1);
+
+  static bool _notPlanted(String _, String etag) =>
+      !EtagCacheStore.isSeedEtag(etag);
+
+  static bool _isPlanted(String _, String etag) =>
+      EtagCacheStore.isSeedEtag(etag);
 
   /// Native downloaded tiles — persist and meter them.
   Future<void> _onPutBatch(List<MapLibreTile> tiles) async {
@@ -224,6 +485,8 @@ class MapTileCache {
     }
     if (writes.isEmpty) return;
     await _store.writeBytesBatch(writes);
+    // Native only reports a body it just downloaded, so the network is back.
+    _networkAnswered();
     // Native necessarily saw the live response before it could report the
     // batch to Dart, and put that raw body in L1 immediately. Rewriting only
     // SQLite therefore left the malformed 35-byte empty GIF under the same L1
@@ -367,8 +630,14 @@ class MapTileCache {
         return (injected: fill.injected, resident: resident);
       }
       // Don't bump last-used for a speculative warm: a frame the user scrubbed
-      // past must not outrank one they actually looked at.
-      final hits = await _store.readBytesBatch(missing, touch: false);
+      // past must not outrank one they actually looked at. Planted rows are
+      // never warmed — only a demand may hand one over, and only after asking
+      // the network (see the class doc).
+      final hits = await _store.readBytesBatch(
+        missing,
+        touch: false,
+        accept: _notPlanted,
+      );
       trace(
         () =>
             'warm#$traceId l2-hit=${hits.length} '
@@ -535,7 +804,11 @@ class MapTileCache {
       if (shouldContinue?.call() == false || used >= cap) break;
       final readEnd = math.min(readAt + _fillReadChunk, missing.length);
       final urls = missing.sublist(readAt, readEnd);
-      final hits = await _store.readBytesBatch(urls, touch: false);
+      final hits = await _store.readBytesBatch(
+        urls,
+        touch: false,
+        accept: _notPlanted,
+      );
       scanned += urls.length;
       l2Hits += hits.length;
       l2Bytes += _binaryBytes(hits.values);

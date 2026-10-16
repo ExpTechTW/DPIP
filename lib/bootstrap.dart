@@ -23,6 +23,7 @@ import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
+import 'package:dpip/shared/map/basemap_seeder.dart';
 import 'package:dpip/shared/map/map_connectivity.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -257,10 +258,22 @@ Future<void> bootstrap() async {
   // this must be bound before the first map is built.
   final mapTileCache = cache == null
       ? null
-      : MapTileCache(cache.etag, usage: cache.usage);
+      : MapTileCache(
+          cache.etag,
+          usage: cache.usage,
+          fetch: MapTileCache.fetchThrough(apiClient),
+        );
   final tileStart = Log.sinceStartMs;
   await mapTileCache?.install();
   final tileMs = Log.sinceStartMs - tileStart;
+  // The basemap the app carries, for a map with no network: planted into the
+  // tile store as a fallback the network always replaces. Every launch, since
+  // the OS may empty the cache directory at any time; after the first it is
+  // one query and no asset reads. The tile cache holds its first answers until
+  // this lands, so a fresh install offline still draws.
+  if (cache != null) {
+    mapTileCache?.servesAfter(BasemapSeeder(cache.etag).run());
+  }
   // Turn off the OS-level disk HTTP cache (iOS NSURLCache) and drop its
   // residue: every cached byte now lives in the app's own SQLite, so a second
   // disk copy is pure overhead. Fire-and-forget: it never delays launch.

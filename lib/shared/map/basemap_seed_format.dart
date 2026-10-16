@@ -8,9 +8,9 @@
 /// ## The format
 /// Each part is an asset of gzip members laid back to back, one per tile, with
 /// no header of its own. Where a tile starts and how long it is lives in the
-/// generated index (`basemap_seed.g.dart`), so a part can be planted by slicing
-/// views out of the one buffer it arrives in — nothing is parsed, inflated or
-/// copied on the UI isolate. A tile the origin answers with no content
+/// generated index (`basemap_seed.g.dart`), so a part is planted by cutting
+/// each tile out of the one buffer it arrives in — nothing is parsed or
+/// inflated on the UI isolate. A tile the origin answers with no content
 /// (204/404, open sea) is an entry of length zero.
 ///
 /// The gzip member is exactly what the tile store keeps for a compressible
