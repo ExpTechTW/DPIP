@@ -3,9 +3,10 @@
 /// The native stores write this file and Dart only reads it, so nothing in the
 /// app exercises both halves — a disagreement about the encoding would show up
 /// as a track that is simply wrong, on a device, with no exception anywhere.
-/// [_writeFixture] below is therefore a line-by-line restatement of what
-/// `LocationTrackStore.swift` and `LocationTrackStore.kt` do, and these tests
-/// assert the reader inverts it exactly.
+/// [writeTrackFixture] (`location_track_fixture.dart`) is therefore a
+/// line-by-line restatement of what `LocationTrackStore.swift` and
+/// `LocationTrackStore.kt` do, and these tests assert the reader inverts it
+/// exactly.
 library;
 
 import 'dart:io';
@@ -14,73 +15,7 @@ import 'package:dpip/core/geo/location_track.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
-const _anchorEvery = 64;
-const _scale = 10000.0;
-
-/// Writes fixes the way the native stores do: deltas, absolute every 64th row.
-void _writeFixture(String path, List<(int, double, double)> fixes) {
-  final db = sqlite3.sqlite3.open(path);
-  db.execute('PRAGMA auto_vacuum=INCREMENTAL');
-  db.execute('PRAGMA journal_mode=WAL');
-  db.execute(
-    'CREATE TABLE IF NOT EXISTS fix ('
-    'id INTEGER PRIMARY KEY, t INTEGER NOT NULL, '
-    'lat INTEGER NOT NULL, lng INTEGER NOT NULL)',
-  );
-
-  // One transaction for the whole fixture. The loop below writes a row at a
-  // time because that is what the native stores do, but in WAL mode each of
-  // those is its own commit and its own fsync — 20 000 of them for the
-  // compactness test at the bottom of this file. A local SSD answers an fsync
-  // in tens of microseconds and a shared CI runner's disk in a millisecond or
-  // two, which is the whole distance between a one-second test here and the
-  // thirty-second timeout that took `main` red. Batching moves when the pages
-  // reach the disk, not what is in them: the file comes out at exactly the
-  // same 282 624 bytes, so the byte-per-fix budget still measures the encoding.
-  db.execute('BEGIN');
-  for (final (time, latitude, longitude) in fixes) {
-    final lat = (latitude * _scale).round();
-    final lng = (longitude * _scale).round();
-
-    final last =
-        db.select('SELECT IFNULL(MAX(id), 0) AS n FROM fix').first['n'] as int;
-    var rowid = last + 1;
-    final previous = rowid % _anchorEvery == 0 ? null : _lastAbsolute(db);
-    if (previous == null && rowid % _anchorEvery != 0) {
-      rowid += _anchorEvery - rowid % _anchorEvery;
-    }
-
-    db.execute('INSERT INTO fix (id, t, lat, lng) VALUES (?, ?, ?, ?)', [
-      rowid,
-      previous == null ? time : time - previous.$1,
-      previous == null ? lat : lat - previous.$2,
-      previous == null ? lng : lng - previous.$3,
-    ]);
-  }
-  db.execute('COMMIT');
-  db.close();
-}
-
-(int, int, int)? _lastAbsolute(sqlite3.Database db) {
-  final last =
-      db.select('SELECT IFNULL(MAX(id), 0) AS n FROM fix').first['n'] as int;
-  if (last == 0) return null;
-  final anchor = last - last % _anchorEvery;
-  (int, int, int)? current;
-  for (final row in db.select(
-    'SELECT id, t, lat, lng FROM fix WHERE id >= ? ORDER BY id',
-    [anchor],
-  )) {
-    final id = row['id'] as int;
-    final t = row['t'] as int;
-    final lat = row['lat'] as int;
-    final lng = row['lng'] as int;
-    current = (id % _anchorEvery == 0 || current == null)
-        ? (t, lat, lng)
-        : (current.$1 + t, current.$2 + lat, current.$3 + lng);
-  }
-  return current;
-}
+import 'location_track_fixture.dart';
 
 /// A plausible walk: a fix a minute, drifting a few metres each time.
 List<(int, double, double)> _walk(int count, {int from = 1735689600}) => [
@@ -104,7 +39,7 @@ void main() {
   });
 
   test('a single fix round-trips', () async {
-    _writeFixture(path, [(1735689600, 25.0330, 121.5654)]);
+    writeTrackFixture(path, [(1735689600, 25.0330, 121.5654)]);
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
 
@@ -123,7 +58,7 @@ void main() {
     // switch between "absolute" and "add to the running total" repeatedly. A
     // one-row-out mistake there decodes into positions that drift.
     final expected = _walk(200);
-    _writeFixture(path, expected);
+    writeTrackFixture(path, expected);
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
 
@@ -149,7 +84,7 @@ void main() {
       // own. Asking for a window that begins there must produce the same
       // coordinates as reading the whole track, not a delta read as a position.
       final expected = _walk(200);
-      _writeFixture(path, expected);
+      writeTrackFixture(path, expected);
       final track = LocationTrack.at(path)!;
       addTearDown(track.close);
 
@@ -165,7 +100,7 @@ void main() {
   );
 
   test('a window older than the whole track returns all of it', () async {
-    _writeFixture(path, _walk(70));
+    writeTrackFixture(path, _walk(70));
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
     expect(await track.since(DateTime.utc(1990)), hasLength(70));
@@ -173,7 +108,7 @@ void main() {
 
   test('limit keeps the most recent fixes', () async {
     final expected = _walk(200);
-    _writeFixture(path, expected);
+    writeTrackFixture(path, expected);
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
 
@@ -189,14 +124,14 @@ void main() {
     // moves the row up to the next multiple of 64 rather than writing an
     // absolute value at a rowid the reader would treat as a delta. Everything
     // below depends on this, so it is asserted rather than assumed.
-    _writeFixture(path, _walk(3));
+    writeTrackFixture(path, _walk(3));
     final db = sqlite3.sqlite3.open(path);
     addTearDown(db.close);
     final ids = db
         .select('SELECT id FROM fix ORDER BY id')
         .map((row) => row['id'] as int)
         .toList();
-    expect(ids, [_anchorEvery, _anchorEvery + 1, _anchorEvery + 2]);
+    expect(ids, [trackAnchorEvery, trackAnchorEvery + 1, trackAnchorEvery + 2]);
   });
 
   test('the track still decodes after the oldest groups are evicted', () async {
@@ -205,13 +140,13 @@ void main() {
     // is itself an anchor — drop one row fewer and every position after it
     // would be a delta read as a coordinate, somewhere off the coast.
     final expected = _walk(200);
-    _writeFixture(path, expected);
+    writeTrackFixture(path, expected);
 
     // Rows start at rowid 64, so expected[i] is at rowid 64 + i. Deleting
     // below 128 takes the first whole group, expected[0..63].
-    const dropped = _anchorEvery;
+    const dropped = trackAnchorEvery;
     final writer = sqlite3.sqlite3.open(path);
-    writer.execute('DELETE FROM fix WHERE id < ${_anchorEvery * 2}');
+    writer.execute('DELETE FROM fix WHERE id < ${trackAnchorEvery * 2}');
     writer.close();
 
     final track = LocationTrack.at(path)!;
@@ -228,7 +163,7 @@ void main() {
   });
 
   test('stats report the row count and the file size', () async {
-    _writeFixture(path, _walk(200));
+    writeTrackFixture(path, _walk(200));
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
 
@@ -237,10 +172,75 @@ void main() {
     expect(stats.bytes, greaterThan(0));
   });
 
+  test('stats name the oldest fix still stored', () async {
+    final expected = _walk(200);
+    writeTrackFixture(path, expected);
+    // Eviction takes the oldest group, and the date has to move with it —
+    // "oldest point" is how a reader learns how far back the history goes.
+    final writer = sqlite3.sqlite3.open(path);
+    writer.execute('DELETE FROM fix WHERE id < ${trackAnchorEvery * 2}');
+    writer.close();
+    final track = LocationTrack.at(path)!;
+    addTearDown(track.close);
+
+    final stats = await track.stats();
+    expect(stats.fixes, 200 - trackAnchorEvery);
+    expect(
+      stats.oldest!.millisecondsSinceEpoch ~/ 1000,
+      expected[trackAnchorEvery].$1,
+    );
+  });
+
+  test('an empty file has no oldest fix', () async {
+    writeTrackFixture(path, const []);
+    final track = LocationTrack.at(path)!;
+    addTearDown(track.close);
+    final stats = await track.stats();
+    expect(stats.fixes, 0);
+    expect(stats.oldest, isNull);
+  });
+
+  group('scan', () {
+    List<(int, int, int)> scanned(DateTime from) {
+      final out = <(int, int, int)>[];
+      LocationTrack.scan(path, from, (t, lat, lng) => out.add((t, lat, lng)));
+      return out;
+    }
+
+    test('visits exactly what since returns, in stored units', () async {
+      // The two readers share one decoder; this pins that they also share one
+      // idea of the window, from a start in the middle of an anchor group.
+      writeTrackFixture(path, _walk(300));
+      final track = LocationTrack.at(path)!;
+      addTearDown(track.close);
+      final all = await track.since(DateTime.utc(2000));
+      for (final from in [DateTime.utc(2000), all[100].time, all[257].time]) {
+        final expected = await track.since(from);
+        final got = scanned(from);
+        expect(got, hasLength(expected.length), reason: '$from');
+        for (var i = 0; i < got.length; i++) {
+          final (t, lat, lng) = got[i];
+          expect(t * 1000, expected[i].time.millisecondsSinceEpoch);
+          expect(lat / 10000, closeTo(expected[i].latitude, 1e-9));
+          expect(lng / 10000, closeTo(expected[i].longitude, 1e-9));
+        }
+      }
+    });
+
+    test('a missing file visits nothing', () {
+      expect(scanned(DateTime.utc(2000)), isEmpty);
+    });
+
+    test('a window after the last fix visits nothing', () {
+      writeTrackFixture(path, _walk(70));
+      expect(scanned(DateTime.utc(2100)), isEmpty);
+    });
+  });
+
   test('the connection cannot write', () async {
     // The separation of duties is enforced by the connection, not by care:
     // the native side owns every write, including eviction.
-    _writeFixture(path, _walk(10));
+    writeTrackFixture(path, _walk(10));
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
     await expectLater(
@@ -254,7 +254,7 @@ void main() {
     // not pin the exact figure — page overhead and the WAL move it — but it
     // does fail if someone stores absolutes again, which would roughly double
     // it and quietly halve how much history fits.
-    _writeFixture(path, _walk(20000));
+    writeTrackFixture(path, _walk(20000));
     final track = LocationTrack.at(path)!;
     addTearDown(track.close);
 

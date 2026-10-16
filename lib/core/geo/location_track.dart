@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/sqlite3.dart' show Database;
+import 'package:sqlite3/sqlite3.dart' show Database, OpenMode, sqlite3;
 import 'package:sqlite_async/native.dart';
 import 'package:sqlite_async/sqlite_async.dart';
 
@@ -108,6 +108,10 @@ class LocationTrack {
 
   Future<void> close() => _db.close();
 
+  /// The file this track reads — what a background isolate opens for itself
+  /// in [scan], since a connection cannot cross an isolate boundary.
+  String get path => _path;
+
   /// The underlying connection, so a test can prove it rejects writes.
   ///
   /// Exposed rather than asserted in a comment: "Dart never writes here" is
@@ -135,24 +139,100 @@ class LocationTrack {
     }
   }
 
-  /// How many fixes are stored and how large the file is.
+  /// How many fixes are stored, how large the file is, and when the oldest
+  /// surviving fix was taken (null when there is none).
   ///
-  /// For the storage screen. This file is the one part of the app's disk use
-  /// that grows without anybody opening anything, so it is worth being able
-  /// to see it.
-  Future<({int fixes, int bytes})> stats() async {
+  /// For the storage screen and the map's track layer. This file is the one
+  /// part of the app's disk use that grows without anybody opening anything,
+  /// so it is worth being able to see it — and once eviction has started,
+  /// [oldest] is the honest answer to "how far back does it go".
+  ///
+  /// [oldest] reads the first row's `t` as an instant, which is right because
+  /// the first row is always an anchor (see [_decodeFrom]); it is the same
+  /// reading the decoder gives it.
+  Future<({int fixes, int bytes, DateTime? oldest})> stats() async {
     try {
       final row = await _db.get('SELECT COUNT(*) AS n FROM fix');
+      final first = await _db.getOptional(
+        'SELECT t FROM fix ORDER BY id LIMIT 1',
+      );
       final file = File(_path);
+      final oldest = (first?['t'] as num?)?.toInt();
       return (
         fixes: ((row['n'] as num?) ?? 0).toInt(),
         bytes: file.existsSync() ? file.lengthSync() : 0,
+        oldest: oldest == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(oldest * 1000, isUtc: true),
       );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'location track stats');
-      return (fixes: 0, bytes: 0);
+      return (fixes: 0, bytes: 0, oldest: null);
     }
   }
+
+  /// Walks every fix at or after [from] in the file at [path], oldest first,
+  /// handing each to [visit] in the units the file stores: Unix seconds and
+  /// ten-thousandths of a degree.
+  ///
+  /// **Blocking — call it from a background isolate, never the UI one.** It is
+  /// what makes "the whole history" readable at all: the budget allows a few
+  /// million rows, and [since] would materialise every one of them as an
+  /// object on the calling isolate. This streams them through a cursor
+  /// instead, one row in memory at a time, so a caller that keeps only a
+  /// bounded summary (the map's track digest) stays bounded however long the
+  /// history is.
+  ///
+  /// Opens its own `SQLITE_OPEN_READONLY` connection for the same reason
+  /// [_ReadOnlyFactory] does, and closes it before returning. A missing or
+  /// unreadable file is not an error here: it visits nothing, and the caller
+  /// sees an empty history — the same answer [open] gives.
+  static void scan(
+    String path,
+    DateTime from,
+    void Function(int seconds, int latE4, int lngE4) visit,
+  ) {
+    if (!File(path).existsSync()) return;
+    final db = sqlite3.open(path, mode: OpenMode.readOnly);
+    try {
+      final fromMs = from.millisecondsSinceEpoch;
+      final anchor = db.select(_anchorQuery, [fromMs ~/ 1000]);
+      final start = anchor.isEmpty
+          ? 0
+          : ((anchor.first.columnAt(0) as num?) ?? 0).toInt();
+      final statement = db.prepare(_walkQuery);
+      try {
+        final cursor = statement.selectCursor([start]);
+        final decoder = _Decoder();
+        while (cursor.moveNext()) {
+          final row = cursor.current;
+          decoder.feed(
+            (row.columnAt(0) as num).toInt(),
+            (row.columnAt(1) as num).toInt(),
+            (row.columnAt(2) as num).toInt(),
+            (row.columnAt(3) as num).toInt(),
+          );
+          // The same cut [since] makes, in the same units: a fix stamped in
+          // whole seconds is in the window when its instant is not before it.
+          if (decoder.t * 1000 < fromMs) continue;
+          visit(decoder.t, decoder.lat, decoder.lng);
+        }
+      } finally {
+        statement.close();
+      }
+    } finally {
+      db.close();
+    }
+  }
+
+  /// The newest anchor at or before an instant (see [_anchorAtOrBefore]).
+  static const _anchorQuery =
+      'SELECT id FROM fix WHERE id % $_anchorEvery = 0 AND t <= ? '
+      'ORDER BY id DESC LIMIT 1';
+
+  /// Every row from an anchor forward, in the order the deltas chain.
+  static const _walkQuery =
+      'SELECT id, t, lat, lng FROM fix WHERE id >= ? ORDER BY id';
 
   /// The rowid of the newest anchor no later than [time], or 0 for "start at
   /// the beginning".
@@ -167,11 +247,9 @@ class LocationTrack {
   /// than the whole track is the one case that scans it all, and it correctly
   /// answers 0.
   Future<int> _anchorAtOrBefore(DateTime time) async {
-    final rows = await _db.getAll(
-      'SELECT id FROM fix WHERE id % $_anchorEvery = 0 AND t <= ? '
-      'ORDER BY id DESC LIMIT 1',
-      [time.millisecondsSinceEpoch ~/ 1000],
-    );
+    final rows = await _db.getAll(_anchorQuery, [
+      time.millisecondsSinceEpoch ~/ 1000,
+    ]);
     return rows.isEmpty ? 0 : ((rows.first['id'] as num?) ?? 0).toInt();
   }
 
@@ -179,41 +257,66 @@ class LocationTrack {
   ///
   /// [startId] has to be an anchor or 0 — the first row of the table is always
   /// an anchor, because the writer rounds up to a boundary whenever it has
-  /// nothing to count from and eviction only ever deletes whole groups. The
-  /// `t == null` arm below is the belt to that braces: a first row that
-  /// somehow is not an anchor is read as absolute, which is the only reading
-  /// that can be right.
+  /// nothing to count from and eviction only ever deletes whole groups.
+  /// [_Decoder] is the belt to that braces.
   Future<List<TrackFix>> _decodeFrom(int startId) async {
-    final rows = await _db.getAll(
-      'SELECT id, t, lat, lng FROM fix WHERE id >= ? ORDER BY id',
-      [startId],
-    );
+    final rows = await _db.getAll(_walkQuery, [startId]);
     final fixes = <TrackFix>[];
-    var t = 0;
-    var lat = 0;
-    var lng = 0;
-    var started = false;
+    final decoder = _Decoder();
     for (final row in rows) {
-      final id = (row['id'] as num).toInt();
-      if (!started || id % _anchorEvery == 0) {
-        t = (row['t'] as num).toInt();
-        lat = (row['lat'] as num).toInt();
-        lng = (row['lng'] as num).toInt();
-        started = true;
-      } else {
-        t += (row['t'] as num).toInt();
-        lat += (row['lat'] as num).toInt();
-        lng += (row['lng'] as num).toInt();
-      }
+      decoder.feed(
+        (row['id'] as num).toInt(),
+        (row['t'] as num).toInt(),
+        (row['lat'] as num).toInt(),
+        (row['lng'] as num).toInt(),
+      );
       fixes.add(
         TrackFix(
-          time: DateTime.fromMillisecondsSinceEpoch(t * 1000, isUtc: true),
-          latitude: lat / _scale,
-          longitude: lng / _scale,
+          time: DateTime.fromMillisecondsSinceEpoch(
+            decoder.t * 1000,
+            isUtc: true,
+          ),
+          latitude: decoder.lat / _scale,
+          longitude: decoder.lng / _scale,
         ),
       );
     }
     return fixes;
+  }
+}
+
+/// The delta walk, written once.
+///
+/// [LocationTrack.since] and [LocationTrack.scan] read the rows through
+/// different connections on different isolates, and the one thing they must
+/// never do is disagree about what a row means — a decoder copied into two
+/// places is two decoders, and the day one of them is fixed the other becomes
+/// the bug.
+///
+/// The first row fed is read as absolute whatever its id: it is always an
+/// anchor (the writer rounds up to a boundary whenever it has nothing to count
+/// from, and eviction only deletes whole groups), and a first row that somehow
+/// is not one is still read absolute, which is the only reading that can be
+/// right.
+class _Decoder {
+  var _started = false;
+
+  /// The absolute values after the last [feed].
+  int t = 0;
+  int lat = 0;
+  int lng = 0;
+
+  void feed(int id, int t, int lat, int lng) {
+    if (!_started || id % LocationTrack._anchorEvery == 0) {
+      this.t = t;
+      this.lat = lat;
+      this.lng = lng;
+      _started = true;
+    } else {
+      this.t += t;
+      this.lat += lat;
+      this.lng += lng;
+    }
   }
 }
 
