@@ -21,15 +21,6 @@ cd "$(repo_root)"
 
 require_mise
 
-if [[ ! -x android/gradlew ]]; then
-  cat >&2 <<'EOF'
-
-  android/gradlew is missing, so there is nothing to run the tests with.
-
-EOF
-  exit 1
-fi
-
 if ! command -v adb >/dev/null 2>&1; then
   cat >&2 <<'EOF'
 
@@ -53,5 +44,11 @@ if [[ -z $(adb devices | awk 'NR>1 && $2 == "device"') ]]; then
 EOF
   exit 1
 fi
+
+# The wrapper and android/local.properties the Gradle call below needs, written
+# the way tool/dev/test_android.sh writes them. After the device checks, so a
+# run with nothing attached still fails without doing this first.
+step "Configuring the Android project for Gradle"
+pinned flutter build apk --config-only
 
 exec android/gradlew -p android :app:connectedDebugAndroidTest "$@"
