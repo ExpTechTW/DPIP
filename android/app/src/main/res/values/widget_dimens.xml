@@ -70,7 +70,8 @@
     <dimen name="widget_icon_location">11dp</dimen>
     <dimen name="widget_icon_metric">12dp</dimen>
 
-    <!-- Action touch targets: the gear and the refresh glyph.
+    <!-- Refresh touch targets. Configuration is provided by launcher reconfigure,
+         not by an action in the widget face.
 
          The platform guidance is a 48 dp touch target, and the glyph is drawn
          smaller than its box via the paddings below, so growing a target never
@@ -78,27 +79,25 @@
          measured budget allows:
 
          * `widget_icon_action_touch` (48 dp) is the full guidance, used only
-           by the empty face's corner gear: it overlays the corner rather than
+           by the empty face's corner refresh: it overlays the corner rather than
            sharing a row, so no text budget competes with it.
-         * `widget_icon_action_target` (28 dp) serves the medium header pair.
+         * `widget_icon_action_target` (28 dp) serves the medium header refresh.
            The header's height is the buttons' height, and the forecast below
            is weighted: at the 172 dp two-row cell a taller header leaves the
            forecast probability line 2 dp short (`WidgetLayoutFitTest` pins
            this exactly), so 28 dp is this slot's ceiling.
          * `widget_icon_action_touch_small` (32 dp) serves the small face's
-           temperature-row gear, which shares its row with the 42 sp reading:
+           temperature-row refresh, which shares its row with the 42 sp reading:
            the weighted spacer absorbs the wider box, and the glyph stays
            12 dp via `widget_action_padding_small`.
-         * `widget_icon_action_touch_small` (32 dp) serves the small face's
-           temperature-row gear, which shares its row with the 42 sp reading.
          * `widget_icon_action_target_large` stays 24 dp and
            `widget_icon_action_target_compact` stays 20 dp: the large header at
            a 200 dp cell and the 110 dp compact box spend their whole width on
            the town and the clock (`WidgetLayoutFitTest` asserts both stay
            whole), so any larger box would ellipsise the primary content to
-           enlarge a secondary button. Those two slots are additionally covered
-           by the launcher's system reconfigure entry (`reconfigurable`) and by
-           the app itself.
+           enlarge a secondary button. Reconfiguration is separate from refresh:
+           use a supporting launcher's system reconfigure entry, or remove and
+           re-add the widget where that entry is unavailable (including API 26-27).
     -->
     <dimen name="widget_icon_action_target">28dp</dimen>
     <dimen name="widget_icon_action_target_large">24dp</dimen>
