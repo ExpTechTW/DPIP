@@ -1,6 +1,8 @@
 package com.exptech.dpip.widget
 
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -20,6 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import java.io.File
@@ -34,6 +37,8 @@ class WidgetConfigurationRenderTest {
         context.deleteDatabase(WidgetStore.DATABASE_NAME)
         WidgetStore.resetForTest()
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        shadowOf(AppWidgetManager.getInstance(context)).addBoundWidget(42,
+            AppWidgetProviderInfo().apply { provider = ComponentName(context, WeatherWidgetProvider::class.java) })
     }
     @After fun cleanup() {
         WidgetStore.resetForTest()

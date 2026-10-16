@@ -2,6 +2,7 @@ package com.exptech.dpip.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,8 +16,9 @@ import com.exptech.dpip.MainActivity
 import com.exptech.dpip.R
 
 /**
- * The location picker the launcher opens when a Widget is added, and the one the
- * Widget's own gear opens to change it afterwards.
+ * The location picker the launcher opens when a Widget is added or reconfigured.
+ * Reconfiguration availability depends on the platform and launcher; launchers
+ * without that entry require removing and adding the Widget again.
  *
  * The result contract is the framework's, and it is the trap this class is
  * careful about:
@@ -25,8 +27,8 @@ import com.exptech.dpip.R
  *   never sets it leaves the user with a Widget that was never added, having
  *   tapped a row. So `RESULT_CANCELED` is set first thing and only replaced
  *   once the choice has been persisted.
- * * **Reconfiguring.** The same Activity is reached from the Widget's gear on
- *   every API level, and there "cancel" means *keep what is configured*. It is
+ * * **Reconfiguring.** The launcher can reopen the same Activity, and there
+ *   "cancel" means *keep what is configured*. It is
  *   answered with `RESULT_OK` **without touching the stored instance**, which is
  *   what "no change" means to the launcher; answering `RESULT_CANCELED` here
  *   would be asking the launcher to undo the reconfiguration.
@@ -54,18 +56,9 @@ class WeatherWidgetConfigurationActivity : Activity() {
     }
 
     /**
-     * A second gear tap while this screen is still alive arrives here, not in
-     * [onCreate].
-     *
-     * The Activity is `singleTop` and the gear's `PendingIntent` is launched with
-     * `CLEAR_TOP`, so the framework hands the new intent to the running instance
-     * instead of making another one. Without this override that instance kept the
-     * `appWidgetId` it was first opened for, and choosing a town after tapping a
-     * *second* Widget's gear wrote to the **first** Widget — silently changing a
-     * screen the user never opened. Re-reading the id, re-deriving add-vs-
-     * reconfigure and rebuilding the list here is what keeps the choice on the
-     * instance the user actually opened; the previous list and buttons are
-     * replaced outright, so no listener from the earlier intent can fire.
+     * A launcher may reuse this `singleTop` Activity for another Widget.
+     * Validate and rebuild for the latest target, rather than writing a new
+     * choice to the Widget whose screen happened to be open first.
      *
      * `setIntent` first, so `getIntent()` — and anything after this that reads it
      * — describes the intent that arrived last, which is the Activity contract.
@@ -90,7 +83,7 @@ class WeatherWidgetConfigurationActivity : Activity() {
             AppWidgetManager.INVALID_APPWIDGET_ID,
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
-        if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+        if (!isOwnWidget()) {
             finish()
             return
         }
@@ -144,6 +137,12 @@ class WeatherWidgetConfigurationActivity : Activity() {
         list.setOnItemClickListener { _, _, position, _ -> choose(rows[position]) }
     }
 
+    /** Intent extras are untrusted, even when the launcher normally supplies them. */
+    private fun isOwnWidget(): Boolean =
+        appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID &&
+            AppWidgetManager.getInstance(this).getAppWidgetInfo(appWidgetId)?.provider ==
+            ComponentName(this, WeatherWidgetProvider::class.java)
+
     /**
      * Cancels, preserving an existing configuration.
      *
@@ -151,7 +150,7 @@ class WeatherWidgetConfigurationActivity : Activity() {
      * `RESULT_OK` with the stored instance left exactly as it was.
      */
     private fun cancel() {
-        setResult(if (isReconfigure) RESULT_OK else RESULT_CANCELED)
+        setResult(if (isReconfigure && isOwnWidget()) RESULT_OK else RESULT_CANCELED)
         finish()
     }
 
@@ -193,6 +192,13 @@ class WeatherWidgetConfigurationActivity : Activity() {
     }
 
     private fun choose(row: Row) {
+        // The launcher can remove the Widget while the picker is open. Recheck
+        // at the write boundary so no durable ghost or refresh work is created.
+        if (!isOwnWidget()) {
+            setResult(RESULT_CANCELED)
+            finish()
+            return
+        }
         val store = WidgetStore.open(this)
         if (!store.writeInstance(
                 appWidgetId = appWidgetId,
