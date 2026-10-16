@@ -204,8 +204,8 @@
             </intent-filter>
         </receiver>
 
-        <!-- Location picker, opened by the launcher when an instance is added and
-             by the Widget's own gear when it is changed. -->
+        <!-- Location picker, opened by the launcher for adding and, where
+             supported, reconfiguring an instance. -->
         <activity
             android:name=".widget.WeatherWidgetConfigurationActivity"
             android:exported="true"
