@@ -199,33 +199,39 @@ class WidgetRefreshServiceTest {
 
         // The first refresh reserves, resolves to township 407, and parks inside
         // its fetch.
-        val slow = Thread {
-            service(
-                resolve = { LocationResolution.Resolved(resolved("407")) },
-                fetchWeather = { _, _ ->
-                    inFlight.countDown()
-                    released.await(10, TimeUnit.SECONDS)
-                    observation(time = 1_791_454_400)
-                },
-            ).refresh(currentLocation, includeForecast = false)
+        CheckedTestThreads().use { threads ->
+            try {
+                val slow = threads.start("older township refresh") {
+                    service(
+                        resolve = { LocationResolution.Resolved(resolved("407")) },
+                        fetchWeather = { _, _ ->
+                            inFlight.countDown()
+                            assertTrue("older fetch was not released", released.await(10, TimeUnit.SECONDS))
+                            observation(time = 1_791_454_400)
+                        },
+                    ).refresh(currentLocation, includeForecast = false).also {
+                        assertEquals(WidgetRefreshResult.Superseded, it)
+                    }
+                }
+                assertTrue(inFlight.await(10, TimeUnit.SECONDS))
+
+                // The device moves to township 100 and a second refresh completes.
+                val fast = service(
+                    resolve = { LocationResolution.Resolved(resolved("100")) },
+                    fetchWeather = { _, _ -> observation(time = 1_791_454_300) },
+                ).refresh(currentLocation, includeForecast = false)
+                assertEquals(WidgetRefreshResult.Refreshed, fast)
+
+                released.countDown()
+                threads.await(slow)
+
+                // The older acquisition must not replace the newer township.
+                val stored = store.readCurrentWeather(currentLocation)!!
+                assertEquals("100", stored.snapshot.regionCode)
+            } finally {
+                released.countDown()
+            }
         }
-        slow.start()
-        assertTrue(inFlight.await(10, TimeUnit.SECONDS))
-
-        // The device moves to township 100 and a second refresh completes.
-        val fast = service(
-            resolve = { LocationResolution.Resolved(resolved("100")) },
-            fetchWeather = { _, _ -> observation(time = 1_791_454_300) },
-        ).refresh(currentLocation, includeForecast = false)
-        assertEquals(WidgetRefreshResult.Refreshed, fast)
-
-        released.countDown()
-        slow.join(10_000)
-
-        // The first refresh finishes last but describes a township the device
-        // has left, and must not replace the newer acquisition.
-        val stored = store.readCurrentWeather(currentLocation)!!
-        assertEquals("100", stored.snapshot.regionCode)
     }
 
     @Test

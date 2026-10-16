@@ -138,7 +138,7 @@ class WidgetDeadlinesTest {
     }
 
     @Test
-    fun `a forecast expiry earlier than the observation boundary is scheduled`() {
+    fun `forecast expiry is scheduled after an already stale observation`() {
         val observation = atTaipei(14, 0) / 1_000
         val forecast = storedForecast(atTaipei(15, 0))
         // Staleness is 14:30 and the forecast expires at 15:00, so staleness wins.
@@ -150,6 +150,24 @@ class WidgetDeadlinesTest {
         assertEquals(
             atTaipei(15, 0),
             WidgetDeadlines.nextChange(snapshot(observation), forecast, atTaipei(14, 31)),
+        )
+    }
+
+    @Test
+    fun `forecast expiry wins before both future staleness and day night transition`() {
+        val entry = snapshot(
+            observationSeconds = atTaipei(14, 0) / 1_000,
+            nextTransitionSeconds = atTaipei(14, 20) / 1_000,
+        )
+        val forecast = storedForecast(atTaipei(14, 10))
+
+        assertEquals(
+            atTaipei(14, 10),
+            WidgetDeadlines.nextChange(entry, forecast, atTaipei(14, 0)),
+        )
+        assertEquals(
+            atTaipei(14, 20),
+            WidgetDeadlines.nextChange(entry, forecast, atTaipei(14, 10)),
         )
     }
 }
