@@ -3370,4 +3370,87 @@ class AppLocalizationsJa extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => '移動履歴';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => 'この端末の移動記録（端末内にのみ保存）';
+
+  @override
+  String get locationTrackRangeToday => '今日';
+
+  @override
+  String get locationTrackRangeWeek => '7日間';
+
+  @override
+  String get locationTrackRangeMonth => '30日間';
+
+  @override
+  String get locationTrackRangeAll => 'すべて';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count 地点';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => 'この期間の記録はありません';
+
+  @override
+  String get locationTrackLocalOnly =>
+      'この端末にのみ保存され、アップロードされることはありません。アプリを削除するか、アプリのデータを消去すると失われます。';
+
+  @override
+  String get locationTrackEmpty => 'まだ記録がありません';
+
+  @override
+  String get locationTrackEmptyBody =>
+      'バックグラウンドでの位置情報を許可すると、この端末の移動が自動的に記録されます。';
+
+  @override
+  String get locationTrackStorage => 'ストレージ';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '保存済み $count 地点 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '最も古い地点：$date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '最新の地点：$time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '上限は 50 MB で、およそ 300 万地点以上を保存できます。1 日 100〜300 地点の一般的なペースなら、数十年分が目安です。上限に達すると古い地点から削除されます。';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '$hours 時間以上離れた地点は線で結びません。';
+  }
+
+  @override
+  String get locationTrackClear => '履歴を消去';
+
+  @override
+  String get locationTrackClearConfirm =>
+      'この端末に記録されたすべての移動履歴が削除されます。元に戻すことはできません。';
+
+  @override
+  String get locationTrackCleared => '履歴を消去しました';
+
+  @override
+  String get locationTrackLegendNewer => '新しい';
+
+  @override
+  String get locationTrackLegendOlder => '古い';
+
+  @override
+  String get locationTrackLegendLatest => '最新の位置';
 }

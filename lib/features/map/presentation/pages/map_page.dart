@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -21,6 +22,7 @@ import 'package:dpip/features/map/presentation/layers/humidity_layer.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/features/map/presentation/layers/lightning_layer.dart';
+import 'package:dpip/features/map/presentation/layers/location_track_layer.dart';
 import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/features/map/presentation/layers/pressure_layer.dart';
 import 'package:dpip/features/map/presentation/layers/qpesums_layer.dart';
@@ -138,6 +140,7 @@ class _MapPageState extends State<MapPage> {
       context.read<MeshNodeStore>(),
       service: context.read<MeshtasticService>(),
     ),
+    LocationTrackMapLayer(context.read<BackgroundLocationService>()),
   ];
 
   @override

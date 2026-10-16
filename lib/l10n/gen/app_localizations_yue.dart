@@ -3351,4 +3351,85 @@ class AppLocalizationsYue extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm 公分';
   }
+
+  @override
+  String get mapLayerLocationTrack => '軌跡';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => '呢部手機去過嘅地方，只存喺本機';
+
+  @override
+  String get locationTrackRangeToday => '今日';
+
+  @override
+  String get locationTrackRangeWeek => '7 日';
+
+  @override
+  String get locationTrackRangeMonth => '30 日';
+
+  @override
+  String get locationTrackRangeAll => '全部';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count 個點';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => '呢段期間冇紀錄';
+
+  @override
+  String get locationTrackLocalOnly =>
+      '只會存喺呢部手機，唔會上載。解除安裝 App 或者清除 App 資料之後就會消失。';
+
+  @override
+  String get locationTrackEmpty => '仲未有軌跡';
+
+  @override
+  String get locationTrackEmptyBody => '允許背景位置之後，呢部手機會自動記錄移動軌跡。';
+
+  @override
+  String get locationTrackStorage => '儲存空間';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '已儲存 $count 個點 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '最早一點：$date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '最新一點：$time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '最多保留 50 MB，大約可以存 300 萬個點以上；以一般每日 100–300 個點估算，大約係幾十年嘅紀錄。存滿之後會先刪除最舊嘅點。';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '相隔超過 $hours 個鐘嘅點唔會連線。';
+  }
+
+  @override
+  String get locationTrackClear => '清除軌跡';
+
+  @override
+  String get locationTrackClearConfirm => '呢部手機記錄嘅所有軌跡都會刪除，而且無法復原。';
+
+  @override
+  String get locationTrackCleared => '已清除軌跡';
+
+  @override
+  String get locationTrackLegendNewer => '較新';
+
+  @override
+  String get locationTrackLegendOlder => '較舊';
+
+  @override
+  String get locationTrackLegendLatest => '最新位置';
 }

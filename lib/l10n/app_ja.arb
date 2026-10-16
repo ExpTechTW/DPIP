@@ -2067,5 +2067,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "移動履歴",
+  "mapLayerLocationTrackSubtitle": "この端末の移動記録（端末内にのみ保存）",
+  "locationTrackRangeToday": "今日",
+  "locationTrackRangeWeek": "7日間",
+  "locationTrackRangeMonth": "30日間",
+  "locationTrackRangeAll": "すべて",
+  "locationTrackRangePoints": "{count} 地点",
+  "locationTrackRangeEmpty": "この期間の記録はありません",
+  "locationTrackLocalOnly": "この端末にのみ保存され、アップロードされることはありません。アプリを削除するか、アプリのデータを消去すると失われます。",
+  "locationTrackEmpty": "まだ記録がありません",
+  "locationTrackEmptyBody": "バックグラウンドでの位置情報を許可すると、この端末の移動が自動的に記録されます。",
+  "locationTrackStorage": "ストレージ",
+  "locationTrackStored": "保存済み {count} 地点 · {size}",
+  "locationTrackOldest": "最も古い地点：{date}",
+  "locationTrackLatest": "最新の地点：{time}",
+  "locationTrackCapacity": "上限は 50 MB で、およそ 300 万地点以上を保存できます。1 日 100〜300 地点の一般的なペースなら、数十年分が目安です。上限に達すると古い地点から削除されます。",
+  "locationTrackGapNote": "{hours} 時間以上離れた地点は線で結びません。",
+  "locationTrackClear": "履歴を消去",
+  "locationTrackClearConfirm": "この端末に記録されたすべての移動履歴が削除されます。元に戻すことはできません。",
+  "locationTrackCleared": "履歴を消去しました",
+  "locationTrackLegendNewer": "新しい",
+  "locationTrackLegendOlder": "古い",
+  "locationTrackLegendLatest": "最新の位置"
 }

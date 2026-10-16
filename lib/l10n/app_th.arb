@@ -2067,5 +2067,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "เส้นทาง",
+  "mapLayerLocationTrackSubtitle": "สถานที่ที่โทรศัพท์เครื่องนี้เคยไป เก็บไว้ในเครื่องเท่านั้น",
+  "locationTrackRangeToday": "วันนี้",
+  "locationTrackRangeWeek": "7 วัน",
+  "locationTrackRangeMonth": "30 วัน",
+  "locationTrackRangeAll": "ทั้งหมด",
+  "locationTrackRangePoints": "{count} จุด",
+  "locationTrackRangeEmpty": "ไม่มีบันทึกในช่วงเวลานี้",
+  "locationTrackLocalOnly": "เก็บไว้ในโทรศัพท์เครื่องนี้เท่านั้นและจะไม่ถูกอัปโหลด หากถอนการติดตั้งแอปหรือล้างข้อมูลแอป ข้อมูลจะหายไป",
+  "locationTrackEmpty": "ยังไม่มีเส้นทาง",
+  "locationTrackEmptyBody": "เมื่ออนุญาตตำแหน่งในเบื้องหลังแล้ว โทรศัพท์เครื่องนี้จะบันทึกเส้นทางการเดินทางโดยอัตโนมัติ",
+  "locationTrackStorage": "พื้นที่จัดเก็บ",
+  "locationTrackStored": "จัดเก็บแล้ว {count} จุด · {size}",
+  "locationTrackOldest": "จุดเก่าที่สุด: {date}",
+  "locationTrackLatest": "จุดล่าสุด: {time}",
+  "locationTrackCapacity": "เก็บได้สูงสุด 50 MB หรือประมาณ 3 ล้านจุดขึ้นไป หากบันทึกวันละ 100–300 จุดตามปกติ จะเก็บได้ราวหลายสิบปี เมื่อเต็มแล้วจุดที่เก่าที่สุดจะถูกลบก่อน",
+  "locationTrackGapNote": "จุดที่ห่างกันเกิน {hours} ชั่วโมงจะไม่ถูกลากเส้นเชื่อม",
+  "locationTrackClear": "ล้างเส้นทาง",
+  "locationTrackClearConfirm": "เส้นทางทั้งหมดที่บันทึกไว้ในโทรศัพท์เครื่องนี้จะถูกลบ และไม่สามารถกู้คืนได้",
+  "locationTrackCleared": "ล้างเส้นทางแล้ว",
+  "locationTrackLegendNewer": "ใหม่กว่า",
+  "locationTrackLegendOlder": "เก่ากว่า",
+  "locationTrackLegendLatest": "ตำแหน่งล่าสุด"
 }

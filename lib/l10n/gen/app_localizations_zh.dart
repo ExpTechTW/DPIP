@@ -3351,6 +3351,87 @@ class AppLocalizationsZh extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm 公分';
   }
+
+  @override
+  String get mapLayerLocationTrack => '軌跡';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => '這支手機去過的地方，只存在本機';
+
+  @override
+  String get locationTrackRangeToday => '今天';
+
+  @override
+  String get locationTrackRangeWeek => '7 天';
+
+  @override
+  String get locationTrackRangeMonth => '30 天';
+
+  @override
+  String get locationTrackRangeAll => '全部';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count 個點';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => '這段期間沒有紀錄';
+
+  @override
+  String get locationTrackLocalOnly =>
+      '只存在這支手機上，不會上傳。解除安裝 App 或清除 App 資料後就會消失。';
+
+  @override
+  String get locationTrackEmpty => '還沒有軌跡';
+
+  @override
+  String get locationTrackEmptyBody => '允許背景位置後，這支手機會自動記錄移動軌跡。';
+
+  @override
+  String get locationTrackStorage => '儲存空間';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '已儲存 $count 個點 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '最早一點：$date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '最新一點：$time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '最多保留 50 MB，約可存 300 萬個點以上；以一般每天 100–300 個點估算，大約是數十年的紀錄。存滿後會先刪除最舊的點。';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '相隔超過 $hours 小時的點不會連線。';
+  }
+
+  @override
+  String get locationTrackClear => '清除軌跡';
+
+  @override
+  String get locationTrackClearConfirm => '這支手機上記錄的所有軌跡都會刪除，而且無法復原。';
+
+  @override
+  String get locationTrackCleared => '已清除軌跡';
+
+  @override
+  String get locationTrackLegendNewer => '較新';
+
+  @override
+  String get locationTrackLegendOlder => '較舊';
+
+  @override
+  String get locationTrackLegendLatest => '最新位置';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6697,6 +6778,86 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => '轨迹';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => '这部手机去过的地方，只存在本机';
+
+  @override
+  String get locationTrackRangeToday => '今天';
+
+  @override
+  String get locationTrackRangeWeek => '7 天';
+
+  @override
+  String get locationTrackRangeMonth => '30 天';
+
+  @override
+  String get locationTrackRangeAll => '全部';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count 个点';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => '这段期间没有记录';
+
+  @override
+  String get locationTrackLocalOnly => '只存在这部手机上，不会上传。卸载 App 或清除 App 数据后就会消失。';
+
+  @override
+  String get locationTrackEmpty => '还没有轨迹';
+
+  @override
+  String get locationTrackEmptyBody => '允许后台定位后，这部手机会自动记录移动轨迹。';
+
+  @override
+  String get locationTrackStorage => '存储空间';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '已存储 $count 个点 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '最早一点：$date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '最新一点：$time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '最多保留 50 MB，约可存 300 万个点以上；按一般每天 100–300 个点估算，大约是数十年的记录。存满后会先删除最旧的点。';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '相隔超过 $hours 小时的点不会连线。';
+  }
+
+  @override
+  String get locationTrackClear => '清除轨迹';
+
+  @override
+  String get locationTrackClearConfirm => '这部手机上记录的所有轨迹都会被删除，且无法恢复。';
+
+  @override
+  String get locationTrackCleared => '已清除轨迹';
+
+  @override
+  String get locationTrackLegendNewer => '较新';
+
+  @override
+  String get locationTrackLegendOlder => '较旧';
+
+  @override
+  String get locationTrackLegendLatest => '最新位置';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10043,6 +10204,87 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm 公分';
   }
+
+  @override
+  String get mapLayerLocationTrack => '軌跡';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => '這部手機去過的地方，只存在本機';
+
+  @override
+  String get locationTrackRangeToday => '今日';
+
+  @override
+  String get locationTrackRangeWeek => '7 日';
+
+  @override
+  String get locationTrackRangeMonth => '30 日';
+
+  @override
+  String get locationTrackRangeAll => '全部';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count 個點';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => '這段期間沒有紀錄';
+
+  @override
+  String get locationTrackLocalOnly =>
+      '只會儲存在這部手機上，不會上載。解除安裝 App 或清除 App 資料後就會消失。';
+
+  @override
+  String get locationTrackEmpty => '還沒有軌跡';
+
+  @override
+  String get locationTrackEmptyBody => '允許背景位置後，這部手機會自動記錄移動軌跡。';
+
+  @override
+  String get locationTrackStorage => '儲存空間';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '已儲存 $count 個點 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '最早一點：$date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '最新一點：$time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '最多保留 50 MB，約可存 300 萬個點以上；以一般每日 100–300 個點估算，大約是數十年的紀錄。存滿後會先刪除最舊的點。';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '相隔超過 $hours 小時的點不會連線。';
+  }
+
+  @override
+  String get locationTrackClear => '清除軌跡';
+
+  @override
+  String get locationTrackClearConfirm => '這部手機上記錄的所有軌跡都會刪除，而且無法復原。';
+
+  @override
+  String get locationTrackCleared => '已清除軌跡';
+
+  @override
+  String get locationTrackLegendNewer => '較新';
+
+  @override
+  String get locationTrackLegendOlder => '較舊';
+
+  @override
+  String get locationTrackLegendLatest => '最新位置';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13389,4 +13631,85 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm 公分';
   }
+
+  @override
+  String get mapLayerLocationTrack => '軌跡';
+
+  @override
+  String get mapLayerLocationTrackSubtitle => '這支手機去過的地方，只存在本機';
+
+  @override
+  String get locationTrackRangeToday => '今天';
+
+  @override
+  String get locationTrackRangeWeek => '7 天';
+
+  @override
+  String get locationTrackRangeMonth => '30 天';
+
+  @override
+  String get locationTrackRangeAll => '全部';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count 個點';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => '這段期間沒有紀錄';
+
+  @override
+  String get locationTrackLocalOnly =>
+      '只存在這支手機上，不會上傳。解除安裝 App 或清除 App 資料後就會消失。';
+
+  @override
+  String get locationTrackEmpty => '還沒有軌跡';
+
+  @override
+  String get locationTrackEmptyBody => '允許背景位置後，這支手機會自動記錄移動軌跡。';
+
+  @override
+  String get locationTrackStorage => '儲存空間';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '已儲存 $count 個點 · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return '最早一點：$date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return '最新一點：$time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      '最多保留 50 MB，約可存 300 萬個點以上；以一般每天 100–300 個點估算，大約是數十年的紀錄。存滿後會先刪除最舊的點。';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return '相隔超過 $hours 小時的點不會連線。';
+  }
+
+  @override
+  String get locationTrackClear => '清除軌跡';
+
+  @override
+  String get locationTrackClearConfirm => '這支手機上記錄的所有軌跡都會刪除，而且無法復原。';
+
+  @override
+  String get locationTrackCleared => '已清除軌跡';
+
+  @override
+  String get locationTrackLegendNewer => '較新';
+
+  @override
+  String get locationTrackLegendOlder => '較舊';
+
+  @override
+  String get locationTrackLegendLatest => '最新位置';
 }

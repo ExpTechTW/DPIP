@@ -2067,5 +2067,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "Ruta",
+  "mapLayerLocationTrackSubtitle": "Mga napuntahan ng teleponong ito, nasa device lang",
+  "locationTrackRangeToday": "Ngayon",
+  "locationTrackRangeWeek": "7 araw",
+  "locationTrackRangeMonth": "30 araw",
+  "locationTrackRangeAll": "Lahat",
+  "locationTrackRangePoints": "{count} na punto",
+  "locationTrackRangeEmpty": "Walang naitala sa panahong ito",
+  "locationTrackLocalOnly": "Nakaimbak lang sa teleponong ito at hindi kailanman ina-upload. Mabubura ito kapag in-uninstall ang app o binura ang data nito.",
+  "locationTrackEmpty": "Wala pang ruta",
+  "locationTrackEmptyBody": "Kapag pinayagan ang lokasyon sa background, kusang itatala ng teleponong ito ang mga dinaraanan nito.",
+  "locationTrackStorage": "Storage",
+  "locationTrackStored": "{count} na punto ang naka-store · {size}",
+  "locationTrackOldest": "Pinakalumang punto: {date}",
+  "locationTrackLatest": "Pinakabagong punto: {time}",
+  "locationTrackCapacity": "Hanggang 50 MB ang itinatabi — humigit-kumulang 3 milyong punto o higit pa. Sa karaniwang 100–300 punto bawat araw, katumbas ito ng ilang dekada. Kapag puno na, ang pinakalumang mga punto ang unang buburahin.",
+  "locationTrackGapNote": "Hindi pinagdudugtong ng linya ang mga puntong mahigit {hours} oras ang pagitan.",
+  "locationTrackClear": "I-clear ang ruta",
+  "locationTrackClearConfirm": "Mabubura ang lahat ng rutang naitala sa teleponong ito. Hindi na ito maibabalik.",
+  "locationTrackCleared": "Na-clear na ang ruta",
+  "locationTrackLegendNewer": "Mas bago",
+  "locationTrackLegendOlder": "Mas luma",
+  "locationTrackLegendLatest": "Pinakabagong lokasyon"
 }

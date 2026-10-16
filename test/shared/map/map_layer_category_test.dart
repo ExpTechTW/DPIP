@@ -53,6 +53,13 @@ void main() {
       expect(categoryOf('dpm'), MapLayerCategory.life);
     });
 
+    test('the device-local layers share the daily-life group', () {
+      // The mesh nodes and the movement track: both drawn from data on the
+      // phone rather than fetched, and both things of everyday life.
+      expect(categoryOf('meshtastic'), MapLayerCategory.life);
+      expect(categoryOf('location-track'), MapLayerCategory.life);
+    });
+
     test('an unknown id resolves deterministically instead of throwing', () {
       // A layer added after the classification was written must not crash.
       expect(categoryOf('next-weather-layer'), MapLayerCategory.weather);

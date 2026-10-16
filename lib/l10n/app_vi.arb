@@ -2067,5 +2067,28 @@
         "type": "int"
       }
     }
-  }
+  },
+  "mapLayerLocationTrack": "Lộ trình",
+  "mapLayerLocationTrackSubtitle": "Những nơi điện thoại này đã đi qua, chỉ lưu trên máy",
+  "locationTrackRangeToday": "Hôm nay",
+  "locationTrackRangeWeek": "7 ngày",
+  "locationTrackRangeMonth": "30 ngày",
+  "locationTrackRangeAll": "Tất cả",
+  "locationTrackRangePoints": "{count} điểm",
+  "locationTrackRangeEmpty": "Không có dữ liệu trong khoảng thời gian này",
+  "locationTrackLocalOnly": "Chỉ được lưu trên điện thoại này và không bao giờ được tải lên. Gỡ cài đặt ứng dụng hoặc xóa dữ liệu ứng dụng sẽ làm mất dữ liệu này.",
+  "locationTrackEmpty": "Chưa có lộ trình",
+  "locationTrackEmptyBody": "Khi bạn cho phép vị trí chạy nền, điện thoại này sẽ tự động ghi lại lộ trình di chuyển.",
+  "locationTrackStorage": "Bộ nhớ",
+  "locationTrackStored": "Đã lưu {count} điểm · {size}",
+  "locationTrackOldest": "Điểm cũ nhất: {date}",
+  "locationTrackLatest": "Điểm mới nhất: {time}",
+  "locationTrackCapacity": "Lưu tối đa 50 MB, tức khoảng 3 triệu điểm trở lên. Với mức thông thường 100–300 điểm mỗi ngày, con số này tương đương vài chục năm. Khi đầy, các điểm cũ nhất sẽ bị xóa trước.",
+  "locationTrackGapNote": "Các điểm cách nhau hơn {hours} giờ sẽ không được nối bằng đường.",
+  "locationTrackClear": "Xóa lộ trình",
+  "locationTrackClearConfirm": "Toàn bộ lộ trình được ghi trên điện thoại này sẽ bị xóa và không thể hoàn tác.",
+  "locationTrackCleared": "Đã xóa lộ trình",
+  "locationTrackLegendNewer": "Mới hơn",
+  "locationTrackLegendOlder": "Cũ hơn",
+  "locationTrackLegendLatest": "Vị trí mới nhất"
 }

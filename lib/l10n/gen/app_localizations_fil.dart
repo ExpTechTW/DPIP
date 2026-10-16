@@ -3454,4 +3454,88 @@ class AppLocalizationsFil extends AppLocalizations {
   String tsunamiWaveHeightCm(int cm) {
     return '$cm cm';
   }
+
+  @override
+  String get mapLayerLocationTrack => 'Ruta';
+
+  @override
+  String get mapLayerLocationTrackSubtitle =>
+      'Mga napuntahan ng teleponong ito, nasa device lang';
+
+  @override
+  String get locationTrackRangeToday => 'Ngayon';
+
+  @override
+  String get locationTrackRangeWeek => '7 araw';
+
+  @override
+  String get locationTrackRangeMonth => '30 araw';
+
+  @override
+  String get locationTrackRangeAll => 'Lahat';
+
+  @override
+  String locationTrackRangePoints(String count) {
+    return '$count na punto';
+  }
+
+  @override
+  String get locationTrackRangeEmpty => 'Walang naitala sa panahong ito';
+
+  @override
+  String get locationTrackLocalOnly =>
+      'Nakaimbak lang sa teleponong ito at hindi kailanman ina-upload. Mabubura ito kapag in-uninstall ang app o binura ang data nito.';
+
+  @override
+  String get locationTrackEmpty => 'Wala pang ruta';
+
+  @override
+  String get locationTrackEmptyBody =>
+      'Kapag pinayagan ang lokasyon sa background, kusang itatala ng teleponong ito ang mga dinaraanan nito.';
+
+  @override
+  String get locationTrackStorage => 'Storage';
+
+  @override
+  String locationTrackStored(String count, String size) {
+    return '$count na punto ang naka-store · $size';
+  }
+
+  @override
+  String locationTrackOldest(String date) {
+    return 'Pinakalumang punto: $date';
+  }
+
+  @override
+  String locationTrackLatest(String time) {
+    return 'Pinakabagong punto: $time';
+  }
+
+  @override
+  String get locationTrackCapacity =>
+      'Hanggang 50 MB ang itinatabi — humigit-kumulang 3 milyong punto o higit pa. Sa karaniwang 100–300 punto bawat araw, katumbas ito ng ilang dekada. Kapag puno na, ang pinakalumang mga punto ang unang buburahin.';
+
+  @override
+  String locationTrackGapNote(int hours) {
+    return 'Hindi pinagdudugtong ng linya ang mga puntong mahigit $hours oras ang pagitan.';
+  }
+
+  @override
+  String get locationTrackClear => 'I-clear ang ruta';
+
+  @override
+  String get locationTrackClearConfirm =>
+      'Mabubura ang lahat ng rutang naitala sa teleponong ito. Hindi na ito maibabalik.';
+
+  @override
+  String get locationTrackCleared => 'Na-clear na ang ruta';
+
+  @override
+  String get locationTrackLegendNewer => 'Mas bago';
+
+  @override
+  String get locationTrackLegendOlder => 'Mas luma';
+
+  @override
+  String get locationTrackLegendLatest => 'Pinakabagong lokasyon';
 }
