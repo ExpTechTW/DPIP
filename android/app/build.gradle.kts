@@ -99,6 +99,18 @@ android {
         }
     }
 
+    // Android lint, as a gate rather than a report.
+    //
+    // `lintDebug` runs from `tool/dev/lint_android.sh` and from android.yml. The
+    // baseline it points at records the issues that were already there before
+    // the Widget existed — a `NewApi` call in `LocationFetcher`, which belongs
+    // to the location reporter rather than to this change — so the gate is about
+    // anything *new*. Without it the task fails on day one on somebody else's
+    // code, which is how a lint gate gets deleted instead of fixed.
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     buildTypes {
         release {
             signingConfig =

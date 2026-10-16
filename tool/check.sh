@@ -26,6 +26,10 @@
 #     `check/pubspec_lock.sh` is what catches a lockfile that disagrees.
 #   - `check/commits.sh`. It belongs to `tool/commit.sh`, which is where you
 #     are when a commit message is the thing being decided.
+#   - `tool/dev/test_android.sh`. The Kotlin Widget tests need the Android SDK
+#     and Gradle, which this macOS-and-Linux gate does not require; android.yml
+#     runs them. The list above is still what ci.yml runs, which is what this
+#     script claims to be.
 source "$(dirname "${BASH_SOURCE[0]}")/dev/_lib.sh"
 cd "$(repo_root)"
 
