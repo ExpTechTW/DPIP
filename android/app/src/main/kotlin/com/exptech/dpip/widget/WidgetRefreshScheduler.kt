@@ -100,6 +100,24 @@ object WidgetRefreshScheduler {
      * them.
      */
     fun scheduleOneTime(context: Context, address: WidgetAddress?, manual: Boolean = false) {
+        enqueueOneTime(context, address, manual, ExistingWorkPolicy.REPLACE)
+    }
+
+    /**
+     * Recovery adds no new demand: keep an unfinished source request, including
+     * a manual refresh's feedback identity, rather than cancelling it each time
+     * the process receives a boot/package/restore reconciliation broadcast.
+     */
+    fun scheduleRecovery(context: Context, address: WidgetAddress) {
+        enqueueOneTime(context, address, false, ExistingWorkPolicy.KEEP)
+    }
+
+    private fun enqueueOneTime(
+        context: Context,
+        address: WidgetAddress?,
+        manual: Boolean,
+        policy: ExistingWorkPolicy,
+    ) {
         val request = OneTimeWorkRequestBuilder<WeatherWidgetRefreshWorker>()
             .setConstraints(
                 Constraints.Builder()
@@ -122,7 +140,7 @@ object WidgetRefreshScheduler {
 
         WorkManager.getInstance(context).enqueueUniqueWork(
             address?.let(::sourceWorkName) ?: allSourcesWorkName,
-            ExistingWorkPolicy.REPLACE,
+            policy,
             request,
         )
         if (manual) WeatherWidgetRefreshWorker.scheduleNextLocalRerender(context)

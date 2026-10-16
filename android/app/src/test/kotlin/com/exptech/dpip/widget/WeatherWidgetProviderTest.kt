@@ -3,6 +3,7 @@ package com.exptech.dpip.widget
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -35,7 +36,10 @@ class WeatherWidgetProviderTest {
         context.deleteDatabase(WidgetStore.DATABASE_NAME)
         WidgetStore.resetForTest()
         store = WidgetStore.open(context)
-        WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+            context,
+            WidgetSchedulingOnlyWorkerFactory.configuration(),
+        )
         store.writeCatalog(
             listOf(
                 WidgetCatalogLocation.create("407", "西屯區", "臺中市", 24.181, 120.645)!!,
@@ -55,6 +59,151 @@ class WeatherWidgetProviderTest {
 
     private fun states(name: String): List<WorkInfo.State> =
         WorkManager.getInstance(context).getWorkInfosForUniqueWork(name).get().map { it.state }
+
+    @Test
+    fun `successful empty reconciliation cancels widget work but not another feature`() {
+        val workManager = WorkManager.getInstance(context)
+        val other = androidx.work.OneTimeWorkRequestBuilder<WeatherWidgetRefreshWorker>()
+            .setInitialDelay(1, java.util.concurrent.TimeUnit.DAYS).build()
+        workManager.enqueueUniqueWork("other-feature", androidx.work.ExistingWorkPolicy.KEEP, other)
+        WidgetRefreshScheduler.schedulePeriodic(context)
+        WidgetRefreshScheduler.scheduleOneTime(context, WidgetAddress.Saved("407"))
+        WidgetRefreshScheduler.scheduleLocalRerender(context, 60_000)
+
+        WidgetUpdater.reconcile(context)
+
+        for (name in listOf(
+            WidgetRefreshScheduler.periodicWorkName,
+            WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")),
+            WidgetRefreshScheduler.localRerenderWorkName,
+        )) assertTrue("$name must be cancelled", states(name).none { it == WorkInfo.State.ENQUEUED })
+        assertEquals(listOf(WorkInfo.State.ENQUEUED), states("other-feature"))
+    }
+
+    @Test
+    fun `failed reconcile transaction rolls back choices and retains periodic recovery`() {
+        val address = WidgetAddress.Saved("407")
+        store.writeInstance(11, address, "407", 1L)
+        store.writeInstance(12, address, "407", 1L)
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL(
+                "CREATE TRIGGER refuse_delete BEFORE DELETE ON widget_instances WHEN OLD.app_widget_id = 12 " +
+                    "BEGIN SELECT RAISE(ABORT, 'temporary delete failure'); END",
+            )
+            try {
+                WidgetUpdater.reconcile(context)
+                assertEquals(setOf(11, 12), store.readInstances().map { it.appWidgetId }.toSet())
+                assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+                assertTrue(states(WidgetRefreshScheduler.sourceWorkName(address)).isEmpty())
+            } finally {
+                database.execSQL("DROP TRIGGER refuse_delete")
+            }
+        }
+        WidgetUpdater.reconcile(context)
+        assertTrue(store.readInstances().isEmpty())
+        assertTrue(states(WidgetRefreshScheduler.periodicWorkName).none { it == WorkInfo.State.ENQUEUED })
+    }
+
+    @Test
+    fun `failed delete authority reads do not cancel work for surviving widgets`() {
+        val address = WidgetAddress.Saved("407")
+        store.writeInstance(11, address, "407", 1L)
+        WidgetRefreshScheduler.schedulePeriodic(context)
+        WidgetRefreshScheduler.scheduleOneTime(context, address)
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
+            try {
+                provider.onDeleted(context, intArrayOf(11))
+                assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+                assertTrue(states(WidgetRefreshScheduler.sourceWorkName(address)).contains(WorkInfo.State.ENQUEUED))
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
+            }
+        }
+        assertEquals(address, store.readInstance(11)?.address)
+    }
+
+    @Test
+    fun `cold reconcile requests each surviving source once without replacing pending recovery`() {
+        val saved = WidgetAddress.Saved("407")
+        val current = WidgetAddress.CurrentLocation
+        val removed = WidgetAddress.Saved("100")
+        store.writeInstance(11, saved, "407", 1L)
+        store.writeInstance(12, saved, "407", 1L)
+        store.writeInstance(13, current, null, 1L)
+        store.writeInstance(99, removed, "100", 1L)
+        for (id in listOf(11, 12, 13)) {
+            org.robolectric.Shadows.shadowOf(manager()).addBoundWidget(
+                id,
+                android.appwidget.AppWidgetProviderInfo().apply {
+                    provider = android.content.ComponentName(context, WeatherWidgetProvider::class.java)
+                },
+            )
+        }
+        WidgetRefreshScheduler.schedulePeriodic(context)
+        WidgetRefreshScheduler.scheduleOneTime(context, removed)
+        val workManager = WorkManager.getInstance(context)
+        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id
+        // Simulate the native store being reopened in a cold process. The
+        // periodic request already exists and UPDATE must not restart its clock.
+        WidgetStore.resetForTest()
+        store = WidgetStore.open(context)
+
+        WidgetUpdater.reconcile(context)
+
+        val firstIds = listOf(saved, current).map { address ->
+            val work = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address)).get()
+            assertEquals("one request per surviving source", 1, work.size)
+            assertEquals(WorkInfo.State.ENQUEUED, work.single().state)
+            assertEquals(androidx.work.NetworkType.CONNECTED, work.single().constraints.requiredNetworkType)
+            work.single().id
+        }
+        assertTrue(states(WidgetRefreshScheduler.sourceWorkName(removed)).none { it == WorkInfo.State.ENQUEUED })
+        assertNull(store.readInstance(99))
+        WidgetUpdater.reconcile(context)
+        assertEquals(periodicId, workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id)
+        assertEquals(firstIds, listOf(saved, current).map { address ->
+            workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address)).get().single().id
+        })
+        assertTrue(states(WidgetRefreshScheduler.allSourcesWorkName).isEmpty())
+    }
+
+    @Test
+    fun `reconcile read failure preserves scheduled recovery and durable choices`() {
+        val address = WidgetAddress.Saved("407")
+        store.writeInstance(11, address, "407", 1L)
+        WidgetRefreshScheduler.schedulePeriodic(context)
+        WidgetRefreshScheduler.scheduleOneTime(context, address)
+        WidgetRefreshScheduler.scheduleLocalRerender(context, 60_000)
+        val workManager = WorkManager.getInstance(context)
+        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
+            try {
+                repeat(3) { WidgetUpdater.reconcile(context, keepIds = setOf(11)) }
+                assertEquals(
+                    periodicId,
+                    workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id,
+                )
+                for (name in listOf(
+                    WidgetRefreshScheduler.periodicWorkName,
+                    WidgetRefreshScheduler.sourceWorkName(address),
+                    WidgetRefreshScheduler.localRerenderWorkName,
+                )) assertTrue("$name must survive failed authority reads", states(name).contains(WorkInfo.State.ENQUEUED))
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
+            }
+        }
+        assertEquals(address, store.readInstance(11)?.address)
+        WidgetUpdater.reconcile(context, keepIds = setOf(11))
+        assertTrue(states(WidgetRefreshScheduler.sourceWorkName(address)).contains(WorkInfo.State.ENQUEUED))
+    }
 
     @Test
     fun `the refresh tap records feedback for its exact queued work and source`() {

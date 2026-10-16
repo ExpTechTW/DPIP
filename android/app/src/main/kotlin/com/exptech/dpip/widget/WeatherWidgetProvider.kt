@@ -78,7 +78,16 @@ class WeatherWidgetProvider : AppWidgetProvider() {
             store.deleteInstance(appWidgetId)
         }
 
-        if (store.readInstances().isEmpty()) {
+        val remaining = when (val result = store.readInstancesResult()) {
+            is WidgetInstanceReadResult.Read -> result.instances
+            WidgetInstanceReadResult.Failed -> {
+                // A failed delete/read is not proof that the launcher removed
+                // every instance. Retain recovery without retrying in a receiver.
+                WidgetRefreshScheduler.schedulePeriodic(context)
+                return
+            }
+        }
+        if (remaining.isEmpty()) {
             // The last instance is gone: cancel the periodic work, the one-time
             // requests and the pending local redraw together. Leaving the
             // redraw behind would keep a worker waking up to redraw nothing.
@@ -89,7 +98,7 @@ class WeatherWidgetProvider : AppWidgetProvider() {
         // Other instances remain, but a source with none left must not keep a
         // queued refresh: it would run and fetch for a screen that is gone.
         for (address in removed) {
-            if (!store.hasInstanceFor(address)) {
+            if (remaining.none { it.address == address }) {
                 WidgetRefreshScheduler.cancelSource(context, address)
             }
         }
