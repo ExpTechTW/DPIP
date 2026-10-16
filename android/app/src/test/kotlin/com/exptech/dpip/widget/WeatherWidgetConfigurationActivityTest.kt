@@ -2,8 +2,11 @@ package com.exptech.dpip.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
 import android.view.View
 import android.widget.Button
 import android.widget.ListView
@@ -49,6 +52,7 @@ class WeatherWidgetConfigurationActivityTest {
         WidgetStore.resetForTest()
         store = WidgetStore.openUncached(context)
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        registerWidget(appWidgetId)
     }
 
     @After
@@ -62,6 +66,33 @@ class WeatherWidgetConfigurationActivityTest {
             action = AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         }
+
+    private fun registerWidget(
+        id: Int,
+        provider: ComponentName = ComponentName(context, WeatherWidgetProvider::class.java),
+    ) {
+        shadowOf(AppWidgetManager.getInstance(context)).addBoundWidget(
+            id,
+            AppWidgetProviderInfo().apply { this.provider = provider },
+        )
+    }
+
+    private fun chooseTown(activity: Activity) {
+        val list = activity.findViewById<ListView>(R.id.widget_config_list)
+        list.onItemClickListener!!.onItemClick(list, null, 1, 1)
+    }
+
+    private fun assertNoRefresh() {
+        assertTrue(WorkManager.getInstance(context).getWorkInfosByTag(WidgetRefreshScheduler.workTag).get().isEmpty())
+        assertTrue(WorkManager.getInstance(context)
+            .getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
+            .get().isEmpty())
+    }
+
+    private fun assertCancelled(activity: Activity) {
+        assertTrue(activity.isFinishing)
+        assertEquals(Activity.RESULT_CANCELED, shadowOf(activity).resultCode)
+    }
 
     private fun launch(id: Int = appWidgetId) = Robolectric.buildActivity(
         WeatherWidgetConfigurationActivity::class.java,
@@ -85,6 +116,106 @@ class WeatherWidgetConfigurationActivityTest {
         val activity = controller.get()
         assertTrue(activity.isFinishing)
         assertEquals(Activity.RESULT_CANCELED, shadowOf(activity).resultCode)
+    }
+
+    @Test
+    fun `an unknown id is rejected without storing or scheduling`() {
+        catalog("407")
+        val activity = launch(999).get()
+        assertCancelled(activity)
+        assertNull(store.readInstance(999))
+        assertNoRefresh()
+    }
+
+    @Test
+    fun `another provider is rejected without drawing storing or scheduling`() {
+        registerWidget(43, ComponentName("other.app", "other.app.Provider"))
+        catalog("407")
+        val activity = launch(43).get()
+        assertCancelled(activity)
+        assertNull(store.readInstance(43))
+        assertNull(shadowOf(AppWidgetManager.getInstance(context)).getViewFor(43))
+        assertNoRefresh()
+    }
+
+    @Test
+    fun `an unknown retarget cancels instead of retaining the previous target`() {
+        catalog("407")
+        store.writeInstance(appWidgetId, WidgetAddress.Saved("100"), "100", 1L)
+        val controller = launch()
+        controller.newIntent(intent(999))
+        assertCancelled(controller.get())
+        assertEquals(WidgetAddress.Saved("100"), store.readInstance(appWidgetId)!!.address)
+        assertNull(store.readInstance(999))
+        assertNoRefresh()
+    }
+
+    @Test
+    fun `another provider retarget is cancelled without changing either instance`() {
+        catalog("407")
+        registerWidget(43, ComponentName(context.packageName, "OtherProvider"))
+        store.writeInstance(appWidgetId, WidgetAddress.Saved("100"), "100", 1L)
+        val controller = launch()
+        controller.newIntent(intent(43))
+        assertCancelled(controller.get())
+        assertEquals(WidgetAddress.Saved("100"), store.readInstance(appWidgetId)!!.address)
+        assertNull(store.readInstance(43))
+        assertNull(shadowOf(AppWidgetManager.getInstance(context)).getViewFor(43))
+        assertNoRefresh()
+    }
+
+    @Test
+    fun `a widget removed before selection is cancelled without writing drawing or scheduling`() {
+        catalog("407")
+        val activity = launch().get()
+        // Rebinding without a provider models getAppWidgetInfo returning null
+        // after launcher removal; the shadow has no delete-widget API.
+        shadowOf(AppWidgetManager.getInstance(context)).bindAppWidgetId(appWidgetId, null)
+        assertNull(AppWidgetManager.getInstance(context).getAppWidgetInfo(appWidgetId))
+        chooseTown(activity)
+        assertCancelled(activity)
+        assertNull(store.readInstance(appWidgetId))
+        assertNull(shadowOf(AppWidgetManager.getInstance(context)).getViewFor(appWidgetId))
+        assertNoRefresh()
+    }
+
+    @Test
+    fun `a provider changed before selection is cancelled without writing drawing or scheduling`() {
+        catalog("407")
+        val activity = launch().get()
+        registerWidget(appWidgetId, ComponentName("other.app", "other.app.Provider"))
+        chooseTown(activity)
+        assertCancelled(activity)
+        assertNull(store.readInstance(appWidgetId))
+        assertNull(shadowOf(AppWidgetManager.getInstance(context)).getViewFor(appWidgetId))
+        assertNoRefresh()
+    }
+
+    @Test
+    fun `a failed write on a valid add does not succeed draw or schedule`() {
+        assertFailedWrite(reconfigure = false)
+    }
+
+    @Test
+    fun `a failed write on a valid reconfigure keeps the original town without success or refresh`() {
+        assertFailedWrite(reconfigure = true)
+    }
+
+    private fun assertFailedWrite(reconfigure: Boolean) {
+        catalog("407")
+        if (reconfigure) store.writeInstance(appWidgetId, WidgetAddress.Saved("100"), "100", 1L)
+        val before = store.readInstance(appWidgetId)
+        val activity = launch().get()
+        // Fail the production SQL write after the picker has loaded successfully.
+        SQLiteDatabase.openDatabase(context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null,
+            SQLiteDatabase.OPEN_READWRITE).use { database ->
+            database.execSQL("CREATE TRIGGER reject_widget_write BEFORE INSERT ON widget_instances BEGIN SELECT RAISE(ABORT, 'test write failure'); END")
+            chooseTown(activity)
+        }
+        assertCancelled(activity)
+        assertEquals(before, store.readInstance(appWidgetId))
+        assertNull(shadowOf(AppWidgetManager.getInstance(context)).getViewFor(appWidgetId))
+        assertNoRefresh()
     }
 
     @Test
@@ -171,37 +302,38 @@ class WeatherWidgetConfigurationActivityTest {
         assertEquals(WidgetAddress.CurrentLocation, store.readInstance(appWidgetId)!!.address)
     }
 
-    // ── The reused-instance path (`singleTop` + the gear's `CLEAR_TOP`) ──
+    // ── Launcher reconfiguration delivered to a reused `singleTop` instance ──
 
     /**
      * The two widgets the reuse path is about: A's screen is already open when
-     * B's gear is tapped.
+     * the launcher opens B's configuration.
      */
     private fun twoConfiguredWidgets(): Pair<Int, Int> {
         catalog("407", "100", "200")
         val a = 42
         val b = 43
+        registerWidget(b)
         store.writeInstance(a, WidgetAddress.Saved("407"), "407", 1L)
         store.writeInstance(b, WidgetAddress.Saved("100"), "100", 1L)
         return a to b
     }
 
     @Test
-    fun `a second gear tap retargets the live screen to that widget`() {
+    fun `a new launcher intent retargets the live screen to that widget`() {
         val (a, b) = twoConfiguredWidgets()
         val controller = launch(a)
 
         // A has not finished. The launcher delivers B's intent to the same
-        // `singleTop` instance, exactly as `CLEAR_TOP` does on a device.
+        // `singleTop` instance when its launch flags reuse the Activity.
         controller.newIntent(intent(b))
 
         // Row 0 is current position; rows 1..3 are 407, 100, 200. Choosing 200
-        // must land on B — the widget whose gear was tapped last.
+        // must land on B — the widget configured by the latest intent.
         val list = controller.get().findViewById<ListView>(R.id.widget_config_list)
         list.onItemClickListener!!.onItemClick(list, null, 3, 3)
 
         assertEquals(
-            "the choice must land on the widget whose gear was tapped last",
+            "the choice must land on the widget in the latest launcher intent",
             WidgetAddress.Saved("200"),
             store.readInstance(b)!!.address,
         )
@@ -213,7 +345,7 @@ class WeatherWidgetConfigurationActivityTest {
     }
 
     @Test
-    fun `cancelling after a second gear tap leaves both widgets configured`() {
+    fun `cancelling after a new launcher intent leaves both widgets configured`() {
         val (a, b) = twoConfiguredWidgets()
         val controller = launch(a)
 
