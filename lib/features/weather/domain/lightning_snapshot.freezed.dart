@@ -28,16 +28,21 @@ $LightningStrikeCopyWith<LightningStrike> get copyWith => _$LightningStrikeCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LightningStrike&&(identical(other.type, type) || other.type == type)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  final _this = this as LightningStrike;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LightningStrike&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,type,time,latitude,longitude);
+int get hashCode {
+  final _this = this as LightningStrike;
+  return Object.hash(runtimeType,_this.type,_this.time,_this.latitude,_this.longitude);
+}
 
 @override
 String toString() {
-  return 'LightningStrike(type: $type, time: $time, latitude: $latitude, longitude: $longitude)';
+  final _this = this as LightningStrike;
+  return 'LightningStrike(type: ${_this.type}, time: ${_this.time}, latitude: ${_this.latitude}, longitude: ${_this.longitude})';
 }
 
 
@@ -232,16 +237,18 @@ _$LightningStrikeCopyWith<_LightningStrike> get copyWith => __$LightningStrikeCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LightningStrike&&(identical(other.type, type) || other.type == type)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LightningStrike&&(identical(other.type, type) || other.type == type)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,type,time,latitude,longitude);
+int get hashCode {
+    return Object.hash(runtimeType,type,time,latitude,longitude);
+}
 
 @override
 String toString() {
-  return 'LightningStrike(type: $type, time: $time, latitude: $latitude, longitude: $longitude)';
+    return 'LightningStrike(type: $type, time: $time, latitude: $latitude, longitude: $longitude)';
 }
 
 
@@ -296,16 +303,21 @@ $LightningSnapshotCopyWith<LightningSnapshot> get copyWith => _$LightningSnapsho
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LightningSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other.strikes, strikes));
+  final _this = this as LightningSnapshot;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LightningSnapshot&&(identical(other.time, _this.time) || other.time == _this.time)&&const DeepCollectionEquality().equals(other.strikes, _this.strikes));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,time,const DeepCollectionEquality().hash(strikes));
+int get hashCode {
+  final _this = this as LightningSnapshot;
+  return Object.hash(runtimeType,_this.time,const DeepCollectionEquality().hash(_this.strikes));
+}
 
 @override
 String toString() {
-  return 'LightningSnapshot(time: $time, strikes: $strikes)';
+  final _this = this as LightningSnapshot;
+  return 'LightningSnapshot(time: ${_this.time}, strikes: ${_this.strikes})';
 }
 
 
@@ -500,16 +512,18 @@ _$LightningSnapshotCopyWith<_LightningSnapshot> get copyWith => __$LightningSnap
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LightningSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other._strikes, _strikes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _LightningSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other.strikes, _strikes));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,time,const DeepCollectionEquality().hash(_strikes));
+int get hashCode {
+    return Object.hash(runtimeType,time,const DeepCollectionEquality().hash(_strikes));
+}
 
 @override
 String toString() {
-  return 'LightningSnapshot(time: $time, strikes: $strikes)';
+    return 'LightningSnapshot(time: $time, strikes: $strikes)';
 }
 
 

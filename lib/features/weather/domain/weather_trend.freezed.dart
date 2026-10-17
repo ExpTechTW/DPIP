@@ -34,16 +34,21 @@ $WeatherTrendCopyWith<WeatherTrend> get copyWith => _$WeatherTrendCopyWithImpl<W
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherTrend&&(identical(other.id, id) || other.id == id)&&(identical(other.range, range) || other.range == range)&&const DeepCollectionEquality().equals(other.times, times)&&const DeepCollectionEquality().equals(other.temperature, temperature)&&const DeepCollectionEquality().equals(other.humidity, humidity)&&const DeepCollectionEquality().equals(other.pressure, pressure)&&const DeepCollectionEquality().equals(other.windSpeed, windSpeed)&&const DeepCollectionEquality().equals(other.windDirection, windDirection));
+  final _this = this as WeatherTrend;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherTrend&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.range, _this.range) || other.range == _this.range)&&const DeepCollectionEquality().equals(other.times, _this.times)&&const DeepCollectionEquality().equals(other.temperature, _this.temperature)&&const DeepCollectionEquality().equals(other.humidity, _this.humidity)&&const DeepCollectionEquality().equals(other.pressure, _this.pressure)&&const DeepCollectionEquality().equals(other.windSpeed, _this.windSpeed)&&const DeepCollectionEquality().equals(other.windDirection, _this.windDirection));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,range,const DeepCollectionEquality().hash(times),const DeepCollectionEquality().hash(temperature),const DeepCollectionEquality().hash(humidity),const DeepCollectionEquality().hash(pressure),const DeepCollectionEquality().hash(windSpeed),const DeepCollectionEquality().hash(windDirection));
+int get hashCode {
+  final _this = this as WeatherTrend;
+  return Object.hash(runtimeType,_this.id,_this.range,const DeepCollectionEquality().hash(_this.times),const DeepCollectionEquality().hash(_this.temperature),const DeepCollectionEquality().hash(_this.humidity),const DeepCollectionEquality().hash(_this.pressure),const DeepCollectionEquality().hash(_this.windSpeed),const DeepCollectionEquality().hash(_this.windDirection));
+}
 
 @override
 String toString() {
-  return 'WeatherTrend(id: $id, range: $range, times: $times, temperature: $temperature, humidity: $humidity, pressure: $pressure, windSpeed: $windSpeed, windDirection: $windDirection)';
+  final _this = this as WeatherTrend;
+  return 'WeatherTrend(id: ${_this.id}, range: ${_this.range}, times: ${_this.times}, temperature: ${_this.temperature}, humidity: ${_this.humidity}, pressure: ${_this.pressure}, windSpeed: ${_this.windSpeed}, windDirection: ${_this.windDirection})';
 }
 
 
@@ -294,16 +299,18 @@ _$WeatherTrendCopyWith<_WeatherTrend> get copyWith => __$WeatherTrendCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherTrend&&(identical(other.id, id) || other.id == id)&&(identical(other.range, range) || other.range == range)&&const DeepCollectionEquality().equals(other._times, _times)&&const DeepCollectionEquality().equals(other._temperature, _temperature)&&const DeepCollectionEquality().equals(other._humidity, _humidity)&&const DeepCollectionEquality().equals(other._pressure, _pressure)&&const DeepCollectionEquality().equals(other._windSpeed, _windSpeed)&&const DeepCollectionEquality().equals(other._windDirection, _windDirection));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherTrend&&(identical(other.id, id) || other.id == id)&&(identical(other.range, range) || other.range == range)&&const DeepCollectionEquality().equals(other.times, _times)&&const DeepCollectionEquality().equals(other.temperature, _temperature)&&const DeepCollectionEquality().equals(other.humidity, _humidity)&&const DeepCollectionEquality().equals(other.pressure, _pressure)&&const DeepCollectionEquality().equals(other.windSpeed, _windSpeed)&&const DeepCollectionEquality().equals(other.windDirection, _windDirection));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,range,const DeepCollectionEquality().hash(_times),const DeepCollectionEquality().hash(_temperature),const DeepCollectionEquality().hash(_humidity),const DeepCollectionEquality().hash(_pressure),const DeepCollectionEquality().hash(_windSpeed),const DeepCollectionEquality().hash(_windDirection));
+int get hashCode {
+    return Object.hash(runtimeType,id,range,const DeepCollectionEquality().hash(_times),const DeepCollectionEquality().hash(_temperature),const DeepCollectionEquality().hash(_humidity),const DeepCollectionEquality().hash(_pressure),const DeepCollectionEquality().hash(_windSpeed),const DeepCollectionEquality().hash(_windDirection));
+}
 
 @override
 String toString() {
-  return 'WeatherTrend(id: $id, range: $range, times: $times, temperature: $temperature, humidity: $humidity, pressure: $pressure, windSpeed: $windSpeed, windDirection: $windDirection)';
+    return 'WeatherTrend(id: $id, range: $range, times: $times, temperature: $temperature, humidity: $humidity, pressure: $pressure, windSpeed: $windSpeed, windDirection: $windDirection)';
 }
 
 

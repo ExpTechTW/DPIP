@@ -29,16 +29,21 @@ $TownCopyWith<Town> get copyWith => _$TownCopyWithImpl<Town>(this as Town, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Town&&(identical(other.code, code) || other.code == code)&&(identical(other.city, city) || other.city == city)&&(identical(other.town, town) || other.town == town)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.cityLevel, cityLevel) || other.cityLevel == cityLevel)&&(identical(other.townLevel, townLevel) || other.townLevel == townLevel));
+  final _this = this as Town;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Town&&(identical(other.code, _this.code) || other.code == _this.code)&&(identical(other.city, _this.city) || other.city == _this.city)&&(identical(other.town, _this.town) || other.town == _this.town)&&(identical(other.lat, _this.lat) || other.lat == _this.lat)&&(identical(other.lng, _this.lng) || other.lng == _this.lng)&&(identical(other.cityLevel, _this.cityLevel) || other.cityLevel == _this.cityLevel)&&(identical(other.townLevel, _this.townLevel) || other.townLevel == _this.townLevel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,code,city,town,lat,lng,cityLevel,townLevel);
+int get hashCode {
+  final _this = this as Town;
+  return Object.hash(runtimeType,_this.code,_this.city,_this.town,_this.lat,_this.lng,_this.cityLevel,_this.townLevel);
+}
 
 @override
 String toString() {
-  return 'Town(code: $code, city: $city, town: $town, lat: $lat, lng: $lng, cityLevel: $cityLevel, townLevel: $townLevel)';
+  final _this = this as Town;
+  return 'Town(code: ${_this.code}, city: ${_this.city}, town: ${_this.town}, lat: ${_this.lat}, lng: ${_this.lng}, cityLevel: ${_this.cityLevel}, townLevel: ${_this.townLevel})';
 }
 
 
@@ -240,16 +245,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Town&&(identical(other.code, code) || other.code == code)&&(identical(other.city, city) || other.city == city)&&(identical(other.town, town) || other.town == town)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.cityLevel, cityLevel) || other.cityLevel == cityLevel)&&(identical(other.townLevel, townLevel) || other.townLevel == townLevel));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Town&&(identical(other.code, code) || other.code == code)&&(identical(other.city, city) || other.city == city)&&(identical(other.town, town) || other.town == town)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.cityLevel, cityLevel) || other.cityLevel == cityLevel)&&(identical(other.townLevel, townLevel) || other.townLevel == townLevel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,code,city,town,lat,lng,cityLevel,townLevel);
+int get hashCode {
+    return Object.hash(runtimeType,code,city,town,lat,lng,cityLevel,townLevel);
+}
 
 @override
 String toString() {
-  return 'Town(code: $code, city: $city, town: $town, lat: $lat, lng: $lng, cityLevel: $cityLevel, townLevel: $townLevel)';
+    return 'Town(code: $code, city: $city, town: $town, lat: $lat, lng: $lng, cityLevel: $cityLevel, townLevel: $townLevel)';
 }
 
 

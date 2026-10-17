@@ -32,16 +32,21 @@ $TsunamiEarthquakeCopyWith<TsunamiEarthquake> get copyWith => _$TsunamiEarthquak
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiEarthquake&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude));
+  final _this = this as TsunamiEarthquake;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiEarthquake&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.location, _this.location) || other.location == _this.location)&&(identical(other.depth, _this.depth) || other.depth == _this.depth)&&(identical(other.magnitude, _this.magnitude) || other.magnitude == _this.magnitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,longitude,latitude,location,depth,magnitude);
+int get hashCode {
+  final _this = this as TsunamiEarthquake;
+  return Object.hash(runtimeType,_this.time,_this.longitude,_this.latitude,_this.location,_this.depth,_this.magnitude);
+}
 
 @override
 String toString() {
-  return 'TsunamiEarthquake(time: $time, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude)';
+  final _this = this as TsunamiEarthquake;
+  return 'TsunamiEarthquake(time: ${_this.time}, longitude: ${_this.longitude}, latitude: ${_this.latitude}, location: ${_this.location}, depth: ${_this.depth}, magnitude: ${_this.magnitude})';
 }
 
 
@@ -244,16 +249,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiEarthquake&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiEarthquake&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,longitude,latitude,location,depth,magnitude);
+int get hashCode {
+    return Object.hash(runtimeType,time,longitude,latitude,location,depth,magnitude);
+}
 
 @override
 String toString() {
-  return 'TsunamiEarthquake(time: $time, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude)';
+    return 'TsunamiEarthquake(time: $time, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude)';
 }
 
 
@@ -315,16 +322,21 @@ $TsunamiPredictionCopyWith<TsunamiPrediction> get copyWith => _$TsunamiPredictio
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiPrediction&&(identical(other.area, area) || other.area == area)&&(identical(other.coast, coast) || other.coast == coast)&&(identical(other.height, height) || other.height == height)&&(identical(other.arrivalTime, arrivalTime) || other.arrivalTime == arrivalTime)&&(identical(other.color, color) || other.color == color));
+  final _this = this as TsunamiPrediction;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiPrediction&&(identical(other.area, _this.area) || other.area == _this.area)&&(identical(other.coast, _this.coast) || other.coast == _this.coast)&&(identical(other.height, _this.height) || other.height == _this.height)&&(identical(other.arrivalTime, _this.arrivalTime) || other.arrivalTime == _this.arrivalTime)&&(identical(other.color, _this.color) || other.color == _this.color));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,area,coast,height,arrivalTime,color);
+int get hashCode {
+  final _this = this as TsunamiPrediction;
+  return Object.hash(runtimeType,_this.area,_this.coast,_this.height,_this.arrivalTime,_this.color);
+}
 
 @override
 String toString() {
-  return 'TsunamiPrediction(area: $area, coast: $coast, height: $height, arrivalTime: $arrivalTime, color: $color)';
+  final _this = this as TsunamiPrediction;
+  return 'TsunamiPrediction(area: ${_this.area}, coast: ${_this.coast}, height: ${_this.height}, arrivalTime: ${_this.arrivalTime}, color: ${_this.color})';
 }
 
 
@@ -524,16 +536,18 @@ _$TsunamiPredictionCopyWith<_TsunamiPrediction> get copyWith => __$TsunamiPredic
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiPrediction&&(identical(other.area, area) || other.area == area)&&(identical(other.coast, coast) || other.coast == coast)&&(identical(other.height, height) || other.height == height)&&(identical(other.arrivalTime, arrivalTime) || other.arrivalTime == arrivalTime)&&(identical(other.color, color) || other.color == color));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiPrediction&&(identical(other.area, area) || other.area == area)&&(identical(other.coast, coast) || other.coast == coast)&&(identical(other.height, height) || other.height == height)&&(identical(other.arrivalTime, arrivalTime) || other.arrivalTime == arrivalTime)&&(identical(other.color, color) || other.color == color));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,area,coast,height,arrivalTime,color);
+int get hashCode {
+    return Object.hash(runtimeType,area,coast,height,arrivalTime,color);
+}
 
 @override
 String toString() {
-  return 'TsunamiPrediction(area: $area, coast: $coast, height: $height, arrivalTime: $arrivalTime, color: $color)';
+    return 'TsunamiPrediction(area: $area, coast: $coast, height: $height, arrivalTime: $arrivalTime, color: $color)';
 }
 
 
@@ -591,16 +605,21 @@ $TsunamiObservationCopyWith<TsunamiObservation> get copyWith => _$TsunamiObserva
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiObservation&&(identical(other.name, name) || other.name == name)&&(identical(other.height, height) || other.height == height)&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude));
+  final _this = this as TsunamiObservation;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiObservation&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.height, _this.height) || other.height == _this.height)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,height,time,longitude,latitude);
+int get hashCode {
+  final _this = this as TsunamiObservation;
+  return Object.hash(runtimeType,_this.name,_this.height,_this.time,_this.longitude,_this.latitude);
+}
 
 @override
 String toString() {
-  return 'TsunamiObservation(name: $name, height: $height, time: $time, longitude: $longitude, latitude: $latitude)';
+  final _this = this as TsunamiObservation;
+  return 'TsunamiObservation(name: ${_this.name}, height: ${_this.height}, time: ${_this.time}, longitude: ${_this.longitude}, latitude: ${_this.latitude})';
 }
 
 
@@ -797,16 +816,18 @@ _$TsunamiObservationCopyWith<_TsunamiObservation> get copyWith => __$TsunamiObse
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiObservation&&(identical(other.name, name) || other.name == name)&&(identical(other.height, height) || other.height == height)&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiObservation&&(identical(other.name, name) || other.name == name)&&(identical(other.height, height) || other.height == height)&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,height,time,longitude,latitude);
+int get hashCode {
+    return Object.hash(runtimeType,name,height,time,longitude,latitude);
+}
 
 @override
 String toString() {
-  return 'TsunamiObservation(name: $name, height: $height, time: $time, longitude: $longitude, latitude: $latitude)';
+    return 'TsunamiObservation(name: $name, height: $height, time: $time, longitude: $longitude, latitude: $latitude)';
 }
 
 
@@ -870,16 +891,21 @@ $TsunamiBulletinCopyWith<TsunamiBulletin> get copyWith => _$TsunamiBulletinCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiBulletin&&(identical(other.id, id) || other.id == id)&&(identical(other.number, number) || other.number == number)&&(identical(other.report, report) || other.report == report)&&(identical(other.type, type) || other.type == type)&&(identical(other.sent, sent) || other.sent == sent));
+  final _this = this as TsunamiBulletin;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiBulletin&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.number, _this.number) || other.number == _this.number)&&(identical(other.report, _this.report) || other.report == _this.report)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.sent, _this.sent) || other.sent == _this.sent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,number,report,type,sent);
+int get hashCode {
+  final _this = this as TsunamiBulletin;
+  return Object.hash(runtimeType,_this.id,_this.number,_this.report,_this.type,_this.sent);
+}
 
 @override
 String toString() {
-  return 'TsunamiBulletin(id: $id, number: $number, report: $report, type: $type, sent: $sent)';
+  final _this = this as TsunamiBulletin;
+  return 'TsunamiBulletin(id: ${_this.id}, number: ${_this.number}, report: ${_this.report}, type: ${_this.type}, sent: ${_this.sent})';
 }
 
 
@@ -1082,16 +1108,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiBulletin&&(identical(other.id, id) || other.id == id)&&(identical(other.number, number) || other.number == number)&&(identical(other.report, report) || other.report == report)&&(identical(other.type, type) || other.type == type)&&(identical(other.sent, sent) || other.sent == sent));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiBulletin&&(identical(other.id, id) || other.id == id)&&(identical(other.number, number) || other.number == number)&&(identical(other.report, report) || other.report == report)&&(identical(other.type, type) || other.type == type)&&(identical(other.sent, sent) || other.sent == sent));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,number,report,type,sent);
+int get hashCode {
+    return Object.hash(runtimeType,id,number,report,type,sent);
+}
 
 @override
 String toString() {
-  return 'TsunamiBulletin(id: $id, number: $number, report: $report, type: $type, sent: $sent)';
+    return 'TsunamiBulletin(id: $id, number: $number, report: $report, type: $type, sent: $sent)';
 }
 
 
@@ -1153,16 +1181,21 @@ $TsunamiReportCopyWith<TsunamiReport> get copyWith => _$TsunamiReportCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiReport&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.report, report) || other.report == report)&&(identical(other.type, type) || other.type == type)&&(identical(other.content, content) || other.content == content)&&(identical(other.earthquake, earthquake) || other.earthquake == earthquake)&&const DeepCollectionEquality().equals(other.predictions, predictions)&&const DeepCollectionEquality().equals(other.observations, observations));
+  final _this = this as TsunamiReport;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TsunamiReport&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.sent, _this.sent) || other.sent == _this.sent)&&(identical(other.msgType, _this.msgType) || other.msgType == _this.msgType)&&(identical(other.report, _this.report) || other.report == _this.report)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.content, _this.content) || other.content == _this.content)&&(identical(other.earthquake, _this.earthquake) || other.earthquake == _this.earthquake)&&const DeepCollectionEquality().equals(other.predictions, _this.predictions)&&const DeepCollectionEquality().equals(other.observations, _this.observations));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,sent,msgType,report,type,content,earthquake,const DeepCollectionEquality().hash(predictions),const DeepCollectionEquality().hash(observations));
+int get hashCode {
+  final _this = this as TsunamiReport;
+  return Object.hash(runtimeType,_this.id,_this.sent,_this.msgType,_this.report,_this.type,_this.content,_this.earthquake,const DeepCollectionEquality().hash(_this.predictions),const DeepCollectionEquality().hash(_this.observations));
+}
 
 @override
 String toString() {
-  return 'TsunamiReport(id: $id, sent: $sent, msgType: $msgType, report: $report, type: $type, content: $content, earthquake: $earthquake, predictions: $predictions, observations: $observations)';
+  final _this = this as TsunamiReport;
+  return 'TsunamiReport(id: ${_this.id}, sent: ${_this.sent}, msgType: ${_this.msgType}, report: ${_this.report}, type: ${_this.type}, content: ${_this.content}, earthquake: ${_this.earthquake}, predictions: ${_this.predictions}, observations: ${_this.observations})';
 }
 
 
@@ -1392,16 +1425,18 @@ _$TsunamiReportCopyWith<_TsunamiReport> get copyWith => __$TsunamiReportCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiReport&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.report, report) || other.report == report)&&(identical(other.type, type) || other.type == type)&&(identical(other.content, content) || other.content == content)&&(identical(other.earthquake, earthquake) || other.earthquake == earthquake)&&const DeepCollectionEquality().equals(other._predictions, _predictions)&&const DeepCollectionEquality().equals(other._observations, _observations));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TsunamiReport&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.report, report) || other.report == report)&&(identical(other.type, type) || other.type == type)&&(identical(other.content, content) || other.content == content)&&(identical(other.earthquake, earthquake) || other.earthquake == earthquake)&&const DeepCollectionEquality().equals(other.predictions, _predictions)&&const DeepCollectionEquality().equals(other.observations, _observations));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,sent,msgType,report,type,content,earthquake,const DeepCollectionEquality().hash(_predictions),const DeepCollectionEquality().hash(_observations));
+int get hashCode {
+    return Object.hash(runtimeType,id,sent,msgType,report,type,content,earthquake,const DeepCollectionEquality().hash(_predictions),const DeepCollectionEquality().hash(_observations));
+}
 
 @override
 String toString() {
-  return 'TsunamiReport(id: $id, sent: $sent, msgType: $msgType, report: $report, type: $type, content: $content, earthquake: $earthquake, predictions: $predictions, observations: $observations)';
+    return 'TsunamiReport(id: $id, sent: $sent, msgType: $msgType, report: $report, type: $type, content: $content, earthquake: $earthquake, predictions: $predictions, observations: $observations)';
 }
 
 
