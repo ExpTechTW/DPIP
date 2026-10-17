@@ -29,16 +29,21 @@ $ShelterDetailCopyWith<ShelterDetail> get copyWith => _$ShelterDetailCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShelterDetail&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other.category, category)&&(identical(other.indoor, indoor) || other.indoor == indoor)&&(identical(other.outdoor, outdoor) || other.outdoor == outdoor)&&(identical(other.vulnerableOk, vulnerableOk) || other.vulnerableOk == vulnerableOk)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.address, address) || other.address == address));
+  final _this = this as ShelterDetail;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShelterDetail&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.capacity, _this.capacity) || other.capacity == _this.capacity)&&const DeepCollectionEquality().equals(other.category, _this.category)&&(identical(other.indoor, _this.indoor) || other.indoor == _this.indoor)&&(identical(other.outdoor, _this.outdoor) || other.outdoor == _this.outdoor)&&(identical(other.vulnerableOk, _this.vulnerableOk) || other.vulnerableOk == _this.vulnerableOk)&&(identical(other.lat, _this.lat) || other.lat == _this.lat)&&(identical(other.lng, _this.lng) || other.lng == _this.lng)&&(identical(other.address, _this.address) || other.address == _this.address));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,capacity,const DeepCollectionEquality().hash(category),indoor,outdoor,vulnerableOk,lat,lng,address);
+int get hashCode {
+  final _this = this as ShelterDetail;
+  return Object.hash(runtimeType,_this.id,_this.name,_this.capacity,const DeepCollectionEquality().hash(_this.category),_this.indoor,_this.outdoor,_this.vulnerableOk,_this.lat,_this.lng,_this.address);
+}
 
 @override
 String toString() {
-  return 'ShelterDetail(id: $id, name: $name, capacity: $capacity, category: $category, indoor: $indoor, outdoor: $outdoor, vulnerableOk: $vulnerableOk, lat: $lat, lng: $lng, address: $address)';
+  final _this = this as ShelterDetail;
+  return 'ShelterDetail(id: ${_this.id}, name: ${_this.name}, capacity: ${_this.capacity}, category: ${_this.category}, indoor: ${_this.indoor}, outdoor: ${_this.outdoor}, vulnerableOk: ${_this.vulnerableOk}, lat: ${_this.lat}, lng: ${_this.lng}, address: ${_this.address})';
 }
 
 
@@ -252,16 +257,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ShelterDetail&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other._category, _category)&&(identical(other.indoor, indoor) || other.indoor == indoor)&&(identical(other.outdoor, outdoor) || other.outdoor == outdoor)&&(identical(other.vulnerableOk, vulnerableOk) || other.vulnerableOk == vulnerableOk)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.address, address) || other.address == address));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ShelterDetail&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&const DeepCollectionEquality().equals(other.category, _category)&&(identical(other.indoor, indoor) || other.indoor == indoor)&&(identical(other.outdoor, outdoor) || other.outdoor == outdoor)&&(identical(other.vulnerableOk, vulnerableOk) || other.vulnerableOk == vulnerableOk)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.address, address) || other.address == address));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,capacity,const DeepCollectionEquality().hash(_category),indoor,outdoor,vulnerableOk,lat,lng,address);
+int get hashCode {
+    return Object.hash(runtimeType,id,name,capacity,const DeepCollectionEquality().hash(_category),indoor,outdoor,vulnerableOk,lat,lng,address);
+}
 
 @override
 String toString() {
-  return 'ShelterDetail(id: $id, name: $name, capacity: $capacity, category: $category, indoor: $indoor, outdoor: $outdoor, vulnerableOk: $vulnerableOk, lat: $lat, lng: $lng, address: $address)';
+    return 'ShelterDetail(id: $id, name: $name, capacity: $capacity, category: $category, indoor: $indoor, outdoor: $outdoor, vulnerableOk: $vulnerableOk, lat: $lat, lng: $lng, address: $address)';
 }
 
 

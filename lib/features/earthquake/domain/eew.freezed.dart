@@ -32,16 +32,21 @@ $EewCopyWith<Eew> get copyWith => _$EewCopyWithImpl<Eew>(this as Eew, _$identity
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info)&&(identical(other.reportTime, reportTime) || other.reportTime == reportTime));
+  final _this = this as Eew;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Eew&&(identical(other.agency, _this.agency) || other.agency == _this.agency)&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.serial, _this.serial) || other.serial == _this.serial)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.isFinal, _this.isFinal) || other.isFinal == _this.isFinal)&&(identical(other.info, _this.info) || other.info == _this.info)&&(identical(other.reportTime, _this.reportTime) || other.reportTime == _this.reportTime));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,agency,id,serial,status,isFinal,info,reportTime);
+int get hashCode {
+  final _this = this as Eew;
+  return Object.hash(runtimeType,_this.agency,_this.id,_this.serial,_this.status,_this.isFinal,_this.info,_this.reportTime);
+}
 
 @override
 String toString() {
-  return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info, reportTime: $reportTime)';
+  final _this = this as Eew;
+  return 'Eew(agency: ${_this.agency}, id: ${_this.id}, serial: ${_this.serial}, status: ${_this.status}, isFinal: ${_this.isFinal}, info: ${_this.info}, reportTime: ${_this.reportTime})';
 }
 
 
@@ -255,16 +260,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info)&&(identical(other.reportTime, reportTime) || other.reportTime == reportTime));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Eew&&(identical(other.agency, agency) || other.agency == agency)&&(identical(other.id, id) || other.id == id)&&(identical(other.serial, serial) || other.serial == serial)&&(identical(other.status, status) || other.status == status)&&(identical(other.isFinal, isFinal) || other.isFinal == isFinal)&&(identical(other.info, info) || other.info == info)&&(identical(other.reportTime, reportTime) || other.reportTime == reportTime));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,agency,id,serial,status,isFinal,info,reportTime);
+int get hashCode {
+    return Object.hash(runtimeType,agency,id,serial,status,isFinal,info,reportTime);
+}
 
 @override
 String toString() {
-  return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info, reportTime: $reportTime)';
+    return 'Eew(agency: $agency, id: $id, serial: $serial, status: $status, isFinal: $isFinal, info: $info, reportTime: $reportTime)';
 }
 
 
@@ -334,16 +341,21 @@ $EewInfoCopyWith<EewInfo> get copyWith => _$EewInfoCopyWithImpl<EewInfo>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EewInfo&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.max, max) || other.max == max));
+  final _this = this as EewInfo;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EewInfo&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.depth, _this.depth) || other.depth == _this.depth)&&(identical(other.magnitude, _this.magnitude) || other.magnitude == _this.magnitude)&&(identical(other.location, _this.location) || other.location == _this.location)&&(identical(other.max, _this.max) || other.max == _this.max));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,longitude,latitude,depth,magnitude,location,max);
+int get hashCode {
+  final _this = this as EewInfo;
+  return Object.hash(runtimeType,_this.time,_this.longitude,_this.latitude,_this.depth,_this.magnitude,_this.location,_this.max);
+}
 
 @override
 String toString() {
-  return 'EewInfo(time: $time, longitude: $longitude, latitude: $latitude, depth: $depth, magnitude: $magnitude, location: $location, max: $max)';
+  final _this = this as EewInfo;
+  return 'EewInfo(time: ${_this.time}, longitude: ${_this.longitude}, latitude: ${_this.latitude}, depth: ${_this.depth}, magnitude: ${_this.magnitude}, location: ${_this.location}, max: ${_this.max})';
 }
 
 
@@ -545,16 +557,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EewInfo&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.max, max) || other.max == max));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _EewInfo&&(identical(other.time, time) || other.time == time)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.max, max) || other.max == max));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,longitude,latitude,depth,magnitude,location,max);
+int get hashCode {
+    return Object.hash(runtimeType,time,longitude,latitude,depth,magnitude,location,max);
+}
 
 @override
 String toString() {
-  return 'EewInfo(time: $time, longitude: $longitude, latitude: $latitude, depth: $depth, magnitude: $magnitude, location: $location, max: $max)';
+    return 'EewInfo(time: $time, longitude: $longitude, latitude: $latitude, depth: $depth, magnitude: $magnitude, location: $location, max: $max)';
 }
 
 

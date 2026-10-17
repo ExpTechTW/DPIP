@@ -33,16 +33,21 @@ $BugMessageCopyWith<BugMessage> get copyWith => _$BugMessageCopyWithImpl<BugMess
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BugMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.author, author) || other.author == author)&&(identical(other.authorName, authorName) || other.authorName == authorName)&&(identical(other.authorAvatar, authorAvatar) || other.authorAvatar == authorAvatar)&&(identical(other.body, body) || other.body == body)&&(identical(other.time, time) || other.time == time));
+  final _this = this as BugMessage;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BugMessage&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.authorName, _this.authorName) || other.authorName == _this.authorName)&&(identical(other.authorAvatar, _this.authorAvatar) || other.authorAvatar == _this.authorAvatar)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.time, _this.time) || other.time == _this.time));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,author,authorName,authorAvatar,body,time);
+int get hashCode {
+  final _this = this as BugMessage;
+  return Object.hash(runtimeType,_this.id,_this.author,_this.authorName,_this.authorAvatar,_this.body,_this.time);
+}
 
 @override
 String toString() {
-  return 'BugMessage(id: $id, author: $author, authorName: $authorName, authorAvatar: $authorAvatar, body: $body, time: $time)';
+  final _this = this as BugMessage;
+  return 'BugMessage(id: ${_this.id}, author: ${_this.author}, authorName: ${_this.authorName}, authorAvatar: ${_this.authorAvatar}, body: ${_this.body}, time: ${_this.time})';
 }
 
 
@@ -246,16 +251,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BugMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.author, author) || other.author == author)&&(identical(other.authorName, authorName) || other.authorName == authorName)&&(identical(other.authorAvatar, authorAvatar) || other.authorAvatar == authorAvatar)&&(identical(other.body, body) || other.body == body)&&(identical(other.time, time) || other.time == time));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BugMessage&&(identical(other.id, id) || other.id == id)&&(identical(other.author, author) || other.author == author)&&(identical(other.authorName, authorName) || other.authorName == authorName)&&(identical(other.authorAvatar, authorAvatar) || other.authorAvatar == authorAvatar)&&(identical(other.body, body) || other.body == body)&&(identical(other.time, time) || other.time == time));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,author,authorName,authorAvatar,body,time);
+int get hashCode {
+    return Object.hash(runtimeType,id,author,authorName,authorAvatar,body,time);
+}
 
 @override
 String toString() {
-  return 'BugMessage(id: $id, author: $author, authorName: $authorName, authorAvatar: $authorAvatar, body: $body, time: $time)';
+    return 'BugMessage(id: $id, author: $author, authorName: $authorName, authorAvatar: $authorAvatar, body: $body, time: $time)';
 }
 
 
@@ -315,16 +322,21 @@ $BugThreadCopyWith<BugThread> get copyWith => _$BugThreadCopyWithImpl<BugThread>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BugThread&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.body, body) || other.body == body)&&(identical(other.author, author) || other.author == author)&&(identical(other.authorName, authorName) || other.authorName == authorName)&&(identical(other.authorAvatar, authorAvatar) || other.authorAvatar == authorAvatar)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.messageCount, messageCount) || other.messageCount == messageCount)&&(identical(other.archived, archived) || other.archived == archived)&&(identical(other.locked, locked) || other.locked == locked)&&(identical(other.lastMessageId, lastMessageId) || other.lastMessageId == lastMessageId));
+  final _this = this as BugThread;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BugThread&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&const DeepCollectionEquality().equals(other.tags, _this.tags)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.author, _this.author) || other.author == _this.author)&&(identical(other.authorName, _this.authorName) || other.authorName == _this.authorName)&&(identical(other.authorAvatar, _this.authorAvatar) || other.authorAvatar == _this.authorAvatar)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.messageCount, _this.messageCount) || other.messageCount == _this.messageCount)&&(identical(other.archived, _this.archived) || other.archived == _this.archived)&&(identical(other.locked, _this.locked) || other.locked == _this.locked)&&(identical(other.lastMessageId, _this.lastMessageId) || other.lastMessageId == _this.lastMessageId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(tags),body,author,authorName,authorAvatar,createdAt,messageCount,archived,locked,lastMessageId);
+int get hashCode {
+  final _this = this as BugThread;
+  return Object.hash(runtimeType,_this.id,_this.title,const DeepCollectionEquality().hash(_this.tags),_this.body,_this.author,_this.authorName,_this.authorAvatar,_this.createdAt,_this.messageCount,_this.archived,_this.locked,_this.lastMessageId);
+}
 
 @override
 String toString() {
-  return 'BugThread(id: $id, title: $title, tags: $tags, body: $body, author: $author, authorName: $authorName, authorAvatar: $authorAvatar, createdAt: $createdAt, messageCount: $messageCount, archived: $archived, locked: $locked, lastMessageId: $lastMessageId)';
+  final _this = this as BugThread;
+  return 'BugThread(id: ${_this.id}, title: ${_this.title}, tags: ${_this.tags}, body: ${_this.body}, author: ${_this.author}, authorName: ${_this.authorName}, authorAvatar: ${_this.authorAvatar}, createdAt: ${_this.createdAt}, messageCount: ${_this.messageCount}, archived: ${_this.archived}, locked: ${_this.locked}, lastMessageId: ${_this.lastMessageId})';
 }
 
 
@@ -542,16 +554,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BugThread&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.body, body) || other.body == body)&&(identical(other.author, author) || other.author == author)&&(identical(other.authorName, authorName) || other.authorName == authorName)&&(identical(other.authorAvatar, authorAvatar) || other.authorAvatar == authorAvatar)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.messageCount, messageCount) || other.messageCount == messageCount)&&(identical(other.archived, archived) || other.archived == archived)&&(identical(other.locked, locked) || other.locked == locked)&&(identical(other.lastMessageId, lastMessageId) || other.lastMessageId == lastMessageId));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BugThread&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.tags, _tags)&&(identical(other.body, body) || other.body == body)&&(identical(other.author, author) || other.author == author)&&(identical(other.authorName, authorName) || other.authorName == authorName)&&(identical(other.authorAvatar, authorAvatar) || other.authorAvatar == authorAvatar)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.messageCount, messageCount) || other.messageCount == messageCount)&&(identical(other.archived, archived) || other.archived == archived)&&(identical(other.locked, locked) || other.locked == locked)&&(identical(other.lastMessageId, lastMessageId) || other.lastMessageId == lastMessageId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_tags),body,author,authorName,authorAvatar,createdAt,messageCount,archived,locked,lastMessageId);
+int get hashCode {
+    return Object.hash(runtimeType,id,title,const DeepCollectionEquality().hash(_tags),body,author,authorName,authorAvatar,createdAt,messageCount,archived,locked,lastMessageId);
+}
 
 @override
 String toString() {
-  return 'BugThread(id: $id, title: $title, tags: $tags, body: $body, author: $author, authorName: $authorName, authorAvatar: $authorAvatar, createdAt: $createdAt, messageCount: $messageCount, archived: $archived, locked: $locked, lastMessageId: $lastMessageId)';
+    return 'BugThread(id: $id, title: $title, tags: $tags, body: $body, author: $author, authorName: $authorName, authorAvatar: $authorAvatar, createdAt: $createdAt, messageCount: $messageCount, archived: $archived, locked: $locked, lastMessageId: $lastMessageId)';
 }
 
 
@@ -614,16 +628,21 @@ $BugThreadDetailCopyWith<BugThreadDetail> get copyWith => _$BugThreadDetailCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BugThreadDetail&&(identical(other.thread, thread) || other.thread == thread)&&const DeepCollectionEquality().equals(other.messages, messages));
+  final _this = this as BugThreadDetail;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BugThreadDetail&&(identical(other.thread, _this.thread) || other.thread == _this.thread)&&const DeepCollectionEquality().equals(other.messages, _this.messages));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,thread,const DeepCollectionEquality().hash(messages));
+int get hashCode {
+  final _this = this as BugThreadDetail;
+  return Object.hash(runtimeType,_this.thread,const DeepCollectionEquality().hash(_this.messages));
+}
 
 @override
 String toString() {
-  return 'BugThreadDetail(thread: $thread, messages: $messages)';
+  final _this = this as BugThreadDetail;
+  return 'BugThreadDetail(thread: ${_this.thread}, messages: ${_this.messages})';
 }
 
 
@@ -827,16 +846,18 @@ _$BugThreadDetailCopyWith<_BugThreadDetail> get copyWith => __$BugThreadDetailCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BugThreadDetail&&(identical(other.thread, thread) || other.thread == thread)&&const DeepCollectionEquality().equals(other._messages, _messages));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _BugThreadDetail&&(identical(other.thread, thread) || other.thread == thread)&&const DeepCollectionEquality().equals(other.messages, _messages));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,thread,const DeepCollectionEquality().hash(_messages));
+int get hashCode {
+    return Object.hash(runtimeType,thread,const DeepCollectionEquality().hash(_messages));
+}
 
 @override
 String toString() {
-  return 'BugThreadDetail(thread: $thread, messages: $messages)';
+    return 'BugThreadDetail(thread: $thread, messages: $messages)';
 }
 
 

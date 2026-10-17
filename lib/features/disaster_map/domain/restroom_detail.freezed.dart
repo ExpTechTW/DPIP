@@ -29,16 +29,21 @@ $RestroomDetailCopyWith<RestroomDetail> get copyWith => _$RestroomDetailCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestroomDetail&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.type, type) || other.type == type)&&(identical(other.type2, type2) || other.type2 == type2)&&(identical(other.typegrade, typegrade) || other.typegrade == typegrade));
+  final _this = this as RestroomDetail;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RestroomDetail&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.address, _this.address) || other.address == _this.address)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.type2, _this.type2) || other.type2 == _this.type2)&&(identical(other.typegrade, _this.typegrade) || other.typegrade == _this.typegrade));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,address,latitude,longitude,type,type2,typegrade);
+int get hashCode {
+  final _this = this as RestroomDetail;
+  return Object.hash(runtimeType,_this.name,_this.address,_this.latitude,_this.longitude,_this.type,_this.type2,_this.typegrade);
+}
 
 @override
 String toString() {
-  return 'RestroomDetail(name: $name, address: $address, latitude: $latitude, longitude: $longitude, type: $type, type2: $type2, typegrade: $typegrade)';
+  final _this = this as RestroomDetail;
+  return 'RestroomDetail(name: ${_this.name}, address: ${_this.address}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, type: ${_this.type}, type2: ${_this.type2}, typegrade: ${_this.typegrade})';
 }
 
 
@@ -240,16 +245,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RestroomDetail&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.type, type) || other.type == type)&&(identical(other.type2, type2) || other.type2 == type2)&&(identical(other.typegrade, typegrade) || other.typegrade == typegrade));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RestroomDetail&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.type, type) || other.type == type)&&(identical(other.type2, type2) || other.type2 == type2)&&(identical(other.typegrade, typegrade) || other.typegrade == typegrade));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,address,latitude,longitude,type,type2,typegrade);
+int get hashCode {
+    return Object.hash(runtimeType,name,address,latitude,longitude,type,type2,typegrade);
+}
 
 @override
 String toString() {
-  return 'RestroomDetail(name: $name, address: $address, latitude: $latitude, longitude: $longitude, type: $type, type2: $type2, typegrade: $typegrade)';
+    return 'RestroomDetail(name: $name, address: $address, latitude: $latitude, longitude: $longitude, type: $type, type2: $type2, typegrade: $typegrade)';
 }
 
 

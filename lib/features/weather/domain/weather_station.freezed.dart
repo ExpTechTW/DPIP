@@ -29,16 +29,21 @@ $WeatherStationCopyWith<WeatherStation> get copyWith => _$WeatherStationCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherStation&&(identical(other.name, name) || other.name == name)&&(identical(other.county, county) || other.county == county)&&(identical(other.town, town) || other.town == town)&&(identical(other.altitude, altitude) || other.altitude == altitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  final _this = this as WeatherStation;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherStation&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.county, _this.county) || other.county == _this.county)&&(identical(other.town, _this.town) || other.town == _this.town)&&(identical(other.altitude, _this.altitude) || other.altitude == _this.altitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,county,town,altitude,latitude,longitude);
+int get hashCode {
+  final _this = this as WeatherStation;
+  return Object.hash(runtimeType,_this.name,_this.county,_this.town,_this.altitude,_this.latitude,_this.longitude);
+}
 
 @override
 String toString() {
-  return 'WeatherStation(name: $name, county: $county, town: $town, altitude: $altitude, latitude: $latitude, longitude: $longitude)';
+  final _this = this as WeatherStation;
+  return 'WeatherStation(name: ${_this.name}, county: ${_this.county}, town: ${_this.town}, altitude: ${_this.altitude}, latitude: ${_this.latitude}, longitude: ${_this.longitude})';
 }
 
 
@@ -238,16 +243,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherStation&&(identical(other.name, name) || other.name == name)&&(identical(other.county, county) || other.county == county)&&(identical(other.town, town) || other.town == town)&&(identical(other.altitude, altitude) || other.altitude == altitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherStation&&(identical(other.name, name) || other.name == name)&&(identical(other.county, county) || other.county == county)&&(identical(other.town, town) || other.town == town)&&(identical(other.altitude, altitude) || other.altitude == altitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,county,town,altitude,latitude,longitude);
+int get hashCode {
+    return Object.hash(runtimeType,name,county,town,altitude,latitude,longitude);
+}
 
 @override
 String toString() {
-  return 'WeatherStation(name: $name, county: $county, town: $town, altitude: $altitude, latitude: $latitude, longitude: $longitude)';
+    return 'WeatherStation(name: $name, county: $county, town: $town, altitude: $altitude, latitude: $latitude, longitude: $longitude)';
 }
 
 

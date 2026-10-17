@@ -29,16 +29,21 @@ $RtsCopyWith<Rts> get copyWith => _$RtsCopyWithImpl<Rts>(this as Rts, _$identity
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Rts&&const DeepCollectionEquality().equals(other.stations, stations)&&(identical(other.time, time) || other.time == time));
+  final _this = this as Rts;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Rts&&const DeepCollectionEquality().equals(other.stations, _this.stations)&&(identical(other.time, _this.time) || other.time == _this.time));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(stations),time);
+int get hashCode {
+  final _this = this as Rts;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.stations),_this.time);
+}
 
 @override
 String toString() {
-  return 'Rts(stations: $stations, time: $time)';
+  final _this = this as Rts;
+  return 'Rts(stations: ${_this.stations}, time: ${_this.time})';
 }
 
 
@@ -236,16 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Rts&&const DeepCollectionEquality().equals(other._stations, _stations)&&(identical(other.time, time) || other.time == time));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Rts&&const DeepCollectionEquality().equals(other.stations, _stations)&&(identical(other.time, time) || other.time == time));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_stations),time);
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_stations),time);
+}
 
 @override
 String toString() {
-  return 'Rts(stations: $stations, time: $time)';
+    return 'Rts(stations: $stations, time: $time)';
 }
 
 
@@ -301,16 +308,21 @@ $RtsStationCopyWith<RtsStation> get copyWith => _$RtsStationCopyWithImpl<RtsStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsStation&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.alert, alert) || other.alert == alert));
+  final _this = this as RtsStation;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RtsStation&&(identical(other.intensity, _this.intensity) || other.intensity == _this.intensity)&&(identical(other.pga, _this.pga) || other.pga == _this.pga)&&(identical(other.alert, _this.alert) || other.alert == _this.alert));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,intensity,pga,alert);
+int get hashCode {
+  final _this = this as RtsStation;
+  return Object.hash(runtimeType,_this.intensity,_this.pga,_this.alert);
+}
 
 @override
 String toString() {
-  return 'RtsStation(intensity: $intensity, pga: $pga, alert: $alert)';
+  final _this = this as RtsStation;
+  return 'RtsStation(intensity: ${_this.intensity}, pga: ${_this.pga}, alert: ${_this.alert})';
 }
 
 
@@ -504,16 +516,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsStation&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.alert, alert) || other.alert == alert));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RtsStation&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.pga, pga) || other.pga == pga)&&(identical(other.alert, alert) || other.alert == alert));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,intensity,pga,alert);
+int get hashCode {
+    return Object.hash(runtimeType,intensity,pga,alert);
+}
 
 @override
 String toString() {
-  return 'RtsStation(intensity: $intensity, pga: $pga, alert: $alert)';
+    return 'RtsStation(intensity: $intensity, pga: $pga, alert: $alert)';
 }
 
 

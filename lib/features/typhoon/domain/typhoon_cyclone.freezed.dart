@@ -39,16 +39,21 @@ $TyphoonCycloneCopyWith<TyphoonCyclone> get copyWith => _$TyphoonCycloneCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonCyclone&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.year, year) || other.year == year)&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.tyNo, tyNo) || other.tyNo == tyNo)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction));
+  final _this = this as TyphoonCyclone;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonCyclone&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.cwaName, _this.cwaName) || other.cwaName == _this.cwaName)&&(identical(other.year, _this.year) || other.year == _this.year)&&(identical(other.tdNo, _this.tdNo) || other.tdNo == _this.tdNo)&&(identical(other.tyNo, _this.tyNo) || other.tyNo == _this.tyNo)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.wind, _this.wind) || other.wind == _this.wind)&&(identical(other.gust, _this.gust) || other.gust == _this.gust)&&(identical(other.pressure, _this.pressure) || other.pressure == _this.pressure)&&(identical(other.speed, _this.speed) || other.speed == _this.speed)&&(identical(other.direction, _this.direction) || other.direction == _this.direction));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,cwaName,year,tdNo,tyNo,time,latitude,longitude,wind,gust,pressure,speed,direction);
+int get hashCode {
+  final _this = this as TyphoonCyclone;
+  return Object.hash(runtimeType,_this.name,_this.cwaName,_this.year,_this.tdNo,_this.tyNo,_this.time,_this.latitude,_this.longitude,_this.wind,_this.gust,_this.pressure,_this.speed,_this.direction);
+}
 
 @override
 String toString() {
-  return 'TyphoonCyclone(name: $name, cwaName: $cwaName, year: $year, tdNo: $tdNo, tyNo: $tyNo, time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, speed: $speed, direction: $direction)';
+  final _this = this as TyphoonCyclone;
+  return 'TyphoonCyclone(name: ${_this.name}, cwaName: ${_this.cwaName}, year: ${_this.year}, tdNo: ${_this.tdNo}, tyNo: ${_this.tyNo}, time: ${_this.time}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, wind: ${_this.wind}, gust: ${_this.gust}, pressure: ${_this.pressure}, speed: ${_this.speed}, direction: ${_this.direction})';
 }
 
 
@@ -272,16 +277,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonCyclone&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.year, year) || other.year == year)&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.tyNo, tyNo) || other.tyNo == tyNo)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonCyclone&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.year, year) || other.year == year)&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.tyNo, tyNo) || other.tyNo == tyNo)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,cwaName,year,tdNo,tyNo,time,latitude,longitude,wind,gust,pressure,speed,direction);
+int get hashCode {
+    return Object.hash(runtimeType,name,cwaName,year,tdNo,tyNo,time,latitude,longitude,wind,gust,pressure,speed,direction);
+}
 
 @override
 String toString() {
-  return 'TyphoonCyclone(name: $name, cwaName: $cwaName, year: $year, tdNo: $tdNo, tyNo: $tyNo, time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, speed: $speed, direction: $direction)';
+    return 'TyphoonCyclone(name: $name, cwaName: $cwaName, year: $year, tdNo: $tdNo, tyNo: $tyNo, time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, speed: $speed, direction: $direction)';
 }
 
 
@@ -348,16 +355,21 @@ $CycloneIndexCopyWith<CycloneIndex> get copyWith => _$CycloneIndexCopyWithImpl<C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CycloneIndex&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+  final _this = this as CycloneIndex;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CycloneIndex&&(identical(other.updated, _this.updated) || other.updated == _this.updated)&&const DeepCollectionEquality().equals(other.cyclones, _this.cyclones));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+int get hashCode {
+  final _this = this as CycloneIndex;
+  return Object.hash(runtimeType,_this.updated,const DeepCollectionEquality().hash(_this.cyclones));
+}
 
 @override
 String toString() {
-  return 'CycloneIndex(updated: $updated, cyclones: $cyclones)';
+  final _this = this as CycloneIndex;
+  return 'CycloneIndex(updated: ${_this.updated}, cyclones: ${_this.cyclones})';
 }
 
 
@@ -555,16 +567,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CycloneIndex&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CycloneIndex&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, _cyclones));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+int get hashCode {
+    return Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+}
 
 @override
 String toString() {
-  return 'CycloneIndex(updated: $updated, cyclones: $cyclones)';
+    return 'CycloneIndex(updated: $updated, cyclones: $cyclones)';
 }
 
 
