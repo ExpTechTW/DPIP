@@ -343,7 +343,7 @@ plugins where practical (e.g. `core/platform/` device_info, compass).
 
 ## Persistence
 
-everything persisted lives in **SQLite**, split
+everything persisted lives in **SQLite**. Flutter's stores are split
 into two files by *durability*: `dpip.db` in application-support (settings,
 `tle`, `mesh_*`) and `http_etag_cache.db` in the platform cache directory
 (`http_cache`, `net_bucket`). The split is the point — the OS may empty the
@@ -352,6 +352,19 @@ may live there, and `AppDatabase.clearCache()` holds no handle to the durable
 file, which makes "clear cache deleted my settings" unavailable rather than
 merely avoided. Tables are one-per-category and each is owned by exactly one
 store (`core/storage/app_database.dart` documents the map).
+
+Android's home-screen Widget keeps its own native-owned `dpip_widget.db` in the
+app's database directory, opened only by `WidgetStore`. The boundary runs both
+ways — Dart reaches it only through `WidgetSnapshotChannel` and never opens the
+file; native code never opens Flutter's databases. Widget instance choices and
+the published location catalog are durable and exist nowhere else: Dart cannot
+rebuild them, so schema rebuilds and snapshot clears must never drop them;
+snapshots, forecasts, ordering and demand state are rebuildable.
+`AppDatabase.clearCache()` does not reach this file; any native clear goes
+through the channel under the same split. The table map, ordering fences and
+reconcile behaviour live with the code that enforces them
+(`android/app/src/main/kotlin/com/exptech/dpip/widget/WidgetStore.kt`).
+
 Settings go through the typed `SettingsStore` facade
 (`core/settings/settings_store.dart`), keyed by a `SettingKey<T>` from the
 `SettingKeys` registry (`core/settings/setting_keys.dart`) — **never a raw

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/widget_config_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/widget_config_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:title="@string/widget_name"
+        app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/widget_config_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/widget_padding"
+        android:layout_marginTop="@dimen/widget_spacing_md"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+        android:textColor="?attr/colorOnSurface" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/widget_config_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_spacing_sm"
+        android:layout_marginHorizontal="@dimen/widget_padding"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/widget_config_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/widget_spacing_md"
+        android:paddingHorizontal="@dimen/widget_padding"
+        android:clipToPadding="false"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
+
+    <com.google.android.material.button.MaterialButton
+        style="?attr/materialButtonTonalStyle"
+        android:id="@+id/widget_config_open_app"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/widget_padding"
+        android:minHeight="@dimen/widget_config_touch_target"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        style="?attr/borderlessButtonStyle"
+        android:id="@+id/widget_config_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/widget_padding"
+        android:layout_marginBottom="@dimen/widget_spacing_md"
+        android:minHeight="@dimen/widget_config_touch_target" />
+</LinearLayout>

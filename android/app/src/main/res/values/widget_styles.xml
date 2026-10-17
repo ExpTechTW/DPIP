@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.RefreshProgress" parent="@android:style/Widget.ProgressBar">
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:indeterminate">true</item>
+        <item name="android:indeterminateOnly">true</item>
+        <item name="android:indeterminateBehavior">repeat</item>
+        <item name="android:indeterminateDuration">1000</item>
+        <item name="android:indeterminateDrawable">@drawable/widget_refresh_spinning</item>
+        <item name="android:indeterminateTint">@color/widget_icon_tint</item>
+        <item name="android:visibility">gone</item>
+    </style>
+    <!--
+      The status notice: "Outdated", a saved town that left the catalog, or a
+      position the app could not resolve.
+
+      It is a plain secondary caption, not a filled pill. iOS has no such line
+      at all, and the requirement is only that a genuinely stale reading or a
+      degraded position is never dressed up as fresh — the words carry that, so
+      the notice must not out-shout the temperature. Capped and ellipsised so a
+      sentence-long position notice shrinks instead of widening the widget,
+      which `WidgetLayoutFitTest` measures with the longest notice the app can
+      produce. `parent=""` because the dotted name would otherwise imply a
+      parent style called `Widget`, which does not exist.
+    -->
+    <style name="Widget.Badge" parent="">
+        <item name="android:textColor">@color/widget_notice</item>
+        <item name="android:textSize">@dimen/widget_text_caption2</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:maxWidth">@dimen/widget_notice_max_width</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- DPIP teal fallback; wallpaper colors are scoped to this picker on API31+. -->
+    <style name="WidgetConfigTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/widget_config_primary</item>
+        <item name="colorOnPrimary">@color/widget_config_on_primary</item>
+        <item name="colorPrimaryContainer">@color/widget_config_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/widget_config_on_primary_container</item>
+        <item name="colorSecondaryContainer">@color/widget_config_primary_container</item>
+        <item name="colorOnSecondaryContainer">@color/widget_config_on_primary_container</item>
+        <item name="colorSurface">@color/widget_config_surface</item>
+        <item name="colorSurfaceContainer">@color/widget_config_container</item>
+        <item name="colorOnSurface">@color/widget_config_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/widget_config_secondary</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+</resources>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Spacing, radius, type sizes and glyph sizes for the Widget.
+
+  The numbers are the iOS Widget's, restated on DESIGN.md's scales
+  (`AppSpacing` 4 dp grid, `AppRadius.lg` = 20 dp): the small layout's 42 pt
+  temperature, the medium layout's 38 pt one, the 17 pt headline and the
+  11 pt captions are SF point sizes, and the glyph sizes are SF Symbol point
+  sizes. A layout must not inline a bare dp or sp; it names one of these.
+
+  Three padding steps exist because the layouts genuinely have three budgets:
+  the normal iOS-shaped layouts use `widget_padding` (16 dp, the WidgetKit
+  content inset), the two-row medium layout uses `widget_padding_medium`
+  (12 dp, measured against the ~172 dp a 4x2 launcher cell reports), and the
+  110 dp compact fallback uses `widget_padding_compact` (8 dp, measured against
+  the metadata's own 110x110 minimum).
+-->
+<resources>
+    <dimen name="widget_padding">16dp</dimen>
+    <!-- Android font extents plus the date/notice need more space than SF at a
+         118x152 dp small cell. Keep the 42sp reading, not a scaled-down face. -->
+    <dimen name="widget_padding_small">12dp</dimen>
+    <dimen name="widget_metric_gap">2dp</dimen>
+    <dimen name="widget_text_metric_min">8sp</dimen>
+    <!-- Fallback Thai tone marks can extend above the nominal label layout. -->
+    <dimen name="widget_grid_label_inset">2dp</dimen>
+    <!-- Android's padded text lines plus the grid's fallback-font guard need
+         a slightly tighter hourly gap than SwiftUI's unpadded SF lines. -->
+    <dimen name="widget_forecast_spacing_large">3dp</dimen>
+    <dimen name="widget_padding_medium">8dp</dimen>
+    <!-- Whole intrinsic forecast columns leave a 3dp section gap at the
+         medium layout's 170dp minimum, without compressing the temperature. -->
+    <dimen name="widget_medium_section_gap">3dp</dimen>
+    <dimen name="widget_padding_compact">4dp</dimen>
+    <!-- Pre-S fallback only: on API 31+ `values-v31` overrides this with the
+         launcher's own `system_app_widget_background_radius`, so the Widget's
+         corners match every other widget on the home screen. There is no inner
+         card inside the faces, so the inner radius has nothing to apply to. -->
+    <dimen name="widget_radius">20dp</dimen>
+
+    <dimen name="widget_spacing_xs">4dp</dimen>
+    <dimen name="widget_spacing_sm">6dp</dimen>
+    <dimen name="widget_spacing_md">12dp</dimen>
+
+    <!-- The large detail grid: iOS uses `spacing: 16` between the columns and
+         `spacing: 14` between the two rows. -->
+    <dimen name="widget_grid_column_gap">16dp</dimen>
+    <dimen name="widget_grid_row_gap">14dp</dimen>
+    <!-- The minimal-height large box (~320 dp) cannot carry iOS's 12/14 section
+         spacing alongside the Android-only notice row; this is the tightened
+         value it uses instead. `WidgetPresenter.largeRoomyMinimumHeightDp`
+         selects between the two. -->
+    <dimen name="widget_grid_row_gap_tight">10dp</dimen>
+
+    <!-- The medium current condition is larger than its 20dp hourly glyphs.
+         32dp remains within the 38sp temperature row's minimum height and is
+         measured against narrow cells with a multi-character condition name. -->
+    <dimen name="widget_icon_small">28dp</dimen>
+    <dimen name="widget_icon_medium">32dp</dimen>
+    <dimen name="widget_icon_compact">20dp</dimen>
+    <dimen name="widget_icon_empty">28dp</dimen>
+
+    <!-- Forecast column glyphs: `.title3` (20 pt) for the medium layout,
+         `.title2` (24 pt) for the large one. -->
+    <dimen name="widget_icon_forecast">20dp</dimen>
+    <dimen name="widget_icon_forecast_large">24dp</dimen>
+
+    <!-- The location.fill mark beside a Current Location's town, and the
+         humidity/drop marks on the small layout's metric row. -->
+    <dimen name="widget_icon_location">11dp</dimen>
+    <dimen name="widget_icon_metric">12dp</dimen>
+
+    <!-- Refresh touch targets. Configuration is provided by launcher reconfigure,
+         not by an action in the widget face.
+
+         The platform guidance is a 48 dp touch target, and the glyph is drawn
+         smaller than its box via the paddings below, so growing a target never
+         changes what the user sees. Each slot is at the largest box its
+         measured budget allows:
+
+         * `widget_icon_action_touch` (48 dp) is the full guidance, used only
+           by the empty face's corner refresh: it overlays the corner rather than
+           sharing a row, so no text budget competes with it.
+         * `widget_icon_action_target` (28 dp) serves the medium header refresh.
+           The header's height is the buttons' height, and the forecast below
+           is weighted: at the 172 dp two-row cell a taller header leaves the
+           forecast probability line 2 dp short (`WidgetLayoutFitTest` pins
+           this exactly), so 28 dp is this slot's ceiling.
+         * `widget_icon_action_touch_small` (32 dp) serves the small face's
+           temperature-row refresh, which shares its row with the 42 sp reading:
+           the weighted spacer absorbs the wider box, and the glyph stays
+           12 dp via `widget_action_padding_small`.
+         * `widget_icon_action_target_large` stays 24 dp and
+           `widget_icon_action_target_compact` stays 20 dp: the large header at
+           a 200 dp cell and the 110 dp compact box spend their whole width on
+           the town and the clock (`WidgetLayoutFitTest` asserts both stay
+           whole), so any larger box would ellipsise the primary content to
+           enlarge a secondary button. Reconfiguration is separate from refresh:
+           use a supporting launcher's system reconfigure entry, or remove and
+           re-add the widget where that entry is unavailable (including API 26-27).
+    -->
+    <dimen name="widget_icon_action_target">28dp</dimen>
+    <dimen name="widget_icon_action_target_large">24dp</dimen>
+    <dimen name="widget_icon_action_target_compact">20dp</dimen>
+    <dimen name="widget_icon_action_touch">48dp</dimen>
+    <dimen name="widget_icon_action_touch_small">32dp</dimen>
+    <!-- Glyph-preserving paddings: (box - glyph) / 2, so the drawn mark keeps
+         its measured size while the tap box grows. -->
+    <dimen name="widget_action_padding_small">10dp</dimen>
+    <dimen name="widget_action_padding_empty">14dp</dimen>
+
+    <dimen name="widget_text_headline">17sp</dimen>
+    <dimen name="widget_text_headline_compact">15sp</dimen>
+    <dimen name="widget_text_body">15sp</dimen>
+    <dimen name="widget_text_caption">12sp</dimen>
+    <dimen name="widget_text_caption2">11sp</dimen>
+    <dimen name="widget_text_temperature">42sp</dimen>
+    <dimen name="widget_text_temperature_medium">38sp</dimen>
+    <dimen name="widget_text_temperature_compact">24sp</dimen>
+
+    <dimen name="widget_text_forecast_time">11sp</dimen>
+    <dimen name="widget_text_forecast_time_large">13sp</dimen>
+    <dimen name="widget_text_forecast_temperature">13sp</dimen>
+    <dimen name="widget_text_forecast_temperature_large">15sp</dimen>
+    <dimen name="widget_text_grid_value">13sp</dimen>
+    <dimen name="widget_text_grid_value_min">10sp</dimen>
+
+    <!-- Autosize floors: the iOS layouts use `minimumScaleFactor(0.8)`, which
+         at 17 pt is ~13.6 pt and at 11 pt is ~8.8 pt. A launcher cell can be
+         120 dp wide, so the town and the condition text have to shrink rather
+         than ellipsise. -->
+    <dimen name="widget_text_headline_min">11sp</dimen>
+    <dimen name="widget_text_caption2_min">9sp</dimen>
+
+    <dimen name="widget_notice_max_width">150dp</dimen>
+    <!-- The square layout's condition name sits under its glyph at the trailing
+         edge. A 120 dp cell cannot hold the town, the location mark, the glyph
+         and a full-width condition name at once; the town keeps priority and the
+         name is capped here and autosizes inside the cap. iOS small is 158 dp,
+         where the cap is never reached. -->
+    <dimen name="widget_weather_max_width">40dp</dimen>
+</resources>

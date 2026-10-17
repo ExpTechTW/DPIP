@@ -48,6 +48,15 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    // Robolectric inflates the Widget's real layouts and resolves its real
+    // resources, so the unit-test run needs the merged resource table — which
+    // is off by default for Android unit tests.
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     compileOptions {
         // Required by awesome_notifications (uses desugared java.time/etc.).
         isCoreLibraryDesugaringEnabled = true
@@ -61,6 +70,12 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = dpipVersionCode
         versionName = dpipVersionName
+
+        // The Widget's on-device suite (`src/androidTest`), which a JVM runner
+        // cannot stand in for: the real `RemoteViews` inflater, the real SQLite,
+        // and the real provider metadata the launcher reads. It runs from
+        // android.yml on an emulator, which is the only place a device exists.
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Flutter ≥3.35 auto-sets release abiFilters to its 3 supported
         // architectures (union with whatever defaultConfig declares).
@@ -84,6 +99,18 @@ android {
         }
     }
 
+    // Android lint, as a gate rather than a report.
+    //
+    // `lintDebug` runs from `tool/dev/lint_android.sh` and from android.yml. The
+    // baseline it points at records the issues that were already there before
+    // the Widget existed — a `NewApi` call in `LocationFetcher`, which belongs
+    // to the location reporter rather than to this change — so the gate is about
+    // anything *new*. Without it the task fails on day one on somebody else's
+    // code, which is how a lint gate gets deleted instead of fixed.
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     buildTypes {
         release {
             signingConfig =
@@ -102,11 +129,30 @@ kotlin {
     }
 }
 
+
+// Robolectric reads the app's *merged assets* — the generated township
+// resources are app assets, and the unit-test packaging task therefore consumes
+// the directory the Flutter Gradle plugin writes into. AGP declares that edge
+// for the app tasks but not for the unit-test packaging tasks, so Gradle's
+// task-order validation fails the build with "uses this output ... without
+// declaring an explicit or implicit dependency". Declaring it is the fix Gradle
+// itself proposes; the alternative is dropping `isIncludeAndroidResources`,
+// which is what makes `RemoteViews.apply` and the SQLite/resources tests
+// possible at all.
+tasks.matching { it.name == "packageDebugUnitTestForUnitTest" }.configureEach {
+    dependsOn("copyFlutterAssetsDebug")
+}
+tasks.matching { it.name == "packageReleaseUnitTestForUnitTest" }.configureEach {
+    dependsOn("copyFlutterAssetsRelease")
+}
+
 flutter {
     source = "../.."
 }
 
 dependencies {
+    // Only the native widget picker uses MDC; Flutter and RemoteViews keep their themes.
+    implementation("com.google.android.material:material:1.14.0")
     // Lets MapSnapshotChannel / MapCacheChannel use MapLibre APIs directly:
     // the maplibre_gl plugin's SDK isn't on the app's compile classpath.
     // maplibre_gl ≥0.26 switched to the OpenGL artifact and excludes the
@@ -136,4 +182,25 @@ dependencies {
     implementation("androidx.work:work-runtime:2.11.2")
     // Backports java.time/etc. for awesome_notifications (see compileOptions).
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
+    // The Widget's native unit tests.
+    //
+    // JUnit alone covers the pure policy (JSON, contracts, ordering,
+    // presentation, solar time, the time protocols). The wiring that only exists
+    // at runtime — `RemoteViews.apply` against the real layouts, the SQLite
+    // store's SQL, WorkManager's scheduling, the configuration Activity and the
+    // provider's restore path — needs an Android runtime, and there is no device
+    // or emulator here or on the CI runner. Robolectric supplies one on the JVM,
+    // so those tests run everywhere `tool/dev/test_android.sh` runs.
+    //
+    // `work-testing` provides the WorkManager test initializer, which is the
+    // only way to inspect what was enqueued without a real scheduler.
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.16")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("androidx.work:work-testing:2.11.2")
+
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:rules:1.6.1")
 }

@@ -3,6 +3,8 @@
 /// one or the closures stay uncovered.
 library;
 
+import 'dart:convert';
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
@@ -15,7 +17,10 @@ import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
+import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
+import 'package:dpip/features/weather/current_weather_widget_coordinator.dart';
+import 'package:dpip/features/weather/data/current_weather_widget_publisher.dart';
 import 'package:dpip/features/weather/domain/current_weather_widget_sync.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
@@ -51,18 +56,21 @@ void main() {
     expect(publishedWeather, same(weather));
   });
 
-  test('Widget callback is enabled for iOS', () {
-    final callback = createCurrentWeatherWidgetCallback(
-      platform: TargetPlatform.iOS,
-      publish: _unusedPublish,
-    );
+  test('Widget callback is enabled for iOS and Android', () {
+    for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
+      final callback = createCurrentWeatherWidgetCallback(
+        platform: platform,
+        publish: _unusedPublish,
+      );
 
-    expect(callback, isNotNull);
+      expect(callback, isNotNull, reason: '$platform has a home-screen Widget');
+    }
   });
 
-  test('Widget callback is disabled for every non-iOS platform', () {
+  test('Widget callback is disabled where there is no home-screen Widget', () {
     for (final platform in TargetPlatform.values.where(
-      (platform) => platform != TargetPlatform.iOS,
+      (platform) =>
+          platform != TargetPlatform.iOS && platform != TargetPlatform.android,
     )) {
       final callback = createCurrentWeatherWidgetCallback(
         platform: platform,
@@ -72,9 +80,180 @@ void main() {
       expect(
         callback,
         isNull,
-        reason: '$platform must not publish iOS Widgets',
+        reason: '$platform has no home-screen Widget to publish to',
       );
     }
+  });
+
+  // The wiring the app actually runs: the Home callback → the real coordinator
+  // → the real publisher → the writer. An adapter test on its own would pass
+  // with the coordinator unplugged, which is the state this replaced.
+  test(
+    'an Android Home update reaches the writer as a source-tagged snapshot',
+    () async {
+      final regions = RegionStore(
+        SettingsStore.inMemory({
+          'home.savedRegionCodes': ['660'],
+        }),
+      );
+      final writer = _RecordingWriter();
+      final coordinator = CurrentWeatherWidgetCoordinator(
+        regions,
+        _directoryWithXitun(),
+        CurrentWeatherWidgetPublisher(writer),
+        time: () => (
+          calibratedNow: DateTime.utc(2026, 9, 16, 4),
+          calibratedTimeOffset: const Duration(minutes: -5),
+        ),
+        isTimeSynced: () => true,
+        syncTime: () async {},
+      );
+      regions.select(2);
+
+      final callback = createCurrentWeatherWidgetCallback(
+        platform: TargetPlatform.android,
+        publish: coordinator.publish,
+      );
+
+      await callback!('660', _weather());
+
+      expect(writer.writes, hasLength(1));
+      expect(writer.writes.single.kind, WidgetSnapshotKind.currentWeather);
+      final decoded =
+          jsonDecode(writer.writes.single.json) as Map<String, dynamic>;
+      expect(decoded['sourceIdentifier'], 'region:660');
+      expect(decoded['regionCode'], '660');
+    },
+  );
+
+  test('an Android Home update is ignored when the selection has moved', () async {
+    // A late callback for a region the user has already left must not publish:
+    // the Widget would otherwise show the town the app was on a moment ago.
+    final regions = RegionStore(
+      SettingsStore.inMemory({
+        'home.savedRegionCodes': ['660', '661'],
+      }),
+    );
+    final writer = _RecordingWriter();
+    final coordinator = CurrentWeatherWidgetCoordinator(
+      regions,
+      _directoryWithXitun(),
+      CurrentWeatherWidgetPublisher(writer),
+      time: () => (
+        calibratedNow: DateTime.utc(2026, 9, 16, 4),
+        calibratedTimeOffset: Duration.zero,
+      ),
+      isTimeSynced: () => true,
+      syncTime: () async {},
+    );
+    regions.select(2);
+
+    final callback = createCurrentWeatherWidgetCallback(
+      platform: TargetPlatform.android,
+      publish: coordinator.publish,
+    );
+
+    await callback!('999', _weather());
+
+    expect(writer.writes, isEmpty);
+  });
+
+  testWidgets(
+    'an Android selection change preserves the previous widget snapshot',
+    (tester) async {
+      final regions = RegionStore(
+        SettingsStore.inMemory({
+          'home.savedRegionCodes': ['660', '661'],
+        }),
+      );
+      final directory = _directoryWithXitun();
+      final writer = _RecordingWriter();
+      final coordinator = CurrentWeatherWidgetCoordinator(
+        regions,
+        directory,
+        CurrentWeatherWidgetPublisher(writer),
+        time: () => (
+          calibratedNow: DateTime.utc(2026, 9, 16, 4),
+          calibratedTimeOffset: Duration.zero,
+        ),
+        isTimeSynced: () => true,
+        syncTime: () async {},
+      );
+      regions.select(2);
+      final location = LocationService(
+        directory,
+        isAvailable: () async => false,
+        fix: () async => null,
+        lastKnown: () async => null,
+        status: () async => LocationStatus.denied,
+      );
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            Provider<CurrentWeatherWidgetSync>.value(value: coordinator),
+            Provider<MeteorWeatherRepository>.value(value: _Weather()),
+            Provider<RainHourTrendRepository>.value(value: _Hours()),
+            ChangeNotifierProvider<RegionStore>.value(value: regions),
+            Provider<TownDirectory>.value(value: directory),
+            Provider<LocationService>.value(value: location),
+            ...homeProviders(),
+          ],
+          child: Builder(
+            builder: (context) {
+              context.read<HomeWeatherController>();
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      await coordinator.publish(regionCode: '660', weather: _weather());
+      final cached = writer.currentWeatherSnapshots['region:660'];
+      expect(cached, isNotNull);
+
+      // Run the real provider wiring and the controller's invalidation callback.
+      // No replacement observation arrives: an offline selection change must not
+      // erase the snapshot a desktop widget still uses for the previous town.
+      regions.select(3);
+      await tester.pump();
+      expect(writer.currentWeatherSnapshots['region:660'], cached);
+      expect(writer.clears, isEmpty);
+      expect(writer.blanketClears, 0);
+
+      regions.select(0);
+      await tester.pump();
+      expect(writer.currentWeatherSnapshots['region:660'], cached);
+      expect(writer.clears, isEmpty);
+      expect(writer.blanketClears, 0);
+    },
+    variant: TargetPlatformVariant({TargetPlatform.android}),
+  );
+
+  test('an iOS selection change still clears the whole kind', () async {
+    final writer = _RecordingWriter();
+    final coordinator = CurrentWeatherWidgetCoordinator(
+      RegionStore(
+        SettingsStore.inMemory({
+          'home.savedRegionCodes': ['660'],
+        }),
+      ),
+      _directoryWithXitun(),
+      CurrentWeatherWidgetPublisher(writer),
+      time: () => (
+        calibratedNow: DateTime.utc(2026, 9, 16, 4),
+        calibratedTimeOffset: Duration.zero,
+      ),
+      isTimeSynced: () => true,
+      syncTime: () async {},
+    );
+
+    final invalidate = createCurrentWeatherWidgetInvalidatedCallback(
+      platform: TargetPlatform.iOS,
+      clear: coordinator.clear,
+    );
+    await invalidate!();
+
+    expect(writer.blanketClears, 1);
+    expect(writer.clears, isEmpty);
   });
 
   test('iOS invalidation callback invokes Widget clear once', () async {
@@ -93,9 +272,10 @@ void main() {
     expect(clearCallCount, 1);
   });
 
-  test('invalidation callback is disabled for every non-iOS platform', () {
+  test('invalidation callback is disabled where there is no Widget', () {
     for (final platform in TargetPlatform.values.where(
-      (platform) => platform != TargetPlatform.iOS,
+      (platform) =>
+          platform != TargetPlatform.iOS && platform != TargetPlatform.android,
     )) {
       final callback = createCurrentWeatherWidgetInvalidatedCallback(
         platform: platform,
@@ -159,6 +339,18 @@ void main() {
   });
 }
 
+/// One township, enough for the coordinator to build a snapshot.
+TownDirectory _directoryWithXitun() => TownDirectory.fromJson({
+  '660': {
+    'city': '臺中',
+    'town': '西屯',
+    'lat': 24.18,
+    'lng': 120.64,
+    'cityLevel': '市',
+    'townLevel': '區',
+  },
+});
+
 Future<void> _unusedPublish({
   required String regionCode,
   required WeatherRealtime weather,
@@ -187,15 +379,58 @@ WeatherRealtime _weather() => WeatherRealtime(
   ),
 );
 
+/// Records what the coordinator asked the platform to store.
+class _RecordingWriter implements WidgetSnapshotWriter {
+  final writes = <({WidgetSnapshotKind kind, String json})>[];
+  final clears = <({WidgetSnapshotKind kind, String? source})>[];
+  final currentWeatherSnapshots = <String, String>{};
+  int blanketClears = 0;
+
+  @override
+  Future<Result<void>> write({
+    required WidgetSnapshotKind kind,
+    required String json,
+    String? sourceIdentifier,
+  }) async {
+    writes.add((kind: kind, json: json));
+    if (kind == WidgetSnapshotKind.currentWeather && sourceIdentifier != null) {
+      currentWeatherSnapshots[sourceIdentifier] = json;
+    }
+    return const Ok(null);
+  }
+
+  @override
+  Future<Result<void>> clear({
+    required WidgetSnapshotKind kind,
+    String? sourceIdentifier,
+  }) async {
+    if (sourceIdentifier == null) {
+      blanketClears += 1;
+      currentWeatherSnapshots.clear();
+    } else {
+      clears.add((kind: kind, source: sourceIdentifier));
+      currentWeatherSnapshots.remove(sourceIdentifier);
+    }
+    return const Ok(null);
+  }
+}
+
 class _WidgetSync implements CurrentWeatherWidgetSync {
+  final published = <String>[];
+  int blanketClears = 0;
+
   @override
   Future<void> publish({
     required String regionCode,
     required WeatherRealtime weather,
-  }) async {}
+  }) async {
+    published.add(regionCode);
+  }
 
   @override
-  Future<void> clear() async {}
+  Future<void> clear() async {
+    blanketClears += 1;
+  }
 }
 
 class _Weather implements MeteorWeatherRepository {
