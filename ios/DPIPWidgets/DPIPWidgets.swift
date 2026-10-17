@@ -1,10 +1,11 @@
 import WidgetKit
 import SwiftUI
 import Intents
+import AppIntents
 
 struct DPIPWidgetProvider: IntentTimelineProvider {
     typealias Intent = WeatherWidgetConfigurationIntent
-    private let staleAfter: TimeInterval = 30 * 60
+    private let staleAfter = CurrentWeatherWidgetTimeline.defaultStaleAfter
     private let dependencies: DPIPWidgetProviderDependencies
 
     init(
@@ -848,6 +849,35 @@ struct HourlyForecastSection: View {
 
     var body: some View {
         let points = entry.upcomingForecastPoints(for: family)
+        if !points.isEmpty, entry.forecastFreshness == .stale {
+            HStack(spacing: 4) {
+                VStack(alignment: .leading, spacing: 4) {
+                    forecastContent(points: points)
+                    Text("widget.forecast_outdated", bundle: localizationBundle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .forecastInvalidatableContent()
+                refreshButton
+            }
+        } else if !points.isEmpty {
+            forecastContent(points: points)
+        } else if ForecastWidgetFamilyPolicy.supportsForecast(family) {
+            unavailableContent
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                // This secondary status shares a fixed forecast area. Bound
+                // only its growth; never shrink the current-weather content.
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    @ViewBuilder
+    private func forecastContent(points: [ForecastWidgetPoint]) -> some View {
         let compact = family == .systemMedium
         if !points.isEmpty, dynamicTypeSize.isAccessibilitySize {
             // Fixed WidgetKit cards cannot scroll. Prioritize the nearest hour(s)
@@ -886,14 +916,36 @@ struct HourlyForecastSection: View {
                     }
                 }
             }
-        } else if ForecastWidgetFamilyPolicy.supportsForecast(family) {
+        }
+    }
+
+    @ViewBuilder
+    private var unavailableContent: some View {
+        if #available(iOS 17.0, *),
+           entry.forecastRefreshIdentifier(for: family) != nil {
+            HStack(spacing: 4) {
+                unavailableLabel
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .forecastInvalidatableContent()
+                refreshButton
+            }
+        } else {
             unavailableLabel
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                // This secondary status shares a fixed forecast area. Bound
-                // only its growth; never shrink the current-weather content.
-                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    @ViewBuilder
+    private var refreshButton: some View {
+        if #available(iOS 17.0, *),
+           let identifier = entry.forecastRefreshIdentifier(for: family) {
+            Button(intent: RefreshForecastIntent(locationIdentifier: identifier)) {
+                Image(systemName: "arrow.clockwise")
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("widget.refresh_forecast", bundle: localizationBundle))
+            .accessibilityHint(Text("widget.refresh_forecast_hint", bundle: localizationBundle))
         }
     }
 
@@ -914,6 +966,17 @@ struct HourlyForecastSection: View {
         Text("widget.forecast_unavailable", bundle: localizationBundle)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func forecastInvalidatableContent() -> some View {
+        if #available(iOS 17.0, *) {
+            invalidatableContent()
+        } else {
+            self
+        }
     }
 }
 

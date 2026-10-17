@@ -69,7 +69,7 @@ struct ForecastWidgetSnapshotStore: Sendable {
                 // A late response for an older API publication cannot replace
                 // a newer same-region forecast in this target's cache.
                 // Receiving the same publication again must not move its
-                // first-receipt hour boundary and resurrect expired values.
+                // original receipt or resurrect a hard-expired publication.
                 let existingAttributes = try? FileManager.default.attributesOfItem(
                     atPath: coordinatedURL.path
                 )
