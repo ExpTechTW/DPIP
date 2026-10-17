@@ -14,14 +14,18 @@ enum ForecastWidgetFamilyPolicy {
     /// - Parameter calibratedDate: a calibrated instant, never a WidgetKit
     ///   entry date. Point labels are Taipei wall-clock readings of calibrated
     ///   time, so a device-clock date shifts the selection by the offset.
+    /// - Parameter observationTime: Current Weather's Unix seconds, already in
+    ///   the calibrated domain. Forecast publication is never a selector.
     static func visiblePoints(
         in forecast: ForecastWidgetSnapshot,
         at calibratedDate: Date,
+        observationTime: Int?,
         family: WidgetFamily
     ) -> [ForecastWidgetPoint] {
         guard supportsForecast(family) else { return [] }
         return ForecastWidgetSelection.upcomingPoints(
-            forecast.points, at: calibratedDate, limit: 5
+            forecast.points, at: calibratedDate,
+            observationTime: observationTime, limit: 5
         )
     }
 }
@@ -240,17 +244,23 @@ struct DPIPWidgetTimelinePlanner: Sendable {
                 normalReloadDate: reloadDate,
                 expiry: expiry
             )
-            // Reload eligibility is not an execution guarantee. Supply the
-            // expiry state even when it falls after the requested reload.
-            if expiry > deviceNow,
-               !states.contains(where: { $0.date == expiry }) {
-                states.append(CurrentWeatherWidgetTimeline.state(
-                    snapshot: snapshot,
-                    at: expiry,
-                    staleAfter: staleAfter
-                ))
-                states.sort { $0.date < $1.date }
+            // Reload eligibility is not an execution guarantee. Schedule both
+            // publication transitions even beyond the requested network reload.
+            let stale = ForecastWidgetExpiry.staleDate(
+                for: forecast,
+                calibratedTimeOffsetMilliseconds:
+                    snapshot.calibratedTimeOffsetMilliseconds
+            )
+            for boundary in [stale, expiry] where boundary > deviceNow {
+                if !states.contains(where: { $0.date == boundary }) {
+                    states.append(CurrentWeatherWidgetTimeline.state(
+                        snapshot: snapshot,
+                        at: boundary,
+                        staleAfter: staleAfter
+                    ))
+                }
             }
+            states.sort { $0.date < $1.date }
         }
 
         #if DEBUG
@@ -416,6 +426,7 @@ struct DPIPWidgetProviderDependencies: Sendable {
                in: forecast,
                at: CurrentWeatherWidgetTimeCalibration(snapshot: current)
                    .calibratedDate(fromDeviceDate: date),
+               observationTime: current.observationTime,
                family: family
            ).isEmpty {
             return cached
@@ -439,7 +450,7 @@ struct DPIPWidgetProviderDependencies: Sendable {
 enum DPIPWidgetProviderRuntime {
     private static let appGroupIdentifier =
         "group.com.exptech.dpip.dpip.widgets"
-    private static let staleAfter: TimeInterval = 30 * 60
+    private static let staleAfter = CurrentWeatherWidgetTimeline.defaultStaleAfter
 
     #if DEBUG
     static let refreshInterval: TimeInterval = 60
