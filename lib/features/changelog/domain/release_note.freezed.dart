@@ -31,16 +31,21 @@ $ReleaseContributorCopyWith<ReleaseContributor> get copyWith => _$ReleaseContrib
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseContributor&&(identical(other.login, login) || other.login == login)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl));
+  final _this = this as ReleaseContributor;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseContributor&&(identical(other.login, _this.login) || other.login == _this.login)&&(identical(other.htmlUrl, _this.htmlUrl) || other.htmlUrl == _this.htmlUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,login,htmlUrl);
+int get hashCode {
+  final _this = this as ReleaseContributor;
+  return Object.hash(runtimeType,_this.login,_this.htmlUrl);
+}
 
 @override
 String toString() {
-  return 'ReleaseContributor(login: $login, htmlUrl: $htmlUrl)';
+  final _this = this as ReleaseContributor;
+  return 'ReleaseContributor(login: ${_this.login}, htmlUrl: ${_this.htmlUrl})';
 }
 
 
@@ -234,16 +239,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseContributor&&(identical(other.login, login) || other.login == login)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseContributor&&(identical(other.login, login) || other.login == login)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,login,htmlUrl);
+int get hashCode {
+    return Object.hash(runtimeType,login,htmlUrl);
+}
 
 @override
 String toString() {
-  return 'ReleaseContributor(login: $login, htmlUrl: $htmlUrl)';
+    return 'ReleaseContributor(login: $login, htmlUrl: $htmlUrl)';
 }
 
 
@@ -306,16 +313,21 @@ $ReleaseNoteCopyWith<ReleaseNote> get copyWith => _$ReleaseNoteCopyWithImpl<Rele
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
+  final _this = this as ReleaseNote;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReleaseNote&&(identical(other.tagName, _this.tagName) || other.tagName == _this.tagName)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.prerelease, _this.prerelease) || other.prerelease == _this.prerelease)&&(identical(other.htmlUrl, _this.htmlUrl) || other.htmlUrl == _this.htmlUrl)&&(identical(other.publishedAt, _this.publishedAt) || other.publishedAt == _this.publishedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tagName,name,body,prerelease,htmlUrl,publishedAt);
+int get hashCode {
+  final _this = this as ReleaseNote;
+  return Object.hash(runtimeType,_this.tagName,_this.name,_this.body,_this.prerelease,_this.htmlUrl,_this.publishedAt);
+}
 
 @override
 String toString() {
-  return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, htmlUrl: $htmlUrl, publishedAt: $publishedAt)';
+  final _this = this as ReleaseNote;
+  return 'ReleaseNote(tagName: ${_this.tagName}, name: ${_this.name}, body: ${_this.body}, prerelease: ${_this.prerelease}, htmlUrl: ${_this.htmlUrl}, publishedAt: ${_this.publishedAt})';
 }
 
 
@@ -522,16 +534,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReleaseNote&&(identical(other.tagName, tagName) || other.tagName == tagName)&&(identical(other.name, name) || other.name == name)&&(identical(other.body, body) || other.body == body)&&(identical(other.prerelease, prerelease) || other.prerelease == prerelease)&&(identical(other.htmlUrl, htmlUrl) || other.htmlUrl == htmlUrl)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tagName,name,body,prerelease,htmlUrl,publishedAt);
+int get hashCode {
+    return Object.hash(runtimeType,tagName,name,body,prerelease,htmlUrl,publishedAt);
+}
 
 @override
 String toString() {
-  return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, htmlUrl: $htmlUrl, publishedAt: $publishedAt)';
+    return 'ReleaseNote(tagName: $tagName, name: $name, body: $body, prerelease: $prerelease, htmlUrl: $htmlUrl, publishedAt: $publishedAt)';
 }
 
 

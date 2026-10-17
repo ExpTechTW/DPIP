@@ -34,16 +34,21 @@ $WarningFixCopyWith<WarningFix> get copyWith => _$WarningFixCopyWithImpl<Warning
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningFix&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.r15, r15) || other.r15 == r15)&&const DeepCollectionEquality().equals(other.scale, scale));
+  final _this = this as WarningFix;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningFix&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.wind, _this.wind) || other.wind == _this.wind)&&(identical(other.gust, _this.gust) || other.gust == _this.gust)&&(identical(other.pressure, _this.pressure) || other.pressure == _this.pressure)&&(identical(other.r15, _this.r15) || other.r15 == _this.r15)&&const DeepCollectionEquality().equals(other.scale, _this.scale));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,latitude,longitude,wind,gust,pressure,r15,const DeepCollectionEquality().hash(scale));
+int get hashCode {
+  final _this = this as WarningFix;
+  return Object.hash(runtimeType,_this.time,_this.latitude,_this.longitude,_this.wind,_this.gust,_this.pressure,_this.r15,const DeepCollectionEquality().hash(_this.scale));
+}
 
 @override
 String toString() {
-  return 'WarningFix(time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, r15: $r15, scale: $scale)';
+  final _this = this as WarningFix;
+  return 'WarningFix(time: ${_this.time}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, wind: ${_this.wind}, gust: ${_this.gust}, pressure: ${_this.pressure}, r15: ${_this.r15}, scale: ${_this.scale})';
 }
 
 
@@ -261,16 +266,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningFix&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.r15, r15) || other.r15 == r15)&&const DeepCollectionEquality().equals(other._scale, _scale));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningFix&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.r15, r15) || other.r15 == r15)&&const DeepCollectionEquality().equals(other.scale, _scale));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,latitude,longitude,wind,gust,pressure,r15,const DeepCollectionEquality().hash(_scale));
+int get hashCode {
+    return Object.hash(runtimeType,time,latitude,longitude,wind,gust,pressure,r15,const DeepCollectionEquality().hash(_scale));
+}
 
 @override
 String toString() {
-  return 'WarningFix(time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, r15: $r15, scale: $scale)';
+    return 'WarningFix(time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, r15: $r15, scale: $scale)';
 }
 
 
@@ -335,16 +342,21 @@ $WarningTyphoonCopyWith<WarningTyphoon> get copyWith => _$WarningTyphoonCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningTyphoon&&(identical(other.no, no) || other.no == no)&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.reportNo, reportNo) || other.reportNo == reportNo)&&(identical(other.category, category) || other.category == category)&&(identical(other.analysis, analysis) || other.analysis == analysis)&&(identical(other.prediction, prediction) || other.prediction == prediction));
+  final _this = this as WarningTyphoon;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningTyphoon&&(identical(other.no, _this.no) || other.no == _this.no)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.cwaName, _this.cwaName) || other.cwaName == _this.cwaName)&&(identical(other.reportNo, _this.reportNo) || other.reportNo == _this.reportNo)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.analysis, _this.analysis) || other.analysis == _this.analysis)&&(identical(other.prediction, _this.prediction) || other.prediction == _this.prediction));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,no,name,cwaName,reportNo,category,analysis,prediction);
+int get hashCode {
+  final _this = this as WarningTyphoon;
+  return Object.hash(runtimeType,_this.no,_this.name,_this.cwaName,_this.reportNo,_this.category,_this.analysis,_this.prediction);
+}
 
 @override
 String toString() {
-  return 'WarningTyphoon(no: $no, name: $name, cwaName: $cwaName, reportNo: $reportNo, category: $category, analysis: $analysis, prediction: $prediction)';
+  final _this = this as WarningTyphoon;
+  return 'WarningTyphoon(no: ${_this.no}, name: ${_this.name}, cwaName: ${_this.cwaName}, reportNo: ${_this.reportNo}, category: ${_this.category}, analysis: ${_this.analysis}, prediction: ${_this.prediction})';
 }
 
 
@@ -570,16 +582,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningTyphoon&&(identical(other.no, no) || other.no == no)&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.reportNo, reportNo) || other.reportNo == reportNo)&&(identical(other.category, category) || other.category == category)&&(identical(other.analysis, analysis) || other.analysis == analysis)&&(identical(other.prediction, prediction) || other.prediction == prediction));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningTyphoon&&(identical(other.no, no) || other.no == no)&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.reportNo, reportNo) || other.reportNo == reportNo)&&(identical(other.category, category) || other.category == category)&&(identical(other.analysis, analysis) || other.analysis == analysis)&&(identical(other.prediction, prediction) || other.prediction == prediction));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,no,name,cwaName,reportNo,category,analysis,prediction);
+int get hashCode {
+    return Object.hash(runtimeType,no,name,cwaName,reportNo,category,analysis,prediction);
+}
 
 @override
 String toString() {
-  return 'WarningTyphoon(no: $no, name: $name, cwaName: $cwaName, reportNo: $reportNo, category: $category, analysis: $analysis, prediction: $prediction)';
+    return 'WarningTyphoon(no: $no, name: $name, cwaName: $cwaName, reportNo: $reportNo, category: $category, analysis: $analysis, prediction: $prediction)';
 }
 
 
@@ -661,16 +675,21 @@ $WarningSectionCopyWith<WarningSection> get copyWith => _$WarningSectionCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningSection&&(identical(other.title, title) || other.title == title)&&(identical(other.text, text) || other.text == text));
+  final _this = this as WarningSection;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningSection&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.text, _this.text) || other.text == _this.text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,text);
+int get hashCode {
+  final _this = this as WarningSection;
+  return Object.hash(runtimeType,_this.title,_this.text);
+}
 
 @override
 String toString() {
-  return 'WarningSection(title: $title, text: $text)';
+  final _this = this as WarningSection;
+  return 'WarningSection(title: ${_this.title}, text: ${_this.text})';
 }
 
 
@@ -862,16 +881,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningSection&&(identical(other.title, title) || other.title == title)&&(identical(other.text, text) || other.text == text));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningSection&&(identical(other.title, title) || other.title == title)&&(identical(other.text, text) || other.text == text));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,text);
+int get hashCode {
+    return Object.hash(runtimeType,title,text);
+}
 
 @override
 String toString() {
-  return 'WarningSection(title: $title, text: $text)';
+    return 'WarningSection(title: $title, text: $text)';
 }
 
 
@@ -927,16 +948,21 @@ $WarningAreaCopyWith<WarningArea> get copyWith => _$WarningAreaCopyWithImpl<Warn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningArea&&(identical(other.name, name) || other.name == name)&&(identical(other.code, code) || other.code == code));
+  final _this = this as WarningArea;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningArea&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.code, _this.code) || other.code == _this.code));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,code);
+int get hashCode {
+  final _this = this as WarningArea;
+  return Object.hash(runtimeType,_this.name,_this.code);
+}
 
 @override
 String toString() {
-  return 'WarningArea(name: $name, code: $code)';
+  final _this = this as WarningArea;
+  return 'WarningArea(name: ${_this.name}, code: ${_this.code})';
 }
 
 
@@ -1128,16 +1154,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningArea&&(identical(other.name, name) || other.name == name)&&(identical(other.code, code) || other.code == code));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningArea&&(identical(other.name, name) || other.name == name)&&(identical(other.code, code) || other.code == code));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,code);
+int get hashCode {
+    return Object.hash(runtimeType,name,code);
+}
 
 @override
 String toString() {
-  return 'WarningArea(name: $name, code: $code)';
+    return 'WarningArea(name: $name, code: $code)';
 }
 
 
@@ -1200,16 +1228,21 @@ $TyphoonWarningCopyWith<TyphoonWarning> get copyWith => _$TyphoonWarningCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonWarning&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other.sections, sections)&&const DeepCollectionEquality().equals(other.areas, areas));
+  final _this = this as TyphoonWarning;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonWarning&&(identical(other.tdNo, _this.tdNo) || other.tdNo == _this.tdNo)&&(identical(other.active, _this.active) || other.active == _this.active)&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.sent, _this.sent) || other.sent == _this.sent)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.msgType, _this.msgType) || other.msgType == _this.msgType)&&(identical(other.scope, _this.scope) || other.scope == _this.scope)&&(identical(other.event, _this.event) || other.event == _this.event)&&(identical(other.urgency, _this.urgency) || other.urgency == _this.urgency)&&(identical(other.severity, _this.severity) || other.severity == _this.severity)&&(identical(other.certainty, _this.certainty) || other.certainty == _this.certainty)&&(identical(other.effective, _this.effective) || other.effective == _this.effective)&&(identical(other.onset, _this.onset) || other.onset == _this.onset)&&(identical(other.expires, _this.expires) || other.expires == _this.expires)&&(identical(other.headline, _this.headline) || other.headline == _this.headline)&&(identical(other.senderName, _this.senderName) || other.senderName == _this.senderName)&&(identical(other.typhoon, _this.typhoon) || other.typhoon == _this.typhoon)&&const DeepCollectionEquality().equals(other.sections, _this.sections)&&const DeepCollectionEquality().equals(other.areas, _this.areas));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,tdNo,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(sections),const DeepCollectionEquality().hash(areas)]);
+int get hashCode {
+  final _this = this as TyphoonWarning;
+  return Object.hashAll([runtimeType,_this.tdNo,_this.active,_this.id,_this.sent,_this.status,_this.msgType,_this.scope,_this.event,_this.urgency,_this.severity,_this.certainty,_this.effective,_this.onset,_this.expires,_this.headline,_this.senderName,_this.typhoon,const DeepCollectionEquality().hash(_this.sections),const DeepCollectionEquality().hash(_this.areas)]);
+}
 
 @override
 String toString() {
-  return 'TyphoonWarning(tdNo: $tdNo, active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
+  final _this = this as TyphoonWarning;
+  return 'TyphoonWarning(tdNo: ${_this.tdNo}, active: ${_this.active}, id: ${_this.id}, sent: ${_this.sent}, status: ${_this.status}, msgType: ${_this.msgType}, scope: ${_this.scope}, event: ${_this.event}, urgency: ${_this.urgency}, severity: ${_this.severity}, certainty: ${_this.certainty}, effective: ${_this.effective}, onset: ${_this.onset}, expires: ${_this.expires}, headline: ${_this.headline}, senderName: ${_this.senderName}, typhoon: ${_this.typhoon}, sections: ${_this.sections}, areas: ${_this.areas})';
 }
 
 
@@ -1468,16 +1501,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonWarning&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other._sections, _sections)&&const DeepCollectionEquality().equals(other._areas, _areas));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonWarning&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.active, active) || other.active == active)&&(identical(other.id, id) || other.id == id)&&(identical(other.sent, sent) || other.sent == sent)&&(identical(other.status, status) || other.status == status)&&(identical(other.msgType, msgType) || other.msgType == msgType)&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.event, event) || other.event == event)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.certainty, certainty) || other.certainty == certainty)&&(identical(other.effective, effective) || other.effective == effective)&&(identical(other.onset, onset) || other.onset == onset)&&(identical(other.expires, expires) || other.expires == expires)&&(identical(other.headline, headline) || other.headline == headline)&&(identical(other.senderName, senderName) || other.senderName == senderName)&&(identical(other.typhoon, typhoon) || other.typhoon == typhoon)&&const DeepCollectionEquality().equals(other.sections, _sections)&&const DeepCollectionEquality().equals(other.areas, _areas));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,tdNo,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(_sections),const DeepCollectionEquality().hash(_areas)]);
+int get hashCode {
+    return Object.hashAll([runtimeType,tdNo,active,id,sent,status,msgType,scope,event,urgency,severity,certainty,effective,onset,expires,headline,senderName,typhoon,const DeepCollectionEquality().hash(_sections),const DeepCollectionEquality().hash(_areas)]);
+}
 
 @override
 String toString() {
-  return 'TyphoonWarning(tdNo: $tdNo, active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
+    return 'TyphoonWarning(tdNo: $tdNo, active: $active, id: $id, sent: $sent, status: $status, msgType: $msgType, scope: $scope, event: $event, urgency: $urgency, severity: $severity, certainty: $certainty, effective: $effective, onset: $onset, expires: $expires, headline: $headline, senderName: $senderName, typhoon: $typhoon, sections: $sections, areas: $areas)';
 }
 
 
@@ -1559,16 +1594,21 @@ $WarningPayloadCopyWith<WarningPayload> get copyWith => _$WarningPayloadCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+  final _this = this as WarningPayload;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WarningPayload&&(identical(other.updated, _this.updated) || other.updated == _this.updated)&&const DeepCollectionEquality().equals(other.cyclones, _this.cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+int get hashCode {
+  final _this = this as WarningPayload;
+  return Object.hash(runtimeType,_this.updated,const DeepCollectionEquality().hash(_this.cyclones));
+}
 
 @override
 String toString() {
-  return 'WarningPayload(updated: $updated, cyclones: $cyclones)';
+  final _this = this as WarningPayload;
+  return 'WarningPayload(updated: ${_this.updated}, cyclones: ${_this.cyclones})';
 }
 
 
@@ -1763,16 +1803,18 @@ _$WarningPayloadCopyWith<_WarningPayload> get copyWith => __$WarningPayloadCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WarningPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, _cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+int get hashCode {
+    return Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+}
 
 @override
 String toString() {
-  return 'WarningPayload(updated: $updated, cyclones: $cyclones)';
+    return 'WarningPayload(updated: $updated, cyclones: $cyclones)';
 }
 
 

@@ -34,16 +34,21 @@ $WeatherObservationCopyWith<WeatherObservation> get copyWith => _$WeatherObserva
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.gustTime, gustTime) || other.gustTime == gustTime)&&(identical(other.high, high) || other.high == high)&&(identical(other.highTime, highTime) || other.highTime == highTime)&&(identical(other.low, low) || other.low == low)&&(identical(other.lowTime, lowTime) || other.lowTime == lowTime));
+  final _this = this as WeatherObservation;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherObservation&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.weatherCode, _this.weatherCode) || other.weatherCode == _this.weatherCode)&&(identical(other.temperature, _this.temperature) || other.temperature == _this.temperature)&&(identical(other.humidity, _this.humidity) || other.humidity == _this.humidity)&&(identical(other.pressure, _this.pressure) || other.pressure == _this.pressure)&&(identical(other.windDirection, _this.windDirection) || other.windDirection == _this.windDirection)&&(identical(other.windSpeed, _this.windSpeed) || other.windSpeed == _this.windSpeed)&&(identical(other.gustSpeed, _this.gustSpeed) || other.gustSpeed == _this.gustSpeed)&&(identical(other.gustDirection, _this.gustDirection) || other.gustDirection == _this.gustDirection)&&(identical(other.gustTime, _this.gustTime) || other.gustTime == _this.gustTime)&&(identical(other.high, _this.high) || other.high == _this.high)&&(identical(other.highTime, _this.highTime) || other.highTime == _this.highTime)&&(identical(other.low, _this.low) || other.low == _this.low)&&(identical(other.lowTime, _this.lowTime) || other.lowTime == _this.lowTime));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,gustTime,high,highTime,low,lowTime);
+int get hashCode {
+  final _this = this as WeatherObservation;
+  return Object.hash(runtimeType,_this.id,_this.weatherCode,_this.temperature,_this.humidity,_this.pressure,_this.windDirection,_this.windSpeed,_this.gustSpeed,_this.gustDirection,_this.gustTime,_this.high,_this.highTime,_this.low,_this.lowTime);
+}
 
 @override
 String toString() {
-  return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, gustTime: $gustTime, high: $high, highTime: $highTime, low: $low, lowTime: $lowTime)';
+  final _this = this as WeatherObservation;
+  return 'WeatherObservation(id: ${_this.id}, weatherCode: ${_this.weatherCode}, temperature: ${_this.temperature}, humidity: ${_this.humidity}, pressure: ${_this.pressure}, windDirection: ${_this.windDirection}, windSpeed: ${_this.windSpeed}, gustSpeed: ${_this.gustSpeed}, gustDirection: ${_this.gustDirection}, gustTime: ${_this.gustTime}, high: ${_this.high}, highTime: ${_this.highTime}, low: ${_this.low}, lowTime: ${_this.lowTime})';
 }
 
 
@@ -264,16 +269,18 @@ _$WeatherObservationCopyWith<_WeatherObservation> get copyWith => __$WeatherObse
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.gustTime, gustTime) || other.gustTime == gustTime)&&(identical(other.high, high) || other.high == high)&&(identical(other.highTime, highTime) || other.highTime == highTime)&&(identical(other.low, low) || other.low == low)&&(identical(other.lowTime, lowTime) || other.lowTime == lowTime));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.windDirection, windDirection) || other.windDirection == windDirection)&&(identical(other.windSpeed, windSpeed) || other.windSpeed == windSpeed)&&(identical(other.gustSpeed, gustSpeed) || other.gustSpeed == gustSpeed)&&(identical(other.gustDirection, gustDirection) || other.gustDirection == gustDirection)&&(identical(other.gustTime, gustTime) || other.gustTime == gustTime)&&(identical(other.high, high) || other.high == high)&&(identical(other.highTime, highTime) || other.highTime == highTime)&&(identical(other.low, low) || other.low == low)&&(identical(other.lowTime, lowTime) || other.lowTime == lowTime));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,gustTime,high,highTime,low,lowTime);
+int get hashCode {
+    return Object.hash(runtimeType,id,weatherCode,temperature,humidity,pressure,windDirection,windSpeed,gustSpeed,gustDirection,gustTime,high,highTime,low,lowTime);
+}
 
 @override
 String toString() {
-  return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, gustTime: $gustTime, high: $high, highTime: $highTime, low: $low, lowTime: $lowTime)';
+    return 'WeatherObservation(id: $id, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, pressure: $pressure, windDirection: $windDirection, windSpeed: $windSpeed, gustSpeed: $gustSpeed, gustDirection: $gustDirection, gustTime: $gustTime, high: $high, highTime: $highTime, low: $low, lowTime: $lowTime)';
 }
 
 
@@ -338,16 +345,21 @@ $WeatherSnapshotCopyWith<WeatherSnapshot> get copyWith => _$WeatherSnapshotCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other.stations, stations));
+  final _this = this as WeatherSnapshot;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherSnapshot&&(identical(other.time, _this.time) || other.time == _this.time)&&const DeepCollectionEquality().equals(other.stations, _this.stations));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,time,const DeepCollectionEquality().hash(stations));
+int get hashCode {
+  final _this = this as WeatherSnapshot;
+  return Object.hash(runtimeType,_this.time,const DeepCollectionEquality().hash(_this.stations));
+}
 
 @override
 String toString() {
-  return 'WeatherSnapshot(time: $time, stations: $stations)';
+  final _this = this as WeatherSnapshot;
+  return 'WeatherSnapshot(time: ${_this.time}, stations: ${_this.stations})';
 }
 
 
@@ -542,16 +554,18 @@ _$WeatherSnapshotCopyWith<_WeatherSnapshot> get copyWith => __$WeatherSnapshotCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other._stations, _stations));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other.stations, _stations));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,time,const DeepCollectionEquality().hash(_stations));
+int get hashCode {
+    return Object.hash(runtimeType,time,const DeepCollectionEquality().hash(_stations));
+}
 
 @override
 String toString() {
-  return 'WeatherSnapshot(time: $time, stations: $stations)';
+    return 'WeatherSnapshot(time: $time, stations: $stations)';
 }
 
 

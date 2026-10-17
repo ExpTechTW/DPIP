@@ -31,16 +31,21 @@ $ForecastPointCopyWith<ForecastPoint> get copyWith => _$ForecastPointCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForecastPoint&&(identical(other.label, label) || other.label == label)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  final _this = this as ForecastPoint;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForecastPoint&&(identical(other.label, _this.label) || other.label == _this.label)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,label,latitude,longitude);
+int get hashCode {
+  final _this = this as ForecastPoint;
+  return Object.hash(runtimeType,_this.label,_this.latitude,_this.longitude);
+}
 
 @override
 String toString() {
-  return 'ForecastPoint(label: $label, latitude: $latitude, longitude: $longitude)';
+  final _this = this as ForecastPoint;
+  return 'ForecastPoint(label: ${_this.label}, latitude: ${_this.latitude}, longitude: ${_this.longitude})';
 }
 
 
@@ -236,16 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForecastPoint&&(identical(other.label, label) || other.label == label)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForecastPoint&&(identical(other.label, label) || other.label == label)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,label,latitude,longitude);
+int get hashCode {
+    return Object.hash(runtimeType,label,latitude,longitude);
+}
 
 @override
 String toString() {
-  return 'ForecastPoint(label: $label, latitude: $latitude, longitude: $longitude)';
+    return 'ForecastPoint(label: $label, latitude: $latitude, longitude: $longitude)';
 }
 
 
@@ -307,16 +314,21 @@ $TyphoonPotentialCopyWith<TyphoonPotential> get copyWith => _$TyphoonPotentialCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonPotential&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.past, past)&&const DeepCollectionEquality().equals(other.forecast, forecast)&&const DeepCollectionEquality().equals(other.cone, cone)&&const DeepCollectionEquality().equals(other.circle, circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other.points, points));
+  final _this = this as TyphoonPotential;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonPotential&&(identical(other.tdNo, _this.tdNo) || other.tdNo == _this.tdNo)&&(identical(other.name, _this.name) || other.name == _this.name)&&const DeepCollectionEquality().equals(other.past, _this.past)&&const DeepCollectionEquality().equals(other.forecast, _this.forecast)&&const DeepCollectionEquality().equals(other.cone, _this.cone)&&const DeepCollectionEquality().equals(other.circle, _this.circle)&&(identical(other.current, _this.current) || other.current == _this.current)&&const DeepCollectionEquality().equals(other.points, _this.points));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,tdNo,name,const DeepCollectionEquality().hash(past),const DeepCollectionEquality().hash(forecast),const DeepCollectionEquality().hash(cone),const DeepCollectionEquality().hash(circle),current,const DeepCollectionEquality().hash(points));
+int get hashCode {
+  final _this = this as TyphoonPotential;
+  return Object.hash(runtimeType,_this.tdNo,_this.name,const DeepCollectionEquality().hash(_this.past),const DeepCollectionEquality().hash(_this.forecast),const DeepCollectionEquality().hash(_this.cone),const DeepCollectionEquality().hash(_this.circle),_this.current,const DeepCollectionEquality().hash(_this.points));
+}
 
 @override
 String toString() {
-  return 'TyphoonPotential(tdNo: $tdNo, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
+  final _this = this as TyphoonPotential;
+  return 'TyphoonPotential(tdNo: ${_this.tdNo}, name: ${_this.name}, past: ${_this.past}, forecast: ${_this.forecast}, cone: ${_this.cone}, circle: ${_this.circle}, current: ${_this.current}, points: ${_this.points})';
 }
 
 
@@ -562,16 +574,18 @@ _$TyphoonPotentialCopyWith<_TyphoonPotential> get copyWith => __$TyphoonPotentia
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonPotential&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other._past, _past)&&const DeepCollectionEquality().equals(other._forecast, _forecast)&&const DeepCollectionEquality().equals(other._cone, _cone)&&const DeepCollectionEquality().equals(other._circle, _circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other._points, _points));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonPotential&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.past, _past)&&const DeepCollectionEquality().equals(other.forecast, _forecast)&&const DeepCollectionEquality().equals(other.cone, _cone)&&const DeepCollectionEquality().equals(other.circle, _circle)&&(identical(other.current, current) || other.current == current)&&const DeepCollectionEquality().equals(other.points, _points));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,tdNo,name,const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_forecast),const DeepCollectionEquality().hash(_cone),const DeepCollectionEquality().hash(_circle),current,const DeepCollectionEquality().hash(_points));
+int get hashCode {
+    return Object.hash(runtimeType,tdNo,name,const DeepCollectionEquality().hash(_past),const DeepCollectionEquality().hash(_forecast),const DeepCollectionEquality().hash(_cone),const DeepCollectionEquality().hash(_circle),current,const DeepCollectionEquality().hash(_points));
+}
 
 @override
 String toString() {
-  return 'TyphoonPotential(tdNo: $tdNo, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
+    return 'TyphoonPotential(tdNo: $tdNo, name: $name, past: $past, forecast: $forecast, cone: $cone, circle: $circle, current: $current, points: $points)';
 }
 
 
@@ -630,16 +644,21 @@ $PotentialPayloadCopyWith<PotentialPayload> get copyWith => _$PotentialPayloadCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PotentialPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+  final _this = this as PotentialPayload;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PotentialPayload&&(identical(other.updated, _this.updated) || other.updated == _this.updated)&&const DeepCollectionEquality().equals(other.cyclones, _this.cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+int get hashCode {
+  final _this = this as PotentialPayload;
+  return Object.hash(runtimeType,_this.updated,const DeepCollectionEquality().hash(_this.cyclones));
+}
 
 @override
 String toString() {
-  return 'PotentialPayload(updated: $updated, cyclones: $cyclones)';
+  final _this = this as PotentialPayload;
+  return 'PotentialPayload(updated: ${_this.updated}, cyclones: ${_this.cyclones})';
 }
 
 
@@ -834,16 +853,18 @@ _$PotentialPayloadCopyWith<_PotentialPayload> get copyWith => __$PotentialPayloa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PotentialPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PotentialPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, _cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+int get hashCode {
+    return Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+}
 
 @override
 String toString() {
-  return 'PotentialPayload(updated: $updated, cyclones: $cyclones)';
+    return 'PotentialPayload(updated: $updated, cyclones: $cyclones)';
 }
 
 
