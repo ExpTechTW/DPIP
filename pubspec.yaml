@@ -27,7 +27,7 @@ dependencies:
   # golden tests were recorded against (lib/features/earthquake/data/
   # ml_intensity_service.dart). Already in the lock through the SDK tooling.
   crypto: ^3.0.6
-  dio: ^5.10.0
+  dio: ^5.11.0
   # Firebase pinned deliberately — a newer major bumps the min iOS target and
   # breaks older-device compatibility. Do not upgrade without checking that.
   # Pinned to the exact version (not `^`) so a plain `pub upgrade` can't drift
@@ -156,7 +156,7 @@ dev_dependencies:
   # it can no longer compile. Only the 4.0 line (dev.3 today) supports 3.13;
   # pinned as prerelease until it goes stable.
   build_runner: ^2.16.0
-  freezed: ^4.0.0-dev.3
+  freezed: ^4.0.0
   json_serializable: ^6.14.1
   url_launcher_platform_interface: ^2.3.2
 
