@@ -40,18 +40,11 @@
 		9F74F772B6E8760DD47AB2FE /* Sounds/normal.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B916667D1B2356583B174E80 /* Sounds/normal.aiff */; };
 		A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */; };
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
-		AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000H01 /* NetworkPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
-		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
-		NS1K00000000000000000002 /* NotificationSettingsLinkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */; };
-		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
-		LR0S00000000000000000002 /* LocationReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000001 /* LocationReportSender.swift */; };
-		LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000003 /* LocationReportSenderTests.swift */; };
-		NSE000000000000000000002 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = NSE000000000000000000001 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		NSE000000000000000000012 /* NotificationDeliveryBreadcrumbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NSE000000000000000000011 /* NotificationDeliveryBreadcrumbTests.swift */; };
 		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
 		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
+		AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000H01 /* NetworkPlugin.swift */; };
 		AE92AD9862B7A721B0924557 /* Sounds/eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */; };
 		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */; };
@@ -72,6 +65,13 @@
 		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */; };
 		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
+		LR0S00000000000000000002 /* LocationReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000001 /* LocationReportSender.swift */; };
+		LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000003 /* LocationReportSenderTests.swift */; };
+		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
+		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
+		NS1K00000000000000000002 /* NotificationSettingsLinkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */; };
+		NSE000000000000000000002 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = NSE000000000000000000001 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		NSE000000000000000000012 /* NotificationDeliveryBreadcrumbTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NSE000000000000000000011 /* NotificationDeliveryBreadcrumbTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,19 +89,19 @@
 			remoteGlobalIDString = 27CACBA0305BD77F0046F79C;
 			remoteInfo = DPIPWidgetIntentsExtension;
 		};
-		NSE000000000000000000003 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = NSE00000000000000000000C;
-			remoteInfo = NotificationService;
-		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		NSE000000000000000000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = NSE00000000000000000000C;
+			remoteInfo = NotificationService;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -178,18 +178,11 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/rain.aiff; sourceTree = "<group>"; };
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
-		AA0000000000000000000H01 /* NetworkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
-		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
-		NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsLinkPlugin.swift; sourceTree = "<group>"; };
-		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
-		LR0S00000000000000000001 /* LocationReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSender.swift; sourceTree = "<group>"; };
-		LR0S00000000000000000003 /* LocationReportSenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSenderTests.swift; sourceTree = "<group>"; };
-		NSE000000000000000000001 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		NSE000000000000000000011 /* NotificationDeliveryBreadcrumbTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeliveryBreadcrumbTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
+		AA0000000000000000000H01 /* NetworkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPlugin.swift; sourceTree = "<group>"; };
 		B916667D1B2356583B174E80 /* Sounds/normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/normal.aiff; sourceTree = "<group>"; };
 		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundLocationPlugin.swift; sourceTree = "<group>"; };
@@ -204,12 +197,19 @@
 		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetSnapshotWriterTests.swift; sourceTree = "<group>"; };
 		E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
-		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000002 /* ForecastWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastWidgetTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetHTTPTimeSourceTests.swift; sourceTree = "<group>"; };
+		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
 		F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTownshipResolverTests.swift; sourceTree = "<group>"; };
 		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
 		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
+		LR0S00000000000000000001 /* LocationReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSender.swift; sourceTree = "<group>"; };
+		LR0S00000000000000000003 /* LocationReportSenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSenderTests.swift; sourceTree = "<group>"; };
+		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
+		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
+		NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsLinkPlugin.swift; sourceTree = "<group>"; };
+		NSE000000000000000000001 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		NSE000000000000000000011 /* NotificationDeliveryBreadcrumbTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDeliveryBreadcrumbTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -219,8 +219,8 @@
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
 				ForecastSnapshotLocation.swift,
-				WidgetLocationCatalog.swift,
 				NativeLog.swift,
+				WidgetLocationCatalog.swift,
 			);
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 		};
@@ -240,8 +240,8 @@
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
 				ForecastSnapshotLocation.swift,
-				WidgetLocationCatalog.swift,
 				NativeLog.swift,
+				WidgetLocationCatalog.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
@@ -286,18 +286,15 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentApparentTemperature.swift,
-				CurrentWeatherClient.swift,
 				CurrentLocationCurrentWeatherWidgetRefreshService.swift,
+				CurrentWeatherClient.swift,
 				CurrentWeatherSnapshotTime.swift,
-				CurrentWeatherWidgetSnapshotFactory.swift,
 				CurrentWeatherWidgetRefreshPipeline.swift,
+				CurrentWeatherWidgetSnapshotFactory.swift,
 				CurrentWeatherWidgetSnapshotWriter.swift,
 				DPIPWidgetEntry.swift,
 				DPIPWidgetProviderSupport.swift,
 				DPIPWidgets.swift,
-				RefreshForecastIntent.swift,
-				Localizable.xcstrings,
-				WeatherWidgetConfiguration.intentdefinition,
 				ForecastClient.swift,
 				ForecastRemoteDTO.swift,
 				ForecastWidgetExpiry.swift,
@@ -305,8 +302,11 @@
 				ForecastWidgetSelection.swift,
 				ForecastWidgetSnapshot.swift,
 				ForecastWidgetSnapshotStore.swift,
+				Localizable.xcstrings,
+				RefreshForecastIntent.swift,
 				SavedCurrentWeatherWidgetRefreshService.swift,
 				SavedWidgetLocationResolver.swift,
+				WeatherWidgetConfiguration.intentdefinition,
 				WidgetCurrentLocationClient.swift,
 				WidgetHTTPTimeSource.swift,
 				WidgetLocationTarget.swift,
@@ -355,7 +355,7 @@
 		270FCE9B305CD066003D1E62 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (270FCEA1305CD07F003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 270FCEA3305CD1DD003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 270FCEA6305CD2D6003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E7A100000000000000000003 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, NSE000000000000000000008 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		2715FCDB30570C1C0014DC8A /* DPIPWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2715FCEA30570C1D0014DC8A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACB9C305BD2A60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACBB1305BD7E60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgets; sourceTree = "<group>"; };
 		27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (27CACC5E305C66560046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACBAF305BD77F0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgetIntentsExtension; sourceTree = "<group>"; };
-		NSE000000000000000000005 /* NotificationService */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (NSE000000000000000000006 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, NSE000000000000000000007 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = NotificationService; sourceTree = "<group>"; };
+		NSE000000000000000000005 /* NotificationService */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (NSE000000000000000000007 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, NSE000000000000000000006 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = NotificationService; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -376,13 +376,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		NSE00000000000000000000A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		97C146EB1CF9000F007C117D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -392,6 +385,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E4840FFE0A305DC1BCA83CC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		NSE00000000000000000000A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -573,28 +573,6 @@
 			productReference = 27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		NSE00000000000000000000C /* NotificationService */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = NSE000000000000000000010 /* Build configuration list for PBXNativeTarget "NotificationService" */;
-			buildPhases = (
-				NSE000000000000000000009 /* Sources */,
-				NSE00000000000000000000A /* Frameworks */,
-				NSE00000000000000000000B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				NSE000000000000000000005 /* NotificationService */,
-			);
-			name = NotificationService;
-			packageProductDependencies = (
-			);
-			productName = NotificationService;
-			productReference = NSE000000000000000000001 /* NotificationService.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		331C8080294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -640,6 +618,28 @@
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
 		};
+		NSE00000000000000000000C /* NotificationService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = NSE000000000000000000010 /* Build configuration list for PBXNativeTarget "NotificationService" */;
+			buildPhases = (
+				NSE000000000000000000009 /* Sources */,
+				NSE00000000000000000000A /* Frameworks */,
+				NSE00000000000000000000B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				NSE000000000000000000005 /* NotificationService */,
+			);
+			name = NotificationService;
+			packageProductDependencies = (
+			);
+			productName = NotificationService;
+			productReference = NSE000000000000000000001 /* NotificationService.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -657,9 +657,6 @@
 					27CACBA0305BD77F0046F79C = {
 						CreatedOnToolsVersion = 26.6;
 					};
-					NSE00000000000000000000C = {
-						CreatedOnToolsVersion = 26.6;
-					};
 					331C8080294A63A400263BE5 = {
 						CreatedOnToolsVersion = 14.0;
 						TestTargetID = 97C146ED1CF9000F007C117D;
@@ -667,6 +664,9 @@
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1100;
+					};
+					NSE00000000000000000000C = {
+						CreatedOnToolsVersion = 26.6;
 					};
 				};
 			};
@@ -714,13 +714,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		NSE00000000000000000000B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		331C807F294A63A400263BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -748,6 +741,13 @@
 				10D4BCAF9E098BDA400160FB /* Sounds/tsunami.aiff in Resources */,
 				72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */,
 				E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		NSE00000000000000000000B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -796,13 +796,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		27CACB9D305BD77F0046F79C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		NSE000000000000000000009 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -865,6 +858,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		NSE000000000000000000009 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -878,15 +878,15 @@
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 			targetProxy = 27CACBA8305BD77F0046F79C /* PBXContainerItemProxy */;
 		};
-		NSE000000000000000000004 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = NSE00000000000000000000C /* NotificationService */;
-			targetProxy = NSE000000000000000000003 /* PBXContainerItemProxy */;
-		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		NSE000000000000000000004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = NSE00000000000000000000C /* NotificationService */;
+			targetProxy = NSE000000000000000000003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1263,6 +1263,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98Q7JARYZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.RunnerTests;
@@ -1280,6 +1281,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98Q7JARYZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.RunnerTests;
@@ -1295,6 +1297,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 98Q7JARYZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.RunnerTests;
@@ -1491,8 +1494,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1584,16 +1587,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		NSE000000000000000000010 /* Build configuration list for PBXNativeTarget "NotificationService" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				NSE00000000000000000000D /* Debug */,
-				NSE00000000000000000000E /* Release */,
-				NSE00000000000000000000F /* Profile */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1620,6 +1613,16 @@
 				97C147061CF9000F007C117D /* Debug */,
 				97C147071CF9000F007C117D /* Release */,
 				249021D4217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		NSE000000000000000000010 /* Build configuration list for PBXNativeTarget "NotificationService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				NSE00000000000000000000D /* Debug */,
+				NSE00000000000000000000E /* Release */,
+				NSE00000000000000000000F /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
