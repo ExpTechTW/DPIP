@@ -295,6 +295,7 @@
 				DPIPWidgetEntry.swift,
 				DPIPWidgetProviderSupport.swift,
 				DPIPWidgets.swift,
+				RefreshForecastIntent.swift,
 				Localizable.xcstrings,
 				WeatherWidgetConfiguration.intentdefinition,
 				ForecastClient.swift,

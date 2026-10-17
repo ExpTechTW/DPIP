@@ -30,6 +30,8 @@ struct CurrentWeatherWidgetTimeCalibration {
 }
 
 enum CurrentWeatherWidgetTimeline {
+    static let defaultStaleAfter: TimeInterval = 30 * 60
+
     static func state(
         snapshot: CurrentWeatherWidgetSnapshot?,
         at date: Date,

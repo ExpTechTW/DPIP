@@ -1,30 +1,54 @@
 import Foundation
 
 enum ForecastWidgetExpiry {
-    /// Device-clock cache/display deadline. Neither input is a point valid time.
-    /// Publication uses server time while receipt uses device time; compare
-    /// them in calibrated time before scheduling the deadline on WidgetKit.
+    enum Freshness: Equatable, Sendable {
+        case fresh, stale, expired
+    }
+
+    static let freshDuration: TimeInterval = 30 * 60
+    static let hardExpiryDuration: TimeInterval = 120 * 60
+    /// Small server/clock disagreement is tolerated; a publication further
+    /// ahead is ineligible, rather than granting an unbounded cache lifetime.
+    static let maximumFutureSkew: TimeInterval = 2 * 60
+
+    /// Device-clock boundaries derived only from the API publication instant.
+    /// Receipt and hourly point selection never determine publication age.
+    static func staleDate(
+        for snapshot: ForecastWidgetSnapshot,
+        calibratedTimeOffsetMilliseconds: Int = 0
+    ) -> Date {
+        publicationDeviceDate(snapshot, calibratedTimeOffsetMilliseconds)
+            .addingTimeInterval(freshDuration)
+    }
+
     static func date(
         for snapshot: ForecastWidgetSnapshot,
         calibratedTimeOffsetMilliseconds: Int = 0
     ) -> Date {
-        let offset = TimeInterval(calibratedTimeOffsetMilliseconds) / 1_000
-        let publishedCalibrated = Date(
-            timeIntervalSince1970: TimeInterval(snapshot.updateTime) / 1_000
+        publicationDeviceDate(snapshot, calibratedTimeOffsetMilliseconds)
+            .addingTimeInterval(hardExpiryDuration)
+    }
+
+    static func freshness(
+        of snapshot: ForecastWidgetSnapshot,
+        at deviceDate: Date,
+        calibratedTimeOffsetMilliseconds: Int = 0
+    ) -> Freshness {
+        let publication = publicationDeviceDate(
+            snapshot, calibratedTimeOffsetMilliseconds
         )
-        let receivedDevice = Date(
-            timeIntervalSince1970: TimeInterval(snapshot.receivedAt) / 1_000
-        )
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Asia/Taipei")!
-        let nextTaipeiHour = calendar.dateInterval(
-            of: .hour,
-            for: receivedDevice.addingTimeInterval(offset)
-        )!.end
-        return min(
-            publishedCalibrated.addingTimeInterval(30 * 60),
-            nextTaipeiHour
-        ).addingTimeInterval(-offset)
+        let age = deviceDate.timeIntervalSince(publication)
+        guard snapshot.updateTime > 0, age.isFinite,
+              age >= -maximumFutureSkew,
+              age < hardExpiryDuration else { return .expired }
+        return age < freshDuration ? .fresh : .stale
+    }
+
+    private static func publicationDeviceDate(
+        _ snapshot: ForecastWidgetSnapshot, _ offsetMilliseconds: Int
+    ) -> Date {
+        Date(timeIntervalSince1970: TimeInterval(snapshot.updateTime) / 1_000)
+            .addingTimeInterval(-TimeInterval(offsetMilliseconds) / 1_000)
     }
 
     /// All dates are in the device clock domain. Bound the lead to two
@@ -49,9 +73,9 @@ enum ForecastWidgetExpiry {
         at deviceDate: Date,
         calibratedTimeOffsetMilliseconds: Int = 0
     ) -> Bool {
-        deviceDate < self.date(
-            for: snapshot,
+        freshness(
+            of: snapshot, at: deviceDate,
             calibratedTimeOffsetMilliseconds: calibratedTimeOffsetMilliseconds
-        )
+        ) != .expired
     }
 }
