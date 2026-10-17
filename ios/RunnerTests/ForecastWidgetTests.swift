@@ -1176,38 +1176,105 @@ final class ForecastWidgetGalleryPreviewTests: XCTestCase {
     }
 
     func testGallerySampleNeverWritesToPersistentStorage() throws {
-        let container = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: container, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: container) }
-        let store = WidgetSnapshotStore(containerURL: container)
-        let forecasts = ForecastWidgetSnapshotStore(containerURL: container)
-        let current = currentSnapshot(target: target)
-        _ = try CurrentWeatherWidgetTestFixtures.seed(
-            current, at: .saved(regionCode: "407"), containerURL: container
-        )
-        let deps = DPIPWidgetProviderDependencies(
-            loadSnapshot: { store.loadCurrentWeatherSnapshot(for: $0) },
-            timelinePlanner: dependencies(ForecastPlannerState(current: nil)).timelinePlanner,
-            loadForecast: { forecasts.load(for: $0, regionCode: $1, at: $2) }
-        )
-        // Include a stale cache file as well as the initially absent cache.
-        for stale in [false, true] {
-            if stale {
-                try forecasts.write(forecastSnapshot(
-                    updateTime: milliseconds("2026-09-25T06:00:00Z"),
-                    receivedAt: milliseconds("2026-09-25T06:00:00Z")
-                ), for: target)
+        let scenarios: [(name: String, forecast: ForecastWidgetSnapshot?, usesSample: Bool)] = [
+            ("no forecast cache", nil, true),
+            ("hard-expired forecast cache", forecastSnapshot(
+                updateTime: milliseconds("2026-09-25T05:00:00Z"),
+                receivedAt: milliseconds("2026-09-25T05:00:00Z"),
+                times: ["16:00", "17:00"]
+            ), true),
+            ("stale usable forecast cache", forecastSnapshot(
+                updateTime: milliseconds("2026-09-25T06:00:00Z"),
+                receivedAt: milliseconds("2026-09-25T06:00:00Z"),
+                times: ["16:00", "17:00"]
+            ), false),
+        ]
+
+        for scenario in scenarios {
+            let container = FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString, isDirectory: true)
+            try FileManager.default.createDirectory(
+                at: container, withIntermediateDirectories: true
+            )
+            defer { try? FileManager.default.removeItem(at: container) }
+
+            let store = WidgetSnapshotStore(containerURL: container)
+            let forecasts = ForecastWidgetSnapshotStore(containerURL: container)
+            let current = currentSnapshot(target: target)
+            _ = try CurrentWeatherWidgetTestFixtures.seed(
+                current, at: .saved(regionCode: "407"), containerURL: container
+            )
+            if let forecast = scenario.forecast {
+                try forecasts.write(forecast, for: target)
             }
+
+            let currentRefreshes = ForecastCallCounter()
+            let forecastRefreshes = ForecastCallCounter()
+            let now = date
+            let planner = DPIPWidgetTimelinePlanner(
+                staleAfter: 30 * 60,
+                refreshInterval: 20 * 60,
+                loadSnapshot: { store.loadCurrentWeatherSnapshot(for: $0) },
+                refreshSaved: { _ in
+                    currentRefreshes.increment()
+                    return .failed
+                },
+                refreshCurrent: {
+                    currentRefreshes.increment()
+                    return .failed
+                },
+                loadForecast: {
+                    forecasts.load(for: $0, regionCode: $1, at: $2)
+                },
+                refreshForecast: { _, _ in forecastRefreshes.increment() },
+                now: { now }
+            )
+            let deps = DPIPWidgetProviderDependencies(
+                loadSnapshot: { store.loadCurrentWeatherSnapshot(for: $0) },
+                timelinePlanner: planner,
+                loadForecast: {
+                    forecasts.load(for: $0, regionCode: $1, at: $2)
+                }
+            )
             let before = try persistedFiles(in: container)
+
             for family: WidgetFamily in [.systemMedium, .systemLarge] {
                 let content = deps.snapshotContent(
                     for: target, at: date, family: family, isPreview: true
                 )
-                XCTAssertEqual(content.forecast?.points.count, 5)
-                XCTAssertEqual(content.snapshot?.temperature, 28)
+                let previewSnapshot = try XCTUnwrap(content.snapshot, scenario.name)
+                let previewForecast = try XCTUnwrap(content.forecast, scenario.name)
+                if scenario.usesSample {
+                    XCTAssertEqual(previewSnapshot.temperature, 28, scenario.name)
+                    XCTAssertNotEqual(previewSnapshot.stationName, current.stationName,
+                                      scenario.name)
+                    XCTAssertEqual(previewForecast.points.count, 5, scenario.name)
+                    XCTAssertEqual(previewForecast.updateTime,
+                                   Int64(date.timeIntervalSince1970 * 1_000), scenario.name)
+                } else {
+                    let cachedForecast = try XCTUnwrap(scenario.forecast)
+                    XCTAssertEqual(previewSnapshot.temperature, current.temperature,
+                                   scenario.name)
+                    XCTAssertEqual(previewSnapshot.stationName, current.stationName,
+                                   scenario.name)
+                    XCTAssertEqual(previewForecast.points, cachedForecast.points,
+                                   scenario.name)
+                    XCTAssertEqual(previewForecast.updateTime, cachedForecast.updateTime,
+                                   scenario.name)
+                    XCTAssertEqual(ForecastWidgetExpiry.freshness(
+                        of: previewForecast, at: date
+                    ), .stale, scenario.name)
+                    XCTAssertTrue(ForecastWidgetExpiry.isUsable(
+                        previewForecast, at: date
+                    ), scenario.name)
+                }
             }
-            XCTAssertEqual(try persistedFiles(in: container), before)
+
+            XCTAssertEqual(currentRefreshes.count, 0, scenario.name)
+            XCTAssertEqual(forecastRefreshes.count, 0, scenario.name)
+            // This includes the Current Weather and Forecast cache bytes and
+            // proves no preview-only data was added to persistent storage.
+            XCTAssertEqual(try persistedFiles(in: container), before, scenario.name)
         }
     }
 
