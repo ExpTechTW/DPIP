@@ -30,16 +30,21 @@ $RainTrendCopyWith<RainTrend> get copyWith => _$RainTrendCopyWithImpl<RainTrend>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RainTrend&&(identical(other.id, id) || other.id == id)&&(identical(other.range, range) || other.range == range)&&const DeepCollectionEquality().equals(other.times, times)&&const DeepCollectionEquality().equals(other.rain, rain));
+  final _this = this as RainTrend;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RainTrend&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.range, _this.range) || other.range == _this.range)&&const DeepCollectionEquality().equals(other.times, _this.times)&&const DeepCollectionEquality().equals(other.rain, _this.rain));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,range,const DeepCollectionEquality().hash(times),const DeepCollectionEquality().hash(rain));
+int get hashCode {
+  final _this = this as RainTrend;
+  return Object.hash(runtimeType,_this.id,_this.range,const DeepCollectionEquality().hash(_this.times),const DeepCollectionEquality().hash(_this.rain));
+}
 
 @override
 String toString() {
-  return 'RainTrend(id: $id, range: $range, times: $times, rain: $rain)';
+  final _this = this as RainTrend;
+  return 'RainTrend(id: ${_this.id}, range: ${_this.range}, times: ${_this.times}, rain: ${_this.rain})';
 }
 
 
@@ -250,16 +255,18 @@ _$RainTrendCopyWith<_RainTrend> get copyWith => __$RainTrendCopyWithImpl<_RainTr
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RainTrend&&(identical(other.id, id) || other.id == id)&&(identical(other.range, range) || other.range == range)&&const DeepCollectionEquality().equals(other._times, _times)&&const DeepCollectionEquality().equals(other._rain, _rain));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RainTrend&&(identical(other.id, id) || other.id == id)&&(identical(other.range, range) || other.range == range)&&const DeepCollectionEquality().equals(other.times, _times)&&const DeepCollectionEquality().equals(other.rain, _rain));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,range,const DeepCollectionEquality().hash(_times),const DeepCollectionEquality().hash(_rain));
+int get hashCode {
+    return Object.hash(runtimeType,id,range,const DeepCollectionEquality().hash(_times),const DeepCollectionEquality().hash(_rain));
+}
 
 @override
 String toString() {
-  return 'RainTrend(id: $id, range: $range, times: $times, rain: $rain)';
+    return 'RainTrend(id: $id, range: $range, times: $times, rain: $rain)';
 }
 
 

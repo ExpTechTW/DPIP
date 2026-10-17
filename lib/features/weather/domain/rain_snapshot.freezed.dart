@@ -36,16 +36,21 @@ $RainObservationCopyWith<RainObservation> get copyWith => _$RainObservationCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RainObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.now, now) || other.now == now)&&(identical(other.min10, min10) || other.min10 == min10)&&(identical(other.hour1, hour1) || other.hour1 == hour1)&&(identical(other.hour3, hour3) || other.hour3 == hour3)&&(identical(other.hour6, hour6) || other.hour6 == hour6)&&(identical(other.hour12, hour12) || other.hour12 == hour12)&&(identical(other.hour24, hour24) || other.hour24 == hour24)&&(identical(other.day2, day2) || other.day2 == day2)&&(identical(other.day3, day3) || other.day3 == day3));
+  final _this = this as RainObservation;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RainObservation&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.now, _this.now) || other.now == _this.now)&&(identical(other.min10, _this.min10) || other.min10 == _this.min10)&&(identical(other.hour1, _this.hour1) || other.hour1 == _this.hour1)&&(identical(other.hour3, _this.hour3) || other.hour3 == _this.hour3)&&(identical(other.hour6, _this.hour6) || other.hour6 == _this.hour6)&&(identical(other.hour12, _this.hour12) || other.hour12 == _this.hour12)&&(identical(other.hour24, _this.hour24) || other.hour24 == _this.hour24)&&(identical(other.day2, _this.day2) || other.day2 == _this.day2)&&(identical(other.day3, _this.day3) || other.day3 == _this.day3));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,now,min10,hour1,hour3,hour6,hour12,hour24,day2,day3);
+int get hashCode {
+  final _this = this as RainObservation;
+  return Object.hash(runtimeType,_this.id,_this.now,_this.min10,_this.hour1,_this.hour3,_this.hour6,_this.hour12,_this.hour24,_this.day2,_this.day3);
+}
 
 @override
 String toString() {
-  return 'RainObservation(id: $id, now: $now, min10: $min10, hour1: $hour1, hour3: $hour3, hour6: $hour6, hour12: $hour12, hour24: $hour24, day2: $day2, day3: $day3)';
+  final _this = this as RainObservation;
+  return 'RainObservation(id: ${_this.id}, now: ${_this.now}, min10: ${_this.min10}, hour1: ${_this.hour1}, hour3: ${_this.hour3}, hour6: ${_this.hour6}, hour12: ${_this.hour12}, hour24: ${_this.hour24}, day2: ${_this.day2}, day3: ${_this.day3})';
 }
 
 
@@ -260,16 +265,18 @@ _$RainObservationCopyWith<_RainObservation> get copyWith => __$RainObservationCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RainObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.now, now) || other.now == now)&&(identical(other.min10, min10) || other.min10 == min10)&&(identical(other.hour1, hour1) || other.hour1 == hour1)&&(identical(other.hour3, hour3) || other.hour3 == hour3)&&(identical(other.hour6, hour6) || other.hour6 == hour6)&&(identical(other.hour12, hour12) || other.hour12 == hour12)&&(identical(other.hour24, hour24) || other.hour24 == hour24)&&(identical(other.day2, day2) || other.day2 == day2)&&(identical(other.day3, day3) || other.day3 == day3));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RainObservation&&(identical(other.id, id) || other.id == id)&&(identical(other.now, now) || other.now == now)&&(identical(other.min10, min10) || other.min10 == min10)&&(identical(other.hour1, hour1) || other.hour1 == hour1)&&(identical(other.hour3, hour3) || other.hour3 == hour3)&&(identical(other.hour6, hour6) || other.hour6 == hour6)&&(identical(other.hour12, hour12) || other.hour12 == hour12)&&(identical(other.hour24, hour24) || other.hour24 == hour24)&&(identical(other.day2, day2) || other.day2 == day2)&&(identical(other.day3, day3) || other.day3 == day3));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,now,min10,hour1,hour3,hour6,hour12,hour24,day2,day3);
+int get hashCode {
+    return Object.hash(runtimeType,id,now,min10,hour1,hour3,hour6,hour12,hour24,day2,day3);
+}
 
 @override
 String toString() {
-  return 'RainObservation(id: $id, now: $now, min10: $min10, hour1: $hour1, hour3: $hour3, hour6: $hour6, hour12: $hour12, hour24: $hour24, day2: $day2, day3: $day3)';
+    return 'RainObservation(id: $id, now: $now, min10: $min10, hour1: $hour1, hour3: $hour3, hour6: $hour6, hour12: $hour12, hour24: $hour24, day2: $day2, day3: $day3)';
 }
 
 
@@ -330,16 +337,21 @@ $RainSnapshotCopyWith<RainSnapshot> get copyWith => _$RainSnapshotCopyWithImpl<R
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RainSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other.stations, stations));
+  final _this = this as RainSnapshot;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RainSnapshot&&(identical(other.time, _this.time) || other.time == _this.time)&&const DeepCollectionEquality().equals(other.stations, _this.stations));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,time,const DeepCollectionEquality().hash(stations));
+int get hashCode {
+  final _this = this as RainSnapshot;
+  return Object.hash(runtimeType,_this.time,const DeepCollectionEquality().hash(_this.stations));
+}
 
 @override
 String toString() {
-  return 'RainSnapshot(time: $time, stations: $stations)';
+  final _this = this as RainSnapshot;
+  return 'RainSnapshot(time: ${_this.time}, stations: ${_this.stations})';
 }
 
 
@@ -534,16 +546,18 @@ _$RainSnapshotCopyWith<_RainSnapshot> get copyWith => __$RainSnapshotCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RainSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other._stations, _stations));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RainSnapshot&&(identical(other.time, time) || other.time == time)&&const DeepCollectionEquality().equals(other.stations, _stations));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,time,const DeepCollectionEquality().hash(_stations));
+int get hashCode {
+    return Object.hash(runtimeType,time,const DeepCollectionEquality().hash(_stations));
+}
 
 @override
 String toString() {
-  return 'RainSnapshot(time: $time, stations: $stations)';
+    return 'RainSnapshot(time: $time, stations: $stations)';
 }
 
 

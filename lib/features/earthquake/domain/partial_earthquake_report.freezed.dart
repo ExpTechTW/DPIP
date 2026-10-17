@@ -30,16 +30,21 @@ $PartialEarthquakeReportCopyWith<PartialEarthquakeReport> get copyWith => _$Part
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartialEarthquakeReport&&(identical(other.id, id) || other.id == id)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.time, time) || other.time == time)&&(identical(other.trem, trem) || other.trem == trem)&&(identical(other.md5, md5) || other.md5 == md5));
+  final _this = this as PartialEarthquakeReport;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PartialEarthquakeReport&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.location, _this.location) || other.location == _this.location)&&(identical(other.depth, _this.depth) || other.depth == _this.depth)&&(identical(other.magnitude, _this.magnitude) || other.magnitude == _this.magnitude)&&(identical(other.intensity, _this.intensity) || other.intensity == _this.intensity)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.trem, _this.trem) || other.trem == _this.trem)&&(identical(other.md5, _this.md5) || other.md5 == _this.md5));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,longitude,latitude,location,depth,magnitude,intensity,time,trem,md5);
+int get hashCode {
+  final _this = this as PartialEarthquakeReport;
+  return Object.hash(runtimeType,_this.id,_this.longitude,_this.latitude,_this.location,_this.depth,_this.magnitude,_this.intensity,_this.time,_this.trem,_this.md5);
+}
 
 @override
 String toString() {
-  return 'PartialEarthquakeReport(id: $id, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude, intensity: $intensity, time: $time, trem: $trem, md5: $md5)';
+  final _this = this as PartialEarthquakeReport;
+  return 'PartialEarthquakeReport(id: ${_this.id}, longitude: ${_this.longitude}, latitude: ${_this.latitude}, location: ${_this.location}, depth: ${_this.depth}, magnitude: ${_this.magnitude}, intensity: ${_this.intensity}, time: ${_this.time}, trem: ${_this.trem}, md5: ${_this.md5})';
 }
 
 
@@ -248,16 +253,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartialEarthquakeReport&&(identical(other.id, id) || other.id == id)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.time, time) || other.time == time)&&(identical(other.trem, trem) || other.trem == trem)&&(identical(other.md5, md5) || other.md5 == md5));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PartialEarthquakeReport&&(identical(other.id, id) || other.id == id)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.time, time) || other.time == time)&&(identical(other.trem, trem) || other.trem == trem)&&(identical(other.md5, md5) || other.md5 == md5));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,longitude,latitude,location,depth,magnitude,intensity,time,trem,md5);
+int get hashCode {
+    return Object.hash(runtimeType,id,longitude,latitude,location,depth,magnitude,intensity,time,trem,md5);
+}
 
 @override
 String toString() {
-  return 'PartialEarthquakeReport(id: $id, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude, intensity: $intensity, time: $time, trem: $trem, md5: $md5)';
+    return 'PartialEarthquakeReport(id: $id, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude, intensity: $intensity, time: $time, trem: $trem, md5: $md5)';
 }
 
 

@@ -30,16 +30,21 @@ $EarthquakeReportCopyWith<EarthquakeReport> get copyWith => _$EarthquakeReportCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EarthquakeReport&&(identical(other.id, id) || other.id == id)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&const DeepCollectionEquality().equals(other.list, list)&&(identical(other.time, time) || other.time == time)&&(identical(other.trem, trem) || other.trem == trem));
+  final _this = this as EarthquakeReport;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EarthquakeReport&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.location, _this.location) || other.location == _this.location)&&(identical(other.depth, _this.depth) || other.depth == _this.depth)&&(identical(other.magnitude, _this.magnitude) || other.magnitude == _this.magnitude)&&const DeepCollectionEquality().equals(other.list, _this.list)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.trem, _this.trem) || other.trem == _this.trem));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,longitude,latitude,location,depth,magnitude,const DeepCollectionEquality().hash(list),time,trem);
+int get hashCode {
+  final _this = this as EarthquakeReport;
+  return Object.hash(runtimeType,_this.id,_this.longitude,_this.latitude,_this.location,_this.depth,_this.magnitude,const DeepCollectionEquality().hash(_this.list),_this.time,_this.trem);
+}
 
 @override
 String toString() {
-  return 'EarthquakeReport(id: $id, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude, list: $list, time: $time, trem: $trem)';
+  final _this = this as EarthquakeReport;
+  return 'EarthquakeReport(id: ${_this.id}, longitude: ${_this.longitude}, latitude: ${_this.latitude}, location: ${_this.location}, depth: ${_this.depth}, magnitude: ${_this.magnitude}, list: ${_this.list}, time: ${_this.time}, trem: ${_this.trem})';
 }
 
 
@@ -252,16 +257,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EarthquakeReport&&(identical(other.id, id) || other.id == id)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&const DeepCollectionEquality().equals(other._list, _list)&&(identical(other.time, time) || other.time == time)&&(identical(other.trem, trem) || other.trem == trem));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _EarthquakeReport&&(identical(other.id, id) || other.id == id)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.location, location) || other.location == location)&&(identical(other.depth, depth) || other.depth == depth)&&(identical(other.magnitude, magnitude) || other.magnitude == magnitude)&&const DeepCollectionEquality().equals(other.list, _list)&&(identical(other.time, time) || other.time == time)&&(identical(other.trem, trem) || other.trem == trem));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,longitude,latitude,location,depth,magnitude,const DeepCollectionEquality().hash(_list),time,trem);
+int get hashCode {
+    return Object.hash(runtimeType,id,longitude,latitude,location,depth,magnitude,const DeepCollectionEquality().hash(_list),time,trem);
+}
 
 @override
 String toString() {
-  return 'EarthquakeReport(id: $id, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude, list: $list, time: $time, trem: $trem)';
+    return 'EarthquakeReport(id: $id, longitude: $longitude, latitude: $latitude, location: $location, depth: $depth, magnitude: $magnitude, list: $list, time: $time, trem: $trem)';
 }
 
 
@@ -324,16 +331,21 @@ $AreaIntensityCopyWith<AreaIntensity> get copyWith => _$AreaIntensityCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AreaIntensity&&(identical(other.intensity, intensity) || other.intensity == intensity)&&const DeepCollectionEquality().equals(other.town, town));
+  final _this = this as AreaIntensity;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AreaIntensity&&(identical(other.intensity, _this.intensity) || other.intensity == _this.intensity)&&const DeepCollectionEquality().equals(other.town, _this.town));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,intensity,const DeepCollectionEquality().hash(town));
+int get hashCode {
+  final _this = this as AreaIntensity;
+  return Object.hash(runtimeType,_this.intensity,const DeepCollectionEquality().hash(_this.town));
+}
 
 @override
 String toString() {
-  return 'AreaIntensity(intensity: $intensity, town: $town)';
+  final _this = this as AreaIntensity;
+  return 'AreaIntensity(intensity: ${_this.intensity}, town: ${_this.town})';
 }
 
 
@@ -531,16 +543,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AreaIntensity&&(identical(other.intensity, intensity) || other.intensity == intensity)&&const DeepCollectionEquality().equals(other._town, _town));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AreaIntensity&&(identical(other.intensity, intensity) || other.intensity == intensity)&&const DeepCollectionEquality().equals(other.town, _town));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,intensity,const DeepCollectionEquality().hash(_town));
+int get hashCode {
+    return Object.hash(runtimeType,intensity,const DeepCollectionEquality().hash(_town));
+}
 
 @override
 String toString() {
-  return 'AreaIntensity(intensity: $intensity, town: $town)';
+    return 'AreaIntensity(intensity: $intensity, town: $town)';
 }
 
 
@@ -596,16 +610,21 @@ $StationIntensityCopyWith<StationIntensity> get copyWith => _$StationIntensityCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StationIntensity&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.intensity, intensity) || other.intensity == intensity));
+  final _this = this as StationIntensity;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StationIntensity&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.intensity, _this.intensity) || other.intensity == _this.intensity));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,longitude,latitude,intensity);
+int get hashCode {
+  final _this = this as StationIntensity;
+  return Object.hash(runtimeType,_this.longitude,_this.latitude,_this.intensity);
+}
 
 @override
 String toString() {
-  return 'StationIntensity(longitude: $longitude, latitude: $latitude, intensity: $intensity)';
+  final _this = this as StationIntensity;
+  return 'StationIntensity(longitude: ${_this.longitude}, latitude: ${_this.latitude}, intensity: ${_this.intensity})';
 }
 
 
@@ -799,16 +818,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StationIntensity&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.intensity, intensity) || other.intensity == intensity));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _StationIntensity&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.intensity, intensity) || other.intensity == intensity));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,longitude,latitude,intensity);
+int get hashCode {
+    return Object.hash(runtimeType,longitude,latitude,intensity);
+}
 
 @override
 String toString() {
-  return 'StationIntensity(longitude: $longitude, latitude: $latitude, intensity: $intensity)';
+    return 'StationIntensity(longitude: $longitude, latitude: $latitude, intensity: $intensity)';
 }
 
 

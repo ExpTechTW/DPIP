@@ -34,16 +34,21 @@ $StormCircleCopyWith<StormCircle> get copyWith => _$StormCircleCopyWithImpl<Stor
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StormCircle&&(identical(other.avg, avg) || other.avg == avg)&&(identical(other.ne, ne) || other.ne == ne)&&(identical(other.se, se) || other.se == se)&&(identical(other.sw, sw) || other.sw == sw)&&(identical(other.nw, nw) || other.nw == nw));
+  final _this = this as StormCircle;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StormCircle&&(identical(other.avg, _this.avg) || other.avg == _this.avg)&&(identical(other.ne, _this.ne) || other.ne == _this.ne)&&(identical(other.se, _this.se) || other.se == _this.se)&&(identical(other.sw, _this.sw) || other.sw == _this.sw)&&(identical(other.nw, _this.nw) || other.nw == _this.nw));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,avg,ne,se,sw,nw);
+int get hashCode {
+  final _this = this as StormCircle;
+  return Object.hash(runtimeType,_this.avg,_this.ne,_this.se,_this.sw,_this.nw);
+}
 
 @override
 String toString() {
-  return 'StormCircle(avg: $avg, ne: $ne, se: $se, sw: $sw, nw: $nw)';
+  final _this = this as StormCircle;
+  return 'StormCircle(avg: ${_this.avg}, ne: ${_this.ne}, se: ${_this.se}, sw: ${_this.sw}, nw: ${_this.nw})';
 }
 
 
@@ -246,16 +251,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StormCircle&&(identical(other.avg, avg) || other.avg == avg)&&(identical(other.ne, ne) || other.ne == ne)&&(identical(other.se, se) || other.se == se)&&(identical(other.sw, sw) || other.sw == sw)&&(identical(other.nw, nw) || other.nw == nw));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _StormCircle&&(identical(other.avg, avg) || other.avg == avg)&&(identical(other.ne, ne) || other.ne == ne)&&(identical(other.se, se) || other.se == se)&&(identical(other.sw, sw) || other.sw == sw)&&(identical(other.nw, nw) || other.nw == nw));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,avg,ne,se,sw,nw);
+int get hashCode {
+    return Object.hash(runtimeType,avg,ne,se,sw,nw);
+}
 
 @override
 String toString() {
-  return 'StormCircle(avg: $avg, ne: $ne, se: $se, sw: $sw, nw: $nw)';
+    return 'StormCircle(avg: $avg, ne: $ne, se: $se, sw: $sw, nw: $nw)';
 }
 
 

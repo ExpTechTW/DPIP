@@ -28,16 +28,21 @@ $ProbabilityLevelCopyWith<ProbabilityLevel> get copyWith => _$ProbabilityLevelCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProbabilityLevel&&(identical(other.p, p) || other.p == p)&&const DeepCollectionEquality().equals(other.coords, coords));
+  final _this = this as ProbabilityLevel;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProbabilityLevel&&(identical(other.p, _this.p) || other.p == _this.p)&&const DeepCollectionEquality().equals(other.coords, _this.coords));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,p,const DeepCollectionEquality().hash(coords));
+int get hashCode {
+  final _this = this as ProbabilityLevel;
+  return Object.hash(runtimeType,_this.p,const DeepCollectionEquality().hash(_this.coords));
+}
 
 @override
 String toString() {
-  return 'ProbabilityLevel(p: $p, coords: $coords)';
+  final _this = this as ProbabilityLevel;
+  return 'ProbabilityLevel(p: ${_this.p}, coords: ${_this.coords})';
 }
 
 
@@ -235,16 +240,18 @@ _$ProbabilityLevelCopyWith<_ProbabilityLevel> get copyWith => __$ProbabilityLeve
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProbabilityLevel&&(identical(other.p, p) || other.p == p)&&const DeepCollectionEquality().equals(other._coords, _coords));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProbabilityLevel&&(identical(other.p, p) || other.p == p)&&const DeepCollectionEquality().equals(other.coords, _coords));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,p,const DeepCollectionEquality().hash(_coords));
+int get hashCode {
+    return Object.hash(runtimeType,p,const DeepCollectionEquality().hash(_coords));
+}
 
 @override
 String toString() {
-  return 'ProbabilityLevel(p: $p, coords: $coords)';
+    return 'ProbabilityLevel(p: $p, coords: $coords)';
 }
 
 
@@ -298,16 +305,21 @@ $CycloneProbabilityCopyWith<CycloneProbability> get copyWith => _$CycloneProbabi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CycloneProbability&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&const DeepCollectionEquality().equals(other.levels, levels));
+  final _this = this as CycloneProbability;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CycloneProbability&&(identical(other.tdNo, _this.tdNo) || other.tdNo == _this.tdNo)&&const DeepCollectionEquality().equals(other.levels, _this.levels));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,tdNo,const DeepCollectionEquality().hash(levels));
+int get hashCode {
+  final _this = this as CycloneProbability;
+  return Object.hash(runtimeType,_this.tdNo,const DeepCollectionEquality().hash(_this.levels));
+}
 
 @override
 String toString() {
-  return 'CycloneProbability(tdNo: $tdNo, levels: $levels)';
+  final _this = this as CycloneProbability;
+  return 'CycloneProbability(tdNo: ${_this.tdNo}, levels: ${_this.levels})';
 }
 
 
@@ -503,16 +515,18 @@ _$CycloneProbabilityCopyWith<_CycloneProbability> get copyWith => __$CycloneProb
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CycloneProbability&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&const DeepCollectionEquality().equals(other._levels, _levels));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CycloneProbability&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&const DeepCollectionEquality().equals(other.levels, _levels));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,tdNo,const DeepCollectionEquality().hash(_levels));
+int get hashCode {
+    return Object.hash(runtimeType,tdNo,const DeepCollectionEquality().hash(_levels));
+}
 
 @override
 String toString() {
-  return 'CycloneProbability(tdNo: $tdNo, levels: $levels)';
+    return 'CycloneProbability(tdNo: $tdNo, levels: $levels)';
 }
 
 
@@ -565,16 +579,21 @@ $TyphoonProbabilityCopyWith<TyphoonProbability> get copyWith => _$TyphoonProbabi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+  final _this = this as TyphoonProbability;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonProbability&&(identical(other.updated, _this.updated) || other.updated == _this.updated)&&const DeepCollectionEquality().equals(other.cyclones, _this.cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+int get hashCode {
+  final _this = this as TyphoonProbability;
+  return Object.hash(runtimeType,_this.updated,const DeepCollectionEquality().hash(_this.cyclones));
+}
 
 @override
 String toString() {
-  return 'TyphoonProbability(updated: $updated, cyclones: $cyclones)';
+  final _this = this as TyphoonProbability;
+  return 'TyphoonProbability(updated: ${_this.updated}, cyclones: ${_this.cyclones})';
 }
 
 
@@ -769,16 +788,18 @@ _$TyphoonProbabilityCopyWith<_TyphoonProbability> get copyWith => __$TyphoonProb
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonProbability&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, _cyclones));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+int get hashCode {
+    return Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+}
 
 @override
 String toString() {
-  return 'TyphoonProbability(updated: $updated, cyclones: $cyclones)';
+    return 'TyphoonProbability(updated: $updated, cyclones: $cyclones)';
 }
 
 

@@ -34,16 +34,21 @@ $WeatherRealtimeCopyWith<WeatherRealtime> get copyWith => _$WeatherRealtimeCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherRealtime&&(identical(other.id, id) || other.id == id)&&(identical(other.station, station) || other.station == station)&&(identical(other.time, time) || other.time == time)&&(identical(other.data, data) || other.data == data));
+  final _this = this as WeatherRealtime;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherRealtime&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.station, _this.station) || other.station == _this.station)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.data, _this.data) || other.data == _this.data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,station,time,data);
+int get hashCode {
+  final _this = this as WeatherRealtime;
+  return Object.hash(runtimeType,_this.id,_this.station,_this.time,_this.data);
+}
 
 @override
 String toString() {
-  return 'WeatherRealtime(id: $id, station: $station, time: $time, data: $data)';
+  final _this = this as WeatherRealtime;
+  return 'WeatherRealtime(id: ${_this.id}, station: ${_this.station}, time: ${_this.time}, data: ${_this.data})';
 }
 
 
@@ -262,16 +267,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherRealtime&&(identical(other.id, id) || other.id == id)&&(identical(other.station, station) || other.station == station)&&(identical(other.time, time) || other.time == time)&&(identical(other.data, data) || other.data == data));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherRealtime&&(identical(other.id, id) || other.id == id)&&(identical(other.station, station) || other.station == station)&&(identical(other.time, time) || other.time == time)&&(identical(other.data, data) || other.data == data));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,station,time,data);
+int get hashCode {
+    return Object.hash(runtimeType,id,station,time,data);
+}
 
 @override
 String toString() {
-  return 'WeatherRealtime(id: $id, station: $station, time: $time, data: $data)';
+    return 'WeatherRealtime(id: $id, station: $station, time: $time, data: $data)';
 }
 
 
@@ -349,16 +356,21 @@ $WeatherRealtimeStationCopyWith<WeatherRealtimeStation> get copyWith => _$Weathe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherRealtimeStation&&(identical(other.name, name) || other.name == name)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.altitude, altitude) || other.altitude == altitude)&&(identical(other.distance, distance) || other.distance == distance));
+  final _this = this as WeatherRealtimeStation;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherRealtimeStation&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.altitude, _this.altitude) || other.altitude == _this.altitude)&&(identical(other.distance, _this.distance) || other.distance == _this.distance));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,latitude,longitude,altitude,distance);
+int get hashCode {
+  final _this = this as WeatherRealtimeStation;
+  return Object.hash(runtimeType,_this.name,_this.latitude,_this.longitude,_this.altitude,_this.distance);
+}
 
 @override
 String toString() {
-  return 'WeatherRealtimeStation(name: $name, latitude: $latitude, longitude: $longitude, altitude: $altitude, distance: $distance)';
+  final _this = this as WeatherRealtimeStation;
+  return 'WeatherRealtimeStation(name: ${_this.name}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, altitude: ${_this.altitude}, distance: ${_this.distance})';
 }
 
 
@@ -558,16 +570,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherRealtimeStation&&(identical(other.name, name) || other.name == name)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.altitude, altitude) || other.altitude == altitude)&&(identical(other.distance, distance) || other.distance == distance));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherRealtimeStation&&(identical(other.name, name) || other.name == name)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.altitude, altitude) || other.altitude == altitude)&&(identical(other.distance, distance) || other.distance == distance));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,latitude,longitude,altitude,distance);
+int get hashCode {
+    return Object.hash(runtimeType,name,latitude,longitude,altitude,distance);
+}
 
 @override
 String toString() {
-  return 'WeatherRealtimeStation(name: $name, latitude: $latitude, longitude: $longitude, altitude: $altitude, distance: $distance)';
+    return 'WeatherRealtimeStation(name: $name, latitude: $latitude, longitude: $longitude, altitude: $altitude, distance: $distance)';
 }
 
 
@@ -630,16 +644,21 @@ $WeatherRealtimeDataCopyWith<WeatherRealtimeData> get copyWith => _$WeatherRealt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherRealtimeData&&(identical(other.weather, weather) || other.weather == weather)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.rain, rain) || other.rain == rain)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.visibilityText, visibilityText) || other.visibilityText == visibilityText)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.sunshine, sunshine) || other.sunshine == sunshine));
+  final _this = this as WeatherRealtimeData;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherRealtimeData&&(identical(other.weather, _this.weather) || other.weather == _this.weather)&&(identical(other.weatherCode, _this.weatherCode) || other.weatherCode == _this.weatherCode)&&(identical(other.temperature, _this.temperature) || other.temperature == _this.temperature)&&(identical(other.humidity, _this.humidity) || other.humidity == _this.humidity)&&(identical(other.rain, _this.rain) || other.rain == _this.rain)&&(identical(other.wind, _this.wind) || other.wind == _this.wind)&&(identical(other.gust, _this.gust) || other.gust == _this.gust)&&(identical(other.visibility, _this.visibility) || other.visibility == _this.visibility)&&(identical(other.visibilityText, _this.visibilityText) || other.visibilityText == _this.visibilityText)&&(identical(other.pressure, _this.pressure) || other.pressure == _this.pressure)&&(identical(other.sunshine, _this.sunshine) || other.sunshine == _this.sunshine));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,weather,weatherCode,temperature,humidity,rain,wind,gust,visibility,visibilityText,pressure,sunshine);
+int get hashCode {
+  final _this = this as WeatherRealtimeData;
+  return Object.hash(runtimeType,_this.weather,_this.weatherCode,_this.temperature,_this.humidity,_this.rain,_this.wind,_this.gust,_this.visibility,_this.visibilityText,_this.pressure,_this.sunshine);
+}
 
 @override
 String toString() {
-  return 'WeatherRealtimeData(weather: $weather, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, rain: $rain, wind: $wind, gust: $gust, visibility: $visibility, visibilityText: $visibilityText, pressure: $pressure, sunshine: $sunshine)';
+  final _this = this as WeatherRealtimeData;
+  return 'WeatherRealtimeData(weather: ${_this.weather}, weatherCode: ${_this.weatherCode}, temperature: ${_this.temperature}, humidity: ${_this.humidity}, rain: ${_this.rain}, wind: ${_this.wind}, gust: ${_this.gust}, visibility: ${_this.visibility}, visibilityText: ${_this.visibilityText}, pressure: ${_this.pressure}, sunshine: ${_this.sunshine})';
 }
 
 
@@ -871,16 +890,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherRealtimeData&&(identical(other.weather, weather) || other.weather == weather)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.rain, rain) || other.rain == rain)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.visibilityText, visibilityText) || other.visibilityText == visibilityText)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.sunshine, sunshine) || other.sunshine == sunshine));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherRealtimeData&&(identical(other.weather, weather) || other.weather == weather)&&(identical(other.weatherCode, weatherCode) || other.weatherCode == weatherCode)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.rain, rain) || other.rain == rain)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.visibilityText, visibilityText) || other.visibilityText == visibilityText)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.sunshine, sunshine) || other.sunshine == sunshine));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,weather,weatherCode,temperature,humidity,rain,wind,gust,visibility,visibilityText,pressure,sunshine);
+int get hashCode {
+    return Object.hash(runtimeType,weather,weatherCode,temperature,humidity,rain,wind,gust,visibility,visibilityText,pressure,sunshine);
+}
 
 @override
 String toString() {
-  return 'WeatherRealtimeData(weather: $weather, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, rain: $rain, wind: $wind, gust: $gust, visibility: $visibility, visibilityText: $visibilityText, pressure: $pressure, sunshine: $sunshine)';
+    return 'WeatherRealtimeData(weather: $weather, weatherCode: $weatherCode, temperature: $temperature, humidity: $humidity, rain: $rain, wind: $wind, gust: $gust, visibility: $visibility, visibilityText: $visibilityText, pressure: $pressure, sunshine: $sunshine)';
 }
 
 
@@ -963,16 +984,21 @@ $WeatherWindCopyWith<WeatherWind> get copyWith => _$WeatherWindCopyWithImpl<Weat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherWind&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.beaufort, beaufort) || other.beaufort == beaufort));
+  final _this = this as WeatherWind;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WeatherWind&&(identical(other.direction, _this.direction) || other.direction == _this.direction)&&(identical(other.speed, _this.speed) || other.speed == _this.speed)&&(identical(other.beaufort, _this.beaufort) || other.beaufort == _this.beaufort));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,direction,speed,beaufort);
+int get hashCode {
+  final _this = this as WeatherWind;
+  return Object.hash(runtimeType,_this.direction,_this.speed,_this.beaufort);
+}
 
 @override
 String toString() {
-  return 'WeatherWind(direction: $direction, speed: $speed, beaufort: $beaufort)';
+  final _this = this as WeatherWind;
+  return 'WeatherWind(direction: ${_this.direction}, speed: ${_this.speed}, beaufort: ${_this.beaufort})';
 }
 
 
@@ -1166,16 +1192,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherWind&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.beaufort, beaufort) || other.beaufort == beaufort));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WeatherWind&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.beaufort, beaufort) || other.beaufort == beaufort));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,direction,speed,beaufort);
+int get hashCode {
+    return Object.hash(runtimeType,direction,speed,beaufort);
+}
 
 @override
 String toString() {
-  return 'WeatherWind(direction: $direction, speed: $speed, beaufort: $beaufort)';
+    return 'WeatherWind(direction: $direction, speed: $speed, beaufort: $beaufort)';
 }
 
 

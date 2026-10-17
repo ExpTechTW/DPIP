@@ -32,16 +32,21 @@ $TrackFixCopyWith<TrackFix> get copyWith => _$TrackFixCopyWithImpl<TrackFix>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackFix&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure));
+  final _this = this as TrackFix;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackFix&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.wind, _this.wind) || other.wind == _this.wind)&&(identical(other.gust, _this.gust) || other.gust == _this.gust)&&(identical(other.pressure, _this.pressure) || other.pressure == _this.pressure));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,latitude,longitude,wind,gust,pressure);
+int get hashCode {
+  final _this = this as TrackFix;
+  return Object.hash(runtimeType,_this.time,_this.latitude,_this.longitude,_this.wind,_this.gust,_this.pressure);
+}
 
 @override
 String toString() {
-  return 'TrackFix(time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure)';
+  final _this = this as TrackFix;
+  return 'TrackFix(time: ${_this.time}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, wind: ${_this.wind}, gust: ${_this.gust}, pressure: ${_this.pressure})';
 }
 
 
@@ -244,16 +249,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackFix&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackFix&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,time,latitude,longitude,wind,gust,pressure);
+int get hashCode {
+    return Object.hash(runtimeType,time,latitude,longitude,wind,gust,pressure);
+}
 
 @override
 String toString() {
-  return 'TrackFix(time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure)';
+    return 'TrackFix(time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure)';
 }
 
 
@@ -318,16 +325,21 @@ $TrackNowCopyWith<TrackNow> get copyWith => _$TrackNowCopyWithImpl<TrackNow>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackNow&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction)&&const DeepCollectionEquality().equals(other.move, move)&&(identical(other.c15, c15) || other.c15 == c15)&&(identical(other.c25, c25) || other.c25 == c25));
+  final _this = this as TrackNow;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackNow&&(identical(other.speed, _this.speed) || other.speed == _this.speed)&&(identical(other.direction, _this.direction) || other.direction == _this.direction)&&const DeepCollectionEquality().equals(other.move, _this.move)&&(identical(other.c15, _this.c15) || other.c15 == _this.c15)&&(identical(other.c25, _this.c25) || other.c25 == _this.c25));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,speed,direction,const DeepCollectionEquality().hash(move),c15,c25);
+int get hashCode {
+  final _this = this as TrackNow;
+  return Object.hash(runtimeType,_this.speed,_this.direction,const DeepCollectionEquality().hash(_this.move),_this.c15,_this.c25);
+}
 
 @override
 String toString() {
-  return 'TrackNow(speed: $speed, direction: $direction, move: $move, c15: $c15, c25: $c25)';
+  final _this = this as TrackNow;
+  return 'TrackNow(speed: ${_this.speed}, direction: ${_this.direction}, move: ${_this.move}, c15: ${_this.c15}, c25: ${_this.c25})';
 }
 
 
@@ -563,16 +575,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackNow&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction)&&const DeepCollectionEquality().equals(other._move, _move)&&(identical(other.c15, c15) || other.c15 == c15)&&(identical(other.c25, c25) || other.c25 == c25));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackNow&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction)&&const DeepCollectionEquality().equals(other.move, _move)&&(identical(other.c15, c15) || other.c15 == c15)&&(identical(other.c25, c25) || other.c25 == c25));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,speed,direction,const DeepCollectionEquality().hash(_move),c15,c25);
+int get hashCode {
+    return Object.hash(runtimeType,speed,direction,const DeepCollectionEquality().hash(_move),c15,c25);
+}
 
 @override
 String toString() {
-  return 'TrackNow(speed: $speed, direction: $direction, move: $move, c15: $c15, c25: $c25)';
+    return 'TrackNow(speed: $speed, direction: $direction, move: $move, c15: $c15, c25: $c25)';
 }
 
 
@@ -664,16 +678,21 @@ $TrackForecastCopyWith<TrackForecast> get copyWith => _$TrackForecastCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackForecast&&(identical(other.tau, tau) || other.tau == tau)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.r15, r15) || other.r15 == r15)&&(identical(other.r70, r70) || other.r70 == r70)&&const DeepCollectionEquality().equals(other.state, state));
+  final _this = this as TrackForecast;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackForecast&&(identical(other.tau, _this.tau) || other.tau == _this.tau)&&(identical(other.time, _this.time) || other.time == _this.time)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.wind, _this.wind) || other.wind == _this.wind)&&(identical(other.gust, _this.gust) || other.gust == _this.gust)&&(identical(other.pressure, _this.pressure) || other.pressure == _this.pressure)&&(identical(other.speed, _this.speed) || other.speed == _this.speed)&&(identical(other.direction, _this.direction) || other.direction == _this.direction)&&(identical(other.r15, _this.r15) || other.r15 == _this.r15)&&(identical(other.r70, _this.r70) || other.r70 == _this.r70)&&const DeepCollectionEquality().equals(other.state, _this.state));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tau,time,latitude,longitude,wind,gust,pressure,speed,direction,r15,r70,const DeepCollectionEquality().hash(state));
+int get hashCode {
+  final _this = this as TrackForecast;
+  return Object.hash(runtimeType,_this.tau,_this.time,_this.latitude,_this.longitude,_this.wind,_this.gust,_this.pressure,_this.speed,_this.direction,_this.r15,_this.r70,const DeepCollectionEquality().hash(_this.state));
+}
 
 @override
 String toString() {
-  return 'TrackForecast(tau: $tau, time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, speed: $speed, direction: $direction, r15: $r15, r70: $r70, state: $state)';
+  final _this = this as TrackForecast;
+  return 'TrackForecast(tau: ${_this.tau}, time: ${_this.time}, latitude: ${_this.latitude}, longitude: ${_this.longitude}, wind: ${_this.wind}, gust: ${_this.gust}, pressure: ${_this.pressure}, speed: ${_this.speed}, direction: ${_this.direction}, r15: ${_this.r15}, r70: ${_this.r70}, state: ${_this.state})';
 }
 
 
@@ -903,16 +922,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackForecast&&(identical(other.tau, tau) || other.tau == tau)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.r15, r15) || other.r15 == r15)&&(identical(other.r70, r70) || other.r70 == r70)&&const DeepCollectionEquality().equals(other._state, _state));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackForecast&&(identical(other.tau, tau) || other.tau == tau)&&(identical(other.time, time) || other.time == time)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.wind, wind) || other.wind == wind)&&(identical(other.gust, gust) || other.gust == gust)&&(identical(other.pressure, pressure) || other.pressure == pressure)&&(identical(other.speed, speed) || other.speed == speed)&&(identical(other.direction, direction) || other.direction == direction)&&(identical(other.r15, r15) || other.r15 == r15)&&(identical(other.r70, r70) || other.r70 == r70)&&const DeepCollectionEquality().equals(other.state, _state));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tau,time,latitude,longitude,wind,gust,pressure,speed,direction,r15,r70,const DeepCollectionEquality().hash(_state));
+int get hashCode {
+    return Object.hash(runtimeType,tau,time,latitude,longitude,wind,gust,pressure,speed,direction,r15,r70,const DeepCollectionEquality().hash(_state));
+}
 
 @override
 String toString() {
-  return 'TrackForecast(tau: $tau, time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, speed: $speed, direction: $direction, r15: $r15, r70: $r70, state: $state)';
+    return 'TrackForecast(tau: $tau, time: $time, latitude: $latitude, longitude: $longitude, wind: $wind, gust: $gust, pressure: $pressure, speed: $speed, direction: $direction, r15: $r15, r70: $r70, state: $state)';
 }
 
 
@@ -978,16 +999,21 @@ $TyphoonTrackCopyWith<TyphoonTrack> get copyWith => _$TyphoonTrackCopyWithImpl<T
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonTrack&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.year, year) || other.year == year)&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.tyNo, tyNo) || other.tyNo == tyNo)&&const DeepCollectionEquality().equals(other.analysis, analysis)&&(identical(other.now, now) || other.now == now)&&const DeepCollectionEquality().equals(other.forecast, forecast));
+  final _this = this as TyphoonTrack;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TyphoonTrack&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.cwaName, _this.cwaName) || other.cwaName == _this.cwaName)&&(identical(other.year, _this.year) || other.year == _this.year)&&(identical(other.tdNo, _this.tdNo) || other.tdNo == _this.tdNo)&&(identical(other.tyNo, _this.tyNo) || other.tyNo == _this.tyNo)&&const DeepCollectionEquality().equals(other.analysis, _this.analysis)&&(identical(other.now, _this.now) || other.now == _this.now)&&const DeepCollectionEquality().equals(other.forecast, _this.forecast));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,cwaName,year,tdNo,tyNo,const DeepCollectionEquality().hash(analysis),now,const DeepCollectionEquality().hash(forecast));
+int get hashCode {
+  final _this = this as TyphoonTrack;
+  return Object.hash(runtimeType,_this.name,_this.cwaName,_this.year,_this.tdNo,_this.tyNo,const DeepCollectionEquality().hash(_this.analysis),_this.now,const DeepCollectionEquality().hash(_this.forecast));
+}
 
 @override
 String toString() {
-  return 'TyphoonTrack(name: $name, cwaName: $cwaName, year: $year, tdNo: $tdNo, tyNo: $tyNo, analysis: $analysis, now: $now, forecast: $forecast)';
+  final _this = this as TyphoonTrack;
+  return 'TyphoonTrack(name: ${_this.name}, cwaName: ${_this.cwaName}, year: ${_this.year}, tdNo: ${_this.tdNo}, tyNo: ${_this.tyNo}, analysis: ${_this.analysis}, now: ${_this.now}, forecast: ${_this.forecast})';
 }
 
 
@@ -1215,16 +1241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonTrack&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.year, year) || other.year == year)&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.tyNo, tyNo) || other.tyNo == tyNo)&&const DeepCollectionEquality().equals(other._analysis, _analysis)&&(identical(other.now, now) || other.now == now)&&const DeepCollectionEquality().equals(other._forecast, _forecast));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TyphoonTrack&&(identical(other.name, name) || other.name == name)&&(identical(other.cwaName, cwaName) || other.cwaName == cwaName)&&(identical(other.year, year) || other.year == year)&&(identical(other.tdNo, tdNo) || other.tdNo == tdNo)&&(identical(other.tyNo, tyNo) || other.tyNo == tyNo)&&const DeepCollectionEquality().equals(other.analysis, _analysis)&&(identical(other.now, now) || other.now == now)&&const DeepCollectionEquality().equals(other.forecast, _forecast));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,cwaName,year,tdNo,tyNo,const DeepCollectionEquality().hash(_analysis),now,const DeepCollectionEquality().hash(_forecast));
+int get hashCode {
+    return Object.hash(runtimeType,name,cwaName,year,tdNo,tyNo,const DeepCollectionEquality().hash(_analysis),now,const DeepCollectionEquality().hash(_forecast));
+}
 
 @override
 String toString() {
-  return 'TyphoonTrack(name: $name, cwaName: $cwaName, year: $year, tdNo: $tdNo, tyNo: $tyNo, analysis: $analysis, now: $now, forecast: $forecast)';
+    return 'TyphoonTrack(name: $name, cwaName: $cwaName, year: $year, tdNo: $tdNo, tyNo: $tyNo, analysis: $analysis, now: $now, forecast: $forecast)';
 }
 
 
@@ -1298,16 +1326,21 @@ $TrackPayloadCopyWith<TrackPayload> get copyWith => _$TrackPayloadCopyWithImpl<T
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, cyclones));
+  final _this = this as TrackPayload;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TrackPayload&&(identical(other.updated, _this.updated) || other.updated == _this.updated)&&const DeepCollectionEquality().equals(other.cyclones, _this.cyclones));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(cyclones));
+int get hashCode {
+  final _this = this as TrackPayload;
+  return Object.hash(runtimeType,_this.updated,const DeepCollectionEquality().hash(_this.cyclones));
+}
 
 @override
 String toString() {
-  return 'TrackPayload(updated: $updated, cyclones: $cyclones)';
+  final _this = this as TrackPayload;
+  return 'TrackPayload(updated: ${_this.updated}, cyclones: ${_this.cyclones})';
 }
 
 
@@ -1505,16 +1538,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other._cyclones, _cyclones));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TrackPayload&&(identical(other.updated, updated) || other.updated == updated)&&const DeepCollectionEquality().equals(other.cyclones, _cyclones));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+int get hashCode {
+    return Object.hash(runtimeType,updated,const DeepCollectionEquality().hash(_cyclones));
+}
 
 @override
 String toString() {
-  return 'TrackPayload(updated: $updated, cyclones: $cyclones)';
+    return 'TrackPayload(updated: $updated, cyclones: $cyclones)';
 }
 
 
