@@ -344,6 +344,28 @@ class WidgetRefreshServiceTest {
     }
 
     @Test
+    fun `a later refresh recovers a temporary location failure without app intervention`() {
+        for (degradation in listOf(WidgetLocationDegradation.Unavailable, WidgetLocationDegradation.UnusableFix,
+            WidgetLocationDegradation.UnresolvedTownship)) {
+            val cached = store.readCurrentWeather(currentLocation)
+            assertEquals(
+                WidgetRefreshResult.Unavailable,
+                service(resolve = { LocationResolution.Degraded(degradation) })
+                    .refresh(currentLocation, includeForecast = false),
+            )
+            assertEquals(degradation, store.readLocationState(currentLocation))
+            assertEquals(cached, store.readCurrentWeather(currentLocation))
+
+            assertEquals(
+                WidgetRefreshResult.Refreshed,
+                service().refresh(currentLocation, includeForecast = false),
+            )
+            assertNull(store.readLocationState(currentLocation))
+            assertEquals("407", store.readCurrentWeather(currentLocation)!!.snapshot.regionCode)
+        }
+    }
+
+    @Test
     fun `the snapshot records a transition in seconds, not milliseconds`() {
         service().refresh(currentLocation, includeForecast = false)
 

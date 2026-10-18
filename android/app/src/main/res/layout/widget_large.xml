@@ -13,9 +13,9 @@
   the other. The only dynamic label is the sun cell, sunrise or sunset depending
   on the phase.
 
-  The section spacing is iOS's own: `spacing: 12` between the header, the
-  current-weather row, the forecast section and the grid, and `spacing: 14`
-  between the grid's two rows.
+  Section gaps use 6 / 12 dp, with 6 dp between the grid's two rows so the
+  Android-only stale notice and refresh still leave a whole probability line
+  at this layout's 336 dp minimum. The tight layout saves another 4 dp there.
 
   Two Android-only adaptations, both forced by the cell sizes a launcher
   reports:
@@ -25,7 +25,7 @@
     200 dp cell — the town became an ellipsis while the notice took half the
     width. On its own row the notice cannot touch the town's budget.
   * The refresh target is 24 dp here, not 28, so the town
-    and the observation date still read at 200 dp. This is the one place the
+    and the observation time still read at 200 dp. This is the one place the
     iOS hierarchy has no room for them at all; `WidgetLayoutFitTest` measures
     the town at that width with the real font metrics.
 -->
@@ -58,6 +58,7 @@
             tools:ignore="UselessParent">
         <TextView
             android:id="@+id/widget_location"
+            android:includeFontPadding="false"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -86,6 +87,7 @@
 
         <TextView
             android:id="@+id/widget_observation_time"
+            android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/widget_spacing_xs"
@@ -96,6 +98,7 @@
 
         <FrameLayout
             android:id="@+id/widget_refresh"
+            android:visibility="gone"
             android:layout_width="@dimen/widget_icon_action_target_large"
             android:layout_height="@dimen/widget_icon_action_target_large"
             android:layout_marginStart="@dimen/widget_spacing_xs"
