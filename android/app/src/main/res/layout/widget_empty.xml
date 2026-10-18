@@ -38,6 +38,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/widget_spacing_sm"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+            android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+            android:autoSizeStepGranularity="1sp"
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="2"
@@ -47,6 +51,7 @@
 
     <FrameLayout
         android:id="@+id/widget_refresh"
+        android:visibility="gone"
         android:layout_width="@dimen/widget_icon_action_touch"
         android:layout_height="@dimen/widget_icon_action_touch"
         android:layout_gravity="top|end"

@@ -42,15 +42,18 @@
     <dimen name="widget_spacing_sm">6dp</dimen>
     <dimen name="widget_spacing_md">12dp</dimen>
 
-    <!-- The large detail grid: iOS uses `spacing: 16` between the columns and
-         `spacing: 14` between the two rows. -->
+    <!-- The large detail grid keeps iOS's 16dp columns. Android's notice and
+         padded text need an 8dp smaller row gap to keep all hourly lines whole
+         at the roomy layout's 336dp boundary with stale data and refresh. -->
     <dimen name="widget_grid_column_gap">16dp</dimen>
-    <dimen name="widget_grid_row_gap">14dp</dimen>
+    <dimen name="widget_grid_row_gap">6dp</dimen>
     <!-- The minimal-height large box (~320 dp) cannot carry iOS's 12/14 section
          spacing alongside the Android-only notice row; this is the tightened
          value it uses instead. `WidgetPresenter.largeRoomyMinimumHeightDp`
          selects between the two. -->
-    <dimen name="widget_grid_row_gap_tight">10dp</dimen>
+    <!-- Reserve a full probability line when the stale notice and refresh
+         share the 320dp box with all five hourly columns. -->
+    <dimen name="widget_grid_row_gap_tight">2dp</dimen>
 
     <!-- The medium current condition is larger than its 20dp hourly glyphs.
          32dp remains within the 38sp temperature row's minimum height and is

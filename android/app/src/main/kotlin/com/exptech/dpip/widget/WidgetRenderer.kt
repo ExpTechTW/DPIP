@@ -96,6 +96,10 @@ object WidgetRenderer {
             R.id.widget_observation_time,
             observationLine(presentation),
         )
+        views.setContentDescription(
+            R.id.widget_observation_time,
+            presentation.observationTimeMillis?.let(WidgetPresenter::observationDescription),
+        )
         setBadge(views, presentation.badgeText)
         views.setTextViewText(R.id.widget_temperature, presentation.temperatureText.orEmpty())
         views.setImageViewResource(
@@ -175,22 +179,11 @@ object WidgetRenderer {
         views.setInt(R.id.widget_empty_icon, "setColorFilter", secondary(context))
     }
 
-    /**
-     * The observation line, with the position hint appended when there is one.
-     *
-     * The date is kept on every family: iOS draws a time and no date, but an
-     * Android device's clock can be frozen, and a weather reading with no date
-     * is indistinguishable from a fresh one to a user whose clock is wrong.
-     */
+    /** The Taipei observation clock, with the position hint when present. */
     private fun observationLine(presentation: WidgetPresentation): String = buildString {
         val observation = presentation.observationTimeMillis
         if (observation != null) {
-            append(
-                WidgetPresenter.observationText(
-                    observation,
-                    compact = presentation.observationTimeCompact,
-                ),
-            )
+            append(WidgetPresenter.observationText(observation))
         }
         val hint = presentation.hintText
         if (isNotEmpty() && hint != null) append("  ·  ")
@@ -206,9 +199,12 @@ object WidgetRenderer {
     ) {
         val feedback = presentation.refreshFeedback
         val busy = feedback == WidgetRefreshFeedback.Queued || feedback == WidgetRefreshFeedback.Running
-        views.setViewVisibility(R.id.widget_refresh, View.VISIBLE)
-        views.setOnClickPendingIntent(R.id.widget_refresh, if (busy) null else refreshIntent(context, appWidgetId))
-        views.setBoolean(R.id.widget_refresh, "setEnabled", !busy)
+        val visible = presentation.showRefresh
+        val actionable = visible && presentation.canRefresh && !busy
+        // Reapply must clear an old click binding as well as collapse its box.
+        views.setViewVisibility(R.id.widget_refresh, if (visible) View.VISIBLE else View.GONE)
+        views.setOnClickPendingIntent(R.id.widget_refresh, if (actionable) refreshIntent(context, appWidgetId) else null)
+        views.setBoolean(R.id.widget_refresh, "setEnabled", actionable)
         views.setContentDescription(context, feedback)
         views.setViewVisibility(R.id.widget_refresh_icon, if (busy) View.GONE else View.VISIBLE)
         views.setViewVisibility(R.id.widget_refresh_progress, if (busy) View.VISIBLE else View.GONE)
@@ -377,6 +373,7 @@ object WidgetRenderer {
             presentation.locationName,
             presentation.weatherText,
             presentation.temperatureText,
+            presentation.observationTimeMillis?.let(WidgetPresenter::observationDescription),
             presentation.badgeText,
         )
             .mapNotNull { it?.trim() }

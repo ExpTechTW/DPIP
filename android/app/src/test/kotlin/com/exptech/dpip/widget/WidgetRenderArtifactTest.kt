@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
@@ -147,6 +148,16 @@ class WidgetRenderArtifactTest {
         view.layout(0, 0, widthPx, heightPx)
         WidgetTextVisibility.assertTree("${widthDp}x$heightDp", view)
         assertImportantTextNotCropped(view, "${widthDp}x$heightDp", presentation)
+        val refresh = view.findViewById<View>(R.id.widget_refresh)
+        assertEquals("$widthDp x $heightDp: refresh visibility",
+            if (presentation.showRefresh) View.VISIBLE else View.GONE, refresh.visibility)
+        if (!presentation.showRefresh) {
+            assertTrue("hidden refresh must not retain a tap target", !refresh.isEnabled && !refresh.hasOnClickListeners())
+        }
+        view.findViewById<TextView>(R.id.widget_observation_time)?.let {
+            assertEquals("14:05", it.text.toString())
+            assertEquals("2026/10/12 14:05", it.contentDescription.toString())
+        }
 
         val bitmap = Bitmap.createBitmap(widthPx, heightPx, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -171,12 +182,18 @@ class WidgetRenderArtifactTest {
 
     /**
      * That the lines the widget must never crop are drawn whole: the town, the
-     * observation date, the square metric values and the forecast probability.
+     * observation clock, the square metric values and the forecast probability.
      * A crop here is exactly what the previous revision shipped — the rainfall
      * value lost its last `m` — and it has to fail the test that produces the
      * picture, not just be visible in it.
      */
     private fun assertImportantTextNotCropped(view: android.view.View, label: String, presentation: WidgetPresentation) {
+        if (presentation.sizeClass == WidgetSizeClass.Medium && presentation.hasObservation) {
+            WidgetTextVisibility.assertVisible("$label: primary temperature", view.findViewById(R.id.widget_temperature))
+            if (presentation.apparentText != null) {
+                WidgetTextVisibility.assertVisible("$label: apparent temperature", view.findViewById(R.id.widget_apparent))
+            }
+        }
         for (id in listOf(
             R.id.widget_location,
             R.id.widget_observation_time,
@@ -223,9 +240,26 @@ class WidgetRenderArtifactTest {
         write("$prefix-small-threshold", render(118, 152))
         write("$prefix-small-normal-threshold", render(118, WidgetPresenter.compactHeightDp))
         write("$prefix-medium", render(320, 172))
+        write("$prefix-200x170-fresh", render(200, 170))
         write("$prefix-large", render(320, 344))
         write("$prefix-large-narrow", render(200, 320))
         write("$prefix-large-narrow-tall", render(250, 344))
+
+        // Capture the same layouts with a collapsed action, active feedback,
+        // retry and success. No old image is evidence for these new states.
+        for ((width, height) in listOf(110 to 110, 120 to 172, 200 to 170, 200 to 320, 250 to 344)) {
+            val fresh = WidgetUpdater.presentation(context, instanceId, width, height)
+            for (feedback in listOf(WidgetRefreshFeedback.Queued, WidgetRefreshFeedback.Running,
+                WidgetRefreshFeedback.Failed, WidgetRefreshFeedback.Updated)) {
+                write("$prefix-${width}x$height-${feedback.wire}",
+                    render(width, height, fresh.copy(refreshFeedback = feedback)))
+            }
+            if (fresh.sizeClass != WidgetSizeClass.Small) {
+                write("$prefix-${width}x$height-no-forecast", render(width, height, fresh.copy(forecast = emptyList())))
+                write("$prefix-${width}x$height-stale", render(width, height, fresh.copy(
+                    isStale = true, badgeText = context.getString(R.string.widget_stale))))
+            }
+        }
 
         WidgetClock.invalidate()
         write("$prefix-small-stale", render(120, 172))

@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import com.exptech.dpip.R
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.robolectric.util.ReflectionHelpers
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -91,6 +92,7 @@ class WidgetRendererTest {
         stored: StoredCurrentWeather? = StoredCurrentWeather(snapshot(), 1, 1),
         address: WidgetAddress? = WidgetAddress.Saved("407"),
         locationName: String? = "西屯區",
+        locationDegradation: WidgetLocationDegradation? = null,
     ) = WidgetPresenter.present(
         sizeClass = sizeClass,
         strings = strings,
@@ -100,7 +102,7 @@ class WidgetRendererTest {
         forecast = StoredForecast(
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
-                sourceIdentifier = "region:407",
+                sourceIdentifier = address?.sourceIdentifier ?: "region:407",
                 regionCode = "407",
                 updateTime = atTaipei(14, 10),
                 receivedAt = atTaipei(14, 10),
@@ -109,7 +111,7 @@ class WidgetRendererTest {
             receivedCalibratedMilliseconds = atTaipei(14, 10),
             expiresAtMilliseconds = atTaipei(15, 0),
         ),
-        locationDegradation = null,
+        locationDegradation = locationDegradation,
         isCatalogMember = true,
         calibratedNowMilliseconds = atTaipei(14, 20),
         latitude = 24.181,
@@ -319,23 +321,15 @@ class WidgetRendererTest {
     }
 
     @Test
-    fun `the observation line carries the date and the wall clock`() {
-        // A roomy large header keeps the year; a 200 dp one uses the short form.
-        val wide = WidgetRenderer.render(
-            context,
-            presentation(WidgetSizeClass.Large, widthDp = 250),
-            42,
-        ).apply(context, FrameLayout(context))
-        val wideText = wide.findViewById<TextView>(R.id.widget_observation_time).text.toString()
-        assertTrue(wideText, wideText.startsWith("2026/10/12 14:05"))
-
-        val narrow = WidgetRenderer.render(
-            context,
-            presentation(WidgetSizeClass.Large, widthDp = 200),
-            42,
-        ).apply(context, FrameLayout(context))
-        val narrowText = narrow.findViewById<TextView>(R.id.widget_observation_time).text.toString()
-        assertTrue(narrowText, narrowText.startsWith("10/12 14:05"))
+    fun `all five layouts show HH mm and retain the full accessible observation date`() {
+        for ((width, height) in listOf(110 to 110, 120 to 172, 200 to 170, 200 to 320, 250 to 344)) {
+            val presentation = presentation(WidgetPresenter.sizeClass(width, height), width, height)
+            val view = WidgetRenderer.render(context, presentation, 42).apply(context, FrameLayout(context))
+            val time = view.findViewById<TextView>(R.id.widget_observation_time)
+            assertEquals("$width x $height", "14:05", time.text.toString())
+            assertEquals("2026/10/12 14:05", time.contentDescription.toString())
+            assertTrue(view.contentDescription.toString().contains("2026/10/12 14:05"))
+        }
     }
 
     @Test
@@ -427,7 +421,7 @@ class WidgetRendererTest {
         // its separator too, not leave a gap.
         val observed = presentation(WidgetSizeClass.Small)
         assertEquals(
-            "多雲有雨",
+            "多雲有雨, 2026/10/12 14:05",
             appliedDescription(
                 WidgetRenderer.render(
                     context,
@@ -437,7 +431,7 @@ class WidgetRendererTest {
             ),
         )
         assertEquals(
-            "多雲有雨, 28°",
+            "多雲有雨, 28°, 2026/10/12 14:05",
             appliedDescription(
                 WidgetRenderer.render(
                     context,
@@ -447,7 +441,7 @@ class WidgetRendererTest {
             ),
         )
         assertEquals(
-            "多雲有雨, 28°",
+            "多雲有雨, 28°, 2026/10/12 14:05",
             appliedDescription(
                 WidgetRenderer.render(
                     context,
@@ -619,8 +613,8 @@ class WidgetRendererTest {
     }
 
     @Test
-    fun `only the surface and the refresh glyph are tap targets`() {
-        val large = WidgetRenderer.render(context, presentation(WidgetSizeClass.Large), 42)
+    fun `a stale widget keeps the surface and refresh glyph tap targets`() {
+        val large = WidgetRenderer.render(context, presentation(WidgetSizeClass.Large).copy(isStale = true), 42)
         assertEquals(
             setOf(android.R.id.background, R.id.widget_refresh),
             clickTargets(large),
@@ -630,10 +624,10 @@ class WidgetRendererTest {
     }
 
     @Test
-    fun `a compact instance offers refresh instead of a settings button`() {
+    fun `a stale compact instance offers refresh instead of a settings button`() {
         val small = WidgetRenderer.render(
             context,
-            presentation(WidgetSizeClass.Small, widthDp = 110, heightDp = 110),
+            presentation(WidgetSizeClass.Small, widthDp = 110, heightDp = 110).copy(isStale = true),
             42,
         )
         assertEquals(
@@ -647,20 +641,46 @@ class WidgetRendererTest {
     }
 
     @Test
+    fun `fresh controls are gone and cannot be clicked while missing forecasts can be retried`() {
+        for ((width, height) in listOf(110 to 110, 120 to 172, 200 to 170, 200 to 320, 250 to 344)) {
+            val base = presentation(WidgetPresenter.sizeClass(width, height), width, height)
+            val view = WidgetRenderer.render(context, base, 42).apply(context, FrameLayout(context))
+            val refresh = view.findViewById<View>(R.id.widget_refresh)
+            assertEquals(View.GONE, refresh.visibility)
+            assertFalse(refresh.isEnabled)
+            assertFalse(refresh.hasOnClickListeners())
+            assertFalse(refresh.performClick())
+
+            WidgetRenderer.render(context, base.copy(forecast = emptyList()), 42).reapply(context, view)
+            val supportsForecast = base.sizeClass != WidgetSizeClass.Small
+            assertEquals(if (supportsForecast) View.VISIBLE else View.GONE, refresh.visibility)
+            assertEquals(supportsForecast, refresh.isEnabled)
+            assertEquals(supportsForecast, refresh.hasOnClickListeners())
+        }
+    }
+
+    @Test
     fun `refresh feedback swaps glyphs without adding a text notice and resets on reapply`() {
-        for (size in WidgetSizeClass.entries) {
-            val base = presentation(size)
+        for ((width, height) in listOf(110 to 110, 120 to 172, 200 to 170, 200 to 320, 250 to 344)) {
+            val base = presentation(WidgetPresenter.sizeClass(width, height), width, height)
             val view = WidgetRenderer.render(context, base, 42).apply(context, FrameLayout(context))
             for (feedback in listOf(WidgetRefreshFeedback.Queued, WidgetRefreshFeedback.Running,
-                WidgetRefreshFeedback.Failed, WidgetRefreshFeedback.Updated, null)) {
+                WidgetRefreshFeedback.Failed, WidgetRefreshFeedback.Updated, null,
+                WidgetRefreshFeedback.Running, WidgetRefreshFeedback.Failed, null)) {
                 WidgetRenderer.render(context, base.copy(refreshFeedback = feedback), 42).reapply(context, view)
                 val busy = feedback == WidgetRefreshFeedback.Queued || feedback == WidgetRefreshFeedback.Running
+                val visible = busy || feedback == WidgetRefreshFeedback.Failed
+                val actionable = visible && !busy
+                val refresh = view.findViewById<View>(R.id.widget_refresh)
+                assertEquals(if (visible) View.VISIBLE else View.GONE, refresh.visibility)
                 assertEquals(View.GONE, view.findViewById<View>(R.id.widget_stale).visibility)
                 assertEquals(if (busy) View.VISIBLE else View.GONE,
                     view.findViewById<View>(R.id.widget_refresh_progress).visibility)
                 assertEquals(if (busy) View.GONE else View.VISIBLE,
                     view.findViewById<View>(R.id.widget_refresh_icon).visibility)
-                assertEquals(!busy, view.findViewById<View>(R.id.widget_refresh).isEnabled)
+                assertEquals(actionable, refresh.isEnabled)
+                assertEquals(actionable, refresh.hasOnClickListeners())
+                if (!actionable) assertFalse(refresh.performClick())
                 val expectedLabel = when (feedback) {
                     WidgetRefreshFeedback.Queued -> R.string.widget_refresh_queued
                     WidgetRefreshFeedback.Running -> R.string.widget_refresh_running
@@ -687,6 +707,87 @@ class WidgetRendererTest {
             val view = WidgetRenderer.render(context, empty.copy(refreshFeedback = feedback), 42)
                 .apply(context, FrameLayout(context))
             assertEquals("NO_DATA", view.findViewById<TextView>(R.id.widget_empty_message).text.toString())
+            assertEquals(View.VISIBLE, view.findViewById<View>(R.id.widget_refresh).visibility)
+        }
+    }
+
+    @Test
+    fun `app attention and unconfigured empty states hide failed retry controls`() {
+        for (stored in listOf(null, StoredCurrentWeather(snapshot(), 1, 1))) {
+            val blocked = presentation(WidgetSizeClass.Small, stored = stored)
+                .copy(state = WidgetDisplayState.NeedsApp, canRefresh = false,
+                    refreshFeedback = WidgetRefreshFeedback.Failed)
+            val view = WidgetRenderer.render(context, blocked, 42).apply(context, FrameLayout(context))
+            val refresh = view.findViewById<View>(R.id.widget_refresh)
+            assertEquals(View.GONE, refresh.visibility)
+            assertFalse(refresh.hasOnClickListeners())
+            WidgetRenderer.render(context, blocked.copy(refreshFeedback = WidgetRefreshFeedback.Running), 42)
+                .reapply(context, view)
+            assertEquals(View.VISIBLE, refresh.visibility)
+            assertFalse(refresh.isEnabled)
+            assertEquals(View.VISIBLE, view.findViewById<View>(R.id.widget_refresh_progress).visibility)
+        }
+        val unconfigured = presentation(WidgetSizeClass.Small, stored = null, address = null)
+        val view = WidgetRenderer.render(context, unconfigured, 42).apply(context, FrameLayout(context))
+        assertEquals(View.GONE, view.findViewById<View>(R.id.widget_refresh).visibility)
+    }
+
+    @Test
+    fun `location retry survives reapply and clears clicks during progress permission loss and recovery`() {
+        for ((width, height) in listOf(110 to 110, 120 to 172, 200 to 170, 200 to 320, 250 to 344)) {
+            for (entry in listOf(null, StoredCurrentWeather(snapshot().copy(sourceIdentifier = "current-location"), 1, 1))) {
+                fun present(degradation: WidgetLocationDegradation?) = presentation(
+                    WidgetPresenter.sizeClass(width, height), width, height, stored = entry,
+                    address = WidgetAddress.CurrentLocation, locationDegradation = degradation,
+                )
+                val initial = present(WidgetLocationDegradation.Unavailable)
+                val view = WidgetRenderer.render(context, initial, 42).apply(context, FrameLayout(context))
+                val refresh = view.findViewById<View>(R.id.widget_refresh)
+                assertEquals(View.VISIBLE, refresh.visibility)
+                assertTrue(refresh.isEnabled)
+                assertTrue(refresh.hasOnClickListeners())
+
+                val states = listOf(
+                    initial.copy(refreshFeedback = WidgetRefreshFeedback.Queued),
+                    initial.copy(refreshFeedback = WidgetRefreshFeedback.Running),
+                    initial.copy(refreshFeedback = WidgetRefreshFeedback.Failed),
+                    present(WidgetLocationDegradation.UnusableFix),
+                    present(WidgetLocationDegradation.Permission).copy(refreshFeedback = WidgetRefreshFeedback.Failed),
+                    initial,
+                    present(null).copy(refreshFeedback = WidgetRefreshFeedback.Updated),
+                    initial,
+                )
+                for (state in states) {
+                    WidgetRenderer.render(context, state, 42).reapply(context, view)
+                    val busy = state.refreshFeedback == WidgetRefreshFeedback.Queued ||
+                        state.refreshFeedback == WidgetRefreshFeedback.Running
+                    val blocked = state.state == WidgetDisplayState.NeedsApp
+                    val recovered = state.state == WidgetDisplayState.Ready
+                    val visible = !blocked && !recovered
+                    val actionable = visible && !busy
+                    assertEquals(if (visible) View.VISIBLE else View.GONE, refresh.visibility)
+                    assertEquals(actionable, refresh.isEnabled)
+                    assertEquals(actionable, refresh.hasOnClickListeners())
+                    assertEquals(if (busy) View.VISIBLE else View.GONE,
+                        view.findViewById<View>(R.id.widget_refresh_progress).visibility)
+                    assertEquals(if (busy) View.GONE else View.VISIBLE,
+                        view.findViewById<View>(R.id.widget_refresh_icon).visibility)
+                    if (actionable) {
+                        val app = shadowOf(ApplicationProvider.getApplicationContext<android.app.Application>())
+                        val count = app.broadcastIntents.size
+                        assertTrue(refresh.performClick())
+                        assertEquals(count + 1, app.broadcastIntents.size)
+                        val sent = app.broadcastIntents.last()
+                        assertEquals(WidgetRenderer.ACTION_REFRESH, sent.action)
+                        assertEquals(42, sent.getIntExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_ID, -1))
+                    } else {
+                        assertFalse(refresh.performClick())
+                    }
+                    if (state.refreshFeedback == WidgetRefreshFeedback.Failed) {
+                        assertEquals(context.getString(R.string.widget_refresh_failed), refresh.contentDescription)
+                    }
+                }
+            }
         }
     }
 

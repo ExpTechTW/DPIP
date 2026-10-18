@@ -3,7 +3,7 @@
   The large layout at the minimal height a launcher can report (~320 dp).
 
   Identical to `widget_large.xml` except that the section spacing is tightened
-  from iOS's `spacing: 12` / `spacing: 14` to 6 / 10 dp: at 320 dp the iOS
+  from the roomy layout's 12 / 6 dp to 6 / 2 dp: at 320 dp the roomy
   spacing, the Android-only notice row and the grid together push the forecast's
   probability line past the bottom of the widget. `WidgetPresenter.
   largeRoomyMinimumHeightDp` selects this document below 336 dp and the
@@ -41,6 +41,7 @@
             tools:ignore="UselessParent">
         <TextView
             android:id="@+id/widget_location"
+            android:includeFontPadding="false"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -69,6 +70,7 @@
 
         <TextView
             android:id="@+id/widget_observation_time"
+            android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/widget_spacing_xs"
@@ -79,6 +81,7 @@
 
         <FrameLayout
             android:id="@+id/widget_refresh"
+            android:visibility="gone"
             android:layout_width="@dimen/widget_icon_action_target_large"
             android:layout_height="@dimen/widget_icon_action_target_large"
             android:layout_marginStart="@dimen/widget_spacing_xs"

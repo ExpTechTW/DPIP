@@ -21,9 +21,8 @@ import java.util.concurrent.TimeUnit
  * periodic work is 15 minutes, and beyond that Doze, app-standby buckets and
  * OEM battery managers all defer it — so this is a **request**, never a
  * guarantee, and nothing in the UI may say "every 20 minutes" or imply the data
- * is live. The observation time is always drawn with its date for exactly this
- * reason: the screen states when the reading was taken, so a late update is
- * visible as a late update.
+ * is live. The screen shows the Taipei observation time and an outdated notice
+ * when appropriate; its accessible description retains the full date and time.
  *
  * `android:updatePeriodMillis` is 0 in `weather_widget_info.xml`, so there is
  * one scheduler and not two disagreeing ones.

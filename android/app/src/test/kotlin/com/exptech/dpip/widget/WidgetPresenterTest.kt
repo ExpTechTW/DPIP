@@ -149,6 +149,7 @@ class WidgetPresenterTest {
         )
         assertTrue(presentation.isStale)
         assertEquals("OUTDATED", presentation.badgeText)
+        assertTrue(presentation.showRefresh)
     }
 
     @Test
@@ -173,17 +174,19 @@ class WidgetPresenterTest {
     }
 
     @Test
-    fun `the observation text carries the server date and Taipei wall clock`() {
-        assertTrue(WidgetPresenter.observationText(atTaipei(14, 5)).startsWith("2026/10/12"))
-        assertTrue(WidgetPresenter.observationText(atTaipei(14, 5)).endsWith("14:05"))
+    fun `every family uses a fixed 24-hour Taipei observation clock`() {
+        for (size in WidgetSizeClass.entries) {
+            val presentation = present(sizeClass = size, stored = stored(snapshot()))
+            assertEquals("14:00", WidgetPresenter.observationText(presentation.observationTimeMillis!!))
+        }
+        assertEquals("14:05", WidgetPresenter.observationText(atTaipei(14, 5)))
+        assertEquals("00:00", WidgetPresenter.observationText(atTaipei(0, 0)))
+        assertEquals("00:05", WidgetPresenter.observationText(atTaipei(0, 5)))
     }
 
     @Test
-    fun `the compact observation text keeps the date and the wall clock`() {
-        // What the compact layout draws: the year is dropped because the long
-        // form cannot fit 110 dp under a large font, but the date and `HH:mm`
-        // are not.
-        assertEquals("10/12 14:05", WidgetPresenter.observationText(atTaipei(14, 5), compact = true))
+    fun `the full observation date and clock remain available for accessibility`() {
+        assertEquals("2026/10/12 14:05", WidgetPresenter.observationDescription(atTaipei(14, 5)))
     }
 
     @Test
@@ -193,28 +196,29 @@ class WidgetPresenterTest {
         val newYearDay = LocalDateTime.of(2027, 1, 1, 0, 5)
             .toInstant(taipei).toEpochMilli()
 
-        assertEquals("12/31 23:59", WidgetPresenter.observationText(newYearEve, compact = true))
-        assertEquals("01/01 00:05", WidgetPresenter.observationText(newYearDay, compact = true))
-        // The long form keeps the year, so a stale cross-year reading is not
-        // ambiguous where there is room to say so.
-        assertTrue(WidgetPresenter.observationText(newYearDay).startsWith("2027/01/01"))
+        assertEquals("23:59", WidgetPresenter.observationText(newYearEve))
+        assertEquals("00:05", WidgetPresenter.observationText(newYearDay))
+        assertEquals("2026/12/31 23:59", WidgetPresenter.observationDescription(newYearEve))
+        assertEquals("2027/01/01 00:05", WidgetPresenter.observationDescription(newYearDay))
     }
 
     @Test
-    fun `the observation text does not depend on the default locale's date order`() {
-        // The field order is explicit (`MM/dd`), not the locale's own date
-        // pattern, so a locale that writes `dd/MM` cannot silently swap the two.
+    fun `the observation clock does not depend on the device locale or timezone`() {
         val original = Locale.getDefault()
+        val originalZone = java.util.TimeZone.getDefault()
         try {
             Locale.setDefault(Locale.US)
-            val us = WidgetPresenter.observationText(atTaipei(14, 5), compact = true)
+            java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("America/Los_Angeles"))
+            val us = WidgetPresenter.observationText(atTaipei(14, 5))
             Locale.setDefault(Locale.JAPAN)
-            val japan = WidgetPresenter.observationText(atTaipei(14, 5), compact = true)
+            java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"))
+            val japan = WidgetPresenter.observationText(atTaipei(14, 5))
 
             assertEquals("the format must be explicit, not locale-ordered", us, japan)
-            assertEquals("10/12 14:05", us)
+            assertEquals("14:05", us)
         } finally {
             Locale.setDefault(original)
+            java.util.TimeZone.setDefault(originalZone)
         }
     }
 
@@ -253,7 +257,7 @@ class WidgetPresenterTest {
     fun `each location degradation says something different`() {
         val cases = mapOf(
             WidgetLocationDegradation.Permission to "NEEDS_APP",
-            WidgetLocationDegradation.UnusableFix to "NEEDS_APP",
+            WidgetLocationDegradation.UnusableFix to "NO_FIX",
             WidgetLocationDegradation.Disabled to "LOCATION_OFF",
             WidgetLocationDegradation.Unavailable to "NO_FIX",
             WidgetLocationDegradation.UnresolvedTownship to "OUTSIDE",
@@ -265,7 +269,11 @@ class WidgetPresenterTest {
                 locationDegradation = degradation,
             )
             assertEquals(degradation.name, expected, presentation.badgeText)
-            assertEquals(WidgetDisplayState.NeedsApp, presentation.state)
+            val expectedState = when (degradation) {
+                WidgetLocationDegradation.Permission, WidgetLocationDegradation.Disabled -> WidgetDisplayState.NeedsApp
+                else -> WidgetDisplayState.LocationUnavailable
+            }
+            assertEquals(expectedState, presentation.state)
         }
     }
 
@@ -339,6 +347,180 @@ class WidgetPresenterTest {
     }
 
     // ── Forecast ────────────────────────────────────────────────────────────
+
+    @Test
+    fun `fresh observations hide refresh and Small does not require a forecast`() {
+        for (size in WidgetSizeClass.entries) {
+            val fresh = present(sizeClass = size, stored = stored(snapshot()), forecast = forecast())
+            assertTrue(fresh.canRefresh)
+            assertFalse(fresh.showRefresh)
+            assertFalse(fresh.copy(refreshFeedback = WidgetRefreshFeedback.Updated).showRefresh)
+        }
+        val small = present(sizeClass = WidgetSizeClass.Small, stored = stored(snapshot()), forecast = null)
+        assertTrue(small.forecast.isEmpty())
+        assertFalse(small.showRefresh)
+    }
+
+    @Test
+    fun `Medium and Large offer refresh when no usable hourly points remain`() {
+        for (size in listOf(WidgetSizeClass.Medium, WidgetSizeClass.Large)) {
+            val unusableForecasts = listOf(
+                null,
+                forecast(expiresAt = atTaipei(14, 20)),
+                forecast(points = emptyList()),
+                forecast(regionCode = "100"),
+                forecast(source = "current-location"),
+                forecast(points = listOf(ForecastPoint("14:00", 27.0, "多雲", 200, 20))),
+            )
+            for (forecast in unusableForecasts) {
+                val presentation = present(sizeClass = size, stored = stored(snapshot()), forecast = forecast)
+                assertFalse("observation is still fresh", presentation.isStale)
+                assertTrue(presentation.forecast.isEmpty())
+                assertTrue(presentation.showRefresh)
+                assertTrue(presentation.copy(refreshFeedback = WidgetRefreshFeedback.Updated).showRefresh)
+            }
+        }
+    }
+
+    @Test
+    fun `stale observations and manual failures offer refresh in every family`() {
+        for (size in WidgetSizeClass.entries) {
+            val fresh = present(sizeClass = size, stored = stored(snapshot()), forecast = forecast())
+            assertTrue(fresh.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
+            val stale = present(sizeClass = size, stored = stored(snapshot()), forecast = forecast(),
+                calibratedNowMilliseconds = atTaipei(14, 30))
+            assertTrue(stale.isStale)
+            assertTrue(stale.showRefresh)
+        }
+    }
+
+    @Test
+    fun `queued and running feedback stays visible until fresh success or idle`() {
+        val fresh = present(stored = stored(snapshot()), forecast = forecast())
+        assertFalse(fresh.showRefresh)
+        for (feedback in listOf(WidgetRefreshFeedback.Queued, WidgetRefreshFeedback.Running)) {
+            assertTrue(fresh.copy(refreshFeedback = feedback).showRefresh)
+        }
+        assertFalse(fresh.copy(refreshFeedback = WidgetRefreshFeedback.Updated).showRefresh)
+        assertFalse(fresh.copy(refreshFeedback = null).showRefresh)
+    }
+
+    @Test
+    fun `no observation offers refresh only for a configured actionable source`() {
+        for (size in WidgetSizeClass.entries) {
+            for (address in listOf(WidgetAddress.Saved("407"), WidgetAddress.CurrentLocation)) {
+                assertTrue(present(sizeClass = size, address = address).showRefresh)
+            }
+            val unconfigured = present(sizeClass = size, address = null)
+            val reconfigure = present(sizeClass = size, isCatalogMember = false)
+            for (blocked in listOf(unconfigured, reconfigure)) {
+                assertFalse(blocked.canRefresh)
+                assertFalse(blocked.showRefresh)
+                assertFalse(blocked.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
+            }
+        }
+    }
+
+    @Test
+    fun `location states requiring the app hide retries but retain active progress`() {
+        for (degradation in listOf(WidgetLocationDegradation.Permission, WidgetLocationDegradation.Disabled)) {
+            for (stored in listOf(null, stored(snapshot(source = "current-location")))) {
+                val blocked = present(address = WidgetAddress.CurrentLocation, stored = stored,
+                    locationDegradation = degradation, calibratedNowMilliseconds = null)
+                assertEquals(WidgetDisplayState.NeedsApp, blocked.state)
+                assertEquals(if (stored == null) "OPEN_APP" else null, blocked.hintText)
+                assertFalse(blocked.canRefresh)
+                assertFalse(blocked.showRefresh)
+                assertFalse(blocked.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
+                for (feedback in listOf(WidgetRefreshFeedback.Queued, WidgetRefreshFeedback.Running)) {
+                    assertTrue(blocked.copy(refreshFeedback = feedback).showRefresh)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `temporary location failures allow retry with or without a cached observation`() {
+        for (degradation in listOf(WidgetLocationDegradation.Unavailable, WidgetLocationDegradation.UnusableFix,
+            WidgetLocationDegradation.UnresolvedTownship)) {
+            for (size in WidgetSizeClass.entries) {
+                for (entry in listOf(null, stored(snapshot(source = "current-location")))) {
+                    // A usable forecast and a fresh observation must not hide a location retry.
+                    for (now in listOf(atTaipei(14, 20), atTaipei(14, 30), null)) {
+                        val retry = present(sizeClass = size, address = WidgetAddress.CurrentLocation,
+                            stored = entry, forecast = forecast(source = "current-location"),
+                            locationDegradation = degradation, calibratedNowMilliseconds = now)
+                        assertEquals(WidgetDisplayState.LocationUnavailable, retry.state)
+                        assertEquals(entry != null, retry.hasObservation)
+                        assertEquals(entry != null && (now == null || now >= atTaipei(14, 30)), retry.isStale)
+                        assertEquals(
+                            if (retry.isStale) "OUTDATED"
+                            else if (degradation == WidgetLocationDegradation.UnresolvedTownship) "OUTSIDE"
+                            else "NO_FIX",
+                            retry.badgeText,
+                        )
+                        assertNull(retry.hintText)
+                        assertTrue(retry.canRefresh)
+                        assertTrue(retry.showRefresh)
+                        assertTrue(retry.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
+                        for (feedback in listOf(WidgetRefreshFeedback.Queued, WidgetRefreshFeedback.Running)) {
+                            assertTrue(retry.copy(refreshFeedback = feedback).showRefresh)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `a recovered location hides retry only when observation and required forecast are fresh`() {
+        for (degradation in listOf(WidgetLocationDegradation.Unavailable, WidgetLocationDegradation.UnusableFix,
+            WidgetLocationDegradation.UnresolvedTownship)) {
+            for (size in WidgetSizeClass.entries) {
+                val entry = stored(snapshot(source = "current-location"))
+                val hourly = forecast(source = "current-location")
+                val failed = present(sizeClass = size, address = WidgetAddress.CurrentLocation,
+                    stored = entry, forecast = hourly, locationDegradation = degradation)
+                    .copy(refreshFeedback = WidgetRefreshFeedback.Failed)
+                assertTrue(failed.showRefresh)
+
+                val recovered = present(sizeClass = size, address = WidgetAddress.CurrentLocation,
+                    stored = entry, forecast = hourly, locationDegradation = null)
+                    .copy(refreshFeedback = WidgetRefreshFeedback.Updated)
+                assertEquals(WidgetDisplayState.Ready, recovered.state)
+                assertNull(recovered.badgeText)
+                assertNull(recovered.hintText)
+                assertTrue(recovered.canRefresh)
+                assertFalse(recovered.showRefresh)
+                assertTrue(recovered.copy(isStale = true).showRefresh)
+                assertEquals(size != WidgetSizeClass.Small, recovered.copy(forecast = emptyList()).showRefresh)
+            }
+        }
+    }
+
+    @Test
+    fun `location degradation does not block saved sources or enable unconfigured sources`() {
+        for (degradation in WidgetLocationDegradation.entries) {
+            for (entry in listOf(null, stored(snapshot()))) {
+                for (size in WidgetSizeClass.entries) {
+                    val saved = present(sizeClass = size, stored = entry, forecast = forecast(),
+                        locationDegradation = degradation)
+                    assertTrue(saved.canRefresh)
+                    assertEquals(entry == null, saved.showRefresh)
+                    assertTrue(saved.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
+
+                    for (blocked in listOf(
+                        present(sizeClass = size, address = null, stored = entry, locationDegradation = degradation),
+                        present(sizeClass = size, stored = entry, locationDegradation = degradation, isCatalogMember = false),
+                    )) {
+                        assertFalse(blocked.canRefresh)
+                        assertFalse(blocked.showRefresh)
+                        assertFalse(blocked.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * A stored forecast, whose deadline was fixed when it was accepted.

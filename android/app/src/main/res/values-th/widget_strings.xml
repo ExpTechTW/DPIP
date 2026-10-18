@@ -28,7 +28,7 @@
     <string name="widget_preview_location">พื้นที่ตัวอย่าง</string>
     <string name="widget_preview_weather">ฟ้าใส</string>
     <string name="widget_preview_temperature">28°</string>
-    <string name="widget_preview_time">10/13 14:05</string>
+    <string name="widget_preview_time">14:05</string>
     <string name="widget_preview_humidity">76%</string>
     <string name="widget_preview_rain">0.0 mm</string>
     <string name="widget_config_saved_locations">สถานที่ที่บันทึกไว้</string>

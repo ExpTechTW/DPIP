@@ -1,5 +1,6 @@
 package com.exptech.dpip.widget
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
@@ -18,6 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
@@ -180,6 +182,17 @@ class WidgetLayoutFitTest {
         context.resources.getResourceEntryName(view.id)
     }
 
+    private fun assertRefreshFits(label: String, view: View, visible: Boolean) {
+        val refresh = view.findViewById<View>(R.id.widget_refresh)
+        assertEquals("$label: refresh visibility", if (visible) View.VISIBLE else View.GONE, refresh.visibility)
+        if (visible) {
+            assertTrue("$label: refresh must have a target box", refresh.width > 0 && refresh.height > 0)
+        } else {
+            assertTrue("$label: hidden refresh must be disabled", !refresh.isEnabled)
+            assertTrue("$label: hidden refresh must not be clickable", !refresh.hasOnClickListeners())
+        }
+    }
+
     private fun withFontScale(scale: Float, block: () -> Unit) {
         val configuration = Configuration(context.resources.configuration)
         val original = configuration.fontScale
@@ -289,12 +302,9 @@ class WidgetLayoutFitTest {
             "$label: the observation time has no readable width",
             observation.width > px(8),
         )
-        assertTrue("$label: the observation time must say something", observation.text.isNotEmpty())
+        assertEquals("$label: observation uses HH:mm", "14:05", observation.text.toString())
 
-        val action = view.findViewById<View>(R.id.widget_refresh)
-        assertEquals("$label: refresh must be visible", View.VISIBLE, action.visibility)
-        assertTrue("$label: refresh must have height", action.height > 0)
-        assertTrue("$label: refresh must have width", action.width > 0)
+        assertRefreshFits(label, view, presentation.showRefresh)
 
         val container = view.findViewById<ViewGroup>(R.id.widget_forecast_container)
         if (presentation.sizeClass == WidgetSizeClass.Small) {
@@ -305,14 +315,11 @@ class WidgetLayoutFitTest {
         assertTrue("$label: the forecast container has no height", container.height > 0)
         assertTrue("$label: the forecast container has no width", container.width > 0)
         assertEquals("$label: five points must be drawn", 5, container.childCount)
-        assertEquals(
-            "$label: the refresh action must be visible",
-            View.VISIBLE,
-            view.findViewById<View>(R.id.widget_refresh).visibility,
-        )
         for (index in 0 until container.childCount) {
             val column = container.getChildAt(index)
             assertTrue("$label: column $index has no height", column.height > 0)
+            assertTrue("$label: hourly columns must share the width evenly",
+                kotlin.math.abs(column.width * container.childCount - container.width) <= container.childCount)
             // The four lines iOS draws — clock, glyph, temperature, probability.
             // "It fits" must never be bought by letting the probability collapse
             // to zero height, which a `wrap_content` column will do silently.
@@ -344,6 +351,106 @@ class WidgetLayoutFitTest {
                     "$label: a forecast line overflows its column sideways",
                     left + leaf.width <= container.width,
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `medium apparent temperature retains its complete reading`() {
+        assertMediumApparentTemperature()
+    }
+
+    @Test
+    @Config(qualifiers = "zh-rTW-420dpi")
+    fun `medium apparent temperature retains its complete reading in Traditional Chinese`() {
+        assertMediumApparentTemperature()
+    }
+
+    @Test
+    @Config(qualifiers = "ja-420dpi")
+    fun `medium apparent temperature retains its complete reading in Japanese`() {
+        assertMediumApparentTemperature()
+    }
+
+    @Test
+    @Config(qualifiers = "ko-420dpi")
+    fun `medium apparent temperature retains its complete reading in Korean`() {
+        assertMediumApparentTemperature()
+    }
+
+    @Test
+    @Config(qualifiers = "th-420dpi")
+    fun `medium apparent temperature retains its complete reading in Thai`() {
+        assertMediumApparentTemperature()
+    }
+
+    @Test
+    @Config(qualifiers = "fil-420dpi")
+    fun `medium apparent temperature retains its complete reading in Filipino`() {
+        assertMediumApparentTemperature()
+    }
+
+    private fun assertMediumApparentTemperature() {
+        val address = WidgetAddress.Saved("407")
+        val snapshot = store.readCurrentWeather(address)!!.snapshot
+        for (scale in listOf(1f, 1.3f)) {
+            withFontScale(scale) {
+                // At 1.3x the original 200x170 box intentionally selects Small.
+                // Also exercise the smallest box that still selects Medium.
+                val boxes = if (scale == 1f) listOf(200 to 170, 320 to 172)
+                    else listOf(260 to 221, 320 to 230)
+                for (apparent in listOf(30.2, -12.0, 100.0, -100.0, null)) {
+                    store.commitCurrentWeather(store.beginCurrentWeatherWrite(address)!!,
+                        snapshot.copy(apparentTemperature = apparent), writtenAt = 1L)
+                    for ((width, height) in boxes) {
+                        for (stale in listOf(false, true)) {
+                            val base = WidgetUpdater.presentation(context, instanceId, width, height)
+                            assertEquals(WidgetSizeClass.Medium, base.sizeClass)
+                            val presentation = base.copy(isStale = stale,
+                                badgeText = if (stale) context.getString(R.string.widget_stale) else null)
+                            val label = "${context.resources.configuration.locales} ${width}x$height @$scale stale=$stale apparent=$apparent"
+                            assertFits(width, height, presentation)
+                            val view = renderAt(presentation, width, height)
+                            val reading = view.findViewById<TextView>(R.id.widget_apparent)
+                            if (apparent == null) {
+                                assertEquals("$label: missing data", View.GONE, reading.visibility)
+                            } else {
+                                assertEquals("$label: localized reading", presentation.apparentText, reading.text.toString())
+                                // Multi-line wrapping may leave a trailing space
+                                // outside getLineWidth's advance. Check every
+                                // drawn line and glyph against all ancestor clips,
+                                // with ellipsis forbidden, using the strict raster
+                                // helper rather than the single-line advance check.
+                                WidgetTextVisibility.assertVisible("$label: apparent", reading)
+                                assertEquals("$label: every character is laid out", reading.text.length,
+                                    reading.layout.getLineEnd(reading.lineCount - 1))
+                                assertEquals("$label: full reading is accessible", presentation.apparentText,
+                                    reading.createAccessibilityNodeInfo().text.toString())
+                            }
+                            val temperature = view.findViewById<TextView>(R.id.widget_temperature)
+                            assertTextFits("$label: primary", temperature)
+                            if (apparent != null) assertTrue("$label: primary remains prominent", temperature.textSize > reading.textSize)
+                            val icon = view.findViewById<View>(R.id.widget_icon)
+                            assertEquals("$label: full condition glyph", px(32), icon.width)
+                            assertEquals(icon.width, icon.height)
+                            val weather = view.findViewById<TextView>(R.id.widget_weather)
+                            WidgetTextVisibility.assertVisible("$label: condition", weather, allowEllipsis = true)
+                            assertTrue("$label: condition has readable space", weather.width >= px(9))
+                            val (_, iconLeft) = offsetWithin(icon, view)
+                            val (_, temperatureLeft) = offsetWithin(temperature, view)
+                            assertTrue("$label: primary stays before condition", temperatureLeft + temperature.width <= iconLeft)
+                            if (apparent != null) {
+                                val (_, apparentLeft) = offsetWithin(reading, view)
+                                assertTrue("$label: readings never overlap", temperatureLeft + temperature.width <= apparentLeft)
+                                assertTrue("$label: apparent stays before condition", apparentLeft + reading.width <= iconLeft)
+                            }
+                            if (width == 320 && scale == 1f) {
+                                assertTextFits("$label: roomy condition", weather)
+                                if (apparent != null) assertEquals("$label: roomy apparent stays on one line", 1, reading.lineCount)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -443,9 +550,66 @@ class WidgetLayoutFitTest {
     }
 
     @Test
-    fun `refresh feedback never moves the weather content`() {
+    fun `large tight stale data keeps all hourly lines inside launcher bounds`() {
+        for ((width, height) in listOf(200 to 320, 250 to 320, 200 to 335, 200 to 336)) {
+            val fresh = WidgetUpdater.presentation(context, instanceId, width, height)
+            for (feedback in listOf(null, WidgetRefreshFeedback.Running, WidgetRefreshFeedback.Failed)) {
+                val stale = fresh.copy(isStale = true, badgeText = context.getString(R.string.widget_stale),
+                    refreshFeedback = feedback)
+                assertFits(width, height, stale)
+                val view = renderAt(stale, width, height)
+                WidgetTextVisibility.assertTree("$width x $height stale $feedback", view)
+                assertEquals(View.VISIBLE, view.findViewById<View>(R.id.widget_stale).visibility)
+                val hours = view.findViewById<ViewGroup>(R.id.widget_forecast_container)
+                assertEquals(5, hours.childCount)
+                for ((index, point) in stale.forecast.withIndex()) {
+                    val column = hours.getChildAt(index)
+                    assertEquals(point.time, column.findViewById<TextView>(R.id.widget_forecast_time).text.toString())
+                    assertEquals(point.temperatureText,
+                        column.findViewById<TextView>(R.id.widget_forecast_temperature).text.toString())
+                    val pop = column.findViewById<TextView>(R.id.widget_forecast_pop)
+                    assertEquals(point.popText, pop.text.toString())
+                    assertTrue("probability remains accessible", !pop.contentDescription.isNullOrBlank())
+                    assertTrue("hour remains an accessibility group", column.isFocusable)
+                    assertTrue("weather icon remains accessible",
+                        !column.findViewById<View>(R.id.widget_forecast_icon).contentDescription.isNullOrBlank())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `hidden refresh gives its width back to each responsive layout`() {
+        for ((width, height) in listOf(110 to 110, 120 to 172, 200 to 170, 200 to 320, 250 to 344)) {
+            val base = WidgetUpdater.presentation(context, instanceId, width, height)
+            val hidden = renderAt(base, width, height)
+            val shown = renderAt(base.copy(refreshFeedback = WidgetRefreshFeedback.Failed), width, height)
+            assertRefreshFits("$width x $height fresh", hidden, visible = false)
+            assertRefreshFits("$width x $height failed", shown, visible = true)
+            // Small's action shares the temperature row; every other variant
+            // shares the town header. Both must reclaim the action and margins.
+            fun expandedBudget(view: View): View {
+                if (base.sizeClass == WidgetSizeClass.Small && !base.compactLayout) {
+                    return view.findViewById(R.id.widget_temperature)
+                }
+                // The town itself keeps its intrinsic width so its location
+                // mark stays adjacent. Its weighted outer group owns the slack.
+                return view.findViewById<View>(R.id.widget_location).parent.parent as View
+            }
+            assertTrue("$width x $height: GONE must release horizontal space",
+                expandedBudget(hidden).width > expandedBudget(shown).width)
+            for (id in listOf(R.id.widget_location, R.id.widget_observation_time, R.id.widget_temperature)) {
+                assertTextFits("$width x $height hidden", hidden.findViewById(id))
+                assertTextFits("$width x $height failed", shown.findViewById(id))
+            }
+        }
+    }
+
+    @Test
+    fun `feedback glyph changes never move content while the refresh action is visible`() {
         for ((width, height) in listOf(110 to 110, 120 to 172, 218 to 202, 373 to 320, 373 to 344)) {
             val base = WidgetUpdater.presentation(context, instanceId, width, height)
+                .copy(isStale = true, badgeText = context.getString(R.string.widget_stale))
             fun bounds(feedback: WidgetRefreshFeedback?): List<List<Int>> {
                 val view = renderAt(base.copy(refreshFeedback = feedback), width, height)
                 return listOf(R.id.widget_location, R.id.widget_observation_time,
@@ -466,7 +630,11 @@ class WidgetLayoutFitTest {
 
     @Test
     fun `roomy Android 12 cells have 48dp actions without enlarging the glyphs`() {
-        val view = layoutAt(373, 307)
+        fun withRefresh(width: Int) = renderAt(
+            WidgetUpdater.presentation(context, instanceId, width, 307)
+                .copy(refreshFeedback = WidgetRefreshFeedback.Failed), width, 307,
+        )
+        val view = withRefresh(373)
         val expectedDp = if (android.os.Build.VERSION.SDK_INT >= 31) 48 else 28
         for (id in listOf(R.id.widget_refresh)) {
             val action = view.findViewById<View>(id)
@@ -474,16 +642,18 @@ class WidgetLayoutFitTest {
             assertTrue("square target", kotlin.math.abs(action.height - px(expectedDp)) <= 1)
             assertTrue("the glyph stays 20dp", kotlin.math.abs(action.width - action.paddingLeft - action.paddingRight - px(20)) <= 1)
         }
-        val narrow = layoutAt(218, 307).findViewById<View>(R.id.widget_refresh)
+        val narrow = withRefresh(218).findViewById<View>(R.id.widget_refresh)
         assertTrue("narrow headers preserve text width", kotlin.math.abs(narrow.width - px(28)) <= 1)
     }
 
     @Test
     @Config(sdk = [35], qualifiers = "420dpi")
     fun `resizing a reused roomy view restores narrow targets instead of hiding the town`() {
-        val view = layoutAt(373, 307)
+        val view = renderAt(WidgetUpdater.presentation(context, instanceId, 373, 307)
+            .copy(refreshFeedback = WidgetRefreshFeedback.Failed), 373, 307)
         val narrow = WidgetUpdater.presentation(context, instanceId, 218, 307)
-        WidgetRenderer.render(context, narrow.copy(isCurrentLocation = true), instanceId).reapply(context, view)
+        WidgetRenderer.render(context, narrow.copy(isCurrentLocation = true,
+            refreshFeedback = WidgetRefreshFeedback.Failed), instanceId).reapply(context, view)
         view.measure(
             View.MeasureSpec.makeMeasureSpec(px(218), View.MeasureSpec.EXACTLY),
             View.MeasureSpec.makeMeasureSpec(px(307), View.MeasureSpec.EXACTLY),
@@ -588,7 +758,7 @@ class WidgetLayoutFitTest {
      * Renders a production presentation at 110×110 dp and lays it out at exactly
      * that size, then asserts the three things the smallest box must not lose:
      * a town that is actually its name, a wall clock that kept its `HH:mm`, and
-     * a refresh action that can be tapped.
+     * a refresh action that can be tapped when recovery is actionable.
      */
     private fun assertMinimalReadable(label: String, presentation: WidgetPresentation) {
         val view = WidgetRenderer.render(context, presentation, instanceId)
@@ -608,9 +778,7 @@ class WidgetLayoutFitTest {
         assertTrue("$label: the clock must keep 14:05 but read '${clock.text}'", clock.text.contains("14:05"))
         assertEquals("$label: the clock must not be ellipsised", 0, ellipsizedCharacters(clock))
 
-        val refresh = view.findViewById<View>(R.id.widget_refresh)
-        assertEquals("$label: refresh must be visible", View.VISIBLE, refresh.visibility)
-        assertTrue("$label: refresh must be tappable", refresh.width > 0 && refresh.height > 0)
+        assertRefreshFits(label, view, presentation.showRefresh)
     }
 
     @Test
@@ -637,53 +805,74 @@ class WidgetLayoutFitTest {
 
     @Test
     fun `the smallest widget keeps its town and clock under a long notice`() {
-        // The longest notice the app can produce, at the smallest box and a large
-        // font. The notice may ellipsise; the town and the wall clock may not.
+        // A retryable position failure and non-retryable app-attention states
+        // must keep their town and clock in the same minimum box at large font.
         withFontScale(1.3f) {
             reportSize(110, 110)
             val notice = "POSITION IS OUTSIDE EVERY COVERED TOWNSHIP AND CANNOT BE RESOLVED"
-            val presentation = WidgetPresenter.present(
-                sizeClass = WidgetPresenter.sizeClass(110, 110, 1.3f),
-                strings = strings.copy(locationOutside = notice),
-                address = WidgetAddress.CurrentLocation,
-                locationName = "西屯區",
-                stored = store.readCurrentWeather(WidgetAddress.Saved("407")),
-                forecast = null,
-                locationDegradation = WidgetLocationDegradation.UnresolvedTownship,
-                isCatalogMember = true,
-                calibratedNowMilliseconds = atTaipei(14, 20),
-                latitude = 24.181,
-                longitude = 120.645,
-                availableWidthDp = 110,
-                availableHeightDp = 110,
-                fontScale = 1.3f,
-            )
+            for (degradation in listOf(WidgetLocationDegradation.UnresolvedTownship,
+                WidgetLocationDegradation.Permission, WidgetLocationDegradation.Disabled)) {
+                val retryable = degradation == WidgetLocationDegradation.UnresolvedTownship
+                val presentation = WidgetPresenter.present(
+                    sizeClass = WidgetPresenter.sizeClass(110, 110, 1.3f),
+                    strings = strings.copy(locationOutside = notice, needsApp = notice, locationDisabled = notice),
+                    address = WidgetAddress.CurrentLocation,
+                    locationName = "西屯區",
+                    stored = store.readCurrentWeather(WidgetAddress.Saved("407")),
+                    forecast = null,
+                    locationDegradation = degradation,
+                    isCatalogMember = true,
+                    calibratedNowMilliseconds = atTaipei(14, 20),
+                    latitude = 24.181,
+                    longitude = 120.645,
+                    availableWidthDp = 110,
+                    availableHeightDp = 110,
+                    fontScale = 1.3f,
+                )
+                assertEquals(if (retryable) WidgetDisplayState.LocationUnavailable else WidgetDisplayState.NeedsApp,
+                    presentation.state)
+                assertEquals(retryable, presentation.canRefresh)
+                assertEquals(retryable, presentation.showRefresh)
 
-            val view = WidgetRenderer.render(context, presentation, instanceId)
-                .apply(context, FrameLayout(context))
-            val px = px(110)
-            view.measure(
-                View.MeasureSpec.makeMeasureSpec(px, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(px, View.MeasureSpec.EXACTLY),
-            )
-            view.layout(0, 0, px, px)
+                val view = renderAt(presentation, 110, 110)
+                WidgetTextVisibility.assertTree("$degradation long notice", view)
+                for (leaf in leaves(view).filter { it.visibility == View.VISIBLE }) {
+                    val (top, left) = offsetWithin(leaf, view)
+                    assertTrue("$degradation: valid bounds for ${nameOf(leaf)}",
+                        top >= 0 && left >= 0 && top + leaf.height <= view.height && left + leaf.width <= view.width)
+                }
+                val town = view.findViewById<TextView>(R.id.widget_location)
+                assertEquals("the town must survive the notice", "西屯區", town.text.toString())
+                assertTextFits("$degradation town", town)
 
-            val town = view.findViewById<TextView>(R.id.widget_location)
-            assertEquals("the town must survive the notice", "西屯區", town.text.toString())
-            assertEquals("the notice must not ellipsise the town", 0, ellipsizedCharacters(town))
+                val clock = view.findViewById<TextView>(R.id.widget_observation_time)
+                assertEquals("14:05", clock.text.toString())
+                assertEquals("2026/10/12 14:05", clock.contentDescription.toString())
+                assertTextFits("$degradation clock", clock)
 
-            val clock = view.findViewById<TextView>(R.id.widget_observation_time)
-            assertTrue("the clock must keep 14:05 but read '${clock.text}'", clock.text.contains("14:05"))
-            assertEquals("the notice must not cost the clock its time", 0, ellipsizedCharacters(clock))
-
-            assertEquals(
-                "the notice must actually be shown",
-                View.VISIBLE,
-                view.findViewById<View>(R.id.widget_stale).visibility,
-            )
-            val refresh = view.findViewById<View>(R.id.widget_refresh)
-            assertEquals(View.VISIBLE, refresh.visibility)
-            assertTrue(refresh.width > 0 && refresh.height > 0)
+                val badge = view.findViewById<TextView>(R.id.widget_stale)
+                assertEquals("the notice must actually be shown", View.VISIBLE, badge.visibility)
+                assertEquals(notice, badge.text.toString())
+                assertTrue("the full notice must be accessible", view.contentDescription.contains(notice))
+                assertRefreshFits("$degradation long notice", view, visible = retryable)
+                val refresh = view.findViewById<View>(R.id.widget_refresh)
+                assertEquals(retryable, refresh.isEnabled)
+                assertEquals(retryable, refresh.hasOnClickListeners())
+                if (retryable) {
+                    assertEquals(context.getString(R.string.widget_refresh), refresh.contentDescription.toString())
+                    // Android leaves node flags empty until a view is attached.
+                    // A JVM activity supplies that host without a device.
+                    val host = Robolectric.buildActivity(Activity::class.java).setup().visible()
+                    try {
+                        host.get().setContentView(view)
+                        val node = refresh.createAccessibilityNodeInfo()
+                        assertTrue("retry must be accessible as an enabled action", node.isEnabled && node.isClickable)
+                        assertEquals(refresh.contentDescription, node.contentDescription)
+                    } finally {
+                        host.pause().stop().destroy()
+                    }
+                }
+            }
         }
     }
 
@@ -921,17 +1110,15 @@ class WidgetLayoutFitTest {
         assertTrue("the long town must keep a readable width", town.width > px(30))
     }
 
-    // ── The large header keeps the town and the date at a narrow cell ───────
+    // ── The large header keeps the town and clock at a narrow cell ──────────
 
-    private fun assertLargeHeaderReads(label: String, view: View) {
+    private fun assertLargeHeaderReads(label: String, view: View, refreshVisible: Boolean = false) {
         val town = view.findViewById<TextView>(R.id.widget_location)
         val time = view.findViewById<TextView>(R.id.widget_observation_time)
-        val refresh = view.findViewById<View>(R.id.widget_refresh)
-        assertEquals("$label: the refresh must stay reachable", View.VISIBLE, refresh.visibility)
-        assertTrue("$label: the refresh must be tappable", refresh.width > 0 && refresh.height > 0)
+        assertRefreshFits(label, view, refreshVisible)
         assertTextFits("$label: town", town)
-        assertTextFits("$label: observation date", time)
-        assertTrue("$label: the date must say something", time.text.contains("/") && time.text.contains(":"))
+        assertTextFits("$label: observation clock", time)
+        assertEquals("$label: observation uses HH:mm", "14:05", time.text.toString())
         // The grid values autosize rather than ellipsise at the narrow cell.
         for (id in listOf(
             R.id.widget_grid_humidity_value,
@@ -945,7 +1132,7 @@ class WidgetLayoutFitTest {
     }
 
     @Test
-    fun `the large header keeps the town and the date at the narrowest cell`() {
+    fun `the large header keeps the town and clock at the narrowest cell`() {
         // The presenter allows Large from 200x320; the header used to spend the
         // whole width on the long date and two 28 dp actions and leave the town
         // ~10 dp. Both the roomy (iOS-spaced) and the tight layout are measured.
@@ -981,7 +1168,7 @@ class WidgetLayoutFitTest {
         commitSnapshot(source = "current-location", address = WidgetAddress.CurrentLocation)
         val current = WidgetUpdater.presentation(context, instanceId, 200, 320)
         val currentView = renderAt(current, 200, 320)
-        assertLargeHeaderReads("200x320 current", currentView)
+        assertLargeHeaderReads("200x320 current without forecast", currentView, refreshVisible = true)
         assertEquals(
             View.VISIBLE,
             currentView.findViewById<View>(R.id.widget_location_icon).visibility,
@@ -1008,7 +1195,7 @@ class WidgetLayoutFitTest {
             availableHeightDp = 320,
         )
         val staleView = renderAt(stale, 200, 320)
-        assertLargeHeaderReads("200x320 stale", staleView)
+        assertLargeHeaderReads("200x320 stale", staleView, refreshVisible = true)
         assertEquals(
             "the stale notice must be shown",
             View.VISIBLE,
@@ -1054,7 +1241,7 @@ class WidgetLayoutFitTest {
         assertTrue("the long town must keep a readable width", town.width > px(40))
         assertTextFits("200x320 long date", view.findViewById(R.id.widget_observation_time))
         assertEquals(
-            View.VISIBLE,
+            View.GONE,
             view.findViewById<View>(R.id.widget_refresh).visibility,
         )
     }
