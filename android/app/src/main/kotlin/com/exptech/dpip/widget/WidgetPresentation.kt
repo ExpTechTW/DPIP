@@ -17,8 +17,11 @@ enum class WidgetDisplayState {
     /** The instance's saved town is no longer in the catalog. */
     Reconfigure,
 
-    /** Showing the last known position; a newer fix needs the app open. */
+    /** Location permission or services need user attention before a new fix. */
     NeedsApp,
+
+    /** A position could not be established, but another refresh can retry it. */
+    LocationUnavailable,
 
     /** A cached observation is on screen. */
     Ready,
@@ -72,14 +75,8 @@ data class WidgetPresentation(
     val badgeText: String?,
     val hintText: String?,
     val observationTimeMillis: Long?,
-    /**
-     * Whether the observation line must use the short `MM/dd HH:mm` form.
-     *
-     * iOS draws a time and no date; Android must keep the date because the OS
-     * clock can be frozen, but the full `yyyy/MM/dd HH:mm` does not fit the
-     * square or the two-row header, so only the large layout keeps the year.
-     */
-    val observationTimeCompact: Boolean,
+    /** A configured source that can be retried without opening the app. */
+    val canRefresh: Boolean,
     val temperatureText: String?,
     val apparentText: String?,
     val weatherText: String?,
@@ -98,9 +95,8 @@ data class WidgetPresentation(
     /**
      * The box the launcher reported, in dp, and the system font scale.
      *
-     * Carried so the size class, the compact fallback and the observation-time
-     * form are all decided from the measured box rather than from the cell
-     * count, which is launcher-defined.
+     * Carried so the size class and compact fallback are decided from the
+     * measured box rather than the cell count, which is launcher-defined.
      */
     val availableWidthDp: Int,
     val availableHeightDp: Int,
@@ -113,6 +109,16 @@ data class WidgetPresentation(
 
     /** The width the layout budgets are written against. */
     val effectiveWidthDp: Int get() = (availableWidthDp / fontScale).toInt()
+
+    /** Keep active feedback visible even if a location now needs app attention. */
+    val showRefresh: Boolean
+        get() = when (refreshFeedback) {
+            WidgetRefreshFeedback.Queued, WidgetRefreshFeedback.Running -> true
+            else -> canRefresh &&
+                (refreshFeedback == WidgetRefreshFeedback.Failed ||
+                    !hasObservation || isStale || state == WidgetDisplayState.LocationUnavailable ||
+                    (sizeClass != WidgetSizeClass.Small && forecast.isEmpty()))
+        }
 }
 
 /** The localized labels the presentation composes, injected so tests are hermetic. */
@@ -166,6 +172,7 @@ object WidgetPresenter {
     private const val maximumFutureMinutes = 12 * 60
     private val taipei = ZoneOffset.ofHours(8)
     private val hourMinute = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)
+    private val observationDateTime = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm", Locale.ROOT)
 
     /** The default budget when a caller does not report a measured box. */
     const val defaultAvailableHeightDp = 110
@@ -224,18 +231,6 @@ object WidgetPresenter {
     const val largeRoomyMinimumHeightDp = 336
 
     /**
-     * The narrowest large header that can carry the year in the observation
-     * date beside the town and the two actions.
-     *
-     * iOS draws a time and no year at all; the year is kept here because an
-     * Android clock can be frozen, but the long `yyyy/MM/dd HH:mm` needs about
-     * 93 dp, and at a 200 dp cell the town would be squeezed to a few dp. Below
-     * this width the large header uses the short `MM/dd HH:mm`, which still
-     * carries the date.
-     */
-    const val largeFullDateMinimumWidthDp = 240
-
-    /**
      * Whether the square layout must fall back to its 110 dp compact form.
      *
      * The normal square layout is budgeted for a ~120x172 dp cell; below these
@@ -289,6 +284,9 @@ object WidgetPresenter {
         val supportsForecast = sizeClass != WidgetSizeClass.Small
         val snapshot = stored?.snapshot
         val isCurrentLocation = address is WidgetAddress.CurrentLocation
+        val canRefresh = canRefresh(address, locationDegradation, isCatalogMember)
+        val degraded = isCurrentLocation && locationDegradation != null
+        val locationState = if (canRefresh) WidgetDisplayState.LocationUnavailable else WidgetDisplayState.NeedsApp
 
         // A saved address whose town has left the catalog is a reconfigure, not
         // a blank: the user's choice is gone and only they can remake it.
@@ -304,15 +302,15 @@ object WidgetPresenter {
                 availableWidthDp = availableWidthDp,
                 availableHeightDp = availableHeightDp,
                 fontScale = fontScale,
+                canRefresh = false,
             )
         }
 
         if (snapshot == null) {
-            val degraded = isCurrentLocation && locationDegradation != null
             return empty(
                 sizeClass = sizeClass,
                 compactLayout = compactLayout,
-                state = if (degraded) WidgetDisplayState.NeedsApp else WidgetDisplayState.NoData,
+                state = if (degraded) locationState else WidgetDisplayState.NoData,
                 isCurrentLocation = isCurrentLocation,
                 locationName = locationName,
                 badgeText = if (degraded) {
@@ -320,10 +318,11 @@ object WidgetPresenter {
                 } else {
                     strings.noData
                 },
-                hintText = strings.openApp,
+                hintText = if (degraded && canRefresh) null else strings.openApp,
                 availableWidthDp = availableWidthDp,
                 availableHeightDp = availableHeightDp,
                 fontScale = fontScale,
+                canRefresh = canRefresh,
             )
         }
 
@@ -360,8 +359,7 @@ object WidgetPresenter {
             emptyList()
         }
 
-        val degraded = isCurrentLocation && locationDegradation != null
-        val displayState = if (degraded) WidgetDisplayState.NeedsApp else WidgetDisplayState.Ready
+        val displayState = if (degraded) locationState else WidgetDisplayState.Ready
 
         val badge = when {
             // An aged observation outranks the position notice: it is the fact
@@ -386,11 +384,7 @@ object WidgetPresenter {
             hintText = null,
             // Already a server instant: no device→calibrated correction applies.
             observationTimeMillis = snapshot.observationTime * 1_000,
-            // iOS draws a time and no date; the date is kept here because an
-            // Android device's clock can be frozen, and only the wide large
-            // header has room for the year. A 200 dp large cell does not.
-            observationTimeCompact = sizeClass != WidgetSizeClass.Large ||
-                availableWidthDp < largeFullDateMinimumWidthDp,
+            canRefresh = canRefresh,
             temperatureText = snapshot.temperature?.let(::temperatureText)
                 ?: if (sizeClass == WidgetSizeClass.Small) "--°" else "—°",
             apparentText = snapshot.apparentTemperature?.let {
@@ -432,6 +426,21 @@ object WidgetPresenter {
         )
     }
 
+    /** A failed fix can recover; permissions and disabled services need user action. */
+    private fun canRefresh(
+        address: WidgetAddress?,
+        degradation: WidgetLocationDegradation?,
+        isCatalogMember: Boolean,
+    ): Boolean = when (address) {
+        null -> false
+        is WidgetAddress.Saved -> isCatalogMember
+        WidgetAddress.CurrentLocation -> when (degradation) {
+            WidgetLocationDegradation.Permission, WidgetLocationDegradation.Disabled -> false
+            null, WidgetLocationDegradation.Unavailable, WidgetLocationDegradation.UnusableFix,
+            WidgetLocationDegradation.UnresolvedTownship -> true
+        }
+    }
+
     /**
      * What to say about a position the app could not establish.
      *
@@ -446,7 +455,7 @@ object WidgetPresenter {
         null -> strings.needsApp
         WidgetLocationDegradation.Permission -> strings.needsApp
         WidgetLocationDegradation.Disabled -> strings.locationDisabled
-        WidgetLocationDegradation.UnusableFix -> strings.needsApp
+        WidgetLocationDegradation.UnusableFix -> strings.locationUnavailable
         WidgetLocationDegradation.UnresolvedTownship -> strings.locationOutside
         WidgetLocationDegradation.Unavailable -> strings.locationUnavailable
     }
@@ -459,6 +468,7 @@ object WidgetPresenter {
         locationName: String?,
         badgeText: String?,
         hintText: String?,
+        canRefresh: Boolean,
         availableWidthDp: Int = minimumWidthDp,
         availableHeightDp: Int = defaultAvailableHeightDp,
         fontScale: Float = 1f,
@@ -473,7 +483,7 @@ object WidgetPresenter {
         badgeText = badgeText,
         hintText = hintText,
         observationTimeMillis = null,
-        observationTimeCompact = sizeClass != WidgetSizeClass.Large,
+        canRefresh = canRefresh,
         temperatureText = null,
         apparentText = null,
         weatherText = null,
@@ -601,30 +611,11 @@ object WidgetPresenter {
     private fun speedText(value: Double): String =
         String.format(Locale.getDefault(), "%.1f m/s", value)
 
-    /**
-     * The observation instant as Taiwan local wall-clock.
-     *
-     * The long form is `yyyy/MM/dd HH:mm`, used only where the header has room
-     * for the year. The compact form drops the year — `MM/dd HH:mm` — and is
-     * used on the square and two-row layouts; the wall clock is never the part
-     * that is given up. The digits are written with the default locale's decimal
-     * style, so a locale whose numbering system differs formats its own way, and
-     * the `HH:mm` part is fixed 24-hour.
-     */
-    fun observationText(calibratedMilliseconds: Long, compact: Boolean = false): String {
-        val local = LocalDateTime.ofInstant(Instant.ofEpochMilli(calibratedMilliseconds), taipei)
-        val clock = local.format(hourMinute)
-        return if (compact) {
-            String.format(Locale.getDefault(), "%02d/%02d %s", local.monthValue, local.dayOfMonth, clock)
-        } else {
-            String.format(
-                Locale.getDefault(),
-                "%d/%02d/%02d %s",
-                local.year,
-                local.monthValue,
-                local.dayOfMonth,
-                clock,
-            )
-        }
-    }
+    /** The original observation instant as a fixed 24-hour Taipei wall clock. */
+    fun observationText(observationMilliseconds: Long): String =
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(observationMilliseconds), taipei).format(hourMinute)
+
+    /** Keep the full date accessible even though every visual header uses HH:mm. */
+    fun observationDescription(observationMilliseconds: Long): String =
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(observationMilliseconds), taipei).format(observationDateTime)
 }

@@ -12,18 +12,14 @@
 
   Two adaptations the iOS layout does not need:
 
-  * The observation time is its own full-width row rather than the second line
-    of the town column. At a representative 120x172 dp box the
-    town column left over beside the condition block is ~46 dp and the
-    `MM/dd HH:mm` label would ellipsise. On its own row it never does, and it
-    still reads under the town exactly as iOS puts it.
+  * The HH:mm observation time keeps its own row under the town, so the
+    condition block cannot squeeze the time out of a narrow launcher cell.
   * The town and the condition name carry an autosize range instead of fixed
     points: iOS applies `minimumScaleFactor(0.8)`, and at 120 dp the two would
     otherwise ellipsise.
 
-  The refresh action is Android-only. It shares the temperature
-  row, right-aligned and tinted secondary, rather than on a toolbar row of its
-  own.
+  The conditional refresh action shares the temperature row. When it is
+  GONE, the temperature receives the entire width; no action slot is reserved.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -137,18 +133,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/widget_temperature"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="@dimen/widget_text_temperature_compact"
+            android:autoSizeMaxTextSize="@dimen/widget_text_temperature"
+            android:autoSizeStepGranularity="1sp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
@@ -157,14 +153,9 @@
             android:textColor="@color/widget_on_surface"
             android:textSize="@dimen/widget_text_temperature" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:orientation="horizontal" />
-
         <FrameLayout
             android:id="@+id/widget_refresh"
+            android:visibility="gone"
             android:layout_width="@dimen/widget_icon_action_touch_small"
             android:layout_height="@dimen/widget_icon_action_touch_small"
             android:contentDescription="@string/widget_refresh"
