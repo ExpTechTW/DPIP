@@ -12,6 +12,8 @@ library;
 import 'dart:io';
 
 import 'package:dpip/core/geo/location_track.dart';
+import 'package:dpip/core/logging/crash_sink.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
@@ -37,6 +39,35 @@ void main() {
   test('no file is an empty history, not an error', () {
     expect(LocationTrack.at(path), isNull);
   });
+
+  test(
+    'a database with no fix table is an empty history, not a crash',
+    () async {
+      // What Android left behind: openOrCreateDatabase created the file, then
+      // execSQL("PRAGMA journal_mode=WAL") threw before CREATE TABLE. The
+      // pragma writes the header, so the file is a database and not empty.
+      final created = sqlite3.sqlite3.open(path);
+      created.execute('PRAGMA user_version = 0');
+      created.close();
+      final track = LocationTrack.at(path)!;
+      addTearDown(track.close);
+
+      final sink = _RecordingSink();
+      Log.crashSink = sink;
+      addTearDown(() => Log.crashSink = null);
+
+      final stats = await track.stats();
+      expect(stats.fixes, 0);
+      expect(stats.oldest, isNull);
+      expect(stats.bytes, greaterThan(0));
+      expect(await track.since(DateTime.utc(2000)), isEmpty);
+
+      final visited = <int>[];
+      LocationTrack.scan(path, DateTime.utc(2000), (t, _, _) => visited.add(t));
+      expect(visited, isEmpty);
+      expect(sink.reports, isEmpty);
+    },
+  );
 
   test('a single fix round-trips', () async {
     writeTrackFixture(path, [(1735689600, 25.0330, 121.5654)]);
@@ -266,4 +297,18 @@ void main() {
       reason: '${stats.bytes} bytes for ${stats.fixes} fixes',
     );
   });
+}
+
+class _RecordingSink implements CrashSink {
+  final List<Object> reports = [];
+
+  @override
+  void report(
+    Object error,
+    StackTrace stackTrace, {
+    String? context,
+    bool fatal = false,
+  }) {
+    reports.add(error);
+  }
 }

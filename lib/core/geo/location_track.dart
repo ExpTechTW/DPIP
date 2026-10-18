@@ -128,6 +128,8 @@ class LocationTrack {
   /// file costs disk.
   Future<List<TrackFix>> since(DateTime from, {int? limit}) async {
     try {
+      // No table is an empty history. See [_fixTableQuery].
+      if (!await _hasFixTable()) return const [];
       final start = await _anchorAtOrBefore(from);
       final fixes = await _decodeFrom(start);
       final wanted = fixes.where((fix) => !fix.time.isBefore(from)).toList();
@@ -152,6 +154,15 @@ class LocationTrack {
   /// reading the decoder gives it.
   Future<({int fixes, int bytes, DateTime? oldest})> stats() async {
     try {
+      // See [_fixTableQuery]: no table is an empty history, not a crash.
+      if (!await _hasFixTable()) {
+        final file = File(_path);
+        return (
+          fixes: 0,
+          bytes: file.existsSync() ? file.lengthSync() : 0,
+          oldest: null,
+        );
+      }
       final row = await _db.get('SELECT COUNT(*) AS n FROM fix');
       final first = await _db.getOptional(
         'SELECT t FROM fix ORDER BY id LIMIT 1',
@@ -195,6 +206,9 @@ class LocationTrack {
     if (!File(path).existsSync()) return;
     final db = sqlite3.open(path, mode: OpenMode.readOnly);
     try {
+      // See [_fixTableQuery]. Throwing here is how the digest becomes a
+      // crash report.
+      if (db.select(_fixTableQuery).isEmpty) return;
       final fromMs = from.millisecondsSinceEpoch;
       final anchor = db.select(_anchorQuery, [fromMs ~/ 1000]);
       final start = anchor.isEmpty
@@ -224,6 +238,20 @@ class LocationTrack {
       db.close();
     }
   }
+
+  /// A file with no `fix` table is an empty history, the same answer as no
+  /// file.
+  ///
+  /// Android creates the file in `openOrCreateDatabase` and only then runs
+  /// the pragmas and `CREATE TABLE`. `execSQL` rejects
+  /// `PRAGMA journal_mode=WAL` because that pragma returns a row; the
+  /// exception was swallowed and the table was never created, so every read
+  /// reported `no such table: fix`.
+  static const _fixTableQuery =
+      "SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'fix'";
+
+  Future<bool> _hasFixTable() async =>
+      (await _db.getOptional(_fixTableQuery)) != null;
 
   /// The newest anchor at or before an instant (see [_anchorAtOrBefore]).
   static const _anchorQuery =

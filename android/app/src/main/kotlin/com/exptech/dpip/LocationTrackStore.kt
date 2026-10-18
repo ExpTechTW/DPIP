@@ -128,11 +128,11 @@ object LocationTrackStore {
             // Before the table exists: set afterwards it is a no-op until a full
             // VACUUM, and without it deleted rows free pages inside the file and
             // never give the bytes back to the budget.
-            handle.execSQL("PRAGMA auto_vacuum=INCREMENTAL")
-            handle.execSQL("PRAGMA journal_mode=WAL")
+            queryPragma(handle, "PRAGMA auto_vacuum=INCREMENTAL")
+            queryPragma(handle, "PRAGMA journal_mode=WAL")
             // A fix lost to a power cut is one point on a track; a blocked fsync
             // inside a background wake can cost the report as well.
-            handle.execSQL("PRAGMA synchronous=NORMAL")
+            queryPragma(handle, "PRAGMA synchronous=NORMAL")
             handle.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS fix (
@@ -151,6 +151,25 @@ object LocationTrackStore {
     }
 
     private data class Fix(val t: Long, val lat: Long, val lng: Long)
+
+    /**
+     * Runs a PRAGMA that returns a row, and reads that row.
+     *
+     * [SQLiteDatabase.execSQL] rejects a statement that produces a result.
+     * `PRAGMA journal_mode=WAL` does — it answers with the mode it just set —
+     * and Android throws "Queries can be performed using SQLiteDatabase query
+     * or rawQuery methods only." [open] caught that and returned null, but
+     * [SQLiteDatabase.openOrCreateDatabase] had already created the file, so
+     * the `fix` table was never created. The Dart reader then opened a
+     * database with no table and reported `no such table: fix`, and every
+     * later fix failed the same way: the history stayed empty.
+     *
+     * The cursor has to be stepped. A query that is never read is a query
+     * that may not have run.
+     */
+    private fun queryPragma(handle: SQLiteDatabase, sql: String) {
+        handle.rawQuery(sql, null).use { it.moveToFirst() }
+    }
 
     private fun scalar(handle: SQLiteDatabase, sql: String): Long =
         handle.rawQuery(sql, null).use { if (it.moveToFirst()) it.getLong(0) else 0L }
