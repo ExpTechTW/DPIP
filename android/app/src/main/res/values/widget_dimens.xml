@@ -59,9 +59,13 @@
          32dp remains within the 38sp temperature row's minimum height and is
          measured against narrow cells with a multi-character condition name. -->
     <dimen name="widget_icon_small">28dp</dimen>
+    <!-- Standard Small's approved icon size, independent of Large and preview. -->
+    <dimen name="widget_icon_small_standard">36dp</dimen>
     <dimen name="widget_icon_medium">32dp</dimen>
     <dimen name="widget_icon_compact">20dp</dimen>
     <dimen name="widget_icon_empty">28dp</dimen>
+    <!-- Larger condition icon for vertically elongated Small Widgets. -->
+    <dimen name="widget_icon_small_tall">52dp</dimen>
 
     <!-- Forecast column glyphs: `.title3` (20 pt) for the medium layout,
          `.title2` (24 pt) for the large one. -->
