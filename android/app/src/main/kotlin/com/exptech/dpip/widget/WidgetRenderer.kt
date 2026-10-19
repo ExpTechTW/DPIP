@@ -49,8 +49,16 @@ object WidgetRenderer {
      */
     fun layoutFor(presentation: WidgetPresentation): Int {
         if (!presentation.hasObservation) return R.layout.widget_empty
-        if (presentation.sizeClass == WidgetSizeClass.Small && presentation.compactLayout) {
-            return R.layout.widget_small_compact
+        if (presentation.sizeClass == WidgetSizeClass.Small) {
+            if (presentation.compactLayout) {
+                return R.layout.widget_small_compact
+            }
+
+            if (presentation.effectiveHeightDp >= 240) {
+                return R.layout.widget_small_tall
+            }
+
+            return R.layout.widget_small
         }
         if (presentation.sizeClass == WidgetSizeClass.Large) {
             // iOS's section spacing only fits a roomy box; the minimal-height
