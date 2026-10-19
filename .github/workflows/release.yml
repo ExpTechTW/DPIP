@@ -381,6 +381,28 @@ jobs:
             ( cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner \
                 -configuration Release -sdk iphoneos \
                 -archivePath "$RUNNER_TEMP/Runner.xcarchive" "${AUTH[@]}" archive )
+
+            # The Runner target's Crashlytics build phase uploads these symbols.
+            # Keep the exact archive output too, so a failed upload can be retried
+            # after the ephemeral runner has gone away.
+            dsym="$RUNNER_TEMP/Runner.xcarchive/dSYMs/Runner.app.dSYM"
+            binary="$RUNNER_TEMP/Runner.xcarchive/Products/Applications/Runner.app/Runner"
+            if [ ! -d "$dsym" ]; then
+              echo "::error::archive contains no Runner.app.dSYM"
+              exit 1
+            fi
+            binary_uuid="$(dwarfdump --uuid "$binary" | awk '{print $2}' | sort)"
+            dsym_uuid="$(dwarfdump --uuid "$dsym" | awk '{print $2}' | sort)"
+            if [ "$binary_uuid" != "$dsym_uuid" ]; then
+              echo "::error::Runner binary and dSYM UUIDs do not match"
+              echo "binary: $binary_uuid"
+              echo "dSYM: $dsym_uuid"
+              exit 1
+            fi
+            ditto -c -k --sequesterRsrc --keepParent \
+              "$RUNNER_TEMP/Runner.xcarchive/dSYMs" \
+              "$RUNNER_TEMP/DPIP-$DPIP_LABEL-$RELEASE_CODE-dSYMs.zip"
+
             xcodebuild -exportArchive \
               -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
               -exportOptionsPlist ios/ExportOptions.plist \
@@ -471,7 +493,9 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dpip-${{ matrix.platform }}
-          path: DPIP-*.*
+          path: |
+            DPIP-*.*
+            ${{ runner.temp }}/DPIP-*-dSYMs.zip
           if-no-files-found: error
 
   publish:
