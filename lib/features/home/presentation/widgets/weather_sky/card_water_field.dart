@@ -208,8 +208,8 @@ class CardWaterField {
       // Everything in `_solveIteration` is one iteration of
       // `b2ParticleSystem::Solve` with the stages plain water never reaches
       // (viscous, powder, tensile, rigid) removed.
-      const sub = _worldStep / _particleIterations;
-      for (var it = 0; it < _particleIterations; it++) {
+      const sub = _worldStep / particleIterations;
+      for (var it = 0; it < particleIterations; it++) {
         _solveIteration(sub, unit, preset, topEdge, gravityScale, surface);
       }
 
@@ -220,8 +220,25 @@ class CardWaterField {
     }
   }
 
-  /// `world.step(..., particleIterations = 5)`.
-  static const int _particleIterations = 5;
+  /// `world.step` particle iterations.
+  ///
+  /// The reference steps five times. Three keeps the same spawn, lifetime and
+  /// collision order; the water stacks a little softer and the solver does
+  /// less work per drop.
+  static const int particleIterations = 3;
+
+  /// Raster scale of the signed accumulation buffers.
+  ///
+  /// The coverage is blurred before it is read back, so half resolution is
+  /// the same film stretched over the card, at a quarter of the pixels.
+  static const double accumulationResolution = 0.5;
+
+  /// [full] rounded up to at least one pixel on each edge, at
+  /// [accumulationResolution].
+  static Size accumulationSize(Size full) => Size(
+    math.max(1, (full.width * accumulationResolution).ceilToDouble()),
+    math.max(1, (full.height * accumulationResolution).ceilToDouble()),
+  );
 
   /// One `b2ParticleSystem` particle iteration.
   ///
@@ -350,9 +367,10 @@ class CardWaterField {
       //
       // Taking the normal as up instead flips both: the gate fires on drops
       // already leaving, and `vy += damp * vn` becomes `vy *= (1 + damp)` — an
-      // amplifier of up to 1.75x per sub-step, five sub-steps a step. That is
-      // a geometric runaway, and it is what threw every drop clean out of the
-      // render buffer to be clipped at the same line, which reads as a bounce
+      // amplifier of up to 1.75x per sub-step, and the step repeats
+      // [particleIterations] times. That is a geometric runaway, and it is
+      // what threw every drop clean out of the render buffer to be clipped at
+      // the same line, which reads as a bounce
       // height that never varies.
       final vn = -_p.vy[i];
       if (vn >= 0) continue;

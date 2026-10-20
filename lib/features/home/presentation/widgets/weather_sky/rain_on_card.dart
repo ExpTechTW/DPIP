@@ -580,10 +580,14 @@ class _RainOnCardState extends State<RainOnCard>
     final (pointSize, threshold) = _pointSizeAndThreshold(screen);
     _pointSize = pointSize;
     _threshold = threshold;
+    // σ is in the half-resolution accumulation's pixels. Drawing that image
+    // back at [CardWaterField.accumulationResolution]'s inverse restores the
+    // on-screen blur the full-resolution buffer used to have.
+    final raster = CardWaterField.accumulationResolution;
     _blurPaint = Paint()
       ..imageFilter = ui.ImageFilter.blur(
-        sigmaX: _blurSigmaUv * screen.width,
-        sigmaY: _blurSigmaUv * screen.height,
+        sigmaX: _blurSigmaUv * screen.width * raster,
+        sigmaY: _blurSigmaUv * screen.height * raster,
       );
   }
 
@@ -741,17 +745,19 @@ class _CardWaterPainter extends CustomPainter {
     double headroom, {
     required bool negative,
   }) {
+    final raster = CardWaterField.accumulationSize(fieldSize);
     final recorder = ui.PictureRecorder();
     final offscreen = Canvas(recorder);
-    offscreen.saveLayer(Offset.zero & fieldSize, blurPaint);
+    offscreen.saveLayer(Offset.zero & raster, blurPaint);
+    offscreen.scale(CardWaterField.accumulationResolution);
     offscreen.translate(0, headroom);
     primary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     secondary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
     offscreen.restore();
     final picture = recorder.endRecording();
     final image = picture.toImageSync(
-      fieldSize.width.ceil(),
-      fieldSize.height.ceil(),
+      raster.width.ceil(),
+      raster.height.ceil(),
     );
     picture.dispose();
     return image;
@@ -768,6 +774,7 @@ class _CardWaterPainter extends CustomPainter {
     // buffer. Spans the card plus the whole fall above it.
     final headroom = CardWaterField.spawnHeadroom(screenHeight);
     final fieldSize = Size(size.width, size.height + headroom);
+    final raster = CardWaterField.accumulationSize(fieldSize);
     final pos = _accumulate(fieldSize, headroom, negative: false);
     final neg = _accumulate(fieldSize, headroom, negative: true);
 
@@ -776,8 +783,8 @@ class _CardWaterPainter extends CustomPainter {
     final hour = AppTime.utc8.hour.toDouble();
     var i = 0;
     void set(double v) => shader.setFloat(i++, v);
-    set(fieldSize.width);
-    set(fieldSize.height);
+    set(raster.width);
+    set(raster.height);
     // The sky at the panel band — the reference's `uBgLightTex` row. Until the first
     // bake lands, a rainy overcast grey-blue stands in.
     final ambient = SkyLutCache.panelAmbient.value ?? const Color(0xFF5C6B7E);
@@ -795,8 +802,9 @@ class _CardWaterPainter extends CustomPainter {
 
     canvas.save();
     canvas.translate(0, -headroom);
+    canvas.scale(1 / CardWaterField.accumulationResolution);
     canvas.drawRect(
-      Rect.fromLTWH(0, 0, fieldSize.width, fieldSize.height),
+      Rect.fromLTWH(0, 0, raster.width, raster.height),
       Paint()..shader = shader,
     );
     canvas.restore();
