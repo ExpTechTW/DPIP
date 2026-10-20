@@ -54,7 +54,11 @@ uniform float uRunningDropSize;
 uniform float uRunningDropAmount;
 uniform float uRunningDropSpeed;
 uniform float uAlpha;
+/// 0 refracts the card using [uField]. 1 writes the droplet coverage (R) and
+/// the coverage one gradient step to the right (G) into a 256² bake.
+uniform float uMode;
 uniform sampler2D uTex;
+uniform sampler2D uField;
 
 out vec4 fragColor;
 
@@ -152,6 +156,12 @@ float Drops(vec2 uv, vec3 dropN, vec3 staticN, float t, float rs, float ra,
 
 void main() {
   vec2 xy = FlutterFragCoord().xy;
+  // The coverage bake is a 256² image of the fixed 1080 frame. Map its pixels
+  // onto that frame before the field is built; the refract pass keeps the
+  // real fragment coordinate and only samples the bake.
+  if (uMode > 0.5) {
+    xy = xy / uSize * uResolution;
+  }
   // The OpenGL ES backend hands image filters a y-flipped texture, so the
   // sampler needs the mirrored row. The **field** must not be mirrored with
   // it: flipping `xy` before the field is built reverses `uv.y`, and the
@@ -181,14 +191,23 @@ void main() {
   float rainAmount = sin(UV.x * UV.y) * 0.3 + 0.7;
   float staticDrops = smoothstep(-0.5, 1.0, rainAmount) * 2.0;
 
-  vec4 dropN = GenDropLayerN(uv, t);
-  vec3 staticN = GenStaticLayerN(uv);
-  float c = Drops(uv, dropN.xyz, staticN, t, staticDrops, rainAmount, dropN.w);
+  float c;
+  float cx;
+  if (uMode > 0.5) {
+    vec4 dropN = GenDropLayerN(uv, t);
+    vec3 staticN = GenStaticLayerN(uv);
+    c = Drops(uv, dropN.xyz, staticN, t, staticDrops, rainAmount, dropN.w);
+    vec2 e = vec2(0.0005, 0.0);
+    cx = Drops(uv + e, dropN.xyz, staticN, t, staticDrops, rainAmount, dropN.w);
+    fragColor = vec4(c, cx, 0.0, 1.0);
+    return;
+  }
+  vec2 fieldUv = clamp(xy / uResolution, vec2(0.0), vec2(1.0));
+  vec2 baked = texture(uField, fieldUv).rg;
+  c = baked.x;
+  cx = baked.y;
 
   if (c > 0.001) {
-    vec2 e = vec2(0.0005, 0.0);
-    float cx =
-        Drops(uv + e, dropN.xyz, staticN, t, staticDrops, rainAmount, dropN.w);
     vec2 n = vec2(c - cx, cx - c);
     // `uTex.eval(texUV * uResolution)`: the displacement is `n` in the
     // 1080-frame, i.e. `n * uResolution` device pixels. It is not small — the
