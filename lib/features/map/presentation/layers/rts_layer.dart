@@ -27,11 +27,11 @@ import 'package:dpip/features/map/presentation/widgets/rts_monitor_panel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
+import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show MapColors, countyFillLayerId, townFillLayerId;
 import 'package:dpip/shared/map/monitor_map_stack.dart';
-import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
@@ -278,6 +278,12 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   SeismicTravelTimeTable? _travelTime;
   Timer? _eewTicker;
 
+  /// Radii last successfully written to the EEW source, keyed by alert id.
+  final Map<String, WavefrontRing> _ringsOnMap = {};
+
+  /// When the ticker last ran the S-wave box coverage test.
+  DateTime? _lastBoxCoverage;
+
   /// Identity of the last payload pushed to the source: `null` when offline
   /// (empty collection was sent), else the feed's data object — skips the
   /// per-tick round trip when a status change re-notifies without new data.
@@ -289,16 +295,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// replay map so a change to one surface can't silently skip the other.
   static const MonitorLayerIds _ids = rtsMonitorIds;
 
-  /// Wave-front rings keep expanding between RTS polls (a realtime channel only
-  /// emits on a real transition) — a fixed cadence redraws them against the
-  /// calibrated clock so the circles grow every frame regardless. Close to
-  /// display-refresh rate (~60 Hz), not the RTS feed's own ~1 Hz: the ring is
-  /// real polygon geometry ([circleFeature]), not a `circle-radius` paint
-  /// property MapLibre can tween on its own, so *this* is what stands between
-  /// a silky-smooth expansion and a visibly stepped one. Each push is small
-  /// (two ~64-point rings), so the extra platform-channel traffic is cheap —
-  /// and it only runs at all while an alert is actually live
-  /// ([_syncEewTicker]). A low-end phone runs it slower — see [wavefrontTick].
+  /// Wave-front rings keep expanding between RTS polls. The ticker wakes at
+  /// [wavefrontTick] — display rate on a capable phone, 5 Hz on a low-end
+  /// one — but only while an alert is live ([_syncEewTicker]). Waking is not
+  /// uploading: [wavefrontUploadDue] holds a step smaller than one screen
+  /// pixel, and the upload that does happen draws the radius at that instant.
   Duration _eewTick = wavefrontTick(RenderTier.high);
   static const int _maxStationRetries = 8;
   static const double _liveOpacity = 1.0;
@@ -365,6 +366,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     _appliedStatus = null;
     // [addMonitorLayers] has just seeded the EEW source empty.
     _eewSourceEmpty = true;
+    _ringsOnMap.clear();
     // The box source was just re-added empty above.
     _boxOnMap = null;
     await _pushUpdate();
@@ -425,17 +427,18 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       final generation = ++_eewTickGeneration;
       _eewTickInFlight = true;
       _eewTicksSkipped = 0;
+      final now = AppTime.utc;
+      final coverBoxes = boxCoverageDue(_lastBoxCoverage, now);
+      if (coverBoxes) _lastBoxCoverage = now;
       unawaited(
         Future.wait([
           _pushEew(),
-          // A box's S-wave coverage (see [_isBoxFullyCovered]) grows every
-          // tick even between RTS polls, so it has to be re-evaluated here
-          // too — not just on [_onFeed] — or a box stops blinking only
-          // whenever the next poll happens to land, well after the wavefront
-          // actually crossed it.
-          _pushBox(),
+          // A box's S-wave coverage grows between RTS polls, but the box is
+          // kilometres across. [kBoxCoverageInterval] is the cadence that
+          // still drops it as the wave passes; [_onFeed] does not wait.
+          if (coverBoxes) _pushBox(),
         ]).whenComplete(() {
-          // A write abandoned by [_eewTickMaxWait] must not clear the flag
+          // A write abandoned after [_eewTickMaxSkips] must not clear the flag
           // of the one that replaced it.
           if (generation == _eewTickGeneration) _eewTickInFlight = false;
         }),
@@ -583,12 +586,32 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     final live = _eewActive;
     // Nothing to draw and nothing drawn — the overwhelmingly common case.
     if (!live && _eewSourceEmpty) return;
+    final now = AppTime.utc;
+    final alerts = live ? _eew.state.data! : const <Eew>[];
+    final rings = _rings(alerts, now);
+    if (live &&
+        !wavefrontUploadDue(
+          next: rings,
+          onMap: _ringsOnMap,
+          zoom: controller.cameraPosition?.zoom,
+        )) {
+      return;
+    }
     try {
       await controller.setGeoJsonSource(
         _ids.eewSource,
-        live ? _eewGeoJson() : monitorEmptyCollection,
+        live
+            ? eewWaveGeoJson(alerts, _travelTime, now)
+            : monitorEmptyCollection,
       );
       _eewSourceEmpty = !live;
+      if (live) {
+        _ringsOnMap
+          ..clear()
+          ..addEntries(rings.map((ring) => MapEntry(ring.id, ring)));
+      } else {
+        _ringsOnMap.clear();
+      }
     } catch (_) {
       // Source not on the map (mid style-reload); the next render re-adds it.
       // The flag is left alone: the write never landed, so whatever was on the
@@ -596,8 +619,39 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
     }
   }
 
-  Map<String, dynamic> _eewGeoJson() =>
-      eewWaveGeoJson(_eew.state.data ?? const [], _travelTime, AppTime.utc);
+  /// P and S radii at [now], in metres. The same instant [eewWaveGeoJson]
+  /// uses, so a due upload draws these numbers and not an older sample.
+  List<WavefrontRing> _rings(List<Eew> alerts, DateTime now) {
+    final table = _travelTime;
+    final rings = <WavefrontRing>[];
+    for (final eew in alerts) {
+      // [eewWaveGeoJson] draws nothing for a cancelled alert, so its radius
+      // must not keep the upload gate awake.
+      if (eew.isCancelled) continue;
+      final info = eew.info;
+      var p = 0.0;
+      var s = 0.0;
+      if (table != null) {
+        final elapsed = now.difference(
+          DateTime.fromMillisecondsSinceEpoch(info.time, isUtc: true),
+        );
+        if (!elapsed.isNegative) {
+          final radius = table.waveRadius(info.depth, elapsed);
+          p = radius.p * 1000;
+          s = radius.s * 1000;
+        }
+      }
+      rings.add(
+        WavefrontRing(
+          id: '${eew.id}:${eew.serial}',
+          pMetres: p,
+          sMetres: s,
+          latitude: info.latitude,
+        ),
+      );
+    }
+    return rings;
+  }
 
   /// Updates the box-grid overlay: a frame with alerting stations lights the
   /// boxes they stand in (see [RtsAlertTracker]) and draws those coloured grid
@@ -616,8 +670,8 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         final (boxes, signature) = _survivingBoxes(grid);
         if (signature != _boxOnMap) {
           // Claimed before the await, not after: the wavefront ticker calls
-          // this every frame, and a tick landing while the write was in
-          // flight used to upload the same collection again. Two writes land
+          // this on the coverage cadence, and a tick landing while the write
+          // was in flight used to upload the same collection again. Two writes land
           // on the platform channel in call order, so the later call's set is
           // the one the source ends up holding — and it is the one recorded.
           _boxOnMap = signature;

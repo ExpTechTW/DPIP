@@ -58,9 +58,9 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
+import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
-import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/map_style.dart'
     show MapColors, countyFillLayerId, townFillLayerId, townLabelLayerId;
@@ -803,7 +803,11 @@ class _ReplayMapState extends State<_ReplayMap> {
     _styleLoaded = true;
     // A style (re)load recreates every source below empty — whatever the box
     // source held before is gone, so the next [_updateBox] must not skip.
+    // The wavefront source is empty too; forgetting the radii would hold the
+    // new source on the sub-pixel gate and leave the rings off the map.
     _boxSignature = null;
+    _ringsOnMap.clear();
+    _eewSourceEmpty = true;
     // The whole stack — sources, layers, badge icons, and the order they mount
     // in — is [addMonitorLayers], shared with the live monitor (`RtsMapLayer`).
     // This page used to carry its own hand-copied port, and the copies drifted
@@ -939,11 +943,15 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// the map for the rest of the replay.
   bool _eewSourceEmpty = true;
 
+  /// Radii last written to the EEW source. A sub-pixel step does not replace
+  /// them; the upload that does uses the replay clock's current radii.
+  final Map<String, WavefrontRing> _ringsOnMap = {};
+
   /// Whether an [_updateEew] write is still on the platform channel. The
-  /// wave-front ticker fires every 16 ms and does not wait for the previous
-  /// write to land, so without this a slow frame let several ring uploads
-  /// queue up behind each other — each one a full polygon set the map would
-  /// render in turn, none of them the current one.
+  /// wavefront ticker does not wait for the previous write to land, so
+  /// without this a slow frame let several ring uploads queue up behind each
+  /// other — each one a full polygon set the map would render in turn, none
+  /// of them the current one.
   bool _eewUpdating = false;
 
   Future<void> _updateEew() async {
@@ -957,12 +965,29 @@ class _ReplayMapState extends State<_ReplayMap> {
       final empty = !widget.eew.alerts.hasUncancelled;
       // Nothing to draw and nothing drawn — skip the per-tick round trip.
       if (empty && _eewSourceEmpty) return;
+      final now = widget.clock.now();
+      final rings = _wavefrontRings(now);
+      if (!empty &&
+          !wavefrontUploadDue(
+            next: rings,
+            onMap: _ringsOnMap,
+            zoom: controller.cameraPosition?.zoom,
+          )) {
+        return;
+      }
       try {
         await controller.setGeoJsonSource(
           _ids.eewSource,
-          empty ? monitorEmptyCollection : _eewGeoJson(),
+          empty ? monitorEmptyCollection : _eewGeoJson(now),
         );
         _eewSourceEmpty = empty;
+        if (empty) {
+          _ringsOnMap.clear();
+        } else {
+          _ringsOnMap
+            ..clear()
+            ..addEntries(rings.map((ring) => MapEntry(ring.id, ring)));
+        }
       } catch (_) {
         // Source not on the map yet (mid style-reload) — the next update
         // retries; the flag is untouched because the write never landed.
@@ -1228,9 +1253,37 @@ class _ReplayMapState extends State<_ReplayMap> {
   /// recomputed every tick so the rings keep expanding even between polls.
   /// No rings render until [_travelTimeTable] resolves (near-instant, but
   /// async since it's an asset load).
-  Map<String, dynamic> _eewGeoJson() {
+  List<WavefrontRing> _wavefrontRings(DateTime now) {
     final table = _travelTimeTable;
-    final now = widget.clock.now();
+    final rings = <WavefrontRing>[];
+    for (final eew in widget.eew.alerts.uncancelled) {
+      final info = eew.info;
+      var p = 0.0;
+      var s = 0.0;
+      if (table != null) {
+        final elapsed = now.difference(
+          DateTime.fromMillisecondsSinceEpoch(info.time, isUtc: true),
+        );
+        if (!elapsed.isNegative) {
+          final radius = table.waveRadius(info.depth, elapsed);
+          p = radius.p * 1000;
+          s = radius.s * 1000;
+        }
+      }
+      rings.add(
+        WavefrontRing(
+          id: '${eew.id}:${eew.serial}',
+          pMetres: p,
+          sMetres: s,
+          latitude: info.latitude,
+        ),
+      );
+    }
+    return rings;
+  }
+
+  Map<String, dynamic> _eewGeoJson(DateTime now) {
+    final table = _travelTimeTable;
     final features = <Map<String, dynamic>>[];
     // A cancelled alert draws nothing: its rings would show a wave the agency
     // has just said is not coming.
