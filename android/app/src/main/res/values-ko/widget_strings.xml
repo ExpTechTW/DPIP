@@ -50,4 +50,10 @@
     <string name="widget_weather_unknown">알 수 없음</string>
     <string name="widget_forecast_pop_description">강수 확률 %1$s</string>
     <string name="widget_forecast_pop_unavailable">강수 확률 정보 없음</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">오래된 정보</string>
+    <string name="widget_compact_location">위치 없음</string>
+    <string name="widget_compact_details">앱을 열어 전체 날씨 정보 확인</string>
+    <string name="widget_compact_attention">앱 열기</string>
 </resources>

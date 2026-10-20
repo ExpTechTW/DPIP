@@ -46,4 +46,10 @@
     <string name="widget_weather_unknown">ไม่ทราบ</string>
     <string name="widget_forecast_pop_description">โอกาสฝนตก %1$s</string>
     <string name="widget_forecast_pop_unavailable">ไม่มีข้อมูลโอกาสฝนตก</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">ข้อมูลเก่า</string>
+    <string name="widget_compact_location">ไม่มีพิกัด</string>
+    <string name="widget_compact_details">เปิดแอปเพื่อดูข้อมูลสภาพอากาศทั้งหมด</string>
+    <string name="widget_compact_attention">เปิดแอป</string>
 </resources>

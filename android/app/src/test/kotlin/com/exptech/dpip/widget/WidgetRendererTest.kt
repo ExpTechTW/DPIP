@@ -420,8 +420,11 @@ class WidgetRendererTest {
         // town was absent announced a leading separator. A blank field must drop
         // its separator too, not leave a gap.
         val observed = presentation(WidgetSizeClass.Small)
+        val condition = context.getString(R.string.widget_weather_rain)
+        val details = ", ${context.getString(R.string.widget_humidity)} 78%, " +
+            "${context.getString(R.string.widget_rain)} 0.4 mm, " + context.getString(R.string.widget_compact_details)
         assertEquals(
-            "多雲有雨, 2026/10/12 14:05",
+            "$condition, 2026/10/12 14:05$details",
             appliedDescription(
                 WidgetRenderer.render(
                     context,
@@ -431,7 +434,7 @@ class WidgetRendererTest {
             ),
         )
         assertEquals(
-            "多雲有雨, 28°, 2026/10/12 14:05",
+            "$condition, 28°, 2026/10/12 14:05$details",
             appliedDescription(
                 WidgetRenderer.render(
                     context,
@@ -441,7 +444,7 @@ class WidgetRendererTest {
             ),
         )
         assertEquals(
-            "多雲有雨, 28°, 2026/10/12 14:05",
+            "$condition, 28°, 2026/10/12 14:05$details",
             appliedDescription(
                 WidgetRenderer.render(
                     context,

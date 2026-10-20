@@ -273,6 +273,11 @@ class WidgetLayoutFitTest {
         for (id in listOf(R.id.widget_location, R.id.widget_icon, R.id.widget_temperature)) {
             val required = view.findViewById<View>(id)
             assertNotNull("$label: $id must exist", required)
+            if (id == R.id.widget_icon && presentation.adaptiveCompact) {
+                assertEquals("adaptive decorative icon", View.GONE, required.visibility)
+                assertTrue("adaptive condition remains accessible", view.contentDescription.isNotEmpty())
+                continue
+            }
             assertEquals("$label: ${nameOf(required)} must be visible", View.VISIBLE, required.visibility)
             assertTrue("$label: ${nameOf(required)} must have height", required.height > 0)
             assertTrue("$label: ${nameOf(required)} must have width", required.width > 0)
@@ -852,7 +857,9 @@ class WidgetLayoutFitTest {
 
                 val badge = view.findViewById<TextView>(R.id.widget_stale)
                 assertEquals("the notice must actually be shown", View.VISIBLE, badge.visibility)
-                assertEquals(notice, badge.text.toString())
+                assertEquals(context.getString(if (retryable) R.string.widget_compact_location else R.string.widget_compact_attention),
+                    badge.text.toString())
+                WidgetTextVisibility.assertVisible("$degradation concise badge", badge)
                 assertTrue("the full notice must be accessible", view.contentDescription.contains(notice))
                 assertRefreshFits("$degradation long notice", view, visible = retryable)
                 val refresh = view.findViewById<View>(R.id.widget_refresh)

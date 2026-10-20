@@ -46,4 +46,10 @@
     <string name="widget_weather_unknown">Hindi alam</string>
     <string name="widget_forecast_pop_description">Posibilidad ng ulan %1$s</string>
     <string name="widget_forecast_pop_unavailable">Walang datos sa posibilidad ng ulan</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Luma na</string>
+    <string name="widget_compact_location">Di matukoy</string>
+    <string name="widget_compact_details">Buksan ang app para sa buong detalye ng panahon</string>
+    <string name="widget_compact_attention">Buksan app</string>
 </resources>

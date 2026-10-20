@@ -57,7 +57,7 @@
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textColor="@color/widget_on_surface"
-            android:textSize="@dimen/widget_text_headline" />
+            android:textSize="@dimen/widget_text_headline_compact" />
 
         <ImageView
             android:id="@+id/widget_location_icon"
@@ -107,7 +107,7 @@
     <TextView
         android:id="@+id/widget_stale"
         style="@style/Widget.Badge"
-        android:includeFontPadding="false"
+        android:includeFontPadding="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone" />

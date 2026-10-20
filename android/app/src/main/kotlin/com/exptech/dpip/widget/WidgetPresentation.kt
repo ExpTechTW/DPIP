@@ -110,6 +110,14 @@ data class WidgetPresentation(
     /** The width the layout budgets are written against. */
     val effectiveWidthDp: Int get() = (availableWidthDp / fontScale).toInt()
 
+    /**
+     * Compact alone adapts; family/Standard/Tall thresholds stay unchanged.
+     * Enlarged type uses four rows rather than shrinking the primary reading
+     * behind a decorative icon. Default-scale Compact keeps its existing face.
+     */
+    val adaptiveCompact: Boolean
+        get() = sizeClass == WidgetSizeClass.Small && compactLayout && fontScale > 1f
+
     /** Keep active feedback visible even if a location now needs app attention. */
     val showRefresh: Boolean
         get() = when (refreshFeedback) {

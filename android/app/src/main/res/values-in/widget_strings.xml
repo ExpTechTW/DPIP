@@ -46,4 +46,10 @@
     <string name="widget_weather_unknown">Tidak diketahui</string>
     <string name="widget_forecast_pop_description">Peluang hujan %1$s</string>
     <string name="widget_forecast_pop_unavailable">Data peluang hujan tidak tersedia</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Data lama</string>
+    <string name="widget_compact_location">Tanpa lokasi</string>
+    <string name="widget_compact_details">Buka aplikasi untuk informasi cuaca lengkap</string>
+    <string name="widget_compact_attention">Buka app</string>
 </resources>

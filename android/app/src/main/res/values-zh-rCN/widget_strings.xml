@@ -50,4 +50,10 @@
     <string name="widget_weather_unknown">未知</string>
     <string name="widget_forecast_pop_description">降雨概率 %1$s</string>
     <string name="widget_forecast_pop_unavailable">无降雨概率数据</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">数据过时</string>
+    <string name="widget_compact_location">暂无定位</string>
+    <string name="widget_compact_details">打开 App 查看完整天气信息</string>
+    <string name="widget_compact_attention">打开 App</string>
 </resources>

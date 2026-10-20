@@ -69,4 +69,10 @@
     <string name="widget_weather_unknown">Unknown</string>
     <string name="widget_forecast_pop_description">Chance of rain %1$s</string>
     <string name="widget_forecast_pop_unavailable">Chance of rain unavailable</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Outdated</string>
+    <string name="widget_compact_location">No location</string>
+    <string name="widget_compact_details">Open the app for full weather details</string>
+    <string name="widget_compact_attention">Open app</string>
 </resources>
