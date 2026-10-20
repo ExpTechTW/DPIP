@@ -313,11 +313,27 @@ class WeatherSkyPainter extends CustomPainter {
     // The sun's direction swings across the sky with its height, so lit faces
     // move around the cloud through the day.
     final day = frame.dayAmount;
+    final lutU = frame.sky.sunAngleY.clamp(0.0, 1.0);
+    final fallback = SkyLutCache.panelAmbient.value ?? const Color(0xFF5C6B7E);
+    CloudRgb sampleSky(double picker) {
+      final color = lutCache.skyAt(lutU, _skyAtV(picker)) ?? fallback;
+      return (r: color.r, g: color.g, b: color.b);
+    }
+
+    final baked = bakeCloudLights(
+      lighting: lighting,
+      sunIntensity: day,
+      fog: frame.fog * 0.5,
+      sunSky: sampleSky(lighting.sun.$1),
+      groundSky: sampleSky(lighting.ground.$1),
+      ambientSky: sampleSky(lighting.ambient.$1),
+      backSky: sampleSky(lighting.sun.$1),
+    );
     final sunDirX = -0.55 + 1.1 * day;
     final sunDirY = 0.25 + 0.70 * day;
     const sunDirZ = 0.45;
 
-    // Only five of the forty-three uniform slots differ between instances —
+    // Only five of the fifty-five uniform slots differ between instances —
     // the sprite's size, its opacity, and the texture's own size. The rest
     // describe the frame, so they are written once here instead of forty
     // times a frame through a closure allocated per sprite. A draw call
@@ -356,11 +372,9 @@ class WeatherSkyPainter extends CustomPainter {
       ..setFloat(30, frame.fog * 0.5)
       ..setFloat(31, frame.lightning.flash * 0.8)
       ..setFloat(32, lighting.whitePer)
-      // iLutSize. NOTE: `clouds.frag` reads `iLutSize.y`, and slot 34 is that
-      // `.y` — so the shader's manual bilinear divides by 1.0, not by the
-      // column's 141 rows. Carried over verbatim from the per-sprite version
-      // rather than corrected here: swapping these two changes what the cloud
-      // deck looks like, which is a rendering decision, not a refactor.
+      // iLutSize stays in 33..34 so iBaseSky and the baked lights do not move.
+      // The shader no longer samples a LUT; these values only keep the uniform
+      // live (see clouds.frag).
       ..setFloat(33, SkyLutCache.skyViewSize.height)
       ..setFloat(34, 1.0)
       ..setFloat(37, baseSky.r)
@@ -369,7 +383,18 @@ class WeatherSkyPainter extends CustomPainter {
       ..setFloat(40, hazeSky.r)
       ..setFloat(41, hazeSky.g)
       ..setFloat(42, hazeSky.b)
-      ..setImageSampler(1, skyColumn)
+      ..setFloat(43, baked.sun.r)
+      ..setFloat(44, baked.sun.g)
+      ..setFloat(45, baked.sun.b)
+      ..setFloat(46, baked.ground.r)
+      ..setFloat(47, baked.ground.g)
+      ..setFloat(48, baked.ground.b)
+      ..setFloat(49, baked.ambient.r)
+      ..setFloat(50, baked.ambient.g)
+      ..setFloat(51, baked.ambient.b)
+      ..setFloat(52, baked.backSky.r)
+      ..setFloat(53, baked.backSky.g)
+      ..setFloat(54, baked.backSky.b)
       // Slot 0 is per-sprite and the loop below overwrites it — but
       // `Paint.shader=` refuses a shader with any sampler still unassigned,
       // and on the first frame after `fragmentShader()` slot 0 has never been

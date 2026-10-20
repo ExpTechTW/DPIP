@@ -504,8 +504,30 @@ Future<ui.Image> _renderScene(
     f(hazeSky.r / 255.0);
     f(hazeSky.g / 255.0);
     f(hazeSky.b / 255.0);
+    CloudRgb rgb(({int r, int g, int b}) sample) =>
+        (r: sample.r / 255.0, g: sample.g / 255.0, b: sample.b / 255.0);
+    final baked = bakeCloudLights(
+      lighting: lighting,
+      sunIntensity: el,
+      fog: 0.0,
+      sunSky: rgb(_sampleLut(lutBytes, lutU, _skyAtV(lighting.sun.$1))),
+      groundSky: rgb(_sampleLut(lutBytes, lutU, _skyAtV(lighting.ground.$1))),
+      ambientSky: rgb(_sampleLut(lutBytes, lutU, _skyAtV(lighting.ambient.$1))),
+      backSky: rgb(_sampleLut(lutBytes, lutU, _skyAtV(lighting.sun.$1))),
+    );
+    f(baked.sun.r);
+    f(baked.sun.g);
+    f(baked.sun.b);
+    f(baked.ground.r);
+    f(baked.ground.g);
+    f(baked.ground.b);
+    f(baked.ambient.r);
+    f(baked.ambient.g);
+    f(baked.ambient.b);
+    f(baked.backSky.r);
+    f(baked.backSky.g);
+    f(baked.backSky.b);
     shader.setImageSampler(0, sprite);
-    shader.setImageSampler(1, lut);
 
     canvas.save();
     canvas.translate(p.left, p.top);
@@ -519,7 +541,7 @@ Future<ui.Image> _renderScene(
   if (rain > 0.002) {
     final field = PrecipitationField(
       atlas: rainAtlas,
-      capacity: 1792,
+      capacity: PrecipitationField.highRainCapacity,
       variants: 4,
       cell: const Size(32, 68),
       seed: 7,
@@ -563,7 +585,7 @@ Future<ui.Image> _renderScene(
   if (snow > 0.002) {
     final field = PrecipitationField(
       atlas: snowAtlas,
-      capacity: 900,
+      capacity: PrecipitationField.highSnowCapacity,
       cell: const Size(40, 40),
       tumble: true,
       seed: 11,

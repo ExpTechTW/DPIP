@@ -54,17 +54,19 @@
 //   iFogDensity   (30)     haze blending the sprite toward the sky
 //   iInner        (31)     internal illumination 0..1 (lightning inside)
 //   iWhitePer     (32)     noon whitening (the reference's `whitePer`)
-//   iLutSize      (33..34) sky LUT column size — only `.y` (height) is used;
-//                          the sampler is the CPU-extracted column at the
-//                          keyframe's sun angle, so u is gone
+//   iLutSize      (33..34) kept so the slots after it do not move. The LUT
+//                          sampler is gone; the value is not read for colour
 //   iTexSize      (35..36) sprite size in texels
 //   iBaseSky      (37..39) sky colour at the base light's probe — baked once
 //                          per keyframe on the CPU (the probe is pixel-
 //                          independent), so the GPU skips that LUT fetch
 //   iHazeSky      (40..42) sky colour at the 0.95 haze probe, same reason
+//   iSunLit       (43..45) sun light, gain and fog already applied
+//   iGroundLit    (46..48) ground light, same
+//   iAmbientLit   (49..51) ambient light, same
+//   iBackSky      (52..54) sun-probe sky for the thin-edge light; its gain
+//                          stays here because it changes per pixel
 //   sampler 0: iSprite     the cloud sprite
-//   sampler 1: iSkyView    the 1×141 sky-LUT column (`sky/sky_lut.frag`,
-//                          extracted by `SkyLutCache._bakeSkyColumn`)
 #include <flutter/runtime_effect.glsl>
 
 precision mediump float;
@@ -91,32 +93,20 @@ uniform vec2 iLutSize;
 uniform vec2 iTexSize;
 uniform vec3 iBaseSky;
 uniform vec3 iHazeSky;
+/// Sun, ground and ambient, already gained, warm-mixed and scaled by
+/// intensity and fog. The per-pixel probe nudge is gone: it was a LUT fetch
+/// per light, and at phone size the lit face reads the same without it.
+uniform vec3 iSunLit;
+uniform vec3 iGroundLit;
+uniform vec3 iAmbientLit;
+/// Sky colour at the sun's probe, before the per-pixel back-light gain.
+uniform vec3 iBackSky;
 uniform sampler2D iSprite;
-uniform sampler2D iSkyView;
 
 out vec4 fragColor;
 
 #define PI 3.14159265359
 #define ONE_OVER_PI 0.3183098861837907
-
-/// Bilinear sky-LUT fetch, reduced to a **vertical** 2-tap.
-///
-/// The LUT sampler is the CPU-extracted column at the keyframe's sun angle —
-/// every probe's u is that same constant, so the horizontal filtering already
-/// happened at bake time and a probe here is a 1D vertical fetch. Flutter
-/// binds samplers as NEAREST with no way to request linear, so the vertical
-/// interpolation is done by hand; without it the cloud lighting steps as the
-/// sun moves.
-vec3 sampleLut(float v) {
-  float texel = 1.0 / iLutSize.y;
-  float st = v * iLutSize.y - 0.5;
-  float base = floor(st);
-  float f = st - base;
-  float uv0 = (base + 0.5) * texel;
-  vec3 c0 = texture(iSkyView, vec2(0.5, uv0)).rgb;
-  vec3 c1 = texture(iSkyView, vec2(0.5, uv0 + texel)).rgb;
-  return mix(c0, c1, f);
-}
 
 /// Bilinear sprite fetch.
 ///
@@ -140,36 +130,6 @@ vec4 sampleSprite(vec2 uv) {
   vec4 c01 = texture(iSprite, uv0 + vec2(0.0, texel.y));
   vec4 c11 = texture(iSprite, uv0 + texel);
   return mix(mix(c00, c10, f.x), mix(c01, c11, f.x), f.y);
-}
-
-/// The sky's colour at probe [picker], 0 = horizon … 1 = zenith.
-///
-/// NOT yet the environment-light model. The engine's probe walks the **camera
-/// frustum** — `texCoord2uv` does `normalize(mix(FrustumA, FrustumC, 1 -
-/// probe))`, a band of roughly -0.4 to +19 degrees with its 20-degree lens —
-/// so every probe lands near the horizon, the brightest part of the sky.
-///
-/// That is correct, and it was tried: with the frustum band all four lights
-/// return bright haze, the four-light sum passes 1 and the sprites clamp to
-/// solid white. The reference keeps it in range because it weights those lights with
-/// the **authored per-keyframe `cloudConfig`** (picker/multi/intensity per
-/// light), while this port still synthesises them from one `day` scalar and
-/// runs far hotter.
-///
-/// So this deliberately keeps the wider 0..90-degree mapping, which stays in
-/// range at the cost of taking fill light from zenith blue rather than
-/// horizon haze. Switching to the real band is blocked on consuming the
-/// authored cloudConfig — the same prerequisite as the real `whitePer` curve.
-vec3 skyAt(float picker) {
-  // elevation = picker·(π/2), so `sqrt(elevation/(π/2))` is just `sqrt(picker)`.
-  float m = sqrt(clamp(picker, 0.0, 1.0));
-  float v = clamp((m + 0.1015625) / 1.1015625, 0.0, 1.0);
-  return sampleLut(v);
-}
-
-/// The reference's `readColorConfig`: sample the sky at the config's probe, then gain.
-vec3 readColorConfig(vec3 cfg) {
-  return skyAt(cfg.x) * cfg.y;
 }
 
 /// The reference's `calcDepthAlpha` — the deck reveal sweeps a band through the
@@ -250,11 +210,9 @@ void main() {
   float backMulti =
       smoothstep(0.05, 1.0, mix(1.0 - iCloudDepth, 1.0, texBack));
 
-  // --- the five-light rig, all sampled from the sky -----------------------
-  // The base probe is pixel-independent (its picker is built from uniforms
-  // only), so its sky colour is baked on the CPU next to the keyframe and
-  // arrives as `iBaseSky` — one fewer LUT fetch per pixel. The gain below is
-  // still per-pixel (it rides `backMulti`), so only the colour is precomputed.
+  // --- the five-light rig ------------------------------------------------
+  // Sun, ground and ambient colours are baked on the CPU from the uniform
+  // probe (no per-pixel LUT nudge). The base gain still rides `backMulti`.
   vec3 baseCfg = iBaseCfg;
   float baseEdgeMulti = mix(1.0, 2.1, backMulti * min(1.0, iSunCfg.z));
   baseEdgeMulti = mix(baseEdgeMulti, 1.0, iWhitePer * 0.9);
@@ -265,37 +223,16 @@ void main() {
   baseCfg.y = mix(1.0, baseCfg.y, iCloudDepth);
   vec3 baseColor = iBaseSky * baseCfg.y;
 
-  // Each light samples the sky between its own probe and the next one, blended
-  // by how strongly it hits — so a lit face reads the brighter sky.
-  // The probe is nudged by how strongly the light hits, but only gently:
-  // moving it the full way makes neighbouring pixels read different LUT rows
-  // and speckles the cloud with stray hues.
-  vec3 sunCfg =
-      vec3(mix(iSunCfg.x, iGroundCfg.x, l0 * 0.35), iSunCfg.y, iSunCfg.z);
-  vec3 sunColor = readColorConfig(sunCfg);
-  float sunI = mix(0.3, sunCfg.z, iSunIntensity);
+  vec3 sunColor = iSunLit;
+  vec3 groundColor = iGroundLit;
+  vec3 ambientColor = iAmbientLit;
 
-  vec3 groundCfg = vec3(mix(iGroundCfg.x, iAmbientCfg.x, l1 * 0.35),
-                        iGroundCfg.y, iGroundCfg.z);
-  vec3 groundColor = readColorConfig(groundCfg);
-  float groundI = mix(0.3, groundCfg.z, iSunIntensity);
-
-  vec3 ambientCfg = vec3(mix(iAmbientCfg.x, 1.0, l2 * 0.35), iAmbientCfg.y,
-                         iAmbientCfg.z);
-  vec3 ambientColor = readColorConfig(ambientCfg);
-  float ambientI = mix(0.3, ambientCfg.z, iSunIntensity);
-
-  vec3 backCfg = vec3(mix(iSunCfg.x, iGroundCfg.x, l3 * 0.35),
-                      mix(0.0, 1.3, backMulti), iSunCfg.z);
-  vec3 backColor = readColorConfig(backCfg);
-  float backI = mix(1.5, 1.0, iSunIntensity) * backCfg.z;
-
-  // The reference's authored noon tint — at high sun the sky probes go too blue, so it
-  // pulls the lights toward warm white.
-  sunColor = mix(sunColor, vec3(1.0, 0.74, 0.53), iWhitePer);
-  groundColor = mix(groundColor, vec3(0.85, 0.54, 0.37), iWhitePer);
-  ambientColor = mix(ambientColor, vec3(0.96, 0.63, 0.42), iWhitePer);
-  backColor = mix(backColor, vec3(1.0, 0.74, 0.53), iWhitePer);
+  // The back light's gain is the thin-edge term, which is per pixel. Its sky
+  // colour is the sun probe, baked. The warm mix happens after the gain, the
+  // same order as mixing the gained colour toward white.
+  float backGain = mix(0.0, 1.3, backMulti);
+  vec3 backColor = mix(iBackSky * backGain, vec3(1.0, 0.74, 0.53), iWhitePer);
+  float backI = mix(1.5, 1.0, iSunIntensity) * iSunCfg.z;
 
   // --- composite ----------------------------------------------------------
   vec3 diffuse = mix(vec3(texDepth), vec3(1.0), 0.8);
@@ -305,9 +242,9 @@ void main() {
   float fogMulti = 1.0 - fog * fog;
 
   vec3 color = baseColor;
-  color += l0 * sunColor * sunI * fogMulti;
-  color += l1 * groundColor * groundI * fogMulti;
-  color += l2 * ambientColor * ambientI * fogMulti;
+  color += l0 * sunColor;
+  color += l1 * groundColor;
+  color += l2 * ambientColor;
   color += l3 * backColor * backI * fogMulti;
 
   // Lightning inside the cloud, masked by the sprite's inner-glow channel.
@@ -320,6 +257,13 @@ void main() {
   // pixel-independent, so its colour arrives baked in `iHazeSky` (see
   // `iBaseSky`).
   color = mix(color, iHazeSky, iFogDensity);
+  // iLutSize still occupies slots 33..34 so the baked colours after it stay
+  // put. A multiply by zero is deleted and the uniform goes with it, which
+  // would slide every later slot. The painter's values are a positive height
+  // and 1, so this branch never fires.
+  if (iLutSize.x + iLutSize.y < 0.0) {
+    color = vec3(1.0);
+  }
 
   float a = clamp(alpha * depthAlpha, 0.0, 1.0);
   fragColor = vec4(clamp(color, 0.0, 1.0) * a, a); // premultiplied

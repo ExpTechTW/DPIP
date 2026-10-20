@@ -251,3 +251,68 @@ CloudLighting cloudLighting({required double sunAngleY}) {
     whitePer: 0.1 * smoothstep(0.30, 1.0, day),
   );
 }
+
+/// One light's colour in the shader's 0..1 RGB, which may exceed 1 before the
+/// fragment clamps the sum.
+typedef CloudRgb = ({double r, double g, double b});
+
+/// Colours the cloud shader used to fetch per pixel, baked from the uniform
+/// probe. [sun], [ground] and [ambient] already include gain, the warm mix,
+/// intensity and fog. [backSky] is the sun probe only — the thin-edge gain
+/// stays in the shader because it changes per pixel.
+typedef CloudBakedLights = ({
+  CloudRgb sun,
+  CloudRgb ground,
+  CloudRgb ambient,
+  CloudRgb backSky,
+});
+
+const CloudRgb _sunWarm = (r: 1.0, g: 0.74, b: 0.53);
+const CloudRgb _groundWarm = (r: 0.85, g: 0.54, b: 0.37);
+const CloudRgb _ambientWarm = (r: 0.96, g: 0.63, b: 0.42);
+
+CloudRgb _rgbScale(CloudRgb color, double gain) =>
+    (r: color.r * gain, g: color.g * gain, b: color.b * gain);
+
+CloudRgb _rgbMix(CloudRgb a, CloudRgb b, double t) => (
+  r: a.r + (b.r - a.r) * t,
+  g: a.g + (b.g - a.g) * t,
+  b: a.b + (b.b - a.b) * t,
+);
+
+double _mix(double a, double b, double t) => a + (b - a) * t;
+
+/// The four directional lights, without the per-pixel probe nudge.
+///
+/// [sunIntensity] is the shader's `iSunIntensity` (the frame's day amount).
+/// [fog] is `iFogDensity`. [sunSky], [groundSky] and [ambientSky] are the LUT
+/// colours at each light's own picker.
+CloudBakedLights bakeCloudLights({
+  required CloudLighting lighting,
+  required double sunIntensity,
+  required double fog,
+  required CloudRgb sunSky,
+  required CloudRgb groundSky,
+  required CloudRgb ambientSky,
+  required CloudRgb backSky,
+}) {
+  final white = lighting.whitePer.clamp(0.0, 1.0);
+  final fogMulti = 1.0 - fog * fog;
+  CloudRgb lit(CloudRgb sky, double multi, CloudRgb warm, double intensity) {
+    final gained = _rgbMix(_rgbScale(sky, multi), warm, white);
+    final weight = _mix(0.3, intensity, sunIntensity);
+    return _rgbScale(gained, weight * fogMulti);
+  }
+
+  return (
+    sun: lit(sunSky, lighting.sun.$2, _sunWarm, lighting.sun.$3),
+    ground: lit(groundSky, lighting.ground.$2, _groundWarm, lighting.ground.$3),
+    ambient: lit(
+      ambientSky,
+      lighting.ambient.$2,
+      _ambientWarm,
+      lighting.ambient.$3,
+    ),
+    backSky: backSky,
+  );
+}
