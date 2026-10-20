@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
-import 'package:dpip/core/geo/location_service.dart' show GpsFix;
+import 'package:dpip/core/geo/location_service.dart'
+    show GpsFix, isLocationRefusal;
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 
@@ -88,11 +89,17 @@ class DeviceLocationReporter {
     if (_sub != null) return;
     _sub = _positions().listen(
       _handle,
-      // A services-off toggle errors the stream; keeping the error here means it
-      // never rides up as an uncaught async error, and dropping the subscription
-      // lets [restart] re-create it when services return.
+      // A services-off toggle, or a permission revoked while the stream is
+      // open, errors it. That is the user changing a setting. Keeping the
+      // error here means it never rides up as an uncaught async error, and
+      // dropping the subscription lets [restart] re-create it when services
+      // return. A refusal is not a fault, so it stays out of crash reports.
       onError: (Object error, StackTrace stackTrace) {
-        Log.handle(error, stackTrace, 'location stream');
+        if (isLocationRefusal(error)) {
+          Log.warning('location stream stopped: location is off or denied');
+        } else {
+          Log.handle(error, stackTrace, 'location stream');
+        }
         _sub = null;
       },
       onDone: () => _sub = null,

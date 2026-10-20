@@ -16,6 +16,15 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 /// A GPS coordinate fix in decimal degrees.
 typedef GpsFix = ({double lat, double lng});
 
+/// Whether [error] is a user who turned location off or denied the permission.
+///
+/// Geolocator raises these instead of returning an empty fix. Callers already
+/// treat that as "no location". Filing it as a crash report makes a phone with
+/// location off look broken.
+bool isLocationRefusal(Object error) =>
+    error is LocationServiceDisabledException ||
+    error is PermissionDeniedException;
+
 /// Resolves the device's current township from GPS.
 ///
 /// Wraps `geolocator` (native `CLLocationManager` / `FusedLocationProvider`).
@@ -247,6 +256,10 @@ class LocationService {
       Log.warning('GPS fix timed out — no current location available');
       return null;
     } catch (error, stackTrace) {
+      if (isLocationRefusal(error)) {
+        Log.warning('GPS fix unavailable: location is off or denied');
+        return null;
+      }
       Log.handle(error, stackTrace, 'GPS fix');
       return null;
     }
@@ -263,6 +276,12 @@ class LocationService {
     try {
       return await _lastKnownFix();
     } catch (error, stackTrace) {
+      if (isLocationRefusal(error)) {
+        Log.warning(
+          'last-known GPS fix unavailable: location is off or denied',
+        );
+        return null;
+      }
       Log.handle(error, stackTrace, 'last-known GPS fix');
       return null;
     }
@@ -282,6 +301,10 @@ class LocationService {
       Log.warning('GPS fix timed out — no current location available');
       return null;
     } catch (error, stackTrace) {
+      if (isLocationRefusal(error)) {
+        Log.warning('GPS fix unavailable: location is off or denied');
+        return null;
+      }
       Log.handle(error, stackTrace, 'GPS fix');
       return null;
     }
