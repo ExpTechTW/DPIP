@@ -4,6 +4,8 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/logging/crash_sink.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -90,11 +92,41 @@ void main() {
   });
 
   test('a lastKnownFix fault degrades to null, never throws', () async {
+    final sink = _Sink();
+    Log.crashSink = sink;
+    addTearDown(() => Log.crashSink = null);
     final service = LocationService(
       _dir(),
       lastKnown: () async => throw Exception('platform fault'),
     );
     expect(await service.lastKnownFix(), isNull);
+    expect(sink.handled, hasLength(1));
+  });
+
+  test('a refused last-known fix is null and not a crash report', () async {
+    final sink = _Sink();
+    Log.crashSink = sink;
+    addTearDown(() => Log.crashSink = null);
+    final denied = LocationService(
+      _dir(),
+      lastKnown: () async => throw const PermissionDeniedException(
+        "User denied permissions to access the device's location.",
+      ),
+    );
+    expect(await denied.lastKnownFix(), isNull);
+    final off = LocationService(
+      _dir(),
+      lastKnown: () async => throw const LocationServiceDisabledException(),
+    );
+    expect(await off.lastKnownFix(), isNull);
+    final live = LocationService(
+      _dir(),
+      isAvailable: () async => true,
+      fix: () async => throw const LocationServiceDisabledException(),
+    );
+    expect(await live.currentFix(), isNull);
+    expect(await live.currentTown(), isNull);
+    expect(sink.handled, isEmpty);
   });
 
   test('a GPS timeout is a null fix, not a crash', () async {
@@ -438,6 +470,20 @@ void _platformCases() {
       expect(await fixes, [(lat: 23.5, lng: 121.1)]);
     });
   });
+}
+
+class _Sink implements CrashSink {
+  final handled = <Object>[];
+
+  @override
+  void report(
+    Object error,
+    StackTrace stackTrace, {
+    String? context,
+    bool fatal = false,
+  }) {
+    handled.add(error);
+  }
 }
 
 class _FakeGeolocator extends GeolocatorPlatform {

@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
+import 'package:dpip/core/logging/crash_sink.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -143,6 +146,36 @@ void main() {
     await pumpEventQueue();
 
     expect(reported, [(lat: 25.0, lng: 121.0)]);
+    reporter.stop();
+    for (final c in controllers) {
+      await c.close();
+    }
+  });
+
+  test('a location refusal ends the stream without a crash report', () async {
+    final sink = _Sink();
+    Log.crashSink = sink;
+    addTearDown(() => Log.crashSink = null);
+    final controllers = <StreamController<GpsFix>>[];
+    final reporter = DeviceLocationReporter(
+      positions: () {
+        final controller = StreamController<GpsFix>();
+        controllers.add(controller);
+        return controller.stream;
+      },
+      settings: await settings(),
+      onMoved: (fix) async => true,
+    )..start();
+
+    controllers[0].addError(const LocationServiceDisabledException());
+    await pumpEventQueue();
+    expect(sink.handled, isEmpty);
+
+    reporter.restart();
+    controllers[1].addError(StateError('gps'));
+    await pumpEventQueue();
+    expect(sink.handled.single, isA<StateError>());
+
     reporter.stop();
     for (final c in controllers) {
       await c.close();
@@ -300,4 +333,18 @@ void main() {
       await positions.close();
     });
   });
+}
+
+class _Sink implements CrashSink {
+  final handled = <Object>[];
+
+  @override
+  void report(
+    Object error,
+    StackTrace stackTrace, {
+    String? context,
+    bool fatal = false,
+  }) {
+    handled.add(error);
+  }
 }
