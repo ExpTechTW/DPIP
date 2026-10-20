@@ -24,6 +24,10 @@
     <dimen name="widget_text_metric_min">8sp</dimen>
     <!-- Fallback Thai tone marks can extend above the nominal label layout. -->
     <dimen name="widget_grid_label_inset">2dp</dimen>
+    <!-- API 26's padded badge line still loses the top raster row of Thai
+         fallback tone marks. Reserve 1dp only on the full-width notice rows;
+         the 170/320/336dp forecast budgets are covered by native tests. -->
+    <dimen name="widget_badge_top_inset">1dp</dimen>
     <!-- Android's padded text lines plus the grid's fallback-font guard need
          a slightly tighter hourly gap than SwiftUI's unpadded SF lines. -->
     <dimen name="widget_forecast_spacing_large">3dp</dimen>
