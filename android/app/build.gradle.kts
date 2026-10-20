@@ -92,6 +92,12 @@ android {
                 } else {
                     signingConfigs.getByName("debug")
                 }
+            // Native WindParticleHost resolves these callbacks by JNI name.
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
