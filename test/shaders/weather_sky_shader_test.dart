@@ -179,8 +179,9 @@ void main() {
         1.0, 1.0, 2.0, // static size / amount / speed  (the rain set, 4..9)
         1.4, 1.0, 1.3, // running size / amount / speed
         0.6, // uAlpha
+        0.0, // uMode — refract, sampling the coverage bake
       ],
-      samplers: 1,
+      samplers: 2,
     ),
     (
       asset: 'shaders/weather/card_water.frag',

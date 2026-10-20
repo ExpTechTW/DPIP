@@ -4,6 +4,7 @@ library;
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,25 +45,50 @@ void main() {
     final prog = await ui.FragmentProgram.fromAsset(
       'shaders/weather/rain_on_glass.frag',
     );
+    final dummyRec = ui.PictureRecorder();
+    ui.Canvas(dummyRec).drawRect(
+      const Rect.fromLTWH(0, 0, 1, 1),
+      Paint()..color = const Color(0x00000000),
+    );
+    final dummy = dummyRec.endRecording().toImageSync(1, 1);
     Future<ui.Image> render(double refraction, double time) async {
+      final field = bakeRainOnGlassField(
+        shader: prog.fragmentShader(),
+        dummy: dummy,
+        time: time,
+        opacity: refraction,
+        staticSize: 1,
+        staticAmount: 1,
+        staticSpeed: 1,
+        runningSize: 1,
+        runningAmount: 1,
+        runningSpeed: 1,
+      );
       final sh = prog.fragmentShader();
       var i = 0;
       void f(double v) => sh.setFloat(i++, v);
       f(w.toDouble());
-      f(h.toDouble()); // engine normally sets this
+      f(h.toDouble());
+      f(1080);
+      f(1080);
       f(time);
       f(1.0);
       f(1.0);
-      f(1.0); // static size/amount/speed
       f(1.0);
       f(1.0);
-      f(1.0); // running size/amount/speed
+      f(1.0);
+      f(1.0);
       f(refraction);
-      sh.setImageSampler(0, content);
+      f(0);
+      sh
+        ..setImageSampler(0, content)
+        ..setImageSampler(1, field);
       final r = ui.PictureRecorder();
       ui.Canvas(r)
           .drawRect(const Rect.fromLTWH(0, 0, 360, 300), Paint()..shader = sh);
-      return r.endRecording().toImageSync(w, h);
+      final image = r.endRecording().toImageSync(w, h);
+      field.dispose();
+      return image;
     }
 
     final off = await render(0.0, 6.0);
