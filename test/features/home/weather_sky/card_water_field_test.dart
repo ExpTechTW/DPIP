@@ -73,6 +73,17 @@ void main() {
     }
   });
 
+  test(
+    'the solver takes three iterations and the accumulation is half size',
+    () {
+      expect(CardWaterField.particleIterations, 3);
+      expect(CardWaterField.accumulationResolution, 0.5);
+      final raster = CardWaterField.accumulationSize(const ui.Size(360, 201));
+      expect(raster.width, 180);
+      expect(raster.height, 101);
+    },
+  );
+
   test('drops are born just above the edge, not a third of a screen up', () {
     // the emitter's spawn y is 0.91, but that is an absolute world y — the collision box
     // puts the card's top face at +0.852, so the spawn line is only 0.058 above
