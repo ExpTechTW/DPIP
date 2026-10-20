@@ -13,9 +13,12 @@
   the other. The only dynamic label is the sun cell, sunrise or sunset depending
   on the phase.
 
-  Section gaps use 6 / 12 dp, with 6 dp between the grid's two rows so the
-  Android-only stale notice and refresh still leave a whole probability line
-  at this layout's 336 dp minimum. The tight layout saves another 4 dp there.
+  Section gaps use 6 dp, including both sides of the weighted forecast.
+  At the 336 dp Roomy boundary, 12 dp forecast gaps left only 15 px for a
+  33 px probability line on API 35 with CJK fallback fonts and a stale notice.
+  Recovering those decorative gaps gives every hourly column its full height
+  without changing text, glyphs, or the shared forecast resource. Tight owns
+  its separate 2 dp section gaps and is measured independently.
 
   Two Android-only adaptations, both forced by the cell sizes a launcher
   reports:
@@ -213,14 +216,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="@dimen/widget_spacing_md"
+        android:layout_marginTop="@dimen/widget_spacing_sm"
         android:baselineAligned="false"
         android:orientation="horizontal" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_spacing_md"
+        android:layout_marginTop="@dimen/widget_spacing_sm"
         android:orientation="horizontal">
 
         <LinearLayout
