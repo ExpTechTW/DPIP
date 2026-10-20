@@ -127,6 +127,7 @@
     <TextView
         android:id="@+id/widget_stale"
         style="@style/Widget.Badge"
+        android:paddingTop="@dimen/widget_badge_top_inset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
