@@ -709,12 +709,9 @@ void main() {
     }
   });
 
-  for (final (tier, low, high) in [
-    (RenderTier.high, 40, 70),
-    (RenderTier.low, 4, 6),
-  ]) {
+  for (final tier in [RenderTier.high, RenderTier.low]) {
     testWidgets(
-      'a ${tier.name}-tier phone redraws the rings $low–$high a second',
+      'a ${tier.name}-tier phone does not redraw a sub-pixel wavefront every frame',
       (tester) async {
         final settings = SettingsStore.inMemory();
         final archive = _Archive(RegionSelection(settings))
@@ -801,12 +798,14 @@ void main() {
           await icons(tester);
           expect(find.text('花蓮縣'), findsOneWidget);
 
+          // The replay clock is a stopwatch, so pumping frames does not move
+          // the wave. A tick that has not moved a pixel is not uploaded. A
+          // high-tier phone that pushed every wake would land far above this.
           final before = platform.eewWrites;
           for (var i = 0; i < 50; i++) {
             await tester.pump(const Duration(milliseconds: 20));
           }
-          final perSecond = platform.eewWrites - before;
-          expect(perSecond, inInclusiveRange(low, high));
+          expect(platform.eewWrites - before, lessThan(10));
         } finally {
           await tester.pumpWidget(const SizedBox.shrink());
           await tester.pump(const Duration(milliseconds: 50));
