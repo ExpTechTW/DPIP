@@ -5,7 +5,9 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.RemoteViews
+import android.widget.TextView
 import com.exptech.dpip.MainActivity
 import com.exptech.dpip.R
 
@@ -51,7 +53,8 @@ object WidgetRenderer {
         if (!presentation.hasObservation) return R.layout.widget_empty
         if (presentation.sizeClass == WidgetSizeClass.Small) {
             if (presentation.compactLayout) {
-                return R.layout.widget_small_compact
+                return if (presentation.adaptiveCompact) R.layout.widget_small_compact_accessible
+                else R.layout.widget_small_compact
             }
 
             if (presentation.effectiveHeightDp >= 240) {
@@ -108,7 +111,9 @@ object WidgetRenderer {
             R.id.widget_observation_time,
             presentation.observationTimeMillis?.let(WidgetPresenter::observationDescription),
         )
-        setBadge(views, presentation.badgeText)
+        setBadge(views, if (presentation.sizeClass == WidgetSizeClass.Small && presentation.compactLayout) {
+            compactStatus(context, presentation)
+        } else presentation.badgeText)
         views.setTextViewText(R.id.widget_temperature, presentation.temperatureText.orEmpty())
         views.setImageViewResource(
             R.id.widget_icon,
@@ -121,6 +126,14 @@ object WidgetRenderer {
             views.setTextViewText(R.id.widget_rain_value, presentation.rainText.orEmpty())
             tint(views, R.id.widget_humidity, context)
             tint(views, R.id.widget_rain, context)
+            if (presentation.adaptiveCompact) {
+                // Always reset both rows on reapply, including after resize.
+                views.setViewVisibility(R.id.widget_compact_header, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_compact_metrics, View.VISIBLE)
+                val secondaryVisibility = if (compactNeedsFallback(context, presentation, views)) View.GONE else View.VISIBLE
+                views.setViewVisibility(R.id.widget_compact_header, secondaryVisibility)
+                views.setViewVisibility(R.id.widget_compact_metrics, secondaryVisibility)
+            }
             return views
         }
 
@@ -172,6 +185,48 @@ object WidgetRenderer {
             }
         }
         return views
+    }
+
+    /**
+     * Measure the bound four-row document before publishing it. Character counts
+     * and linear dp/fontScale envelopes cannot model weighted metric columns,
+     * fallback fonts or Android 14+'s nonlinear sp conversion. Keep Android view
+     * work here, rather than introducing a Context into the pure presentation.
+     *
+     * This detached, single-pass probe uses the same resources, actions and box
+     * as the host; it does not attach a window or draw, start refresh work, or
+     * depend on a later layout traversal. Only enlarged Compact pays this cost.
+     * Long place names retain the existing header ellipsis policy; the clock,
+     * status and numeric readings must fit whole at the XML's autosize floors.
+     */
+    private fun compactNeedsFallback(
+        context: Context,
+        presentation: WidgetPresentation,
+        views: RemoteViews,
+    ): Boolean {
+        val probe = views.apply(context, FrameLayout(context))
+        val density = context.resources.displayMetrics.density
+        val width = (presentation.availableWidthDp * density).toInt()
+        val height = (presentation.availableHeightDp * density).toInt()
+        probe.measure(
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY),
+        )
+        probe.layout(0, 0, width, height)
+        return listOf(
+            R.id.widget_observation_time, R.id.widget_stale, R.id.widget_temperature,
+            R.id.widget_humidity_value, R.id.widget_rain_value,
+        ).any { id ->
+            val text = probe.findViewById<TextView>(id)
+            if (text.visibility != View.VISIBLE || text.text.isEmpty()) return@any false
+            val layout = text.layout ?: return@any true
+            val contentHeight = text.height - text.compoundPaddingTop - text.compoundPaddingBottom
+            val contentWidth = text.width - text.compoundPaddingLeft - text.compoundPaddingRight
+            layout.height > contentHeight || (0 until layout.lineCount).any { line ->
+                layout.getEllipsisCount(line) != 0 || layout.getLineLeft(line) < 0 ||
+                    layout.getLineRight(line) > contentWidth
+            }
+        }
     }
 
     /** The empty face: the cloud and the presenter's message, in secondary ink. */
@@ -376,18 +431,40 @@ object WidgetRenderer {
      * announced in the system language, so an English default here would speak
      * English at a reader whose entire Widget is translated.
      */
-    private fun contentDescription(context: Context, presentation: WidgetPresentation): String =
-        listOf(
+    private fun contentDescription(context: Context, presentation: WidgetPresentation): String {
+        val compact = presentation.hasObservation &&
+            presentation.sizeClass == WidgetSizeClass.Small && presentation.compactLayout
+        return listOf(
             presentation.locationName,
-            presentation.weatherText,
+            if (compact && presentation.isCurrentLocation) context.getString(R.string.widget_current_location) else null,
+            if (compact) presentation.condition?.let { conditionDescription(context, it) } ?: presentation.weatherText
+            else presentation.weatherText,
             presentation.temperatureText,
             presentation.observationTimeMillis?.let(WidgetPresenter::observationDescription),
+            if (compact) presentation.humidityText?.let { "${context.getString(R.string.widget_humidity)} $it" } else null,
+            if (compact) presentation.rainText?.let { "${context.getString(R.string.widget_rain)} $it" } else null,
             presentation.badgeText,
+            if (compact) presentation.hintText else null,
+            if (compact) context.getString(R.string.widget_compact_details) else null,
         )
             .mapNotNull { it?.trim() }
             .filter { it.isNotEmpty() }
+            .let { if (compact) it.distinct() else it }
             .joinToString(", ")
             .ifEmpty { context.getString(R.string.widget_name) }
+    }
+
+    /** Short visual labels; the full degradation message stays on the surface. */
+    private fun compactStatus(context: Context, presentation: WidgetPresentation): String? {
+        if (presentation.badgeText == null) return null
+        return context.getString(when {
+            presentation.isStale -> if (presentation.adaptiveCompact) R.string.widget_compact_stale
+                else return presentation.badgeText
+            presentation.state == WidgetDisplayState.LocationUnavailable -> R.string.widget_compact_location
+            presentation.state == WidgetDisplayState.NeedsApp -> R.string.widget_compact_attention
+            else -> return presentation.badgeText
+        })
+    }
 
     /**
      * The tap targets, each unique per instance **and per action**.

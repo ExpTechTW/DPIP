@@ -46,4 +46,10 @@
     <string name="widget_weather_unknown">Không rõ</string>
     <string name="widget_forecast_pop_description">Khả năng mưa %1$s</string>
     <string name="widget_forecast_pop_unavailable">Không có dữ liệu khả năng mưa</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Đã cũ</string>
+    <string name="widget_compact_location">Mất vị trí</string>
+    <string name="widget_compact_details">Mở ứng dụng để xem đầy đủ thông tin thời tiết</string>
+    <string name="widget_compact_attention">Mở ứng dụng</string>
 </resources>
