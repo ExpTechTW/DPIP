@@ -146,4 +146,10 @@
          name is capped here and autosizes inside the cap. iOS small is 158 dp,
          where the cap is never reached. -->
     <dimen name="widget_weather_max_width">40dp</dimen>
+    <!-- Compact-only budgets: do not change Small/Tall/Medium/Large tokens. -->
+    <dimen name="widget_padding_compact_adaptive">3dp</dimen>
+    <dimen name="widget_compact_inline_gap">2dp</dimen>
+    <dimen name="widget_text_compact_temperature_min">18sp</dimen>
+    <dimen name="widget_text_compact_status_min">9sp</dimen>
+    <dimen name="widget_compact_metric_height">17sp</dimen>
 </resources>

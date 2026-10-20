@@ -304,7 +304,7 @@ class WidgetSmallTallRegressionTest {
                     view.findViewById<View>(R.id.widget_observation_time).contentDescription.toString())
                 WidgetTextVisibility.assertTree("boundary $scale $height", view)
             }
-            assertEquals(R.layout.widget_small_compact,
+            assertEquals(if (scale > 1f) R.layout.widget_small_compact_accessible else R.layout.widget_small_compact,
                 WidgetRenderer.layoutFor(presentation(c, (110 * scale).toInt(), heights[1])))
             val medium = presentation(c, (200 * scale).toInt(), heights[1])
             assertEquals(R.layout.widget_medium, WidgetRenderer.layoutFor(medium))

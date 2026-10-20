@@ -50,4 +50,10 @@
     <string name="widget_weather_unknown">不明</string>
     <string name="widget_forecast_pop_description">降水確率 %1$s</string>
     <string name="widget_forecast_pop_unavailable">降水確率のデータなし</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">古い情報</string>
+    <string name="widget_compact_location">位置不明</string>
+    <string name="widget_compact_details">アプリで詳しい天気情報を確認</string>
+    <string name="widget_compact_attention">アプリへ</string>
 </resources>
