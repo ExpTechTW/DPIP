@@ -54,6 +54,8 @@
     <!-- Reserve a full probability line when the stale notice and refresh
          share the 320dp box with all five hourly columns. -->
     <dimen name="widget_grid_row_gap_tight">2dp</dimen>
+    <!-- Tight only: reserve the full hourly probability line with status visible. -->
+    <dimen name="widget_large_tight_section_gap">2dp</dimen>
 
     <!-- The medium current condition is larger than its 20dp hourly glyphs.
          32dp remains within the 38sp temperature row's minimum height and is

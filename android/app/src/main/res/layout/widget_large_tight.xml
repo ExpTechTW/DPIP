@@ -2,15 +2,15 @@
 <!--
   The large layout at the minimal height a launcher can report (~320 dp).
 
-  Identical to `widget_large.xml` except that the section spacing is tightened
-  from the roomy layout's 12 / 6 dp to 6 / 2 dp: at 320 dp the roomy
-  spacing, the Android-only notice row and the grid together push the forecast's
-  probability line past the bottom of the widget. `WidgetPresenter.
-  largeRoomyMinimumHeightDp` selects this document below 336 dp and the
-  iOS-spaced `widget_large.xml` above it, so a real 4x4 cell (~344 dp) gets the
-  iOS spacing and only the minimal box is tightened. Every other contract — the
-  ids, the autosize ranges, the notice row — is the same, and both documents are
-  measured by `WidgetLayoutFitTest`.
+  The three section gaps use 2dp instead of 6dp, reserving complete hourly
+  columns when the Android-only stale notice and refresh share the 320dp box.
+  Keep the padded text, 28dp condition icon, detail grid and all five forecast
+  columns; only decorative section space is recovered. The roomy layout and
+  shared forecast items retain their own spacing and typography.
+
+  `WidgetPresenter.largeRoomyMinimumHeightDp` selects this document below
+  336 effective dp. Native first-draw and subsequent-measure coverage lives in
+  `WidgetLargeTightForecastRegressionTest`.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -115,7 +115,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_spacing_sm"
+        android:layout_marginTop="@dimen/widget_large_tight_section_gap"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
@@ -195,14 +195,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="@dimen/widget_spacing_sm"
+        android:layout_marginTop="@dimen/widget_large_tight_section_gap"
         android:baselineAligned="false"
         android:orientation="horizontal" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/widget_spacing_sm"
+        android:layout_marginTop="@dimen/widget_large_tight_section_gap"
         android:orientation="horizontal">
 
         <LinearLayout
