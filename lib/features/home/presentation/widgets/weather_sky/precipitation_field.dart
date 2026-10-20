@@ -38,6 +38,22 @@ import 'package:flutter/material.dart';
 ///   non-uniformly, so the atlas carries four width variants (widest first,
 ///   baked by `tool/build_rain_sprite.py`) and depth indexes them directly.
 class PrecipitationField {
+  /// High-tier rain pool, one rung under the authored storm count of 1792.
+  ///
+  /// 1472 is the reference's 大雨 preset. The phone still draws a downpour;
+  /// it just does not allocate the storm's full set on every frame.
+  static const int highRainCapacity = 1472;
+
+  /// Low-tier rain pool — the reference's 大雨 count was already the cap here.
+  static const int lowRainCapacity = 1024;
+
+  /// High-tier snow pool, scaled by the same ratio as [highRainCapacity]
+  /// against the old 1792-drop storm (900 × 1472 / 1792).
+  static const int highSnowCapacity = 739;
+
+  /// Low-tier snow pool. Unchanged: it was already the reduced budget.
+  static const int lowSnowCapacity = 640;
+
   /// Sprite atlas: rain has [rainVariants] width variants side by side.
   final ui.Image atlas;
 

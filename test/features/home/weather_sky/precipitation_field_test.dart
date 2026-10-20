@@ -53,6 +53,14 @@ void main() {
     return last;
   }
 
+  test('the high rain pool is one rung under the storm count', () {
+    expect(PrecipitationField.highRainCapacity, 1472);
+    expect(PrecipitationField.highRainCapacity, lessThan(1792));
+    expect(PrecipitationField.lowRainCapacity, 1024);
+    expect(PrecipitationField.highSnowCapacity, 739);
+    expect(PrecipitationField.lowSnowCapacity, 640);
+  });
+
   test('particles fall downward', () {
     final f = field();
     final before = meanY(f, frames: 2);
