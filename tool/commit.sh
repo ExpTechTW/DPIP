@@ -307,28 +307,24 @@ fi
 
 if ((run_gates)); then
   heading 'CI gates'
-  note 'Local checks depend on the platform; full CI validation runs on Linux.'
+  note 'Everything ci.yml runs. Each step is cached on a content hash of its'
+  note 'inputs, so an unchanged tree costs seconds instead of a minute.'
   printf '\n'
   if tool/check.sh; then
-    case "$(uname -s)" in
-      Linux*)
-        ok 'all local gates passed on Linux'
-        ;;
-      MINGW*|MSYS*|CYGWIN*)
-        ok 'Windows development checks passed'
-        note 'Full tests, coverage and codegen validation are delegated to Linux CI.'
-        ;;
-      *)
-        ok "local checks passed on $(uname -s)"
-        note 'Full CI validation runs on Linux.'
-        ;;
-    esac
+    ok "every gate passed, on $(uname -s)"
+    # Said, because the difference has already cost a red CI: this runs CI's
+    # command list on *this* machine, and the runner is Linux. A test that
+    # shells out meets a different sed, a different awk and a different
+    # `script`, and passes here while failing there.
+    [[ "$(uname -s)" == Linux ]] ||
+      note 'CI runs Linux — a test that shells out can still differ there'
   else
-    block 'a local check failed'
+    block 'a gate failed — CI will fail the same way'
   fi
 else
   warn 'gates skipped (--no-check) — CI has not been reproduced'
 fi
+
 # ── Verdict ─────────────────────────────────────────────────────────────────
 heading 'Verdict'
 
