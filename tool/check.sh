@@ -65,15 +65,10 @@ step 'codegen is up to date'
 # build_info.g.dart is excluded because it can never match: it holds the hash
 # of the commit it is committed in.
 generated_hashes() {
-  local path digest
-  while IFS= read -r path; do
-    digest="$(sha256 <"$path" | cut -d' ' -f1)" || return
-    printf '%s  %s\n' "$digest" "$path"
-  done < <(
-    git ls-files -co --exclude-standard -- '*.g.dart' '*.freezed.dart' |
-      grep -v '^lib/core/build_info\.g\.dart$' |
-      LC_ALL=C sort
-  )
+  require_sha256 || return
+  git ls-files -co --exclude-standard -- '*.g.dart' '*.freezed.dart' |
+    grep -v '^lib/core/build_info\.g\.dart$' |
+    LC_ALL=C sort | tr '\n' '\0' | xargs -0 "${SHA256[@]}"
 }
 
 codegen_check() {

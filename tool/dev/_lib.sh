@@ -150,36 +150,37 @@ step() { printf '\n\033[1m▸ %s\033[0m\n' "$*" >&2; }
 # clean` cannot reach it, and it is per-clone.
 cache_dir() { printf '%s/dpip-checks' "$(git rev-parse --git-dir)"; }
 
-# A portable SHA-256 command. macOS provides `shasum`, while Git Bash on
-# Windows may provide only `sha256sum`. Prefer `shasum` when available to
-# preserve the existing behavior; fall back to `sha256sum` otherwise.
-# Fail explicitly if neither utility exists, rather than silently skipping
-# content-hash cache validation.
-sha256() {
-  if command -v shasum >/dev/null 2>&1; then
-    shasum -a 256
-  elif command -v sha256sum >/dev/null 2>&1; then
-    sha256sum
-  else
-    printf 'error: no SHA-256 utility found\n' >&2
-    return 127
-  fi
+# The SHA-256 command, as an array rather than a function so that xargs can
+# run it: a shell function does not exist in xargs' child process. macOS and
+# Linux have `shasum`; Git Bash on Windows may have only `sha256sum`. Both
+# print `<digest>  <path>`.
+if command -v shasum >/dev/null 2>&1; then
+  SHA256=(shasum -a 256)
+elif command -v sha256sum >/dev/null 2>&1; then
+  SHA256=(sha256sum)
+else
+  SHA256=()
+fi
+
+# Fails when there is no SHA-256 command: with an empty SHA256, `xargs` would
+# run `echo` instead and every cache key would silently be a list of names.
+require_sha256() {
+  ((${#SHA256[@]})) && return 0
+  printf 'error: no SHA-256 utility found (shasum or sha256sum)\n' >&2
+  return 127
 }
 
 # A hash of every tracked and every untracked-but-not-ignored file under the
 # given paths — contents *and* names, so a rename or a deletion also invalidates.
-# Measured at 0.09 s over 793 files.
+# One xargs batch, not one process per file: measured at 0.18 s over 1,265
+# files, where a process per file took 12 s on macOS (`shasum` is Perl).
 cache_key() {
-  local files path digest
+  require_sha256 || return
+  local files
   files="$(git ls-files -co --exclude-standard -- "$@" | LC_ALL=C sort)"
   [[ -z $files ]] && { printf 'empty'; return; }
-
-  # Do not pass `sha256` through xargs: shell functions are not available in
-  # xargs' child process on Git Bash. Hash each path in this shell instead.
-  while IFS= read -r path; do
-    digest="$(sha256 <"$path" | cut -d' ' -f1)" || return
-    printf '%s  %s\n' "$digest" "$path"
-  done <<< "$files" | sha256 | cut -d' ' -f1
+  printf '%s' "$files" | tr '\n' '\0' | xargs -0 "${SHA256[@]}" |
+    "${SHA256[@]}" | cut -d' ' -f1
 }
 
 # What each cached step reads. Anything a step's result depends on has to be in
