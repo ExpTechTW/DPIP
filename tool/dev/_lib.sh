@@ -10,6 +10,14 @@ set -euo pipefail
 # The repo root, whatever directory the script was invoked from.
 repo_root() { cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd; }
 
+# Git Bash, MSYS2 or Cygwin on Windows.
+is_windows() {
+  case "$(uname -s)" in
+    MINGW* | MSYS* | CYGWIN*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 # Refuses to go on without mise, and without mise owning the toolchain.
 #
 # A bare `flutter` is not merely discouraged here, it is forbidden — because the
@@ -88,10 +96,13 @@ EOF
   local owned_norm="${owned//\\//}"
   resolved_norm="${resolved_norm%/}"
   owned_norm="${owned_norm%/}"
-  local resolved_folded owned_folded
-  resolved_folded="$(printf '%s' "$resolved_norm" | tr '[:upper:]' '[:lower:]')"
-  owned_folded="$(printf '%s' "$owned_norm" | tr '[:upper:]' '[:lower:]')"
-  if [[ -z $owned || $resolved_folded != "$owned_folded"/* ]]; then
+  # Windows paths are case-insensitive, and mise and PATH need not agree on
+  # the drive letter's case. Elsewhere a case difference is a different path.
+  if is_windows; then
+    resolved_norm="$(printf '%s' "$resolved_norm" | tr '[:upper:]' '[:lower:]')"
+    owned_norm="$(printf '%s' "$owned_norm" | tr '[:upper:]' '[:lower:]')"
+  fi
+  if [[ -z $owned || $resolved_norm != "$owned_norm"/* ]]; then
     printf '\n  flutter resolves to %s\n' "$resolved" >&2
     printf '  which is not inside mise (%s).\n\n' "${owned:-not installed}" >&2
     printf '  Run `mise install` from %s.\n\n' "$root" >&2
