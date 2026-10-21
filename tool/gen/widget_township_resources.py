@@ -75,18 +75,11 @@ def main() -> int:
 
     outputs = generated_outputs()
     if args.check:
-        stale = []
-        for path, expected in outputs.items():
-            if not path.is_file():
-                stale.append(path)
-                continue
-
-            actual = path.read_bytes()
-            if path == DIRECTORY_OUTPUT:
-                actual = actual.replace(b"\r\n", b"\n")
-
-            if actual != expected:
-                stale.append(path)
+        stale = [
+            path
+            for path, expected in outputs.items()
+            if not path.is_file() or path.read_bytes() != expected
+        ]
         if stale:
             for path in stale:
                 print(

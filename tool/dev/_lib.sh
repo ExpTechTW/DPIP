@@ -88,7 +88,10 @@ EOF
   local owned_norm="${owned//\\//}"
   resolved_norm="${resolved_norm%/}"
   owned_norm="${owned_norm%/}"
-  if [[ -z $owned || ${resolved_norm,,} != "${owned_norm,,}"/* ]]; then
+  local resolved_folded owned_folded
+  resolved_folded="$(printf '%s' "$resolved_norm" | tr '[:upper:]' '[:lower:]')"
+  owned_folded="$(printf '%s' "$owned_norm" | tr '[:upper:]' '[:lower:]')"
+  if [[ -z $owned || $resolved_folded != "$owned_folded"/* ]]; then
     printf '\n  flutter resolves to %s\n' "$resolved" >&2
     printf '  which is not inside mise (%s).\n\n' "${owned:-not installed}" >&2
     printf '  Run `mise install` from %s.\n\n' "$root" >&2

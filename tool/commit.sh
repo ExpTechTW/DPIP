@@ -326,6 +326,8 @@ if ((run_gates)); then
   else
     block 'a local check failed'
   fi
+else
+  warn 'gates skipped (--no-check) — CI has not been reproduced'
 fi
 # ── Verdict ─────────────────────────────────────────────────────────────────
 heading 'Verdict'
