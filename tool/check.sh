@@ -32,15 +32,6 @@ cd "$(repo_root)"
 step 'format + analyze'
 cached analyze "$(cache_key "${CODE_INPUTS[@]}")" tool/dev/analyze.sh
 
-# Windows is for local development. The shell-based test suite and
-# code-generation checks are validated by Linux CI.
-case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*)
-    step 'Windows development checks passed'
-    exit 0
-    ;;
-esac
-
 # Most of these finish in under a quarter of a second and are run every time:
 # hashing their inputs would cost as much as running them, and a cache that
 # saves nothing is a cache that can only be wrong. The two workflow gates
