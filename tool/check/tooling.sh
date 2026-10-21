@@ -66,7 +66,8 @@ for wf in .github/workflows/*.yml; do
   )
 done
 
-# Every script in tool/, checked as a script.
+# Every executable workflow in tool/, checked as a script. Shared libraries are
+# parsed too, but are not launched directly.
 #
 # `tool/run.sh` runs this at launch, so these are the things worth catching
 # before anything else happens: a script that does not parse, one that is not
@@ -75,7 +76,10 @@ done
 while IFS= read -r script; do
   bash -n "$script" 2>/dev/null || report "$script: does not parse"
 
-  [[ -x $script ]] || report "$script: is not executable (chmod +x)"
+  # `_lib.sh` is sourced by workflows, not launched as one. It deliberately has
+  # no shebang, so do not require an executable bit for this shared library.
+  [[ $script == tool/dev/_lib.sh || -x $script ]] ||
+    report "$script: is not executable (chmod +x)"
 
   head -1 "$script" | grep -q '^#!/usr/bin/env bash$' ||
     [[ $script == tool/dev/_lib.sh ]] ||
