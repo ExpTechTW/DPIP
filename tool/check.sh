@@ -41,16 +41,6 @@ case "$(uname -s)" in
     ;;
 esac
 
-# Windows is for local development. The shell-based test suite and
-# code-generation checks are validated by Linux CI.
-case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*)
-    step 'Windows development checks passed'
-    note 'Full tests, coverage and codegen validation run in Linux CI.'
-    exit 0
-    ;;
-esac
-
 # Most of these finish in under a quarter of a second and are run every time:
 # hashing their inputs would cost as much as running them, and a cache that
 # saves nothing is a cache that can only be wrong. The two workflow gates
@@ -84,15 +74,9 @@ step 'codegen is up to date'
 # build_info.g.dart is excluded because it can never match: it holds the hash
 # of the commit it is committed in.
 generated_hashes() {
-  local path digest
-  while IFS= read -r path; do
-    digest="$(sha256 <"$path" | cut -d' ' -f1)" || return
-    printf '%s  %s\n' "$digest" "$path"
-  done < <(
-    git ls-files -co --exclude-standard -- '*.g.dart' '*.freezed.dart' |
-      grep -v '^lib/core/build_info\.g\.dart$' |
-      LC_ALL=C sort
-  )
+  git ls-files -co --exclude-standard -- '*.g.dart' '*.freezed.dart' |
+    grep -v '^lib/core/build_info\.g\.dart$' |
+    LC_ALL=C sort | tr '\n' '\0' | xargs -0 shasum -a 256
 }
 
 codegen_check() {
