@@ -42,6 +42,8 @@
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
 		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
+		SK0S00000000000000000002 /* SecretStorePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK0S00000000000000000001 /* SecretStorePlugin.swift */; };
+		SK0S00000000000000000004 /* SecretStorePluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK0S00000000000000000003 /* SecretStorePluginTests.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
 		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
 		AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000H01 /* NetworkPlugin.swift */; };
@@ -180,6 +182,8 @@
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
+		SK0S00000000000000000001 /* SecretStorePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretStorePlugin.swift; sourceTree = "<group>"; };
+		SK0S00000000000000000003 /* SecretStorePluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretStorePluginTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
 		AA0000000000000000000H01 /* NetworkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPlugin.swift; sourceTree = "<group>"; };
@@ -429,6 +433,7 @@
 				27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */,
 				NL0G00000000000000000003 /* NativeLogTests.swift */,
 				LR0S00000000000000000003 /* LocationReportSenderTests.swift */,
+				SK0S00000000000000000003 /* SecretStorePluginTests.swift */,
 				NSE000000000000000000011 /* NotificationDeliveryBreadcrumbTests.swift */,
 				270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */,
 				270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */,
@@ -497,6 +502,7 @@
 				AA0000000000000000000C01 /* CompassPlugin.swift */,
 				AA0000000000000000000H01 /* NetworkPlugin.swift */,
 				AA0000000000000000000E01 /* ScreenWakePlugin.swift */,
+				SK0S00000000000000000001 /* SecretStorePlugin.swift */,
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
 				AA0000000000000000000D01 /* DeviceInfoPlugin.swift */,
@@ -843,6 +849,7 @@
 				27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */,
 				NL0G00000000000000000004 /* NativeLogTests.swift in Sources */,
 				LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */,
+				SK0S00000000000000000004 /* SecretStorePluginTests.swift in Sources */,
 				NSE000000000000000000012 /* NotificationDeliveryBreadcrumbTests.swift in Sources */,
 				270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */,
 				27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */,
@@ -865,6 +872,7 @@
 				AA0000000000000000000C02 /* CompassPlugin.swift in Sources */,
 				AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */,
 				AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */,
+				SK0S00000000000000000002 /* SecretStorePlugin.swift in Sources */,
 				AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */,
 				AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */,
 				AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */,
