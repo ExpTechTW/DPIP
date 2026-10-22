@@ -783,6 +783,7 @@ private struct HourlyForecastPointView: View {
                 )
             )
             .font(compact ? .title3 : .title2)
+            .frame(height: compact ? 32 : 40)
 
             Text("\(point.temperature, specifier: "%.0f")°")
                 .font(compact ? .caption : .subheadline)
