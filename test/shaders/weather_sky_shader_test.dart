@@ -80,12 +80,16 @@ void main() {
         0.8, // iSunIntensity
         0.0, 0.0, // fog, inner
         0.1, // iWhitePer
-        16, 16, // iLutSize — the sampler is the 1×N sky column; `.y` is height
+        16, 16, // iLutSize — slot kept; the LUT sampler is gone
         256, 288, // iTexSize
         0.44, 0.50, 0.56, // iBaseSky — CPU-baked base probe
         0.46, 0.52, 0.58, // iHazeSky — CPU-baked haze probe
+        0.40, 0.45, 0.50, // iSunLit
+        0.30, 0.32, 0.34, // iGroundLit
+        0.35, 0.38, 0.42, // iAmbientLit
+        0.50, 0.55, 0.60, // iBackSky
       ],
-      samplers: 2,
+      samplers: 1,
     ),
     (
       asset: 'shaders/weather/sun_flare.frag',
@@ -179,8 +183,9 @@ void main() {
         1.0, 1.0, 2.0, // static size / amount / speed  (the rain set, 4..9)
         1.4, 1.0, 1.3, // running size / amount / speed
         0.6, // uAlpha
+        0.0, // uMode — refract, sampling the coverage bake
       ],
-      samplers: 1,
+      samplers: 2,
     ),
     (
       asset: 'shaders/weather/card_water.frag',

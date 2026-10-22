@@ -45,4 +45,21 @@ void main() {
     expect(againCoords, hasLength(coords.length));
     expect(againCoords.first, isNot(equals(coords.first)));
   });
+
+  test('the default wavefront is a 48-gon on the circle', () {
+    expect(kWavefrontSteps, 48);
+    const centre = LatLng(23.5, 121.5);
+    const radius = 80000.0;
+    final line = circleFeature(centre, radius);
+    final coords = (line['geometry'] as Map)['coordinates'] as List;
+    expect(coords, hasLength(kWavefrontSteps + 1));
+    expect(coords.first, coords.last);
+    for (final raw in coords) {
+      final point = raw as List;
+      final distance = centre.distanceTo(
+        LatLng(point[1] as double, point[0] as double),
+      );
+      expect(distance, closeTo(radius, radius * 0.002));
+    }
+  });
 }

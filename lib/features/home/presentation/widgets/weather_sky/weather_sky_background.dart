@@ -277,11 +277,13 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
           ? null
           : PrecipitationField(
               atlas: rainAtlas,
-              // The reference's storm preset pool; lighter rain uses proportionally
-              // fewer, which is how it expresses intensity. The low tier caps at
-              // the 大雨 pool — the storm's full 1792-drop budget is the single
-              // most expensive layer a low-end GPU can be asked to draw.
-              capacity: lowEnd ? 1024 : 1792,
+              // Lighter rain uses a fraction of this pool. The high tier is one
+              // preset under the authored storm (see
+              // [PrecipitationField.highRainCapacity]); the low tier stays on
+              // the smaller pool.
+              capacity: lowEnd
+                  ? PrecipitationField.lowRainCapacity
+                  : PrecipitationField.highRainCapacity,
               variants: 4,
               cell: const Size(32, 68),
               seed: 7,
@@ -290,7 +292,9 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
           ? null
           : PrecipitationField(
               atlas: snowAtlas,
-              capacity: lowEnd ? 640 : 900,
+              capacity: lowEnd
+                  ? PrecipitationField.lowSnowCapacity
+                  : PrecipitationField.highSnowCapacity,
               cell: const Size(40, 40),
               tumble: true,
               seed: 11,
@@ -640,7 +644,8 @@ _Look _lookFor(WeatherMode mode) => switch (mode) {
     keyframes: rainyExtremeKeyframes,
     layout: CloudLayout.rain,
     coverage: 1.0,
-    // The 暴雨 rung — the full 1792-drop pool.
+    // The full pool. The pool itself is one preset under the authored
+    // storm count — see [PrecipitationField.highRainCapacity].
     rain: 1.0,
     snow: 0.0,
     fog: 0.12,

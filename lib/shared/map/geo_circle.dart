@@ -14,6 +14,11 @@ import 'dart:math' as math;
 import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/models/lat_lng.dart';
 
+/// Sides of an earthquake wavefront. A 48-gon's sagitta is about 0.21% of the
+/// radius; the previous 64-gon was 0.12%. On a phone that difference is a
+/// fraction of the line's own width.
+const int kWavefrontSteps = 48;
+
 /// A GeoJSON `Feature` (closed `LineString` geometry) tracing a [steps]-sided
 /// approximation of the circle of [radiusMetres] around [center].
 ///
@@ -22,7 +27,7 @@ import 'package:dpip/core/models/lat_lng.dart';
 Map<String, dynamic> circleFeature(
   LatLng center,
   double radiusMetres, {
-  int steps = 64,
+  int steps = kWavefrontSteps,
   Map<String, dynamic> properties = const {},
 }) => _lineFeature(_ring(center, radiusMetres, steps), properties);
 
@@ -32,7 +37,7 @@ Map<String, dynamic> circleFeature(
 Map<String, dynamic> circleFillFeature(
   LatLng center,
   double radiusMetres, {
-  int steps = 64,
+  int steps = kWavefrontSteps,
   Map<String, dynamic> properties = const {},
 }) => _fillFeature(_ring(center, radiusMetres, steps), properties);
 
@@ -43,7 +48,7 @@ void addCircleFeatures(
   List<Map<String, dynamic>> features,
   LatLng center,
   double radiusMetres, {
-  int steps = 64,
+  int steps = kWavefrontSteps,
   Map<String, dynamic>? fillProperties,
   required Map<String, dynamic> lineProperties,
 }) {
