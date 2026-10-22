@@ -21,12 +21,16 @@ import 'package:provider/provider.dart';
 /// feeds these from its sheet extent; Events leaves them at 0 for an opaque
 /// bar. It carries its own top safe area so both effects cover the status-bar
 /// row too.
+///
+/// A page may put one action at the bar's right end ([trailing]); it fades and
+/// slides away with the bar, and is inked like the badges.
 class RegionBar extends StatefulWidget {
   const RegionBar({
     super.key,
     this.blend = 0,
     this.dismiss = 0,
     this.skyIsLight = true,
+    this.trailing,
   });
 
   /// The bar's own height, below the status bar it is inset by. Public because
@@ -43,6 +47,14 @@ class RegionBar extends StatefulWidget {
   /// Whether the weather sky behind the bar is light — badge ink goes dark on
   /// a light sky (dark-theme white [ColorScheme.onSurface] would vanish).
   final bool skyIsLight;
+
+  /// One action at the right end — an icon button. The carousel keeps an
+  /// equal inset on both sides while it is there, so the selected badge stays
+  /// centred on the screen rather than shifting left by half the button.
+  final Widget? trailing;
+
+  /// The width kept for [trailing], on each side of the carousel.
+  static const double actionWidth = 44;
 
   @override
   State<RegionBar> createState() => _RegionBarState();
@@ -78,37 +90,74 @@ class _RegionBarState extends State<RegionBar> with AreaPageSyncMixin {
               bottom: false,
               child: SizedBox(
                 height: RegionBar.height,
-                child: PageView.builder(
-                  controller: areaPageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: areas.length,
-                  itemBuilder: (context, index) {
-                    // Resolved here, once per item, not inside the builder
-                    // below: the label is a directory lookup that does not
-                    // depend on the page position, and the builder runs for
-                    // every visible badge on every pixel of the slide.
-                    final label = regionAreaLabel(
-                      l10n,
-                      directory,
-                      areas[index],
-                    );
-                    return AnimatedBuilder(
-                      animation: areaPageController,
-                      builder: (context, _) => _RegionBadge(
-                        index: index,
-                        label: label,
-                        distance: (areaPage - index).abs(),
-                        blend: blend,
-                        skyIsLight: widget.skyIsLight,
-                      ),
-                    );
-                  },
+                child: _withTrailing(
+                  context,
+                  PageView.builder(
+                    controller: areaPageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: areas.length,
+                    itemBuilder: (context, index) {
+                      // Resolved here, once per item, not inside the builder
+                      // below: the label is a directory lookup that does not
+                      // depend on the page position, and the builder runs for
+                      // every visible badge on every pixel of the slide.
+                      final label = regionAreaLabel(
+                        l10n,
+                        directory,
+                        areas[index],
+                      );
+                      return AnimatedBuilder(
+                        animation: areaPageController,
+                        builder: (context, _) => _RegionBadge(
+                          index: index,
+                          label: label,
+                          distance: (areaPage - index).abs(),
+                          blend: blend,
+                          skyIsLight: widget.skyIsLight,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// [carousel] alone, or with [RegionBar.trailing] at the right end.
+  Widget _withTrailing(BuildContext context, Widget carousel) {
+    final trailing = widget.trailing;
+    if (trailing == null) return carousel;
+    // The same sky-aware ink as the unselected badges, for an icon button.
+    final ink = inkOverWeather(
+      Theme.of(context).colorScheme,
+      widget.blend,
+      skyIsLight: widget.skyIsLight,
+    );
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: RegionBar.actionWidth,
+          ),
+          child: carousel,
+        ),
+        Positioned(
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: RegionBar.actionWidth,
+          child: IconButtonTheme(
+            data: IconButtonThemeData(
+              style: IconButton.styleFrom(foregroundColor: ink),
+            ),
+            child: Center(child: trailing),
+          ),
+        ),
+      ],
     );
   }
 }
