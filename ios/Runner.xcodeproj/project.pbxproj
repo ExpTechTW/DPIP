@@ -792,7 +792,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+			shellScript = "# Uploads this build's dSYM to Crashlytics. Only a Release build ships, so\n# Debug and Profile builds (flutter run, the RunnerTests suite) skip it: they\n# have nothing to symbolicate, and they must build offline.\nif [ \"${CONFIGURATION}\" != \"Release\" ]; then\n  exit 0\nfi\n# Where Swift Package Manager cloned firebase-ios-sdk: DerivedData when\n# xcodebuild runs alone (the release workflow's archive), build/ios when Flutter\n# drives it, since Flutter passes -clonedSourcePackagesDirPath.\nfor packages in \"${BUILD_DIR%/Build/*}/SourcePackages\" \"${SRCROOT}/../build/ios/SourcePackages\"; do\n  run=\"${packages}/checkouts/firebase-ios-sdk/Crashlytics/run\"\n  if [ -x \"${run}\" ]; then\n    exec \"${run}\"\n  fi\ndone\necho \"error: Crashlytics upload script not found in DerivedData or build/ios/SourcePackages\" >&2\nexit 1\n";
 		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
