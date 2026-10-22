@@ -168,6 +168,20 @@ void main() {
     );
   });
 
+  test('the AI assistant is a page over the shell, not a sixth tab', () {
+    final routes = appRouter.configuration.routes;
+    final shell = routes.whereType<StatefulShellRoute>().single;
+    // Material's bottom bar is for three to five destinations.
+    expect(shell.branches, hasLength(5));
+    final branchNames = [
+      for (final branch in shell.branches)
+        for (final route in branch.routes.whereType<GoRoute>()) route.name,
+    ];
+    expect(branchNames, isNot(contains(AppRoutes.ai)));
+    final ai = routes.whereType<GoRoute>().where((r) => r.name == AppRoutes.ai);
+    expect(ai.single.path, AppRoutes.aiPath);
+  });
+
   testWidgets('an unfinished welcome stays put until the refresh fires', (
     tester,
   ) async {

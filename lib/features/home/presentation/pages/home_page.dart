@@ -397,6 +397,16 @@ class _HomePageState extends State<HomePage> {
                                 blend: dials.blend,
                                 dismiss: dials.dismiss,
                                 skyIsLight: skyIsLightFrom(sky, weatherMode),
+                                // The AI assistant's one way in: a page
+                                // pushed over the shell, so the bottom bar
+                                // stays at five destinations.
+                                trailing: IconButton(
+                                  tooltip: AppLocalizations.of(context)
+                                      .aiChatTitle,
+                                  onPressed: () =>
+                                      context.pushNamed(AppRoutes.ai),
+                                  icon: const Icon(Icons.auto_awesome_outlined),
+                                ),
                               ),
                               SizedBox(
                                 height: stackHeight,

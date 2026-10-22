@@ -131,6 +131,38 @@ class ApiClient {
     return response.data;
   }
 
+  /// Absolute-URL request with a streamed body (no region failover) — a
+  /// third-party host that writes its answer as it goes, e.g. the AI service
+  /// the user set up for the AI chat.
+  ///
+  /// Never cached: [EtagInterceptor] skips stream responses, which is the
+  /// point for an answer that depends on the caller's own key. Every status
+  /// is returned rather than thrown, so the caller can read the service's own
+  /// error body (an AI service explains a 400 or a 429 there). [idleTimeout]
+  /// replaces the client-wide 10 s receive timeout: Dio applies it between
+  /// body chunks, and a model on a busy GPU can think for longer than that
+  /// before its first word. `Accept-Encoding: identity`, as for SSE: a
+  /// compressed body arrives in the compressor's blocks, not as written.
+  Future<Response<ResponseBody>> streamAbsolute(
+    String url, {
+    String method = 'POST',
+    Object? data,
+    Map<String, dynamic>? headers,
+    Duration idleTimeout = Duration.zero,
+    CancelToken? cancelToken,
+  }) => _dio.request<ResponseBody>(
+    url,
+    data: data,
+    cancelToken: cancelToken,
+    options: Options(
+      method: method,
+      responseType: ResponseType.stream,
+      receiveTimeout: idleTimeout,
+      headers: {'Accept-Encoding': 'identity', ...?headers},
+      validateStatus: (_) => true,
+    ),
+  );
+
   static BytePayload _bytePayload(Response<dynamic> response) {
     final data = response.data;
     final Uint8List bytes = switch (data) {
