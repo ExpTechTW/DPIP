@@ -3567,4 +3567,302 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => '나중에 설정';
+
+  @override
+  String get aiChatTitle => 'AI 어시스턴트';
+
+  @override
+  String get aiChatNew => '새 대화';
+
+  @override
+  String get aiChatAbout => '안내';
+
+  @override
+  String get aiChatInputHint => '지진, 날씨, 태풍에 대해 물어보세요…';
+
+  @override
+  String get aiChatSend => '보내기';
+
+  @override
+  String get aiChatStop => '중지';
+
+  @override
+  String get aiChatDisclaimer => 'AI는 틀릴 수 있습니다. 긴급 시에는 공식 경보를 따르세요.';
+
+  @override
+  String get aiChatEmptyTitle => '무엇이 궁금하세요?';
+
+  @override
+  String get aiChatSuggestionQuakes => '최근에 지진이 있었나요?';
+
+  @override
+  String get aiChatSuggestionRain => '오늘 여기 비가 올까요?';
+
+  @override
+  String get aiChatSuggestionTyphoon => '지금 태풍이 있나요?';
+
+  @override
+  String get aiChatSuggestionAlerts => '현재 발효 중인 재난 경보는?';
+
+  @override
+  String get aiChatThinking => '생각 중…';
+
+  @override
+  String get aiChatWaiting => '응답을 기다리는 중…';
+
+  @override
+  String get aiChatStopped => '중지됨';
+
+  @override
+  String get aiChatOpenSettings => '설정 열기';
+
+  @override
+  String get aiChatCopied => '복사했습니다';
+
+  @override
+  String get aiChatSetupTitle => 'AI 서비스가 설정되지 않았습니다';
+
+  @override
+  String get aiChatSetupBody => '사용 중인 AI 서비스의 URL, 키, 모델을 입력하면 시작할 수 있습니다.';
+
+  @override
+  String get aiChatSetupAction => '설정하기';
+
+  @override
+  String get aiIntroTitle => 'AI 어시스턴트';
+
+  @override
+  String get aiIntroBody =>
+      '최근 지진, 내일 날씨, 태풍 진로 등을 물어보세요. AI가 먼저 DPIP 데이터를 실시간으로 조회한 뒤 사용자의 언어로 답합니다.';
+
+  @override
+  String get aiIntroOwnKeyTitle => '자신의 AI 서비스를 사용합니다';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      '도구 호출을 지원하는 OpenAI 호환 AI 서비스(OpenAI, Google Gemini, Anthropic, OpenRouter 등)의 URL과 키를 입력하세요. 사용량과 요금은 해당 AI 서비스에서 계산됩니다.';
+
+  @override
+  String get aiIntroLocalTitle => '키는 이 기기에만 저장되고, 대화는 저장되지 않습니다';
+
+  @override
+  String get aiIntroLocalBody =>
+      'API 키는 시스템 키 저장소(iOS 키체인, Android Keystore)에 보관되며 ExpTech에 업로드되지 않고, 백업을 통해 다른 기기로 옮겨지지도 않습니다. 대화는 저장되지 않으며 앱을 닫으면 사라집니다.';
+
+  @override
+  String get aiIntroDataTitle => '데이터 전송 방식';
+
+  @override
+  String get aiIntroDataBody =>
+      '질문은 이 기기에서 설정한 AI 서비스로 바로 전송되며 ExpTech를 거치지 않습니다. AI에 데이터가 필요하면 앱이 DPIP 공개 데이터 서버에 조회하며, 조회 조건(지역 코드나 날짜 등)만 보내고 키나 대화 내용은 보내지 않습니다. ‘여기’가 어디인지 알 수 있도록 앱에 설정된 현재 위치와 저장한 향진(이름과 코드만)을 AI에 알려 줍니다.';
+
+  @override
+  String get aiIntroCautionTitle => 'AI는 틀릴 수 있습니다';
+
+  @override
+  String get aiIntroCautionBody =>
+      '답변은 참고용입니다. 위험할 수 있을 때는 먼저 자신을 보호하고, 중앙기상서와 정부의 공식 경보와 지시를 따르세요.';
+
+  @override
+  String get aiIntroMcpTitle => '직접 만들어 보기';
+
+  @override
+  String get aiIntroMcpBody =>
+      'DPIP 데이터는 MCP 서버로도 공개되어 있습니다(읽기 전용, 키 불필요). Claude, ChatGPT 등 MCP를 지원하는 도구에 연결해 나만의 활용법을 만들어 보세요.';
+
+  @override
+  String get aiIntroStart => '설정 시작';
+
+  @override
+  String get aiMcpTitle => 'DPIP MCP 서버';
+
+  @override
+  String get aiMcpBody =>
+      'Streamable HTTP를 지원하는 MCP 클라이언트라면 이 주소를 바로 사용할 수 있습니다.';
+
+  @override
+  String get aiMcpCopyUrl => 'URL 복사';
+
+  @override
+  String get aiMcpCopyConfig => '설정 예시 복사';
+
+  @override
+  String get aiMcpCopied => '복사했습니다';
+
+  @override
+  String get aiSettingsTitle => 'AI 설정';
+
+  @override
+  String get aiSettingsService => 'AI 서비스';
+
+  @override
+  String get aiSettingsServiceBody =>
+      '도구 호출을 지원하는 OpenAI 호환 서비스(/chat/completions)라면 사용할 수 있습니다. 아래 서비스를 누르면 URL이 입력됩니다.';
+
+  @override
+  String get aiSettingsBaseUrl => 'API URL';
+
+  @override
+  String get aiSettingsBaseUrlHelper => 'API의 기본 URL로, 보통 /v1로 끝납니다.';
+
+  @override
+  String get aiSettingsUrlEmpty => 'URL을 입력하세요';
+
+  @override
+  String get aiSettingsUrlInvalid => '올바른 URL이 아닙니다';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'https://를 사용하세요. http://는 이 기기 자체(localhost)에만 사용할 수 있습니다.';
+
+  @override
+  String get aiSettingsApiKey => 'API 키';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      '이 기기의 키 저장소에만 저장됩니다. 키가 필요 없는 서비스라면 비워 두세요.';
+
+  @override
+  String get aiSettingsApiKeySaved => '키가 저장되어 있습니다. 비워 두면 기존 키를 유지합니다.';
+
+  @override
+  String get aiSettingsShowKey => '키 표시';
+
+  @override
+  String get aiSettingsHideKey => '키 숨기기';
+
+  @override
+  String get aiSettingsRemoveKey => '저장된 키 삭제';
+
+  @override
+  String get aiSettingsKeyRemoved => '키를 삭제했습니다';
+
+  @override
+  String get aiSettingsModel => '모델';
+
+  @override
+  String get aiSettingsModelHelper =>
+      '도구 호출(function calling)을 지원하는 모델이어야 합니다. 오른쪽 버튼으로 모델 목록을 불러올 수 있습니다.';
+
+  @override
+  String get aiSettingsModelEmpty => '모델을 입력하거나 선택하세요';
+
+  @override
+  String get aiSettingsFetchModels => '모델 목록 가져오기';
+
+  @override
+  String get aiSettingsFilterModels => '모델 검색';
+
+  @override
+  String get aiSettingsNoModels => '이 서비스는 모델 목록을 제공하지 않습니다. 모델 이름을 직접 입력하세요.';
+
+  @override
+  String get aiSettingsSave => '저장';
+
+  @override
+  String get aiSettingsSaved => '저장했습니다';
+
+  @override
+  String get aiSettingsSaveFailed => '키를 저장하지 못했습니다. 다시 시도하세요.';
+
+  @override
+  String get aiSettingsPrivacy => '개인정보';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      '키는 이 기기의 키 저장소에만 보관되며 ExpTech에 업로드되지 않습니다. 대화는 이 기기와 AI 서비스 사이에서만 오가며 저장되지 않습니다. AI가 데이터를 조회할 때는 조회 조건만 DPIP 데이터 서버로 전송됩니다.';
+
+  @override
+  String get aiSettingsForget => 'AI 설정 모두 지우기';
+
+  @override
+  String get aiSettingsForgetTitle => 'AI 설정을 지울까요?';
+
+  @override
+  String get aiSettingsForgetBody => '이 기기에서 URL, 모델, 키가 삭제됩니다.';
+
+  @override
+  String get aiSettingsForgetConfirm => '지우기';
+
+  @override
+  String get aiSettingsForgotten => 'AI 설정을 지웠습니다';
+
+  @override
+  String get aiToolEarthquake => '지진 정보';
+
+  @override
+  String get aiToolWeather => '날씨 정보';
+
+  @override
+  String get aiToolTyphoon => '태풍 정보';
+
+  @override
+  String get aiToolTsunami => '쓰나미 정보';
+
+  @override
+  String get aiToolNotices => '재난 알림';
+
+  @override
+  String get aiToolPlaces => '지역';
+
+  @override
+  String get aiToolTimeline => '데이터 시각';
+
+  @override
+  String get aiToolOther => '데이터';
+
+  @override
+  String aiToolRunning(String subject) {
+    return '$subject 조회 중…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return '$subject 조회 완료';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return '$subject 조회 실패';
+  }
+
+  @override
+  String get aiErrorUnauthorized => 'API 키가 잘못되었거나 만료되었거나, 이 모델을 사용할 권한이 없습니다.';
+
+  @override
+  String get aiErrorNotFound => 'API 또는 모델을 찾을 수 없습니다. URL과 모델 이름을 확인하세요.';
+
+  @override
+  String get aiErrorRateLimited =>
+      'AI 서비스의 요청 한도나 사용량 한도에 도달했습니다. 잠시 후 다시 시도하거나 요금제를 확인하세요.';
+
+  @override
+  String get aiErrorRejected =>
+      'AI 서비스가 요청을 거부했습니다. 선택한 모델이 도구 호출을 지원하지 않을 수 있습니다.';
+
+  @override
+  String get aiErrorServer => 'AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get aiErrorNetwork => 'AI 서비스에 연결할 수 없습니다. 네트워크를 확인하세요.';
+
+  @override
+  String get aiErrorTimeout => 'AI 서비스의 응답이 너무 오래 걸립니다.';
+
+  @override
+  String get aiErrorBadResponse =>
+      'AI 서비스의 응답을 읽을 수 없습니다. 이 URL은 OpenAI 호환 API가 아닐 수 있습니다.';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'DPIP 데이터 서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'AI가 데이터를 너무 여러 번 조회했지만 답을 내지 못했습니다. 더 구체적으로 질문해 보세요.';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return '서비스 메시지: $detail';
+  }
 }

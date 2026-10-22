@@ -3565,4 +3565,301 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'あとで設定する';
+
+  @override
+  String get aiChatTitle => 'AIアシスタント';
+
+  @override
+  String get aiChatNew => '新しい会話';
+
+  @override
+  String get aiChatAbout => '説明';
+
+  @override
+  String get aiChatInputHint => '地震・天気・台風について質問…';
+
+  @override
+  String get aiChatSend => '送信';
+
+  @override
+  String get aiChatStop => '停止';
+
+  @override
+  String get aiChatDisclaimer => 'AIは間違えることがあります。緊急時は公式の警報に従ってください。';
+
+  @override
+  String get aiChatEmptyTitle => '何を知りたいですか？';
+
+  @override
+  String get aiChatSuggestionQuakes => '最近地震はありましたか？';
+
+  @override
+  String get aiChatSuggestionRain => '今日ここは雨が降りますか？';
+
+  @override
+  String get aiChatSuggestionTyphoon => '今、台風はありますか？';
+
+  @override
+  String get aiChatSuggestionAlerts => '現在出ている災害情報は？';
+
+  @override
+  String get aiChatThinking => '考え中…';
+
+  @override
+  String get aiChatWaiting => '応答を待っています…';
+
+  @override
+  String get aiChatStopped => '停止しました';
+
+  @override
+  String get aiChatOpenSettings => '設定を開く';
+
+  @override
+  String get aiChatCopied => 'コピーしました';
+
+  @override
+  String get aiChatSetupTitle => 'AIサービスが未設定です';
+
+  @override
+  String get aiChatSetupBody => '自分のAIサービスのURL、APIキー、モデルを入力すると使えます。';
+
+  @override
+  String get aiChatSetupAction => '設定する';
+
+  @override
+  String get aiIntroTitle => 'AIアシスタント';
+
+  @override
+  String get aiIntroBody =>
+      '最近の地震、明日の天気、台風の進路などを質問できます。AIはまずDPIPのデータをリアルタイムで調べてから、あなたの言語で答えます。';
+
+  @override
+  String get aiIntroOwnKeyTitle => '自分のAIサービスを使います';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      'ツール呼び出しに対応した OpenAI 互換の AI サービス（OpenAI、Google Gemini、Anthropic、OpenRouter など）の URL と API キーを入力します。利用量と料金はそのサービス側で計算されます。';
+
+  @override
+  String get aiIntroLocalTitle => 'キーはこの端末にだけ保存され、会話は保存されません';
+
+  @override
+  String get aiIntroLocalBody =>
+      'APIキーはシステムのキー保管庫（iOSのキーチェーン、AndroidのKeystore）に保存され、ExpTechにアップロードされることはなく、バックアップで別の端末に移ることもありません。会話は保存されず、アプリを閉じると消えます。';
+
+  @override
+  String get aiIntroDataTitle => 'データの流れ';
+
+  @override
+  String get aiIntroDataBody =>
+      '質問はこの端末から、設定したAIサービスへ直接送られ、ExpTechを経由しません。AIがデータを必要とするときは、アプリがDPIPの公開データサーバーに問い合わせますが、送るのは検索条件（地域コードや日付など）だけで、キーや会話は含みません。「ここ」がどこかを伝えるため、アプリに登録した現在地と保存した郷鎮（名称とコードのみ）もAIに伝えます。';
+
+  @override
+  String get aiIntroCautionTitle => 'AIは間違えることがあります';
+
+  @override
+  String get aiIntroCautionBody =>
+      '回答は参考情報です。危険がありそうなときは、まず身の安全を確保し、中央気象署や政府の公式の警報・指示に従ってください。';
+
+  @override
+  String get aiIntroMcpTitle => '自分で作る';
+
+  @override
+  String get aiIntroMcpBody =>
+      'DPIPのデータはMCPサーバーとしても公開されています（読み取り専用、キー不要）。Claude、ChatGPT など MCP 対応ツールにつないで、自分だけの使い方ができます。';
+
+  @override
+  String get aiIntroStart => '設定を始める';
+
+  @override
+  String get aiMcpTitle => 'DPIP MCPサーバー';
+
+  @override
+  String get aiMcpBody => 'Streamable HTTP に対応した MCP クライアントなら、このアドレスをそのまま使えます。';
+
+  @override
+  String get aiMcpCopyUrl => 'URLをコピー';
+
+  @override
+  String get aiMcpCopyConfig => '設定例をコピー';
+
+  @override
+  String get aiMcpCopied => 'コピーしました';
+
+  @override
+  String get aiSettingsTitle => 'AI設定';
+
+  @override
+  String get aiSettingsService => 'AIサービス';
+
+  @override
+  String get aiSettingsServiceBody =>
+      'ツール呼び出しに対応した OpenAI 互換サービス（/chat/completions）なら使えます。下のサービスをタップすると URL が入力されます。';
+
+  @override
+  String get aiSettingsBaseUrl => 'API の URL';
+
+  @override
+  String get aiSettingsBaseUrlHelper => 'APIのベースURL。通常は /v1 で終わります。';
+
+  @override
+  String get aiSettingsUrlEmpty => 'URLを入力してください';
+
+  @override
+  String get aiSettingsUrlInvalid => '有効なURLではありません';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'https:// を使ってください。http:// はこの端末自身（localhost）にだけ使えます。';
+
+  @override
+  String get aiSettingsApiKey => 'APIキー';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      'この端末のキー保管庫にのみ保存されます。キーが不要なサービスでは空欄のままにしてください。';
+
+  @override
+  String get aiSettingsApiKeySaved => 'キーは保存済みです。空欄のままにすると今のキーを使い続けます。';
+
+  @override
+  String get aiSettingsShowKey => 'キーを表示';
+
+  @override
+  String get aiSettingsHideKey => 'キーを隠す';
+
+  @override
+  String get aiSettingsRemoveKey => '保存したキーを削除';
+
+  @override
+  String get aiSettingsKeyRemoved => 'キーを削除しました';
+
+  @override
+  String get aiSettingsModel => 'モデル';
+
+  @override
+  String get aiSettingsModelHelper =>
+      'ツール呼び出し（function calling）に対応したモデルが必要です。右のボタンでモデル一覧を取得できます。';
+
+  @override
+  String get aiSettingsModelEmpty => 'モデルを入力または選択してください';
+
+  @override
+  String get aiSettingsFetchModels => 'モデル一覧を取得';
+
+  @override
+  String get aiSettingsFilterModels => 'モデルを検索';
+
+  @override
+  String get aiSettingsNoModels => 'このサービスはモデルを公開していません。モデル名を直接入力してください。';
+
+  @override
+  String get aiSettingsSave => '保存';
+
+  @override
+  String get aiSettingsSaved => '保存しました';
+
+  @override
+  String get aiSettingsSaveFailed => 'キーを保存できませんでした。もう一度お試しください。';
+
+  @override
+  String get aiSettingsPrivacy => 'プライバシー';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      'キーはこの端末のキー保管庫にのみ保存され、ExpTechにアップロードされることはありません。会話はこの端末とあなたのAIサービスの間だけでやり取りされ、保存されません。AIがデータを調べるときは、検索条件だけがDPIPのデータサーバーに送られます。';
+
+  @override
+  String get aiSettingsForget => 'AI設定をすべて消去';
+
+  @override
+  String get aiSettingsForgetTitle => 'AI設定を消去しますか？';
+
+  @override
+  String get aiSettingsForgetBody => 'URL、モデル、キーがこの端末から削除されます。';
+
+  @override
+  String get aiSettingsForgetConfirm => '消去';
+
+  @override
+  String get aiSettingsForgotten => 'AI設定を消去しました';
+
+  @override
+  String get aiToolEarthquake => '地震情報';
+
+  @override
+  String get aiToolWeather => '気象情報';
+
+  @override
+  String get aiToolTyphoon => '台風情報';
+
+  @override
+  String get aiToolTsunami => '津波情報';
+
+  @override
+  String get aiToolNotices => '災害情報';
+
+  @override
+  String get aiToolPlaces => '地点';
+
+  @override
+  String get aiToolTimeline => 'データの時刻';
+
+  @override
+  String get aiToolOther => 'データ';
+
+  @override
+  String aiToolRunning(String subject) {
+    return '$subjectを調べています…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return '$subjectを調べました';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return '$subjectを取得できませんでした';
+  }
+
+  @override
+  String get aiErrorUnauthorized => 'APIキーが無効か期限切れ、またはこのモデルを使う権限がありません。';
+
+  @override
+  String get aiErrorNotFound => 'APIまたはモデルが見つかりません。URLとモデル名を確認してください。';
+
+  @override
+  String get aiErrorRateLimited =>
+      'AIサービスのレート制限または利用枠の上限に達しました。しばらくしてから再試行するか、プランを確認してください。';
+
+  @override
+  String get aiErrorRejected =>
+      'AIサービスがリクエストを拒否しました。モデルがツール呼び出しに対応していない可能性があります。';
+
+  @override
+  String get aiErrorServer => 'AIサービスで一時的なエラーが発生しました。しばらくしてから再試行してください。';
+
+  @override
+  String get aiErrorNetwork => 'AIサービスに接続できません。ネットワークを確認してください。';
+
+  @override
+  String get aiErrorTimeout => 'AIサービスの応答に時間がかかりすぎています。';
+
+  @override
+  String get aiErrorBadResponse =>
+      'AIサービスの応答を読み取れませんでした。このURLはOpenAI互換のAPIではない可能性があります。';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'DPIPのデータサーバーに接続できません。しばらくしてから再試行してください。';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'AIがデータを何度も調べましたが答えが出ませんでした。もっと具体的に質問してください。';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return 'サービスからのメッセージ：$detail';
+  }
 }

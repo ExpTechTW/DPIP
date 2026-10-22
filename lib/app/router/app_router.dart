@@ -1,4 +1,6 @@
 import 'package:dpip/app/shell/main_shell.dart';
+import 'package:dpip/features/ai_chat/presentation/pages/ai_chat_page.dart';
+import 'package:dpip/features/ai_chat/presentation/pages/ai_settings_page.dart';
 import 'package:dpip/app/router/route_params.dart';
 import 'package:dpip/app/router/widget_location_routes.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
@@ -298,6 +300,16 @@ final GoRouter appRouter = GoRouter(
           builder: (_, _) => const NotificationTestPage(),
         ),
       ],
+    ),
+    GoRoute(
+      path: AppRoutes.aiPath,
+      name: AppRoutes.ai,
+      builder: (_, _) => const AiChatPage(),
+    ),
+    GoRoute(
+      path: AppRoutes.aiSettingsPath,
+      name: AppRoutes.aiSettings,
+      builder: (_, _) => const AiSettingsPage(),
     ),
     GoRoute(
       path: AppRoutes.sponsorPath,

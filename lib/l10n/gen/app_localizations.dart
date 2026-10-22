@@ -6809,6 +6809,552 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip for now'**
   String get onboardingNotifySkip;
+
+  /// App bar title of the AI chat
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get aiChatTitle;
+
+  /// Tooltip: start a new, empty conversation
+  ///
+  /// In en, this message translates to:
+  /// **'New conversation'**
+  String get aiChatNew;
+
+  /// Tooltip: show the AI chat explanation again
+  ///
+  /// In en, this message translates to:
+  /// **'About the AI assistant'**
+  String get aiChatAbout;
+
+  /// Hint in the empty question field
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about earthquakes, weather or typhoons…'**
+  String get aiChatInputHint;
+
+  /// Tooltip of the send button
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get aiChatSend;
+
+  /// Tooltip of the button that stops an answer in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get aiChatStop;
+
+  /// Always-visible line under the question field
+  ///
+  /// In en, this message translates to:
+  /// **'AI can be wrong. In an emergency, follow official alerts.'**
+  String get aiChatDisclaimer;
+
+  /// Heading of an empty conversation, above suggested questions
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to know?'**
+  String get aiChatEmptyTitle;
+
+  /// Suggested question; tapping it asks it
+  ///
+  /// In en, this message translates to:
+  /// **'Any earthquakes recently?'**
+  String get aiChatSuggestionQuakes;
+
+  /// Suggested question about the user's own area
+  ///
+  /// In en, this message translates to:
+  /// **'Will it rain here today?'**
+  String get aiChatSuggestionRain;
+
+  /// Suggested question
+  ///
+  /// In en, this message translates to:
+  /// **'Is there a typhoon right now?'**
+  String get aiChatSuggestionTyphoon;
+
+  /// Suggested question
+  ///
+  /// In en, this message translates to:
+  /// **'What disaster alerts are in effect?'**
+  String get aiChatSuggestionAlerts;
+
+  /// Shown while a reasoning model thinks before answering
+  ///
+  /// In en, this message translates to:
+  /// **'Thinking…'**
+  String get aiChatThinking;
+
+  /// Shown until the AI service sends its first word
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for a reply…'**
+  String get aiChatWaiting;
+
+  /// Under an answer the user stopped
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped'**
+  String get aiChatStopped;
+
+  /// Button under an error that is fixed in the AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get aiChatOpenSettings;
+
+  /// Toast after a message is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get aiChatCopied;
+
+  /// Title shown when no AI service is set up yet
+  ///
+  /// In en, this message translates to:
+  /// **'No AI service set up yet'**
+  String get aiChatSetupTitle;
+
+  /// Body shown when no AI service is set up yet
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your own AI service\'s URL, key and model to start.'**
+  String get aiChatSetupBody;
+
+  /// Button that opens the AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get aiChatSetupAction;
+
+  /// Heading of the AI chat explanation page
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
+  String get aiIntroTitle;
+
+  /// Opening paragraph of the AI chat explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about recent earthquakes, tomorrow\'s weather or a typhoon\'s track. The AI looks the data up in DPIP first, then answers in your language.'**
+  String get aiIntroBody;
+
+  /// Explanation point title
+  ///
+  /// In en, this message translates to:
+  /// **'Use your own AI service'**
+  String get aiIntroOwnKeyTitle;
+
+  /// Explanation point body; service names are proper nouns
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the URL and key of any OpenAI-compatible AI service that supports tool calls, such as OpenAI, Google Gemini, Anthropic or OpenRouter. Usage and charges are counted by your AI service.'**
+  String get aiIntroOwnKeyBody;
+
+  /// Explanation point title
+  ///
+  /// In en, this message translates to:
+  /// **'Your key stays on this phone; conversations are not saved'**
+  String get aiIntroLocalTitle;
+
+  /// Explanation point body: where the key is stored, and that conversations are not saved
+  ///
+  /// In en, this message translates to:
+  /// **'The API key is kept in the system\'s key storage (iOS Keychain, Android Keystore). It is never uploaded to ExpTech and is not carried to another phone by a backup. Conversations are not saved: they disappear when the app is closed.'**
+  String get aiIntroLocalBody;
+
+  /// Explanation point title
+  ///
+  /// In en, this message translates to:
+  /// **'Where your data goes'**
+  String get aiIntroDataTitle;
+
+  /// Explanation point body: what is sent where. Townships are sent as names and codes only, never coordinates
+  ///
+  /// In en, this message translates to:
+  /// **'Your questions go straight from this phone to the AI service you set up, not through ExpTech. When the AI needs data, the app asks DPIP\'s public data server, sending only the query (such as an area code or a date) — never your key or the conversation. So the AI knows where \"here\" is, it is told your current township and saved townships in the app (names and codes only).'**
+  String get aiIntroDataBody;
+
+  /// Explanation point title
+  ///
+  /// In en, this message translates to:
+  /// **'The AI can be wrong'**
+  String get aiIntroCautionTitle;
+
+  /// Explanation point body: the AI is not an official warning source
+  ///
+  /// In en, this message translates to:
+  /// **'Its answers are for reference only. If you may be in danger, protect yourself first and follow official alerts and instructions from the Central Weather Administration and the government.'**
+  String get aiIntroCautionBody;
+
+  /// Explanation point title: using the DPIP MCP server in other tools
+  ///
+  /// In en, this message translates to:
+  /// **'Build your own'**
+  String get aiIntroMcpTitle;
+
+  /// Explanation point body; Claude and ChatGPT are product names
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP\'s data is also open as an MCP server — read-only, no key needed. Connect it to Claude, ChatGPT or any other MCP-capable tool and build something of your own.'**
+  String get aiIntroMcpBody;
+
+  /// Button that leaves the explanation and opens the AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get aiIntroStart;
+
+  /// Title of the card with the MCP server URL
+  ///
+  /// In en, this message translates to:
+  /// **'DPIP MCP server'**
+  String get aiMcpTitle;
+
+  /// Card body; Streamable HTTP is the MCP transport name, not translated
+  ///
+  /// In en, this message translates to:
+  /// **'Any MCP client that supports Streamable HTTP can use this address directly.'**
+  String get aiMcpBody;
+
+  /// Button: copy the MCP server URL
+  ///
+  /// In en, this message translates to:
+  /// **'Copy URL'**
+  String get aiMcpCopyUrl;
+
+  /// Button: copy an example MCP client configuration
+  ///
+  /// In en, this message translates to:
+  /// **'Copy config example'**
+  String get aiMcpCopyConfig;
+
+  /// Toast after copying the MCP URL or config
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get aiMcpCopied;
+
+  /// Title of the AI settings page
+  ///
+  /// In en, this message translates to:
+  /// **'AI settings'**
+  String get aiSettingsTitle;
+
+  /// Section header in AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'AI service'**
+  String get aiSettingsService;
+
+  /// Text under the AI service header; /chat/completions is an API path
+  ///
+  /// In en, this message translates to:
+  /// **'Any OpenAI-compatible service (/chat/completions) with tool calls works. Tap a service below to fill in its URL.'**
+  String get aiSettingsServiceBody;
+
+  /// Label of the API URL field
+  ///
+  /// In en, this message translates to:
+  /// **'API URL'**
+  String get aiSettingsBaseUrl;
+
+  /// Helper under the API URL field
+  ///
+  /// In en, this message translates to:
+  /// **'The API\'s base URL, usually ending in /v1.'**
+  String get aiSettingsBaseUrlHelper;
+
+  /// Error: the URL field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a URL'**
+  String get aiSettingsUrlEmpty;
+
+  /// Error: the URL is not a URL
+  ///
+  /// In en, this message translates to:
+  /// **'This is not a valid URL'**
+  String get aiSettingsUrlInvalid;
+
+  /// Error: plain http to another host; https:// and http:// are literal
+  ///
+  /// In en, this message translates to:
+  /// **'Use https://. Plain http:// is only allowed to this phone itself (localhost).'**
+  String get aiSettingsUrlInsecure;
+
+  /// Label of the API key field
+  ///
+  /// In en, this message translates to:
+  /// **'API key'**
+  String get aiSettingsApiKey;
+
+  /// Helper under the API key field when no key is saved
+  ///
+  /// In en, this message translates to:
+  /// **'Stored only in this phone\'s key storage. Leave empty for a service that needs no key.'**
+  String get aiSettingsApiKeyHelper;
+
+  /// Helper under the API key field when a key is saved
+  ///
+  /// In en, this message translates to:
+  /// **'A key is saved. Leave empty to keep it.'**
+  String get aiSettingsApiKeySaved;
+
+  /// Tooltip: reveal the typed key
+  ///
+  /// In en, this message translates to:
+  /// **'Show key'**
+  String get aiSettingsShowKey;
+
+  /// Tooltip: hide the typed key
+  ///
+  /// In en, this message translates to:
+  /// **'Hide key'**
+  String get aiSettingsHideKey;
+
+  /// Button: delete the saved key
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the saved key'**
+  String get aiSettingsRemoveKey;
+
+  /// Toast after the saved key is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Key deleted'**
+  String get aiSettingsKeyRemoved;
+
+  /// Label of the model field
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get aiSettingsModel;
+
+  /// Helper under the model field
+  ///
+  /// In en, this message translates to:
+  /// **'Must support tool calls (function calling). The button on the right lists the service\'s models.'**
+  String get aiSettingsModelHelper;
+
+  /// Error: no model given
+  ///
+  /// In en, this message translates to:
+  /// **'Enter or pick a model'**
+  String get aiSettingsModelEmpty;
+
+  /// Tooltip: fetch the service's model list
+  ///
+  /// In en, this message translates to:
+  /// **'List models'**
+  String get aiSettingsFetchModels;
+
+  /// Hint of the search field in the model list
+  ///
+  /// In en, this message translates to:
+  /// **'Filter models'**
+  String get aiSettingsFilterModels;
+
+  /// Error: the service returned an empty model list
+  ///
+  /// In en, this message translates to:
+  /// **'This service lists no models. Type the model name instead.'**
+  String get aiSettingsNoModels;
+
+  /// Button: save the AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get aiSettingsSave;
+
+  /// Toast after saving
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get aiSettingsSaved;
+
+  /// Toast: the platform's key storage refused the key
+  ///
+  /// In en, this message translates to:
+  /// **'The key could not be saved. Please try again.'**
+  String get aiSettingsSaveFailed;
+
+  /// Section header in AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get aiSettingsPrivacy;
+
+  /// Short privacy summary in AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'The key stays in this phone\'s key storage and is never uploaded to ExpTech. Conversations travel only between this phone and your AI service, and are not saved. When the AI looks data up, only the query goes to DPIP\'s data server.'**
+  String get aiSettingsPrivacyBody;
+
+  /// Button: delete URL, model and key
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all AI settings'**
+  String get aiSettingsForget;
+
+  /// Confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Clear AI settings?'**
+  String get aiSettingsForgetTitle;
+
+  /// Confirmation dialog body
+  ///
+  /// In en, this message translates to:
+  /// **'The URL, model and key will be deleted from this phone.'**
+  String get aiSettingsForgetBody;
+
+  /// Confirmation dialog: the destructive action
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get aiSettingsForgetConfirm;
+
+  /// Toast after clearing the AI settings
+  ///
+  /// In en, this message translates to:
+  /// **'AI settings cleared'**
+  String get aiSettingsForgotten;
+
+  /// Kind of data a tool looks up; inserted into the "looking up" lines
+  ///
+  /// In en, this message translates to:
+  /// **'earthquake data'**
+  String get aiToolEarthquake;
+
+  /// Kind of data a tool looks up
+  ///
+  /// In en, this message translates to:
+  /// **'weather data'**
+  String get aiToolWeather;
+
+  /// Kind of data a tool looks up
+  ///
+  /// In en, this message translates to:
+  /// **'typhoon data'**
+  String get aiToolTyphoon;
+
+  /// Kind of data a tool looks up
+  ///
+  /// In en, this message translates to:
+  /// **'tsunami data'**
+  String get aiToolTsunami;
+
+  /// Kind of data a tool looks up
+  ///
+  /// In en, this message translates to:
+  /// **'disaster notices'**
+  String get aiToolNotices;
+
+  /// Kind of data a tool looks up
+  ///
+  /// In en, this message translates to:
+  /// **'places'**
+  String get aiToolPlaces;
+
+  /// Kind of data a tool looks up: which times have data
+  ///
+  /// In en, this message translates to:
+  /// **'data times'**
+  String get aiToolTimeline;
+
+  /// Kind of data a tool looks up, when the tool is not one the app knows
+  ///
+  /// In en, this message translates to:
+  /// **'data'**
+  String get aiToolOther;
+
+  /// A tool call in progress; {subject} is one of the aiTool* kinds
+  ///
+  /// In en, this message translates to:
+  /// **'Looking up {subject}…'**
+  String aiToolRunning(String subject);
+
+  /// A finished tool call
+  ///
+  /// In en, this message translates to:
+  /// **'Looked up {subject}'**
+  String aiToolDone(String subject);
+
+  /// A tool call that failed
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t look up {subject}'**
+  String aiToolFailed(String subject);
+
+  /// AI service answered 401/403
+  ///
+  /// In en, this message translates to:
+  /// **'The API key is invalid or expired, or has no access to this model.'**
+  String get aiErrorUnauthorized;
+
+  /// AI service answered 404
+  ///
+  /// In en, this message translates to:
+  /// **'The API or the model was not found. Check the URL and the model name.'**
+  String get aiErrorNotFound;
+
+  /// AI service answered 429
+  ///
+  /// In en, this message translates to:
+  /// **'Your AI service\'s rate limit or quota was reached. Try again later or check your plan.'**
+  String get aiErrorRateLimited;
+
+  /// AI service refused the request with another 4xx
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service refused the request. The model may not support tool calls.'**
+  String get aiErrorRejected;
+
+  /// AI service answered 5xx
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service had a problem. Try again later.'**
+  String get aiErrorServer;
+
+  /// No connection to the AI service
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the AI service. Check your connection.'**
+  String get aiErrorNetwork;
+
+  /// AI service went quiet too long
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service took too long to respond.'**
+  String get aiErrorTimeout;
+
+  /// AI service answered with something that is not a chat completion
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service\'s reply could not be read. This URL may not be an OpenAI-compatible API.'**
+  String get aiErrorBadResponse;
+
+  /// The DPIP MCP server could not be reached
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the DPIP data server. Try again later.'**
+  String get aiErrorToolsUnavailable;
+
+  /// The model kept calling tools past the per-question limit
+  ///
+  /// In en, this message translates to:
+  /// **'The AI looked up data too many times without an answer. Try a more specific question.'**
+  String get aiErrorTooManySteps;
+
+  /// The AI service's own error text, untranslated; {detail} is e.g. "HTTP 401 · Invalid API key"
+  ///
+  /// In en, this message translates to:
+  /// **'Service said: {detail}'**
+  String aiErrorServiceSaid(String detail);
 }
 
 class _AppLocalizationsDelegate

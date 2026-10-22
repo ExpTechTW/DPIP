@@ -72,6 +72,7 @@ import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
+import 'package:dpip/features/ai_chat/ai_chat_providers.dart';
 import 'package:dpip/features/changelog/changelog_providers.dart';
 import 'package:dpip/features/release_highlights/release_highlights_providers.dart';
 import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
@@ -527,6 +528,7 @@ Future<void> bootstrap() async {
         ...homeProviders(),
         ...statusProviders(deps),
         ...bugTrackerProviders(deps),
+        ...aiChatProviders(deps),
       ],
     ),
   );

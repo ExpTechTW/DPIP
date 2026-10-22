@@ -48,4 +48,13 @@ abstract final class ApiPaths {
 
   /// CWA tsunami bulletins — the index, and `/{id}` for one bulletin.
   static const String tsunami = '/api/v1/cwa/tsunami';
+
+  /// The read-only DPIP MCP server (Streamable HTTP, JSON-RPC over POST) that
+  /// the AI chat hands its AI service as tools.
+  static const String mcp = '/mcp';
+
+  /// [mcp] on the DNS-balanced bare host — the address the AI chat *shows*
+  /// users for their own MCP clients. The app itself never calls it (see
+  /// `api.md`); it goes through the region-pinned hosts like every other call.
+  static const String mcpPublicUrl = 'https://api.core.exptech.dev/mcp';
 }

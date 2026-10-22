@@ -3649,4 +3649,312 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Lewati dulu';
+
+  @override
+  String get aiChatTitle => 'Asisten AI';
+
+  @override
+  String get aiChatNew => 'Percakapan baru';
+
+  @override
+  String get aiChatAbout => 'Tentang';
+
+  @override
+  String get aiChatInputHint => 'Tanya soal gempa, cuaca, atau topan…';
+
+  @override
+  String get aiChatSend => 'Kirim';
+
+  @override
+  String get aiChatStop => 'Hentikan';
+
+  @override
+  String get aiChatDisclaimer =>
+      'AI bisa salah. Saat darurat, ikuti peringatan resmi.';
+
+  @override
+  String get aiChatEmptyTitle => 'Ingin tahu apa?';
+
+  @override
+  String get aiChatSuggestionQuakes => 'Ada gempa akhir-akhir ini?';
+
+  @override
+  String get aiChatSuggestionRain => 'Apakah di sini akan hujan hari ini?';
+
+  @override
+  String get aiChatSuggestionTyphoon => 'Apakah sekarang ada topan?';
+
+  @override
+  String get aiChatSuggestionAlerts =>
+      'Peringatan bencana apa yang sedang berlaku?';
+
+  @override
+  String get aiChatThinking => 'Sedang berpikir…';
+
+  @override
+  String get aiChatWaiting => 'Menunggu balasan…';
+
+  @override
+  String get aiChatStopped => 'Dihentikan';
+
+  @override
+  String get aiChatOpenSettings => 'Buka pengaturan';
+
+  @override
+  String get aiChatCopied => 'Disalin';
+
+  @override
+  String get aiChatSetupTitle => 'Layanan AI belum diatur';
+
+  @override
+  String get aiChatSetupBody =>
+      'Masukkan URL, kunci, dan model layanan AI Anda untuk mulai.';
+
+  @override
+  String get aiChatSetupAction => 'Atur';
+
+  @override
+  String get aiIntroTitle => 'Asisten AI';
+
+  @override
+  String get aiIntroBody =>
+      'Tanyakan gempa terbaru, cuaca besok, atau jalur topan. AI akan mencari data DPIP secara real-time lalu menjawab dalam bahasa Anda.';
+
+  @override
+  String get aiIntroOwnKeyTitle => 'Gunakan layanan AI Anda sendiri';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      'Masukkan URL dan kunci layanan AI yang kompatibel dengan OpenAI dan mendukung pemanggilan alat, seperti OpenAI, Google Gemini, Anthropic, atau OpenRouter. Pemakaian dan biaya dihitung oleh layanan AI Anda.';
+
+  @override
+  String get aiIntroLocalTitle =>
+      'Kunci hanya ada di ponsel ini; percakapan tidak disimpan';
+
+  @override
+  String get aiIntroLocalBody =>
+      'Kunci API disimpan di penyimpanan kunci sistem (iOS Keychain, Android Keystore), tidak pernah diunggah ke ExpTech, dan tidak ikut pindah ke ponsel lain lewat cadangan. Percakapan tidak disimpan dan hilang saat aplikasi ditutup.';
+
+  @override
+  String get aiIntroDataTitle => 'Ke mana data dikirim';
+
+  @override
+  String get aiIntroDataBody =>
+      'Pertanyaan Anda dikirim langsung dari ponsel ke layanan AI yang Anda atur, tidak melalui ExpTech. Saat AI butuh data, aplikasi menanyakan server data publik DPIP dan hanya mengirim kriteria pencarian (seperti kode wilayah atau tanggal), tanpa kunci atau percakapan. Agar AI tahu di mana \"di sini\", lokasi saat ini dan kota yang Anda simpan di aplikasi (hanya nama dan kode) juga diberitahukan ke AI.';
+
+  @override
+  String get aiIntroCautionTitle => 'AI bisa salah';
+
+  @override
+  String get aiIntroCautionBody =>
+      'Jawabannya hanya sebagai referensi. Jika mungkin ada bahaya, lindungi diri Anda terlebih dahulu dan ikuti peringatan serta instruksi resmi dari Central Weather Administration dan pemerintah.';
+
+  @override
+  String get aiIntroMcpTitle => 'Buat sendiri';
+
+  @override
+  String get aiIntroMcpBody =>
+      'Data DPIP juga terbuka sebagai server MCP — hanya baca, tanpa kunci. Hubungkan ke Claude, ChatGPT, atau alat lain yang mendukung MCP dan buat sesuatu milik Anda sendiri.';
+
+  @override
+  String get aiIntroStart => 'Mulai atur';
+
+  @override
+  String get aiMcpTitle => 'Server MCP DPIP';
+
+  @override
+  String get aiMcpBody =>
+      'Klien MCP apa pun yang mendukung Streamable HTTP dapat langsung memakai alamat ini.';
+
+  @override
+  String get aiMcpCopyUrl => 'Salin URL';
+
+  @override
+  String get aiMcpCopyConfig => 'Salin contoh konfigurasi';
+
+  @override
+  String get aiMcpCopied => 'Disalin';
+
+  @override
+  String get aiSettingsTitle => 'Pengaturan AI';
+
+  @override
+  String get aiSettingsService => 'Layanan AI';
+
+  @override
+  String get aiSettingsServiceBody =>
+      'Layanan apa pun yang kompatibel dengan OpenAI (/chat/completions) dan mendukung pemanggilan alat bisa dipakai. Ketuk layanan di bawah untuk mengisi URL-nya.';
+
+  @override
+  String get aiSettingsBaseUrl => 'URL API';
+
+  @override
+  String get aiSettingsBaseUrlHelper => 'URL dasar API, biasanya diakhiri /v1.';
+
+  @override
+  String get aiSettingsUrlEmpty => 'Masukkan URL';
+
+  @override
+  String get aiSettingsUrlInvalid => 'URL tidak valid';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'Gunakan https://. http:// hanya diizinkan untuk ponsel ini sendiri (localhost).';
+
+  @override
+  String get aiSettingsApiKey => 'Kunci API';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      'Hanya disimpan di penyimpanan kunci ponsel ini. Kosongkan jika layanan tidak memerlukan kunci.';
+
+  @override
+  String get aiSettingsApiKeySaved =>
+      'Kunci sudah tersimpan. Kosongkan untuk tetap memakainya.';
+
+  @override
+  String get aiSettingsShowKey => 'Tampilkan kunci';
+
+  @override
+  String get aiSettingsHideKey => 'Sembunyikan kunci';
+
+  @override
+  String get aiSettingsRemoveKey => 'Hapus kunci tersimpan';
+
+  @override
+  String get aiSettingsKeyRemoved => 'Kunci dihapus';
+
+  @override
+  String get aiSettingsModel => 'Model';
+
+  @override
+  String get aiSettingsModelHelper =>
+      'Harus mendukung pemanggilan alat (function calling). Tombol di kanan menampilkan daftar model layanan.';
+
+  @override
+  String get aiSettingsModelEmpty => 'Masukkan atau pilih model';
+
+  @override
+  String get aiSettingsFetchModels => 'Tampilkan daftar model';
+
+  @override
+  String get aiSettingsFilterModels => 'Cari model';
+
+  @override
+  String get aiSettingsNoModels =>
+      'Layanan ini tidak menampilkan model. Ketik nama modelnya langsung.';
+
+  @override
+  String get aiSettingsSave => 'Simpan';
+
+  @override
+  String get aiSettingsSaved => 'Tersimpan';
+
+  @override
+  String get aiSettingsSaveFailed => 'Kunci tidak dapat disimpan. Coba lagi.';
+
+  @override
+  String get aiSettingsPrivacy => 'Privasi';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      'Kunci tetap di penyimpanan kunci ponsel ini dan tidak pernah diunggah ke ExpTech. Percakapan hanya berlangsung antara ponsel ini dan layanan AI Anda, dan tidak disimpan. Saat AI mencari data, hanya kriteria pencarian yang dikirim ke server data DPIP.';
+
+  @override
+  String get aiSettingsForget => 'Hapus semua pengaturan AI';
+
+  @override
+  String get aiSettingsForgetTitle => 'Hapus pengaturan AI?';
+
+  @override
+  String get aiSettingsForgetBody =>
+      'URL, model, dan kunci akan dihapus dari ponsel ini.';
+
+  @override
+  String get aiSettingsForgetConfirm => 'Hapus';
+
+  @override
+  String get aiSettingsForgotten => 'Pengaturan AI dihapus';
+
+  @override
+  String get aiToolEarthquake => 'data gempa';
+
+  @override
+  String get aiToolWeather => 'data cuaca';
+
+  @override
+  String get aiToolTyphoon => 'data topan';
+
+  @override
+  String get aiToolTsunami => 'data tsunami';
+
+  @override
+  String get aiToolNotices => 'pemberitahuan bencana';
+
+  @override
+  String get aiToolPlaces => 'lokasi';
+
+  @override
+  String get aiToolTimeline => 'waktu data';
+
+  @override
+  String get aiToolOther => 'data';
+
+  @override
+  String aiToolRunning(String subject) {
+    return 'Mencari $subject…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return 'Selesai mencari $subject';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return 'Gagal mencari $subject';
+  }
+
+  @override
+  String get aiErrorUnauthorized =>
+      'Kunci API tidak valid atau kedaluwarsa, atau tidak punya akses ke model ini.';
+
+  @override
+  String get aiErrorNotFound =>
+      'API atau model tidak ditemukan. Periksa URL dan nama model.';
+
+  @override
+  String get aiErrorRateLimited =>
+      'Batas laju atau kuota layanan AI Anda tercapai. Coba lagi nanti atau periksa paket Anda.';
+
+  @override
+  String get aiErrorRejected =>
+      'Layanan AI menolak permintaan. Model mungkin tidak mendukung pemanggilan alat.';
+
+  @override
+  String get aiErrorServer => 'Layanan AI sedang bermasalah. Coba lagi nanti.';
+
+  @override
+  String get aiErrorNetwork =>
+      'Tidak dapat menjangkau layanan AI. Periksa koneksi Anda.';
+
+  @override
+  String get aiErrorTimeout => 'Layanan AI terlalu lama merespons.';
+
+  @override
+  String get aiErrorBadResponse =>
+      'Balasan layanan AI tidak dapat dibaca. URL ini mungkin bukan API yang kompatibel dengan OpenAI.';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'Tidak dapat menjangkau server data DPIP. Coba lagi nanti.';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'AI mencari data terlalu banyak kali tanpa jawaban. Coba pertanyaan yang lebih spesifik.';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return 'Pesan layanan: $detail';
+  }
 }

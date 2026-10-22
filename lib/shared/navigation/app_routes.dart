@@ -79,6 +79,14 @@ abstract final class AppRoutes {
   static const String more = 'more';
   static const String morePath = '/more';
 
+  /// The AI assistant, pushed over the shell from Home's region bar.
+  static const String ai = 'ai';
+  static const String aiPath = '/ai';
+
+  /// The AI chat's service setup (URL, key, model), pushed over the shell.
+  static const String aiSettings = 'aiSettings';
+  static const String aiSettingsPath = '/ai-settings';
+
   // First-launch onboarding (intro → terms → permissions), shown before the
   // shell until completed.
   static const String onboarding = 'onboarding';
