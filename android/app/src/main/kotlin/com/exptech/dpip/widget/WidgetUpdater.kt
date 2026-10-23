@@ -14,13 +14,27 @@ import com.exptech.dpip.R
 object WidgetUpdater {
 
     fun updateAll(context: Context) {
-        val manager = AppWidgetManager.getInstance(context)
+        val manager = managerOrNull(context) ?: return
         for (id in liveAppWidgetIds(context, manager)) updateInstance(context, manager, id)
     }
 
     fun updateInstance(context: Context, appWidgetId: Int) {
-        updateInstance(context, AppWidgetManager.getInstance(context), appWidgetId)
+        updateInstance(context, managerOrNull(context) ?: return, appWidgetId)
     }
+
+    /**
+     * `AppWidgetManager` when the device has one.
+     *
+     * `getInstance` is documented to return null without `FEATURE_APP_WIDGETS` —
+     * Android TV, Automotive, some work profiles — and Kotlin turns that into an
+     * NPE at the assignment, not at the call that needed it. Every entry point
+     * here is reached from a Flutter channel task or a `BroadcastReceiver`, where
+     * an escaping throw costs more than the redraw: the channel's reply is the
+     * future Dart's publish chain is waiting on. Nothing to draw on such a device
+     * is the correct outcome, so this answers null and the callers return.
+     */
+    private fun managerOrNull(context: Context): AppWidgetManager? =
+        AppWidgetManager.getInstance(context)
 
     private fun updateInstance(
         context: Context,
@@ -54,8 +68,9 @@ object WidgetUpdater {
     }
 
     fun sizeClass(context: Context, appWidgetId: Int): WidgetSizeClass {
-        val options = optionsOf(AppWidgetManager.getInstance(context), appWidgetId)
-        return WidgetSizes.largestClass(context, options)
+        val manager = managerOrNull(context)
+            ?: return WidgetSizes.largestClass(context, Bundle())
+        return WidgetSizes.largestClass(context, optionsOf(manager, appWidgetId))
     }
 
     fun presentation(
@@ -248,7 +263,7 @@ object WidgetUpdater {
 
     /** Re-renders every instance of one address from the cache. */
     fun updateAddress(context: Context, address: WidgetAddress) {
-        val manager = AppWidgetManager.getInstance(context)
+        val manager = managerOrNull(context) ?: return
         for (instance in WidgetStore.open(context).readInstances()) {
             if (instance.address.sourceIdentifier == address.sourceIdentifier) {
                 updateInstance(context, manager, instance.appWidgetId)
@@ -256,13 +271,19 @@ object WidgetUpdater {
         }
     }
 
-    /** The ids the launcher actually still has for this Widget. */
+    /**
+     * The ids the launcher actually still has for this Widget.
+     *
+     * Empty on a device with no `AppWidgetManager` at all, which is the same
+     * answer as a device that has one and holds no instances — see
+     * [managerOrNull].
+     */
     fun liveAppWidgetIds(
         context: Context,
-        manager: AppWidgetManager = AppWidgetManager.getInstance(context),
-    ): IntArray = manager.getAppWidgetIds(
+        manager: AppWidgetManager? = managerOrNull(context),
+    ): IntArray = manager?.getAppWidgetIds(
         ComponentName(context, WeatherWidgetProvider::class.java),
-    )
+    ) ?: IntArray(0)
 
     /**
      * Brings the stored instances and the scheduled work back in line.
