@@ -137,10 +137,17 @@ class WeatherWidgetConfigurationActivity : Activity() {
         list.setOnItemClickListener { _, _, position, _ -> choose(rows[position]) }
     }
 
-    /** Intent extras are untrusted, even when the launcher normally supplies them. */
+    /**
+     * Intent extras are untrusted, even when the launcher normally supplies them.
+     *
+     * A null `AppWidgetManager` (no `FEATURE_APP_WIDGETS`) answers "not ours",
+     * which is both true and the safe direction: this activity is only reachable
+     * by an explicit intent on such a device, and that intent is exactly the one
+     * this guard exists to reject.
+     */
     private fun isOwnWidget(): Boolean =
         appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID &&
-            AppWidgetManager.getInstance(this).getAppWidgetInfo(appWidgetId)?.provider ==
+            AppWidgetManager.getInstance(this)?.getAppWidgetInfo(appWidgetId)?.provider ==
             ComponentName(this, WeatherWidgetProvider::class.java)
 
     /**

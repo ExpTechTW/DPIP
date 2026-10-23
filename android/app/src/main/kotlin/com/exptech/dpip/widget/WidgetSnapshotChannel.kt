@@ -59,8 +59,7 @@ class WidgetSnapshotChannel(private val context: Context) : MethodChannel.Method
         }
 
         executor.execute {
-            val failure = write(kind, json, sourceIdentifier)
-            reply(result, failure)
+            reply(result, guarded("write kind=${kind.wire}") { write(kind, json, sourceIdentifier) })
         }
     }
 
@@ -92,23 +91,58 @@ class WidgetSnapshotChannel(private val context: Context) : MethodChannel.Method
         }
 
         executor.execute {
-            val store = WidgetStore.open(context)
-            val cleared = when (kind) {
-                WidgetSnapshotKind.CurrentWeather -> if (address == null) {
-                    store.clearCurrentWeather()
-                } else {
-                    store.clearCurrentWeatherSource(address)
-                }
-                WidgetSnapshotKind.WeatherForecast -> store.clearForecast()
-                // Clearing the catalog is "there are no saved locations": the
-                // same code path a publish with an empty list takes, so the
-                // fence on a removed town is applied here too.
-                WidgetSnapshotKind.LocationCatalog ->
-                    store.writeCatalog(emptyList(), System.currentTimeMillis())
-            }
+            reply(
+                result,
+                guarded("clear kind=${kind.wire}") {
+                    val store = WidgetStore.open(context)
+                    val cleared = when (kind) {
+                        WidgetSnapshotKind.CurrentWeather -> if (address == null) {
+                            store.clearCurrentWeather()
+                        } else {
+                            store.clearCurrentWeatherSource(address)
+                        }
+                        WidgetSnapshotKind.WeatherForecast -> store.clearForecast()
+                        // Clearing the catalog is "there are no saved locations":
+                        // the same code path a publish with an empty list takes,
+                        // so the fence on a removed town is applied here too.
+                        WidgetSnapshotKind.LocationCatalog ->
+                            store.writeCatalog(emptyList(), System.currentTimeMillis())
+                    }
 
-            WidgetUpdater.updateAll(context)
-            reply(result, if (cleared) null else error("write_failed", "clear kind=${kind.wire}"))
+                    WidgetUpdater.updateAll(context)
+                    if (cleared) null else error("write_failed", "clear kind=${kind.wire}")
+                },
+            )
+        }
+    }
+
+    /**
+     * Runs one storage task and turns anything it throws into `write_failed`.
+     *
+     * The reply is the point. Dart serialises its publishes behind the future
+     * this channel completes (`WidgetLocationCatalogCoordinator`'s pending-write
+     * chain), so a task that escapes with an exception does not merely lose its
+     * own result — `result` is never completed and every later publish queues
+     * behind a future that will never resolve. The platform channel has no
+     * timeout to rescue it.
+     *
+     * A backstop, not the only guard: the store's own writes answer `false`
+     * rather than throwing, and `WidgetUpdater.updateInstance` catches the
+     * launcher's own failures. What reaches here is everything *between* them —
+     * opening the store, asking the launcher for its ids, and whatever a future
+     * caller adds to these tasks. Deliberately `Throwable`: this is the top of an
+     * executor task, where the alternative to catching is an uncaught-exception
+     * handler that cannot reply.
+     */
+    private fun guarded(operation: String, body: () -> FlutterErrorLike?): FlutterErrorLike? {
+        return try {
+            body()
+        } catch (failure: Throwable) {
+            WidgetLog.error(
+                context,
+                "channel failed operation=$operation error=${failure.logName()}",
+            )
+            error("write_failed", operation)
         }
     }
 
