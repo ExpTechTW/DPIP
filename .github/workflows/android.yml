@@ -18,6 +18,7 @@ jobs:
       contents: read
     outputs:
       android: ${{ steps.filter.outputs.android }}
+      native: ${{ steps.filter.outputs.native }}
       release: ${{ steps.release.outputs.builds }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,6 +39,16 @@ jobs:
               - 'assets/**'
               - 'lib/**'
               - 'pubspec.yaml'
+            # The emulator job's filter, and deliberately narrower than
+            # `android`. What it tests — provider metadata, RemoteViews
+            # inflation, the Widget's own SQLite — is decided entirely by the
+            # native sources, the resources and the manifest. A Dart-only change
+            # cannot alter any of the three, so booting an emulator for one
+            # spends ~15 minutes of a runner to re-prove an unchanged tree.
+            native:
+              - 'android/**'
+              - '.github/workflows/android.yml'
+              - 'tool/dev/test_android_device.sh'
 
       # Whether release.yml builds this push, for the job below. It publishes
       # a snapshot only when a commit since the last tag carries a changelog
@@ -158,12 +169,12 @@ jobs:
   # `src/androidTest` covers, and a device is the only place they can run — so
   # this job exists, and a green `Android` job above says nothing about them.
   #
-  # Gated on the same path filter as the build, and deliberately not on the
-  # release decision: a device run is worth doing whether or not release.yml also
-  # builds this push.
+  # Gated on the `native` filter rather than the build's `android`, and
+  # deliberately not on the release decision: a device run is worth doing whether
+  # or not release.yml also builds this push.
   Instrumented:
     needs: changes
-    if: ${{ needs.changes.outputs.android == 'true' }}
+    if: ${{ needs.changes.outputs.native == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
