@@ -854,4 +854,32 @@ class WidgetStoreTest {
             commit(upgraded.beginCurrentWeatherWrite(saved)!!),
         )
     }
+
+    // ── Forecast demand ─────────────────────────────────────────────────────
+
+    @Test
+    fun `a cached forecast retires the demand it answers`() {
+        // The leak: `commitForecast` is the only other place the demand clears,
+        // and a refresh that keeps a still-valid cached forecast never reaches
+        // it. Left raised, every later options change re-reserves a ticket.
+        assertTrue(store.setForecastDemand(saved, demand = true, updatedAt = 1L))
+        assertTrue(store.hasForecastDemand(saved))
+        val version = store.readForecastDemandVersion(saved)
+
+        assertTrue(store.clearAnsweredForecastDemand(saved, version, updatedAt = 2L))
+
+        assertFalse(store.hasForecastDemand(saved))
+    }
+
+    @Test
+    fun `a demand raised after the run started stays raised`() {
+        assertTrue(store.setForecastDemand(saved, demand = true, updatedAt = 1L))
+        val answered = store.readForecastDemandVersion(saved)
+        // A resize while the refresh was deciding: a newer ask nothing answered.
+        assertTrue(store.setForecastDemand(saved, demand = true, updatedAt = 2L))
+
+        assertFalse(store.clearAnsweredForecastDemand(saved, answered, updatedAt = 3L))
+
+        assertTrue(store.hasForecastDemand(saved))
+    }
 }
