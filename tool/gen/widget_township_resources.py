@@ -97,7 +97,11 @@ def main() -> int:
                 continue
 
             actual = path.read_bytes()
-            if path == DIRECTORY_OUTPUT:
+            # Both directories are text, so a Windows checkout with autocrlf
+            # rewrites their newline; the boundary payloads are binary and Git
+            # leaves them alone. Listing only the iOS one is how the Android
+            # copy, added beside it, failed this check on Windows alone.
+            if path in (DIRECTORY_OUTPUT, ANDROID_DIRECTORY_OUTPUT):
                 actual = actual.replace(b"\r\n", b"\n")
 
             if actual != expected:
