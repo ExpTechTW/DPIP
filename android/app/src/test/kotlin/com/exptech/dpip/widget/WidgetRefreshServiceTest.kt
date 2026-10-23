@@ -638,6 +638,75 @@ class WidgetRefreshServiceTest {
         assertEquals("407", store.readForecast(currentLocation)!!.forecast.regionCode)
     }
 
+    @Test
+    fun `a kept forecast retires the demand that asked for it`() {
+        // The leak: this path returns before `commitForecast`, the only other
+        // place the demand clears. Left raised it is permanent — `wantsForecast`
+        // reads it on every later options change, so each one reserves a ticket
+        // and re-fetches a forecast that is already stored, including after a
+        // resize back down to a size that draws none.
+        store.commitCurrentWeather(
+            token = store.beginCurrentWeatherWrite(currentLocation)!!,
+            snapshot = currentSnapshot("407"),
+            writtenAt = 1L,
+        )
+        seedForecast(
+            regionCode = "407",
+            updateTime = 1_791_454_400_000L,
+            expiresAt = 1_791_457_200_000L,
+        )
+        store.setForecastDemand(currentLocation, demand = true, updatedAt = 1L)
+        val demandVersion = store.readForecastDemandVersion(currentLocation)
+
+        var forecastFetches = 0
+        val result = service(
+            fetchForecast = { forecastFetches++; forecastUpdate() },
+        ).refresh(
+            currentLocation,
+            includeForecast = true,
+            answeredDemandVersion = demandVersion,
+        )
+
+        assertEquals(WidgetRefreshResult.Refreshed, result)
+        assertEquals(0, forecastFetches)
+        assertFalse(
+            "the cache is the answer, so the demand must not outlive it",
+            store.hasForecastDemand(currentLocation),
+        )
+    }
+
+    @Test
+    fun `a demand raised while the run was deciding survives a kept forecast`() {
+        // The version fence, on this path too: a resize that asked for a forecast
+        // after this run read its arguments is a question the cache has not been
+        // checked against, so it must stay raised for the next run.
+        store.commitCurrentWeather(
+            token = store.beginCurrentWeatherWrite(currentLocation)!!,
+            snapshot = currentSnapshot("407"),
+            writtenAt = 1L,
+        )
+        seedForecast(
+            regionCode = "407",
+            updateTime = 1_791_454_400_000L,
+            expiresAt = 1_791_457_200_000L,
+        )
+        store.setForecastDemand(currentLocation, demand = true, updatedAt = 1L)
+        val staleVersion = store.readForecastDemandVersion(currentLocation)
+        store.setForecastDemand(currentLocation, demand = true, updatedAt = 2L)
+
+        val result = service().refresh(
+            currentLocation,
+            includeForecast = true,
+            answeredDemandVersion = staleVersion,
+        )
+
+        assertEquals(WidgetRefreshResult.Refreshed, result)
+        assertTrue(
+            "a newer ask is not answered by the run that never saw it",
+            store.hasForecastDemand(currentLocation),
+        )
+    }
+
     // ── Calibration does not depend on getting a background fix ──
 
     @Test

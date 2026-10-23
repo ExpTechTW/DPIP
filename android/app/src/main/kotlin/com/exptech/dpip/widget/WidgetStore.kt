@@ -844,6 +844,44 @@ class WidgetStore private constructor(
         readSourceState(helper.readableDatabase, address.sourceIdentifier)?.forecastDemand
     } ?: false
 
+    /**
+     * Retires the demand a forecast *already in the cache* answers.
+     *
+     * [commitForecast] clears the demand in the same transaction as the data, so
+     * every fetch retires its own. A refresh that finds the cache already holding
+     * this township's forecast, inside its deadline, never reaches that commit —
+     * and the demand it was dispatched to answer would outlive the thing that
+     * satisfied it. Left raised it is permanent: `wantsForecast` reads it on every
+     * later options change, so each one reserves a forecast ticket and re-fetches
+     * a forecast nothing draws, including after a resize back down to a size that
+     * has no forecast to draw.
+     *
+     * Version-matched for the same reason the commit is: a resize that raised a
+     * newer demand while this run was deciding must stay raised.
+     */
+    @Synchronized
+    fun clearAnsweredForecastDemand(
+        address: WidgetAddress,
+        answeredDemandVersion: Long,
+        updatedAt: Long,
+    ): Boolean {
+        return attempt("forecastDemand.answered", address.sourceIdentifier) {
+            inTransaction { database ->
+                val state = readSourceState(database, address.sourceIdentifier)
+                if (state != null && state.forecastDemandVersion != answeredDemandVersion) {
+                    return@inTransaction false
+                }
+                raiseForecastDemand(
+                    database = database,
+                    sourceIdentifier = address.sourceIdentifier,
+                    demand = false,
+                    updatedAt = updatedAt,
+                )
+                true
+            }
+        } ?: false
+    }
+
     /** The version a fetch should name when it clears the demand it answered. */
     @Synchronized
     fun readForecastDemandVersion(address: WidgetAddress): Long =

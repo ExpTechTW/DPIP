@@ -288,6 +288,22 @@ class WidgetRefreshService(
                     context,
                     "forecast kept region=${location.regionCode}",
                 )
+                // The cache *is* the answer to the demand this run was dispatched
+                // for, so retire it here. `commitForecast` is the only other place
+                // that clears it and this return never reaches it; left raised, the
+                // flag survives every later options change and keeps reserving a
+                // ticket for a forecast that is already stored.
+                //
+                // Not guarded by `isCancelled`, unlike the commit: what answers
+                // the demand here is the stored forecast, which this run neither
+                // produced nor can lose. A stopped run leaves it just as answered.
+                if (answeredDemandVersion != null) {
+                    store.clearAnsweredForecastDemand(
+                        address = location.address,
+                        answeredDemandVersion = answeredDemandVersion,
+                        updatedAt = nowMilliseconds(),
+                    )
+                }
                 return
             }
         }
