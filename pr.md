@@ -105,7 +105,7 @@ PR 不需要它，例如只改文件的 PR 不會 build App。
 | `build` | `ci.yml` | 每個 PR | commit 訊息、分支已 rebase 到 base、workflow 語法／workflow 安全／layering／l10n／storage／wall-clock／通知音效／lockfile／tooling 各道 gate、format + analyze、codegen 是最新、完整測試（含覆蓋率上傳） |
 | `changes` | `android.yml`、`ios.yml` | 每個 PR | 判斷這個 PR 需不需要 build Android／iOS |
 | `Android` | `android.yml` | 動到 `android/`、`assets/`、`lib/`、`pubspec.yaml` | 原生 Widget 單元測試、Android lint、Android 能 build |
-| `Instrumented` | `android.yml` | 與 Android build 相同的路徑過濾，不受 release 決策影響 | 在 Android 35 模擬器驗證 Widget metadata、RemoteViews 與 SQLite |
+| `Instrumented` | `android.yml` | 只動到 `android/`、`android.yml` 或 `tool/dev/test_android_device.sh`，不受 release 決策影響 | 在 Android 35 模擬器驗證 Widget metadata、RemoteViews 與 SQLite |
 | `iOS` | `ios.yml` | 動到 `ios/`、`assets/`、`lib/`、`pubspec.yaml` | iOS 能 build |
 | `code-review` | `review.yml` | 開 PR、推新 commit | 自動 code review 跑完；它留的意見要逐條回應 |
 | `codecov/project` | Codecov | `build` 上傳覆蓋率之後 | 總覆蓋率比 base 掉超過 1% 就失敗 |
