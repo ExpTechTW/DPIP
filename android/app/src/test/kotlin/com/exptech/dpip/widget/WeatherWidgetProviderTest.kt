@@ -10,6 +10,8 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -381,5 +383,50 @@ class WeatherWidgetProviderTest {
         assertTrue(
             states(WidgetRefreshScheduler.periodicWorkName).none { it == WorkInfo.State.ENQUEUED },
         )
+    }
+
+    @Test
+    fun `a deleted town asks for a reconfigure but an unreadable catalog does not`() {
+        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
+
+        // The catalog read fine and this town is not in it: the user deleted the
+        // saved location, and reconfiguring is the only thing that fixes it.
+        store.writeCatalog(
+            listOf(WidgetCatalogLocation.create("100", "中正區", "臺北市", 25.032, 121.518)!!),
+            2L,
+        )
+        val deleted = WidgetUpdater.presentation(context, 11, 218, 202)
+        assertEquals(WidgetDisplayState.Reconfigure, deleted.state)
+        assertFalse(deleted.canRefresh)
+
+        // The catalog did not read at all, which says nothing about the town. The
+        // old code could not tell the two apart, so a transient SQLite error told
+        // the user to reconfigure a widget that was fine — and took away the
+        // refresh button that would have recovered it on the next tick.
+        store.writeCatalog(
+            listOf(WidgetCatalogLocation.create("407", "西屯區", "臺中市", 24.181, 120.645)!!),
+            3L,
+        )
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path,
+            null,
+            SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_catalog RENAME TO unavailable_catalog")
+            try {
+                val unreadable = WidgetUpdater.presentation(context, 11, 218, 202)
+                assertNotEquals(
+                    "a failed catalog read must not demand a reconfigure",
+                    WidgetDisplayState.Reconfigure,
+                    unreadable.state,
+                )
+                assertTrue(
+                    "and must keep the refresh that recovers it",
+                    unreadable.canRefresh,
+                )
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_catalog RENAME TO widget_catalog")
+            }
+        }
     }
 }

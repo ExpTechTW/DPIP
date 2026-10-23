@@ -855,6 +855,40 @@ class WidgetStoreTest {
         )
     }
 
+    // ── Catalog lookups ─────────────────────────────────────────────────────
+
+    @Test
+    fun `a catalog lookup distinguishes a deleted town from an unreadable table`() {
+        assertTrue(store.writeCatalog(catalog("407"), 1L))
+        assertEquals(
+            WidgetCatalogLookup.Found(catalog("407").single()),
+            store.lookupCatalogLocation("407"),
+        )
+        // A town the user never saved, on a catalog that read fine.
+        assertEquals(WidgetCatalogLookup.Absent, store.lookupCatalogLocation("100"))
+
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path,
+            null,
+            SQLiteDatabase.OPEN_READWRITE,
+        ).use { database ->
+            database.execSQL("ALTER TABLE widget_catalog RENAME TO unavailable_catalog")
+            try {
+                // The read did not happen. Answering `Absent` here is what made a
+                // transient SQLite error render a still-saved town as Reconfigure.
+                assertEquals(WidgetCatalogLookup.Failed, store.lookupCatalogLocation("407"))
+                assertNull(store.findCatalogLocation("407"))
+            } finally {
+                database.execSQL("ALTER TABLE unavailable_catalog RENAME TO widget_catalog")
+            }
+        }
+
+        assertEquals(
+            WidgetCatalogLookup.Found(catalog("407").single()),
+            store.lookupCatalogLocation("407"),
+        )
+    }
+
     // ── Forecast demand ─────────────────────────────────────────────────────
 
     @Test
