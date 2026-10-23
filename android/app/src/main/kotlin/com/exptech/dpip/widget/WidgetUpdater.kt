@@ -108,8 +108,9 @@ object WidgetUpdater {
         }
 
         val address = instance.address
-        val catalogLocation = (address as? WidgetAddress.Saved)
-            ?.let { store.findCatalogLocation(it.regionCode) }
+        val catalogLookup = (address as? WidgetAddress.Saved)
+            ?.let { store.lookupCatalogLocation(it.regionCode) }
+        val catalogLocation = (catalogLookup as? WidgetCatalogLookup.Found)?.location
 
         val stored = store.readCurrentWeather(address)
         val regionCode = stored?.snapshot?.regionCode ?: catalogLocation?.regionCode
@@ -143,7 +144,12 @@ object WidgetUpdater {
             } else {
                 null
             },
-            isCatalogMember = address !is WidgetAddress.Saved || catalogLocation != null,
+            // Only a catalog that was *read* and does not contain this town means
+            // the user deleted it. A failed read says nothing about membership, so
+            // it keeps the Widget presentable — and keeps the refresh button that
+            // recovers it — rather than demanding a reconfigure for a town that is
+            // very probably still saved.
+            isCatalogMember = catalogLookup !is WidgetCatalogLookup.Absent,
             // The one trusted instant the presentation is allowed to reason
             // from, from the monotonic anchor rather than the wall clock.
             calibratedNowMilliseconds = WidgetClock.calibratedNowMilliseconds(),

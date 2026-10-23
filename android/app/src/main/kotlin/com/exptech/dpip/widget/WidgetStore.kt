@@ -32,6 +32,18 @@ sealed interface WidgetInstanceReadResult {
     data object Failed : WidgetInstanceReadResult
 }
 
+/**
+ * The outcome of looking one region code up in the published catalog.
+ *
+ * `Absent` and `Failed` are kept apart because only one of them is a statement
+ * about the user's saved locations; see [WidgetStore.lookupCatalogLocation].
+ */
+sealed interface WidgetCatalogLookup {
+    data class Found(val location: WidgetCatalogLocation) : WidgetCatalogLookup
+    data object Absent : WidgetCatalogLookup
+    data object Failed : WidgetCatalogLookup
+}
+
 /** One desktop Widget instance's persisted choice of location. */
 data class WidgetInstance(
     val appWidgetId: Int,
@@ -175,23 +187,42 @@ class WidgetStore private constructor(
         }
     }
 
+    fun findCatalogLocation(regionCode: String): WidgetCatalogLocation? =
+        (lookupCatalogLocation(regionCode) as? WidgetCatalogLookup.Found)?.location
+
+    /**
+     * A catalog row, its absence, or the fact that the read did not happen.
+     *
+     * The three are not interchangeable to a caller that renders. "No such row"
+     * means the user deleted that saved location and the Widget must say
+     * *reconfigure*; a failed read means nothing about the row, and answering
+     * *reconfigure* there tells the user to fix something that is not broken and
+     * takes away the refresh button that would have recovered it. This is the
+     * same distinction [WidgetInstanceReadResult.Failed] exists for, applied to
+     * the catalog reads.
+     */
     @Synchronized
-    fun findCatalogLocation(regionCode: String): WidgetCatalogLocation? = quietly("catalog.find") {
-        helper.readableDatabase.rawQuery(
-            "SELECT region_code, display_name, administrative_area, latitude, longitude" +
-                " FROM $TABLE_CATALOG WHERE region_code = ?",
-            arrayOf(regionCode),
-        ).use { cursor ->
-            if (!cursor.moveToFirst()) return@quietly null
-            WidgetCatalogLocation.create(
-                regionCode = cursor.getString(0),
-                displayName = cursor.getString(1),
-                administrativeAreaName = cursor.getString(2),
-                latitude = cursor.getDouble(3),
-                longitude = cursor.getDouble(4),
-            )
-        }
-    }
+    fun lookupCatalogLocation(regionCode: String): WidgetCatalogLookup =
+        quietly("catalog.find") {
+            helper.readableDatabase.rawQuery(
+                "SELECT region_code, display_name, administrative_area, latitude, longitude" +
+                    " FROM $TABLE_CATALOG WHERE region_code = ?",
+                arrayOf(regionCode),
+            ).use { cursor ->
+                if (!cursor.moveToFirst()) return@quietly WidgetCatalogLookup.Absent
+                val location = WidgetCatalogLocation.create(
+                    regionCode = cursor.getString(0),
+                    displayName = cursor.getString(1),
+                    administrativeAreaName = cursor.getString(2),
+                    latitude = cursor.getDouble(3),
+                    longitude = cursor.getDouble(4),
+                )
+                // A row `create` rejects is treated as absent, as it was before
+                // this distinction existed: it is a row no renderer can use, and
+                // reconfiguring is what replaces it.
+                if (location == null) WidgetCatalogLookup.Absent else WidgetCatalogLookup.Found(location)
+            }
+        } ?: WidgetCatalogLookup.Failed
 
     // Manual feedback survives process death. A request id fences an old,
     // cancelled worker's result; short expiry prevents orphaned "updating".
