@@ -64,7 +64,11 @@ object WidgetUpdater {
             return RemoteViews(boxes.associateWith(::child))
         }
         if (boxes.size == 1) return child(boxes.first())
-        return RemoteViews(child(WidgetSizes.landscape(boxes)), child(WidgetSizes.portrait(boxes)))
+        // Each rotation by name. Recovering the two from `boxes` by width cannot
+        // tell them apart when a launcher reports one width for both — see
+        // WidgetSizes.RotationBoxes.
+        val rotations = WidgetSizes.rotationBoxes(options)
+        return RemoteViews(child(rotations.landscape), child(rotations.portrait))
     }
 
     fun sizeClass(context: Context, appWidgetId: Int): WidgetSizeClass {
