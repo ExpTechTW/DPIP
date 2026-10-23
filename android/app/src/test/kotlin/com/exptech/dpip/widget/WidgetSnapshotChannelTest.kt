@@ -104,6 +104,25 @@ class WidgetSnapshotChannelTest {
         }
     }
 
+    @Test(timeout = 10_000)
+    fun `a redraw that cannot find a widget manager still answers the platform`() {
+        // The device with no `FEATURE_APP_WIDGETS`, where
+        // `AppWidgetManager.getInstance` answers null and Kotlin turns that into
+        // an NPE *outside* `updateInstance`'s own catch. Dart chains its publishes
+        // behind the future this reply completes, so a throw escaping here would
+        // not merely lose one result: `result` is never completed and every later
+        // publish waits on a future that never resolves.
+        //
+        // Robolectric always supplies a manager, so what this pins is the other
+        // half of the fix — the redraw asks for the ids through a nullable
+        // manager and a device without one simply has nothing to draw.
+        assertEquals(0, WidgetUpdater.liveAppWidgetIds(context, manager = null).size)
+
+        val result = clear(kind = "currentWeather")
+
+        assertNull("a clear with nothing to redraw is still a success", result.errorCode)
+    }
+
     @Test(timeout = 2_000)
     fun `an unanswered platform reply fails at a bounded total deadline`() {
         val failure = assertThrows(AssertionError::class.java) {
