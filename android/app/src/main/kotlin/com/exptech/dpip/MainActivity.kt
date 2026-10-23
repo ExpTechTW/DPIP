@@ -18,9 +18,16 @@ class MainActivity : FlutterActivity() {
     /**
      * The channel that tells Dart a home-screen Widget was tapped.
      *
-     * Created with the engine, so the action that *started* the process cannot be
-     * delivered until then — `onCreate` only remembers that it must be. A warm
-     * tap arrives through `onNewIntent` and goes out immediately.
+     * A **warm** tap arrives through `onNewIntent`, when Dart is long since
+     * listening, and is pushed out immediately.
+     *
+     * A **cold** tap cannot be pushed at all. `configureFlutterEngine` runs
+     * before the Dart entrypoint, so an `invokeMethod` from there reaches a
+     * channel with no handler on the other side and is dropped — the tap is lost
+     * and the app opens on whatever route it would have opened on anyway. So the
+     * cold path is a pull instead: `onCreate` records that the Widget started
+     * this process, and Dart collects it with `consumeInitialIntent` once its own
+     * handler is installed.
      */
     private var widgetHomeChannel: MethodChannel? = null
     private var pendingWidgetHome = false
@@ -33,7 +40,11 @@ class MainActivity : FlutterActivity() {
         // dies with ExceptionInInitializerError and stalls on the splash.
         // getInstance is idempotent; MapSnapshotChannel re-inits later.
         MapLibre.getInstance(applicationContext)
-        pendingWidgetHome = intent?.action == WidgetRenderer.ACTION_OPEN_HOME
+        // Only a fresh launch. A recreation re-delivers the same launch intent,
+        // and a restored activity is not a second tap — without the guard, every
+        // recreation after a Widget launch would route Home again.
+        pendingWidgetHome = savedInstanceState == null &&
+            intent?.action == WidgetRenderer.ACTION_OPEN_HOME
         super.onCreate(savedInstanceState)
     }
 
@@ -97,19 +108,34 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, WidgetSnapshotChannel.NAME)
             .setMethodCallHandler(WidgetSnapshotChannel(applicationContext))
 
-        widgetHomeChannel = MethodChannel(messenger, WIDGET_HOME_CHANNEL)
-        if (pendingWidgetHome) {
-            pendingWidgetHome = false
-            deliverWidgetHome()
+        widgetHomeChannel = MethodChannel(messenger, WIDGET_HOME_CHANNEL).apply {
+            setMethodCallHandler { call, result ->
+                when (call.method) {
+                    // Answered once: a second call is a later launch that this
+                    // Widget did not start, and must not route anywhere.
+                    METHOD_CONSUME_INITIAL_INTENT -> {
+                        result.success(pendingWidgetHome)
+                        pendingWidgetHome = false
+                    }
+
+                    else -> result.notImplemented()
+                }
+            }
         }
     }
 
     private fun deliverWidgetHome() {
-        widgetHomeChannel?.invokeMethod("openHome", null)
+        widgetHomeChannel?.invokeMethod(METHOD_OPEN_HOME, null)
     }
 
     companion object {
         /** The same name `WidgetHomeIntent.channel` uses on the Dart side. */
         const val WIDGET_HOME_CHANNEL = "com.exptech.dpip/widget_home"
+
+        /** Native → Dart: a warm tap, happening now. */
+        const val METHOD_OPEN_HOME = "openHome"
+
+        /** Dart → native: did a Widget tap start this process? */
+        const val METHOD_CONSUME_INITIAL_INTENT = "consumeInitialIntent"
     }
 }
