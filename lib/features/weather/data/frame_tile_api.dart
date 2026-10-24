@@ -102,7 +102,13 @@ class FrameTileApi {
       }
       frames.add((validTime: row['t'] as int, cycle: row['c'] as int));
     }
-    frames.sort((a, b) => b.validTime.compareTo(a.validTime));
+    // A model rerun can publish the same valid time under a newer cycle. The
+    // cycle is part of the frame identity, so keep the newest cycle first for
+    // equal valid times instead of depending on the API's response order.
+    frames.sort((a, b) {
+      final valid = b.validTime.compareTo(a.validTime);
+      return valid != 0 ? valid : b.cycle.compareTo(a.cycle);
+    });
     return [for (final frame in frames) '${frame.validTime}@${frame.cycle}'];
   }
 
