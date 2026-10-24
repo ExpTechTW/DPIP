@@ -1,5 +1,9 @@
 package com.exptech.dpip
 
+import android.content.Intent
+import android.os.Bundle
+import com.exptech.dpip.widget.WidgetRenderer
+import com.exptech.dpip.widget.WidgetSnapshotChannel
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -11,6 +15,23 @@ import org.maplibre.android.MapLibre
  * third-party plugin is registered here against the engine's binary messenger.
  */
 class MainActivity : FlutterActivity() {
+    /**
+     * The channel that tells Dart a home-screen Widget was tapped.
+     *
+     * A **warm** tap arrives through `onNewIntent`, when Dart is long since
+     * listening, and is pushed out immediately.
+     *
+     * A **cold** tap cannot be pushed at all. `configureFlutterEngine` runs
+     * before the Dart entrypoint, so an `invokeMethod` from there reaches a
+     * channel with no handler on the other side and is dropped — the tap is lost
+     * and the app opens on whatever route it would have opened on anyway. So the
+     * cold path is a pull instead: `onCreate` records that the Widget started
+     * this process, and Dart collects it with `consumeInitialIntent` once its own
+     * handler is installed.
+     */
+    private var widgetHomeChannel: MethodChannel? = null
+    private var pendingWidgetHome = false
+
     override fun onCreate(savedInstanceState: android.os.Bundle?) {
         // The maplibre_gl fork's HttpRequestImpl class-init calls
         // MapLibre.getApplicationContext(), which throws unless MapLibre was
@@ -19,7 +40,19 @@ class MainActivity : FlutterActivity() {
         // dies with ExceptionInInitializerError and stalls on the splash.
         // getInstance is idempotent; MapSnapshotChannel re-inits later.
         MapLibre.getInstance(applicationContext)
+        // Only a fresh launch. A recreation re-delivers the same launch intent,
+        // and a restored activity is not a second tap — without the guard, every
+        // recreation after a Widget launch would route Home again.
+        pendingWidgetHome = savedInstanceState == null &&
+            intent?.action == WidgetRenderer.ACTION_OPEN_HOME
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == WidgetRenderer.ACTION_OPEN_HOME) {
+            deliverWidgetHome()
+        }
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -68,5 +101,41 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(messenger, NativeLogChannel.NAME)
             .setMethodCallHandler(NativeLogChannel(applicationContext))
+
+        // The snapshot bridge for the home-screen Widget. Same channel name and
+        // protocol as iOS's WidgetSnapshotPlugin, so the Dart writer is one
+        // implementation and the platform is the only difference.
+        MethodChannel(messenger, WidgetSnapshotChannel.NAME)
+            .setMethodCallHandler(WidgetSnapshotChannel(applicationContext))
+
+        widgetHomeChannel = MethodChannel(messenger, WIDGET_HOME_CHANNEL).apply {
+            setMethodCallHandler { call, result ->
+                when (call.method) {
+                    // Answered once: a second call is a later launch that this
+                    // Widget did not start, and must not route anywhere.
+                    METHOD_CONSUME_INITIAL_INTENT -> {
+                        result.success(pendingWidgetHome)
+                        pendingWidgetHome = false
+                    }
+
+                    else -> result.notImplemented()
+                }
+            }
+        }
+    }
+
+    private fun deliverWidgetHome() {
+        widgetHomeChannel?.invokeMethod(METHOD_OPEN_HOME, null)
+    }
+
+    companion object {
+        /** The same name `WidgetHomeIntent.channel` uses on the Dart side. */
+        const val WIDGET_HOME_CHANNEL = "com.exptech.dpip/widget_home"
+
+        /** Native → Dart: a warm tap, happening now. */
+        const val METHOD_OPEN_HOME = "openHome"
+
+        /** Dart → native: did a Widget tap start this process? */
+        const val METHOD_CONSUME_INITIAL_INTENT = "consumeInitialIntent"
     }
 }

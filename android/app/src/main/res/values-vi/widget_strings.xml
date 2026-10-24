@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">Thời tiết hiện tại</string>
+    <string name="widget_description">Hiển thị thời tiết hiện tại của địa điểm đã đặt cho tiện ích này</string>
+    <string name="widget_stale">Dữ liệu cũ</string>
+    <string name="widget_no_data">Chưa có dữ liệu thời tiết</string>
+    <string name="widget_open_app">Mở ứng dụng</string>
+    <string name="widget_needs_app">Vị trí chỉ cập nhật khi ứng dụng đang mở</string>
+    <string name="widget_reconfigure">Địa điểm đã bị xoá — hãy đặt lại</string>
+    <string name="widget_refresh">Cập nhật ngay</string>
+    <string name="widget_humidity">Độ ẩm</string>
+    <string name="widget_rain">Lượng mưa</string>
+    <string name="widget_wind">Gió</string>
+    <string name="widget_station">Trạm</string>
+    <string name="widget_sunrise">Mặt Trời mọc</string>
+    <string name="widget_sunset">Mặt Trời lặn</string>
+    <string name="widget_apparent">Cảm giác</string>
+    <string name="widget_location_disabled">Đang tắt vị trí</string>
+    <string name="widget_location_unavailable">Không lấy được vị trí</string>
+    <string name="widget_location_outside">Vị trí nằm ngoài vùng hỗ trợ</string>
+    <string name="widget_current_location">Vị trí hiện tại</string>
+    <string name="widget_config_title">Cài đặt tiện ích thời tiết</string>
+    <string name="widget_config_hint">Chọn địa điểm hiển thị thời tiết trên tiện ích</string>
+    <string name="widget_config_empty">Chưa có địa điểm nào được lưu. Hãy mở ứng dụng và thêm một địa điểm.</string>
+    <string name="widget_config_needs_permission">Vị trí hiện tại cần quyền truy cập vị trí; nếu không có quyền chạy nền, tiện ích sẽ hiển thị vị trí đã biết gần nhất và nhắc bạn mở ứng dụng.</string>
+    <string name="widget_config_open_app">Mở ứng dụng</string>
+    <string name="widget_config_cancel">Hủy</string>
+    <string name="widget_preview_location">Địa điểm mẫu</string>
+    <string name="widget_preview_weather">Trời quang</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">Địa điểm đã lưu</string>
+    <string name="widget_refresh_queued">Đang chờ cập nhật</string>
+    <string name="widget_refresh_running">Đang cập nhật…</string>
+    <string name="widget_refresh_updated">Đã cập nhật thời tiết</string>
+    <string name="widget_refresh_failed">Cập nhật thất bại</string>
+    <string name="widget_weather_clear">Trời quang</string>
+    <string name="widget_weather_cloudy">Nhiều mây</string>
+    <string name="widget_weather_overcast">Trời âm u</string>
+    <string name="widget_weather_rain">Mưa</string>
+    <string name="widget_weather_thunderstorm">Mưa dông</string>
+    <string name="widget_weather_snow">Tuyết rơi</string>
+    <string name="widget_weather_fog">Sương mù</string>
+    <string name="widget_weather_unknown">Không rõ</string>
+    <string name="widget_forecast_pop_description">Khả năng mưa %1$s</string>
+    <string name="widget_forecast_pop_unavailable">Không có dữ liệu khả năng mưa</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Đã cũ</string>
+    <string name="widget_compact_location">Mất vị trí</string>
+    <string name="widget_compact_details">Mở ứng dụng để xem đầy đủ thông tin thời tiết</string>
+    <string name="widget_compact_attention">Mở ứng dụng</string>
+</resources>

@@ -14,6 +14,7 @@ import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/widget_home_intent.dart';
 import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
 import 'package:dpip/core/realtime/realtime_lifecycle.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
@@ -26,6 +27,7 @@ import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -195,6 +197,12 @@ class _AppServicesHostState extends State<_AppServicesHost>
       focusMapLayer: (layerId) =>
           mapCamera.request(BaseMap.taiwanBounds, layerId: layerId),
     );
+    // The home-screen Widget's surface tap. Android delivers a warm tap through
+    // the channel and a cold-start tap only when asked, which is what `listen`
+    // does; either way the tap is stashed until `markReady` below, so it never
+    // navigates a router that has not drawn a frame.
+    WidgetHomeIntent.onOpen = () => appRouter.goNamed(AppRoutes.home);
+    unawaited(WidgetHomeIntent.listen());
     widget.onboarding.addListener(_onOnboardingChanged);
     _tokenChanges = widget.notificationService.tokenChanges.listen(
       (_) => _onTokenChanged(),
@@ -219,6 +227,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
           ),
         ),
       );
+      WidgetHomeIntent.markReady();
       // Permissions belong to onboarding — only run the permission-dependent
       // setup once it's complete (immediately for returning users).
       if (widget.onboarding.isComplete) _onReady();
@@ -325,6 +334,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
   void dispose() {
     NotificationTaps.onTap = null;
     widget.notificationService.settingsLink.stop();
+    WidgetHomeIntent.reset();
     widget.onboarding.removeListener(_onOnboardingChanged);
     unawaited(_tokenChanges?.cancel());
     widget.deviceRegistration?.dispose();

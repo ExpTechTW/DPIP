@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">現在の天気</string>
+    <string name="widget_description">このウィジェットに設定された場所の現在の天気を表示します。</string>
+
+    <string name="widget_stale">古いデータ</string>
+    <string name="widget_no_data">天気データなし</string>
+    <string name="widget_open_app">アプリを開く</string>
+    <string name="widget_needs_app">位置の更新はアプリを開いている間のみ</string>
+    <string name="widget_reconfigure">場所が削除されました — 再設定してください</string>
+    <string name="widget_refresh">今すぐ更新</string>
+
+    <string name="widget_humidity">湿度</string>
+    <string name="widget_rain">降雨量</string>
+    <string name="widget_wind">風</string>
+    <string name="widget_station">観測所</string>
+    <string name="widget_sunrise">日の出</string>
+    <string name="widget_sunset">日の入り</string>
+    <string name="widget_apparent">体感</string>
+    <string name="widget_location_disabled">位置情報がオフです</string>
+    <string name="widget_location_unavailable">位置を取得できません</string>
+    <string name="widget_location_outside">対応地域外の位置です</string>
+    <string name="widget_current_location">現在地</string>
+
+    <string name="widget_config_title">天気ウィジェットの設定</string>
+    <string name="widget_config_hint">ウィジェットに天気を表示する場所を選択します。</string>
+    <string name="widget_config_empty">保存された場所がありません。アプリを開いて場所を追加してから、もう一度お試しください。</string>
+    <string name="widget_config_needs_permission">現在地には位置情報の権限が必要です。バックグラウンドでの取得が許可されていない場合、ウィジェットは最後に確認された位置を表示し、アプリを開くよう促します。</string>
+    <string name="widget_config_open_app">アプリを開く</string>
+    <string name="widget_config_cancel">キャンセル</string>
+
+    <string name="widget_preview_location">プレビュー地点</string>
+    <string name="widget_preview_weather">晴れ</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">保存済みの地点</string>
+    <string name="widget_refresh_queued">更新待ち</string>
+    <string name="widget_refresh_running">更新中…</string>
+    <string name="widget_refresh_updated">天気を更新しました</string>
+    <string name="widget_refresh_failed">更新できませんでした</string>
+    <string name="widget_weather_clear">晴れ</string>
+    <string name="widget_weather_cloudy">曇り</string>
+    <string name="widget_weather_overcast">本曇り</string>
+    <string name="widget_weather_rain">雨</string>
+    <string name="widget_weather_thunderstorm">雷雨</string>
+    <string name="widget_weather_snow">雪</string>
+    <string name="widget_weather_fog">霧</string>
+    <string name="widget_weather_unknown">不明</string>
+    <string name="widget_forecast_pop_description">降水確率 %1$s</string>
+    <string name="widget_forecast_pop_unavailable">降水確率のデータなし</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">古い情報</string>
+    <string name="widget_compact_location">位置不明</string>
+    <string name="widget_compact_details">アプリで詳しい天気情報を確認</string>
+    <string name="widget_compact_attention">アプリへ</string>
+</resources>

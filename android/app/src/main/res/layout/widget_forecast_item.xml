@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One hourly forecast column for the medium layout.
+
+  A restatement of `HourlyForecastPointView`'s compact form (`compact == true`,
+  `ios/DPIPWidgets/DPIPWidgets.swift` lines 627–674): the clock label, the
+  glyph, the temperature and the probability of precipitation, stacked in that
+  order and centred. Four lines, not the two the previous revision collapsed
+  them into — the whole point of the medium layout is the hourly forecast, and
+  dropping the glyph and the probability to make it "fit" left it saying less
+  than the square layout.
+
+  The column is inflated once per point into `widget_forecast_container`; the
+  horizontal gap is half its padding on each side, so adjacent columns add up to
+  the section's spacing without shifting the first column off the edge.
+
+  Each line carries an autosize floor. A five-column forecast in a 200 dp cell
+  gives each column ~30 dp, and a fixed 11 pt clock would ellipsise there; the
+  lines shrink to 9 pt instead, which is what "the probability is never dropped"
+  has to mean.
+
+  Focus the column as one group (including on API 26); its child text and icon
+  descriptions are announced together without a duplicated aggregate label.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:focusable="true"
+    android:importantForAccessibility="yes"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/widget_metric_gap"
+    android:paddingEnd="@dimen/widget_metric_gap">
+
+    <TextView
+        android:id="@+id/widget_forecast_time"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="@dimen/widget_text_forecast_time"
+        android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/widget_secondary"
+        android:textSize="@dimen/widget_text_forecast_time" />
+
+    <ImageView
+        android:id="@+id/widget_forecast_icon"
+        android:layout_width="@dimen/widget_icon_forecast"
+        android:layout_height="@dimen/widget_icon_forecast"
+        android:layout_marginTop="0dp"
+        android:importantForAccessibility="yes" />
+
+    <TextView
+        android:id="@+id/widget_forecast_temperature"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:autoSizeMaxTextSize="@dimen/widget_text_forecast_temperature"
+        android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="@dimen/widget_text_forecast_temperature" />
+
+    <TextView
+        android:id="@+id/widget_forecast_pop"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:autoSizeMaxTextSize="@dimen/widget_text_forecast_time"
+        android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/widget_secondary"
+        android:textSize="@dimen/widget_text_forecast_time" />
+</LinearLayout>
