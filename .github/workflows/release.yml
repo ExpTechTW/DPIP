@@ -200,12 +200,12 @@ jobs:
       # developer use. A published build is the one that most needs to be
       # reproducible, so it must not be the one tracking whatever "stable"
       # happens to mean on the day it runs.
-      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
           cache: true # zizmor: ignore[cache-poisoning] — accepted, see above
 
       - if: matrix.platform == 'android'
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: "temurin"
           java-version: "25"
