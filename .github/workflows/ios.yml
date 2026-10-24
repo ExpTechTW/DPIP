@@ -89,7 +89,7 @@ jobs:
       # built against an SDK nobody chose, and nothing in the build log would
       # say so. See AGENTS.md → Toolchain.
       - name: Install toolchain (mise)
-        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
 
       # The iOS build uses Swift Package Manager, not CocoaPods (there is no
       # Podfile). Cache SPM's clone/artifact store keyed on the resolved pins.
