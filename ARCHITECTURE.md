@@ -377,5 +377,18 @@ app or clearing its data deletes it. Recording has no switch of its own — it
 follows the background-location grant — and the map's 軌跡 layer, which shows
 it, says all of this in its sheet; its clear goes through the native side,
 never a file delete from Dart.
+
+Secrets the user hands the app — today only the API key of their own AI
+service, for the AI assistant — are the one thing persisted outside SQLite,
+and on purpose: `dpip.db` sits in application-support, which iOS copies into
+backups, and the AI page promises the key does not leave the phone. They go
+through `SecretStore` (`core/platform/secret_store.dart`), keyed by a
+`SecretKey` enum for the same reason settings take a `SettingKey`: an iOS
+Keychain item with `AfterFirstUnlockThisDeviceOnly`, and on Android an
+AES-GCM key generated in the Android Keystore with only the ciphertext on
+disk, in `noBackupFilesDir`.
+The AI service's base URL and model are ordinary settings. The AI
+conversation itself is not persisted at all — it lives in memory and ends
+with the process.
 - Every file starts with a doc comment; one public declaration = one clear
 responsibility.

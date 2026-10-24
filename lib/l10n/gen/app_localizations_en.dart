@@ -3635,4 +3635,312 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Skip for now';
+
+  @override
+  String get aiChatTitle => 'AI Assistant';
+
+  @override
+  String get aiChatNew => 'New conversation';
+
+  @override
+  String get aiChatAbout => 'About the AI assistant';
+
+  @override
+  String get aiChatInputHint => 'Ask about earthquakes, weather or typhoons…';
+
+  @override
+  String get aiChatSend => 'Send';
+
+  @override
+  String get aiChatStop => 'Stop';
+
+  @override
+  String get aiChatDisclaimer =>
+      'AI can be wrong. In an emergency, follow official alerts.';
+
+  @override
+  String get aiChatEmptyTitle => 'What would you like to know?';
+
+  @override
+  String get aiChatSuggestionQuakes => 'Any earthquakes recently?';
+
+  @override
+  String get aiChatSuggestionRain => 'Will it rain here today?';
+
+  @override
+  String get aiChatSuggestionTyphoon => 'Is there a typhoon right now?';
+
+  @override
+  String get aiChatSuggestionAlerts => 'What disaster alerts are in effect?';
+
+  @override
+  String get aiChatThinking => 'Thinking…';
+
+  @override
+  String get aiChatWaiting => 'Waiting for a reply…';
+
+  @override
+  String get aiChatStopped => 'Stopped';
+
+  @override
+  String get aiChatOpenSettings => 'Open settings';
+
+  @override
+  String get aiChatCopied => 'Copied';
+
+  @override
+  String get aiChatSetupTitle => 'No AI service set up yet';
+
+  @override
+  String get aiChatSetupBody =>
+      'Enter your own AI service\'s URL, key and model to start.';
+
+  @override
+  String get aiChatSetupAction => 'Set up';
+
+  @override
+  String get aiIntroTitle => 'AI Assistant';
+
+  @override
+  String get aiIntroBody =>
+      'Ask about recent earthquakes, tomorrow\'s weather or a typhoon\'s track. The AI looks the data up in DPIP first, then answers in your language.';
+
+  @override
+  String get aiIntroOwnKeyTitle => 'Use your own AI service';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      'Enter the URL and key of any OpenAI-compatible AI service that supports tool calls, such as OpenAI, Google Gemini, Anthropic or OpenRouter. Usage and charges are counted by your AI service.';
+
+  @override
+  String get aiIntroLocalTitle =>
+      'Your key stays on this phone; conversations are not saved';
+
+  @override
+  String get aiIntroLocalBody =>
+      'The API key is kept in the system\'s key storage (iOS Keychain, Android Keystore). It is never uploaded to ExpTech and is not carried to another phone by a backup. Conversations are not saved: they disappear when the app is closed.';
+
+  @override
+  String get aiIntroDataTitle => 'Where your data goes';
+
+  @override
+  String get aiIntroDataBody =>
+      'Your questions go straight from this phone to the AI service you set up, not through ExpTech. When the AI needs data, the app asks DPIP\'s public data server, sending only the query (such as an area code or a date) — never your key or the conversation. So the AI knows where \"here\" is, it is told your current township and saved townships in the app (names and codes only).';
+
+  @override
+  String get aiIntroCautionTitle => 'The AI can be wrong';
+
+  @override
+  String get aiIntroCautionBody =>
+      'Its answers are for reference only. If you may be in danger, protect yourself first and follow official alerts and instructions from the Central Weather Administration and the government.';
+
+  @override
+  String get aiIntroMcpTitle => 'Build your own';
+
+  @override
+  String get aiIntroMcpBody =>
+      'DPIP\'s data is also open as an MCP server — read-only, no key needed. Connect it to Claude, ChatGPT or any other MCP-capable tool and build something of your own.';
+
+  @override
+  String get aiIntroStart => 'Get started';
+
+  @override
+  String get aiMcpTitle => 'DPIP MCP server';
+
+  @override
+  String get aiMcpBody =>
+      'Any MCP client that supports Streamable HTTP can use this address directly.';
+
+  @override
+  String get aiMcpCopyUrl => 'Copy URL';
+
+  @override
+  String get aiMcpCopyConfig => 'Copy config example';
+
+  @override
+  String get aiMcpCopied => 'Copied';
+
+  @override
+  String get aiSettingsTitle => 'AI settings';
+
+  @override
+  String get aiSettingsService => 'AI service';
+
+  @override
+  String get aiSettingsServiceBody =>
+      'Any OpenAI-compatible service (/chat/completions) with tool calls works. Tap a service below to fill in its URL.';
+
+  @override
+  String get aiSettingsBaseUrl => 'API URL';
+
+  @override
+  String get aiSettingsBaseUrlHelper =>
+      'The API\'s base URL, usually ending in /v1.';
+
+  @override
+  String get aiSettingsUrlEmpty => 'Enter a URL';
+
+  @override
+  String get aiSettingsUrlInvalid => 'This is not a valid URL';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'Use https://. Plain http:// is only allowed to this phone itself (localhost).';
+
+  @override
+  String get aiSettingsApiKey => 'API key';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      'Stored only in this phone\'s key storage. Leave empty for a service that needs no key.';
+
+  @override
+  String get aiSettingsApiKeySaved => 'A key is saved. Leave empty to keep it.';
+
+  @override
+  String get aiSettingsShowKey => 'Show key';
+
+  @override
+  String get aiSettingsHideKey => 'Hide key';
+
+  @override
+  String get aiSettingsRemoveKey => 'Delete the saved key';
+
+  @override
+  String get aiSettingsKeyRemoved => 'Key deleted';
+
+  @override
+  String get aiSettingsModel => 'Model';
+
+  @override
+  String get aiSettingsModelHelper =>
+      'Must support tool calls (function calling). The button on the right lists the service\'s models.';
+
+  @override
+  String get aiSettingsModelEmpty => 'Enter or pick a model';
+
+  @override
+  String get aiSettingsFetchModels => 'List models';
+
+  @override
+  String get aiSettingsFilterModels => 'Filter models';
+
+  @override
+  String get aiSettingsNoModels =>
+      'This service lists no models. Type the model name instead.';
+
+  @override
+  String get aiSettingsSave => 'Save';
+
+  @override
+  String get aiSettingsSaved => 'Saved';
+
+  @override
+  String get aiSettingsSaveFailed =>
+      'The key could not be saved. Please try again.';
+
+  @override
+  String get aiSettingsPrivacy => 'Privacy';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      'The key stays in this phone\'s key storage and is never uploaded to ExpTech. Conversations travel only between this phone and your AI service, and are not saved. When the AI looks data up, only the query goes to DPIP\'s data server.';
+
+  @override
+  String get aiSettingsForget => 'Clear all AI settings';
+
+  @override
+  String get aiSettingsForgetTitle => 'Clear AI settings?';
+
+  @override
+  String get aiSettingsForgetBody =>
+      'The URL, model and key will be deleted from this phone.';
+
+  @override
+  String get aiSettingsForgetConfirm => 'Clear';
+
+  @override
+  String get aiSettingsForgotten => 'AI settings cleared';
+
+  @override
+  String get aiToolEarthquake => 'earthquake data';
+
+  @override
+  String get aiToolWeather => 'weather data';
+
+  @override
+  String get aiToolTyphoon => 'typhoon data';
+
+  @override
+  String get aiToolTsunami => 'tsunami data';
+
+  @override
+  String get aiToolNotices => 'disaster notices';
+
+  @override
+  String get aiToolPlaces => 'places';
+
+  @override
+  String get aiToolTimeline => 'data times';
+
+  @override
+  String get aiToolOther => 'data';
+
+  @override
+  String aiToolRunning(String subject) {
+    return 'Looking up $subject…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return 'Looked up $subject';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return 'Couldn\'t look up $subject';
+  }
+
+  @override
+  String get aiErrorUnauthorized =>
+      'The API key is invalid or expired, or has no access to this model.';
+
+  @override
+  String get aiErrorNotFound =>
+      'The API or the model was not found. Check the URL and the model name.';
+
+  @override
+  String get aiErrorRateLimited =>
+      'Your AI service\'s rate limit or quota was reached. Try again later or check your plan.';
+
+  @override
+  String get aiErrorRejected =>
+      'The AI service refused the request. The model may not support tool calls.';
+
+  @override
+  String get aiErrorServer => 'The AI service had a problem. Try again later.';
+
+  @override
+  String get aiErrorNetwork =>
+      'Couldn\'t reach the AI service. Check your connection.';
+
+  @override
+  String get aiErrorTimeout => 'The AI service took too long to respond.';
+
+  @override
+  String get aiErrorBadResponse =>
+      'The AI service\'s reply could not be read. This URL may not be an OpenAI-compatible API.';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'Couldn\'t reach the DPIP data server. Try again later.';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'The AI looked up data too many times without an answer. Try a more specific question.';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return 'Service said: $detail';
+  }
 }

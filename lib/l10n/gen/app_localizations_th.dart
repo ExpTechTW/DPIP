@@ -3626,4 +3626,313 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'ข้ามไปก่อน';
+
+  @override
+  String get aiChatTitle => 'ผู้ช่วย AI';
+
+  @override
+  String get aiChatNew => 'บทสนทนาใหม่';
+
+  @override
+  String get aiChatAbout => 'เกี่ยวกับ';
+
+  @override
+  String get aiChatInputHint =>
+      'ถามเรื่องแผ่นดินไหว สภาพอากาศ หรือพายุไต้ฝุ่น…';
+
+  @override
+  String get aiChatSend => 'ส่ง';
+
+  @override
+  String get aiChatStop => 'หยุด';
+
+  @override
+  String get aiChatDisclaimer =>
+      'AI อาจผิดพลาดได้ ในกรณีฉุกเฉินให้ยึดตามประกาศเตือนภัยอย่างเป็นทางการ';
+
+  @override
+  String get aiChatEmptyTitle => 'อยากรู้อะไร?';
+
+  @override
+  String get aiChatSuggestionQuakes => 'ช่วงนี้มีแผ่นดินไหวไหม?';
+
+  @override
+  String get aiChatSuggestionRain => 'วันนี้ที่นี่ฝนจะตกไหม?';
+
+  @override
+  String get aiChatSuggestionTyphoon => 'ตอนนี้มีพายุไต้ฝุ่นไหม?';
+
+  @override
+  String get aiChatSuggestionAlerts => 'ตอนนี้มีประกาศเตือนภัยอะไรบ้าง?';
+
+  @override
+  String get aiChatThinking => 'กำลังคิด…';
+
+  @override
+  String get aiChatWaiting => 'กำลังรอคำตอบ…';
+
+  @override
+  String get aiChatStopped => 'หยุดแล้ว';
+
+  @override
+  String get aiChatOpenSettings => 'เปิดการตั้งค่า';
+
+  @override
+  String get aiChatCopied => 'คัดลอกแล้ว';
+
+  @override
+  String get aiChatSetupTitle => 'ยังไม่ได้ตั้งค่าบริการ AI';
+
+  @override
+  String get aiChatSetupBody =>
+      'กรอก URL คีย์ และโมเดลของบริการ AI ของคุณเพื่อเริ่มใช้งาน';
+
+  @override
+  String get aiChatSetupAction => 'ไปที่การตั้งค่า';
+
+  @override
+  String get aiIntroTitle => 'ผู้ช่วย AI';
+
+  @override
+  String get aiIntroBody =>
+      'ถามเรื่องแผ่นดินไหวล่าสุด สภาพอากาศพรุ่งนี้ หรือเส้นทางพายุไต้ฝุ่นได้ AI จะค้นข้อมูลจาก DPIP แบบเรียลไทม์ก่อน แล้วตอบเป็นภาษาของคุณ';
+
+  @override
+  String get aiIntroOwnKeyTitle => 'ใช้บริการ AI ของคุณเอง';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      'กรอก URL และคีย์ของบริการ AI ที่รองรับรูปแบบ OpenAI และการเรียกใช้เครื่องมือ เช่น OpenAI, Google Gemini, Anthropic หรือ OpenRouter ปริมาณการใช้และค่าใช้จ่ายคิดโดยบริการ AI ของคุณ';
+
+  @override
+  String get aiIntroLocalTitle =>
+      'คีย์อยู่ในโทรศัพท์เครื่องนี้เท่านั้น และบทสนทนาจะไม่ถูกบันทึก';
+
+  @override
+  String get aiIntroLocalBody =>
+      'คีย์ API ถูกเก็บในที่เก็บคีย์ของระบบ (iOS Keychain, Android Keystore) ไม่ถูกอัปโหลดไปยัง ExpTech และจะไม่ถูกย้ายไปยังโทรศัพท์เครื่องอื่นผ่านการสำรองข้อมูล บทสนทนาจะไม่ถูกบันทึกและจะหายไปเมื่อปิดแอป';
+
+  @override
+  String get aiIntroDataTitle => 'ข้อมูลถูกส่งไปที่ไหน';
+
+  @override
+  String get aiIntroDataBody =>
+      'คำถามของคุณถูกส่งจากโทรศัพท์ไปยังบริการ AI ที่คุณตั้งค่าไว้โดยตรง ไม่ผ่าน ExpTech เมื่อ AI ต้องการข้อมูล แอปจะสอบถามเซิร์ฟเวอร์ข้อมูลสาธารณะของ DPIP โดยส่งเพียงเงื่อนไขการค้นหา (เช่น รหัสพื้นที่หรือวันที่) ไม่รวมคีย์และบทสนทนา เพื่อให้ AI รู้ว่า \"ที่นี่\" คือที่ไหน แอปจะบอกตำบลปัจจุบันและตำบลที่คุณบันทึกไว้ (เฉพาะชื่อและรหัส) ให้ AI ทราบ';
+
+  @override
+  String get aiIntroCautionTitle => 'AI อาจผิดพลาดได้';
+
+  @override
+  String get aiIntroCautionBody =>
+      'คำตอบมีไว้เพื่อการอ้างอิงเท่านั้น หากอาจมีอันตราย ให้ปกป้องตัวเองก่อน และปฏิบัติตามประกาศเตือนภัยและคำแนะนำอย่างเป็นทางการจากสำนักงานอุตุนิยมวิทยากลางและหน่วยงานรัฐ';
+
+  @override
+  String get aiIntroMcpTitle => 'สร้างเองได้';
+
+  @override
+  String get aiIntroMcpBody =>
+      'ข้อมูลของ DPIP ยังเปิดให้ใช้ในรูปแบบเซิร์ฟเวอร์ MCP (อ่านอย่างเดียว ไม่ต้องใช้คีย์) เชื่อมต่อกับ Claude, ChatGPT หรือเครื่องมืออื่นที่รองรับ MCP เพื่อสร้างสิ่งของคุณเองได้';
+
+  @override
+  String get aiIntroStart => 'เริ่มตั้งค่า';
+
+  @override
+  String get aiMcpTitle => 'เซิร์ฟเวอร์ MCP ของ DPIP';
+
+  @override
+  String get aiMcpBody =>
+      'ไคลเอนต์ MCP ที่รองรับ Streamable HTTP ใช้ที่อยู่นี้ได้ทันที';
+
+  @override
+  String get aiMcpCopyUrl => 'คัดลอก URL';
+
+  @override
+  String get aiMcpCopyConfig => 'คัดลอกตัวอย่างการตั้งค่า';
+
+  @override
+  String get aiMcpCopied => 'คัดลอกแล้ว';
+
+  @override
+  String get aiSettingsTitle => 'การตั้งค่า AI';
+
+  @override
+  String get aiSettingsService => 'บริการ AI';
+
+  @override
+  String get aiSettingsServiceBody =>
+      'ใช้ได้กับบริการที่รองรับรูปแบบ OpenAI (/chat/completions) และการเรียกใช้เครื่องมือ แตะบริการด้านล่างเพื่อกรอก URL ให้อัตโนมัติ';
+
+  @override
+  String get aiSettingsBaseUrl => 'URL ของ API';
+
+  @override
+  String get aiSettingsBaseUrlHelper =>
+      'URL หลักของ API โดยทั่วไปลงท้ายด้วย /v1';
+
+  @override
+  String get aiSettingsUrlEmpty => 'กรุณากรอก URL';
+
+  @override
+  String get aiSettingsUrlInvalid => 'URL ไม่ถูกต้อง';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'กรุณาใช้ https:// ใช้ http:// ได้เฉพาะกับโทรศัพท์เครื่องนี้เอง (localhost)';
+
+  @override
+  String get aiSettingsApiKey => 'คีย์ API';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      'เก็บไว้ในที่เก็บคีย์ของโทรศัพท์เครื่องนี้เท่านั้น เว้นว่างได้หากบริการไม่ต้องใช้คีย์';
+
+  @override
+  String get aiSettingsApiKeySaved =>
+      'บันทึกคีย์แล้ว เว้นว่างไว้เพื่อใช้คีย์เดิม';
+
+  @override
+  String get aiSettingsShowKey => 'แสดงคีย์';
+
+  @override
+  String get aiSettingsHideKey => 'ซ่อนคีย์';
+
+  @override
+  String get aiSettingsRemoveKey => 'ลบคีย์ที่บันทึกไว้';
+
+  @override
+  String get aiSettingsKeyRemoved => 'ลบคีย์แล้ว';
+
+  @override
+  String get aiSettingsModel => 'โมเดล';
+
+  @override
+  String get aiSettingsModelHelper =>
+      'ต้องเป็นโมเดลที่รองรับการเรียกใช้เครื่องมือ (function calling) แตะปุ่มด้านขวาเพื่อดูรายการโมเดล';
+
+  @override
+  String get aiSettingsModelEmpty => 'กรุณากรอกหรือเลือกโมเดล';
+
+  @override
+  String get aiSettingsFetchModels => 'ดูรายการโมเดล';
+
+  @override
+  String get aiSettingsFilterModels => 'ค้นหาโมเดล';
+
+  @override
+  String get aiSettingsNoModels =>
+      'บริการนี้ไม่ได้แสดงรายการโมเดล กรุณาพิมพ์ชื่อโมเดลเอง';
+
+  @override
+  String get aiSettingsSave => 'บันทึก';
+
+  @override
+  String get aiSettingsSaved => 'บันทึกแล้ว';
+
+  @override
+  String get aiSettingsSaveFailed => 'บันทึกคีย์ไม่สำเร็จ โปรดลองอีกครั้ง';
+
+  @override
+  String get aiSettingsPrivacy => 'ความเป็นส่วนตัว';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      'คีย์อยู่ในที่เก็บคีย์ของโทรศัพท์เครื่องนี้และไม่ถูกอัปโหลดไปยัง ExpTech บทสนทนาส่งระหว่างโทรศัพท์เครื่องนี้กับบริการ AI ของคุณเท่านั้นและไม่ถูกบันทึก เมื่อ AI ค้นข้อมูล จะส่งเพียงเงื่อนไขการค้นหาไปยังเซิร์ฟเวอร์ข้อมูลของ DPIP';
+
+  @override
+  String get aiSettingsForget => 'ล้างการตั้งค่า AI ทั้งหมด';
+
+  @override
+  String get aiSettingsForgetTitle => 'ล้างการตั้งค่า AI ไหม?';
+
+  @override
+  String get aiSettingsForgetBody =>
+      'URL โมเดล และคีย์จะถูกลบออกจากโทรศัพท์เครื่องนี้';
+
+  @override
+  String get aiSettingsForgetConfirm => 'ล้าง';
+
+  @override
+  String get aiSettingsForgotten => 'ล้างการตั้งค่า AI แล้ว';
+
+  @override
+  String get aiToolEarthquake => 'ข้อมูลแผ่นดินไหว';
+
+  @override
+  String get aiToolWeather => 'ข้อมูลสภาพอากาศ';
+
+  @override
+  String get aiToolTyphoon => 'ข้อมูลพายุไต้ฝุ่น';
+
+  @override
+  String get aiToolTsunami => 'ข้อมูลสึนามิ';
+
+  @override
+  String get aiToolNotices => 'ประกาศภัยพิบัติ';
+
+  @override
+  String get aiToolPlaces => 'สถานที่';
+
+  @override
+  String get aiToolTimeline => 'เวลาของข้อมูล';
+
+  @override
+  String get aiToolOther => 'ข้อมูล';
+
+  @override
+  String aiToolRunning(String subject) {
+    return 'กำลังค้นหา$subject…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return 'ค้นหา$subjectแล้ว';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return 'ค้นหา$subjectไม่สำเร็จ';
+  }
+
+  @override
+  String get aiErrorUnauthorized =>
+      'คีย์ API ไม่ถูกต้องหรือหมดอายุ หรือไม่มีสิทธิ์ใช้โมเดลนี้';
+
+  @override
+  String get aiErrorNotFound =>
+      'ไม่พบ API หรือโมเดล กรุณาตรวจสอบ URL และชื่อโมเดล';
+
+  @override
+  String get aiErrorRateLimited =>
+      'ถึงขีดจำกัดอัตราการใช้หรือโควตาของบริการ AI แล้ว โปรดลองใหม่ภายหลังหรือตรวจสอบแพ็กเกจ';
+
+  @override
+  String get aiErrorRejected =>
+      'บริการ AI ปฏิเสธคำขอ โมเดลที่เลือกอาจไม่รองรับการเรียกใช้เครื่องมือ';
+
+  @override
+  String get aiErrorServer => 'บริการ AI ขัดข้องชั่วคราว โปรดลองใหม่ภายหลัง';
+
+  @override
+  String get aiErrorNetwork =>
+      'เชื่อมต่อบริการ AI ไม่ได้ กรุณาตรวจสอบการเชื่อมต่อ';
+
+  @override
+  String get aiErrorTimeout => 'บริการ AI ใช้เวลาตอบนานเกินไป';
+
+  @override
+  String get aiErrorBadResponse =>
+      'อ่านคำตอบของบริการ AI ไม่ได้ URL นี้อาจไม่ใช่ API ที่รองรับรูปแบบ OpenAI';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'เชื่อมต่อเซิร์ฟเวอร์ข้อมูล DPIP ไม่ได้ โปรดลองใหม่ภายหลัง';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'AI ค้นข้อมูลหลายครั้งเกินไปแต่ยังไม่ได้คำตอบ ลองถามให้เจาะจงขึ้น';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return 'ข้อความจากบริการ: $detail';
+  }
 }

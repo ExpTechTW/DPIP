@@ -283,4 +283,18 @@ abstract final class SettingKeys {
   static const SettingKey<String> regionCore = SettingKey<String>._(
     'network:region:core',
   );
+
+  /// The AI chat's AI service: its OpenAI-compatible base URL and the model
+  /// to ask for. The API key is **not** a setting — it lives in the platform's
+  /// key storage (`SecretKey.aiApiKey`), because settings are backed up. See
+  /// `AiSettingsRepositoryImpl`.
+  static const SettingKey<String> aiBaseUrl = SettingKey<String>._(
+    'ai.baseUrl',
+  );
+  static const SettingKey<String> aiModel = SettingKey<String>._('ai.model');
+
+  /// Whether the AI chat's explanation page has been read and dismissed.
+  static const SettingKey<bool> aiIntroSeen = SettingKey<bool>._(
+    'ai.introSeen',
+  );
 }

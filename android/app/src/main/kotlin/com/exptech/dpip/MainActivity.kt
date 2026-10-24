@@ -53,6 +53,9 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, BackgroundExecutionChannel.NAME)
             .setMethodCallHandler(BackgroundExecutionChannel(applicationContext))
 
+        MethodChannel(messenger, SecretStoreChannel.NAME)
+            .setMethodCallHandler(SecretStoreChannel(applicationContext))
+
         // Activity-scoped: the keep-awake window flag belongs to this window.
         MethodChannel(messenger, ScreenWakeChannel.NAME)
             .setMethodCallHandler(ScreenWakeChannel(this))

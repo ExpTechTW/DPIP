@@ -3637,4 +3637,312 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Để sau';
+
+  @override
+  String get aiChatTitle => 'Trợ lý AI';
+
+  @override
+  String get aiChatNew => 'Cuộc trò chuyện mới';
+
+  @override
+  String get aiChatAbout => 'Giới thiệu';
+
+  @override
+  String get aiChatInputHint => 'Hỏi về động đất, thời tiết hoặc bão…';
+
+  @override
+  String get aiChatSend => 'Gửi';
+
+  @override
+  String get aiChatStop => 'Dừng';
+
+  @override
+  String get aiChatDisclaimer =>
+      'AI có thể sai. Khi khẩn cấp, hãy làm theo cảnh báo chính thức.';
+
+  @override
+  String get aiChatEmptyTitle => 'Bạn muốn biết điều gì?';
+
+  @override
+  String get aiChatSuggestionQuakes => 'Gần đây có động đất không?';
+
+  @override
+  String get aiChatSuggestionRain => 'Hôm nay chỗ tôi có mưa không?';
+
+  @override
+  String get aiChatSuggestionTyphoon => 'Hiện có bão không?';
+
+  @override
+  String get aiChatSuggestionAlerts => 'Hiện có những cảnh báo thiên tai nào?';
+
+  @override
+  String get aiChatThinking => 'Đang suy nghĩ…';
+
+  @override
+  String get aiChatWaiting => 'Đang chờ phản hồi…';
+
+  @override
+  String get aiChatStopped => 'Đã dừng';
+
+  @override
+  String get aiChatOpenSettings => 'Mở cài đặt';
+
+  @override
+  String get aiChatCopied => 'Đã sao chép';
+
+  @override
+  String get aiChatSetupTitle => 'Chưa thiết lập dịch vụ AI';
+
+  @override
+  String get aiChatSetupBody =>
+      'Nhập URL, khóa và mô hình của dịch vụ AI của bạn để bắt đầu.';
+
+  @override
+  String get aiChatSetupAction => 'Thiết lập';
+
+  @override
+  String get aiIntroTitle => 'Trợ lý AI';
+
+  @override
+  String get aiIntroBody =>
+      'Hỏi về các trận động đất gần đây, thời tiết ngày mai hay đường đi của bão. AI sẽ tra dữ liệu DPIP theo thời gian thực trước rồi trả lời bằng ngôn ngữ của bạn.';
+
+  @override
+  String get aiIntroOwnKeyTitle => 'Dùng dịch vụ AI của riêng bạn';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      'Nhập URL và khóa của bất kỳ dịch vụ AI tương thích OpenAI có hỗ trợ gọi công cụ, như OpenAI, Google Gemini, Anthropic hoặc OpenRouter. Lượng sử dụng và chi phí do dịch vụ AI của bạn tính.';
+
+  @override
+  String get aiIntroLocalTitle =>
+      'Khóa chỉ ở trên điện thoại này; cuộc trò chuyện không được lưu';
+
+  @override
+  String get aiIntroLocalBody =>
+      'Khóa API được lưu trong kho khóa của hệ thống (iOS Keychain, Android Keystore), không bao giờ được tải lên ExpTech và không theo bản sao lưu sang điện thoại khác. Cuộc trò chuyện không được lưu và sẽ mất khi đóng ứng dụng.';
+
+  @override
+  String get aiIntroDataTitle => 'Dữ liệu được gửi đi đâu';
+
+  @override
+  String get aiIntroDataBody =>
+      'Câu hỏi của bạn được gửi thẳng từ điện thoại tới dịch vụ AI bạn thiết lập, không qua ExpTech. Khi AI cần dữ liệu, ứng dụng sẽ hỏi máy chủ dữ liệu công khai của DPIP, chỉ gửi điều kiện truy vấn (như mã khu vực hoặc ngày), không kèm khóa hay cuộc trò chuyện. Để AI biết \"chỗ tôi\" là đâu, vị trí hiện tại và các thị trấn đã lưu trong ứng dụng (chỉ tên và mã) cũng được gửi cho AI.';
+
+  @override
+  String get aiIntroCautionTitle => 'AI có thể sai';
+
+  @override
+  String get aiIntroCautionBody =>
+      'Câu trả lời chỉ mang tính tham khảo. Khi có thể gặp nguy hiểm, hãy bảo vệ bản thân trước và làm theo cảnh báo, chỉ dẫn chính thức của Cục Khí tượng Trung ương và chính quyền.';
+
+  @override
+  String get aiIntroMcpTitle => 'Tự xây dựng';
+
+  @override
+  String get aiIntroMcpBody =>
+      'Dữ liệu của DPIP cũng được mở dưới dạng máy chủ MCP — chỉ đọc, không cần khóa. Hãy kết nối với Claude, ChatGPT hoặc công cụ hỗ trợ MCP khác để tự xây dựng ứng dụng của bạn.';
+
+  @override
+  String get aiIntroStart => 'Bắt đầu thiết lập';
+
+  @override
+  String get aiMcpTitle => 'Máy chủ MCP của DPIP';
+
+  @override
+  String get aiMcpBody =>
+      'Mọi ứng dụng khách MCP hỗ trợ Streamable HTTP đều dùng được địa chỉ này.';
+
+  @override
+  String get aiMcpCopyUrl => 'Sao chép URL';
+
+  @override
+  String get aiMcpCopyConfig => 'Sao chép cấu hình mẫu';
+
+  @override
+  String get aiMcpCopied => 'Đã sao chép';
+
+  @override
+  String get aiSettingsTitle => 'Cài đặt AI';
+
+  @override
+  String get aiSettingsService => 'Dịch vụ AI';
+
+  @override
+  String get aiSettingsServiceBody =>
+      'Dùng được với mọi dịch vụ tương thích OpenAI (/chat/completions) có hỗ trợ gọi công cụ. Chạm vào một dịch vụ bên dưới để điền URL.';
+
+  @override
+  String get aiSettingsBaseUrl => 'URL API';
+
+  @override
+  String get aiSettingsBaseUrlHelper =>
+      'URL gốc của API, thường kết thúc bằng /v1.';
+
+  @override
+  String get aiSettingsUrlEmpty => 'Hãy nhập URL';
+
+  @override
+  String get aiSettingsUrlInvalid => 'URL không hợp lệ';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'Hãy dùng https://. Chỉ được dùng http:// cho chính điện thoại này (localhost).';
+
+  @override
+  String get aiSettingsApiKey => 'Khóa API';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      'Chỉ được lưu trong kho khóa của điện thoại này. Để trống nếu dịch vụ không cần khóa.';
+
+  @override
+  String get aiSettingsApiKeySaved =>
+      'Đã lưu khóa. Để trống để giữ khóa hiện tại.';
+
+  @override
+  String get aiSettingsShowKey => 'Hiện khóa';
+
+  @override
+  String get aiSettingsHideKey => 'Ẩn khóa';
+
+  @override
+  String get aiSettingsRemoveKey => 'Xóa khóa đã lưu';
+
+  @override
+  String get aiSettingsKeyRemoved => 'Đã xóa khóa';
+
+  @override
+  String get aiSettingsModel => 'Mô hình';
+
+  @override
+  String get aiSettingsModelHelper =>
+      'Cần mô hình hỗ trợ gọi công cụ (function calling). Nút bên phải sẽ liệt kê các mô hình của dịch vụ.';
+
+  @override
+  String get aiSettingsModelEmpty => 'Hãy nhập hoặc chọn mô hình';
+
+  @override
+  String get aiSettingsFetchModels => 'Lấy danh sách mô hình';
+
+  @override
+  String get aiSettingsFilterModels => 'Lọc mô hình';
+
+  @override
+  String get aiSettingsNoModels =>
+      'Dịch vụ này không liệt kê mô hình nào. Hãy nhập tên mô hình.';
+
+  @override
+  String get aiSettingsSave => 'Lưu';
+
+  @override
+  String get aiSettingsSaved => 'Đã lưu';
+
+  @override
+  String get aiSettingsSaveFailed => 'Không lưu được khóa. Vui lòng thử lại.';
+
+  @override
+  String get aiSettingsPrivacy => 'Quyền riêng tư';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      'Khóa chỉ nằm trong kho khóa của điện thoại này và không bao giờ được tải lên ExpTech. Cuộc trò chuyện chỉ truyền giữa điện thoại này và dịch vụ AI của bạn, và không được lưu. Khi AI tra dữ liệu, chỉ điều kiện truy vấn được gửi tới máy chủ dữ liệu của DPIP.';
+
+  @override
+  String get aiSettingsForget => 'Xóa toàn bộ cài đặt AI';
+
+  @override
+  String get aiSettingsForgetTitle => 'Xóa cài đặt AI?';
+
+  @override
+  String get aiSettingsForgetBody =>
+      'URL, mô hình và khóa sẽ bị xóa khỏi điện thoại này.';
+
+  @override
+  String get aiSettingsForgetConfirm => 'Xóa';
+
+  @override
+  String get aiSettingsForgotten => 'Đã xóa cài đặt AI';
+
+  @override
+  String get aiToolEarthquake => 'dữ liệu động đất';
+
+  @override
+  String get aiToolWeather => 'dữ liệu thời tiết';
+
+  @override
+  String get aiToolTyphoon => 'dữ liệu bão';
+
+  @override
+  String get aiToolTsunami => 'dữ liệu sóng thần';
+
+  @override
+  String get aiToolNotices => 'thông báo thiên tai';
+
+  @override
+  String get aiToolPlaces => 'địa điểm';
+
+  @override
+  String get aiToolTimeline => 'thời điểm dữ liệu';
+
+  @override
+  String get aiToolOther => 'dữ liệu';
+
+  @override
+  String aiToolRunning(String subject) {
+    return 'Đang tra $subject…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return 'Đã tra $subject';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return 'Không tra được $subject';
+  }
+
+  @override
+  String get aiErrorUnauthorized =>
+      'Khóa API không hợp lệ, đã hết hạn hoặc không có quyền dùng mô hình này.';
+
+  @override
+  String get aiErrorNotFound =>
+      'Không tìm thấy API hoặc mô hình. Hãy kiểm tra URL và tên mô hình.';
+
+  @override
+  String get aiErrorRateLimited =>
+      'Đã chạm giới hạn tốc độ hoặc hạn mức của dịch vụ AI. Hãy thử lại sau hoặc kiểm tra gói của bạn.';
+
+  @override
+  String get aiErrorRejected =>
+      'Dịch vụ AI đã từ chối yêu cầu. Mô hình có thể không hỗ trợ gọi công cụ.';
+
+  @override
+  String get aiErrorServer => 'Dịch vụ AI tạm thời gặp lỗi. Hãy thử lại sau.';
+
+  @override
+  String get aiErrorNetwork =>
+      'Không kết nối được dịch vụ AI. Hãy kiểm tra mạng.';
+
+  @override
+  String get aiErrorTimeout => 'Dịch vụ AI phản hồi quá lâu.';
+
+  @override
+  String get aiErrorBadResponse =>
+      'Không đọc được phản hồi của dịch vụ AI. URL này có thể không phải API tương thích OpenAI.';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'Không kết nối được máy chủ dữ liệu DPIP. Hãy thử lại sau.';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'AI đã tra dữ liệu quá nhiều lần mà chưa có câu trả lời. Hãy hỏi cụ thể hơn.';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return 'Thông báo từ dịch vụ: $detail';
+  }
 }
