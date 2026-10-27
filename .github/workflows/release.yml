@@ -180,8 +180,8 @@ jobs:
           # .git/config beside them.
           persist-credentials: false
 
-      # Four caches are restored below — the SDK, Gradle, pub and Swift
-      # packages — into the job that signs and ships, and the workflow lint
+      # Three caches are restored below — Gradle, pub and Swift packages —
+      # into the job that signs and ships, and the workflow lint
       # (tool/check/workflow_security.sh) flags each one, rightly: whoever can
       # write a cache this job restores can put code into a store build.
       #
@@ -196,13 +196,21 @@ jobs:
       # accepted, and the pins in review.yml are what bound it; take these
       # caches out rather than loosen them.
       #
+      # mise's own cache is not one of them. What it saves is an SDK that
+      # mise.toml reconstructs identically on the next run, not minutes of work
+      # that only a cache can give back — 20 s on Linux and 46 s on macOS in
+      # the run of 2026-10-25, against 65 s for the Swift packages alone. It is
+      # therefore the one to give up first, and v5.2.0's release notes say
+      # outright that a job which publishes a release should not restore a
+      # cache at all.
+      #
       # Flutter/Dart come from mise.toml, the same pin ci.yml and every
       # developer use. A published build is the one that most needs to be
       # reproducible, so it must not be the one tracking whatever "stable"
       # happens to mean on the day it runs.
       - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
         with:
-          cache: true # zizmor: ignore[cache-poisoning] — accepted, see above
+          cache: false
 
       - if: matrix.platform == 'android'
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
