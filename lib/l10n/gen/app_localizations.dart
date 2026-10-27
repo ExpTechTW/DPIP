@@ -1542,6 +1542,24 @@ abstract class AppLocalizations {
   /// **'Other'**
   String get notifySectionOther;
 
+  /// No description provided for @weatherRankingCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get weatherRankingCurrent;
+
+  /// No description provided for @weatherRankingLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get weatherRankingLatest;
+
+  /// No description provided for @weatherRankingPickTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose data time'**
+  String get weatherRankingPickTime;
+
   /// Snapshot time and station count above a ranking list
   ///
   /// In en, this message translates to:
@@ -2357,12 +2375,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report image not available'**
   String get reportDetailImageUnavailable;
-
-  /// Chip to rank temperature descending
-  ///
-  /// In en, this message translates to:
-  /// **'Highest'**
-  String get weatherRankingHighest;
 
   /// Button that opens the RTS/EEW replay starting from this report's origin time
   ///
@@ -3545,12 +3557,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open-source licenses'**
   String get openSourceLicenses;
-
-  /// Chip to rank temperature ascending
-  ///
-  /// In en, this message translates to:
-  /// **'Lowest'**
-  String get weatherRankingLowest;
 
   /// Sort reports by hypocentral depth
   ///

@@ -355,6 +355,9 @@
   "mapLayerSatelliteB02": "ひまわり 可視緑(B02)",
   "weatherRankingEmpty": "並べ替え可能な観測がありません",
   "notifySectionOther": "その他",
+  "weatherRankingCurrent": "現在",
+  "weatherRankingLatest": "最新",
+  "weatherRankingPickTime": "データ時刻を選択",
   "weatherRankingMeta": "データ時刻：{time}\n観測点 {count}",
   "onboardingTermsAgree": "サービス利用規約を読み、同意します",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(植生なし)",
@@ -562,7 +565,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "最高",
   "reportDetailReplay": "リプレイ",
   "mapLayerRestroom": "トイレ",
   "restroomCategoryWelfare": "社会福祉施設・集会所",
@@ -900,7 +902,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "オープンソースライセンス",
-  "weatherRankingLowest": "最低",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

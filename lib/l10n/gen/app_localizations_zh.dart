@@ -785,6 +785,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notifySectionOther => '其他';
 
   @override
+  String get weatherRankingCurrent => '當下';
+
+  @override
+  String get weatherRankingLatest => '最新';
+
+  @override
+  String get weatherRankingPickTime => '選擇資料時間';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '資料時間：$time\n共 $count 觀測點';
   }
@@ -1209,9 +1218,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => '報告圖尚未提供';
-
-  @override
-  String get weatherRankingHighest => '最高';
 
   @override
   String get reportDetailReplay => '重播';
@@ -1829,9 +1835,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get openSourceLicenses => '引用套件';
-
-  @override
-  String get weatherRankingLowest => '最低';
 
   @override
   String get reportFilterSortDepth => '深度';
@@ -4322,6 +4325,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get notifySectionOther => '其他';
 
   @override
+  String get weatherRankingCurrent => '当前';
+
+  @override
+  String get weatherRankingLatest => '最新';
+
+  @override
+  String get weatherRankingPickTime => '选择资料时间';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '资料时间：$time\n共 $count 观测点';
   }
@@ -4746,9 +4758,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get reportDetailImageUnavailable => '报告图尚未提供';
-
-  @override
-  String get weatherRankingHighest => '最高';
 
   @override
   String get reportDetailReplay => '重播';
@@ -5366,9 +5375,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get openSourceLicenses => '开源许可';
-
-  @override
-  String get weatherRankingLowest => '最低';
 
   @override
   String get reportFilterSortDepth => '深度';
@@ -7858,6 +7864,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get notifySectionOther => '其他';
 
   @override
+  String get weatherRankingCurrent => '當下';
+
+  @override
+  String get weatherRankingLatest => '最新';
+
+  @override
+  String get weatherRankingPickTime => '選擇資料時間';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '資料時間：$time\n共 $count 觀測點';
   }
@@ -8282,9 +8297,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get reportDetailImageUnavailable => '報告圖尚未提供';
-
-  @override
-  String get weatherRankingHighest => '最高';
 
   @override
   String get reportDetailReplay => '重播';
@@ -8902,9 +8914,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get openSourceLicenses => '引用套件';
-
-  @override
-  String get weatherRankingLowest => '最低';
 
   @override
   String get reportFilterSortDepth => '深度';
@@ -11395,6 +11404,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get notifySectionOther => '其他';
 
   @override
+  String get weatherRankingCurrent => '當下';
+
+  @override
+  String get weatherRankingLatest => '最新';
+
+  @override
+  String get weatherRankingPickTime => '選擇資料時間';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '資料時間：$time\n共 $count 觀測點';
   }
@@ -11819,9 +11837,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get reportDetailImageUnavailable => '報告圖尚未提供';
-
-  @override
-  String get weatherRankingHighest => '最高';
 
   @override
   String get reportDetailReplay => '重播';
@@ -12439,9 +12454,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get openSourceLicenses => '引用套件';
-
-  @override
-  String get weatherRankingLowest => '最低';
 
   @override
   String get reportFilterSortDepth => '深度';

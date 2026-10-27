@@ -789,6 +789,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifySectionOther => '기타';
 
   @override
+  String get weatherRankingCurrent => '현재';
+
+  @override
+  String get weatherRankingLatest => '최신';
+
+  @override
+  String get weatherRankingPickTime => '자료 시각 선택';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '자료 시각: $time\n관측점 $count';
   }
@@ -1218,9 +1227,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => '보고서 이미지가 아직 없습니다';
-
-  @override
-  String get weatherRankingHighest => '최고';
 
   @override
   String get reportDetailReplay => '다시 보기';
@@ -1841,9 +1847,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get openSourceLicenses => '오픈소스 라이선스';
-
-  @override
-  String get weatherRankingLowest => '최저';
 
   @override
   String get reportFilterSortDepth => '깊이';

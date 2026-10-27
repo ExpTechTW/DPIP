@@ -355,6 +355,9 @@
   "mapLayerSatelliteB02": "Himawari Green (B02)",
   "weatherRankingEmpty": "Không có quan trắc để xếp hạng",
   "notifySectionOther": "Khác",
+  "weatherRankingCurrent": "Hiện tại",
+  "weatherRankingLatest": "Mới nhất",
+  "weatherRankingPickTime": "Chọn thời gian dữ liệu",
   "weatherRankingMeta": "Thời gian: {time}\n{count} trạm",
   "onboardingTermsAgree": "Tôi đã đọc và đồng ý với Điều khoản Dịch vụ",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
@@ -562,7 +565,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "Cao nhất",
   "reportDetailReplay": "Phát lại",
   "mapLayerRestroom": "Nhà vệ sinh công cộng",
   "restroomCategoryWelfare": "Cơ sở phúc lợi",
@@ -900,7 +902,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "Giấy phép mã nguồn mở",
-  "weatherRankingLowest": "Thấp nhất",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

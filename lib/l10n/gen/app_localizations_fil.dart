@@ -810,6 +810,15 @@ class AppLocalizationsFil extends AppLocalizations {
   String get notifySectionOther => 'Iba pa';
 
   @override
+  String get weatherRankingCurrent => 'Kasalukuyan';
+
+  @override
+  String get weatherRankingLatest => 'Pinakabago';
+
+  @override
+  String get weatherRankingPickTime => 'Pumili ng oras ng datos';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Oras ng datos: $time\n$count istasyon';
   }
@@ -1250,9 +1259,6 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get reportDetailImageUnavailable =>
       'Wala pang available na larawan ng ulat';
-
-  @override
-  String get weatherRankingHighest => 'Pinakamataas';
 
   @override
   String get reportDetailReplay => 'I-replay';
@@ -1886,9 +1892,6 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Mga lisensya ng open-source';
-
-  @override
-  String get weatherRankingLowest => 'Pinakamababa';
 
   @override
   String get reportFilterSortDepth => 'Lalim';

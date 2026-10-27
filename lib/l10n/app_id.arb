@@ -355,6 +355,9 @@
   "mapLayerSatelliteB02": "Himawari Green (B02)",
   "weatherRankingEmpty": "Tidak ada observasi untuk diurutkan",
   "notifySectionOther": "Lainnya",
+  "weatherRankingCurrent": "Saat ini",
+  "weatherRankingLatest": "Terbaru",
+  "weatherRankingPickTime": "Pilih waktu data",
   "weatherRankingMeta": "Waktu data: {time}\n{count} stasiun",
   "onboardingTermsAgree": "Saya telah membaca dan menyetujui Ketentuan Layanan",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
@@ -562,7 +565,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "Tertinggi",
   "reportDetailReplay": "Putar ulang",
   "mapLayerRestroom": "Toilet Umum",
   "restroomCategoryWelfare": "Lembaga kesejahteraan",
@@ -900,7 +902,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "Lisensi sumber terbuka",
-  "weatherRankingLowest": "Terendah",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

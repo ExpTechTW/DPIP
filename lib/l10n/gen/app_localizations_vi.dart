@@ -801,6 +801,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notifySectionOther => 'Khác';
 
   @override
+  String get weatherRankingCurrent => 'Hiện tại';
+
+  @override
+  String get weatherRankingLatest => 'Mới nhất';
+
+  @override
+  String get weatherRankingPickTime => 'Chọn thời gian dữ liệu';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Thời gian: $time\n$count trạm';
   }
@@ -1238,9 +1247,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => 'Hình ảnh báo cáo chưa có sẵn';
-
-  @override
-  String get weatherRankingHighest => 'Cao nhất';
 
   @override
   String get reportDetailReplay => 'Phát lại';
@@ -1873,9 +1879,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Giấy phép mã nguồn mở';
-
-  @override
-  String get weatherRankingLowest => 'Thấp nhất';
 
   @override
   String get reportFilterSortDepth => 'Độ sâu';

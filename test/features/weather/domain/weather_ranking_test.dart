@@ -137,4 +137,81 @@ void main() {
       expect(ranked.first.eventTime, isNull); // range has no single event time
     });
   });
+
+  group('rankTemperature', () {
+    const snapshot = WeatherSnapshot(
+      time: 0,
+      stations: [
+        WeatherObservation(
+          id: 'A',
+          weatherCode: 0,
+          temperature: 28,
+          high: 32,
+          highTime: 100,
+          low: 24,
+          lowTime: 50,
+        ),
+        WeatherObservation(
+          id: 'B',
+          weatherCode: 0,
+          temperature: 30,
+          high: 31,
+          highTime: 110,
+          low: 29,
+          lowTime: 60,
+        ),
+        WeatherObservation(
+          id: 'C',
+          weatherCode: 0,
+          temperature: 33,
+          high: 33,
+          highTime: 120,
+          // no low → skipped by the extreme metrics, still ranked as current
+        ),
+      ],
+    );
+
+    List<RankedObservation> rank(
+      TempRankMetric metric, {
+      bool ascending = false,
+    }) => rankTemperature(
+      stations: stations,
+      snapshot: snapshot,
+      metric: metric,
+      ascending: ascending,
+      merge: RankingMerge.none,
+    );
+
+    test('current ranks the reading in the snapshot, with no clock', () {
+      final ranked = rank(TempRankMetric.current);
+      expect(ranked.map((e) => e.id).toList(), ['C', 'B', 'A']);
+      expect(ranked.first.value, 33);
+      expect(ranked.first.eventTime, isNull);
+    });
+
+    // The chip strip is one entry point over the old separate tab, so each
+    // metric must behave exactly as its own list used to.
+    test('high ranks the recorded maximum with its occurrence time', () {
+      // C has no recorded low, so the extremes cannot place it — the snapshot's
+      // `hi` and `lo` always come as a pair.
+      final ranked = rank(TempRankMetric.high);
+      expect(ranked.map((e) => e.id).toList(), ['A', 'B']);
+      expect(ranked.first.value, 32);
+      expect(ranked.first.eventTime, 100);
+    });
+
+    test('low ranks coldest-first and skips stations without one', () {
+      final ranked = rank(TempRankMetric.low, ascending: true);
+      expect(ranked.map((e) => e.id).toList(), ['A', 'B']);
+      expect(ranked.first.value, 24);
+      expect(ranked.first.eventTime, 50);
+    });
+
+    test('range ranks the diurnal spread, which has no single time', () {
+      final ranked = rank(TempRankMetric.range);
+      expect(ranked.map((e) => e.id).toList(), ['A', 'B']);
+      expect(ranked.first.value, 8);
+      expect(ranked.first.eventTime, isNull);
+    });
+  });
 }

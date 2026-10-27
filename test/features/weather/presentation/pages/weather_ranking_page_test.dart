@@ -16,7 +16,9 @@ import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
+import 'package:dpip/features/weather/domain/weather_ranking.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
+import 'package:dpip/features/weather/presentation/widgets/ranking_time_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -69,12 +71,22 @@ RainObservation _rain(String id) => RainObservation(
 );
 
 class _Weather implements MeteorWeatherRepository {
-  _Weather(this.stationsResult, this.latestResult);
+  _Weather(
+    this.stationsResult,
+    this.latestResult, {
+    this.historyResult = const Ok(<int>[]),
+    Map<int, WeatherSnapshot>? past,
+  }) : past = past ?? {};
 
   Result<Map<String, WeatherStation>> stationsResult;
   Result<WeatherSnapshot> latestResult;
+  Result<List<int>> historyResult;
+  final Map<int, WeatherSnapshot> past;
   Completer<void>? holdStations;
   bool explode = false;
+
+  /// Every second the page actually asked the API for.
+  final List<int> requested = [];
 
   @override
   Future<Result<Map<String, WeatherStation>>> stations() async {
@@ -88,14 +100,19 @@ class _Weather implements MeteorWeatherRepository {
   Future<Result<WeatherSnapshot>> latest() async => latestResult;
 
   @override
-  Future<Result<WeatherSnapshot>> at(int second) => throw UnimplementedError();
+  Future<Result<WeatherSnapshot>> at(int second) async {
+    requested.add(second);
+    final snapshot = past[second];
+    if (snapshot != null) return Ok(snapshot);
+    return Err<WeatherSnapshot>(const NetworkFailure('no such snapshot'));
+  }
 
   @override
   Future<Result<WeatherForecast>> forecast(String code) =>
       throw UnimplementedError();
 
   @override
-  Future<Result<List<int>>> history() => throw UnimplementedError();
+  Future<Result<List<int>>> history() async => historyResult;
 
   @override
   Future<Result<WeatherRealtime?>> realtime(
@@ -109,10 +126,20 @@ class _Weather implements MeteorWeatherRepository {
 }
 
 class _Rain implements MeteorRainRepository {
-  _Rain(this.stationsResult, this.latestResult);
+  _Rain(
+    this.stationsResult,
+    this.latestResult, {
+    this.historyResult = const Ok(<int>[]),
+    Map<int, RainSnapshot>? past,
+  }) : past = past ?? {};
 
   Result<Map<String, WeatherStation>> stationsResult;
   Result<RainSnapshot> latestResult;
+  Result<List<int>> historyResult;
+  final Map<int, RainSnapshot> past;
+
+  /// Every second the page actually asked the API for.
+  final List<int> requested = [];
 
   @override
   Future<Result<Map<String, WeatherStation>>> stations() async =>
@@ -122,30 +149,80 @@ class _Rain implements MeteorRainRepository {
   Future<Result<RainSnapshot>> latest() async => latestResult;
 
   @override
-  Future<Result<RainSnapshot>> at(int second) => throw UnimplementedError();
+  Future<Result<RainSnapshot>> at(int second) async {
+    requested.add(second);
+    final snapshot = past[second];
+    if (snapshot != null) return Ok(snapshot);
+    return Err<RainSnapshot>(const NetworkFailure('no such snapshot'));
+  }
 
   @override
-  Future<Result<List<int>>> history() => throw UnimplementedError();
+  Future<Result<List<int>>> history() async => historyResult;
 
   @override
   Future<Result<RainTrend>> trend(String id, {String range = '24h'}) =>
       throw UnimplementedError();
 }
 
+/// The newest snapshot the fakes serve, and the one an hour before it — the
+/// second is what the picker hands to `at()`.
+const int _now = 1_700_000_000;
+const int _earlier = _now - 3600;
+
 Result<Map<String, WeatherStation>> _catalogue() =>
     Ok({'A': _station('大同區'), 'B': _station('信義區')});
 
 Result<WeatherSnapshot> _weatherSnap() =>
-    Ok(WeatherSnapshot(time: 1_700_000_000, stations: [_obs('A'), _obs('B')]));
+    Ok(WeatherSnapshot(time: _now, stations: [_obs('A'), _obs('B')]));
 
 Result<RainSnapshot> _rainSnap() =>
-    Ok(RainSnapshot(time: 1_700_000_000, stations: [_rain('A'), _rain('B')]));
+    Ok(RainSnapshot(time: _now, stations: [_rain('A'), _rain('B')]));
+
+/// The snapshot an hour back: different readings, so a list that ignored the
+/// picked time cannot accidentally look right.
+WeatherObservation _pastObs(String id) => WeatherObservation(
+  id: id,
+  weatherCode: 100,
+  temperature: id == 'A' ? 41.5 : 9,
+  humidity: 55,
+  pressure: 990,
+  windSpeed: 2,
+  gustSpeed: 3,
+  high: 42,
+  low: 39,
+  highTime: _earlier + 600,
+  lowTime: _earlier,
+);
+
+Result<WeatherSnapshot> _pastWeatherSnap() => Ok(
+  WeatherSnapshot(time: _earlier, stations: [_pastObs('A'), _pastObs('B')]),
+);
+
+/// Rain an hour back: `now` accumulation 21 mm, so the rain tab's default
+/// interval proves it ranked the historical snapshot.
+RainObservation _pastRain(String id) => RainObservation(
+  id: id,
+  now: id == 'A' ? 21 : 2,
+  min10: 1,
+  hour1: 2,
+  hour3: 3,
+  hour6: 4,
+  hour12: 5,
+  hour24: 6,
+  day2: 7,
+  day3: 8,
+);
+
+Result<RainSnapshot> _pastRainSnap() => Ok(
+  RainSnapshot(time: _earlier, stations: [_pastRain('A'), _pastRain('B')]),
+);
 
 Future<MapStationHandoff> _pump(
   WidgetTester tester, {
   required MeteorWeatherRepository weather,
   required MeteorRainRepository rain,
   WeatherRankingTab tab = WeatherRankingTab.rain,
+  TempRankMetric tempMetric = TempRankMetric.current,
 }) async {
   tester.view.physicalSize = _tall;
   tester.view.devicePixelRatio = 1;
@@ -156,7 +233,8 @@ Future<MapStationHandoff> _pump(
     routes: [
       GoRoute(
         path: '/',
-        builder: (_, _) => WeatherRankingPage(initialTab: tab),
+        builder: (_, _) =>
+            WeatherRankingPage(initialTab: tab, initialTempMetric: tempMetric),
       ),
       GoRoute(
         name: AppRoutes.map,
@@ -198,14 +276,29 @@ void main() {
       expect(tab.mapLayerId, isNotEmpty);
     }
     expect(WeatherRankingTab.parse('temp'), WeatherRankingTab.temperature);
-    expect(WeatherRankingTab.parse('high'), WeatherRankingTab.tempExtremes);
-    expect(WeatherRankingTab.parse('low'), WeatherRankingTab.tempExtremes);
-    expect(WeatherRankingTab.parse('range'), WeatherRankingTab.tempExtremes);
     expect(WeatherRankingTab.parse('pres'), WeatherRankingTab.pressure);
     expect(WeatherRankingTab.parse('rh'), WeatherRankingTab.humidity);
     expect(WeatherRankingTab.parse(null), WeatherRankingTab.rain);
     expect(WeatherRankingTab.parse('nope'), WeatherRankingTab.rain);
   });
+
+  test(
+    'the old daily-extremes tab is now a chip inside the temperature tab',
+    () {
+      // The value still has to resolve, so a link shared before the merge does
+      // not land on rain.
+      expect(
+        WeatherRankingTab.parse('tempExtremes'),
+        WeatherRankingTab.temperature,
+      );
+      expect(TempRankMetric.parse('tempExtremes'), TempRankMetric.high);
+      expect(TempRankMetric.parse('high'), TempRankMetric.high);
+      expect(TempRankMetric.parse('low'), TempRankMetric.low);
+      expect(TempRankMetric.parse('range'), TempRankMetric.range);
+      expect(TempRankMetric.parse('temperature'), TempRankMetric.current);
+      expect(TempRankMetric.parse(null), TempRankMetric.current);
+    },
+  );
 
   testWidgets('lists rain, switches intervals, and opens the station', (
     tester,
@@ -287,17 +380,25 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
 
     expect(find.text('32.4 °C'), findsOneWidget);
-    await tester.tap(find.text(l10n.weatherRankingLowest));
+
+    // The four figure chips push the sort chips past the screen edge.
+    await tester.drag(
+      find.text(l10n.weatherRankingCurrent).hitTestable(),
+      const Offset(-400, 0),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.reportFilterOrderAsc).hitTestable());
     await tester.pumpAndSettle();
     expect(find.text('18.0 °C'), findsOneWidget);
-    await tester.tap(find.text(l10n.weatherRankingHighest));
+    await tester.tap(find.text(l10n.reportFilterOrderDesc).hitTestable());
     await tester.pumpAndSettle();
     expect(find.text('32.4 °C'), findsOneWidget);
 
-    await tester.ensureVisible(find.text(l10n.weatherRankingMergeCounty));
-    await tester.tap(find.text(l10n.weatherRankingMergeCounty));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(l10n.weatherRankingMergeCounty));
+    // Back to the figure chips.
+    await tester.drag(
+      find.text(l10n.reportFilterOrderDesc).hitTestable(),
+      const Offset(400, 0),
+    );
     await tester.pumpAndSettle();
 
     await _openTab(tester, l10n.weatherRankingWind);
@@ -315,29 +416,36 @@ void main() {
     await _openTab(tester, l10n.mapLayerPressure);
     expect(find.text('1013.2 hPa'), findsOneWidget);
 
-    await _openTab(tester, l10n.weatherRankingTempExtremes);
+    // The daily extremes are chips on the temperature tab now, not a tab.
+    await _openTab(tester, l10n.mapLayerTemperature);
     expect(find.textContaining('°C'), findsWidgets);
+    expect(find.text(l10n.weatherRankingTempExtremes), findsNothing);
+
+    await tester.tap(find.text(l10n.weatherRankingExtremeHigh).hitTestable());
+    await tester.pumpAndSettle();
+    expect(find.text('33.0 °C'), findsOneWidget);
+
     await tester.tap(find.text(l10n.weatherRankingExtremeLow).hitTestable());
     await tester.pumpAndSettle();
+    expect(find.text('16.0 °C'), findsOneWidget);
+
     await tester.tap(find.text(l10n.weatherRankingExtremeRange).hitTestable());
     await tester.pumpAndSettle();
-    await tester.drag(
-      find.text(l10n.weatherRankingExtremeHigh).hitTestable(),
-      const Offset(-700, 0),
-    );
+    expect(find.text('17.0 °C'), findsOneWidget);
+
+    await tester.tap(find.text(l10n.weatherRankingCurrent).hitTestable());
     await tester.pumpAndSettle();
-    await tester.tap(find.text(l10n.reportFilterOrderAsc).hitTestable());
-    await tester.pumpAndSettle();
+    expect(find.text('32.4 °C'), findsOneWidget);
+
+    // Merge chips sit at the far end of the same strip.
     await tester.drag(
-      find.text(l10n.reportFilterOrderAsc).hitTestable(),
-      const Offset(-500, 0),
+      find.text(l10n.weatherRankingCurrent).hitTestable(),
+      const Offset(-800, 0),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.weatherRankingMergeTown).hitTestable());
     await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.weatherRankingMergeCounty).hitTestable());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(l10n.reportFilterOrderDesc).hitTestable());
     await tester.pumpAndSettle();
   });
 
@@ -401,7 +509,124 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     expect(find.text(l10n.weatherRankingEmpty), findsOneWidget);
 
-    await _openTab(tester, l10n.weatherRankingTempExtremes);
+    await _openTab(tester, l10n.mapLayerTemperature);
+    expect(find.text('20.0 °C'), findsWidgets);
+
+    // The stations have a reading but no recorded extremes, so the chip that
+    // needs them is the empty one.
+    await tester.tap(find.text(l10n.weatherRankingExtremeHigh).hitTestable());
+    await tester.pumpAndSettle();
     expect(find.text(l10n.weatherRankingEmpty), findsOneWidget);
+  });
+
+  testWidgets('picking a past time re-ranks the list at that snapshot', (
+    tester,
+  ) async {
+    final weather = _Weather(
+      _catalogue(),
+      _weatherSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastWeatherSnap().valueOrNull!},
+    );
+    final rain = _Rain(
+      _catalogue(),
+      _rainSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastRainSnap().valueOrNull!},
+    );
+    await _pump(tester, weather: weather, rain: rain);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text('12.5 mm'), findsOneWidget);
+
+    await tester.tap(find.text(l10n.weatherRankingLatest));
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.weatherRankingPickTime), findsOneWidget);
+
+    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.pumpAndSettle();
+
+    // One `at()` per dataset, both for the chosen second.
+    expect(weather.requested, [_earlier]);
+    expect(rain.requested, [_earlier]);
+    expect(find.text('21 mm'), findsOneWidget);
+    expect(find.text('12.5 mm'), findsNothing);
+    // The bar says where the list is instead of claiming to be live.
+    expect(find.text(l10n.weatherRankingLatest), findsNothing);
+    expect(find.text(rankingTimeLabel(_earlier)), findsOneWidget);
+  });
+
+  testWidgets('the picker walks back to the newest snapshot', (tester) async {
+    final weather = _Weather(
+      _catalogue(),
+      _weatherSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastWeatherSnap().valueOrNull!},
+    );
+    final rain = _Rain(
+      _catalogue(),
+      _rainSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastRainSnap().valueOrNull!},
+    );
+    await _pump(tester, weather: weather, rain: rain);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    await tester.tap(find.text(l10n.weatherRankingLatest));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.pumpAndSettle();
+    expect(find.text('21 mm'), findsOneWidget);
+
+    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(l10n.weatherRankingLatest).last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('12.5 mm'), findsOneWidget);
+    expect(weather.requested, [_earlier]);
+  });
+
+  testWidgets('rain lands on its own nearest snapshot, not the weather one', (
+    tester,
+  ) async {
+    final rainSecond = _earlier + 600;
+    final weather = _Weather(
+      _catalogue(),
+      _weatherSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastWeatherSnap().valueOrNull!},
+    );
+    final rain = _Rain(
+      _catalogue(),
+      _rainSnap(),
+      // The rain history runs on finer steps than the weather one.
+      historyResult: const Ok(<int>[_earlier + 600, _now]),
+      past: {rainSecond: _pastRainSnap().valueOrNull!},
+    );
+    await _pump(tester, weather: weather, rain: rain);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    await tester.tap(find.text(l10n.weatherRankingLatest));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.pumpAndSettle();
+
+    expect(weather.requested, [_earlier]);
+    expect(rain.requested, [rainSecond]);
+    expect(find.text('21 mm'), findsOneWidget);
+  });
+
+  testWidgets('no history means no picker, and the newest list still works', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      weather: _Weather(_catalogue(), _weatherSnap()),
+      rain: _Rain(_catalogue(), _rainSnap()),
+    );
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.byIcon(Icons.schedule), findsNothing);
+    expect(find.text(l10n.weatherRankingLatest), findsNothing);
+    expect(find.text('12.5 mm'), findsOneWidget);
   });
 }

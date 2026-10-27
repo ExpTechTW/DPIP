@@ -355,6 +355,9 @@
   "mapLayerSatelliteB02": "Himawari Green (B02)",
   "weatherRankingEmpty": "Walang obserbasyon na iraranggo",
   "notifySectionOther": "Iba pa",
+  "weatherRankingCurrent": "Kasalukuyan",
+  "weatherRankingLatest": "Pinakabago",
+  "weatherRankingPickTime": "Pumili ng oras ng datos",
   "weatherRankingMeta": "Oras ng datos: {time}\n{count} istasyon",
   "onboardingTermsAgree": "Nabasa ko na at sumasang-ayon ako sa Mga Tuntunin ng Serbisyo",
   "mapLayerSatelliteTransparentNoVegetation": "Sa ibaba ng 0.1 = transparent (walang vegetation)",
@@ -562,7 +565,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "Pinakamataas",
   "reportDetailReplay": "I-replay",
   "mapLayerRestroom": "Pampublikong Palikuran",
   "restroomCategoryWelfare": "Institusyon ng kapakanan",
@@ -900,7 +902,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "Mga lisensya ng open-source",
-  "weatherRankingLowest": "Pinakamababa",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

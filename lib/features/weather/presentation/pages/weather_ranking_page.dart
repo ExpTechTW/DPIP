@@ -4,6 +4,7 @@ library;
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/geo_math.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
@@ -12,6 +13,7 @@ import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_ranking.dart';
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
+import 'package:dpip/features/weather/presentation/widgets/ranking_time_sheet.dart';
 import 'package:dpip/features/weather/presentation/widgets/weather_ranking_row.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
@@ -26,28 +28,30 @@ import 'package:provider/provider.dart';
 
 /// Which metric tab to open (from the Data hub deep-link `?tab=`).
 ///
-/// - [temperature] ranks **current** `temp` (當下氣溫).
-/// - [tempExtremes] ranks recorded daily `hi` / `lo` / `hi−lo` with occurrence
-///   times (`hit` / `lot`) and a full analysis line.
+/// - [temperature] ranks the reading itself or, through [TempRankMetric], one
+///   of the day's recorded extremes (`hi` / `lo` / `hi−lo`) with occurrence
+///   times (`hit` / `lot`). The standalone daily-extremes tab was folded in
+///   here: two tabs over the same field made it look as though only
+///   temperature had extremes.
 /// - Other tabs cover rain / wind / gust / humidity / pressure.
 enum WeatherRankingTab {
   rain,
   temperature,
-  tempExtremes,
   wind,
   gust,
   humidity,
   pressure;
 
   static WeatherRankingTab parse(String? raw) => switch (raw) {
-    'temperature' || 'temp' => WeatherRankingTab.temperature,
+    'temperature' ||
+    'temp' ||
     'tempExtremes' ||
     'extremes' ||
     'tempHigh' ||
     'high' ||
     'tempLow' ||
     'low' ||
-    'range' => WeatherRankingTab.tempExtremes,
+    'range' => WeatherRankingTab.temperature,
     'wind' => WeatherRankingTab.wind,
     'gust' => WeatherRankingTab.gust,
     'pressure' || 'pres' => WeatherRankingTab.pressure,
@@ -61,7 +65,6 @@ enum WeatherRankingTab {
   String label(AppLocalizations l10n) => switch (this) {
     WeatherRankingTab.rain => l10n.mapLayerRain,
     WeatherRankingTab.temperature => l10n.mapLayerTemperature,
-    WeatherRankingTab.tempExtremes => l10n.weatherRankingTempExtremes,
     WeatherRankingTab.wind => l10n.weatherRankingWind,
     WeatherRankingTab.gust => l10n.weatherRankingGust,
     WeatherRankingTab.humidity => l10n.mapLayerHumidity,
@@ -71,7 +74,6 @@ enum WeatherRankingTab {
   IconData get icon => switch (this) {
     WeatherRankingTab.rain => Icons.umbrella_outlined,
     WeatherRankingTab.temperature => Icons.thermostat_outlined,
-    WeatherRankingTab.tempExtremes => Icons.thermostat_auto_outlined,
     WeatherRankingTab.wind => Icons.air_outlined,
     WeatherRankingTab.gust => Icons.storm_outlined,
     WeatherRankingTab.humidity => Icons.water_drop_outlined,
@@ -82,12 +84,24 @@ enum WeatherRankingTab {
   /// Gust has no dedicated layer — land on wind.
   String get mapLayerId => switch (this) {
     WeatherRankingTab.rain => 'rain',
-    WeatherRankingTab.temperature ||
-    WeatherRankingTab.tempExtremes => 'temperature',
+    WeatherRankingTab.temperature => 'temperature',
     WeatherRankingTab.wind || WeatherRankingTab.gust => 'wind',
     WeatherRankingTab.humidity => 'humidity',
     WeatherRankingTab.pressure => 'pressure',
   };
+}
+
+/// Localised labels for [TempRankMetric] (domain stays Flutter-free).
+extension on TempRankMetric {
+  String label(AppLocalizations l10n) => switch (this) {
+    TempRankMetric.current => l10n.weatherRankingCurrent,
+    TempRankMetric.high => l10n.weatherRankingExtremeHigh,
+    TempRankMetric.low => l10n.weatherRankingExtremeLow,
+    TempRankMetric.range => l10n.weatherRankingExtremeRange,
+  };
+
+  /// Coldest-first for the daily low, hottest/widest otherwise.
+  bool get ascendingByDefault => this == TempRankMetric.low;
 }
 
 /// Localised labels for [RainInterval] (domain stays Flutter-free).
@@ -125,9 +139,15 @@ class WeatherRankingPage extends StatefulWidget {
   const WeatherRankingPage({
     super.key,
     this.initialTab = WeatherRankingTab.rain,
+    this.initialTempMetric = TempRankMetric.current,
   });
 
   final WeatherRankingTab initialTab;
+
+  /// Which temperature figure the temperature tab opens on. The Data hub's
+  /// 「溫度極值」 tile lands here with [TempRankMetric.high] instead of opening a
+  /// tab of its own.
+  final TempRankMetric initialTempMetric;
 
   @override
   State<WeatherRankingPage> createState() => _WeatherRankingPageState();
@@ -138,6 +158,26 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
   late final TabController _tabs;
   late Future<Result<_RankingData>> _future;
   _RankingData? _loaded;
+
+  /// The chosen historical snapshot, or `null` for the newest one — which is
+  /// fetched through `latest()` (not pinned to a timestamp), so a refresh keeps
+  /// the default list live instead of freezing it an hour back.
+  int? _selectedSecond;
+
+  /// Snapshot times each dataset can still serve, ascending. Empty until the
+  /// history endpoints answer — and when they fail, which only costs the
+  /// picker: the newest ranking is still worth showing.
+  List<int> _weatherTimes = const [];
+  List<int> _rainTimes = const [];
+
+  /// Time of the newest weather snapshot last loaded, for the picker's
+  /// 「最新」 row. Null until the first load lands.
+  int? _latestWeatherTime;
+
+  /// Snapshots already fetched for a chosen time. History snapshots are
+  /// immutable and addressed by their second, so re-picking one costs nothing.
+  final Map<int, WeatherSnapshot> _weatherAt = {};
+  final Map<int, RainSnapshot> _rainAt = {};
 
   static const _order = WeatherRankingTab.values;
 
@@ -152,6 +192,9 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
           .clamp(0, _order.length - 1),
     );
     _future = _load();
+    // Independent of the ranking itself: the list must not wait for a picker
+    // that may never be opened.
+    _loadHistory().ignore();
   }
 
   @override
@@ -160,7 +203,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     super.dispose();
   }
 
-  Future<Result<_RankingData>> _load() async {
+  Future<Result<_RankingData>> _load({int? second}) async {
     final weatherRepo = context.read<MeteorWeatherRepository>();
     final rainRepo = context.read<MeteorRainRepository>();
 
@@ -168,7 +211,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     final weatherStationsErr = weatherStations.failureOrNull;
     if (weatherStationsErr != null) return Err(weatherStationsErr);
 
-    final weather = await weatherRepo.latest();
+    final weather = await _weatherSnapshot(weatherRepo, second);
     final weatherErr = weather.failureOrNull;
     if (weatherErr != null) return Err(weatherErr);
 
@@ -176,22 +219,132 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     final rainStationsErr = rainStations.failureOrNull;
     if (rainStationsErr != null) return Err(rainStationsErr);
 
-    final rain = await rainRepo.latest();
+    final rain = await _rainSnapshot(rainRepo, second);
     final rainErr = rain.failureOrNull;
     if (rainErr != null) return Err(rainErr);
 
-    return Ok(
-      _RankingData(
-        weatherStations: weatherStations.valueOrNull!,
-        weather: weather.valueOrNull!,
-        rainStations: rainStations.valueOrNull!,
-        rain: rain.valueOrNull!,
-      ),
+    final data = _RankingData(
+      weatherStations: weatherStations.valueOrNull!,
+      weather: weather.valueOrNull!,
+      rainStations: rainStations.valueOrNull!,
+      rain: rain.valueOrNull!,
     );
+    if (second == null) _latestWeatherTime = data.weather.time;
+    return Ok(data);
+  }
+
+  /// The weather snapshot for [second]: `latest()` while the list is live,
+  /// otherwise the newest history time at or before it.
+  Future<Result<WeatherSnapshot>> _weatherSnapshot(
+    MeteorWeatherRepository repo,
+    int? second,
+  ) async {
+    if (second == null) return repo.latest();
+    final cached = _weatherAt[second];
+    if (cached != null) return Ok(cached);
+    final resolved = _atOrBefore(_weatherTimes, second);
+    // The history has not answered (or is empty): the newest snapshot is the
+    // only one this page can honestly draw.
+    if (resolved == null) return repo.latest();
+    final result = await repo.at(resolved);
+    final snapshot = result.valueOrNull;
+    if (snapshot != null) _weatherAt[second] = snapshot;
+    return result;
+  }
+
+  /// The rain counterpart of [_weatherSnapshot] — rain keeps a finer history
+  /// (10-minute steps), so the same chosen time usually resolves to its own
+  /// nearest snapshot.
+  Future<Result<RainSnapshot>> _rainSnapshot(
+    MeteorRainRepository repo,
+    int? second,
+  ) async {
+    if (second == null) return repo.latest();
+    final cached = _rainAt[second];
+    if (cached != null) return Ok(cached);
+    final resolved = _atOrBefore(_rainTimes, second);
+    if (resolved == null) return repo.latest();
+    final result = await repo.at(resolved);
+    final snapshot = result.valueOrNull;
+    if (snapshot != null) _rainAt[second] = snapshot;
+    return result;
+  }
+
+  /// The newest time in [times] at or before [second]; the oldest one when
+  /// [second] predates everything the history still keeps.
+  static int? _atOrBefore(List<int> times, int second) {
+    if (times.isEmpty) return null;
+    int? best;
+    for (final time in times) {
+      if (time <= second && (best == null || time > best)) best = time;
+    }
+    return best ?? times.first;
+  }
+
+  /// Loads the snapshot-time lists the picker offers. Failures are logged and
+  /// swallowed: the newest ranking does not depend on them, and the next
+  /// refresh tries again.
+  Future<void> _loadHistory() async {
+    final weatherRepo = context.read<MeteorWeatherRepository>();
+    final rainRepo = context.read<MeteorRainRepository>();
+    final weather = await _timesFrom(weatherRepo.history());
+    final rain = await _timesFrom(rainRepo.history());
+    if (!mounted) return;
+    setState(() {
+      _weatherTimes = weather;
+      _rainTimes = rain;
+    });
+  }
+
+  Future<List<int>> _timesFrom(Future<Result<List<int>>> pending) async {
+    try {
+      final result = await pending;
+      final times = result.valueOrNull;
+      return times == null ? const <int>[] : (List<int>.of(times)..sort());
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'ranking history');
+      return const <int>[];
+    }
+  }
+
+  /// Weather drives the picker: it is the coarser of the two histories, and
+  /// every weather tab reads it. Rain alone answers when weather has none.
+  List<int> get _pickerTimes =>
+      _weatherTimes.isNotEmpty ? _weatherTimes : _rainTimes;
+
+  int? get _newestTime =>
+      _latestWeatherTime ??
+      (_weatherTimes.isNotEmpty
+          ? _weatherTimes.last
+          : _rainTimes.isNotEmpty
+          ? _rainTimes.last
+          : null);
+
+  Future<void> _pickTime() async {
+    final times = _pickerTimes;
+    final newest = _newestTime;
+    if (times.isEmpty || newest == null) return;
+    final choice = await showRankingTimeSheet(
+      context: context,
+      times: times,
+      latest: newest,
+      selected: _selectedSecond,
+    );
+    if (!mounted || choice == null) return;
+    final second = choice.second;
+    if (second == _selectedSecond) return;
+    final next = _load(second: second);
+    setState(() {
+      _selectedSecond = second;
+      _future = next;
+    });
+    // The FutureBuilder owns the outcome; the error surface already shows a
+    // failed pick, so awaiting here would only rethrow it into the zone.
+    next.ignore();
   }
 
   Future<void> _reload() async {
-    final next = _load();
+    final next = _load(second: _selectedSecond);
     // A block, not an arrow: the assignment expression's value is the future,
     // and `setState` rejects a callback that returns one — in debug that throw
     // lands before the frame is even marked dirty, so pull-to-refresh never
@@ -199,7 +352,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     setState(() {
       _future = next;
     });
-    await next;
+    await Future.wait([next, _loadHistory()]);
   }
 
   Widget _tabsFor(_RankingData value) => TabBarView(
@@ -216,19 +369,10 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
-    WeatherRankingTab.temperature => _WeatherMetricPanel(
+    WeatherRankingTab.temperature => _TemperaturePanel(
       stations: value.weatherStations,
       snapshot: value.weather,
-      valueOf: (o) => o.temperature,
-      unit: '°C',
-      fractionDigits: 1,
-      highLowSort: true,
-      mapLayerId: tab.mapLayerId,
-      onRefresh: _reload,
-    ),
-    WeatherRankingTab.tempExtremes => _TempExtremePanel(
-      stations: value.weatherStations,
-      snapshot: value.weather,
+      initialMetric: widget.initialTempMetric,
       mapLayerId: tab.mapLayerId,
       onRefresh: _reload,
     ),
@@ -278,9 +422,30 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final selected = _selectedSecond;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.weatherRankingTitle),
+        actions: [
+          if (_pickerTimes.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: Tooltip(
+                message: l10n.weatherRankingPickTime,
+                child: TextButton.icon(
+                  onPressed: _pickTime,
+                  icon: const Icon(Icons.schedule, size: 18),
+                  // A past snapshot is not the current weather, so the label
+                  // stops saying 「最新」 the moment the user leaves it.
+                  label: Text(
+                    selected == null
+                        ? l10n.weatherRankingLatest
+                        : rankingTimeLabel(selected),
+                  ),
+                ),
+              ),
+            ),
+        ],
         bottom: TabBar(
           controller: _tabs,
           isScrollable: true,
@@ -523,7 +688,6 @@ class _WeatherMetricPanel extends StatefulWidget {
     required this.onRefresh,
     this.windDirectionOf,
     this.eventTimeOf,
-    this.highLowSort = false,
     this.requirePositive = false,
   });
 
@@ -536,7 +700,6 @@ class _WeatherMetricPanel extends StatefulWidget {
   final int fractionDigits;
   final String mapLayerId;
   final Future<void> Function() onRefresh;
-  final bool highLowSort;
   final bool requirePositive;
 
   @override
@@ -625,11 +788,7 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: ChoiceChip(
-                    label: Text(
-                      widget.highLowSort
-                          ? l10n.weatherRankingHighest
-                          : l10n.reportFilterOrderDesc,
-                    ),
+                    label: Text(l10n.reportFilterOrderDesc),
                     selected: !_ascending,
                     onSelected: (_) => setState(() => _ascending = false),
                   ),
@@ -637,11 +796,7 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: ChoiceChip(
-                    label: Text(
-                      widget.highLowSort
-                          ? l10n.weatherRankingLowest
-                          : l10n.reportFilterOrderAsc,
-                    ),
+                    label: Text(l10n.reportFilterOrderAsc),
                     selected: _ascending,
                     onSelected: (_) => setState(() => _ascending = true),
                   ),
@@ -755,28 +910,45 @@ class _WeatherMetricPanelState extends State<_WeatherMetricPanel> {
   }
 }
 
-/// Daily temperature extremes: rank by recorded high / low / diurnal range.
-class _TempExtremePanel extends StatefulWidget {
-  const _TempExtremePanel({
+/// Temperature: the reading in the snapshot, or one of the day's recorded
+/// extremes (high / low / diurnal range) with its occurrence time.
+///
+/// The extremes used to be a tab of their own, which read as "only temperature
+/// has extremes". They are one field with the reading, so they share one tab
+/// and one chip strip.
+class _TemperaturePanel extends StatefulWidget {
+  const _TemperaturePanel({
     required this.stations,
     required this.snapshot,
+    required this.initialMetric,
     required this.mapLayerId,
     required this.onRefresh,
   });
 
   final Map<String, WeatherStation> stations;
   final WeatherSnapshot snapshot;
+  final TempRankMetric initialMetric;
   final String mapLayerId;
   final Future<void> Function() onRefresh;
 
   @override
-  State<_TempExtremePanel> createState() => _TempExtremePanelState();
+  State<_TemperaturePanel> createState() => _TemperaturePanelState();
 }
 
-class _TempExtremePanelState extends State<_TempExtremePanel> {
-  TempExtremeMetric _metric = TempExtremeMetric.high;
-  bool _ascending = false;
+class _TemperaturePanelState extends State<_TemperaturePanel> {
+  late TempRankMetric _metric = widget.initialMetric;
+  late bool _ascending = widget.initialMetric.ascendingByDefault;
   RankingMerge _merge = RankingMerge.none;
+
+  /// Same identity cache as [_WeatherMetricPanelState._ranked]: a tab swipe
+  /// rebuilds this panel, and re-sorting several hundred stations for the same
+  /// answer is the stutter.
+  List<RankedObservation>? _rankedCache;
+  Map<String, WeatherStation>? _rankedStations;
+  WeatherSnapshot? _rankedSnapshot;
+  TempRankMetric _rankedMetric = TempRankMetric.current;
+  bool _rankedAscending = false;
+  RankingMerge _rankedMerge = RankingMerge.none;
 
   void _setMerge(RankingMerge next) {
     setState(() {
@@ -784,17 +956,36 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-    final ranked = rankTempExtremes(
+  List<RankedObservation> _ranked() {
+    final cached = _rankedCache;
+    if (cached != null &&
+        identical(_rankedStations, widget.stations) &&
+        identical(_rankedSnapshot, widget.snapshot) &&
+        _rankedMetric == _metric &&
+        _rankedAscending == _ascending &&
+        _rankedMerge == _merge) {
+      return cached;
+    }
+    final ranked = rankTemperature(
       stations: widget.stations,
       snapshot: widget.snapshot,
       metric: _metric,
       ascending: _ascending,
       merge: _merge,
     );
+    _rankedStations = widget.stations;
+    _rankedSnapshot = widget.snapshot;
+    _rankedMetric = _metric;
+    _rankedAscending = _ascending;
+    _rankedMerge = _merge;
+    return _rankedCache = ranked;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final ranked = _ranked();
     final time = _formatSnapshotTime(widget.snapshot.time);
 
     return RefreshIndicator(
@@ -808,22 +999,17 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               children: [
-                for (final metric in TempExtremeMetric.values)
+                for (final metric in TempRankMetric.values)
                   Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.sm),
                     child: ChoiceChip(
-                      label: Text(switch (metric) {
-                        TempExtremeMetric.high =>
-                          l10n.weatherRankingExtremeHigh,
-                        TempExtremeMetric.low => l10n.weatherRankingExtremeLow,
-                        TempExtremeMetric.range =>
-                          l10n.weatherRankingExtremeRange,
-                      }),
+                      label: Text(metric.label(l10n)),
                       selected: _metric == metric,
                       onSelected: (_) => setState(() {
                         _metric = metric;
-                        // Low: default coldest-first; high/range: hottest/widest.
-                        _ascending = metric == TempExtremeMetric.low;
+                        // Daily low reads coldest-first; everything else reads
+                        // hottest / widest first.
+                        _ascending = metric.ascendingByDefault;
                       }),
                     ),
                   ),
@@ -922,7 +1108,8 @@ class _TempExtremePanelState extends State<_TempExtremePanel> {
                           index: index,
                           ascending: _ascending,
                         ),
-                        // Clock only — no "當下/最高/最低/溫差" dump.
+                        // Only the extremes happened at a time; the reading
+                        // itself is the snapshot's own clock, shown above.
                         eventTimeLabel: item.eventTime == null
                             ? null
                             : _formatClock(item.eventTime!),
