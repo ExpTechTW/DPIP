@@ -84,7 +84,7 @@ jobs:
       # built against an SDK nobody chose, and nothing in the build log would
       # say so. See AGENTS.md → Toolchain.
       - name: Install toolchain (mise)
-        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
 
       - name: Cache Android NDK
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
