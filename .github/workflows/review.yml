@@ -184,7 +184,7 @@ jobs:
         # the `uses:` line and cannot see that one, so it sits directly below,
         # where a Dependabot diff shows it: bump the two together, to the npm
         # release matching the action's tag.
-        uses: alibaba/open-code-review@8eb83340a487b1150af00701b94f01af97e4b4d6 # v1.13.1
+        uses: alibaba/open-code-review@375f64cd6f67a48a135da83cfcf59c52669a09cb # v1.13.3
         with:
           ocr_version: 1.13.1
           llm_url: ${{ secrets.OCR_LLM_URL }}
