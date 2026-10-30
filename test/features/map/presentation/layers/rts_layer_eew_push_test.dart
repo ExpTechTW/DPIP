@@ -8,9 +8,9 @@
 /// pausing the render loop does not stop the Dart listener).
 ///
 /// The guard must be exactly one-sided. Skipping a redundant *empty* push is
-/// free; skipping a *live* one is not, because the wavefront geometry is a
-/// function of the calibrated clock — every tick genuinely differs, and a
-/// dropped one is a ring that stops expanding during an earthquake.
+/// free. A live ring is skipped only while it has moved less than a screen
+/// pixel; the upload that follows draws the radius at that instant, so the
+/// ring never stays behind the wave.
 library;
 
 import 'dart:async';
@@ -18,7 +18,10 @@ import 'dart:async';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/platform/render_tier.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
+import 'package:dpip/core/realtime/server_clock.dart';
+import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/realtime_channel.dart';
 import 'package:dpip/core/realtime/realtime_config.dart';
@@ -73,6 +76,51 @@ class _SlowEewController extends _EewRecordingController {
   }
 }
 
+/// [AppTime] reads [DateTime.now], which a [FakeAsync] zone does not move.
+/// The wavefront is measured against [AppTime], so the ticker tests install
+/// a clock that follows [FakeAsync.elapsed]. Otherwise the radius sits still
+/// and the pixel gate holds every tick.
+FakeAsync? _fake;
+
+class _ZoneClock implements Clock {
+  @override
+  DateTime now() {
+    final fake = _fake;
+    if (fake == null) return DateTime.now().toUtc();
+    return fake
+        .getClock(DateTime.fromMillisecondsSinceEpoch(0, isUtc: true))
+        .now();
+  }
+}
+
+void _during(void Function(FakeAsync async) body) {
+  fakeAsync((async) {
+    _fake = async;
+    try {
+      body(async);
+    } finally {
+      _fake = null;
+    }
+  });
+}
+
+class _UnusedServerTime implements ServerTimeSource {
+  @override
+  Future<Result<int>> serverTimeMs() async => const Ok(0);
+}
+
+void _followFakeTime() {
+  AppTime.install(
+    ServerClock(_ZoneClock(), _FakeElapsed(), _UnusedServerTime()),
+  );
+}
+
+void _restoreWallClock() {
+  AppTime.install(
+    ServerClock(const SystemClock(), _FakeElapsed(), _UnusedServerTime()),
+  );
+}
+
 class _FakeClock implements Clock {
   _FakeClock(this.current);
   DateTime current;
@@ -124,14 +172,14 @@ class _EmptyStations implements TremStationRepository {
       const Ok(<String, SeismicStation>{});
 }
 
-Eew _alert() => Eew(
+Eew _alert({DateTime? time}) => Eew(
   agency: 'CWA',
   id: 'a',
   serial: 1,
   status: 0,
   isFinal: false,
   info: EewInfo(
-    time: DateTime.utc(2026, 8, 12, 12).millisecondsSinceEpoch,
+    time: (time ?? DateTime.utc(2026, 8, 12, 12)).millisecondsSinceEpoch,
     longitude: 121.5,
     latitude: 23.5,
     depth: 10,
@@ -322,6 +370,9 @@ void main() {
   );
 
   group('the wavefront ticker', () {
+    setUp(_followFakeTime);
+    tearDown(_restoreWallClock);
+
     /// Renders a live alert inside [async] and returns the layer, settled.
     RtsMapLayer attach(
       FakeAsync async,
@@ -329,8 +380,14 @@ void main() {
       RenderTier? tier,
     }) {
       late RtsMapLayer layer;
+      // Origin is this fake clock, so elapse grows the wave. The bundled
+      // fixture would already be past the table and the radius would sit still.
       _build(
-        alerts: [_alert()],
+        // Two seconds in, the fixture is between its two rows and the
+        // radius is actually moving. Before the first row it sits still.
+        alerts: [
+          _alert(time: _ZoneClock().now().subtract(const Duration(seconds: 2))),
+        ],
         eewElapsed: _FakeElapsed(),
         renderTier: tier == null ? null : Future.value(tier),
       ).then((built) => layer = built.layer);
@@ -340,9 +397,24 @@ void main() {
       return layer;
     }
 
+    test('a sub-pixel step is not uploaded', () {
+      _during((async) {
+        final controller = _EewRecordingController();
+        final layer = attach(async, controller);
+
+        final before = controller.eewPushes.length;
+        // At zoom 7 one pixel is about 560 m here (512 px tiles, 23.5°N);
+        // this fixture moves about 400 m in 80 ms, under one pixel.
+        async.elapse(const Duration(milliseconds: 16 * 5));
+        expect(controller.eewPushes, hasLength(before));
+        layer.clear(controller);
+        async.flushMicrotasks();
+      });
+    });
+
     test('waits for the previous write instead of queueing behind it', () {
-      fakeAsync((async) {
-        final controller = _SlowEewController();
+      _during((async) {
+        final controller = _SlowEewController()..reportCamera(zoom: 14);
         final layer = attach(async, controller);
 
         final gate = controller.gate = Completer<void>();
@@ -370,8 +442,8 @@ void main() {
     });
 
     test('treats a write that never answers as lost, not slow', () {
-      fakeAsync((async) {
-        final controller = _SlowEewController();
+      _during((async) {
+        final controller = _SlowEewController()..reportCamera(zoom: 14);
         final layer = attach(async, controller);
 
         controller.gate = Completer<void>(); // never completed
@@ -388,8 +460,11 @@ void main() {
     });
 
     test('a low-end phone redraws the rings five times a second', () {
-      fakeAsync((async) {
-        final controller = _EewRecordingController();
+      _during((async) {
+        // Zoomed in until one 200 ms step of this wave is more than a pixel.
+        // Farther out the pixel gate holds the tick and the count is not the
+        // ticker rate.
+        final controller = _EewRecordingController()..reportCamera(zoom: 14);
         final layer = attach(async, controller, tier: RenderTier.low);
 
         final before = controller.eewPushes.length;
@@ -401,8 +476,8 @@ void main() {
     });
 
     test('a low-end phone still gives up on a lost write after a second', () {
-      fakeAsync((async) {
-        final controller = _SlowEewController();
+      _during((async) {
+        final controller = _SlowEewController()..reportCamera(zoom: 14);
         final layer = attach(async, controller, tier: RenderTier.low);
 
         controller.gate = Completer<void>(); // never completed
@@ -418,8 +493,8 @@ void main() {
     });
 
     test('writes on every tick while the map keeps up', () {
-      fakeAsync((async) {
-        final controller = _EewRecordingController();
+      _during((async) {
+        final controller = _EewRecordingController()..reportCamera(zoom: 14);
         final layer = attach(async, controller);
 
         final before = controller.eewPushes.length;

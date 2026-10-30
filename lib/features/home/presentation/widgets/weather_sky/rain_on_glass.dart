@@ -3,6 +3,57 @@ import 'dart:ui' as ui;
 import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/material.dart';
 
+/// Edge of the droplet-coverage bake, in pixels. The refract pass samples
+/// this instead of rebuilding the field at the card's resolution.
+const int kRainOnGlassFieldEdge = 256;
+
+/// Writes coverage (R) and the one-step neighbour (G) for [shader] into a
+/// [kRainOnGlassFieldEdge] square. [shader] must be `rain_on_glass.frag`
+/// with `uMode` driven to the bake path. [dummy] satisfies the two samplers
+/// the bake does not read.
+ui.Image bakeRainOnGlassField({
+  required ui.FragmentShader shader,
+  required ui.Image dummy,
+  required double time,
+  required double opacity,
+  required double staticSize,
+  required double staticAmount,
+  required double staticSpeed,
+  required double runningSize,
+  required double runningAmount,
+  required double runningSpeed,
+}) {
+  final edge = kRainOnGlassFieldEdge.toDouble();
+  var i = 0;
+  void set(double v) => shader.setFloat(i++, v);
+  set(edge);
+  set(edge);
+  set(1080);
+  set(1080);
+  set(time);
+  set(staticSize);
+  set(staticAmount);
+  set(staticSpeed);
+  set(runningSize);
+  set(runningAmount);
+  set(runningSpeed);
+  set(opacity);
+  set(1);
+  shader
+    ..setImageSampler(0, dummy)
+    ..setImageSampler(1, dummy);
+  final recorder = ui.PictureRecorder();
+  ui.Canvas(recorder)
+      .drawRect(Rect.fromLTWH(0, 0, edge, edge), Paint()..shader = shader);
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(
+    kRainOnGlassFieldEdge,
+    kRainOnGlassFieldEdge,
+  );
+  picture.dispose();
+  return image;
+}
+
 /// Puts rain on the *content*: droplets cling to [child] and bend its pixels
 /// through each bead.
 ///
@@ -59,6 +110,9 @@ class _RainOnGlassState extends State<RainOnGlass>
   );
 
   ui.FragmentShader? _shader;
+  ui.FragmentShader? _fieldShader;
+  ui.Image? _field;
+  ui.Image? _dummy;
 
   /// Set once `ImageFilter.shader` has been seen to fail, so the throw is not
   /// repeated every frame on a Skia device.
@@ -74,7 +128,10 @@ class _RainOnGlassState extends State<RainOnGlass>
     try {
       final program = await ui.FragmentProgram.fromAsset(_asset);
       if (!mounted) return;
-      setState(() => _shader = program.fragmentShader());
+      setState(() {
+        _shader = program.fragmentShader();
+        _fieldShader = program.fragmentShader();
+      });
       _syncRunning();
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'Failed to load shader $_asset');
@@ -118,8 +175,46 @@ class _RainOnGlassState extends State<RainOnGlass>
   void dispose() {
     _ticker.dispose();
     _shader?.dispose();
+    _fieldShader?.dispose();
+    _field?.dispose();
+    _dummy?.dispose();
     _clock.stop();
     super.dispose();
+  }
+
+  ui.Image _dummyImage() {
+    final existing = _dummy;
+    if (existing != null) return existing;
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawRect(
+      const Rect.fromLTWH(0, 0, 1, 1),
+      Paint()..color = const Color(0x00000000),
+    );
+    final picture = recorder.endRecording();
+    final image = picture.toImageSync(1, 1);
+    picture.dispose();
+    return _dummy = image;
+  }
+
+  /// One coverage bake per frame. The previous image is dropped so the GPU
+  /// does not keep every frame of the glass.
+  ui.Image _coverage(_GlassGrade grade, double time) {
+    final shader = _fieldShader;
+    if (shader == null) return _dummyImage();
+    final next = bakeRainOnGlassField(
+      shader: shader,
+      dummy: _dummyImage(),
+      time: time,
+      opacity: widget.opacity,
+      staticSize: grade.staticSize,
+      staticAmount: grade.staticAmount,
+      staticSpeed: grade.staticSpeed,
+      runningSize: grade.runningSize,
+      runningAmount: grade.runningAmount,
+      runningSpeed: grade.runningSpeed,
+    );
+    _field?.dispose();
+    return _field = next;
   }
 
   /// Builds the droplet filter, or `null` if shaders-as-filters are not
@@ -149,6 +244,8 @@ class _RainOnGlassState extends State<RainOnGlass>
     set(grade.runningSpeed);
     // `uAlpha` is the effect's own strength, not the rain amount.
     set(widget.opacity.clamp(0.0, 1.0));
+    set(0);
+    shader.setImageSampler(1, _coverage(grade, time));
 
     try {
       return ui.ImageFilter.shader(shader);
