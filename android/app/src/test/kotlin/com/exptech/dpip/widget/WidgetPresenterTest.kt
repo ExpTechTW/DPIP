@@ -103,8 +103,11 @@ class WidgetPresenterTest {
         assertEquals(WidgetSizeClass.Small, WidgetPresenter.sizeClass(250, 103))
         assertEquals(WidgetSizeClass.Small, WidgetPresenter.sizeClass(250, 169))
         assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(250, 170))
-        assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(250, 319))
-        assertEquals(WidgetSizeClass.Large, WidgetPresenter.sizeClass(250, 320))
+        assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(340, 307))
+        assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(339, 319))
+        assertEquals(WidgetSizeClass.Large, WidgetPresenter.sizeClass(340, 308))
+        // A Pixel 10a reports 373x312 for 4x3; it reads like its 4x4 cell.
+        assertEquals(WidgetSizeClass.Large, WidgetPresenter.sizeClass(373, 312))
     }
 
     @Test

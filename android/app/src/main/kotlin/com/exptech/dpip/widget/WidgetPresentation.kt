@@ -215,6 +215,8 @@ object WidgetPresenter {
             effectiveWidth < minimumWidthDp -> WidgetSizeClass.Small
             effectiveHeight < mediumMinimumHeightDp -> WidgetSizeClass.Small
             effectiveHeight < largeMinimumHeightDp -> WidgetSizeClass.Medium
+            effectiveWidth < largeWideMinimumWidthDp &&
+                effectiveHeight < largeNarrowMinimumHeightDp -> WidgetSizeClass.Medium
             else -> WidgetSizeClass.Large
         }
     }
@@ -225,8 +227,37 @@ object WidgetPresenter {
     /** The shortest height the two-row layout's budget has been measured to fit. */
     const val mediumMinimumHeightDp = 170
 
-    /** Where the large layout's detail grid stops being clipped. */
-    const val largeMinimumHeightDp = 320
+    /**
+     * Where the two-row layout gains the large layout's first detail row.
+     *
+     * A two-row cell on a tall launcher grid (a Pixel Pro, unlike a Pixel a)
+     * reports far more than [mediumMinimumHeightDp]; without a breakpoint the
+     * surplus was drawn as empty space.
+     */
+    const val mediumTallMinimumHeightDp = 230
+
+    /** Where the tall two-row layout also shows wind and station. */
+    const val mediumTallFullDetailHeightDp = 275
+
+    /** Narrower than this the apparent text wraps and the second row is clipped. */
+    const val mediumTallFullDetailWidthDp = 210
+
+    /**
+     * Where a full-width cell gets the large layout's detail grid.
+     *
+     * A three-row Pixel cell is ~307-312 dp (a Pixel 10a reports 373x312 for 4x3), and
+     * it has to read like the four-row cell rather than a stretched two-row one.
+     * Narrower than [largeWideMinimumWidthDp] the town, condition and apparent
+     * text wrap taller, and the hourly probability line is clipped below
+     * [largeNarrowMinimumHeightDp].
+     */
+    const val largeMinimumHeightDp = 308
+
+    /** The width from which [largeMinimumHeightDp] applies. */
+    const val largeWideMinimumWidthDp = 340
+
+    /** Where a narrower cell's large layout stops being clipped. */
+    const val largeNarrowMinimumHeightDp = 320
 
     /**
      * The height at which the large layout gets iOS's own section spacing back.

@@ -244,6 +244,14 @@ class WidgetRenderArtifactTest {
         write("$prefix-large", render(320, 344))
         write("$prefix-large-narrow", render(200, 320))
         write("$prefix-large-narrow-tall", render(250, 344))
+        // Taller than either layout's content: a Pixel Pro's grid reports these.
+        write("$prefix-medium-tall", render(330, 270))
+        write("$prefix-medium-tall-threshold", render(250, WidgetPresenter.mediumTallMinimumHeightDp))
+        write("$prefix-large-pixel10a-4x3", render(374, 310))
+        write("$prefix-large-threshold", render(340, WidgetPresenter.largeMinimumHeightDp))
+        write("$prefix-medium-tall-pixel7pro", render(218, 307))
+        write("$prefix-medium-tall-full-threshold", render(218, WidgetPresenter.mediumTallFullDetailHeightDp))
+        write("$prefix-large-tall", render(330, 420))
 
         // Capture the same layouts with a collapsed action, active feedback,
         // retry and success. No old image is evidence for these new states.

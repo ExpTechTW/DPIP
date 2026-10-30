@@ -155,8 +155,10 @@ class WidgetLayoutFitTest {
         context.resources.displayMetrics,
     ).toInt()
 
+    // A GONE group's children keep VISIBLE but are never laid out.
     private fun leaves(view: View): List<View> = if (view is ViewGroup) {
-        (0 until view.childCount).flatMap { leaves(view.getChildAt(it)) }
+        if (view.visibility != View.VISIBLE) emptyList()
+        else (0 until view.childCount).flatMap { leaves(view.getChildAt(it)) }
     } else {
         listOf(view)
     }
@@ -475,23 +477,37 @@ class WidgetLayoutFitTest {
     }
 
     @Test
-    fun `Pixel three-row cells place the forecast at the bottom instead of leaving dead space`() {
+    fun `Pixel three-row cells spend their height on details instead of leaving dead space`() {
         // Pixel 7 Pro, 5-column launcher: the measured 3x3 and 5x3 content
-        // boxes are 218x307 and 373x307 dp. An expanding forecast container
-        // with top-aligned wrap_content columns left about 130 dp unused.
+        // boxes are 218x307 and 373x307 dp; a Pixel 10a's 4x3 is 374x310. An
+        // expanding forecast container with top-aligned wrap_content columns
+        // left about 130 dp unused. A 307 dp cell is now the tall two-row layout
+        // with both detail rows; from 308 dp a wide one is the large layout.
         for (width in listOf(218, 373)) {
             assertFits(width, 307)
             val view = layoutAt(width, 307)
-            val container = view.findViewById<ViewGroup>(R.id.widget_forecast_container)
-            for (index in 0 until container.childCount) {
-                val probability = container.getChildAt(index)
-                    .findViewById<TextView>(R.id.widget_forecast_pop)
-                val (top, _) = offsetWithin(probability, view)
-                assertTrue(
-                    "$width x 307: the forecast must finish near the bottom, not halfway down",
-                    view.height - (top + probability.height) <= px(12),
-                )
+            for (id in listOf(R.id.widget_grid_humidity_value, R.id.widget_grid_station_value)) {
+                WidgetTextVisibility.assertVisible("$width x 307 detail", view.findViewById(id))
             }
+            val station = view.findViewById<TextView>(R.id.widget_grid_station_value)
+            val (top, _) = offsetWithin(station, view)
+            assertTrue(
+                "$width x 307: the details must finish near the bottom, not halfway down",
+                view.height - (top + station.height) <= px(24),
+            )
+        }
+    }
+
+    @Test
+    fun `the tall two-row layout fits from its first breakpoint`() {
+        for (width in listOf(200, 250, 373)) {
+            assertFits(width, WidgetPresenter.mediumTallMinimumHeightDp)
+            assertFits(width, WidgetPresenter.mediumTallFullDetailHeightDp)
+            assertFits(width, WidgetPresenter.largeMinimumHeightDp - 1)
+        }
+        withFontScale(1.3f) {
+            assertFits(260, 300)
+            assertFits(373, 400)
         }
     }
 
@@ -542,7 +558,7 @@ class WidgetLayoutFitTest {
     @Test
     fun `manual feedback and outdated data do not clip the shortest medium cell`() {
         for (width in listOf(200, 218, 373)) {
-            for (height in listOf(170, 202, 307)) {
+            for (height in listOf(170, 202, 280)) {
                 val fresh = WidgetUpdater.presentation(context, instanceId, width, height)
                 assertFits(width, height, fresh.copy(
                     isCurrentLocation = true,
@@ -556,7 +572,8 @@ class WidgetLayoutFitTest {
 
     @Test
     fun `large tight stale data keeps all hourly lines inside launcher bounds`() {
-        for ((width, height) in listOf(200 to 320, 250 to 320, 200 to 335, 200 to 336)) {
+        for ((width, height) in listOf(340 to 308, 373 to 308, 373 to 312, 374 to 310, 200 to 320, 250 to 320,
+            200 to 335, 200 to 336)) {
             val fresh = WidgetUpdater.presentation(context, instanceId, width, height)
             for (feedback in listOf(null, WidgetRefreshFeedback.Running, WidgetRefreshFeedback.Failed)) {
                 val stale = fresh.copy(isStale = true, badgeText = context.getString(R.string.widget_stale),
@@ -636,8 +653,8 @@ class WidgetLayoutFitTest {
     @Test
     fun `roomy Android 12 cells have 48dp actions without enlarging the glyphs`() {
         fun withRefresh(width: Int) = renderAt(
-            WidgetUpdater.presentation(context, instanceId, width, 307)
-                .copy(refreshFeedback = WidgetRefreshFeedback.Failed), width, 307,
+            WidgetUpdater.presentation(context, instanceId, width, 280)
+                .copy(refreshFeedback = WidgetRefreshFeedback.Failed), width, 280,
         )
         val view = withRefresh(373)
         val expectedDp = if (android.os.Build.VERSION.SDK_INT >= 31) 48 else 28
@@ -654,16 +671,16 @@ class WidgetLayoutFitTest {
     @Test
     @Config(sdk = [35], qualifiers = "420dpi")
     fun `resizing a reused roomy view restores narrow targets instead of hiding the town`() {
-        val view = renderAt(WidgetUpdater.presentation(context, instanceId, 373, 307)
-            .copy(refreshFeedback = WidgetRefreshFeedback.Failed), 373, 307)
-        val narrow = WidgetUpdater.presentation(context, instanceId, 218, 307)
+        val view = renderAt(WidgetUpdater.presentation(context, instanceId, 373, 280)
+            .copy(refreshFeedback = WidgetRefreshFeedback.Failed), 373, 280)
+        val narrow = WidgetUpdater.presentation(context, instanceId, 218, 280)
         WidgetRenderer.render(context, narrow.copy(isCurrentLocation = true,
             refreshFeedback = WidgetRefreshFeedback.Failed), instanceId).reapply(context, view)
         view.measure(
             View.MeasureSpec.makeMeasureSpec(px(218), View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(px(307), View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(px(280), View.MeasureSpec.EXACTLY),
         )
-        view.layout(0, 0, px(218), px(307))
+        view.layout(0, 0, px(218), px(280))
         for (id in listOf(R.id.widget_refresh)) {
             assertTrue("reapply restores 28dp", kotlin.math.abs(view.findViewById<View>(id).width - px(28)) <= 1)
         }
@@ -673,7 +690,7 @@ class WidgetLayoutFitTest {
     @Test
     fun `the medium current-weather icon is more prominent than the hourly icons without clipping`() {
         for (width in listOf(218, 373)) {
-            for (height in listOf(170, 202, 307)) {
+            for (height in listOf(170, 202, 280)) {
                 assertFits(width, height)
                 val view = layoutAt(width, height)
                 val icon = view.findViewById<View>(R.id.widget_icon)
@@ -943,8 +960,9 @@ class WidgetLayoutFitTest {
         assertEquals(WidgetSizeClass.Small, WidgetPresenter.sizeClass(250, 110))
         assertEquals(WidgetSizeClass.Small, WidgetPresenter.sizeClass(250, 169))
         assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(250, 170))
-        assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(250, 319))
-        assertEquals(WidgetSizeClass.Large, WidgetPresenter.sizeClass(250, 320))
+        assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(340, 307))
+        assertEquals(WidgetSizeClass.Medium, WidgetPresenter.sizeClass(339, 319))
+        assertEquals(WidgetSizeClass.Large, WidgetPresenter.sizeClass(340, 308))
         // A large system font needs proportionally more height, so the same box
         // gets a smaller layout rather than clipped text.
         assertEquals(WidgetSizeClass.Small, WidgetPresenter.sizeClass(250, 172, fontScale = 1.3f))

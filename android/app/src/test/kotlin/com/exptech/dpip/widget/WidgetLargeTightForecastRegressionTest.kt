@@ -293,7 +293,7 @@ class WidgetLargeTightForecastRegressionTest {
                     val p = if (state == "stale-running") presentation(c, w, h, "stale").copy(refreshFeedback = WidgetRefreshFeedback.Running)
                         else presentation(c, w, h, state)
                     val expected = when {
-                        p.effectiveHeightDp < 320 -> R.layout.widget_medium
+                        p.effectiveHeightDp < 320 && p.effectiveWidthDp < 340 -> R.layout.widget_medium_tall
                         p.effectiveHeightDp < 336 -> R.layout.widget_large_tight
                         else -> R.layout.widget_large
                     }
