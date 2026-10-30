@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">Cuaca saat ini</string>
+    <string name="widget_description">Menampilkan cuaca saat ini untuk lokasi yang diatur pada widget ini</string>
+    <string name="widget_stale">Data lama</string>
+    <string name="widget_no_data">Belum ada data cuaca</string>
+    <string name="widget_open_app">Buka aplikasi</string>
+    <string name="widget_needs_app">Lokasi hanya diperbarui saat aplikasi terbuka</string>
+    <string name="widget_reconfigure">Lokasi dihapus — atur ulang</string>
+    <string name="widget_refresh">Perbarui sekarang</string>
+    <string name="widget_humidity">Kelembapan</string>
+    <string name="widget_rain">Curah hujan</string>
+    <string name="widget_wind">Angin</string>
+    <string name="widget_station">Stasiun</string>
+    <string name="widget_sunrise">Matahari terbit</string>
+    <string name="widget_sunset">Matahari terbenam</string>
+    <string name="widget_apparent">Terasa</string>
+    <string name="widget_location_disabled">Lokasi dimatikan</string>
+    <string name="widget_location_unavailable">Lokasi tidak tersedia</string>
+    <string name="widget_location_outside">Lokasi di luar area yang dicakup</string>
+    <string name="widget_current_location">Lokasi saat ini</string>
+    <string name="widget_config_title">Pengaturan widget cuaca</string>
+    <string name="widget_config_hint">Pilih lokasi yang cuacanya ditampilkan di widget</string>
+    <string name="widget_config_empty">Belum ada lokasi tersimpan. Buka aplikasi dan tambahkan satu.</string>
+    <string name="widget_config_needs_permission">Lokasi saat ini memerlukan izin lokasi; tanpa izin latar belakang, widget menampilkan lokasi terakhir yang diketahui dan meminta Anda membuka aplikasi.</string>
+    <string name="widget_config_open_app">Buka aplikasi</string>
+    <string name="widget_config_cancel">Batal</string>
+    <string name="widget_preview_location">Lokasi contoh</string>
+    <string name="widget_preview_weather">Cerah</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">Lokasi tersimpan</string>
+    <string name="widget_refresh_queued">Menunggu pembaruan</string>
+    <string name="widget_refresh_running">Memperbarui…</string>
+    <string name="widget_refresh_updated">Cuaca diperbarui</string>
+    <string name="widget_refresh_failed">Pembaruan gagal</string>
+    <string name="widget_weather_clear">Cerah</string>
+    <string name="widget_weather_cloudy">Berawan</string>
+    <string name="widget_weather_overcast">Mendung</string>
+    <string name="widget_weather_rain">Hujan</string>
+    <string name="widget_weather_thunderstorm">Badai petir</string>
+    <string name="widget_weather_snow">Salju</string>
+    <string name="widget_weather_fog">Kabut</string>
+    <string name="widget_weather_unknown">Tidak diketahui</string>
+    <string name="widget_forecast_pop_description">Peluang hujan %1$s</string>
+    <string name="widget_forecast_pop_unavailable">Data peluang hujan tidak tersedia</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Data lama</string>
+    <string name="widget_compact_location">Tanpa lokasi</string>
+    <string name="widget_compact_details">Buka aplikasi untuk informasi cuaca lengkap</string>
+    <string name="widget_compact_attention">Buka app</string>
+</resources>

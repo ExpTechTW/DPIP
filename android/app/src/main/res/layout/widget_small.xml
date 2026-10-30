@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    DPIP Android Weather Widget - Small Layout
+
+    Design:
+    - Compact weather information grouping.
+    - Same information as the iOS Small Widget.
+    - Responsive spacing for different Android Launcher sizes.
+    - Preserve existing RemoteViews IDs and interactions.
+
+    Layout:
+
+    Header:
+      Location + Observation Time
+      Weather Icon + Condition
+
+    Flexible Space
+
+    Weather Information:
+      Temperature + Conditional Refresh
+      Humidity + Rainfall
+
+    The temperature and metrics form a single compact group.
+    A single weighted spacer between the header/status and this group
+    absorbs the remaining vertical space; there is no bottom spacer.
+
+    Compact Small uses widget_small_compact.xml.
+-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@android:id/background"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+    android:gravity="top"
+
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_padding_small"
+
+    tools:ignore="DisableBaselineAlignment,UselessLeaf,UseAppTint,UseCompoundDrawables">
+
+
+    <!-- ======================================== -->
+    <!-- HEADER                                   -->
+    <!-- ======================================== -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="top">
+
+
+        <!-- LEFT: LOCATION + TIME -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="start"
+            tools:ignore="NestedWeights">
+
+
+            <!-- Location -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/widget_location"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+                    android:autoSizeMaxTextSize="@dimen/widget_text_headline"
+                    android:autoSizeMinTextSize="@dimen/widget_text_headline_min"
+                    android:autoSizeStepGranularity="1sp"
+                    android:autoSizeTextType="uniform"
+
+                    android:ellipsize="end"
+                    android:maxLines="1"
+
+                    android:fontFamily="sans-serif-medium"
+                    android:includeFontPadding="false"
+
+                    android:textColor="@color/widget_on_surface"
+                    android:textSize="@dimen/widget_text_headline"
+
+                    tools:ignore="NestedWeights" />
+
+                <ImageView
+                    android:id="@+id/widget_location_icon"
+
+                    android:layout_width="@dimen/widget_icon_location"
+                    android:layout_height="@dimen/widget_icon_location"
+
+                    android:layout_marginStart="@dimen/widget_spacing_xs"
+
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_widget_location"
+
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+
+            <!-- Observation Time -->
+
+            <TextView
+                android:id="@+id/widget_observation_time"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="@dimen/widget_spacing_xs"
+
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:includeFontPadding="false"
+
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+        </LinearLayout>
+
+
+        <!-- RIGHT: WEATHER CONDITION -->
+
+        <LinearLayout
+            android:layout_width="@dimen/widget_weather_max_width"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="@dimen/widget_spacing_sm"
+
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+
+            tools:ignore="NestedWeights">
+
+
+            <!-- Weather Icon -->
+
+            <ImageView
+                android:id="@+id/widget_icon"
+
+                android:layout_width="@dimen/widget_icon_small_standard"
+                android:layout_height="@dimen/widget_icon_small_standard"
+
+                android:importantForAccessibility="no" />
+
+
+            <!-- Weather Description -->
+
+            <TextView
+                android:id="@+id/widget_weather"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:gravity="center"
+
+                android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+                android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:includeFontPadding="false"
+
+                android:maxWidth="@dimen/widget_weather_max_width"
+
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption2" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <!-- ======================================== -->
+    <!-- STALE WEATHER NOTICE                     -->
+    <!-- ======================================== -->
+
+    <TextView
+        android:id="@+id/widget_stale"
+
+        style="@style/Widget.Badge"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:includeFontPadding="true"
+        android:visibility="gone" />
+
+
+    <!-- ======================================== -->
+    <!-- FLEXIBLE SPACE: HEADER -> WEATHER        -->
+    <!-- ======================================== -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+
+        tools:ignore="UselessLeaf" />
+
+
+    <!-- ======================================== -->
+    <!-- COMPACT WEATHER INFORMATION GROUP        -->
+    <!-- ======================================== -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <!-- ==================================== -->
+        <!-- CURRENT TEMPERATURE                  -->
+        <!-- ==================================== -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+
+            <!-- Temperature -->
+
+            <TextView
+                android:id="@+id/widget_temperature"
+
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="@dimen/widget_text_temperature_compact"
+                android:autoSizeMaxTextSize="@dimen/widget_text_temperature"
+                android:autoSizeStepGranularity="1sp"
+
+                android:ellipsize="end"
+                android:maxLines="1"
+
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+
+                android:textColor="@color/widget_on_surface"
+                android:textSize="@dimen/widget_text_temperature" />
+
+
+            <!-- Conditional Refresh -->
+
+            <FrameLayout
+                android:id="@+id/widget_refresh"
+
+                android:layout_width="@dimen/widget_icon_action_touch_small"
+                android:layout_height="@dimen/widget_icon_action_touch_small"
+
+                android:padding="@dimen/widget_action_padding_small"
+
+                android:contentDescription="@string/widget_refresh"
+
+                android:visibility="gone">
+
+
+                <ImageView
+                    android:id="@+id/widget_refresh_icon"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:importantForAccessibility="no"
+
+                    android:src="@drawable/ic_widget_refresh"
+                    android:tint="@color/widget_icon_tint" />
+
+
+                <ProgressBar
+                    android:id="@+id/widget_refresh_progress"
+
+                    style="@style/Widget.RefreshProgress"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+
+        <!-- ==================================== -->
+        <!-- HUMIDITY + RAINFALL                  -->
+        <!-- ==================================== -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="@dimen/widget_spacing_xs"
+
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+
+            <!-- HUMIDITY -->
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+
+                tools:ignore="UseCompoundDrawables">
+
+
+                <ImageView
+                    android:id="@+id/widget_humidity"
+
+                    android:layout_width="@dimen/widget_icon_metric"
+                    android:layout_height="@dimen/widget_icon_metric"
+
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_widget_humidity" />
+
+
+                <TextView
+                    android:id="@+id/widget_humidity_value"
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+                    android:layout_marginStart="@dimen/widget_metric_gap"
+
+                    android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+                    android:autoSizeMinTextSize="@dimen/widget_text_metric_min"
+                    android:autoSizeStepGranularity="1sp"
+                    android:autoSizeTextType="uniform"
+
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+
+                    android:textColor="@color/widget_secondary"
+                    android:textSize="@dimen/widget_text_caption"
+
+                    tools:ignore="NestedWeights" />
+
+            </LinearLayout>
+
+
+            <!-- RAINFALL -->
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+
+                tools:ignore="UseCompoundDrawables">
+
+
+                <ImageView
+                    android:id="@+id/widget_rain"
+
+                    android:layout_width="@dimen/widget_icon_metric"
+                    android:layout_height="@dimen/widget_icon_metric"
+
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_widget_raindrop" />
+
+
+                <TextView
+                    android:id="@+id/widget_rain_value"
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+                    android:layout_marginStart="@dimen/widget_metric_gap"
+
+                    android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+                    android:autoSizeMinTextSize="@dimen/widget_text_metric_min"
+                    android:autoSizeStepGranularity="1sp"
+                    android:autoSizeTextType="uniform"
+
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+
+                    android:textColor="@color/widget_secondary"
+                    android:textSize="@dimen/widget_text_caption"
+
+                    tools:ignore="NestedWeights" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

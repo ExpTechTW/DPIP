@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The no-observation face, the same one every family shows: a cloud glyph and a
+  message, centred, in secondary ink. iOS draws `cloud.fill` over
+  "widget.no_weather_data" in all three families (`SmallCurrentWeatherView` and
+  its medium and large siblings, the `else` branch of each).
+
+  The message is the presenter's own text — "no weather data", a reconfigure
+  prompt, or the position degradation — so a genuinely unavailable reading is
+  never dressed as data. Refresh feedback stays in its own fixed-size action;
+  it must not replace the message or shift the centred cloud.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_padding_compact"
+    tools:ignore="DisableBaselineAlignment,UseAppTint,UseCompoundDrawables">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/widget_empty_icon"
+            android:layout_width="@dimen/widget_icon_empty"
+            android:layout_height="@dimen/widget_icon_empty"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_widget_cloud"
+            android:tint="@color/widget_icon_tint" />
+
+        <TextView
+            android:id="@+id/widget_empty_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_spacing_sm"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+            android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+            android:autoSizeStepGranularity="1sp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="2"
+            android:textColor="@color/widget_secondary"
+            android:textSize="@dimen/widget_text_caption2" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/widget_refresh"
+        android:visibility="gone"
+        android:layout_width="@dimen/widget_icon_action_touch"
+        android:layout_height="@dimen/widget_icon_action_touch"
+        android:layout_gravity="top|end"
+        android:contentDescription="@string/widget_refresh"
+        android:padding="@dimen/widget_action_padding_empty">
+        <ImageView
+            android:id="@+id/widget_refresh_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_widget_refresh"
+            android:tint="@color/widget_icon_tint" />
+        <ProgressBar
+            android:id="@+id/widget_refresh_progress"
+            style="@style/Widget.RefreshProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+</FrameLayout>

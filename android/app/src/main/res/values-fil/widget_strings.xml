@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">Kasalukuyang panahon</string>
+    <string name="widget_description">Ipinapakita ang kasalukuyang panahon para sa lokasyong itinakda sa widget na ito</string>
+    <string name="widget_stale">Lumang data</string>
+    <string name="widget_no_data">Wala pang datos ng panahon</string>
+    <string name="widget_open_app">Buksan ang app</string>
+    <string name="widget_needs_app">Naga-update lang ng lokasyon habang bukas ang app</string>
+    <string name="widget_reconfigure">Inalis ang lokasyon — i-set up muli</string>
+    <string name="widget_refresh">I-update ngayon</string>
+    <string name="widget_humidity">Halumigmig</string>
+    <string name="widget_rain">Ulan</string>
+    <string name="widget_wind">Hangin</string>
+    <string name="widget_station">Istasyon</string>
+    <string name="widget_sunrise">Pagsikat ng araw</string>
+    <string name="widget_sunset">Paglubog ng araw</string>
+    <string name="widget_apparent">Pakiramdam</string>
+    <string name="widget_location_disabled">Naka-off ang lokasyon</string>
+    <string name="widget_location_unavailable">Hindi makuha ang lokasyon</string>
+    <string name="widget_location_outside">Nasa labas ng saklaw ang lokasyon</string>
+    <string name="widget_current_location">Kasalukuyang lokasyon</string>
+    <string name="widget_config_title">Setting ng weather widget</string>
+    <string name="widget_config_hint">Piliin ang lokasyong ipapakita ng panahon sa widget</string>
+    <string name="widget_config_empty">Wala pang naka-save na lokasyon. Buksan ang app at magdagdag ng isa.</string>
+    <string name="widget_config_needs_permission">Kailangan ng pahintulot sa lokasyon ang kasalukuyang lokasyon; kung walang background na pahintulot, ipapakita ng widget ang huling alam na lokasyon at hihilingin kang buksan ang app.</string>
+    <string name="widget_config_open_app">Buksan ang app</string>
+    <string name="widget_config_cancel">Kanselahin</string>
+    <string name="widget_preview_location">Halimbawang lokasyon</string>
+    <string name="widget_preview_weather">Maaliwalas</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">Mga naka-save na lokasyon</string>
+    <string name="widget_refresh_queued">Naghihintay ng update</string>
+    <string name="widget_refresh_running">Ina-update…</string>
+    <string name="widget_refresh_updated">Na-update ang panahon</string>
+    <string name="widget_refresh_failed">Nabigo ang update</string>
+    <string name="widget_weather_clear">Maaliwalas</string>
+    <string name="widget_weather_cloudy">Maulap</string>
+    <string name="widget_weather_overcast">Makulimlim</string>
+    <string name="widget_weather_rain">Ulan</string>
+    <string name="widget_weather_thunderstorm">Kulog at Kidlat</string>
+    <string name="widget_weather_snow">Niyebe</string>
+    <string name="widget_weather_fog">Makapal na Hamog</string>
+    <string name="widget_weather_unknown">Hindi alam</string>
+    <string name="widget_forecast_pop_description">Posibilidad ng ulan %1$s</string>
+    <string name="widget_forecast_pop_unavailable">Walang datos sa posibilidad ng ulan</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Luma na</string>
+    <string name="widget_compact_location">Di matukoy</string>
+    <string name="widget_compact_details">Buksan ang app para sa buong detalye ng panahon</string>
+    <string name="widget_compact_attention">Buksan app</string>
+</resources>

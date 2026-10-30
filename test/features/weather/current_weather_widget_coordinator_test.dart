@@ -355,7 +355,10 @@ final class _FakeWidgetSnapshotWriter implements WidgetSnapshotWriter {
   WidgetSnapshotKind? clearedKind;
 
   @override
-  Future<Result<void>> clear({required WidgetSnapshotKind kind}) async {
+  Future<Result<void>> clear({
+    required WidgetSnapshotKind kind,
+    String? sourceIdentifier,
+  }) async {
     clearCallCount += 1;
     clearedKind = kind;
     return const Ok(null);

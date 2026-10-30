@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Four-row Compact. Extreme mode collapses only header/metrics.
+  Hidden icon and secondary IDs remain targets for every RemoteViews action.
+  A fixed metric line reserves fallback glyph height before autosize runs.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_padding_compact_adaptive"
+    tools:ignore="DisableBaselineAlignment,UselessLeaf,UseAppTint,UseCompoundDrawables">
+    <LinearLayout
+        android:id="@+id/widget_compact_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+        <TextView
+            android:id="@+id/widget_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="true"
+            android:maxLines="1"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="@dimen/widget_text_caption2" />
+        <ImageView
+            android:id="@+id/widget_location_icon"
+            android:layout_width="@dimen/widget_icon_location"
+            android:layout_height="@dimen/widget_icon_location"
+            android:layout_marginStart="@dimen/widget_spacing_xs"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_widget_location"
+            android:visibility="gone"
+            tools:visibility="visible" />
+        <TextView
+            android:id="@+id/widget_observation_time"
+            android:includeFontPadding="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/widget_secondary"
+            android:textSize="@dimen/widget_text_caption2"
+            android:layout_marginStart="@dimen/widget_compact_inline_gap" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/widget_stale"
+        style="@style/Widget.Badge"
+        android:includeFontPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="@dimen/widget_text_compact_status_min"
+        android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+        android:autoSizeStepGranularity="1sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+        <ImageView
+            android:id="@+id/widget_icon"
+            android:layout_width="@dimen/widget_icon_compact"
+            android:layout_height="@dimen/widget_icon_compact"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/widget_temperature"
+            tools:ignore="NestedWeights"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="@dimen/widget_text_compact_temperature_min"
+            android:autoSizeMaxTextSize="@dimen/widget_text_temperature_compact"
+            android:autoSizeStepGranularity="1sp"
+            android:maxLines="1"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="@dimen/widget_text_temperature_compact" />
+        <FrameLayout
+            android:id="@+id/widget_refresh"
+            android:visibility="gone"
+            android:layout_width="@dimen/widget_icon_action_target_compact"
+            android:layout_height="@dimen/widget_icon_action_target_compact"
+            android:layout_marginStart="@dimen/widget_spacing_xs"
+            android:contentDescription="@string/widget_refresh"
+            android:padding="@dimen/widget_spacing_xs">
+            <ImageView
+                android:id="@+id/widget_refresh_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_refresh"
+                android:tint="@color/widget_icon_tint" />
+            <ProgressBar
+                android:id="@+id/widget_refresh_progress"
+                style="@style/Widget.RefreshProgress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:id="@+id/widget_compact_metrics"
+        android:baselineAligned="false">
+        <ImageView
+            android:id="@+id/widget_humidity"
+            android:layout_width="@dimen/widget_icon_location"
+            android:layout_height="@dimen/widget_icon_location"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_widget_humidity" />
+        <TextView
+            android:id="@+id/widget_humidity_value"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/widget_compact_metric_height"
+            android:layout_weight="1"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="@dimen/widget_text_metric_min"
+            android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+            android:textSize="@dimen/widget_text_caption2"
+            android:textColor="@color/widget_secondary"
+            android:ellipsize="end" />
+        <ImageView
+            android:id="@+id/widget_rain"
+            android:layout_width="@dimen/widget_icon_location"
+            android:layout_height="@dimen/widget_icon_location"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_widget_raindrop" />
+        <TextView
+            android:id="@+id/widget_rain_value"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/widget_compact_metric_height"
+            android:layout_weight="2"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="@dimen/widget_text_metric_min"
+            android:autoSizeMaxTextSize="@dimen/widget_text_caption2"
+            android:textSize="@dimen/widget_text_caption2"
+            android:textColor="@color/widget_secondary"
+            android:ellipsize="end" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    DPIP Android Weather Widget - Medium Layout
+
+    Preview:
+    Location: 關廟區
+    Temperature: 31°
+    Apparent Temperature: 36°
+    Weather: 晴
+    Observation Time: 17:10
+
+    Preview-only attributes use the tools namespace.
+    They do not affect runtime data or Widget behavior.
+
+    Actual weather data is provided by WidgetRenderer.kt.
+-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="@dimen/widget_padding_medium"
+
+    tools:ignore="DisableBaselineAlignment,UselessLeaf,UseAppTint,UseCompoundDrawables">
+
+    <!-- ======================================= -->
+    <!-- HEADER: Location / Time / Refresh       -->
+    <!-- ======================================= -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Location Container -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <!-- Location Name -->
+
+                <TextView
+                    android:id="@+id/widget_location"
+                    android:includeFontPadding="false"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+                    android:autoSizeMaxTextSize="@dimen/widget_text_headline"
+                    android:autoSizeMinTextSize="@dimen/widget_text_headline_min"
+                    android:autoSizeStepGranularity="1sp"
+                    android:autoSizeTextType="uniform"
+
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+
+                    android:textColor="@color/widget_on_surface"
+                    android:textSize="@dimen/widget_text_headline"
+
+                    tools:ignore="NestedWeights"
+                    tools:text="關廟區" />
+
+                <!-- Current Location Icon -->
+
+                <ImageView
+                    android:id="@+id/widget_location_icon"
+                    android:layout_width="@dimen/widget_icon_location"
+                    android:layout_height="@dimen/widget_icon_location"
+                    android:layout_marginStart="@dimen/widget_spacing_xs"
+
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_widget_location"
+                    android:visibility="gone"
+
+                    tools:tint="@color/widget_icon_tint"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Observation Time -->
+
+        <TextView
+            android:id="@+id/widget_observation_time"
+            android:includeFontPadding="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/widget_spacing_sm"
+
+            android:ellipsize="end"
+            android:maxLines="1"
+
+            android:textColor="@color/widget_secondary"
+            android:textSize="@dimen/widget_text_caption2"
+
+            tools:text="17:10" />
+
+        <!-- Refresh Button -->
+
+        <FrameLayout
+            android:id="@+id/widget_refresh"
+            android:visibility="gone"
+            android:layout_width="@dimen/widget_icon_action_target"
+            android:layout_height="@dimen/widget_icon_action_target"
+            android:layout_marginStart="@dimen/widget_spacing_xs"
+
+            android:contentDescription="@string/widget_refresh"
+            android:padding="@dimen/widget_spacing_xs">
+
+            <!-- Refresh Icon -->
+
+            <ImageView
+                android:id="@+id/widget_refresh_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_widget_refresh"
+                android:tint="@color/widget_icon_tint" />
+
+            <!-- Refresh Progress -->
+
+            <ProgressBar
+                android:id="@+id/widget_refresh_progress"
+                style="@style/Widget.RefreshProgress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                tools:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- ======================================= -->
+    <!-- STATUS: Stale Weather Notice            -->
+    <!-- ======================================= -->
+
+    <TextView
+        android:id="@+id/widget_stale"
+        style="@style/Widget.Badge"
+        android:paddingTop="@dimen/widget_badge_top_inset"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+
+        tools:text="資料已過期"
+        tools:visibility="gone" />
+
+    <!-- ======================================= -->
+    <!-- CURRENT WEATHER                         -->
+    <!-- ======================================= -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/widget_medium_section_gap"
+
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Temperature Container -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Current Temperature -->
+
+            <TextView
+                android:id="@+id/widget_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="@dimen/widget_text_temperature_compact"
+                android:autoSizeMaxTextSize="@dimen/widget_text_temperature_medium"
+                android:autoSizeStepGranularity="1sp"
+
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+
+                android:textColor="@color/widget_on_surface"
+                android:textSize="@dimen/widget_text_temperature_medium"
+
+                tools:text="31°" />
+
+            <!-- Apparent Temperature -->
+
+            <!-- Keep the complete localized reading: at the minimum width even
+                 9sp cannot fit an English label plus a signed three-digit value
+                 on one line. Long labels may need two lines plus the value;
+                 roomy cells still use one line at the existing caption size. -->
+            <TextView
+                android:id="@+id/widget_apparent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+                android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+                android:autoSizeStepGranularity="1sp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/widget_spacing_xs"
+
+                android:ellipsize="end"
+                android:maxLines="3"
+
+                android:textColor="@color/widget_secondary"
+                android:textSize="@dimen/widget_text_caption"
+
+                tools:text="體感 36°" />
+
+        </LinearLayout>
+
+        <!-- Bound both current-weather groups so long apparent-temperature
+             labels cannot take the condition glyph's width in narrow cells. -->
+        <!-- Weather Condition Container -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal"
+
+            tools:ignore="UseCompoundDrawables,NestedWeights">
+
+            <!-- Keep the glyph next to its text when roomy, while the outer
+                 weighted group bounds both when the launcher is narrow. -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+                <!-- Weather Icon -->
+
+                <ImageView
+                    android:id="@+id/widget_icon"
+                    android:layout_width="@dimen/widget_icon_medium"
+                    android:layout_height="@dimen/widget_icon_medium"
+
+                    android:importantForAccessibility="no"
+
+                    tools:src="@drawable/ic_widget_weather_clear_day"
+                    tools:tint="@color/widget_icon_tint" />
+
+                <!-- Weather Description -->
+
+                <TextView
+                    android:id="@+id/widget_weather"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/widget_spacing_sm"
+
+                    android:autoSizeMaxTextSize="@dimen/widget_text_body"
+                    android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+                    android:autoSizeStepGranularity="1sp"
+                    android:autoSizeTextType="uniform"
+
+                    android:ellipsize="end"
+                    android:maxLines="1"
+
+                    android:textColor="@color/widget_secondary"
+                    android:textSize="@dimen/widget_text_body"
+
+                    tools:text="晴" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- ======================================= -->
+    <!-- HOURLY FORECAST                         -->
+    <!-- ======================================= -->
+
+    <!--
+        Forecast items are dynamically inserted
+        by WidgetRenderer.kt using RemoteViews.
+
+        Individual forecast layout:
+        widget_forecast_item.xml
+
+        The Android Studio preview does not
+        automatically populate this container.
+    -->
+
+    <LinearLayout
+        android:id="@+id/widget_forecast_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/widget_medium_section_gap"
+
+        android:baselineAligned="false"
+        android:orientation="horizontal" />
+
+</LinearLayout>

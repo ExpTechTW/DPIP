@@ -18,6 +18,7 @@ jobs:
       contents: read
     outputs:
       android: ${{ steps.filter.outputs.android }}
+      native: ${{ steps.filter.outputs.native }}
       release: ${{ steps.release.outputs.builds }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,6 +39,16 @@ jobs:
               - 'assets/**'
               - 'lib/**'
               - 'pubspec.yaml'
+            # The emulator job's filter, and deliberately narrower than
+            # `android`. What it tests — provider metadata, RemoteViews
+            # inflation, the Widget's own SQLite — is decided entirely by the
+            # native sources, the resources and the manifest. A Dart-only change
+            # cannot alter any of the three, so booting an emulator for one
+            # spends ~15 minutes of a runner to re-prove an unchanged tree.
+            native:
+              - 'android/**'
+              - '.github/workflows/android.yml'
+              - 'tool/dev/test_android_device.sh'
 
       # Whether release.yml builds this push, for the job below. It publishes
       # a snapshot only when a commit since the last tag carries a changelog
@@ -112,6 +123,20 @@ jobs:
           bash tool/dev/deps.sh
           bash tool/dev/codegen.sh
 
+      # The Kotlin Widget tests, which `tool/dev/test.sh` cannot see: its suite
+      # is Dart, and none of it compiles a line of the native policy. Before
+      # this step existed, a change to the Widget's JSON decoding, ordering or
+      # presentation could ship with every other check green.
+      - name: Run native Widget unit tests
+        run: bash tool/dev/test_android.sh
+
+      # Lint reads the merged manifest and resources, which the unit tests
+      # cannot: a receiver without `exported`, an API-31 attribute on a minSdk-26
+      # app. It is a gate on new issues only — the pre-existing ones are in
+      # android/app/lint-baseline.xml.
+      - name: Run Android lint
+        run: bash tool/dev/lint_android.sh
+
       # No keystore, and deliberately so. This job builds the artifact nobody
       # installs — release.yml signs and uploads the one that ships — so the
       # release keystore buys nothing here, and asking for it is what breaks
@@ -135,3 +160,61 @@ jobs:
           path: build/app/outputs/flutter-apk/*.apk
           retention-days: 7
           compression-level: 6
+
+  # The Widget on a real Android runtime.
+  #
+  # `tool/dev/test_android.sh` is a JVM suite: it cannot inflate a `RemoteViews`
+  # through the platform's own inflater, cannot read `AppWidgetProviderInfo` the
+  # way a launcher does, and cannot open the device's SQLite. Those three are what
+  # `src/androidTest` covers, and a device is the only place they can run — so
+  # this job exists, and a green `Android` job above says nothing about them.
+  #
+  # Gated on the `native` filter rather than the build's `android`, and
+  # deliberately not on the release decision: a device run is worth doing whether
+  # or not release.yml also builds this push.
+  Instrumented:
+    needs: changes
+    if: ${{ needs.changes.outputs.native == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: "temurin"
+          java-version: "25"
+          cache: "gradle"
+
+      - name: Install toolchain (mise)
+        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+
+      - name: Install dependencies
+        run: bash tool/dev/deps.sh
+
+      # Hardware acceleration: without KVM the emulator boots in software and the
+      # run takes the better part of an hour.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run the instrumented Widget tests
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
+        with:
+          # One recent platform. The JVM suite already runs the layouts and the
+          # store against two SDK levels (26 and 35) through Robolectric; this
+          # job is for the real framework, not for a version matrix it cannot
+          # afford.
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash tool/dev/test_android_device.sh

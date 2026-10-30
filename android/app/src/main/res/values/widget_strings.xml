@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Widget strings.
+
+  Values are labels and fragments; anything with a number in it is formatted in
+  `WidgetPresenter` with the device locale, so a locale's decimal separator is
+  decided by the locale and not by a positional placeholder.
+
+  The vocabulary shared with the iOS Widget is taken from
+  `ios/DPIPWidgets/Localizable.xcstrings` (`widget.stale`, `widget.humidity`, …)
+  so the two platforms' Widgets say the same thing in the same language. The
+  strings that only exist here — the degradation notices, the configuration
+  screen, the preview sample — are authored in this file and in the four
+  translations beside it.
+
+  The app's in-app language picker does not reach here: a home-screen Widget is
+  rendered with the system locale, which is why every locale the app ships is
+  covered by `values-<locale>/` rather than left to English.
+-->
+<resources>
+    <string name="widget_name">Current Weather</string>
+    <string name="widget_description">Shows current weather for the location configured for this widget.</string>
+
+    <string name="widget_stale">Outdated</string>
+    <string name="widget_no_data">No weather data</string>
+    <string name="widget_open_app">Open the app</string>
+    <string name="widget_needs_app">Position updates only while the app is open</string>
+    <string name="widget_reconfigure">Location removed — reconfigure</string>
+    <string name="widget_refresh">Update now</string>
+
+    <string name="widget_humidity">Humidity</string>
+    <string name="widget_rain">Rainfall</string>
+    <string name="widget_wind">Wind</string>
+    <string name="widget_station">Station</string>
+    <string name="widget_sunrise">Sunrise</string>
+    <string name="widget_sunset">Sunset</string>
+    <string name="widget_apparent">Feels Like</string>
+    <string name="widget_location_disabled">Location is off</string>
+    <string name="widget_location_unavailable">Position unavailable</string>
+    <string name="widget_location_outside">Position is outside the covered area</string>
+    <string name="widget_current_location">Current position</string>
+
+    <string name="widget_config_title">Weather Widget Configuration</string>
+    <string name="widget_config_hint">Choose the location whose weather is shown in the widget.</string>
+    <string name="widget_config_empty">No saved locations yet. Open the app and add one, then come back.</string>
+    <string name="widget_config_needs_permission">Current position needs location permission; without background access the Widget shows the last known position and asks you to open the app.</string>
+    <string name="widget_config_open_app">Open the app</string>
+    <string name="widget_config_cancel">Cancel</string>
+    <string name="widget_config_saved_locations">Saved locations</string>
+
+    <string name="widget_preview_location">Sample Location</string>
+    <string name="widget_preview_weather">Clear</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_refresh_queued">Update queued</string>
+    <string name="widget_refresh_running">Updating…</string>
+    <string name="widget_refresh_updated">Weather updated</string>
+    <string name="widget_refresh_failed">Update failed</string>
+    <!-- Weather labels share the app ARBs' weatherMode* vocabulary. -->
+    <string name="widget_weather_clear">Clear</string>
+    <string name="widget_weather_cloudy">Cloudy</string>
+    <string name="widget_weather_overcast">Overcast</string>
+    <string name="widget_weather_rain">Rain</string>
+    <string name="widget_weather_thunderstorm">Thunderstorm</string>
+    <string name="widget_weather_snow">Snow</string>
+    <string name="widget_weather_fog">Fog</string>
+    <string name="widget_weather_unknown">Unknown</string>
+    <string name="widget_forecast_pop_description">Chance of rain %1$s</string>
+    <string name="widget_forecast_pop_unavailable">Chance of rain unavailable</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">Outdated</string>
+    <string name="widget_compact_location">No location</string>
+    <string name="widget_compact_details">Open the app for full weather details</string>
+    <string name="widget_compact_attention">Open app</string>
+</resources>

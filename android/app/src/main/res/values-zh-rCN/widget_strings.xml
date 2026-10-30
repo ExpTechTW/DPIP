@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">当前天气</string>
+    <string name="widget_description">显示此小组件所设定地区的当前天气。</string>
+
+    <string name="widget_stale">已过时</string>
+    <string name="widget_no_data">暂无天气数据</string>
+    <string name="widget_open_app">打开应用</string>
+    <string name="widget_needs_app">仅在应用打开时更新位置</string>
+    <string name="widget_reconfigure">地点已移除 — 请重新设置</string>
+    <string name="widget_refresh">立即更新</string>
+
+    <string name="widget_humidity">湿度</string>
+    <string name="widget_rain">雨量</string>
+    <string name="widget_wind">风</string>
+    <string name="widget_station">观测站</string>
+    <string name="widget_sunrise">日出</string>
+    <string name="widget_sunset">日落</string>
+    <string name="widget_apparent">体感</string>
+    <string name="widget_location_disabled">定位已关闭</string>
+    <string name="widget_location_unavailable">无法取得位置</string>
+    <string name="widget_location_outside">位置不在涵盖范围内</string>
+    <string name="widget_current_location">当前位置</string>
+
+    <string name="widget_config_title">天气小组件设置</string>
+    <string name="widget_config_hint">选择小组件显示天气的地点。</string>
+    <string name="widget_config_empty">尚未保存任何地点。请先打开应用新增地点，再回来设置。</string>
+    <string name="widget_config_needs_permission">当前位置需要定位权限；若未获得后台定位权限，小组件会显示最后已知位置并提示打开应用。</string>
+    <string name="widget_config_open_app">打开应用</string>
+    <string name="widget_config_cancel">取消</string>
+
+    <string name="widget_preview_location">预览地点</string>
+    <string name="widget_preview_weather">晴</string>
+    <string name="widget_preview_temperature">28°</string>
+    <string name="widget_preview_time">14:05</string>
+    <string name="widget_preview_humidity">76%</string>
+    <string name="widget_preview_rain">0.0 mm</string>
+    <string name="widget_config_saved_locations">已保存地点</string>
+    <string name="widget_refresh_queued">等待更新</string>
+    <string name="widget_refresh_running">正在更新…</string>
+    <string name="widget_refresh_updated">天气已更新</string>
+    <string name="widget_refresh_failed">更新失败</string>
+    <string name="widget_weather_clear">晴天</string>
+    <string name="widget_weather_cloudy">多云</string>
+    <string name="widget_weather_overcast">阴天</string>
+    <string name="widget_weather_rain">雨天</string>
+    <string name="widget_weather_thunderstorm">雷雨</string>
+    <string name="widget_weather_snow">下雪</string>
+    <string name="widget_weather_fog">大雾</string>
+    <string name="widget_weather_unknown">未知</string>
+    <string name="widget_forecast_pop_description">降雨概率 %1$s</string>
+    <string name="widget_forecast_pop_unavailable">无降雨概率数据</string>
+
+    <!-- Concise Compact labels; full status and hidden readings remain accessible. -->
+    <string name="widget_compact_stale">数据过时</string>
+    <string name="widget_compact_location">暂无定位</string>
+    <string name="widget_compact_details">打开 App 查看完整天气信息</string>
+    <string name="widget_compact_attention">打开 App</string>
+</resources>
