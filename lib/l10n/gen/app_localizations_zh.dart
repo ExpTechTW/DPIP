@@ -794,6 +794,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherRankingPickTime => '選擇資料時間';
 
   @override
+  String get weatherRankingRainMissingAt => '此時間沒有雨量資料';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '資料時間：$time\n共 $count 觀測點';
   }
@@ -4332,6 +4335,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get weatherRankingPickTime => '选择资料时间';
+
+  @override
+  String get weatherRankingRainMissingAt => '此时间没有雨量资料';
 
   @override
   String weatherRankingMeta(String time, int count) {
@@ -7873,6 +7879,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get weatherRankingPickTime => '選擇資料時間';
 
   @override
+  String get weatherRankingRainMissingAt => '此時間沒有雨量資料';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '資料時間：$time\n共 $count 觀測點';
   }
@@ -11411,6 +11420,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get weatherRankingPickTime => '選擇資料時間';
+
+  @override
+  String get weatherRankingRainMissingAt => '此時間沒有雨量資料';
 
   @override
   String weatherRankingMeta(String time, int count) {

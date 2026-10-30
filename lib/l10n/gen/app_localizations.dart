@@ -1560,6 +1560,12 @@ abstract class AppLocalizations {
   /// **'Choose data time'**
   String get weatherRankingPickTime;
 
+  /// Rain tab empty state when the picked data time has no rain snapshot at or before it
+  ///
+  /// In en, this message translates to:
+  /// **'No rain data at this time'**
+  String get weatherRankingRainMissingAt;
+
   /// Snapshot time and station count above a ranking list
   ///
   /// In en, this message translates to:

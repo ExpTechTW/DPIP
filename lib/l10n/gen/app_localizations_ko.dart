@@ -798,6 +798,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherRankingPickTime => '자료 시각 선택';
 
   @override
+  String get weatherRankingRainMissingAt => '이 시각의 강수 자료가 없습니다';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '자료 시각: $time\n관측점 $count';
   }

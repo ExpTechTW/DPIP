@@ -360,6 +360,7 @@
   "weatherRankingCurrent": "而家",
   "weatherRankingLatest": "最新",
   "weatherRankingPickTime": "選擇資料時間",
+  "weatherRankingRainMissingAt": "呢個時間冇雨量資料",
   "weatherRankingMeta": "資料時間：{time}\n共 {count} 觀測點",
   "onboardingTermsAgree": "我已閱讀並同意服務條款",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(無植被)",

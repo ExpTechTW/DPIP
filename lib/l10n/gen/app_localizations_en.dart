@@ -814,6 +814,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherRankingPickTime => 'Choose data time';
 
   @override
+  String get weatherRankingRainMissingAt => 'No rain data at this time';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Data time: $time\n$count stations';
   }

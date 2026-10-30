@@ -2,6 +2,7 @@
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -131,7 +132,9 @@ class _RankingData {
   final Map<String, WeatherStation> weatherStations;
   final WeatherSnapshot weather;
   final Map<String, WeatherStation> rainStations;
-  final RainSnapshot rain;
+
+  /// `null` when a picked time has no rain snapshot at or before it.
+  final RainSnapshot? rain;
 }
 
 /// Tabbed station ranking under the Data hub.
@@ -227,7 +230,7 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
       weatherStations: weatherStations.valueOrNull!,
       weather: weather.valueOrNull!,
       rainStations: rainStations.valueOrNull!,
-      rain: rain.valueOrNull!,
+      rain: rain.valueOrNull,
     );
     if (second == null) _latestWeatherTime = data.weather.time;
     return Ok(data);
@@ -243,9 +246,12 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     final cached = _weatherAt[second];
     if (cached != null) return Ok(cached);
     final resolved = _atOrBefore(_weatherTimes, second);
-    // The history has not answered (or is empty): the newest snapshot is the
-    // only one this page can honestly draw.
-    if (resolved == null) return repo.latest();
+    // The picker only offers weather times, so this is a history that has
+    // since gone away. Drawing `latest()` here would put the newest readings
+    // under a past time in the app bar.
+    if (resolved == null) {
+      return Err(NoDataFailure('no weather snapshot at or before $second'));
+    }
     final result = await repo.at(resolved);
     final snapshot = result.valueOrNull;
     if (snapshot != null) _weatherAt[second] = snapshot;
@@ -255,7 +261,11 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
   /// The rain counterpart of [_weatherSnapshot] — rain keeps a finer history
   /// (10-minute steps), so the same chosen time usually resolves to its own
   /// nearest snapshot.
-  Future<Result<RainSnapshot>> _rainSnapshot(
+  ///
+  /// `Ok(null)` when rain has nothing at or before [second]: its history
+  /// failed, or it does not reach back that far. The rain tab says so; the
+  /// weather tabs for that time are still good.
+  Future<Result<RainSnapshot?>> _rainSnapshot(
     MeteorRainRepository repo,
     int? second,
   ) async {
@@ -263,22 +273,22 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
     final cached = _rainAt[second];
     if (cached != null) return Ok(cached);
     final resolved = _atOrBefore(_rainTimes, second);
-    if (resolved == null) return repo.latest();
+    if (resolved == null) return const Ok(null);
     final result = await repo.at(resolved);
     final snapshot = result.valueOrNull;
     if (snapshot != null) _rainAt[second] = snapshot;
     return result;
   }
 
-  /// The newest time in [times] at or before [second]; the oldest one when
-  /// [second] predates everything the history still keeps.
+  /// The newest time in [times] at or before [second], or `null` when there
+  /// is none. Never a later time: that would be a snapshot from after the
+  /// one the user asked for, drawn under the time they picked.
   static int? _atOrBefore(List<int> times, int second) {
-    if (times.isEmpty) return null;
     int? best;
     for (final time in times) {
       if (time <= second && (best == null || time > best)) best = time;
     }
-    return best ?? times.first;
+    return best;
   }
 
   /// Loads the snapshot-time lists the picker offers. Failures are logged and
@@ -308,17 +318,14 @@ class _WeatherRankingPageState extends State<WeatherRankingPage>
   }
 
   /// Weather drives the picker: it is the coarser of the two histories, and
-  /// every weather tab reads it. Rain alone answers when weather has none.
-  List<int> get _pickerTimes =>
-      _weatherTimes.isNotEmpty ? _weatherTimes : _rainTimes;
+  /// five of the six tabs read it. Offering rain's times when weather has none
+  /// would pick seconds the weather tabs cannot draw, so no weather history
+  /// means no picker.
+  List<int> get _pickerTimes => _weatherTimes;
 
   int? get _newestTime =>
       _latestWeatherTime ??
-      (_weatherTimes.isNotEmpty
-          ? _weatherTimes.last
-          : _rainTimes.isNotEmpty
-          ? _rainTimes.last
-          : null);
+      (_weatherTimes.isNotEmpty ? _weatherTimes.last : null);
 
   Future<void> _pickTime() async {
     final times = _pickerTimes;
@@ -550,7 +557,9 @@ class _RainRankingPanel extends StatefulWidget {
   });
 
   final Map<String, WeatherStation> stations;
-  final RainSnapshot snapshot;
+
+  /// `null` when the picked time has no rain snapshot at or before it.
+  final RainSnapshot? snapshot;
   final String mapLayerId;
   final Future<void> Function() onRefresh;
 
@@ -570,21 +579,21 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
   RainSnapshot? _rankedSnapshot;
   RainInterval? _rankedInterval;
 
-  List<RankedObservation> _ranked() {
+  List<RankedObservation> _ranked(RainSnapshot snapshot) {
     final cached = _rankedCache;
     if (cached != null &&
         identical(_rankedStations, widget.stations) &&
-        identical(_rankedSnapshot, widget.snapshot) &&
+        identical(_rankedSnapshot, snapshot) &&
         _rankedInterval == _interval) {
       return cached;
     }
     final ranked = rankRain(
       stations: widget.stations,
-      snapshot: widget.snapshot,
+      snapshot: snapshot,
       interval: _interval,
     );
     _rankedStations = widget.stations;
-    _rankedSnapshot = widget.snapshot;
+    _rankedSnapshot = snapshot;
     _rankedInterval = _interval;
     return _rankedCache = ranked;
   }
@@ -592,9 +601,29 @@ class _RainRankingPanelState extends State<_RainRankingPanel> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final snapshot = widget.snapshot;
+    if (snapshot == null) {
+      // No snapshot at or before the picked time. Saying so beats drawing a
+      // later one under the time in the app bar.
+      return RefreshIndicator(
+        onRefresh: widget.onRefresh,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: 240,
+              child: EmptyView(
+                icon: Icons.umbrella_outlined,
+                message: l10n.weatherRankingRainMissingAt,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     final colors = Theme.of(context).colorScheme;
-    final ranked = _ranked();
-    final time = _formatSnapshotTime(widget.snapshot.time);
+    final ranked = _ranked(snapshot);
+    final time = _formatSnapshotTime(snapshot.time);
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,

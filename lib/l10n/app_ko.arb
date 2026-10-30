@@ -358,6 +358,7 @@
   "weatherRankingCurrent": "현재",
   "weatherRankingLatest": "최신",
   "weatherRankingPickTime": "자료 시각 선택",
+  "weatherRankingRainMissingAt": "이 시각의 강수 자료가 없습니다",
   "weatherRankingMeta": "자료 시각: {time}\n관측점 {count}",
   "onboardingTermsAgree": "서비스 약관을 읽었으며 이에 동의합니다",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 투명(식생 없음)",

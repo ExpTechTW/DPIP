@@ -810,6 +810,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherRankingPickTime => 'Chọn thời gian dữ liệu';
 
   @override
+  String get weatherRankingRainMissingAt =>
+      'Không có dữ liệu mưa tại thời điểm này';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Thời gian: $time\n$count trạm';
   }

@@ -358,6 +358,7 @@
   "weatherRankingCurrent": "ปัจจุบัน",
   "weatherRankingLatest": "ล่าสุด",
   "weatherRankingPickTime": "เลือกเวลาข้อมูล",
+  "weatherRankingRainMissingAt": "ไม่มีข้อมูลฝนในเวลานี้",
   "weatherRankingMeta": "เวลาข้อมูล: {time}\n{count} สถานี",
   "onboardingTermsAgree": "ฉันได้อ่านและยอมรับข้อกำหนดการให้บริการแล้ว",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",

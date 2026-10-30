@@ -809,6 +809,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get weatherRankingPickTime => 'เลือกเวลาข้อมูล';
 
   @override
+  String get weatherRankingRainMissingAt => 'ไม่มีข้อมูลฝนในเวลานี้';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'เวลาข้อมูล: $time\n$count สถานี';
   }

@@ -358,6 +358,7 @@
   "weatherRankingCurrent": "當下",
   "weatherRankingLatest": "最新",
   "weatherRankingPickTime": "選擇資料時間",
+  "weatherRankingRainMissingAt": "此時間沒有雨量資料",
   "weatherRankingMeta": "資料時間：{time}\n共 {count} 觀測點",
   "onboardingTermsAgree": "我已閱讀並同意服務條款",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(無植被)",

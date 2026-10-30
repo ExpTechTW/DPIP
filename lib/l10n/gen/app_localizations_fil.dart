@@ -819,6 +819,10 @@ class AppLocalizationsFil extends AppLocalizations {
   String get weatherRankingPickTime => 'Pumili ng oras ng datos';
 
   @override
+  String get weatherRankingRainMissingAt =>
+      'Walang datos ng ulan sa oras na ito';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Oras ng datos: $time\n$count istasyon';
   }

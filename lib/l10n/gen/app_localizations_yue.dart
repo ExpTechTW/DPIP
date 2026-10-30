@@ -794,6 +794,9 @@ class AppLocalizationsYue extends AppLocalizations {
   String get weatherRankingPickTime => '選擇資料時間';
 
   @override
+  String get weatherRankingRainMissingAt => '呢個時間冇雨量資料';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return '資料時間：$time\n共 $count 觀測點';
   }

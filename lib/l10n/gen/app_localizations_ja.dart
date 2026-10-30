@@ -799,6 +799,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get weatherRankingPickTime => 'データ時刻を選択';
 
   @override
+  String get weatherRankingRainMissingAt => 'この時刻の雨量データはありません';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'データ時刻：$time\n観測点 $count';
   }

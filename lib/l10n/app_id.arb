@@ -358,6 +358,7 @@
   "weatherRankingCurrent": "Saat ini",
   "weatherRankingLatest": "Terbaru",
   "weatherRankingPickTime": "Pilih waktu data",
+  "weatherRankingRainMissingAt": "Tidak ada data hujan pada waktu ini",
   "weatherRankingMeta": "Waktu data: {time}\n{count} stasiun",
   "onboardingTermsAgree": "Saya telah membaca dan menyetujui Ketentuan Layanan",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",

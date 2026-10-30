@@ -1052,6 +1052,10 @@
   "weatherRankingCurrent": "Current",
   "weatherRankingLatest": "Latest",
   "weatherRankingPickTime": "Choose data time",
+  "weatherRankingRainMissingAt": "No rain data at this time",
+  "@weatherRankingRainMissingAt": {
+    "description": "Rain tab empty state when the picked data time has no rain snapshot at or before it"
+  },
   "weatherRankingMeta": "Data time: {time}\n{count} stations",
   "onboardingTermsAgree": "I have read and agree to the Terms of Service",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",

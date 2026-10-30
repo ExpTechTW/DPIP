@@ -358,6 +358,7 @@
   "weatherRankingCurrent": "Hiện tại",
   "weatherRankingLatest": "Mới nhất",
   "weatherRankingPickTime": "Chọn thời gian dữ liệu",
+  "weatherRankingRainMissingAt": "Không có dữ liệu mưa tại thời điểm này",
   "weatherRankingMeta": "Thời gian: {time}\n{count} trạm",
   "onboardingTermsAgree": "Tôi đã đọc và đồng ý với Điều khoản Dịch vụ",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",

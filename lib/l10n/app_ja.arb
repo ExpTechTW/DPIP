@@ -358,6 +358,7 @@
   "weatherRankingCurrent": "現在",
   "weatherRankingLatest": "最新",
   "weatherRankingPickTime": "データ時刻を選択",
+  "weatherRankingRainMissingAt": "この時刻の雨量データはありません",
   "weatherRankingMeta": "データ時刻：{time}\n観測点 {count}",
   "onboardingTermsAgree": "サービス利用規約を読み、同意します",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(植生なし)",

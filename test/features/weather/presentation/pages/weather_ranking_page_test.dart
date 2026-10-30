@@ -589,7 +589,7 @@ void main() {
   testWidgets('rain lands on its own nearest snapshot, not the weather one', (
     tester,
   ) async {
-    final rainSecond = _earlier + 600;
+    final rainSecond = _earlier - 600;
     final weather = _Weather(
       _catalogue(),
       _weatherSnap(),
@@ -599,8 +599,10 @@ void main() {
     final rain = _Rain(
       _catalogue(),
       _rainSnap(),
-      // The rain history runs on finer steps than the weather one.
-      historyResult: const Ok(<int>[_earlier + 600, _now]),
+      // The rain history runs on finer steps than the weather one, with no
+      // snapshot on the picked second. The one just after is as close as the
+      // one just before, but it is from after the time the user asked for.
+      historyResult: const Ok(<int>[_earlier - 600, _earlier + 600, _now]),
       past: {rainSecond: _pastRainSnap().valueOrNull!},
     );
     await _pump(tester, weather: weather, rain: rain);
@@ -614,6 +616,62 @@ void main() {
     expect(weather.requested, [_earlier]);
     expect(rain.requested, [rainSecond]);
     expect(find.text('21 mm'), findsOneWidget);
+  });
+
+  testWidgets('a time older than the rain history shows no rain, not a later '
+      'snapshot', (tester) async {
+    final weather = _Weather(
+      _catalogue(),
+      _weatherSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastWeatherSnap().valueOrNull!},
+    );
+    final rain = _Rain(
+      _catalogue(),
+      _rainSnap(),
+      // Rain keeps less history than weather: its oldest snapshot is ten
+      // minutes after the hour the user is about to pick.
+      historyResult: const Ok(<int>[_earlier + 600, _now]),
+      past: {_earlier + 600: _pastRainSnap().valueOrNull!},
+    );
+    await _pump(tester, weather: weather, rain: rain);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    await tester.tap(find.text(l10n.weatherRankingLatest));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.pumpAndSettle();
+
+    expect(find.text(rankingTimeLabel(_earlier)), findsOneWidget);
+    expect(rain.requested, isEmpty, reason: 'nothing at or before the pick');
+    expect(find.text('21 mm'), findsNothing, reason: 'a later snapshot');
+    expect(find.text('12.5 mm'), findsNothing, reason: 'the newest snapshot');
+  });
+
+  testWidgets('no rain history does not pass the newest rain off as the '
+      'picked time', (tester) async {
+    final weather = _Weather(
+      _catalogue(),
+      _weatherSnap(),
+      historyResult: const Ok(<int>[_earlier, _now]),
+      past: {_earlier: _pastWeatherSnap().valueOrNull!},
+    );
+    final rain = _Rain(
+      _catalogue(),
+      _rainSnap(),
+      historyResult: Err<List<int>>(const NetworkFailure('offline')),
+    );
+    await _pump(tester, weather: weather, rain: rain);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text('12.5 mm'), findsOneWidget);
+
+    await tester.tap(find.text(l10n.weatherRankingLatest));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.pumpAndSettle();
+
+    expect(find.text(rankingTimeLabel(_earlier)), findsOneWidget);
+    expect(find.text('12.5 mm'), findsNothing, reason: 'the newest snapshot');
   });
 
   testWidgets('no history means no picker, and the newest list still works', (

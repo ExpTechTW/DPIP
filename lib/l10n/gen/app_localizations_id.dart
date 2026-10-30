@@ -813,6 +813,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherRankingPickTime => 'Pilih waktu data';
 
   @override
+  String get weatherRankingRainMissingAt =>
+      'Tidak ada data hujan pada waktu ini';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Waktu data: $time\n$count stasiun';
   }
