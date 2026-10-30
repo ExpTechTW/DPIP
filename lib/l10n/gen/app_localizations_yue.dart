@@ -3542,4 +3542,294 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => '跳過，遲啲先設定';
+
+  @override
+  String get aiChatTitle => 'AI 助理';
+
+  @override
+  String get aiChatNew => '新對話';
+
+  @override
+  String get aiChatAbout => '說明';
+
+  @override
+  String get aiChatInputHint => '問下地震、天氣或者颱風…';
+
+  @override
+  String get aiChatSend => '傳送';
+
+  @override
+  String get aiChatStop => '停止';
+
+  @override
+  String get aiChatDisclaimer => 'AI 有機會出錯，緊急時請以官方警報為準。';
+
+  @override
+  String get aiChatEmptyTitle => '想知啲乜？';
+
+  @override
+  String get aiChatSuggestionQuakes => '最近有冇地震？';
+
+  @override
+  String get aiChatSuggestionRain => '我呢度今日會唔會落雨？';
+
+  @override
+  String get aiChatSuggestionTyphoon => '而家有冇颱風？';
+
+  @override
+  String get aiChatSuggestionAlerts => '而家有咩災害警報？';
+
+  @override
+  String get aiChatThinking => '諗緊…';
+
+  @override
+  String get aiChatWaiting => '等緊回覆…';
+
+  @override
+  String get aiChatStopped => '已停止';
+
+  @override
+  String get aiChatOpenSettings => '開啟設定';
+
+  @override
+  String get aiChatCopied => '已複製';
+
+  @override
+  String get aiChatSetupTitle => '未設定 AI 服務';
+
+  @override
+  String get aiChatSetupBody => '填入你自己嘅 AI 服務網址、金鑰同模型就可以開始。';
+
+  @override
+  String get aiChatSetupAction => '去設定';
+
+  @override
+  String get aiIntroTitle => 'AI 助理';
+
+  @override
+  String get aiIntroBody => '問下最近嘅地震、聽日嘅天氣或者颱風動向。AI 會先即時查 DPIP 嘅資料，再用你嘅語言答你。';
+
+  @override
+  String get aiIntroOwnKeyTitle => '用你自己嘅 AI 服務';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      '填入任何兼容 OpenAI 格式、支援工具呼叫嘅 AI 服務網址同金鑰，例如 OpenAI、Google Gemini、Anthropic、OpenRouter。用量同費用由你嘅 AI 服務計。';
+
+  @override
+  String get aiIntroLocalTitle => '金鑰只會存喺呢部手機，對話唔會儲存';
+
+  @override
+  String get aiIntroLocalBody =>
+      'API 金鑰存喺系統嘅金鑰庫（iOS 鑰匙圈、Android Keystore），唔會上載去 ExpTech，亦唔會跟備份還原去第二部手機。對話唔會儲存，閂咗 App 就會消失。';
+
+  @override
+  String get aiIntroDataTitle => '資料點樣傳送';
+
+  @override
+  String get aiIntroDataBody =>
+      '你嘅問題會由手機直接傳去你設定嘅 AI 服務，唔經 ExpTech。AI 要資料嗰陣，App 會向 DPIP 嘅公開資料伺服器查，只會傳查詢條件（例如地區代碼或者日期），唔包金鑰同對話。為咗知道「我呢度」係邊度，你喺 App 入面嘅所在地同收藏嘅鄉鎮（只有名稱同代碼）會一齊話俾 AI 知。';
+
+  @override
+  String get aiIntroCautionTitle => 'AI 有機會出錯';
+
+  @override
+  String get aiIntroCautionBody =>
+      'AI 嘅答案只供參考。有機會有危險嗰陣，請先保護自己，並以中央氣象署同政府嘅官方警報同指示為準。';
+
+  @override
+  String get aiIntroMcpTitle => '自己整';
+
+  @override
+  String get aiIntroMcpBody =>
+      'DPIP 嘅資料亦都以 MCP 伺服器形式開放，唯讀、唔使金鑰。可以駁去 Claude、ChatGPT 或者其他支援 MCP 嘅工具，整你自己嘅應用。';
+
+  @override
+  String get aiIntroStart => '開始設定';
+
+  @override
+  String get aiMcpTitle => 'DPIP MCP 伺服器';
+
+  @override
+  String get aiMcpBody => '支援 Streamable HTTP 嘅 MCP 用戶端都可以直接用呢個網址。';
+
+  @override
+  String get aiMcpCopyUrl => '複製網址';
+
+  @override
+  String get aiMcpCopyConfig => '複製設定範例';
+
+  @override
+  String get aiMcpCopied => '已複製';
+
+  @override
+  String get aiSettingsTitle => 'AI 設定';
+
+  @override
+  String get aiSettingsService => 'AI 服務';
+
+  @override
+  String get aiSettingsServiceBody =>
+      '任何兼容 OpenAI 格式（/chat/completions）同支援工具呼叫嘅服務都得。㩒下面嘅服務會自動填入網址。';
+
+  @override
+  String get aiSettingsBaseUrl => 'API 網址';
+
+  @override
+  String get aiSettingsBaseUrlHelper => 'API 嘅根網址，通常以 /v1 結尾。';
+
+  @override
+  String get aiSettingsUrlEmpty => '請輸入網址';
+
+  @override
+  String get aiSettingsUrlInvalid => '呢個唔係有效嘅網址';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      '請用 https://。只有駁去呢部手機本身（localhost）先可以用 http://。';
+
+  @override
+  String get aiSettingsApiKey => 'API 金鑰';
+
+  @override
+  String get aiSettingsApiKeyHelper => '只會存喺呢部手機嘅系統金鑰庫。唔使金鑰嘅服務可以留空。';
+
+  @override
+  String get aiSettingsApiKeySaved => '已經儲存咗金鑰。留空會保留原本嘅金鑰。';
+
+  @override
+  String get aiSettingsShowKey => '顯示金鑰';
+
+  @override
+  String get aiSettingsHideKey => '隱藏金鑰';
+
+  @override
+  String get aiSettingsRemoveKey => '刪除已儲存嘅金鑰';
+
+  @override
+  String get aiSettingsKeyRemoved => '已刪除金鑰';
+
+  @override
+  String get aiSettingsModel => '模型';
+
+  @override
+  String get aiSettingsModelHelper =>
+      '要支援工具呼叫（function calling）嘅模型。㩒右邊個掣可以攞服務嘅模型清單。';
+
+  @override
+  String get aiSettingsModelEmpty => '請輸入或者揀模型';
+
+  @override
+  String get aiSettingsFetchModels => '攞模型清單';
+
+  @override
+  String get aiSettingsFilterModels => '搵模型';
+
+  @override
+  String get aiSettingsNoModels => '呢個服務冇列出任何模型，請直接輸入名稱。';
+
+  @override
+  String get aiSettingsSave => '儲存';
+
+  @override
+  String get aiSettingsSaved => '已儲存';
+
+  @override
+  String get aiSettingsSaveFailed => '儲存唔到金鑰，請再試一次。';
+
+  @override
+  String get aiSettingsPrivacy => '私隱';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      '金鑰只會存喺呢部手機嘅系統金鑰庫，唔會上載去 ExpTech。對話只會喺手機同你嘅 AI 服務之間傳送，唔會儲存。AI 查資料嗰陣，只有查詢條件會傳去 DPIP 嘅資料伺服器。';
+
+  @override
+  String get aiSettingsForget => '清除所有 AI 設定';
+
+  @override
+  String get aiSettingsForgetTitle => '清除 AI 設定？';
+
+  @override
+  String get aiSettingsForgetBody => '會由呢部手機刪除網址、模型同金鑰。';
+
+  @override
+  String get aiSettingsForgetConfirm => '清除';
+
+  @override
+  String get aiSettingsForgotten => '已清除 AI 設定';
+
+  @override
+  String get aiToolEarthquake => '地震資料';
+
+  @override
+  String get aiToolWeather => '天氣資料';
+
+  @override
+  String get aiToolTyphoon => '颱風資料';
+
+  @override
+  String get aiToolTsunami => '海嘯資料';
+
+  @override
+  String get aiToolNotices => '災害通知';
+
+  @override
+  String get aiToolPlaces => '地點';
+
+  @override
+  String get aiToolTimeline => '資料時間';
+
+  @override
+  String get aiToolOther => '資料';
+
+  @override
+  String aiToolRunning(String subject) {
+    return '查緊$subject…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return '查咗$subject';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return '查唔到$subject';
+  }
+
+  @override
+  String get aiErrorUnauthorized => 'API 金鑰無效、過咗期，或者冇用呢個模型嘅權限。';
+
+  @override
+  String get aiErrorNotFound => '搵唔到 API 或者模型，請檢查網址同模型名稱。';
+
+  @override
+  String get aiErrorRateLimited => '已經到咗 AI 服務嘅速率限制或者額度上限，請遲啲再試或者檢查計劃。';
+
+  @override
+  String get aiErrorRejected => 'AI 服務拒絕咗呢個請求，揀咗嘅模型可能唔支援工具呼叫。';
+
+  @override
+  String get aiErrorServer => 'AI 服務暫時出錯，請遲啲再試。';
+
+  @override
+  String get aiErrorNetwork => '連唔到 AI 服務，請檢查網絡。';
+
+  @override
+  String get aiErrorTimeout => 'AI 服務太耐冇回應。';
+
+  @override
+  String get aiErrorBadResponse => '認唔到 AI 服務嘅回應，呢個網址可能唔係兼容 OpenAI 格式嘅 API。';
+
+  @override
+  String get aiErrorToolsUnavailable => '暫時連唔到 DPIP 資料伺服器，請遲啲再試。';
+
+  @override
+  String get aiErrorTooManySteps => 'AI 查咗太多次資料都未有結論，請問得具體啲。';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return '服務嘅訊息：$detail';
+  }
 }

@@ -76,6 +76,16 @@ class _RecordingApiClient implements ApiClient {
   }) => throw UnimplementedError();
 
   @override
+  Future<Response<ResponseBody>> streamAbsolute(
+    String url, {
+    String method = 'POST',
+    Object? data,
+    Map<String, dynamic>? headers,
+    Duration idleTimeout = Duration.zero,
+    CancelToken? cancelToken,
+  }) => throw UnimplementedError();
+
+  @override
   Future<dynamic> post(
     ApiTier tier,
     String path, {

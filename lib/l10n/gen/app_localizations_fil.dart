@@ -3658,4 +3658,316 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Laktawan muna';
+
+  @override
+  String get aiChatTitle => 'AI Assistant';
+
+  @override
+  String get aiChatNew => 'Bagong usapan';
+
+  @override
+  String get aiChatAbout => 'Tungkol dito';
+
+  @override
+  String get aiChatInputHint => 'Magtanong tungkol sa lindol, panahon o bagyo…';
+
+  @override
+  String get aiChatSend => 'Ipadala';
+
+  @override
+  String get aiChatStop => 'Itigil';
+
+  @override
+  String get aiChatDisclaimer =>
+      'Maaaring magkamali ang AI. Sa emergency, sundin ang opisyal na babala.';
+
+  @override
+  String get aiChatEmptyTitle => 'Ano ang gusto mong malaman?';
+
+  @override
+  String get aiChatSuggestionQuakes => 'May lindol ba kamakailan?';
+
+  @override
+  String get aiChatSuggestionRain => 'Uulan ba rito ngayong araw?';
+
+  @override
+  String get aiChatSuggestionTyphoon => 'May bagyo ba ngayon?';
+
+  @override
+  String get aiChatSuggestionAlerts =>
+      'Anong mga babala sa sakuna ang umiiral?';
+
+  @override
+  String get aiChatThinking => 'Nag-iisip…';
+
+  @override
+  String get aiChatWaiting => 'Hinihintay ang sagot…';
+
+  @override
+  String get aiChatStopped => 'Itinigil';
+
+  @override
+  String get aiChatOpenSettings => 'Buksan ang settings';
+
+  @override
+  String get aiChatCopied => 'Nakopya';
+
+  @override
+  String get aiChatSetupTitle => 'Hindi pa naka-set up ang AI service';
+
+  @override
+  String get aiChatSetupBody =>
+      'Ilagay ang URL, key at model ng sarili mong AI service para magsimula.';
+
+  @override
+  String get aiChatSetupAction => 'I-set up';
+
+  @override
+  String get aiIntroTitle => 'AI Assistant';
+
+  @override
+  String get aiIntroBody =>
+      'Magtanong tungkol sa mga kamakailang lindol, panahon bukas o daan ng bagyo. Hahanapin muna ng AI ang datos ng DPIP nang real-time, saka sasagot sa iyong wika.';
+
+  @override
+  String get aiIntroOwnKeyTitle => 'Gamitin ang sarili mong AI service';
+
+  @override
+  String get aiIntroOwnKeyBody =>
+      'Ilagay ang URL at key ng anumang AI service na compatible sa OpenAI at sumusuporta sa tool calls, gaya ng OpenAI, Google Gemini, Anthropic o OpenRouter. Ang paggamit at singil ay kinukuwenta ng iyong AI service.';
+
+  @override
+  String get aiIntroLocalTitle =>
+      'Sa teleponong ito lang ang key; hindi sine-save ang usapan';
+
+  @override
+  String get aiIntroLocalBody =>
+      'Nakatago ang API key sa key storage ng system (iOS Keychain, Android Keystore). Hindi ito ina-upload sa ExpTech at hindi nadadala sa ibang telepono sa pamamagitan ng backup. Hindi sine-save ang mga usapan: nawawala ang mga ito kapag isinara ang app.';
+
+  @override
+  String get aiIntroDataTitle => 'Saan napupunta ang datos';
+
+  @override
+  String get aiIntroDataBody =>
+      'Direktang ipinapadala ang mga tanong mo mula sa teleponong ito papunta sa AI service na itinakda mo, hindi dumadaan sa ExpTech. Kapag kailangan ng AI ng datos, nagtatanong ang app sa pampublikong data server ng DPIP at ipinapadala lang ang query (gaya ng area code o petsa), hindi ang key o ang usapan. Para malaman ng AI kung saan ang \"dito\", sinasabi rin sa kaniya ang kasalukuyang township at mga naka-save na township sa app (pangalan at code lang).';
+
+  @override
+  String get aiIntroCautionTitle => 'Maaaring magkamali ang AI';
+
+  @override
+  String get aiIntroCautionBody =>
+      'Para sa sanggunian lang ang mga sagot. Kapag maaaring may panganib, protektahan muna ang sarili at sundin ang opisyal na babala at tagubilin ng Central Weather Administration at ng pamahalaan.';
+
+  @override
+  String get aiIntroMcpTitle => 'Gumawa ng sarili mo';
+
+  @override
+  String get aiIntroMcpBody =>
+      'Bukas din ang datos ng DPIP bilang MCP server — read-only, walang key na kailangan. Ikonekta ito sa Claude, ChatGPT o anumang tool na may MCP at gumawa ng sarili mong app.';
+
+  @override
+  String get aiIntroStart => 'Simulan ang setup';
+
+  @override
+  String get aiMcpTitle => 'DPIP MCP server';
+
+  @override
+  String get aiMcpBody =>
+      'Magagamit agad ang address na ito ng anumang MCP client na sumusuporta sa Streamable HTTP.';
+
+  @override
+  String get aiMcpCopyUrl => 'Kopyahin ang URL';
+
+  @override
+  String get aiMcpCopyConfig => 'Kopyahin ang halimbawang config';
+
+  @override
+  String get aiMcpCopied => 'Nakopya';
+
+  @override
+  String get aiSettingsTitle => 'Settings ng AI';
+
+  @override
+  String get aiSettingsService => 'AI service';
+
+  @override
+  String get aiSettingsServiceBody =>
+      'Gumagana ang anumang serbisyong compatible sa OpenAI (/chat/completions) na may tool calls. I-tap ang isang serbisyo sa ibaba para ilagay ang URL nito.';
+
+  @override
+  String get aiSettingsBaseUrl => 'API URL';
+
+  @override
+  String get aiSettingsBaseUrlHelper =>
+      'Ang base URL ng API, karaniwang nagtatapos sa /v1.';
+
+  @override
+  String get aiSettingsUrlEmpty => 'Maglagay ng URL';
+
+  @override
+  String get aiSettingsUrlInvalid => 'Hindi ito wastong URL';
+
+  @override
+  String get aiSettingsUrlInsecure =>
+      'Gumamit ng https://. Pinapayagan lang ang http:// para sa teleponong ito mismo (localhost).';
+
+  @override
+  String get aiSettingsApiKey => 'API key';
+
+  @override
+  String get aiSettingsApiKeyHelper =>
+      'Sa key storage lang ng teleponong ito nakatago. Iwanang blangko kung walang key na kailangan ang serbisyo.';
+
+  @override
+  String get aiSettingsApiKeySaved =>
+      'May naka-save nang key. Iwanang blangko para panatilihin ito.';
+
+  @override
+  String get aiSettingsShowKey => 'Ipakita ang key';
+
+  @override
+  String get aiSettingsHideKey => 'Itago ang key';
+
+  @override
+  String get aiSettingsRemoveKey => 'Burahin ang naka-save na key';
+
+  @override
+  String get aiSettingsKeyRemoved => 'Nabura ang key';
+
+  @override
+  String get aiSettingsModel => 'Model';
+
+  @override
+  String get aiSettingsModelHelper =>
+      'Dapat sumusuporta sa tool calls (function calling). Ipinapakita ng button sa kanan ang mga model ng serbisyo.';
+
+  @override
+  String get aiSettingsModelEmpty => 'Maglagay o pumili ng model';
+
+  @override
+  String get aiSettingsFetchModels => 'Ilista ang mga model';
+
+  @override
+  String get aiSettingsFilterModels => 'Hanapin ang model';
+
+  @override
+  String get aiSettingsNoModels =>
+      'Walang inililistang model ang serbisyong ito. I-type na lang ang pangalan ng model.';
+
+  @override
+  String get aiSettingsSave => 'I-save';
+
+  @override
+  String get aiSettingsSaved => 'Na-save';
+
+  @override
+  String get aiSettingsSaveFailed =>
+      'Hindi na-save ang key. Pakisubukang muli.';
+
+  @override
+  String get aiSettingsPrivacy => 'Privacy';
+
+  @override
+  String get aiSettingsPrivacyBody =>
+      'Nasa key storage ng teleponong ito ang key at hindi ito ina-upload sa ExpTech. Sa pagitan lang ng teleponong ito at ng iyong AI service dumadaan ang usapan, at hindi ito sine-save. Kapag naghahanap ng datos ang AI, ang query lang ang ipinapadala sa data server ng DPIP.';
+
+  @override
+  String get aiSettingsForget => 'Burahin lahat ng settings ng AI';
+
+  @override
+  String get aiSettingsForgetTitle => 'Burahin ang settings ng AI?';
+
+  @override
+  String get aiSettingsForgetBody =>
+      'Buburahin sa teleponong ito ang URL, model at key.';
+
+  @override
+  String get aiSettingsForgetConfirm => 'Burahin';
+
+  @override
+  String get aiSettingsForgotten => 'Nabura ang settings ng AI';
+
+  @override
+  String get aiToolEarthquake => 'datos ng lindol';
+
+  @override
+  String get aiToolWeather => 'datos ng panahon';
+
+  @override
+  String get aiToolTyphoon => 'datos ng bagyo';
+
+  @override
+  String get aiToolTsunami => 'datos ng tsunami';
+
+  @override
+  String get aiToolNotices => 'abiso sa sakuna';
+
+  @override
+  String get aiToolPlaces => 'lugar';
+
+  @override
+  String get aiToolTimeline => 'oras ng datos';
+
+  @override
+  String get aiToolOther => 'datos';
+
+  @override
+  String aiToolRunning(String subject) {
+    return 'Hinahanap ang $subject…';
+  }
+
+  @override
+  String aiToolDone(String subject) {
+    return 'Nahanap ang $subject';
+  }
+
+  @override
+  String aiToolFailed(String subject) {
+    return 'Hindi mahanap ang $subject';
+  }
+
+  @override
+  String get aiErrorUnauthorized =>
+      'Hindi wasto o expired ang API key, o wala itong access sa model na ito.';
+
+  @override
+  String get aiErrorNotFound =>
+      'Hindi nahanap ang API o model. Suriin ang URL at pangalan ng model.';
+
+  @override
+  String get aiErrorRateLimited =>
+      'Naabot na ang rate limit o quota ng iyong AI service. Subukang muli mamaya o suriin ang iyong plan.';
+
+  @override
+  String get aiErrorRejected =>
+      'Tinanggihan ng AI service ang request. Maaaring hindi sumusuporta sa tool calls ang model.';
+
+  @override
+  String get aiErrorServer =>
+      'Nagkaproblema ang AI service. Subukang muli mamaya.';
+
+  @override
+  String get aiErrorNetwork =>
+      'Hindi maabot ang AI service. Suriin ang iyong koneksyon.';
+
+  @override
+  String get aiErrorTimeout =>
+      'Masyadong natagalan ang AI service sa pagsagot.';
+
+  @override
+  String get aiErrorBadResponse =>
+      'Hindi mabasa ang sagot ng AI service. Maaaring hindi API na compatible sa OpenAI ang URL na ito.';
+
+  @override
+  String get aiErrorToolsUnavailable =>
+      'Hindi maabot ang data server ng DPIP. Subukang muli mamaya.';
+
+  @override
+  String get aiErrorTooManySteps =>
+      'Masyadong maraming beses naghanap ng datos ang AI nang walang sagot. Subukan ang mas tiyak na tanong.';
+
+  @override
+  String aiErrorServiceSaid(String detail) {
+    return 'Sabi ng serbisyo: $detail';
+  }
 }

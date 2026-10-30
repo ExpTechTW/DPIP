@@ -287,6 +287,11 @@ void main() {
           name: AppRoutes.sponsor,
           builder: (_, _) => const Text('sponsor-route'),
         ),
+        GoRoute(
+          path: AppRoutes.aiPath,
+          name: AppRoutes.ai,
+          builder: (_, _) => const Text('ai-route'),
+        ),
       ],
     );
     addTearDown(router.dispose);
@@ -319,6 +324,18 @@ void main() {
     await tester.pump();
     expect(
       find.text('sponsor-route'),
+      findsOneWidget,
+      reason: 'location ${router.state.uri}',
+    );
+    router.go(AppRoutes.homePath);
+    await _flush(tester);
+
+    // The AI assistant's way in is the region bar's action, not a tab.
+    await tester.tap(find.byTooltip(l10n.aiChatTitle).hitTestable());
+    await tester.pump();
+    await tester.pump();
+    expect(
+      find.text('ai-route'),
       findsOneWidget,
       reason: 'location ${router.state.uri}',
     );
