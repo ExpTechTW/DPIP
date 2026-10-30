@@ -212,6 +212,9 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- iOS puts a `Spacer()` on both sides of the hourly section, so a box
+         taller than the content splits the slack around the forecast. The
+         columns are wrap_content; centring them is that same split. -->
     <LinearLayout
         android:id="@+id/widget_forecast_container"
         android:layout_width="match_parent"
@@ -219,6 +222,7 @@
         android:layout_weight="1"
         android:layout_marginTop="@dimen/widget_spacing_sm"
         android:baselineAligned="false"
+        android:gravity="center_vertical"
         android:orientation="horizontal" />
 
     <LinearLayout

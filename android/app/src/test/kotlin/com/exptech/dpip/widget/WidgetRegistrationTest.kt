@@ -73,7 +73,7 @@ class WidgetRegistrationTest {
         )
         assertTrue(metadata.contains("android:configure="))
         for (name in listOf("widget_small", "widget_small_compact", "widget_medium",
-            "widget_large", "widget_large_tight", "widget_empty")) {
+            "widget_medium_tall", "widget_large", "widget_large_tight", "widget_empty")) {
             val layout = file("src/main/res/layout/$name.xml", "app/src/main/res/layout/$name.xml").readText()
             assertFalse("$name must not offer settings", layout.contains("@+id/widget_reconfigure"))
             assertFalse("$name must not draw a gear", layout.contains("@drawable/ic_widget_settings"))

@@ -74,6 +74,11 @@ object WidgetRenderer {
                 R.layout.widget_large_tight
             }
         }
+        if (presentation.sizeClass == WidgetSizeClass.Medium &&
+            presentation.effectiveHeightDp >= WidgetPresenter.mediumTallMinimumHeightDp
+        ) {
+            return R.layout.widget_medium_tall
+        }
         return layoutFor(presentation.sizeClass)
     }
 
@@ -152,39 +157,42 @@ object WidgetRenderer {
 
             WidgetSizeClass.Medium -> {
                 setOptionalText(views, R.id.widget_apparent, presentation.apparentText)
+                if (layoutFor(presentation) == R.layout.widget_medium_tall) {
+                    renderDetailRow(views, presentation)
+                    val full = presentation.effectiveHeightDp >=
+                        WidgetPresenter.mediumTallFullDetailHeightDp &&
+                        presentation.effectiveWidthDp >= WidgetPresenter.mediumTallFullDetailWidthDp
+                    views.setViewVisibility(
+                        R.id.widget_detail_second_row,
+                        if (full) View.VISIBLE else View.GONE,
+                    )
+                    if (full) renderSecondDetailRow(views, presentation)
+                }
                 renderForecast(context, views, presentation, R.layout.widget_forecast_item)
             }
 
             WidgetSizeClass.Large -> {
                 setOptionalText(views, R.id.widget_apparent, presentation.apparentText)
-                views.setTextViewText(
-                    R.id.widget_grid_humidity_value,
-                    presentation.humidityText.orEmpty(),
-                )
-                views.setTextViewText(
-                    R.id.widget_grid_rain_value,
-                    presentation.rainText.orEmpty(),
-                )
-                views.setTextViewText(
-                    R.id.widget_grid_sun_label,
-                    presentation.sunLabel.orEmpty(),
-                )
-                views.setTextViewText(
-                    R.id.widget_grid_sun_value,
-                    presentation.sunValue.orEmpty(),
-                )
-                views.setTextViewText(
-                    R.id.widget_grid_wind_value,
-                    presentation.windText.orEmpty(),
-                )
-                views.setTextViewText(
-                    R.id.widget_grid_station_value,
-                    presentation.stationText.orEmpty(),
-                )
+                renderDetailRow(views, presentation)
+                renderSecondDetailRow(views, presentation)
                 renderForecast(context, views, presentation, R.layout.widget_forecast_item_large)
             }
         }
         return views
+    }
+
+    /** Humidity, rainfall and the sun cell: shared by Large and Medium Tall. */
+    private fun renderDetailRow(views: RemoteViews, presentation: WidgetPresentation) {
+        views.setTextViewText(R.id.widget_grid_humidity_value, presentation.humidityText.orEmpty())
+        views.setTextViewText(R.id.widget_grid_rain_value, presentation.rainText.orEmpty())
+        views.setTextViewText(R.id.widget_grid_sun_label, presentation.sunLabel.orEmpty())
+        views.setTextViewText(R.id.widget_grid_sun_value, presentation.sunValue.orEmpty())
+    }
+
+    /** Wind and station: Large, and Medium Tall once it is tall enough. */
+    private fun renderSecondDetailRow(views: RemoteViews, presentation: WidgetPresentation) {
+        views.setTextViewText(R.id.widget_grid_wind_value, presentation.windText.orEmpty())
+        views.setTextViewText(R.id.widget_grid_station_value, presentation.stationText.orEmpty())
     }
 
     /**

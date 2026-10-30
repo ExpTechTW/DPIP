@@ -159,7 +159,7 @@ class WidgetSubmissionWiringTest {
     @Test fun `resize callback submits medium and large faces and requests only their source`() {
         WidgetUpdater.updateInstance(context, 11)
         assertNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
-        resize(11, 300, 240)
+        resize(11, 300, 200)
         assertNotNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
         assertNull(submitted(11).findViewById<View>(R.id.widget_grid_station_value))
         assertTrue(store.hasForecastDemand(a))

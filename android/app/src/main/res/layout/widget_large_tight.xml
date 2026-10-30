@@ -198,6 +198,7 @@
         android:layout_weight="1"
         android:layout_marginTop="@dimen/widget_large_tight_section_gap"
         android:baselineAligned="false"
+        android:gravity="center_vertical"
         android:orientation="horizontal" />
 
     <LinearLayout
