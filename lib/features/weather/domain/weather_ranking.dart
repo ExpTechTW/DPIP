@@ -18,6 +18,37 @@ enum RankingMerge {
   county,
 }
 
+/// Which temperature figure a ranking shows: the observation itself (at
+/// whichever snapshot the list is drawn from) or one of the day's recorded
+/// extremes.
+///
+/// Temperature is the only metric whose extremes the v5 snapshot carries
+/// (`hi` / `lo` with their occurrence times), so it is the only one the app can
+/// rank as an extreme without inventing one.
+enum TempRankMetric {
+  /// The temperature recorded at the snapshot.
+  current,
+
+  /// The day's recorded maximum (`hi`).
+  high,
+
+  /// The day's recorded minimum (`lo`).
+  low,
+
+  /// Diurnal range (`hi − lo`).
+  range;
+
+  /// Parses the deep-link values the Data hub links use: the current metric,
+  /// and the aliases the standalone daily-extremes tab had before it became a
+  /// chip inside the temperature tab (`?tab=tempExtremes`, `?tab=low`, …).
+  static TempRankMetric parse(String? raw) => switch (raw) {
+    'high' || 'tempHigh' || 'tempExtremes' || 'extremes' => TempRankMetric.high,
+    'low' || 'tempLow' => TempRankMetric.low,
+    'range' => TempRankMetric.range,
+    _ => TempRankMetric.current,
+  };
+}
+
 /// Which daily-temperature extreme to rank by.
 enum TempExtremeMetric {
   /// Recorded daily maximum (`hi`).
@@ -176,6 +207,38 @@ List<RankedObservation> rankTempExtremes({
     merge: merge,
   );
 }
+
+/// Ranks temperature by [metric]: the reading in the snapshot itself, or one of
+/// the day's recorded extremes. One entry point so the temperature tab does not
+/// have to know which of the two implementations backs the chip it is on.
+List<RankedObservation> rankTemperature({
+  required Map<String, WeatherStation> stations,
+  required WeatherSnapshot snapshot,
+  required TempRankMetric metric,
+  required bool ascending,
+  required RankingMerge merge,
+}) => switch (metric) {
+  TempRankMetric.current => rankWeather(
+    stations: stations,
+    snapshot: snapshot,
+    valueOf: (o) => o.temperature,
+    ascending: ascending,
+    merge: merge,
+  ),
+  TempRankMetric.high ||
+  TempRankMetric.low ||
+  TempRankMetric.range => rankTempExtremes(
+    stations: stations,
+    snapshot: snapshot,
+    metric: switch (metric) {
+      TempRankMetric.high => TempExtremeMetric.high,
+      TempRankMetric.low => TempExtremeMetric.low,
+      _ => TempExtremeMetric.range,
+    },
+    ascending: ascending,
+    merge: merge,
+  ),
+};
 
 class RankInput {
   const RankInput({

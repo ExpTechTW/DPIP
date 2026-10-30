@@ -448,9 +448,6 @@
     "description": "Hint under the county-border toggle in the radar overlay menu."
   },
   "meshtasticLayerOptions": "Node options",
-  "@weatherRankingLowest": {
-    "description": "Chip to rank temperature ascending"
-  },
   "onboardingAgreeContinue": "Agree and continue",
   "commonRetry": "Retry",
   "@restroomGradePoor": {
@@ -1052,6 +1049,13 @@
   "@typhoonOverlaySectionStorm": {
     "description": "Section header for L7/L10 storm-band choices in the overlay menu"
   },
+  "weatherRankingCurrent": "Current",
+  "weatherRankingLatest": "Latest",
+  "weatherRankingPickTime": "Choose data time",
+  "weatherRankingRainMissingAt": "No rain data at this time",
+  "@weatherRankingRainMissingAt": {
+    "description": "Rain tab empty state when the picked data time has no rain snapshot at or before it"
+  },
   "weatherRankingMeta": "Data time: {time}\n{count} stations",
   "onboardingTermsAgree": "I have read and agree to the Terms of Service",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
@@ -1643,7 +1647,6 @@
   "@typhoonOverlaySectionWeather": {
     "description": "Overlay-menu section for radar / IR under the typhoon vectors"
   },
-  "weatherRankingHighest": "Highest",
   "@aedCategory": {
     "description": "AED venue category row label"
   },
@@ -2316,9 +2319,6 @@
     "description": "Short Map-tab bottom-nav / default-layer picker label for typhoon"
   },
   "meshtasticUtilization": "Airtime (24h)",
-  "@weatherRankingHighest": {
-    "description": "Chip to rank temperature descending"
-  },
   "restroomTypeMixed": "Mixed",
   "restroomGradeGood": "Good",
   "notifyTsunami": "Tsunami information",
@@ -2517,7 +2517,6 @@
   "@weatherPrecipitation": {
     "description": "Label for the precipitation metric in the home weather header"
   },
-  "weatherRankingLowest": "Lowest",
   "@onboardingPermLocation": {
     "description": "Permission row: location"
   },

@@ -804,6 +804,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get notifySectionOther => 'Lainnya';
 
   @override
+  String get weatherRankingCurrent => 'Saat ini';
+
+  @override
+  String get weatherRankingLatest => 'Terbaru';
+
+  @override
+  String get weatherRankingPickTime => 'Pilih waktu data';
+
+  @override
+  String get weatherRankingRainMissingAt =>
+      'Tidak ada data hujan pada waktu ini';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Waktu data: $time\n$count stasiun';
   }
@@ -1241,9 +1254,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => 'Gambar laporan belum tersedia';
-
-  @override
-  String get weatherRankingHighest => 'Tertinggi';
 
   @override
   String get reportDetailReplay => 'Putar ulang';
@@ -1877,9 +1887,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Lisensi sumber terbuka';
-
-  @override
-  String get weatherRankingLowest => 'Terendah';
 
   @override
   String get reportFilterSortDepth => 'Kedalaman';

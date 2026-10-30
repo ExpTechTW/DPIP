@@ -800,6 +800,18 @@ class AppLocalizationsTh extends AppLocalizations {
   String get notifySectionOther => 'อื่น ๆ';
 
   @override
+  String get weatherRankingCurrent => 'ปัจจุบัน';
+
+  @override
+  String get weatherRankingLatest => 'ล่าสุด';
+
+  @override
+  String get weatherRankingPickTime => 'เลือกเวลาข้อมูล';
+
+  @override
+  String get weatherRankingRainMissingAt => 'ไม่มีข้อมูลฝนในเวลานี้';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'เวลาข้อมูล: $time\n$count สถานี';
   }
@@ -1236,9 +1248,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => 'ยังไม่มีภาพรายงาน';
-
-  @override
-  String get weatherRankingHighest => 'สูงสุด';
 
   @override
   String get reportDetailReplay => 'เล่นย้อนหลัง';
@@ -1868,9 +1877,6 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'ใบอนุญาตโอเพนซอร์ส';
-
-  @override
-  String get weatherRankingLowest => 'ต่ำสุด';
 
   @override
   String get reportFilterSortDepth => 'ความลึก';

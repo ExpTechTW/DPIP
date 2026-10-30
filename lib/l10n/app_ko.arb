@@ -355,6 +355,10 @@
   "mapLayerSatelliteB02": "히마와리 가시 녹색(B02)",
   "weatherRankingEmpty": "정렬할 관측이 없습니다",
   "notifySectionOther": "기타",
+  "weatherRankingCurrent": "현재",
+  "weatherRankingLatest": "최신",
+  "weatherRankingPickTime": "자료 시각 선택",
+  "weatherRankingRainMissingAt": "이 시각의 강수 자료가 없습니다",
   "weatherRankingMeta": "자료 시각: {time}\n관측점 {count}",
   "onboardingTermsAgree": "서비스 약관을 읽었으며 이에 동의합니다",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 투명(식생 없음)",
@@ -562,7 +566,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "최고",
   "reportDetailReplay": "다시 보기",
   "mapLayerRestroom": "공중화장실",
   "restroomCategoryWelfare": "사회복지 기관·집회 시설",
@@ -900,7 +903,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "오픈소스 라이선스",
-  "weatherRankingLowest": "최저",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

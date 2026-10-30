@@ -355,6 +355,10 @@
   "mapLayerSatelliteB02": "ひまわり 可見光-綠(B02)",
   "weatherRankingEmpty": "目前沒有可排序的觀測",
   "notifySectionOther": "其他",
+  "weatherRankingCurrent": "當下",
+  "weatherRankingLatest": "最新",
+  "weatherRankingPickTime": "選擇資料時間",
+  "weatherRankingRainMissingAt": "此時間沒有雨量資料",
   "weatherRankingMeta": "資料時間：{time}\n共 {count} 觀測點",
   "onboardingTermsAgree": "我已閱讀並同意服務條款",
   "mapLayerSatelliteTransparentNoVegetation": "< 0.1 = 透明(無植被)",
@@ -562,7 +566,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "最高",
   "reportDetailReplay": "重播",
   "mapLayerRestroom": "公廁",
   "restroomCategoryWelfare": "社福機構、集會場所",
@@ -900,7 +903,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "引用套件",
-  "weatherRankingLowest": "最低",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

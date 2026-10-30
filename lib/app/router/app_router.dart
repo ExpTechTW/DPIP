@@ -41,6 +41,7 @@ import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/features/bug_tracker/presentation/pages/bug_list_page.dart';
 import 'package:dpip/features/bug_tracker/presentation/pages/bug_thread_page.dart';
 import 'package:dpip/features/status/presentation/pages/server_status_page.dart';
+import 'package:dpip/features/weather/domain/weather_ranking.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -148,11 +149,15 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: AppRoutes.weatherRankingPath,
                   name: AppRoutes.weatherRanking,
-                  builder: (_, state) => WeatherRankingPage(
-                    initialTab: WeatherRankingTab.parse(
-                      state.uri.queryParameters['tab'],
-                    ),
-                  ),
+                  builder: (_, state) {
+                    final rawTab = state.uri.queryParameters['tab'];
+                    return WeatherRankingPage(
+                      initialTab: WeatherRankingTab.parse(rawTab),
+                      initialTempMetric: TempRankMetric.parse(
+                        state.uri.queryParameters['metric'] ?? rawTab,
+                      ),
+                    );
+                  },
                 ),
                 GoRoute(
                   path: AppRoutes.moonPath,

@@ -805,6 +805,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifySectionOther => 'Other';
 
   @override
+  String get weatherRankingCurrent => 'Current';
+
+  @override
+  String get weatherRankingLatest => 'Latest';
+
+  @override
+  String get weatherRankingPickTime => 'Choose data time';
+
+  @override
+  String get weatherRankingRainMissingAt => 'No rain data at this time';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'Data time: $time\n$count stations';
   }
@@ -1241,9 +1253,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => 'Report image not available';
-
-  @override
-  String get weatherRankingHighest => 'Highest';
 
   @override
   String get reportDetailReplay => 'Replay';
@@ -1875,9 +1884,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'Open-source licenses';
-
-  @override
-  String get weatherRankingLowest => 'Lowest';
 
   @override
   String get reportFilterSortDepth => 'Depth';

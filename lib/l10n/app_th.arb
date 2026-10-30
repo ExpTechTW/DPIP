@@ -355,6 +355,10 @@
   "mapLayerSatelliteB02": "Himawari Green (B02)",
   "weatherRankingEmpty": "ไม่มีข้อมูลให้จัดอันดับ",
   "notifySectionOther": "อื่น ๆ",
+  "weatherRankingCurrent": "ปัจจุบัน",
+  "weatherRankingLatest": "ล่าสุด",
+  "weatherRankingPickTime": "เลือกเวลาข้อมูล",
+  "weatherRankingRainMissingAt": "ไม่มีข้อมูลฝนในเวลานี้",
   "weatherRankingMeta": "เวลาข้อมูล: {time}\n{count} สถานี",
   "onboardingTermsAgree": "ฉันได้อ่านและยอมรับข้อกำหนดการให้บริการแล้ว",
   "mapLayerSatelliteTransparentNoVegetation": "Below 0.1 = transparent (no vegetation)",
@@ -562,7 +566,6 @@
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },
-  "weatherRankingHighest": "สูงสุด",
   "reportDetailReplay": "เล่นย้อนหลัง",
   "mapLayerRestroom": "ห้องน้ำสาธารณะ",
   "restroomCategoryWelfare": "สถานสงเคราะห์",
@@ -900,7 +903,6 @@
     "description": "Why two clients on one radio is a problem"
   },
   "openSourceLicenses": "ใบอนุญาตโอเพนซอร์ส",
-  "weatherRankingLowest": "ต่ำสุด",
   "@meshtasticConnectAnyway": {
     "description": "Connect despite the other app"
   },

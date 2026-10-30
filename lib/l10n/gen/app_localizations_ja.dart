@@ -790,6 +790,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifySectionOther => 'その他';
 
   @override
+  String get weatherRankingCurrent => '現在';
+
+  @override
+  String get weatherRankingLatest => '最新';
+
+  @override
+  String get weatherRankingPickTime => 'データ時刻を選択';
+
+  @override
+  String get weatherRankingRainMissingAt => 'この時刻の雨量データはありません';
+
+  @override
   String weatherRankingMeta(String time, int count) {
     return 'データ時刻：$time\n観測点 $count';
   }
@@ -1218,9 +1230,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get reportDetailImageUnavailable => 'レポート画像はまだありません';
-
-  @override
-  String get weatherRankingHighest => '最高';
 
   @override
   String get reportDetailReplay => 'リプレイ';
@@ -1841,9 +1850,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get openSourceLicenses => 'オープンソースライセンス';
-
-  @override
-  String get weatherRankingLowest => '最低';
 
   @override
   String get reportFilterSortDepth => '深さ';
