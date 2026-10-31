@@ -93,17 +93,29 @@ class FrameTileApi {
   /// Converts the wind list's `{t: validTime, c: cycle}` rows into stable,
   /// opaque frame ids. Valid time comes first so the shared timeline can read
   /// it without knowing weather API details; cycle remains part of identity so
-  /// two model runs can never share a native or SQLite cache key.
+  /// two model runs can never share a native or SQLite cache key. One id per
+  /// valid time: when two runs cover it, the newer cycle wins.
   static List<String> windFramesFromList(List<dynamic> rows) {
-    final frames = <({int validTime, int cycle})>[];
+    // A model rerun can publish the same valid time under a newer cycle. Only
+    // the newest cycle is kept: the timeline orders frames by instant alone,
+    // so two ids at one valid time would be two identical steps, and which of
+    // them it opens on would depend on how its own sort breaks the tie.
+    final cycleByValidTime = <int, int>{};
     for (final row in rows) {
       if (row is! Map || row['t'] is! int || row['c'] is! int) {
         throw const FormatException('invalid wind frame list');
       }
-      frames.add((validTime: row['t'] as int, cycle: row['c'] as int));
+      final validTime = row['t'] as int;
+      final cycle = row['c'] as int;
+      final kept = cycleByValidTime[validTime];
+      if (kept == null || cycle > kept) cycleByValidTime[validTime] = cycle;
     }
-    frames.sort((a, b) => b.validTime.compareTo(a.validTime));
-    return [for (final frame in frames) '${frame.validTime}@${frame.cycle}'];
+    final validTimes = cycleByValidTime.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
+    return [
+      for (final validTime in validTimes)
+        '$validTime@${cycleByValidTime[validTime]}',
+    ];
   }
 
   /// Decodes the app's opaque `valid@cycle` wind frame id.
