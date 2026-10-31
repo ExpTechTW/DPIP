@@ -5,6 +5,8 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/weather/data/frame_tile_api.dart';
+import 'package:dpip/shared/map/map_layer.dart';
+import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// A Dio adapter that records requested URLs and answers a fixed JSON body.
@@ -87,16 +89,52 @@ void main() {
       );
     });
 
-    test('puts the newer model cycle first when valid times tie', () {
-      expect(
-        FrameTileApi.windFramesFromList([
-          {'t': 1783360200, 'c': 1783339200},
-          {'t': 1783360200, 'c': 1783360800},
-        ]),
+    // Two six-hourly runs that both reach 1783360200. A cycle is when a run
+    // starts, so both are before the valid time they forecast.
+    const olderCycle = 1783317600;
+    const newerCycle = 1783339200;
+
+    test('keeps only the newer model cycle when valid times tie', () {
+      for (final rows in [
         [
-          '1783360200@1783360800',
-          '1783360200@1783339200',
+          {'t': 1783360200, 'c': olderCycle},
+          {'t': 1783360200, 'c': newerCycle},
         ],
+        [
+          {'t': 1783360200, 'c': newerCycle},
+          {'t': 1783360200, 'c': olderCycle},
+        ],
+      ]) {
+        expect(FrameTileApi.windFramesFromList(rows), [
+          '1783360200@$newerCycle',
+        ], reason: 'whatever order the API answers in');
+      }
+    });
+
+    test('the timeline opens on the newer cycle, not the older one', () {
+      // What the map does with these ids: an ascending sort by instant
+      // (RasterTimelineLayer.frames), then nowFrameIndex scans from the end.
+      final ids = FrameTileApi.windFramesFromList([
+        {'t': 1783356600, 'c': olderCycle},
+        {'t': 1783360200, 'c': olderCycle},
+        {'t': 1783360200, 'c': newerCycle},
+      ]);
+      final frames = [
+        for (final id in ids) MapFrame(id: id, time: parseFrameTime(id)),
+      ]..sort((a, b) => a.time.compareTo(b.time));
+      final now = DateTime.fromMillisecondsSinceEpoch(
+        1783360200 * 1000 + 60000,
+        isUtc: true,
+      );
+
+      expect(
+        frames[nowFrameIndex(frames, now: now)].id,
+        '1783360200@$newerCycle',
+      );
+      expect(
+        frames.map((f) => f.time).toSet(),
+        hasLength(frames.length),
+        reason: 'one timeline step per valid time',
       );
     });
 
