@@ -60,6 +60,8 @@ import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/geo_circle.dart';
 import 'package:dpip/shared/map/wavefront_cadence.dart';
 import 'package:dpip/shared/map/map_compass.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
+import 'package:dpip/shared/map/map_immersive_chrome.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/map/map_style.dart'
@@ -118,6 +120,16 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// advances it through the alert set (modulo the count in the builder).
   int _eewIndex = 0;
 
+  /// Immersive view state, local to this page. The map tab's controller is
+  /// app-wide because the shell draws its nav bar; a replay is a pushed route
+  /// with no nav bar to move, and sharing that controller would let a replay
+  /// pop back into an unexpectedly chrome-less map tab (and vice versa).
+  final MapImmersiveController _immersive = MapImmersiveController();
+
+  void _onImmersiveChanged() {
+    if (mounted) setState(() {});
+  }
+
   /// Speaks each new report's estimated intensity while the replay runs, the
   /// same way the live monitor does — a replay that stayed silent would not be
   /// a replay of what the user would have heard.
@@ -153,6 +165,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       cwaOnly: () => cwaOnly.enabled,
     )..start();
     _session.eew.addListener(_syncAnnouncement);
+    _immersive.addListener(_onImmersiveChanged);
     _startTicker();
   }
 
@@ -281,166 +294,209 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     _speechSettings?.removeListener(_syncAnnouncement);
     _announcement?.dispose();
     _clockSecond.dispose();
+    _immersive
+      ..removeListener(_onImmersiveChanged)
+      ..dispose();
     _session.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final immersive = _immersive.value;
     return ActiveWhileVisible(
       tabIndex: ReportListPage.tabIndex,
       onActiveChanged: _applyActivity,
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: _ReplayMap(
-                stationRepository: context.read<TremStationRepository>(),
-                travelTimeTable: context.read<Future<SeismicTravelTimeTable>>(),
-                boxGrid: context.read<Future<RtsBoxGrid>>(),
-                rts: _session.rts,
-                alerts: _alerts,
-                eew: _session.eew,
-                tick: _tick,
-                clock: _session.clock,
-                eewIndex: _eewIndex,
+      child: PopScope(
+        // While immersive the first back gesture belongs to the mode, not to
+        // the route: a user who hid the back chip must not have to find the
+        // exit chip to avoid leaving the replay.
+        canPop: !immersive,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _immersive.exit();
+        },
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: _ReplayMap(
+                  stationRepository: context.read<TremStationRepository>(),
+                  travelTimeTable: context
+                      .read<Future<SeismicTravelTimeTable>>(),
+                  boxGrid: context.read<Future<RtsBoxGrid>>(),
+                  rts: _session.rts,
+                  alerts: _alerts,
+                  eew: _session.eew,
+                  tick: _tick,
+                  clock: _session.clock,
+                  eewIndex: _eewIndex,
+                  immersive: immersive,
+                  onImmersive: _immersive.enter,
+                ),
               ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Back and legend share one row, and both are the
-                      // shared [MapChipButton] so the whole top edge — back,
-                      // legend, and the base-map chip on the right — is one
-                      // height. A bare [IconButton] back was the tallest thing
-                      // on screen (its padded tap target is 48px) and read as
-                      // a different app's control sitting next to ours.
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
+              Positioned(
+                top: 0,
+                left: 0,
+                child: MapImmersiveChrome(
+                  hidden: immersive,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          MapChipButton(
-                            icon: Icons.arrow_back,
-                            tooltip: MaterialLocalizations.of(context)
-                                .backButtonTooltip,
-                            active: false,
-                            onTap: () => context.pop(),
+                          // Back and legend share one row, and both are the
+                          // shared [MapChipButton] so the whole top edge — back,
+                          // legend, and the base-map chip on the right — is one
+                          // height. A bare [IconButton] back was the tallest thing
+                          // on screen (its padded tap target is 48px) and read as
+                          // a different app's control sitting next to ours.
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              MapChipButton(
+                                icon: Icons.arrow_back,
+                                tooltip: MaterialLocalizations.of(context)
+                                    .backButtonTooltip,
+                                active: false,
+                                onTap: () => context.pop(),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              // The replay surface is the 強震監視器 frozen in time —
+                              // the same intensity legend the live monitor carries,
+                              // switching to the EEW felt-scale while an alert is up
+                              // (the legacy monitor did exactly this on active EEW).
+                              //
+                              // Collapsible, and collapsed to a chip to start with,
+                              // exactly as [MapScaffold] mounts every layer's legend:
+                              // this page is a full-screen map too, and an
+                              // eleven-row scale pinned open covers the north-west
+                              // corner of the island for the whole replay. The wrap
+                              // sits *outside* the mode swap on purpose — an alert
+                              // arriving mid-replay changes the scale being shown,
+                              // not whether the user asked to see it.
+                              CollapsibleMapLegend(
+                                legend: ListenableBuilder(
+                                  listenable: _session.eew,
+                                  builder: (context, _) {
+                                    final alerts =
+                                        _session.eew.alerts.uncancelled;
+                                    final maxEewLevel = alerts.isEmpty
+                                        ? null
+                                        : alerts
+                                              .map(
+                                                (alert) =>
+                                                    alert.info.max.clamp(0, 9),
+                                              )
+                                              .reduce((a, b) => a > b ? a : b);
+                                    return MapLegendCard(
+                                      child: IntensityLegend(
+                                        mode: alerts.isNotEmpty
+                                            ? IntensityLegendMode.eew
+                                            : IntensityLegendMode.rts,
+                                        maxEewLevel: maxEewLevel,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          // The replay surface is the 強震監視器 frozen in time —
-                          // the same intensity legend the live monitor carries,
-                          // switching to the EEW felt-scale while an alert is up
-                          // (the legacy monitor did exactly this on active EEW).
-                          //
-                          // Collapsible, and collapsed to a chip to start with,
-                          // exactly as [MapScaffold] mounts every layer's legend:
-                          // this page is a full-screen map too, and an
-                          // eleven-row scale pinned open covers the north-west
-                          // corner of the island for the whole replay. The wrap
-                          // sits *outside* the mode swap on purpose — an alert
-                          // arriving mid-replay changes the scale being shown,
-                          // not whether the user asked to see it.
-                          CollapsibleMapLegend(
-                            legend: ListenableBuilder(
-                              listenable: _session.eew,
-                              builder: (context, _) {
-                                final alerts = _session.eew.alerts.uncancelled;
-                                final maxEewLevel = alerts.isEmpty
-                                    ? null
-                                    : alerts
-                                          .map(
-                                            (alert) =>
-                                                alert.info.max.clamp(0, 9),
-                                          )
-                                          .reduce((a, b) => a > b ? a : b);
-                                return MapLegendCard(
-                                  child: IntensityLegend(
-                                    mode: alerts.isNotEmpty
-                                        ? IntensityLegendMode.eew
-                                        : IntensityLegendMode.rts,
-                                    maxEewLevel: maxEewLevel,
-                                  ),
-                                );
-                              },
-                            ),
+                          const SizedBox(height: AppSpacing.md),
+                          ListenableBuilder(
+                            listenable: _session.rts,
+                            builder: (context, _) {
+                              final towns = context.read<TownDirectory>();
+                              return IntensityRankingCard(
+                                entries: [
+                                  for (final row in _alerts.ranking(
+                                    towns.byCode,
+                                  ))
+                                    (name: row.name, level: row.level),
+                                ],
+                              );
+                            },
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      ListenableBuilder(
-                        listenable: _session.rts,
-                        builder: (context, _) {
-                          final towns = context.read<TownDirectory>();
-                          return IntensityRankingCard(
-                            entries: [
-                              for (final row in _alerts.ranking(towns.byCode))
-                                (name: row.name, level: row.level),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ListenableBuilder(
-                        listenable: _session.eew,
-                        builder: (context, _) {
-                          final alerts = _session.eew.alerts;
-                          if (alerts.isEmpty) return const SizedBox.shrink();
-                          // One card at a time — tapping cycles through the
-                          // active alerts (parallel earthquakes, overlapping
-                          // reports) instead of stacking every one on screen.
-                          // The index is clamped by modulo, so a report leaving
-                          // the active set mid-replay can't point past the list.
-                          final index = _eewIndex % alerts.length;
-                          final eew = alerts[index];
-                          return _EewAlertCard(
-                            eew: eew,
-                            clock: () => _session.clock.now(),
-                            position: index + 1,
-                            count: alerts.length,
-                            onTap: alerts.length > 1
-                                ? () => setState(
-                                    () => _eewIndex =
-                                        (_eewIndex + 1) % alerts.length,
-                                  )
-                                : null,
-                          );
-                        },
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: MapImmersiveChrome(
+                  hidden: immersive,
+                  slide: const Offset(0, 0.25),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ListenableBuilder(
+                            listenable: _session.eew,
+                            builder: (context, _) {
+                              final alerts = _session.eew.alerts;
+                              if (alerts.isEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              // One card at a time — tapping cycles through the
+                              // active alerts (parallel earthquakes, overlapping
+                              // reports) instead of stacking every one on screen.
+                              // The index is clamped by modulo, so a report leaving
+                              // the active set mid-replay can't point past the list.
+                              final index = _eewIndex % alerts.length;
+                              final eew = alerts[index];
+                              return _EewAlertCard(
+                                eew: eew,
+                                clock: () => _session.clock.now(),
+                                position: index + 1,
+                                count: alerts.length,
+                                onTap: alerts.length > 1
+                                    ? () => setState(
+                                        () => _eewIndex =
+                                            (_eewIndex + 1) % alerts.length,
+                                      )
+                                    : null,
+                              );
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          _ReplayStatusBar(
+                            clock: _session.clock,
+                            second: _clockSecond,
+                            rts: _session.rts,
+                            eew: _session.eew,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      _ReplayStatusBar(
-                        clock: _session.clock,
-                        second: _clockSecond,
-                        rts: _session.rts,
-                        eew: _session.eew,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              // The one control left in immersive mode, above every card the
+              // replay can draw — and in the same corner the map tab puts it.
+              Positioned(
+                top: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: MapImmersiveExitChip(
+                      immersive: immersive,
+                      onExit: _immersive.exit,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -464,6 +520,8 @@ class _ReplayMap extends StatefulWidget {
     required this.tick,
     required this.clock,
     required this.eewIndex,
+    required this.immersive,
+    required this.onImmersive,
   });
 
   final TremStationRepository stationRepository;
@@ -489,6 +547,13 @@ class _ReplayMap extends StatefulWidget {
   /// so with two simultaneous quakes it follows whichever one the card is
   /// showing, not always the newest.
   final int eewIndex;
+
+  /// Whether the replay is in immersive mode. The map hides its own top-right
+  /// chrome with the rest of the page's.
+  final bool immersive;
+
+  /// Enters the mode from the map's own chip.
+  final VoidCallback onImmersive;
 
   @override
   State<_ReplayMap> createState() => _ReplayMapState();
@@ -1386,28 +1451,45 @@ class _ReplayMapState extends State<_ReplayMap> {
               ),
             ),
             // Base-map options (OSM detailed map / terrain relief / township
-            // names) above the compass — the same chrome the 強震監視器 carries in
-            // the map tab, persisted to the shared settings store. No sheet
-            // here, so the controls stay up for the whole replay.
+            // names) and the immersive toggle, above the compass — the same
+            // chrome the 強震監視器 carries in the map tab, persisted to the
+            // shared settings store. No sheet here, so the controls stay up
+            // for the whole replay.
             Positioned(
               top: 0,
               right: 0,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      MapBasemapMenu(
-                        showTownLabels: _showTownLabels,
-                        onShowTownLabelsChanged: _setShowTownLabels,
-                        showTerrain: _showTerrain,
-                        onShowTerrainChanged: _setShowTerrain,
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      MapCompass(bearing: _bearing, onPressed: _resetNorth),
-                    ],
+              child: MapImmersiveChrome(
+                hidden: widget.immersive,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            MapChipButton(
+                              icon: Icons.fullscreen,
+                              tooltip: AppLocalizations.of(context)
+                                  .mapImmersive,
+                              active: false,
+                              onTap: widget.onImmersive,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            MapBasemapMenu(
+                              showTownLabels: _showTownLabels,
+                              onShowTownLabelsChanged: _setShowTownLabels,
+                              showTerrain: _showTerrain,
+                              onShowTerrainChanged: _setShowTerrain,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        MapCompass(bearing: _bearing, onPressed: _resetNorth),
+                      ],
+                    ),
                   ),
                 ),
               ),

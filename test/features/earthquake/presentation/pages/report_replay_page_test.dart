@@ -630,6 +630,36 @@ void main() {
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pump();
 
+      // The replay carries the same immersive chip as the map tab, and hides
+      // its own back/legend/ranking and base-map chrome while it is on.
+      expect(find.byTooltip(l10n.mapImmersive), findsOneWidget);
+      await tester.tap(find.byTooltip(l10n.mapImmersive));
+      await tester.pump();
+      expect(find.byIcon(Icons.arrow_back).hitTestable(), findsNothing);
+      expect(find.byTooltip(l10n.mapLegendExpand).hitTestable(), findsNothing);
+      expect(find.byTooltip('Township names').hitTestable(), findsNothing);
+      expect(find.byTooltip(l10n.mapImmersiveExit), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byTooltip(l10n.mapImmersiveExit));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byTooltip(l10n.mapImmersiveExit), findsNothing);
+      expect(find.byIcon(Icons.arrow_back).hitTestable(), findsOneWidget);
+      expect(
+        find.byTooltip(l10n.mapLegendExpand).hitTestable(),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('Township names').hitTestable(), findsOneWidget);
+
+      // A back press belongs to the mode first: it must not pop the replay.
+      await tester.tap(find.byTooltip(l10n.mapImmersive));
+      await tester.pump();
+      await tester.binding.handlePopRoute();
+      await tester.pump();
+      expect(find.byType(ReportReplayPage), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back).hitTestable(), findsOneWidget);
+
       await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pump();
       await tester.pump();
