@@ -591,8 +591,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// How much of the map's bottom the active layer's resting chrome hides: the
   /// layer's own declared share (a collapsed sheet, a status strip) plus the
   /// timeline, whose real height the scaffold measures because it owns it.
+  ///
+  /// The timeline keeps its place in the tree while immersive — it fades out
+  /// rather than unmounting — so its measured height is still real; it just is
+  /// not in the way any more.
   double _bottomInset(Size size) =>
-      size.height * _active.bottomChromeFraction + _timelineHeight;
+      size.height * _active.bottomChromeFraction +
+      ((_immersive?.value ?? false) ? 0 : _timelineHeight);
 
   /// Measures the timeline panel after layout.
   ///
@@ -1275,18 +1280,46 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (candidate.id != _active.id) _onLayerSelected(candidate);
   }
 
+  /// Fades and nudges a block of map chrome as immersive mode toggles.
+  ///
+  /// Blocks stay mounted: the timeline carries a [GlobalKey] for measurement,
+  /// and swapping it out and back mid-transition could duplicate that key on a
+  /// fast double-tap. Hidden therefore means opacity 0 plus no hit testing,
+  /// semantics or focus — not absence.
+  Widget _immersiveChrome({
+    required bool hidden,
+    required Widget child,
+    Offset slide = const Offset(0, -0.08),
+  }) {
+    return IgnorePointer(
+      ignoring: hidden,
+      child: ExcludeSemantics(
+        excluding: hidden,
+        child: ExcludeFocus(
+          excluding: hidden,
+          child: AnimatedSlide(
+            duration: mapImmersiveTransition,
+            curve: mapImmersiveCurve,
+            offset: hidden ? slide : Offset.zero,
+            child: AnimatedOpacity(
+              duration: mapImmersiveTransition,
+              curve: mapImmersiveCurve,
+              opacity: hidden ? 0 : 1,
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Enters/leaves immersive mode.
   ///
-  /// The timeline is not built while immersive, so its last measured height
-  /// would otherwise keep padding [_bottomInset] and re-frame the next
-  /// deliberate camera move (a station hand-off, say) as if a scrubber were
-  /// still there. Drop it on entry; the next build outside immersive measures
-  /// the real panel again.
+  /// The chrome stays mounted and cross-fades (see [_immersiveChrome]), so the
+  /// only state this has to rebuild is the target of those animations.
   void _onImmersiveChanged() {
     if (!mounted) return;
-    setState(() {
-      if (_immersive?.value ?? false) _timelineHeight = 0;
-    });
+    setState(() {});
   }
 
   @override
@@ -1320,7 +1353,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final immersive = _immersive?.value ?? false;
     // The timeline's height depends on its content, so measure it after every
     // build; a change re-frames (see [_measureTimeline]).
-    if (_active.usesTimeline && !immersive) _measureTimeline();
+    if (_active.usesTimeline) _measureTimeline();
     return Stack(
       children: [
         Positioned.fill(
@@ -1390,10 +1423,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         ),
         // Colour / key legend — top-left. Under the sheet so a dragged-up
         // sheet covers it instead of sitting behind a floating chip.
-        if (!immersive)
-          Positioned(
-            top: 0,
-            left: 0,
+        Positioned(
+          top: 0,
+          left: 0,
+          child: _immersiveChrome(
+            hidden: immersive,
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -1411,13 +1445,15 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
               ),
             ),
           ),
-        // Layer switcher (+ optional layer chrome) — top-right, only while the
-        // controls are shown. Immersive mode's own exit chip paints above the
-        // sheet at the end of this stack — see there for why.
-        if (!immersive)
-          Positioned(
-            top: 0,
-            right: 0,
+        ),
+        // Layer switcher (+ optional layer chrome) — top-right. Immersive
+        // mode's own exit chip paints above the sheet at the end of this stack
+        // — see there for why.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: _immersiveChrome(
+            hidden: immersive,
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -1474,54 +1510,61 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
               ),
             ),
           ),
+        ),
         // Sheet / timeline last so they paint above the chrome when expanded.
         if (!_active.usesTimeline)
           Positioned.fill(child: _active.buildSheet(context)),
-        if (_active.usesTimeline && !immersive)
+        if (_active.usesTimeline)
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: SafeArea(
-              key: _timelineKey,
-              top: false,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  _frames.isNotEmpty
-                      ? _timelinePanel(context)
-                      : _error != null
-                      ? _errorPanel(context)
-                      : const SizedBox.shrink(),
-                  if (_frames.isNotEmpty)
-                    Positioned(
-                      top: 0,
-                      left: AppSpacing.lg,
-                      right: AppSpacing.lg,
-                      child: IgnorePointer(
-                        child: Transform.translate(
-                          offset: const Offset(0, -AppSpacing.sm),
-                          child: FractionalTranslation(
-                            translation: const Offset(0, -1),
-                            child: MapTimelineScrubPauseNotice(
-                              paused: _scrubBackpressure,
+            child: _immersiveChrome(
+              hidden: immersive,
+              // Slides back down as it clears, then rises on the way back.
+              slide: const Offset(0, 0.25),
+              child: SafeArea(
+                key: _timelineKey,
+                top: false,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _frames.isNotEmpty
+                        ? _timelinePanel(context)
+                        : _error != null
+                        ? _errorPanel(context)
+                        : const SizedBox.shrink(),
+                    if (_frames.isNotEmpty)
+                      Positioned(
+                        top: 0,
+                        left: AppSpacing.lg,
+                        right: AppSpacing.lg,
+                        child: IgnorePointer(
+                          child: Transform.translate(
+                            offset: const Offset(0, -AppSpacing.sm),
+                            child: FractionalTranslation(
+                              translation: const Offset(0, -1),
+                              child: MapTimelineScrubPauseNotice(
+                                paused: _scrubBackpressure,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         // Compass on top of *everything* — a screen-space callout (typhoon
         // forecast tips) or an expanded sheet must never hide north. Parked
         // just under the layer switcher chip, with a touch of breathing room.
-        // Hidden while immersive, where it would be the only chrome left.
-        if (!immersive)
-          Positioned(
-            top: 0,
-            right: 0,
+        // It fades out with the rest of the chrome while immersive.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: _immersiveChrome(
+            hidden: immersive,
             child: SafeArea(
               child: Padding(
                 padding: EdgeInsets.only(
@@ -1532,27 +1575,47 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
               ),
             ),
           ),
+        ),
         // The way out of immersive mode, above *everything* — including the
         // layer's own sheet. Those sheets can be dragged to full height (DPM,
         // typhoon, tsunami), and one covering the top-right corner would bury
         // the only control left: Android's back gesture also leaves the mode,
         // but iOS has no equivalent, so a buried chip is a dead end.
-        if (immersive)
-          Positioned(
-            top: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: MapChipButton(
-                  icon: Icons.fullscreen_exit,
-                  tooltip: AppLocalizations.of(context).mapImmersiveExit,
-                  active: false,
-                  onTap: () => _immersive?.exit(),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: AnimatedSwitcher(
+                duration: mapImmersiveTransition,
+                switchInCurve: mapImmersiveCurve,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween<double>(
+                      begin: 0.88,
+                      end: 1,
+                    ).animate(animation),
+                    child: child,
+                  ),
                 ),
+                child: immersive
+                    ? MapChipButton(
+                        key: const ValueKey('map-immersive-exit'),
+                        icon: Icons.fullscreen_exit,
+                        tooltip: AppLocalizations.of(context).mapImmersiveExit,
+                        active: false,
+                        onTap: () => _immersive?.exit(),
+                      )
+                    : const SizedBox.shrink(
+                        key: ValueKey('map-immersive-exit-hidden'),
+                      ),
               ),
             ),
           ),
+        ),
       ],
     );
   }
