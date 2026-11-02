@@ -501,6 +501,29 @@ void main() {
     expect(find.byTooltip(l10n.mapImmersiveExit), findsNothing);
   });
 
+  testWidgets('the MapLibre corner ornament is pushed out of the map', (
+    tester,
+  ) async {
+    final echo = _Layer(id: 'echo', name: 'Echo')
+      ..framesResult = Ok(twoFrames());
+    await show(
+      tester,
+      settings: SettingsStore.inMemory(),
+      camera: MapCameraHandoff(),
+      stations: MapStationHandoff(),
+      visibility: MapLayerVisibilityController(SettingsStore.inMemory()),
+      layers: [echo],
+    );
+    await loadStyle(tester);
+
+    // The plugin has no hide flag for the (i) ornament; the view is moved off
+    // the platform view and tinted clear. If this regresses, the button is
+    // back in the bottom-right corner with no test failing.
+    final map = tester.widget<MapLibreMap>(find.byType(MapLibreMap));
+    expect(map.attributionButtonColor, Colors.transparent);
+    expect(map.attributionButtonMargins, const Point(-4000, -4000));
+  });
+
   testWidgets('a failed frame list shows the message and retry reloads', (
     tester,
   ) async {
