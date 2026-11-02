@@ -15,6 +15,7 @@ import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_scaffold.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
@@ -112,6 +113,7 @@ class _Layer with MapLayerDefaults implements MapLayer {
     required this.name,
     this.timeline = true,
     this.withChrome = false,
+    this.sheetFills = false,
   });
 
   @override
@@ -119,6 +121,10 @@ class _Layer with MapLayerDefaults implements MapLayer {
   final String name;
   final bool timeline;
   final bool withChrome;
+
+  /// Whether [buildSheet] is a full-screen, tap-absorbing panel — the state a
+  /// draggable detail sheet reaches when the user drags it to the top.
+  final bool sheetFills;
 
   Result<List<MapFrame>> framesResult = const Ok([]);
   Completer<Result<List<MapFrame>>>? framesGate;
@@ -235,7 +241,13 @@ class _Layer with MapLayerDefaults implements MapLayer {
   Widget? buildLegendAccessory(BuildContext context) => const Text('Rank');
 
   @override
-  Widget buildSheet(BuildContext context) => const Text('Sheet body');
+  Widget buildSheet(BuildContext context) => sheetFills
+      ? GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {},
+          child: const SizedBox.expand(),
+        )
+      : const Text('Sheet body');
 
   @override
   Widget buildMapOverlay(BuildContext context) => const Text('Callout');
@@ -295,6 +307,7 @@ void main() {
     bool initialOsmEnabled = false,
     VisibleTab? visibleTab,
     int? tabIndex,
+    MapImmersiveController? immersive,
   }) async {
     final child = MapScaffold(
       layers: layers,
@@ -310,6 +323,9 @@ void main() {
           ChangeNotifierProvider<MapStationHandoff>.value(value: stations),
           ChangeNotifierProvider<MapLayerVisibilityController>.value(
             value: visibility,
+          ),
+          ChangeNotifierProvider<MapImmersiveController>.value(
+            value: immersive ?? MapImmersiveController(),
           ),
           ChangeNotifierProvider<MapLayerOrderController>.value(
             value: MapLayerOrderController(settings),
@@ -371,6 +387,118 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     expect(echo.scrubs, greaterThan(0));
     expect(echo.shown.length, greaterThan(1));
+  });
+
+  testWidgets('immersive hides the chrome, and its chip brings it back', (
+    tester,
+  ) async {
+    final l10n = await english();
+    final immersive = MapImmersiveController();
+    final echo = _Layer(id: 'echo', name: 'Echo')
+      ..framesResult = Ok(twoFrames());
+    await show(
+      tester,
+      settings: SettingsStore.inMemory(),
+      camera: MapCameraHandoff(),
+      stations: MapStationHandoff(),
+      visibility: MapLayerVisibilityController(SettingsStore.inMemory()),
+      layers: [echo],
+      immersive: immersive,
+    );
+    await loadStyle(tester);
+
+    expect(find.byTooltip(l10n.mapImmersive), findsOneWidget);
+    expect(find.byTooltip(l10n.mapLayers), findsOneWidget);
+    expect(find.text(l10n.mapTimelineObserved), findsOneWidget);
+    expect(find.byTooltip(l10n.mapLegendExpand), findsOneWidget);
+    // It is map chrome on the filter/selector row — not inside the layers
+    // sheet — and it sits to the left of the layer selector.
+    expect(
+      tester.getTopLeft(find.byTooltip(l10n.mapImmersive)).dx,
+      lessThan(tester.getTopLeft(find.byTooltip(l10n.mapLayers)).dx),
+    );
+
+    await tester.tap(find.byTooltip(l10n.mapImmersive));
+    await tester.pump();
+
+    expect(find.byTooltip(l10n.mapLayers), findsNothing);
+    expect(find.text(l10n.mapTimelineObserved), findsNothing);
+    expect(find.byTooltip(l10n.mapLegendExpand), findsNothing);
+    expect(find.byTooltip(l10n.mapImmersiveExit), findsOneWidget);
+
+    await tester.tap(find.byTooltip(l10n.mapImmersiveExit));
+    await tester.pump();
+
+    expect(find.byTooltip(l10n.mapImmersive), findsOneWidget);
+    expect(find.byTooltip(l10n.mapLayers), findsOneWidget);
+    expect(find.text(l10n.mapTimelineObserved), findsOneWidget);
+    expect(find.byTooltip(l10n.mapLegendExpand), findsOneWidget);
+    expect(immersive.value, isFalse);
+  });
+
+  testWidgets('the immersive exit stays tappable above a full-height sheet', (
+    tester,
+  ) async {
+    final l10n = await english();
+    final immersive = MapImmersiveController();
+    final stations = _Layer(
+      id: 'stations',
+      name: 'Stations',
+      timeline: false,
+      sheetFills: true,
+    );
+    await show(
+      tester,
+      settings: SettingsStore.inMemory(),
+      camera: MapCameraHandoff(),
+      stations: MapStationHandoff(),
+      visibility: MapLayerVisibilityController(SettingsStore.inMemory()),
+      layers: [stations],
+      immersive: immersive,
+    );
+    await loadStyle(tester);
+
+    immersive.enter();
+    await tester.pump();
+    expect(immersive.value, isTrue);
+
+    // The sheet covers the whole map, including the chip's corner. Tapping
+    // must still reach the chip: it is the only part of the mode that has to
+    // stay above the layer's own content.
+    await tester.tap(find.byTooltip(l10n.mapImmersiveExit));
+    await tester.pump();
+
+    expect(immersive.value, isFalse);
+  });
+
+  testWidgets('system back leaves immersive before it leaves the app', (
+    tester,
+  ) async {
+    final l10n = await english();
+    final immersive = MapImmersiveController();
+    final echo = _Layer(id: 'echo', name: 'Echo')
+      ..framesResult = Ok(twoFrames());
+    await show(
+      tester,
+      settings: SettingsStore.inMemory(),
+      camera: MapCameraHandoff(),
+      stations: MapStationHandoff(),
+      visibility: MapLayerVisibilityController(SettingsStore.inMemory()),
+      layers: [echo],
+      immersive: immersive,
+    );
+    await loadStyle(tester);
+
+    immersive.enter();
+    await tester.pump();
+
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+
+    // The map route is the app's root: a back press there would otherwise
+    // leave DPIP. While immersive it exits the mode instead.
+    expect(immersive.value, isFalse);
+    expect(find.byTooltip(l10n.mapImmersiveExit), findsNothing);
   });
 
   testWidgets('a failed frame list shows the message and retry reloads', (

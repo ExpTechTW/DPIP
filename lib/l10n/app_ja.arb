@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "地域を選ぶと予報を表示します",
   "mapLayers": "レイヤー",
+  "mapImmersive": "没入型マップ",
+  "mapImmersiveExit": "全画面表示を終了",
   "meshtasticHardware": "ハードウェア",
   "languageSettings": "言語設定",
   "@moonNextFullMoon": {

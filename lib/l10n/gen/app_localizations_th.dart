@@ -1080,6 +1080,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override
+  String get mapImmersive => 'แผนที่เต็มจอ';
+
+  @override
+  String get mapImmersiveExit => 'ออกจากโหมดเต็มจอ';
+
+  @override
   String get meshtasticHardware => 'ฮาร์ดแวร์';
 
   @override

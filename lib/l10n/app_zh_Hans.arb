@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "选择乡镇后可查看预报",
   "mapLayers": "图层",
+  "mapImmersive": "沉浸式地图",
+  "mapImmersiveExit": "退出沉浸模式",
   "meshtasticHardware": "硬件",
   "languageSettings": "语言设置",
   "@moonNextFullMoon": {

@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "選擇鄉鎮後可查看預報",
   "mapLayers": "圖層",
+  "mapImmersive": "沉浸式地圖",
+  "mapImmersiveExit": "結束沉浸式",
   "meshtasticHardware": "硬體",
   "languageSettings": "語言設定",
   "@moonNextFullMoon": {

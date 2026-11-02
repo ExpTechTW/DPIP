@@ -2064,6 +2064,18 @@ abstract class AppLocalizations {
   /// **'Layers'**
   String get mapLayers;
 
+  /// Layer sheet entry that hides the map controls and the navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Immersive map'**
+  String get mapImmersive;
+
+  /// Tooltip for the floating button that leaves immersive map mode
+  ///
+  /// In en, this message translates to:
+  /// **'Exit immersive mode'**
+  String get mapImmersiveExit;
+
   /// Board model
   ///
   /// In en, this message translates to:

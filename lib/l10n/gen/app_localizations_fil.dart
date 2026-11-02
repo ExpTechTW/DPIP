@@ -1094,6 +1094,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayers => 'Mga Layer';
 
   @override
+  String get mapImmersive => 'Immersive na mapa';
+
+  @override
+  String get mapImmersiveExit => 'Lumabas sa immersive mode';
+
+  @override
   String get meshtasticHardware => 'Hardware';
 
   @override

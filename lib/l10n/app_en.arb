@@ -1416,6 +1416,14 @@
   },
   "homeForecastUnavailable": "Select a township to see the forecast",
   "mapLayers": "Layers",
+  "mapImmersive": "Immersive map",
+  "mapImmersiveExit": "Exit immersive mode",
+  "@mapImmersive": {
+    "description": "Layer sheet entry that hides the map controls and the navigation bar"
+  },
+  "@mapImmersiveExit": {
+    "description": "Tooltip for the floating button that leaves immersive map mode"
+  },
   "@homeRainTrendHeavyStopping": {
     "description": "Home rain trend subtitle: heavy rain forecast to stop partway through the hour",
     "placeholders": {
