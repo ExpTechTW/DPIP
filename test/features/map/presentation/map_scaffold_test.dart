@@ -114,6 +114,7 @@ class _Layer with MapLayerDefaults implements MapLayer {
     this.timeline = true,
     this.withChrome = false,
     this.sheetFills = false,
+    this.sheetBottom = false,
   });
 
   @override
@@ -125,6 +126,10 @@ class _Layer with MapLayerDefaults implements MapLayer {
   /// Whether [buildSheet] is a full-screen, tap-absorbing panel — the state a
   /// draggable detail sheet reaches when the user drags it to the top.
   final bool sheetFills;
+
+  /// Whether [buildSheet] is a bottom strip inside a [SafeArea] — the shape the
+  /// RTS monitor's status bar and every sheet layer's peek use.
+  final bool sheetBottom;
 
   Result<List<MapFrame>> framesResult = const Ok([]);
   Completer<Result<List<MapFrame>>>? framesGate;
@@ -241,13 +246,22 @@ class _Layer with MapLayerDefaults implements MapLayer {
   Widget? buildLegendAccessory(BuildContext context) => const Text('Rank');
 
   @override
-  Widget buildSheet(BuildContext context) => sheetFills
-      ? GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {},
-          child: const SizedBox.expand(),
-        )
-      : const Text('Sheet body');
+  Widget buildSheet(BuildContext context) {
+    if (sheetBottom) {
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: SafeArea(top: false, child: const Text('Sheet bottom')),
+      );
+    }
+    if (sheetFills) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {},
+        child: const SizedBox.expand(),
+      );
+    }
+    return const Text('Sheet body');
+  }
 
   @override
   Widget buildMapOverlay(BuildContext context) => const Text('Callout');
@@ -296,6 +310,24 @@ void main() {
   Future<AppLocalizations> english() =>
       AppLocalizations.delegate.load(const Locale('en'));
 
+  /// Reproduces the shell's `extendBody` contract: the nav bar's height is part
+  /// of this subtree's bottom padding, above the system inset.
+  Widget homeWithInset(Widget home, {required bool navInset}) {
+    if (!navInset) return home;
+    return Builder(
+      builder: (context) {
+        final media = MediaQuery.of(context);
+        return MediaQuery(
+          data: media.copyWith(
+            padding: media.padding.copyWith(bottom: 80),
+            viewPadding: media.viewPadding.copyWith(bottom: 24),
+          ),
+          child: home,
+        );
+      },
+    );
+  }
+
   Future<void> show(
     WidgetTester tester, {
     required SettingsStore settings,
@@ -308,6 +340,7 @@ void main() {
     VisibleTab? visibleTab,
     int? tabIndex,
     MapImmersiveController? immersive,
+    bool navInset = false,
   }) async {
     final child = MapScaffold(
       layers: layers,
@@ -339,9 +372,12 @@ void main() {
           locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: visibleTab == null
-              ? child
-              : VisibleTabScope(visibleTab: visibleTab, child: child),
+          home: homeWithInset(
+            visibleTab == null
+                ? child
+                : VisibleTabScope(visibleTab: visibleTab, child: child),
+            navInset: navInset,
+          ),
         ),
       ),
     );
@@ -543,6 +579,39 @@ void main() {
     final map = tester.widget<MapLibreMap>(find.byType(MapLibreMap));
     expect(map.attributionButtonColor, Colors.transparent);
     expect(map.attributionButtonMargins, const Point(-4000, -4000));
+  });
+
+  testWidgets('a sheet layer drops into the hidden nav bar space', (
+    tester,
+  ) async {
+    final immersive = MapImmersiveController();
+    final stations = _Layer(
+      id: 'stations',
+      name: 'Stations',
+      timeline: false,
+      sheetBottom: true,
+    );
+    await show(
+      tester,
+      settings: SettingsStore.inMemory(),
+      camera: MapCameraHandoff(),
+      stations: MapStationHandoff(),
+      visibility: MapLayerVisibilityController(SettingsStore.inMemory()),
+      layers: [stations],
+      immersive: immersive,
+      navInset: true,
+    );
+    await loadStyle(tester);
+
+    final before = tester.getBottomLeft(find.text('Sheet bottom')).dy;
+    immersive.enter();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    final after = tester.getBottomLeft(find.text('Sheet bottom')).dy;
+
+    // The bar reserved 80 logical px above the 24 px system inset; immersive
+    // settles one spacing token above that inset, so the strip drops by 40.
+    expect(after - before, closeTo(40, 0.5));
   });
 
   testWidgets('a failed frame list shows the message and retry reloads', (
