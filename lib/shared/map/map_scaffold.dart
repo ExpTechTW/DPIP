@@ -1281,10 +1281,48 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (candidate.id != _active.id) _onLayerSelected(candidate);
   }
 
+  /// Drops a sheet layer's bottom chrome toward the space the shell's nav bar
+  /// leaves behind in immersive mode.
+  ///
+  /// `MainShell` extends its body behind the nav bar, so Scaffold adds the
+  /// bar's height to this subtree's MediaQuery padding. Sliding the bar away
+  /// does not shrink that padding, which left the 強震監視器 status strip — and
+  /// every other sheet layer's peek — floating a bar's height above the
+  /// bottom. Animate the inset away on the same curve as the bar, but stop one
+  /// spacing token above the system inset: flush against it read as too low
+  /// next to the home indicator, while the bar's full height read as a gap.
+  Widget _immersiveSheetInset({
+    required bool immersive,
+    required Widget child,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: immersive ? 1 : 0),
+      duration: mapImmersiveTransition,
+      curve: mapImmersiveCurve,
+      builder: (context, progress, child) {
+        final media = MediaQuery.of(context);
+        final extra = media.padding.bottom - media.viewPadding.bottom;
+        if (extra <= 0) return child!;
+        final settled = media.viewPadding.bottom + AppSpacing.lg;
+        return MediaQuery(
+          data: media.copyWith(
+            padding: media.padding.copyWith(
+              bottom:
+                  media.padding.bottom +
+                  (settled - media.padding.bottom) * progress,
+            ),
+          ),
+          child: child!,
+        );
+      },
+      child: child,
+    );
+  }
+
   /// Enters/leaves immersive mode.
   ///
-  /// The chrome stays mounted and cross-fades (see [_immersiveChrome]), so the
-  /// only state this has to rebuild is the target of those animations.
+  /// The chrome stays mounted and cross-fades (see [MapImmersiveChrome]), so
+  /// the only state this has to rebuild is the target of those animations.
   void _onImmersiveChanged() {
     if (!mounted) return;
     setState(() {});
@@ -1481,7 +1519,12 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         ),
         // Sheet / timeline last so they paint above the chrome when expanded.
         if (!_active.usesTimeline)
-          Positioned.fill(child: _active.buildSheet(context)),
+          Positioned.fill(
+            child: _immersiveSheetInset(
+              immersive: immersive,
+              child: _active.buildSheet(context),
+            ),
+          ),
         if (_active.usesTimeline)
           Positioned(
             left: 0,
