@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "Pilih wilayah untuk melihat prakiraan",
   "mapLayers": "Lapisan",
+  "mapImmersive": "Peta imersif",
+  "mapImmersiveExit": "Keluar dari mode imersif",
   "meshtasticHardware": "Perangkat keras",
   "languageSettings": "Bahasa",
   "@moonNextFullMoon": {

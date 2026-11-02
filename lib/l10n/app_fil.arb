@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "Pumili ng bayan para makita ang forecast",
   "mapLayers": "Mga Layer",
+  "mapImmersive": "Immersive na mapa",
+  "mapImmersiveExit": "Lumabas sa immersive mode",
   "meshtasticHardware": "Hardware",
   "languageSettings": "Wika",
   "@moonNextFullMoon": {

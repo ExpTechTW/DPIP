@@ -1086,6 +1086,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapLayers => 'Lapisan';
 
   @override
+  String get mapImmersive => 'Peta imersif';
+
+  @override
+  String get mapImmersiveExit => 'Keluar dari mode imersif';
+
+  @override
   String get meshtasticHardware => 'Perangkat keras';
 
   @override

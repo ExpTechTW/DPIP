@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "Chọn khu vực để xem dự báo",
   "mapLayers": "Lớp bản đồ",
+  "mapImmersive": "Bản đồ toàn màn hình",
+  "mapImmersiveExit": "Thoát chế độ toàn màn hình",
   "meshtasticHardware": "Phần cứng",
   "languageSettings": "Ngôn ngữ",
   "@moonNextFullMoon": {

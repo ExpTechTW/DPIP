@@ -1064,6 +1064,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayers => 'レイヤー';
 
   @override
+  String get mapImmersive => '没入型マップ';
+
+  @override
+  String get mapImmersiveExit => '全画面表示を終了';
+
+  @override
   String get meshtasticHardware => 'ハードウェア';
 
   @override

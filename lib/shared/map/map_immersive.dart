@@ -1,0 +1,25 @@
+/// The map surface's immersive view mode — chrome hidden, map edge to edge.
+library;
+
+import 'package:flutter/foundation.dart';
+
+/// Whether the map tab is in immersive mode.
+///
+/// App-wide rather than per-[MapScaffold] state because two widgets on opposite
+/// sides of the tree have to agree: the scaffold hides the map chrome, and
+/// `MainShell` slides the bottom navigation away so the map really does fill
+/// the screen. A [ValueNotifier] so only those two listeners rebuild when it
+/// flips, not the platform-view map underneath them.
+///
+/// Deliberately not persisted. Immersive is a way of looking at the map right
+/// now, not a preference: a launch that restored it would greet the user with
+/// a chrome-less map and no visible way out of it.
+class MapImmersiveController extends ValueNotifier<bool> {
+  MapImmersiveController() : super(false);
+
+  /// Hides the map chrome and the shell's navigation bar.
+  void enter() => value = true;
+
+  /// Brings the controls back.
+  void exit() => value = false;
+}

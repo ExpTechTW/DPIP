@@ -1085,6 +1085,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayers => 'Layers';
 
   @override
+  String get mapImmersive => 'Immersive map';
+
+  @override
+  String get mapImmersiveExit => 'Exit immersive mode';
+
+  @override
   String get meshtasticHardware => 'Hardware';
 
   @override

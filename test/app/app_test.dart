@@ -54,6 +54,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:dpip/features/map/map_providers.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -109,6 +110,7 @@ void main() {
         deps: deps,
         providers: [
           ...coreProviders(deps),
+          ...mapProviders(),
           ChangeNotifierProvider<MapCameraHandoff>.value(value: handoff),
         ],
       ),
