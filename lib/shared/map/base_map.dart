@@ -545,6 +545,18 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
       compassEnabled: widget.interactive && widget.compassEnabled,
       compassViewPosition: CompassViewPosition.topRight,
       compassViewMargins: Point(AppSpacing.lg, compassTop),
+      // MapLibre draws its own attribution (i) ornament in the bottom-right
+      // corner. The plugin exposes no visibility flag, so push it past the
+      // trailing/bottom edges with negative margins — the platform view clips,
+      // so it is neither painted nor tappable. iOS also tints it clear as a
+      // second line of defence; Android treats a clear tint as "keep the
+      // default", so the margin is the fix there. The attribution text itself
+      // stays in More → data sources ("© OpenStreetMap contributors").
+      // Replace this with an `attributionButtonEnabled: false` option if the
+      // maplibre_gl fork ever grows one.
+      attributionButtonPosition: AttributionButtonPosition.bottomRight,
+      attributionButtonMargins: const Point(-4000, -4000),
+      attributionButtonColor: Colors.transparent,
       scrollGesturesEnabled: widget.interactive,
       zoomGesturesEnabled: widget.interactive,
       rotateGesturesEnabled: widget.interactive,
