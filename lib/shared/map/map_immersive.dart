@@ -1,7 +1,17 @@
 /// The map surface's immersive view mode — chrome hidden, map edge to edge.
 library;
 
+import 'package:dpip/app/theme/app_motion.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
+
+/// How long the map chrome and the shell's navigation bar take to clear or
+/// return. One choreography for both surfaces: the bar and the chrome have to
+/// move together or the mode reads as two separate changes.
+const Duration mapImmersiveTransition = AppMotion.medium;
+
+/// The easing both surfaces use for that transition.
+const Curve mapImmersiveCurve = Curves.easeOutCubic;
 
 /// Whether the map tab is in immersive mode.
 ///
