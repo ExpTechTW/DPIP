@@ -65,6 +65,7 @@ import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
+import 'package:dpip/features/map/map_providers.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/weather/domain/meteor_weather_repository.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
@@ -224,6 +225,7 @@ void main() {
           ...weatherProviders(deps),
           Provider<RadarRepository>.value(value: _Radar()),
           ...homeProviders(),
+          ...mapProviders(),
           _eew(),
           Provider<Future<SeismicTravelTimeTable>>.value(
             value: Future<SeismicTravelTimeTable>.value(
@@ -400,6 +402,7 @@ Widget _widgetRouterApp(SharedDeps deps, _WidgetWeather weather) =>
         ...weatherProviders(deps),
         Provider<RadarRepository>.value(value: _Radar()),
         ...homeProviders(),
+        ...mapProviders(),
         ChangeNotifierProvider<HomeWeatherController>(
           create: (_) => HomeWeatherController(
             weather,

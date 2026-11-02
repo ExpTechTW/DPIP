@@ -1083,6 +1083,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapLayers => 'Lớp bản đồ';
 
   @override
+  String get mapImmersive => 'Bản đồ toàn màn hình';
+
+  @override
+  String get mapImmersiveExit => 'Thoát chế độ toàn màn hình';
+
+  @override
   String get meshtasticHardware => 'Phần cứng';
 
   @override

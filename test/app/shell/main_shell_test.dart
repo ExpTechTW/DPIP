@@ -25,6 +25,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,9 @@ void main() {
           ),
           ChangeNotifierProvider<EndpointHealthMonitor>.value(value: endpoints),
           ChangeNotifierProvider<MeshUnread>.value(value: unread),
+          ChangeNotifierProvider<MapImmersiveController>(
+            create: (_) => MapImmersiveController(),
+          ),
         ],
         child: MaterialApp.router(
           locale: const Locale('en'),
@@ -143,6 +147,25 @@ void main() {
     await tester.pump();
     expect(find.text('map-body'), findsOneWidget);
     expect(handoff.takePending()?.layerId, layers.layer.id);
+
+    // An immersive map owns the whole screen, so the shell's bar slides away
+    // with it and comes back on exit — the map cannot reach the bar itself.
+    final immersive = Provider.of<MapImmersiveController>(
+      tester.element(find.byType(MainShell)),
+      listen: false,
+    );
+    immersive.enter();
+    await tester.pump();
+    expect(
+      tester.getTopLeft(find.text(layers.layer.label(l10n))).dy,
+      greaterThan(600),
+    );
+    immersive.exit();
+    await tester.pump();
+    expect(
+      tester.getTopLeft(find.text(layers.layer.label(l10n))).dy,
+      lessThan(600),
+    );
 
     unread.recordIncoming(1, 1);
     endpoints.failure(

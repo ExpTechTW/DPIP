@@ -78,6 +78,7 @@ import 'package:dpip/features/disaster_map/disaster_map_providers.dart';
 import 'package:dpip/features/earthquake/earthquake_providers.dart';
 import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
+import 'package:dpip/features/map/map_providers.dart';
 import 'package:dpip/features/meshtastic/meshtastic_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
@@ -516,6 +517,7 @@ Future<void> bootstrap() async {
         ...earthquakeProviders(deps),
         ...weatherProviders(deps),
         ...disasterMapProviders(deps),
+        ...mapProviders(),
         ...typhoonProviders(deps),
         ...tsunamiProviders(deps),
         ...eventsProviders(deps),

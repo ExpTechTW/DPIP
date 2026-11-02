@@ -14,6 +14,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -76,6 +77,12 @@ class _MainShellState extends State<MainShell> with RouteAware {
   final ValueNotifier<double> _navDismiss = ValueNotifier(0);
   late final HomeSheetExtent _sheetExtent;
 
+  /// The map tab's immersive toggle. It dismisses the bar for the same reason
+  /// a full-screen Home sheet does: the map is meant to own the whole screen,
+  /// and a navigation strip over it is the one piece of shell chrome the map
+  /// cannot hide itself.
+  late final MapImmersiveController _mapImmersive;
+
   /// The launch summary's frame window, prerelease builds only. Started here
   /// rather than at the app's first frame because the shell is the first
   /// screen with a map on it — onboarding has none — and it owns the one
@@ -87,6 +94,8 @@ class _MainShellState extends State<MainShell> with RouteAware {
     super.initState();
     _trace(() => 'init current=${widget.navigationShell.currentIndex}');
     _sheetExtent = context.read<HomeSheetExtent>()
+      ..addListener(_syncNavDismiss);
+    _mapImmersive = context.read<MapImmersiveController>()
       ..addListener(_syncNavDismiss);
     if (isPrereleaseBuild()) {
       // Home (its live map backdrop and the monitor banner) and the map tab
@@ -105,10 +114,14 @@ class _MainShellState extends State<MainShell> with RouteAware {
     }
   }
 
-  /// Only Home dismisses the bar; every other tab keeps it (dismiss 0).
+  /// Home's sheet or an immersive map dismisses the bar; every other tab and
+  /// every other map state keeps it (dismiss 0).
   void _syncNavDismiss() {
-    final dismiss = widget.navigationShell.currentIndex == 0
+    final index = widget.navigationShell.currentIndex;
+    final dismiss = index == 0
         ? HomeChrome.navDismiss(_sheetExtent.value)
+        : index == _mapBranchIndex && _mapImmersive.value
+        ? 1.0
         : 0.0;
     if (dismiss == _navDismiss.value) return;
     _navDismiss.value = dismiss;
@@ -155,6 +168,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
     _startupFrames?.stop();
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _sheetExtent.removeListener(_syncNavDismiss);
+    _mapImmersive.removeListener(_syncNavDismiss);
     _navDismiss.dispose();
     _visibleTab.dispose();
     super.dispose();

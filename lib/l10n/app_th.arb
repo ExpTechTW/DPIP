@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "เลือกพื้นที่เพื่อดูพยากรณ์",
   "mapLayers": "ชั้นข้อมูล",
+  "mapImmersive": "แผนที่เต็มจอ",
+  "mapImmersiveExit": "ออกจากโหมดเต็มจอ",
   "meshtasticHardware": "ฮาร์ดแวร์",
   "languageSettings": "ภาษา",
   "@moonNextFullMoon": {
