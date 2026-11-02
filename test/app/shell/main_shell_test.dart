@@ -154,18 +154,28 @@ void main() {
       tester.element(find.byType(MainShell)),
       listen: false,
     );
+    final label = find.text(layers.layer.label(l10n));
+    final restingY = tester.getTopLeft(label).dy;
+
     immersive.enter();
     await tester.pump();
-    expect(
-      tester.getTopLeft(find.text(layers.layer.label(l10n))).dy,
-      greaterThan(600),
-    );
+    // The first frame starts the transition without moving the bar yet; a
+    // snap would already be at the bottom here.
+    expect(tester.getTopLeft(label).dy, closeTo(restingY, 0.01));
+
+    await tester.pump(const Duration(milliseconds: 110));
+    final midway = tester.getTopLeft(label).dy;
+    expect(midway, greaterThan(restingY));
+
+    await tester.pump(const Duration(milliseconds: 200));
+    final hiddenY = tester.getTopLeft(label).dy;
+    expect(hiddenY, greaterThan(midway));
+    expect(hiddenY, greaterThan(600));
+
     immersive.exit();
     await tester.pump();
-    expect(
-      tester.getTopLeft(find.text(layers.layer.label(l10n))).dy,
-      lessThan(600),
-    );
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(label).dy, lessThan(600));
 
     unread.recordIncoming(1, 1);
     endpoints.failure(

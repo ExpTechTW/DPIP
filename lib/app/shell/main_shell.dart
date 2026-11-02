@@ -41,7 +41,8 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> with RouteAware {
+class _MainShellState extends State<MainShell>
+    with RouteAware, SingleTickerProviderStateMixin {
   final int _traceId = nextMapTraceId();
 
   String get _traceScope => 'shell#$_traceId';
@@ -77,6 +78,15 @@ class _MainShellState extends State<MainShell> with RouteAware {
   final ValueNotifier<double> _navDismiss = ValueNotifier(0);
   late final HomeSheetExtent _sheetExtent;
 
+  /// Drives [_navDismiss] on the immersive edge. Home's sheet writes the same
+  /// notifier directly on every drag tick — that is a drag, not a transition —
+  /// so this controller only runs for the map mode's slide.
+  late final AnimationController _navSlide;
+
+  /// Where the bar is heading, kept apart from the animation's current value so
+  /// a rebuild mid-transition does not restart it.
+  double _navTarget = 0;
+
   /// The map tab's immersive toggle. It dismisses the bar for the same reason
   /// a full-screen Home sheet does: the map is meant to own the whole screen,
   /// and a navigation strip over it is the one piece of shell chrome the map
@@ -93,6 +103,10 @@ class _MainShellState extends State<MainShell> with RouteAware {
   void initState() {
     super.initState();
     _trace(() => 'init current=${widget.navigationShell.currentIndex}');
+    _navSlide = AnimationController(
+      vsync: this,
+      duration: mapImmersiveTransition,
+    )..addListener(() => _navDismiss.value = _navSlide.value);
     _sheetExtent = context.read<HomeSheetExtent>()
       ..addListener(_syncNavDismiss);
     _mapImmersive = context.read<MapImmersiveController>()
@@ -115,16 +129,29 @@ class _MainShellState extends State<MainShell> with RouteAware {
   }
 
   /// Home's sheet or an immersive map dismisses the bar; every other tab and
-  /// every other map state keeps it (dismiss 0).
+  /// every other map state keeps it (dismiss 0). The immersive edge is
+  /// animated; Home's sheet is a live drag and is followed exactly.
   void _syncNavDismiss() {
     final index = widget.navigationShell.currentIndex;
-    final dismiss = index == 0
+    final target = index == 0
         ? HomeChrome.navDismiss(_sheetExtent.value)
         : index == _mapBranchIndex && _mapImmersive.value
         ? 1.0
         : 0.0;
-    if (dismiss == _navDismiss.value) return;
-    _navDismiss.value = dismiss;
+    if (target == _navTarget) return;
+    _navTarget = target;
+    if (index == 0) {
+      _navSlide.stop();
+      _navSlide.value = target;
+      return;
+    }
+    unawaited(
+      _navSlide.animateTo(
+        target,
+        duration: mapImmersiveTransition,
+        curve: mapImmersiveCurve,
+      ),
+    );
   }
 
   @override
@@ -169,6 +196,7 @@ class _MainShellState extends State<MainShell> with RouteAware {
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _sheetExtent.removeListener(_syncNavDismiss);
     _mapImmersive.removeListener(_syncNavDismiss);
+    _navSlide.dispose();
     _navDismiss.dispose();
     _visibleTab.dispose();
     super.dispose();

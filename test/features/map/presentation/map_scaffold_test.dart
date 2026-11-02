@@ -418,21 +418,41 @@ void main() {
       lessThan(tester.getTopLeft(find.byTooltip(l10n.mapLayers)).dx),
     );
 
+    final timelineAtRest = tester
+        .getTopLeft(find.text(l10n.mapTimelineObserved))
+        .dy;
     await tester.tap(find.byTooltip(l10n.mapImmersive));
     await tester.pump();
 
-    expect(find.byTooltip(l10n.mapLayers), findsNothing);
-    expect(find.text(l10n.mapTimelineObserved), findsNothing);
-    expect(find.byTooltip(l10n.mapLegendExpand), findsNothing);
+    // The chrome is still painted on the first frame (it is fading), but it is
+    // already non-interactive. That is the transition, not a swap.
+    expect(find.byTooltip(l10n.mapLayers).hitTestable(), findsNothing);
+    expect(find.text(l10n.mapTimelineObserved).hitTestable(), findsNothing);
+    expect(find.byTooltip(l10n.mapLegendExpand).hitTestable(), findsNothing);
     expect(find.byTooltip(l10n.mapImmersiveExit), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text(l10n.mapTimelineObserved)).dy,
+      closeTo(timelineAtRest, 0.01),
+    );
+
+    await tester.pump(const Duration(milliseconds: 110));
+    final midway = tester.getTopLeft(find.text(l10n.mapTimelineObserved)).dy;
+    expect(midway, greaterThan(timelineAtRest));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(
+      tester.getTopLeft(find.text(l10n.mapTimelineObserved)).dy,
+      greaterThan(midway),
+    );
 
     await tester.tap(find.byTooltip(l10n.mapImmersiveExit));
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
+    expect(find.byTooltip(l10n.mapImmersiveExit), findsNothing);
     expect(find.byTooltip(l10n.mapImmersive), findsOneWidget);
-    expect(find.byTooltip(l10n.mapLayers), findsOneWidget);
-    expect(find.text(l10n.mapTimelineObserved), findsOneWidget);
-    expect(find.byTooltip(l10n.mapLegendExpand), findsOneWidget);
+    expect(find.byTooltip(l10n.mapLayers).hitTestable(), findsOneWidget);
+    expect(find.text(l10n.mapTimelineObserved).hitTestable(), findsOneWidget);
+    expect(find.byTooltip(l10n.mapLegendExpand).hitTestable(), findsOneWidget);
     expect(immersive.value, isFalse);
   });
 
@@ -494,6 +514,7 @@ void main() {
 
     await tester.binding.handlePopRoute();
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // The map route is the app's root: a back press there would otherwise
     // leave DPIP. While immersive it exits the mode instead.
