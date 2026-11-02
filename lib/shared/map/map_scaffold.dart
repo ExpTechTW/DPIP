@@ -23,6 +23,7 @@ import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_immersive.dart';
+import 'package:dpip/shared/map/map_immersive_chrome.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
@@ -1280,39 +1281,6 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (candidate.id != _active.id) _onLayerSelected(candidate);
   }
 
-  /// Fades and nudges a block of map chrome as immersive mode toggles.
-  ///
-  /// Blocks stay mounted: the timeline carries a [GlobalKey] for measurement,
-  /// and swapping it out and back mid-transition could duplicate that key on a
-  /// fast double-tap. Hidden therefore means opacity 0 plus no hit testing,
-  /// semantics or focus — not absence.
-  Widget _immersiveChrome({
-    required bool hidden,
-    required Widget child,
-    Offset slide = const Offset(0, -0.08),
-  }) {
-    return IgnorePointer(
-      ignoring: hidden,
-      child: ExcludeSemantics(
-        excluding: hidden,
-        child: ExcludeFocus(
-          excluding: hidden,
-          child: AnimatedSlide(
-            duration: mapImmersiveTransition,
-            curve: mapImmersiveCurve,
-            offset: hidden ? slide : Offset.zero,
-            child: AnimatedOpacity(
-              duration: mapImmersiveTransition,
-              curve: mapImmersiveCurve,
-              opacity: hidden ? 0 : 1,
-              child: child,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   /// Enters/leaves immersive mode.
   ///
   /// The chrome stays mounted and cross-fades (see [_immersiveChrome]), so the
@@ -1425,7 +1393,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         Positioned(
           top: 0,
           left: 0,
-          child: _immersiveChrome(
+          child: MapImmersiveChrome(
             hidden: immersive,
             child: SafeArea(
               child: Padding(
@@ -1451,7 +1419,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         Positioned(
           top: 0,
           right: 0,
-          child: _immersiveChrome(
+          child: MapImmersiveChrome(
             hidden: immersive,
             child: SafeArea(
               child: Padding(
@@ -1518,7 +1486,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             left: 0,
             right: 0,
             bottom: 0,
-            child: _immersiveChrome(
+            child: MapImmersiveChrome(
               hidden: immersive,
               // Slides back down as it clears, then rises on the way back.
               slide: const Offset(0, 0.25),
@@ -1562,7 +1530,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         Positioned(
           top: 0,
           right: 0,
-          child: _immersiveChrome(
+          child: MapImmersiveChrome(
             hidden: immersive,
             child: SafeArea(
               child: Padding(
@@ -1586,31 +1554,9 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: AnimatedSwitcher(
-                duration: mapImmersiveTransition,
-                switchInCurve: mapImmersiveCurve,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(
-                    scale: Tween<double>(
-                      begin: 0.88,
-                      end: 1,
-                    ).animate(animation),
-                    child: child,
-                  ),
-                ),
-                child: immersive
-                    ? MapChipButton(
-                        key: const ValueKey('map-immersive-exit'),
-                        icon: Icons.fullscreen_exit,
-                        tooltip: AppLocalizations.of(context).mapImmersiveExit,
-                        active: false,
-                        onTap: () => _immersive?.exit(),
-                      )
-                    : const SizedBox.shrink(
-                        key: ValueKey('map-immersive-exit-hidden'),
-                      ),
+              child: MapImmersiveExitChip(
+                immersive: immersive,
+                onExit: () => _immersive?.exit(),
               ),
             ),
           ),
