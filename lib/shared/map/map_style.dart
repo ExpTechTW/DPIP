@@ -103,6 +103,17 @@ abstract final class MapColors {
     labelHalo: '#FFFFFF'.vision,
   );
 
+  /// Light-mode cartography used beneath satellite imagery. The darker neutral
+  /// base keeps white cloud pixels distinct without changing the imagery.
+  static MapPalette get lightSatellite => MapPalette(
+    background: '#777A80'.vision,
+    fill: '#5F6268'.vision,
+    outline: '#303238'.vision,
+    townOutline: '#4B4E54'.vision,
+    label: '#FFFFFF'.vision,
+    labelHalo: '#18191C'.vision,
+  );
+
   /// Palette for the given UI [brightness].
   static MapPalette of(Brightness brightness) =>
       brightness == Brightness.dark ? dark : light;

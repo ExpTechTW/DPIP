@@ -1292,6 +1292,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
             onPointerCancel: _onMapPointerEnded,
             child: BaseMap(
               includeTerrainInStyle: !widget.initialOsmEnabled,
+              lightPalette: _active.lightMapPalette,
               minZoomPreference: _active.mapMinZoom,
               maxZoomPreference: _gsi.enabled
                   ? gsiDisplayMaxZoom

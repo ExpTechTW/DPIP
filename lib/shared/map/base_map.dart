@@ -53,6 +53,7 @@ class BaseMap extends StatefulWidget {
     this.compassEnabled = true,
     this.showUserLocation = true,
     this.includeTerrainInStyle = true,
+    this.lightPalette,
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
     this.tabIndex,
@@ -152,6 +153,10 @@ class BaseMap extends StatefulWidget {
   /// Runtime owners can still add terrain later. Omitting it here prevents an
   /// OSM-first surface from fetching and briefly painting an unused DEM.
   final bool includeTerrainInStyle;
+
+  /// Optional light-theme cartography override for overlays that need stronger
+  /// contrast than the standard pale base map.
+  final MapPalette? lightPalette;
 
   /// Per-surface zoom floor (typhoon may go lower so the whole basin fits).
   /// Other layers keep [defaultMinZoom].
@@ -507,7 +512,11 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final mountAttempt = _mountAttempt;
-    final palette = MapColors.of(Theme.of(context).brightness);
+    final brightness = Theme.of(context).brightness;
+    final palette =
+        brightness == Brightness.light && widget.lightPalette != null
+        ? widget.lightPalette!
+        : MapColors.of(brightness);
     // MapScaffold parks the layer switcher at top-right (SafeArea + lg). Drop
     // the native compass just under that chip. iOS ornaments are already
     // constrained to the safe-area top — adding MediaQuery.padding again left
