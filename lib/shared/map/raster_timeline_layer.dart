@@ -67,6 +67,9 @@ enum _IdlePreloadOutcome { ready, timeout, cancelled }
 abstract class RasterTimelineLayer implements MapLayer {
   RasterTimelineLayer(this.source);
 
+  @override
+  MapPalette? get lightMapPalette => null;
+
   /// Frames, tile URLs, and tile-memory control for this overlay.
   @protected
   final RasterFrameSource source;

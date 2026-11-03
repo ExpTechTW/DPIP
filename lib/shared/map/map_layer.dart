@@ -1,6 +1,7 @@
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/shared/map/base_map.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -104,6 +105,10 @@ abstract interface class MapLayer {
   /// Timeline layers return 0: the scaffold owns the timeline widget and measures
   /// its real height instead of taking a declared number.
   double get bottomChromeFraction;
+
+  /// Optional light-theme base-map palette for an overlay that needs stronger
+  /// contrast than the standard pale cartography.
+  MapPalette? get lightMapPalette;
 
   /// Per-surface MapLibre zoom floor. Default matches [BaseMap.defaultMinZoom]
   /// (radar tiles); typhoon may go lower so the whole basin fits.
@@ -366,6 +371,9 @@ mixin MapLayerDefaults implements MapLayer {
 
   @override
   Future<void> onMemoryPressure(MapLibreMapController controller) async {}
+
+  @override
+  MapPalette? get lightMapPalette => null;
 
   @override
   double get mapMinZoom => BaseMap.defaultMinZoom;

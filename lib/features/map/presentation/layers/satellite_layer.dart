@@ -125,6 +125,9 @@ class SatelliteMapLayer extends RasterTimelineLayer {
   @override
   IconData get icon => Icons.satellite_alt_outlined;
 
+  @override
+  MapPalette get lightMapPalette => MapColors.lightSatellite;
+
   /// Fully opaque — IR brightness is the whole signal; blending it with the
   /// basemap would misread as thinner cloud.
   @override
