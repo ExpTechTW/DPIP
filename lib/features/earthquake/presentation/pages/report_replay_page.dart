@@ -120,11 +120,13 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// advances it through the alert set (modulo the count in the builder).
   int _eewIndex = 0;
 
-  /// Immersive view state, local to this page. The map tab's controller is
-  /// app-wide because the shell draws its nav bar; a replay is a pushed route
-  /// with no nav bar to move, and sharing that controller would let a replay
-  /// pop back into an unexpectedly chrome-less map tab (and vice versa).
-  final MapImmersiveController _immersive = MapImmersiveController();
+  /// The app-wide immersive toggle, borrowed from the map tab for the length
+  /// of this route. The shell draws the bottom nav bar for every branch,
+  /// including this nested one, so a page-local flag could hide the replay's
+  /// own chrome while leaving the bar on screen. The controller is reset on
+  /// entry and exit so the map tab and the replay never inherit each other's
+  /// mode.
+  late final MapImmersiveController _immersive;
 
   void _onImmersiveChanged() {
     if (mounted) setState(() {});
@@ -165,7 +167,10 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       cwaOnly: () => cwaOnly.enabled,
     )..start();
     _session.eew.addListener(_syncAnnouncement);
-    _immersive.addListener(_onImmersiveChanged);
+    _immersive = context.read<MapImmersiveController>()
+      ..addListener(_onImmersiveChanged);
+    // A replay opens with its controls, whatever the map tab was left in.
+    if (_immersive.value) _immersive.exit();
     _startTicker();
   }
 
@@ -294,9 +299,8 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     _speechSettings?.removeListener(_syncAnnouncement);
     _announcement?.dispose();
     _clockSecond.dispose();
-    _immersive
-      ..removeListener(_onImmersiveChanged)
-      ..dispose();
+    _immersive.removeListener(_onImmersiveChanged);
+    if (_immersive.value) _immersive.exit();
     _session.dispose();
     super.dispose();
   }

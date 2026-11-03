@@ -41,6 +41,7 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_replay_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -491,6 +492,9 @@ void main() {
         MultiProvider(
           providers: [
             Provider<ApiClient>.value(value: archive),
+            ChangeNotifierProvider<MapImmersiveController>(
+              create: (_) => MapImmersiveController(),
+            ),
             Provider<RealtimeService>.value(value: realtime),
             ChangeNotifierProvider<EewCwaOnlySettings>.value(value: cwaOnly),
             ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(
@@ -700,6 +704,9 @@ void main() {
         MultiProvider(
           providers: [
             Provider<ApiClient>.value(value: archive),
+            ChangeNotifierProvider<MapImmersiveController>(
+              create: (_) => MapImmersiveController(),
+            ),
             Provider<RealtimeService>.value(value: realtime),
             ChangeNotifierProvider<EewCwaOnlySettings>.value(value: cwaOnly),
             ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(
@@ -777,6 +784,9 @@ void main() {
             MultiProvider(
               providers: [
                 Provider<ApiClient>.value(value: archive),
+                ChangeNotifierProvider<MapImmersiveController>(
+                  create: (_) => MapImmersiveController(),
+                ),
                 Provider<RealtimeService>.value(value: realtime),
                 ChangeNotifierProvider<EewCwaOnlySettings>.value(
                   value: cwaOnly,
@@ -877,6 +887,9 @@ void main() {
           child: MultiProvider(
             providers: [
               Provider<ApiClient>.value(value: archive),
+              ChangeNotifierProvider<MapImmersiveController>(
+                create: (_) => MapImmersiveController(),
+              ),
               Provider<RealtimeService>.value(value: realtime),
               ChangeNotifierProvider<EewCwaOnlySettings>.value(value: cwaOnly),
               ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(
