@@ -133,9 +133,15 @@ class _MainShellState extends State<MainShell>
   /// animated; Home's sheet is a live drag and is followed exactly.
   void _syncNavDismiss() {
     final index = widget.navigationShell.currentIndex;
+    // Both the map tab and the data branch can show a surface that owns the
+    // whole screen (the map, or the earthquake replay nested under data). The
+    // controller is only true while one of them is in the mode; other branches
+    // never hide the bar.
+    final immersiveBranch =
+        index == _mapBranchIndex || index == _dataBranchIndex;
     final target = index == 0
         ? HomeChrome.navDismiss(_sheetExtent.value)
-        : index == _mapBranchIndex && _mapImmersive.value
+        : immersiveBranch && _mapImmersive.value
         ? 1.0
         : 0.0;
     if (target == _navTarget) return;
