@@ -199,6 +199,17 @@ void main() {
     await tester.pump();
     expect(find.text('replay-body'), findsOneWidget);
 
+    // The replay is nested under the data branch; its immersive mode must
+    // retract the shell's bar even though the map branch is not selected.
+    immersive.enter();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(label).dy, greaterThan(600));
+    immersive.exit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(label).dy, lessThan(600));
+
     await tester.tap(find.text(l10n.navHome));
     await tester.pump();
     await tester.pump();

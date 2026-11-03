@@ -389,6 +389,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           'style=$_styleLoaded controller=${mapTraceObject(_controller)}',
     );
     _wasVisible = visible;
+    // The controller is shared with the shell, which hides its bar for any
+    // immersive-capable branch. Leaving this tab must clear it, or a stale
+    // true would follow the user to another branch (or the replay's route)
+    // and hide a bar with no immersive surface behind it.
+    final tabIndex = widget.tabIndex;
+    if ((_immersive?.value ?? false) &&
+        tabIndex != null &&
+        _visibleTab?.value != tabIndex) {
+      _immersive?.exit();
+    }
     // Both edges, before the timeline reload: a realtime layer skips its
     // platform uploads while hidden and flushes once on return.
     if (changed) _active.onSurfaceVisibility(visible);
