@@ -1936,6 +1936,296 @@ final class ForecastUnavailablePresentationTests: XCTestCase {
     private let date = instant("2026-09-25T07:21:00Z")
     private let locales = ["en", "zh-Hant", "zh-Hans", "ja", "ko"]
 
+    private func staleForecastObservation(regionName: String) -> CurrentWeatherWidgetSnapshot {
+        CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407",
+            regionName: regionName, observationTime: Int(date.addingTimeInterval(-3_600).timeIntervalSince1970),
+            stationName: "臺中氣象觀測站", weather: "雷雨", weatherCode: 319,
+            condition: .thunderstorm, isNight: false,
+            nextDayNightTransitionTime: Int(date.addingTimeInterval(3_600).timeIntervalSince1970),
+            calibratedTimeOffsetMilliseconds: 0, temperature: 32, humidity: 100,
+            rain: 123.4, windDirection: "NE", windSpeed: 12.3, apparentTemperature: 38
+        )
+    }
+
+    private func forecastLayoutEntry(
+        regionName: String = "臺中市西屯區臺灣大道三段", age: TimeInterval = 45 * 60
+    ) -> DPIPWidgetEntry {
+        DPIPWidgetEntry(
+            date: date, snapshot: staleForecastObservation(regionName: regionName),
+            isStale: false, isNight: false,
+            forecast: forecastSnapshot(
+                sourceIdentifier: "current-location",
+                updateTime: Int64(date.addingTimeInterval(-age).timeIntervalSince1970 * 1_000),
+                receivedAt: milliseconds("2026-09-25T07:21:00Z"),
+                times: ["16:00", "17:00", "18:00", "19:00", "20:00"]
+            )
+        )
+    }
+
+    private func widgetLocalization(_ locale: String) throws -> Bundle {
+        let path = try XCTUnwrap(Bundle(for: Self.self).path(forResource: locale, ofType: "lproj"))
+        return try XCTUnwrap(Bundle(path: path))
+    }
+
+    func testStaleForecastLayoutDiagnostics() throws {
+        let entry = forecastLayoutEntry()
+        XCTAssertEqual(entry.forecastFreshness, .stale)
+        let margin: CGFloat = 16
+        var measurements = ["Family\tLocale\tDynamic Type\tContent W×H (pt)\tIdeal W×H (pt)"]
+        // Keep the earlier audit's ideal-size inputs for comparison with HEAD.
+        // Medium xxxLarge/AX5 and Large xxxLarge/AX5 have known layout pressure.
+        // Captures use finite HIG card bounds with simulated content margins.
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            XCTAssertFalse(entry.upcomingForecastPoints(for: family).isEmpty)
+            let contentSize = CGSize(width: 300, height: family == .systemMedium ? 158 : 354)
+            for locale in locales {
+                let bundle = try widgetLocalization(locale)
+                for size: DynamicTypeSize in [.large, .xxxLarge, .accessibility1, .accessibility3, .accessibility5] {
+                    autoreleasepool {
+                        let widget = family == .systemMedium
+                            ? AnyView(MediumCurrentWeatherView(entry: entry, localizationBundle: bundle))
+                            : AnyView(LargeCurrentWeatherView(entry: entry, localizationBundle: bundle))
+                        let view = widget
+                            .environment(\.locale, Locale(identifier: locale))
+                            .environment(\.dynamicTypeSize, size)
+                        // Ideal size measures layout pressure. The render below
+                        // independently proposes the finite content rectangle.
+                        let ideal = UIHostingController(rootView: view.fixedSize(horizontal: false, vertical: true))
+                        if #available(iOS 16.4, *) { ideal.safeAreaRegions = [] }
+                        let fitting = ideal.sizeThatFits(in: CGSize(width: contentSize.width, height: 1_000))
+                        measurements.append("\(family)\t\(locale)\t\(size)\t"
+                            + "\(contentSize.width)×\(contentSize.height)\t\(fitting.width)×\(fitting.height)")
+
+                        if ["en", "ja"].contains(locale),
+                           [.large, .xxxLarge, .accessibility5].contains(size) {
+                            let card = CGRect(x: 0, y: 0, width: 338, height: contentSize.height)
+                            let content = card.insetBy(dx: margin, dy: margin)
+                            let render = UIHostingController(rootView: view
+                                .environment(\.colorScheme, .light)
+                                .frame(width: content.width, height: content.height, alignment: .topLeading)
+                                .padding(margin)
+                                .background(Color.white)
+                                .clipped())
+                            if #available(iOS 16.4, *) { render.safeAreaRegions = [] }
+                            render.view.frame = card
+                            render.view.layoutIfNeeded()
+                            attachWidgetRender(render.view, named: "stale-audit-\(family)-\(locale)-\(size)")
+                        }
+                    }
+                }
+            }
+        }
+        let report = XCTAttachment(string: measurements.joined(separator: "\n"))
+        report.name = "stale-audit-ideal-sizes"
+        report.lifetime = .keepAlways
+        add(report)
+    }
+
+    private func attachWidgetRender(_ view: UIView, named name: String) {
+        let image = UIGraphicsImageRenderer(size: view.bounds.size).image { _ in
+            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testMediumStaleHeaderAndForecastInConstrainedHost() throws {
+        let cases: [(locale: String, region: String, size: DynamicTypeSize, compact: Bool, icon: Bool)] =
+            locales.map { ($0, "西屯", .large, false, false) } + [
+                ("en", "臺中市西屯區臺灣大道三段", .large, true, true),
+                ("ja", "臺中市西屯區臺灣大道三段", .accessibility1, false, true),
+                ("zh-Hant", "臺中市西屯區臺灣大道三段", .accessibility1, false, true),
+            ]
+        for sample in cases {
+            let entry = forecastLayoutEntry(regionName: sample.region)
+            XCTAssertEqual(entry.forecastFreshness, .stale)
+            let bundle = try widgetLocalization(sample.locale)
+            let context = "\(sample.locale) \(sample.region) \(sample.size)"
+            let widget = renderMediumWidget(entry, bundle: bundle, locale: sample.locale,
+                                            size: sample.size, compact: sample.compact,
+                                            capture: ["en", "ja"].contains(sample.locale) ? "stale-\(context)" : nil)
+            let time = try observationTime(in: widget.elements, entry: entry, locale: sample.locale)
+            let warningLabel = bundle.localizedString(forKey: "widget.forecast_outdated", value: nil, table: nil)
+            XCTAssertNotEqual(warningLabel, "widget.forecast_outdated", context)
+            let warnings = widget.elements.filter { $0.label == warningLabel }
+            XCTAssertEqual(warnings.count, 1, "Expected one stale warning: \(context)")
+            let warning = try XCTUnwrap(warnings.first, context)
+            if #available(iOS 16.0, *) {
+                XCTAssertTrue(warning.traits.contains(sample.icon ? .image : .staticText), context)
+            } else {
+                XCTAssertTrue(warning.traits.contains(.image), context)
+            }
+            let location = try XCTUnwrap(widget.elements.first { $0.label == sample.region }, context)
+            XCTAssertLessThanOrEqual(location.frame.maxX, warning.frame.minX, context)
+            XCTAssertLessThanOrEqual(warning.frame.maxX, time.frame.minX, context)
+            XCTAssertGreaterThan(warning.frame.maxY, time.frame.minY, context)
+            for element in [time, warning] {
+                XCTAssertFalse(element.frame.isEmpty, context)
+                XCTAssertTrue(widget.content.contains(element.frame), "\(context) \(element.label)")
+            }
+
+            let forecast = try forecastElements(in: widget.elements, size: sample.size, context: context)
+            let refreshLabel = bundle.localizedString(forKey: "widget.refresh_forecast", value: nil, table: nil)
+            let refresh = widget.elements.filter { $0.label == refreshLabel && $0.traits.contains(.button) }
+            if #available(iOS 17.0, *) {
+                XCTAssertEqual(refresh.count, 1, context)
+                let frame = try XCTUnwrap(refresh.first, context).frame
+                // AX rounds each edge to the display grid independently.
+                XCTAssertEqual(frame.width, 44 * widget.scale, accuracy: 1, context)
+                XCTAssertEqual(frame.height, 44 * widget.scale, accuracy: 1, context)
+                XCTAssertTrue(widget.card.contains(frame), "\(context): refresh outside card")
+                XCTAssertGreaterThanOrEqual(frame.minX, widget.content.minX, context)
+                XCTAssertLessThanOrEqual(frame.maxX, widget.content.maxX, context)
+                for element in forecast {
+                    XCTAssertLessThanOrEqual(element.frame.maxX, frame.minX, context)
+                }
+            } else {
+                XCTAssertTrue(refresh.isEmpty, context)
+            }
+            for element in forecast {
+                XCTAssertFalse(element.frame.isEmpty, context)
+                XCTAssertGreaterThanOrEqual(element.frame.minX, widget.content.minX, context)
+                XCTAssertLessThanOrEqual(element.frame.maxX, widget.content.maxX, context)
+                XCTAssertGreaterThanOrEqual(element.frame.minY, time.frame.maxY, context)
+            }
+            let forecastBottom = try XCTUnwrap(forecast.map(\.frame.maxY).max(), context)
+            if sample.compact {
+                // The narrow card already pressures the bottom forecast row.
+                // Use the same forecast and observation with a fresh publication
+                // as the control for added overflow from stale presentation.
+                let fresh = forecastLayoutEntry(regionName: sample.region, age: 15 * 60)
+                XCTAssertEqual(fresh.forecastFreshness, .fresh)
+                let control = renderMediumWidget(fresh, bundle: bundle, locale: sample.locale,
+                                                 size: sample.size, compact: true)
+                let controlForecast = try forecastElements(in: control.elements, size: sample.size, context: context)
+                let controlBottom = try XCTUnwrap(controlForecast.map(\.frame.maxY).max(), context)
+                XCTAssertLessThanOrEqual(forecastBottom, max(widget.card.maxY, controlBottom), context)
+            } else {
+                XCTAssertLessThanOrEqual(forecastBottom, widget.card.maxY, context)
+            }
+        }
+    }
+
+    func testMediumNonStaleStatesDoNotExposeStaleWarning() throws {
+        let stale = forecastLayoutEntry(regionName: "西屯")
+        let bundle = try widgetLocalization("zh-Hant")
+        let warning = bundle.localizedString(forKey: "widget.forecast_outdated", value: nil, table: nil)
+        let cases: [(offset: TimeInterval, forecast: ForecastWidgetSnapshot?,
+                     freshness: ForecastWidgetExpiry.Freshness?)] = [
+            (-30 * 60, stale.forecast, .fresh),
+            (80 * 60, stale.forecast, .expired),
+            (0, nil, nil),
+        ]
+        for sample in cases {
+            let entry = DPIPWidgetEntry(
+                date: stale.date.addingTimeInterval(sample.offset), snapshot: stale.snapshot,
+                isStale: false, isNight: false, forecast: sample.forecast
+            )
+            XCTAssertEqual(entry.forecastFreshness, sample.freshness)
+            for size: DynamicTypeSize in [.large, .accessibility1] {
+                let capture = sample.forecast == nil && size == .large ? "unavailable-zh-Hant-large" : nil
+                let widget = renderMediumWidget(entry, bundle: bundle, locale: "zh-Hant",
+                                                size: size, capture: capture)
+                _ = try observationTime(in: widget.elements, entry: entry, locale: "zh-Hant")
+                XCTAssertFalse(widget.elements.contains { $0.label == warning },
+                               "\(String(describing: sample.freshness)) \(size)")
+            }
+        }
+    }
+
+    private func forecastElements(in elements: [WidgetElement], size: DynamicTypeSize,
+                                  context: String) throws -> [WidgetElement] {
+        if size.isAccessibilitySize {
+            // SwiftUI combines this row for VoiceOver. Its SF Symbol may be
+            // absent from the combined label, so verify that glyph in captures.
+            let row = try XCTUnwrap(elements.first { $0.label.contains("16:00") }, context)
+            XCTAssertTrue(row.label.contains("22°"), context)
+            XCTAssertTrue(row.label.contains("20%"), context)
+            return [row]
+        }
+        let hours = ["16:00", "17:00", "18:00", "19:00", "20:00"]
+        let times = elements.filter { hours.contains($0.label) }
+        XCTAssertEqual(times.map(\.label).sorted(), hours, context)
+        let temperatures = elements.filter { $0.label == "22°" }
+        let probabilities = elements.filter { $0.label == "20%" }
+        let firstHour = try XCTUnwrap(times.first { $0.label == hours.first }, context)
+        let weatherIcons = elements.filter {
+            $0.traits.contains(.image) && $0.frame.minY >= firstHour.frame.maxY
+        }
+        XCTAssertEqual(temperatures.count, hours.count, context)
+        XCTAssertEqual(probabilities.count, hours.count, context)
+        XCTAssertEqual(weatherIcons.count, hours.count, context)
+        return times + temperatures + probabilities + weatherIcons
+    }
+
+    private func observationTime(in elements: [WidgetElement], entry: DPIPWidgetEntry,
+                                 locale: String) throws -> WidgetElement {
+        let snapshot = try XCTUnwrap(entry.snapshot)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: locale)
+        formatter.timeStyle = .short
+        let observed = formatter.string(from: Date(timeIntervalSince1970: TimeInterval(snapshot.observationTime)))
+        XCTAssertNotEqual(observed, formatter.string(from: entry.date), "Fixture must distinguish both clocks")
+        let matching = elements.filter { $0.label == observed }
+        XCTAssertEqual(matching.count, 1, "Expected the full observation time \(observed) for \(locale)")
+        return try XCTUnwrap(matching.first)
+    }
+
+    private struct WidgetElement {
+        let label: String
+        let traits: UIAccessibilityTraits
+        let frame: CGRect
+    }
+
+    private func renderMediumWidget(
+        _ entry: DPIPWidgetEntry, bundle: Bundle, locale: String, size: DynamicTypeSize,
+        compact: Bool = false, capture: String? = nil
+    ) -> (elements: [WidgetElement], card: CGRect, content: CGRect, scale: CGFloat) {
+        // Apple HIG Medium card examples and standard 16 pt content margins.
+        // AX geometry locates semantic elements. WidgetKit owns actual clipping.
+        let card = compact
+            ? CGRect(x: 0, y: 0, width: 338, height: 158)
+            : CGRect(x: 0, y: 0, width: 364, height: 170)
+        let margin: CGFloat = 16
+        let content = card.insetBy(dx: margin, dy: margin)
+        let host = UIHostingController(rootView:
+            MediumCurrentWeatherView(entry: entry, localizationBundle: bundle)
+                .environment(\.locale, Locale(identifier: locale))
+                .environment(\.dynamicTypeSize, size)
+                .environment(\.colorScheme, .light)
+                .frame(width: content.width, height: content.height, alignment: .topLeading)
+                .padding(margin)
+                .background(Color.white)
+        )
+        if #available(iOS 16.4, *) { host.safeAreaRegions = [] }
+        let window = UIWindow(frame: card)
+        defer { window.isHidden = true }
+        window.rootViewController = host
+        window.isHidden = false
+        host.view.frame = card
+        host.view.layoutIfNeeded()
+
+        let scale = max(host.traitCollection.displayScale, 1)
+        func pixels(_ rect: CGRect) -> CGRect {
+            let x = (rect.minX * scale).rounded()
+            let y = (rect.minY * scale).rounded()
+            return CGRect(x: x, y: y, width: (rect.maxX * scale).rounded() - x,
+                          height: (rect.maxY * scale).rounded() - y)
+        }
+        let elements = (0..<host.view.accessibilityElementCount()).compactMap { index -> WidgetElement? in
+            guard let element = host.view.accessibilityElement(at: index) as? NSObject,
+                  let label = element.accessibilityLabel else { return nil }
+            return WidgetElement(label: label, traits: element.accessibilityTraits,
+                                 frame: pixels(element.accessibilityFrame))
+        }
+        if let capture { attachWidgetRender(host.view, named: capture) }
+        return (elements, pixels(UIAccessibility.convertToScreenCoordinates(card, in: host.view)),
+                pixels(UIAccessibility.convertToScreenCoordinates(content, in: host.view)), scale)
+    }
+
     func testMediumAndLargeUnavailableSectionFitsAllLocalesAndLargestText() throws {
         let current = currentSnapshot(target: .saved(regionCode: "407"))
         let entry = DPIPWidgetEntry(date: date, snapshot: current, isStale: false, isNight: false)

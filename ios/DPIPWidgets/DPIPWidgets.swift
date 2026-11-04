@@ -305,12 +305,44 @@ struct MediumCurrentWeatherView: View {
                         }
                     }
 
-                    Spacer()
+                    Spacer(minLength: 6)
 
-                    Text(observationDate, style: .time)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        if entry.forecastFreshness == .stale,
+                           !entry.upcomingForecastPoints(for: .systemMedium).isEmpty {
+                            if #available(iOS 16.0, *) {
+                                ViewThatFits(in: .horizontal) {
+                                    Text("widget.forecast_outdated", bundle: localizationBundle)
+                                        .font(.system(size: 10))
+                                        .foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: true, vertical: false)
+
+                                    Image(systemName: "exclamationmark.triangle")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(.secondary)
+                                        .fixedSize()
+                                        .accessibilityLabel(
+                                            Text("widget.forecast_outdated", bundle: localizationBundle)
+                                        )
+                                }
+                            } else {
+                                // Fallback for iOS 15
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize()
+                                    .accessibilityLabel(
+                                        Text("widget.forecast_outdated", bundle: localizationBundle)
+                                    )
+                            }
+                        }
+
+                        Text(observationDate, style: .time)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
+                    }
                 }
 
                 HStack(alignment: .center) {
@@ -643,11 +675,33 @@ private struct AccessibleCurrentWeatherContent: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
+
                 Spacer(minLength: 0)
-                Text(Date(timeIntervalSince1970: TimeInterval(snapshot.observationTime)), style: .time)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+
+                // Accessibility layout: show stale forecast indicator
+                // beside the observation time on Medium widgets.
+                if family == .systemMedium,
+                   entry.forecastFreshness == .stale,
+                   !entry.upcomingForecastPoints(for: .systemMedium).isEmpty {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                        .accessibilityLabel(
+                            Text("widget.forecast_outdated", bundle: localizationBundle)
+                        )
+                }
+
+                Text(
+                    Date(timeIntervalSince1970: TimeInterval(snapshot.observationTime)),
+                    style: .time
+                )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                // Reserve the observation time before the long location name
+                // can consume the Medium accessibility header's width.
+                .fixedSize(horizontal: family == .systemMedium, vertical: false)
             }
             .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 
@@ -854,11 +908,16 @@ struct HourlyForecastSection: View {
             HStack(spacing: 4) {
                 VStack(alignment: .leading, spacing: 4) {
                     forecastContent(points: points)
-                    Text("widget.forecast_outdated", bundle: localizationBundle)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                        .fixedSize(horizontal: false, vertical: true)
+
+                    // Medium shows the stale warning in the header.
+                    // Keep the existing placement for other widget families.
+                    if family != .systemMedium {
+                        Text("widget.forecast_outdated", bundle: localizationBundle)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .forecastInvalidatableContent()
@@ -941,6 +1000,7 @@ struct HourlyForecastSection: View {
            let identifier = entry.forecastRefreshIdentifier(for: family) {
             Button(intent: RefreshForecastIntent(locationIdentifier: identifier)) {
                 Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 18, weight: .medium))
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
@@ -1046,6 +1106,106 @@ struct DPIPWidgets_Previews: PreviewProvider {
         forecast: previewContent.forecast
     )
 
+    private static let noForecastPreviewEntry = DPIPWidgetEntry(
+        date: previewEntry.date,
+        snapshot: previewEntry.snapshot,
+        isStale: previewEntry.isStale,
+        isNight: previewEntry.isNight,
+        forecast: nil,
+        locationTarget: previewEntry.locationTarget
+    )
+
+    private static let noWeatherDataEntry = DPIPWidgetEntry(
+        date: previewNow,
+        snapshot: nil,
+        isStale: false,
+        isNight: false,
+        forecast: nil
+    )
+
+    private static let stalePreviewEntry: DPIPWidgetEntry? = {
+        guard let snapshot = previewContent.snapshot,
+              let forecast = previewContent.forecast else {
+            return nil
+        }
+
+        // Convert the forecast publication time to device-clock time.
+        let publicationDate = Date(
+            timeIntervalSince1970:
+                TimeInterval(forecast.updateTime) / 1_000
+        ).addingTimeInterval(
+            -TimeInterval(snapshot.calibratedTimeOffsetMilliseconds) / 1_000
+        )
+
+        // 45 minutes after publication: expected .stale.
+        let staleDate = publicationDate.addingTimeInterval(45 * 60)
+
+        return DPIPWidgetEntry(
+            date: staleDate,
+            snapshot: snapshot,
+            isStale: false,
+            isNight: snapshot.isNight,
+            forecast: forecast
+        )
+    }()
+
+    private static let expiredPreviewEntry: DPIPWidgetEntry? = {
+        guard let base = stalePreviewEntry else {
+            return nil
+        }
+
+        // The stale fixture is 45 minutes after publication.
+        // Advance another 80 minutes to reach 125 minutes.
+        let expiredDate = base.date.addingTimeInterval(80 * 60)
+
+        return DPIPWidgetEntry(
+            date: expiredDate,
+            snapshot: base.snapshot,
+            isStale: base.isStale,
+            isNight: base.isNight,
+            forecast: base.forecast,
+            locationTarget: base.locationTarget
+        )
+    }()
+
+    private static let longRegionStaleEntry: DPIPWidgetEntry? = {
+        guard let base = stalePreviewEntry,
+              let snapshot = base.snapshot else {
+            return nil
+        }
+
+        let longRegionSnapshot = CurrentWeatherWidgetSnapshot(
+            schemaVersion: snapshot.schemaVersion,
+            sourceIdentifier: snapshot.sourceIdentifier,
+            regionCode: snapshot.regionCode,
+            regionName: "臺中市西屯區臺灣大道三段",
+            observationTime: snapshot.observationTime,
+            stationName: snapshot.stationName,
+            weather: snapshot.weather,
+            weatherCode: snapshot.weatherCode,
+            condition: snapshot.condition,
+            isNight: snapshot.isNight,
+            nextDayNightTransitionTime: snapshot.nextDayNightTransitionTime,
+            calibratedTimeOffsetMilliseconds:
+                snapshot.calibratedTimeOffsetMilliseconds,
+            temperature: snapshot.temperature,
+            humidity: snapshot.humidity,
+            rain: snapshot.rain,
+            windDirection: snapshot.windDirection,
+            windSpeed: snapshot.windSpeed,
+            apparentTemperature: snapshot.apparentTemperature
+        )
+
+        return DPIPWidgetEntry(
+            date: base.date,
+            snapshot: longRegionSnapshot,
+            isStale: base.isStale,
+            isNight: base.isNight,
+            forecast: base.forecast,
+            locationTarget: base.locationTarget
+        )
+    }()
+
     private static let missingOptionalDataEntry = DPIPWidgetEntry(
         date: previewNow,
         snapshot: CurrentWeatherWidgetSnapshot(
@@ -1140,6 +1300,62 @@ struct DPIPWidgets_Previews: PreviewProvider {
                 .previewContext(
                     WidgetPreviewContext(family: .systemMedium)
                 )
+
+            previewView(entry: noForecastPreviewEntry)
+                .environment(\.locale, Locale(identifier: "zh-TW"))
+                .previewDisplayName("Medium — No Forecast")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: noWeatherDataEntry)
+                .environment(\.locale, Locale(identifier: "zh-TW"))
+                .previewDisplayName("Medium — No Weather Data")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            if let stalePreviewEntry {
+                previewView(entry: stalePreviewEntry)
+                    .environment(\.locale, Locale(identifier: "zh-tw"))
+                    .previewDisplayName("Medium — Stale (TW)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+
+                previewView(entry: stalePreviewEntry)
+                    .environment(\.locale, Locale(identifier: "ja"))
+                    .previewDisplayName("Medium — Stale (JA)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+
+                previewView(entry: stalePreviewEntry)
+                    .environment(\.locale, Locale(identifier: "ja"))
+                    .environment(\.dynamicTypeSize, .accessibility1)
+                    .previewDisplayName("Medium — Stale (JA, Accessibility)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+            }
+
+            if let expiredPreviewEntry {
+                previewView(entry: expiredPreviewEntry)
+                    .environment(\.locale, Locale(identifier: "zh-TW"))
+                    .previewDisplayName("Medium — Expired Forecast")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+            }
+
+            if let longRegionStaleEntry {
+                previewView(entry: longRegionStaleEntry)
+                    .environment(\.locale, Locale(identifier: "ja"))
+                    .previewDisplayName("Medium — Stale (Long Region)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+            }
         }
     }
 }
