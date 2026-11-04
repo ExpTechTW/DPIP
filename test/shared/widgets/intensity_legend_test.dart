@@ -36,4 +36,20 @@ void main() {
       expect(find.byType(Container), findsNWidgets(9));
     },
   );
+
+  testWidgets('the felt scale omits levels above the warning maximum', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      const IntensityLegend(mode: IntensityLegendMode.eew, maxEewLevel: 5),
+    );
+    for (final label in ['5⁻', '4', '3', '2', '1']) {
+      expect(find.text(label), findsOneWidget);
+    }
+    for (final label in ['7', '6⁺', '6⁻', '5⁺']) {
+      expect(find.text(label), findsNothing);
+    }
+    expect(find.byType(Container), findsNWidgets(5));
+  });
 }

@@ -350,13 +350,21 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                             legend: ListenableBuilder(
                               listenable: _session.eew,
                               builder: (context, _) {
-                                final hasEew =
-                                    _session.eew.alerts.hasUncancelled;
+                                final alerts = _session.eew.alerts.uncancelled;
+                                final maxEewLevel = alerts.isEmpty
+                                    ? null
+                                    : alerts
+                                          .map(
+                                            (alert) =>
+                                                alert.info.max.clamp(0, 9),
+                                          )
+                                          .reduce((a, b) => a > b ? a : b);
                                 return MapLegendCard(
                                   child: IntensityLegend(
-                                    mode: hasEew
+                                    mode: alerts.isNotEmpty
                                         ? IntensityLegendMode.eew
                                         : IntensityLegendMode.rts,
+                                    maxEewLevel: maxEewLevel,
                                   ),
                                 );
                               },
