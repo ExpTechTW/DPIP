@@ -1094,6 +1094,12 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapLayers => 'Mga Layer';
 
   @override
+  String get mapImmersive => 'Immersive na mapa';
+
+  @override
+  String get mapImmersiveExit => 'Lumabas sa immersive mode';
+
+  @override
   String get meshtasticHardware => 'Hardware';
 
   @override
@@ -2569,6 +2575,9 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get mapTownLabels => 'Mga pangalan ng bayan';
+
+  @override
+  String get mapSettingsPanel => 'Panel ng mga setting ng mapa';
 
   @override
   String get notifySetFailed => 'Hindi ma-save ang setting. Pakisubukan muli.';

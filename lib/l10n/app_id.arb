@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "Pilih wilayah untuk melihat prakiraan",
   "mapLayers": "Lapisan",
+  "mapImmersive": "Peta imersif",
+  "mapImmersiveExit": "Keluar dari mode imersif",
   "meshtasticHardware": "Perangkat keras",
   "languageSettings": "Bahasa",
   "@moonNextFullMoon": {
@@ -1183,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "Jalan & bangunan",
   "mapOsmSectionLabelsAndPlaces": "Label & tempat",
   "mapTownLabels": "Nama kecamatan",
+  "mapSettingsPanel": "Panel pengaturan peta",
   "notifySetFailed": "Tidak dapat menyimpan pengaturan. Silakan coba lagi.",
   "meshtasticDisconnect": "Putuskan",
   "meshtasticUndecoded": "Belum didekripsi",

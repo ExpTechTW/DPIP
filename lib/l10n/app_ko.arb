@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "지역을 선택하면 예보를 볼 수 있습니다",
   "mapLayers": "레이어",
+  "mapImmersive": "몰입형 지도",
+  "mapImmersiveExit": "몰입 모드 종료",
   "meshtasticHardware": "하드웨어",
   "languageSettings": "언어",
   "@moonNextFullMoon": {
@@ -1183,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "도로 및 건물",
   "mapOsmSectionLabelsAndPlaces": "레이블 및 장소",
   "mapTownLabels": "읍면동 이름",
+  "mapSettingsPanel": "지도 설정 패널",
   "notifySetFailed": "설정을 저장하지 못했습니다. 다시 시도해 주세요.",
   "meshtasticDisconnect": "연결 해제",
   "meshtasticUndecoded": "복호화되지 않음",

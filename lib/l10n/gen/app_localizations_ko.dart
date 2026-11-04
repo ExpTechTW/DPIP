@@ -1064,6 +1064,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapLayers => '레이어';
 
   @override
+  String get mapImmersive => '몰입형 지도';
+
+  @override
+  String get mapImmersiveExit => '몰입 모드 종료';
+
+  @override
   String get meshtasticHardware => '하드웨어';
 
   @override
@@ -2509,6 +2515,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get mapTownLabels => '읍면동 이름';
+
+  @override
+  String get mapSettingsPanel => '지도 설정 패널';
 
   @override
   String get notifySetFailed => '설정을 저장하지 못했습니다. 다시 시도해 주세요.';

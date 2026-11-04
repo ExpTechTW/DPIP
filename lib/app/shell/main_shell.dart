@@ -14,6 +14,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -40,7 +41,8 @@ class MainShell extends StatefulWidget {
   State<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> with RouteAware {
+class _MainShellState extends State<MainShell>
+    with RouteAware, SingleTickerProviderStateMixin {
   final int _traceId = nextMapTraceId();
 
   String get _traceScope => 'shell#$_traceId';
@@ -76,6 +78,21 @@ class _MainShellState extends State<MainShell> with RouteAware {
   final ValueNotifier<double> _navDismiss = ValueNotifier(0);
   late final HomeSheetExtent _sheetExtent;
 
+  /// Drives [_navDismiss] on the immersive edge. Home's sheet writes the same
+  /// notifier directly on every drag tick — that is a drag, not a transition —
+  /// so this controller only runs for the map mode's slide.
+  late final AnimationController _navSlide;
+
+  /// Where the bar is heading, kept apart from the animation's current value so
+  /// a rebuild mid-transition does not restart it.
+  double _navTarget = 0;
+
+  /// The map tab's immersive toggle. It dismisses the bar for the same reason
+  /// a full-screen Home sheet does: the map is meant to own the whole screen,
+  /// and a navigation strip over it is the one piece of shell chrome the map
+  /// cannot hide itself.
+  late final MapImmersiveController _mapImmersive;
+
   /// The launch summary's frame window, prerelease builds only. Started here
   /// rather than at the app's first frame because the shell is the first
   /// screen with a map on it — onboarding has none — and it owns the one
@@ -86,7 +103,13 @@ class _MainShellState extends State<MainShell> with RouteAware {
   void initState() {
     super.initState();
     _trace(() => 'init current=${widget.navigationShell.currentIndex}');
+    _navSlide = AnimationController(
+      vsync: this,
+      duration: mapImmersiveTransition,
+    )..addListener(() => _navDismiss.value = _navSlide.value);
     _sheetExtent = context.read<HomeSheetExtent>()
+      ..addListener(_syncNavDismiss);
+    _mapImmersive = context.read<MapImmersiveController>()
       ..addListener(_syncNavDismiss);
     if (isPrereleaseBuild()) {
       // Home (its live map backdrop and the monitor banner) and the map tab
@@ -105,13 +128,36 @@ class _MainShellState extends State<MainShell> with RouteAware {
     }
   }
 
-  /// Only Home dismisses the bar; every other tab keeps it (dismiss 0).
+  /// Home's sheet or an immersive map dismisses the bar; every other tab and
+  /// every other map state keeps it (dismiss 0). The immersive edge is
+  /// animated; Home's sheet is a live drag and is followed exactly.
   void _syncNavDismiss() {
-    final dismiss = widget.navigationShell.currentIndex == 0
+    final index = widget.navigationShell.currentIndex;
+    // Both the map tab and the data branch can show a surface that owns the
+    // whole screen (the map, or the earthquake replay nested under data). The
+    // controller is only true while one of them is in the mode; other branches
+    // never hide the bar.
+    final immersiveBranch =
+        index == _mapBranchIndex || index == _dataBranchIndex;
+    final target = index == 0
         ? HomeChrome.navDismiss(_sheetExtent.value)
+        : immersiveBranch && _mapImmersive.value
+        ? 1.0
         : 0.0;
-    if (dismiss == _navDismiss.value) return;
-    _navDismiss.value = dismiss;
+    if (target == _navTarget) return;
+    _navTarget = target;
+    if (index == 0) {
+      _navSlide.stop();
+      _navSlide.value = target;
+      return;
+    }
+    unawaited(
+      _navSlide.animateTo(
+        target,
+        duration: mapImmersiveTransition,
+        curve: mapImmersiveCurve,
+      ),
+    );
   }
 
   @override
@@ -155,6 +201,8 @@ class _MainShellState extends State<MainShell> with RouteAware {
     _startupFrames?.stop();
     if (_shellRoute != null) shellRouteObserver.unsubscribe(this);
     _sheetExtent.removeListener(_syncNavDismiss);
+    _mapImmersive.removeListener(_syncNavDismiss);
+    _navSlide.dispose();
     _navDismiss.dispose();
     _visibleTab.dispose();
     super.dispose();

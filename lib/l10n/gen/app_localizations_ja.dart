@@ -1064,6 +1064,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapLayers => 'レイヤー';
 
   @override
+  String get mapImmersive => '没入型マップ';
+
+  @override
+  String get mapImmersiveExit => '全画面表示を終了';
+
+  @override
   String get meshtasticHardware => 'ハードウェア';
 
   @override
@@ -2508,6 +2514,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get mapTownLabels => '郷鎮名';
+
+  @override
+  String get mapSettingsPanel => '地図設定パネル';
 
   @override
   String get notifySetFailed => '設定を保存できませんでした。もう一度お試しください。';

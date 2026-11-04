@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "Chọn khu vực để xem dự báo",
   "mapLayers": "Lớp bản đồ",
+  "mapImmersive": "Bản đồ toàn màn hình",
+  "mapImmersiveExit": "Thoát chế độ toàn màn hình",
   "meshtasticHardware": "Phần cứng",
   "languageSettings": "Ngôn ngữ",
   "@moonNextFullMoon": {
@@ -1183,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "Đường & tòa nhà",
   "mapOsmSectionLabelsAndPlaces": "Nhãn & địa điểm",
   "mapTownLabels": "Tên hương trấn",
+  "mapSettingsPanel": "Bảng cài đặt bản đồ",
   "notifySetFailed": "Không thể lưu cài đặt. Vui lòng thử lại.",
   "meshtasticDisconnect": "Ngắt kết nối",
   "meshtasticUndecoded": "Chưa giải mã",

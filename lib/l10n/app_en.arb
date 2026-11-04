@@ -1416,6 +1416,14 @@
   },
   "homeForecastUnavailable": "Select a township to see the forecast",
   "mapLayers": "Layers",
+  "mapImmersive": "Immersive map",
+  "mapImmersiveExit": "Exit immersive mode",
+  "@mapImmersive": {
+    "description": "Layer sheet entry that hides the map controls and the navigation bar"
+  },
+  "@mapImmersiveExit": {
+    "description": "Tooltip for the floating button that leaves immersive map mode"
+  },
   "@homeRainTrendHeavyStopping": {
     "description": "Home rain trend subtitle: heavy rain forecast to stop partway through the hour",
     "placeholders": {
@@ -1426,6 +1434,9 @@
   },
   "@mapTownLabels": {
     "description": "Map setting: show township-name labels when the map is zoomed in"
+  },
+  "@mapSettingsPanel": {
+    "description": "Tooltip for the button that opens the map settings panel"
   },
   "@weatherModeRain": {
     "description": "Weather animation forced to rain"
@@ -2996,6 +3007,7 @@
   "mapOsmSectionRoadsAndBuildings": "Roads & buildings",
   "mapOsmSectionLabelsAndPlaces": "Labels & places",
   "mapTownLabels": "Township names",
+  "mapSettingsPanel": "Map settings panel",
   "@typhoonOverlayWarningTooltip": {
     "description": "Tooltip for the warning-areas overlay toggle"
   },

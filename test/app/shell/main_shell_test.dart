@@ -25,6 +25,7 @@ import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/default_map_layer_ui.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,9 @@ void main() {
           ),
           ChangeNotifierProvider<EndpointHealthMonitor>.value(value: endpoints),
           ChangeNotifierProvider<MeshUnread>.value(value: unread),
+          ChangeNotifierProvider<MapImmersiveController>(
+            create: (_) => MapImmersiveController(),
+          ),
         ],
         child: MaterialApp.router(
           locale: const Locale('en'),
@@ -144,6 +148,35 @@ void main() {
     expect(find.text('map-body'), findsOneWidget);
     expect(handoff.takePending()?.layerId, layers.layer.id);
 
+    // An immersive map owns the whole screen, so the shell's bar slides away
+    // with it and comes back on exit — the map cannot reach the bar itself.
+    final immersive = Provider.of<MapImmersiveController>(
+      tester.element(find.byType(MainShell)),
+      listen: false,
+    );
+    final label = find.text(layers.layer.label(l10n));
+    final restingY = tester.getTopLeft(label).dy;
+
+    immersive.enter();
+    await tester.pump();
+    // The first frame starts the transition without moving the bar yet; a
+    // snap would already be at the bottom here.
+    expect(tester.getTopLeft(label).dy, closeTo(restingY, 0.01));
+
+    await tester.pump(const Duration(milliseconds: 110));
+    final midway = tester.getTopLeft(label).dy;
+    expect(midway, greaterThan(restingY));
+
+    await tester.pump(const Duration(milliseconds: 200));
+    final hiddenY = tester.getTopLeft(label).dy;
+    expect(hiddenY, greaterThan(midway));
+    expect(hiddenY, greaterThan(600));
+
+    immersive.exit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(label).dy, lessThan(600));
+
     unread.recordIncoming(1, 1);
     endpoints.failure(
       ApiTier.lbApi,
@@ -165,6 +198,17 @@ void main() {
     await tester.pump();
     await tester.pump();
     expect(find.text('replay-body'), findsOneWidget);
+
+    // The replay is nested under the data branch; its immersive mode must
+    // retract the shell's bar even though the map branch is not selected.
+    immersive.enter();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(label).dy, greaterThan(600));
+    immersive.exit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(label).dy, lessThan(600));
 
     await tester.tap(find.text(l10n.navHome));
     await tester.pump();

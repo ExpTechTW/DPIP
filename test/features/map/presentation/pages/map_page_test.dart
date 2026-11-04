@@ -46,6 +46,7 @@ import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:flutter/foundation.dart';
@@ -218,6 +219,9 @@ void main() {
           ),
           ChangeNotifierProvider<MapLayerVisibilityController>.value(
             value: visibility,
+          ),
+          ChangeNotifierProvider<MapImmersiveController>(
+            create: (_) => MapImmersiveController(),
           ),
           ChangeNotifierProvider<MapLayerOrderController>.value(
             value: MapLayerOrderController(settings),

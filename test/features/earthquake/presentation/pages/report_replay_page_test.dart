@@ -41,6 +41,7 @@ import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
 import 'package:dpip/features/earthquake/domain/trem_station_repository.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_replay_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -491,6 +492,9 @@ void main() {
         MultiProvider(
           providers: [
             Provider<ApiClient>.value(value: archive),
+            ChangeNotifierProvider<MapImmersiveController>(
+              create: (_) => MapImmersiveController(),
+            ),
             Provider<RealtimeService>.value(value: realtime),
             ChangeNotifierProvider<EewCwaOnlySettings>.value(value: cwaOnly),
             ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(
@@ -606,7 +610,7 @@ void main() {
       // Settle, never a bare pump: the menu opens on an animation, so one
       // frame leaves every row mid-flight and a tap lands wherever it was
       // passing.
-      await tester.tap(find.byTooltip('Township names'));
+      await tester.tap(find.byTooltip('Map settings panel'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Detailed map'));
       await tester.pumpAndSettle();
@@ -614,7 +618,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Township names'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Township names'));
+      await tester.tap(find.byTooltip('Map settings panel'));
       await tester.pumpAndSettle();
 
       platform.lookEast();
@@ -629,6 +633,39 @@ void main() {
       await tester.pump();
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pump();
+
+      // The replay carries the same immersive chip as the map tab, and hides
+      // its own back/legend/ranking and base-map chrome while it is on.
+      expect(find.byTooltip(l10n.mapImmersive), findsOneWidget);
+      await tester.tap(find.byTooltip(l10n.mapImmersive));
+      await tester.pump();
+      expect(find.byIcon(Icons.arrow_back).hitTestable(), findsNothing);
+      expect(find.byTooltip(l10n.mapLegendExpand).hitTestable(), findsNothing);
+      expect(find.byTooltip('Map settings panel').hitTestable(), findsNothing);
+      expect(find.byTooltip(l10n.mapImmersiveExit), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.byTooltip(l10n.mapImmersiveExit));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byTooltip(l10n.mapImmersiveExit), findsNothing);
+      expect(find.byIcon(Icons.arrow_back).hitTestable(), findsOneWidget);
+      expect(
+        find.byTooltip(l10n.mapLegendExpand).hitTestable(),
+        findsOneWidget,
+      );
+      expect(
+        find.byTooltip('Map settings panel').hitTestable(),
+        findsOneWidget,
+      );
+
+      // A back press belongs to the mode first: it must not pop the replay.
+      await tester.tap(find.byTooltip(l10n.mapImmersive));
+      await tester.pump();
+      await tester.binding.handlePopRoute();
+      await tester.pump();
+      expect(find.byType(ReportReplayPage), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back).hitTestable(), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pump();
@@ -670,6 +707,9 @@ void main() {
         MultiProvider(
           providers: [
             Provider<ApiClient>.value(value: archive),
+            ChangeNotifierProvider<MapImmersiveController>(
+              create: (_) => MapImmersiveController(),
+            ),
             Provider<RealtimeService>.value(value: realtime),
             ChangeNotifierProvider<EewCwaOnlySettings>.value(value: cwaOnly),
             ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(
@@ -747,6 +787,9 @@ void main() {
             MultiProvider(
               providers: [
                 Provider<ApiClient>.value(value: archive),
+                ChangeNotifierProvider<MapImmersiveController>(
+                  create: (_) => MapImmersiveController(),
+                ),
                 Provider<RealtimeService>.value(value: realtime),
                 ChangeNotifierProvider<EewCwaOnlySettings>.value(
                   value: cwaOnly,
@@ -847,6 +890,9 @@ void main() {
           child: MultiProvider(
             providers: [
               Provider<ApiClient>.value(value: archive),
+              ChangeNotifierProvider<MapImmersiveController>(
+                create: (_) => MapImmersiveController(),
+              ),
               Provider<RealtimeService>.value(value: realtime),
               ChangeNotifierProvider<EewCwaOnlySettings>.value(value: cwaOnly),
               ChangeNotifierProvider<EewSpokenAnnouncementSettings>.value(

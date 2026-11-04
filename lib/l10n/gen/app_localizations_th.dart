@@ -1080,6 +1080,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapLayers => 'ชั้นข้อมูล';
 
   @override
+  String get mapImmersive => 'แผนที่เต็มจอ';
+
+  @override
+  String get mapImmersiveExit => 'ออกจากโหมดเต็มจอ';
+
+  @override
   String get meshtasticHardware => 'ฮาร์ดแวร์';
 
   @override
@@ -2545,6 +2551,9 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get mapTownLabels => 'ชื่อตำบล';
+
+  @override
+  String get mapSettingsPanel => 'แผงการตั้งค่าแผนที่';
 
   @override
   String get notifySetFailed => 'ไม่สามารถบันทึกการตั้งค่าได้ โปรดลองอีกครั้ง';

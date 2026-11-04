@@ -2064,6 +2064,18 @@ abstract class AppLocalizations {
   /// **'Layers'**
   String get mapLayers;
 
+  /// Layer sheet entry that hides the map controls and the navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Immersive map'**
+  String get mapImmersive;
+
+  /// Tooltip for the floating button that leaves immersive map mode
+  ///
+  /// In en, this message translates to:
+  /// **'Exit immersive mode'**
+  String get mapImmersiveExit;
+
   /// Board model
   ///
   /// In en, this message translates to:
@@ -4799,6 +4811,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Township names'**
   String get mapTownLabels;
+
+  /// Tooltip for the button that opens the map settings panel
+  ///
+  /// In en, this message translates to:
+  /// **'Map settings panel'**
+  String get mapSettingsPanel;
 
   /// Snackbar shown when saving a notification channel fails
   ///

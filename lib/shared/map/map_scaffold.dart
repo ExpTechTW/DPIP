@@ -22,6 +22,8 @@ import 'package:dpip/shared/map/map_layer_switcher.dart';
 import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
+import 'package:dpip/shared/map/map_immersive.dart';
+import 'package:dpip/shared/map/map_immersive_chrome.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
@@ -31,6 +33,7 @@ import 'package:dpip/shared/navigation/refresh_on_appear.dart'
     show VisibleTab, VisibleTabScope;
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -122,6 +125,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// close any sheet open above it, such as the layer-order editor the hide
   /// itself was just tapped from.
   MapLayerVisibilityController? _visibility;
+
+  /// The map tab's immersive toggle — chrome hidden, shell nav dismissed. Read
+  /// through a listener rather than `context.watch` so entering the mode can
+  /// also drop the measured timeline height (see [_onImmersiveChanged]).
+  MapImmersiveController? _immersive;
 
   late MapLayer _active = _resolveInitial(widget);
 
@@ -259,6 +267,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       _visibility?.removeListener(_onVisibilityChanged);
       _visibility = visibility..addListener(_onVisibilityChanged);
     }
+    final immersive = context.read<MapImmersiveController>();
+    if (immersive != _immersive) {
+      _immersive?.removeListener(_onImmersiveChanged);
+      _immersive = immersive..addListener(_onImmersiveChanged);
+    }
     final visibleTab = VisibleTabScope.of(context);
     if (identical(visibleTab, _visibleTab)) return;
     _visibleTab?.removeListener(_onTabChanged);
@@ -352,6 +365,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     _handoff?.removeListener(_onHandoff);
     _stationHandoff?.removeListener(_onStationHandoff);
     _visibility?.removeListener(_onVisibilityChanged);
+    _immersive?.removeListener(_onImmersiveChanged);
     super.dispose();
   }
 
@@ -375,6 +389,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
           'style=$_styleLoaded controller=${mapTraceObject(_controller)}',
     );
     _wasVisible = visible;
+    // The controller is shared with the shell, which hides its bar for any
+    // immersive-capable branch. Leaving this tab must clear it, or a stale
+    // true would follow the user to another branch (or the replay's route)
+    // and hide a bar with no immersive surface behind it.
+    final tabIndex = widget.tabIndex;
+    if ((_immersive?.value ?? false) &&
+        tabIndex != null &&
+        _visibleTab?.value != tabIndex) {
+      _immersive?.exit();
+    }
     // Both edges, before the timeline reload: a realtime layer skips its
     // platform uploads while hidden and flushes once on return.
     if (changed) _active.onSurfaceVisibility(visible);
@@ -578,8 +602,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   /// How much of the map's bottom the active layer's resting chrome hides: the
   /// layer's own declared share (a collapsed sheet, a status strip) plus the
   /// timeline, whose real height the scaffold measures because it owns it.
+  ///
+  /// The timeline keeps its place in the tree while immersive — it fades out
+  /// rather than unmounting — so its measured height is still real; it just is
+  /// not in the way any more.
   double _bottomInset(Size size) =>
-      size.height * _active.bottomChromeFraction + _timelineHeight;
+      size.height * _active.bottomChromeFraction +
+      ((_immersive?.value ?? false) ? 0 : _timelineHeight);
 
   /// Measures the timeline panel after layout.
   ///
@@ -1262,23 +1291,82 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     if (candidate.id != _active.id) _onLayerSelected(candidate);
   }
 
+  /// Drops a sheet layer's bottom chrome toward the space the shell's nav bar
+  /// leaves behind in immersive mode.
+  ///
+  /// `MainShell` extends its body behind the nav bar, so Scaffold adds the
+  /// bar's height to this subtree's MediaQuery padding. Sliding the bar away
+  /// does not shrink that padding, which left the 強震監視器 status strip — and
+  /// every other sheet layer's peek — floating a bar's height above the
+  /// bottom. Animate the inset away on the same curve as the bar, but stop one
+  /// spacing token above the system inset: flush against it read as too low
+  /// next to the home indicator, while the bar's full height read as a gap.
+  Widget _immersiveSheetInset({
+    required bool immersive,
+    required Widget child,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: immersive ? 1 : 0),
+      duration: mapImmersiveTransition,
+      curve: mapImmersiveCurve,
+      builder: (context, progress, child) {
+        final media = MediaQuery.of(context);
+        final extra = media.padding.bottom - media.viewPadding.bottom;
+        if (extra <= 0) return child!;
+        final settled = media.viewPadding.bottom + AppSpacing.lg;
+        return MediaQuery(
+          data: media.copyWith(
+            padding: media.padding.copyWith(
+              bottom:
+                  media.padding.bottom +
+                  (settled - media.padding.bottom) * progress,
+            ),
+          ),
+          child: child!,
+        );
+      },
+      child: child,
+    );
+  }
+
+  /// Enters/leaves immersive mode.
+  ///
+  /// The chrome stays mounted and cross-fades (see [MapImmersiveChrome]), so
+  /// the only state this has to rebuild is the target of those animations.
+  void _onImmersiveChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GsiOverlayScope(
-        controller: _gsi,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final measured = constraints.biggest;
-            if (measured.isFinite) _mapViewSize = measured;
-            return _body(context);
-          },
+    final immersive = _immersive?.value ?? false;
+    return PopScope(
+      // While immersive the first back gesture belongs to the mode, not to the
+      // app: a user who hid every control must not have to find the exit chip
+      // to avoid leaving DPIP. A modal sheet over the map still gets the back
+      // press first, because it is its own route.
+      canPop: !immersive,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _immersive?.exit();
+      },
+      child: Scaffold(
+        body: GsiOverlayScope(
+          controller: _gsi,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final measured = constraints.biggest;
+              if (measured.isFinite) _mapViewSize = measured;
+              return _body(context);
+            },
+          ),
         ),
       ),
     );
   }
 
   Widget _body(BuildContext context) {
+    final immersive = _immersive?.value ?? false;
     // The timeline's height depends on its content, so measure it after every
     // build; a change re-frames (see [_measureTimeline]).
     if (_active.usesTimeline) _measureTimeline();
@@ -1353,125 +1441,176 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         Positioned(
           top: 0,
           left: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CollapsibleMapLegend(
-                    key: ValueKey(_active.id),
-                    legend: _active.buildLegend(context),
-                  ),
-                  ?_active.buildLegendAccessory(context),
-                ],
+          child: MapImmersiveChrome(
+            hidden: immersive,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CollapsibleMapLegend(
+                      key: ValueKey(_active.id),
+                      legend: _active.buildLegend(context),
+                    ),
+                    ?_active.buildLegendAccessory(context),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-        // Layer switcher (+ optional layer chrome) — top-right.
+        // Layer switcher (+ optional layer chrome) — top-right. Immersive
+        // mode's own exit chip paints above the sheet at the end of this stack
+        // — see there for why.
         Positioned(
           top: 0,
           right: 0,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Builder(
-                builder: (context) {
-                  // Layers with a settings menu (radar / QPESUMS / DPM / typhoon
-                  // / rain) receive the shared township-label toggle to carry;
-                  // the rest return [SizedBox.shrink], so show the standalone
-                  // township-label menu instead — every layer can set it.
-                  final chrome = _active.buildTopTrailingChrome(
-                    context,
-                    showTownLabels: _showTownLabels,
-                    onShowTownLabelsChanged: _setShowTownLabels,
-                    showTerrain: _showTerrain,
-                    onShowTerrainChanged: _setShowTerrain,
-                    onReloadActive: _reloadActive,
-                  );
-                  final hasChrome = chrome is! SizedBox;
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (hasChrome) ...[
-                        chrome,
-                        const SizedBox(width: AppSpacing.sm),
-                      ] else ...[
-                        MapBasemapMenu(
-                          showTownLabels: _showTownLabels,
-                          onShowTownLabelsChanged: _setShowTownLabels,
-                          showTerrain: _showTerrain,
-                          onShowTerrainChanged: _setShowTerrain,
+          child: MapImmersiveChrome(
+            hidden: immersive,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Builder(
+                  builder: (context) {
+                    // Layers with a settings menu (radar / QPESUMS / DPM / typhoon
+                    // / rain) receive the shared township-label toggle to carry;
+                    // the rest return [SizedBox.shrink], so show the standalone
+                    // township-label menu instead — every layer can set it.
+                    final chrome = _active.buildTopTrailingChrome(
+                      context,
+                      showTownLabels: _showTownLabels,
+                      onShowTownLabelsChanged: _setShowTownLabels,
+                      showTerrain: _showTerrain,
+                      onShowTerrainChanged: _setShowTerrain,
+                      onReloadActive: _reloadActive,
+                    );
+                    final hasChrome = chrome is! SizedBox;
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Immersive toggle, left of the layer's own options and
+                        // the layer selector: it presents the whole map rather
+                        // than filtering what is drawn on it, so it leads the
+                        // row instead of living inside the layer picker.
+                        MapChipButton(
+                          icon: Icons.fullscreen,
+                          tooltip: AppLocalizations.of(context).mapImmersive,
+                          active: false,
+                          onTap: () => _immersive?.enter(),
                         ),
                         const SizedBox(width: AppSpacing.sm),
+                        if (hasChrome) ...[
+                          chrome,
+                          const SizedBox(width: AppSpacing.sm),
+                        ] else ...[
+                          MapBasemapMenu(
+                            showTownLabels: _showTownLabels,
+                            onShowTownLabelsChanged: _setShowTownLabels,
+                            showTerrain: _showTerrain,
+                            onShowTerrainChanged: _setShowTerrain,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                        ],
+                        MapLayerSwitcher(
+                          layers: widget.layers,
+                          active: _active,
+                          onSelected: _onLayerSelected,
+                        ),
                       ],
-                      MapLayerSwitcher(
-                        layers: widget.layers,
-                        active: _active,
-                        onSelected: _onLayerSelected,
-                      ),
-                    ],
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
         ),
         // Sheet / timeline last so they paint above the chrome when expanded.
         if (!_active.usesTimeline)
-          Positioned.fill(child: _active.buildSheet(context)),
+          Positioned.fill(
+            child: _immersiveSheetInset(
+              immersive: immersive,
+              child: _active.buildSheet(context),
+            ),
+          ),
         if (_active.usesTimeline)
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: SafeArea(
-              key: _timelineKey,
-              top: false,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  _frames.isNotEmpty
-                      ? _timelinePanel(context)
-                      : _error != null
-                      ? _errorPanel(context)
-                      : const SizedBox.shrink(),
-                  if (_frames.isNotEmpty)
-                    Positioned(
-                      top: 0,
-                      left: AppSpacing.lg,
-                      right: AppSpacing.lg,
-                      child: IgnorePointer(
-                        child: Transform.translate(
-                          offset: const Offset(0, -AppSpacing.sm),
-                          child: FractionalTranslation(
-                            translation: const Offset(0, -1),
-                            child: MapTimelineScrubPauseNotice(
-                              paused: _scrubBackpressure,
+            child: MapImmersiveChrome(
+              hidden: immersive,
+              // Slides back down as it clears, then rises on the way back.
+              slide: const Offset(0, 0.25),
+              child: SafeArea(
+                key: _timelineKey,
+                top: false,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    _frames.isNotEmpty
+                        ? _timelinePanel(context)
+                        : _error != null
+                        ? _errorPanel(context)
+                        : const SizedBox.shrink(),
+                    if (_frames.isNotEmpty)
+                      Positioned(
+                        top: 0,
+                        left: AppSpacing.lg,
+                        right: AppSpacing.lg,
+                        child: IgnorePointer(
+                          child: Transform.translate(
+                            offset: const Offset(0, -AppSpacing.sm),
+                            child: FractionalTranslation(
+                              translation: const Offset(0, -1),
+                              child: MapTimelineScrubPauseNotice(
+                                paused: _scrubBackpressure,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         // Compass on top of *everything* — a screen-space callout (typhoon
         // forecast tips) or an expanded sheet must never hide north. Parked
         // just under the layer switcher chip, with a touch of breathing room.
+        // It fades out with the rest of the chrome while immersive.
+        Positioned(
+          top: 0,
+          right: 0,
+          child: MapImmersiveChrome(
+            hidden: immersive,
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: layerChipBand + AppSpacing.sm,
+                  right: AppSpacing.lg,
+                ),
+                child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
+              ),
+            ),
+          ),
+        ),
+        // The way out of immersive mode, above *everything* — including the
+        // layer's own sheet. Those sheets can be dragged to full height (DPM,
+        // typhoon, tsunami), and one covering the top-right corner would bury
+        // the only control left: Android's back gesture also leaves the mode,
+        // but iOS has no equivalent, so a buried chip is a dead end.
         Positioned(
           top: 0,
           right: 0,
           child: SafeArea(
             child: Padding(
-              padding: EdgeInsets.only(
-                top: layerChipBand + AppSpacing.sm,
-                right: AppSpacing.lg,
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: MapImmersiveExitChip(
+                immersive: immersive,
+                onExit: () => _immersive?.exit(),
               ),
-              child: MapCompass(bearing: _bearing, onPressed: _resetNorth),
             ),
           ),
         ),

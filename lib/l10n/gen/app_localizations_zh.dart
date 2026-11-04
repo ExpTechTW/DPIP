@@ -1057,6 +1057,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapLayers => '圖層';
 
   @override
+  String get mapImmersive => '沉浸式地圖';
+
+  @override
+  String get mapImmersiveExit => '結束沉浸式';
+
+  @override
   String get meshtasticHardware => '硬體';
 
   @override
@@ -2496,6 +2502,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapSettingsPanel => '地圖設定面板';
 
   @override
   String get notifySetFailed => '設定失敗，請稍後再試。';
@@ -4600,6 +4609,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get mapLayers => '图层';
 
   @override
+  String get mapImmersive => '沉浸式地图';
+
+  @override
+  String get mapImmersiveExit => '退出沉浸模式';
+
+  @override
   String get meshtasticHardware => '硬件';
 
   @override
@@ -6039,6 +6054,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapTownLabels => '乡镇名称';
+
+  @override
+  String get mapSettingsPanel => '地图设置面板';
 
   @override
   String get notifySetFailed => '设置失败，请稍后再试。';
@@ -8142,6 +8160,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapLayers => '圖層';
 
   @override
+  String get mapImmersive => '沉浸式地圖';
+
+  @override
+  String get mapImmersiveExit => '結束沉浸式';
+
+  @override
   String get meshtasticHardware => '硬體';
 
   @override
@@ -9581,6 +9605,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapSettingsPanel => '地圖設定面板';
 
   @override
   String get notifySetFailed => '設定失敗,請稍後再試。';
@@ -11685,6 +11712,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get mapLayers => '圖層';
 
   @override
+  String get mapImmersive => '沉浸式地圖';
+
+  @override
+  String get mapImmersiveExit => '結束沉浸式';
+
+  @override
   String get meshtasticHardware => '硬體';
 
   @override
@@ -13124,6 +13157,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapSettingsPanel => '地圖設定面板';
 
   @override
   String get notifySetFailed => '設定失敗，請稍後再試。';

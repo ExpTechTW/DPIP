@@ -1085,6 +1085,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLayers => 'Layers';
 
   @override
+  String get mapImmersive => 'Immersive map';
+
+  @override
+  String get mapImmersiveExit => 'Exit immersive mode';
+
+  @override
   String get meshtasticHardware => 'Hardware';
 
   @override
@@ -2553,6 +2559,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapTownLabels => 'Township names';
+
+  @override
+  String get mapSettingsPanel => 'Map settings panel';
 
   @override
   String get notifySetFailed => 'Couldn\'t save the setting. Please try again.';

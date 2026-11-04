@@ -1057,6 +1057,12 @@ class AppLocalizationsYue extends AppLocalizations {
   String get mapLayers => '圖層';
 
   @override
+  String get mapImmersive => '沉浸式地圖';
+
+  @override
+  String get mapImmersiveExit => '結束沉浸式';
+
+  @override
   String get meshtasticHardware => '硬體';
 
   @override
@@ -2496,6 +2502,9 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapSettingsPanel => '地圖設定面板';
 
   @override
   String get notifySetFailed => '設定失敗,請稍後再試。';

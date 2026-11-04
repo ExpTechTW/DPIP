@@ -494,6 +494,8 @@
   "moreGithub": "ExpTech GitHub",
   "homeForecastUnavailable": "เลือกพื้นที่เพื่อดูพยากรณ์",
   "mapLayers": "ชั้นข้อมูล",
+  "mapImmersive": "แผนที่เต็มจอ",
+  "mapImmersiveExit": "ออกจากโหมดเต็มจอ",
   "meshtasticHardware": "ฮาร์ดแวร์",
   "languageSettings": "ภาษา",
   "@moonNextFullMoon": {
@@ -1183,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "ถนนและอาคาร",
   "mapOsmSectionLabelsAndPlaces": "ป้ายชื่อและสถานที่",
   "mapTownLabels": "ชื่อตำบล",
+  "mapSettingsPanel": "แผงการตั้งค่าแผนที่",
   "notifySetFailed": "ไม่สามารถบันทึกการตั้งค่าได้ โปรดลองอีกครั้ง",
   "meshtasticDisconnect": "ตัดการเชื่อมต่อ",
   "meshtasticUndecoded": "ไม่ได้ถอดรหัส",
