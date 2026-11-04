@@ -2561,6 +2561,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapTownLabels => 'Township names';
 
   @override
+  String get mapSettingsPanel => 'Map settings panel';
+
+  @override
   String get notifySetFailed => 'Couldn\'t save the setting. Please try again.';
 
   @override

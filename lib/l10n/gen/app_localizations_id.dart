@@ -2567,6 +2567,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get mapTownLabels => 'Nama kecamatan';
 
   @override
+  String get mapSettingsPanel => 'Panel pengaturan peta';
+
+  @override
   String get notifySetFailed =>
       'Tidak dapat menyimpan pengaturan. Silakan coba lagi.';
 

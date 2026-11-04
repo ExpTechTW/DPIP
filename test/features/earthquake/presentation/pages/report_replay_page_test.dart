@@ -610,7 +610,7 @@ void main() {
       // Settle, never a bare pump: the menu opens on an animation, so one
       // frame leaves every row mid-flight and a tap lands wherever it was
       // passing.
-      await tester.tap(find.byTooltip('Township names'));
+      await tester.tap(find.byTooltip('Map settings panel'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Detailed map'));
       await tester.pumpAndSettle();
@@ -618,7 +618,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Township names'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Township names'));
+      await tester.tap(find.byTooltip('Map settings panel'));
       await tester.pumpAndSettle();
 
       platform.lookEast();
@@ -641,7 +641,7 @@ void main() {
       await tester.pump();
       expect(find.byIcon(Icons.arrow_back).hitTestable(), findsNothing);
       expect(find.byTooltip(l10n.mapLegendExpand).hitTestable(), findsNothing);
-      expect(find.byTooltip('Township names').hitTestable(), findsNothing);
+      expect(find.byTooltip('Map settings panel').hitTestable(), findsNothing);
       expect(find.byTooltip(l10n.mapImmersiveExit), findsOneWidget);
 
       await tester.pump(const Duration(milliseconds: 300));
@@ -654,7 +654,10 @@ void main() {
         find.byTooltip(l10n.mapLegendExpand).hitTestable(),
         findsOneWidget,
       );
-      expect(find.byTooltip('Township names').hitTestable(), findsOneWidget);
+      expect(
+        find.byTooltip('Map settings panel').hitTestable(),
+        findsOneWidget,
+      );
 
       // A back press belongs to the mode first: it must not pop the replay.
       await tester.tap(find.byTooltip(l10n.mapImmersive));

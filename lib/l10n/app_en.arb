@@ -1435,6 +1435,9 @@
   "@mapTownLabels": {
     "description": "Map setting: show township-name labels when the map is zoomed in"
   },
+  "@mapSettingsPanel": {
+    "description": "Tooltip for the button that opens the map settings panel"
+  },
   "@weatherModeRain": {
     "description": "Weather animation forced to rain"
   },
@@ -3004,6 +3007,7 @@
   "mapOsmSectionRoadsAndBuildings": "Roads & buildings",
   "mapOsmSectionLabelsAndPlaces": "Labels & places",
   "mapTownLabels": "Township names",
+  "mapSettingsPanel": "Map settings panel",
   "@typhoonOverlayWarningTooltip": {
     "description": "Tooltip for the warning-areas overlay toggle"
   },

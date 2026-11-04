@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "ถนนและอาคาร",
   "mapOsmSectionLabelsAndPlaces": "ป้ายชื่อและสถานที่",
   "mapTownLabels": "ชื่อตำบล",
+  "mapSettingsPanel": "แผงการตั้งค่าแผนที่",
   "notifySetFailed": "ไม่สามารถบันทึกการตั้งค่าได้ โปรดลองอีกครั้ง",
   "meshtasticDisconnect": "ตัดการเชื่อมต่อ",
   "meshtasticUndecoded": "ไม่ได้ถอดรหัส",

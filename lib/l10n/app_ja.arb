@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "道路と建物",
   "mapOsmSectionLabelsAndPlaces": "ラベルと場所",
   "mapTownLabels": "郷鎮名",
+  "mapSettingsPanel": "地図設定パネル",
   "notifySetFailed": "設定を保存できませんでした。もう一度お試しください。",
   "meshtasticDisconnect": "切断",
   "meshtasticUndecoded": "復号されていません",

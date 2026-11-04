@@ -2577,6 +2577,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get mapTownLabels => 'Mga pangalan ng bayan';
 
   @override
+  String get mapSettingsPanel => 'Panel ng mga setting ng mapa';
+
+  @override
   String get notifySetFailed => 'Hindi ma-save ang setting. Pakisubukan muli.';
 
   @override
