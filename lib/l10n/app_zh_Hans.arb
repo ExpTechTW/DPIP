@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "道路与建筑",
   "mapOsmSectionLabelsAndPlaces": "地名与标注",
   "mapTownLabels": "乡镇名称",
+  "mapSettingsPanel": "地图设置面板",
   "notifySetFailed": "设置失败，请稍后再试。",
   "meshtasticDisconnect": "斷線",
   "meshtasticUndecoded": "无法解密",

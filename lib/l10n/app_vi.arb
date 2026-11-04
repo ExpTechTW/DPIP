@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "Đường & tòa nhà",
   "mapOsmSectionLabelsAndPlaces": "Nhãn & địa điểm",
   "mapTownLabels": "Tên hương trấn",
+  "mapSettingsPanel": "Bảng cài đặt bản đồ",
   "notifySetFailed": "Không thể lưu cài đặt. Vui lòng thử lại.",
   "meshtasticDisconnect": "Ngắt kết nối",
   "meshtasticUndecoded": "Chưa giải mã",

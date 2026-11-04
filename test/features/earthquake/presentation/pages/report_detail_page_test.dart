@@ -586,7 +586,7 @@ void main() {
 
     // Settle, never a bare pump: the menu opens on an animation, so one frame
     // leaves every row mid-flight and a tap lands wherever it was passing.
-    await tester.tap(find.byTooltip('Township names'));
+    await tester.tap(find.byTooltip('Map settings panel'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Terrain relief'));
     await tester.pumpAndSettle();
@@ -597,7 +597,7 @@ void main() {
     await tester.tap(find.text('Township names'));
     await tester.pumpAndSettle();
     // The menu stays open over the compass; close it before tapping the needle.
-    await tester.tap(find.byTooltip('Township names'));
+    await tester.tap(find.byTooltip('Map settings panel'));
     await tester.pumpAndSettle();
 
     platform.failNextDetailSource = true;

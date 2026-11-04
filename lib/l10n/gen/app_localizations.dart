@@ -4812,6 +4812,12 @@ abstract class AppLocalizations {
   /// **'Township names'**
   String get mapTownLabels;
 
+  /// Tooltip for the button that opens the map settings panel
+  ///
+  /// In en, this message translates to:
+  /// **'Map settings panel'**
+  String get mapSettingsPanel;
+
   /// Snackbar shown when saving a notification channel fails
   ///
   /// In en, this message translates to:

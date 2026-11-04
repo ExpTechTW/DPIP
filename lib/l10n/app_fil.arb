@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "Mga kalsada at gusali",
   "mapOsmSectionLabelsAndPlaces": "Mga label at lugar",
   "mapTownLabels": "Mga pangalan ng bayan",
+  "mapSettingsPanel": "Panel ng mga setting ng mapa",
   "notifySetFailed": "Hindi ma-save ang setting. Pakisubukan muli.",
   "meshtasticDisconnect": "I-disconnect",
   "meshtasticUndecoded": "Hindi nade-decrypt",

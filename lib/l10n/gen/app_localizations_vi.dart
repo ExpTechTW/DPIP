@@ -2562,6 +2562,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get mapTownLabels => 'Tên hương trấn';
 
   @override
+  String get mapSettingsPanel => 'Bảng cài đặt bản đồ';
+
+  @override
   String get notifySetFailed => 'Không thể lưu cài đặt. Vui lòng thử lại.';
 
   @override

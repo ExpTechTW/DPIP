@@ -118,7 +118,7 @@ class MapBasemapMenu extends StatelessWidget {
         style: MapChipButton.menuStyle(context),
         builder: (context, controller, _) => MapChipButton(
           icon: Icons.tune,
-          tooltip: l10n.mapTownLabels,
+          tooltip: l10n.mapSettingsPanel,
           active:
               !showTownLabels.value ||
               !showTerrain.value ||
