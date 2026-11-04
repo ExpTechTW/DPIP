@@ -17,10 +17,19 @@ import 'package:flutter/material.dart';
 enum IntensityLegendMode { eew, rts }
 
 class IntensityLegend extends StatelessWidget {
-  const IntensityLegend({super.key, this.mode = IntensityLegendMode.rts});
+  const IntensityLegend({
+    super.key,
+    this.mode = IntensityLegendMode.rts,
+    this.maxEewLevel,
+  });
 
   /// Which scale to render.
   final IntensityLegendMode mode;
+
+  /// Highest discrete EEW level to show (`0`–`9`). Null shows the full scale.
+  /// Levels above it carry no information for the current warning and are
+  /// omitted to preserve map space.
+  final int? maxEewLevel;
 
   /// Height of one scale cell / gradient step (px).
   static const double _cell = 12;
@@ -91,8 +100,8 @@ class IntensityLegend extends StatelessWidget {
 
   /// Discrete felt-intensity scale as stacked cells, 7 (top) → 1 (bottom).
   Widget _eewScale(TextStyle? labelStyle) {
-    // Scale index → label, top (strongest) to bottom.
-    const rows = [
+    // Scale index → label, strongest visible level to weakest.
+    const allRows = [
       (9, '7'),
       (8, '6⁺'),
       (7, '6⁻'),
@@ -103,6 +112,8 @@ class IntensityLegend extends StatelessWidget {
       (2, '2'),
       (1, '1'),
     ];
+    final ceiling = maxEewLevel?.clamp(1, 9) ?? 9;
+    final rows = allRows.where((row) => row.$1 <= ceiling).toList();
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,

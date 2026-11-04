@@ -963,8 +963,24 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   @override
   Widget buildLegend(BuildContext context) {
     _captureBrightness(context);
-    return const MapLegendCard(
-      child: IntensityLegend(mode: IntensityLegendMode.rts),
+    return ListenableBuilder(
+      listenable: _eew,
+      builder: (context, _) {
+        final alerts = (_eew.state.data ?? const <Eew>[]).uncancelled;
+        final maxEewLevel = alerts.isEmpty
+            ? null
+            : alerts
+                  .map((alert) => alert.info.max.clamp(0, 9))
+                  .reduce((a, b) => a > b ? a : b);
+        return MapLegendCard(
+          child: IntensityLegend(
+            mode: _eewActive
+                ? IntensityLegendMode.eew
+                : IntensityLegendMode.rts,
+            maxEewLevel: maxEewLevel,
+          ),
+        );
+      },
     );
   }
 
