@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "道路與建物",
   "mapOsmSectionLabelsAndPlaces": "地名與標示",
   "mapTownLabels": "鄉鎮名稱",
+  "mapSettingsPanel": "地圖設定面板",
   "notifySetFailed": "設定失敗,請稍後再試。",
   "meshtasticDisconnect": "斷線",
   "meshtasticUndecoded": "無法解密",

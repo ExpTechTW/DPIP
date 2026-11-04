@@ -2504,6 +2504,9 @@ class AppLocalizationsYue extends AppLocalizations {
   String get mapTownLabels => '鄉鎮名稱';
 
   @override
+  String get mapSettingsPanel => '地圖設定面板';
+
+  @override
   String get notifySetFailed => '設定失敗,請稍後再試。';
 
   @override

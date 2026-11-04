@@ -2504,6 +2504,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mapTownLabels => '鄉鎮名稱';
 
   @override
+  String get mapSettingsPanel => '地圖設定面板';
+
+  @override
   String get notifySetFailed => '設定失敗，請稍後再試。';
 
   @override
@@ -6051,6 +6054,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get mapTownLabels => '乡镇名称';
+
+  @override
+  String get mapSettingsPanel => '地图设置面板';
 
   @override
   String get notifySetFailed => '设置失败，请稍后再试。';
@@ -9601,6 +9607,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get mapTownLabels => '鄉鎮名稱';
 
   @override
+  String get mapSettingsPanel => '地圖設定面板';
+
+  @override
   String get notifySetFailed => '設定失敗,請稍後再試。';
 
   @override
@@ -13148,6 +13157,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get mapTownLabels => '鄉鎮名稱';
+
+  @override
+  String get mapSettingsPanel => '地圖設定面板';
 
   @override
   String get notifySetFailed => '設定失敗，請稍後再試。';

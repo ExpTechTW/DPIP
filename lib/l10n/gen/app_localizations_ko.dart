@@ -2517,6 +2517,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get mapTownLabels => '읍면동 이름';
 
   @override
+  String get mapSettingsPanel => '지도 설정 패널';
+
+  @override
   String get notifySetFailed => '설정을 저장하지 못했습니다. 다시 시도해 주세요.';
 
   @override

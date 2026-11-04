@@ -2516,6 +2516,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get mapTownLabels => '郷鎮名';
 
   @override
+  String get mapSettingsPanel => '地図設定パネル';
+
+  @override
   String get notifySetFailed => '設定を保存できませんでした。もう一度お試しください。';
 
   @override

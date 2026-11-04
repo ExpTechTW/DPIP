@@ -1185,6 +1185,7 @@
   "mapOsmSectionRoadsAndBuildings": "Jalan & bangunan",
   "mapOsmSectionLabelsAndPlaces": "Label & tempat",
   "mapTownLabels": "Nama kecamatan",
+  "mapSettingsPanel": "Panel pengaturan peta",
   "notifySetFailed": "Tidak dapat menyimpan pengaturan. Silakan coba lagi.",
   "meshtasticDisconnect": "Putuskan",
   "meshtasticUndecoded": "Belum didekripsi",

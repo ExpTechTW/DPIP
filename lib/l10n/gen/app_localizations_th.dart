@@ -2553,6 +2553,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get mapTownLabels => 'ชื่อตำบล';
 
   @override
+  String get mapSettingsPanel => 'แผงการตั้งค่าแผนที่';
+
+  @override
   String get notifySetFailed => 'ไม่สามารถบันทึกการตั้งค่าได้ โปรดลองอีกครั้ง';
 
   @override
