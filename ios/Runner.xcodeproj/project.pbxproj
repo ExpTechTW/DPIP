@@ -7,11 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05A9E1F31DB4B19A7C04393F /* Sounds/rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */; };
+		0334844EBD87BB9124BAF331 /* ForecastWidgetRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B53B5D0DB4B0DCDB7D278B6 /* ForecastWidgetRefreshService.swift */; };
+		034479865F0359B00D72CD49 /* CurrentLocationCurrentWeatherWidgetRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AAE145B26A41B9DA98EAF99 /* CurrentLocationCurrentWeatherWidgetRefreshService.swift */; };
+		05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* rain.aiff */; };
+		06EED3D8C22E510B03D19085 /* NativeLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B4AE57C7A28415CBCDB754 /* NativeLog.swift */; };
 		071504DB0F1524DF85241961 /* MapSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */; };
-		10D4BCAF9E098BDA400160FB /* Sounds/tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */; };
+		0E479A7A0BF081C9094B1BDA /* WidgetHTTPTimeSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3401BB0014DA175AB450CB29 /* WidgetHTTPTimeSource.swift */; };
+		10D4BCAF9E098BDA400160FB /* tsunami.aiff in Resources */ = {isa = PBXBuildFile; fileRef = CCF0E2286072A9283A916C69 /* tsunami.aiff */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
-		17BD5D769AA990E7EE681203 /* Sounds/eew_alert.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */; };
+		17BD5D769AA990E7EE681203 /* eew_alert.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 4D00D2962CF4598B61D0C722 /* eew_alert.aiff */; };
+		18BBFD68468108E1DE74F06F /* WidgetTownshipDirectory.json in Resources */ = {isa = PBXBuildFile; fileRef = B0B571D3A475DE50D92BA8B1 /* WidgetTownshipDirectory.json */; };
+		1A7F6FB76D1D5340CE4D63C3 /* WidgetTownshipBoundaries.bin in Resources */ = {isa = PBXBuildFile; fileRef = 489AD678C4C1C65F1C591DD1 /* WidgetTownshipBoundaries.bin */; };
 		270FCEA5305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */; };
 		270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */; };
 		2715FCD830570C1C0014DC8A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2715FCD730570C1C0014DC8A /* WidgetKit.framework */; };
@@ -23,48 +29,89 @@
 		27CACC80305C67530046F79C /* WidgetLocationCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */; };
 		28A000000000000000000003 /* WidgetSNTPClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A000000000000000000001 /* WidgetSNTPClientTests.swift */; };
 		28A000000000000000000004 /* WidgetServerClockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A000000000000000000002 /* WidgetServerClockTests.swift */; };
+		28B6943C2D56690DE902653F /* WidgetFixtureApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEEE1F3A6F1164DC9CE4161F /* WidgetFixtureApp.swift */; };
+		2AFC7FB89F16F49FE367E940 /* ForecastRemoteDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20FCE0616A9771F7E70AF83 /* ForecastRemoteDTO.swift */; };
+		3101D2FBDD6323A333E1D9FB /* CurrentWeatherRemoteDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4066B35C995E2221DFB8BF48 /* CurrentWeatherRemoteDTO.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
+		362A44511C58C756B71871A0 /* SavedCurrentWeatherWidgetRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F715E0DC85C56822D8A35131 /* SavedCurrentWeatherWidgetRefreshService.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		3E2D8922A319B1999D40876F /* WidgetServerClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4DB3A7BD1F5F7B4CB91B2 /* WidgetServerClock.swift */; };
+		457C2F0CEB07C77223E60286 /* ForecastWidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826919D73A498877CF8595C9 /* ForecastWidgetSnapshotStore.swift */; };
+		4C8A94A5C08FADC030321CD1 /* WeatherWidgetConfiguration.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = DC3914CA5DEB5E11D8220925 /* WeatherWidgetConfiguration.intentdefinition */; };
+		4EE9844B9D0EF0C3059F035C /* WidgetLocationTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACCDA9BE69E45C4342BE158 /* WidgetLocationTarget.swift */; };
 		4F1000000000000000000002 /* WidgetCurrentLocationClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F1000000000000000000001 /* WidgetCurrentLocationClientTests.swift */; };
 		4F3000000000000000000002 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3000000000000000000001 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift */; };
 		4F4000000000000000000002 /* WidgetRefreshTestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F4000000000000000000001 /* WidgetRefreshTestSupport.swift */; };
 		4F5000000000000000000002 /* CurrentWeatherWidgetTestFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5000000000000000000001 /* CurrentWeatherWidgetTestFixtures.swift */; };
+		4FE5A06BE99EACE8EF146D3B /* WidgetLocationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BED390CC724BADAAB3B0E3 /* WidgetLocationCatalog.swift */; };
+		50A4ED6E93A36113C61EE214 /* CurrentApparentTemperature.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FAD5DC3F6652E60B2E7D25 /* CurrentApparentTemperature.swift */; };
+		51B9DC38D42B6AD9FEB505C3 /* DPIPWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747052EB9B4DA68CF8A1B684 /* DPIPWidgetEntry.swift */; };
 		522508B9301F863A006148C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 522508B7301F863A006148C2 /* InfoPlist.strings */; };
-		72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */; };
+		531FA46BE496DE525E245337 /* CurrentWeatherWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C306863AE0BE6FD3B1FE7867 /* CurrentWeatherWidgetSnapshot.swift */; };
+		5BAC5273A60A144E4F17C730 /* WidgetCurrentLocationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDCDAAA85F3A017CC074E0E /* WidgetCurrentLocationClient.swift */; };
+		7213BCEFDA2E73280E828ADA /* ForecastWidgetExpiry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1CD1DB564A1F0398BC9C479 /* ForecastWidgetExpiry.swift */; };
+		72E4CBC23930C168D057AC64 /* warn.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 3AE87ED82FDB896B2B5C5F1B /* warn.aiff */; };
+		7389A824BAB0F62586137EB6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D70E5CCEA46A49349D6E800 /* Foundation.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		74E37B8858777424D2DC8D56 /* WeatherWidgetConfiguration.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B1F42F3BE3AA30D1DE27F446 /* WeatherWidgetConfiguration.xcstrings */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		853B13B6BC041C8260599808 /* SavedWidgetLocationResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58A75A2C8CF83236BD8B39F /* SavedWidgetLocationResolver.swift */; };
+		8B880B2E030B005A9797F9DA /* ForecastWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A5F62E139A1C90E0F701C07 /* ForecastWidgetSnapshot.swift */; };
+		9350FAB1858495F0BBB23BA2 /* CurrentWeatherClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C12ED5DECE17160AFDE4BAD /* CurrentWeatherClient.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
-		9F74F772B6E8760DD47AB2FE /* Sounds/normal.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B916667D1B2356583B174E80 /* Sounds/normal.aiff */; };
-		A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */; };
+		9F74F772B6E8760DD47AB2FE /* normal.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B916667D1B2356583B174E80 /* normal.aiff */; };
+		A5531C64BCD5F244F54BD79D /* RefreshForecastIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFD3BA3C79D6C96F95F3D8CE /* RefreshForecastIntent.swift */; };
+		A8D382D04B4ACD327E29F46B /* eq.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 682D0165E2FF3895C5B252C5 /* eq.aiff */; };
+		A9940B18359A7E21BBE6CEC0 /* MediumWeatherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F83C02F5BF6754ACD109090 /* MediumWeatherUITests.swift */; };
+		A9AFB8B20A5C9E6EA7415DAA /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD1B81D187E4EB2B0AEDDD8 /* CurrentWeatherWidgetTimeline.swift */; };
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
 		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
 		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
 		AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000H01 /* NetworkPlugin.swift */; };
-		AE92AD9862B7A721B0924557 /* Sounds/eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */; };
+		ABEE1236B8BD0A23137A1A34 /* ForecastSnapshotLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4553486EA71F5D516CD34E0 /* ForecastSnapshotLocation.swift */; };
+		ACD49BADF30A6E140DBDC8E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 56478B1534F3E42C11422A0C /* Assets.xcassets */; };
+		AD7ABC28AA9BF110673AA5E4 /* CurrentWeatherWidgetSnapshotFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4424BBFE59FCA1A38F73025 /* CurrentWeatherWidgetSnapshotFactory.swift */; };
+		AE4BE322799F31BAB2A1C9BA /* CurrentWeatherWidgetRefreshPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3744900574669D023D98FE /* CurrentWeatherWidgetRefreshPipeline.swift */; };
+		AE92AD9862B7A721B0924557 /* eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 7A6E88CB92902C0CACB07792 /* eew.aiff */; };
+		B1198B1FBCE65A0CB614096C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 18DE4FC26D55B8310EE42E35 /* Localizable.xcstrings */; };
+		BA04AEE1869DC91E22E0C553 /* DPIPWidgetProviderSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC3A50ECDCEA7D33C172BDD /* DPIPWidgetProviderSupport.swift */; };
+		BB16CD8381FB73B7482A59ED /* CurrentWeatherSnapshotStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4588C7B7EC56C9C8179E246 /* CurrentWeatherSnapshotStorage.swift */; };
+		C714159D45BB00E7C2729F27 /* DPIPWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46025AC67911192DE950586F /* DPIPWidgets.swift */; };
+		C7FB0B1FA234355D3A557362 /* CurrentWeatherSnapshotTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97011A79ABAD11471A79244 /* CurrentWeatherSnapshotTime.swift */; };
 		CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000B002 /* MapCachePlugin.swift */; };
 		CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */; };
 		CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */; };
 		CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000D002 /* StorageScanPlugin.swift */; };
 		CAC4EF00000000000000E101 /* WidgetSnapshotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */; };
+		D4EDB0E99CED1B26E28D1BDA /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A01E791E7E90F48F8A2048 /* WidgetSnapshotStore.swift */; };
 		D91A00000000000000000011 /* CurrentWeatherWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */; };
 		D91A00000000000000000012 /* CurrentWeatherWidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */; };
 		D91A00000000000000000013 /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */; };
 		D91A00000000000000000014 /* CurrentWeatherRemoteDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */; };
-		DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */; };
+		DB8E84D957A6C2B12EEB0AB7 /* report.aiff in Resources */ = {isa = PBXBuildFile; fileRef = FD769D73A7C4BE3619C1F9FB /* report.aiff */; };
+		DCE20EA8EC70FC39EE390E05 /* WidgetResolvedWeatherLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D209B1018B2A6EE2C6812A /* WidgetResolvedWeatherLocation.swift */; };
 		DP1PF1REBASE0001PL1ST010 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */; };
-		E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* Sounds/weather.aiff */; };
+		E1EBD3F0B2991F7D60DF56C5 /* weather.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 762B2690D1D999F97D84162C /* weather.aiff */; };
+		E24998AC18239DD02F6C6F8D /* CurrentWeatherSnapshotAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97667BE92D68FD7CCDA933EF /* CurrentWeatherSnapshotAddress.swift */; };
+		E4FB0E5F4F392D880FF81F61 /* WidgetSolarTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AA3B1BCAD98FA010ED515C1 /* WidgetSolarTime.swift */; };
 		E7A100000000000000000001 /* CurrentWeatherWidgetSnapshotWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */; };
 		E7A200000000000000000001 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */; };
+		E94B8E4BB2EB3E4C0E4C7E07 /* WidgetSNTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B15DD1817D3FA1AFD14B4F /* WidgetSNTPClient.swift */; };
 		E9F000000000000000000001 /* ForecastWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F000000000000000000002 /* ForecastWidgetTests.swift */; };
 		E9F000000000000000000011 /* WidgetHTTPTimeSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */; };
+		EBD0CEACA5C57FA4948682B7 /* CurrentWeatherWidgetSnapshotWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B840E208BA7F71D7AA787CD /* CurrentWeatherWidgetSnapshotWriter.swift */; };
+		EFC526F4C8EFA7517C766E95 /* ForecastWidgetSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238235236BC1A9B17B75A67C /* ForecastWidgetSelection.swift */; };
+		F3BC5F2663935A0CF6DCB4A4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D70E5CCEA46A49349D6E800 /* Foundation.framework */; };
 		F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */; };
 		F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */; };
-		F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */; };
+		F56D5186166227E46D96919D /* info.aiff in Resources */ = {isa = PBXBuildFile; fileRef = F9BCED8E5498E9FD7A454E8F /* info.aiff */; };
+		F765ECAAD6048A3511C79968 /* WidgetTownshipResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1923205FABD42A0835ACDC0 /* WidgetTownshipResolver.swift */; };
+		FA189DB6B5D2AEDE6B6F84EC /* ForecastClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4C17303E0719AE3C5AA97C /* ForecastClient.swift */; };
 		LR0S00000000000000000002 /* LocationReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000001 /* LocationReportSender.swift */; };
 		LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000003 /* LocationReportSenderTests.swift */; };
 		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
@@ -95,6 +142,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		5ADF518B0BC4B63C7F073F14 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65B5BFCA050097B30A8EE91C;
+			remoteInfo = WidgetFixture;
 		};
 		NSE000000000000000000003 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -132,8 +186,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		07B4AE57C7A28415CBCDB754 /* NativeLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NativeLog.swift; path = Shared/NativeLog.swift; sourceTree = "<group>"; };
+		0AAE145B26A41B9DA98EAF99 /* CurrentLocationCurrentWeatherWidgetRefreshService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentLocationCurrentWeatherWidgetRefreshService.swift; path = DPIPWidgets/CurrentLocationCurrentWeatherWidgetRefreshService.swift; sourceTree = "<group>"; };
+		0E3744900574669D023D98FE /* CurrentWeatherWidgetRefreshPipeline.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetRefreshPipeline.swift; path = DPIPWidgets/CurrentWeatherWidgetRefreshPipeline.swift; sourceTree = "<group>"; };
+		11B15DD1817D3FA1AFD14B4F /* WidgetSNTPClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetSNTPClient.swift; path = DPIPWidgets/WidgetSNTPClient.swift; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		18DE4FC26D55B8310EE42E35 /* Localizable.xcstrings */ = {isa = PBXFileReference; includeInIndex = 1; name = Localizable.xcstrings; path = DPIPWidgets/Localizable.xcstrings; sourceTree = "<group>"; };
+		1C12ED5DECE17160AFDE4BAD /* CurrentWeatherClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherClient.swift; path = DPIPWidgets/CurrentWeatherClient.swift; sourceTree = "<group>"; };
+		238235236BC1A9B17B75A67C /* ForecastWidgetSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastWidgetSelection.swift; path = DPIPWidgets/ForecastWidgetSelection.swift; sourceTree = "<group>"; };
 		270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherSnapshotAddressTests.swift; sourceTree = "<group>"; };
 		270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotFileTests.swift; sourceTree = "<group>"; };
 		2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DPIPWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -146,11 +207,20 @@
 		27CACC7F305C67530046F79C /* WidgetLocationCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetLocationCatalogTests.swift; sourceTree = "<group>"; };
 		28A000000000000000000001 /* WidgetSNTPClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSNTPClientTests.swift; sourceTree = "<group>"; };
 		28A000000000000000000002 /* WidgetServerClockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetServerClockTests.swift; sourceTree = "<group>"; };
+		2B840E208BA7F71D7AA787CD /* CurrentWeatherWidgetSnapshotWriter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshotWriter.swift; path = DPIPWidgets/CurrentWeatherWidgetSnapshotWriter.swift; sourceTree = "<group>"; };
+		2D70E5CCEA46A49349D6E800 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		30BED390CC724BADAAB3B0E3 /* WidgetLocationCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetLocationCatalog.swift; path = Shared/WidgetLocationCatalog.swift; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/warn.aiff; sourceTree = "<group>"; };
+		3401BB0014DA175AB450CB29 /* WidgetHTTPTimeSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetHTTPTimeSource.swift; path = DPIPWidgets/WidgetHTTPTimeSource.swift; sourceTree = "<group>"; };
+		3A5F62E139A1C90E0F701C07 /* ForecastWidgetSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastWidgetSnapshot.swift; path = DPIPWidgets/ForecastWidgetSnapshot.swift; sourceTree = "<group>"; };
+		3AE87ED82FDB896B2B5C5F1B /* warn.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/warn.aiff; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
-		4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eew_alert.aiff; sourceTree = "<group>"; };
+		4066B35C995E2221DFB8BF48 /* CurrentWeatherRemoteDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherRemoteDTO.swift; path = DPIPWidgets/CurrentWeatherRemoteDTO.swift; sourceTree = "<group>"; };
+		46025AC67911192DE950586F /* DPIPWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DPIPWidgets.swift; path = DPIPWidgets/DPIPWidgets.swift; sourceTree = "<group>"; };
+		489AD678C4C1C65F1C591DD1 /* WidgetTownshipBoundaries.bin */ = {isa = PBXFileReference; includeInIndex = 1; name = WidgetTownshipBoundaries.bin; path = DPIPWidgets/WidgetTownshipBoundaries.bin; sourceTree = "<group>"; };
+		4B53B5D0DB4B0DCDB7D278B6 /* ForecastWidgetRefreshService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastWidgetRefreshService.swift; path = DPIPWidgets/ForecastWidgetRefreshService.swift; sourceTree = "<group>"; };
+		4D00D2962CF4598B61D0C722 /* eew_alert.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eew_alert.aiff; sourceTree = "<group>"; };
 		4F1000000000000000000001 /* WidgetCurrentLocationClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetCurrentLocationClientTests.swift; sourceTree = "<group>"; };
 		4F3000000000000000000001 /* CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentLocationCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
 		4F4000000000000000000001 /* WidgetRefreshTestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetRefreshTestSupport.swift; sourceTree = "<group>"; };
@@ -160,49 +230,81 @@
 		522508BB301F868B006148C2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		522508BC301F868E006148C2 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		52632D1A304BDB7500955176 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eq.aiff; sourceTree = "<group>"; };
+		55A01E791E7E90F48F8A2048 /* WidgetSnapshotStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetSnapshotStore.swift; path = DPIPWidgets/WidgetSnapshotStore.swift; sourceTree = "<group>"; };
+		56478B1534F3E42C11422A0C /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = DPIPWidgets/Assets.xcassets; sourceTree = "<group>"; };
+		5AC4DB3A7BD1F5F7B4CB91B2 /* WidgetServerClock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetServerClock.swift; path = DPIPWidgets/WidgetServerClock.swift; sourceTree = "<group>"; };
+		67D209B1018B2A6EE2C6812A /* WidgetResolvedWeatherLocation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetResolvedWeatherLocation.swift; path = DPIPWidgets/WidgetResolvedWeatherLocation.swift; sourceTree = "<group>"; };
+		682D0165E2FF3895C5B252C5 /* eq.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eq.aiff; sourceTree = "<group>"; };
+		747052EB9B4DA68CF8A1B684 /* DPIPWidgetEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DPIPWidgetEntry.swift; path = DPIPWidgets/DPIPWidgetEntry.swift; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		762B2690D1D999F97D84162C /* Sounds/weather.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/weather.aiff; sourceTree = "<group>"; };
+		762B2690D1D999F97D84162C /* weather.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/weather.aiff; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		797A71348A49484748BB3224 /* MapSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapSnapshotPlugin.swift; sourceTree = "<group>"; };
-		7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eew.aiff; sourceTree = "<group>"; };
+		7A6E88CB92902C0CACB07792 /* eew.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/eew.aiff; sourceTree = "<group>"; };
+		7AA3B1BCAD98FA010ED515C1 /* WidgetSolarTime.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetSolarTime.swift; path = DPIPWidgets/WidgetSolarTime.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		7CDCDAAA85F3A017CC074E0E /* WidgetCurrentLocationClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetCurrentLocationClient.swift; path = DPIPWidgets/WidgetCurrentLocationClient.swift; sourceTree = "<group>"; };
+		826919D73A498877CF8595C9 /* ForecastWidgetSnapshotStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastWidgetSnapshotStore.swift; path = DPIPWidgets/ForecastWidgetSnapshotStore.swift; sourceTree = "<group>"; };
+		8A4C17303E0719AE3C5AA97C /* ForecastClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastClient.swift; path = DPIPWidgets/ForecastClient.swift; sourceTree = "<group>"; };
+		8EC3A50ECDCEA7D33C172BDD /* DPIPWidgetProviderSupport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DPIPWidgetProviderSupport.swift; path = DPIPWidgets/DPIPWidgetProviderSupport.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
+		97667BE92D68FD7CCDA933EF /* CurrentWeatherSnapshotAddress.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherSnapshotAddress.swift; path = Shared/CurrentWeatherSnapshotAddress.swift; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97C146FB1CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/rain.aiff; sourceTree = "<group>"; };
+		9F83C02F5BF6754ACD109090 /* MediumWeatherUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MediumWeatherUITests.swift; path = WidgetFixtureUITests/MediumWeatherUITests.swift; sourceTree = "<group>"; };
+		A382CD9DEA741E45DBF741D7 /* rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/rain.aiff; sourceTree = "<group>"; };
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
 		AA0000000000000000000H01 /* NetworkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPlugin.swift; sourceTree = "<group>"; };
-		B916667D1B2356583B174E80 /* Sounds/normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/normal.aiff; sourceTree = "<group>"; };
+		AACCDA9BE69E45C4342BE158 /* WidgetLocationTarget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetLocationTarget.swift; path = DPIPWidgets/WidgetLocationTarget.swift; sourceTree = "<group>"; };
+		AB20106D337D285B265F568A /* WidgetFixture.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WidgetFixture.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADD1B81D187E4EB2B0AEDDD8 /* CurrentWeatherWidgetTimeline.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetTimeline.swift; path = DPIPWidgets/CurrentWeatherWidgetTimeline.swift; sourceTree = "<group>"; };
+		AFD3BA3C79D6C96F95F3D8CE /* RefreshForecastIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RefreshForecastIntent.swift; path = DPIPWidgets/RefreshForecastIntent.swift; sourceTree = "<group>"; };
+		B0B571D3A475DE50D92BA8B1 /* WidgetTownshipDirectory.json */ = {isa = PBXFileReference; includeInIndex = 1; name = WidgetTownshipDirectory.json; path = DPIPWidgets/WidgetTownshipDirectory.json; sourceTree = "<group>"; };
+		B1F42F3BE3AA30D1DE27F446 /* WeatherWidgetConfiguration.xcstrings */ = {isa = PBXFileReference; includeInIndex = 1; name = WeatherWidgetConfiguration.xcstrings; path = DPIPWidgets/WeatherWidgetConfiguration.xcstrings; sourceTree = "<group>"; };
+		B4553486EA71F5D516CD34E0 /* ForecastSnapshotLocation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastSnapshotLocation.swift; path = Shared/ForecastSnapshotLocation.swift; sourceTree = "<group>"; };
+		B916667D1B2356583B174E80 /* normal.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/normal.aiff; sourceTree = "<group>"; };
+		B97011A79ABAD11471A79244 /* CurrentWeatherSnapshotTime.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherSnapshotTime.swift; path = DPIPWidgets/CurrentWeatherSnapshotTime.swift; sourceTree = "<group>"; };
+		C1923205FABD42A0835ACDC0 /* WidgetTownshipResolver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetTownshipResolver.swift; path = DPIPWidgets/WidgetTownshipResolver.swift; sourceTree = "<group>"; };
+		C1CD1DB564A1F0398BC9C479 /* ForecastWidgetExpiry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastWidgetExpiry.swift; path = DPIPWidgets/ForecastWidgetExpiry.swift; sourceTree = "<group>"; };
+		C20FCE0616A9771F7E70AF83 /* ForecastRemoteDTO.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ForecastRemoteDTO.swift; path = DPIPWidgets/ForecastRemoteDTO.swift; sourceTree = "<group>"; };
+		C2FAD5DC3F6652E60B2E7D25 /* CurrentApparentTemperature.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentApparentTemperature.swift; path = DPIPWidgets/CurrentApparentTemperature.swift; sourceTree = "<group>"; };
+		C306863AE0BE6FD3B1FE7867 /* CurrentWeatherWidgetSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshot.swift; path = DPIPWidgets/CurrentWeatherWidgetSnapshot.swift; sourceTree = "<group>"; };
+		C4588C7B7EC56C9C8179E246 /* CurrentWeatherSnapshotStorage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherSnapshotStorage.swift; path = Shared/CurrentWeatherSnapshotStorage.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000B002 /* MapCachePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MapCachePlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundLocationPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackgroundExecutionPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000D002 /* StorageScanPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageScanPlugin.swift; sourceTree = "<group>"; };
 		CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotPlugin.swift; sourceTree = "<group>"; };
-		CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/tsunami.aiff; sourceTree = "<group>"; };
+		CCF0E2286072A9283A916C69 /* tsunami.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/tsunami.aiff; sourceTree = "<group>"; };
+		CEEE1F3A6F1164DC9CE4161F /* WidgetFixtureApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetFixtureApp.swift; path = WidgetFixture/WidgetFixtureApp.swift; sourceTree = "<group>"; };
+		D4424BBFE59FCA1A38F73025 /* CurrentWeatherWidgetSnapshotFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshotFactory.swift; path = DPIPWidgets/CurrentWeatherWidgetSnapshotFactory.swift; sourceTree = "<group>"; };
 		D91A00000000000000000001 /* CurrentWeatherWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetTests.swift; sourceTree = "<group>"; };
 		D91A00000000000000000002 /* CurrentWeatherWidgetSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetSnapshot.swift; path = ../DPIPWidgets/CurrentWeatherWidgetSnapshot.swift; sourceTree = "<group>"; };
 		D91A00000000000000000003 /* CurrentWeatherWidgetTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherWidgetTimeline.swift; path = ../DPIPWidgets/CurrentWeatherWidgetTimeline.swift; sourceTree = "<group>"; };
 		D91A00000000000000000004 /* CurrentWeatherRemoteDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CurrentWeatherRemoteDTO.swift; path = ../DPIPWidgets/CurrentWeatherRemoteDTO.swift; sourceTree = "<group>"; };
+		DC3914CA5DEB5E11D8220925 /* WeatherWidgetConfiguration.intentdefinition */ = {isa = PBXFileReference; includeInIndex = 1; name = WeatherWidgetConfiguration.intentdefinition; path = DPIPWidgets/WeatherWidgetConfiguration.intentdefinition; sourceTree = "<group>"; };
 		DP1PF1REBASE0002PL1ST020 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E4A27DBF5CD5240732625D7A /* WidgetFixtureUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WidgetFixtureUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E58A75A2C8CF83236BD8B39F /* SavedWidgetLocationResolver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SavedWidgetLocationResolver.swift; path = DPIPWidgets/SavedWidgetLocationResolver.swift; sourceTree = "<group>"; };
 		E7A100000000000000000002 /* CurrentWeatherWidgetSnapshotWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherWidgetSnapshotWriterTests.swift; sourceTree = "<group>"; };
 		E7A200000000000000000002 /* SavedCurrentWeatherWidgetRefreshServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCurrentWeatherWidgetRefreshServiceTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000002 /* ForecastWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastWidgetTests.swift; sourceTree = "<group>"; };
 		E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetHTTPTimeSourceTests.swift; sourceTree = "<group>"; };
 		F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DPIPWidgetProviderTests.swift; sourceTree = "<group>"; };
 		F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetTownshipResolverTests.swift; sourceTree = "<group>"; };
-		F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
-		FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
+		F715E0DC85C56822D8A35131 /* SavedCurrentWeatherWidgetRefreshService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SavedCurrentWeatherWidgetRefreshService.swift; path = DPIPWidgets/SavedCurrentWeatherWidgetRefreshService.swift; sourceTree = "<group>"; };
+		F9BCED8E5498E9FD7A454E8F /* info.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/info.aiff; sourceTree = "<group>"; };
+		FD769D73A7C4BE3619C1F9FB /* report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
 		LR0S00000000000000000001 /* LocationReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSender.swift; sourceTree = "<group>"; };
 		LR0S00000000000000000003 /* LocationReportSenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSenderTests.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
@@ -213,7 +315,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		270FCEA1305CD07F003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		270FCEA1305CD07F003D1E62 /* Exceptions for "Shared" folder in "DPIPWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
@@ -224,7 +326,7 @@
 			);
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 		};
-		270FCEA3305CD1DD003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		270FCEA3305CD1DD003D1E62 /* Exceptions for "Shared" folder in "Runner" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
@@ -234,7 +336,7 @@
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 		};
-		270FCEA6305CD2D6003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		270FCEA6305CD2D6003D1E62 /* Exceptions for "Shared" folder in "RunnerTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
@@ -245,14 +347,14 @@
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
-		2715FCEA30570C1D0014DC8A /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		2715FCEA30570C1D0014DC8A /* Exceptions for "DPIPWidgets" folder in "DPIPWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 2715FCD430570C1C0014DC8A /* DPIPWidgetsExtension */;
 		};
-		27CACB9C305BD2A60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		27CACB9C305BD2A60046F79C /* Exceptions for "DPIPWidgets" folder in "Runner" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WeatherWidgetConfiguration.intentdefinition,
@@ -260,14 +362,14 @@
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 		};
-		27CACBAF305BD77F0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		27CACBAF305BD77F0046F79C /* Exceptions for "DPIPWidgetIntentsExtension" folder in "DPIPWidgetIntentsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 		};
-		27CACBB1305BD7E60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		27CACBB1305BD7E60046F79C /* Exceptions for "DPIPWidgets" folder in "DPIPWidgetIntentsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WeatherWidgetConfiguration.intentdefinition,
@@ -275,14 +377,14 @@
 			);
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 		};
-		27CACC5E305C66560046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		27CACC5E305C66560046F79C /* Exceptions for "DPIPWidgetIntentsExtension" folder in "RunnerTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WidgetLocationOptions.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
-		27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		27CACD20305C6E2D0046F79C /* Exceptions for "DPIPWidgets" folder in "RunnerTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentApparentTemperature.swift,
@@ -321,28 +423,28 @@
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
-		E7A100000000000000000003 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		E7A100000000000000000003 /* Exceptions for "Shared" folder in "DPIPWidgetIntentsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				CurrentWeatherSnapshotStorage.swift,
 			);
 			target = 27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */;
 		};
-		NSE000000000000000000006 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		NSE000000000000000000006 /* Exceptions for "NotificationService" folder in "NotificationService" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = NSE00000000000000000000C /* NotificationService */;
 		};
-		NSE000000000000000000007 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		NSE000000000000000000007 /* Exceptions for "NotificationService" folder in "RunnerTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				NotificationDeliveryBreadcrumb.swift,
 			);
 			target = 331C8080294A63A400263BE5 /* RunnerTests */;
 		};
-		NSE000000000000000000008 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		NSE000000000000000000008 /* Exceptions for "Shared" folder in "NotificationService" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				NativeLog.swift,
@@ -352,13 +454,74 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		270FCE9B305CD066003D1E62 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (270FCEA1305CD07F003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 270FCEA3305CD1DD003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 270FCEA6305CD2D6003D1E62 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, E7A100000000000000000003 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, NSE000000000000000000008 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
-		2715FCDB30570C1C0014DC8A /* DPIPWidgets */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (2715FCEA30570C1D0014DC8A /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACB9C305BD2A60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACD20305C6E2D0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACBB1305BD7E60046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgets; sourceTree = "<group>"; };
-		27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (27CACC5E305C66560046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 27CACBAF305BD77F0046F79C /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DPIPWidgetIntentsExtension; sourceTree = "<group>"; };
-		NSE000000000000000000005 /* NotificationService */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (NSE000000000000000000007 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, NSE000000000000000000006 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = NotificationService; sourceTree = "<group>"; };
+		270FCE9B305CD066003D1E62 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				270FCEA1305CD07F003D1E62 /* Exceptions for "Shared" folder in "DPIPWidgetsExtension" target */,
+				270FCEA3305CD1DD003D1E62 /* Exceptions for "Shared" folder in "Runner" target */,
+				270FCEA6305CD2D6003D1E62 /* Exceptions for "Shared" folder in "RunnerTests" target */,
+				E7A100000000000000000003 /* Exceptions for "Shared" folder in "DPIPWidgetIntentsExtension" target */,
+				NSE000000000000000000008 /* Exceptions for "Shared" folder in "NotificationService" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		2715FCDB30570C1C0014DC8A /* DPIPWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2715FCEA30570C1D0014DC8A /* Exceptions for "DPIPWidgets" folder in "DPIPWidgetsExtension" target */,
+				27CACB9C305BD2A60046F79C /* Exceptions for "DPIPWidgets" folder in "Runner" target */,
+				27CACD20305C6E2D0046F79C /* Exceptions for "DPIPWidgets" folder in "RunnerTests" target */,
+				27CACBB1305BD7E60046F79C /* Exceptions for "DPIPWidgets" folder in "DPIPWidgetIntentsExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = DPIPWidgets;
+			sourceTree = "<group>";
+		};
+		27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				27CACC5E305C66560046F79C /* Exceptions for "DPIPWidgetIntentsExtension" folder in "RunnerTests" target */,
+				27CACBAF305BD77F0046F79C /* Exceptions for "DPIPWidgetIntentsExtension" folder in "DPIPWidgetIntentsExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = DPIPWidgetIntentsExtension;
+			sourceTree = "<group>";
+		};
+		NSE000000000000000000005 /* NotificationService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				NSE000000000000000000007 /* Exceptions for "NotificationService" folder in "RunnerTests" target */,
+				NSE000000000000000000006 /* Exceptions for "NotificationService" folder in "NotificationService" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = NotificationService;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		18A62422C0575494FF73F5D0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7389A824BAB0F62586137EB6 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2715FCD230570C1C0014DC8A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -373,6 +536,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				27CACBA3305BD77F0046F79C /* Intents.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		64477954B60C56EE1D0065C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F3BC5F2663935A0CF6DCB4A4 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +578,7 @@
 				2715FCD730570C1C0014DC8A /* WidgetKit.framework */,
 				2715FCD930570C1C0014DC8A /* SwiftUI.framework */,
 				27CACBA2305BD77F0046F79C /* Intents.framework */,
+				AE682A336620C52362561BAF /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -467,6 +639,7 @@
 				2715FCD630570C1C0014DC8A /* Frameworks */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				F39A1E8EB7D22C2BD0DA39C1 /* WidgetFixture Infrastructure */,
 			);
 			sourceTree = "<group>";
 		};
@@ -478,6 +651,8 @@
 				2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */,
 				27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */,
 				NSE000000000000000000001 /* NotificationService.appex */,
+				AB20106D337D285B265F568A /* WidgetFixture.app */,
+				E4A27DBF5CD5240732625D7A /* WidgetFixtureUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -511,18 +686,78 @@
 				CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */,
 				CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */,
 				CAC4EF00000000000000D002 /* StorageScanPlugin.swift */,
-				7A6E88CB92902C0CACB07792 /* Sounds/eew.aiff */,
-				4D00D2962CF4598B61D0C722 /* Sounds/eew_alert.aiff */,
-				682D0165E2FF3895C5B252C5 /* Sounds/eq.aiff */,
-				F9BCED8E5498E9FD7A454E8F /* Sounds/info.aiff */,
-				B916667D1B2356583B174E80 /* Sounds/normal.aiff */,
-				A382CD9DEA741E45DBF741D7 /* Sounds/rain.aiff */,
-				FD769D73A7C4BE3619C1F9FB /* Sounds/report.aiff */,
-				CCF0E2286072A9283A916C69 /* Sounds/tsunami.aiff */,
-				3AE87ED82FDB896B2B5C5F1B /* Sounds/warn.aiff */,
-				762B2690D1D999F97D84162C /* Sounds/weather.aiff */,
+				7A6E88CB92902C0CACB07792 /* eew.aiff */,
+				4D00D2962CF4598B61D0C722 /* eew_alert.aiff */,
+				682D0165E2FF3895C5B252C5 /* eq.aiff */,
+				F9BCED8E5498E9FD7A454E8F /* info.aiff */,
+				B916667D1B2356583B174E80 /* normal.aiff */,
+				A382CD9DEA741E45DBF741D7 /* rain.aiff */,
+				FD769D73A7C4BE3619C1F9FB /* report.aiff */,
+				CCF0E2286072A9283A916C69 /* tsunami.aiff */,
+				3AE87ED82FDB896B2B5C5F1B /* warn.aiff */,
+				762B2690D1D999F97D84162C /* weather.aiff */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		AE682A336620C52362561BAF /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				2D70E5CCEA46A49349D6E800 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		F39A1E8EB7D22C2BD0DA39C1 /* WidgetFixture Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				3401BB0014DA175AB450CB29 /* WidgetHTTPTimeSource.swift */,
+				7AA3B1BCAD98FA010ED515C1 /* WidgetSolarTime.swift */,
+				8EC3A50ECDCEA7D33C172BDD /* DPIPWidgetProviderSupport.swift */,
+				C306863AE0BE6FD3B1FE7867 /* CurrentWeatherWidgetSnapshot.swift */,
+				ADD1B81D187E4EB2B0AEDDD8 /* CurrentWeatherWidgetTimeline.swift */,
+				0E3744900574669D023D98FE /* CurrentWeatherWidgetRefreshPipeline.swift */,
+				E58A75A2C8CF83236BD8B39F /* SavedWidgetLocationResolver.swift */,
+				238235236BC1A9B17B75A67C /* ForecastWidgetSelection.swift */,
+				5AC4DB3A7BD1F5F7B4CB91B2 /* WidgetServerClock.swift */,
+				8A4C17303E0719AE3C5AA97C /* ForecastClient.swift */,
+				46025AC67911192DE950586F /* DPIPWidgets.swift */,
+				AFD3BA3C79D6C96F95F3D8CE /* RefreshForecastIntent.swift */,
+				C20FCE0616A9771F7E70AF83 /* ForecastRemoteDTO.swift */,
+				C2FAD5DC3F6652E60B2E7D25 /* CurrentApparentTemperature.swift */,
+				3A5F62E139A1C90E0F701C07 /* ForecastWidgetSnapshot.swift */,
+				826919D73A498877CF8595C9 /* ForecastWidgetSnapshotStore.swift */,
+				AACCDA9BE69E45C4342BE158 /* WidgetLocationTarget.swift */,
+				4B53B5D0DB4B0DCDB7D278B6 /* ForecastWidgetRefreshService.swift */,
+				1C12ED5DECE17160AFDE4BAD /* CurrentWeatherClient.swift */,
+				F715E0DC85C56822D8A35131 /* SavedCurrentWeatherWidgetRefreshService.swift */,
+				7CDCDAAA85F3A017CC074E0E /* WidgetCurrentLocationClient.swift */,
+				747052EB9B4DA68CF8A1B684 /* DPIPWidgetEntry.swift */,
+				11B15DD1817D3FA1AFD14B4F /* WidgetSNTPClient.swift */,
+				C1923205FABD42A0835ACDC0 /* WidgetTownshipResolver.swift */,
+				D4424BBFE59FCA1A38F73025 /* CurrentWeatherWidgetSnapshotFactory.swift */,
+				4066B35C995E2221DFB8BF48 /* CurrentWeatherRemoteDTO.swift */,
+				55A01E791E7E90F48F8A2048 /* WidgetSnapshotStore.swift */,
+				B97011A79ABAD11471A79244 /* CurrentWeatherSnapshotTime.swift */,
+				C1CD1DB564A1F0398BC9C479 /* ForecastWidgetExpiry.swift */,
+				0AAE145B26A41B9DA98EAF99 /* CurrentLocationCurrentWeatherWidgetRefreshService.swift */,
+				67D209B1018B2A6EE2C6812A /* WidgetResolvedWeatherLocation.swift */,
+				2B840E208BA7F71D7AA787CD /* CurrentWeatherWidgetSnapshotWriter.swift */,
+				30BED390CC724BADAAB3B0E3 /* WidgetLocationCatalog.swift */,
+				B4553486EA71F5D516CD34E0 /* ForecastSnapshotLocation.swift */,
+				07B4AE57C7A28415CBCDB754 /* NativeLog.swift */,
+				97667BE92D68FD7CCDA933EF /* CurrentWeatherSnapshotAddress.swift */,
+				C4588C7B7EC56C9C8179E246 /* CurrentWeatherSnapshotStorage.swift */,
+				DC3914CA5DEB5E11D8220925 /* WeatherWidgetConfiguration.intentdefinition */,
+				CEEE1F3A6F1164DC9CE4161F /* WidgetFixtureApp.swift */,
+				56478B1534F3E42C11422A0C /* Assets.xcassets */,
+				18DE4FC26D55B8310EE42E35 /* Localizable.xcstrings */,
+				B1F42F3BE3AA30D1DE27F446 /* WeatherWidgetConfiguration.xcstrings */,
+				489AD678C4C1C65F1C591DD1 /* WidgetTownshipBoundaries.bin */,
+				B0B571D3A475DE50D92BA8B1 /* WidgetTownshipDirectory.json */,
+				9F83C02F5BF6754ACD109090 /* MediumWeatherUITests.swift */,
+			);
+			name = "WidgetFixture Infrastructure";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -544,8 +779,6 @@
 				2715FCDB30570C1C0014DC8A /* DPIPWidgets */,
 			);
 			name = DPIPWidgetsExtension;
-			packageProductDependencies = (
-			);
 			productName = DPIPWidgetsExtension;
 			productReference = 2715FCD530570C1C0014DC8A /* DPIPWidgetsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -567,8 +800,6 @@
 				27CACBA4305BD77F0046F79C /* DPIPWidgetIntentsExtension */,
 			);
 			name = DPIPWidgetIntentsExtension;
-			packageProductDependencies = (
-			);
 			productName = DPIPWidgetIntentsExtension;
 			productReference = 27CACBA1305BD77F0046F79C /* DPIPWidgetIntentsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -590,6 +821,23 @@
 			productName = RunnerTests;
 			productReference = 331C8081294A63A400263BE5 /* RunnerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		65B5BFCA050097B30A8EE91C /* WidgetFixture */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 88D9A434AF2315D07DC1154E /* Build configuration list for PBXNativeTarget "WidgetFixture" */;
+			buildPhases = (
+				336158EA9D76634C860EDC69 /* Sources */,
+				64477954B60C56EE1D0065C4 /* Frameworks */,
+				BF1A141604E86C9746A00A99 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WidgetFixture;
+			productName = WidgetFixture;
+			productReference = AB20106D337D285B265F568A /* WidgetFixture.app */;
+			productType = "com.apple.product-type.application";
 		};
 		97C146ED1CF9000F007C117D /* Runner */ = {
 			isa = PBXNativeTarget;
@@ -619,6 +867,24 @@
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AA14AFC32B0EC6D344D1B2EE /* WidgetFixtureUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BFDEA3E58787075BD259D607 /* Build configuration list for PBXNativeTarget "WidgetFixtureUITests" */;
+			buildPhases = (
+				3918962E561D23DD3192B2C1 /* Sources */,
+				18A62422C0575494FF73F5D0 /* Frameworks */,
+				D4AA39A0EEA9D6AE1D22F61A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE2D5560A234BC58677726B9 /* PBXTargetDependency */,
+			);
+			name = WidgetFixtureUITests;
+			productName = WidgetFixtureUITests;
+			productReference = E4A27DBF5CD5240732625D7A /* WidgetFixtureUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		NSE00000000000000000000C /* NotificationService */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = NSE000000000000000000010 /* Build configuration list for PBXNativeTarget "NotificationService" */;
@@ -635,8 +901,6 @@
 				NSE000000000000000000005 /* NotificationService */,
 			);
 			name = NotificationService;
-			packageProductDependencies = (
-			);
 			productName = NotificationService;
 			productReference = NSE000000000000000000001 /* NotificationService.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -685,7 +949,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -696,6 +960,8 @@
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				27CACBA0305BD77F0046F79C /* DPIPWidgetIntentsExtension */,
 				NSE00000000000000000000C /* NotificationService */,
+				65B5BFCA050097B30A8EE91C /* WidgetFixture */,
+				AA14AFC32B0EC6D344D1B2EE /* WidgetFixtureUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -732,16 +998,35 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				522508B9301F863A006148C2 /* InfoPlist.strings in Resources */,
-				AE92AD9862B7A721B0924557 /* Sounds/eew.aiff in Resources */,
-				17BD5D769AA990E7EE681203 /* Sounds/eew_alert.aiff in Resources */,
-				A8D382D04B4ACD327E29F46B /* Sounds/eq.aiff in Resources */,
-				F56D5186166227E46D96919D /* Sounds/info.aiff in Resources */,
-				9F74F772B6E8760DD47AB2FE /* Sounds/normal.aiff in Resources */,
-				05A9E1F31DB4B19A7C04393F /* Sounds/rain.aiff in Resources */,
-				DB8E84D957A6C2B12EEB0AB7 /* Sounds/report.aiff in Resources */,
-				10D4BCAF9E098BDA400160FB /* Sounds/tsunami.aiff in Resources */,
-				72E4CBC23930C168D057AC64 /* Sounds/warn.aiff in Resources */,
-				E1EBD3F0B2991F7D60DF56C5 /* Sounds/weather.aiff in Resources */,
+				AE92AD9862B7A721B0924557 /* eew.aiff in Resources */,
+				17BD5D769AA990E7EE681203 /* eew_alert.aiff in Resources */,
+				A8D382D04B4ACD327E29F46B /* eq.aiff in Resources */,
+				F56D5186166227E46D96919D /* info.aiff in Resources */,
+				9F74F772B6E8760DD47AB2FE /* normal.aiff in Resources */,
+				05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */,
+				DB8E84D957A6C2B12EEB0AB7 /* report.aiff in Resources */,
+				10D4BCAF9E098BDA400160FB /* tsunami.aiff in Resources */,
+				72E4CBC23930C168D057AC64 /* warn.aiff in Resources */,
+				E1EBD3F0B2991F7D60DF56C5 /* weather.aiff in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF1A141604E86C9746A00A99 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ACD49BADF30A6E140DBDC8E5 /* Assets.xcassets in Resources */,
+				B1198B1FBCE65A0CB614096C /* Localizable.xcstrings in Resources */,
+				74E37B8858777424D2DC8D56 /* WeatherWidgetConfiguration.xcstrings in Resources */,
+				1A7F6FB76D1D5340CE4D63C3 /* WidgetTownshipBoundaries.bin in Resources */,
+				18BBFD68468108E1DE74F06F /* WidgetTownshipDirectory.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D4AA39A0EEA9D6AE1D22F61A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -857,6 +1142,60 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		336158EA9D76634C860EDC69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0E479A7A0BF081C9094B1BDA /* WidgetHTTPTimeSource.swift in Sources */,
+				E4FB0E5F4F392D880FF81F61 /* WidgetSolarTime.swift in Sources */,
+				BA04AEE1869DC91E22E0C553 /* DPIPWidgetProviderSupport.swift in Sources */,
+				531FA46BE496DE525E245337 /* CurrentWeatherWidgetSnapshot.swift in Sources */,
+				A9AFB8B20A5C9E6EA7415DAA /* CurrentWeatherWidgetTimeline.swift in Sources */,
+				AE4BE322799F31BAB2A1C9BA /* CurrentWeatherWidgetRefreshPipeline.swift in Sources */,
+				853B13B6BC041C8260599808 /* SavedWidgetLocationResolver.swift in Sources */,
+				EFC526F4C8EFA7517C766E95 /* ForecastWidgetSelection.swift in Sources */,
+				3E2D8922A319B1999D40876F /* WidgetServerClock.swift in Sources */,
+				FA189DB6B5D2AEDE6B6F84EC /* ForecastClient.swift in Sources */,
+				C714159D45BB00E7C2729F27 /* DPIPWidgets.swift in Sources */,
+				A5531C64BCD5F244F54BD79D /* RefreshForecastIntent.swift in Sources */,
+				2AFC7FB89F16F49FE367E940 /* ForecastRemoteDTO.swift in Sources */,
+				50A4ED6E93A36113C61EE214 /* CurrentApparentTemperature.swift in Sources */,
+				8B880B2E030B005A9797F9DA /* ForecastWidgetSnapshot.swift in Sources */,
+				457C2F0CEB07C77223E60286 /* ForecastWidgetSnapshotStore.swift in Sources */,
+				4EE9844B9D0EF0C3059F035C /* WidgetLocationTarget.swift in Sources */,
+				0334844EBD87BB9124BAF331 /* ForecastWidgetRefreshService.swift in Sources */,
+				9350FAB1858495F0BBB23BA2 /* CurrentWeatherClient.swift in Sources */,
+				362A44511C58C756B71871A0 /* SavedCurrentWeatherWidgetRefreshService.swift in Sources */,
+				5BAC5273A60A144E4F17C730 /* WidgetCurrentLocationClient.swift in Sources */,
+				51B9DC38D42B6AD9FEB505C3 /* DPIPWidgetEntry.swift in Sources */,
+				E94B8E4BB2EB3E4C0E4C7E07 /* WidgetSNTPClient.swift in Sources */,
+				F765ECAAD6048A3511C79968 /* WidgetTownshipResolver.swift in Sources */,
+				AD7ABC28AA9BF110673AA5E4 /* CurrentWeatherWidgetSnapshotFactory.swift in Sources */,
+				3101D2FBDD6323A333E1D9FB /* CurrentWeatherRemoteDTO.swift in Sources */,
+				D4EDB0E99CED1B26E28D1BDA /* WidgetSnapshotStore.swift in Sources */,
+				C7FB0B1FA234355D3A557362 /* CurrentWeatherSnapshotTime.swift in Sources */,
+				7213BCEFDA2E73280E828ADA /* ForecastWidgetExpiry.swift in Sources */,
+				034479865F0359B00D72CD49 /* CurrentLocationCurrentWeatherWidgetRefreshService.swift in Sources */,
+				DCE20EA8EC70FC39EE390E05 /* WidgetResolvedWeatherLocation.swift in Sources */,
+				EBD0CEACA5C57FA4948682B7 /* CurrentWeatherWidgetSnapshotWriter.swift in Sources */,
+				4FE5A06BE99EACE8EF146D3B /* WidgetLocationCatalog.swift in Sources */,
+				ABEE1236B8BD0A23137A1A34 /* ForecastSnapshotLocation.swift in Sources */,
+				06EED3D8C22E510B03D19085 /* NativeLog.swift in Sources */,
+				E24998AC18239DD02F6C6F8D /* CurrentWeatherSnapshotAddress.swift in Sources */,
+				BB16CD8381FB73B7482A59ED /* CurrentWeatherSnapshotStorage.swift in Sources */,
+				4C8A94A5C08FADC030321CD1 /* WeatherWidgetConfiguration.intentdefinition in Sources */,
+				28B6943C2D56690DE902653F /* WidgetFixtureApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3918962E561D23DD3192B2C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9940B18359A7E21BBE6CEC0 /* MediumWeatherUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97C146EA1CF9000F007C117D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -907,6 +1246,12 @@
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
 		};
+		FE2D5560A234BC58677726B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WidgetFixture;
+			target = 65B5BFCA050097B30A8EE91C /* WidgetFixture */;
+			targetProxy = 5ADF518B0BC4B63C7F073F14 /* PBXContainerItemProxy */;
+		};
 		NSE000000000000000000004 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = NSE00000000000000000000C /* NotificationService */;
@@ -946,6 +1291,29 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		17B93244B43FD8BF7AC59C71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.exptech.dpip.widgetfixture;
+				PRODUCT_NAME = WidgetFixture;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1331,6 +1699,78 @@
 			};
 			name = Profile;
 		};
+		445F5ED0DEBB0CDBF8B3C258 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = tw.exptech.dpip.widgetfixture.uitests;
+				PRODUCT_NAME = WidgetFixtureUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = WidgetFixture;
+			};
+			name = Debug;
+		};
+		4CA163D1EA9BAB1A0D0ED7B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.exptech.dpip.widgetfixture;
+				PRODUCT_NAME = WidgetFixture;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		55BEBBE2D3DDE5D7A5CD2FCA /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = tw.exptech.dpip.widgetfixture.uitests;
+				PRODUCT_NAME = WidgetFixtureUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = WidgetFixture;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+		949A0E2D9872CCD0527FAF8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = tw.exptech.dpip.widgetfixture.uitests;
+				PRODUCT_NAME = WidgetFixtureUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = WidgetFixture;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		97C147031CF9000F007C117D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1493,6 +1933,29 @@
 			};
 			name = Release;
 		};
+		B05F26B86BF2CA45173C4D7A /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.exptech.dpip.widgetfixture;
+				PRODUCT_NAME = WidgetFixture;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
 		NSE00000000000000000000D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
@@ -1621,6 +2084,16 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		88D9A434AF2315D07DC1154E /* Build configuration list for PBXNativeTarget "WidgetFixture" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				17B93244B43FD8BF7AC59C71 /* Release */,
+				4CA163D1EA9BAB1A0D0ED7B0 /* Debug */,
+				B05F26B86BF2CA45173C4D7A /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1641,6 +2114,16 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		BFDEA3E58787075BD259D607 /* Build configuration list for PBXNativeTarget "WidgetFixtureUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				949A0E2D9872CCD0527FAF8D /* Release */,
+				445F5ED0DEBB0CDBF8B3C258 /* Debug */,
+				55BEBBE2D3DDE5D7A5CD2FCA /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		NSE000000000000000000010 /* Build configuration list for PBXNativeTarget "NotificationService" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1654,7 +2137,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};
