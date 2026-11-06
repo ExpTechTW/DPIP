@@ -66,6 +66,7 @@
 | `TremStationRepositoryImpl.refresh` | `/resource/station` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `DpipMcpToolHost`（AI 對話的工具） | `/mcp`（**POST**，JSON-RPC） | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 
 > **地震報告 list（v2）query：** `limit`/`page`、`sort`/`order`
 > （`time`\|`intensity`\|`magnitude`\|`depth` × `asc`\|`desc`）、震度／規模／深度
@@ -75,6 +76,13 @@
 > `getEewAt` / `getRtsAt` 是**歷史回放**（時間軸），tier 為 `coreApi`。
 > `getRtsAt` 的 `{sec}` 必須是 10 位數的 Unix 秒；剛過去的一兩分鐘可能只有一個
 > 區域歸檔好（實測 now−30 s：tnn1 200、tyo1 404），所以 404 是常態而非故障。
+
+> **MCP `/mcp`** 是唯讀的 DPIP MCP 伺服器（Streamable HTTP，無狀態、不發
+> session id），AI 對話把它的工具交給使用者自己的 AI 服務。App 只送
+> `initialize`、`notifications/initialized`、`tools/list`、`tools/call`；回應是
+> 一則 `text/event-stream` 的 `message` 事件（也接受純 JSON）。兩個區域都有
+> （2026-10-22 實測 `x-served-by: core-tnn1` / `core-tyo1`）。AI 對話頁**顯示**給
+> 使用者自用的網址是裸主機 `https://api.core.exptech.dev/mcp`，App 自己不呼叫它。
 
 > **測站清單 `/resource/station` 是 CSV**（`Content-Type` 卻標成 JSON）：
 > `loc_code,id,lat,lon,floor,code,net,time,work`，`id` 是 RTS 用的 hex 裝置 id、
@@ -341,7 +349,15 @@ ETag 重新驗證。
 | `ServerStatusApi.getStatus` | `https://status.exptech.dev/api/ds/query`（**POST**，Grafana datasource query；伺服器狀態頁） |
 | `CloudflareStatusApi.getComponents` | `https://www.cloudflarestatus.com/api/v2/components.json`（Cloudflare 元件狀態） |
 | `HasteApi.upload` | `https://haste.exptech.dev/api/pastes`（**POST**，上傳 App 日誌；回應的 `key` 組成 `https://haste.exptech.dev/<key>`） |
+| `OpenAiChatModel.complete` | 使用者自己設定的 AI 服務：`{baseUrl}/chat/completions`（**POST**，`stream: true`，OpenAI 相容格式；走 `ApiClient.streamAbsolute`） |
+| `AiSettingsRepositoryImpl.listModels` | 同一個 AI 服務的 `{baseUrl}/models`（**GET**，走 `streamAbsolute`） |
 | `MlIntensityService._download` | `https://exptechtw.github.io/TREM-Lite/models/intensity_ml_v1.onnx`，失敗再試 `https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@main/packages/core/static/models/intensity_ml_v1.onnx`（ML v1 震度模型，14.7 MB、gzip 傳輸約 2.3 MB） |
+
+> **AI 服務是使用者自己的，不是 ExpTech 的。** 網址、模型與金鑰由使用者在 AI
+> 設定頁填入；金鑰只存在系統金鑰庫（`SecretStore`），以 `Authorization: Bearer`
+> 送給該服務。這兩個呼叫走 `streamAbsolute` 而不是 `getAbsolute`：串流回應不進
+> ETag 快取，而這些回應取決於使用者的金鑰。只允許 `https://`（`localhost` 除
+> 外）。日誌只記狀態碼與錯誤種類，不記網址、金鑰或對話內容。
 
 > **ML v1 模型目前沒有 ExpTech 主機提供**（`static.core-{tnn1,tyo1}` 都是 404），
 > 所以從 TREM-Lite 發布的位置下載，並以 SHA-256 釘住檔案：jsDelivr 跟著

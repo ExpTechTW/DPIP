@@ -140,4 +140,61 @@ void main() {
     );
     expect(ignored.ignoring, isTrue);
   });
+
+  testWidgets(
+    'a trailing action sits at the right and keeps the badge centred',
+    (tester) async {
+      tester.view.physicalSize = const Size(400, 200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final store = RegionStore(SettingsStore.inMemory())..select(0);
+      var taps = 0;
+      await tester.pumpWidget(
+        _app(
+          store,
+          RegionBar(
+            trailing: IconButton(
+              tooltip: 'action',
+              onPressed: () => taps++,
+              icon: const Icon(Icons.auto_awesome_outlined),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(tester.element(find.byType(RegionBar)));
+
+      final action = tester.getRect(find.byTooltip('action'));
+      expect(action.right, lessThanOrEqualTo(400));
+      expect(action.left, greaterThanOrEqualTo(400 - RegionBar.actionWidth));
+      // The selected badge is still in the middle of the screen.
+      final badge = tester.getRect(find.text(l10n.regionNationwide).first);
+      expect(badge.center.dx, moreOrLessEquals(200, epsilon: 1));
+
+      await tester.tap(find.byTooltip('action'));
+      expect(taps, 1);
+    },
+  );
+
+  testWidgets('the trailing action leaves with the bar', (tester) async {
+    final store = RegionStore(SettingsStore.inMemory());
+    var taps = 0;
+    await tester.pumpWidget(
+      _app(
+        store,
+        RegionBar(
+          dismiss: 1,
+          trailing: IconButton(
+            tooltip: 'action',
+            onPressed: () => taps++,
+            icon: const Icon(Icons.auto_awesome_outlined),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('action'), warnIfMissed: false);
+    expect(taps, 0);
+  });
 }
