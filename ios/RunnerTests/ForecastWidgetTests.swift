@@ -1936,6 +1936,120 @@ final class ForecastUnavailablePresentationTests: XCTestCase {
     private let date = instant("2026-09-25T07:21:00Z")
     private let locales = ["en", "zh-Hant", "zh-Hans", "ja", "ko"]
 
+    private func staleForecastObservation(regionName: String) -> CurrentWeatherWidgetSnapshot {
+        CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407",
+            regionName: regionName, observationTime: Int(date.addingTimeInterval(-3_600).timeIntervalSince1970),
+            stationName: "臺中氣象觀測站", weather: "雷雨", weatherCode: 319,
+            condition: .thunderstorm, isNight: false,
+            nextDayNightTransitionTime: Int(date.addingTimeInterval(3_600).timeIntervalSince1970),
+            calibratedTimeOffsetMilliseconds: 0, temperature: 32, humidity: 100,
+            rain: 123.4, windDirection: "NE", windSpeed: 12.3, apparentTemperature: 38
+        )
+    }
+
+    private func forecastLayoutEntry(
+        regionName: String = "臺中市西屯區臺灣大道三段", age: TimeInterval = 45 * 60
+    ) -> DPIPWidgetEntry {
+        DPIPWidgetEntry(
+            date: date, snapshot: staleForecastObservation(regionName: regionName),
+            isStale: false, isNight: false,
+            forecast: forecastSnapshot(
+                sourceIdentifier: "current-location",
+                updateTime: Int64(date.addingTimeInterval(-age).timeIntervalSince1970 * 1_000),
+                receivedAt: milliseconds("2026-09-25T07:21:00Z"),
+                times: ["16:00", "17:00", "18:00", "19:00", "20:00"]
+            )
+        )
+    }
+
+    private func widgetLocalization(_ locale: String) throws -> Bundle {
+        let path = try XCTUnwrap(Bundle(for: Self.self).path(forResource: locale, ofType: "lproj"))
+        return try XCTUnwrap(Bundle(path: path))
+    }
+
+    func testStaleForecastLayoutDiagnostics() throws {
+        let entry = forecastLayoutEntry()
+        XCTAssertEqual(entry.forecastFreshness, .stale)
+        let margin: CGFloat = 16
+        var measurements = ["Family\tLocale\tDynamic Type\tContent W×H (pt)\tIdeal W×H (pt)"]
+        // Keep the earlier audit's ideal-size inputs for comparison with HEAD.
+        // Medium xxxLarge/AX5 and Large xxxLarge/AX5 have known layout pressure.
+        // Captures use finite HIG card bounds with simulated content margins.
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            XCTAssertFalse(entry.upcomingForecastPoints(for: family).isEmpty)
+            let contentSize = CGSize(width: 300, height: family == .systemMedium ? 158 : 354)
+            for locale in locales {
+                let bundle = try widgetLocalization(locale)
+                for size: DynamicTypeSize in [.large, .xxxLarge, .accessibility1, .accessibility3, .accessibility5] {
+                    autoreleasepool {
+                        let widget = family == .systemMedium
+                            ? AnyView(MediumCurrentWeatherView(entry: entry, localizationBundle: bundle))
+                            : AnyView(LargeCurrentWeatherView(entry: entry, localizationBundle: bundle))
+                        let view = widget
+                            .environment(\.locale, Locale(identifier: locale))
+                            .environment(\.dynamicTypeSize, size)
+                        // Ideal size measures layout pressure. The render below
+                        // independently proposes the finite content rectangle.
+                        let ideal = UIHostingController(rootView: view.fixedSize(horizontal: false, vertical: true))
+                        if #available(iOS 16.4, *) { ideal.safeAreaRegions = [] }
+                        let fitting = ideal.sizeThatFits(in: CGSize(width: contentSize.width, height: 1_000))
+                        measurements.append("\(family)\t\(locale)\t\(size)\t"
+                            + "\(contentSize.width)×\(contentSize.height)\t\(fitting.width)×\(fitting.height)")
+
+                        if ["en", "ja"].contains(locale),
+                           [.large, .xxxLarge, .accessibility5].contains(size) {
+                            let card = CGRect(x: 0, y: 0, width: 338, height: contentSize.height)
+                            let content = card.insetBy(dx: margin, dy: margin)
+                            let render = UIHostingController(rootView: view
+                                .environment(\.colorScheme, .light)
+                                .frame(width: content.width, height: content.height, alignment: .topLeading)
+                                .padding(margin)
+                                .background(Color.white)
+                                .clipped())
+                            if #available(iOS 16.4, *) { render.safeAreaRegions = [] }
+                            render.view.frame = card
+                            render.view.layoutIfNeeded()
+                            attachWidgetRender(render.view, named: "stale-audit-\(family)-\(locale)-\(size)")
+                        }
+                    }
+                }
+            }
+        }
+        let report = XCTAttachment(string: measurements.joined(separator: "\n"))
+        report.name = "stale-audit-ideal-sizes"
+        report.lifetime = .keepAlways
+        add(report)
+    }
+
+    private func attachWidgetRender(_ view: UIView, named name: String) {
+        let image = UIGraphicsImageRenderer(size: view.bounds.size).image { _ in
+            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        }
+        let attachment = XCTAttachment(image: image)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    func testMediumForecastFixtureFreshness() {
+        let stale = forecastLayoutEntry(regionName: "西屯")
+        let cases: [(offset: TimeInterval, forecast: ForecastWidgetSnapshot?,
+                     freshness: ForecastWidgetExpiry.Freshness?)] = [
+            (-30 * 60, stale.forecast, .fresh),
+            (0, stale.forecast, .stale),
+            (80 * 60, stale.forecast, .expired),
+            (0, nil, nil),
+        ]
+        for sample in cases {
+            let entry = DPIPWidgetEntry(
+                date: stale.date.addingTimeInterval(sample.offset), snapshot: stale.snapshot,
+                isStale: false, isNight: false, forecast: sample.forecast
+            )
+            XCTAssertEqual(entry.forecastFreshness, sample.freshness)
+        }
+    }
+
     func testMediumAndLargeUnavailableSectionFitsAllLocalesAndLargestText() throws {
         let current = currentSnapshot(target: .saved(regionCode: "407"))
         let entry = DPIPWidgetEntry(date: date, snapshot: current, isStale: false, isNight: false)
