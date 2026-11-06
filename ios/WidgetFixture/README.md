@@ -23,7 +23,8 @@ tests use `XCUIApplication.launchEnvironment`):
 | `DPIP_FIXTURE_FORECAST` | `stale`, `fresh`, `expired`, `unavailable` |
 | `DPIP_FIXTURE_LANGUAGE` | `en`, `zh-Hant`, `zh-Hans`, `ja`, `ko` |
 | `DPIP_FIXTURE_TEXT_SIZE` | `normal` (.large), `larger` (.xLarge), `accessibility` (.accessibility1) |
-| `DPIP_FIXTURE_LOCATION` | `short` (Taichung Xitun), `compact` (Xitun), `long` (Taichung City Xitun District Shuinan Central Park) |
+| `DPIP_FIXTURE_LOCATION` | `short` (Taichung Xitun), `compact` (Xitun), `long` (Taichung City Xitun District Shuinan Central Park), `xitun` (西屯), `longChinese` (臺中市西屯區臺灣大道三段) |
+| `DPIP_FIXTURE_CARD` | `narrow` (338 × 158 pt), `wide` (364 × 170 pt) |
 
 The fixture uses a fixed September 25, 2026 entry (15:21 in Asia/Taipei) and
 a distinct observation time (14:21). Fresh, stale and expired forecasts use
@@ -42,14 +43,17 @@ and time formatting. The system UI language is not switched.
 | Stale | en | accessibility / long | Image | Button |
 | Fresh | en | normal / short | Absent | Absent |
 | Expired, unavailable | en | normal / short | Absent | Button |
+| Stale, wide card | all five locales | normal / xitun | StaticText | Button |
+| Stale, wide card | ja, zh-Hant | accessibility / longChinese | Image | Button |
+| Stale and fresh comparison, narrow card | en | normal / longChinese | Image when stale | Button when stale |
+| Fresh, expired, unavailable, wide card | zh-Hant | normal and accessibility / xitun | Absent | Button for expired or unavailable |
 
-The card has a fixed 338 × 158 pt presentation and 16 pt margins. An
-independent sibling element reports the card frame in screen coordinates
+Both card sizes use 16 pt margins. An independent sibling element reports
+the card frame in screen coordinates
 without collecting the widget descendants' frames. The assertions check
 accessibility labels and geometry, including a 44 × 44 pt refresh button and
-representative forecast time, temperature and precipitation. They do not
-invoke the refresh intent, measure rendered glyphs or exercise WidgetKit or
-VoiceOver. The normal and .xLarge captures clip the bottom precipitation
+all five regular forecast columns or one combined accessibility forecast
+row. The normal and .xLarge captures clip the bottom precipitation
 glyphs, as in Phase 1. The test checks semantic placement with a frame that
 intersects the forecast region. The .accessibility1 capture shows a single
 forecast row inside the card; both long-location cases visually abbreviate
@@ -62,8 +66,7 @@ case: supplying the entry date as the observation date made the expected
 observation count zero; rendering a second warning with the same catalog
 label made the warning count two. The fixture was restored after each run.
 
-Phase 2A keeps both app-hosted Medium XCTest cases intact. Before replacing
-them, compare coverage against their full locale, text-size and forecast
-matrix. Phase 1's observation-removed, warning-removed and out-of-bounds
-controls remain in the original PoC evidence (`remove-time`,
+The [Phase 2B mapping](PHASE_2B.md) traces the app-hosted assertions to their
+replacement coverage. Phase 1's observation-removed, warning-removed and
+out-of-bounds controls remain in the original PoC evidence (`remove-time`,
 `remove-warning-real` and `move-time-bounded` logs and result bundles).
