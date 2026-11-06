@@ -1,28 +1,148 @@
 import SwiftUI
 import WidgetKit
 
-@main struct WidgetProofApp: App {
-    init() { NSTimeZone.default = TimeZone(identifier: "Asia/Taipei")! }
+@main
+struct WidgetFixtureApp: App {
+    private let scenario = MediumWeatherScenario(environment: ProcessInfo.processInfo.environment)
+
+    init() {
+        NSTimeZone.default = MediumWeatherScenario.timeZone
+    }
+
     var body: some Scene {
         WindowGroup {
             ZStack {
                 Color.gray.opacity(0.25).ignoresSafeArea()
-                MediumCurrentWeatherView(entry: fixture, localizationBundle: Bundle(path: Bundle.main.path(forResource: "en", ofType: "lproj")!)!)
-                    .environment(\.locale, Locale(identifier: "en_US"))
-                    .environment(\.timeZone, TimeZone(identifier: "Asia/Taipei")!)
+
+                // A sibling of the widget: its accessibility frame cannot grow
+                // when the widget's descendants overflow the clipped card.
+                Rectangle()
+                    .fill(.white)
+                    .frame(width: 338, height: 158)
+                    .accessibilityLabel("Fixture presentation boundary")
+                    .accessibilityIdentifier("widget-presentation-boundary")
+
+                MediumCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
+                    .environment(\.locale, scenario.locale)
+                    .environment(\.timeZone, MediumWeatherScenario.timeZone)
+                    .environment(\.dynamicTypeSize, scenario.dynamicTypeSize)
                     .environment(\.colorScheme, .light)
                     .frame(width: 306, height: 126, alignment: .topLeading)
                     .padding(16)
-                    .background(Color.white)
-                    .frame(width: 338, height: 158)
                     .clipped()
-                    .accessibilityElement(children: .contain)
-                    .accessibilityIdentifier("widget-card")
             }
         }
     }
 }
-let date = ISO8601DateFormatter().date(from: "2026-09-25T07:21:00Z")!
-let snapshot = CurrentWeatherWidgetSnapshot(schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407", regionName: "Taichung Xitun", observationTime: Int(date.addingTimeInterval(-3600).timeIntervalSince1970), stationName: "Taichung", weather: "雷雨", weatherCode: 319, condition: .thunderstorm, isNight: false, nextDayNightTransitionTime: Int(date.addingTimeInterval(3600).timeIntervalSince1970), calibratedTimeOffsetMilliseconds: 0, temperature: 32, humidity: 100, rain: 123.4, windDirection: "NE", windSpeed: 12.3, apparentTemperature: 38)
-let forecast = ForecastWidgetSnapshot(sourceIdentifier: "current-location", regionCode: "407", updateTime: Int64(date.addingTimeInterval(-2700).timeIntervalSince1970 * 1000), receivedAt: Int64(date.timeIntervalSince1970 * 1000), points: ["16:00", "17:00", "18:00", "19:00", "20:00"].map { ForecastWidgetPoint(time: $0, temperature: 22, weather: "晴", weatherCode: 100, pop: 20)! })!
-let fixture = DPIPWidgetEntry(date: date, snapshot: snapshot, isStale: false, isNight: false, forecast: forecast)
+
+private struct MediumWeatherScenario {
+    private enum Forecast: String {
+        case fresh, stale, expired, unavailable
+
+        var publicationAge: TimeInterval? {
+            switch self {
+            case .fresh: 15 * 60
+            case .stale: 45 * 60
+            case .expired: 135 * 60
+            case .unavailable: nil
+            }
+        }
+    }
+
+    private enum Language: String {
+        case en, traditionalChinese = "zh-Hant", simplifiedChinese = "zh-Hans", ja, ko
+
+        var locale: Locale {
+            switch self {
+            case .en: Locale(identifier: "en_US")
+            case .traditionalChinese: Locale(identifier: "zh_Hant_TW")
+            case .simplifiedChinese: Locale(identifier: "zh_Hans_CN")
+            case .ja: Locale(identifier: "ja_JP")
+            case .ko: Locale(identifier: "ko_KR")
+            }
+        }
+
+        var bundle: Bundle {
+            Bundle(url: Bundle.main.url(forResource: rawValue, withExtension: "lproj")!)!
+        }
+    }
+
+    private enum TextSize: String {
+        case normal, larger, accessibility
+
+        var dynamicTypeSize: DynamicTypeSize {
+            switch self {
+            case .normal: .large
+            case .larger: .xLarge
+            case .accessibility: .accessibility1
+            }
+        }
+    }
+
+    private enum Location: String {
+        case short, long, compact
+
+        var name: String {
+            switch self {
+            case .short: "Taichung Xitun"
+            case .compact: "Xitun"
+            case .long: "Taichung City Xitun District Shuinan Central Park"
+            }
+        }
+    }
+
+    static let timeZone = TimeZone(identifier: "Asia/Taipei")!
+    private let forecast: Forecast
+    private let language: Language
+    private let textSize: TextSize
+    private let location: Location
+
+    init(environment: [String: String]) {
+        forecast = Self.option("DPIP_FIXTURE_FORECAST", default: .stale, environment: environment)
+        language = Self.option("DPIP_FIXTURE_LANGUAGE", default: .en, environment: environment)
+        textSize = Self.option("DPIP_FIXTURE_TEXT_SIZE", default: .normal, environment: environment)
+        location = Self.option("DPIP_FIXTURE_LOCATION", default: .short, environment: environment)
+    }
+
+    private static func option<Value: RawRepresentable>(
+        _ key: String, default defaultValue: Value, environment: [String: String]
+    ) -> Value where Value.RawValue == String {
+        guard let rawValue = environment[key] else { return defaultValue }
+        guard let value = Value(rawValue: rawValue) else {
+            preconditionFailure("Unsupported WidgetFixture option \(key)=\(rawValue)")
+        }
+        return value
+    }
+
+    var locale: Locale { language.locale }
+    var bundle: Bundle { language.bundle }
+    var dynamicTypeSize: DynamicTypeSize { textSize.dynamicTypeSize }
+
+    var entry: DPIPWidgetEntry {
+        // 15:21 entry date and 14:21 observation, both in Taipei.
+        let date = ISO8601DateFormatter().date(from: "2026-09-25T07:21:00Z")!
+        let observationDate = date.addingTimeInterval(-3600)
+        let snapshot = CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407",
+            regionName: location.name, observationTime: Int(observationDate.timeIntervalSince1970),
+            stationName: "Taichung", weather: "雷雨", weatherCode: 319, condition: .thunderstorm,
+            isNight: false, nextDayNightTransitionTime: Int(date.addingTimeInterval(3600).timeIntervalSince1970),
+            calibratedTimeOffsetMilliseconds: 0, temperature: 32, humidity: 100, rain: 123.4,
+            windDirection: "NE", windSpeed: 12.3, apparentTemperature: 38
+        )
+        let forecastSnapshot = forecast.publicationAge.map { age in
+            ForecastWidgetSnapshot(
+                sourceIdentifier: "current-location", regionCode: "407",
+                updateTime: Int64(date.addingTimeInterval(-age).timeIntervalSince1970 * 1000),
+                receivedAt: Int64(date.timeIntervalSince1970 * 1000),
+                points: (16...20).map { hour in
+                    ForecastWidgetPoint(
+                        time: "\(hour):00", temperature: Double(hour + 6),
+                        weather: "晴", weatherCode: 100, pop: (hour - 14) * 10
+                    )!
+                }
+            )!
+        }
+        return DPIPWidgetEntry(date: date, snapshot: snapshot, isStale: false, isNight: false, forecast: forecastSnapshot)
+    }
+}
