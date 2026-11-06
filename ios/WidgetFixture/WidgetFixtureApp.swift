@@ -4,6 +4,7 @@ import WidgetKit
 @main
 struct WidgetFixtureApp: App {
     private let scenario = MediumWeatherScenario(environment: ProcessInfo.processInfo.environment)
+    private let margin: CGFloat = 16
 
     init() {
         NSTimeZone.default = MediumWeatherScenario.timeZone
@@ -18,7 +19,7 @@ struct WidgetFixtureApp: App {
                 // when the widget's descendants overflow the clipped card.
                 Rectangle()
                     .fill(.white)
-                    .frame(width: 338, height: 158)
+                    .frame(width: scenario.card.width, height: scenario.card.height)
                     .accessibilityLabel("Fixture presentation boundary")
                     .accessibilityIdentifier("widget-presentation-boundary")
 
@@ -27,8 +28,9 @@ struct WidgetFixtureApp: App {
                     .environment(\.timeZone, MediumWeatherScenario.timeZone)
                     .environment(\.dynamicTypeSize, scenario.dynamicTypeSize)
                     .environment(\.colorScheme, .light)
-                    .frame(width: 306, height: 126, alignment: .topLeading)
-                    .padding(16)
+                    .frame(width: scenario.card.width - 2 * margin, height: scenario.card.height - 2 * margin,
+                           alignment: .topLeading)
+                    .padding(margin)
                     .clipped()
             }
         }
@@ -36,6 +38,17 @@ struct WidgetFixtureApp: App {
 }
 
 private struct MediumWeatherScenario {
+    private enum Card: String {
+        case narrow, wide
+
+        var size: CGSize {
+            switch self {
+            case .narrow: CGSize(width: 338, height: 158)
+            case .wide: CGSize(width: 364, height: 170)
+            }
+        }
+    }
+
     private enum Forecast: String {
         case fresh, stale, expired, unavailable
 
@@ -80,13 +93,15 @@ private struct MediumWeatherScenario {
     }
 
     private enum Location: String {
-        case short, long, compact
+        case short, long, compact, xitun, longChinese
 
         var name: String {
             switch self {
             case .short: "Taichung Xitun"
             case .compact: "Xitun"
             case .long: "Taichung City Xitun District Shuinan Central Park"
+            case .xitun: "西屯"
+            case .longChinese: "臺中市西屯區臺灣大道三段"
             }
         }
     }
@@ -96,12 +111,14 @@ private struct MediumWeatherScenario {
     private let language: Language
     private let textSize: TextSize
     private let location: Location
+    let card: CGSize
 
     init(environment: [String: String]) {
         forecast = Self.option("DPIP_FIXTURE_FORECAST", default: .stale, environment: environment)
         language = Self.option("DPIP_FIXTURE_LANGUAGE", default: .en, environment: environment)
         textSize = Self.option("DPIP_FIXTURE_TEXT_SIZE", default: .normal, environment: environment)
         location = Self.option("DPIP_FIXTURE_LOCATION", default: .short, environment: environment)
+        card = Self.option("DPIP_FIXTURE_CARD", default: Card.narrow, environment: environment).size
     }
 
     private static func option<Value: RawRepresentable>(

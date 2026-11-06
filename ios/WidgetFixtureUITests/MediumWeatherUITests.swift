@@ -3,7 +3,7 @@ import XCTest
 final class MediumWeatherUITests: XCTestCase {
     // Independent expectations for the catalog and regional clock formatting.
     // The fixture uses the production catalog; these literals are test oracles.
-    private enum Language: String {
+    private enum Language: String, CaseIterable {
         case en, traditionalChinese = "zh-Hant", simplifiedChinese = "zh-Hans", ja, ko
 
         var expected: (locale: String, warning: String, refresh: String) {
@@ -13,6 +13,16 @@ final class MediumWeatherUITests: XCTestCase {
             case .simplifiedChinese: ("zh_Hans_CN", "预报数据较旧", "刷新预报")
             case .ja: ("ja_JP", "予報データが古くなっています", "予報を更新")
             case .ko: ("ko_KR", "예보 데이터가 오래되었습니다", "예보 새로 고침")
+            }
+        }
+
+        var unavailableLabel: String {
+            switch self {
+            case .en: "Hourly forecast unavailable"
+            case .traditionalChinese: "每小時預報暫無資料"
+            case .simplifiedChinese: "暂无逐小时预报"
+            case .ja: "時間別予報は利用できません"
+            case .ko: "시간별 예보를 이용할 수 없습니다"
             }
         }
 
@@ -35,17 +45,34 @@ final class MediumWeatherUITests: XCTestCase {
     }
 
     private enum Location: String {
-        case short, long, compact
+        case short, long, compact, xitun, longChinese
 
         var label: String {
             switch self {
             case .short: "Taichung Xitun"
             case .compact: "Xitun"
             case .long: "Taichung City Xitun District Shuinan Central Park"
+            case .xitun: "西屯"
+            case .longChinese: "臺中市西屯區臺灣大道三段"
             }
         }
     }
 
+    private enum Card: String {
+        case narrow, wide
+
+        var size: CGSize {
+            switch self {
+            case .narrow: CGSize(width: 338, height: 158)
+            case .wide: CGSize(width: 364, height: 170)
+            }
+        }
+    }
+
+    private let hours = ["16:00", "17:00", "18:00", "19:00", "20:00"]
+    private let temperatures = ["22°", "23°", "24°", "25°", "26°"]
+    private let probabilities = ["20%", "30%", "40%", "50%", "60%"]
+    private let margin: CGFloat = 16
     private let tolerance: CGFloat = 0.5
 
     func testEnglishStaleMediumHeader() {
@@ -92,62 +119,119 @@ final class MediumWeatherUITests: XCTestCase {
         assertNonStale(.unavailable)
     }
 
-    private func launch(_ forecast: Forecast, language: Language, size: TextSize, location: Location) -> XCUIApplication {
+    func testWideStaleMediumUsesLocalizedWarningText() {
+        for language in Language.allCases {
+            XCTContext.runActivity(named: language.rawValue) { _ in
+                assertStale(language, location: .xitun, card: .wide, warningRole: .staticText,
+                            screenshot: "stale-wide-\(language.rawValue)")
+            }
+        }
+    }
+
+    func testWideAccessibilityStaleMediumUsesLocalizedWarningImage() {
+        for language in [Language.ja, .traditionalChinese] {
+            XCTContext.runActivity(named: language.rawValue) { _ in
+                assertStale(language, size: .accessibility, location: .longChinese, card: .wide,
+                            warningRole: .image, screenshot: "stale-wide-ax1-\(language.rawValue)")
+            }
+        }
+    }
+
+    func testNarrowStaleForecastDoesNotIncreaseFreshOverflow() {
+        let stale = assertStale(.en, location: .longChinese, warningRole: .image,
+                                screenshot: "stale-narrow-long-Chinese")
+        let fresh = assertNonStale(.fresh, location: .longChinese, screenshot: "fresh-narrow-long-Chinese")
+        guard let stale, let fresh else { return }
+        XCTAssertLessThanOrEqual(stale.bottom - stale.cardBottom, max(0, fresh.bottom - fresh.cardBottom) + tolerance,
+                                 "Stale forecast must not increase overflow below the narrow card")
+    }
+
+    func testTraditionalChineseNonStaleStatesAtRegularAndAccessibilitySizes() {
+        for forecast in [Forecast.fresh, .expired, .unavailable] {
+            for size in [TextSize.normal, .accessibility] {
+                XCTContext.runActivity(named: "\(forecast.rawValue)-\(size.rawValue)") { _ in
+                    assertNonStale(forecast, language: .traditionalChinese, size: size, location: .xitun, card: .wide,
+                                   screenshot: forecast == .unavailable && size == .normal ? "unavailable-zh-Hant-large" : nil)
+                }
+            }
+        }
+    }
+
+    private func launch(
+        _ forecast: Forecast, language: Language, size: TextSize, location: Location, card: Card
+    ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = [
             "DPIP_FIXTURE_FORECAST": forecast.rawValue,
             "DPIP_FIXTURE_LANGUAGE": language.rawValue,
             "DPIP_FIXTURE_TEXT_SIZE": size.rawValue,
             "DPIP_FIXTURE_LOCATION": location.rawValue,
+            "DPIP_FIXTURE_CARD": card.rawValue,
         ]
         app.launch()
         return app
     }
 
+    @discardableResult
     private func assertStale(
         _ language: Language, size: TextSize = .normal, location: Location = .short,
-        warningRole: XCUIElement.ElementType, screenshot: String? = nil
-    ) {
-        let app = launch(.stale, language: language, size: size, location: location)
+        card: Card = .narrow, warningRole: XCUIElement.ElementType, screenshot: String? = nil
+    ) -> (bottom: CGFloat, cardBottom: CGFloat)? {
+        let app = launch(.stale, language: language, size: size, location: location, card: card)
         capture(screenshot)
-        guard let layout = assertCurrentWeather(app, language: language, location: location) else { return }
+        guard let layout = assertCurrentWeather(app, language: language, location: location, card: card) else { return nil }
 
         let warningLabel = language.expected.warning
         if let warning = requireOne(elements(app, label: warningLabel), "Stale warning '\(warningLabel)'") {
+            let frame = warning.frame
             XCTAssertEqual(warning.elementType, warningRole, "Wrong stale warning representation")
-            assertInside(warning.frame, layout.bounds, "Stale warning")
-            XCTAssertLessThanOrEqual(warning.frame.maxX, layout.time.minX + tolerance, "Warning must precede observation time")
-            XCTAssertGreaterThan(min(warning.frame.maxY, layout.time.maxY),
-                                 max(warning.frame.minY, layout.time.minY),
+            assertInside(frame, layout.bounds.insetBy(dx: margin, dy: margin), "Stale warning")
+            XCTAssertLessThanOrEqual(layout.location.maxX, frame.minX + tolerance, "Location must precede stale warning")
+            XCTAssertLessThanOrEqual(frame.maxX, layout.time.minX + tolerance, "Warning must precede observation time")
+            XCTAssertGreaterThan(min(frame.maxY, layout.time.maxY), max(frame.minY, layout.time.minY),
                                  "Warning and observation time must share a row")
         }
-        assertRefresh(app, label: language.expected.refresh, region: layout.forecast)
-        _ = assertForecast(app, size: size, region: layout.forecast)
+        let refresh = assertRefresh(app, label: language.expected.refresh, region: layout.forecast)
+        guard let forecast = assertForecast(app, size: size, card: card, region: layout.forecast) else { return nil }
+        if let refresh {
+            XCTAssertLessThanOrEqual(forecast.maxX, refresh.minX + tolerance, "Forecast must not overlap refresh")
+        }
+        return (forecast.maxY, layout.bounds.maxY)
     }
 
-    private func assertNonStale(_ forecast: Forecast, screenshot: String? = nil) {
-        let app = launch(forecast, language: .en, size: .normal, location: .short)
+    @discardableResult
+    private func assertNonStale(
+        _ forecast: Forecast, language: Language = .en, size: TextSize = .normal,
+        location: Location = .short, card: Card = .narrow, screenshot: String? = nil
+    ) -> (bottom: CGFloat, cardBottom: CGFloat)? {
+        let app = launch(forecast, language: language, size: size, location: location, card: card)
         capture(screenshot)
-        guard let layout = assertCurrentWeather(app, language: .en, location: .short) else { return }
+        guard let layout = assertCurrentWeather(app, language: language, location: location, card: card) else { return nil }
 
+        var forecastFrame: CGRect?
         if forecast == .fresh {
-            guard assertForecast(app, size: .normal, region: layout.forecast) else { return }
+            guard let frame = assertForecast(app, size: size, card: card, region: layout.forecast) else { return nil }
+            forecastFrame = frame
             XCTAssertEqual(app.buttons.count, 0, "Fresh forecast must not offer refresh")
         } else {
-            guard let status = requireOne(texts(app, label: "Hourly forecast unavailable"), "Forecast unavailable status"),
-                  assertRefresh(app, label: Language.en.expected.refresh, region: layout.forecast) else { return }
+            guard let status = requireOne(texts(app, label: language.unavailableLabel), "Forecast unavailable status"),
+                  assertRefresh(app, label: language.expected.refresh, region: layout.forecast) != nil else { return nil }
             assertInside(status.frame, layout.forecast, "Forecast unavailable status")
-            for label in ["16:00", "22°", "20%"] {
-                XCTAssertEqual(elements(app, label: label).count, 0, "Unexpected expired or missing forecast value: \(label)")
-            }
+            let unexpectedForecast = app.descendants(matching: .any).matching(NSCompoundPredicate(
+                orPredicateWithSubpredicates: (hours + temperatures + probabilities).map {
+                    NSPredicate(format: "label CONTAINS %@", $0)
+                }
+            ))
+            XCTAssertEqual(unexpectedForecast.count, 0, "Expired or missing forecasts must not show hourly values")
         }
         // Positive current-weather and state-specific content must exist first.
-        XCTAssertEqual(elements(app, label: Language.en.expected.warning).count, 0, "Non-stale forecast exposed a stale warning")
+        XCTAssertEqual(elements(app, label: language.expected.warning).count, 0, "Non-stale forecast exposed a stale warning")
+        return forecastFrame.map { ($0.maxY, layout.bounds.maxY) }
     }
 
     private func assertCurrentWeather(
-        _ app: XCUIApplication, language: Language, location: Location
-    ) -> (bounds: CGRect, time: CGRect, forecast: CGRect)? {
+        _ app: XCUIApplication, language: Language, location: Location, card: Card
+    ) -> (bounds: CGRect, location: CGRect, time: CGRect, forecast: CGRect)? {
         guard texts(app, label: location.label).firstMatch.waitForExistence(timeout: 10) else {
             XCTFail("Missing fixture location '\(location.label)'; widget accessibility content did not load")
             return nil
@@ -156,57 +240,92 @@ final class MediumWeatherUITests: XCTestCase {
         let boundary = app.descendants(matching: .any).matching(identifier: "widget-presentation-boundary")
         let timeLabel = language.timeLabel(utcHour: 6)
         guard let marker = requireOne(boundary, "Independent presentation boundary"),
+              let locationElement = requireOne(texts(app, label: location.label), "Location"),
               let time = requireOne(elements(app, label: timeLabel), "Observation time '\(timeLabel)'"),
               let temperature = requireOne(texts(app, label: "32°"), "Current temperature") else { return nil }
 
         let bounds = marker.frame
-        XCTAssertEqual(bounds.width, 338, accuracy: tolerance)
-        XCTAssertEqual(bounds.height, 158, accuracy: tolerance)
+        XCTAssertEqual(bounds.width, card.size.width, accuracy: tolerance)
+        XCTAssertEqual(bounds.height, card.size.height, accuracy: tolerance)
         XCTAssertEqual(time.elementType, .staticText)
         XCTAssertEqual(elements(app, label: language.timeLabel(utcHour: 7)).count, 0, "Entry time must not replace observation time")
-        assertInside(time.frame, bounds, "Observation time")
-        assertInside(temperature.frame, bounds, "Current temperature")
+        let header = bounds.insetBy(dx: margin, dy: margin)
+        let timeFrame = time.frame
+        let locationFrame = locationElement.frame
+        let temperatureFrame = temperature.frame
+        assertInside(timeFrame, header, "Observation time")
+        assertInside(locationFrame, header, "Location")
+        assertInside(temperatureFrame, bounds, "Current temperature")
 
-        let content = bounds.insetBy(dx: 16, dy: 0)
-        let forecast = CGRect(x: content.minX, y: temperature.frame.maxY,
-                              width: content.width, height: content.maxY - temperature.frame.maxY)
-        return (bounds, time.frame, forecast)
+        let forecastTop = max(temperatureFrame.maxY, timeFrame.maxY)
+        let forecast = CGRect(x: header.minX, y: forecastTop,
+                              width: header.width, height: bounds.maxY - forecastTop)
+        return (bounds, locationFrame, timeFrame, forecast)
     }
 
-    @discardableResult
-    private func assertRefresh(_ app: XCUIApplication, label: String, region: CGRect) -> Bool {
-        guard let refresh = requireOne(elements(app, label: label), "Refresh '\(label)'") else { return false }
-        XCTAssertEqual(refresh.elementType, .button)
+    private func assertRefresh(_ app: XCUIApplication, label: String, region: CGRect) -> CGRect? {
+        guard let refresh = requireOne(elements(app, label: label), "Refresh '\(label)'") else { return nil }
+        XCTAssertEqual(refresh.elementType, .button, "Refresh must expose the Button role")
         XCTAssertEqual(app.buttons.count, 1)
-        XCTAssertEqual(refresh.frame.width, 44, accuracy: tolerance)
-        XCTAssertEqual(refresh.frame.height, 44, accuracy: tolerance)
-        assertInside(refresh.frame, region, "Refresh button")
-        return true
+        XCTAssertTrue(refresh.isEnabled, "Refresh button must be enabled")
+        let frame = refresh.frame
+        XCTAssertEqual(frame.width, 44, accuracy: tolerance)
+        XCTAssertEqual(frame.height, 44, accuracy: tolerance)
+        assertInside(frame, region, "Refresh button")
+        return frame
     }
 
-    private func assertForecast(_ app: XCUIApplication, size: TextSize, region: CGRect) -> Bool {
+    private func assertForecast(_ app: XCUIApplication, size: TextSize, card: Card, region: CGRect) -> CGRect? {
         if size == .accessibility {
             let rows = app.descendants(matching: .any).matching(NSPredicate(
-                format: "label CONTAINS %@ AND label CONTAINS %@ AND label CONTAINS %@", "16:00", "22°", "20%"
+                format: "label CONTAINS %@ AND label CONTAINS %@ AND label CONTAINS %@",
+                hours[0], temperatures[0], probabilities[0]
             ))
-            guard let row = requireOne(rows, "Accessible forecast row with time, temperature and precipitation") else { return false }
-            assertInside(row.frame, region, "Accessible forecast row")
-        } else {
-            guard let time = requireOne(texts(app, label: "16:00"), "Forecast time"),
-                  let temperature = requireOne(texts(app, label: "22°"), "Forecast temperature"),
-                  let precipitation = requireOne(texts(app, label: "20%"), "Forecast precipitation") else { return false }
-            assertInside(time.frame, region, "Forecast time")
-            assertInside(temperature.frame, region, "Forecast temperature")
-            // The regular fixture may clip the bottom of the precipitation row.
-            // Check its semantic position and association without certifying glyph visibility.
-            XCTAssertTrue(region.intersects(precipitation.frame), "Forecast precipitation must intersect the forecast region")
-            XCTAssertGreaterThanOrEqual(precipitation.frame.minX, region.minX - tolerance)
-            XCTAssertLessThanOrEqual(precipitation.frame.maxX, region.maxX + tolerance)
-            XCTAssertGreaterThanOrEqual(precipitation.frame.minY, temperature.frame.maxY - tolerance)
-            XCTAssertEqual(temperature.frame.midX, time.frame.midX, accuracy: tolerance)
-            XCTAssertEqual(precipitation.frame.midX, time.frame.midX, accuracy: tolerance)
+            guard let row = requireOne(rows, "Accessible forecast row with time, temperature and precipitation") else { return nil }
+            let frame = row.frame
+            assertInside(frame, region, "Accessible forecast row")
+            return frame
         }
-        return true
+
+        var forecast = CGRect.null
+        var hourFrames: [CGRect] = []
+        for (index, hour) in hours.enumerated() {
+            guard let time = requireOne(texts(app, label: hour), "Forecast time \(hour)"),
+                  let temperature = requireOne(texts(app, label: temperatures[index]), "Forecast temperature at \(hour)"),
+                  let precipitation = requireOne(texts(app, label: probabilities[index]), "Forecast precipitation at \(hour)") else { return nil }
+            let timeFrame = time.frame
+            let temperatureFrame = temperature.frame
+            let precipitationFrame = precipitation.frame
+            assertInside(timeFrame, region, "Forecast time \(hour)")
+            assertInside(temperatureFrame, region, "Forecast temperature at \(hour)")
+            // The narrow card can clip the bottom precipitation glyphs.
+            // Still require each semantic frame to intersect the card.
+            if card == .narrow {
+                XCTAssertTrue(region.intersects(precipitationFrame), "Precipitation at \(hour) must intersect the forecast region")
+                XCTAssertGreaterThanOrEqual(precipitationFrame.minX, region.minX - tolerance)
+                XCTAssertLessThanOrEqual(precipitationFrame.maxX, region.maxX + tolerance)
+            } else {
+                assertInside(precipitationFrame, region, "Forecast precipitation at \(hour)")
+            }
+            XCTAssertGreaterThanOrEqual(precipitationFrame.minY, temperatureFrame.maxY - tolerance)
+            XCTAssertEqual(temperatureFrame.midX, timeFrame.midX, accuracy: tolerance)
+            XCTAssertEqual(precipitationFrame.midX, timeFrame.midX, accuracy: tolerance)
+            forecast = forecast.union(timeFrame).union(temperatureFrame).union(precipitationFrame)
+            hourFrames.append(timeFrame)
+        }
+
+        // Forecast weather images share their hour's column below its time.
+        let icons = app.images.allElementsBoundByIndex.map(\.frame)
+            .filter { $0.minY >= hourFrames[0].maxY - tolerance }
+            .sorted { $0.midX < $1.midX }
+        XCTAssertEqual(icons.count, hours.count, "Expected a weather image for each forecast hour")
+        for (icon, hour) in zip(icons, hourFrames) {
+            assertInside(icon, region, "Forecast weather image")
+            XCTAssertGreaterThanOrEqual(icon.midX, hour.minX - tolerance)
+            XCTAssertLessThanOrEqual(icon.midX, hour.maxX + tolerance)
+            forecast = forecast.union(icon)
+        }
+        return forecast
     }
 
     private func assertInside(_ frame: CGRect, _ bounds: CGRect, _ name: String) {
