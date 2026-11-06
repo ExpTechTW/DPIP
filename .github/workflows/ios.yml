@@ -50,6 +50,17 @@ jobs:
               - 'assets/**'
               - 'lib/**'
               - 'pubspec.yaml'
+              - 'pubspec.lock'
+              - 'mise.toml'
+              - 'tool/dev/_lib.sh'
+              - 'tool/dev/build.sh'
+              - 'tool/dev/codegen.sh'
+              - 'tool/dev/deps.sh'
+              - 'tool/dev/test_ios.sh'
+              - 'tool/dev/test_widget_ui.sh'
+              - 'tool/internal/apply_sdk_patches.sh'
+              - 'tool/patches/**'
+              - '.github/workflows/ios.yml'
 
       # Whether release.yml builds this push, for the job below. It publishes
       # a snapshot only when a commit since the last tag carries a changelog
@@ -120,13 +131,139 @@ jobs:
           bash tool/dev/deps.sh
           bash tool/dev/codegen.sh
 
-      # Before the device build, because it is the step that can fail on
-      # something a reviewer would have had to catch by eye. It builds the
-      # Runner scheme, which depends on DPIPWidgetsExtension, so the widget
-      # target and its SwiftUI views are compiled here as well — nothing else
-      # in this repository compiles them.
+      - name: Select and boot iPhone simulator
+        id: simulator
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          diagnostics="$RUNNER_TEMP/ios-test-diagnostics"
+          mkdir -p "$diagnostics"
+          # Keep the startup log even if Xcode cannot find or boot a device.
+          {
+            xcodebuild -version
+            sdk="$(xcrun --sdk iphonesimulator --show-sdk-version)"
+            xcrun simctl list devices available
+            # Prefer the runtime matching the selected Xcode's SDK, then the
+            # newest installed runtime. Prefer the locally verified model on
+            # that runtime when the image provides it.
+            selected="$(xcrun simctl list --json | jq -er --arg sdk "$sdk" '
+              . as $inventory
+              | [ .runtimes[]
+                  | select(.isAvailable and (.platform == "iOS"))
+                  | . as $runtime
+                  | $inventory.devices[$runtime.identifier][]?
+                  | select(.isAvailable and ((.deviceTypeIdentifier // "") | startswith("com.apple.CoreSimulator.SimDeviceType.iPhone-")))
+                  | { version: $runtime.version, name, udid, state }
+                ]
+              | sort_by([(.version == $sdk), (.version | split(".") | map(tonumber)),
+                         (.name == "iPhone 17 Pro"), (.state == "Booted"), .name, .udid])
+              | if length == 0 then error("No available iPhone simulator") else last end
+              | [.udid, .name, .version] | @tsv
+            ')"
+            IFS=$'\t' read -r udid name version <<< "$selected"
+            printf 'Selected %s / iOS %s / %s (iOS SDK %s)\n' "$name" "$version" "$udid" "$sdk"
+            boot_log="$RUNNER_TEMP/ios-simulator-bootstatus.log"
+            xcrun simctl bootstatus "$udid" -b 2>&1 | tee "$boot_log"
+            # bootstatus can exit zero after reporting a failed data migration.
+            if grep -Fq 'Data Migration Failed' "$boot_log"; then
+              echo '::error::Simulator data migration failed during startup.'
+              exit 1
+            fi
+            printf 'udid=%s\n' "$udid" >> "$GITHUB_OUTPUT"
+          } 2>&1 | tee "$diagnostics/simulator-startup.log"
+
+      # Runner builds DPIPWidgetsExtension and runs the hosted XCTest suite.
+      # Disable parallel testing so Xcode uses the selected simulator itself
+      # rather than launching clones for test workers.
       - name: Test (ios/RunnerTests)
-        run: bash tool/dev/test_ios.sh
+        id: runner_tests
+        timeout-minutes: 30
+        shell: bash
+        env:
+          DPIP_IOS_SIMULATOR: ${{ steps.simulator.outputs.udid }}
+        run: |
+          diagnostics="$RUNNER_TEMP/ios-test-diagnostics"
+          bash tool/dev/test_ios.sh \
+            -parallel-testing-enabled NO \
+            -derivedDataPath "$RUNNER_TEMP/RunnerTests-DerivedData" \
+            -resultBundlePath "$diagnostics/RunnerTests.xcresult" \
+            2>&1 | tee "$diagnostics/RunnerTests.log" || {
+              codes=("${PIPESTATUS[@]}")
+              exit "$((codes[0] != 0 ? codes[0] : codes[1]))"
+            }
+
+      - name: Test (ios/WidgetFixtureUITests)
+        id: widget_ui_tests
+        # Run after RunnerTests even if it failed. The failed step remains a
+        # job failure; only the prerequisite setup and cancellation gate this step.
+        if: ${{ !cancelled() && steps.simulator.outcome == 'success' }}
+        timeout-minutes: 30
+        shell: bash
+        env:
+          DPIP_IOS_SIMULATOR: ${{ steps.simulator.outputs.udid }}
+        run: |
+          diagnostics="$RUNNER_TEMP/ios-test-diagnostics"
+          bash tool/dev/test_widget_ui.sh \
+            -parallel-testing-enabled NO \
+            -derivedDataPath "$RUNNER_TEMP/WidgetFixtureUITests-DerivedData" \
+            -clonedSourcePackagesDirPath build/ios/SourcePackages \
+            -resultBundlePath "$diagnostics/WidgetFixtureUITests.xcresult" \
+            2>&1 | tee "$diagnostics/WidgetFixtureUITests.log" || {
+              codes=("${PIPESTATUS[@]}")
+              exit "$((codes[0] != 0 ? codes[0] : codes[1]))"
+            }
+
+      - name: Summarize iOS tests
+        if: ${{ !cancelled() && (steps.simulator.outcome == 'success' || steps.simulator.outcome == 'failure') }}
+        shell: bash
+        env:
+          SIMULATOR_OUTCOME: ${{ steps.simulator.outcome }}
+          RUNNER_TESTS_OUTCOME: ${{ steps.runner_tests.outcome }}
+          WIDGET_UI_TESTS_OUTCOME: ${{ steps.widget_ui_tests.outcome }}
+        run: |
+          diagnostics="$RUNNER_TEMP/ios-test-diagnostics"
+          {
+            printf '### iOS test results\n\n- Simulator setup: %s\n' "$SIMULATOR_OUTCOME"
+            for suite in RunnerTests WidgetFixtureUITests; do
+              case "$suite" in
+                RunnerTests) outcome="$RUNNER_TESTS_OUTCOME" ;;
+                WidgetFixtureUITests) outcome="$WIDGET_UI_TESTS_OUTCOME" ;;
+              esac
+              printf -- '- %s: %s' "$suite" "$outcome"
+              bundle="$diagnostics/$suite.xcresult"
+              if [[ -d "$bundle" ]] && summary="$(xcrun xcresulttool get test-results summary --path "$bundle" | jq -er '
+                select(.totalTestCount > 0)
+                | " — \(.passedTests) passed, \(.failedTests) failed, \(.skippedTests) skipped"
+              ')"; then
+                printf '%s' "$summary"
+              elif [[ "$outcome" == failure ]]; then
+                if [[ -d "$bundle" ]] && xcrun xcresulttool get build-results --path "$bundle" |
+                  jq -e '(.errorCount // (.errors | length)) > 0' >/dev/null; then
+                  printf ' — build errors recorded in xcresult'
+                else
+                  printf ' — no test counts; check the log for build or test launch errors'
+                fi
+              fi
+              printf '\n'
+            done
+          } | tee "$diagnostics/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+          # The full bundle retains XCTest diagnostics and attachments. Export
+          # any UI failure screenshots as well so they can be opened directly.
+          ui_bundle="$diagnostics/WidgetFixtureUITests.xcresult"
+          if [[ "$WIDGET_UI_TESTS_OUTCOME" == failure && -d "$ui_bundle" ]]; then
+            xcrun xcresulttool export attachments --only-failures --filter '*.png' \
+              --path "$ui_bundle" --output-path "$diagnostics/WidgetFixtureUITests-attachments" ||
+              echo '::warning::Could not export UI test screenshots; see the xcresult bundle.'
+          fi
+
+      - name: Upload iOS test failure diagnostics
+        if: ${{ !cancelled() && (steps.simulator.outcome == 'failure' || steps.runner_tests.outcome == 'failure' || steps.widget_ui_tests.outcome == 'failure') }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: DPIP-iOS-test-diagnostics
+          path: ${{ runner.temp }}/ios-test-diagnostics/
+          retention-days: 7
 
       - name: Build iOS App and create IPA
         run: |
