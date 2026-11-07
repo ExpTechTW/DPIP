@@ -25,6 +25,12 @@ abstract final class EewEstimator {
   /// `sqrt(3)`, the S-wave slowness ratio. See [waveTime].
   static const double _sqrt3 = 1.7320508075688772;
 
+  /// PGA attenuation exponent (shared by [locationInfo] and [areaPga]).
+  static const double _pgaExponent = -1.607;
+
+  static double _pga(double pgaFactor, double hypocentralKm) =>
+      pgaFactor * math.exp(_pgaExponent * math.log(hypocentralKm));
+
   /// Estimated continuous intensity at [point] for an event of moment
   /// magnitude [magW] at [epicenter] and focal [depth] (km), via the PGV
   /// attenuation model.
@@ -37,7 +43,7 @@ abstract final class EewEstimator {
     epicentralKm: epicenter.distanceTo(point) / 1000,
     depth: depth,
     magW: magW,
-    tenPowHalfMag: math.pow(10, 0.5 * magW).toDouble(),
+    tenPowHalfMag: math.exp(0.5 * magW * math.ln10),
   );
 
   /// [areaPgv]'s body, with the two values a caller already holds passed in:
@@ -76,15 +82,18 @@ abstract final class EewEstimator {
     required LatLng user,
   }) {
     final surfaceDistance = epicenter.distanceTo(user) / 1000;
-    final dist = math.sqrt(surfaceDistance * surfaceDistance + depth * depth);
-    final pga = 1.657 * math.exp(1.533 * mag) * math.pow(dist, -1.607);
-    var intensity = Intensity.fromPga(pga);
+    final depthSquared = depth * depth;
+    final dist = math.sqrt(surfaceDistance * surfaceDistance + depthSquared);
+    final pgaFactor = 1.657 * math.exp(1.533 * mag);
+    var intensity = Intensity.fromPga(_pga(pgaFactor, dist));
     if (intensity >= 4.5) {
+      // Only the strong-shaking branch needs 10^(0.5·mag). The common path
+      // (intensity under 4.5) stops at the PGA above.
       intensity = _pgvIntensity(
         epicentralKm: surfaceDistance,
         depth: depth,
         magW: mag,
-        tenPowHalfMag: math.pow(10, 0.5 * mag).toDouble(),
+        tenPowHalfMag: math.exp(0.5 * mag * math.ln10),
       );
     }
     return (dist: dist, i: intensity);
@@ -104,14 +113,14 @@ abstract final class EewEstimator {
     // Depth- and magnitude-dependent factors are constant across regions.
     final pgaFactor = 1.657 * math.exp(1.533 * mag);
     final depthSquared = depth * depth;
-    final tenPowHalfMag = math.pow(10, 0.5 * mag).toDouble();
+    final tenPowHalfMag = math.exp(0.5 * mag * math.ln10);
 
     final regions = <String, ({double dist, double i})>{};
     var maxIntensity = 0.0;
     regionCentroids.forEach((code, centroid) {
       final surfaceDistance = epicenter.distanceTo(centroid) / 1000;
       final dist = math.sqrt(surfaceDistance * surfaceDistance + depthSquared);
-      final pga = pgaFactor * math.pow(dist, -1.607);
+      final pga = _pga(pgaFactor, dist);
       var i = Intensity.fromPga(pga);
       if (i >= 4.5) {
         // The strong-shaking branch reuses this region's haversine rather than
