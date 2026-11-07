@@ -81,25 +81,41 @@ class MoonEphemeris {
     // depends on the Sun's anomaly (Meeus 45.6).
     final e = 1 - 0.002516 * t - 0.0000074 * t * t;
 
+    // The series arguments are degrees; the sine wants radians. Converting
+    // the four mean arguments once drops a multiply from every one of the
+    // ~60 terms. `(c₀·d + …) · deg` and `c₀·(d·deg) + …` agree well inside
+    // the truncation of this table.
+    final dR = d * degrees;
+    final mR = m * degrees;
+    final mpR = mp * degrees;
+    final fR = f * degrees;
+
     var sumL = 0.0; // 1e-6 degrees
     var sumR = 0.0; // 1e-3 km
-    for (var i = 0; i < _longitudeAndRadius.length; i += 6) {
-      final row = _longitudeAndRadius;
+    final longitudeRows = _longitudeAndRadius;
+    for (var i = 0; i < longitudeRows.length; i += 6) {
       final arg =
-          (row[i] * d + row[i + 1] * m + row[i + 2] * mp + row[i + 3] * f) *
-          degrees;
-      final scale = _eccentricityPower(e, row[i + 1]);
-      sumL += row[i + 4] * scale * math.sin(arg);
-      sumR += row[i + 5] * scale * math.cos(arg);
+          longitudeRows[i] * dR +
+          longitudeRows[i + 1] * mR +
+          longitudeRows[i + 2] * mpR +
+          longitudeRows[i + 3] * fR;
+      final scale = _eccentricityPower(e, longitudeRows[i + 1]);
+      sumL += longitudeRows[i + 4] * scale * math.sin(arg);
+      sumR += longitudeRows[i + 5] * scale * math.cos(arg);
     }
 
     var sumB = 0.0; // 1e-6 degrees
-    for (var i = 0; i < _latitude.length; i += 5) {
-      final row = _latitude;
+    final latitudeRows = _latitude;
+    for (var i = 0; i < latitudeRows.length; i += 5) {
       final arg =
-          (row[i] * d + row[i + 1] * m + row[i + 2] * mp + row[i + 3] * f) *
-          degrees;
-      sumB += row[i + 4] * _eccentricityPower(e, row[i + 1]) * math.sin(arg);
+          latitudeRows[i] * dR +
+          latitudeRows[i + 1] * mR +
+          latitudeRows[i + 2] * mpR +
+          latitudeRows[i + 3] * fR;
+      sumB +=
+          latitudeRows[i + 4] *
+          _eccentricityPower(e, latitudeRows[i + 1]) *
+          math.sin(arg);
     }
 
     // Venus, Jupiter and the Earth's flattening, folded into three fictitious

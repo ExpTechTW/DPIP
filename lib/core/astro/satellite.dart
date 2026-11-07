@@ -161,6 +161,10 @@ class SatelliteState {
   final (double, double, double) velocity;
 }
 
+/// `x³`. Integer powers via `pow` go through a general routine; three
+/// multiplies are the whole operation and stay exact for finite values.
+double _cube(double x) => x * x * x;
+
 /// The SGP4 propagator, set up once per element set.
 ///
 /// The expensive part is the initialisation — recovering the original mean
@@ -196,7 +200,9 @@ class Sgp4 {
     var qoms24 = 1.88027916e-9;
     if (perigee < 156) {
       final sTemp = perigee < 98 ? 20.0 : perigee - 78.0;
-      qoms24 = math.pow((120 - sTemp) / _earthRadiusKm, 4).toDouble();
+      final q = (120 - sTemp) / _earthRadiusKm;
+      final q2 = q * q;
+      qoms24 = q2 * q2;
       s = sTemp / _earthRadiusKm + 1;
     }
 
@@ -205,8 +211,11 @@ class Sgp4 {
     final etaSquared = eta * eta;
     final eeta = e0 * eta;
     final psi = (1 - etaSquared).abs();
-    final coef = qoms24 * math.pow(xi, 4).toDouble();
-    final coef1 = coef / math.pow(psi, 3.5);
+    final xi2 = xi * xi;
+    final coef = qoms24 * (xi2 * xi2);
+    // psi^3.5 = psi³ · √psi. psi is an absolute value, so the root is real.
+    final psi2 = psi * psi;
+    final coef1 = coef / (psi2 * psi * math.sqrt(psi));
 
     final c2 =
         coef1 *
@@ -305,7 +314,6 @@ class Sgp4 {
         (221 * _semiMajorAxis + 31 * s) *
         _c1;
 
-    _xi = xi;
     _eta = eta;
     _qoms24 = qoms24;
     _theta = cosInclination;
@@ -316,8 +324,9 @@ class Sgp4 {
     _sinMeanAnomaly0 = math.sin(elements.meanAnomaly);
     _cosMeanAnomaly0 = math.cos(elements.meanAnomaly);
     _sinInclination = math.sin(elements.inclination);
-    _xiToFourth = math.pow(_xi, 4);
-    _meanAnomalyDragBase = math.pow(1 + _eta * _cosMeanAnomaly0, 3);
+    _xiToFourth = xi2 * xi2;
+    final dragBase = 1 + _eta * _cosMeanAnomaly0;
+    _meanAnomalyDragBase = dragBase * dragBase * dragBase;
   }
 
   final TleSet elements;
@@ -334,7 +343,6 @@ class Sgp4 {
   late final double _meanAnomalyDot;
   late final double _perigeeDot;
   late final double _nodeDot;
-  late final double _xi;
   late final double _eta;
   late final double _qoms24;
   late final double _theta;
@@ -343,8 +351,8 @@ class Sgp4 {
   late final double _sinMeanAnomaly0;
   late final double _cosMeanAnomaly0;
   late final double _sinInclination;
-  late final num _xiToFourth;
-  late final num _meanAnomalyDragBase;
+  late final double _xiToFourth;
+  late final double _meanAnomalyDragBase;
 
   /// The satellite's TEME state at [utc].
   SatelliteState at(DateTime utc) =>
@@ -353,6 +361,12 @@ class Sgp4 {
   /// The state [minutes] after the element epoch.
   SatelliteState propagate(double minutes) {
     final t = minutes;
+    // Powers of t show up in every secular term. One product chain replaces
+    // the repeated `t * t * t * …` multiplies.
+    final t2 = t * t;
+    final t3 = t2 * t;
+    final t4 = t2 * t2;
+    final t5 = t4 * t;
     final e0 = elements.eccentricity;
 
     // Secular effects of drag and gravity.
@@ -368,8 +382,7 @@ class Sgp4 {
               elements.bstar *
               _xiToFourth /
               (e0 * _eta) *
-              (math.pow(1 + _eta * math.cos(meanAnomalyDf), 3) -
-                  _meanAnomalyDragBase)
+              (_cube(1 + _eta * math.cos(meanAnomalyDf)) - _meanAnomalyDragBase)
         : 0.0;
 
     final meanAnomaly = meanAnomalyDf + deltaPerigee + deltaMean;
@@ -382,45 +395,33 @@ class Sgp4 {
             _theta /
             (_semiMajorAxis * _semiMajorAxis * _beta0 * _beta0) *
             _c1 *
-            t *
-            t;
+            t2;
 
     final eccentricity =
         e0 -
         elements.bstar * _c4 * t -
         elements.bstar * _c5 * (math.sin(meanAnomaly) - _sinMeanAnomaly0);
-    final a =
-        _semiMajorAxis *
-        math.pow(
-          1 - _c1 * t - _d2 * t * t - _d3 * t * t * t - _d4 * t * t * t * t,
-          2,
-        );
+    final aFactor = 1 - _c1 * t - _d2 * t2 - _d3 * t3 - _d4 * t4;
+    final a = _semiMajorAxis * aFactor * aFactor;
     final l =
         meanAnomaly +
         perigee +
         node +
         _meanMotion *
-            (1.5 * _c1 * t * t +
-                (_d2 + 2 * _c1 * _c1) * t * t * t +
-                0.25 *
-                    (3 * _d3 + 12 * _c1 * _d2 + 10 * _c1 * _c1 * _c1) *
-                    t *
-                    t *
-                    t *
-                    t +
+            (1.5 * _c1 * t2 +
+                (_d2 + 2 * _c1 * _c1) * t3 +
+                0.25 * (3 * _d3 + 12 * _c1 * _d2 + 10 * _c1 * _c1 * _c1) * t4 +
                 0.2 *
                     (3 * _d4 +
                         12 * _c1 * _d3 +
                         6 * _d2 * _d2 +
                         30 * _c1 * _c1 * _d2 +
                         15 * _c1 * _c1 * _c1 * _c1) *
-                    t *
-                    t *
-                    t *
-                    t *
-                    t);
+                    t5);
     final beta = math.sqrt(1 - eccentricity * eccentricity);
-    final n = _ke / math.pow(a, 1.5);
+    // a^1.5 = a · √a, and the velocity below wants √a again.
+    final sqrtA = math.sqrt(a);
+    final n = _ke / (a * sqrtA);
 
     // Long-period periodics.
     final axn = eccentricity * math.cos(perigee);
@@ -457,7 +458,7 @@ class Sgp4 {
     final eSquared = axn * axn + ayn * ayn;
     final pl = a * (1 - eSquared);
     final r = a * (1 - ecosE);
-    final rdot = _ke * math.sqrt(a) / r * esinE;
+    final rdot = _ke * sqrtA / r * esinE;
     final rfdot = _ke * math.sqrt(pl) / r;
     final betaL = math.sqrt(1 - eSquared);
     final temp3 = esinE / (1 + betaL);
@@ -468,16 +469,18 @@ class Sgp4 {
     final sin2u = 2 * sinu * cosu;
     final cos2u = 1 - 2 * sinu * sinu;
     final theta2 = _theta * _theta;
+    final pl2 = pl * pl;
 
-    // Short-period periodics.
+    // Short-period periodics. Inclination sine is an element constant —
+    // propagate() used to recompute it on every call.
     final rk =
-        r * (1 - 1.5 * _k2 * betaL / (pl * pl) * (3 * theta2 - 1)) +
+        r * (1 - 1.5 * _k2 * betaL / pl2 * (3 * theta2 - 1)) +
         0.5 * _k2 / pl * (1 - theta2) * cos2u;
-    final uk = uAngle - 0.25 * _k2 / (pl * pl) * (7 * theta2 - 1) * sin2u;
-    final nodek = node + 1.5 * _k2 * _theta / (pl * pl) * sin2u;
+    final uk = uAngle - 0.25 * _k2 / pl2 * (7 * theta2 - 1) * sin2u;
+    final nodek = node + 1.5 * _k2 * _theta / pl2 * sin2u;
     final inclinationk =
         elements.inclination +
-        1.5 * _k2 * _theta * math.sin(elements.inclination) / (pl * pl) * cos2u;
+        1.5 * _k2 * _theta * _sinInclination / pl2 * cos2u;
     final rdotk = rdot - _k2 * n / pl * (1 - theta2) * sin2u;
     final rfdotk =
         rfdot + _k2 * n / pl * ((1 - theta2) * cos2u + 1.5 * (1 - 3 * theta2));
@@ -537,15 +540,16 @@ class Sgp4 {
     final sinPhi = math.sin(phi);
     final cosPhi = math.cos(phi);
     const flattening = 1 / 298.26; // WGS-72, to match SGP4's Earth.
+    final oneMinusF = 1 - flattening;
     final c =
-        1 / math.sqrt(1 + flattening * (flattening - 2) * math.pow(sinPhi, 2));
+        1 / math.sqrt(1 + flattening * (flattening - 2) * sinPhi * sinPhi);
     final observerX = _earthRadiusKm * c * cosPhi * math.cos(localSidereal);
     final observerY = _earthRadiusKm * c * cosPhi * math.sin(localSidereal);
-    final observerZ = _earthRadiusKm * c * math.pow(1 - flattening, 2) * sinPhi;
+    final observerZ = _earthRadiusKm * c * oneMinusF * oneMinusF * sinPhi;
 
     final rx = state.position.$1 - observerX;
     final ry = state.position.$2 - observerY;
-    final rz = state.position.$3 - observerZ.toDouble();
+    final rz = state.position.$3 - observerZ;
 
     // Rotate the range vector into the observer's south-east-zenith frame.
     final sinTheta = math.sin(localSidereal);

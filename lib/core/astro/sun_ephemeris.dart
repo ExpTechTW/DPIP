@@ -107,21 +107,25 @@ class SunEphemeris {
   /// (so the Sun's apparent motion is uneven) and its axis is tilted (so that
   /// motion projects unevenly onto the equator).
   Duration get equationOfTime {
-    final y = math.pow(math.tan(meanObliquity(centuries) / 2), 2).toDouble();
+    // tan²(ε/2). One tan, then a multiply: pow(tan, 2) is the same square
+    // and evaluates the tangent twice if written out by hand.
+    final tanHalfObl = math.tan(meanObliquity(centuries) / 2);
+    final y = tanHalfObl * tanHalfObl;
     final eccentricity =
         0.016708634 -
         0.000042037 * centuries -
         0.0000001267 * centuries * centuries;
+    final sinM = math.sin(meanAnomaly);
+    final sin2M = math.sin(2 * meanAnomaly);
+    final sin2L = math.sin(2 * meanLongitude);
+    final cos2L = math.cos(2 * meanLongitude);
+    // sin(4L) = 2 sin(2L) cos(2L). The double angle is already in hand.
     final value =
-        y * math.sin(2 * meanLongitude) -
-        2 * eccentricity * math.sin(meanAnomaly) +
-        4 *
-            eccentricity *
-            y *
-            math.sin(meanAnomaly) *
-            math.cos(2 * meanLongitude) -
-        0.5 * y * y * math.sin(4 * meanLongitude) -
-        1.25 * eccentricity * eccentricity * math.sin(2 * meanAnomaly);
+        y * sin2L -
+        2 * eccentricity * sinM +
+        4 * eccentricity * y * sinM * cos2L -
+        0.5 * y * y * (2 * sin2L * cos2L) -
+        1.25 * eccentricity * eccentricity * sin2M;
     // Radians of Earth rotation → seconds of clock time.
     return Duration(
       milliseconds: (value / degrees * 4 * Duration.millisecondsPerMinute)

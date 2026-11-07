@@ -42,6 +42,10 @@ const double _solarAmplitude = 0.164;
 /// Mean Earth–Moon distance, km — the reference the cube law scales from.
 const double _meanLunarDistanceKm = 384400;
 
+/// `(mean / distance)³`. The tidal potential scales with the cube of distance;
+/// three multiplies are that cube.
+double _cube(double ratio) => ratio * ratio * ratio;
+
 /// How strong the tide-raising forces are, and why.
 class TidalForcing {
   const TidalForcing({
@@ -74,8 +78,7 @@ class TidalForcing {
 
   /// How much stronger the Moon's pull is than at its mean distance. The cube
   /// law turns perigee into about +23% and apogee into about −18%.
-  double get distanceFactor =>
-      math.pow(_meanLunarDistanceKm / lunarDistanceKm, 3).toDouble();
+  double get distanceFactor => _cube(_meanLunarDistanceKm / lunarDistanceKm);
 
   /// A spring tide near perigee — the combination that produces the highest
   /// water of the year, and the one that matters alongside a storm surge.
@@ -109,11 +112,11 @@ class TidalForcing {
 
     final lunar =
         _lunarAmplitude *
-        math.pow(_meanLunarDistanceKm / moon.distanceKm, 3) *
+        _cube(_meanLunarDistanceKm / moon.distanceKm) *
         potential(moon.equatorial, utc);
     final solar =
         _solarAmplitude *
-        math.pow(astronomicalUnitKm / sun.distanceKm, 3) *
+        _cube(astronomicalUnitKm / sun.distanceKm) *
         potential(sun.equatorial, utc);
 
     // |cos| of the phase angle: 1 at new and full, 0 at the quarters.
@@ -121,9 +124,9 @@ class TidalForcing {
 
     return TidalForcing(
       at: utc,
-      equilibriumMetres: (lunar + solar).toDouble(),
-      lunarMetres: lunar.toDouble(),
-      solarMetres: solar.toDouble(),
+      equilibriumMetres: lunar + solar,
+      lunarMetres: lunar,
+      solarMetres: solar,
       springNeap: alignment,
       lunarDistanceKm: moon.distanceKm,
     );
@@ -195,7 +198,7 @@ class TidalForcing {
     while (syzygy.isBefore(limit) || full.isBefore(limit)) {
       final next = syzygy.isBefore(full) ? syzygy : full;
       final moon = MoonEphemeris.at(next);
-      if (math.pow(_meanLunarDistanceKm / moon.distanceKm, 3) > 1.15) {
+      if (_cube(_meanLunarDistanceKm / moon.distanceKm) > 1.15) {
         return next;
       }
       if (syzygy.isBefore(full)) {
