@@ -18,6 +18,7 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -54,9 +55,38 @@ List<AdminBoundary> backdropBoundaries(String? code) => [
   AdminBoundary.county,
 ];
 
+/// The notifier that pauses the home map once the sheet covers it.
+///
+/// Sits above [HomeMapBackdrop] so the backdrop itself stays `const`. A new
+/// widget here on every page rebuild does not rebuild the backdrop: its child
+/// is the same instance, and the platform view is left where it is. The
+/// notifier carries the pause edge without a drag-pixel rebuild.
+class HomeMapRenderHold extends InheritedWidget {
+  const HomeMapRenderHold({
+    super.key,
+    required this.hold,
+    required super.child,
+  });
+
+  final ValueListenable<bool> hold;
+
+  static ValueListenable<bool>? maybeOf(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<HomeMapRenderHold>()?.hold;
+
+  @override
+  bool updateShouldNotify(HomeMapRenderHold oldWidget) =>
+      hold != oldWidget.hold;
+}
+
 /// wedging.
 class HomeMapBackdrop extends StatefulWidget {
-  const HomeMapBackdrop({super.key});
+  const HomeMapBackdrop({super.key, this.renderHold});
+
+  /// When this flips true the native map stops drawing. Home publishes the
+  /// same signal through [HomeMapRenderHold] so this widget can stay `const`:
+  /// a page rebuild must not reconstruct the platform view. The notifier, not
+  /// a rebuild, carries the edge.
+  final ValueListenable<bool>? renderHold;
 
   @override
   State<HomeMapBackdrop> createState() => _HomeMapBackdropState();
@@ -503,6 +533,7 @@ class _HomeMapBackdropState extends State<HomeMapBackdrop>
             // The backdrop sits in the home tab — pause its native render loop
             // when the user is elsewhere (indexedStack keeps it mounted).
             tabIndex: HomePage.tabIndex,
+            renderHold: widget.renderHold ?? HomeMapRenderHold.maybeOf(context),
             onMapCreated: _onMapCreated,
             onStyleLoaded: _onStyleLoaded,
           );

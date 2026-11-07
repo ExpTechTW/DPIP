@@ -36,6 +36,11 @@ class HomeChrome {
   /// Whether the weather backdrop should be playing (any of it revealed).
   static bool weatherActive(double extent) => extent > _weatherFrom;
 
+  /// The sheet covers the map. A ten-thousandth short of full is under a
+  /// pixel on any phone, and the sheet's reported extent often lands there
+  /// instead of on exactly 1 — the backdrop behind it is not visible either way.
+  static bool mapCovered(double extent) => extent >= HomeSheetExtent.max - 1e-4;
+
   /// Map dim progress, `0` (at rest) → `1` (by the time the weather starts to
   /// reveal). The consumer scales this onto its own peak — the exposed map
   /// darkens as the sheet climbs so its cards gain contrast against a quieter

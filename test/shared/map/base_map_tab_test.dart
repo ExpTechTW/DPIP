@@ -371,4 +371,54 @@ void main() {
     await tester.pump();
     expect(platform.paused, [true], reason: 'still the wrong tab to draw');
   });
+
+  testWidgets('renderHold pauses a visible map and releases it', (
+    tester,
+  ) async {
+    final hold = ValueNotifier(false);
+    addTearDown(hold.dispose);
+    await pump(tester, BaseMap(renderHold: hold));
+    expect(platform.paused, isEmpty, reason: 'visible and not held');
+
+    hold.value = true;
+    await tester.pump();
+    expect(platform.paused, [true]);
+
+    // The same value must not talk to the platform again.
+    hold.value = true;
+    await tester.pump();
+    expect(platform.paused, [true]);
+
+    hold.value = false;
+    await tester.pump();
+    expect(platform.paused, [true, false]);
+  });
+
+  testWidgets('a held map stays paused when its tab comes back', (
+    tester,
+  ) async {
+    final visibleTab = VisibleTab(2);
+    final hold = ValueNotifier(true);
+    addTearDown(hold.dispose);
+    await pump(
+      tester,
+      VisibleTabScope(
+        visibleTab: visibleTab,
+        child: BaseMap(tabIndex: 2, renderHold: hold),
+      ),
+    );
+    expect(platform.paused, [true], reason: 'covered at birth');
+
+    visibleTab.value = 0;
+    await tester.pump();
+    visibleTab.value = 2;
+    await tester.pump();
+    expect(platform.paused, [
+      true,
+    ], reason: 'returning to the tab stays covered');
+
+    hold.value = false;
+    await tester.pump();
+    expect(platform.paused, [true, false]);
+  });
 }

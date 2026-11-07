@@ -57,6 +57,7 @@ class BaseMap extends StatefulWidget {
     this.minZoomPreference = defaultMinZoom,
     this.maxZoomPreference = maxZoom,
     this.tabIndex,
+    this.renderHold,
     this.recreateOnReturn = false,
     this.onMapInvalidated,
   });
@@ -171,6 +172,12 @@ class BaseMap extends StatefulWidget {
   /// `null` belongs to no branch (a full-screen route or external preview).
   final int? tabIndex;
 
+  /// Extra pause, OR'd with the visibility pause. Listened to directly so a
+  /// drag can cover the map without rebuilding the platform view on every
+  /// pixel — the home sheet uses this once it covers the backdrop completely.
+  /// The native loop otherwise keeps drawing a map nobody can see.
+  final ValueListenable<bool>? renderHold;
+
   /// Recreates the iOS platform view if its native resume cannot render a frame.
   ///
   /// Flutter keeps an `IndexedStack` branch (and therefore its `UiKitView`)
@@ -211,6 +218,9 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   /// Last-applied pause state, so [setRenderPaused] fires only on transitions.
   bool _renderPaused = false;
 
+  /// The [BaseMap.renderHold] currently listened to.
+  ValueListenable<bool>? _renderHold;
+
   /// Whether the app itself is in the foreground. Used by platforms whose
   /// native render lifecycle is safe to drive from Dart.
   bool _foreground = true;
@@ -231,7 +241,22 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     super.initState();
     _trace(() => 'init platform=$defaultTargetPlatform');
     WidgetsBinding.instance.addObserver(this);
+    _bindRenderHold();
     _scheduleReadinessRetry();
+  }
+
+  void _bindRenderHold() {
+    final next = widget.renderHold;
+    if (identical(next, _renderHold)) return;
+    _renderHold?.removeListener(_onRenderHold);
+    _renderHold = next;
+    _renderHold?.addListener(_onRenderHold);
+    _syncRender();
+  }
+
+  void _onRenderHold() {
+    if (!mounted) return;
+    _syncRender();
   }
 
   /// A backgrounded app still owns its platform views, and MapLibre draws from
@@ -281,6 +306,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
           'widget-update tab=${oldWidget.tabIndex}->${widget.tabIndex} '
           'interactive=${oldWidget.interactive}->${widget.interactive}',
     );
+    _bindRenderHold();
   }
 
   @override
@@ -297,6 +323,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     final controller = _controller;
     if (controller != null) MapConnectivity.instance.detach(controller);
     _visibleTab?.removeListener(_onTabChanged);
+    _renderHold?.removeListener(_onRenderHold);
     WidgetsBinding.instance.removeObserver(this);
     _readinessTimer?.cancel();
     super.dispose();
@@ -313,12 +340,14 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   /// states that actually reached the platform.
   void _syncRender() {
     final onScreen = _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
-    final pause = !(_foreground && onScreen);
+    final held = widget.renderHold?.value ?? false;
+    final pause = held || !(_foreground && onScreen);
     final controller = _controller;
     _trace(
       () =>
           'render-sync selected=${_visibleTab?.value} '
           'shellOnTop=${_visibleTab?.shellOnTop} onScreen=$onScreen '
+          'held=$held '
           'foreground=$_foreground '
           'desiredPause=$pause appliedPause=$_renderPaused '
           'controller=${mapTraceObject(controller)}',

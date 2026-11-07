@@ -131,10 +131,26 @@ class _HomePageState extends State<HomePage> {
   ImageFilter? _mapBlur;
   double _mapBlurSigma = -1;
 
+  /// True once the sheet covers the map. Flips only on that edge, so the
+  /// backdrop's native render loop pauses without the map widget rebuilding
+  /// on every drag pixel.
+  final ValueNotifier<bool> _mapCovered = ValueNotifier(false);
+
+  void _syncMapCover() {
+    final covered = HomeChrome.mapCovered(_extent?.value ?? 0);
+    if (covered == _mapCovered.value) return;
+    _mapCovered.value = covered;
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _extent = context.read<HomeSheetExtent>();
+    final extent = context.read<HomeSheetExtent>();
+    if (!identical(extent, _extent)) {
+      _extent?.removeListener(_syncMapCover);
+      _extent = extent..addListener(_syncMapCover);
+      _syncMapCover();
+    }
     final signal = context.read<HomeResetSignal>();
     if (signal != _resetSignal) {
       _resetSignal?.removeListener(_resetSheet);
@@ -191,6 +207,8 @@ class _HomePageState extends State<HomePage> {
     widget.widgetLocationRequests?.removeListener(_queueWidgetRequest);
     _visibleTab?.removeListener(_syncTabVisibility);
     _resetSignal?.removeListener(_resetSheet);
+    _extent?.removeListener(_syncMapCover);
+    _mapCovered.dispose();
     _sheet.dispose();
     super.dispose();
   }
@@ -258,7 +276,10 @@ class _HomePageState extends State<HomePage> {
                     }
                     context.goNamed(AppRoutes.map);
                   },
-                  child: const HomeMapBackdrop(),
+                  child: HomeMapRenderHold(
+                    hold: _mapCovered,
+                    child: const HomeMapBackdrop(),
+                  ),
                 ),
               ),
               // Blurs and dims the map backdrop as the sheet climbs
@@ -304,7 +325,12 @@ class _HomePageState extends State<HomePage> {
                       // display) — see [mapChromeBlursBackdrop].
                       return BackdropFilter(
                         filter: _mapBlur!,
-                        enabled: t > 0 && mapChromeBlursBackdrop,
+                        // A covered map has nothing to blur, and the filter
+                        // would keep sampling the platform view anyway.
+                        enabled:
+                            t > 0 &&
+                            mapChromeBlursBackdrop &&
+                            !HomeChrome.mapCovered(extentValue),
                         child: ColoredBox(
                           color: Colors.black.withValues(alpha: dim),
                         ),
