@@ -3,6 +3,7 @@
 #
 #     tool/dev/build.sh android      # APK  → build/app/outputs/flutter-apk/
 #     tool/dev/build.sh android-debug   # debug-signed APK, installable over run.sh
+#     tool/dev/build.sh android-profile # profile APK — what tool/dev/bench_map.sh measures
 #     tool/dev/build.sh bundle       # AAB  → what Play actually takes
 #     tool/dev/build.sh ios          # unsigned, for a local check
 #
@@ -35,12 +36,13 @@ shift || true
 case "$target" in
   android)       pinned flutter build apk --release "$@" ;;
   android-debug) pinned flutter build apk --debug "$@" ;;
+  android-profile) pinned flutter build apk --profile "$@" ;;
   bundle)  pinned flutter build appbundle --release "$@" ;;
   # No --release: `flutter build ios` is release by default, and hardcoding it
   # would fight the `--debug` the iOS smoke-test build passes.
   ios)     pinned flutter build ios --no-codesign "$@" ;;
   *)
-    printf 'usage: tool/dev/build.sh {android|android-debug|bundle|ios} [flutter build args]\n' >&2
+    printf 'usage: tool/dev/build.sh {android|android-debug|android-profile|bundle|ios} [flutter build args]\n' >&2
     exit 2
     ;;
 esac

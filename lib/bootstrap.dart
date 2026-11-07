@@ -7,6 +7,7 @@ import 'package:dpip/app/app.dart';
 import 'package:dpip/app/router/app_router.dart' show onboardingRefresh;
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/diagnostics/frame_bench.dart';
 import 'package:dpip/core/diagnostics/crash_reporting.dart';
 import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
 import 'package:dpip/core/diagnostics/startup_report.dart';
@@ -182,6 +183,8 @@ Future<void> bootstrap() async {
   Log.installErrorHandlers();
   Log.info('DPIP starting up');
   _refuseUnlessLaunchedByTool();
+  // Benchmark builds only (`tool/dev/bench_map.sh`); compiled out otherwise.
+  unawaited(FrameBench.installIfEnabled());
 
   // Which distributor this build came from (App Store, Play Store, TestFlight,
   // or a non-store install — a GitHub release APK included).
