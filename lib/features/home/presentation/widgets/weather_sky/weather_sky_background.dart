@@ -15,6 +15,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cach
 import 'package:dpip/core/weather/solar_time.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_painter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 /// GPU-rendered layered sky backdrop, ported from the reference engine.
@@ -34,6 +35,10 @@ import 'package:flutter/services.dart' show rootBundle;
 /// Cost is controlled by structure: the scattering integral runs only when the
 /// resolved keyframe changes (minutes apart, not frames), layers render at
 /// [_renderScale] and are upscaled, and each gates itself on its own control.
+/// A dry sky is painted at 20 Hz. Cloud drift and star shimmer move by a
+/// fraction of a pixel between display frames, so the frames in between only
+/// heated the GPU. Rain, snow, and lightning stay on the display rate, where
+/// a dropped step is visible.
 ///
 /// [mode] forces a look; [active] holds the last frame when the backdrop is
 /// off-screen to save GPU.
@@ -118,10 +123,23 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   ];
 
   final Stopwatch _clock = Stopwatch();
-  late final AnimationController _ticker = AnimationController(
-    duration: const Duration(seconds: 60),
-    vsync: this,
-  );
+
+  /// Vsync source. The notifier, not the ticker, rebuilds the sky, so a dry
+  /// scene can drop frames and still be muted by [TickerMode] on a hidden tab.
+  /// Created on the first sync: disposing a backdrop that never finished
+  /// loading must not construct a ticker just to throw it away.
+  Ticker? _vsync;
+  final ValueNotifier<int> _frameTick = ValueNotifier(0);
+
+  /// Last vsync that actually painted. Cleared on stop so the next start
+  /// paints immediately — a restarted ticker's elapsed time goes back to zero,
+  /// and comparing it with the old stamp would skip the first second.
+  Duration? _lastPaint;
+
+  /// Dry-sky paint interval. 50 ms is 20 Hz: enough samples for a shimmer
+  /// whose period is a few seconds, and for clouds that drift a couple of
+  /// pixels a second.
+  static const Duration _calmFrame = Duration(milliseconds: 50);
 
   final Map<String, ui.FragmentShader> _shaders = {};
   final List<ui.Image> _sprites = [];
@@ -334,14 +352,38 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     _snow = null;
   }
 
+  void _onVsync(Duration elapsed) {
+    if (!_wantsFullRate()) {
+      final last = _lastPaint;
+      if (last != null && elapsed - last < _calmFrame) return;
+    }
+    _lastPaint = elapsed;
+    _frameTick.value++;
+  }
+
+  /// Rain, snow, and lightning move fast enough that 20 Hz reads as stutter.
+  /// The 0.002 floor is the painter's own cutoff, so a trace that never draws
+  /// does not keep the full rate.
+  bool _wantsFullRate() {
+    final look = _lookFor(widget.mode);
+    final rain = widget.rainIntensity ?? look.rain;
+    final snow = widget.snowIntensity ?? look.snow;
+    return look.lightning || rain >= 0.002 || snow >= 0.002;
+  }
+
   void _syncRunning() {
     final ready = _lutCache != null && _shaders.length >= _layerAssets.length;
+    final ticker = _vsync ??= createTicker(_onVsync);
     if (widget.active && ready) {
       if (!_clock.isRunning) _clock.start();
-      _ticker.repeat();
+      if (!ticker.isActive) {
+        _lastPaint = null;
+        ticker.start();
+      }
     } else {
       _clock.stop();
-      _ticker.stop();
+      _lastPaint = null;
+      if (ticker.isActive) ticker.stop();
     }
   }
 
@@ -353,7 +395,8 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   @override
   void dispose() {
-    _ticker.dispose();
+    _vsync?.dispose();
+    _frameTick.dispose();
     _disposeResources();
     _clock.stop();
     super.dispose();
@@ -369,7 +412,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     return LayoutBuilder(
       builder: (context, constraints) {
         final painted = AnimatedBuilder(
-          animation: _ticker,
+          animation: _frameTick,
           builder: (context, _) {
             final frame = _buildFrame();
             // Re-bakes only when the resolved keyframe has actually moved.

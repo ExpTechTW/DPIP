@@ -199,6 +199,7 @@ class WeatherSkyPainter extends CustomPainter {
   static final Paint _gradientSky = Paint()..filterQuality = FilterQuality.low;
   static final Paint _rainPaint = Paint()..blendMode = BlendMode.plus;
   static final Paint _snowPaint = Paint();
+  static final Paint _cloudPaint = Paint();
 
   /// Bilinear on the way up is what softens the quarter-res sun.
   static final Paint _sunBlit = Paint()
@@ -403,7 +404,9 @@ class WeatherSkyPainter extends CustomPainter {
       // it, not just the clouds. `cloudSprites` is non-empty by the guard.
       ..setImageSampler(0, cloudSprites.first);
 
-    final paint = Paint()..shader = shader;
+    // drawRect copies the paint, and the shader object is the same for every
+    // sprite — only its uniforms change, and those are snapshotted per draw.
+    _cloudPaint.shader = shader;
     for (final p in placed) {
       final sprite = cloudSprites[p.sprite % cloudSprites.length];
       shader
@@ -416,7 +419,7 @@ class WeatherSkyPainter extends CustomPainter {
 
       canvas.save();
       canvas.translate(p.left, p.top);
-      canvas.drawRect(Rect.fromLTWH(0, 0, p.width, p.height), paint);
+      canvas.drawRect(Rect.fromLTWH(0, 0, p.width, p.height), _cloudPaint);
       canvas.restore();
     }
   }
