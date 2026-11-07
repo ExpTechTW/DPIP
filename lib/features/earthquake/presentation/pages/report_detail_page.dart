@@ -23,6 +23,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
+import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -517,6 +518,10 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
         children: [
           Positioned.fill(
             child: BaseMap(
+              // Nested under the data branch, which the shell keeps mounted.
+              // A null tab would leave this native map drawing after the user
+              // has switched away.
+              tabIndex: ReportListPage.tabIndex,
               showUserLocation: false,
               compassEnabled: false,
               includeTerrainInStyle: !_initialOsmEnabled,
