@@ -179,7 +179,7 @@ class WindCamera {
   final double width;
   final double height;
 
-  double get _world => 512 * math.pow(2.0, zoom).toDouble();
+  double get _world => 512 * math.exp(zoom * math.ln2);
   double get _cx => (centerLng + 180) / 360 * _world;
   double get _cy => mercatorY(centerLat) * _world;
 

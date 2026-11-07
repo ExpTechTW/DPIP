@@ -99,7 +99,7 @@ LatLngBounds? safeFitBounds(LatLngBounds bounds) {
       .toDouble();
   if (!zoom.isFinite) return null;
 
-  final worldPx = 512 * math.pow(2, zoom).toDouble();
+  final worldPx = 512 * math.exp(zoom * math.ln2);
   final centreX = (x1 + x2) / 2;
   // The camera target renders at the view's centre, but the box should land in
   // the centre of the *visible band*, which sits (topInset - bottomInset) / 2
