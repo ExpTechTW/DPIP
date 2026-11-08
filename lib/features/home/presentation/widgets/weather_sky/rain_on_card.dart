@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
@@ -5,6 +6,7 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_raster.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
@@ -29,6 +31,10 @@ import 'package:flutter/scheduler.dart';
 ///      threshold and the lighting. Everything that makes it look like water
 ///      happens in this pass, so drawing the particles straight to the screen —
 ///      as an earlier version of this did — shows the dots instead.
+///
+/// The accumulation is not redrawn on every vsync. It is rasterized, off the
+/// UI thread, only when a 20 ms solver step moved the drops, and the previous
+/// image stays on screen until that raster finishes — at most a frame behind.
 ///
 /// Applied per card rather than to the whole sheet: the reference wets the
 /// card, not the page, and a refraction filter over an entire scrolling list
@@ -147,6 +153,18 @@ class _RainOnCardState extends State<RainOnCard>
   // exactly what it always did.
   late Paint _blurPaint = Paint()
     ..imageFilter = ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0);
+
+  /// The last finished accumulation. The painter holds this object and reads
+  /// it at paint time, so a finished raster shows up without rebuilding the
+  /// card underneath. A frame whose solver did not step leaves it untouched.
+  final _WaterImages _water = _WaterImages();
+  ui.Image? _retirePos;
+  ui.Image? _retireNeg;
+  bool _rasterInFlight = false;
+  bool _rasterAgain = false;
+  bool _accumDirty = false;
+  bool _closed = false;
+  int _rasterGen = 0;
 
   /// Local minute of the cached [_night], so the wall-clock read and the
   /// keyframe-ring lookup run once a minute rather than once per build (a
@@ -362,6 +380,7 @@ class _RainOnCardState extends State<RainOnCard>
       if (widget.intensity <= 0.001) {
         _primary.clear();
         _secondary.clear();
+        _clearAccumulation();
       }
     }
   }
@@ -471,7 +490,7 @@ class _RainOnCardState extends State<RainOnCard>
     if (!_gateOpen) {
       _primary.clear();
       _secondary.clear();
-      _frame.value++;
+      _clearAccumulation();
       _ticker.stop();
       return;
     }
@@ -483,7 +502,7 @@ class _RainOnCardState extends State<RainOnCard>
     final intensity = awaitingSurface ? 0.0 : widget.intensity.clamp(0.0, 1.0);
     final surface = widget.silhouette ? _surface : null;
     final grade = _gradeFor(intensity);
-    _primary.update(
+    final steps = _primary.update(
       dt,
       width: _size.width,
       screenHeight: _screenHeight,
@@ -492,7 +511,7 @@ class _RainOnCardState extends State<RainOnCard>
       gravityScale: _gravityScale,
       surface: surface,
     );
-    _secondary.update(
+    final other = _secondary.update(
       dt,
       width: _size.width,
       screenHeight: _screenHeight,
@@ -501,12 +520,134 @@ class _RainOnCardState extends State<RainOnCard>
       gravityScale: _gravityScale,
       surface: surface,
     );
-    _frame.value++;
+    final n = steps > other ? steps : other;
+    if (n > 0) noteWeatherSolverSteps(n);
 
-    if (intensity <= 0.001 &&
-        _primary.liveCount == 0 &&
-        _secondary.liveCount == 0) {
+    final live = _primary.liveCount > 0 || _secondary.liveCount > 0;
+    if (n > 0 || _accumDirty) {
+      if (!live) {
+        if (_water.pos != null || _retirePos != null) _clearAccumulation();
+        _accumDirty = false;
+      } else {
+        _scheduleAccumulation(fromTick: n > 0);
+      }
+    }
+
+    if (intensity <= 0.001 && !live) {
       _ticker.stop();
+    }
+  }
+
+  void _clearAccumulation() {
+    // Invalidate a raster already in flight so its completion cannot put a
+    // picture back up after the card went dry or left the sheet.
+    _rasterGen++;
+    _rasterAgain = false;
+    _retirePos?.dispose();
+    _retireNeg?.dispose();
+    _retirePos = _water.pos;
+    _retireNeg = _water.neg;
+    _water.pos = null;
+    _water.neg = null;
+    _frame.value++;
+  }
+
+  /// Records both signed passes and hands them to the raster thread. One
+  /// raster is in flight at a time; a step that arrives during it is folded
+  /// into one follow-up, which is not itself counted as a tick raster.
+  void _scheduleAccumulation({required bool fromTick}) {
+    if (_closed) return;
+    if (_rasterInFlight) {
+      _rasterAgain = true;
+      return;
+    }
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize || box.size.isEmpty || _screenHeight <= 0) {
+      _accumDirty = true;
+      return;
+    }
+    final card = box.size;
+    final headroom = CardWaterField.spawnHeadroom(_screenHeight);
+    final fieldSize = Size(card.width, card.height + headroom);
+    final raster = CardWaterField.accumulationSize(fieldSize);
+    _rasterInFlight = true;
+    _accumDirty = false;
+    if (fromTick) noteWeatherTickRaster();
+    final gen = ++_rasterGen;
+    final pos = _recordPass(
+      raster: raster,
+      headroom: headroom,
+      negative: false,
+    );
+    final neg = _recordPass(raster: raster, headroom: headroom, negative: true);
+    unawaited(
+      _finishAccumulation(
+        pos,
+        neg,
+        raster.width.ceil(),
+        raster.height.ceil(),
+        gen,
+      ),
+    );
+  }
+
+  ui.Picture _recordPass({
+    required Size raster,
+    required double headroom,
+    required bool negative,
+  }) {
+    final recorder = ui.PictureRecorder();
+    final offscreen = Canvas(recorder);
+    offscreen.saveLayer(Offset.zero & raster, _blurPaint);
+    offscreen.scale(CardWaterField.accumulationResolution);
+    offscreen.translate(0, headroom);
+    _primary.paintCoverage(offscreen, dropSize: _pointSize, negative: negative);
+    _secondary.paintCoverage(
+      offscreen,
+      dropSize: _pointSize,
+      negative: negative,
+    );
+    offscreen.restore();
+    return recorder.endRecording();
+  }
+
+  Future<void> _finishAccumulation(
+    ui.Picture pos,
+    ui.Picture neg,
+    int width,
+    int height,
+    int gen,
+  ) async {
+    ui.Image? posImage;
+    ui.Image? negImage;
+    try {
+      posImage = await rasterizePicture(pos, width, height);
+      negImage = await rasterizePicture(neg, width, height);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'card-water raster failed');
+    } finally {
+      pos.dispose();
+      neg.dispose();
+      _rasterInFlight = false;
+    }
+    final stale = _closed || !mounted || gen != _rasterGen;
+    if (stale || posImage == null || negImage == null) {
+      posImage?.dispose();
+      negImage?.dispose();
+    } else {
+      // The layer still on screen samples the retired pair until this frame
+      // replaces it, so that generation stays alive.
+      _retirePos?.dispose();
+      _retireNeg?.dispose();
+      _retirePos = _water.pos;
+      _retireNeg = _water.neg;
+      _water.pos = posImage;
+      _water.neg = negImage;
+      _frame.value++;
+    }
+    if (!_closed && _rasterAgain && gen == _rasterGen) {
+      _rasterAgain = false;
+      _scheduleAccumulation(fromTick: false);
     }
   }
 
@@ -589,6 +730,9 @@ class _RainOnCardState extends State<RainOnCard>
         sigmaX: _blurSigmaUv * screen.width * raster,
         sigmaY: _blurSigmaUv * screen.height * raster,
       );
+    // The blur radius and the atlas scale both depend on the screen size, so
+    // the picture already in hand was drawn for a different one.
+    _accumDirty = true;
   }
 
   /// The reference's night flag is `hour >= 15 || hour <= 4` — and that hour
@@ -616,9 +760,15 @@ class _RainOnCardState extends State<RainOnCard>
 
   @override
   void dispose() {
+    _closed = true;
+    _rasterGen++;
     _ticker.dispose();
     _frame.dispose();
     _shader?.dispose();
+    _water.pos?.dispose();
+    _water.neg?.dispose();
+    _retirePos?.dispose();
+    _retireNeg?.dispose();
     super.dispose();
   }
 
@@ -683,13 +833,11 @@ class _RainOnCardState extends State<RainOnCard>
                       secondary: _secondary,
                       shader: _shader,
                       repaint: _repaint,
-                      blurPaint: _blurPaint,
+                      water: _water,
                       opacity: widget.opacity.clamp(0.0, 1.0),
                       night: night,
                       screenHeight: _screenHeight,
-                      pointSize: _pointSize,
                       threshold: _threshold,
-                      screenWidth: _screenSize.width,
                       gateOpen: _gateOpen,
                     ),
                   ),
@@ -709,13 +857,11 @@ class _CardWaterPainter extends CustomPainter {
     required this.secondary,
     required this.shader,
     required Listenable repaint,
-    required this.blurPaint,
+    required this.water,
     required this.opacity,
     required this.night,
     required this.screenHeight,
-    required this.screenWidth,
     required this.gateOpen,
-    required this.pointSize,
     required this.threshold,
   }) : super(repaint: repaint);
 
@@ -723,68 +869,37 @@ class _CardWaterPainter extends CustomPainter {
   final CardWaterField secondary;
   final ui.FragmentShader? shader;
 
-  /// The accumulation layer's blur, owned by the State and rebuilt only when
-  /// the screen size changes — see `_RainOnCardState._syncScreen` for the σ
-  /// derivation. Held as a [Paint] rather than an `ImageFilter` so `saveLayer`
-  /// allocates nothing per pass either.
-  final Paint blurPaint;
+  /// The last raster of each signed half. The state replaces the images;
+  /// this painter only composites whatever is there at paint time.
+  final _WaterImages water;
   final double opacity;
   final bool night;
   final double screenHeight;
-  final double screenWidth;
 
   /// The position gate — false once the card is too high on screen; both
   /// passes are skipped, not just the draw.
   final bool gateOpen;
-  final double pointSize;
   final double threshold;
-
-  /// One signed half of the accumulation — see [CardWaterField.paintCoverage].
-  ui.Image _accumulate(
-    Size fieldSize,
-    double headroom, {
-    required bool negative,
-  }) {
-    final raster = CardWaterField.accumulationSize(fieldSize);
-    final recorder = ui.PictureRecorder();
-    final offscreen = Canvas(recorder);
-    offscreen.saveLayer(Offset.zero & raster, blurPaint);
-    offscreen.scale(CardWaterField.accumulationResolution);
-    offscreen.translate(0, headroom);
-    primary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
-    secondary.paintCoverage(offscreen, dropSize: pointSize, negative: negative);
-    offscreen.restore();
-    final picture = recorder.endRecording();
-    final image = picture.toImageSync(
-      raster.width.ceil(),
-      raster.height.ceil(),
-    );
-    picture.dispose();
-    return image;
-  }
 
   @override
   void paint(Canvas canvas, Size size) {
     final shader = this.shader;
-    if (shader == null || opacity <= 0.004 || !gateOpen) return;
+    final pos = water.pos;
+    final neg = water.neg;
+    if (shader == null || pos == null || neg == null) return;
+    if (opacity <= 0.004 || !gateOpen) return;
     if (primary.liveCount == 0 && secondary.liveCount == 0) return;
     if (size.isEmpty) return;
 
-    // Pass 1: accumulate both signed halves, blurred as the engine blurs its
-    // buffer. Spans the card plus the whole fall above it.
-    final headroom = CardWaterField.spawnHeadroom(screenHeight);
-    final fieldSize = Size(size.width, size.height + headroom);
-    final raster = CardWaterField.accumulationSize(fieldSize);
-    final pos = _accumulate(fieldSize, headroom, negative: false);
-    final neg = _accumulate(fieldSize, headroom, negative: true);
-
-    // Pass 2: reassemble the signed sum, light it, hard-cut it.
+    // Reassemble the signed sum, light it, hard-cut it. The accumulation
+    // itself was rasterized when the solver last stepped.
     // `J.s()` passes `Time().hour` — the local wall-clock hour.
+    final headroom = CardWaterField.spawnHeadroom(screenHeight);
     final hour = AppTime.utc8.hour.toDouble();
     var i = 0;
     void set(double v) => shader.setFloat(i++, v);
-    set(raster.width);
-    set(raster.height);
+    set(pos.width.toDouble());
+    set(pos.height.toDouble());
     // The sky at the panel band — the reference's `uBgLightTex` row. Until the first
     // bake lands, a rainy overcast grey-blue stands in.
     final ambient = SkyLutCache.panelAmbient.value ?? const Color(0xFF5C6B7E);
@@ -804,12 +919,10 @@ class _CardWaterPainter extends CustomPainter {
     canvas.translate(0, -headroom);
     canvas.scale(1 / CardWaterField.accumulationResolution);
     canvas.drawRect(
-      Rect.fromLTWH(0, 0, raster.width, raster.height),
+      Rect.fromLTWH(0, 0, pos.width.toDouble(), pos.height.toDouble()),
       Paint()..shader = shader,
     );
     canvas.restore();
-    pos.dispose();
-    neg.dispose();
   }
 
   static const double _specularDay = _RainOnCardState._specularDay;
@@ -820,9 +933,14 @@ class _CardWaterPainter extends CustomPainter {
       oldDelegate.opacity != opacity ||
       oldDelegate.night != night ||
       oldDelegate.shader != shader ||
-      oldDelegate.pointSize != pointSize ||
+      oldDelegate.water != water ||
       oldDelegate.threshold != threshold ||
       oldDelegate.screenHeight != screenHeight ||
-      oldDelegate.screenWidth != screenWidth ||
       oldDelegate.gateOpen != gateOpen;
+}
+
+/// The two signed accumulation images, swapped in place when a raster lands.
+class _WaterImages {
+  ui.Image? pos;
+  ui.Image? neg;
 }

@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_raster.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 /// Edge of the droplet-coverage bake, in pixels. The refract pass samples
 /// this instead of rebuilding the field at the card's resolution.
@@ -11,7 +15,78 @@ const int kRainOnGlassFieldEdge = 256;
 /// [kRainOnGlassFieldEdge] square. [shader] must be `rain_on_glass.frag`
 /// with `uMode` driven to the bake path. [dummy] satisfies the two samplers
 /// the bake does not read.
+///
+/// Synchronous, for the field test. The running effect uses
+/// [bakeRainOnGlassFieldAsync] so a frame does not flush the GPU.
 ui.Image bakeRainOnGlassField({
+  required ui.FragmentShader shader,
+  required ui.Image dummy,
+  required double time,
+  required double opacity,
+  required double staticSize,
+  required double staticAmount,
+  required double staticSpeed,
+  required double runningSize,
+  required double runningAmount,
+  required double runningSpeed,
+}) {
+  final picture = _recordGlassField(
+    shader: shader,
+    dummy: dummy,
+    time: time,
+    opacity: opacity,
+    staticSize: staticSize,
+    staticAmount: staticAmount,
+    staticSpeed: staticSpeed,
+    runningSize: runningSize,
+    runningAmount: runningAmount,
+    runningSpeed: runningSpeed,
+  );
+  final image = rasterizePictureSync(
+    picture,
+    kRainOnGlassFieldEdge,
+    kRainOnGlassFieldEdge,
+  );
+  picture.dispose();
+  return image;
+}
+
+/// [bakeRainOnGlassField] without the UI-thread flush. The picture is recorded
+/// here and rasterized on the raster thread.
+Future<ui.Image> bakeRainOnGlassFieldAsync({
+  required ui.FragmentShader shader,
+  required ui.Image dummy,
+  required double time,
+  required double opacity,
+  required double staticSize,
+  required double staticAmount,
+  required double staticSpeed,
+  required double runningSize,
+  required double runningAmount,
+  required double runningSpeed,
+}) {
+  final picture = _recordGlassField(
+    shader: shader,
+    dummy: dummy,
+    time: time,
+    opacity: opacity,
+    staticSize: staticSize,
+    staticAmount: staticAmount,
+    staticSpeed: staticSpeed,
+    runningSize: runningSize,
+    runningAmount: runningAmount,
+    runningSpeed: runningSpeed,
+  );
+  final future = rasterizePicture(
+    picture,
+    kRainOnGlassFieldEdge,
+    kRainOnGlassFieldEdge,
+  );
+  picture.dispose();
+  return future;
+}
+
+ui.Picture _recordGlassField({
   required ui.FragmentShader shader,
   required ui.Image dummy,
   required double time,
@@ -45,13 +120,7 @@ ui.Image bakeRainOnGlassField({
   final recorder = ui.PictureRecorder();
   ui.Canvas(recorder)
       .drawRect(Rect.fromLTWH(0, 0, edge, edge), Paint()..shader = shader);
-  final picture = recorder.endRecording();
-  final image = picture.toImageSync(
-    kRainOnGlassFieldEdge,
-    kRainOnGlassFieldEdge,
-  );
-  picture.dispose();
-  return image;
+  return recorder.endRecording();
 }
 
 /// Puts rain on the *content*: droplets cling to [child] and bend its pixels
@@ -103,16 +172,32 @@ class _RainOnGlassState extends State<RainOnGlass>
     Matrix4.identity().storage,
   );
 
-  final Stopwatch _clock = Stopwatch();
-  late final AnimationController _ticker = AnimationController(
-    duration: const Duration(seconds: 30),
-    vsync: this,
-  );
+  /// Same clock as the card-water solver. The bead field is a function of
+  /// time, so holding [uTime] on this quantum is what lets one [ImageFilter]
+  /// survive the frames in between.
+  static const double _step = CardWaterField.emitterTick;
+
+  late final Ticker _ticker = createTicker(_onTick);
+  Duration _last = Duration.zero;
+  double _carry = 0;
+  double _simTime = 0;
 
   ui.FragmentShader? _shader;
   ui.FragmentShader? _fieldShader;
   ui.Image? _field;
+  ui.Image? _retireField;
   ui.Image? _dummy;
+
+  ui.ImageFilter? _cachedFilter;
+  double _cachedOpacity = -1;
+  _GlassGrade? _cachedGrade;
+  double _displayedTime = -1;
+  _GlassGrade? _bakedGrade;
+
+  bool _bakeInFlight = false;
+  bool _bakeAgain = false;
+  double _pendingTime = 0;
+  bool _closed = false;
 
   /// Set once `ImageFilter.shader` has been seen to fail, so the throw is not
   /// repeated every frame on a Skia device.
@@ -140,24 +225,215 @@ class _RainOnGlassState extends State<RainOnGlass>
 
   void _syncRunning() {
     // No shader means there can be no visible frame. This also permanently
-    // stops the vsync loop on Skia after the filter capability check fails.
+    // stops the vsync loop on Skia, where a shader image filter cannot exist.
     //
     // The opacity term mirrors [build]'s own short-circuit: below 0.004 the
-    // filter is never built, so a ticker kept alive there only rebuilds an
-    // `ImageFiltered(enabled: false)` sixty times a second. The header card's
-    // opacity reaches exactly 0 once the hero scrolls past the fold, and that
-    // is the state this used to spin in (`RainOnCard` gates its own ticker
-    // the same way).
+    // filter is never built, so a ticker kept alive there only wakes a frame
+    // sixty times a second. The header card's opacity reaches exactly 0 once
+    // the hero scrolls past the fold, and that is the state this used to spin
+    // in (`RainOnCard` gates its own ticker the same way).
+    if (!ui.ImageFilter.isShaderFilterSupported) {
+      _filterUnsupported = true;
+    }
     if (widget.active &&
         widget.intensity > 0.01 &&
         widget.opacity > 0.004 &&
         _shader != null &&
         !_filterUnsupported) {
-      if (!_clock.isRunning) _clock.start();
-      _ticker.repeat();
+      if (!_ticker.isActive) {
+        _last = Duration.zero;
+        _ticker.start();
+      }
     } else {
-      _clock.stop();
       _ticker.stop();
+    }
+  }
+
+  void _onTick(Duration elapsed) {
+    if (_closed || _filterUnsupported) {
+      _ticker.stop();
+      return;
+    }
+    final dt = _last == Duration.zero
+        ? 0.0
+        : (elapsed - _last).inMicroseconds / 1e6;
+    _last = elapsed;
+    // The first callback has no dt. Seed a still field so the glass is not
+    // blank until the first step; it is not itself a solver step.
+    if (dt <= 0) {
+      if (_field == null) _requestBake(0, fromTick: false);
+      return;
+    }
+    final elapsedDt = dt > 0.1 ? 0.1 : dt;
+    _carry += elapsedDt;
+    final steps = _carry ~/ _step;
+    if (steps <= 0) return;
+    _carry -= steps * _step;
+    _simTime += steps * _step;
+    noteWeatherSolverSteps(steps);
+    _requestBake(_simTime, fromTick: true);
+  }
+
+  /// Starts one coverage raster, unless one is already running — then the
+  /// newest time waits, and the picture on screen stays the previous one.
+  void _requestBake(double time, {required bool fromTick}) {
+    if (_closed || _filterUnsupported) return;
+    if (_bakeInFlight) {
+      _bakeAgain = true;
+      _pendingTime = time;
+      return;
+    }
+    final shader = _fieldShader;
+    if (shader == null) return;
+    final grade = _GlassGrade.forIntensity(widget.intensity);
+    if (_field != null && time == _displayedTime && grade == _bakedGrade) {
+      return;
+    }
+    _bakeInFlight = true;
+    if (fromTick) noteWeatherTickRaster();
+    unawaited(_bake(shader, grade, time));
+  }
+
+  Future<void> _bake(
+    ui.FragmentShader shader,
+    _GlassGrade grade,
+    double time,
+  ) async {
+    ui.Image? image;
+    try {
+      final dummy = await _ensureDummy();
+      if (dummy != null) {
+        image = await bakeRainOnGlassFieldAsync(
+          shader: shader,
+          dummy: dummy,
+          time: time,
+          opacity: widget.opacity,
+          staticSize: grade.staticSize,
+          staticAmount: grade.staticAmount,
+          staticSpeed: grade.staticSpeed,
+          runningSize: grade.runningSize,
+          runningAmount: grade.runningAmount,
+          runningSpeed: grade.runningSpeed,
+        );
+      }
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'rain-on-glass raster failed');
+    } finally {
+      _bakeInFlight = false;
+    }
+    if (_closed || !mounted || image == null) {
+      image?.dispose();
+    } else {
+      // The filter still on screen samples [_retireField] until this frame
+      // replaces it, so the image one generation back stays alive.
+      _retireField?.dispose();
+      _retireField = _field;
+      _field = image;
+      _displayedTime = time;
+      _bakedGrade = grade;
+      _cachedFilter = null;
+      setState(() {});
+    }
+    if (!_closed && _bakeAgain) {
+      _bakeAgain = false;
+      _requestBake(_pendingTime, fromTick: false);
+    }
+  }
+
+  Future<ui.Image?> _ensureDummy() async {
+    final existing = _dummy;
+    if (existing != null) return existing;
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawRect(
+      const Rect.fromLTWH(0, 0, 1, 1),
+      Paint()..color = const Color(0x00000000),
+    );
+    final picture = recorder.endRecording();
+    try {
+      final image = await rasterizePicture(picture, 1, 1);
+      picture.dispose();
+      if (_closed) {
+        image.dispose();
+        return null;
+      }
+      return _dummy = image;
+    } catch (error, stackTrace) {
+      picture.dispose();
+      Log.handle(error, stackTrace, 'rain-on-glass raster failed');
+      return null;
+    }
+  }
+
+  /// The droplet filter for the current field image. The same instance is
+  /// handed back while time, grade and opacity are unchanged, so the card
+  /// snapshot under [ImageFiltered] is not recomposited on an idle frame.
+  ui.ImageFilter? _filterFor(double intensity, double opacity) {
+    final field = _field;
+    final shader = _shader;
+    if (field == null || shader == null || _filterUnsupported) {
+      return null;
+    }
+    final grade = _GlassGrade.forIntensity(intensity);
+    // [_cachedFilter] is cleared whenever the field image or its time changes,
+    // so a non-null cache is already the filter for [_displayedTime].
+    if (_cachedFilter != null &&
+        _cachedOpacity == opacity &&
+        _cachedGrade == grade) {
+      return _cachedFilter;
+    }
+    final filter = _compose(shader, grade, opacity, field);
+    if (filter == null) return null;
+    _cachedFilter = filter;
+    _cachedOpacity = opacity;
+    _cachedGrade = grade;
+    return filter;
+  }
+
+  ui.ImageFilter? _compose(
+    ui.FragmentShader shader,
+    _GlassGrade grade,
+    double opacity,
+    ui.Image field,
+  ) {
+    var i = 0;
+    void set(double v) => shader.setFloat(i++, v);
+    // Slots 0..1 are the input size; the engine overwrites them, but they must
+    // exist for `ImageFilter.shader` to accept the shader.
+    set(0);
+    set(0);
+    // The reference's fixed frame — uResolution is 1080×1080 once at creation
+    // and never per-view, so bead size is absolute, not card-relative.
+    set(1080);
+    set(1080);
+    set(_displayedTime);
+    set(grade.staticSize);
+    set(grade.staticAmount);
+    set(grade.staticSpeed);
+    set(grade.runningSize);
+    set(grade.runningAmount);
+    set(grade.runningSpeed);
+    // `uAlpha` is the effect's own strength, not the rain amount. The coverage
+    // bake does not read it, so an opacity change rebuilds the filter only.
+    set(opacity);
+    set(0);
+    shader.setImageSampler(1, field);
+    try {
+      return ui.ImageFilter.shader(shader);
+    } catch (error, stackTrace) {
+      // Skia backend: no shader image filters. Drop the effect for good.
+      Log.handle(
+        error,
+        stackTrace,
+        'ImageFilter.shader unavailable; rain-on-glass disabled',
+      );
+      _filterUnsupported = true;
+      _ticker.stop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _closed) return;
+        setState(() {});
+        _syncRunning();
+      });
+      return null;
     }
   }
 
@@ -169,100 +445,23 @@ class _RainOnGlassState extends State<RainOnGlass>
         (oldWidget.opacity > 0.004) != (widget.opacity > 0.004)) {
       _syncRunning();
     }
+    final oldGrade = _GlassGrade.forIntensity(oldWidget.intensity);
+    final grade = _GlassGrade.forIntensity(widget.intensity);
+    if (oldGrade != grade && _ticker.isActive) {
+      _requestBake(_simTime, fromTick: false);
+    }
   }
 
   @override
   void dispose() {
+    _closed = true;
     _ticker.dispose();
     _shader?.dispose();
     _fieldShader?.dispose();
     _field?.dispose();
+    _retireField?.dispose();
     _dummy?.dispose();
-    _clock.stop();
     super.dispose();
-  }
-
-  ui.Image _dummyImage() {
-    final existing = _dummy;
-    if (existing != null) return existing;
-    final recorder = ui.PictureRecorder();
-    ui.Canvas(recorder).drawRect(
-      const Rect.fromLTWH(0, 0, 1, 1),
-      Paint()..color = const Color(0x00000000),
-    );
-    final picture = recorder.endRecording();
-    final image = picture.toImageSync(1, 1);
-    picture.dispose();
-    return _dummy = image;
-  }
-
-  /// One coverage bake per frame. The previous image is dropped so the GPU
-  /// does not keep every frame of the glass.
-  ui.Image _coverage(_GlassGrade grade, double time) {
-    final shader = _fieldShader;
-    if (shader == null) return _dummyImage();
-    final next = bakeRainOnGlassField(
-      shader: shader,
-      dummy: _dummyImage(),
-      time: time,
-      opacity: widget.opacity,
-      staticSize: grade.staticSize,
-      staticAmount: grade.staticAmount,
-      staticSpeed: grade.staticSpeed,
-      runningSize: grade.runningSize,
-      runningAmount: grade.runningAmount,
-      runningSpeed: grade.runningSpeed,
-    );
-    _field?.dispose();
-    return _field = next;
-  }
-
-  /// Builds the droplet filter, or `null` if shaders-as-filters are not
-  /// available on this backend.
-  ui.ImageFilter? _filter(double intensity) {
-    final shader = _shader;
-    if (shader == null || _filterUnsupported) return null;
-
-    final grade = _GlassGrade.forIntensity(intensity);
-    final time = _clock.elapsedMilliseconds / 1000.0;
-    var i = 0;
-    void set(double v) => shader.setFloat(i++, v);
-    // Slots 0..1 are the input size; the engine overwrites them, but they must
-    // exist for `ImageFilter.shader` to accept the shader.
-    set(0);
-    set(0);
-    // The reference's fixed frame — the reference sets uResolution to 1080×1080 once at
-    // creation and never per-view, so bead size is absolute, not card-relative.
-    set(1080);
-    set(1080);
-    set(time);
-    set(grade.staticSize);
-    set(grade.staticAmount);
-    set(grade.staticSpeed);
-    set(grade.runningSize);
-    set(grade.runningAmount);
-    set(grade.runningSpeed);
-    // `uAlpha` is the effect's own strength, not the rain amount.
-    set(widget.opacity.clamp(0.0, 1.0));
-    set(0);
-    shader.setImageSampler(1, _coverage(grade, time));
-
-    try {
-      return ui.ImageFilter.shader(shader);
-    } catch (error, stackTrace) {
-      // Skia backend: no shader image filters. Drop the effect for good.
-      Log.handle(
-        error,
-        stackTrace,
-        'ImageFilter.shader unavailable; rain-on-glass disabled',
-      );
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _filterUnsupported) return;
-        setState(() => _filterUnsupported = true);
-        _syncRunning();
-      });
-      return null;
-    }
   }
 
   @override
@@ -275,21 +474,18 @@ class _RainOnGlassState extends State<RainOnGlass>
     // frame; a drag does not.
     //
     // So the structure is fixed and only `enabled` and the filter change.
-    return AnimatedBuilder(
-      animation: _ticker,
-      builder: (context, child) {
-        final intensity = widget.intensity.clamp(0.0, 1.0);
-        final filter = intensity < 0.01 || widget.opacity < 0.004
-            ? null
-            : _filter(intensity);
-        return ImageFiltered(
-          // A no-op filter keeps the widget — and so the element tree —
-          // present even when the effect is off.
-          imageFilter: filter ?? _identityFilter,
-          enabled: filter != null,
-          child: child,
-        );
-      },
+    // The filter object itself is reused until a 20 ms step's raster lands
+    // or the opacity / grade actually change.
+    final intensity = widget.intensity.clamp(0.0, 1.0);
+    final opacity = widget.opacity.clamp(0.0, 1.0);
+    final filter = intensity < 0.01 || opacity <= 0.004 || _filterUnsupported
+        ? null
+        : _filterFor(intensity, opacity);
+    return ImageFiltered(
+      // A no-op filter keeps the widget — and so the element tree —
+      // present even when the effect is off.
+      imageFilter: filter ?? _identityFilter,
+      enabled: filter != null,
       child: widget.child,
     );
   }

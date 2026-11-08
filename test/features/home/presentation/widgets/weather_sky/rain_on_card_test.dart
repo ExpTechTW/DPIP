@@ -11,6 +11,7 @@ import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_card.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_raster.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -140,6 +141,58 @@ void main() {
 
     await tester.pumpWidget(const SizedBox());
     addTearDown(tester.view.reset);
+  });
+
+  testWidgets('a frame the solver skips does not toImageSync', (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      const MediaQuery(
+        data: MediaQueryData(size: Size(400, 800)),
+        child: MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 280,
+              height: 120,
+              child: RainOnCard(
+                intensity: 0.5,
+                child: ColoredBox(color: Color(0xFF224466)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await _waitForShader(tester);
+    // The first tick records a zero dt; the ones after it step and emit.
+    for (var i = 0; i < 8; i++) {
+      await tester.pump(const Duration(milliseconds: 32));
+    }
+    debugResetWeatherRasterCounts();
+
+    var idle = 0;
+    var stepped = 0;
+    for (var i = 0; i < 30; i++) {
+      final sync = debugWeatherToImageSyncCount;
+      final steps = debugWeatherSolverSteps;
+      final rasters = debugWeatherTickRasters;
+      await tester.pump(const Duration(milliseconds: 8));
+      expect(debugWeatherToImageSyncCount, sync);
+      if (debugWeatherSolverSteps == steps) {
+        expect(debugWeatherTickRasters, rasters);
+        idle++;
+      } else {
+        stepped++;
+      }
+    }
+    expect(idle, greaterThan(0));
+    expect(stepped, greaterThan(0));
+    expect(debugWeatherToImageCount, greaterThan(0));
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
   });
 }
 
