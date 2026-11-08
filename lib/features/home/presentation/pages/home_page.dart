@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_glass.dart';
+import 'package:dpip/core/diagnostics/bench_sky.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -198,7 +199,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final experimental = context.watch<ExperimentalSettings>();
-    final skyTimeMode = experimental.skyTimeMode;
+    // A frame-bench build can pin both axes without the experimental UI.
+    // Anywhere else these are the settings values unchanged.
+    final skyTimeMode = benchSkyTimeOr(experimental.skyTimeMode);
     // The station's live reading drives both the look and the continuous
     // channels: the code picks the mode (keyframes/clouds), and the rain/snow
     // intensity + humidity ride along as overrides where the code carries them.
@@ -210,7 +213,10 @@ class _HomePageState extends State<HomePage> {
     final data = context.select<HomeWeatherController, WeatherRealtimeData?>(
       (c) => c.weather?.data,
     );
-    final backdrop = resolveBackdrop(experimental.weatherMode, data);
+    final backdrop = resolveBackdrop(
+      benchWeatherOr(experimental.weatherMode),
+      data,
+    );
     final weatherMode = backdrop.mode;
     final rainIntensity = backdrop.rain;
     final snowIntensity = backdrop.snow;
