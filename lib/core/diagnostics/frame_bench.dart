@@ -1,4 +1,5 @@
-/// Per-frame timing capture for the map benchmark, `tool/dev/bench_map.sh`.
+/// Per-frame timing capture for the map and sky benchmarks
+/// (`tool/dev/bench_map.sh`, `tool/dev/bench_sky.sh`).
 ///
 /// Compiled out unless the build sets `--dart-define=DPIP_FRAME_BENCH=true`,
 /// which only the benchmark's own profile build does. Every frame's build and
