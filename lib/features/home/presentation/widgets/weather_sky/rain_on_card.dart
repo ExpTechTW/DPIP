@@ -656,7 +656,14 @@ class _RainOnCardState extends State<RainOnCard>
   /// **Both** worlds run at every grade — the reference's loop configures world 0 and
   /// world 1 identically for grades 0/1 and differently only for 2/3, and
   /// The reference always draws both. Idling the second world at the lighter grades,
-  /// as an earlier version did, halves the water.
+  /// as an earlier version did, halves the water. The storm pair is not
+  /// redundant either: [CardWaterPreset.heavy] is slow and fat,
+  /// [CardWaterPreset.heavySecondary] is fast and nearly vertical. A same-time
+  /// render of the lip (see `card_water_worlds_test.dart`) moves pixels by up
+  /// to 153 on the droplets that exist only in the fast world. The header and
+  /// the glass card each keep their own pair — the header collides with the
+  /// glyph silhouette and the card with a flat edge, so one set of positions
+  /// cannot feed both.
   static (CardWaterPreset, CardWaterPreset) _gradeFor(double intensity) {
     if (intensity >= 0.7) {
       return (CardWaterPreset.heavy, CardWaterPreset.heavySecondary);

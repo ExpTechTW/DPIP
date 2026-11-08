@@ -9,6 +9,7 @@ import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/precipitation_field.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_deck.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
@@ -32,8 +33,10 @@ import 'package:flutter/services.dart' show rootBundle;
 /// cloud colour always agrees with the sky behind it.
 ///
 /// Cost is controlled by structure: the scattering integral runs only when the
-/// resolved keyframe changes (minutes apart, not frames), layers render at
-/// [_renderScale] and are upscaled, and each gates itself on its own control.
+/// resolved keyframe changes (minutes apart, not frames), precipitation and
+/// lightning render at [_renderScale] and are upscaled, and the cloud deck
+/// has its own slower, smaller target ([SkyDeck]). Each layer gates itself
+/// on its own control.
 ///
 /// [mode] forces a look; [active] holds the last frame when the backdrop is
 /// off-screen to save GPU.
@@ -87,13 +90,25 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   ///
   /// The reference rasterises everything before layer 8 — sky, galaxy, clouds
   /// — at **half** device resolution and the deferred layers at 0.75, then
-  /// upscales. This port draws every layer in one pass, so a
-  /// single scale has to serve both; 0.75 matches the precipitation layers,
-  /// which are the ones that suffer most from being softened, and leaves the
-  /// cloud deck only slightly sharper than the original. The low tier draws
-  /// at 0.6 — a softer upscale, not a lower frame rate.
+  /// upscales. Precipitation and lightning stay at 0.75 because a streak
+  /// softens badly below that. The cloud deck is not on this scale: it is
+  /// [kSkyDeckScale] of the screen, updated at [kSkyDeckPeriod]. The low
+  /// tier draws the fast layers at 0.6 and leaves the sky picture on the
+  /// vsync clock. Near rain falls 2.25–2.60 screen-heights a second, so a
+  /// 30 fps step is about 8% of the screen and reads as stepping. A 30 fps
+  /// offscreen copy of the sky and night was measured on a low-tier emulator
+  /// and raised CPU (clear noon about 13% to 19%, clear night about 13% to
+  /// 18%): the gradient is already one image, the night pass is one sample,
+  /// and copying that image 30 times a second cost more than drawing it.
+  /// Rain also has to stay in this picture — it is [BlendMode.plus] against
+  /// the sky, and a second layer would composite the drops over the sky
+  /// instead of adding them to it.
   static const double _renderScaleHigh = 0.75;
   static const double _renderScaleLow = 0.6;
+
+  /// One deck for the life of the backdrop. The painter is rebuilt every
+  /// tick; the images must not be.
+  final SkyDeck _deck = SkyDeck();
 
   /// The device tier, resolved once before the particles are built (their
   /// pools depend on it). Null only while the first tier probe is in flight;
@@ -354,6 +369,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   @override
   void dispose() {
     _ticker.dispose();
+    _deck.dispose();
     _disposeResources();
     _clock.stop();
     super.dispose();
@@ -368,6 +384,13 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final scale = _tier == RenderTier.low
+            ? _renderScaleLow
+            : _renderScaleHigh;
+        // The picture is rasterized at this ratio. The deck records its own
+        // image, so it has to apply the ratio itself or 0.4× lands in logical
+        // pixels (about 0.15× of a 2.6× screen).
+        final dpr = MediaQuery.devicePixelRatioOf(context);
         final painted = AnimatedBuilder(
           animation: _ticker,
           builder: (context, _) {
@@ -399,6 +422,9 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
                     rainField: _rain,
                     snowField: _snow,
                     dt: dt,
+                    deck: _deck,
+                    renderScale: scale,
+                    devicePixelRatio: dpr,
                   )
                 : _lastPainter!;
             _lastPainter = painter;
@@ -417,10 +443,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
           return painted;
         }
 
-        // Rasterise small and let the transform upscale bilinearly.
-        final scale = _tier == RenderTier.low
-            ? _renderScaleLow
-            : _renderScaleHigh;
+        // Rasterise the fast layers small and let the transform upscale.
         return ClipRect(
           child: Align(
             alignment: Alignment.topLeft,
