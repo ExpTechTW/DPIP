@@ -1,3 +1,4 @@
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_deck.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,6 +41,51 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 100));
     expect(identical(first, painterOf()), isFalse);
+  });
+
+  testWidgets('the cloud deck re-renders at most twelve times a second', (
+    tester,
+  ) async {
+    // A full-size sky makes one pump slower than the deck period, so a
+    // correct 12 fps clock and a once-per-frame clock count the same. A
+    // small surface keeps the pump well under a period.
+    tester.view.physicalSize = const Size(240, 420);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    await pumpLoaded(
+      tester,
+      const MaterialApp(home: WeatherSkyBackground(active: true)),
+    );
+    // Let the opening raster land so the measurement window is the steady
+    // clock, not the first bake.
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 80)),
+    );
+    await tester.pump();
+    debugResetSkyDeckRenders();
+
+    final clock = Stopwatch()..start();
+    var pumps = 0;
+    // Wall time has to pass: the deck's clock is a Stopwatch, and a burst of
+    // pumps would otherwise finish inside one period.
+    while (clock.elapsedMilliseconds < 500) {
+      await tester.pump(const Duration(milliseconds: 16));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 16)),
+      );
+      pumps++;
+    }
+    final elapsed = clock.elapsedMilliseconds / 1000.0;
+    // One extra for a bake that was already due at the window's first tick,
+    // and one for a raster that finishes just inside the window.
+    final cap = (elapsed / kSkyDeckPeriod).ceil() + 2;
+    expect(pumps, greaterThan(8));
+    expect(debugSkyDeckRenders, greaterThanOrEqualTo(1));
+    expect(debugSkyDeckRenders, lessThan(pumps));
+    expect(debugSkyDeckRenders, lessThanOrEqualTo(cap));
   });
 }
 

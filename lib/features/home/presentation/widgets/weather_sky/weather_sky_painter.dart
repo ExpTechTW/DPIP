@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_deck.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/precipitation_field.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
@@ -143,6 +144,19 @@ class WeatherSkyPainter extends CustomPainter {
   /// Seconds since the previous frame, for the particle integration.
   final double dt;
 
+  /// The slow cloud target. Null draws the deck live, which the layer tests
+  /// use; the backdrop always passes one.
+  final SkyDeck? deck;
+
+  /// The canvas's fraction of the widget. The deck combines it with
+  /// [kSkyDeckScale] so the clouds land at the same fraction of the screen
+  /// on both tiers.
+  final double renderScale;
+
+  /// Physical pixels per logical pixel. The deck image is recorded at this
+  /// ratio; the picture around it is rasterized at it already.
+  final double devicePixelRatio;
+
   const WeatherSkyPainter({
     required this.shaders,
     required this.lutCache,
@@ -152,6 +166,9 @@ class WeatherSkyPainter extends CustomPainter {
     required this.rainField,
     required this.snowField,
     required this.dt,
+    this.deck,
+    this.renderScale = 0.75,
+    this.devicePixelRatio = 1,
   });
 
   // Asset keys, matching `pubspec.yaml`.
@@ -164,9 +181,31 @@ class WeatherSkyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Night stays in this pass. Its shimmer is `iTime * 2` radians per
+    // second, about a third of a hertz, so the 12 fps cloud deck would step
+    // the bright stars. It is one full-screen sample, not the overlapping
+    // cloud rects. Copying the sky into its own image at 30 fps was measured
+    // on the low tier and cost more than drawing this pass, so it stays live
+    // on both tiers — see the scale note on WeatherSkyBackground.
     _paintSky(canvas, size);
     _paintNight(canvas, size);
-    _paintClouds(canvas, size);
+    final deck = this.deck;
+    if (deck == null) {
+      _paintClouds(canvas, size);
+    } else {
+      deck.present(
+        canvas: canvas,
+        view: size,
+        renderScale: renderScale,
+        devicePixelRatio: devicePixelRatio,
+        time: frame.time,
+        layout: frame.cloudLayout,
+        wind: frame.wind,
+        coverage: frame.cloudCoverage,
+        flash: frame.lightning.flash,
+        paintClouds: _paintClouds,
+      );
+    }
     _paintRain(canvas, size);
     _paintSnow(canvas, size);
     _paintLightning(canvas, size);
