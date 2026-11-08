@@ -168,11 +168,14 @@ class CardWaterField {
 
   /// Advances the simulation by [dt] seconds.
   ///
+  /// Returns how many 20 ms solver steps actually ran. Zero means every drop
+  /// is where it was: the coverage image does not need to be rasterized again.
+  ///
   /// [width] is the card, [screenHeight] the scale the engine's world units are
   /// defined against, and [topEdge] the y (in card space) drops land on — 0 is
   /// the card's own top. [surface], when given, overrides [topEdge] per
   /// column instead of everywhere at once — see [CardWaterSurface].
-  void update(
+  int update(
     double dt, {
     required double width,
     required double screenHeight,
@@ -182,7 +185,7 @@ class CardWaterField {
     double gravityScale = 1.0,
     CardWaterSurface? surface,
   }) {
-    if (dt <= 0 || width <= 0 || screenHeight <= 0) return;
+    if (dt <= 0 || width <= 0 || screenHeight <= 0) return 0;
     // A backgrounded tab must not replay minutes of physics on resume.
     final elapsed = math.min(dt, 0.1);
     final unit = screenHeight / _worldHeight;
@@ -218,6 +221,7 @@ class CardWaterField {
       }
       _compact();
     }
+    return ticks;
   }
 
   /// `world.step` particle iterations.
