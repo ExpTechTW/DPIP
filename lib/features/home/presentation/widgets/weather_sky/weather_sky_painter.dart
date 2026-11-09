@@ -117,6 +117,21 @@ class LightningFrame {
   int get hashCode => Object.hash(age, flash, bolt, seed);
 }
 
+/// Lowest rain or snow intensity the sky draws.
+///
+/// Both particle layers return before stepping when the amount is under
+/// this. [skyPrecipitationOn] is that test; the frame pacer calls it so a
+/// scene this painter treats as dry is not scheduled as precipitation.
+const double kSkyPrecipitationThreshold = 0.002;
+
+/// Whether rain or snow at [intensity] is actually drawn.
+///
+/// The early-out is `intensity < [kSkyPrecipitationThreshold]`, so the
+/// boundary itself counts as on. Live amounts and the authored looks never
+/// land on it, but a second copy of the cutoff would be free to disagree.
+bool skyPrecipitationOn(double intensity) =>
+    intensity >= kSkyPrecipitationThreshold;
+
 /// Draws the layer stack in the reference scene order.
 ///
 /// Order mirrors the original engine: sky → night → clouds → precipitation →
@@ -532,7 +547,7 @@ class WeatherSkyPainter extends CustomPainter {
   // what makes rain read as rain.
   void _paintRain(Canvas canvas, Size size) {
     final field = rainField;
-    if (field == null || frame.rain < 0.002) return;
+    if (field == null || !skyPrecipitationOn(frame.rain)) return;
 
     // The reference's streak sprite is WHITE (its texture's RGB is 248/255 wherever
     // alpha > 0) and composites additively — night rain dims because the
@@ -591,7 +606,7 @@ class WeatherSkyPainter extends CustomPainter {
   // --- snow ---------------------------------------------------------------
   void _paintSnow(Canvas canvas, Size size) {
     final field = snowField;
-    if (field == null || frame.snow < 0.002) return;
+    if (field == null || !skyPrecipitationOn(frame.snow)) return;
 
     // Flakes are lit by the sky, so they grey down at night.
     final lit = ((1.0 - 0.5 * frame.nightAmount) * 255).round();
