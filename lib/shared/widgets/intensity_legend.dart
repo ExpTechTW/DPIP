@@ -29,6 +29,11 @@ class IntensityLegend extends StatelessWidget {
   /// Highest discrete EEW level to show (`0`–`9`). Null shows the full scale.
   /// Levels above it carry no information for the current warning and are
   /// omitted to preserve map space.
+  ///
+  /// This is the ceiling of the *wash*, not the warning's reported maximum —
+  /// see [legendCeiling] in `features/earthquake/domain/eew_town_levels.dart`.
+  /// A level the map paints but this scale omits would be read as another
+  /// intensity.
   final int? maxEewLevel;
 
   /// Height of one scale cell / gradient step (px).
