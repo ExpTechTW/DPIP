@@ -32,6 +32,7 @@ import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/camera_fit.dart';
 import 'package:dpip/shared/map/map_compass.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
+import 'package:dpip/shared/map/map_image_density.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -289,15 +290,15 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   /// 0.2, 15 → 0.6): those source PNGs render at native (device-pixel) size,
   /// so on a modern 3x display that old scale is only ~20 logical px — this
   /// page needs the marker legible at a glance, so it's sized up accordingly.
-  static const List<Object> _iconSizeExpression = [
-    'interpolate',
-    ['linear'],
-    ['zoom'],
-    5,
-    0.75,
-    15,
-    1.7,
-  ];
+  ///
+  /// [intensityIconSizeCurve] also folds in [mapIconDensityFactor], because
+  /// Android's `addImage` pins the bitmap to density 160: without it the same
+  /// markers come out three times larger there than on a 3x iPhone.
+  List<Object> get _iconSizeExpression => intensityIconSizeCurve(
+    mapIconDensityFactor(
+      devicePixelRatio: MediaQuery.devicePixelRatioOf(context),
+    ),
+  );
 
   MapLibreMapController? _controller;
   bool _iconsLoaded = false;
@@ -448,8 +449,8 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
       await controller.addSymbolLayer(
         _sourceId,
         _symbolLayerId,
-        const SymbolLayerProperties(
-          iconImage: ['get', 'icon'],
+        SymbolLayerProperties(
+          iconImage: const ['get', 'icon'],
           iconSize: _iconSizeExpression,
           iconAllowOverlap: true,
           iconIgnorePlacement: true,

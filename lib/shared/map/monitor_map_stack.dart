@@ -19,6 +19,7 @@ library;
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/color_hex.dart';
+import 'package:dpip/shared/map/map_image_density.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/map/map_style.dart' show landLayerId;
 import 'package:dpip/shared/seismic/intensity_circle_renderer.dart';
@@ -120,22 +121,6 @@ const List<Object> monitorDotRadius = [
   2.0,
   12,
   8.0,
-];
-
-/// The discrete-reading badge's on-map scale of its 64px artwork. The legacy
-/// monitor's own badge layer used 0.2 at z5 → 0.8 at z10, but that assumed
-/// native-resolution PNG assets — applied to a baked canvas here it renders at
-/// only device-pixel size, ~13px on a 3x display and effectively invisible.
-/// `ReportDetailPage` already solved this for the same 64px canvas class (see
-/// [IntensityIconRenderer]); this is its scale.
-const List<Object> monitorBadgeIconSize = [
-  'interpolate',
-  ['linear'],
-  ['zoom'],
-  5,
-  0.75,
-  15,
-  1.7,
 ];
 
 /// Higher intensity draws on top (dot, badge and label all key off this) —
@@ -266,6 +251,7 @@ Future<void> addMonitorLayers(
   MonitorLayerIds ids, {
   Map<String, dynamic> stationData = monitorEmptyCollection,
   double dotOpacity = 1,
+  double? iconDensityFactor,
   required String logTag,
 }) async {
   await controller.addSource(
@@ -294,9 +280,11 @@ Future<void> addMonitorLayers(
   await controller.addSymbolLayer(
     ids.stationSource,
     ids.stationBadge,
-    const SymbolLayerProperties(
-      iconImage: <Object>['get', 'icon'],
-      iconSize: monitorBadgeIconSize,
+    SymbolLayerProperties(
+      iconImage: const <Object>['get', 'icon'],
+      iconSize: intensityIconSizeCurve(
+        iconDensityFactor ?? mapIconDensityFactor(),
+      ),
       iconAllowOverlap: true,
       iconIgnorePlacement: true,
       // Same "stronger wins" rule as the dot layer's circleSortKey — two
@@ -381,7 +369,9 @@ Future<void> addMonitorLayers(
       ids.eewEpicenter,
       SymbolLayerProperties(
         iconImage: ids.eewCrossIcon,
-        iconSize: 1.0,
+        // The 96px cross is artwork too: without the factor an Android device
+        // draws it at 96dp against the iPhone's 32pt.
+        iconSize: iconDensityFactor ?? mapIconDensityFactor(),
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
       ),
