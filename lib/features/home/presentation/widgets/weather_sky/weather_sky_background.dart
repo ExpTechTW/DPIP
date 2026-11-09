@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -10,6 +11,7 @@ import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/precipitation_field.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_deck.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
@@ -35,8 +37,10 @@ import 'package:flutter/services.dart' show rootBundle;
 /// Cost is controlled by structure: the scattering integral runs only when the
 /// resolved keyframe changes (minutes apart, not frames), precipitation and
 /// lightning render at [_renderScale] and are upscaled, and the cloud deck
-/// has its own slower, smaller target ([SkyDeck]). Each layer gates itself
-/// on its own control.
+/// has its own slower, smaller target ([SkyDeck]). The picture itself is
+/// repainted on [skyFrameInterval]. Between paints the ticker is stopped,
+/// so the engine is not asked for a frame. Each layer gates itself on its
+/// own control.
 ///
 /// [mode] forces a look; [active] holds the last frame when the backdrop is
 /// off-screen to save GPU.
@@ -82,6 +86,21 @@ class WeatherSkyBackground extends StatefulWidget {
 
   @override
   State<WeatherSkyBackground> createState() => _WeatherSkyBackgroundState();
+
+  /// How early the pace timer wakes, so the next vsync lands near the due
+  /// time. A 120 Hz frame is about 8 ms; waking 6 ms ahead skips the vsync
+  /// that would still be early and catches the one that is due.
+  @visibleForTesting
+  static const Duration paceLead = Duration(milliseconds: 6);
+
+  /// Seconds the sky clock reads in tests. Null in the app.
+  ///
+  /// Frames are timed with a [Stopwatch], which a widget test cannot
+  /// advance, so the `dt` of a skipped vsync could not be asserted. Tests
+  /// assign this and move the value. Production leaves it null, and the
+  /// stopwatch stays the time base the particles already integrate against.
+  @visibleForTesting
+  static double Function()? debugFrameNow;
 }
 
 class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
@@ -145,12 +164,42 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   PrecipitationField? _rain;
   PrecipitationField? _snow;
 
-  /// Wall-clock of the previous frame, for the particle integration step.
+  /// Seconds of the last frame that was actually painted.
+  ///
+  /// Skipped vsyncs leave this alone. The next painted frame's `dt` is the
+  /// whole gap, which is what keeps rain and snow at the speed they had
+  /// when every vsync painted.
   double _lastFrameSeconds = 0;
 
-  /// The painter instance from the last animated frame, reused while the
-  /// animation is stopped so rebuilds of the subtree above don't repaint the
-  /// sky (see the [CustomPaint] construction in build).
+  /// Weather or [WeatherSkyBackground.active] changed since the last paint.
+  ///
+  /// The next builder invocation paints even when the pace interval has not
+  /// elapsed, then clears this. Waiting the interval out would hold the old
+  /// sky — a clear frame after the rain had started, or a frozen one after
+  /// the sheet returned to the top. Setting this also drops the pace timer
+  /// so that frame is not deferred.
+  bool _paintNow = false;
+
+  /// One timer between paints. While it is pending the ticker is stopped,
+  /// so the engine is not asked for a frame.
+  Timer? _paceTimer;
+
+  /// The scene the current build handed the post-frame callback. The
+  /// callback decides the wait; build only records it.
+  Duration _paceInterval = Duration.zero;
+  double _paceSincePaint = 0;
+  bool _pacePainted = false;
+  bool _paceCallbackScheduled = false;
+
+  /// Last [TickerMode] value. Null until the first dependency resolution.
+  /// A disabled mode is the same as [WeatherSkyBackground.active] false:
+  /// the ticker, the clock and the pace timer all stop, and the timer
+  /// must not start them again.
+  bool? _tickerModeEnabled;
+
+  /// The painter from the last painted frame. Reused while the animation is
+  /// stopped and while the pace interval has not elapsed, so a rebuild does
+  /// not repaint the sky (see the [CustomPaint] construction in build).
   WeatherSkyPainter? _lastPainter;
 
   /// UTC day of the cached [_sun] / [_moon] (sunrise/sunset move ~1 min
@@ -174,7 +223,18 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   @override
   void initState() {
     super.initState();
+    // repeat() asks for another frame when this notification returns, which
+    // is still the transient-callback phase. A post-frame stop is too late:
+    // the engine frame is already requested, and cancelling the callback
+    // does not clear that request. Stopping here is what leaves no frame
+    // scheduled. The post-frame callback arms the timer once build has
+    // decided how long to wait.
+    _ticker.addListener(_haltAfterTick);
     _init();
+  }
+
+  void _haltAfterTick() {
+    _ticker.stop();
   }
 
   /// Resolves the device tier, then loads shaders/sprites/particles — the
@@ -349,30 +409,112 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     _snow = null;
   }
 
+  bool get _ready =>
+      _lutCache != null && _shaders.length >= _layerAssets.length;
+
+  /// `active`, a loaded scene, and [TickerMode] all have to agree. The sheet
+  /// gate stops the sky by clearing `active`; an offstage route does it with
+  /// [TickerMode]. Either one drops the ticker, the clock and the timer.
+  bool get _shouldRun =>
+      widget.active && _ready && (_tickerModeEnabled ?? false);
+
   void _syncRunning() {
-    final ready = _lutCache != null && _shaders.length >= _layerAssets.length;
-    if (widget.active && ready) {
+    if (_shouldRun) {
+      _cancelPace();
       if (!_clock.isRunning) _clock.start();
-      _ticker.repeat();
+      // This runs inside a frame that is already scheduled (load, resume,
+      // or a ticker-mode change). repeat() would ask for the next frame
+      // too, and stopping the ticker after the frame does not clear that
+      // request. The pace timer is what starts the ticker again.
     } else {
-      _clock.stop();
+      _cancelPace();
+      if (_clock.isRunning) _clock.stop();
       _ticker.stop();
     }
+  }
+
+  void _cancelPace() {
+    _paceTimer?.cancel();
+    _paceTimer = null;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final enabled = TickerMode.valuesOf(context).enabled;
+    if (enabled == _tickerModeEnabled) return;
+    _tickerModeEnabled = enabled;
+    _syncRunning();
   }
 
   @override
   void didUpdateWidget(WeatherSkyBackground oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final resumed = !oldWidget.active && widget.active;
+    final weatherChanged =
+        oldWidget.mode != widget.mode ||
+        oldWidget.rainIntensity != widget.rainIntensity ||
+        oldWidget.snowIntensity != widget.snowIntensity;
     if (oldWidget.active != widget.active) _syncRunning();
+    if (weatherChanged || resumed) {
+      _paintNow = true;
+      // The frame this update is already in paints the new look. The timer
+      // from the previous pace must not hold that paint.
+      _cancelPace();
+      if (_shouldRun && !_clock.isRunning) _clock.start();
+    }
   }
 
   @override
   void dispose() {
+    _cancelPace();
+    _ticker.removeListener(_haltAfterTick);
     _ticker.dispose();
     _deck.dispose();
     _disposeResources();
     _clock.stop();
     super.dispose();
+  }
+
+  void _schedulePace() {
+    if (_paceCallbackScheduled) return;
+    _paceCallbackScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _paceCallbackScheduled = false;
+      _finishPace();
+    });
+  }
+
+  /// Stops the ticker and arms one timer for the time until the next paint
+  /// is due, minus [WeatherSkyBackground.paceLead]. An early tick uses the
+  /// remainder the same way. A weather change has already cancelled the
+  /// previous timer, so this arms the new look's interval.
+  void _finishPace() {
+    if (!mounted) return;
+    _ticker.stop();
+    if (!_shouldRun) {
+      _cancelPace();
+      return;
+    }
+    final since = _pacePainted ? Duration.zero : _seconds(_paceSincePaint);
+    var wait = _paceInterval - since - WeatherSkyBackground.paceLead;
+    if (wait < Duration.zero) wait = Duration.zero;
+    _cancelPace();
+    _paceTimer = Timer(wait, _onPaceFired);
+  }
+
+  void _onPaceFired() {
+    _paceTimer = null;
+    if (!mounted || !_shouldRun) return;
+    if (!_clock.isRunning) _clock.start();
+    _ticker.repeat();
+  }
+
+  Duration _seconds(double seconds) {
+    if (!(seconds > 0)) return Duration.zero;
+    return Duration(
+      microseconds: (seconds * Duration.microsecondsPerSecond).round(),
+    );
   }
 
   @override
@@ -398,10 +540,19 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
             // Re-bakes only when the resolved keyframe has actually moved.
             cache.update(frame.sky);
 
-            // Clamped so a dropped frame or a resume from background does not
-            // teleport every particle down the screen in one step.
-            final dt = (frame.time - _lastFrameSeconds).clamp(0.0, 1 / 20);
-            _lastFrameSeconds = frame.time;
+            // Gap since the last picture we handed out. A skipped vsync must
+            // not move this mark: particles integrate `dt`, not the clock, so
+            // a mark that advanced on a skip would throw that time away and
+            // slow the rain by the skip ratio.
+            final sincePaint = frame.time - _lastFrameSeconds;
+            final interval = skyFrameInterval(
+              rain: frame.rain,
+              snow: frame.snow,
+              lightning: frame.lightning,
+            );
+            final due =
+                sincePaint * Duration.microsecondsPerSecond >=
+                interval.inMicroseconds;
 
             // While the animation is stopped (`active: false` — the sheet is
             // collapsed, or the sky sits under the scroll blur), the scene
@@ -411,23 +562,47 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
             // scroll-driven rebuilds of the subtree above this widget
             // (`_ScrollBlurredWeather`) then cost an element update instead
             // of a full-screen shader stack re-render on every scroll tick.
-            final moving = widget.active && dt > 0;
-            final painter = moving || _lastPainter == null
-                ? WeatherSkyPainter(
-                    shaders: _shaders,
-                    lutCache: cache,
-                    cloudSprites: _sprites,
-                    sunTextures: _sunTextures,
-                    frame: frame,
-                    rainField: _rain,
-                    snowField: _snow,
-                    dt: dt,
-                    deck: _deck,
-                    renderScale: scale,
-                    devicePixelRatio: dpr,
-                  )
-                : _lastPainter!;
+            //
+            // The same reuse applies when the pace interval has not elapsed.
+            // Clouds, stars and the sun do not need a new picture every
+            // vsync; rain, snow and a strike do. A weather change or a resume
+            // paints on this frame anyway (`_paintNow`).
+            final paint =
+                _lastPainter == null || _paintNow || (widget.active && due);
+            final WeatherSkyPainter painter;
+            if (paint) {
+              // Clamped so a dropped frame or a resume from background does
+              // not teleport every particle down the screen in one step.
+              // `sincePaint` is the whole gap, including skipped vsyncs.
+              // Rain's 16 ms and snow's 33 ms stay under the cap, so a paced
+              // step is not shortened.
+              final dt = sincePaint.clamp(0.0, 1 / 20);
+              _lastFrameSeconds = frame.time;
+              _paintNow = false;
+              painter = WeatherSkyPainter(
+                shaders: _shaders,
+                lutCache: cache,
+                cloudSprites: _sprites,
+                sunTextures: _sunTextures,
+                frame: frame,
+                rainField: _rain,
+                snowField: _snow,
+                dt: dt,
+                deck: _deck,
+                renderScale: scale,
+                devicePixelRatio: dpr,
+              );
+            } else {
+              painter = _lastPainter!;
+            }
             _lastPainter = painter;
+            // Build only records the pace. The post-frame callback stops the
+            // ticker and arms the timer, which is what keeps the arm out of
+            // build.
+            _paceInterval = interval;
+            _paceSincePaint = sincePaint;
+            _pacePainted = paint;
+            _schedulePace();
             // Its own layer, so a repaint of the sky stops at this boundary
             // instead of dirtying the layer it shares with the sheet's frosted
             // chrome and the map's overlay — on Home those are full-screen
@@ -465,7 +640,9 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   SkyFrame _buildFrame() {
     final utc = AppTime.utc;
-    final time = _clock.elapsedMilliseconds / 1000.0;
+    final time =
+        WeatherSkyBackground.debugFrameNow?.call() ??
+        _clock.elapsedMilliseconds / 1000.0;
 
     final look = _lookFor(widget.mode);
     final frames = look.keyframes;
