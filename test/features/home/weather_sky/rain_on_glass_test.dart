@@ -1,5 +1,7 @@
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glass.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// `RainOnGlass` wraps the home sheet's own content, which is the surface the
@@ -97,5 +99,51 @@ void main() {
     }
 
     expect(tester.binding.transientCallbackCount, 0);
+  });
+
+  testWidgets('rain on the glass schedules the next frame one interval later', (
+    tester,
+  ) async {
+    // The test backend has no shader image filter, so the ticker would
+    // otherwise never start and there would be no paced gap to see.
+    addTearDown(() => RainOnGlass.debugRunTickerWithoutShaderFilter = false);
+    RainOnGlass.debugRunTickerWithoutShaderFilter = true;
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RainOnGlass(intensity: 0.8, child: SizedBox.expand()),
+      ),
+    );
+
+    // Shader load is real async. The load starts the ticker, which asks
+    // for one frame and then stops until the shared pulse wakes it.
+    var armed = false;
+    for (var i = 0; i < 40 && !armed; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      if (SchedulerBinding.instance.hasScheduledFrame) {
+        armed = true;
+        break;
+      }
+      await tester.pump();
+      armed = SchedulerBinding.instance.hasScheduledFrame;
+    }
+    expect(armed, isTrue, reason: 'the glass ticker should ask for a frame');
+
+    await tester.pump();
+    expect(SchedulerBinding.instance.hasScheduledFrame, isFalse);
+
+    // Elapse without yielding first: the pulse timer is fake time, and a
+    // yield here lets the coverage raster land and the next tick build a
+    // filter the test backend cannot draw.
+    final elapsed = tester.binding.delayed(kSkyRainInterval);
+    expect(SchedulerBinding.instance.hasScheduledFrame, isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await elapsed;
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 50)),
+    );
+    await tester.pump();
   });
 }
