@@ -52,3 +52,29 @@ Future<({Map<String, int> levels, bool fromModel})> eewTownLevels(
     fromModel: false,
   );
 }
+
+/// The highest level in [levels] that the wash actually paints, or null when
+/// it paints none (every township at 0 is transparent).
+///
+/// This is what the legend's ceiling has to follow, not the warning's reported
+/// `max`: [eewTownLevels] scores townships itself — the ML model, or the
+/// formula until it loads — and can put one higher than the round number the
+/// alert reports. A colour painted on the map with no row beside it is read as
+/// some other intensity, which is the one thing a legend may not do.
+int? highestPaintedLevel(Map<String, int> levels) {
+  int? highest;
+  for (final level in levels.values) {
+    if (level <= 0) continue;
+    if (highest == null || level > highest) highest = level;
+  }
+  return highest;
+}
+
+/// The legend ceiling for a warning reporting [reportedMax] while its wash
+/// paints up to [paintedMax] — whichever is higher, and null when neither is
+/// known (the caller then shows the full scale).
+int? legendCeiling({int? reportedMax, int? paintedMax}) {
+  if (reportedMax == null) return paintedMax;
+  if (paintedMax == null || reportedMax >= paintedMax) return reportedMax;
+  return paintedMax;
+}
