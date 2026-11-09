@@ -17,6 +17,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -363,7 +364,7 @@ void main() {
     );
   }
 
-  GoRouter nestedRouter(_Reports reports) => GoRouter(
+  GoRouter nestedRouter(_Reports reports, {ImageSaver? imageSaver}) => GoRouter(
     initialLocation: '/earthquake/115053-2026-0310-140000',
     routes: [
       GoRoute(
@@ -374,8 +375,10 @@ void main() {
           GoRoute(
             path: ':id',
             name: AppRoutes.earthquakeReport,
-            builder: (_, state) =>
-                ReportDetailPage(reportId: state.pathParameters['id']!),
+            builder: (_, state) => ReportDetailPage(
+              reportId: state.pathParameters['id']!,
+              imageSaver: imageSaver,
+            ),
             routes: [
               GoRoute(
                 path: 'replay',
@@ -773,6 +776,75 @@ void main() {
     await tester.pump();
     expect(find.text('Report image not available'), findsOneWidget);
   });
+
+  testWidgets('the report image saves to the photo library', (tester) async {
+    final reports = _Reports()..next = Ok(_report());
+    final settings = SettingsStore.inMemory();
+    final saver = _RecordingSaver();
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: nestedRouter(reports, imageSaver: saver),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    await _expandSheet(tester);
+    await tester.scrollUntilVisible(find.byType(Image), 400);
+    // Image.memory decodes off the fake clock; let the real codec finish.
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 100)),
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.byTooltip('Save image'));
+
+    await tester.tap(find.byTooltip('Save image'));
+    await tester.pump();
+
+    expect(saver.saved, hasLength(1));
+    expect(
+      saver.saved.single.fileName,
+      'dpip-earthquake-115053-2026-0310-140000.png',
+    );
+    expect(find.text('Saved to your photos'), findsOneWidget);
+
+    // A refusal must say so in its own words, and offer the only way out:
+    // Settings, not another tap.
+    saver.result = const Err(
+      ImageSaveFailure(ImageSaveFailureReason.permissionDenied, 'refused'),
+    );
+    await tester.tap(find.byTooltip('Save image'));
+    await tester.pump();
+
+    expect(find.text('Allow photo access to save the image'), findsOneWidget);
+    expect(find.text('Open Settings'), findsOneWidget);
+  });
+}
+
+/// Records what the save button hands over, and answers with [result].
+///
+/// The permission gate itself is covered by `image_saver_test.dart`; here it
+/// simply agrees, so the widget path is what is under test.
+class _RecordingSaver implements ImageSaver {
+  final saved = <({Uint8List bytes, String fileName})>[];
+  Result<void> result = const Ok(null);
+
+  @override
+  Future<Result<void>> ensurePermission() async => const Ok(null);
+
+  @override
+  Future<Result<void>> saveToGallery({
+    required Uint8List bytes,
+    required String fileName,
+    String mimeType = 'image/png',
+  }) async {
+    saved.add((bytes: bytes, fileName: fileName));
+    return result;
+  }
 }
 
 /// Drags the peek, not the sheet's full-screen centre (that is the map).

@@ -15,6 +15,8 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
+import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -61,10 +63,17 @@ import 'package:url_launcher/url_launcher.dart';
 /// [_sheetExpanded] toggles which one, so expanding the sheet hides the
 /// floating button instead of stacking both.
 class ReportDetailPage extends StatefulWidget {
-  const ReportDetailPage({super.key, required this.reportId});
+  const ReportDetailPage({super.key, required this.reportId, this.imageSaver});
 
   /// The report id (e.g. `115053-2026-0731-005836`), from the route's `:id`.
   final String reportId;
+
+  /// Saves the report image; null means the platform's own saver.
+  ///
+  /// A test seam, not a product switch: `dart:io`'s `Platform` answers for the
+  /// machine the test runs on, so a widget test could otherwise only ever see
+  /// the unsupported saver and prove nothing about the button.
+  final ImageSaver? imageSaver;
 
   @override
   State<ReportDetailPage> createState() => _ReportDetailPageState();
@@ -72,6 +81,10 @@ class ReportDetailPage extends StatefulWidget {
 
 class _ReportDetailPageState extends State<ReportDetailPage> {
   final ValueNotifier<bool> _sheetExpanded = ValueNotifier(false);
+
+  /// Resolved once: the platform saver opens no resource until it is used, and
+  /// rebuilding the card must not replace the object under it.
+  late final ImageSaver _imageSaver = widget.imageSaver ?? createImageSaver();
 
   /// Guards the bounce below — the error builder runs on every rebuild, and a
   /// second `pop` would take the list away too.
@@ -124,6 +137,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
               builder: (context, report) => _ReportMapDetail(
                 report: report,
                 sheetExpanded: _sheetExpanded,
+                imageSaver: _imageSaver,
               ),
               error: (context, failure, retry) {
                 if (failure is NotFoundFailure) {
@@ -247,9 +261,17 @@ List<_IntensityGroup> _buildIntensityGroups(EarthquakeReport report) {
 /// The map surface: epicentre + per-town intensity dots, framed to the
 /// report's extent, with [_ReportSheet] docked at the bottom.
 class _ReportMapDetail extends StatefulWidget {
-  const _ReportMapDetail({required this.report, required this.sheetExpanded});
+  const _ReportMapDetail({
+    required this.report,
+    required this.sheetExpanded,
+    required this.imageSaver,
+  });
 
   final EarthquakeReport report;
+
+  /// Hands [ReportDetailPage.imageSaver] down to the sheet's report-image card
+  /// — the widget that owns the save button.
+  final ImageSaver imageSaver;
 
   /// Set by [_ReportSheet] as it's dragged — drives the page's floating back
   /// button's visibility (see [ReportDetailPage]).
@@ -529,6 +551,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
             child: _ReportSheet(
               report: widget.report,
               expandedNotifier: widget.sheetExpanded,
+              saver: widget.imageSaver,
             ),
           ),
           // Base-map options (OSM detailed map / terrain relief / township
@@ -577,13 +600,20 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
 /// 詳細資訊 + 各地震度 + report-image content under a pinned "地震報告" header
 /// that stays fixed while that content scrolls.
 class _ReportSheet extends StatefulWidget {
-  const _ReportSheet({required this.report, required this.expandedNotifier});
+  const _ReportSheet({
+    required this.report,
+    required this.expandedNotifier,
+    required this.saver,
+  });
 
   final EarthquakeReport report;
 
   /// Mirrors this sheet's collapsed/expanded state up to the page, so it can
   /// hide its floating back button while the sheet's own header has one.
   final ValueNotifier<bool> expandedNotifier;
+
+  /// Where the report image goes when its save button is tapped.
+  final ImageSaver saver;
 
   /// Collapsed height — sized to the compact summary card.
   static const double peek = 0.32;
@@ -759,7 +789,7 @@ class _ReportSheetState extends State<_ReportSheet> {
           _LocalIntensitySection(report: report),
           if (report.list.isNotEmpty) _AreaIntensitySection(report: report),
           SectionHeader(l10n.reportDetailImage),
-          _ReportImageCard(report: report),
+          _ReportImageCard(report: report, saver: widget.saver),
         ],
       ),
     );
@@ -1665,10 +1695,16 @@ class _TownChip extends StatelessWidget {
 /// caches the picture like any map tile — `Image.network` would hit Flutter's
 /// image pipeline, which has no SQLite store behind it and refetches on every
 /// visit.
+/// The save action sits on the image itself rather than beside the section
+/// header: it only means anything once the bytes are here, and a header action
+/// would have to explain why it is disabled while the picture loads.
 class _ReportImageCard extends StatefulWidget {
-  const _ReportImageCard({required this.report});
+  const _ReportImageCard({required this.report, required this.saver});
 
   final EarthquakeReport report;
+
+  /// Where the picture goes when the save button is tapped.
+  final ImageSaver saver;
 
   @override
   State<_ReportImageCard> createState() => _ReportImageCardState();
@@ -1684,6 +1720,53 @@ class _ReportImageCardState extends State<_ReportImageCard> {
   /// aspect ratio (that varies per event), so it's only a skeleton size; the
   /// image itself sizes to its own natural proportions once loaded.
   static const double _placeholderHeight = 200;
+
+  /// True while the platform is writing; the button shows a spinner and
+  /// ignores a second tap rather than stacking saves of the same picture.
+  bool _saving = false;
+
+  /// Unique per report and recognisable in a gallery: the same report saved
+  /// twice gets `(1)`, `(2)`… from the platform, never an overwrite.
+  String get _fileName => 'dpip-earthquake-${widget.report.id}.png';
+
+  Future<void> _save(Uint8List bytes) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+
+    final result = await widget.saver.saveToGallery(
+      bytes: bytes,
+      fileName: _fileName,
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+
+    final l10n = AppLocalizations.of(context);
+    final refused =
+        result.failureOrNull is ImageSaveFailure &&
+        (result.failureOrNull! as ImageSaveFailure).reason ==
+            ImageSaveFailureReason.permissionDenied;
+    final message = result.when(
+      ok: (_) => l10n.reportDetailImageSaved,
+      // A refusal is not "try again": the only way forward is Settings, so the
+      // two failures must not share a sentence — nor the same snackbar.
+      err: (_) => refused
+          ? l10n.reportDetailImageSavePermissionDenied
+          : l10n.reportDetailImageSaveFailed,
+    );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          action: refused
+              ? SnackBarAction(
+                  label: l10n.permissionOpenSettings,
+                  onPressed: openAppSettingsPage,
+                )
+              : null,
+        ),
+      );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1722,23 +1805,41 @@ class _ReportImageCardState extends State<_ReportImageCard> {
         }
         return ClipRRect(
           borderRadius: AppRadius.medium,
-          child: Image.memory(
-            snapshot.data!,
-            // No forced aspect ratio / BoxFit.cover — the report image's real
-            // proportions vary per event, so this sizes to the image's own
-            // natural aspect ratio at full width instead of cropping or padding.
-            width: double.infinity,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Container(
-              height: _placeholderHeight,
-              width: double.infinity,
-              color: colors.surfaceContainer,
-              alignment: Alignment.center,
-              child: Text(
-                l10n.reportDetailImageUnavailable,
-                style: TextStyle(color: colors.onSurfaceVariant),
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: [
+              Image.memory(
+                snapshot.data!,
+                // No forced aspect ratio / BoxFit.cover — the report image's real
+                // proportions vary per event, so this sizes to the image's own
+                // natural aspect ratio at full width instead of cropping or padding.
+                width: double.infinity,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: _placeholderHeight,
+                  width: double.infinity,
+                  color: colors.surfaceContainer,
+                  alignment: Alignment.center,
+                  child: Text(
+                    l10n.reportDetailImageUnavailable,
+                    style: TextStyle(color: colors.onSurfaceVariant),
+                  ),
+                ),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: IconButton.filledTonal(
+                  onPressed: _saving ? null : () => _save(snapshot.data!),
+                  tooltip: l10n.reportDetailImageSave,
+                  icon: _saving
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.download_rounded),
+                ),
+              ),
+            ],
           ),
         );
       },

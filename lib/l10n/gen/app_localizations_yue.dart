@@ -1229,6 +1229,18 @@ class AppLocalizationsYue extends AppLocalizations {
   String get reportDetailImageUnavailable => '報告圖尚未提供';
 
   @override
+  String get reportDetailImageSave => '儲存圖片';
+
+  @override
+  String get reportDetailImageSaved => '已儲存到相簿';
+
+  @override
+  String get reportDetailImageSaveFailed => '儲存圖片失敗';
+
+  @override
+  String get reportDetailImageSavePermissionDenied => '要相簿權限先可以儲存圖片';
+
+  @override
   String get reportDetailReplay => '重播';
 
   @override

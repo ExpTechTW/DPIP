@@ -565,6 +565,10 @@
   "reportFilterOrderAsc": "오름차순",
   "reportFilterApply": "적용",
   "reportDetailImageUnavailable": "보고서 이미지가 아직 없습니다",
+  "reportDetailImageSave": "이미지 저장",
+  "reportDetailImageSaved": "사진에 저장했습니다",
+  "reportDetailImageSaveFailed": "이미지를 저장하지 못했습니다",
+  "reportDetailImageSavePermissionDenied": "사진 접근을 허용하면 저장할 수 있습니다",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

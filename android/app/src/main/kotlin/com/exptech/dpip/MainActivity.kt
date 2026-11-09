@@ -102,6 +102,11 @@ class MainActivity : FlutterActivity() {
         MethodChannel(messenger, NativeLogChannel.NAME)
             .setMethodCallHandler(NativeLogChannel(applicationContext))
 
+        // Saving an image into the gallery. Same channel name and protocol as
+        // iOS's ImageSaverPlugin.
+        MethodChannel(messenger, ImageSaverChannel.NAME)
+            .setMethodCallHandler(ImageSaverChannel(applicationContext))
+
         // The snapshot bridge for the home-screen Widget. Same channel name and
         // protocol as iOS's WidgetSnapshotPlugin, so the Dart writer is one
         // implementation and the platform is the only difference.

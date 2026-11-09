@@ -565,6 +565,10 @@
   "reportFilterOrderAsc": "น้อย→มาก",
   "reportFilterApply": "ใช้",
   "reportDetailImageUnavailable": "ยังไม่มีภาพรายงาน",
+  "reportDetailImageSave": "บันทึกรูปภาพ",
+  "reportDetailImageSaved": "บันทึกไปยังรูปภาพแล้ว",
+  "reportDetailImageSaveFailed": "บันทึกรูปภาพไม่สำเร็จ",
+  "reportDetailImageSavePermissionDenied": "อนุญาตการเข้าถึงรูปภาพเพื่อบันทึก",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

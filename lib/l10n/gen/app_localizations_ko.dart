@@ -1238,6 +1238,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailImageUnavailable => '보고서 이미지가 아직 없습니다';
 
   @override
+  String get reportDetailImageSave => '이미지 저장';
+
+  @override
+  String get reportDetailImageSaved => '사진에 저장했습니다';
+
+  @override
+  String get reportDetailImageSaveFailed => '이미지를 저장하지 못했습니다';
+
+  @override
+  String get reportDetailImageSavePermissionDenied => '사진 접근을 허용하면 저장할 수 있습니다';
+
+  @override
   String get reportDetailReplay => '다시 보기';
 
   @override

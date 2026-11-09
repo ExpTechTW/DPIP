@@ -565,6 +565,10 @@
   "reportFilterOrderAsc": "Tăng dần",
   "reportFilterApply": "Áp dụng",
   "reportDetailImageUnavailable": "Hình ảnh báo cáo chưa có sẵn",
+  "reportDetailImageSave": "Lưu ảnh",
+  "reportDetailImageSaved": "Đã lưu vào ảnh",
+  "reportDetailImageSaveFailed": "Không lưu được ảnh",
+  "reportDetailImageSavePermissionDenied": "Cho phép truy cập ảnh để lưu",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

@@ -2394,6 +2394,30 @@ abstract class AppLocalizations {
   /// **'Report image not available'**
   String get reportDetailImageUnavailable;
 
+  /// Save button on the CWA report image
+  ///
+  /// In en, this message translates to:
+  /// **'Save image'**
+  String get reportDetailImageSave;
+
+  /// Confirmation after the report image was saved to the photo library
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your photos'**
+  String get reportDetailImageSaved;
+
+  /// Shown when saving the report image failed
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the image'**
+  String get reportDetailImageSaveFailed;
+
+  /// Shown when the photo library refused the report image
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photo access to save the image'**
+  String get reportDetailImageSavePermissionDenied;
+
   /// Button that opens the RTS/EEW replay starting from this report's origin time
   ///
   /// In en, this message translates to:

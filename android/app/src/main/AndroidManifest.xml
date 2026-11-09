@@ -21,6 +21,13 @@
          keeps running on aggressive battery managers (safety-app use). -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
+    <!-- Saving the report image (ImageSaverChannel). Android 9 and below write
+         into the public Pictures directory, which needs this grant; Android 10+
+         goes through MediaStore and needs nothing, so the declaration stops at
+         28 rather than asking for storage the app no longer uses. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
+
     <!-- Bluetooth (meshtastic_flutter / flutter_blue_plus): connect to LoRa
          mesh radios over BLE. The maxSdkVersion=30 pair is the legacy API;
          CONNECT/SCAN cover Android 12+ (runtime permissions, requested by the

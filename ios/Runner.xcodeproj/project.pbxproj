@@ -68,6 +68,7 @@
 		LR0S00000000000000000002 /* LocationReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000001 /* LocationReportSender.swift */; };
 		LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000003 /* LocationReportSenderTests.swift */; };
 		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
+		IMSV00000000000000000002 /* ImageSaverPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = IMSV00000000000000000001 /* ImageSaverPlugin.swift */; };
 		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
 		NS1K00000000000000000002 /* NotificationSettingsLinkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */; };
 		NSE000000000000000000002 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = NSE000000000000000000001 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -206,6 +207,7 @@
 		LR0S00000000000000000001 /* LocationReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSender.swift; sourceTree = "<group>"; };
 		LR0S00000000000000000003 /* LocationReportSenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSenderTests.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
+		IMSV00000000000000000001 /* ImageSaverPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSaverPlugin.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
 		NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsLinkPlugin.swift; sourceTree = "<group>"; };
 		NSE000000000000000000001 /* NotificationService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -501,6 +503,7 @@
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
 				AA0000000000000000000D01 /* DeviceInfoPlugin.swift */,
 				NL0G00000000000000000001 /* NativeLogPlugin.swift */,
+				IMSV00000000000000000001 /* ImageSaverPlugin.swift */,
 				NS1K00000000000000000001 /* NotificationSettingsLinkPlugin.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
@@ -869,6 +872,7 @@
 				AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */,
 				AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */,
 				NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */,
+				IMSV00000000000000000002 /* ImageSaverPlugin.swift in Sources */,
 				NS1K00000000000000000002 /* NotificationSettingsLinkPlugin.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
