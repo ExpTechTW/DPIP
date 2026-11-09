@@ -365,6 +365,18 @@
   "@reportDetailImageUnavailable": {
     "description": "Shown in place of the report image when it fails to load"
   },
+  "@reportDetailImageSave": {
+    "description": "Button under the CWA report image that saves it to the photo library"
+  },
+  "@reportDetailImageSaved": {
+    "description": "Snackbar confirming the CWA report image was saved to the photo library"
+  },
+  "@reportDetailImageSavePermission": {
+    "description": "Snackbar shown when photo-library access is denied, so the report image cannot be saved"
+  },
+  "@reportDetailImageSaveFailed": {
+    "description": "Snackbar shown when saving the report image failed"
+  },
   "meshtasticFirmware": "Firmware",
   "@mapLayerMeshtastic": {
     "description": "Map layer name: mesh nodes"
@@ -1638,6 +1650,10 @@
     "description": "Rainfall accumulation since local midnight (API now)"
   },
   "reportDetailImageUnavailable": "Report image not available",
+  "reportDetailImageSave": "Save image",
+  "reportDetailImageSaved": "Saved to your photo library",
+  "reportDetailImageSavePermission": "Photo library access is off. Turn it on in system settings.",
+  "reportDetailImageSaveFailed": "Couldn't save the image. Try again.",
   "@weatherRankingMergeTo": {
     "description": "Label before township/county merge chips on ranking"
   },

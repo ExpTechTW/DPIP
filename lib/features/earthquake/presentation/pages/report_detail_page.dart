@@ -15,6 +15,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/platform/photo_library.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -1685,6 +1686,36 @@ class _ReportImageCardState extends State<_ReportImageCard> {
   /// image itself sizes to its own natural proportions once loaded.
   static const double _placeholderHeight = 200;
 
+  /// A save is in flight — the button stays visible but disabled so a second
+  /// tap cannot start a second write to the gallery.
+  bool _saving = false;
+
+  /// The section is CWA's picture: save those exact bytes, never a screenshot
+  /// of the card, so what lands in the gallery is the official report at full
+  /// resolution rather than the on-screen, width-scaled copy.
+  Future<void> _save(BuildContext context, Uint8List bytes) async {
+    if (_saving) return;
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    setState(() => _saving = true);
+    final outcome = await PhotoLibrary.saveImage(
+      bytes,
+      name: 'dpip-report-${widget.report.id}',
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+    messenger?.showSnackBar(
+      SnackBar(
+        content: Text(switch (outcome) {
+          PhotoSaveOutcome.saved => l10n.reportDetailImageSaved,
+          PhotoSaveOutcome.permissionDenied =>
+            l10n.reportDetailImageSavePermission,
+          PhotoSaveOutcome.failed => l10n.reportDetailImageSaveFailed,
+        }),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -1720,26 +1751,48 @@ class _ReportImageCardState extends State<_ReportImageCard> {
             ),
           );
         }
-        return ClipRRect(
-          borderRadius: AppRadius.medium,
-          child: Image.memory(
-            snapshot.data!,
-            // No forced aspect ratio / BoxFit.cover — the report image's real
-            // proportions vary per event, so this sizes to the image's own
-            // natural aspect ratio at full width instead of cropping or padding.
-            width: double.infinity,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Container(
-              height: _placeholderHeight,
-              width: double.infinity,
-              color: colors.surfaceContainer,
-              alignment: Alignment.center,
-              child: Text(
-                l10n.reportDetailImageUnavailable,
-                style: TextStyle(color: colors.onSurfaceVariant),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius: AppRadius.medium,
+              child: Image.memory(
+                snapshot.data!,
+                // No forced aspect ratio / BoxFit.cover — the report image's
+                // real proportions vary per event, so this sizes to the image's
+                // own natural aspect ratio at full width instead of cropping or
+                // padding.
+                width: double.infinity,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: _placeholderHeight,
+                  width: double.infinity,
+                  color: colors.surfaceContainer,
+                  alignment: Alignment.center,
+                  child: Text(
+                    l10n.reportDetailImageUnavailable,
+                    style: TextStyle(color: colors.onSurfaceVariant),
+                  ),
+                ),
               ),
             ),
-          ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: _saving
+                    ? null
+                    : () => _save(context, snapshot.data!),
+                icon: _saving
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.download_outlined),
+                label: Text(l10n.reportDetailImageSave),
+              ),
+            ),
+          ],
         );
       },
     );

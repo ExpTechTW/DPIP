@@ -1256,6 +1256,20 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportDetailImageUnavailable => 'Gambar laporan belum tersedia';
 
   @override
+  String get reportDetailImageSave => 'Simpan gambar';
+
+  @override
+  String get reportDetailImageSaved => 'Tersimpan ke galeri foto';
+
+  @override
+  String get reportDetailImageSavePermission =>
+      'Akses galeri foto dimatikan. Aktifkan di pengaturan sistem.';
+
+  @override
+  String get reportDetailImageSaveFailed =>
+      'Gagal menyimpan gambar. Coba lagi.';
+
+  @override
   String get reportDetailReplay => 'Putar ulang';
 
   @override

@@ -563,6 +563,10 @@
   "reportFilterOrderAsc": "升序",
   "reportFilterApply": "套用",
   "reportDetailImageUnavailable": "報告圖尚未提供",
+  "reportDetailImageSave": "儲存圖片",
+  "reportDetailImageSaved": "已儲存到相簿",
+  "reportDetailImageSavePermission": "沒有相簿權限，請到系統設定開啟",
+  "reportDetailImageSaveFailed": "儲存失敗，請稍後再試",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

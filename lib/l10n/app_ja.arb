@@ -563,6 +563,10 @@
   "reportFilterOrderAsc": "昇順",
   "reportFilterApply": "適用",
   "reportDetailImageUnavailable": "レポート画像はまだありません",
+  "reportDetailImageSave": "画像を保存",
+  "reportDetailImageSaved": "写真ライブラリに保存しました",
+  "reportDetailImageSavePermission": "写真ライブラリへのアクセスが許可されていません。システム設定から許可してください。",
+  "reportDetailImageSaveFailed": "画像を保存できませんでした。もう一度お試しください。",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

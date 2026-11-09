@@ -1232,6 +1232,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailImageUnavailable => 'レポート画像はまだありません';
 
   @override
+  String get reportDetailImageSave => '画像を保存';
+
+  @override
+  String get reportDetailImageSaved => '写真ライブラリに保存しました';
+
+  @override
+  String get reportDetailImageSavePermission =>
+      '写真ライブラリへのアクセスが許可されていません。システム設定から許可してください。';
+
+  @override
+  String get reportDetailImageSaveFailed => '画像を保存できませんでした。もう一度お試しください。';
+
+  @override
   String get reportDetailReplay => 'リプレイ';
 
   @override

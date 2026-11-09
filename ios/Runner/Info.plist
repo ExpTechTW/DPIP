@@ -59,6 +59,8 @@
 	<string>DPIP 需要在背景持續存取你的位置，即使關閉 App 也能為你所在地推送地震、天氣等災害警報。</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>DPIP 需要存取相簿，把你選擇的地震報告圖儲存到相簿。</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>WeatherWidgetConfigurationIntent</string>

@@ -1253,6 +1253,20 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportDetailImageUnavailable => 'Hình ảnh báo cáo chưa có sẵn';
 
   @override
+  String get reportDetailImageSave => 'Lưu ảnh';
+
+  @override
+  String get reportDetailImageSaved => 'Đã lưu vào thư viện ảnh';
+
+  @override
+  String get reportDetailImageSavePermission =>
+      'Chưa được cấp quyền truy cập thư viện ảnh. Hãy bật trong cài đặt hệ thống.';
+
+  @override
+  String get reportDetailImageSaveFailed =>
+      'Không lưu được ảnh. Vui lòng thử lại.';
+
+  @override
   String get reportDetailReplay => 'Phát lại';
 
   @override

@@ -20,6 +20,12 @@
     <!-- Onboarding "省電白名單": request Doze exemption so background reporting
          keeps running on aggressive battery managers (safety-app use). -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <!-- Saving the report image to the gallery (gal): Android 10+ writes
+         through MediaStore and needs no permission at all, so this is capped at
+         the API levels that still use the legacy external-storage write —
+         minSdk is 26, so those levels really are reachable. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
 
     <!-- Bluetooth (meshtastic_flutter / flutter_blue_plus): connect to LoRa
          mesh radios over BLE. The maxSdkVersion=30 pair is the legacy API;

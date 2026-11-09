@@ -114,6 +114,13 @@ dependencies:
   # Direct dep: MeshtasticClientImpl's device map holds flutter_blue_plus's
   # BluetoothDevice (meshtastic_flutter doesn't re-export it).
   flutter_blue_plus: ^1.36.8
+  # Saves the CWA report image to the system gallery (地震報告圖 → 儲存).
+  # Wrapped in lib/core/platform/photo_library.dart, which owns the permission
+  # prompt and turns every GalException into an outcome the UI can explain.
+  # iOS 15+/Android 26+ are both inside its floor; it ships a Swift Package
+  # Manager manifest (2.3.1+), which this project needs — there is no
+  # CocoaPods setup. Do not drop below 2.3.1.
+  gal: ^2.3.3
   # Direct dep: the impl requests Bluetooth/location permissions itself so a
   # denial surfaces a typed failure with a settings path.
   permission_handler: ^12.0.3

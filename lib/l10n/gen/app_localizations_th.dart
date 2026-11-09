@@ -1250,6 +1250,20 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportDetailImageUnavailable => 'ยังไม่มีภาพรายงาน';
 
   @override
+  String get reportDetailImageSave => 'บันทึกรูปภาพ';
+
+  @override
+  String get reportDetailImageSaved => 'บันทึกลงอัลบั้มภาพแล้ว';
+
+  @override
+  String get reportDetailImageSavePermission =>
+      'ไม่ได้รับสิทธิ์เข้าถึงอัลบั้มภาพ โปรดเปิดในตั้งค่าระบบ';
+
+  @override
+  String get reportDetailImageSaveFailed =>
+      'บันทึกรูปภาพไม่สำเร็จ โปรดลองอีกครั้ง';
+
+  @override
   String get reportDetailReplay => 'เล่นย้อนหลัง';
 
   @override
