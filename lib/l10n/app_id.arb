@@ -565,6 +565,10 @@
   "reportFilterOrderAsc": "Menaik",
   "reportFilterApply": "Terapkan",
   "reportDetailImageUnavailable": "Gambar laporan belum tersedia",
+  "reportDetailImageSave": "Simpan gambar",
+  "reportDetailImageSaved": "Tersimpan di foto",
+  "reportDetailImageSaveFailed": "Gambar gagal disimpan",
+  "reportDetailImageSavePermissionDenied": "Izinkan akses foto untuk menyimpan gambar",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

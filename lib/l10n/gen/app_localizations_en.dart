@@ -1261,6 +1261,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportDetailImageUnavailable => 'Report image not available';
 
   @override
+  String get reportDetailImageSave => 'Save image';
+
+  @override
+  String get reportDetailImageSaved => 'Saved to your photos';
+
+  @override
+  String get reportDetailImageSaveFailed => 'Couldn\'t save the image';
+
+  @override
+  String get reportDetailImageSavePermissionDenied =>
+      'Allow photo access to save the image';
+
+  @override
   String get reportDetailReplay => 'Replay';
 
   @override

@@ -48,6 +48,29 @@ final class UnexpectedFailure extends Failure {
   const UnexpectedFailure(super.message);
 }
 
+/// An image could not be handed to the platform's photo library.
+///
+/// Its own type because the recovery differs by reason: a refused permission
+/// needs the user in Settings, while a failed write is a plain "try again".
+final class ImageSaveFailure extends Failure {
+  const ImageSaveFailure(this.reason, super.message);
+
+  final ImageSaveFailureReason reason;
+}
+
+/// Why an [ImageSaveFailure] happened.
+enum ImageSaveFailureReason {
+  /// This build has no photo library to save into.
+  unavailable,
+
+  /// The OS refused: photo-library access on iOS, or the legacy storage grant
+  /// on Android 9 and below.
+  permissionDenied,
+
+  /// The write itself failed.
+  failed,
+}
+
 /// A LoRa radio has no free channel slot left for DPIP's own channel.
 ///
 /// Its own type because the recovery is specific and human: DPIP never

@@ -1649,6 +1649,22 @@
     "description": "Rainfall accumulation since local midnight (API now)"
   },
   "reportDetailImageUnavailable": "Report image not available",
+  "@reportDetailImageSave": {
+    "description": "Save button on the CWA report image"
+  },
+  "@reportDetailImageSaved": {
+    "description": "Confirmation after the report image was saved to the photo library"
+  },
+  "@reportDetailImageSaveFailed": {
+    "description": "Shown when saving the report image failed"
+  },
+  "@reportDetailImageSavePermissionDenied": {
+    "description": "Shown when the photo library refused the report image"
+  },
+  "reportDetailImageSave": "Save image",
+  "reportDetailImageSaved": "Saved to your photos",
+  "reportDetailImageSaveFailed": "Couldn't save the image",
+  "reportDetailImageSavePermissionDenied": "Allow photo access to save the image",
   "@weatherRankingMergeTo": {
     "description": "Label before township/county merge chips on ranking"
   },

@@ -25,7 +25,8 @@ lib/
 │   ├── network/           # ApiClient + ApiTier + ApiPaths, region failover,
 │   │                      # SSE, ETag cache, meteor delta decode
 │   ├── notifications/     # FCM/APNs + awesome channels, tap routing seam
-│   ├── platform/          # native-first device_info / compass / battery / tier
+│   ├── platform/          # native-first device_info / compass / battery / tier /
+│   │                      # gallery image saver
 │   ├── realtime/          # polling spine (channel/state/clock/staleness/SSE)
 │   ├── settings/          # typed Prefs facade + persisted/ephemeral controllers
 │   ├── storage/           # SQLite stores (ETag cache, network usage)

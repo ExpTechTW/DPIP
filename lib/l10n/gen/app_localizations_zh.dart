@@ -1229,6 +1229,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportDetailImageUnavailable => '報告圖尚未提供';
 
   @override
+  String get reportDetailImageSave => '儲存圖片';
+
+  @override
+  String get reportDetailImageSaved => '已儲存到相簿';
+
+  @override
+  String get reportDetailImageSaveFailed => '儲存圖片失敗';
+
+  @override
+  String get reportDetailImageSavePermissionDenied => '需要相簿權限才能儲存圖片';
+
+  @override
   String get reportDetailReplay => '重播';
 
   @override
@@ -4779,6 +4791,18 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get reportDetailImageUnavailable => '报告图尚未提供';
+
+  @override
+  String get reportDetailImageSave => '保存图片';
+
+  @override
+  String get reportDetailImageSaved => '已保存到相册';
+
+  @override
+  String get reportDetailImageSaveFailed => '保存图片失败';
+
+  @override
+  String get reportDetailImageSavePermissionDenied => '需要相册权限才能保存图片';
 
   @override
   String get reportDetailReplay => '重播';
@@ -8332,6 +8356,18 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportDetailImageUnavailable => '報告圖尚未提供';
 
   @override
+  String get reportDetailImageSave => '儲存圖片';
+
+  @override
+  String get reportDetailImageSaved => '已儲存到相簿';
+
+  @override
+  String get reportDetailImageSaveFailed => '儲存圖片失敗';
+
+  @override
+  String get reportDetailImageSavePermissionDenied => '需要相簿權限才能儲存圖片';
+
+  @override
   String get reportDetailReplay => '重播';
 
   @override
@@ -11882,6 +11918,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get reportDetailImageUnavailable => '報告圖尚未提供';
+
+  @override
+  String get reportDetailImageSave => '儲存圖片';
+
+  @override
+  String get reportDetailImageSaved => '已儲存到相簿';
+
+  @override
+  String get reportDetailImageSaveFailed => '儲存圖片失敗';
+
+  @override
+  String get reportDetailImageSavePermissionDenied => '需要相簿權限才能儲存圖片';
 
   @override
   String get reportDetailReplay => '重播';

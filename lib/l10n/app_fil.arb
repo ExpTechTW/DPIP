@@ -565,6 +565,10 @@
   "reportFilterOrderAsc": "Pataas",
   "reportFilterApply": "I-apply",
   "reportDetailImageUnavailable": "Wala pang available na larawan ng ulat",
+  "reportDetailImageSave": "I-save ang larawan",
+  "reportDetailImageSaved": "Nai-save sa mga larawan",
+  "reportDetailImageSaveFailed": "Hindi ma-save ang larawan",
+  "reportDetailImageSavePermissionDenied": "Payagan ang access sa mga larawan upang ma-save",
   "@weatherModeSand": {
     "description": "Label for the weatherModeSand option in the experimental backdrop settings."
   },

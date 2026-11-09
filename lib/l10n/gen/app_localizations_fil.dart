@@ -1271,6 +1271,19 @@ class AppLocalizationsFil extends AppLocalizations {
       'Wala pang available na larawan ng ulat';
 
   @override
+  String get reportDetailImageSave => 'I-save ang larawan';
+
+  @override
+  String get reportDetailImageSaved => 'Nai-save sa mga larawan';
+
+  @override
+  String get reportDetailImageSaveFailed => 'Hindi ma-save ang larawan';
+
+  @override
+  String get reportDetailImageSavePermissionDenied =>
+      'Payagan ang access sa mga larawan upang ma-save';
+
+  @override
   String get reportDetailReplay => 'I-replay';
 
   @override
