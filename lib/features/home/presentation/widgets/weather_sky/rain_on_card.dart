@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/realtime/app_time.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
@@ -11,7 +12,6 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glas
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter/scheduler.dart';
 
 /// Puts rain on one card: water caught and pooling along its top edge, and —
 /// while [RainOnCard.glass] is on — droplets clinging to its face.
@@ -33,8 +33,8 @@ import 'package:flutter/scheduler.dart';
 ///      as an earlier version of this did — shows the dots instead.
 ///
 /// The accumulation is not redrawn on every vsync. It is rasterized, off the
-/// UI thread, only when a 20 ms solver step moved the drops, and the previous
-/// image stays on screen until that raster finishes — at most a frame behind.
+/// UI thread, only when a 20 ms solver step moved the drops. A finished raster
+/// waits for the next paced tick before it replaces the image on screen.
 ///
 /// Applied per card rather than to the whole sheet: the reference wets the
 /// card, not the page, and a refraction filter over an entire scrolling list
@@ -109,7 +109,7 @@ class _RainOnCardState extends State<RainOnCard>
     with SingleTickerProviderStateMixin {
   static const String _asset = 'shaders/weather/card_water.frag';
 
-  late final Ticker _ticker = createTicker(_onTick);
+  late final SkyPacedTicker _ticker = SkyPacedTicker(this, _onTick);
 
   /// Two fields — the reference configures two LiquidFun worlds and always
   /// draws both into one buffer.
@@ -160,6 +160,11 @@ class _RainOnCardState extends State<RainOnCard>
   final _WaterImages _water = _WaterImages();
   ui.Image? _retirePos;
   ui.Image? _retireNeg;
+
+  /// Finished passes waiting for the next tick. Publishing them as they land
+  /// would ask for a frame of their own between two paced ticks.
+  ui.Image? _readyPos;
+  ui.Image? _readyNeg;
   bool _rasterInFlight = false;
   bool _rasterAgain = false;
   bool _accumDirty = false;
@@ -495,6 +500,8 @@ class _RainOnCardState extends State<RainOnCard>
       return;
     }
 
+    _publishReady();
+
     // While silhouette mode is waiting on its first capture there is no
     // surface to catch a drop on, so hold emission off rather than fall back
     // to a flat topEdge for a frame or two.
@@ -538,7 +545,32 @@ class _RainOnCardState extends State<RainOnCard>
     }
   }
 
+  void _discardReady() {
+    _readyPos?.dispose();
+    _readyNeg?.dispose();
+    _readyPos = null;
+    _readyNeg = null;
+  }
+
+  void _publishReady() {
+    final pos = _readyPos;
+    final neg = _readyNeg;
+    if (pos == null || neg == null) return;
+    _readyPos = null;
+    _readyNeg = null;
+    // The layer still on screen samples the retired pair until this frame
+    // replaces it, so that generation stays alive.
+    _retirePos?.dispose();
+    _retireNeg?.dispose();
+    _retirePos = _water.pos;
+    _retireNeg = _water.neg;
+    _water.pos = pos;
+    _water.neg = neg;
+    _frame.value++;
+  }
+
   void _clearAccumulation() {
+    _discardReady();
     // Invalidate a raster already in flight so its completion cannot put a
     // picture back up after the card went dry or left the sheet.
     _rasterGen++;
@@ -635,15 +667,11 @@ class _RainOnCardState extends State<RainOnCard>
       posImage?.dispose();
       negImage?.dispose();
     } else {
-      // The layer still on screen samples the retired pair until this frame
-      // replaces it, so that generation stays alive.
-      _retirePos?.dispose();
-      _retireNeg?.dispose();
-      _retirePos = _water.pos;
-      _retireNeg = _water.neg;
-      _water.pos = posImage;
-      _water.neg = negImage;
-      _frame.value++;
+      _discardReady();
+      _readyPos = posImage;
+      _readyNeg = negImage;
+      // A stopped ticker has no next tick to publish on.
+      if (!_ticker.isActive) _publishReady();
     }
     if (!_closed && _rasterAgain && gen == _rasterGen) {
       _rasterAgain = false;
@@ -772,6 +800,7 @@ class _RainOnCardState extends State<RainOnCard>
     _ticker.dispose();
     _frame.dispose();
     _shader?.dispose();
+    _discardReady();
     _water.pos?.dispose();
     _water.neg?.dispose();
     _retirePos?.dispose();

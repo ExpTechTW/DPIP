@@ -3,6 +3,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pa
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_painter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The sky's repaint budget, and the fact that the gap between paints does
@@ -172,8 +173,7 @@ void main() {
       snow: 0,
       lightning: LightningFrame.none,
     );
-    final early =
-        wait - WeatherSkyBackground.paceLead - const Duration(milliseconds: 5);
+    final early = wait - kSkyPaceLead - const Duration(milliseconds: 5);
     // delayed advances the fake clock without flushing a frame, so a timer
     // that restarted the ticker leaves hasScheduledFrame set.
     await tester.binding.delayed(early);
@@ -252,6 +252,208 @@ void main() {
     await tester.binding.delayed(const Duration(seconds: 1));
     expect(tester.binding.hasScheduledFrame, isFalse);
   });
+
+  testWidgets('callbacks registered together share one fire', (tester) async {
+    final fired = <String>[];
+    void first() => fired.add('first');
+    void second() => fired.add('second');
+    addTearDown(() {
+      SkyFramePulse.shared.cancel(first);
+      SkyFramePulse.shared.cancel(second);
+    });
+
+    const wait = Duration(milliseconds: 20);
+    SkyFramePulse.shared.wake(wait, first);
+    SkyFramePulse.shared.wake(wait, second);
+
+    await tester.pump(const Duration(milliseconds: 19));
+    expect(fired, isEmpty);
+
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(fired, ['first', 'second']);
+  });
+
+  testWidgets('a shorter wake brings the shared timer forward', (tester) async {
+    final fired = <String>[];
+    void late() => fired.add('late');
+    void early() => fired.add('early');
+    addTearDown(() {
+      SkyFramePulse.shared.cancel(late);
+      SkyFramePulse.shared.cancel(early);
+    });
+
+    SkyFramePulse.shared.wake(const Duration(milliseconds: 50), late);
+    SkyFramePulse.shared.wake(const Duration(milliseconds: 10), early);
+
+    await tester.pump(const Duration(milliseconds: 9));
+    expect(fired, isEmpty);
+
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(fired, ['late', 'early']);
+  });
+
+  testWidgets('cancelling the last callback leaves no timer', (tester) async {
+    final fired = <String>[];
+    void first() => fired.add('first');
+    void second() => fired.add('second');
+    addTearDown(() {
+      SkyFramePulse.shared.cancel(first);
+      SkyFramePulse.shared.cancel(second);
+    });
+
+    const wait = Duration(milliseconds: 40);
+    SkyFramePulse.shared.wake(wait, first);
+    SkyFramePulse.shared.wake(wait, second);
+    // One waiter remains, so the shared timer stays and fires both that
+    // were still registered — here, only the second.
+    SkyFramePulse.shared.cancel(first);
+    await tester.pump(wait);
+    expect(fired, ['second']);
+
+    SkyFramePulse.shared.wake(wait, first);
+    SkyFramePulse.shared.cancel(first);
+    // Short of [wait], so a timer that survived the last cancel is still
+    // pending when the binding checks, and [first] has not run.
+    await tester.pump(wait - const Duration(milliseconds: 1));
+    expect(fired, ['second']);
+  });
+
+  testWidgets('SkyPacedTicker keeps elapsed across one frame per interval', (
+    tester,
+  ) async {
+    final ticks = <Duration>[];
+    final ticker = await _mountPaced(tester, ticks.add);
+
+    ticker.start();
+    await tester.pump();
+    expect(ticks, [Duration.zero]);
+    expect(ticker.isActive, isTrue);
+    expect(SchedulerBinding.instance.hasScheduledFrame, isFalse);
+
+    // The pulse has not asked for the next frame yet.
+    await tester.binding.delayed(
+      kSkyRainInterval - kSkyPaceLead - const Duration(milliseconds: 1),
+    );
+    expect(SchedulerBinding.instance.hasScheduledFrame, isFalse);
+    expect(ticks, [Duration.zero]);
+
+    // By the interval the early wake has scheduled exactly one frame.
+    await tester.binding.delayed(
+      kSkyPaceLead + const Duration(milliseconds: 1),
+    );
+    expect(SchedulerBinding.instance.hasScheduledFrame, isTrue);
+
+    await tester.pump();
+    expect(ticks, [Duration.zero, kSkyRainInterval]);
+    ticker.dispose();
+  });
+
+  testWidgets('stopping inside onTick does not arm another wake', (
+    tester,
+  ) async {
+    var ticks = 0;
+    late SkyPacedTicker ticker;
+    await tester.pumpWidget(
+      _PaceHost(
+        onCreated: (vsync) {
+          ticker = SkyPacedTicker(vsync, (_) {
+            ticks += 1;
+            ticker.stop();
+          });
+        },
+      ),
+    );
+    addTearDown(ticker.dispose);
+
+    ticker.start();
+    await tester.pump();
+    expect(ticks, 1);
+    expect(ticker.isActive, isFalse);
+    expect(SchedulerBinding.instance.hasScheduledFrame, isFalse);
+
+    await tester.pump(const Duration(seconds: 1));
+    expect(ticks, 1);
+    expect(SchedulerBinding.instance.hasScheduledFrame, isFalse);
+    ticker.dispose();
+  });
+
+  testWidgets('SkyPacedTicker does not tick while TickerMode is off', (
+    tester,
+  ) async {
+    final ticks = <Duration>[];
+    late SkyPacedTicker ticker;
+    late StateSetter setEnabled;
+    var enabled = false;
+
+    await tester.pumpWidget(
+      StatefulBuilder(
+        builder: (context, setState) {
+          setEnabled = setState;
+          return TickerMode(
+            enabled: enabled,
+            child: _PaceHost(
+              onCreated: (vsync) {
+                ticker = SkyPacedTicker(vsync, ticks.add);
+              },
+            ),
+          );
+        },
+      ),
+    );
+    addTearDown(ticker.dispose);
+
+    ticker.start();
+    await tester.pump();
+    await tester.pump(kSkyRainInterval);
+    expect(ticks, isEmpty);
+    expect(SchedulerBinding.instance.hasScheduledFrame, isFalse);
+
+    enabled = true;
+    setEnabled(() {});
+    // The mode change unmutes during this frame, so the tick is the next one.
+    await tester.pump();
+    expect(ticks, isEmpty);
+    await tester.pump();
+    expect(ticks, [Duration.zero]);
+    ticker.dispose();
+  });
+}
+
+Future<SkyPacedTicker> _mountPaced(
+  WidgetTester tester,
+  void Function(Duration elapsed) onTick,
+) async {
+  late SkyPacedTicker ticker;
+  await tester.pumpWidget(
+    _PaceHost(
+      onCreated: (vsync) {
+        ticker = SkyPacedTicker(vsync, onTick);
+      },
+    ),
+  );
+  addTearDown(ticker.dispose);
+  return ticker;
+}
+
+class _PaceHost extends StatefulWidget {
+  const _PaceHost({required this.onCreated});
+
+  final void Function(TickerProvider vsync) onCreated;
+
+  @override
+  State<_PaceHost> createState() => _PaceHostState();
+}
+
+class _PaceHostState extends State<_PaceHost>
+    with SingleTickerProviderStateMixin {
+  @override
+  void initState() {
+    super.initState();
+    widget.onCreated(this);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 WeatherSkyPainter skyPainter(WidgetTester tester) {

@@ -3,9 +3,9 @@ import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_raster.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 /// Edge of the droplet-coverage bake, in pixels. The refract pass samples
 /// this instead of rebuilding the field at the card's resolution.
@@ -163,6 +163,15 @@ class RainOnGlass extends StatefulWidget {
 
   @override
   State<RainOnGlass> createState() => _RainOnGlassState();
+
+  /// When true, the ticker starts even though shader image filters are
+  /// unsupported.
+  ///
+  /// A widget-test backend reports them unsupported, which would otherwise
+  /// leave the ticker stopped. The filter still fails to build, and that
+  /// failure stops the ticker once a field image is shown.
+  @visibleForTesting
+  static bool debugRunTickerWithoutShaderFilter = false;
 }
 
 class _RainOnGlassState extends State<RainOnGlass>
@@ -177,7 +186,7 @@ class _RainOnGlassState extends State<RainOnGlass>
   /// survive the frames in between.
   static const double _step = CardWaterField.emitterTick;
 
-  late final Ticker _ticker = createTicker(_onTick);
+  late final SkyPacedTicker _ticker = SkyPacedTicker(this, _onTick);
   Duration _last = Duration.zero;
   double _carry = 0;
   double _simTime = 0;
@@ -187,6 +196,12 @@ class _RainOnGlassState extends State<RainOnGlass>
   ui.Image? _field;
   ui.Image? _retireField;
   ui.Image? _dummy;
+
+  /// Finished field waiting for the next tick. Publishing it as it lands
+  /// would ask for a frame of its own between two paced ticks.
+  ui.Image? _readyField;
+  double _readyTime = 0;
+  _GlassGrade? _readyGrade;
 
   ui.ImageFilter? _cachedFilter;
   double _cachedOpacity = -1;
@@ -226,13 +241,16 @@ class _RainOnGlassState extends State<RainOnGlass>
   void _syncRunning() {
     // No shader means there can be no visible frame. This also permanently
     // stops the vsync loop on Skia, where a shader image filter cannot exist.
+    // [RainOnGlass.debugRunTickerWithoutShaderFilter] lets a test run the
+    // ticker on that backend anyway.
     //
     // The opacity term mirrors [build]'s own short-circuit: below 0.004 the
     // filter is never built, so a ticker kept alive there only wakes a frame
     // sixty times a second. The header card's opacity reaches exactly 0 once
     // the hero scrolls past the fold, and that is the state this used to spin
     // in (`RainOnCard` gates its own ticker the same way).
-    if (!ui.ImageFilter.isShaderFilterSupported) {
+    if (!ui.ImageFilter.isShaderFilterSupported &&
+        !RainOnGlass.debugRunTickerWithoutShaderFilter) {
       _filterUnsupported = true;
     }
     if (widget.active &&
@@ -254,6 +272,7 @@ class _RainOnGlassState extends State<RainOnGlass>
       _ticker.stop();
       return;
     }
+    _publishReady();
     final dt = _last == Duration.zero
         ? 0.0
         : (elapsed - _last).inMicroseconds / 1e6;
@@ -294,6 +313,21 @@ class _RainOnGlassState extends State<RainOnGlass>
     unawaited(_bake(shader, grade, time));
   }
 
+  void _publishReady() {
+    final image = _readyField;
+    if (image == null || !mounted) return;
+    _readyField = null;
+    // The filter still on screen samples [_retireField] until this frame
+    // replaces it, so the image one generation back stays alive.
+    _retireField?.dispose();
+    _retireField = _field;
+    _field = image;
+    _displayedTime = _readyTime;
+    _bakedGrade = _readyGrade;
+    _cachedFilter = null;
+    setState(() {});
+  }
+
   Future<void> _bake(
     ui.FragmentShader shader,
     _GlassGrade grade,
@@ -324,15 +358,11 @@ class _RainOnGlassState extends State<RainOnGlass>
     if (_closed || !mounted || image == null) {
       image?.dispose();
     } else {
-      // The filter still on screen samples [_retireField] until this frame
-      // replaces it, so the image one generation back stays alive.
-      _retireField?.dispose();
-      _retireField = _field;
-      _field = image;
-      _displayedTime = time;
-      _bakedGrade = grade;
-      _cachedFilter = null;
-      setState(() {});
+      _readyField?.dispose();
+      _readyField = image;
+      _readyTime = time;
+      _readyGrade = grade;
+      if (!_ticker.isActive) _publishReady();
     }
     if (!_closed && _bakeAgain) {
       _bakeAgain = false;
@@ -460,6 +490,7 @@ class _RainOnGlassState extends State<RainOnGlass>
     _fieldShader?.dispose();
     _field?.dispose();
     _retireField?.dispose();
+    _readyField?.dispose();
     _dummy?.dispose();
     super.dispose();
   }
