@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -87,12 +86,6 @@ class WeatherSkyBackground extends StatefulWidget {
   @override
   State<WeatherSkyBackground> createState() => _WeatherSkyBackgroundState();
 
-  /// How early the pace timer wakes, so the next vsync lands near the due
-  /// time. A 120 Hz frame is about 8 ms; waking 6 ms ahead skips the vsync
-  /// that would still be early and catches the one that is due.
-  @visibleForTesting
-  static const Duration paceLead = Duration(milliseconds: 6);
-
   /// Seconds the sky clock reads in tests. Null in the app.
   ///
   /// Frames are timed with a [Stopwatch], which a widget test cannot
@@ -176,13 +169,13 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   /// The next builder invocation paints even when the pace interval has not
   /// elapsed, then clears this. Waiting the interval out would hold the old
   /// sky — a clear frame after the rain had started, or a frozen one after
-  /// the sheet returned to the top. Setting this also drops the pace timer
+  /// the sheet returned to the top. Setting this also drops the pending wake
   /// so that frame is not deferred.
   bool _paintNow = false;
 
-  /// One timer between paints. While it is pending the ticker is stopped,
-  /// so the engine is not asked for a frame.
-  Timer? _paceTimer;
+  /// Whether [_onPaceFired] is registered with [SkyFramePulse]. While it is,
+  /// the ticker is stopped, so the engine is not asked for a frame.
+  bool _pacePending = false;
 
   /// The scene the current build handed the post-frame callback. The
   /// callback decides the wait; build only records it.
@@ -193,7 +186,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   /// Last [TickerMode] value. Null until the first dependency resolution.
   /// A disabled mode is the same as [WeatherSkyBackground.active] false:
-  /// the ticker, the clock and the pace timer all stop, and the timer
+  /// the ticker, the clock and the pending wake all stop, and the wake
   /// must not start them again.
   bool? _tickerModeEnabled;
 
@@ -227,7 +220,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     // is still the transient-callback phase. A post-frame stop is too late:
     // the engine frame is already requested, and cancelling the callback
     // does not clear that request. Stopping here is what leaves no frame
-    // scheduled. The post-frame callback arms the timer once build has
+    // scheduled. The post-frame callback arms the wake once build has
     // decided how long to wait.
     _ticker.addListener(_haltAfterTick);
     _init();
@@ -414,7 +407,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
 
   /// `active`, a loaded scene, and [TickerMode] all have to agree. The sheet
   /// gate stops the sky by clearing `active`; an offstage route does it with
-  /// [TickerMode]. Either one drops the ticker, the clock and the timer.
+  /// [TickerMode]. Either one drops the ticker, the clock and the wake.
   bool get _shouldRun =>
       widget.active && _ready && (_tickerModeEnabled ?? false);
 
@@ -425,7 +418,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       // This runs inside a frame that is already scheduled (load, resume,
       // or a ticker-mode change). repeat() would ask for the next frame
       // too, and stopping the ticker after the frame does not clear that
-      // request. The pace timer is what starts the ticker again.
+      // request. The wake is what starts the ticker again.
     } else {
       _cancelPace();
       if (_clock.isRunning) _clock.stop();
@@ -434,8 +427,9 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
   }
 
   void _cancelPace() {
-    _paceTimer?.cancel();
-    _paceTimer = null;
+    if (!_pacePending) return;
+    _pacePending = false;
+    SkyFramePulse.shared.cancel(_onPaceFired);
   }
 
   @override
@@ -458,7 +452,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     if (oldWidget.active != widget.active) _syncRunning();
     if (weatherChanged || resumed) {
       _paintNow = true;
-      // The frame this update is already in paints the new look. The timer
+      // The frame this update is already in paints the new look. The wake
       // from the previous pace must not hold that paint.
       _cancelPace();
       if (_shouldRun && !_clock.isRunning) _clock.start();
@@ -485,10 +479,10 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     });
   }
 
-  /// Stops the ticker and arms one timer for the time until the next paint
-  /// is due, minus [WeatherSkyBackground.paceLead]. An early tick uses the
-  /// remainder the same way. A weather change has already cancelled the
-  /// previous timer, so this arms the new look's interval.
+  /// Stops the ticker and registers [_onPaceFired] with [SkyFramePulse] for
+  /// the time until the next paint is due, minus [kSkyPaceLead]. An early
+  /// tick uses the remainder the same way. A weather change has already
+  /// cancelled the previous wake, so this arms the new look's interval.
   void _finishPace() {
     if (!mounted) return;
     _ticker.stop();
@@ -497,14 +491,15 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       return;
     }
     final since = _pacePainted ? Duration.zero : _seconds(_paceSincePaint);
-    var wait = _paceInterval - since - WeatherSkyBackground.paceLead;
+    var wait = _paceInterval - since - kSkyPaceLead;
     if (wait < Duration.zero) wait = Duration.zero;
     _cancelPace();
-    _paceTimer = Timer(wait, _onPaceFired);
+    _pacePending = true;
+    SkyFramePulse.shared.wake(wait, _onPaceFired);
   }
 
   void _onPaceFired() {
-    _paceTimer = null;
+    _pacePending = false;
     if (!mounted || !_shouldRun) return;
     if (!_clock.isRunning) _clock.start();
     _ticker.repeat();
@@ -597,7 +592,7 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
             }
             _lastPainter = painter;
             // Build only records the pace. The post-frame callback stops the
-            // ticker and arms the timer, which is what keeps the arm out of
+            // ticker and arms the wake, which is what keeps the arm out of
             // build.
             _paceInterval = interval;
             _paceSincePaint = sincePaint;
