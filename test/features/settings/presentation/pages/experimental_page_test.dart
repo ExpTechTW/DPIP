@@ -26,7 +26,7 @@ Future<ExperimentalSettings> _pump(WidgetTester tester) async {
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const ExperimentalPage(),
+        home: ExperimentalPage(watchWeatherCode: (_) => null),
       ),
     ),
   );
@@ -72,7 +72,6 @@ void main() {
       SkyTimeMode.sunset: l10n.skyTimeSunset,
       SkyTimeMode.dusk: l10n.skyTimeDusk,
       SkyTimeMode.night: l10n.skyTimeNight,
-      SkyTimeMode.auto: l10n.skyTimeAuto,
     };
     for (final entry in sky.entries) {
       await tester.tap(find.widgetWithText(ListTile, entry.value).last);
@@ -80,5 +79,11 @@ void main() {
       expect(settings.skyTimeMode, entry.key);
       expect(settings.weatherMode, WeatherMode.thunderstorm);
     }
+
+    // The Auto row also names what it resolves to, so its text is not exact.
+    await tester.tap(find.textContaining('${l10n.skyTimeAuto} ('));
+    await tester.pumpAndSettle();
+    expect(settings.skyTimeMode, SkyTimeMode.auto);
+    expect(settings.weatherMode, WeatherMode.thunderstorm);
   });
 }

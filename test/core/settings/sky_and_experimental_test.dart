@@ -20,6 +20,23 @@ void main() {
     expect(skyTimeHour(SkyTimeMode.night), 1);
   });
 
+  test('every pinned hour reads back as its own mode', () {
+    for (final mode in SkyTimeMode.values) {
+      final hour = skyTimeHour(mode);
+      if (hour == null) continue;
+      expect(skyTimeModeForHour(hour), mode, reason: 'hour $hour');
+    }
+  });
+
+  test('night runs from the end of dusk to dawn', () {
+    expect(skyTimeModeForHour(19.9), SkyTimeMode.dusk);
+    expect(skyTimeModeForHour(20), SkyTimeMode.night);
+    expect(skyTimeModeForHour(23.9), SkyTimeMode.night);
+    expect(skyTimeModeForHour(0), SkyTimeMode.night);
+    expect(skyTimeModeForHour(4.4), SkyTimeMode.night);
+    expect(skyTimeModeForHour(4.5), SkyTimeMode.dawn);
+  });
+
   test('experimental settings persist a change and ignore a repeat', () async {
     final settings = ExperimentalSettings(SettingsStore.inMemory());
     expect(settings.unlocked, isFalse);

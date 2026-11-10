@@ -8,6 +8,7 @@ import 'package:dpip/features/earthquake/presentation/pages/report_detail_page.d
 import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_replay_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
+import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
@@ -205,7 +206,12 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.experimentalPath,
       name: AppRoutes.experimental,
-      builder: (_, _) => const ExperimentalPage(),
+      builder: (_, _) => ExperimentalPage(
+        watchWeatherCode: (context) =>
+            context.select<HomeWeatherController, int?>(
+              (controller) => controller.weather?.data.weatherCode,
+            ),
+      ),
     ),
     GoRoute(
       path: AppRoutes.logPath,

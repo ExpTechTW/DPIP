@@ -2336,6 +2336,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weatherModeAuto => 'Auto';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto ($mode)';
+  }
+
+  @override
   String get typhoonLabelProbCircle => '70% probability circle';
 
   @override
