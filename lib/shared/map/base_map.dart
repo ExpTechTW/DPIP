@@ -4,7 +4,9 @@ import 'dart:math' show Point;
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/shared/map/map_connectivity.dart';
+import 'package:dpip/shared/map/map_frame_cap.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
@@ -446,7 +448,20 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     // including the ones the app's own tile store would have answered.
     MapConnectivity.instance.attach(controller, controller.forceOnlineMode);
     _syncRender();
+    unawaited(_capFrameRate(controller));
     widget.onMapCreated?.call(controller);
+  }
+
+  /// Applies this device's [mapMaxFps]. The tier is probed asynchronously, so
+  /// a map replaced in the meantime is left alone.
+  Future<void> _capFrameRate(MapLibreMapController controller) async {
+    final fps = mapMaxFps(await deviceRenderTier());
+    if (fps == null || !mounted || !identical(_controller, controller)) return;
+    try {
+      await controller.setMaximumFps(fps);
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'map frame cap');
+    }
   }
 
   void _onStyleLoaded(int mountAttempt) {
