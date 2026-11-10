@@ -171,6 +171,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       context.read<RealtimeService>().clock,
       widget.replayTimestamp,
       cwaOnly: () => cwaOnly.enabled,
+      mlIntensity: context.read<MlIntensityEstimator>(),
     )..start();
     _session.eew.addListener(_syncAnnouncement);
     _immersive = context.read<MapImmersiveController>()
@@ -397,15 +398,16 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                                   builder: (context, _) {
                                     final alerts =
                                         _session.eew.alerts.uncancelled;
+                                    final alertMax = alerts.isEmpty
+                                        ? null
+                                        : alerts
+                                              .map(
+                                                (alert) =>
+                                                    alert.info.max.clamp(0, 9),
+                                              )
+                                              .reduce((a, b) => a > b ? a : b);
                                     final maxEewLevel = legendCeiling(
-                                      reportedMax: alerts.isEmpty
-                                          ? null
-                                          : alerts
-                                                .map(
-                                                  (alert) => alert.info.max
-                                                      .clamp(0, 9),
-                                                )
-                                                .reduce((a, b) => a > b ? a : b),
+                                      reportedMax: alertMax,
                                       paintedMax: _paintedMaxLevel.value,
                                     );
                                     return MapLegendCard(
