@@ -729,6 +729,7 @@ void main() {
             ChangeNotifierProvider<RegionStore>.value(
               value: RegionStore(settings),
             ),
+            Provider<MlIntensityEstimator>.value(value: _Model()),
           ],
           child: MaterialApp.router(
             locale: const Locale('en'),
@@ -912,6 +913,7 @@ void main() {
               ChangeNotifierProvider<RegionStore>.value(
                 value: RegionStore(settings),
               ),
+              Provider<MlIntensityEstimator>.value(value: _Model()),
             ],
             child: MaterialApp.router(
               locale: const Locale('en'),

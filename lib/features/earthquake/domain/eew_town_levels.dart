@@ -70,9 +70,8 @@ int? highestPaintedLevel(Map<String, int> levels) {
   return highest;
 }
 
-/// The legend ceiling for a warning reporting [reportedMax] while its wash
-/// paints up to [paintedMax] — whichever is higher, and null when neither is
-/// known (the caller then shows the full scale).
+/// Includes both the warning's maximum and every level painted on the map.
+/// Returns null only when neither maximum is known.
 int? legendCeiling({int? reportedMax, int? paintedMax}) {
   if (reportedMax == null) return paintedMax;
   if (paintedMax == null || reportedMax >= paintedMax) return reportedMax;
