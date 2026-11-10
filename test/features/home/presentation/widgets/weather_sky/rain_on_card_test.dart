@@ -194,6 +194,69 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
   });
+
+  testWidgets('a solver step rasterizes the accumulation atlas once', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      const MediaQuery(
+        data: MediaQueryData(size: Size(400, 800)),
+        child: MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 280,
+              height: 120,
+              // Face droplets bake their own image. Off, so the counter is
+              // the edge-water atlas and nothing else.
+              child: RainOnCard(
+                intensity: 0.5,
+                glass: false,
+                child: ColoredBox(color: Color(0xFF224466)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await _waitForShader(tester);
+    // Land the first drops and finish any raster already in flight, so the
+    // window below only counts rasters this run starts.
+    for (var i = 0; i < 8; i++) {
+      await tester.pump(const Duration(milliseconds: 32));
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+    }
+    debugResetWeatherRasterCounts();
+
+    for (var i = 0; i < 24; i++) {
+      final steps = debugWeatherSolverSteps;
+      final images = debugWeatherToImageCount;
+      await tester.pump(const Duration(milliseconds: 16));
+      // toImage finishes off the test's fake clock. Waiting here counts a
+      // second raster of the same step, if one were still issued.
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 30)),
+      );
+      expect(
+        debugWeatherToImageCount - images,
+        lessThanOrEqualTo(debugWeatherSolverSteps - steps),
+      );
+    }
+    expect(debugWeatherSolverSteps, greaterThan(0));
+    expect(debugWeatherToImageCount, greaterThan(0));
+    expect(
+      debugWeatherToImageCount,
+      lessThanOrEqualTo(debugWeatherSolverSteps),
+    );
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
 }
 
 Future<void> _waitForShader(WidgetTester tester) async {

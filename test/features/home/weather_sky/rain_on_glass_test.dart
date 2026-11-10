@@ -1,6 +1,9 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glass.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -146,4 +149,112 @@ void main() {
     );
     await tester.pump();
   });
+
+  testWidgets('setting the glass filter does not run performLayout again', (
+    tester,
+  ) async {
+    // The widget-test backend has no shader image filter. A paced tick does
+    // reach publish, then ImageFilter.shader throws and no filter is
+    // installed, so the ticker cannot be what changes the filter. The render
+    // object is given one directly.
+    final layouts = _LayoutCount();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LayoutBuilder(
+          builder: (context, constraints) {
+            return _CountLayouts(
+              count: layouts,
+              child: const RainOnGlass(
+                intensity: 0.8,
+                child: SizedBox.expand(),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    final render = tester.renderObject<RenderRainGlassFiltered>(
+      find.byType(RainGlassFiltered),
+    );
+    expect(render.filter, isNull);
+    expect(render.debugNeedsPaint, isFalse);
+    final afterFirst = layouts.performLayouts;
+    expect(afterFirst, greaterThan(0));
+
+    render.filter = ImageFilter.blur(sigmaX: 1, sigmaY: 1);
+    expect(render.debugNeedsPaint, isTrue);
+    expect(layouts.performLayouts, afterFirst);
+
+    await tester.pump();
+    expect(render.debugNeedsPaint, isFalse);
+    expect(layouts.performLayouts, afterFirst);
+
+    // A later field is a different filter instance on the same render object.
+    render.filter = ImageFilter.blur(sigmaX: 2, sigmaY: 2);
+    expect(
+      render.debugNeedsPaint || render.debugNeedsCompositedLayerUpdate,
+      isTrue,
+    );
+    expect(layouts.performLayouts, afterFirst);
+
+    await tester.pump();
+    expect(layouts.performLayouts, afterFirst);
+  });
+
+  testWidgets('a new filter updates the layer without repainting the child', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      RainGlassFiltered(
+        filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+        child: const SizedBox.expand(),
+      ),
+    );
+    final render = tester.renderObject<RenderRainGlassFiltered>(
+      find.byType(RainGlassFiltered),
+    );
+
+    render.filter = ImageFilter.blur(sigmaX: 2, sigmaY: 2);
+
+    expect(render.debugNeedsCompositedLayerUpdate, isTrue);
+    expect(render.debugNeedsPaint, isFalse);
+    await tester.pump();
+    expect(render.debugNeedsCompositedLayerUpdate, isFalse);
+  });
+}
+
+class _LayoutCount {
+  int performLayouts = 0;
+}
+
+class _CountLayouts extends SingleChildRenderObjectWidget {
+  const _CountLayouts({required this.count, super.child});
+
+  final _LayoutCount count;
+
+  @override
+  _RenderCountLayouts createRenderObject(BuildContext context) {
+    return _RenderCountLayouts(count);
+  }
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant _RenderCountLayouts renderObject,
+  ) {
+    renderObject.count = count;
+  }
+}
+
+class _RenderCountLayouts extends RenderProxyBox {
+  _RenderCountLayouts(this.count);
+
+  _LayoutCount count;
+
+  @override
+  void performLayout() {
+    count.performLayouts++;
+    super.performLayout();
+  }
 }

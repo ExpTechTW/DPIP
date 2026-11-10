@@ -22,25 +22,29 @@
 // lit by the same sky the backdrop shows.
 //
 // 8-bit adaptation: unsigned surfaces cannot hold signed sums, so the Dart
-// side accumulates the **positive and negative parts in two buffers** (same
-// draw, two channel-packed sprites), scaled by the anti-saturation factor the
-// threshold is also scaled by. This pass reassembles `Σn = pos − neg`,
-// giving both `normalize(Σn)` and the self-lit ambient the float original
-// computes.
+// side accumulates the positive and negative parts side by side in one atlas
+// (same draw, two channel-packed sprites), scaled by the anti-saturation
+// factor the threshold is also scaled by. Blank pixels between the halves keep
+// one half's blur and this pass's bilinear fetch off the other. This pass
+// reassembles `Σn = pos − neg`, giving both `normalize(Σn)` and the self-lit
+// ambient the float original computes.
 //
 // Uniform contract — slots are float indices in declaration order.
-//   iResolution  (0..1) field size in pixels
-//   iAmbient     (2..4) the sky-view LUT sample at the panel band (see above)
-//   iSpecular    (5)    specular intensity (1.0 day / 1.2 night, panel branch)
-//   iThreshold   (6)    alpha cut — the grade's cut x the accumulation scale
-//   iAlpha       (7)    scene alpha (`uAlpha`), multiplied into the 0.6
-//   iHour        (8)    local hour 0..23, steers the light sweep
-//   sampler 0: iFieldPos  rgb = Σ(max(n,0)) — positive normal parts
-//   sampler 1: iFieldNeg  rg = Σ(max(−n,0)), b = Σ kernel·0.784 (coverage)
+//   iResolution     (0..1)  one half of the atlas, in pixels
+//   iAmbient        (2..4)  the sky-view LUT sample at the panel band
+//   iSpecular       (5)     specular intensity (1.0 day / 1.2 night)
+//   iThreshold      (6)     alpha cut — the grade's cut x the accumulation scale
+//   iAlpha          (7)     scene alpha (`uAlpha`), multiplied into the 0.6
+//   iHour           (8)     local hour 0..23, steers the light sweep
+//   iFieldScale     (9)     half width / atlas width
+//   iFieldNegOffset (10)    (half width + gutter) / atlas width
+//   sampler 0: iField  left half rgb = Σ(max(n,0)); right half
+//                      rg = Σ(max(−n,0)), b = Σ kernel·0.784 (coverage)
 //
-// Alpha is deliberately unused in both: canvas surfaces store premultiplied
-// colour, so any payload in an alpha-carrying channel would be scaled by it.
-// Both sprites are opaque and every datum lives in a colour channel.
+// Alpha is deliberately unused in both halves: canvas surfaces store
+// premultiplied colour, so any payload in an alpha-carrying channel would be
+// scaled by it. Both sprites are opaque and every datum lives in a colour
+// channel.
 #include <flutter/runtime_effect.glsl>
 
 precision mediump float;
@@ -51,8 +55,9 @@ uniform float iSpecular;
 uniform float iThreshold;
 uniform float iAlpha;
 uniform float iHour;
-uniform sampler2D iFieldPos;
-uniform sampler2D iFieldNeg;
+uniform float iFieldScale;
+uniform float iFieldNegOffset;
+uniform sampler2D iField;
 
 out vec4 fragColor;
 
@@ -66,24 +71,35 @@ const float kSurfaceAlpha = 0.6;
 void main() {
   vec2 uv = FlutterFragCoord().xy / iResolution;
 
-  // Bilinear fetch — samplers bind NEAREST, and the two buffers must be
-  // filtered identically or the reassembled sum tears at texel edges. The
-  // address is the same for both, so it is built once; SkSL rejects samplers
-  // as function parameters, which is why the eight taps sit here together.
+  // Bilinear fetch — the sampler binds NEAREST. Both halves are columns of
+  // iField (SkSL rejects samplers as function parameters, so the eight taps
+  // sit here). A column past the edge of a half is clamped back inside it;
+  // the gutter and the other half must not enter the sum.
   vec2 texel = 1.0 / iResolution;
   vec2 st = uv * iResolution - 0.5;
   vec2 f = fract(st);
   vec2 base = (floor(st) + 0.5) * texel;
-  vec2 dx = vec2(texel.x, 0.0);
-  vec2 dy = vec2(0.0, texel.y);
+  float hx = 0.5 * texel.x;
+  float x0 = clamp(base.x, hx, 1.0 - hx) * iFieldScale;
+  float x1 = clamp(base.x + texel.x, hx, 1.0 - hx) * iFieldScale;
+  float y0 = base.y;
+  float y1 = base.y + texel.y;
   vec3 pos = mix(
-    mix(texture(iFieldPos, base), texture(iFieldPos, base + dx), f.x),
-    mix(texture(iFieldPos, base + dy), texture(iFieldPos, base + texel), f.x),
+    mix(texture(iField, vec2(x0, y0)), texture(iField, vec2(x1, y0)), f.x),
+    mix(texture(iField, vec2(x0, y1)), texture(iField, vec2(x1, y1)), f.x),
     f.y
   ).rgb;
   vec3 neg = mix(
-    mix(texture(iFieldNeg, base), texture(iFieldNeg, base + dx), f.x),
-    mix(texture(iFieldNeg, base + dy), texture(iFieldNeg, base + texel), f.x),
+    mix(
+      texture(iField, vec2(x0 + iFieldNegOffset, y0)),
+      texture(iField, vec2(x1 + iFieldNegOffset, y0)),
+      f.x
+    ),
+    mix(
+      texture(iField, vec2(x0 + iFieldNegOffset, y1)),
+      texture(iField, vec2(x1 + iFieldNegOffset, y1)),
+      f.x
+    ),
     f.y
   ).rgb;
 
