@@ -92,13 +92,13 @@ dependencies:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl
-      ref: 310cc57a068814266402e437b1c767e9acc5ee69
+      ref: 455f0b33c09064d1943a2750d3ef1667d55d1296
   # Direct (not just override) so tests can import the platform interface.
   maplibre_gl_platform_interface:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_platform_interface
-      ref: 310cc57a068814266402e437b1c767e9acc5ee69
+      ref: 455f0b33c09064d1943a2750d3ef1667d55d1296
   # LoRa mesh (Meshtastic) over BLE — off-grid emergency messaging. Requires
   # Bluetooth + location permissions (Android manifest / iOS Info.plist below).
   # Vendored (third_party/) with two upstream fixes: requestMtu is skipped off
@@ -170,12 +170,12 @@ dependency_overrides:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_platform_interface
-      ref: 310cc57a068814266402e437b1c767e9acc5ee69
+      ref: 455f0b33c09064d1943a2750d3ef1667d55d1296
   maplibre_gl_web:
     git:
       url: https://github.com/ExpTechTW/flutter-maplibre-gl.git
       path: maplibre_gl_web
-      ref: 310cc57a068814266402e437b1c767e9acc5ee69
+      ref: 455f0b33c09064d1943a2750d3ef1667d55d1296
 
 flutter:
   config:
