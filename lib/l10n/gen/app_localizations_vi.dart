@@ -2318,6 +2318,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get weatherModeAuto => 'Tự động';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto ($mode)';
+  }
+
+  @override
   String get typhoonLabelProbCircle => 'Vòng tròn xác suất 70%';
 
   @override

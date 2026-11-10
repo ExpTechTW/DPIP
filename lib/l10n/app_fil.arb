@@ -1060,6 +1060,7 @@
   "typhoonOverlayWeatherNone": "Wala",
   "mapLayerStyleGray": "Grayscale (JMA)",
   "weatherModeAuto": "Awtomatiko",
+  "autoResolved": "{auto} ({mode})",
   "typhoonLabelProbCircle": "70% probability circle",
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."

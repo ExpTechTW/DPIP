@@ -1060,6 +1060,7 @@
   "typhoonOverlayWeatherNone": "None",
   "mapLayerStyleGray": "Grayscale (JMA)",
   "weatherModeAuto": "Otomatis",
+  "autoResolved": "{auto} ({mode})",
   "typhoonLabelProbCircle": "Lingkaran probabilitas 70%",
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."

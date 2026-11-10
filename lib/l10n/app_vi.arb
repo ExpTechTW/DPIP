@@ -1060,6 +1060,7 @@
   "typhoonOverlayWeatherNone": "Không có",
   "mapLayerStyleGray": "Thang xám (JMA)",
   "weatherModeAuto": "Tự động",
+  "autoResolved": "{auto} ({mode})",
   "typhoonLabelProbCircle": "Vòng tròn xác suất 70%",
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."

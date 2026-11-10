@@ -15,7 +15,10 @@ import 'package:provider/provider.dart';
 
 const Size _tall = Size(400, 4000);
 
-Future<ExperimentalSettings> _pump(WidgetTester tester) async {
+Future<ExperimentalSettings> _pump(
+  WidgetTester tester, {
+  int? weatherCode,
+}) async {
   tester.view.physicalSize = _tall;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -27,7 +30,7 @@ Future<ExperimentalSettings> _pump(WidgetTester tester) async {
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const ExperimentalPage(),
+        home: ExperimentalPage(watchWeatherCode: (_) => weatherCode),
       ),
     ),
   );
@@ -58,7 +61,6 @@ void main() {
       l10n.weatherModeSand,
       l10n.weatherModeFog,
       l10n.weatherModeThunderstorm,
-      l10n.skyTimeAuto,
       l10n.skyTimeDawn,
       l10n.skyTimeSunrise,
       l10n.skyTimeMorning,
@@ -71,7 +73,27 @@ void main() {
     ]) {
       expect(find.text(label), findsWidgets, reason: 'missing "$label"');
     }
+    expect(find.textContaining('${l10n.skyTimeAuto} ('), findsOneWidget);
     expect(find.byIcon(Icons.check), findsNWidgets(2));
+  });
+
+  testWidgets('Auto names the weather the station reports', (tester) async {
+    await _pump(tester, weatherCode: 200);
+    final l10n = await _en();
+
+    expect(
+      find.text(
+        l10n.autoResolved(l10n.weatherModeAuto, l10n.weatherModeCloudy),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Auto stays plain until the station has a code', (tester) async {
+    await _pump(tester);
+    final l10n = await _en();
+
+    expect(find.text(l10n.weatherModeAuto), findsOneWidget);
   });
 
   testWidgets('tapping rain then noon moves only that axis', (tester) async {

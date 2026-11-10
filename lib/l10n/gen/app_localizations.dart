@@ -4356,6 +4356,12 @@ abstract class AppLocalizations {
   /// **'Auto'**
   String get weatherModeAuto;
 
+  /// An Auto option that also names what Auto resolves to right now, e.g. Auto (Clear).
+  ///
+  /// In en, this message translates to:
+  /// **'{auto} ({mode})'**
+  String autoResolved(String auto, String mode);
+
   /// Forecast point: radius of the 70% track probability circle
   ///
   /// In en, this message translates to:

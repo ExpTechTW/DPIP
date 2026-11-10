@@ -1060,6 +1060,7 @@
   "typhoonOverlayWeatherNone": "ไม่มี",
   "mapLayerStyleGray": "ระดับสีเทา (JMA)",
   "weatherModeAuto": "อัตโนมัติ",
+  "autoResolved": "{auto} ({mode})",
   "typhoonLabelProbCircle": "วงกลมความน่าจะเป็น 70%",
   "@radarCountyOutline": {
     "description": "County-border overlay toggle in the map's radar overlay menu."

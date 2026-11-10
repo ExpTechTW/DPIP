@@ -52,3 +52,21 @@ double? skyTimeHour(SkyTimeMode mode) => switch (mode) {
   SkyTimeMode.dusk => 19.2,
   SkyTimeMode.night => 1.0,
 };
+
+/// The part of the day local [hour] (0..24) falls in: what [SkyTimeMode.auto]
+/// is showing.
+///
+/// Each boundary sits midway between two pinned hours in [skyTimeHour]. Night
+/// is the exception, pinned at 1:00 but running from the end of dusk to dawn.
+SkyTimeMode skyTimeModeForHour(double hour) => switch (hour) {
+  < 4.5 => SkyTimeMode.night,
+  < 5.5 => SkyTimeMode.dawn,
+  < 7.25 => SkyTimeMode.sunrise,
+  < 9.9 => SkyTimeMode.morning,
+  < 13.15 => SkyTimeMode.noon,
+  < 16.25 => SkyTimeMode.afternoon,
+  < 17.95 => SkyTimeMode.golden,
+  < 18.8 => SkyTimeMode.sunset,
+  < 20 => SkyTimeMode.dusk,
+  _ => SkyTimeMode.night,
+};

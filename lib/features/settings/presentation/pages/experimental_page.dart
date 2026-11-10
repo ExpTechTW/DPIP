@@ -1,4 +1,6 @@
+import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
+import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
@@ -13,13 +15,22 @@ import 'package:provider/provider.dart';
 /// axes on purpose: the look is the product of the weather *and* where the
 /// keyframe ring sits, so testing needs both without squaring the entries.
 class ExperimentalPage extends StatelessWidget {
-  const ExperimentalPage({super.key});
+  const ExperimentalPage({super.key, required this.watchWeatherCode});
+
+  /// Watches the live weather code from the page's context. The app wires
+  /// this to the home feed, since one feature cannot import another's.
+  final int? Function(BuildContext context) watchWeatherCode;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final settings = context.watch<ExperimentalSettings>();
     final colors = Theme.of(context).colorScheme;
+    // What Auto is showing right now, from the same inputs the backdrop uses.
+    // The weather stays plain Auto until the station has reported a code.
+    final autoWeather = weatherModeFor(watchWeatherCode(context) ?? 0);
+    final local = AppTime.utc8;
+    final autoSky = skyTimeModeForHour(local.hour + local.minute / 60.0);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.experimentalFeatures)),
@@ -29,7 +40,14 @@ class ExperimentalPage extends StatelessWidget {
           for (final mode in WeatherMode.values)
             ListTile(
               leading: Icon(_iconFor(mode)),
-              title: Text(_labelFor(mode, l10n)),
+              title: Text(
+                mode == WeatherMode.auto && autoWeather != WeatherMode.auto
+                    ? l10n.autoResolved(
+                        l10n.weatherModeAuto,
+                        _labelFor(autoWeather, l10n),
+                      )
+                    : _labelFor(mode, l10n),
+              ),
               trailing: settings.weatherMode == mode
                   ? Icon(Icons.check, color: colors.primary)
                   : null,
@@ -40,7 +58,14 @@ class ExperimentalPage extends StatelessWidget {
           for (final mode in SkyTimeMode.values)
             ListTile(
               leading: Icon(_timeIconFor(mode)),
-              title: Text(_timeLabelFor(mode, l10n)),
+              title: Text(
+                mode == SkyTimeMode.auto
+                    ? l10n.autoResolved(
+                        l10n.skyTimeAuto,
+                        _timeLabelFor(autoSky, l10n),
+                      )
+                    : _timeLabelFor(mode, l10n),
+              ),
               trailing: settings.skyTimeMode == mode
                   ? Icon(Icons.check, color: colors.primary)
                   : null,

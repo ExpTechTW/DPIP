@@ -2323,6 +2323,11 @@ class AppLocalizationsId extends AppLocalizations {
   String get weatherModeAuto => 'Otomatis';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto ($mode)';
+  }
+
+  @override
   String get typhoonLabelProbCircle => 'Lingkaran probabilitas 70%';
 
   @override

@@ -2263,6 +2263,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get weatherModeAuto => '自動';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto（$mode）';
+  }
+
+  @override
   String get typhoonLabelProbCircle => '70%機率圓';
 
   @override
@@ -5804,6 +5809,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get weatherModeAuto => '自动';
+
+  @override
+  String autoResolved(String auto, String mode) {
+    return '$auto（$mode）';
+  }
 
   @override
   String get typhoonLabelProbCircle => '70%概率圆';
@@ -9348,6 +9358,11 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get weatherModeAuto => '自動';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto（$mode）';
+  }
+
+  @override
   String get typhoonLabelProbCircle => '70%機率圓';
 
   @override
@@ -12889,6 +12904,11 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get weatherModeAuto => '自動';
+
+  @override
+  String autoResolved(String auto, String mode) {
+    return '$auto（$mode）';
+  }
 
   @override
   String get typhoonLabelProbCircle => '70%機率圓';
