@@ -216,9 +216,9 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// Bumped on every feed notification, so the ranking card rebuilds with it.
   final ValueNotifier<int> _rankingTick = ValueNotifier(0);
 
-  /// The highest level the current wash paints — the legend's ceiling, which
-  /// [_updateAreaFill] writes and [buildLegend] reads. The warning's own
-  /// reported max is not enough on its own, see [legendCeiling].
+  /// The highest level the current wash paints — the legend must include it
+  /// even when the active alerts' model-derived maximum belongs to another
+  /// warning.
   final ValueNotifier<int?> _paintedMaxLevel = ValueNotifier(null);
 
   /// Brightness captured from the last context-bearing call ([buildLegend] /
@@ -974,12 +974,13 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       listenable: Listenable.merge([_eew, _paintedMaxLevel]),
       builder: (context, _) {
         final alerts = (_eew.state.data ?? const <Eew>[]).uncancelled;
+        final alertMax = alerts.isEmpty
+            ? null
+            : alerts
+                  .map((alert) => alert.info.max.clamp(0, 9))
+                  .reduce((a, b) => a > b ? a : b);
         final maxEewLevel = legendCeiling(
-          reportedMax: alerts.isEmpty
-              ? null
-              : alerts
-                    .map((alert) => alert.info.max.clamp(0, 9))
-                    .reduce((a, b) => a > b ? a : b),
+          reportedMax: alertMax,
           paintedMax: _paintedMaxLevel.value,
         );
         return MapLegendCard(
