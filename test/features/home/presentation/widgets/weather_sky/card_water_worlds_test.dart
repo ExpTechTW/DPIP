@@ -171,11 +171,14 @@ ui.Image _render(
 
   final pos = pass(false);
   final neg = pass(true);
+  final atlas = _packFieldAtlas(pos, neg);
   const hour = 12.0;
   const ambient = [0.25, 0.32, 0.42];
+  final halfWidth = pos.width.toDouble();
+  final atlasWidth = atlas.width.toDouble();
   var i = 0;
   void set(double v) => shader.setFloat(i++, v);
-  set(pos.width.toDouble());
+  set(halfWidth);
   set(pos.height.toDouble());
   set(ambient[0]);
   set(ambient[1]);
@@ -184,8 +187,9 @@ ui.Image _render(
   set(threshold * CardWaterField.accumulationScale);
   set(1.0);
   set(hour);
-  shader.setImageSampler(0, pos);
-  shader.setImageSampler(1, neg);
+  set(halfWidth / atlasWidth);
+  set((halfWidth + _fieldGutter) / atlasWidth);
+  shader.setImageSampler(0, atlas);
 
   final recorder = ui.PictureRecorder();
   Canvas(recorder).drawRect(
@@ -195,8 +199,29 @@ ui.Image _render(
   final picture = recorder.endRecording();
   final image = picture.toImageSync(pos.width, pos.height);
   picture.dispose();
+  atlas.dispose();
   pos.dispose();
   neg.dispose();
+  return image;
+}
+
+/// Blank columns between the halves, so a bilinear tap on one cannot read
+/// the other. Matches the gap the card records.
+const int _fieldGutter = 4;
+
+ui.Image _packFieldAtlas(ui.Image pos, ui.Image neg) {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  final paint = Paint()..filterQuality = FilterQuality.none;
+  canvas.drawImage(pos, Offset.zero, paint);
+  canvas.drawImage(
+    neg,
+    Offset((pos.width + _fieldGutter).toDouble(), 0),
+    paint,
+  );
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(pos.width * 2 + _fieldGutter, pos.height);
+  picture.dispose();
   return image;
 }
 

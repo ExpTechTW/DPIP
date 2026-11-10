@@ -190,14 +190,16 @@ void main() {
     (
       asset: 'shaders/weather/card_water.frag',
       floats: [
-        200, 160, // iResolution
+        200, 160, // iResolution — one half of the atlas
         0.36, 0.42, 0.49, // iAmbient — a rainy sky sample
         1.0, // iSpecular
         0.15, // iThreshold (0.6 × accum scale)
         1.0, // iAlpha
         14.0, // iHour
+        200 / 404, // iFieldScale — half / (half + gutter + half)
+        204 / 404, // iFieldNegOffset
       ],
-      samplers: 2,
+      samplers: 1,
     ),
   ];
 
