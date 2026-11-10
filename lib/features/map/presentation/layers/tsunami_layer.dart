@@ -251,6 +251,16 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
   Timer? _blink;
   int _blinkStep = 0;
 
+  /// Whether the hosting surface can currently be seen. The coast blink
+  /// rewrites layer properties twice a second; while the map sits behind
+  /// another tab those writes have nothing to show, so the timer runs only
+  /// while this is true.
+  bool _surfaceVisible = true;
+
+  /// The bands the blink is painting. Held while the surface is hidden so
+  /// the timer can resume, and cleared when the area layer is removed.
+  Map<String, TsunamiWaveBand>? _blinkBands;
+
   /// Paints each predicted region's coast in its warning band, blinking.
   ///
   /// A region the asset does not know, or one whose colour has no band, is
@@ -276,7 +286,8 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
       sourceLayer: _areaSourceLayer,
       enableInteraction: false,
     );
-    _startBlink(bands);
+    _blinkBands = bands;
+    if (_surfaceVisible) _startBlink(bands);
   }
 
   /// A `match` on the `area` property, as the legacy `AREANAME` one was.
@@ -317,9 +328,26 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
     });
   }
 
+  /// Stops the coast blink while the map is off-screen. The bands stay, so
+  /// showing the map again resumes the same blink.
+  @override
+  void onSurfaceVisibility(bool visible) {
+    _surfaceVisible = visible;
+    if (!visible) {
+      _blink?.cancel();
+      _blink = null;
+      return;
+    }
+    final bands = _blinkBands;
+    if (bands != null) _startBlink(bands);
+  }
+
   Future<void> _removeAreas(MapLibreMapController controller) async {
     _blink?.cancel();
     _blink = null;
+    // The area layer is leaving the map, so a later show must not start a
+    // blink for a coast that is no longer drawn.
+    _blinkBands = null;
     try {
       await controller.removeLayer(_areaLayerId);
     } catch (_) {
@@ -408,6 +436,7 @@ class TsunamiMapLayer with MapLayerDefaults implements MapLayer {
   void onStyleReset() {
     _blink?.cancel();
     _blink = null;
+    _blinkBands = null;
     // The style reload dropped every runtime source and image; the bulletin
     // itself is untouched, and the scaffold's re-render re-adds them. Only the
     // controller is stale.
