@@ -2281,6 +2281,11 @@ class AppLocalizationsYue extends AppLocalizations {
   String get weatherModeAuto => '自動';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto（$mode）';
+  }
+
+  @override
   String get typhoonLabelProbCircle => '70%機率圓';
 
   @override

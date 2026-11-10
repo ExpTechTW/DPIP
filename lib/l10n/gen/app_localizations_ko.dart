@@ -2293,6 +2293,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get weatherModeAuto => '자동';
 
   @override
+  String autoResolved(String auto, String mode) {
+    return '$auto ($mode)';
+  }
+
+  @override
   String get typhoonLabelProbCircle => '70% 확률 원';
 
   @override
