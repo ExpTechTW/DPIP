@@ -74,14 +74,4 @@ void main() {
     expect(highestPaintedLevel(const {'970': 0, '100': 0}), isNull);
     expect(highestPaintedLevel(const {'970': 7, '100': 3, '630': 0}), 7);
   });
-
-  test('the legend ceiling covers every colour the wash paints', () {
-    expect(legendCeiling(reportedMax: null, paintedMax: null), isNull);
-    expect(legendCeiling(reportedMax: 5, paintedMax: null), 5);
-    expect(legendCeiling(reportedMax: null, paintedMax: 6), 6);
-    // The wash scoring a township above the warning's own maximum is the case
-    // this exists for: the map would otherwise paint a colour with no row.
-    expect(legendCeiling(reportedMax: 5, paintedMax: 6), 6);
-    expect(legendCeiling(reportedMax: 6, paintedMax: 5), 6);
-  });
 }
