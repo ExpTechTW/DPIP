@@ -53,6 +53,12 @@ class CardWaterField {
   ui.Image spritePos;
   ui.Image spriteNeg;
 
+  /// Blur margin around [spritePos] and [spriteNeg], in sprite pixels.
+  ///
+  /// The drop itself is the texels inside this border; the border is the
+  /// blur halo. Zero when the sprites are unblurred.
+  double spriteMargin = 0;
+
   /// Hard cap on live drops — `B.a.run()` clamps each world at 200.
   final int capacity;
 
@@ -233,7 +239,7 @@ class CardWaterField {
 
   /// Raster scale of the signed accumulation buffers.
   ///
-  /// The coverage is blurred before it is read back, so half resolution is
+  /// Drop sprites are blurred before they are drawn, so half resolution is
   /// the same film stretched over the card, at a quarter of the pixels.
   static const double accumulationResolution = 0.5;
 
@@ -638,6 +644,13 @@ class CardWaterField {
   /// affected.
   static const double accumulationScale = 0x40 / 0xFF;
 
+  /// How far the metaball cut comes down for pre-blurred sprites.
+  ///
+  /// Blurring a sprite before it is drawn spreads its tail over more pixels,
+  /// and the 8-bit accumulation rounds the faintest of those contributions to
+  /// zero. Lowering the cut this much keeps the drop's area.
+  static const double blurredSpriteCutScale = 0.94;
+
   /// Packs a cell coordinate into one int. The offset keeps negatives (drops
   /// above the edge) on distinct keys.
   static int _key(int cx, int cy) => (cx + 4096) * 8192 + (cy + 4096);
@@ -741,7 +754,10 @@ class CardWaterField {
 
     final w = sprite.width.toDouble();
     final h = sprite.height.toDouble();
-    final scale = dropSize / w;
+    // The margin is the blur halo, not part of the drop, so the payload
+    // inside it is what maps onto [dropSize]. The quad stays centred: the
+    // halo hangs off every side by the same amount.
+    final scale = dropSize / (w - 2 * spriteMargin);
 
     // Every drop samples the whole sprite, so the rect is one value repeated
     // — refilled only when the sprite itself is swapped (the procedural
@@ -1114,6 +1130,40 @@ Future<ui.Image> _imageFromRgba(Uint8List rgba, int size) {
     completer.complete,
   );
   return completer.future;
+}
+
+/// A copy of [src] blurred by the given sigmas, in [src]'s pixels, on a
+/// canvas grown by [margin] on every side so the blur has room.
+///
+/// The sprites are opaque with their payload in colour, so the margin is
+/// opaque black: a blurred sprite contributes nothing past its own kernel.
+ui.Image blurParticleSprite(
+  ui.Image src,
+  double sigmaX,
+  double sigmaY,
+  int margin,
+) {
+  final w = src.width + margin * 2;
+  final h = src.height + margin * 2;
+  final bounds = Rect.fromLTWH(0, 0, w.toDouble(), h.toDouble());
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  canvas.drawRect(bounds, Paint()..color = const Color(0xFF000000));
+  canvas.saveLayer(
+    bounds,
+    Paint()
+      ..imageFilter = ui.ImageFilter.blur(
+        sigmaX: sigmaX,
+        sigmaY: sigmaY,
+        tileMode: TileMode.decal,
+      ),
+  );
+  canvas.drawImage(src, Offset(margin.toDouble(), margin.toDouble()), Paint());
+  canvas.restore();
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(w, h);
+  picture.dispose();
+  return image;
 }
 
 /// Procedural stand-ins for [bakeParticleSprites], matching the generated

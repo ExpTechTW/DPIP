@@ -1,6 +1,9 @@
+import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_deck.dart';
+import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The animated sky must not repaint when it is stopped: the scroll-blur
@@ -87,6 +90,53 @@ void main() {
     expect(debugSkyDeckRenders, lessThan(pumps));
     expect(debugSkyDeckRenders, lessThanOrEqualTo(cap));
   });
+
+  testWidgets('paced rain frames do not lay the backdrop out again', (
+    tester,
+  ) async {
+    // Rain paints on [kSkyRainInterval]. Those frames rebuild the picture
+    // under the [LayoutBuilder] above, and the rebuild must not run layout
+    // again: a layout pass rebuilds the semantics tree.
+    var now = 0.0;
+    WeatherSkyBackground.debugFrameNow = () => now;
+    addTearDown(() => WeatherSkyBackground.debugFrameNow = null);
+
+    final layouts = _LayoutTally();
+    await pumpLoaded(
+      tester,
+      MaterialApp(
+        home: LayoutBuilder(
+          builder: (context, constraints) => _LayoutCount(
+            tally: layouts,
+            child: const WeatherSkyBackground(
+              active: true,
+              mode: WeatherMode.rain,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final laidOut = layouts.count;
+    expect(laidOut, greaterThan(0));
+
+    CustomPainter painterOf() => tester
+        .widget<CustomPaint>(
+          find.descendant(
+            of: find.byType(WeatherSkyBackground),
+            matching: find.byType(CustomPaint),
+          ),
+        )
+        .painter!;
+
+    final firstPaint = painterOf();
+    for (var i = 0; i < 4; i++) {
+      now += 0.016;
+      await tester.pump(kSkyRainInterval);
+    }
+    expect(layouts.count, laidOut);
+    expect(identical(painterOf(), firstPaint), isFalse);
+  });
 }
 
 /// Pumps [widget] and waits for the backdrop's shader/sprite load — a real
@@ -102,4 +152,39 @@ Future<void> pumpLoaded(WidgetTester tester, Widget widget) async {
     await tester.pump();
   }
   expect(paint, findsOneWidget, reason: 'the sky shaders should load');
+}
+
+/// Counts [RenderBox.performLayout] for the box wrapped around the sky.
+class _LayoutTally {
+  int count = 0;
+}
+
+class _LayoutCount extends SingleChildRenderObjectWidget {
+  const _LayoutCount({required this.tally, required super.child});
+
+  final _LayoutTally tally;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderLayoutCount(tally);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderLayoutCount renderObject,
+  ) {
+    renderObject.tally = tally;
+  }
+}
+
+class _RenderLayoutCount extends RenderProxyBox {
+  _RenderLayoutCount(this.tally);
+
+  _LayoutTally tally;
+
+  @override
+  void performLayout() {
+    tally.count += 1;
+    super.performLayout();
+  }
 }

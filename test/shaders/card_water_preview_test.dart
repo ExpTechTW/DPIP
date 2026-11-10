@@ -97,6 +97,7 @@ void main() {
 
     final pos = accumulate(negative: false);
     final neg = accumulate(negative: true);
+    final atlas = _packFieldAtlas(pos, neg);
 
     var i = 0;
     void set(double v) => shader.setFloat(i++, v);
@@ -109,8 +110,10 @@ void main() {
     set(threshold * CardWaterField.accumulationScale);
     set(1.0);
     set(14.0);
-    shader.setImageSampler(0, pos);
-    shader.setImageSampler(1, neg);
+    final atlasWidth = atlas.width.toDouble();
+    set(pos.width / atlasWidth);
+    set((pos.width + _fieldGutter) / atlasWidth);
+    shader.setImageSampler(0, atlas);
 
     // Compose the scene: sky, card, then the water overlay — the exact
     // layering RainOnCard produces.
@@ -171,6 +174,7 @@ void main() {
       }
     }
     image.dispose();
+    atlas.dispose();
     pos.dispose();
     neg.dispose();
     return (
@@ -246,6 +250,26 @@ void main() {
       );
     }
   });
+}
+
+/// Blank columns between the halves, so a bilinear tap on one cannot read
+/// the other. Matches the gap the card records.
+const int _fieldGutter = 4;
+
+ui.Image _packFieldAtlas(ui.Image pos, ui.Image neg) {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  final paint = Paint()..filterQuality = FilterQuality.none;
+  canvas.drawImage(pos, Offset.zero, paint);
+  canvas.drawImage(
+    neg,
+    Offset((pos.width + _fieldGutter).toDouble(), 0),
+    paint,
+  );
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(pos.width * 2 + _fieldGutter, pos.height);
+  picture.dispose();
+  return image;
 }
 
 double _luma(Color c) =>

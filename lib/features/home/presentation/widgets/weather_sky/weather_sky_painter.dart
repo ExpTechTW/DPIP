@@ -233,6 +233,12 @@ class WeatherSkyPainter extends CustomPainter {
   @override
   bool shouldRepaint(WeatherSkyPainter old) => !identical(old.frame, frame);
 
+  // The sky has no semantics. The default follows [shouldRepaint], which would
+  // rebuild the page's semantics on every painted frame whenever an
+  // accessibility service is on.
+  @override
+  bool shouldRebuildSemantics(WeatherSkyPainter oldDelegate) => false;
+
   void _fill(
     Canvas canvas,
     Size size,

@@ -6,6 +6,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_f
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_raster.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// Edge of the droplet-coverage bake, in pixels. The refract pass samples
 /// this instead of rebuilding the field at the card's resolution.
@@ -177,9 +178,6 @@ class RainOnGlass extends StatefulWidget {
 class _RainOnGlassState extends State<RainOnGlass>
     with SingleTickerProviderStateMixin {
   static const String _asset = 'shaders/weather/rain_on_glass.frag';
-  static final ui.ImageFilter _identityFilter = ui.ImageFilter.matrix(
-    Matrix4.identity().storage,
-  );
 
   /// Same clock as the card-water solver. The bead field is a function of
   /// time, so holding [uTime] on this quantum is what lets one [ImageFilter]
@@ -325,7 +323,11 @@ class _RainOnGlassState extends State<RainOnGlass>
     _displayedTime = _readyTime;
     _bakedGrade = _readyGrade;
     _cachedFilter = null;
-    setState(() {});
+    // The new field is published by writing the filter onto the render
+    // object already in the tree. The widget is not rebuilt, so an ancestor
+    // [LayoutBuilder] is not laid out again for this frame.
+    final render = context.findRenderObject();
+    if (render is RenderRainGlassFiltered) render.filter = _activeFilter();
   }
 
   Future<void> _bake(
@@ -396,7 +398,7 @@ class _RainOnGlassState extends State<RainOnGlass>
 
   /// The droplet filter for the current field image. The same instance is
   /// handed back while time, grade and opacity are unchanged, so the card
-  /// snapshot under [ImageFiltered] is not recomposited on an idle frame.
+  /// snapshot under [RainGlassFiltered] is not recomposited on an idle frame.
   ui.ImageFilter? _filterFor(double intensity, double opacity) {
     final field = _field;
     final shader = _shader;
@@ -495,6 +497,15 @@ class _RainOnGlassState extends State<RainOnGlass>
     super.dispose();
   }
 
+  /// Filter applied to the child right now. Null leaves the child unfiltered.
+  ui.ImageFilter? _activeFilter() {
+    final intensity = widget.intensity.clamp(0.0, 1.0);
+    final opacity = widget.opacity.clamp(0.0, 1.0);
+    return intensity < 0.01 || opacity <= 0.004 || _filterUnsupported
+        ? null
+        : _filterFor(intensity, opacity);
+  }
+
   @override
   Widget build(BuildContext context) {
     // The widget tree's SHAPE must not depend on the intensity. `intensity`
@@ -504,21 +515,78 @@ class _RainOnGlassState extends State<RainOnGlass>
     // the in-flight drag. Taps survive it because they complete within a
     // frame; a drag does not.
     //
-    // So the structure is fixed and only `enabled` and the filter change.
+    // So the structure is fixed: [RainGlassFiltered] is always there, and
+    // only its filter changes. A null filter leaves the child unfiltered.
     // The filter object itself is reused until a 20 ms step's raster lands
     // or the opacity / grade actually change.
-    final intensity = widget.intensity.clamp(0.0, 1.0);
-    final opacity = widget.opacity.clamp(0.0, 1.0);
-    final filter = intensity < 0.01 || opacity <= 0.004 || _filterUnsupported
-        ? null
-        : _filterFor(intensity, opacity);
-    return ImageFiltered(
-      // A no-op filter keeps the widget — and so the element tree —
-      // present even when the effect is off.
-      imageFilter: filter ?? _identityFilter,
-      enabled: filter != null,
-      child: widget.child,
-    );
+    return RainGlassFiltered(filter: _activeFilter(), child: widget.child);
+  }
+}
+
+/// Applies [filter] to [child]. A null [filter] draws [child] unchanged.
+///
+/// The element stays either way, so the effect turning on or off does not
+/// reparent [child]. The render object keeps one [ImageFilterLayer] and
+/// replaces the filter on it.
+@visibleForTesting
+class RainGlassFiltered extends SingleChildRenderObjectWidget {
+  const RainGlassFiltered({super.key, required this.filter, super.child});
+
+  /// The filter to apply, or null to leave [child] unfiltered.
+  final ui.ImageFilter? filter;
+
+  @override
+  RenderRainGlassFiltered createRenderObject(BuildContext context) {
+    return RenderRainGlassFiltered(filter);
+  }
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant RenderRainGlassFiltered renderObject,
+  ) {
+    renderObject.filter = filter;
+  }
+}
+
+/// Render object for [RainGlassFiltered].
+///
+/// A null [filter] is the off state: this is a repaint boundary only while a
+/// filter is set, and [updateCompositedLayer] writes that filter onto the
+/// [ImageFilterLayer] it already owns.
+@visibleForTesting
+class RenderRainGlassFiltered extends RenderProxyBox {
+  RenderRainGlassFiltered(ui.ImageFilter? filter) : _filter = filter;
+
+  ui.ImageFilter? get filter => _filter;
+  ui.ImageFilter? _filter;
+  set filter(ui.ImageFilter? value) {
+    if (identical(value, _filter)) return;
+    final toggled = (value == null) != (_filter == null);
+    _filter = value;
+    if (toggled) {
+      markNeedsCompositingBitsUpdate();
+      markNeedsPaint();
+    } else {
+      // A new filter on the layer that is already there. The child's pixels
+      // have not changed, so nothing under this layer is repainted.
+      markNeedsCompositedLayerUpdate();
+    }
+  }
+
+  @override
+  bool get alwaysNeedsCompositing => child != null && filter != null;
+
+  @override
+  bool get isRepaintBoundary => alwaysNeedsCompositing;
+
+  @override
+  OffsetLayer updateCompositedLayer({
+    required covariant ImageFilterLayer? oldLayer,
+  }) {
+    final layer = oldLayer ?? ImageFilterLayer();
+    layer.imageFilter = filter;
+    return layer;
   }
 }
 

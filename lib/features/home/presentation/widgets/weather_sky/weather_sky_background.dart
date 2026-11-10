@@ -519,117 +519,102 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
       return ColoredBox(color: _fallbackColour(widget.mode));
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final scale = _tier == RenderTier.low
-            ? _renderScaleLow
-            : _renderScaleHigh;
-        // The picture is rasterized at this ratio. The deck records its own
-        // image, so it has to apply the ratio itself or 0.4× lands in logical
-        // pixels (about 0.15× of a 2.6× screen).
-        final dpr = MediaQuery.devicePixelRatioOf(context);
-        final painted = AnimatedBuilder(
-          animation: _ticker,
-          builder: (context, _) {
-            final frame = _buildFrame();
-            // Re-bakes only when the resolved keyframe has actually moved.
-            cache.update(frame.sky);
+    final scale = _tier == RenderTier.low ? _renderScaleLow : _renderScaleHigh;
+    // The picture is rasterized at this ratio. The deck records its own
+    // image, so it has to apply the ratio itself or 0.4× lands in logical
+    // pixels (about 0.15× of a 2.6× screen).
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final painted = AnimatedBuilder(
+      animation: _ticker,
+      builder: (context, _) {
+        final frame = _buildFrame();
+        // Re-bakes only when the resolved keyframe has actually moved.
+        cache.update(frame.sky);
 
-            // Gap since the last picture we handed out. A skipped vsync must
-            // not move this mark: particles integrate `dt`, not the clock, so
-            // a mark that advanced on a skip would throw that time away and
-            // slow the rain by the skip ratio.
-            final sincePaint = frame.time - _lastFrameSeconds;
-            final interval = skyFrameInterval(
-              rain: frame.rain,
-              snow: frame.snow,
-              lightning: frame.lightning,
-            );
-            final due =
-                sincePaint * Duration.microsecondsPerSecond >=
-                interval.inMicroseconds;
-
-            // While the animation is stopped (`active: false` — the sheet is
-            // collapsed, or the sky sits under the scroll blur), the scene
-            // cannot change, so a rebuilt painter is byte-identical. Handing
-            // the *same* painter instance back lets RenderCustomPaint skip
-            // the repaint on those rebuilds (it compares by identity) — the
-            // scroll-driven rebuilds of the subtree above this widget
-            // (`_ScrollBlurredWeather`) then cost an element update instead
-            // of a full-screen shader stack re-render on every scroll tick.
-            //
-            // The same reuse applies when the pace interval has not elapsed.
-            // Clouds, stars and the sun do not need a new picture every
-            // vsync; rain, snow and a strike do. A weather change or a resume
-            // paints on this frame anyway (`_paintNow`).
-            final paint =
-                _lastPainter == null || _paintNow || (widget.active && due);
-            final WeatherSkyPainter painter;
-            if (paint) {
-              // Clamped so a dropped frame or a resume from background does
-              // not teleport every particle down the screen in one step.
-              // `sincePaint` is the whole gap, including skipped vsyncs.
-              // Rain's 16 ms and snow's 33 ms stay under the cap, so a paced
-              // step is not shortened.
-              final dt = sincePaint.clamp(0.0, 1 / 20);
-              _lastFrameSeconds = frame.time;
-              _paintNow = false;
-              painter = WeatherSkyPainter(
-                shaders: _shaders,
-                lutCache: cache,
-                cloudSprites: _sprites,
-                sunTextures: _sunTextures,
-                frame: frame,
-                rainField: _rain,
-                snowField: _snow,
-                dt: dt,
-                deck: _deck,
-                renderScale: scale,
-                devicePixelRatio: dpr,
-              );
-            } else {
-              painter = _lastPainter!;
-            }
-            _lastPainter = painter;
-            // Build only records the pace. The post-frame callback stops the
-            // ticker and arms the wake, which is what keeps the arm out of
-            // build.
-            _paceInterval = interval;
-            _paceSincePaint = sincePaint;
-            _pacePainted = paint;
-            _schedulePace();
-            // Its own layer, so a repaint of the sky stops at this boundary
-            // instead of dirtying the layer it shares with the sheet's frosted
-            // chrome and the map's overlay — on Home those are full-screen
-            // offscreen passes, and re-rasterising them once per animated frame
-            // is the single most expensive thing this widget can ask for.
-            return RepaintBoundary(
-              child: CustomPaint(size: Size.infinite, painter: painter),
-            );
-          },
+        // Gap since the last picture we handed out. A skipped vsync must
+        // not move this mark: particles integrate `dt`, not the clock, so
+        // a mark that advanced on a skip would throw that time away and
+        // slow the rain by the skip ratio.
+        final sincePaint = frame.time - _lastFrameSeconds;
+        final interval = skyFrameInterval(
+          rain: frame.rain,
+          snow: frame.snow,
+          lightning: frame.lightning,
         );
+        final due =
+            sincePaint * Duration.microsecondsPerSecond >=
+            interval.inMicroseconds;
 
-        if (!constraints.hasBoundedWidth || !constraints.hasBoundedHeight) {
-          return painted;
+        // While the animation is stopped (`active: false` — the sheet is
+        // collapsed, or the sky sits under the scroll blur), the scene
+        // cannot change, so a rebuilt painter is byte-identical. Handing
+        // the *same* painter instance back lets RenderCustomPaint skip
+        // the repaint on those rebuilds (it compares by identity) — the
+        // scroll-driven rebuilds of the subtree above this widget
+        // (`_ScrollBlurredWeather`) then cost an element update instead
+        // of a full-screen shader stack re-render on every scroll tick.
+        //
+        // The same reuse applies when the pace interval has not elapsed.
+        // Clouds, stars and the sun do not need a new picture every
+        // vsync; rain, snow and a strike do. A weather change or a resume
+        // paints on this frame anyway (`_paintNow`).
+        final paint =
+            _lastPainter == null || _paintNow || (widget.active && due);
+        final WeatherSkyPainter painter;
+        if (paint) {
+          // Clamped so a dropped frame or a resume from background does
+          // not teleport every particle down the screen in one step.
+          // `sincePaint` is the whole gap, including skipped vsyncs.
+          // Rain's 16 ms and snow's 33 ms stay under the cap, so a paced
+          // step is not shortened.
+          final dt = sincePaint.clamp(0.0, 1 / 20);
+          _lastFrameSeconds = frame.time;
+          _paintNow = false;
+          painter = WeatherSkyPainter(
+            shaders: _shaders,
+            lutCache: cache,
+            cloudSprites: _sprites,
+            sunTextures: _sunTextures,
+            frame: frame,
+            rainField: _rain,
+            snowField: _snow,
+            dt: dt,
+            deck: _deck,
+            renderScale: scale,
+            devicePixelRatio: dpr,
+          );
+        } else {
+          painter = _lastPainter!;
         }
-
-        // Rasterise the fast layers small and let the transform upscale.
-        return ClipRect(
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Transform.scale(
-              scale: 1 / scale,
-              alignment: Alignment.topLeft,
-              filterQuality: FilterQuality.low,
-              child: SizedBox(
-                width: (constraints.maxWidth * scale).ceilToDouble(),
-                height: (constraints.maxHeight * scale).ceilToDouble(),
-                child: painted,
-              ),
-            ),
-          ),
+        _lastPainter = painter;
+        // Build only records the pace. The post-frame callback stops the
+        // ticker and arms the wake, which is what keeps the arm out of
+        // build.
+        _paceInterval = interval;
+        _paceSincePaint = sincePaint;
+        _pacePainted = paint;
+        _schedulePace();
+        // Its own layer, so a repaint of the sky stops at this boundary
+        // instead of dirtying the layer it shares with the sheet's frosted
+        // chrome and the map's overlay — on Home those are full-screen
+        // offscreen passes, and re-rasterising them once per animated frame
+        // is the single most expensive thing this widget can ask for.
+        return RepaintBoundary(
+          child: CustomPaint(size: Size.infinite, painter: painter),
         );
       },
+    );
+
+    return ClipRect(
+      child: CustomSingleChildLayout(
+        delegate: _SkyLayout(scale),
+        child: Transform.scale(
+          scale: 1 / scale,
+          alignment: Alignment.topLeft,
+          filterQuality: FilterQuality.low,
+          child: painted,
+        ),
+      ),
     );
   }
 
@@ -714,6 +699,41 @@ class _WeatherSkyBackgroundState extends State<WeatherSkyBackground>
     WeatherMode.fog => const Color(0xFF8A9099),
     _ => const Color(0xFF3F6DAE),
   };
+}
+
+/// Sizes the sky to the space it is given and its picture to [scale] of that,
+/// rounded up to whole pixels, anchored at the top left.
+///
+/// A [SingleChildLayoutDelegate] rather than a [LayoutBuilder]: a builder's
+/// scope turns every rebuild below it into a layout pass, and the sky
+/// rebuilds on every painted frame.
+class _SkyLayout extends SingleChildLayoutDelegate {
+  const _SkyLayout(this.scale);
+
+  final double scale;
+
+  @override
+  Size getSize(BoxConstraints constraints) => Size(
+    constraints.hasBoundedWidth ? constraints.maxWidth : 0,
+    constraints.hasBoundedHeight ? constraints.maxHeight : 0,
+  );
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      BoxConstraints.tightFor(
+        width: constraints.hasBoundedWidth
+            ? (constraints.maxWidth * scale).ceilToDouble()
+            : 0,
+        height: constraints.hasBoundedHeight
+            ? (constraints.maxHeight * scale).ceilToDouble()
+            : 0,
+      );
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) => Offset.zero;
+
+  @override
+  bool shouldRelayout(_SkyLayout oldDelegate) => oldDelegate.scale != scale;
 }
 
 typedef _Look = ({

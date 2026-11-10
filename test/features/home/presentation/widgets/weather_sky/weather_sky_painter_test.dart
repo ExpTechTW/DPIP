@@ -177,17 +177,14 @@ void main() {
     // Same keyframe identity: the cloud-probe memo hits.
     _draw(deck, size);
     expect(deck.shouldRepaint(deck), isFalse);
-    expect(
-      deck.shouldRepaint(
-        _painter(
-          frame: _frame(sun: 0.01),
-          shaders: shaders,
-          sprites: [sprite],
-          lut: lut,
-        ),
-      ),
-      isTrue,
+    final nextFrame = _painter(
+      frame: _frame(sun: 0.01),
+      shaders: shaders,
+      sprites: [sprite],
+      lut: lut,
     );
+    expect(deck.shouldRepaint(nextFrame), isTrue);
+    expect(deck.shouldRebuildSemantics(nextFrame), isFalse);
 
     final storm = LightningFrame(age: 0.2, flash: 1, bolt: 0.6, seed: 9);
     final full = _painter(

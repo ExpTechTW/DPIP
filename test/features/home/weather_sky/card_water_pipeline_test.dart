@@ -74,6 +74,9 @@ void main() {
     final fieldSize = Size(width, cardHeight + headroom);
     final pos = accumulate(field, fieldSize, headroom, negative: false);
     final neg = accumulate(field, fieldSize, headroom, negative: true);
+    // The composite reads one atlas. The copies stay pixel-identical to the
+    // buffers the float reference reads below.
+    final atlas = _packFieldAtlas(pos, neg);
 
     const scale = CardWaterField.accumulationScale;
     const hour = 14.0;
@@ -90,8 +93,10 @@ void main() {
     set(threshold * scale);
     set(1.0); // scene alpha
     set(hour);
-    shader.setImageSampler(0, pos);
-    shader.setImageSampler(1, neg);
+    final atlasWidth = atlas.width.toDouble();
+    set(pos.width / atlasWidth);
+    set((pos.width + _fieldGutter) / atlasWidth);
+    shader.setImageSampler(0, atlas);
 
     final out = ui.PictureRecorder();
     ui.Canvas(out).drawRect(Offset.zero & fieldSize, Paint()..shader = shader);
@@ -219,6 +224,145 @@ void main() {
   });
 
   test(
+    'pre-blurred sprites match a saveLayer blur of the same drops',
+    () async {
+      // The card's blur for this 360×800 screen, in half-resolution
+      // accumulation pixels: σ = 0.46253/355 UV · screen · raster scale.
+      const screen = Size(width, screenHeight);
+      const blurStepUv = 1 / 355;
+      const blurSigmaUv = 0.46253 * blurStepUv;
+      const rasterScale = CardWaterField.accumulationResolution;
+      final sigmaX = blurSigmaUv * screen.width * rasterScale;
+      final sigmaY = blurSigmaUv * screen.height * rasterScale;
+
+      final sprites = buildParticleSprites();
+      final field = CardWaterField(
+        spritePos: sprites.$1,
+        spriteNeg: sprites.$2,
+      );
+      for (var t = 0.0; t < 1.5; t += 1 / 60) {
+        field.update(
+          1 / 60,
+          width: width,
+          screenHeight: screenHeight,
+          intensity: 1,
+          preset: CardWaterPreset.heavy,
+        );
+      }
+      expect(field.liveCount, greaterThan(10));
+
+      final headroom = CardWaterField.spawnHeadroom(screenHeight);
+      final raster = CardWaterField.accumulationSize(
+        Size(width, cardHeight + headroom),
+      );
+      final blur = Paint()
+        ..imageFilter = ui.ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY);
+
+      ui.Image? oldPos;
+      ui.Image? oldNeg;
+      ui.Image? newPos;
+      ui.Image? newNeg;
+      ui.Image? blurredPos;
+      ui.Image? blurredNeg;
+      try {
+        oldPos = _drawCoverage(
+          field,
+          raster,
+          headroom,
+          pointSize,
+          negative: false,
+          blur: blur,
+        );
+        oldNeg = _drawCoverage(
+          field,
+          raster,
+          headroom,
+          pointSize,
+          negative: true,
+          blur: blur,
+        );
+
+        // Sprite-pixel width of the discrete kernel, not the nominal sigma.
+        final spriteW = sprites.$1.width.toDouble();
+        final perSprite = (pointSize / spriteW) * rasterScale;
+        final sx = _effectiveSigma(sigmaX) / perSprite;
+        final sy = _effectiveSigma(sigmaY) / perSprite;
+        final margin = (3 * math.max(sx, sy)).ceil() + 1;
+        blurredPos = blurParticleSprite(sprites.$1, sx, sy, margin);
+        blurredNeg = blurParticleSprite(sprites.$2, sx, sy, margin);
+        field
+          ..spritePos = blurredPos
+          ..spriteNeg = blurredNeg
+          ..spriteMargin = margin.toDouble();
+
+        newPos = _drawCoverage(
+          field,
+          raster,
+          headroom,
+          pointSize,
+          negative: false,
+        );
+        newNeg = _drawCoverage(
+          field,
+          raster,
+          headroom,
+          pointSize,
+          negative: true,
+        );
+
+        final oldPosPx = (await oldPos.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!.buffer.asUint8List();
+        final newPosPx = (await newPos.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!.buffer.asUint8List();
+        final oldNegPx = (await oldNeg.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!.buffer.asUint8List();
+        final newNegPx = (await newNeg.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!.buffer.asUint8List();
+        expect(oldPosPx.length, newPosPx.length);
+        expect(oldNegPx.length, newNegPx.length);
+
+        final pooled = _RgbDiff()
+          ..add(oldPosPx, newPosPx)
+          ..add(oldNegPx, newNegPx);
+        final cut = threshold * CardWaterField.accumulationScale;
+        final newCut = cut * CardWaterField.blurredSpriteCutScale;
+        final (inter, union, oldArea, newArea) = _coverageIou(
+          oldNegPx,
+          newNegPx,
+          cut,
+          newCut,
+        );
+        final iou = union == 0 ? 0.0 : inter / union;
+        final detail =
+            'mean |ΔRGB| r=${pooled.r} g=${pooled.g} b=${pooled.b} '
+            'iou=$iou ($inter/$union) area $newArea vs $oldArea';
+
+        const limit = 4 / 255;
+        expect(pooled.r, lessThanOrEqualTo(limit), reason: detail);
+        expect(pooled.g, lessThanOrEqualTo(limit), reason: detail);
+        expect(pooled.b, lessThanOrEqualTo(limit), reason: detail);
+        // The drops are a few pixels across, so one pixel of edge is a large
+        // part of the union; the area is what the eye reads as drop size.
+        expect(iou, greaterThanOrEqualTo(0.85), reason: detail);
+        expect(newArea / oldArea, inInclusiveRange(0.9, 1.1), reason: detail);
+      } finally {
+        oldPos?.dispose();
+        oldNeg?.dispose();
+        newPos?.dispose();
+        newNeg?.dispose();
+        blurredPos?.dispose();
+        blurredNeg?.dispose();
+        sprites.$1.dispose();
+        sprites.$2.dispose();
+      }
+    },
+  );
+
+  test(
     'the sprites baked from the shipped particle textures decode correctly',
     () async {
       final kernel = await _decodeAsset(
@@ -267,9 +411,116 @@ void main() {
   );
 }
 
+/// Blank columns between the halves, so a bilinear tap on one cannot read
+/// the other. Matches the gap the card records.
+const int _fieldGutter = 4;
+
+ui.Image _packFieldAtlas(ui.Image pos, ui.Image neg) {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  final paint = Paint()..filterQuality = FilterQuality.none;
+  canvas.drawImage(pos, Offset.zero, paint);
+  canvas.drawImage(
+    neg,
+    Offset((pos.width + _fieldGutter).toDouble(), 0),
+    paint,
+  );
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(pos.width * 2 + _fieldGutter, pos.height);
+  picture.dispose();
+  return image;
+}
+
 double _smoothstep(double a, double b, double x) {
   final t = ((x - a) / (b - a)).clamp(0.0, 1.0);
   return t * t * (3 - 2 * t);
 }
 
 double _lerp(double a, double b, double t) => a + (b - a) * t;
+
+/// Standard deviation of the discrete Gaussian kernel of nominal [sigma],
+/// in the same pixels. Below about one pixel the sampled kernel is much
+/// narrower than [sigma].
+double _effectiveSigma(double sigma) {
+  if (sigma <= 0) return 0;
+  final radius = (3 * sigma).ceil();
+  var sum = 1.0;
+  var variance = 0.0;
+  for (var k = 1; k <= radius; k++) {
+    final g = math.exp(-(k * k) / (2 * sigma * sigma));
+    sum += 2 * g;
+    variance += 2 * g * k * k;
+  }
+  return math.sqrt(variance / sum);
+}
+
+/// One signed half of the accumulation. [blur], when set, is applied to the
+/// whole half; without it the field's sprites are drawn as they stand.
+ui.Image _drawCoverage(
+  CardWaterField field,
+  Size raster,
+  double headroom,
+  double dropSize, {
+  required bool negative,
+  Paint? blur,
+}) {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  final half = Offset.zero & raster;
+  canvas.save();
+  canvas.clipRect(half);
+  if (blur != null) canvas.saveLayer(half, blur);
+  canvas.scale(CardWaterField.accumulationResolution);
+  canvas.translate(0, headroom);
+  field.paintCoverage(canvas, dropSize: dropSize, negative: negative);
+  if (blur != null) canvas.restore();
+  canvas.restore();
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(raster.width.ceil(), raster.height.ceil());
+  picture.dispose();
+  return image;
+}
+
+/// Mean absolute RGB error between two rawRgba buffers.
+final class _RgbDiff {
+  int sumR = 0;
+  int sumG = 0;
+  int sumB = 0;
+  int n = 0;
+
+  void add(Uint8List a, Uint8List b) {
+    for (var i = 0; i < a.length; i += 4) {
+      sumR += (a[i] - b[i]).abs();
+      sumG += (a[i + 1] - b[i + 1]).abs();
+      sumB += (a[i + 2] - b[i + 2]).abs();
+      n++;
+    }
+  }
+
+  double get r => sumR / n / 255.0;
+  double get g => sumG / n / 255.0;
+  double get b => sumB / n / 255.0;
+}
+
+/// Coverage is the negative half's blue channel, the channel the card shader
+/// cuts on. A pixel is inside when it is strictly above [cut].
+(int, int, int, int) _coverageIou(
+  Uint8List a,
+  Uint8List b,
+  double aCut,
+  double bCut,
+) {
+  var inter = 0;
+  var union = 0;
+  var aArea = 0;
+  var bArea = 0;
+  for (var i = 0; i < a.length; i += 4) {
+    final aOn = a[i + 2] / 255.0 > aCut;
+    final bOn = b[i + 2] / 255.0 > bCut;
+    if (aOn) aArea++;
+    if (bOn) bArea++;
+    if (aOn && bOn) inter++;
+    if (aOn || bOn) union++;
+  }
+  return (inter, union, aArea, bArea);
+}
