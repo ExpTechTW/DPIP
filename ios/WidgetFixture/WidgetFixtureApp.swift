@@ -3,11 +3,11 @@ import WidgetKit
 
 @main
 struct WidgetFixtureApp: App {
-    private let scenario = MediumWeatherScenario(environment: ProcessInfo.processInfo.environment)
+    private let scenario = WeatherScenario(environment: ProcessInfo.processInfo.environment)
     private let margin: CGFloat = 16
 
     init() {
-        NSTimeZone.default = MediumWeatherScenario.timeZone
+        NSTimeZone.default = WeatherScenario.timeZone
     }
 
     var body: some Scene {
@@ -23,9 +23,9 @@ struct WidgetFixtureApp: App {
                     .accessibilityLabel("Fixture presentation boundary")
                     .accessibilityIdentifier("widget-presentation-boundary")
 
-                MediumCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
+                weatherView
                     .environment(\.locale, scenario.locale)
-                    .environment(\.timeZone, MediumWeatherScenario.timeZone)
+                    .environment(\.timeZone, WeatherScenario.timeZone)
                     .environment(\.dynamicTypeSize, scenario.dynamicTypeSize)
                     .environment(\.colorScheme, .light)
                     .frame(width: scenario.card.width - 2 * margin, height: scenario.card.height - 2 * margin,
@@ -35,16 +35,31 @@ struct WidgetFixtureApp: App {
             }
         }
     }
+
+    @ViewBuilder
+    private var weatherView: some View {
+        if scenario.family == .large {
+            LargeCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
+        } else {
+            MediumCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
+        }
+    }
 }
 
-private struct MediumWeatherScenario {
+private struct WeatherScenario {
+    enum Family: String {
+        case medium, large
+    }
+
     private enum Card: String {
         case narrow, wide
 
-        var size: CGSize {
-            switch self {
-            case .narrow: CGSize(width: 338, height: 158)
-            case .wide: CGSize(width: 364, height: 170)
+        func size(for family: Family) -> CGSize {
+            switch (family, self) {
+            case (.medium, .narrow): CGSize(width: 338, height: 158)
+            case (.medium, .wide): CGSize(width: 364, height: 170)
+            case (.large, .narrow): CGSize(width: 319, height: 318)
+            case (.large, .wide): CGSize(width: 350, height: 365)
             }
         }
     }
@@ -111,14 +126,16 @@ private struct MediumWeatherScenario {
     private let language: Language
     private let textSize: TextSize
     private let location: Location
+    let family: Family
     let card: CGSize
 
     init(environment: [String: String]) {
+        family = Self.option("DPIP_FIXTURE_FAMILY", default: .medium, environment: environment)
         forecast = Self.option("DPIP_FIXTURE_FORECAST", default: .stale, environment: environment)
         language = Self.option("DPIP_FIXTURE_LANGUAGE", default: .en, environment: environment)
         textSize = Self.option("DPIP_FIXTURE_TEXT_SIZE", default: .normal, environment: environment)
         location = Self.option("DPIP_FIXTURE_LOCATION", default: .short, environment: environment)
-        card = Self.option("DPIP_FIXTURE_CARD", default: Card.narrow, environment: environment).size
+        card = Self.option("DPIP_FIXTURE_CARD", default: Card.narrow, environment: environment).size(for: family)
     }
 
     private static func option<Value: RawRepresentable>(
