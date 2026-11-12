@@ -2,23 +2,26 @@
 /// that difference is cancelled out.
 ///
 /// `addImage` has no pixel-ratio argument in this fork, so every icon's
-/// on-screen size is fixed by the density the platform records **with the
-/// image**, and the two platforms disagree:
+/// on-screen size is fixed by the density recorded on the bitmap. MapLibre
+/// Android turns that into a pixel ratio with `bitmap.getDensity() / 160`
+/// (`Style.toImage`). The two platforms record the density differently:
 ///
 /// - **iOS** decodes at `UIScreen.main.scale` (`MapLibreMapController.swift`,
 ///   `style#addImage`), so a 64px badge is 64/3 ≈ 21pt on a 3x phone and 64pt
 ///   on a 1x display.
-/// - **Android** decodes with `inDensity = 0`, which leaves the bitmap at
-///   Android's default density (160dpi) and makes MapLibre's
-///   `bitmap.getDensity() / 160` a pixel ratio of **1.0** on every device
-///   (`MapLibreMapController.java`, `style#addImage`). A 64px badge therefore
-///   lands at 64dp — three times the iPhone's.
+/// - **Android** decodes with `inScaled = false`, `inDensity = 0` and
+///   `inTargetDensity = 0` (`MapLibreMapController.java`, `style#addImage`)
+///   so the pixels are not resampled. The icon-size curve used to multiply by
+///   a fixed `1/3`, which cancels the divisor only when that pixel ratio is 1
+///   — an mdpi panel, and the 540×960 emulator this was tuned on. On a denser
+///   phone the bitmap density follows the display, so the same `1/3` shrinks
+///   the badge by the screen scale a second time. That is the report map on a
+///   1080×2340 device: the town digits are still there, and too small to read.
 ///
-/// So the same `icon-size` curve renders at three different physical sizes.
-/// [mapIconDensityFactor] is the multiplier that cancels the platform's own
-/// divisor, expressed against the size the design was drawn at: a 3x iPhone.
-/// Multiply every pixel-based icon-size curve by it and the curve's numbers
-/// mean dp/pt on both platforms, at every density.
+/// [mapIconDensityFactor] cancels the platform divisor against the size the
+/// design was drawn at: a 3x iPhone. On both phones the divisor is the screen
+/// scale. Multiply every pixel-based icon-size curve by the factor and the
+/// curve's numbers mean dp/pt at every density.
 library;
 
 import 'dart:io';
@@ -37,12 +40,19 @@ const double _referenceImageScale = 3;
 ///
 /// `renderedPoints = artworkPixels × iconSize / platformDivisor`, so
 /// `iconSize = curve × platformDivisor / referenceScale` renders
-/// `artworkPixels × curve / referenceScale` **points** everywhere — the 3x
-/// iPhone size — instead of on Android three times that.
+/// `artworkPixels × curve / referenceScale` points everywhere — the 3x
+/// iPhone size.
+///
+/// On both phones the divisor is the screen scale: iOS records
+/// `UIScreen.main.scale` on the image, Android records the display density
+/// and MapLibre divides it by 160. Pass [devicePixelRatio] from the widget
+/// tree when there is one; production otherwise reads the dispatcher. The
+/// report map already passes the ratio it measured.
 ///
 /// The arguments exist to test the selection: `dart:io` `Platform` answers for
 /// the machine the test runs on, and `PlatformDispatcher` in a widget test is
-/// not a phone's. Production passes neither.
+/// not a phone's. Production passes neither, except the report map, which
+/// passes the ratio.
 double mapIconDensityFactor({
   double? devicePixelRatio,
   bool? isIOS,
@@ -51,7 +61,6 @@ double mapIconDensityFactor({
   final ios = isIOS ?? Platform.isIOS;
   final android = isAndroid ?? Platform.isAndroid;
   if (!ios && !android) return 1;
-  if (!ios) return 1 / _referenceImageScale; // Android's divisor is a fixed 1.
   final ratio = devicePixelRatio ?? _dispatcherPixelRatio();
   return ratio / _referenceImageScale;
 }

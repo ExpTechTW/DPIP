@@ -1,7 +1,8 @@
-/// The intensity artwork is a fixed 64px canvas, and the two platforms turn
-/// those pixels into points differently — so the same `icon-size` curve used to
-/// draw a station badge three times larger on Android. These pin the factor
-/// that cancels that out.
+/// The intensity artwork is a fixed 64px canvas. MapLibre divides those
+/// pixels by the scale recorded with the bitmap — the screen scale on both
+/// iOS and Android — so the icon-size curve is multiplied by
+/// `devicePixelRatio / 3` to land on the 3x iPhone size. A constant `1/3`
+/// only did that on an mdpi Android panel.
 library;
 
 import 'package:dpip/shared/map/map_image_density.dart';
@@ -9,8 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   /// What a [artworkPixels] icon actually renders at, in points: MapLibre
-  /// divides the image's pixels by the density the platform recorded with it
-  /// (the screen scale on iOS, a fixed 1 on Android).
+  /// divides the image's pixels by the density the platform recorded with it.
+  /// On both phones that divisor is the screen scale.
   double renderedPoints({
     required int artworkPixels,
     required List<Object> curve,
@@ -28,10 +29,18 @@ void main() {
     );
   });
 
-  test('an Android device always divides by 1, so the factor is 1/3', () {
+  test('Android follows the screen scale; only mdpi stays at 1/3', () {
     expect(
-      mapIconDensityFactor(isIOS: false, isAndroid: true),
+      mapIconDensityFactor(isIOS: false, isAndroid: true, devicePixelRatio: 1),
       closeTo(1 / 3, 1e-9),
+    );
+    expect(
+      mapIconDensityFactor(isIOS: false, isAndroid: true, devicePixelRatio: 2),
+      closeTo(2 / 3, 1e-9),
+    );
+    expect(
+      mapIconDensityFactor(isIOS: false, isAndroid: true, devicePixelRatio: 3),
+      closeTo(1.0, 1e-9),
     );
   });
 
@@ -55,21 +64,34 @@ void main() {
 
   test('the curve carries the factor', () {
     final unscaled = intensityIconSizeCurve(1);
-    final android = intensityIconSizeCurve(1 / 3);
+    final mdpi = intensityIconSizeCurve(1 / 3);
 
     expect(iconSizeAt(unscaled, 5), closeTo(0.75, 1e-9));
     expect(iconSizeAt(unscaled, 15), closeTo(1.7, 1e-9));
-    expect(iconSizeAt(android, 5), closeTo(0.25, 1e-9));
-    expect(iconSizeAt(android, 15), closeTo(1.7 / 3, 1e-9));
+    expect(iconSizeAt(mdpi, 5), closeTo(0.25, 1e-9));
+    expect(iconSizeAt(mdpi, 15), closeTo(1.7 / 3, 1e-9));
   });
 
   test('every platform now renders the badge at the same point size', () {
-    // The three cases behind the 540×960 emulator report: Android's fixed
-    // divisor, a 3x iPhone, and a 1x display.
+    // Android's divisor is the screen scale, same as iOS. The 540×960
+    // emulator is the mdpi row; a 1080×2340 phone is the 3x row.
     final cases = <({double factor, double divisor, String name})>[
       (
-        name: 'Android',
-        factor: mapIconDensityFactor(isIOS: false, isAndroid: true),
+        name: 'Android 3x',
+        factor: mapIconDensityFactor(
+          isIOS: false,
+          isAndroid: true,
+          devicePixelRatio: 3,
+        ),
+        divisor: 3,
+      ),
+      (
+        name: 'Android mdpi',
+        factor: mapIconDensityFactor(
+          isIOS: false,
+          isAndroid: true,
+          devicePixelRatio: 1,
+        ),
         divisor: 1,
       ),
       (
