@@ -61,12 +61,18 @@ final class MediumWeatherUITests: XCTestCase {
     private enum Card: String {
         case narrow, wide
 
-        var size: CGSize {
-            switch self {
-            case .narrow: CGSize(width: 338, height: 158)
-            case .wide: CGSize(width: 364, height: 170)
+        func size(for family: Family) -> CGSize {
+            switch (family, self) {
+            case (.medium, .narrow): CGSize(width: 338, height: 158)
+            case (.medium, .wide): CGSize(width: 364, height: 170)
+            case (.large, .narrow): CGSize(width: 319, height: 318)
+            case (.large, .wide): CGSize(width: 350, height: 365)
             }
         }
+    }
+
+    private enum Family: String {
+        case medium, large
     }
 
     private let hours = ["16:00", "17:00", "18:00", "19:00", "20:00"]
@@ -158,7 +164,8 @@ final class MediumWeatherUITests: XCTestCase {
     }
 
     private func launch(
-        _ forecast: Forecast, language: Language, size: TextSize, location: Location, card: Card
+        _ forecast: Forecast, language: Language, size: TextSize, location: Location, card: Card,
+        family: Family = .medium
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = [
@@ -167,6 +174,7 @@ final class MediumWeatherUITests: XCTestCase {
             "DPIP_FIXTURE_TEXT_SIZE": size.rawValue,
             "DPIP_FIXTURE_LOCATION": location.rawValue,
             "DPIP_FIXTURE_CARD": card.rawValue,
+            "DPIP_FIXTURE_FAMILY": family.rawValue,
         ]
         app.launch()
         return app
@@ -230,7 +238,7 @@ final class MediumWeatherUITests: XCTestCase {
     }
 
     private func assertCurrentWeather(
-        _ app: XCUIApplication, language: Language, location: Location, card: Card
+        _ app: XCUIApplication, language: Language, location: Location, card: Card, family: Family = .medium
     ) -> (bounds: CGRect, location: CGRect, time: CGRect, forecast: CGRect)? {
         guard texts(app, label: location.label).firstMatch.waitForExistence(timeout: 10) else {
             XCTFail("Missing fixture location '\(location.label)'; widget accessibility content did not load")
@@ -245,8 +253,9 @@ final class MediumWeatherUITests: XCTestCase {
               let temperature = requireOne(texts(app, label: "32°"), "Current temperature") else { return nil }
 
         let bounds = marker.frame
-        XCTAssertEqual(bounds.width, card.size.width, accuracy: tolerance)
-        XCTAssertEqual(bounds.height, card.size.height, accuracy: tolerance)
+        let expectedSize = card.size(for: family)
+        XCTAssertEqual(bounds.width, expectedSize.width, accuracy: tolerance)
+        XCTAssertEqual(bounds.height, expectedSize.height, accuracy: tolerance)
         XCTAssertEqual(time.elementType, .staticText)
         XCTAssertEqual(elements(app, label: language.timeLabel(utcHour: 7)).count, 0, "Entry time must not replace observation time")
         let header = bounds.insetBy(dx: margin, dy: margin)
@@ -354,5 +363,94 @@ final class MediumWeatherUITests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+}
+
+extension MediumWeatherUITests {
+    func testLargeStaleHeaderUsesLocalizedText() {
+        for language in [Language.traditionalChinese, .en] {
+            XCTContext.runActivity(named: language.rawValue) { _ in
+                assertLargeStaleHeader(language, location: .compact, card: .wide, warningRole: .staticText)
+            }
+        }
+    }
+
+    func testLargeNarrowJapaneseStaleHeaderUsesLocalizedWarningIcon() {
+        assertLargeStaleHeader(.ja, location: .longChinese, card: .narrow, warningRole: .image)
+    }
+
+    func testLargeAccessibilityStaleWarningFollowsForecastRows() {
+        let language = Language.traditionalChinese
+        let app = launch(.stale, language: language, size: .accessibility, location: .xitun, card: .wide, family: .large)
+        guard let layout = assertCurrentWeather(app, language: language, location: .xitun, card: .wide, family: .large),
+              let warning = assertLargeWarning(app, language: language, role: .staticText) else { return }
+
+        for index in 0..<2 {
+            let rows = app.descendants(matching: .any).matching(NSPredicate(
+                format: "label CONTAINS %@ AND label CONTAINS %@ AND label CONTAINS %@",
+                hours[index], temperatures[index], probabilities[index]
+            ))
+            guard let row = requireOne(rows, "Accessible forecast row at \(hours[index])") else { return }
+            assertInside(row.frame, layout.forecast, "Accessible forecast row")
+            XCTAssertLessThanOrEqual(row.frame.maxY, warning.frame.minY + tolerance)
+        }
+        assertInside(warning.frame, layout.forecast, "Warning below forecast")
+        _ = assertRefresh(app, label: language.expected.refresh, region: layout.forecast)
+        capture("large-stale-ax1-zh-Hant")
+    }
+
+    func testLargeNonStaleForecastsExposeNoWarning() {
+        let language = Language.traditionalChinese
+        for forecast in [Forecast.fresh, .expired, .unavailable] {
+            XCTContext.runActivity(named: forecast.rawValue) { _ in
+                let app = launch(forecast, language: language, size: .normal, location: .xitun, card: .wide, family: .large)
+                guard let layout = assertCurrentWeather(app, language: language, location: .xitun,
+                                                        card: .wide, family: .large) else { return }
+                if forecast == .fresh {
+                    guard assertForecast(app, size: .normal, card: .wide, region: layout.forecast) != nil else { return }
+                    XCTAssertEqual(app.buttons.count, 0)
+                } else {
+                    guard requireOne(texts(app, label: language.unavailableLabel), "Forecast unavailable status") != nil,
+                          assertRefresh(app, label: language.expected.refresh, region: layout.forecast) != nil else { return }
+                }
+                XCTAssertEqual(largeWarningElements(app, language: language).count, 0)
+                capture("large-\(forecast.rawValue)-zh-Hant")
+            }
+        }
+    }
+
+    private func assertLargeStaleHeader(
+        _ language: Language, location: Location, card: Card, warningRole: XCUIElement.ElementType
+    ) {
+        let app = launch(.stale, language: language, size: .normal, location: location, card: card, family: .large)
+        guard let layout = assertCurrentWeather(app, language: language, location: location, card: card, family: .large),
+              let warning = assertLargeWarning(app, language: language, role: warningRole) else { return }
+
+        let frame = warning.frame
+        assertInside(frame, layout.bounds.insetBy(dx: margin, dy: margin), "Large stale warning")
+        XCTAssertLessThanOrEqual(layout.location.maxX, frame.minX + tolerance)
+        XCTAssertLessThanOrEqual(frame.maxX, layout.time.minX + tolerance, "Warning must precede observation time")
+        XCTAssertGreaterThan(min(frame.maxY, layout.time.maxY), max(frame.minY, layout.time.minY),
+                             "Warning and observation time must share a row")
+        let labels = [language.expected.warning, language.timeLabel(utcHour: 6)]
+        let headerElements = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label IN %@", labels)).allElementsBoundByIndex
+        XCTAssertEqual(headerElements.map(\.label), labels, "XCUI tree must list the warning before observation time")
+        _ = assertRefresh(app, label: language.expected.refresh, region: layout.forecast)
+        capture("large-stale-\(language.rawValue)")
+    }
+
+    private func assertLargeWarning(
+        _ app: XCUIApplication, language: Language, role: XCUIElement.ElementType
+    ) -> XCUIElement? {
+        guard let warning = requireOne(largeWarningElements(app, language: language), "Large stale warning") else { return nil }
+        XCTAssertEqual(warning.label, language.expected.warning)
+        XCTAssertEqual(warning.elementType, role)
+        return warning
+    }
+
+    private func largeWarningElements(_ app: XCUIApplication, language: Language) -> XCUIElementQuery {
+        // Count occurrences in combined labels as well as standalone elements.
+        app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", language.expected.warning))
     }
 }
