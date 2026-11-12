@@ -313,7 +313,7 @@ struct MediumCurrentWeatherView: View {
                             if #available(iOS 16.0, *) {
                                 ViewThatFits(in: .horizontal) {
                                     Text("widget.forecast_outdated", bundle: localizationBundle)
-                                        .font(.system(size: 10))
+                                        .font(.caption2)
                                         .foregroundStyle(.secondary)
                                         .fixedSize(horizontal: true, vertical: false)
 
@@ -468,10 +468,40 @@ struct LargeCurrentWeatherView: View {
 
                     Spacer()
 
-                    Text(observationDate, style: .time)
+                    let observationTime = Text(observationDate, style: .time)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+
+                    if entry.forecastFreshness == .stale,
+                       !entry.upcomingForecastPoints(for: .systemLarge).isEmpty {
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            let warningIcon = Image(systemName: "exclamationmark.triangle")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                                .fixedSize()
+                                .accessibilityLabel(
+                                    Text("widget.forecast_outdated", bundle: localizationBundle)
+                                )
+
+                            if #available(iOS 16.0, *) {
+                                ViewThatFits(in: .horizontal) {
+                                    Text("widget.forecast_outdated", bundle: localizationBundle)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: true, vertical: false)
+
+                                    warningIcon
+                                }
+                            } else {
+                                warningIcon
+                            }
+
+                            observationTime.fixedSize(horizontal: true, vertical: false)
+                        }
+                    } else {
+                        observationTime
+                    }
                 }
 
                 HStack(alignment: .center) {
@@ -909,9 +939,9 @@ struct HourlyForecastSection: View {
                 VStack(alignment: .leading, spacing: 4) {
                     forecastContent(points: points)
 
-                    // Medium shows the stale warning in the header.
-                    // Keep the existing placement for other widget families.
-                    if family != .systemMedium {
+                    // Large keeps the warning below the forecast at accessibility sizes.
+                    if family != .systemMedium,
+                       family != .systemLarge || dynamicTypeSize.isAccessibilitySize {
                         Text("widget.forecast_outdated", bundle: localizationBundle)
                             .font(.caption2)
                             .foregroundStyle(.secondary)
