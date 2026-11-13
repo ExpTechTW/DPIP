@@ -3,12 +3,13 @@
 /// would tell the user the phone will wake them when it will not.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/notification/presentation/pages/notification_test_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +59,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: KeyedSubtree(
             key: ValueKey(allowed),

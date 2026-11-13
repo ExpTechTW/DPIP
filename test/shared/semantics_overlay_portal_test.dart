@@ -14,7 +14,7 @@
 // Shape credit: the reduction in the upstream issue. Each of the three oddities
 // below is load-bearing; drop any one and the assert does not fire.
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Two tooltips, one of which is rigged to reach the bug.

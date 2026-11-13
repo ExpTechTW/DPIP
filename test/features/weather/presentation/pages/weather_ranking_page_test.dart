@@ -3,6 +3,8 @@
 /// the user cannot open.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dpip/core/error/failure.dart';
@@ -22,7 +24,7 @@ import 'package:dpip/features/weather/presentation/widgets/ranking_time_sheet.da
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -254,7 +256,7 @@ Future<MapStationHandoff> _pump(
       ],
       child: MaterialApp.router(
         routerConfig: router,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
       ),
     ),

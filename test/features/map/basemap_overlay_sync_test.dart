@@ -2,7 +2,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
-import 'package:flutter/material.dart' show Brightness;
+import 'package:material_ui/material_ui.dart' show Brightness;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';

@@ -1,7 +1,7 @@
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/features/settings/presentation/widgets/network_usage_chart.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

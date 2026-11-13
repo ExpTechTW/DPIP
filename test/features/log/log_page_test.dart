@@ -1,7 +1,8 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -27,7 +28,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const LogPage(),
       ),

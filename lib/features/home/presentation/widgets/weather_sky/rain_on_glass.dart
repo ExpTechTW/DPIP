@@ -5,8 +5,8 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/card_water_field.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_raster.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Edge of the droplet-coverage bake, in pixels. The refract pass samples
 /// this instead of rebuilding the field at the card's resolution.

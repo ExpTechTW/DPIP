@@ -16,7 +16,7 @@ import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 const _absent = '\u2014';
 const _intensitySize = 96.0;

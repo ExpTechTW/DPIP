@@ -1,5 +1,5 @@
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The empty state of the async-state contract: a calm icon + message for a
 /// request that succeeded but returned nothing. Distinct from [ErrorView] — an

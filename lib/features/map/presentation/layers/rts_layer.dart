@@ -38,7 +38,7 @@ import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/intensity_ranking_card.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The EEW map overlay as GeoJSON: per active alert an epicentre cross plus the

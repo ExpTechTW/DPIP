@@ -3,6 +3,8 @@
 /// clear that cannot happen by accident.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:io';
 
 import 'package:dpip/core/geo/location_track.dart';
@@ -12,7 +14,7 @@ import 'package:dpip/features/map/presentation/layers/location_track_layer.dart'
 import 'package:dpip/features/map/presentation/widgets/location_track_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -137,7 +139,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp.router(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),

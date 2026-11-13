@@ -16,7 +16,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class EewFeedDownNotice extends StatelessWidget {
   /// A self-contained pill — Home's banner slot and its alert section.

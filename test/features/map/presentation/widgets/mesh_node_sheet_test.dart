@@ -1,10 +1,11 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/mesh_node_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../core/meshtastic/fake_mesh_service.dart';
@@ -54,7 +55,7 @@ void main() {
     ValueNotifier<MeshRouteState>? route,
   }) => MaterialApp(
     locale: const Locale('en'),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(
       body: MeshNodeSheet(

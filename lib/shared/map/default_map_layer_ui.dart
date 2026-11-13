@@ -3,7 +3,7 @@ library;
 
 import 'package:dpip/core/settings/default_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Icons / labels shared by the bottom-nav Map tab and the settings picker.
 ///

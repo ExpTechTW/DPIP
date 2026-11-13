@@ -14,7 +14,7 @@
 library;
 
 import 'package:dpip/core/a11y/color_vision.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Report chrome that is not part of a colour *ramp*.
 abstract final class ReportColors {

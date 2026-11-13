@@ -8,6 +8,8 @@
 /// states a reader actually hits.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -38,7 +40,7 @@ import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -378,7 +380,7 @@ void main() {
         child: MaterialApp.router(
           theme: theme,
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
         ),
@@ -392,7 +394,7 @@ void main() {
       GoRoute(
         path: '/earthquake',
         name: AppRoutes.earthquake,
-        builder: (_, _) => const Text('catalogue'),
+        builder: (_, _) => const Scaffold(body: Text('catalogue')),
         routes: [
           GoRoute(
             path: ':id',
@@ -577,7 +579,7 @@ void main() {
         GoRoute(
           path: '/earthquake',
           name: AppRoutes.earthquake,
-          builder: (_, _) => const Text('catalogue-root'),
+          builder: (_, _) => const Scaffold(body: Text('catalogue-root')),
         ),
       ],
     );

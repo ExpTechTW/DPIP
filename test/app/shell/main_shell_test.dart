@@ -3,6 +3,8 @@
 /// exercises that chrome without building each feature page.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:typed_data';
 
 import 'package:dpip/app/shell/main_shell.dart';
@@ -28,7 +30,7 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -116,7 +118,7 @@ void main() {
         ],
         child: MaterialApp.router(
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
         ),

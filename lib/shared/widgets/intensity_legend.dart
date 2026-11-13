@@ -11,7 +11,7 @@ library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Which intensity scale the legend shows.
 enum IntensityLegendMode { eew, rts }

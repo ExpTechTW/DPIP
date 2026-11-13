@@ -9,10 +9,11 @@
 /// this layer's own [WindMapLayer.extraProperties] flowing through.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/map/presentation/layers/wind_layer.dart';
 import 'package:dpip/features/map/presentation/wind_speed.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../raster_timeline_harness.dart';
@@ -35,8 +36,8 @@ void main() {
 
   testWidgets('label reads the localized wind string', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+      MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: Locale('en'),
         home: Scaffold(),
@@ -190,7 +191,7 @@ void main() {
     // so it needs a real delegate even though this card has no other l10n text.
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         home: Scaffold(

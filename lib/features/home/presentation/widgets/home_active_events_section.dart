@@ -10,7 +10,7 @@ import 'package:dpip/features/home/presentation/home_active_events_controller.da
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/event_icon.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

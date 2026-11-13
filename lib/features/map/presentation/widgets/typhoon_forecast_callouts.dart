@@ -18,7 +18,7 @@ import 'package:dpip/features/typhoon/domain/compass_direction.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart'
     show mapChromeBlursBackdrop;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Min zoom before forecast Flutter tips appear.

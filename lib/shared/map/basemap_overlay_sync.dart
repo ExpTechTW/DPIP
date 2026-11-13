@@ -6,7 +6,7 @@ library;
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
-import 'package:flutter/material.dart' show Brightness;
+import 'package:material_ui/material_ui.dart' show Brightness;
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Runtime DEM source — identical to what the baked style declares (see

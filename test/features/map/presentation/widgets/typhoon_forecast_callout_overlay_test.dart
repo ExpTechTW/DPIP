@@ -17,7 +17,7 @@ import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 

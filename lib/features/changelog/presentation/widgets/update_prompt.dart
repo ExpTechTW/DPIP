@@ -23,7 +23,7 @@ import 'package:dpip/features/changelog/domain/update_check.dart';
 import 'package:dpip/features/changelog/domain/update_destination.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';

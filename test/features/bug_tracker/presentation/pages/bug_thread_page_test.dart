@@ -3,6 +3,8 @@
 /// fails silently would hide who answered and where the conversation lives.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:typed_data';
 
 import 'package:dpip/core/error/failure.dart';
@@ -12,7 +14,7 @@ import 'package:dpip/features/bug_tracker/domain/bug_thread.dart';
 import 'package:dpip/features/bug_tracker/presentation/pages/bug_thread_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -78,7 +80,7 @@ Future<void> _pump(WidgetTester tester, _Repo repo) async {
       value: repo,
       child: MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: BugThreadPage(id: 7, repository: repo),
       ),

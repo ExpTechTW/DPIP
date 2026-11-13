@@ -1,3 +1,5 @@
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
@@ -9,7 +11,7 @@ import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/permission_checklist.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
@@ -17,7 +19,7 @@ import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:provider/provider.dart';
 
 Widget _wrap(Widget child, {TextScaler? textScaler}) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   builder: textScaler == null

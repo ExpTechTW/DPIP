@@ -19,7 +19,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/selectable_pill.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class TyphoonPanel extends StatefulWidget {
   const TyphoonPanel({super.key, required this.layer});

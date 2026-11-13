@@ -13,7 +13,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_scaffold.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/permission_checklist.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class OnboardingPermissionsPage extends StatefulWidget {
   const OnboardingPermissionsPage({super.key, required this.onFinish});

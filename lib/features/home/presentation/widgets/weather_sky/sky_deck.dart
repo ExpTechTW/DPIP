@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Fraction of the on-screen widget the cloud deck is rasterized at.
 ///

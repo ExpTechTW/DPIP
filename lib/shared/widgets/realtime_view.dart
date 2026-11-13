@@ -4,7 +4,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Renders a [RealtimeState] to the async-state contract, adding the freshness
 /// dimension the one-shot [AsyncView] lacks:

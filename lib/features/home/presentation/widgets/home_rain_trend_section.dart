@@ -15,7 +15,7 @@ import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 // intl 0.20 defines its own `TextDirection` class, which would shadow dart:ui's
 // enum used by `TextPainter` — pull only `DateFormat` to keep them apart.
 import 'package:intl/intl.dart' show DateFormat;

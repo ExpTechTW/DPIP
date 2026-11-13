@@ -32,7 +32,7 @@ import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/eew_cancelled_notice.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// One live EEW alert in the monitor's overlay sheet — compact so the map stays

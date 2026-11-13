@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Bakes and caches the two atmospheric lookup tables the sky is drawn from.
 ///

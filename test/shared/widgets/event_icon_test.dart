@@ -13,7 +13,7 @@ library;
 
 import 'package:dpip/core/weather/weather_icons.dart';
 import 'package:dpip/shared/widgets/event_icon.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

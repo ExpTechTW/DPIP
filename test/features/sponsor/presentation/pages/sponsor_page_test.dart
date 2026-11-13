@@ -7,6 +7,8 @@
 /// store does, rather than only checking that a price rendered.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dpip/core/error/failure.dart';
@@ -18,7 +20,7 @@ import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -87,9 +89,9 @@ Future<void> _pump(WidgetTester tester, _SponsorRepository repository) async {
   await tester.pumpWidget(
     Provider<SponsorRepository>.value(
       value: repository,
-      child: const MaterialApp(
-        locale: Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: SponsorPage(),
       ),

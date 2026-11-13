@@ -5,7 +5,7 @@ import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/realtime_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Earthquake monitor — the live EEW feed rendered through the async-state

@@ -14,7 +14,7 @@ import 'package:dpip/features/home/presentation/widgets/home_sheet_header.dart';
 import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_card.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// The scrollable home dashboard shown inside the draggable sheet — the surface

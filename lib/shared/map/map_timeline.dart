@@ -10,7 +10,7 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 /// A horizontal, scrubbable timeline over a layer's [frames].

@@ -11,7 +11,7 @@ import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permiss
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_terms.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/language_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

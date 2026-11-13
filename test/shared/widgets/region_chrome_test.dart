@@ -4,6 +4,7 @@
 /// different places.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/home_area.dart';
@@ -14,7 +15,7 @@ import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_label.dart';
 import 'package:dpip/shared/widgets/region_pager.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -32,7 +33,7 @@ const _directory = TownDirectory({
 
 Widget _app(RegionStore store, Widget child) => MaterialApp(
   locale: const Locale('en'),
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: MultiProvider(
     providers: [

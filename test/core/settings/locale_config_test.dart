@@ -1,6 +1,9 @@
 import 'package:dpip/core/settings/locale_config.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
+// Verify the compatibility bridge for dependencies using the legacy library.
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as legacy;
 
 void main() {
   const supported = <Locale>[
@@ -97,6 +100,48 @@ void main() {
       expect(intlDateLocale(const Locale('ja')), 'ja');
     },
   );
+
+  testWidgets('Material menus resolve localized strings in every app locale', (
+    tester,
+  ) async {
+    for (final locale in supported) {
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: locale,
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: supported,
+          builder: (context, child) {
+            // ignore: deprecated_member_use
+            return MaterialUiCompatibilityBridge(child: child!);
+          },
+          home: Builder(
+            builder: (context) {
+              expect(
+                MaterialLocalizations.of(context).menuDismissLabel,
+                isNotEmpty,
+              );
+              expect(
+                legacy.MaterialLocalizations.of(context).menuDismissLabel,
+                isNotEmpty,
+              );
+              return Scaffold(
+                body: PopupMenuButton<int>(
+                  itemBuilder: (_) => [
+                    const PopupMenuItem(value: 1, child: Text('Item')),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(PopupMenuButton<int>));
+      await tester.pumpAndSettle();
+      expect(find.text('Item'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    }
+  });
 
   testWidgets('app delegates serve Cantonese without crashing', (tester) async {
     // flutter_localizations ships no yue; the fallback delegates must serve

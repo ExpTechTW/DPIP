@@ -11,7 +11,7 @@ import 'package:dpip/core/geo/geo_math.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A circular, frosted north button driven by the camera [bearing].
 ///

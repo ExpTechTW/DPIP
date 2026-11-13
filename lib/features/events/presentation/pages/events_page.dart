@@ -7,7 +7,7 @@ import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_pager.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Disaster-event feed — a per-area timeline of events from the DPIP history

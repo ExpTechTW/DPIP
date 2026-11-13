@@ -3,7 +3,7 @@
 /// the trend plot agree by construction.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
 
 /// The five speed buckets, weakest first — the same thresholds / colours as the

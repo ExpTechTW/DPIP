@@ -1,10 +1,11 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/map/presentation/layers/radar_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/radar_overlay_menu.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -24,7 +25,7 @@ Widget _wrap(
   ValueListenable<bool>? showTerrain,
   ValueChanged<bool>? onShowTerrainChanged,
 }) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   // Top-right of the map, where the scaffold mounts it beside the switcher.

@@ -2,6 +2,7 @@
 /// narrow phone and both audience tabs expose their content.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/release_highlights/data/release_highlight_repository.dart';
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
@@ -9,7 +10,7 @@ import 'package:dpip/features/release_highlights/presentation/pages/release_high
 import 'package:dpip/features/release_highlights/presentation/widgets/highlight_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +38,7 @@ Future<void> _pumpPage(WidgetTester tester) async {
     Provider<ReleaseHighlightRepository>.value(
       value: const ReleaseHighlightRepositoryImpl(),
       child: MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),
