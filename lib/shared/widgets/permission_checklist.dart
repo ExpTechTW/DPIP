@@ -94,6 +94,11 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   bool _background = false;
   bool _batteryOk = false;
 
+  /// Whether this device has a screen that can change the exemption. True until
+  /// the platform says otherwise, so a ROM that dropped both the grant dialog
+  /// and the exemption list gets no row — and no dead button either.
+  bool _batteryCanOpen = true;
+
   /// Whether Android will hibernate the app and revoke its permissions.
   /// Starts at [UnusedAppRestrictions.unavailable] so the row stays hidden
   /// until the platform has actually answered — showing a warning for one
@@ -183,6 +188,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     final locationGranted = await location.granted();
     final backgroundGranted = await location.backgroundGranted();
     final batteryOk = Platform.isAndroid ? await _battery.isIgnoring() : true;
+    final batteryCanOpen = Platform.isAndroid ? await _battery.canOpen() : true;
     final unusedApp = await _unusedApp.status();
     final execution = await _execution.status();
     if (!mounted || epoch != _refreshEpoch) return;
@@ -190,7 +196,8 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       'permission state: notify=$notify critical=$critical '
       'urgent=${urgent?.allBypass} '
       'location=$locationGranted background=$backgroundGranted '
-      'battery=$batteryOk unusedApp=${unusedApp.name} '
+      'battery=$batteryOk batteryScreenAvailable=$batteryCanOpen '
+      'unusedApp=${unusedApp.name} '
       'bgExec=${execution.restricted ? "restricted" : "ok"} '
       'bucket=${execution.standbyBucket} vendor=${execution.manufacturer}',
     );
@@ -215,6 +222,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       _location = locationGranted;
       _background = backgroundGranted;
       _batteryOk = batteryOk;
+      _batteryCanOpen = batteryCanOpen;
       _unusedAppStatus = unusedApp;
       _executionStatus = execution;
       _unchangedUrgentChannel = urgentUnchangedHint(
@@ -464,7 +472,11 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   Future<void> _grantBattery() async {
     const item = _PermissionItem.battery;
     _begin(item);
-    final opened = await _leaveForSettings(item, _battery.request);
+    final opened = await _leaveForSettings(item, () async {
+      final screen = await _battery.request();
+      Log.info('permission[battery]: opened ${screen.name}');
+      return screen != BatteryScreen.none;
+    });
     if (!opened && mounted) await _refresh(feedbackFor: item);
   }
 
@@ -657,17 +669,23 @@ class _PermissionChecklistState extends State<PermissionChecklist>
           ),
         ],
         if (Platform.isAndroid) ...[
-          const SizedBox(height: AppSpacing.sm),
-          PermissionRow(
-            icon: Icons.battery_saver_outlined,
-            title: l10n.onboardingPermBattery,
-            description: l10n.onboardingPermBatteryDesc,
-            granted: _batteryOk,
-            loading: _loading(_PermissionItem.battery),
-            blocked: _busy != null,
-            feedback: _rowFeedback(_PermissionItem.battery),
-            onGrant: _grantBattery,
-          ),
+          // Hidden where neither the grant dialog nor the exemption list exists:
+          // the row's only action is one of those two screens, and the app's own
+          // page is not where the setting lives, so there would be nothing to
+          // open that changes anything.
+          if (_batteryCanOpen) ...[
+            const SizedBox(height: AppSpacing.sm),
+            PermissionRow(
+              icon: Icons.battery_saver_outlined,
+              title: l10n.onboardingPermBattery,
+              description: l10n.onboardingPermBatteryDesc,
+              granted: _batteryOk,
+              loading: _loading(_PermissionItem.battery),
+              blocked: _busy != null,
+              feedback: _rowFeedback(_PermissionItem.battery),
+              onGrant: _grantBattery,
+            ),
+          ],
           // Hidden where the platform cannot answer — a device too old for the
           // API, or without the Play services that back-port it, has nothing
           // the user could change, and an un-actionable warning on a disaster
@@ -693,7 +711,10 @@ class _PermissionChecklistState extends State<PermissionChecklist>
           // work behind an "auto-start" switch that is off by default. Advisory
           // because it is genuinely unmeasurable: a tick here would be a claim
           // the app cannot support, and a permanent warning would be worse.
-          if (_executionStatus.vendorManaged) ...[
+          // Hidden when no screen for this brand resolves: the button would
+          // open the app's own page, which is not where the vendor switch is.
+          if (_executionStatus.vendorManaged &&
+              _executionStatus.canOpenVendorSettings) ...[
             const SizedBox(height: AppSpacing.sm),
             PermissionRow(
               icon: Icons.factory_outlined,

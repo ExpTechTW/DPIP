@@ -10,6 +10,7 @@ void main() {
       'manufacturer': 'Samsung',
       'vendorManaged': true,
       'canOpenSettings': false,
+      'canOpenVendorSettings': false,
     });
 
     expect(status.known, isTrue);
@@ -19,16 +20,16 @@ void main() {
     expect(status.manufacturer, 'Samsung');
     expect(status.vendorManaged, isTrue);
     expect(status.canOpenSettings, isFalse);
+    expect(status.canOpenVendorSettings, isFalse);
   });
 
   // The key arrived with the row-hiding change, so a native build that predates
   // it answers without it. Losing the row there would hide a state the user can
   // still fix, which is the worse error.
   test('a platform that does not answer keeps the row', () {
-    expect(
-      BackgroundExecutionStatus.fromMap({'restricted': false}).canOpenSettings,
-      isTrue,
-    );
+    final status = BackgroundExecutionStatus.fromMap({'restricted': false});
+    expect(status.canOpenSettings, isTrue);
+    expect(status.canOpenVendorSettings, isTrue);
     expect(const BackgroundExecutionStatus().canOpenSettings, isTrue);
   });
 }

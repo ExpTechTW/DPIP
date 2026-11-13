@@ -15,6 +15,7 @@ class BackgroundExecutionStatus {
     this.manufacturer,
     this.vendorManaged = false,
     this.canOpenSettings = true,
+    this.canOpenVendorSettings = true,
     this.known = false,
   });
 
@@ -28,6 +29,7 @@ class BackgroundExecutionStatus {
         manufacturer: map['manufacturer'] as String?,
         vendorManaged: map['vendorManaged'] as bool? ?? false,
         canOpenSettings: map['canOpenSettings'] as bool? ?? true,
+        canOpenVendorSettings: map['canOpenVendorSettings'] as bool? ?? true,
         known: true,
       );
 
@@ -65,6 +67,14 @@ class BackgroundExecutionStatus {
   /// True when the platform did not say otherwise, so an older native build or
   /// a test harness keeps the row rather than silently losing it.
   final bool canOpenSettings;
+
+  /// Whether a vendor screen this table knows for the manufacturer resolves.
+  ///
+  /// The advisory row's only action is one of those screens, so a brand whose
+  /// screens moved in a ROM update — or one listed as aggressive without
+  /// offering a screen at all — has nothing to open and must not show the row.
+  /// True when the platform did not say otherwise.
+  final bool canOpenVendorSettings;
 
   /// Whether the platform actually answered. False leaves every field at its
   /// optimistic default, so an unsupported platform or a failed call can never

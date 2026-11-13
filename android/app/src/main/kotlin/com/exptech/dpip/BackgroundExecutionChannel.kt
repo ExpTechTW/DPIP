@@ -59,6 +59,12 @@ class BackgroundExecutionChannel(private val context: Context) :
             data class Component(val pkg: String, val cls: String) : Screen()
         }
 
+        /** The intent a table entry stands for, before it is started or probed. */
+        private fun Screen.toIntent(): Intent = when (this) {
+            is Screen.Action -> Intent(name)
+            is Screen.Component -> Intent().setComponent(ComponentName(pkg, cls))
+        }
+
         /**
          * Vendor screens, tried in order until one opens.
          *
@@ -301,7 +307,30 @@ class BackgroundExecutionChannel(private val context: Context) :
             // visibility makes the latter unanswerable (see OEM_SCREENS).
             "vendorManaged" to (vendor in AGGRESSIVE),
             "canOpenSettings" to canOpenSettings(),
+            "canOpenVendorSettings" to canOpenVendorSettings(),
         )
+    }
+
+    /**
+     * Whether any vendor screen this table knows for the manufacturer resolves.
+     *
+     * Keyed on the table rather than on the brand: the row exists to open the
+     * vendor's own screen, so a brand whose screens moved in a ROM update has
+     * nothing the button could reach. The `<queries>` package entries in the
+     * manifest are what make the answer trustworthy on Android 11+ — without
+     * them every vendor package is invisible and this would answer false
+     * everywhere.
+     */
+    private fun canOpenVendorSettings(): Boolean {
+        val screens = OEM_SCREENS[vendor].orEmpty()
+        if (screens.isEmpty()) return false
+        return try {
+            screens.any { context.packageManager.resolveActivity(it.toIntent(), 0) != null }
+        } catch (e: Exception) {
+            // A failed probe is not a "no".
+            Log.w(TAG, "cannot resolve a vendor screen", e)
+            true
+        }
     }
 
     /**
@@ -388,12 +417,8 @@ class BackgroundExecutionChannel(private val context: Context) :
      */
     private fun openOemSettings(): String {
         for (screen in OEM_SCREENS[vendor].orEmpty()) {
-            val intent = when (screen) {
-                is Screen.Action -> Intent(screen.name)
-                is Screen.Component ->
-                    Intent().setComponent(ComponentName(screen.pkg, screen.cls))
-            }
             try {
+                val intent = screen.toIntent()
                 context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 return "vendor"
             } catch (e: Exception) {

@@ -46,6 +46,7 @@ import 'package:flutter/widgets.dart';
 ///    a
 ///    normal-priority message is deferred until Doze lifts; and geofence
 ///    transitions are delayed. On a disaster app the latency *is* the product;
+///    counted only where the device has a screen that can actually change it.
 ///  - **critical alerts** (iOS). They are what makes a life-threatening warning
 ///    sound through silent mode and Do Not Disturb — at 3am, which is when it
 ///    matters. This app holds Apple's entitlement, so the grant is genuinely the
@@ -86,6 +87,7 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
   bool _execute = true;
   bool _keptActive = true;
   bool _batteryExempt = true;
+  bool _batteryActionable = true;
   bool _critical = true;
 
   /// Whether any prerequisite is missing — what the badge watches.
@@ -96,7 +98,7 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
       !_background ||
       !_execute ||
       !_keptActive ||
-      !_batteryExempt;
+      (!_batteryExempt && _batteryActionable);
 
   bool get notificationsAllowed => _notify;
   bool get locationGranted => _foreground;
@@ -156,6 +158,9 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
     final unusedApp = await _unusedApp.status();
     final keptActive = unusedApp != UnusedAppRestrictions.restricted;
     final batteryExempt = await _battery.isIgnoring();
+    // The Doze row hides itself on a ROM without either screen that controls
+    // it, so the badge must not count that state — it could never be cleared.
+    final batteryActionable = await _battery.canOpen();
     // Only asked once notifications are allowed at all: iOS reports the critical
     // grant as absent while the parent permission is denied, which is true but
     // duplicates what `notify` is already saying.
@@ -170,6 +175,7 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
         execute == _execute &&
         keptActive == _keptActive &&
         batteryExempt == _batteryExempt &&
+        batteryActionable == _batteryActionable &&
         critical == _critical) {
       return;
     }
@@ -180,12 +186,14 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
     _execute = execute;
     _keptActive = keptActive;
     _batteryExempt = batteryExempt;
+    _batteryActionable = batteryActionable;
     _critical = critical;
     if (needsAttention != was) {
       Log.info(
         'permission health: needsAttention=$needsAttention '
         '(notify=$notify location=$foreground background=$background '
         'execute=$execute keptActive=$keptActive battery=$batteryExempt '
+        'batteryScreen=$batteryActionable '
         'critical=$critical bucket=${execution.standbyBucket})',
       );
     }

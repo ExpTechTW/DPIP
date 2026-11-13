@@ -53,12 +53,18 @@ class _AllowedNotifications extends NotificationService {
 }
 
 class _FakeBattery extends BatteryOptimization {
-  _FakeBattery(this._exempt);
+  _FakeBattery(this._exempt, {this.screenOpen = true});
 
   final bool _exempt;
 
+  /// Whether a screen that changes the exemption exists.
+  final bool screenOpen;
+
   @override
   Future<bool> isIgnoring() async => _exempt;
+
+  @override
+  Future<bool> canOpen() async => screenOpen;
 }
 
 class _FakeExecution extends BackgroundExecutionService {
@@ -85,6 +91,7 @@ PermissionHealth _health({
   required BackgroundExecutionStatus execution,
   required UnusedAppRestrictions unusedApp,
   bool batteryExempt = true,
+  bool batteryActionable = true,
   bool critical = true,
   bool criticalApplies = false,
 }) => PermissionHealth(
@@ -96,7 +103,7 @@ PermissionHealth _health({
   ),
   execution: _FakeExecution(execution),
   unusedApp: _FakeUnusedApp(unusedApp),
-  battery: _FakeBattery(batteryExempt),
+  battery: _FakeBattery(batteryExempt, screenOpen: batteryActionable),
 );
 
 void main() {
@@ -269,5 +276,23 @@ void main() {
 
     expect(health.batteryExempt, isFalse);
     expect(health.needsAttention, isTrue);
+  });
+
+  test('a device with no Doze screen to change is left alone', () async {
+    final health = _health(
+      execution: const BackgroundExecutionStatus(known: true),
+      unusedApp: UnusedAppRestrictions.exempt,
+      batteryExempt: false,
+      batteryActionable: false,
+    );
+    await health.refresh();
+
+    expect(
+      health.needsAttention,
+      isFalse,
+      reason:
+          'the battery row hides itself when neither the grant dialog nor the '
+          'exemption list exists, so the dot it fed could never be cleared',
+    );
   });
 }
