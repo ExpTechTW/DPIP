@@ -29,6 +29,16 @@ TownDirectory _dir() => TownDirectory.fromJson({
     'cityLevel': '縣',
     'townLevel': '市',
   },
+  // Taiwan's westernmost township — the one every coordinate west of the
+  // island used to collapse onto.
+  '902': {
+    'city': '金門',
+    'town': '烈嶼',
+    'lat': 24.43,
+    'lng': 118.24,
+    'cityLevel': '縣',
+    'townLevel': '鄉',
+  },
 });
 
 void main() {
@@ -37,6 +47,41 @@ void main() {
       _dir(),
       isAvailable: () async => true,
       fix: () async => (lat: 25.05, lng: 121.55),
+    );
+    expect((await service.currentTown())?.code, '100');
+  });
+
+  test('a fix outside Taiwan resolves to no township, not the nearest one', () async {
+    // The reported bug: in the US, 所在地 read 金門縣 烈嶼鄉 with 00:00 data.
+    // Nearest-centroid grew monotonically westward, so every fix west of the
+    // island landed on the westernmost township no matter how far away it was.
+    for (final fix in [
+      (lat: 37.77, lng: -122.42), // San Francisco
+      (lat: 26.21, lng: 127.68), // Okinawa — nearer, but still another country
+      (lat: 1.35, lng: 103.82), // Singapore
+    ]) {
+      final service = LocationService(
+        _dir(),
+        isAvailable: () async => true,
+        fix: () async => fix,
+      );
+      expect(
+        await service.currentTown(),
+        isNull,
+        reason: 'no township is near $fix',
+      );
+      expect(await service.townAt(fix.lat, fix.lng), isNull);
+    }
+  });
+
+  test('a fix offshore still resolves to the township it belongs to', () async {
+    // The nearest-centroid fallback exists for sea and boundary gaps, so the
+    // range limit must not take those away: ~85 km NE of Taipei is still
+    // 所在地 for the people out there.
+    final service = LocationService(
+      _dir(),
+      isAvailable: () async => true,
+      fix: () async => (lat: 25.60, lng: 122.10),
     );
     expect((await service.currentTown())?.code, '100');
   });

@@ -65,9 +65,18 @@ class TownDirectory {
   /// The township with [code], or null.
   Town? byCode(String? code) => code == null ? null : _byCode[code];
 
-  /// The township whose centroid is nearest to ([lat], [lng]), or null if the
-  /// directory is empty. Distance is cos-weighted planar (fine at Taiwan's
-  /// extent) so no per-town trig is needed.
+  /// The township whose centroid is nearest to ([lat], [lng]), or null when
+  /// none is within [_maxDistanceKm]. Distance is cos-weighted planar (fine at
+  /// Taiwan's extent) so no per-town trig is needed.
+  ///
+  /// The range limit is what makes this answer "which Taiwan township is this,
+  /// if any" instead of "which of these points is least far away". Without it
+  /// distance grew monotonically westward, so every coordinate on the planet
+  /// resolved to the westernmost township — Lieyu, Kinmen — and a user in the
+  /// Americas had 金門縣 烈嶼鄉 reported as 所在地. The limit sits far beyond
+  /// the readings the nearest-centroid fallback exists for (a boat a few tens
+  /// of km offshore, a gap in the boundary data) and far short of another
+  /// country.
   Town? nearest(double lat, double lng) {
     final cosLat = math.cos(degToRad(lat));
     Town? best;
@@ -81,6 +90,14 @@ class TownDirectory {
         best = town;
       }
     }
-    return best;
+    return math.sqrt(bestSq) * _kmPerDegree <= _maxDistanceKm ? best : null;
   }
+
+  /// How far from a township centroid a point may be and still be reported as
+  /// that township.
+  static const double _maxDistanceKm = 100;
+
+  /// Kilometres per degree of latitude — what the cos-weighted degrees above
+  /// reduce to.
+  static const double _kmPerDegree = 111.32;
 }
