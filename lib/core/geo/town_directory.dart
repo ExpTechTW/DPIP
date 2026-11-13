@@ -90,14 +90,10 @@ class TownDirectory {
         best = town;
       }
     }
-    return math.sqrt(bestSq) * _kmPerDegree <= _maxDistanceKm ? best : null;
+    return math.sqrt(bestSq) * kKmPerDegree <= _maxDistanceKm ? best : null;
   }
 
   /// How far from a township centroid a point may be and still be reported as
   /// that township.
   static const double _maxDistanceKm = 100;
-
-  /// Kilometres per degree of latitude — what the cos-weighted degrees above
-  /// reduce to.
-  static const double _kmPerDegree = 111.32;
 }

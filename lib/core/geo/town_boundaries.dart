@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:dpip/core/geo/geo_math.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 /// Exact GPS→township resolution by **point-in-polygon** over the bundled
@@ -150,9 +151,50 @@ class TownBoundaries {
     return towns;
   }
 
+  /// The code of the township whose **coastline** is nearest to ([lat], [lng]),
+  /// or null when the nearest coastline is farther than [km].
+  ///
+  /// This is the second half of GPS resolution, for a fix that lands on the
+  /// water. A phone on a pier, a quay or a beach road gets fixes that drift a
+  /// few hundred metres offshore, and [codeAt] alone would drop every one of
+  /// them. [km] is what separates "on the water beside Taiwan" from "somewhere
+  /// else on the planet": by this data Xiamen's waterfront is 10 km from
+  /// Lieyu's coast and the rest of the Fujian coast near Kinmen and Matsu is
+  /// 8 km or more, so no fix of the user's own position reaches them.
+  ///
+  /// Meant for points [codeAt] already rejected — an inland point is farther
+  /// from its coast than from the middle of its township, and is not what this
+  /// answers.
+  String? codeNearCoast(double lat, double lng, double km) {
+    final cosLat = math.cos(degToRad(lat));
+    final limit = km / kKmPerDegree;
+    var bestSq = limit * limit;
+    String? best;
+    for (final entry in _shapes.entries) {
+      final shape = entry.value;
+      // The polygon lies inside its bounding box, so the distance to the box is
+      // a lower bound: anything already outside the limit is skipped without
+      // touching a vertex.
+      final dx = lng < shape.minLng
+          ? shape.minLng - lng
+          : (lng > shape.maxLng ? lng - shape.maxLng : 0.0);
+      final dy = lat < shape.minLat
+          ? shape.minLat - lat
+          : (lat > shape.maxLat ? lat - shape.maxLat : 0.0);
+      final boxDx = dx * cosLat;
+      if (boxDx * boxDx + dy * dy >= bestSq) continue;
+      final distanceSq = shape.nearestEdgeSq(lng, lat, cosLat);
+      if (distanceSq < bestSq) {
+        bestSq = distanceSq;
+        best = entry.key;
+      }
+    }
+    return best;
+  }
+
   /// The code of the township containing ([lat], [lng]), or null if the point is
-  /// outside every township (e.g. at sea) — the caller then falls back to
-  /// nearest-centroid.
+  /// outside every township (e.g. at sea) — the caller then asks
+  /// [codeNearCoast], and refuses the fix if that is null too.
   String? codeAt(double lat, double lng) {
     for (final code in _grid.candidates(lng, lat)) {
       if (_shapes[code]!.contains(lng, lat)) return code;
@@ -201,6 +243,33 @@ class _TownShape {
       if (!inHole) return true;
     }
     return false;
+  }
+
+  /// Squared distance from ([x], [y]) to the nearest edge, in cos-weighted
+  /// degrees — the space [TownBoundaries.codeNearCoast] compares in.
+  double nearestEdgeSq(double x, double y, double cosLat) {
+    final px = x * cosLat;
+    var best = double.infinity;
+    for (final polygon in polygons) {
+      for (final ring in polygon) {
+        // Rings are closed (last vertex repeats the first), so every edge is
+        // covered by walking consecutive pairs.
+        for (var i = 3; i < ring.length; i += 2) {
+          final ax = ring[i - 3] * cosLat, ay = ring[i - 2];
+          final bx = ring[i - 1] * cosLat, by = ring[i];
+          final vx = bx - ax, vy = by - ay;
+          final wx = px - ax, wy = y - ay;
+          final lengthSq = vx * vx + vy * vy;
+          final t = lengthSq == 0
+              ? 0.0
+              : ((wx * vx + wy * vy) / lengthSq).clamp(0.0, 1.0);
+          final dx = wx - t * vx, dy = wy - t * vy;
+          final distanceSq = dx * dx + dy * dy;
+          if (distanceSq < best) best = distanceSq;
+        }
+      }
+    }
+    return best;
   }
 
   /// Ray-casting: whether ([x], [y]) is inside the flat `[lng,lat,…]` [ring].

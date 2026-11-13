@@ -31,7 +31,7 @@ TownDirectory _dir() => TownDirectory.fromJson({
   },
   // Taiwan's westernmost township — the one every coordinate west of the
   // island used to collapse onto.
-  '902': {
+  '894': {
     'city': '金門',
     'town': '烈嶼',
     'lat': 24.43,
@@ -74,16 +74,87 @@ void main() {
     }
   });
 
-  test('a fix offshore still resolves to the township it belongs to', () async {
-    // The nearest-centroid fallback exists for sea and boundary gaps, so the
-    // range limit must not take those away: ~85 km NE of Taipei is still
-    // 所在地 for the people out there.
+  test('without boundary data the resolution is nearest-centroid', () async {
+    // Only a service built without the polygons (tests, older wiring) takes the
+    // centroid path — production always loads them. It is still bounded: a
+    // township 100 km away is the nearest one, not the user's.
     final service = LocationService(
       _dir(),
       isAvailable: () async => true,
       fix: () async => (lat: 25.60, lng: 122.10),
     );
     expect((await service.currentTown())?.code, '100');
+  });
+
+  test('a fix on the water keeps the coast it is beside', () async {
+    // A phone at the quay whose fix drifts offshore must still be 所在地; the
+    // township it is standing in is the one whose coast is under it.
+    final boundaries = TownBoundaries.fromDecoded({
+      '894': {
+        'b': [118.20, 24.40, 118.28, 24.44],
+        'p': [
+          [
+            [
+              118.20,
+              24.40,
+              118.28,
+              24.40,
+              118.28,
+              24.44,
+              118.20,
+              24.44,
+              118.20,
+              24.40,
+            ],
+          ],
+        ],
+      },
+    });
+    final service = LocationService(
+      _dir(),
+      boundaries: Future.value(boundaries),
+      isAvailable: () async => true,
+      fix: () async => (lat: 24.43, lng: 118.195),
+    );
+    expect((await service.currentTown())?.code, '894');
+  });
+
+  test('Xiamen resolves to nothing, not to Lieyu 17 km away', () async {
+    // The reported coordinate: 24.449350, 118.077110. It is outside every
+    // township polygon and 10 km from the nearest Taiwanese coast, so no
+    // township is named — the card shows "outside the service area" instead of
+    // 金門縣 烈嶼鄉 and its weather station.
+    final boundaries = TownBoundaries.fromDecoded({
+      '894': {
+        'b': [118.20, 24.40, 118.28, 24.44],
+        'p': [
+          [
+            [
+              118.20,
+              24.40,
+              118.28,
+              24.40,
+              118.28,
+              24.44,
+              118.20,
+              24.44,
+              118.20,
+              24.40,
+            ],
+          ],
+        ],
+      },
+    });
+    final service = LocationService(
+      _dir(),
+      boundaries: Future.value(boundaries),
+      isAvailable: () async => true,
+      fix: () async => (lat: 24.449350, lng: 118.077110),
+    );
+    expect(await service.currentTown(), isNull);
+    expect(await service.townAt(24.449350, 118.077110), isNull);
+    // 8 km out on the same bearing: still no coast within 5 km.
+    expect(await service.townAt(24.43, 118.13), isNull);
   });
 
   test('null when location is unavailable (services off / denied)', () async {
@@ -184,39 +255,40 @@ void main() {
     expect(await service.currentFix(), isNull);
   });
 
-  test(
-    'townAt uses a boundary hit, a miss, and nearest when nothing contains it',
-    () async {
-      final boundaries = TownBoundaries.fromDecoded({
-        '100': {
-          'b': [121.5, 25.0, 121.6, 25.1],
-          'p': [
-            [
-              [121.5, 25.0, 121.6, 25.0, 121.6, 25.1, 121.5, 25.1, 121.5, 25.0],
-            ],
+  test('townAt uses the polygons, and refuses a fix it cannot place', () async {
+    final boundaries = TownBoundaries.fromDecoded({
+      '100': {
+        'b': [121.5, 25.0, 121.6, 25.1],
+        'p': [
+          [
+            [121.5, 25.0, 121.6, 25.0, 121.6, 25.1, 121.5, 25.1, 121.5, 25.0],
           ],
-        },
-        'missing': {
-          'b': [120.0, 20.0, 120.1, 20.1],
-          'p': [
-            [
-              [120.0, 20.0, 120.1, 20.0, 120.1, 20.1, 120.0, 20.1, 120.0, 20.0],
-            ],
+        ],
+      },
+      'missing': {
+        'b': [120.0, 20.0, 120.1, 20.1],
+        'p': [
+          [
+            [120.0, 20.0, 120.1, 20.0, 120.1, 20.1, 120.0, 20.1, 120.0, 20.0],
           ],
-        },
-      });
-      final service = LocationService(
-        _dir(),
-        boundaries: Future.value(boundaries),
-      );
-      expect((await service.townAt(25.05, 121.55))?.code, '100');
-      expect(await service.townAt(20.05, 120.05), isNull);
-      expect((await service.townAt(23.99, 121.60))?.code, '970');
+        ],
+      },
+    });
+    final service = LocationService(
+      _dir(),
+      boundaries: Future.value(boundaries),
+    );
+    expect((await service.townAt(25.05, 121.55))?.code, '100');
+    expect(await service.townAt(20.05, 120.05), isNull);
+    // Hualien is outside both squares this fixture has and farther than the
+    // coast limit from either — the fix is refused rather than mapped to the
+    // nearest township in the directory, which is what used to name Kinmen
+    // for a user in the US.
+    expect(await service.townAt(23.99, 121.60), isNull);
 
-      final nearest = LocationService(_dir());
-      expect((await nearest.townAt(25.05, 121.55))?.code, '100');
-    },
-  );
+    final nearest = LocationService(_dir());
+    expect((await nearest.townAt(25.05, 121.55))?.code, '100');
+  });
 
   _platformCases();
 }
