@@ -1,4 +1,6 @@
+import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// A few adjacent synthetic townships (Taiwan-scale coords) exercising the
@@ -127,6 +129,38 @@ void main() {
       expect(boundaries.codeNearCoast(22.6000, 120.2500, 5), '805');
       // The same water 5.1 km out: past the limit, so no township at all.
       expect(boundaries.codeNearCoast(22.6000, 120.2100, 5), isNull);
+    });
+
+    test('every township resolves from a point inside it', () async {
+      // The coast limit must not strand any township — the small islands are
+      // the ones it could: 烏坵's islets, 彭佳嶼 (part of 基隆中正區), 小蘭嶼,
+      // 東沙. One interior point per township through the real service path is
+      // enough to catch a limit that has been widened or narrowed into them.
+      final directory = await TownDirectory.load();
+      final service = LocationService(
+        directory,
+        boundaries: Future.value(boundaries),
+        isAvailable: () async => true,
+      );
+      final unreachable = <String>[];
+      for (final town in directory.all) {
+        final box = boundaries.boundsFor(town.code);
+        if (box == null) {
+          unreachable.add('${town.code} 沒有邊界資料');
+          continue;
+        }
+        String? got;
+        outer:
+        for (var lat = box[1]; lat <= box[3]; lat += 0.004) {
+          for (var lng = box[0]; lng <= box[2]; lng += 0.004) {
+            if (boundaries.codeAt(lat, lng) != town.code) continue;
+            got = (await service.townAt(lat, lng))?.code;
+            break outer;
+          }
+        }
+        if (got != town.code) unreachable.add('${town.code} → $got');
+      }
+      expect(unreachable, isEmpty);
     });
 
     test('the reported Xiamen coordinate is not near a Taiwanese coast', () {
