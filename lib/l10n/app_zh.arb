@@ -1187,7 +1187,7 @@
   "meshtasticUndecoded": "無法解密",
   "notifyAnnouncement": "公告",
   "onboardingIntroTitle": "歡迎使用 DPIP",
-  "regionCurrentUnavailable": "無法取得所在地位置資訊",
+  "regionCurrentUnavailable": "目前所在地不在服務範圍內",
   "languageSystem": "系統預設",
   "skyTimeSunset": "日落",
   "mapLayerSatelliteDust": "ひまわり 沙塵",

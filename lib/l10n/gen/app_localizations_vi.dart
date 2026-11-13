@@ -2593,7 +2593,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingIntroTitle => 'Chào mừng đến với DPIP';
 
   @override
-  String get regionCurrentUnavailable => 'Không thể lấy vị trí hiện tại';
+  String get regionCurrentUnavailable =>
+      'Vị trí hiện tại nằm ngoài khu vực phục vụ';
 
   @override
   String get languageSystem => 'Mặc định hệ thống';

@@ -157,8 +157,8 @@ class _HomeSheetHeaderState extends State<HomeSheetHeader> {
     // noon sky's dark ink, whichever the semantic colour happened to pick.
     final conditionAccent = foreground;
 
-    // 全國 has no township weather — name only. 所在地 without GPS: say so
-    // instead of a dashed reading row.
+    // 全國 has no township weather — name only. 所在地 with no township
+    // resolved (GPS off, or outside Taiwan): say so instead of a dashed row.
     final nationwide = area is NationwideArea;
     final currentUnavailable = area is CurrentArea && area.code == null;
 

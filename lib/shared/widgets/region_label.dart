@@ -12,9 +12,10 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 
 /// The badge label for [area]: 全國 / 所在地 / the saved town's name.
 ///
-/// The current-location slot always reads 所在地 even with no GPS fix — the
-/// "can't get location" wording ([AppLocalizations.regionCurrentUnavailable])
-/// belongs to the body, not the switcher, so the slot never disappears.
+/// The current-location slot always reads 所在地 even with no township resolved
+/// — the "outside the service area" wording
+/// ([AppLocalizations.regionCurrentUnavailable]) belongs to the body, not the
+/// switcher, so the slot never disappears.
 String regionAreaLabel(
   AppLocalizations l10n,
   TownDirectory directory,

@@ -1195,7 +1195,7 @@
   "meshtasticUndecoded": "Belum didekripsi",
   "notifyAnnouncement": "Pengumuman",
   "onboardingIntroTitle": "Selamat datang di DPIP",
-  "regionCurrentUnavailable": "Tidak dapat memperoleh lokasi saat ini",
+  "regionCurrentUnavailable": "Lokasi saat ini berada di luar area layanan",
   "languageSystem": "Bawaan sistem",
   "skyTimeSunset": "Matahari terbenam",
   "mapLayerSatelliteDust": "Himawari Dust",

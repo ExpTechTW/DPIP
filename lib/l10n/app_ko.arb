@@ -1195,7 +1195,7 @@
   "meshtasticUndecoded": "복호화되지 않음",
   "notifyAnnouncement": "공지사항",
   "onboardingIntroTitle": "DPIP에 오신 것을 환영합니다",
-  "regionCurrentUnavailable": "현재 위치를 가져올 수 없습니다",
+  "regionCurrentUnavailable": "현재 위치가 서비스 지역 밖입니다",
   "languageSystem": "시스템 기본값",
   "skyTimeSunset": "일몰",
   "mapLayerSatelliteDust": "히마와리 황사",

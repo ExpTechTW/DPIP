@@ -2600,7 +2600,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get regionCurrentUnavailable =>
-      'Tidak dapat memperoleh lokasi saat ini';
+      'Lokasi saat ini berada di luar area layanan';
 
   @override
   String get languageSystem => 'Bawaan sistem';

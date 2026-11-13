@@ -4872,10 +4872,10 @@ abstract class AppLocalizations {
   /// **'Welcome to DPIP'**
   String get onboardingIntroTitle;
 
-  /// Shown when the current-location area is selected but GPS is off/unavailable
+  /// Shown when the current-location area is selected but no township could be resolved — location services off, permission denied, or the device is outside Taiwan
   ///
   /// In en, this message translates to:
-  /// **'Can\'t get current location'**
+  /// **'Your current location is outside the service area'**
   String get regionCurrentUnavailable;
 
   /// Language picker option: follow the system language

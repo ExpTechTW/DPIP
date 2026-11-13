@@ -1195,7 +1195,7 @@
   "meshtasticUndecoded": "復号されていません",
   "notifyAnnouncement": "お知らせ",
   "onboardingIntroTitle": "DPIP へようこそ",
-  "regionCurrentUnavailable": "現在地を取得できません",
+  "regionCurrentUnavailable": "現在地はサービス対象地域外です",
   "languageSystem": "システムの既定",
   "skyTimeSunset": "日の入り",
   "mapLayerSatelliteDust": "ひまわり 黄砂",

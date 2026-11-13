@@ -34,8 +34,8 @@ import 'package:provider/provider.dart';
 /// the sheet is scrolled past the trend card; `HomeSheet` blurs the sky
 /// backdrop in step with that same scroll so the list reads clearly once it
 /// arrives. 全國 skips weather entirely (name + events only, no hero block);
-/// 所在地 with no GPS fix shows the header's "can't locate you" notice **alone**
-/// — no cards at all.
+/// 所在地 with no township resolved (GPS off, or the device is outside Taiwan)
+/// shows the header's notice **alone** — no cards at all.
 class HomeContent extends StatelessWidget {
   const HomeContent({
     super.key,
@@ -82,9 +82,10 @@ class HomeContent extends StatelessWidget {
     final hourTrend = context.select<HomeWeatherController, RainHourTrend?>(
       (controller) => controller.hourTrend,
     );
-    // 所在地 with no GPS fix has no township to report on. The header already
-    // says so; showing cards below it would only be rows of dashes and empty
-    // feeds pretending to be readings for a place we could not identify.
+    // 所在地 with no township (GPS off, or outside Taiwan) has nothing to
+    // report on. The header already says so; showing cards below it would only
+    // be rows of dashes and empty feeds pretending to be readings for a place
+    // we could not identify.
     final located = area is! CurrentArea || area.code != null;
     final showWeather = area is! NationwideArea && located;
     // MediaQuery.paddingOf(context).bottom is *not* the device's real bottom
