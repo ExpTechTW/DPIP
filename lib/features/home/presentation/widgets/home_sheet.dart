@@ -10,7 +10,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_
 import 'package:dpip/shared/widgets/frosted_surface.dart'
     show mapChromeBlursBackdrop;
 import 'package:flutter/foundation.dart' show ValueListenable;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// The draggable home sheet: a frosted panel over the map that reveals an

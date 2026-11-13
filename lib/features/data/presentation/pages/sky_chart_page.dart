@@ -27,7 +27,7 @@ import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/data/presentation/observer_place.dart';
 import 'package:dpip/features/data/presentation/pages/planets_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SkyChartPage extends StatefulWidget {
   const SkyChartPage({super.key});

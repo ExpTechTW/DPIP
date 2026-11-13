@@ -11,7 +11,7 @@ import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class LightningMapLayer with MapLayerDefaults implements MapLayer {

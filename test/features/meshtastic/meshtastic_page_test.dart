@@ -5,6 +5,8 @@
 /// whatever [MeshLink] and the chat controller already decided.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:convert';
 
 import 'package:dpip/core/error/failure.dart';
@@ -21,7 +23,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/meshtastic/presentation/mesh_chat_controller.dart';
 import 'package:dpip/features/meshtastic/presentation/pages/meshtastic_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -530,7 +532,7 @@ Future<_Page> _open(WidgetTester tester, {int? dpipChannel}) async {
       ],
       child: MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const MeshtasticPage(),
       ),

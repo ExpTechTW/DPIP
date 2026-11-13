@@ -13,7 +13,7 @@ library;
 import 'package:dpip/features/weather/domain/weather_ranking.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/features/weather/presentation/widgets/weather_ranking_row.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _station = WeatherStation(

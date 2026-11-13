@@ -25,6 +25,7 @@
 /// than only the ones that deserve it.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town.dart';
@@ -36,7 +37,7 @@ import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permissions.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/permission_checklist.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -160,7 +161,7 @@ Widget _wrap(
       ),
     ],
     child: MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: child),
     ),

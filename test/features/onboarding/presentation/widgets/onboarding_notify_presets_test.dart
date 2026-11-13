@@ -8,6 +8,7 @@
 /// server actually ended up holding, and every failure must leave a way out.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -18,7 +19,7 @@ import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_notify_presets.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -73,7 +74,7 @@ Future<void> _pump(
         Provider.value(value: NotificationService(settings)),
       ],
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context)

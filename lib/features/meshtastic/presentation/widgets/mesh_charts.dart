@@ -21,7 +21,7 @@ import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/models/series_runs.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Channel/air utilization — how busy the mesh's airtime is.
 class MeshUtilizationChart extends StatelessWidget {

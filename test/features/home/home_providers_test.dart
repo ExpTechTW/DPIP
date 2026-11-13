@@ -29,7 +29,7 @@ import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 

@@ -8,7 +8,7 @@ import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The radar layer's own options chip — the shared chrome menu, titled for
 /// radar and carrying two extra rows the other rasters do not have: the

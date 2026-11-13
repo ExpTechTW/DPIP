@@ -6,7 +6,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/area_page_sync.dart';
 import 'package:dpip/shared/widgets/region_label.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// The area (地區) indicator at the top of Home and Events — a centered carousel

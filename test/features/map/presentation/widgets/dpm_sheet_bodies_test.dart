@@ -4,6 +4,7 @@
 /// missing category collapse to nothing.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
 import 'package:dpip/features/disaster_map/domain/restroom_detail.dart';
@@ -11,7 +12,7 @@ import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/dpm_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _UnusedRepo implements DisasterMapRepository {
@@ -44,7 +45,7 @@ class _UnusedRepo implements DisasterMapRepository {
 }
 
 Widget _app(Widget home) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   home: Scaffold(body: home),

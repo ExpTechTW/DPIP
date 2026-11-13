@@ -3,6 +3,8 @@
 /// the clipboard before the dialog can be dismissed.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:io';
 
 import 'package:dpip/core/diagnostics/dump_uploader.dart';
@@ -14,7 +16,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/diagnostics/dump_action.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -129,7 +131,7 @@ void main() {
         ],
         child: MaterialApp(
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Builder(

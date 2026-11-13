@@ -8,7 +8,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/data/presentation/observer_place.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 

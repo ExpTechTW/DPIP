@@ -7,7 +7,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A thin banner flagging that the data below it is not current.
 ///

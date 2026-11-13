@@ -1,6 +1,6 @@
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/shared/widgets/area_page_sync.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Pages a screen's body by area, so switching areas slides the *whole page*

@@ -21,7 +21,7 @@ import 'dart:ui' as ui;
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/core/weather/weather_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart' show FontLoader, rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 

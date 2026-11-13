@@ -6,7 +6,7 @@ import 'package:dpip/core/settings/language_options.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// A full-screen language list — "follow system" plus every supported language

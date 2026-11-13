@@ -11,13 +11,14 @@
 /// unlocks before the content it gates was ever shown.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_intro.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: child),
 );

@@ -6,6 +6,7 @@
 /// for tiles. Building the lists with fakes is enough to see each one.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/di/core_providers.dart';
@@ -62,7 +63,7 @@ import 'package:dpip/features/weather/domain/wind_forecast_model.dart';
 import 'package:dpip/features/weather/domain/wind_forecast_repository.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -157,7 +158,7 @@ void main() {
         providers: coreProviders(deps),
         child: MaterialApp(
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const _ReadCore(),
         ),

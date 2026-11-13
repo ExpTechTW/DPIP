@@ -12,7 +12,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.d
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Renders reference-driven sky to PNGs for eyeballing.

@@ -2,6 +2,7 @@
 /// redirect and each page builder; they do not start Firebase or a database.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dio/dio.dart';
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
@@ -80,7 +81,7 @@ import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -185,7 +186,7 @@ void main() {
         ],
         child: MaterialApp.router(
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: appRouter,
         ),
@@ -235,7 +236,7 @@ void main() {
         ],
         child: MaterialApp.router(
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: appRouter,
         ),
@@ -418,7 +419,7 @@ Widget _widgetRouterApp(SharedDeps deps, _WidgetWeather weather) =>
       ],
       child: MaterialApp.router(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: appRouter,
       ),
@@ -456,10 +457,12 @@ void _walk(
   for (final route in routes) {
     switch (route) {
       case GoRoute():
-        final builder = route.builder;
-        if (builder != null) {
-          built.add(builder(context, state ?? _state(route.path)));
-        }
+        final routeState = state ?? _state(route.path);
+        expect(route.builder, isNull, reason: route.name);
+        final page = route.pageBuilder!(context, routeState);
+        expect(page, isA<MaterialPage<void>>(), reason: route.name);
+        expect(page.key, routeState.pageKey, reason: route.name);
+        built.add((page as MaterialPage<void>).child);
         _walk(route.routes, context, built, state: state);
       case StatefulShellRoute():
         for (final branch in route.branches) {

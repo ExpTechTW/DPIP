@@ -9,13 +9,14 @@
 /// all, so there is nothing of its own to pin there.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/map/presentation/layers/temperature_layer.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../raster_timeline_harness.dart';
@@ -38,8 +39,8 @@ void main() {
 
   testWidgets('label reads the localized temperature string', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+      MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: Locale('en'),
         home: Scaffold(),
@@ -175,7 +176,7 @@ void main() {
     // so it needs a real delegate even though this card shows no localized text.
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         home: Scaffold(
@@ -232,7 +233,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('zh', 'TW'),
         home: Scaffold(

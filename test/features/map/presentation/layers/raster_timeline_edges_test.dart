@@ -2,11 +2,12 @@
 /// lines a real show emits when tile tracing is on.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../raster_timeline_harness.dart';
@@ -46,7 +47,7 @@ void main() {
     layer.onSurfaceVisibility(false);
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         home: Scaffold(

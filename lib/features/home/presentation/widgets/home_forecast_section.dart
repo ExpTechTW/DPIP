@@ -16,7 +16,7 @@ import 'package:dpip/core/weather/solar_time.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// 24-hour forecast block under the home header.

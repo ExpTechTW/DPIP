@@ -1,3 +1,4 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/satellite_style_menu.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
@@ -5,7 +6,7 @@ import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
@@ -39,7 +40,7 @@ void main() {
       AppLocalizations.delegate.load(const Locale('en'));
 
   Widget wrap(SatelliteStyleMenu menu) => MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('en'),
     home: Scaffold(
@@ -195,7 +196,7 @@ void main() {
     final terrain = ValueNotifier(true);
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         home: Scaffold(

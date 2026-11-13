@@ -6,7 +6,7 @@ import 'package:dpip/features/map/presentation/layers/weather_station_layer.dart
 import 'package:dpip/features/weather/domain/weather_snapshot.dart';
 import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class HumidityMapLayer
     extends

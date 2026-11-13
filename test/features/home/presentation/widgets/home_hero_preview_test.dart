@@ -1,6 +1,8 @@
 @Tags(['preview'])
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -20,7 +22,7 @@ import 'package:dpip/features/weather/domain/rain_hour_trend_repository.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -134,7 +136,7 @@ void main() {
     final key = GlobalKey();
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('zh', 'TW'),
         home: MultiProvider(

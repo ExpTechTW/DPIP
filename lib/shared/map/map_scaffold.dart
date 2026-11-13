@@ -34,7 +34,7 @@ import 'package:dpip/shared/navigation/refresh_on_appear.dart'
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 

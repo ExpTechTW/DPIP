@@ -7,7 +7,7 @@ import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
 import 'package:dpip/features/release_highlights/presentation/widgets/highlight_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// The page behind the version card's chevron — the cycle's key highlights

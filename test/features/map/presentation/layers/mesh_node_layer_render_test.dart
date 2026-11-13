@@ -3,6 +3,8 @@
 /// name from looking like a neighbour you can reach.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:math' show Point;
 
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
@@ -12,7 +14,7 @@ import 'package:dpip/features/map/presentation/layers/mesh_node_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_menu_toggle_row.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -252,7 +254,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: Builder(builder: layer.buildSheet)),
       ),
@@ -363,7 +365,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Builder(

@@ -19,7 +19,7 @@ import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The wind forecast (風場) raster overlay for one model.

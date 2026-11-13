@@ -6,7 +6,7 @@ library;
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/shared/map/map_layer.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 

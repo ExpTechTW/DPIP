@@ -3,7 +3,7 @@ library;
 
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// UI text size, as a multiplier on whatever the OS accessibility setting
 /// already gives.

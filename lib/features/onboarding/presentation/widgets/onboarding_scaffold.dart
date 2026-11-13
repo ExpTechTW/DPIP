@@ -3,7 +3,7 @@
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A step layout: [child] scrolls; [actionBuilder] builds the pinned bottom bar
 /// and is told whether the content has been scrolled to the end (`atEnd`), so a

@@ -10,11 +10,12 @@
 /// have the legend open.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/intensity_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Mirrors the replay page's own subtree: a top-left overlay whose
@@ -23,7 +24,7 @@ import 'package:flutter_test/flutter_test.dart';
 Future<void> _pumpLegend(WidgetTester tester, ValueNotifier<bool> hasEew) {
   return tester.pumpWidget(
     MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('zh'),
       home: Scaffold(

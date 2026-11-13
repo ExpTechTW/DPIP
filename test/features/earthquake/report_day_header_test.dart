@@ -11,10 +11,11 @@
 /// assertions below.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -29,7 +30,7 @@ Future<AppLocalizations> _l10n(Locale locale) =>
 /// reference the screen size cannot move.
 Widget _wrap(Widget child, {required Locale locale, required double width}) =>
     MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
       home: Scaffold(

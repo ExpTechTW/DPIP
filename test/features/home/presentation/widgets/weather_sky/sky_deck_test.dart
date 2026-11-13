@@ -12,7 +12,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_painter.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 

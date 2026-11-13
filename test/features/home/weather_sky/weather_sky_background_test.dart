@@ -2,9 +2,9 @@ import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_deck.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The animated sky must not repaint when it is stopped: the scroll-blur
 /// subtree above it rebuilds on every scroll tick while the sky is frozen

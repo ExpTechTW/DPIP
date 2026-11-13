@@ -1,5 +1,5 @@
 import 'package:dpip/core/settings/display_settings.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Centralized Material 3 theming for light and dark modes.
 abstract final class AppTheme {

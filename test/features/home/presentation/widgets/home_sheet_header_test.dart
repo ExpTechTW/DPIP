@@ -4,6 +4,8 @@
 /// the new fetch runs — this is what must never appear as the new area's.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dpip/core/error/result.dart';
@@ -20,7 +22,7 @@ import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_station_handoff.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -163,7 +165,7 @@ Widget _wrap(
     ],
   );
   return MaterialApp.router(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('zh', 'TW'),
     routerConfig: router,

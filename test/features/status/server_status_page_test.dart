@@ -2,6 +2,7 @@
 /// reading of the multi-active endpoints ("本機狀態") below.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_region.dart';
@@ -12,7 +13,7 @@ import 'package:dpip/features/status/domain/server_status.dart';
 import 'package:dpip/features/status/domain/server_status_repository.dart';
 import 'package:dpip/features/status/presentation/pages/server_status_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher_platform_interface/link.dart';
@@ -34,7 +35,7 @@ void main() {
         ChangeNotifierProvider.value(value: health ?? EndpointHealthMonitor()),
       ],
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: ServerStatusPage(key: pageKey),
       ),

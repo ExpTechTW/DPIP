@@ -36,7 +36,7 @@ import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// One mock report row.

@@ -2,10 +2,10 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_glass.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_frame_pace.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// `RainOnGlass` wraps the home sheet's own content, which is the surface the
 /// user drags to collapse the sheet. A decorative filter must never eat that

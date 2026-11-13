@@ -4,7 +4,7 @@ library;
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_immersive.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Fades and nudges a block of map chrome as immersive mode toggles.
 ///

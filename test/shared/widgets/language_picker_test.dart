@@ -5,11 +5,11 @@
 /// override (the reported "switching back to default fails" bug).
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/locale_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/language_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -31,13 +31,9 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: controller,
-        child: const MaterialApp(
+        child: MaterialApp(
           locale: Locale('zh', 'TW'),
-          localizationsDelegates: [
-            ...AppLocalizations.localizationsDelegates,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(body: Center(child: LanguagePicker())),
         ),

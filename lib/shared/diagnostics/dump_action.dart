@@ -13,7 +13,7 @@ import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/dump_link_dialog.dart';
 import 'package:dpip/shared/widgets/dump_upload_dialog.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:talker_flutter/talker_flutter.dart';

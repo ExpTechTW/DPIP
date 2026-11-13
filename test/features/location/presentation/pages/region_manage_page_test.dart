@@ -3,6 +3,7 @@
 /// saved list or make a removal look like it failed.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -10,7 +11,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -60,7 +61,7 @@ Future<RegionStore> _pump(
       ],
       child: MaterialApp.router(
         routerConfig: router,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
       ),
     ),

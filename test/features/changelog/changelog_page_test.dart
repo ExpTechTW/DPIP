@@ -6,6 +6,8 @@
 /// front-end compiler.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:typed_data';
 
 import 'package:dpip/core/error/failure.dart';
@@ -15,7 +17,7 @@ import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/changelog/presentation/pages/changelog_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher_platform_interface/link.dart';
@@ -51,7 +53,7 @@ class _PagedRepository implements ChangelogRepository {
 Widget _wrap(ChangelogRepository repo) => Provider<ChangelogRepository>.value(
   value: repo,
   child: MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('en'),
     home: const ChangelogPage(),

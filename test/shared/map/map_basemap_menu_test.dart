@@ -3,11 +3,12 @@
 /// map unchanged while the checkbox looks flipped.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_terrain_toggle.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -20,7 +21,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: MenuAnchor(
@@ -67,7 +68,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Align(
@@ -110,7 +111,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: MenuAnchor(

@@ -7,7 +7,7 @@
 library;
 
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Pumps the gate under [visibleTab] and returns every state it reported.

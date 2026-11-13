@@ -1,15 +1,16 @@
 /// The radio's battery chart: what it plots, and what it refuses to imply.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_charts.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   home: Scaffold(body: child),

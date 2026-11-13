@@ -18,7 +18,7 @@ import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:dpip/shared/widgets/selectable_pill.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 

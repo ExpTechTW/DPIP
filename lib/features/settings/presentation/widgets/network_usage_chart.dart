@@ -7,7 +7,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Which series the chart plots: both stacked, or one on its own.
 enum NetworkChartMode {

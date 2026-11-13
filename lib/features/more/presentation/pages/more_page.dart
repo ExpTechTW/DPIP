@@ -24,7 +24,7 @@ import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/shared/diagnostics/dump_action.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
