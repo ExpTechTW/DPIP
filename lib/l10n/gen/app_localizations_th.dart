@@ -2584,7 +2584,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get onboardingIntroTitle => 'ยินดีต้อนรับสู่ DPIP';
 
   @override
-  String get regionCurrentUnavailable => 'ไม่สามารถระบุตำแหน่งปัจจุบันได้';
+  String get regionCurrentUnavailable =>
+      'ตำแหน่งปัจจุบันอยู่นอกพื้นที่ให้บริการ';
 
   @override
   String get languageSystem => 'ค่าเริ่มต้นของระบบ';

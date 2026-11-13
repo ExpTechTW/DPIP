@@ -2547,7 +2547,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get onboardingIntroTitle => 'DPIP에 오신 것을 환영합니다';
 
   @override
-  String get regionCurrentUnavailable => '현재 위치를 가져올 수 없습니다';
+  String get regionCurrentUnavailable => '현재 위치가 서비스 지역 밖입니다';
 
   @override
   String get languageSystem => '시스템 기본값';

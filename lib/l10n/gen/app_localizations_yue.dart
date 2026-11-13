@@ -2534,7 +2534,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get onboardingIntroTitle => '歡迎使用 DPIP';
 
   @override
-  String get regionCurrentUnavailable => '冇辦法取得所在地位置資訊';
+  String get regionCurrentUnavailable => '目前所在地唔喺服務範圍內';
 
   @override
   String get languageSystem => '系統預設';

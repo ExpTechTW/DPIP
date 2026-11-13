@@ -2534,7 +2534,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingIntroTitle => '歡迎使用 DPIP';
 
   @override
-  String get regionCurrentUnavailable => '無法取得所在地位置資訊';
+  String get regionCurrentUnavailable => '目前所在地不在服務範圍內';
 
   @override
   String get languageSystem => '系統預設';
@@ -6098,7 +6098,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get onboardingIntroTitle => '欢迎使用 DPIP';
 
   @override
-  String get regionCurrentUnavailable => '无法获取所在地位置信息';
+  String get regionCurrentUnavailable => '目前所在地不在服务范围内';
 
   @override
   String get languageSystem => '系统默认';
@@ -9661,7 +9661,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get onboardingIntroTitle => '歡迎使用 DPIP';
 
   @override
-  String get regionCurrentUnavailable => '無法取得所在地位置資訊';
+  String get regionCurrentUnavailable => '目前所在地不在服務範圍內';
 
   @override
   String get languageSystem => '系統預設';
@@ -13225,7 +13225,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get onboardingIntroTitle => '歡迎使用 DPIP';
 
   @override
-  String get regionCurrentUnavailable => '無法取得所在地位置資訊';
+  String get regionCurrentUnavailable => '目前所在地不在服務範圍內';
 
   @override
   String get languageSystem => '系統預設';

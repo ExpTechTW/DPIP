@@ -59,10 +59,10 @@ class _EventsPageState extends State<EventsPage> {
 
   /// The body for the area at [index].
   ///
-  /// 所在地 with no GPS fix gets a notice, not a feed: the nationwide list would
-  /// be indistinguishable from "these are the events where you are", which in a
-  /// disaster app is the one thing it must not be mistaken for. Every other area
-  /// is a township code, or null for 全國.
+  /// 所在地 with no township resolved (GPS off, or abroad) gets a notice, not a
+  /// feed: the nationwide list would be indistinguishable from "these are the
+  /// events where you are", which in a disaster app is the one thing it must
+  /// not be mistaken for. Every other area is a township code, or null for 全國.
   Widget _pageAt(BuildContext context, int index) {
     // `read`, not `watch`: [RegionPager] already watches the store, so a fix
     // arriving rebuilds every page through it.

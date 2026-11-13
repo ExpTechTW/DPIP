@@ -1195,7 +1195,7 @@
   "meshtasticUndecoded": "ไม่ได้ถอดรหัส",
   "notifyAnnouncement": "ประกาศ",
   "onboardingIntroTitle": "ยินดีต้อนรับสู่ DPIP",
-  "regionCurrentUnavailable": "ไม่สามารถระบุตำแหน่งปัจจุบันได้",
+  "regionCurrentUnavailable": "ตำแหน่งปัจจุบันอยู่นอกพื้นที่ให้บริการ",
   "languageSystem": "ค่าเริ่มต้นของระบบ",
   "skyTimeSunset": "พระอาทิตย์ตก",
   "mapLayerSatelliteDust": "Himawari Dust",

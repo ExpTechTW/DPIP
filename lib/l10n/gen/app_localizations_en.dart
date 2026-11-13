@@ -2592,7 +2592,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingIntroTitle => 'Welcome to DPIP';
 
   @override
-  String get regionCurrentUnavailable => 'Can\'t get current location';
+  String get regionCurrentUnavailable =>
+      'Your current location is outside the service area';
 
   @override
   String get languageSystem => 'System default';

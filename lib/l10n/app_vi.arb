@@ -1195,7 +1195,7 @@
   "meshtasticUndecoded": "Chưa giải mã",
   "notifyAnnouncement": "Thông báo",
   "onboardingIntroTitle": "Chào mừng đến với DPIP",
-  "regionCurrentUnavailable": "Không thể lấy vị trí hiện tại",
+  "regionCurrentUnavailable": "Vị trí hiện tại nằm ngoài khu vực phục vụ",
   "languageSystem": "Mặc định hệ thống",
   "skyTimeSunset": "Hoàng hôn",
   "mapLayerSatelliteDust": "Himawari Dust",

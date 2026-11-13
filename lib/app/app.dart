@@ -141,7 +141,7 @@ class DpipApp extends StatelessWidget {
 ///   whose channel→screen table lives in `notification_routes.dart`);
 /// - requesting notification permission once, after the first frame;
 /// - resolving the current GPS township into the [RegionStore] so 所在地 shows
-///   the real location (and the "can't get location" state when GPS is off).
+///   the real location (and the "outside the service area" state otherwise).
 class _AppServicesHost extends StatefulWidget {
   const _AppServicesHost({
     required this.realtimeService,

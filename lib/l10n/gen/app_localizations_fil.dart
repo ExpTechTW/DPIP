@@ -2609,7 +2609,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get regionCurrentUnavailable =>
-      'Hindi makuha ang kasalukuyang lokasyon';
+      'Ang kasalukuyang lokasyon ay nasa labas ng saklaw ng serbisyo';
 
   @override
   String get languageSystem => 'Default ng system';

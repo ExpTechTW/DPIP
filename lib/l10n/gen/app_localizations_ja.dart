@@ -2546,7 +2546,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get onboardingIntroTitle => 'DPIP へようこそ';
 
   @override
-  String get regionCurrentUnavailable => '現在地を取得できません';
+  String get regionCurrentUnavailable => '現在地はサービス対象地域外です';
 
   @override
   String get languageSystem => 'システムの既定';

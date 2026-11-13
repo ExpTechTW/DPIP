@@ -40,7 +40,7 @@
     "description": "Himawari longwave-infrared channel (B14, 11.2 µm) layer name"
   },
   "@regionCurrentUnavailable": {
-    "description": "Shown when the current-location area is selected but GPS is off/unavailable"
+    "description": "Shown when the current-location area is selected but no township could be resolved — location services off, permission denied, or the device is outside Taiwan"
   },
   "@mapLayerCategoryEarthquake": {
     "description": "Section title in map overlay lists: the seismic-monitor overlays"
@@ -3053,7 +3053,7 @@
   },
   "notifyAnnouncement": "Announcements",
   "onboardingIntroTitle": "Welcome to DPIP",
-  "regionCurrentUnavailable": "Can't get current location",
+  "regionCurrentUnavailable": "Your current location is outside the service area",
   "languageSystem": "System default",
   "skyTimeSunset": "Sunset",
   "mapLayerSatelliteDust": "Himawari Dust",
