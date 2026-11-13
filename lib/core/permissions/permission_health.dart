@@ -145,9 +145,14 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
     final background = foreground ? await _location.backgroundGranted() : false;
     final execution = await _execution.status();
     // Only a state the platform actually answered can be a problem, and only
-    // one the user can act on: a profile-locked device has nothing to change.
+    // one the user can act on: a profile-locked device has nothing to change,
+    // and neither has one whose settings page for this state is missing — the
+    // row that would clear it is hidden, so a badge from it could never be.
     final execute =
-        !execution.known || !execution.restricted || execution.lockedByPolicy;
+        !execution.known ||
+        !execution.restricted ||
+        execution.lockedByPolicy ||
+        !execution.canOpenSettings;
     final unusedApp = await _unusedApp.status();
     final keptActive = unusedApp != UnusedAppRestrictions.restricted;
     final batteryExempt = await _battery.isIgnoring();

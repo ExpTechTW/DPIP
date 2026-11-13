@@ -14,8 +14,22 @@ class BackgroundExecutionStatus {
     this.standbyBucket,
     this.manufacturer,
     this.vendorManaged = false,
+    this.canOpenSettings = true,
     this.known = false,
   });
+
+  /// Reads the shape both platforms answer with. In one place so the key names
+  /// are pinned by a test instead of by two native implementations agreeing.
+  factory BackgroundExecutionStatus.fromMap(Map<String, Object?> map) =>
+      BackgroundExecutionStatus(
+        restricted: map['restricted'] as bool? ?? false,
+        lockedByPolicy: map['lockedByPolicy'] as bool? ?? false,
+        standbyBucket: map['standbyBucket'] as String?,
+        manufacturer: map['manufacturer'] as String?,
+        vendorManaged: map['vendorManaged'] as bool? ?? false,
+        canOpenSettings: map['canOpenSettings'] as bool? ?? true,
+        known: true,
+      );
 
   /// The OS is actively refusing to run this app in the background.
   ///
@@ -40,6 +54,17 @@ class BackgroundExecutionStatus {
   /// query API and no exemption intent (Samsung, Xiaomi, Huawei, OPPO, vivo …).
   /// Nothing here can measure it; the row exists to tell the user it is there.
   final bool vendorManaged;
+
+  /// Whether this device has a screen that could change the state at all.
+  ///
+  /// Android's "Restricted" state does not exist below API 28, and a device can
+  /// ship without the Settings activity that exposes it (kiosk images, ROMs
+  /// that replace Settings). The row's button opens that screen, so where it
+  /// cannot be opened the row is a dead end and must not be shown.
+  ///
+  /// True when the platform did not say otherwise, so an older native build or
+  /// a test harness keeps the row rather than silently losing it.
+  final bool canOpenSettings;
 
   /// Whether the platform actually answered. False leaves every field at its
   /// optimistic default, so an unsupported platform or a failed call can never
@@ -72,14 +97,7 @@ class BackgroundExecutionService {
     try {
       final map = await _channel.invokeMapMethod<String, Object?>('status');
       if (map == null) return const BackgroundExecutionStatus();
-      return BackgroundExecutionStatus(
-        restricted: map['restricted'] as bool? ?? false,
-        lockedByPolicy: map['lockedByPolicy'] as bool? ?? false,
-        standbyBucket: map['standbyBucket'] as String?,
-        manufacturer: map['manufacturer'] as String?,
-        vendorManaged: map['vendorManaged'] as bool? ?? false,
-        known: true,
-      );
+      return BackgroundExecutionStatus.fromMap(map);
     } on PlatformException catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'background execution status');
       return const BackgroundExecutionStatus();

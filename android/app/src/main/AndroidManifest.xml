@@ -256,5 +256,13 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Android 11+ package visibility for the app-details screen that
+             BackgroundExecutionChannel resolves before offering its row. The
+             filter matches Settings' own (action + package scheme); without it
+             resolveActivity answers null and the row would be hidden everywhere. -->
+        <intent>
+            <action android:name="android.settings.APPLICATION_DETAILS_SETTINGS"/>
+            <data android:scheme="package"/>
+        </intent>
     </queries>
 </manifest>

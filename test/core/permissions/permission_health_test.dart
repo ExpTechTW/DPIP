@@ -186,6 +186,26 @@ void main() {
     },
   );
 
+  test('a restricted device with no screen to fix it is left alone', () async {
+    final health = _health(
+      execution: const BackgroundExecutionStatus(
+        restricted: true,
+        canOpenSettings: false,
+        known: true,
+      ),
+      unusedApp: UnusedAppRestrictions.exempt,
+    );
+    await health.refresh();
+
+    expect(
+      health.needsAttention,
+      isFalse,
+      reason:
+          'the permission row hides itself when its settings screen does not '
+          'exist, so a badge fed by the same state could never be cleared',
+    );
+  });
+
   test('an unanswered platform raises nothing', () async {
     final health = _health(
       // `known: false` is what an unsupported platform, an older build without

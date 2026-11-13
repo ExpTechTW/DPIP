@@ -300,7 +300,38 @@ class BackgroundExecutionChannel(private val context: Context) :
             // rather than on whether a component resolves, because package
             // visibility makes the latter unanswerable (see OEM_SCREENS).
             "vendorManaged" to (vendor in AGGRESSIVE),
+            "canOpenSettings" to canOpenSettings(),
         )
+    }
+
+    /**
+     * Whether [openAppDetails] can actually land somewhere on this device.
+     *
+     * The "Restricted" state the row exists for does not exist below API 28,
+     * and a device can ship without the Settings activity that shows it (kiosk
+     * images, ROMs that replace Settings). A row whose only action is a
+     * settings screen that cannot be opened is a dead end, so the caller hides
+     * it instead — the state and the screen are one capability, not two.
+     *
+     * `resolveActivity` is filtered by Android 11 package visibility, so this
+     * answers false on every API 30+ device unless the manifest carries the
+     * matching `<queries>` entry. That entry is what makes this question
+     * answerable; without it the row would vanish everywhere.
+     */
+    private fun canOpenSettings(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
+        return try {
+            val intent = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:${context.packageName}"),
+            )
+            context.packageManager.resolveActivity(intent, 0) != null
+        } catch (e: Exception) {
+            // A failed probe is not a "no": hiding a row for a state the user
+            // can still fix is the worse of the two errors.
+            Log.w(TAG, "cannot resolve the app settings screen", e)
+            true
+        }
     }
 
     /**

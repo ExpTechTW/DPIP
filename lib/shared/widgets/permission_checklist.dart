@@ -636,9 +636,13 @@ class _PermissionChecklistState extends State<PermissionChecklist>
         // On iOS it is the sharpest failure on the page — with Background App
         // Refresh off, no significant-change or region event is delivered at
         // all, so the location spine reports itself armed and never fires.
-        // Hidden until the platform answers, and hidden when a management
-        // profile owns the switch, because then there is nothing to tap.
-        if (_executionStatus.known && !_executionStatus.lockedByPolicy) ...[
+        // Hidden until the platform answers, hidden when a management
+        // profile owns the switch, because then there is nothing to tap, and
+        // hidden where the screen the row opens does not exist — a button that
+        // cannot reach a setting is worse than no row.
+        if (_executionStatus.known &&
+            !_executionStatus.lockedByPolicy &&
+            _executionStatus.canOpenSettings) ...[
           const SizedBox(height: AppSpacing.sm),
           PermissionRow(
             icon: Icons.play_circle_outline,
