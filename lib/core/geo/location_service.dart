@@ -30,14 +30,13 @@ bool isLocationRefusal(Object error) =>
 /// Wraps `geolocator` (native `CLLocationManager` / `FusedLocationProvider`).
 /// The availability check and the position fetch are injectable seams, so the
 /// resolution is unit-testable without the platform. A fix resolves by exact
-/// **point-in-polygon** ([TownBoundaries]) when the boundary data is available,
-/// falling back to nearest-centroid ([TownDirectory]) at sea or before the
-/// boundaries finish loading. [currentTown] returns null whenever a fix can't be
-/// had (services off, permission denied, timeout) — the caller then shows the
-/// "can't get current location" state and keeps the last known region. A fix
-/// nowhere near Taiwan (the user is abroad) resolves to null the same way, by
-/// [TownDirectory.nearest]'s range limit, so a Taiwanese township is never named
-/// for a place on the other side of the Pacific.
+/// **point-in-polygon** ([TownBoundaries]), then the nearest **coastline** within
+/// a few km for a fix that drifted onto the water. [currentTown] returns null
+/// whenever a fix can't be had (services off, permission denied, timeout) — the
+/// caller then shows the "outside the service area" state and keeps the last
+/// known region. A fix nowhere near Taiwan (the user is abroad) resolves to null
+/// the same way, so a Taiwanese township is never named for a place on the other
+/// side of the Pacific.
 class LocationService {
   LocationService(
     this._directory, {
@@ -317,17 +316,28 @@ class LocationService {
   /// fix (the foreground position stream) and must not pay for another one.
   Future<Town?> townAt(double lat, double lng) => _resolve(lat, lng);
 
-  /// Resolves ([lat], [lng]) to a township: exact point-in-polygon when the
-  /// boundary data is loaded, else nearest-centroid (at sea, in a boundary gap,
-  /// or before the background boundary load completes) — null from both when
-  /// the fix is nowhere near Taiwan. See [TownDirectory.nearest].
+  /// How far off the coast a fix may be and still belong to the township it is
+  /// beside — a phone on a pier whose fix drifts offshore, a boat at the quay.
+  /// Past this the app says it cannot place the user rather than naming a
+  /// township they are not in: Xiamen's waterfront is 10 km from Lieyu's coast
+  /// by the boundary data and the rest of the Fujian coast near Kinmen and Matsu
+  /// is 8 km or more, so no fix of the user's own position can reach them.
+  static const double _coastKm = 5;
+
+  /// Resolves ([lat], [lng]) to a township: exact point-in-polygon, else the
+  /// township whose coast is within [_coastKm]. A fix that is neither — another
+  /// country, the open sea — resolves to null, because the nearest township to a
+  /// point on the other side of the planet is not where the user is.
+  ///
+  /// Only a service built without boundary data falls back to nearest-centroid;
+  /// production always has them (see `bootstrap.dart`).
   Future<Town?> _resolve(double lat, double lng) async {
     final boundaries = _boundaries;
-    if (boundaries != null) {
-      final code = (await boundaries).codeAt(lat, lng);
-      if (code != null) return _directory.byCode(code);
-    }
-    return _directory.nearest(lat, lng);
+    if (boundaries == null) return _directory.nearest(lat, lng);
+    final loaded = await boundaries;
+    final code =
+        loaded.codeAt(lat, lng) ?? loaded.codeNearCoast(lat, lng, _coastKm);
+    return _directory.byCode(code);
   }
 
   static Future<bool> _geolocatorAvailable() async {

@@ -77,6 +77,30 @@ void main() {
     });
   });
 
+  group('TownBoundaries.codeNearCoast (synthetic)', () {
+    final b = _synthetic();
+
+    test('a fix just off the coast belongs to the township it is beside', () {
+      // ~1.1 km south of A's edge — the fix of a phone at the water's edge.
+      expect(b.codeNearCoast(23.99, 120.05, 5), 'A');
+      // The same for a point 1 km east of B's edge.
+      expect(b.codeNearCoast(24.05, 120.21, 5), 'B');
+    });
+
+    test('a point farther than the limit from any coast is null', () {
+      // ~6.7 km south of A: on the water, but not beside anything.
+      expect(b.codeNearCoast(23.94, 120.05, 5), isNull);
+      // Between the A/B row and the H row: 5.6 km from both.
+      expect(b.codeNearCoast(24.15, 120.05, 5), isNull);
+    });
+
+    test('the nearest coast wins, not the first one scanned', () {
+      // 1.0° west of A is 4° from everything else — but 1.0° is 111 km, so this
+      // only proves the limit is applied to the winner.
+      expect(b.codeNearCoast(24.05, 119.10, 5), isNull);
+    });
+  });
+
   group('TownBoundaries.load (real asset — golden)', () {
     late TownBoundaries boundaries;
 
@@ -94,6 +118,27 @@ void main() {
 
     test('a point at sea resolves to null (caller falls back)', () {
       expect(boundaries.codeAt(24.0, 120.0), isNull); // Taiwan Strait
+    });
+
+    test('a fix on the water keeps the coast it is beside', () {
+      // Keelung's harbour mouth, ~0.5 km off the quay.
+      expect(boundaries.codeNearCoast(25.1530, 121.7440, 5), '203');
+      // Kaohsiung, 1.4 km offshore of the port.
+      expect(boundaries.codeNearCoast(22.6000, 120.2500, 5), '805');
+      // The same water 5.1 km out: past the limit, so no township at all.
+      expect(boundaries.codeNearCoast(22.6000, 120.2100, 5), isNull);
+    });
+
+    test('the reported Xiamen coordinate is not near a Taiwanese coast', () {
+      // 24.449350, 118.077110 — Siming, Xiamen. Before this rule it resolved to
+      // 金門縣 烈嶼鄉 by nearest centroid, 17 km away, and its weather card named
+      // Lieyu's station. By the boundary data it is 10 km from the nearest
+      // Taiwanese coastline, so no township is named.
+      expect(boundaries.codeAt(24.449350, 118.077110), isNull);
+      expect(boundaries.codeNearCoast(24.449350, 118.077110, 5), isNull);
+      // The rest of the Fujian coast across from Kinmen and Matsu, same answer.
+      expect(boundaries.codeNearCoast(24.570, 118.330, 5), isNull); // Xiang'an
+      expect(boundaries.codeNearCoast(26.0745, 119.2965, 5), isNull); // Fuzhou
     });
   });
 }
