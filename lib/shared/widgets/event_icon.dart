@@ -3,7 +3,7 @@
 library;
 
 import 'package:dpip/core/weather/weather_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The icon for an event kind, keyed off `EventType.iconKey` so the domain
 /// enum stays Material-free. Falls back to a generic notification mark for an

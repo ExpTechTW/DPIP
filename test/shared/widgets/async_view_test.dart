@@ -1,3 +1,5 @@
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dpip/core/error/failure.dart';
@@ -7,11 +9,11 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/freshness_banner.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   home: Scaffold(body: child),

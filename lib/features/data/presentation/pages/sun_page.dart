@@ -20,7 +20,7 @@ import 'package:dpip/features/data/presentation/observer_place.dart';
 import 'package:dpip/features/data/presentation/widgets/astro_card.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 /// Taiwan's fixed offset — the wall clock every time on this page is read in.

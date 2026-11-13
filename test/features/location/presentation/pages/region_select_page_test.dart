@@ -12,6 +12,7 @@
 /// and both paths must forward identically onto the next push.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -19,7 +20,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -83,7 +84,7 @@ Widget _wrap(
     ],
   );
   return MaterialApp.router(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('zh', 'TW'),
     routerConfig: router,
@@ -267,7 +268,7 @@ void main() {
     );
     await tester.pumpWidget(
       MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('zh', 'TW'),
         routerConfig: router,

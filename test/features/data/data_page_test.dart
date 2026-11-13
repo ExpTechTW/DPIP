@@ -7,10 +7,11 @@
 /// entry that fails to land fails here instead of on a phone.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -68,7 +69,7 @@ Future<void> _pump(WidgetTester tester, GoRouter router) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     MaterialApp.router(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
     ),
@@ -101,7 +102,7 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: _router([]),
       ),
@@ -136,7 +137,7 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         MaterialApp.router(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: _router([]),
         ),

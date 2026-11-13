@@ -5,7 +5,7 @@ library;
 import 'package:dpip/features/map/presentation/layers/satellite_layer.dart';
 import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

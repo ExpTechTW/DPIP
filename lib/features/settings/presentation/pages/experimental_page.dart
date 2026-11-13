@@ -4,7 +4,7 @@ import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Experimental / in-progress features, reachable from the More tab.

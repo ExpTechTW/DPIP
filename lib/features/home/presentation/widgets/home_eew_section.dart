@@ -44,7 +44,7 @@ import 'package:dpip/shared/widgets/eew_cancelled_notice.dart';
 import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/eew_feed_down_notice.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

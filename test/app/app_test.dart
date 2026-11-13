@@ -56,7 +56,7 @@ import 'package:dpip/core/storage/app_database.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:dpip/features/map/map_providers.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 // ignore: depend_on_referenced_packages

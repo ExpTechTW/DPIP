@@ -5,7 +5,7 @@
 library;
 
 import 'package:dpip/shared/widgets/intensity_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> _pump(WidgetTester tester, IntensityLegend legend) async {

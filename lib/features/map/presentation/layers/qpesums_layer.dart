@@ -10,7 +10,7 @@ import 'package:dpip/shared/map/map_style.dart' show townLabelLayerId;
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The QPESUMS next-1-hour precipitation forecast (未來一小時降水預報) raster
 /// overlay.

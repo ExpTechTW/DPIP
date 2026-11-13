@@ -18,7 +18,7 @@ import 'package:dpip/features/weather/domain/satellite_channel.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The satellite layer's legend card, rebuilt when the band's [style] changes
 /// (grayscale vs cloud-top vs Dvorak are three different keys) or the 國界

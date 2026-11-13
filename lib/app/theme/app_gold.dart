@@ -27,7 +27,7 @@
 library;
 
 import 'package:dpip/core/a11y/color_vision.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The gold pair for one brightness.
 @immutable

@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe_data.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The CPU-baked sky gradient (`SkyLutCache._bakeSkyGradient`) must reproduce

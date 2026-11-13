@@ -16,7 +16,7 @@ import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// A sheet layer: one event, no frames and no timeline.

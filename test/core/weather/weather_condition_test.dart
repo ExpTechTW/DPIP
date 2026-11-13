@@ -2,7 +2,7 @@ import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/core/weather/weather_code.dart';
 import 'package:dpip/core/weather/weather_condition.dart';
 import 'package:dpip/core/weather/weather_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

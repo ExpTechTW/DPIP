@@ -3,7 +3,7 @@ import 'package:dpip/features/events/domain/event.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/event_icon.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

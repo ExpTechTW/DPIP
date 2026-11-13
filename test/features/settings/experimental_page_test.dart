@@ -3,13 +3,14 @@
 /// home backdrop lie about which override is in force.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/settings/presentation/pages/experimental_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,7 @@ Future<ExperimentalSettings> _pump(WidgetTester tester) async {
     ChangeNotifierProvider.value(
       value: settings,
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const ExperimentalPage(),
       ),

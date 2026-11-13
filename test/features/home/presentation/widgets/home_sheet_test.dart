@@ -1,3 +1,4 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -28,7 +29,7 @@ import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/foundation.dart' show listEquals;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -105,7 +106,7 @@ Widget _wrap(RegionStore store, HomeSheetExtent extent) {
   const directory = TownDirectory(<String, Town>{});
   final events = _FakeEventRepository();
   return MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('en'),
     home: MultiProvider(

@@ -1,14 +1,15 @@
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:math' as math;
 
-import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_compass.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   Widget harness(double bearing, VoidCallback onPressed) {
     return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       home: Scaffold(
         body: MapCompass(bearing: ValueNotifier(bearing), onPressed: onPressed),
       ),

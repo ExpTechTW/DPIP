@@ -6,6 +6,7 @@
 /// that overflows at 1.45 discredits the setting it is demonstrating.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/settings/color_vision_controller.dart';
 import 'package:dpip/core/settings/display_settings.dart';
@@ -16,7 +17,7 @@ import 'package:dpip/features/settings/presentation/pages/display_page.dart';
 import 'package:dpip/features/settings/presentation/widgets/display_preview.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +49,7 @@ Future<SettingsStore> _pump(
         ChangeNotifierProvider(create: (_) => ColorVisionController(settings)),
       ],
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         // Stands in for the ComposedTextScaler the real app installs at its
         // root, so the page is exercised at the sizes it offers.

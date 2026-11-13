@@ -1,5 +1,5 @@
 import 'package:dpip/features/home/presentation/widgets/weather_sky/weather_sky_background.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The animated sky must not repaint when it is stopped: the scroll-blur

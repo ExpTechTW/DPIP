@@ -4,7 +4,7 @@ import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../features/map/raster_timeline_harness.dart';

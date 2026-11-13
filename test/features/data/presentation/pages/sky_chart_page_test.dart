@@ -8,6 +8,7 @@
 /// only drawn once it has a place to be drawn for.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/astro/star_catalog.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -15,7 +16,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/data/presentation/pages/sky_chart_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -51,8 +52,8 @@ Future<void> _pump(
         Provider<TownDirectory>.value(value: directory),
         ChangeNotifierProvider<RegionStore>.value(value: regions),
       ],
-      child: const MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+      child: MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: SkyChartPage(),
       ),

@@ -3,6 +3,8 @@
 /// not offer the restroom kinds, leaves the toggles unlabeled.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:math' show Point;
 
 import 'package:dpip/core/error/result.dart';
@@ -13,7 +15,7 @@ import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_style.dart' show dpmAedPointsLayerId;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -67,7 +69,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Builder(

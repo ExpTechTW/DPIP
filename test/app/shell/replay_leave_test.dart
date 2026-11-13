@@ -10,7 +10,7 @@
 // frame — is what `MainShell._onDestinationSelected` uses, so any change to
 // go_router's branch behaviour that breaks it shows up here.
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 

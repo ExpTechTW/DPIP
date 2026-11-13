@@ -3,6 +3,7 @@
 /// on the empty state during an alert is the one screen that must not.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
@@ -22,7 +23,7 @@ import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.da
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:flutter/foundation.dart' show listEquals;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -140,7 +141,7 @@ Future<void> _pump(WidgetTester tester, List<Eew> alerts) async {
       ],
       child: MaterialApp(
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const EarthquakePage(),
       ),

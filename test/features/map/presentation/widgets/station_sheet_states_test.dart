@@ -3,6 +3,8 @@
 /// look like a flat line of real observations.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dpip/core/error/failure.dart';
@@ -10,7 +12,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/widgets/station_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _Source implements StationSheetSource {
@@ -97,7 +99,7 @@ class _Source implements StationSheetSource {
 
 Widget _app(Widget home) => MaterialApp(
   locale: const Locale('en'),
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: home),
 );

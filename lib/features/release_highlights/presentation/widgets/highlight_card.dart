@@ -4,7 +4,7 @@ library;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The tag of the active locale, e.g. `zh_Hant`, `en`.
 String localeTagOf(BuildContext context) =>

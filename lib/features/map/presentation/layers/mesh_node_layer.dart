@@ -26,7 +26,7 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Traceroute state shared by the sheet's button and the dashed overlay.

@@ -7,7 +7,7 @@ library;
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/core/weather/weather_code.dart';
 import 'package:dpip/core/weather/weather_icons.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// CWB families 100 (晴) / 200 (多雲) / 300 (陰) each carry the same 20
 /// phenomenon suffixes (ones digits 1–19, `0` = the plain family sky). `0`

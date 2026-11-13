@@ -18,6 +18,7 @@
 /// every single toggle, the kind of regression no analyzer catches.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/disaster_map/domain/aed_detail.dart';
 import 'package:dpip/features/disaster_map/domain/disaster_map_repository.dart';
@@ -27,7 +28,7 @@ import 'package:dpip/features/map/presentation/layers/disaster_map_layer.dart';
 import 'package:dpip/features/map/presentation/widgets/disaster_map_overlay_menu.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The menu only reads [DisasterMapLayer.subLayers] and flips a sub-layer's
@@ -66,7 +67,7 @@ class _FakeDisasterMapRepository implements DisasterMapRepository {
 }
 
 Widget _wrap(Widget child) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   home: Scaffold(

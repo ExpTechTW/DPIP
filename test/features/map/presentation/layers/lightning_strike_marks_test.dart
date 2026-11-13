@@ -3,13 +3,14 @@
 /// again.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/lightning_strike_overlay.dart';
 import 'package:dpip/features/weather/domain/lightning_snapshot.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../raster_timeline_harness.dart';
@@ -131,7 +132,7 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         home: Scaffold(

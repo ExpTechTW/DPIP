@@ -1,7 +1,7 @@
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Reveal-driven "glass" tinting for content layered over the weather backdrop.
 ///

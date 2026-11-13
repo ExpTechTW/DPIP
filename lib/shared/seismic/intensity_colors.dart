@@ -22,7 +22,7 @@ library;
 
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The real-time monitor's station dots, coloured by the continuous
 /// instrumental intensity `i` — rts-image-go's station table, the colours

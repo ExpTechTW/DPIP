@@ -3,7 +3,7 @@ library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// One on/off overlay inside a [MapChipButton] dropdown: icon, title, optional
 /// hint, and a trailing checkbox.

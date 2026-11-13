@@ -1,5 +1,5 @@
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A settings / menu section header — a small primary-tinted label above a
 /// group of rows. Shared so every list groups its sections identically.

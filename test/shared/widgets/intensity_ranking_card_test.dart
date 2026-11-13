@@ -6,16 +6,17 @@
 /// colour — the badge is what is read first, before the place name.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/intensity_colors.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:dpip/shared/widgets/intensity_ranking_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _host(List<IntensityRankingEntry> entries) => MaterialApp(
   locale: const Locale('zh', 'TW'),
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: IntensityRankingCard(entries: entries)),
 );

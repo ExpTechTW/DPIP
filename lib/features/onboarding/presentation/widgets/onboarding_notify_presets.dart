@@ -27,7 +27,7 @@ import 'package:dpip/features/notification/domain/notify_preset_applier.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_scaffold.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 class OnboardingNotifyPresetsPage extends StatefulWidget {

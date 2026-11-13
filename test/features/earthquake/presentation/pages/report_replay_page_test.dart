@@ -8,6 +8,8 @@
 /// is decided here, not in the archive clients.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dio/dio.dart';
@@ -47,7 +49,7 @@ import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -516,7 +518,7 @@ void main() {
           ],
           child: MaterialApp.router(
             locale: const Locale('en'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: appLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             routerConfig: router,
           ),
@@ -730,7 +732,7 @@ void main() {
           ],
           child: MaterialApp.router(
             locale: const Locale('en'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            localizationsDelegates: appLocalizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             routerConfig: router,
           ),
@@ -830,7 +832,7 @@ void main() {
               ],
               child: MaterialApp.router(
                 locale: const Locale('en'),
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                localizationsDelegates: appLocalizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 routerConfig: router,
               ),
@@ -913,7 +915,7 @@ void main() {
             ],
             child: MaterialApp.router(
               locale: const Locale('en'),
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              localizationsDelegates: appLocalizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               routerConfig: router,
             ),

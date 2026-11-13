@@ -13,7 +13,7 @@ import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Localised labels for [RainInterval] (domain stays Flutter-free).
 extension RainIntervalL10n on RainInterval {

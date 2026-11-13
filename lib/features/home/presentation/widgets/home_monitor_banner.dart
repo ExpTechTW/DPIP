@@ -42,7 +42,7 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/eew_feed_down_notice.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

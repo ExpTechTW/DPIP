@@ -20,7 +20,7 @@ import 'package:dpip/shared/map/map_layer.dart';
 import 'package:dpip/shared/map/map_station_labels.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// A sheet-driven [MapLayer]: renders every station as a dot coloured by its

@@ -8,6 +8,8 @@
 /// thread must carry both. The assertions below make both observable.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:typed_data';
 
 import 'package:dpip/core/error/failure.dart';
@@ -20,7 +22,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +96,7 @@ Future<void> _pump(WidgetTester tester, _BugRepository repository) async {
       child: MaterialApp.router(
         routerConfig: router,
         locale: const Locale('en'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
       ),
     ),

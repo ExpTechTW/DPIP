@@ -9,7 +9,7 @@ library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// One icon / label / value line.
 typedef AstroReading = (IconData icon, String label, String value);

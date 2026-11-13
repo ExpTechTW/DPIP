@@ -14,7 +14,7 @@ import 'package:dpip/shared/map/map_layer_order.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Frosted chip (active layer name) that opens a layer-picker drag sheet.

@@ -10,7 +10,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_timeline_layer.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The satellite cloud (衛星雲圖) raster overlay for one [SatelliteChannel] —

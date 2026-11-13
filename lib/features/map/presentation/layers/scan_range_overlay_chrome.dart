@@ -11,7 +11,7 @@ import 'package:dpip/features/map/presentation/layers/admin_outline_chrome.dart'
 import 'package:dpip/features/map/presentation/layers/radar_scan_range.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// The reference chrome a weather raster can sit over.

@@ -1,16 +1,17 @@
 /// The radio's free counters, one full-width chart each.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_chart_section.dart';
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_ratio_chart.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: SingleChildScrollView(child: child)),
 );

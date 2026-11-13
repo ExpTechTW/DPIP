@@ -30,7 +30,7 @@ import 'package:dpip/shared/widgets/frosted_surface.dart'
     show mapChromeBlursBackdrop;
 import 'package:dpip/shared/widgets/region_bar.dart';
 import 'package:dpip/shared/widgets/region_swipe_area.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/logging/log.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Edge of the droplet-coverage bake, in pixels. The refract pass samples
 /// this instead of rebuilding the field at the card's resolution.

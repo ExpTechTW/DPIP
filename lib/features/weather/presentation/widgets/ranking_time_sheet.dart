@@ -4,7 +4,7 @@ library;
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 /// One choice from [showRankingTimeSheet].

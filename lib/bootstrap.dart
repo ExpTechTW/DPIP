@@ -91,7 +91,7 @@ import 'package:dpip/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
     show LicenseEntry, LicenseEntryWithLineBreaks, LicenseRegistry;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite_async/sqlite_async.dart';
 

@@ -13,7 +13,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 

@@ -8,7 +8,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Default blur for compact map chrome (legend chip, layer button, timeline).
 const double kMapFrostBlurSigma = 48;

@@ -1,6 +1,6 @@
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A small inline spinner for list rows / cards — no label, sized for context.
 /// Use instead of a hand-rolled `SizedBox` + `CircularProgressIndicator` so

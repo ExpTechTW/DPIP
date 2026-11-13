@@ -9,6 +9,8 @@
 /// `Asia/Taipei` and a report filed at 23:00 local belongs to that day.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 
 import 'package:dpip/core/error/failure.dart';
@@ -29,7 +31,7 @@ import 'package:dpip/shared/widgets/empty_view.dart';
 import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/freshness_banner.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -138,7 +140,7 @@ Future<void> _pump(
       providers: [Provider<ReportRepository>.value(value: repository)],
       child: MaterialApp.router(
         routerConfig: router,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
       ),

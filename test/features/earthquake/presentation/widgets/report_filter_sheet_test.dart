@@ -11,10 +11,11 @@
 /// entry for an identical request.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/report_filter_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -51,7 +52,7 @@ Future<void> _open(
 
   await tester.pumpWidget(
     MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
       home: Scaffold(

@@ -3,6 +3,7 @@
 /// and a second storm has to be selectable without mixing the two bulletins.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_layer.dart';
 import 'package:dpip/features/map/presentation/layers/typhoon_storm_band.dart';
@@ -19,7 +20,7 @@ import 'package:dpip/features/typhoon/domain/typhoon_warning.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/domain/satellite_repository.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -234,7 +235,7 @@ class _Sat extends FakeRasterFrameSource implements SatelliteRepository {
 
 Widget _app(Widget home) => MaterialApp(
   locale: const Locale('en'),
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   home: Scaffold(body: home),
 );

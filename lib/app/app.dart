@@ -28,7 +28,7 @@ import 'package:dpip/core/settings/theme_controller.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -125,7 +125,11 @@ class DpipApp extends StatelessWidget {
                             display.textScale.factor,
                           ),
                         ),
-                        child: child ?? const SizedBox.shrink(),
+                        // Dependencies may still use Flutter's original Material widgets.
+                        // ignore: deprecated_member_use
+                        child: MaterialUiCompatibilityBridge(
+                          child: child ?? const SizedBox.shrink(),
+                        ),
                       );
                     },
                   ),

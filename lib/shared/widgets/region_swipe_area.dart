@@ -1,5 +1,5 @@
 import 'package:dpip/core/settings/region_store.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Switches the active area ([RegionStore]) on a horizontal fling anywhere

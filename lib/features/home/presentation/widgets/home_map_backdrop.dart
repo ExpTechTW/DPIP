@@ -18,7 +18,7 @@ import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:dpip/shared/widgets/region_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 

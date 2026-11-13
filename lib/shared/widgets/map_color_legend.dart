@@ -23,7 +23,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/color_hex.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// One stop on a continuous colour ramp: [at] is the labelled value, [hex] an
 /// opaque `#RRGGBB` (same wire form the map layers feed MapLibre).
