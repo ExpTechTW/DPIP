@@ -50,6 +50,19 @@ void main() {
     expect(const TownDirectory(<String, Town>{}).nearest(25, 121), isNull);
   });
 
+  test('nearest is null when no township is anywhere near', () {
+    // Every coordinate west of the island used to answer with the westernmost
+    // township, so a US fix read as 金門縣 烈嶼鄉 as 所在地. A nearest that is
+    // 21,000 km away is not a nearest.
+    expect(dir.nearest(37.77, -122.42), isNull); // San Francisco
+    expect(dir.nearest(51.51, -0.13), isNull); // London
+  });
+
+  test('nearest still answers a little offshore', () {
+    // The fallback exists for sea and boundary gaps — ~85 km NE of Taipei.
+    expect(dir.nearest(25.60, 122.10)!.code, '100');
+  });
+
   test('cities lists each city once in directory order', () {
     expect(dir.cities, ['臺北市', '屏東縣', '花蓮縣']);
   });

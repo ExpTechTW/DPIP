@@ -70,10 +70,16 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Republishes the current township for a fix from the foreground position
   /// stream. Silent when the township is unchanged (the common case: most moves
-  /// stay inside one township) or unresolvable.
+  /// stay inside one township).
+  ///
+  /// A fix that resolves to **no** township clears it, exactly as losing GPS
+  /// does: the two are indistinguishable here, and both mean the last township
+  /// is no longer where the user is. Leaving it published is how travelling out
+  /// of Taiwan kept 所在地 (and its alerts) naming the county the flight left
+  /// from.
   Future<void> _onFix(GpsFix fix) async {
     final code = (await _location.townAt(fix.lat, fix.lng))?.code;
-    if (code == null || code == _publishedCode) return;
+    if (code == _publishedCode) return;
     _publishedCode = code;
     _regions.setCurrentCode(code);
   }

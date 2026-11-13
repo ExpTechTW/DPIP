@@ -94,6 +94,32 @@ void main() {
     monitor.dispose();
   });
 
+  test(
+    'leaving Taiwan clears 所在地 instead of keeping the last township',
+    () async {
+      final monitor = LocationMonitor(
+        location: location,
+        reporter: reporter,
+        regions: regions,
+      )..start();
+      reporter.start();
+      await pumpEventQueue();
+
+      positions.add((lat: _tainanFix.lat, lng: _tainanFix.lng));
+      await pumpEventQueue();
+      expect(regions.currentCode, _tainanCode);
+
+      // Abroad — nowhere near any township, so there is none to name. Keeping
+      // Tainan would show (and frame the backdrop on) a county the user left,
+      // which is the same wrong 所在地 a launch abroad used to show.
+      positions.add((lat: 37.77, lng: -122.42));
+      await pumpEventQueue();
+      expect(regions.currentCode, isNull);
+
+      monitor.dispose();
+    },
+  );
+
   test('a move inside the same township does not churn listeners', () async {
     final monitor = LocationMonitor(
       location: location,

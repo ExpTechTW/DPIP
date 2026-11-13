@@ -34,7 +34,10 @@ bool isLocationRefusal(Object error) =>
 /// falling back to nearest-centroid ([TownDirectory]) at sea or before the
 /// boundaries finish loading. [currentTown] returns null whenever a fix can't be
 /// had (services off, permission denied, timeout) — the caller then shows the
-/// "can't get current location" state and keeps the last known region.
+/// "can't get current location" state and keeps the last known region. A fix
+/// nowhere near Taiwan (the user is abroad) resolves to null the same way, by
+/// [TownDirectory.nearest]'s range limit, so a Taiwanese township is never named
+/// for a place on the other side of the Pacific.
 class LocationService {
   LocationService(
     this._directory, {
@@ -316,7 +319,8 @@ class LocationService {
 
   /// Resolves ([lat], [lng]) to a township: exact point-in-polygon when the
   /// boundary data is loaded, else nearest-centroid (at sea, in a boundary gap,
-  /// or before the background boundary load completes).
+  /// or before the background boundary load completes) — null from both when
+  /// the fix is nowhere near Taiwan. See [TownDirectory.nearest].
   Future<Town?> _resolve(double lat, double lng) async {
     final boundaries = _boundaries;
     if (boundaries != null) {
