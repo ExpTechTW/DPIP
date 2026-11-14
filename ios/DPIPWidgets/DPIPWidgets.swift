@@ -159,10 +159,18 @@ private func forecastIsNight(
 
 // All weather families show the source observation time beside current weather.
 // Using the WidgetKit entry or render time would make stale data look fresh.
-private struct SmallCurrentWeatherView: View {
+struct SmallCurrentWeatherView: View {
     let entry: DPIPWidgetEntry
+    var localizationBundle: Bundle = .main
 
     var body: some View {
+        // Small has a fixed layout. Keep the default text and symbol metrics
+        // at every Dynamic Type size while preserving the accessibility tree.
+        content.dynamicTypeSize(.large)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         if let snapshot = entry.snapshot {
             let observationDate = Date(
                 timeIntervalSince1970: TimeInterval(snapshot.observationTime)
@@ -200,7 +208,7 @@ private struct SmallCurrentWeatherView: View {
                         ))
                         .font(.title)
 
-                        Text(snapshot.presentationCondition.localizedDisplayName)
+                        Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                             .font(.caption2)
@@ -249,13 +257,16 @@ private struct SmallCurrentWeatherView: View {
                         .font(.caption)
                     }
                 }
+                // Keep longer readings and their units together in the row.
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             }
         } else {
             VStack(spacing: 8) {
                 Image(systemName: "cloud.fill")
                     .font(.title)
 
-                Text("widget.no_weather_data")
+                Text("widget.no_weather_data", bundle: localizationBundle)
                     .font(.caption)
             }
             .foregroundStyle(.secondary)
@@ -271,123 +282,8 @@ struct MediumCurrentWeatherView: View {
     let entry: DPIPWidgetEntry
     var localizationBundle: Bundle = .main
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
     var body: some View {
-        if dynamicTypeSize.isAccessibilitySize, let snapshot = entry.snapshot {
-            AccessibleCurrentWeatherContent(
-                entry: entry, snapshot: snapshot, family: .systemMedium,
-                localizationBundle: localizationBundle
-            )
-        } else if let snapshot = entry.snapshot {
-            let observationDate = Date(
-                timeIntervalSince1970: TimeInterval(snapshot.observationTime)
-            )
-
-            let calibratedDate = CurrentWeatherWidgetTimeCalibration(
-                snapshot: snapshot
-            ).calibratedDate(fromDeviceDate: entry.date)
-
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline) {
-                    HStack(spacing: 4) {
-                        Text(snapshot.regionName)
-                            .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .layoutPriority(1)
-
-                        if snapshot.sourceIdentifier == "current-location" {
-                            Image(systemName: "location.fill")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .fixedSize()
-                        }
-                    }
-
-                    Spacer()
-
-                    Text(observationDate, style: .time)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                HStack(alignment: .center) {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
-                        if let temperature = snapshot.temperature {
-                            Text("\(temperature, specifier: "%.0f")°")
-                                .font(.system(
-                                    size: 38,
-                                    weight: .semibold,
-                                    design: .rounded
-                                ))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                        } else {
-                            Text("—°")
-                                .font(.system(
-                                    size: 38,
-                                    weight: .semibold,
-                                    design: .rounded
-                                ))
-                                .foregroundStyle(.secondary)
-                        }
-
-                        if let apparentTemperature = snapshot.apparentTemperature {
-                            HStack(spacing: 4) {
-                                Text("widget.feels_like", bundle: localizationBundle)
-                                Text("\(apparentTemperature, specifier: "%.0f")°")
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Spacer()
-
-                    HStack(spacing: 6) {
-                        Image(systemName: snapshot.presentationCondition.systemImageName(
-                            isNight: entry.isNight
-                        ))
-                            .font(.title2)
-
-                        Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
-                            .font(.subheadline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                    .foregroundStyle(.secondary)
-                }
-
-                HourlyForecastSection(
-                    entry: entry,
-                    family: .systemMedium,
-                    calibratedDate: calibratedDate,
-                    isCurrentlyNight: entry.isNight,
-                    nextTransitionTime: snapshot.nextDayNightTransitionTime,
-                    localizationBundle: localizationBundle
-                )
-            }
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-                alignment: .topLeading
-            )
-        } else {
-            VStack(spacing: 8) {
-                Image(systemName: "cloud.fill")
-                    .font(.title)
-
-                Text("widget.no_weather_data", bundle: localizationBundle)
-                    .font(.caption)
-            }
-            .foregroundStyle(.secondary)
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity
-            )
-        }
+        CurrentWeatherWidgetContent(entry: entry, family: .systemMedium, localizationBundle: localizationBundle)
     }
 }
 
@@ -395,246 +291,144 @@ struct LargeCurrentWeatherView: View {
     let entry: DPIPWidgetEntry
     var localizationBundle: Bundle = .main
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
     var body: some View {
-        if dynamicTypeSize.isAccessibilitySize, let snapshot = entry.snapshot {
-            AccessibleCurrentWeatherContent(
-                entry: entry, snapshot: snapshot, family: .systemLarge,
-                localizationBundle: localizationBundle
-            )
-        } else if let snapshot = entry.snapshot {
-            let observationDate = Date(
-                timeIntervalSince1970: TimeInterval(snapshot.observationTime)
-            )
-
-            let transitionDate = Date(
-                timeIntervalSince1970:
-                    TimeInterval(snapshot.nextDayNightTransitionTime)
-            )
-
-            let calibratedDate = CurrentWeatherWidgetTimeCalibration(
-                snapshot: snapshot
-            ).calibratedDate(fromDeviceDate: entry.date)
-
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .firstTextBaseline) {
-                    HStack(spacing: 4) {
-                        Text(snapshot.regionName)
-                            .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .layoutPriority(1)
-
-                        if snapshot.sourceIdentifier == "current-location" {
-                            Image(systemName: "location.fill")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                                .fixedSize()
-                        }
-                    }
-
-                    Spacer()
-
-                    Text(observationDate, style: .time)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        if let temperature = snapshot.temperature {
-                            Text("\(temperature, specifier: "%.0f")°")
-                                .font(.system(
-                                    size: 42,
-                                    weight: .semibold,
-                                    design: .rounded
-                                ))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                        } else {
-                            Text("—°")
-                                .font(.system(
-                                    size: 42,
-                                    weight: .semibold,
-                                    design: .rounded
-                                ))
-                                .foregroundStyle(.secondary)
-                        }
-
-                        if let apparentTemperature = snapshot.apparentTemperature {
-                            HStack(spacing: 4) {
-                                Text("widget.feels_like", bundle: localizationBundle)
-                                Text("\(apparentTemperature, specifier: "%.0f")°")
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Spacer()
-
-                    HStack(spacing: 6) {
-                        Image(systemName: snapshot.presentationCondition.systemImageName(
-                            isNight: entry.isNight
-                        ))
-                            .font(.title)
-
-                        Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
-                            .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                    .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                HourlyForecastSection(
-                    entry: entry,
-                    family: .systemLarge,
-                    calibratedDate: calibratedDate,
-                    isCurrentlyNight: entry.isNight,
-                    nextTransitionTime: snapshot.nextDayNightTransitionTime,
-                    localizationBundle: localizationBundle
-                )
-
-                Spacer()
-
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack(alignment: .top, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("widget.humidity", bundle: localizationBundle)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-
-                            if let humidity = snapshot.humidity {
-                                Text("\(humidity)%")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                            } else {
-                                Text("--%")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("widget.rainfall", bundle: localizationBundle)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-
-                            if let rain = snapshot.rain {
-                                Text("\(rain, specifier: "%.1f") mm")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                            } else {
-                                Text("-- mm")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(entry.isNight ? "widget.sunrise" : "widget.sunset", bundle: localizationBundle)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-
-                            Text(transitionDate, style: .time)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .lineLimit(1)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-
-                    HStack(alignment: .top, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("widget.wind", bundle: localizationBundle)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-
-                            if let windSpeed = snapshot.windSpeed {
-                                HStack(spacing: 4) {
-                                    if let direction = snapshot.presentationWindDirection {
-                                        Text(direction.localizedDisplayName, bundle: localizationBundle)
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                    } else if let windDirection = snapshot.windDirection {
-                                        Text(windDirection)
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                    }
-
-                                    Text("\(windSpeed, specifier: "%.1f") m/s")
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                }
-                            } else if let windDirection = snapshot.windDirection {
-                                Text(windDirection)
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                            } else {
-                                Text("--")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("widget.station", bundle: localizationBundle)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-
-                            Text(snapshot.stationName.isEmpty ? "--" : snapshot.stationName)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .lineLimit(1)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-            }
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-                alignment: .topLeading
-            )
-        } else {
-            VStack(spacing: 8) {
-                Image(systemName: "cloud.fill")
-                    .font(.title)
-
-                Text("widget.no_weather_data", bundle: localizationBundle)
-                    .font(.caption)
-            }
-            .foregroundStyle(.secondary)
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-            )
-        }
+        CurrentWeatherWidgetContent(entry: entry, family: .systemLarge, localizationBundle: localizationBundle)
     }
 }
 
-/// Accessibility sizes need fewer columns and less vertical stacking inside
-/// WidgetKit's fixed bounds. Keep the main temperature and nearest forecast
-/// readable; cap only supporting metadata, whose rows retain their full values.
-private struct AccessibleCurrentWeatherContent: View {
+private struct CurrentWeatherWidgetContent: View {
+    let entry: DPIPWidgetEntry
+    let family: WidgetFamily
+    let localizationBundle: Bundle
+
+    var body: some View {
+        Group {
+            if let snapshot = entry.snapshot {
+                WeatherWidgetLayout(entry: entry, snapshot: snapshot, family: family,
+                                    localizationBundle: localizationBundle)
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "cloud.fill").font(.title)
+                    Text("widget.no_weather_data", bundle: localizationBundle)
+                        .font(.caption)
+                }
+                .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity,
+               alignment: entry.snapshot == nil ? .center : .topLeading)
+    }
+}
+
+/// Measure complete layouts against the card's *content* area. A stack
+/// measured after compression can fit geometrically while clipping glyphs.
+private struct WeatherWidgetLayout: View {
     let entry: DPIPWidgetEntry
     let snapshot: CurrentWeatherWidgetSnapshot
     let family: WidgetFamily
     let localizationBundle: Bundle
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var isMedium: Bool { family == .systemMedium }
+    private var calibratedDate: Date {
+        CurrentWeatherWidgetTimeCalibration(snapshot: snapshot).calibratedDate(fromDeviceDate: entry.date)
+    }
+    private var transitionDate: Date {
+        Date(timeIntervalSince1970: TimeInterval(snapshot.nextDayNightTransitionTime))
+    }
+    private var showsWarning: Bool {
+        entry.forecastFreshness == .stale && !entry.upcomingForecastPoints(for: family).isEmpty
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
+        if #available(iOS 16.0, *) {
+            if isMedium {
+                ViewThatFits(in: .vertical) {
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        regular(tight: false)
+                        regular(tight: true)
+                    }
+                    adaptive(detailLimit: 0, showsApparentTemperature: true)
+                    // Keep the approved regular candidates intact. Only AX
+                    // sizes can trade secondary content for vertical space.
+                    if dynamicTypeSize.isAccessibilitySize {
+                        adaptive(detailLimit: 0, showsApparentTemperature: false)
+                        adaptive(detailLimit: 0, showsApparentTemperature: false, tight: true)
+                    }
+                }
+            } else {
+                ViewThatFits(in: .vertical) {
+                    if dynamicTypeSize <= .xLarge {
+                        regular(tight: false)
+                        regular(tight: true)
+                    }
+                    adaptive(detailLimit: 5, showsApparentTemperature: true)
+                    adaptive(detailLimit: 5, showsApparentTemperature: false)
+                    adaptive(detailLimit: 4, showsApparentTemperature: false)
+                    adaptive(detailLimit: 3, showsApparentTemperature: false)
+                    adaptive(detailLimit: 2, showsApparentTemperature: false)
+                    adaptive(detailLimit: 1, showsApparentTemperature: false)
+                    adaptive(detailLimit: 0, showsApparentTemperature: false)
+                }
+            }
+        } else if dynamicTypeSize <= .large {
+            regular(tight: true)
+        } else {
+            // iOS 15 has no ViewThatFits or interactive widget button.
+            adaptive(detailLimit: isMedium ? 0 : 3, showsApparentTemperature: false, tight: isMedium)
+        }
+    }
+
+    private func regular(tight: Bool) -> some View {
+        VStack(alignment: .leading, spacing: tight ? (isMedium ? 2 : 4) : (isMedium ? 6 : 12)) {
+            header(adaptive: false)
+            regularCurrentWeather
+
+            if !isMedium { Spacer(minLength: tight ? 0 : nil) }
+            forecast
+            if !isMedium {
+                Spacer(minLength: tight ? 0 : nil)
+                detailGrid(tight: tight)
+            }
+        }
+    }
+
+    private func adaptive(detailLimit: Int, showsApparentTemperature: Bool, tight: Bool = false) -> some View {
+        VStack(alignment: .leading, spacing: tight ? 2 : 4) {
+            header(adaptive: dynamicTypeSize.isAccessibilitySize)
+                .dynamicTypeSize(...(tight ? DynamicTypeSize.large : .accessibility1))
+            adaptiveCurrentWeather(showsApparentTemperature: showsApparentTemperature, tight: tight)
+                .dynamicTypeSize(...(tight ? DynamicTypeSize.large : .accessibility1))
+            // Center the forecast between current weather and details
+            // at larger Dynamic Type sizes.
+            if !isMedium && dynamicTypeSize >= .xxLarge && detailLimit > 0 {
+                Spacer(minLength: 0)
+            }
+
+            if tight && dynamicTypeSize.isAccessibilitySize {
+                forecastContent(compactAccessibility: true)
+            } else {
+                forecast
+            }
+
+            if detailLimit > 0 {
+                Spacer(minLength: 0)
+                detailRows(limit: detailLimit)
+                    .font(.caption2)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            }
+        }
+    }
+
+    private func header(adaptive: Bool) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: adaptive ? 4 : nil) {
+            HStack(spacing: 4) {
                 Text(snapshot.regionName)
-                    .font(.headline)
+                    .font(isMedium && !dynamicTypeSize.isAccessibilitySize
+                          ? .subheadline.weight(.semibold)
+                          : .headline
+                    )
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .layoutPriority(1)
@@ -642,99 +436,349 @@ private struct AccessibleCurrentWeatherContent: View {
                     Image(systemName: "location.fill")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                        .fixedSize()
                 }
-                Spacer(minLength: 0)
+            }
+            Spacer(minLength: adaptive ? 0 : (isMedium ? 6 : nil))
+            HStack(alignment: .firstTextBaseline, spacing: adaptive ? 4 : 6) {
+                if showsWarning {
+                    if !adaptive, #available(iOS 16.0, *) {
+                        ViewThatFits(in: .horizontal) {
+                            Text("widget.forecast_outdated", bundle: localizationBundle)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: true, vertical: false)
+                            warningIcon(adaptive: false)
+                        }
+                    } else {
+                        warningIcon(adaptive: adaptive)
+                    }
+                }
                 Text(Date(timeIntervalSince1970: TimeInterval(snapshot.observationTime)), style: .time)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
-            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            // The clock always takes its ideal width. In the adaptive header,
+            // reserve the whole icon-and-clock group before offering space to
+            // the location; keeping only the Text fixed can still overflow.
+            .layoutPriority(adaptive ? 1 : 0)
+        }
+    }
 
-            HStack(spacing: 8) {
-                Group {
-                    if let temperature = snapshot.temperature {
-                        Text("\(temperature, specifier: "%.0f")°")
-                    } else {
-                        Text("—°").foregroundStyle(.secondary)
-                    }
+    private func warningIcon(adaptive: Bool) -> some View {
+        Image(systemName: "exclamationmark.triangle")
+            .font(adaptive ? .caption2 : .system(size: 12))
+            .foregroundStyle(.secondary)
+            .fixedSize()
+            .accessibilityLabel(Text("widget.forecast_outdated", bundle: localizationBundle))
+    }
+
+    private var forecast: some View {
+        forecastContent(compactAccessibility: false)
+    }
+
+    private func forecastContent(compactAccessibility: Bool) -> some View {
+        HourlyForecastSection(
+            entry: entry, family: family, calibratedDate: calibratedDate,
+            isCurrentlyNight: entry.isNight, nextTransitionTime: snapshot.nextDayNightTransitionTime,
+            localizationBundle: localizationBundle, compactAccessibility: compactAccessibility
+        )
+    }
+
+    @ViewBuilder
+    private var regularCurrentWeather: some View {
+        if isMedium {
+        HStack(alignment: .center) {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                if let temperature = snapshot.temperature {
+                    Text("\(temperature, specifier: "%.0f")°")
+                        .font(.system(
+                            size: 38,
+                            weight: .semibold,
+                            design: .rounded
+                        ))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                } else {
+                    Text("—°")
+                        .font(.system(
+                            size: 38,
+                            weight: .semibold,
+                            design: .rounded
+                        ))
+                        .foregroundStyle(.secondary)
                 }
-                .font(.system(size: family == .systemMedium ? 38 : 42,
-                              weight: .semibold, design: .rounded))
-                .fixedSize()
 
                 if let apparentTemperature = snapshot.apparentTemperature {
-                    VStack(alignment: .leading, spacing: 0) {
+                    HStack(spacing: 4) {
                         Text("widget.feels_like", bundle: localizationBundle)
                         Text("\(apparentTemperature, specifier: "%.0f")°")
                     }
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 }
-                Spacer(minLength: 0)
-                HStack(spacing: 4) {
-                    Image(systemName: snapshot.presentationCondition.systemImageName(isNight: entry.isNight))
-                    Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
-                        .lineLimit(2)
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             }
-            .fixedSize(horizontal: false, vertical: true)
 
-            HourlyForecastSection(
-                entry: entry, family: family,
-                calibratedDate: CurrentWeatherWidgetTimeCalibration(snapshot: snapshot)
-                    .calibratedDate(fromDeviceDate: entry.date),
-                isCurrentlyNight: entry.isNight,
-                nextTransitionTime: snapshot.nextDayNightTransitionTime,
-                localizationBundle: localizationBundle
-            )
+            Spacer()
 
-            if family == .systemLarge {
-                Spacer(minLength: 0)
-                details
-                    .font(.caption2)
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            HStack(spacing: 6) {
+                Image(systemName: snapshot.presentationCondition.systemImageName(
+                    isNight: entry.isNight
+                ))
+                    .font(.title2)
+
+                Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
+                    .font(.subheadline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
+            .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 0) {
+                if let temperature = snapshot.temperature {
+                    Text("\(temperature, specifier: "%.0f")°")
+                        .font(.system(
+                            size: 42,
+                            weight: .semibold,
+                            design: .rounded
+                        ))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                } else {
+                    Text("—°")
+                        .font(.system(
+                            size: 42,
+                            weight: .semibold,
+                            design: .rounded
+                        ))
+                        .foregroundStyle(.secondary)
+                }
+
+                if let apparentTemperature = snapshot.apparentTemperature {
+                    HStack(spacing: 4) {
+                        Text("widget.feels_like", bundle: localizationBundle)
+                        Text("\(apparentTemperature, specifier: "%.0f")°")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+
+            HStack(spacing: 6) {
+                Image(systemName: snapshot.presentationCondition.systemImageName(
+                    isNight: entry.isNight
+                ))
+                    .font(.title)
+
+                Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
+                    .font(.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(.secondary)
+        }
+        }
     }
 
-    private var details: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            detail("widget.humidity") {
-                Text(snapshot.humidity.map { "\($0)%" } ?? "--%")
+    @ViewBuilder
+    private func adaptiveCurrentWeather(showsApparentTemperature: Bool, tight: Bool) -> some View {
+        if #available(iOS 16.0, *), showsApparentTemperature, snapshot.apparentTemperature != nil {
+            ViewThatFits(in: .horizontal) {
+                adaptiveCurrentWeatherRow(showsApparentTemperature: true, tight: tight)
+                adaptiveCurrentWeatherRow(showsApparentTemperature: false, tight: tight)
             }
-            detail("widget.rainfall") {
-                if let rain = snapshot.rain {
-                    Text("\(rain, specifier: "%.1f") mm")
+        } else {
+            adaptiveCurrentWeatherRow(showsApparentTemperature: false, tight: tight)
+        }
+    }
+
+    private func adaptiveCurrentWeatherRow(showsApparentTemperature: Bool, tight: Bool) -> some View {
+        HStack(spacing: 8) {
+            Group {
+                if let temperature = snapshot.temperature {
+                    Text("\(temperature, specifier: "%.0f")°")
                 } else {
-                    Text("-- mm")
+                    Text("—°").foregroundStyle(.secondary)
                 }
             }
-            detail(entry.isNight ? "widget.sunrise" : "widget.sunset") {
-                Text(Date(timeIntervalSince1970: TimeInterval(snapshot.nextDayNightTransitionTime)), style: .time)
-            }
-            detail("widget.wind") {
-                HStack(spacing: 4) {
-                    if let direction = snapshot.presentationWindDirection {
-                        Text(direction.localizedDisplayName, bundle: localizationBundle)
-                    } else if let direction = snapshot.windDirection {
-                        Text(direction)
-                    }
-                    if let speed = snapshot.windSpeed {
-                        Text("\(speed, specifier: "%.1f") m/s")
-                    } else if snapshot.windDirection == nil {
-                        Text("--")
-                    }
+            .font(.system(size: isMedium ? 38 : 42, weight: .semibold, design: .rounded))
+            .fixedSize()
+
+            if showsApparentTemperature, let apparentTemperature = snapshot.apparentTemperature {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("widget.feels_like", bundle: localizationBundle)
+                    Text("\(apparentTemperature, specifier: "%.0f")°")
                 }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .fixedSize()
+                .accessibilityElement(children: .combine)
             }
-            detail("widget.station") {
-                Text(snapshot.stationName.isEmpty ? "--" : snapshot.stationName)
+
+            Spacer(minLength: 0)
+
+            HStack(spacing: 4) {
+                Image(systemName: snapshot.presentationCondition.systemImageName(isNight: entry.isNight))
+                    .font(.system(size: isMedium ? 20 : 24))
+                    .accessibilityHidden(true)
+                Text(snapshot.presentationCondition.localizedDisplayName, bundle: localizationBundle)
+                    .font(.caption)
                     .lineLimit(2)
+            }
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: !dynamicTypeSize.isAccessibilitySize || showsApparentTemperature,
+                       vertical: false)
+            .layoutPriority(1)
+        }
+    }
+
+    private func detailGrid(tight: Bool) -> some View {
+        VStack(alignment: .leading, spacing: tight ? 6 : 14) {
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("widget.humidity", bundle: localizationBundle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    if let humidity = snapshot.humidity {
+                        Text("\(humidity)%")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    } else {
+                        Text("--%")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("widget.rainfall", bundle: localizationBundle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    if let rain = snapshot.rain {
+                        Text("\(rain, specifier: "%.1f") mm")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    } else {
+                        Text("-- mm")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(entry.isNight ? "widget.sunrise" : "widget.sunset", bundle: localizationBundle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    Text(transitionDate, style: .time)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("widget.wind", bundle: localizationBundle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    if let windSpeed = snapshot.windSpeed {
+                        HStack(spacing: 4) {
+                            if let direction = snapshot.presentationWindDirection {
+                                Text(direction.localizedDisplayName, bundle: localizationBundle)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                            } else if let windDirection = snapshot.windDirection {
+                                Text(windDirection)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                            }
+
+                            Text("\(windSpeed, specifier: "%.1f") m/s")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                    } else if let windDirection = snapshot.windDirection {
+                        Text(windDirection)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    } else {
+                        Text("--")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("widget.station", bundle: localizationBundle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+
+                    Text(snapshot.stationName.isEmpty ? "--" : snapshot.stationName)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private func detailRows(limit: Int) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if limit >= 1 {
+                detail("widget.humidity") {
+                    Text(snapshot.humidity.map { "\($0)%" } ?? "--%")
+                }
+            }
+            if limit >= 2 {
+                detail("widget.rainfall") {
+                    if let rain = snapshot.rain {
+                        Text("\(rain, specifier: "%.1f") mm")
+                    } else {
+                        Text("-- mm")
+                    }
+                }
+            }
+            if limit >= 3 {
+                detail(entry.isNight ? "widget.sunrise" : "widget.sunset") {
+                    Text(Date(timeIntervalSince1970: TimeInterval(snapshot.nextDayNightTransitionTime)), style: .time)
+                }
+            }
+            if limit >= 4 {
+                detail("widget.wind") {
+                    HStack(spacing: 4) {
+                        if let direction = snapshot.presentationWindDirection {
+                            Text(direction.localizedDisplayName, bundle: localizationBundle)
+                        } else if let direction = snapshot.windDirection {
+                            Text(direction)
+                        }
+                        if let speed = snapshot.windSpeed {
+                            Text("\(speed, specifier: "%.1f") m/s")
+                        } else if snapshot.windDirection == nil {
+                            Text("--")
+                        }
+                    }
+                }
+            }
+            if limit >= 5 {
+                detail("widget.station") {
+                    Text(snapshot.stationName.isEmpty ? "--" : snapshot.stationName)
+                        .lineLimit(1)
+                }
             }
         }
     }
@@ -747,91 +791,56 @@ private struct AccessibleCurrentWeatherContent: View {
                 .foregroundStyle(.secondary)
                 .fixedSize()
             Spacer(minLength: 0)
-            value().font(.caption2.weight(.medium))
+            value()
+                .font(.caption2.weight(.medium))
+                .lineLimit(1)
         }
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .combine)
     }
 }
 
-private struct HourlyForecastPointView: View {
+struct HourlyForecastPointView: View {
     let point: ForecastWidgetPoint
     let compact: Bool
+    let isNight: Bool
+    var localizationBundle: Bundle = .main
+    var compactAccessibility = false
 
-    let calibratedDate: Date
-    let isCurrentlyNight: Bool
-    let nextTransitionTime: Int
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        let isNight = forecastIsNight(
-            pointTime: point.time,
-            calibratedDate: calibratedDate,
-            isCurrentlyNight: isCurrentlyNight,
-            nextTransitionTime: nextTransitionTime
-        )
+        if dynamicTypeSize.isAccessibilitySize {
+            column.accessibilityElement(children: .combine)
+        } else {
+            column
+        }
+    }
 
-        VStack(spacing: compact ? 2 : 5) {
+    private var column: some View {
+        // The fixed card always presents the same five forecast slots.
+        // Bound the supporting typography so each slot can keep all four
+        // values in their original vertical order at every widget text size.
+        VStack(spacing: compactAccessibility ? 0 : (compact ? 2 : 4)) {
             Text(point.time)
                 .font(compact ? .caption2 : .caption)
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
 
-            Image(
-                systemName: point.presentationCondition.systemImageName(
-                    isNight: isNight
-                )
-            )
-            .font(compact ? .title3 : .title2)
-            .frame(height: compact ? 32 : 40)
+            Image(systemName: point.presentationCondition.systemImageName(isNight: isNight))
+                .font(compactAccessibility ? .body : (compact ? .title3 : .title2))
+                .frame(height: compactAccessibility ? 18 : (compact ? 25 : 36))
+                .accessibilityLabel(Text(point.presentationCondition.localizedDisplayName, bundle: localizationBundle))
 
             Text("\(point.temperature, specifier: "%.0f")°")
                 .font(compact ? .caption : .subheadline)
                 .fontWeight(.semibold)
-                .lineLimit(1)
 
-            if let pop = point.pop {
-                Text("\(pop)%")
-                    .font(compact ? .caption2 : .caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("—")
-                    .font(compact ? .caption2 : .caption)
-                    .foregroundStyle(.tertiary)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct AccessibleForecastPointView: View {
-    let point: ForecastWidgetPoint
-    let isNight: Bool
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Text(point.time)
-                .foregroundStyle(.secondary)
-                .fixedSize()
-            Image(systemName: point.presentationCondition.systemImageName(isNight: isNight))
-                .font(.system(size: 22))
-                .fixedSize()
-            Text("\(point.temperature, specifier: "%.0f")°")
-                .fontWeight(.semibold)
-                .fixedSize()
-            Spacer(minLength: 0)
             Text(point.pop.map { "\($0)%" } ?? "—")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                // Keep the time and temperature at the requested size. The
-                // secondary probability must leave room for full HH:mm labels,
-                // negative temperatures and 100% even on narrow widget cards.
-                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                .fixedSize()
+                .font(compact ? .caption2 : .caption)
+                .foregroundStyle(point.pop == nil ? .tertiary : .secondary)
         }
-        .font(.caption2)
-        .fixedSize(horizontal: false, vertical: true)
-        .accessibilityElement(children: .combine)
+        .lineLimit(1)
+        .dynamicTypeSize(...DynamicTypeSize.large)
     }
 }
 
@@ -845,23 +854,15 @@ struct HourlyForecastSection: View {
     let isCurrentlyNight: Bool
     let nextTransitionTime: Int
     var localizationBundle: Bundle = .main
-
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    var compactAccessibility = false
 
     var body: some View {
         let points = entry.upcomingForecastPoints(for: family)
         if !points.isEmpty, entry.forecastFreshness == .stale {
             HStack(spacing: 4) {
-                VStack(alignment: .leading, spacing: 4) {
-                    forecastContent(points: points)
-                    Text("widget.forecast_outdated", bundle: localizationBundle)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .forecastInvalidatableContent()
+                forecastContent(points: points)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .forecastInvalidatableContent()
                 refreshButton
             }
         } else if !points.isEmpty {
@@ -870,52 +871,26 @@ struct HourlyForecastSection: View {
             unavailableContent
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                // This secondary status shares a fixed forecast area. Bound
-                // only its growth; never shrink the current-weather content.
                 .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    @ViewBuilder
     private func forecastContent(points: [ForecastWidgetPoint]) -> some View {
         let compact = family == .systemMedium
-        if !points.isEmpty, dynamicTypeSize.isAccessibilitySize {
-            // Fixed WidgetKit cards cannot scroll. Prioritize the nearest hour(s)
-            // at larger text sizes, with time, condition, temperature and rain
-            // probability on a single row instead of four stacked lines.
-            VStack(spacing: 4) {
-                ForEach(Array(points.prefix(compact ? 1 : 2)), id: \.time) { point in
-                    AccessibleForecastPointView(
-                        point: point,
-                        isNight: forecastIsNight(
-                            pointTime: point.time, calibratedDate: calibratedDate,
-                            isCurrentlyNight: isCurrentlyNight,
-                            nextTransitionTime: nextTransitionTime
-                        )
-                    )
-                }
-            }
-        } else if !points.isEmpty {
-            VStack(
-                alignment: .leading,
-                spacing: compact ? 4 : 12
-            ) {
-                HStack(
-                    alignment: .top,
-                    spacing: compact ? 4 : 8
-                ) {
-                    ForEach(Array(points.enumerated()), id: \.offset) { _, point in
-                        HourlyForecastPointView(
-                            point: point,
-                            compact: compact,
-                            calibratedDate: calibratedDate,
-                            isCurrentlyNight: isCurrentlyNight,
-                            nextTransitionTime: nextTransitionTime
-                        )
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
-                }
+        return HStack(alignment: .top, spacing: compact ? 4 : 8) {
+            // Stateless display slots can contain repeated API clock labels.
+            ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+                HourlyForecastPointView(
+                    point: point, compact: compact,
+                    isNight: forecastIsNight(
+                        pointTime: point.time, calibratedDate: calibratedDate,
+                        isCurrentlyNight: isCurrentlyNight, nextTransitionTime: nextTransitionTime
+                    ),
+                    localizationBundle: localizationBundle,
+                    compactAccessibility: compactAccessibility
+                )
+                .frame(maxWidth: .infinity)
             }
         }
     }
@@ -941,6 +916,7 @@ struct HourlyForecastSection: View {
            let identifier = entry.forecastRefreshIdentifier(for: family) {
             Button(intent: RefreshForecastIntent(locationIdentifier: identifier)) {
                 Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 18, weight: .medium))
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
@@ -1046,6 +1022,106 @@ struct DPIPWidgets_Previews: PreviewProvider {
         forecast: previewContent.forecast
     )
 
+    private static let noForecastPreviewEntry = DPIPWidgetEntry(
+        date: previewEntry.date,
+        snapshot: previewEntry.snapshot,
+        isStale: previewEntry.isStale,
+        isNight: previewEntry.isNight,
+        forecast: nil,
+        locationTarget: previewEntry.locationTarget
+    )
+
+    private static let noWeatherDataEntry = DPIPWidgetEntry(
+        date: previewNow,
+        snapshot: nil,
+        isStale: false,
+        isNight: false,
+        forecast: nil
+    )
+
+    private static let stalePreviewEntry: DPIPWidgetEntry? = {
+        guard let snapshot = previewContent.snapshot,
+              let forecast = previewContent.forecast else {
+            return nil
+        }
+
+        // Convert the forecast publication time to device-clock time.
+        let publicationDate = Date(
+            timeIntervalSince1970:
+                TimeInterval(forecast.updateTime) / 1_000
+        ).addingTimeInterval(
+            -TimeInterval(snapshot.calibratedTimeOffsetMilliseconds) / 1_000
+        )
+
+        // 45 minutes after publication: expected .stale.
+        let staleDate = publicationDate.addingTimeInterval(45 * 60)
+
+        return DPIPWidgetEntry(
+            date: staleDate,
+            snapshot: snapshot,
+            isStale: false,
+            isNight: snapshot.isNight,
+            forecast: forecast
+        )
+    }()
+
+    private static let expiredPreviewEntry: DPIPWidgetEntry? = {
+        guard let base = stalePreviewEntry else {
+            return nil
+        }
+
+        // The stale fixture is 45 minutes after publication.
+        // Advance another 80 minutes to reach 125 minutes.
+        let expiredDate = base.date.addingTimeInterval(80 * 60)
+
+        return DPIPWidgetEntry(
+            date: expiredDate,
+            snapshot: base.snapshot,
+            isStale: base.isStale,
+            isNight: base.isNight,
+            forecast: base.forecast,
+            locationTarget: base.locationTarget
+        )
+    }()
+
+    private static let longRegionStaleEntry: DPIPWidgetEntry? = {
+        guard let base = stalePreviewEntry,
+              let snapshot = base.snapshot else {
+            return nil
+        }
+
+        let longRegionSnapshot = CurrentWeatherWidgetSnapshot(
+            schemaVersion: snapshot.schemaVersion,
+            sourceIdentifier: snapshot.sourceIdentifier,
+            regionCode: snapshot.regionCode,
+            regionName: "臺中市西屯區臺灣大道三段",
+            observationTime: snapshot.observationTime,
+            stationName: snapshot.stationName,
+            weather: snapshot.weather,
+            weatherCode: snapshot.weatherCode,
+            condition: snapshot.condition,
+            isNight: snapshot.isNight,
+            nextDayNightTransitionTime: snapshot.nextDayNightTransitionTime,
+            calibratedTimeOffsetMilliseconds:
+                snapshot.calibratedTimeOffsetMilliseconds,
+            temperature: snapshot.temperature,
+            humidity: snapshot.humidity,
+            rain: snapshot.rain,
+            windDirection: snapshot.windDirection,
+            windSpeed: snapshot.windSpeed,
+            apparentTemperature: snapshot.apparentTemperature
+        )
+
+        return DPIPWidgetEntry(
+            date: base.date,
+            snapshot: longRegionSnapshot,
+            isStale: base.isStale,
+            isNight: base.isNight,
+            forecast: base.forecast,
+            locationTarget: base.locationTarget
+        )
+    }()
+
     private static let missingOptionalDataEntry = DPIPWidgetEntry(
         date: previewNow,
         snapshot: CurrentWeatherWidgetSnapshot(
@@ -1140,6 +1216,62 @@ struct DPIPWidgets_Previews: PreviewProvider {
                 .previewContext(
                     WidgetPreviewContext(family: .systemMedium)
                 )
+
+            previewView(entry: noForecastPreviewEntry)
+                .environment(\.locale, Locale(identifier: "zh-TW"))
+                .previewDisplayName("Medium — No Forecast")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            previewView(entry: noWeatherDataEntry)
+                .environment(\.locale, Locale(identifier: "zh-TW"))
+                .previewDisplayName("Medium — No Weather Data")
+                .previewContext(
+                    WidgetPreviewContext(family: .systemMedium)
+                )
+
+            if let stalePreviewEntry {
+                previewView(entry: stalePreviewEntry)
+                    .environment(\.locale, Locale(identifier: "zh-tw"))
+                    .previewDisplayName("Medium — Stale (TW)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+
+                previewView(entry: stalePreviewEntry)
+                    .environment(\.locale, Locale(identifier: "ja"))
+                    .previewDisplayName("Medium — Stale (JA)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+
+                previewView(entry: stalePreviewEntry)
+                    .environment(\.locale, Locale(identifier: "ja"))
+                    .environment(\.dynamicTypeSize, .accessibility1)
+                    .previewDisplayName("Medium — Stale (JA, Accessibility)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+            }
+
+            if let expiredPreviewEntry {
+                previewView(entry: expiredPreviewEntry)
+                    .environment(\.locale, Locale(identifier: "zh-TW"))
+                    .previewDisplayName("Medium — Expired Forecast")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+            }
+
+            if let longRegionStaleEntry {
+                previewView(entry: longRegionStaleEntry)
+                    .environment(\.locale, Locale(identifier: "ja"))
+                    .previewDisplayName("Medium — Stale (Long Region)")
+                    .previewContext(
+                        WidgetPreviewContext(family: .systemMedium)
+                    )
+            }
         }
     }
 }
