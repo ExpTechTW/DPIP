@@ -6,6 +6,8 @@ struct WidgetFixtureApp: App {
     private let scenario = WeatherScenario(environment: ProcessInfo.processInfo.environment)
     private let margin: CGFloat = 16
 
+    private let isDark = ProcessInfo.processInfo.environment["DPIP_FIXTURE_DARK"] == "1"
+
     init() {
         NSTimeZone.default = WeatherScenario.timeZone
     }
@@ -18,7 +20,7 @@ struct WidgetFixtureApp: App {
                 // A sibling of the widget: its accessibility frame cannot grow
                 // when the widget's descendants overflow the clipped card.
                 Rectangle()
-                    .fill(.white)
+                    .fill(isDark ? .black : .white)
                     .frame(width: scenario.card.width, height: scenario.card.height)
                     .accessibilityLabel("Fixture presentation boundary")
                     .accessibilityIdentifier("widget-presentation-boundary")
@@ -27,7 +29,7 @@ struct WidgetFixtureApp: App {
                     .environment(\.locale, scenario.locale)
                     .environment(\.timeZone, WeatherScenario.timeZone)
                     .environment(\.dynamicTypeSize, scenario.dynamicTypeSize)
-                    .environment(\.colorScheme, .light)
+                    .environment(\.colorScheme, isDark ? .dark : .light)
                     .frame(width: scenario.card.width - 2 * margin, height: scenario.card.height - 2 * margin,
                            alignment: .topLeading)
                     .padding(margin)
@@ -38,7 +40,9 @@ struct WidgetFixtureApp: App {
 
     @ViewBuilder
     private var weatherView: some View {
-        if scenario.family == .large {
+        if scenario.family == .small {
+            SmallCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
+        } else if scenario.family == .large {
             LargeCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
         } else {
             MediumCurrentWeatherView(entry: scenario.entry, localizationBundle: scenario.bundle)
@@ -48,7 +52,7 @@ struct WidgetFixtureApp: App {
 
 private struct WeatherScenario {
     enum Family: String {
-        case medium, large
+        case small, medium, large
     }
 
     private enum Card: String {
@@ -56,6 +60,8 @@ private struct WeatherScenario {
 
         func size(for family: Family) -> CGSize {
             switch (family, self) {
+            case (.small, .narrow): CGSize(width: 158, height: 158)
+            case (.small, .wide): CGSize(width: 170, height: 170)
             case (.medium, .narrow): CGSize(width: 338, height: 158)
             case (.medium, .wide): CGSize(width: 364, height: 170)
             case (.large, .narrow): CGSize(width: 319, height: 318)
@@ -96,19 +102,29 @@ private struct WeatherScenario {
     }
 
     private enum TextSize: String {
-        case normal, larger, accessibility
+        case xSmall, small, medium, normal, larger, xxLarge, xxxLarge
+        case accessibility, accessibility2, accessibility3, accessibility4, accessibility5
 
         var dynamicTypeSize: DynamicTypeSize {
             switch self {
+            case .xSmall: .xSmall
+            case .small: .small
+            case .medium: .medium
             case .normal: .large
             case .larger: .xLarge
+            case .xxLarge: .xxLarge
+            case .xxxLarge: .xxxLarge
             case .accessibility: .accessibility1
+            case .accessibility2: .accessibility2
+            case .accessibility3: .accessibility3
+            case .accessibility4: .accessibility4
+            case .accessibility5: .accessibility5
             }
         }
     }
 
     private enum Location: String {
-        case short, long, compact, xitun, longChinese
+        case short, long, compact, xitun, longChinese, longJapanese, shortJapanese
 
         var name: String {
             switch self {
@@ -117,6 +133,8 @@ private struct WeatherScenario {
             case .long: "Taichung City Xitun District Shuinan Central Park"
             case .xitun: "西屯"
             case .longChinese: "臺中市西屯區臺灣大道三段"
+            case .longJapanese: "東京都千代田区丸の内一丁目"
+            case .shortJapanese: "丸の内"
             }
         }
     }
