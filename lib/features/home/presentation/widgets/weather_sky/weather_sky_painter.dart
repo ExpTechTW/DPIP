@@ -5,7 +5,7 @@ import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_clouds.d
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_keyframe.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/precipitation_field.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/sky_lut_cache.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The per-frame scene state the painter renders.
 ///

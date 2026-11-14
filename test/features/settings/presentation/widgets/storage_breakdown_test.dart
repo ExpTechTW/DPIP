@@ -16,7 +16,7 @@ library;
 import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/features/settings/presentation/widgets/storage_breakdown.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));

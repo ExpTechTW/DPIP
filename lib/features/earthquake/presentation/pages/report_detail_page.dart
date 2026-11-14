@@ -45,7 +45,7 @@ import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -291,9 +291,10 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   /// so on a modern 3x display that old scale is only ~20 logical px — this
   /// page needs the marker legible at a glance, so it's sized up accordingly.
   ///
-  /// [intensityIconSizeCurve] also folds in [mapIconDensityFactor], because
-  /// Android's `addImage` pins the bitmap to density 160: without it the same
-  /// markers come out three times larger there than on a 3x iPhone.
+  /// [intensityIconSizeCurve] also folds in [mapIconDensityFactor] to account
+  /// for the image density recorded by each platform. Android bitmap density
+  /// can follow the display density, so a fixed 1/3 factor can shrink markers
+  /// twice on dense screens.
   List<Object> get _iconSizeExpression => intensityIconSizeCurve(
     mapIconDensityFactor(
       devicePixelRatio: MediaQuery.devicePixelRatioOf(context),

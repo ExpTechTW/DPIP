@@ -14,7 +14,7 @@ import 'package:dpip/shared/map/maps_launcher.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Peek / rest / full sheet for DPM detail.
 class DpmSheet extends StatefulWidget {

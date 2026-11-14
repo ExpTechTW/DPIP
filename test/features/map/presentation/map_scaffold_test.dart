@@ -3,6 +3,8 @@
 /// until someone retries — a blank map would look like "nothing happening".
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:async';
 import 'dart:math' show Point;
 
@@ -23,7 +25,7 @@ import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
@@ -370,7 +372,7 @@ void main() {
         ],
         child: MaterialApp(
           locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: homeWithInset(
             visibleTab == null

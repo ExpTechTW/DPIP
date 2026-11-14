@@ -6,7 +6,7 @@ library;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Round frosted chip for opening an overlay menu — the same chrome the layer
 /// switcher uses — with a marker dot when the layer's options deviate from

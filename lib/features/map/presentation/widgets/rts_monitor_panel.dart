@@ -34,7 +34,7 @@ import 'package:dpip/shared/widgets/alert_cycle_chip.dart';
 import 'package:dpip/shared/widgets/eew_feed_down_notice.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/shared/seismic/spoken_intensity.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 

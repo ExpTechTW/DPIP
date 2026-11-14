@@ -14,7 +14,7 @@ import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
 import 'package:dpip/shared/widgets/sheet_surface.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 

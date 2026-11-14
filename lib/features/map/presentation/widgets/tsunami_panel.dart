@@ -15,7 +15,7 @@ import 'package:dpip/shared/widgets/error_view.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/selectable_pill.dart';
 import 'package:dpip/shared/widgets/sheet_extent.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 /// Collapsible tsunami bulletin sheet — the text half of the layer, on the same

@@ -1,3 +1,4 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
@@ -24,7 +25,7 @@ import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:flutter/foundation.dart' show listEquals;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -163,7 +164,7 @@ Widget _wrap(
   );
   final body = Scaffold(body: panel);
   return MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: appLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: const Locale('en'),
     home: MultiProvider(

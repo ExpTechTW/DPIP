@@ -11,7 +11,7 @@ import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/features/home/presentation/widgets/weather_sky/rain_on_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

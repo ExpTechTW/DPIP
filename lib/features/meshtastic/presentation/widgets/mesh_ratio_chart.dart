@@ -19,7 +19,7 @@ library;
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/features/meshtastic/presentation/widgets/mesh_charts.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Which counter pair a chart plots.
 enum MeshRatio {

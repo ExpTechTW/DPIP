@@ -23,6 +23,7 @@ dependencies:
   # pre-rewrite app shipped this package; the rewrite dropped it.
   awesome_notifications_fcm: ^0.12.0
   cupertino_icons: ^1.0.8
+  cupertino_ui: ^1.1.0
   # SHA-256 pins the downloaded ML intensity model to the exact file the
   # golden tests were recorded against (lib/features/earthquake/data/
   # ml_intensity_service.dart). Already in the lock through the SDK tooling.
@@ -75,6 +76,7 @@ dependencies:
   # Direct dep: MeshtasticClientImpl bridges the vendored package's
   # `package:logging` records into the app Log.
   logging: ^1.3.0
+  material_ui: ^1.11.0
   # ExpTech fork — HTTPS intercept + Dart tile-cache bridge + Android gzip fix
   # + render lifecycle, batched layer updates, and compact tile-cache messages.
   # Requires MapLibre Native 6.28.0, which the fork's Package.swift pins exactly.

@@ -21,6 +21,7 @@
 ///    beside them.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/map/presentation/layers/rain_layer.dart';
 import 'package:dpip/features/weather/domain/meteor_rain_repository.dart';
@@ -31,7 +32,7 @@ import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/collapsible_map_legend.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _StubRainRepository implements MeteorRainRepository {
@@ -62,7 +63,7 @@ Future<void> _pumpExpanded(
 ) async {
   await tester.pumpWidget(
     MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('zh'),
       home: Scaffold(

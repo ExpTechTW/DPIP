@@ -14,7 +14,7 @@ import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/map/map_trace.dart';
 import 'package:dpip/shared/map/raster_frame_source.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 enum _IdlePreloadOutcome { ready, timeout, cancelled }

@@ -3,6 +3,8 @@
 /// hide the experimental menu or wipe the cache by accident.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:io';
 
 import 'package:dpip/core/network/etag_cache_store.dart';
@@ -18,7 +20,7 @@ import 'package:dpip/l10n/gen/app_localizations.dart';
 
 import '../../../../core/storage/memory_db.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -136,7 +138,7 @@ void main() {
           ChangeNotifierProvider.value(value: experimental),
         ],
         child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const DeveloperPage(),
         ),
@@ -220,7 +222,7 @@ void main() {
           ChangeNotifierProvider.value(value: ExperimentalSettings(store)),
         ],
         child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const DeveloperPage(),
         ),
@@ -291,7 +293,7 @@ void main() {
           ChangeNotifierProvider.value(value: ExperimentalSettings(store)),
         ],
         child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const DeveloperPage(),
         ),
@@ -345,7 +347,7 @@ void main() {
           ChangeNotifierProvider.value(value: ExperimentalSettings(store)),
         ],
         child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const DeveloperPage(),
         ),

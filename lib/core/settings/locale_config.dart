@@ -2,9 +2,14 @@
 library;
 
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+// Legacy localization types are needed by unmigrated third-party widgets.
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as legacy_material;
+// ignore: deprecated_member_use
+import 'package:flutter/cupertino.dart' as legacy_cupertino;
+import 'package:flutter_localizations/flutter_localizations.dart' as legacy;
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 
 /// The app's home locale: Traditional Chinese for Taiwan (`zh_TW`).
@@ -53,7 +58,30 @@ List<LocalizationsDelegate<dynamic>> get appLocalizationsDelegates => [
     unsupported: [Locale('yue')],
     replacement: kHomeLocale,
   ),
+  ...GlobalMaterialLocalizations.delegates,
+  const _WidgetsFallbackDelegate<legacy_material.MaterialLocalizations>(
+    loadWith: _loadLegacyMaterial,
+    unsupported: [Locale('yue')],
+    replacement: kHomeLocale,
+  ),
+  const _WidgetsFallbackDelegate<legacy_cupertino.CupertinoLocalizations>(
+    loadWith: _loadLegacyCupertino,
+    unsupported: [Locale('yue')],
+    replacement: kHomeLocale,
+  ),
 ];
+
+Future<legacy_material.MaterialLocalizations> _loadLegacyMaterial(
+  Locale locale,
+) =>
+    // ignore: deprecated_member_use
+    legacy.GlobalMaterialLocalizations.delegate.load(locale);
+
+Future<legacy_cupertino.CupertinoLocalizations> _loadLegacyCupertino(
+  Locale locale,
+) =>
+    // ignore: deprecated_member_use
+    legacy.GlobalCupertinoLocalizations.delegate.load(locale);
 
 Future<MaterialLocalizations> _loadMaterial(Locale locale) =>
     GlobalMaterialLocalizations.delegate.load(locale);

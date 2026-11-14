@@ -45,8 +45,8 @@ import 'package:dpip/features/weather/domain/weather_ranking.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
-import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Fires when a redirect *input* changes outside any navigation — today only
@@ -88,11 +88,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.onboardingPath,
       name: AppRoutes.onboarding,
-      builder: (_, _) => const OnboardingPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const OnboardingPage()),
     ),
     StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) =>
-          MainShell(navigationShell: navigationShell),
+      pageBuilder: (context, state, navigationShell) => MaterialPage<void>(
+        key: state.pageKey,
+        child: MainShell(navigationShell: navigationShell),
+      ),
       branches: [
         _branch(
           AppRoutes.homePath,
@@ -111,30 +114,42 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: AppRoutes.dataPath,
               name: AppRoutes.data,
-              builder: (_, _) => const DataPage(),
+              pageBuilder: (_, state) => MaterialPage<void>(
+                key: state.pageKey,
+                child: const DataPage(),
+              ),
               routes: [
                 GoRoute(
                   path: AppRoutes.earthquakePath,
                   name: AppRoutes.earthquake,
-                  builder: (_, _) => const ReportListPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const ReportListPage(),
+                  ),
                   routes: [
                     GoRoute(
                       path: AppRoutes.earthquakeReportPath,
                       name: AppRoutes.earthquakeReport,
                       redirect: reportRedirect,
-                      builder: (_, state) => ReportDetailPage(
-                        reportId: state.pathParameters['id'] ?? '',
+                      pageBuilder: (_, state) => MaterialPage<void>(
+                        key: state.pageKey,
+                        child: ReportDetailPage(
+                          reportId: state.pathParameters['id'] ?? '',
+                        ),
                       ),
                       routes: [
                         GoRoute(
                           path: AppRoutes.earthquakeReplayPath,
                           name: AppRoutes.earthquakeReplay,
                           redirect: replayRedirect,
-                          builder: (_, state) => ReportReplayPage(
-                            // [replayRedirect] has already turned a link
-                            // without a usable `t` away; this only keeps the
-                            // builder total.
-                            replayTimestamp: replayTimestampOf(state) ?? 0,
+                          pageBuilder: (_, state) => MaterialPage<void>(
+                            key: state.pageKey,
+                            child: ReportReplayPage(
+                              // [replayRedirect] has already turned a link
+                              // without a usable `t` away; this only keeps the
+                              // builder total.
+                              replayTimestamp: replayTimestampOf(state) ?? 0,
+                            ),
                           ),
                         ),
                       ],
@@ -144,17 +159,23 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: AppRoutes.eewPath,
                   name: AppRoutes.eew,
-                  builder: (_, _) => const EarthquakePage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const EarthquakePage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.weatherRankingPath,
                   name: AppRoutes.weatherRanking,
-                  builder: (_, state) {
+                  pageBuilder: (_, state) {
                     final rawTab = state.uri.queryParameters['tab'];
-                    return WeatherRankingPage(
-                      initialTab: WeatherRankingTab.parse(rawTab),
-                      initialTempMetric: TempRankMetric.parse(
-                        state.uri.queryParameters['metric'] ?? rawTab,
+                    return MaterialPage<void>(
+                      key: state.pageKey,
+                      child: WeatherRankingPage(
+                        initialTab: WeatherRankingTab.parse(rawTab),
+                        initialTempMetric: TempRankMetric.parse(
+                          state.uri.queryParameters['metric'] ?? rawTab,
+                        ),
                       ),
                     );
                   },
@@ -162,37 +183,58 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: AppRoutes.moonPath,
                   name: AppRoutes.moon,
-                  builder: (_, _) => const MoonPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const MoonPage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.sunPath,
                   name: AppRoutes.sun,
-                  builder: (_, _) => const SunPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const SunPage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.planetsPath,
                   name: AppRoutes.planets,
-                  builder: (_, _) => const PlanetsPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const PlanetsPage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.tonightPath,
                   name: AppRoutes.tonight,
-                  builder: (_, _) => const TonightPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const TonightPage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.almanacPath,
                   name: AppRoutes.almanac,
-                  builder: (_, _) => const AlmanacPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const AlmanacPage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.skyChartPath,
                   name: AppRoutes.skyChart,
-                  builder: (_, _) => const SkyChartPage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const SkyChartPage(),
+                  ),
                 ),
                 GoRoute(
                   path: AppRoutes.tidePath,
                   name: AppRoutes.tide,
-                  builder: (_, _) => const TidePage(),
+                  pageBuilder: (_, state) => MaterialPage<void>(
+                    key: state.pageKey,
+                    child: const TidePage(),
+                  ),
                 ),
               ],
             ),
@@ -205,84 +247,115 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.experimentalPath,
       name: AppRoutes.experimental,
-      builder: (_, _) => const ExperimentalPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const ExperimentalPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.logPath,
       name: AppRoutes.log,
-      builder: (_, _) => const LogPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const LogPage()),
     ),
     GoRoute(
       path: AppRoutes.meshtasticPath,
       name: AppRoutes.meshtastic,
-      builder: (_, _) => const MeshtasticPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const MeshtasticPage()),
     ),
     GoRoute(
       path: AppRoutes.changelogPath,
       name: AppRoutes.changelog,
-      builder: (_, _) => const ChangelogPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const ChangelogPage()),
     ),
     GoRoute(
       path: AppRoutes.versionNotesPath,
       name: AppRoutes.versionNotes,
-      builder: (_, _) => const VersionNotesPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const VersionNotesPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.releaseHighlightsPath,
       name: AppRoutes.releaseHighlights,
-      builder: (_, _) => const ReleaseHighlightsPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const ReleaseHighlightsPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.developerPath,
       name: AppRoutes.developer,
-      builder: (_, _) => const DeveloperPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const DeveloperPage()),
     ),
     GoRoute(
       path: AppRoutes.displayPath,
       name: AppRoutes.display,
-      builder: (_, _) => const DisplayPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const DisplayPage()),
     ),
     GoRoute(
       path: AppRoutes.languagePath,
       name: AppRoutes.language,
-      builder: (_, _) => const LanguagePage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const LanguagePage()),
     ),
     GoRoute(
       path: AppRoutes.defaultMapLayerPath,
       name: AppRoutes.defaultMapLayer,
-      builder: (_, _) => const DefaultMapLayerPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const DefaultMapLayerPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.eewSourcePath,
       name: AppRoutes.eewSource,
-      builder: (_, _) => const EewSourcePage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const EewSourcePage()),
     ),
     GoRoute(
       path: AppRoutes.spokenIntensityPath,
       name: AppRoutes.spokenIntensity,
-      builder: (_, _) => const SpokenIntensityPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const SpokenIntensityPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.regionManagePath,
       name: AppRoutes.regionManage,
-      builder: (_, _) => const RegionManagePage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const RegionManagePage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.regionSelectPath,
       name: AppRoutes.regionSelect,
-      builder: (_, state) => RegionSelectPage(
-        replaceCode: state.uri.queryParameters['replace'],
-        returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: RegionSelectPage(
+          replaceCode: state.uri.queryParameters['replace'],
+          returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+        ),
       ),
       routes: [
         GoRoute(
           path: AppRoutes.regionSelectCityPath,
           name: AppRoutes.regionSelectCity,
           redirect: regionCityRedirect,
-          builder: (_, state) => RegionCityPage(
-            city: state.pathParameters['city'] ?? '',
-            replaceCode: state.uri.queryParameters['replace'],
-            returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+          pageBuilder: (_, state) => MaterialPage<void>(
+            key: state.pageKey,
+            child: RegionCityPage(
+              city: state.pathParameters['city'] ?? '',
+              replaceCode: state.uri.queryParameters['replace'],
+              returnToMore: state.uri.queryParameters['returnToMore'] == '1',
+            ),
           ),
         ),
       ],
@@ -290,40 +363,55 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.permissionsPath,
       name: AppRoutes.permissions,
-      builder: (_, _) => const PermissionsPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const PermissionsPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.notifySettingsPath,
       name: AppRoutes.notifySettings,
-      builder: (_, _) => const NotifyPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const NotifyPage()),
       routes: [
         GoRoute(
           path: AppRoutes.notifyTestPath,
           name: AppRoutes.notifyTest,
-          builder: (_, _) => const NotificationTestPage(),
+          pageBuilder: (_, state) => MaterialPage<void>(
+            key: state.pageKey,
+            child: const NotificationTestPage(),
+          ),
         ),
       ],
     ),
     GoRoute(
       path: AppRoutes.sponsorPath,
       name: AppRoutes.sponsor,
-      builder: (_, _) => const SponsorPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const SponsorPage()),
     ),
     GoRoute(
       path: AppRoutes.serverStatusPath,
       name: AppRoutes.serverStatus,
-      builder: (_, _) => const ServerStatusPage(),
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const ServerStatusPage(),
+      ),
     ),
     GoRoute(
       path: AppRoutes.bugTrackerPath,
       name: AppRoutes.bugTracker,
-      builder: (_, _) => const BugListPage(),
+      pageBuilder: (_, state) =>
+          MaterialPage<void>(key: state.pageKey, child: const BugListPage()),
       routes: [
         GoRoute(
           path: AppRoutes.bugThreadPath,
           name: AppRoutes.bugThread,
           redirect: bugThreadRedirect,
-          builder: (_, state) => BugThreadPage(id: bugThreadIdOf(state) ?? 0),
+          pageBuilder: (_, state) => MaterialPage<void>(
+            key: state.pageKey,
+            child: BugThreadPage(id: bugThreadIdOf(state) ?? 0),
+          ),
         ),
       ],
     ),
@@ -336,5 +424,14 @@ StatefulShellBranch _branch(
   String name,
   GoRouterWidgetBuilder builder,
 ) => StatefulShellBranch(
-  routes: [GoRoute(path: path, name: name, builder: builder)],
+  routes: [
+    GoRoute(
+      path: path,
+      name: name,
+      pageBuilder: (context, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: builder(context, state),
+      ),
+    ),
+  ],
 );

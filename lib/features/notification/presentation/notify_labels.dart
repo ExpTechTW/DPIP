@@ -6,7 +6,7 @@ library;
 import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The channel's display title.
 String notifyChannelTitle(NotifyChannel channel, AppLocalizations l10n) =>

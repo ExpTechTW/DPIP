@@ -19,7 +19,7 @@ import 'package:dpip/features/status/domain/cloudflare_status_repository.dart';
 import 'package:dpip/features/status/domain/server_status.dart';
 import 'package:dpip/features/status/domain/server_status_repository.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 

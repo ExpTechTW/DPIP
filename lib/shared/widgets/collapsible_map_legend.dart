@@ -8,7 +8,7 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Wraps a layer's [legend] body. Remount with a new [Key] (e.g. layer id) to
 /// reset to the collapsed state when the active layer changes.

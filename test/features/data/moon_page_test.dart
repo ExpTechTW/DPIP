@@ -7,6 +7,7 @@
 /// the one it actually computed for.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/astro/moon_phase.dart';
 import 'package:dpip/core/astro/moon_rise_set.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -18,7 +19,7 @@ import 'package:dpip/features/data/presentation/widgets/moon_calendar.dart';
 import 'package:dpip/features/data/presentation/widgets/moon_glyph.dart';
 import 'package:dpip/shared/map/map_timeline.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -60,8 +61,8 @@ Future<void> _pumpPage(WidgetTester tester, RegionStore regions) async {
         Provider<TownDirectory>.value(value: _directory),
         ChangeNotifierProvider<RegionStore>.value(value: regions),
       ],
-      child: const MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+      child: MaterialApp(
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: MoonPage(),
       ),
@@ -287,8 +288,8 @@ void main() {
           Provider<TownDirectory>.value(value: directory),
           ChangeNotifierProvider<RegionStore>.value(value: regions),
         ],
-        child: const MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+        child: MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: Locale('en'),
           home: MoonPage(),

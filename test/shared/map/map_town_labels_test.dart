@@ -1,9 +1,10 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_town_labels.dart';
 import 'package:dpip/shared/widgets/map_chip_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Standalone base-map dropdown, as [MapScaffold] shows it for layers with no
@@ -15,7 +16,7 @@ Widget _wrap(
   ValueChanged<bool>? onTerrainChanged,
   GsiOverlayController? gsi,
 }) => MaterialApp(
-  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  localizationsDelegates: appLocalizationsDelegates,
   supportedLocales: AppLocalizations.supportedLocales,
   locale: const Locale('en'),
   home: GsiOverlayScope(

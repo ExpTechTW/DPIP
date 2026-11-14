@@ -4,7 +4,7 @@ library;
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/features/weather/domain/weather_ranking.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// One row in a weather ranking list — top-3 medals, relative fill bar, value.
 class WeatherRankingRow extends StatelessWidget {

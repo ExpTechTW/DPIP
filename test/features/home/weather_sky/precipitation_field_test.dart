@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:dpip/features/home/presentation/widgets/weather_sky/precipitation_field.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// The particle field reproduces the reference's emitter and compute shader, so the

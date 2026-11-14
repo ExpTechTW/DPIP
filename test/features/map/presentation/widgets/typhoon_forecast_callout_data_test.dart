@@ -7,7 +7,7 @@ import 'dart:math' as math;
 
 import 'package:dpip/features/map/presentation/widgets/typhoon_forecast_callouts.dart';
 import 'package:dpip/features/typhoon/domain/typhoon_track.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 TrackForecast _fix({

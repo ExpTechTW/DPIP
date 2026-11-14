@@ -1,3 +1,4 @@
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town.dart';
@@ -14,7 +15,7 @@ import 'package:dpip/shared/widgets/eew_estimate_tile.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
 import 'package:dpip/core/models/lat_lng.dart';
 import 'package:dpip/features/earthquake/domain/eew_local_estimate.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
@@ -102,7 +103,7 @@ Future<RegionStore> _store({int select = 2}) async {
 
 Widget _wrap(RegionStore store, {Eew? eew, DateTime Function()? clock}) =>
     MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
       home: MultiProvider(

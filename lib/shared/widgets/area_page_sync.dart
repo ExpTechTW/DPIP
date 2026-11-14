@@ -1,6 +1,6 @@
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/core/settings/region_store.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Binds a driven [PageController] to [RegionStore] for a widget that only

@@ -11,7 +11,7 @@
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Which known tag this is, driving the badge's icon and accent colour.
 ///

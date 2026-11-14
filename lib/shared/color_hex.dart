@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Hex conversion for feeding theme colours into MapLibre style JSON.
 extension ColorHex on Color {

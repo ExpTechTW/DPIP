@@ -7,6 +7,8 @@
 /// is a failure that only shows up on the day it matters.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
+
 import 'dart:typed_data';
 
 import 'package:dpip/app/theme/app_gold.dart';
@@ -36,7 +38,7 @@ import 'package:dpip/features/more/domain/developer_note.dart';
 import 'package:dpip/features/more/presentation/pages/more_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -225,7 +227,7 @@ Future<void> _pump(
         ),
       ],
       child: MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),

@@ -11,7 +11,7 @@
 library;
 
 import 'package:dpip/features/data/presentation/widgets/astro_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));

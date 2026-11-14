@@ -6,6 +6,7 @@
 /// server holds afterwards: finishing must mean the choice was saved.
 library;
 
+import 'package:dpip/core/settings/locale_config.dart';
 import 'package:awesome_notifications/awesome_notifications_platform_interface.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -22,7 +23,7 @@ import 'package:dpip/features/notification/domain/notify_settings.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -121,7 +122,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: router,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
         ),
       ),

@@ -6,7 +6,7 @@ library;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AlertCycleChip extends StatelessWidget {
   const AlertCycleChip({

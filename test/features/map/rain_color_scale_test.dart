@@ -7,7 +7,7 @@ import 'package:dpip/features/weather/domain/rain_snapshot.dart';
 import 'package:dpip/features/weather/domain/rain_trend.dart';
 import 'package:dpip/features/weather/domain/weather_station.dart';
 import 'package:dpip/shared/color_hex.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'raster_timeline_harness.dart';
