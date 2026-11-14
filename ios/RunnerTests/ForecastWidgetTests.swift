@@ -2158,30 +2158,34 @@ final class ForecastUnavailablePresentationTests: XCTestCase {
         }
     }
 
-    func testAccessibilityForecastRowFitsFullTimeNegativeTemperatureAndProbability() throws {
+    func testAccessibilityForecastColumnFitsFullTimeNegativeTemperatureAndProbability() throws {
         for size: DynamicTypeSize in [.accessibility1, .accessibility3, .accessibility5] {
             for probability: Int? in [nil, 0, 100] {
                 let point = try XCTUnwrap(ForecastWidgetPoint(
                     time: "16:00", temperature: -20, weather: "雷雨", weatherCode: 319, pop: probability
                 ))
-                let row = AccessibleForecastPointView(point: point, isNight: false)
+                let column = HourlyForecastPointView(point: point, compact: true, isNight: false)
                     .environment(\.dynamicTypeSize, size)
                     // With an unconstrained ideal width, no parent frame can
                     // mask truncation of the time or either numeric value.
                     .fixedSize(horizontal: true, vertical: true)
-                let host = UIHostingController(rootView: row)
+                let host = UIHostingController(rootView: column)
                 if #available(iOS 16.4, *) { host.safeAreaRegions = [] }
-                let fitting = host.sizeThatFits(in: CGSize(width: 300, height: 1_000))
-                XCTAssertLessThanOrEqual(fitting.width, 300,
-                    "Forecast row clips at \(size), probability=\(String(describing: probability))")
+                // Five columns after 16 pt margins, a 44 pt refresh button,
+                // and the 4 pt gaps in the narrow Medium card.
+                let slotWidth: CGFloat = (338 - 32 - 44 - 5 * 4) / 5
+                let fitting = host.sizeThatFits(in: CGSize(width: slotWidth, height: 1_000))
+                XCTAssertGreaterThan(fitting.width, 0)
+                XCTAssertLessThanOrEqual(fitting.width, slotWidth,
+                    "Forecast column clips at \(size), probability=\(String(describing: probability))")
             }
         }
     }
 
-    func testAccessibilityContentFitsWithoutVerticalCompression() throws {
-        // Measure the ideal height, before the fixed widget frame can hide
-        // overflow. Include four hours and full observations, unlike the
-        // minimal render fixture, to exercise both forecast and detail rows.
+    func testAccessibilityWeatherRendersWithinFiniteCard() throws {
+        // ViewThatFits needs the actual proposal to select a candidate.
+        // An unlimited height only measures the largest candidate.
+        // Exercise the finite card with negative temperatures and 100% PoP.
         let current = CurrentWeatherWidgetSnapshot(
             schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407",
             regionName: "臺中市西屯區", observationTime: Int(date.timeIntervalSince1970),
@@ -2208,32 +2212,55 @@ final class ForecastUnavailablePresentationTests: XCTestCase {
                         let widget = family == .systemMedium
                             ? AnyView(MediumCurrentWeatherView(entry: entry, localizationBundle: Bundle(for: Self.self)))
                             : AnyView(LargeCurrentWeatherView(entry: entry, localizationBundle: Bundle(for: Self.self)))
+                        let content = family == .systemMedium
+                            ? CGSize(width: 306, height: 126)
+                            : CGSize(width: 287, height: 286)
+                        let card = CGSize(width: content.width + 32, height: content.height + 32)
                         let view = widget
                             .environment(\.locale, Locale(identifier: locale))
                             .environment(\.dynamicTypeSize, size)
-                            .fixedSize(horizontal: false, vertical: true)
+                            .environment(\.colorScheme, .light)
+                            .frame(width: content.width, height: content.height, alignment: .topLeading)
+                            .padding(16)
+                            .background(Color.white)
                         let host = UIHostingController(rootView: view)
                         if #available(iOS 16.4, *) { host.safeAreaRegions = [] }
-                        let fitting = host.sizeThatFits(in: CGSize(width: 300, height: 1_000))
-                        let limit: CGFloat = family == .systemMedium ? 158 : 354
-                        XCTAssertGreaterThan(fitting.height, 50)
-                        XCTAssertLessThanOrEqual(fitting.height, limit,
-                            "Content clips: \(family) \(locale) \(size) forecast=\(forecast != nil)")
-                        XCTAssertLessThanOrEqual(fitting.width, 300)
-                        if size == .accessibility5, ["en", "zh-Hant"].contains(locale) {
-                            let render = UIHostingController(rootView: view
-                                .frame(width: 300, height: limit, alignment: .topLeading)
-                                .padding(16).background(Color.white)
-                                .environment(\.colorScheme, .light))
-                            if #available(iOS 16.4, *) { render.safeAreaRegions = [] }
-                            render.view.frame = CGRect(x: 0, y: 0, width: 332, height: limit + 32)
-                            render.view.setNeedsLayout()
-                            render.view.layoutIfNeeded()
-                            let image = UIGraphicsImageRenderer(size: render.view.bounds.size).image { _ in
-                                render.view.drawHierarchy(in: render.view.bounds, afterScreenUpdates: true)
+                        host.view.frame = CGRect(origin: .zero, size: card)
+                        host.view.layoutIfNeeded()
+                        let format = UIGraphicsImageRendererFormat()
+                        format.scale = 1
+                        format.opaque = true
+                        format.preferredRange = .standard
+                        let image = UIGraphicsImageRenderer(size: card, format: format).image { _ in
+                            host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+                        }
+                        let rendered = try XCTUnwrap(image.cgImage)
+                        let width = rendered.width
+                        let height = rendered.height
+                        var pixels = [UInt8](repeating: 0, count: width * height * 4)
+                        let ink = pixels.withUnsafeMutableBytes { bytes -> (content: Int, bottom: Int)? in
+                            guard let context = CGContext(data: bytes.baseAddress, width: width, height: height,
+                                                          bitsPerComponent: 8, bytesPerRow: width * 4,
+                                                          space: CGColorSpaceCreateDeviceRGB(),
+                                                          bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
+                            else { return nil }
+                            context.draw(rendered, in: CGRect(x: 0, y: 0, width: width, height: height))
+                            var contentInk = 0
+                            var bottomInk = 0
+                            for y in 16..<height {
+                                for x in 16..<(width - 16) where bytes[(y * width + x) * 4] < 180 {
+                                    if y >= height - 8 { bottomInk += 1 } else { contentInk += 1 }
+                                }
                             }
+                            return (contentInk, bottomInk)
+                        }
+                        let measurement = try XCTUnwrap(ink)
+                        let name = "\(family)-\(locale)-\(size)-\(forecast == nil ? "unavailable" : "forecast")"
+                        XCTAssertGreaterThan(measurement.content, 100, "Missing rendered weather: \(name)")
+                        XCTAssertEqual(measurement.bottom, 0, "Weather reaches the card edge: \(name)")
+                        if size == .accessibility5, ["en", "zh-Hant"].contains(locale) {
                             let attachment = XCTAttachment(image: image)
-                            attachment.name = "full-observations-\(family)-\(locale)-AX5-\(forecast == nil ? "unavailable" : "forecast")"
+                            attachment.name = "full-observations-\(name)"
                             attachment.lifetime = .keepAlways
                             add(attachment)
                         }
