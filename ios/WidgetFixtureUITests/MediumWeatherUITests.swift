@@ -48,7 +48,7 @@ final class MediumWeatherUITests: XCTestCase {
     }
 
     private enum Location: String {
-        case short, long, compact, xitun, longChinese, longJapanese, shortJapanese
+        case short, long, compact, xitun, longChinese, longJapanese, shortJapanese, shortKorean
 
         var label: String {
             switch self {
@@ -59,8 +59,13 @@ final class MediumWeatherUITests: XCTestCase {
             case .longChinese: "臺中市西屯區臺灣大道三段"
             case .longJapanese: "東京都千代田区丸の内一丁目"
             case .shortJapanese: "丸の内"
+            case .shortKorean: "시툰"
             }
         }
+    }
+
+    private enum SmallObservation: String {
+        case regular, heavyRain, dry, missingValues, noSnapshot
     }
 
     private enum Card: String, CaseIterable {
@@ -169,7 +174,7 @@ final class MediumWeatherUITests: XCTestCase {
 
     private func launch(
         _ forecast: Forecast, language: Language, size: TextSize, location: Location, card: Card,
-        family: Family = .medium, dark: Bool = false
+        family: Family = .medium, dark: Bool = false, smallObservation: SmallObservation = .regular
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = [
@@ -180,6 +185,7 @@ final class MediumWeatherUITests: XCTestCase {
             "DPIP_FIXTURE_CARD": card.rawValue,
             "DPIP_FIXTURE_FAMILY": family.rawValue,
             "DPIP_FIXTURE_DARK": dark ? "1" : "0",
+            "DPIP_FIXTURE_SMALL_OBSERVATION": smallObservation.rawValue,
         ]
         app.launch()
         return app
@@ -598,6 +604,130 @@ extension MediumWeatherUITests {
             XCTAssertEqual(app.buttons.count, 0)
             XCTAssertEqual(warningElements(app, language: language).count, 0)
             XCTAssertEqual(texts(app, label: hours[0]).count, 0)
+        }
+    }
+
+    func testSmallKeepsDefaultGeometryAcrossAllDynamicTypeSizes() {
+        for card in Card.allCases {
+            assertSmallGeometry(card: card, language: .en, location: .compact, condition: "Thunder",
+                                observation: .heavyRain, readings: ["32°", "100%", "1,234.5 mm"],
+                                dark: false, sizes: TextSize.allCases)
+        }
+    }
+
+    func testSmallLocalizedObservationsAtDefaultAndLargestTextSizes() {
+        let scenarios: [(Language, Location, String, SmallObservation, [String], Bool)] = [
+            (.en, .long, "Thunder", .regular, ["32°", "100%", "123.4 mm"], false),
+            (.traditionalChinese, .xitun, "雷電", .dry, ["32°", "0%", "0.0 mm"], true),
+            (.simplifiedChinese, .longChinese, "雷电", .missingValues, ["--°", "--%", "-- mm"], false),
+            (.ja, .longJapanese, "雷", .regular, ["32°", "100%", "123.4 mm"], true),
+            (.ko, .shortKorean, "천둥·번개", .dry, ["32°", "0%", "0.0 mm"], false),
+        ]
+        for card in Card.allCases {
+            for (language, location, condition, observation, readings, dark) in scenarios {
+                assertSmallGeometry(card: card, language: language, location: location, condition: condition,
+                                    observation: observation, readings: readings, dark: dark,
+                                    sizes: [.normal, .accessibility5])
+            }
+        }
+    }
+
+    func testSmallMissingSnapshotKeepsDefaultGeometry() {
+        for card in Card.allCases {
+            var baseline: [CGRect]?
+            for size in [TextSize.normal, .accessibility5] {
+                XCTContext.runActivity(named: "small-\(card)-zh-Hant-noSnapshot-\(size)") { _ in
+                    let app = launch(.stale, language: .traditionalChinese, size: size, location: .xitun,
+                                     card: card, family: .small, dark: true, smallObservation: .noSnapshot)
+                    guard let bounds = smallBounds(app, card: card),
+                          let message = requireOne(texts(app, label: "尚無天氣資料"), "No weather data"),
+                          let icon = requireOne(app.images, "No weather data icon") else { return }
+                    let frames = [message.frame, icon.frame]
+                    for frame in frames {
+                        assertInside(frame, bounds.insetBy(dx: margin, dy: margin), "No weather data")
+                    }
+                    assertSmallFrames(frames, match: baseline)
+                    baseline = baseline ?? frames
+                    capture("small-\(card)-zh-Hant-noSnapshot-\(size)")
+                }
+            }
+        }
+    }
+
+    private func assertSmallGeometry(
+        card: Card, language: Language, location: Location, condition: String,
+        observation: SmallObservation, readings: [String], dark: Bool, sizes: [TextSize]
+    ) {
+        var baseline: [CGRect]?
+        // Always compare against the original default text size.
+        for size in [.normal] + sizes.filter({ $0 != .normal }) {
+            let name = "small-\(card)-\(language.rawValue)-\(observation.rawValue)-\(size)"
+            XCTContext.runActivity(named: name) { _ in
+                let app = launch(.stale, language: language, size: size, location: location, card: card,
+                                 family: .small, dark: dark, smallObservation: observation)
+                guard let bounds = smallBounds(app, card: card) else { return }
+                if [.xSmall, .normal, .accessibility5].contains(size) {
+                    capture(name)
+                }
+                let labels = [location.label, language.timeLabel(utcHour: 6), condition] + readings
+                let frames = labels.compactMap { requireOne(texts(app, label: $0), "Full label '\($0)'")?.frame }
+                guard frames.count == labels.count else { return }
+                let icons = app.images.allElementsBoundByIndex.map(\.frame)
+                let temperature = frames[3]
+                let humidity = frames[4]
+                let rain = frames[5]
+                let headerIcons = icons.filter { $0.midY < temperature.minY }.sorted { $0.midX < $1.midX }
+                let bottomIcons = icons.filter { $0.midY > temperature.maxY }.sorted { $0.midX < $1.midX }
+                XCTAssertEqual(headerIcons.count, 2, "Location and weather icons must stay in the header")
+                XCTAssertEqual(bottomIcons.count, 2, "Humidity and rainfall icons must stay in the bottom row")
+                XCTAssertEqual(icons.count, 4)
+
+                let content = bounds.insetBy(dx: margin, dy: margin)
+                for (label, frame) in zip(labels, frames) {
+                    assertInside(frame, content, label)
+                }
+                for icon in icons {
+                    assertInside(icon, content, "Weather widget icon")
+                }
+                XCTAssertEqual(humidity.midY, rain.midY, accuracy: tolerance, "Both values must share the bottom row")
+                XCTAssertLessThanOrEqual(temperature.maxY, min(humidity.minY, rain.minY) + tolerance)
+                XCTAssertLessThan(humidity.midX, content.midX)
+                XCTAssertGreaterThan(rain.midX, content.midX)
+                if bottomIcons.count == 2 {
+                    XCTAssertLessThanOrEqual(bottomIcons[0].maxX, humidity.minX + tolerance)
+                    XCTAssertLessThanOrEqual(humidity.maxX, bottomIcons[1].minX + tolerance,
+                                             "Humidity and rainfall groups must not overlap")
+                    XCTAssertLessThanOrEqual(bottomIcons[1].maxX, rain.minX + tolerance)
+                    XCTAssertEqual(rain.maxX, content.maxX, accuracy: tolerance)
+                }
+
+                let geometry = frames + headerIcons + bottomIcons
+                assertSmallFrames(geometry, match: baseline)
+                baseline = baseline ?? geometry
+            }
+        }
+    }
+
+    private func smallBounds(_ app: XCUIApplication, card: Card) -> CGRect? {
+        let boundary = app.descendants(matching: .any).matching(identifier: "widget-presentation-boundary")
+        _ = boundary.firstMatch.waitForExistence(timeout: 10)
+        guard let marker = requireOne(boundary, "Independent presentation boundary") else { return nil }
+        let bounds = marker.frame
+        let expected = card.size(for: .small)
+        XCTAssertEqual(bounds.width, expected.width, accuracy: tolerance)
+        XCTAssertEqual(bounds.height, expected.height, accuracy: tolerance)
+        return bounds
+    }
+
+    private func assertSmallFrames(_ frames: [CGRect], match baseline: [CGRect]?) {
+        guard let baseline else { return }
+        XCTAssertEqual(frames.count, baseline.count)
+        for (frame, expected) in zip(frames, baseline) {
+            XCTAssertTrue(abs(frame.minX - expected.minX) <= tolerance
+                          && abs(frame.minY - expected.minY) <= tolerance
+                          && abs(frame.width - expected.width) <= tolerance
+                          && abs(frame.height - expected.height) <= tolerance,
+                          "Small frame changed from default size: \(frame) vs \(expected)")
         }
     }
 }
