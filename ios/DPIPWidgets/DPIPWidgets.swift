@@ -164,6 +164,13 @@ struct SmallCurrentWeatherView: View {
     var localizationBundle: Bundle = .main
 
     var body: some View {
+        // Small has a fixed layout. Keep the default text and symbol metrics
+        // at every Dynamic Type size while preserving the accessibility tree.
+        content.dynamicTypeSize(.large)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         if let snapshot = entry.snapshot {
             let observationDate = Date(
                 timeIntervalSince1970: TimeInterval(snapshot.observationTime)
@@ -250,6 +257,9 @@ struct SmallCurrentWeatherView: View {
                         .font(.caption)
                     }
                 }
+                // Keep longer readings and their units together in the row.
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             }
         } else {
             VStack(spacing: 8) {

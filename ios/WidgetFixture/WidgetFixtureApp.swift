@@ -124,7 +124,7 @@ private struct WeatherScenario {
     }
 
     private enum Location: String {
-        case short, long, compact, xitun, longChinese, longJapanese, shortJapanese
+        case short, long, compact, xitun, longChinese, longJapanese, shortJapanese, shortKorean
 
         var name: String {
             switch self {
@@ -135,6 +135,20 @@ private struct WeatherScenario {
             case .longChinese: "臺中市西屯區臺灣大道三段"
             case .longJapanese: "東京都千代田区丸の内一丁目"
             case .shortJapanese: "丸の内"
+            case .shortKorean: "시툰"
+            }
+        }
+    }
+
+    private enum SmallObservation: String {
+        case regular, heavyRain, dry, missingValues, noSnapshot
+
+        var values: (temperature: Double?, humidity: Int?, rain: Double?) {
+            switch self {
+            case .regular: (32, 100, 123.4)
+            case .heavyRain: (32, 100, 1234.5)
+            case .dry: (32, 0, 0)
+            case .missingValues, .noSnapshot: (nil, nil, nil)
             }
         }
     }
@@ -144,6 +158,7 @@ private struct WeatherScenario {
     private let language: Language
     private let textSize: TextSize
     private let location: Location
+    private let smallObservation: SmallObservation
     let family: Family
     let card: CGSize
 
@@ -153,6 +168,7 @@ private struct WeatherScenario {
         language = Self.option("DPIP_FIXTURE_LANGUAGE", default: .en, environment: environment)
         textSize = Self.option("DPIP_FIXTURE_TEXT_SIZE", default: .normal, environment: environment)
         location = Self.option("DPIP_FIXTURE_LOCATION", default: .short, environment: environment)
+        smallObservation = Self.option("DPIP_FIXTURE_SMALL_OBSERVATION", default: .regular, environment: environment)
         card = Self.option("DPIP_FIXTURE_CARD", default: Card.narrow, environment: environment).size(for: family)
     }
 
@@ -174,12 +190,18 @@ private struct WeatherScenario {
         // 15:21 entry date and 14:21 observation, both in Taipei.
         let date = ISO8601DateFormatter().date(from: "2026-09-25T07:21:00Z")!
         let observationDate = date.addingTimeInterval(-3600)
+        let observation = family == .small ? smallObservation : .regular
+        if observation == .noSnapshot {
+            return DPIPWidgetEntry(date: date, snapshot: nil, isStale: false, isNight: false)
+        }
+        let values = observation.values
         let snapshot = CurrentWeatherWidgetSnapshot(
             schemaVersion: 7, sourceIdentifier: "current-location", regionCode: "407",
             regionName: location.name, observationTime: Int(observationDate.timeIntervalSince1970),
             stationName: "Taichung", weather: "雷雨", weatherCode: 319, condition: .thunderstorm,
             isNight: false, nextDayNightTransitionTime: Int(date.addingTimeInterval(3600).timeIntervalSince1970),
-            calibratedTimeOffsetMilliseconds: 0, temperature: 32, humidity: 100, rain: 123.4,
+            calibratedTimeOffsetMilliseconds: 0, temperature: values.temperature, humidity: values.humidity,
+            rain: values.rain,
             windDirection: "NE", windSpeed: 12.3, apparentTemperature: 38
         )
         let forecastSnapshot = forecast.publicationAge.map { age in
