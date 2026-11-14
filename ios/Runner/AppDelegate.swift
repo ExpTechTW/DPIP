@@ -66,6 +66,10 @@ import UserNotifications
     NativeLogPlugin.register(with: registry.registrar(forPlugin: "NativeLogPlugin")!)
     NotificationSettingsLinkPlugin.register(
       with: registry.registrar(forPlugin: "NotificationSettingsLinkPlugin")!)
+    #if DEBUG
+    EEWLiveActivityPlugin.register(
+      with: registry.registrar(forPlugin: "EEWLiveActivityPlugin")!)
+    #endif
 
     // Re-post the launch notification the plugins just missed.
     //
