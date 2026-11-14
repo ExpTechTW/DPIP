@@ -108,6 +108,12 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// digits four times out of five. Assigned only when the second changes.
   final ValueNotifier<int> _clockSecond = ValueNotifier(0);
 
+  /// The highest level the replay's wash paints — the legend's ceiling. The
+  /// estimate belongs to the map ([_ReplayMapState._updateAreaFill]; the
+  /// legend lives up here beside the back button), so it is written back the
+  /// same way [_tick] travels down.
+  final ValueNotifier<int?> _paintedMaxLevel = ValueNotifier(null);
+
   void _syncClockSecond() {
     final second = _session.clock.now().millisecondsSinceEpoch ~/ 1000;
     if (second == _clockSecond.value) return;
@@ -165,6 +171,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       context.read<RealtimeService>().clock,
       widget.replayTimestamp,
       cwaOnly: () => cwaOnly.enabled,
+      mlIntensity: context.read<MlIntensityEstimator>(),
     )..start();
     _session.eew.addListener(_syncAnnouncement);
     _immersive = context.read<MapImmersiveController>()
@@ -301,6 +308,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     _clockSecond.dispose();
     _immersive.removeListener(_onImmersiveChanged);
     if (_immersive.value) _immersive.exit();
+    _paintedMaxLevel.dispose();
     _session.dispose();
     super.dispose();
   }
@@ -334,6 +342,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                   tick: _tick,
                   clock: _session.clock,
                   eewIndex: _eewIndex,
+                  paintedMaxLevel: _paintedMaxLevel,
                   immersive: immersive,
                   onImmersive: _immersive.enter,
                 ),
@@ -382,11 +391,14 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                               // not whether the user asked to see it.
                               CollapsibleMapLegend(
                                 legend: ListenableBuilder(
-                                  listenable: _session.eew,
+                                  listenable: Listenable.merge([
+                                    _session.eew,
+                                    _paintedMaxLevel,
+                                  ]),
                                   builder: (context, _) {
                                     final alerts =
                                         _session.eew.alerts.uncancelled;
-                                    final maxEewLevel = alerts.isEmpty
+                                    final alertMax = alerts.isEmpty
                                         ? null
                                         : alerts
                                               .map(
@@ -394,6 +406,13 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                                                     alert.info.max.clamp(0, 9),
                                               )
                                               .reduce((a, b) => a > b ? a : b);
+                                    final paintedMax = _paintedMaxLevel.value;
+                                    final maxEewLevel = alertMax == null
+                                        ? paintedMax
+                                        : paintedMax == null ||
+                                              alertMax >= paintedMax
+                                        ? alertMax
+                                        : paintedMax;
                                     return MapLegendCard(
                                       child: IntensityLegend(
                                         mode: alerts.isNotEmpty
@@ -524,6 +543,7 @@ class _ReplayMap extends StatefulWidget {
     required this.tick,
     required this.clock,
     required this.eewIndex,
+    required this.paintedMaxLevel,
     required this.immersive,
     required this.onImmersive,
   });
@@ -551,6 +571,9 @@ class _ReplayMap extends StatefulWidget {
   /// so with two simultaneous quakes it follows whichever one the card is
   /// showing, not always the newest.
   final int eewIndex;
+
+  /// The highest level painted by the wash, for the page's legend.
+  final ValueNotifier<int?> paintedMaxLevel;
 
   /// Whether the replay is in immersive mode. The map hides its own top-right
   /// chrome with the rest of the page's.
@@ -1128,6 +1151,7 @@ class _ReplayMapState extends State<_ReplayMap> {
         // with no alert up it paints nothing, so the OSM detailed ground —
         // which mounts directly beneath it — keeps showing. The grey island is
         // [countyFillLayerId]'s job, restored just above.
+        widget.paintedMaxLevel.value = null;
         await controller.setLayerProperties(
           townFillLayerId,
           const FillLayerProperties(fillColor: '#00000000', fillOpacity: 0),
@@ -1146,6 +1170,7 @@ class _ReplayMapState extends State<_ReplayMap> {
       // A newer alert, serial or the model itself took over while this one
       // was being scored — its own update paints, not this stale one.
       if (!mounted || key != _fillEewKey) return;
+      widget.paintedMaxLevel.value = highestPaintedLevel(estimate.levels);
       final entries = <Object>[];
       estimate.levels.forEach((code, level) {
         if (level > 0) {

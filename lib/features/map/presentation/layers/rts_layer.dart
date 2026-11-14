@@ -216,6 +216,11 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   /// Bumped on every feed notification, so the ranking card rebuilds with it.
   final ValueNotifier<int> _rankingTick = ValueNotifier(0);
 
+  /// The highest level the current wash paints — the legend must include it
+  /// even when the active alerts' model-derived maximum belongs to another
+  /// warning.
+  final ValueNotifier<int?> _paintedMaxLevel = ValueNotifier(null);
+
   /// Brightness captured from the last context-bearing call ([buildLegend] /
   /// [buildSheet]) — the render/data-push methods get no `BuildContext`, but
   /// the intensity icons come in light/dark artwork and the area fill needs
@@ -905,6 +910,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
         // with no alert up it paints nothing, so the OSM detailed ground —
         // which mounts directly beneath it — keeps showing. The grey island is
         // [countyFillLayerId]'s job, restored just above.
+        _paintedMaxLevel.value = null;
         await controller.setLayerProperties(
           townFillLayerId,
           const FillLayerProperties(fillColor: '#00000000', fillOpacity: 0),
@@ -923,6 +929,7 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
       // A newer alert, serial or the model itself took over while this one
       // was being scored — its own update paints, not this stale one.
       if (key != _fillEewKey) return;
+      _paintedMaxLevel.value = highestPaintedLevel(estimate.levels);
       final entries = <Object>[];
       estimate.levels.forEach((code, level) {
         if (level > 0) {
@@ -964,14 +971,20 @@ class RtsMapLayer with MapLayerDefaults implements MapLayer {
   Widget buildLegend(BuildContext context) {
     _captureBrightness(context);
     return ListenableBuilder(
-      listenable: _eew,
+      listenable: Listenable.merge([_eew, _paintedMaxLevel]),
       builder: (context, _) {
         final alerts = (_eew.state.data ?? const <Eew>[]).uncancelled;
-        final maxEewLevel = alerts.isEmpty
+        final alertMax = alerts.isEmpty
             ? null
             : alerts
                   .map((alert) => alert.info.max.clamp(0, 9))
                   .reduce((a, b) => a > b ? a : b);
+        final paintedMax = _paintedMaxLevel.value;
+        final maxEewLevel = alertMax == null
+            ? paintedMax
+            : paintedMax == null || alertMax >= paintedMax
+            ? alertMax
+            : paintedMax;
         return MapLegendCard(
           child: IntensityLegend(
             mode: _eewActive

@@ -12,6 +12,7 @@ import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
+import 'package:dpip/features/earthquake/data/eew_ml_max_source.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
 import 'package:dpip/features/earthquake/data/ml_intensity_service.dart';
@@ -57,8 +58,9 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   // Held by the 強震監視器 while it is on screen: only then does the RTS feed
   // need every frame, rather than the alerting ones the stream's sleep sends.
   final rtsLiveDemand = RtsLiveDemand();
-  // ML v1 township estimates. Nothing is fetched or built here: the monitor
-  // calls `prepare` the first time it opens.
+  // ML v1 township estimates. The EEW source starts loading it on the first
+  // alert, then republishes that alert with the model's nationwide maximum;
+  // the monitor reuses the same service for its township wash.
   final mlIntensity = MlIntensityService(
     client: deps.apiClient,
     store: MlModelStore(deps.database.durable),
@@ -89,7 +91,7 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
           poll: api.getEewRealtime,
         ) as RealtimeSource<List<Eew>>;
   final eewChannel = RealtimeChannel<List<Eew>>(
-    source: eewSource,
+    source: EewMlMaxSource(eewSource, mlIntensity),
     clock: deps.serverClock,
     elapsed: SystemElapsed(),
     ticker: const SystemTicker(),
