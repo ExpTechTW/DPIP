@@ -542,7 +542,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(l10n.weatherRankingPickTime), findsOneWidget);
 
-    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.tap(find.text(rankingTimeLabel(_earlier).substring(6)));
     await tester.pumpAndSettle();
 
     // One `at()` per dataset, both for the chosen second.
@@ -573,7 +573,7 @@ void main() {
 
     await tester.tap(find.text(l10n.weatherRankingLatest));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.tap(find.text(rankingTimeLabel(_earlier).substring(6)));
     await tester.pumpAndSettle();
     expect(find.text('21 mm'), findsOneWidget);
 
@@ -610,7 +610,7 @@ void main() {
 
     await tester.tap(find.text(l10n.weatherRankingLatest));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.tap(find.text(rankingTimeLabel(_earlier).substring(6)));
     await tester.pumpAndSettle();
 
     expect(weather.requested, [_earlier]);
@@ -639,7 +639,7 @@ void main() {
 
     await tester.tap(find.text(l10n.weatherRankingLatest));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.tap(find.text(rankingTimeLabel(_earlier).substring(6)));
     await tester.pumpAndSettle();
 
     expect(find.text(rankingTimeLabel(_earlier)), findsOneWidget);
@@ -667,7 +667,7 @@ void main() {
 
     await tester.tap(find.text(l10n.weatherRankingLatest));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(rankingTimeLabel(_earlier)));
+    await tester.tap(find.text(rankingTimeLabel(_earlier).substring(6)));
     await tester.pumpAndSettle();
 
     expect(find.text(rankingTimeLabel(_earlier)), findsOneWidget);
