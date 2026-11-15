@@ -16,13 +16,16 @@ import 'package:intl/intl.dart';
 typedef RankingTimeChoice = ({int? second});
 
 final DateFormat _timeFormat = DateFormat('MM/dd HH:mm');
+final DateFormat _dateFormat = DateFormat('MM/dd');
+final DateFormat _hourFormat = DateFormat('HH:mm');
+
+DateTime _taipeiTime(int second) => AppTime.taipei(
+  DateTime.fromMillisecondsSinceEpoch(second * 1000, isUtc: true),
+);
 
 /// Taiwan wall-clock label for a snapshot second (`10/27 03:00`).
-String rankingTimeLabel(int unixSeconds) => _timeFormat.format(
-  AppTime.taipei(
-    DateTime.fromMillisecondsSinceEpoch(unixSeconds * 1000, isUtc: true),
-  ),
-);
+String rankingTimeLabel(int unixSeconds) =>
+    _timeFormat.format(_taipeiTime(unixSeconds));
 
 /// Shows the snapshot picker and resolves to the chosen time.
 ///
@@ -69,6 +72,17 @@ class _RankingTimeSheet extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final older = _older;
+    final entries = <({int? second, DateTime? date})>[];
+    DateTime? previousDate;
+    for (final second in older) {
+      final time = _taipeiTime(second);
+      final date = DateTime(time.year, time.month, time.day);
+      if (date != previousDate) {
+        entries.add((second: null, date: date));
+        previousDate = date;
+      }
+      entries.add((second: second, date: null));
+    }
 
     return SafeArea(
       top: false,
@@ -96,7 +110,7 @@ class _RankingTimeSheet extends StatelessWidget {
               child: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                itemCount: older.length + 1,
+                itemCount: entries.length + 1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return _TimeRow(
@@ -109,9 +123,26 @@ class _RankingTimeSheet extends StatelessWidget {
                       },
                     );
                   }
-                  final second = older[index - 1];
+                  final entry = entries[index - 1];
+                  if (entry.date case final date?) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.sm,
+                        AppSpacing.lg,
+                        AppSpacing.sm,
+                      ),
+                      child: Text(
+                        _dateFormat.format(date),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    );
+                  }
+                  final second = entry.second!;
                   return _TimeRow(
-                    title: rankingTimeLabel(second),
+                    title: _hourFormat.format(_taipeiTime(second)),
                     selected: selected == second,
                     onTap: () {
                       Navigator.of(context)
