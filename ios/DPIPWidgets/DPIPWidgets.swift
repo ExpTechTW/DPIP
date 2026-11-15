@@ -383,6 +383,8 @@ private struct WeatherWidgetLayout: View {
     private func regular(tight: Bool) -> some View {
         VStack(alignment: .leading, spacing: tight ? (isMedium ? 2 : 4) : (isMedium ? 6 : 12)) {
             header(adaptive: false)
+                // Use the header gap to keep all five precipitation values on the card.
+                .padding(.bottom, isMedium && tight && dynamicTypeSize == .xxxLarge ? -2 : 0)
             regularCurrentWeather
 
             if !isMedium { Spacer(minLength: tight ? 0 : nil) }
@@ -425,10 +427,7 @@ private struct WeatherWidgetLayout: View {
         HStack(alignment: .firstTextBaseline, spacing: adaptive ? 4 : nil) {
             HStack(spacing: 4) {
                 Text(snapshot.regionName)
-                    .font(isMedium && !dynamicTypeSize.isAccessibilitySize
-                          ? .subheadline.weight(.semibold)
-                          : .headline
-                    )
+                    .font(.headline)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .layoutPriority(1)
