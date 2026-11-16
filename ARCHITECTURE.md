@@ -153,7 +153,9 @@ hosts. See `api.md`. `ApiClient` fails over to the next region **only** on
 transient/server faults (connection drop, timeout, 5xx) and logs each
 failover; a 4xx or a cancellation throws immediately (it would recur on every
 region). Pass a `CancelToken` to abort a superseded request. SSE streams go
-through `ApiClient.openStream` + `core/network/sse_client.dart`. Fatal and
+through `ApiClient.openStream` + `core/network/sse_client.dart`, and every
+live feed shares one connection through `core/network/sse_mux.dart` — never
+open a second one for a new topic. Fatal and
 handled errors forward to the `CrashSink` set on `Log` — Crashlytics, in a
 prerelease build (see [Logging](#logging)).
 
@@ -188,11 +190,19 @@ against a corrected `ServerClock` — a feed ages to stale/offline on its own
 when polls stop, and a failed poll keeps the last data (never blanks). Add a
 feed by implementing `RealtimeSource` (in `data/`) and subclassing
 `RealtimeNotifier` (in `presentation/`) — no engine change; the transport
-lives entirely behind the source seam. EEW now streams over **SSE**
+lives entirely behind the source seam. EEW and RTS stream over **SSE**
 (`sse_realtime_source.dart` holds one connection, buffers the latest event,
 and answers each poll from that buffer — `Ok` while connected, `Err` while
 reconnecting — so the channel/state/staleness are untouched); the `data:`
-payload is the same JSON the GET returned. A bursty feed (EEW, silent between
+payload, once inflated, is the same JSON the GET returned. Both ride **one**
+connection: `SseMux` (`core/network/sse_mux.dart`) opens the shared stream
+with every registered topic, routes each frame to its topic by event name,
+and hands each source a lease that behaves like a connection of its own — so
+the source's reconnect, silence and lifecycle rules are unchanged. The socket
+is open while any source holds a lease and closed when none does; a source
+reconnecting on its own joins it and is replayed the greeting and its
+topic's latest snapshot, and a change of RTS speed hands the shared
+connection over without a gap. A bursty feed (EEW, silent between
 events) uses connection-open liveness; a continuous feed (RTS, ~1 Hz) uses
 event-recency. Neither trusts an open socket on its own: the servers write a
 `: ping` comment on an idle stream, the parser surfaces it, and a connection

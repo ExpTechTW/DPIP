@@ -58,8 +58,7 @@
 
 | 類別.方法 | 路徑 | 層級 | 主機（容錯順序 = 選定區域優先） |
 |---|---|---|---|
-| `EarthquakeApi.openEewSse` | `/api/v2/eq/eew?sse=1&compress=1` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
-| `EarthquakeApi.openTremSse` | `/api/v1/trem/sse?topics=trem.rts.v1[&mode=live]` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
+| `SseMux.lb` | `/api/v1/sse?topics=…[&mode=live]` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `EarthquakeApi.getEewRealtime` | `/api/v2/eq/eew` | `lbApi` | `api.lb-{tpe1,khh1}.exptech.dev` |
 | `EarthquakeApi.getEewAt` | `/api/v2/eq/eew/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getRtsAt` | `/api/v3/trem/rts/{sec}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
@@ -83,19 +82,20 @@
 > 存進 `dpip.db` 的 `trem_station`（不是 HTTP 快取，那個會被系統清掉），
 > 開強震監視器時先畫存著的、再問一次伺服器。
 
-> **即時串流走 SSE（gzip 壓縮），不是輪詢。** EEW：`?sse=1` 把端點切換成
-> `text/event-stream`；再加 `&compress=1`，payload 會以 `event: g` 事件送出，其
-> `data:` 是 **base64 的 gzip**（解開後就是純 GET 的同一份 JSON），由**應用層**在
-> `sse_realtime_source.dart` 解壓。`getEewRealtime` 保留為一次性快照。
+> **即時串流走 SSE（gzip 壓縮），不是輪詢，而且整個 App 只開一條連線。**
+> `SseMux.lb` 開 `/api/v1/sse?topics=<a,b>`：`topics` 是 App 正在串流的每一個
+> topic（常數在 `EarthquakeApi`，在 `earthquake_providers.dart` 註冊），每則事件
+> 以 topic 為名（`event: trem.rts.v1`），`data:` 一律是 **base64 的 gzip**，由
+> **應用層**在 `sse_realtime_source.dart` 解壓。連線一開先送 `retry:` 與
+> `event: info`（列出允許與 `denied` 的 topic），之後約每 60 秒一行 `: ping`。
+> 只要還有一個 feed 在用就維持這一條，最後一個放手（進背景）就關掉；某個 feed
+> 自己重連時是加入已開的那一條，不會另開。
 >
-> RTS 走 **TREM 串流** `/api/v1/trem/sse?topics=…`：一條連線可以帶多個 topic，
-> 每則事件以 topic 為名（`event: trem.rts.v1`），`data:` 一律是 base64 的 gzip，
-> 內容是 `rts.v1` JSON（`{ts, stations:{<hex id>:{i, pga?, alert?}}, eq}`，**沒有**
-> v2 的 `box`／`int`／`I`／`pgv` —— 由前端從 alert 測站推算）。連線一開先送
-> `retry:` 與 `event: info`（列出允許與 `denied` 的 topic）。不帶 `mode=live`
+> `trem.rts.v1` 的內容是 `rts.v1` JSON（`{ts, stations:{<hex id>:{i, pga?, alert?}}, eq}`，**沒有**
+> v2 的 `box`／`int`／`I`／`pgv` —— 由前端從 alert 測站推算）。不帶 `mode=live`
 > 時是**睡眠模式**：只送有測站 alert 的幀；App 只在強震監視器顯示時要
-> `mode=live`，換模式時先連新的、收到招呼才斷舊的。不要訂 `trem.eew.v1`
-> —— 那是 TREM 自己的 EEW，不是 CWA 的。
+> `mode=live`（整條共用連線一起切換），換模式時先連新的、收到招呼才斷舊的。
+> 不要訂 `trem.eew.v1` —— 那是 TREM 自己的 EEW，不是 CWA 的。
 >
 > 傳輸、緩衝與重連都藏在 `RealtimeSource` seam 後面 —— channel、過期分類器與
 > 生命週期都不變。EEW 是**突發型**（地震之間靜默 → 存活判定用「連線開著」）；
