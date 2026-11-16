@@ -3667,4 +3667,50 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Để sau';
+
+  @override
+  String get seismometerTitle => 'Máy đo địa chấn';
+
+  @override
+  String get seismometerIntensity => 'Cường độ đo bằng máy';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return 'Đang hiệu chuẩn — giữ điện thoại đứng yên ($seconds giây)';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return 'Đang thu thập dữ liệu $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => 'Đang đo';
+
+  @override
+  String get seismometerUnavailable =>
+      'Thiết bị này không có gia tốc kế dùng được';
+
+  @override
+  String get seismometerSessionMax => 'Cường độ cao nhất';
+
+  @override
+  String get seismometerAcceleration => 'Gia tốc';
+
+  @override
+  String get seismometerPeakAcceleration => 'Gia tốc đỉnh';
+
+  @override
+  String get seismometerSampleRate => 'Tốc độ lấy mẫu';
+
+  @override
+  String get seismometerReset => 'Đặt lại';
+
+  @override
+  String get seismometerDisclaimer =>
+      'Đặt điện thoại nằm phẳng trên mặt phẳng vững. Cảm biến điện thoại có độ chính xác hạn chế, nên kết quả chỉ để tham khảo và không phải cường độ chính thức của CWA.';
+
+  @override
+  String get seismometerAlgorithm =>
+      'Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng';
 }

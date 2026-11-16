@@ -15,8 +15,8 @@ import 'package:go_router/go_router.dart';
 /// Catalogue of in-app data surfaces. The shell's 4th tab; entries push nested
 /// routes under `/data/…` so the bottom nav stays visible.
 ///
-/// Laid out as a catalogue rather than a plain list: the seismic entry is a
-/// full-width featured card (the primary hazard surface), and the weather
+/// Laid out as a catalogue rather than a plain list: the seismic entries are
+/// full-width featured cards (the primary hazard surfaces), and the weather
 /// rankings fill a two-column grid so every metric reads at a glance.
 class DataPage extends StatelessWidget {
   const DataPage({super.key});
@@ -72,6 +72,19 @@ class DataPage extends StatelessWidget {
                 icon: Icons.monitor_heart_outlined,
                 title: l10n.dataEarthquakeSubtitle,
                 onTap: () => context.pushNamed(AppRoutes.earthquake),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              child: _SeismicCard(
+                icon: Icons.vibration,
+                title: l10n.seismometerTitle,
+                onTap: () => context.pushNamed(AppRoutes.seismometer),
               ),
             ),
             SectionHeader(l10n.dataSectionWeather),

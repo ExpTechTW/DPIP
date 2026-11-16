@@ -52,6 +52,10 @@ abstract final class AppRoutes {
   static const String moon = 'moon';
   static const String moonPath = 'moon';
 
+  /// Phone seismometer — nested under [dataPath].
+  static const String seismometer = 'seismometer';
+  static const String seismometerPath = 'seismometer';
+
   /// Daylight, twilight and the solar terms — nested under [dataPath].
   static const String sun = 'sun';
   static const String sunPath = 'sun';

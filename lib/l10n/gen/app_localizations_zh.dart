@@ -3569,6 +3569,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => '略過，之後再設定';
+
+  @override
+  String get seismometerTitle => '地震儀';
+
+  @override
+  String get seismometerIntensity => '計測震度';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '校正中，請保持手機靜止（$seconds 秒）';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return '累積資料中 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '量測中';
+
+  @override
+  String get seismometerUnavailable => '這台裝置沒有可用的加速度計';
+
+  @override
+  String get seismometerSessionMax => '最大震度';
+
+  @override
+  String get seismometerAcceleration => '加速度';
+
+  @override
+  String get seismometerPeakAcceleration => '最大加速度';
+
+  @override
+  String get seismometerSampleRate => '取樣率';
+
+  @override
+  String get seismometerReset => '重設';
+
+  @override
+  String get seismometerDisclaimer =>
+      '請將手機平放在穩固的平面上。手機感測器精度有限，量測結果僅供參考，不代表中央氣象署發布的震度。';
+
+  @override
+  String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -7132,6 +7176,50 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get onboardingNotifySkip => '跳过，稍后再设置';
+
+  @override
+  String get seismometerTitle => '地震仪';
+
+  @override
+  String get seismometerIntensity => '计测震度';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '校正中，请保持手机静止（$seconds 秒）';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return '累积数据中 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '测量中';
+
+  @override
+  String get seismometerUnavailable => '这台设备没有可用的加速度计';
+
+  @override
+  String get seismometerSessionMax => '最大震度';
+
+  @override
+  String get seismometerAcceleration => '加速度';
+
+  @override
+  String get seismometerPeakAcceleration => '最大加速度';
+
+  @override
+  String get seismometerSampleRate => '采样率';
+
+  @override
+  String get seismometerReset => '重置';
+
+  @override
+  String get seismometerDisclaimer =>
+      '请将手机平放在稳固的平面上。手机传感器精度有限，测量结果仅供参考，不代表中央气象署发布的震度。';
+
+  @override
+  String get seismometerAlgorithm => '依 ES-Net 的 JMA 计测震度算法计算';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10696,6 +10784,50 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get onboardingNotifySkip => '略過，之後再設定';
+
+  @override
+  String get seismometerTitle => '地震儀';
+
+  @override
+  String get seismometerIntensity => '計測震度';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '校正中，請保持手機靜止（$seconds 秒）';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return '累積資料中 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '量測中';
+
+  @override
+  String get seismometerUnavailable => '這部裝置沒有可用的加速度計';
+
+  @override
+  String get seismometerSessionMax => '最大震度';
+
+  @override
+  String get seismometerAcceleration => '加速度';
+
+  @override
+  String get seismometerPeakAcceleration => '最大加速度';
+
+  @override
+  String get seismometerSampleRate => '取樣率';
+
+  @override
+  String get seismometerReset => '重設';
+
+  @override
+  String get seismometerDisclaimer =>
+      '請將手機平放在穩固的平面上。手機感測器精度有限，量測結果僅供參考，並不代表中央氣象署發布的震度。';
+
+  @override
+  String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -14260,4 +14392,48 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingNotifySkip => '略過，之後再設定';
+
+  @override
+  String get seismometerTitle => '地震儀';
+
+  @override
+  String get seismometerIntensity => '計測震度';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '校正中，請保持手機靜止（$seconds 秒）';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return '累積資料中 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '量測中';
+
+  @override
+  String get seismometerUnavailable => '這台裝置沒有可用的加速度計';
+
+  @override
+  String get seismometerSessionMax => '最大震度';
+
+  @override
+  String get seismometerAcceleration => '加速度';
+
+  @override
+  String get seismometerPeakAcceleration => '最大加速度';
+
+  @override
+  String get seismometerSampleRate => '取樣率';
+
+  @override
+  String get seismometerReset => '重設';
+
+  @override
+  String get seismometerDisclaimer =>
+      '請將手機平放在穩固的平面上。手機感測器精度有限，量測結果僅供參考，不代表中央氣象署發布的震度。';
+
+  @override
+  String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
 }

@@ -3678,4 +3678,50 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Lewati dulu';
+
+  @override
+  String get seismometerTitle => 'Seismometer';
+
+  @override
+  String get seismometerIntensity => 'Intensitas instrumental';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return 'Mengkalibrasi — jangan gerakkan ponsel ($seconds dtk)';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return 'Mengumpulkan data $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => 'Mengukur';
+
+  @override
+  String get seismometerUnavailable =>
+      'Perangkat ini tidak memiliki akselerometer yang dapat dipakai';
+
+  @override
+  String get seismometerSessionMax => 'Intensitas tertinggi';
+
+  @override
+  String get seismometerAcceleration => 'Percepatan';
+
+  @override
+  String get seismometerPeakAcceleration => 'Percepatan puncak';
+
+  @override
+  String get seismometerSampleRate => 'Laju sampel';
+
+  @override
+  String get seismometerReset => 'Atur ulang';
+
+  @override
+  String get seismometerDisclaimer =>
+      'Letakkan ponsel rata di permukaan yang stabil. Sensor ponsel tidak presisi, jadi pembacaan ini hanya referensi dan bukan intensitas resmi CWA.';
+
+  @override
+  String get seismometerAlgorithm =>
+      'Dihitung dengan metode intensitas instrumental JMA yang dipakai ES-Net';
 }

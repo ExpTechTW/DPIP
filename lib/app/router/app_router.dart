@@ -18,6 +18,7 @@ import 'package:dpip/features/release_highlights/presentation/pages/release_high
 import 'package:dpip/features/log/presentation/pages/log_page.dart';
 import 'package:dpip/features/map/presentation/pages/map_page.dart';
 import 'package:dpip/features/data/presentation/pages/moon_page.dart';
+import 'package:dpip/features/seismometer/presentation/seismometer_page.dart';
 import 'package:dpip/features/data/presentation/pages/almanac_page.dart';
 import 'package:dpip/features/data/presentation/pages/planets_page.dart';
 import 'package:dpip/features/data/presentation/pages/sky_chart_page.dart';
@@ -163,6 +164,12 @@ final GoRouter appRouter = GoRouter(
                   path: AppRoutes.moonPath,
                   name: AppRoutes.moon,
                   builder: (_, _) => const MoonPage(),
+                ),
+                GoRoute(
+                  path: AppRoutes.seismometerPath,
+                  name: AppRoutes.seismometer,
+                  builder: (_, _) =>
+                      const SeismometerPage(tabIndex: DataPage.tabIndex),
                 ),
                 GoRoute(
                   path: AppRoutes.sunPath,

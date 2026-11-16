@@ -3687,4 +3687,50 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Laktawan muna';
+
+  @override
+  String get seismometerTitle => 'Seismometer';
+
+  @override
+  String get seismometerIntensity => 'Instrumental na intensidad';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return 'Nagka-calibrate — huwag galawin ang telepono ($seconds s)';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return 'Kinokolekta ang data $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => 'Sinusukat';
+
+  @override
+  String get seismometerUnavailable =>
+      'Walang magagamit na accelerometer ang device na ito';
+
+  @override
+  String get seismometerSessionMax => 'Pinakamataas na intensidad';
+
+  @override
+  String get seismometerAcceleration => 'Akselerasyon';
+
+  @override
+  String get seismometerPeakAcceleration => 'Pinakamataas na akselerasyon';
+
+  @override
+  String get seismometerSampleRate => 'Rate ng sampling';
+
+  @override
+  String get seismometerReset => 'I-reset';
+
+  @override
+  String get seismometerDisclaimer =>
+      'Ihiga nang patag ang telepono sa matatag na ibabaw. Limitado ang katumpakan ng sensor ng telepono, kaya sanggunian lang ang pagbasang ito at hindi ito opisyal na intensidad ng CWA.';
+
+  @override
+  String get seismometerAlgorithm =>
+      'Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net';
 }

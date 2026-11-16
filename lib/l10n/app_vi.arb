@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "Đang áp dụng…",
   "onboardingNotifyTitle": "Cảnh báo của bạn",
   "onboardingNotifyBody": "Hãy chọn một điểm bắt đầu. Bạn có thể tinh chỉnh từng kênh trong Cài đặt thông báo bất cứ lúc nào, và mọi lựa chọn đều giữ cảnh báo động đất khẩn cấp.",
-  "onboardingNotifySkip": "Để sau"
+  "onboardingNotifySkip": "Để sau",
+  "seismometerTitle": "Máy đo địa chấn",
+  "seismometerIntensity": "Cường độ đo bằng máy",
+  "seismometerCalibrating": "Đang hiệu chuẩn — giữ điện thoại đứng yên ({seconds} giây)",
+  "seismometerBuffering": "Đang thu thập dữ liệu {percent}%",
+  "seismometerMeasuring": "Đang đo",
+  "seismometerUnavailable": "Thiết bị này không có gia tốc kế dùng được",
+  "seismometerSessionMax": "Cường độ cao nhất",
+  "seismometerAcceleration": "Gia tốc",
+  "seismometerPeakAcceleration": "Gia tốc đỉnh",
+  "seismometerSampleRate": "Tốc độ lấy mẫu",
+  "seismometerReset": "Đặt lại",
+  "seismometerDisclaimer": "Đặt điện thoại nằm phẳng trên mặt phẳng vững. Cảm biến điện thoại có độ chính xác hạn chế, nên kết quả chỉ để tham khảo và không phải cường độ chính thức của CWA.",
+  "seismometerAlgorithm": "Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng"
 }

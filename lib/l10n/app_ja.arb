@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "適用しています…",
   "onboardingNotifyTitle": "通知の受け取り方",
   "onboardingNotifyBody": "まずは出発点を選んでください。各チャンネルは「通知設定」でいつでも個別に調整でき、どの選択肢でも緊急地震速報は受け取れます。",
-  "onboardingNotifySkip": "あとで設定する"
+  "onboardingNotifySkip": "あとで設定する",
+  "seismometerTitle": "地震計",
+  "seismometerIntensity": "計測震度",
+  "seismometerCalibrating": "校正中です。スマートフォンを動かさないでください（残り{seconds}秒）",
+  "seismometerBuffering": "データを収集中 {percent}%",
+  "seismometerMeasuring": "計測中",
+  "seismometerUnavailable": "この端末には使える加速度センサーがありません",
+  "seismometerSessionMax": "最大震度",
+  "seismometerAcceleration": "加速度",
+  "seismometerPeakAcceleration": "最大加速度",
+  "seismometerSampleRate": "サンプリングレート",
+  "seismometerReset": "リセット",
+  "seismometerDisclaimer": "スマートフォンを安定した平らな面に置いてください。端末のセンサー精度には限界があるため、この値は参考であり、中央気象署が発表する震度ではありません。",
+  "seismometerAlgorithm": "ES-Net が用いる気象庁の計測震度の方法で計算しています"
 }

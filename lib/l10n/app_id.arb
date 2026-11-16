@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "Menerapkan…",
   "onboardingNotifyTitle": "Peringatan Anda",
   "onboardingNotifyBody": "Pilih titik awal. Anda dapat menyesuaikan setiap saluran di Pengaturan notifikasi kapan saja, dan setiap pilihan tetap menyalakan peringatan gempa darurat.",
-  "onboardingNotifySkip": "Lewati dulu"
+  "onboardingNotifySkip": "Lewati dulu",
+  "seismometerTitle": "Seismometer",
+  "seismometerIntensity": "Intensitas instrumental",
+  "seismometerCalibrating": "Mengkalibrasi — jangan gerakkan ponsel ({seconds} dtk)",
+  "seismometerBuffering": "Mengumpulkan data {percent}%",
+  "seismometerMeasuring": "Mengukur",
+  "seismometerUnavailable": "Perangkat ini tidak memiliki akselerometer yang dapat dipakai",
+  "seismometerSessionMax": "Intensitas tertinggi",
+  "seismometerAcceleration": "Percepatan",
+  "seismometerPeakAcceleration": "Percepatan puncak",
+  "seismometerSampleRate": "Laju sampel",
+  "seismometerReset": "Atur ulang",
+  "seismometerDisclaimer": "Letakkan ponsel rata di permukaan yang stabil. Sensor ponsel tidak presisi, jadi pembacaan ini hanya referensi dan bukan intensitas resmi CWA.",
+  "seismometerAlgorithm": "Dihitung dengan metode intensitas instrumental JMA yang dipakai ES-Net"
 }

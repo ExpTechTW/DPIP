@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "Inilalapat…",
   "onboardingNotifyTitle": "Iyong mga alerto",
   "onboardingNotifyBody": "Pumili ng panimulang setting. Maaari mong ayusin ang bawat channel sa Mga setting ng notipikasyon anumang oras, at bawat opsyon ay nananatiling may emergency na alerto sa lindol.",
-  "onboardingNotifySkip": "Laktawan muna"
+  "onboardingNotifySkip": "Laktawan muna",
+  "seismometerTitle": "Seismometer",
+  "seismometerIntensity": "Instrumental na intensidad",
+  "seismometerCalibrating": "Nagka-calibrate — huwag galawin ang telepono ({seconds} s)",
+  "seismometerBuffering": "Kinokolekta ang data {percent}%",
+  "seismometerMeasuring": "Sinusukat",
+  "seismometerUnavailable": "Walang magagamit na accelerometer ang device na ito",
+  "seismometerSessionMax": "Pinakamataas na intensidad",
+  "seismometerAcceleration": "Akselerasyon",
+  "seismometerPeakAcceleration": "Pinakamataas na akselerasyon",
+  "seismometerSampleRate": "Rate ng sampling",
+  "seismometerReset": "I-reset",
+  "seismometerDisclaimer": "Ihiga nang patag ang telepono sa matatag na ibabaw. Limitado ang katumpakan ng sensor ng telepono, kaya sanggunian lang ang pagbasang ito at hindi ito opisyal na intensidad ng CWA.",
+  "seismometerAlgorithm": "Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net"
 }

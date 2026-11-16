@@ -53,13 +53,21 @@ GoRouter _router(List<String> visited) => GoRouter(
           name: AppRoutes.earthquake,
           builder: (_, _) => const SizedBox.shrink(),
         ),
+        GoRoute(
+          path: AppRoutes.seismometerPath,
+          name: AppRoutes.seismometer,
+          builder: (_, _) {
+            visited.add(AppRoutes.seismometer);
+            return const SizedBox.shrink();
+          },
+        ),
       ],
     ),
   ],
 );
 
 Future<void> _pump(WidgetTester tester, GoRouter router) async {
-  // Tall enough to lay out and *hit-test* the whole hub: the seismic card, the
+  // Tall enough to lay out and *hit-test* the whole hub: the seismic cards, the
   // seven-tile weather grid and the seven-tile astronomy grid below it. On a
   // phone the page scrolls; here nothing may fall past the viewport, or a tap
   // silently misses.
@@ -161,6 +169,17 @@ void main() {
       );
     });
   }
+
+  testWidgets('the seismometer card opens the seismometer route', (
+    tester,
+  ) async {
+    final visited = <String>[];
+    await _pump(tester, _router(visited));
+    expect(find.text('Seismometer'), findsOneWidget);
+    await tester.tap(find.text('Seismometer'));
+    await tester.pumpAndSettle();
+    expect(visited, [AppRoutes.seismometer]);
+  });
 
   for (final (route, label) in _astronomyTiles) {
     testWidgets('the $label tile navigates to $route', (tester) async {

@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "正在应用…",
   "onboardingNotifyTitle": "通知偏好",
   "onboardingNotifyBody": "先选一个起点，之后随时可以在“通知设置”中逐项调整。每个选项都会保留地震预警。",
-  "onboardingNotifySkip": "跳过，稍后再设置"
+  "onboardingNotifySkip": "跳过，稍后再设置",
+  "seismometerTitle": "地震仪",
+  "seismometerIntensity": "计测震度",
+  "seismometerCalibrating": "校正中，请保持手机静止（{seconds} 秒）",
+  "seismometerBuffering": "累积数据中 {percent}%",
+  "seismometerMeasuring": "测量中",
+  "seismometerUnavailable": "这台设备没有可用的加速度计",
+  "seismometerSessionMax": "最大震度",
+  "seismometerAcceleration": "加速度",
+  "seismometerPeakAcceleration": "最大加速度",
+  "seismometerSampleRate": "采样率",
+  "seismometerReset": "重置",
+  "seismometerDisclaimer": "请将手机平放在稳固的平面上。手机传感器精度有限，测量结果仅供参考，不代表中央气象署发布的震度。",
+  "seismometerAlgorithm": "依 ES-Net 的 JMA 计测震度算法计算"
 }

@@ -93,6 +93,9 @@ class MainActivity : FlutterActivity() {
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
 
+        EventChannel(messenger, AccelerometerChannel.NAME)
+            .setStreamHandler(AccelerometerChannel(applicationContext))
+
         EventChannel(messenger, NetworkChannel.NAME)
             .setStreamHandler(NetworkChannel(applicationContext))
 

@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "กำลังใช้…",
   "onboardingNotifyTitle": "การแจ้งเตือนของคุณ",
   "onboardingNotifyBody": "เลือกจุดเริ่มต้นก่อน คุณปรับแต่ละช่องได้ทุกเมื่อใน “การตั้งค่าการแจ้งเตือน” และทุกตัวเลือกยังคงรับการเตือนแผ่นดินไหวฉุกเฉิน",
-  "onboardingNotifySkip": "ข้ามไปก่อน"
+  "onboardingNotifySkip": "ข้ามไปก่อน",
+  "seismometerTitle": "เครื่องวัดแผ่นดินไหว",
+  "seismometerIntensity": "ความรุนแรงที่วัดด้วยเครื่องมือ",
+  "seismometerCalibrating": "กำลังปรับเทียบ — วางโทรศัพท์ให้นิ่ง ({seconds} วินาที)",
+  "seismometerBuffering": "กำลังเก็บข้อมูล {percent}%",
+  "seismometerMeasuring": "กำลังวัด",
+  "seismometerUnavailable": "อุปกรณ์นี้ไม่มีตัววัดความเร่งที่ใช้ได้",
+  "seismometerSessionMax": "ความรุนแรงสูงสุด",
+  "seismometerAcceleration": "ความเร่ง",
+  "seismometerPeakAcceleration": "ความเร่งสูงสุด",
+  "seismometerSampleRate": "อัตราการเก็บตัวอย่าง",
+  "seismometerReset": "รีเซ็ต",
+  "seismometerDisclaimer": "วางโทรศัพท์ราบลงบนพื้นผิวที่มั่นคง เซ็นเซอร์ของโทรศัพท์มีความละเอียดจำกัด ค่านี้ใช้ประกอบการพิจารณาเท่านั้น ไม่ใช่ความรุนแรงอย่างเป็นทางการของ CWA",
+  "seismometerAlgorithm": "คำนวณด้วยวิธีความรุนแรงที่วัดด้วยเครื่องมือของ JMA ซึ่ง ES-Net ใช้"
 }
