@@ -54,14 +54,14 @@ dependencies:
   # project through the dependency, which is the half of that warning nobody
   # reads.
   #
-  # The fork carries dlutton/flutter_tts#651 (@shivanshu877) and nothing else.
+  # The fork carries dlutton/flutter_tts#651 and Android AGP 9 migration fixes.
   # Upstream has had three functionally identical SPM pull requests open since
   # May with none merged, so waiting on it is not a plan. Pinned to the commit
   # on the fork's master, like the maplibre fork below.
   flutter_tts:
     git:
       url: https://github.com/ExpTechTW/flutter_tts.git
-      ref: a9cd6eda7feacd78c3fc288272a27edfd614fc30
+      ref: 8f6265f3b6ea5dd6809169fbad01288bc9974d5d
   # Direct because a MarkdownElementBuilder's signature takes an md.Element
   # and flutter_markdown_plus does not re-export the package that defines it.
   markdown: ^7.3.1
