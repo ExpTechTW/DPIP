@@ -27,12 +27,13 @@ abstract final class ApiPaths {
   /// elevation mesh, same XYZ shape as [mapTilesV1].
   static const String mapTerrainV1 = '/api/v1/map/terrain/';
 
-  /// Live EEW feed (with `?sse=1&compress=1` for the stream).
+  /// Live EEW list, one-shot (the stream is a topic of [sse]).
   static const String eew = '/api/v2/eq/eew';
 
-  /// The TREM stream: one Server-Sent Events connection carrying every topic
-  /// named in `?topics=` (`trem.rts.v1`, …), each frame named for its topic.
-  static const String tremSse = '/api/v1/trem/sse';
+  /// The shared stream: one Server-Sent Events connection carrying every topic
+  /// named in `?topics=` (comma-separated), each frame named for its topic and
+  /// its `data:` base64-gzipped. Opened only through `SseMux`.
+  static const String sse = '/api/v1/sse';
 
   /// Archived `rts.v1` snapshots, one per second: `/api/v3/trem/rts/{seconds}`.
   static const String rtsArchive = '/api/v3/trem/rts';

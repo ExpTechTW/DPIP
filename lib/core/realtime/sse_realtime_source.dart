@@ -91,7 +91,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
     Future<void> Function(Duration delay)? delay,
     Random? random,
     this._label = 'sse',
-    this._payloadEvent = 'g',
+    required this._payloadEvent,
   }) : _elapsed = elapsed ?? SystemElapsed(),
        _delay = delay ?? _defaultDelay,
        _random = random ?? Random();
@@ -108,9 +108,9 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   final Random _random;
   final String _label;
 
-  /// The event name whose `data:` is a base64-gzipped payload: `g` under the
-  /// LB feeds' `compress=1`, the topic itself (`trem.rts.v1`) on the TREM
-  /// stream, which compresses every topic frame and names each for its topic.
+  /// The event name whose `data:` is a base64-gzipped payload: the topic
+  /// itself (`trem.rts.v1`) on the shared stream (`SseMux`), which compresses
+  /// every topic frame and names each for its topic.
   final String _payloadEvent;
 
   /// The default server reconnect hint, refined by any `retry:` frame.
@@ -159,7 +159,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
   /// JSON the one-shot GET returns, so this mirrors the repository's mapping.
   T decode(String data);
 
-  /// Decodes an inflated `compress=1` payload — the same JSON as [decode]'s
+  /// Decodes an inflated payload-event frame — the same JSON as [decode]'s
   /// argument, still as UTF-8 bytes.
   ///
   /// Default: materialise the string and hand it to [decode], which is what
@@ -440,7 +440,7 @@ abstract class SseRealtimeSource<T> extends RealtimeSource<T> {
         Log.handle(error, stackTrace, '[$_label] SSE decode');
       }
     } else if (event.name == 'info') {
-      // The TREM stream's greeting lists what it would not grant under
+      // The shared stream's greeting lists what it would not grant under
       // `denied` — a topic this source is waiting on that will never arrive.
       if (event.data.contains('"denied"')) {
         Log.warning('[$_label] SSE refused a topic: ${event.data}');

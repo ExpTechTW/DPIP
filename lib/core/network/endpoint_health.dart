@@ -8,13 +8,15 @@
 /// tried host down-ish, a success marks it up.
 ///
 /// Outcomes are bucketed by **service × tier × host**: the same region carries
-/// different services (EEW/RTS on `lbApi`, radar lists on
+/// different services (EEW/RTS on `lbApi` — one shared stream feeding both
+/// rows, see [EndpointService.allOfPath] — radar lists on
 /// `coreExclusiveApi` → `api.core-tnn1`), and one service's dead host may be
 /// another's healthy one. The More → 伺服器狀態 screen renders this map as a
 /// table — rows are services, columns are tier groups, cells are the regions
 /// each service was observed on.
 library;
 
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:flutter/foundation.dart';
 
@@ -62,6 +64,13 @@ enum EndpointService {
     if (path.startsWith('/api/v2/notify')) return notify;
     return other;
   }
+
+  /// Every service a request to [path] carried: the one [ofPath] names —
+  /// except for the shared realtime stream ([ApiPaths.sse]), whose one
+  /// connection carries the live EEW and RTS feeds at once, so its outcome is
+  /// both rows' outcome on the status screen.
+  static List<EndpointService> allOfPath(String path) =>
+      path.startsWith(ApiPaths.sse) ? const [eew, rts] : [ofPath(path)];
 }
 
 /// How [EndpointHealthMonitor] currently judges one service host.
@@ -138,15 +147,18 @@ class EndpointHealthMonitor extends ChangeNotifier {
   /// An API request to [hostUrl] on [tier] for [path] completed with a 2xx/3xx.
   /// The URL is keyed by hostname (scheme stripped).
   void success(ApiTier tier, String hostUrl, String path) {
-    final key = _keyOf(EndpointService.ofPath(path), tier, hostUrl);
-    final s = _hosts.putIfAbsent(key, _HostState.new);
-    final changed =
-        s.lastSuccess == null ||
-        s.consecutiveFailures > 0 ||
-        s.state != EndpointState.healthy;
-    s.consecutiveFailures = 0;
-    s.lastSuccess = _now();
-    s.state = EndpointState.healthy;
+    var changed = false;
+    for (final service in EndpointService.allOfPath(path)) {
+      final key = _keyOf(service, tier, hostUrl);
+      final s = _hosts.putIfAbsent(key, _HostState.new);
+      changed |=
+          s.lastSuccess == null ||
+          s.consecutiveFailures > 0 ||
+          s.state != EndpointState.healthy;
+      s.consecutiveFailures = 0;
+      s.lastSuccess = _now();
+      s.state = EndpointState.healthy;
+    }
     if (changed) notifyListeners();
   }
 
@@ -156,13 +168,15 @@ class EndpointHealthMonitor extends ChangeNotifier {
   /// Non-retryable outcomes (4xx, cancellation, certificate errors) never reach
   /// here — they are the client's problem, not the host's.
   void failure(ApiTier tier, String hostUrl, String path) {
-    final key = _keyOf(EndpointService.ofPath(path), tier, hostUrl);
-    final s = _hosts.putIfAbsent(key, _HostState.new);
-    s.consecutiveFailures++;
-    s.lastFailure = _now();
-    s.state = s.consecutiveFailures >= 2
-        ? EndpointState.down
-        : EndpointState.degraded;
+    for (final service in EndpointService.allOfPath(path)) {
+      final key = _keyOf(service, tier, hostUrl);
+      final s = _hosts.putIfAbsent(key, _HostState.new);
+      s.consecutiveFailures++;
+      s.lastFailure = _now();
+      s.state = s.consecutiveFailures >= 2
+          ? EndpointState.down
+          : EndpointState.degraded;
+    }
     notifyListeners();
   }
 

@@ -6,7 +6,6 @@ library;
 import 'package:dio/dio.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/error/failure.dart';
-import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
@@ -68,14 +67,7 @@ class _Api implements EarthquakeApi {
   Future<List<dynamic>> getEewRealtime() => throw UnimplementedError();
 
   @override
-  Stream<SseEvent> openEewSse() => throw UnimplementedError();
-
-  @override
   Future<List<dynamic>> getEewAt(int seconds) => throw UnimplementedError();
-
-  @override
-  Stream<SseEvent> openTremSse({required bool live}) =>
-      throw UnimplementedError();
 
   @override
   Future<Map<String, dynamic>> getRtsAt(int seconds) =>

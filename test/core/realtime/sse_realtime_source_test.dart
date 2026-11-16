@@ -40,6 +40,7 @@ class _TestSseSource extends SseRealtimeSource<String> {
   }) : super(
          liveness: liveness ?? const SseLiveness.connectionOpen(),
          label: 'test',
+         payloadEvent: 'g',
        );
 
   /// Exposes the protected swap to the tests.
@@ -254,7 +255,7 @@ void main() {
     test('decompresses a compressed payload (event: g, base64 gzip)', () async {
       final h = _Harness();
       await h.source.fetch();
-      // What `compress=1` sends: event name "g", data = base64(gzip(json)).
+      // A payload event: data = base64(gzip(json)).
       final packed = base64.encode(gzip.encode(utf8.encode('shaken')));
       h.current.add(SseEvent(name: 'g', data: packed));
       await pumpEventQueue();

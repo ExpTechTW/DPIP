@@ -1,32 +1,22 @@
 /// EarthquakeApi is a thin, unguarded wrapper over [ApiClient]: every method
-/// must hit the right tier/path/query — the TREM stream must ask for its topic
-/// and only ask for every frame (`mode=live`) when told to, since the sleeping
-/// stream is what saves the phone's data — and [getReportList] must build the
-/// canonical query (omitting default
-/// page/sort/order so the URL — and its ETag — matches the server's own
-/// form). None of it guards errors, so whatever `ApiClient` throws must come
+/// must hit the right tier/path/query — [getReportList] must build the
+/// canonical query (omitting default page/sort/order so the URL — and its
+/// ETag — matches the server's own form). None of it guards errors, so whatever `ApiClient` throws must come
 /// straight back out, unchanged, for the repository layer to convert.
 library;
-
-import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
-import 'package:dpip/core/network/sse_client.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _RecordingApiClient implements ApiClient {
   final List<(ApiTier, String, Map<String, dynamic>?)> getCalls = [];
-  final List<(ApiTier, String, Map<String, dynamic>?)> streamCalls = [];
-  final List<Duration> idleTimeouts = [];
 
   dynamic nextGetResult;
   Object? getError;
-  Stream<List<int>>? nextStream;
 
   @override
   Future<dynamic> get(
@@ -47,14 +37,7 @@ class _RecordingApiClient implements ApiClient {
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
     Duration idleTimeout = Duration.zero,
-  }) async {
-    streamCalls.add((tier, path, query));
-    idleTimeouts.add(idleTimeout);
-    return StreamedResponse(
-      (nextStream ?? const Stream<List<int>>.empty()).cast<Uint8List>(),
-      () {},
-    );
-  }
+  }) => throw UnimplementedError();
 
   @override
   Future<BytePayload> getBytes(
@@ -117,9 +100,6 @@ class _RecordingApiClient implements ApiClient {
   @override
   List<String> hostsFor(ApiTier tier) => throw UnimplementedError();
 }
-
-Stream<List<int>> _sseBody(String data) =>
-    Stream.value(utf8.encode('data: $data\n\n'));
 
 void main() {
   late _RecordingApiClient client;
@@ -235,52 +215,5 @@ void main() {
       client.getError = StateError('boom');
       await expectLater(api.getRtsAt(1), throwsA(isA<StateError>()));
     });
-  });
-
-  group('SSE streams', () {
-    test(
-      'openTremSse asks for the RTS topic, and every frame only when live',
-      () async {
-        client.nextStream = _sseBody('x');
-        final events = await api.openTremSse(live: true).toList();
-        expect(client.streamCalls.single.$1, ApiTier.lbApi);
-        expect(client.streamCalls.single.$2, ApiPaths.tremSse);
-        expect(client.streamCalls.single.$3, {
-          'topics': 'trem.rts.v1',
-          'mode': 'live',
-        });
-        expect(events.single.data, 'x');
-
-        client.nextStream = _sseBody('x');
-        await api.openTremSse(live: false).toList();
-        expect(client.streamCalls.last.$3, {'topics': 'trem.rts.v1'});
-      },
-    );
-
-    test(
-      'openEewSse opens the lb tier with sse+compress and parses frames',
-      () async {
-        client.nextStream = _sseBody('[]');
-        final events = await api.openEewSse().toList();
-        expect(client.streamCalls.single.$1, ApiTier.lbApi);
-        expect(client.streamCalls.single.$2, ApiPaths.eew);
-        expect(client.streamCalls.single.$3, {'sse': 1, 'compress': 1});
-        expect(events, hasLength(1));
-        expect(events.single.data, '[]');
-      },
-    );
-
-    test(
-      'both streams bound their silence by the server ping, not forever',
-      () async {
-        // A zero idle timeout is how a half-open socket used to wait out a
-        // handover indefinitely.
-        client.nextStream = _sseBody('[]');
-        await api.openEewSse().toList();
-        client.nextStream = _sseBody('x');
-        await api.openTremSse(live: false).toList();
-        expect(client.idleTimeouts, [sseSilenceLimit, sseSilenceLimit]);
-      },
-    );
   });
 }
