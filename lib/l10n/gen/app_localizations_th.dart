@@ -3655,4 +3655,49 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'ข้ามไปก่อน';
+
+  @override
+  String get seismometerTitle => 'เครื่องวัดแผ่นดินไหว';
+
+  @override
+  String get seismometerIntensity => 'ความรุนแรงที่วัดด้วยเครื่องมือ';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return 'กำลังปรับเทียบ — วางโทรศัพท์ให้นิ่ง ($seconds วินาที)';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return 'กำลังเก็บข้อมูล $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => 'กำลังวัด';
+
+  @override
+  String get seismometerUnavailable => 'อุปกรณ์นี้ไม่มีตัววัดความเร่งที่ใช้ได้';
+
+  @override
+  String get seismometerSessionMax => 'ความรุนแรงสูงสุด';
+
+  @override
+  String get seismometerAcceleration => 'ความเร่ง';
+
+  @override
+  String get seismometerPeakAcceleration => 'ความเร่งสูงสุด';
+
+  @override
+  String get seismometerSampleRate => 'อัตราการเก็บตัวอย่าง';
+
+  @override
+  String get seismometerReset => 'รีเซ็ต';
+
+  @override
+  String get seismometerDisclaimer =>
+      'วางโทรศัพท์ราบลงบนพื้นผิวที่มั่นคง เซ็นเซอร์ของโทรศัพท์มีความละเอียดจำกัด ค่านี้ใช้ประกอบการพิจารณาเท่านั้น ไม่ใช่ความรุนแรงอย่างเป็นทางการของ CWA';
+
+  @override
+  String get seismometerAlgorithm =>
+      'คำนวณด้วยวิธีความรุนแรงที่วัดด้วยเครื่องมือของ JMA ซึ่ง ES-Net ใช้';
 }

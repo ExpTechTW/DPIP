@@ -3592,4 +3592,48 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'あとで設定する';
+
+  @override
+  String get seismometerTitle => '地震計';
+
+  @override
+  String get seismometerIntensity => '計測震度';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '校正中です。スマートフォンを動かさないでください（残り$seconds秒）';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return 'データを収集中 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '計測中';
+
+  @override
+  String get seismometerUnavailable => 'この端末には使える加速度センサーがありません';
+
+  @override
+  String get seismometerSessionMax => '最大震度';
+
+  @override
+  String get seismometerAcceleration => '加速度';
+
+  @override
+  String get seismometerPeakAcceleration => '最大加速度';
+
+  @override
+  String get seismometerSampleRate => 'サンプリングレート';
+
+  @override
+  String get seismometerReset => 'リセット';
+
+  @override
+  String get seismometerDisclaimer =>
+      'スマートフォンを安定した平らな面に置いてください。端末のセンサー精度には限界があるため、この値は参考であり、中央気象署が発表する震度ではありません。';
+
+  @override
+  String get seismometerAlgorithm => 'ES-Net が用いる気象庁の計測震度の方法で計算しています';
 }

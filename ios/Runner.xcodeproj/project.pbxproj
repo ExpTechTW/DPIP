@@ -68,6 +68,7 @@
 		A9940B18359A7E21BBE6CEC0 /* MediumWeatherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F83C02F5BF6754ACD109090 /* MediumWeatherUITests.swift */; };
 		A9AFB8B20A5C9E6EA7415DAA /* CurrentWeatherWidgetTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD1B81D187E4EB2B0AEDDD8 /* CurrentWeatherWidgetTimeline.swift */; };
 		AA0000000000000000000C02 /* CompassPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000C01 /* CompassPlugin.swift */; };
+		ACCE10000000000000000002 /* AccelerometerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCE10000000000000000001 /* AccelerometerPlugin.swift */; };
 		AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000D01 /* DeviceInfoPlugin.swift */; };
 		AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000E01 /* ScreenWakePlugin.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
@@ -261,6 +262,7 @@
 		9F83C02F5BF6754ACD109090 /* MediumWeatherUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MediumWeatherUITests.swift; path = WidgetFixtureUITests/MediumWeatherUITests.swift; sourceTree = "<group>"; };
 		A382CD9DEA741E45DBF741D7 /* rain.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/rain.aiff; sourceTree = "<group>"; };
 		AA0000000000000000000C01 /* CompassPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompassPlugin.swift; sourceTree = "<group>"; };
+		ACCE10000000000000000001 /* AccelerometerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccelerometerPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000D01 /* DeviceInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000E01 /* ScreenWakePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenWakePlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
@@ -672,6 +674,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				AA0000000000000000000C01 /* CompassPlugin.swift */,
+				ACCE10000000000000000001 /* AccelerometerPlugin.swift */,
 				AA0000000000000000000H01 /* NetworkPlugin.swift */,
 				AA0000000000000000000E01 /* ScreenWakePlugin.swift */,
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
@@ -1205,6 +1208,7 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				AA0000000000000000000C02 /* CompassPlugin.swift in Sources */,
+				ACCE10000000000000000002 /* AccelerometerPlugin.swift in Sources */,
 				AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */,
 				AA0000000000000000000E02 /* ScreenWakePlugin.swift in Sources */,
 				AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */,

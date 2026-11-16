@@ -6863,6 +6863,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip for now'**
   String get onboardingNotifySkip;
+
+  /// Title of the phone seismometer page and its entry on the Data tab
+  ///
+  /// In en, this message translates to:
+  /// **'Seismometer'**
+  String get seismometerTitle;
+
+  /// Label for the current instrumental-intensity reading
+  ///
+  /// In en, this message translates to:
+  /// **'Instrumental intensity'**
+  String get seismometerIntensity;
+
+  /// Status while the sensor offset is being measured. seconds is the whole seconds remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibrating — keep the phone still ({seconds} s)'**
+  String seismometerCalibrating(int seconds);
+
+  /// Status while the 60-second intensity window is filling. percent is the whole percent stored.
+  ///
+  /// In en, this message translates to:
+  /// **'Collecting data {percent}%'**
+  String seismometerBuffering(int percent);
+
+  /// Status once the intensity window is producing a reading
+  ///
+  /// In en, this message translates to:
+  /// **'Measuring'**
+  String get seismometerMeasuring;
+
+  /// Status when the device has no usable accelerometer
+  ///
+  /// In en, this message translates to:
+  /// **'This device has no usable accelerometer'**
+  String get seismometerUnavailable;
+
+  /// Label for the highest instrumental intensity in this session
+  ///
+  /// In en, this message translates to:
+  /// **'Highest intensity'**
+  String get seismometerSessionMax;
+
+  /// Label for the current triaxial acceleration
+  ///
+  /// In en, this message translates to:
+  /// **'Acceleration'**
+  String get seismometerAcceleration;
+
+  /// Label for the largest acceleration in this session
+  ///
+  /// In en, this message translates to:
+  /// **'Peak acceleration'**
+  String get seismometerPeakAcceleration;
+
+  /// Label for the accelerometer sample rate
+  ///
+  /// In en, this message translates to:
+  /// **'Sample rate'**
+  String get seismometerSampleRate;
+
+  /// Tooltip for the button that clears the session maximum and peak acceleration
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get seismometerReset;
+
+  /// Tells the user to lay the phone flat and that the reading is not an official CWA intensity
+  ///
+  /// In en, this message translates to:
+  /// **'Lay the phone flat on a steady surface. Phone sensors are imprecise, so this reading is for reference only and is not an official CWA intensity.'**
+  String get seismometerDisclaimer;
+
+  /// Names the JMA instrumental-intensity method used to compute the reading
+  ///
+  /// In en, this message translates to:
+  /// **'Computed with the JMA instrumental intensity method used by ES-Net'**
+  String get seismometerAlgorithm;
 }
 
 class _AppLocalizationsDelegate

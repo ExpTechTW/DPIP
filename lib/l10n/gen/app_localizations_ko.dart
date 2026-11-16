@@ -3594,4 +3594,48 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => '나중에 설정';
+
+  @override
+  String get seismometerTitle => '지진계';
+
+  @override
+  String get seismometerIntensity => '계측진도';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '교정 중 — 휴대전화를 가만히 두세요($seconds초)';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return '데이터 수집 중 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '측정 중';
+
+  @override
+  String get seismometerUnavailable => '이 기기에는 사용할 수 있는 가속도계가 없습니다';
+
+  @override
+  String get seismometerSessionMax => '최대 진도';
+
+  @override
+  String get seismometerAcceleration => '가속도';
+
+  @override
+  String get seismometerPeakAcceleration => '최대 가속도';
+
+  @override
+  String get seismometerSampleRate => '샘플링 레이트';
+
+  @override
+  String get seismometerReset => '초기화';
+
+  @override
+  String get seismometerDisclaimer =>
+      '휴대전화를 단단한 평면에 평평하게 놓으세요. 휴대전화 센서의 정밀도는 제한되어 있어 이 값은 참고용이며, 중앙기상서가 발표하는 진도가 아닙니다.';
+
+  @override
+  String get seismometerAlgorithm => 'ES-Net에서 쓰는 일본 기상청 계측진도 방법으로 계산합니다';
 }

@@ -51,6 +51,7 @@ import UserNotifications
     // lifecycle (registering a bare channel here can silently stop firing).
     DeviceInfoPlugin.register(with: registry.registrar(forPlugin: "DeviceInfoPlugin")!)
     CompassPlugin.register(with: registry.registrar(forPlugin: "CompassPlugin")!)
+    AccelerometerPlugin.register(with: registry.registrar(forPlugin: "AccelerometerPlugin")!)
     NetworkPlugin.register(with: registry.registrar(forPlugin: "NetworkPlugin")!)
     MapSnapshotPlugin.register(with: registry.registrar(forPlugin: "MapSnapshotPlugin")!)
     MapCachePlugin.register(with: registry.registrar(forPlugin: "MapCachePlugin")!)

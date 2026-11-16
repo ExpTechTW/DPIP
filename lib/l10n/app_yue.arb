@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "套用緊…",
   "onboardingNotifyTitle": "通知偏好",
   "onboardingNotifyBody": "揀一個起點先，之後隨時可以喺「通知設定」逐項調整。每個選項都會保留地震速報。",
-  "onboardingNotifySkip": "跳過，遲啲先設定"
+  "onboardingNotifySkip": "跳過，遲啲先設定",
+  "seismometerTitle": "地震儀",
+  "seismometerIntensity": "計測震度",
+  "seismometerCalibrating": "校正緊，請保持手機唔好郁（{seconds} 秒）",
+  "seismometerBuffering": "累積緊資料 {percent}%",
+  "seismometerMeasuring": "量測緊",
+  "seismometerUnavailable": "呢部裝置冇可用嘅加速度計",
+  "seismometerSessionMax": "最大震度",
+  "seismometerAcceleration": "加速度",
+  "seismometerPeakAcceleration": "最大加速度",
+  "seismometerSampleRate": "取樣率",
+  "seismometerReset": "重設",
+  "seismometerDisclaimer": "請將手機平放喺穩固嘅平面上面。手機感測器精度有限，量測結果只供參考，唔代表中央氣象署發布嘅震度。",
+  "seismometerAlgorithm": "用 ES-Net 嗰套 JMA 計測震度演算法計"
 }

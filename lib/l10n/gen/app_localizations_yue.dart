@@ -3569,4 +3569,48 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => '跳過，遲啲先設定';
+
+  @override
+  String get seismometerTitle => '地震儀';
+
+  @override
+  String get seismometerIntensity => '計測震度';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return '校正緊，請保持手機唔好郁（$seconds 秒）';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return '累積緊資料 $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => '量測緊';
+
+  @override
+  String get seismometerUnavailable => '呢部裝置冇可用嘅加速度計';
+
+  @override
+  String get seismometerSessionMax => '最大震度';
+
+  @override
+  String get seismometerAcceleration => '加速度';
+
+  @override
+  String get seismometerPeakAcceleration => '最大加速度';
+
+  @override
+  String get seismometerSampleRate => '取樣率';
+
+  @override
+  String get seismometerReset => '重設';
+
+  @override
+  String get seismometerDisclaimer =>
+      '請將手機平放喺穩固嘅平面上面。手機感測器精度有限，量測結果只供參考，唔代表中央氣象署發布嘅震度。';
+
+  @override
+  String get seismometerAlgorithm => '用 ES-Net 嗰套 JMA 計測震度演算法計';
 }

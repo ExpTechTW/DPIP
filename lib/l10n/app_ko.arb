@@ -2126,5 +2126,18 @@
   "notifyPresetApplying": "적용하는 중…",
   "onboardingNotifyTitle": "알림 받기",
   "onboardingNotifyBody": "먼저 시작점을 골라 주세요. 각 채널은 언제든 '알림 설정'에서 조정할 수 있으며, 어떤 옵션이든 긴급 지진 경보는 계속 받습니다.",
-  "onboardingNotifySkip": "나중에 설정"
+  "onboardingNotifySkip": "나중에 설정",
+  "seismometerTitle": "지진계",
+  "seismometerIntensity": "계측진도",
+  "seismometerCalibrating": "교정 중 — 휴대전화를 가만히 두세요({seconds}초)",
+  "seismometerBuffering": "데이터 수집 중 {percent}%",
+  "seismometerMeasuring": "측정 중",
+  "seismometerUnavailable": "이 기기에는 사용할 수 있는 가속도계가 없습니다",
+  "seismometerSessionMax": "최대 진도",
+  "seismometerAcceleration": "가속도",
+  "seismometerPeakAcceleration": "최대 가속도",
+  "seismometerSampleRate": "샘플링 레이트",
+  "seismometerReset": "초기화",
+  "seismometerDisclaimer": "휴대전화를 단단한 평면에 평평하게 놓으세요. 휴대전화 센서의 정밀도는 제한되어 있어 이 값은 참고용이며, 중앙기상서가 발표하는 진도가 아닙니다.",
+  "seismometerAlgorithm": "ES-Net에서 쓰는 일본 기상청 계측진도 방법으로 계산합니다"
 }

@@ -3664,4 +3664,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingNotifySkip => 'Skip for now';
+
+  @override
+  String get seismometerTitle => 'Seismometer';
+
+  @override
+  String get seismometerIntensity => 'Instrumental intensity';
+
+  @override
+  String seismometerCalibrating(int seconds) {
+    return 'Calibrating — keep the phone still ($seconds s)';
+  }
+
+  @override
+  String seismometerBuffering(int percent) {
+    return 'Collecting data $percent%';
+  }
+
+  @override
+  String get seismometerMeasuring => 'Measuring';
+
+  @override
+  String get seismometerUnavailable =>
+      'This device has no usable accelerometer';
+
+  @override
+  String get seismometerSessionMax => 'Highest intensity';
+
+  @override
+  String get seismometerAcceleration => 'Acceleration';
+
+  @override
+  String get seismometerPeakAcceleration => 'Peak acceleration';
+
+  @override
+  String get seismometerSampleRate => 'Sample rate';
+
+  @override
+  String get seismometerReset => 'Reset';
+
+  @override
+  String get seismometerDisclaimer =>
+      'Lay the phone flat on a steady surface. Phone sensors are imprecise, so this reading is for reference only and is not an official CWA intensity.';
+
+  @override
+  String get seismometerAlgorithm =>
+      'Computed with the JMA instrumental intensity method used by ES-Net';
 }

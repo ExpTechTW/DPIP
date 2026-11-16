@@ -4420,5 +4420,69 @@
   "onboardingNotifySkip": "Skip for now",
   "@onboardingNotifySkip": {
     "description": "Onboarding: finish without applying a notification preset after a failed attempt"
+  },
+  "seismometerTitle": "Seismometer",
+  "@seismometerTitle": {
+    "description": "Title of the phone seismometer page and its entry on the Data tab"
+  },
+  "seismometerIntensity": "Instrumental intensity",
+  "@seismometerIntensity": {
+    "description": "Label for the current instrumental-intensity reading"
+  },
+  "seismometerCalibrating": "Calibrating — keep the phone still ({seconds} s)",
+  "@seismometerCalibrating": {
+    "description": "Status while the sensor offset is being measured. seconds is the whole seconds remaining.",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "seismometerBuffering": "Collecting data {percent}%",
+  "@seismometerBuffering": {
+    "description": "Status while the 60-second intensity window is filling. percent is the whole percent stored.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "50"
+      }
+    }
+  },
+  "seismometerMeasuring": "Measuring",
+  "@seismometerMeasuring": {
+    "description": "Status once the intensity window is producing a reading"
+  },
+  "seismometerUnavailable": "This device has no usable accelerometer",
+  "@seismometerUnavailable": {
+    "description": "Status when the device has no usable accelerometer"
+  },
+  "seismometerSessionMax": "Highest intensity",
+  "@seismometerSessionMax": {
+    "description": "Label for the highest instrumental intensity in this session"
+  },
+  "seismometerAcceleration": "Acceleration",
+  "@seismometerAcceleration": {
+    "description": "Label for the current triaxial acceleration"
+  },
+  "seismometerPeakAcceleration": "Peak acceleration",
+  "@seismometerPeakAcceleration": {
+    "description": "Label for the largest acceleration in this session"
+  },
+  "seismometerSampleRate": "Sample rate",
+  "@seismometerSampleRate": {
+    "description": "Label for the accelerometer sample rate"
+  },
+  "seismometerReset": "Reset",
+  "@seismometerReset": {
+    "description": "Tooltip for the button that clears the session maximum and peak acceleration"
+  },
+  "seismometerDisclaimer": "Lay the phone flat on a steady surface. Phone sensors are imprecise, so this reading is for reference only and is not an official CWA intensity.",
+  "@seismometerDisclaimer": {
+    "description": "Tells the user to lay the phone flat and that the reading is not an official CWA intensity"
+  },
+  "seismometerAlgorithm": "Computed with the JMA instrumental intensity method used by ES-Net",
+  "@seismometerAlgorithm": {
+    "description": "Names the JMA instrumental-intensity method used to compute the reading"
   }
 }
