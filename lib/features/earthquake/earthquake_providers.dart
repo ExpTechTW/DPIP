@@ -1,5 +1,6 @@
 import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/network/sse_mux.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
 import 'package:dpip/core/storage/ml_model_store.dart';
@@ -38,7 +39,8 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 /// Earthquake providers: the EEW repository, report catalogue, and the live
-/// EEW + RTS realtime feeds (SSE behind the `RealtimeSource` seam).
+/// EEW + RTS realtime feeds (one shared SSE connection behind the
+/// `RealtimeSource` seam).
 ///
 /// Each realtime channel is built and registered **eagerly** here (not in a lazy
 /// provider `create`), because `RealtimeService.startAll()` runs after the first
@@ -73,7 +75,14 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   // Bundled RTS box grid (asset load, not network) — same `Future` pattern.
   final boxGrid = const RtsBoxGridSource().load();
 
-  // Live EEW over SSE (`/api/v2/eq/eew?sse=1`) — bursty, connection-open
+  // One SSE connection for both live feeds (`/api/v1/sse?topics=…`): each
+  // source registers its topic and leases a share of it, so the app holds a
+  // single socket per device however many feeds are live, and it closes when
+  // every feed has let go (background). Only a feed that is really streaming
+  // registers its topic — a demo source asks the server for nothing.
+  final liveStream = SseMux.lb(deps.apiClient);
+
+  // Live EEW, a snapshot topic of the shared stream — bursty, connection-open
   // liveness, with the one-shot GET polled as a flagged fallback while the
   // stream is down. Debug runs with `DPIP_DEMO_MONITOR=1` swap in a synthetic alert
   // instead (see monitor_demo.dart) — its parameters are read from the newest
@@ -84,7 +93,7 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
       : kStartupEewDemoEnabled
       ? StartupEewDemoSource() as RealtimeSource<List<Eew>>
       : EewRealtimeSource(
-          api.openEewSse,
+          liveStream.topic(EarthquakeApi.eewTopic, snapshot: true).connect,
           cwaOnly: () => eewCwaOnly.enabled,
           poll: api.getEewRealtime,
         ) as RealtimeSource<List<Eew>>;
@@ -99,15 +108,16 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   deps.realtimeService.register(eewChannel);
   final eewController = EewRealtimeController(eewChannel);
 
-  // Live RTS: the `trem.rts.v1` topic of the TREM stream — every frame while
-  // the monitor holds [rtsLiveDemand], only the alerting ones otherwise. The
-  // demo flag swaps in a synthetic frame generator the same way. Live frames
-  // are decoded on a worker isolate, started on the first one.
+  // Live RTS: the `trem.rts.v1` topic of the shared stream — every frame
+  // while the monitor holds [rtsLiveDemand] (`mode=live` on the connection),
+  // only the alerting ones otherwise. The demo flag swaps in a synthetic
+  // frame generator the same way. Live frames are decoded on a worker
+  // isolate, started on the first one.
   final rtsWorker = RtsWorkerService();
   final rtsSource = kMonitorDemoEnabled
       ? DemoRtsSource(stations: tremStations) as RealtimeSource<Rts>
       : RtsRealtimeSource(
-          api.openTremSse,
+          liveStream.topic(EarthquakeApi.rtsTopic).connect,
           demand: rtsLiveDemand,
           worker: rtsWorker,
         ) as RealtimeSource<Rts>;

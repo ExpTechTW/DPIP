@@ -10,7 +10,8 @@ import 'package:dpip/features/earthquake/data/rts_worker_service.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 
-/// The live RTS feed: the `trem.rts.v1` topic of the TREM stream.
+/// The live RTS feed: the `trem.rts.v1` topic of the shared Server-Sent
+/// Events stream (`SseMux`).
 ///
 /// Runs at whichever speed [RtsLiveDemand] asks for. **Live**, every frame
 /// arrives (~2 Hz) and liveness is event recency — silence on a feed that
@@ -22,14 +23,16 @@ import 'package:dpip/features/earthquake/domain/rts_live_demand.dart';
 /// not calm but dead, and is reported and replaced as such.
 ///
 /// A change of speed swaps the connection without a gap (see
-/// [SseRealtimeSource.renew]). Waking is immediate — the monitor has just
+/// [SseRealtimeSource.renew]); on the shared stream the speed belongs to the
+/// connection, which runs live while this feed asks for it and is handed
+/// over the same gapless way. Waking is immediate — the monitor has just
 /// opened and wants the frames now — while falling asleep waits
 /// [sleepDelay], so flicking between tabs does not reconnect each time.
 class RtsRealtimeSource extends SseRealtimeSource<Rts> {
-  /// [connect] opens one TREM stream connection at the given speed — in
-  /// production `EarthquakeApi.openTremSse`; the source calls it again for
-  /// each reconnect and each change of speed. Frames are decoded on [worker]
-  /// while it can be used, and on this isolate without one.
+  /// [connect] opens one connection at the given speed — in production a
+  /// lease on the shared stream (`SseMuxTopic.connect`); the source calls it
+  /// again for each reconnect and each change of speed. Frames are decoded on
+  /// [worker] while it can be used, and on this isolate without one.
   RtsRealtimeSource(
     Stream<SseEvent> Function({required bool live}) connect, {
     required RtsLiveDemand demand,

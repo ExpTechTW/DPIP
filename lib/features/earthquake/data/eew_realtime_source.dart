@@ -10,16 +10,20 @@ import 'package:dpip/core/network/sse_event.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/sse_realtime_source.dart';
+import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/eew_feed.dart';
 import 'package:flutter/foundation.dart' show listEquals;
 
-/// The live EEW feed, streamed over Server-Sent Events (`/api/v2/eq/eew?sse=1`).
+/// The live EEW feed: the [EarthquakeApi.eewTopic] topic of the shared
+/// Server-Sent Events stream (`SseMux`).
 ///
 /// Extends the generic [SseRealtimeSource] with the EEW specifics — nothing here
-/// touches connection, buffering, or reconnection. [decode] parses each event's
-/// `data:` with the same [Eew.fromJson] mapping the one-shot GET used, so the
-/// data format is unchanged by the move to SSE.
+/// touches connection, buffering, or reconnection. Each frame's `data:` is the
+/// base64-gzipped list the one-shot GET returns, inflated by the base and
+/// parsed by [decode] with the same [Eew.fromJson] mapping, so the data format
+/// is unchanged by the move to SSE. Every frame is the whole list in force,
+/// and replaces the last.
 ///
 /// Liveness is [SseLiveness.connectionOpen] (the default): the EEW stream is
 /// **silent between earthquakes** apart from the server's keep-alive pings, so
@@ -52,8 +56,9 @@ import 'package:flutter/foundation.dart' show listEquals;
 /// already shown: the server a reconnect or a poll lands on may be a serial
 /// behind the one before it.
 class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
-  /// [connect] opens one EEW SSE connection — in production
-  /// `EarthquakeApi.openEewSse`; the source calls it again to reconnect.
+  /// [connect] opens one EEW SSE connection — in production a lease on the
+  /// shared stream (`SseMuxTopic.connect`); the source calls it again to
+  /// reconnect.
   ///
   /// [poll] fetches the same alert list once, as raw JSON — in production
   /// `EarthquakeApi.getEewRealtime`. Without it there is no fallback.
@@ -93,6 +98,7 @@ class EewRealtimeSource extends SseRealtimeSource<List<Eew>> {
   ) : super(
         connect: connect,
         label: 'eew',
+        payloadEvent: EarthquakeApi.eewTopic,
         elapsed: _monotonic,
         delay: delay,
         random: random,

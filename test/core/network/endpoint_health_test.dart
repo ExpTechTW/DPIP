@@ -168,4 +168,44 @@ void main() {
       'KHH1',
     );
   });
+
+  group('the shared realtime stream', () {
+    const host = 'https://api.lb-tpe1.exptech.dev';
+    const path = '/api/v1/sse';
+
+    test('feeds both the EEW and the RTS row: its one connection carries '
+        'both feeds', () {
+      expect(EndpointService.allOfPath(path), [
+        EndpointService.eew,
+        EndpointService.rts,
+      ]);
+      // Every other path still names one service.
+      expect(EndpointService.allOfPath('/api/v2/eq/eew'), [
+        EndpointService.eew,
+      ]);
+
+      final m = EndpointHealthMonitor();
+      var notified = 0;
+      m.addListener(() => notified++);
+      m.success(ApiTier.lbApi, host, path);
+      expect(notified, 1, reason: 'one outcome, one notification');
+      for (final service in [EndpointService.eew, EndpointService.rts]) {
+        final h = m.of(service, ApiTier.lbApi, 'api.lb-tpe1.exptech.dev')!;
+        expect(h.state, EndpointState.healthy);
+      }
+    });
+
+    test('a failure to reach it marks both rows', () {
+      final m = EndpointHealthMonitor();
+      m
+        ..failure(ApiTier.lbApi, host, path)
+        ..failure(ApiTier.lbApi, host, path);
+      for (final service in [EndpointService.eew, EndpointService.rts]) {
+        final h = m.of(service, ApiTier.lbApi, 'api.lb-tpe1.exptech.dev')!;
+        expect(h.state, EndpointState.down);
+        expect(h.consecutiveFailures, 2);
+      }
+      expect(m.summary, EndpointState.down);
+    });
+  });
 }

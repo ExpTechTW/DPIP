@@ -5,8 +5,8 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/sse_event.dart';
 
-/// How often DPIP's SSE servers write a `: ping` comment on a stream that has
-/// nothing else to send — the LB hubs (EEW) and the TREM stream (RTS) both.
+/// How often DPIP's SSE server writes a `: ping` comment on the shared stream
+/// (`SseMux`) — on a timer, whatever else the connection is carrying.
 ///
 /// A fact about the servers, not a client setting: the silence limit below is
 /// derived from it, so if the servers ping more often this is the one number to
@@ -73,6 +73,9 @@ class HttpSseClient implements SseClient {
         // Override the client-wide gzip: a ResponseType.stream is not
         // auto-decompressed, so a compressed event-stream would parse as
         // garbage. SSE is uncompressed by convention; make that explicit.
+        // The shared stream compresses each frame's `data:` itself (base64
+        // gzip, one member per frame), which the feed undoes — a layer this
+        // header does not touch.
         'Accept-Encoding': 'identity',
       },
     );
