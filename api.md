@@ -132,8 +132,9 @@ Basemap、OSM 詳細街道建築與 terrain 都由 MapLibre 直接抓（app 的 
 ### 雷達（v2）—— `core-tnn1`
 
 時間清單是差量編碼的 Unix 秒（`[baseSec, Δ, …]`），在 API 主機上帶 ETag/304；
-tile 是 WebP，放在 **static** 主機（由 MapLibre 直接抓取，`Cache-Control:
-max-age=300`）。`{sec}` 就是解出清單後的 10 位數秒，直接使用。
+tile 是 WebP，放在 **static** 主機（由 MapLibre 直接抓取；`Cache-Control:
+no-store` 加弱 ETag，重新驗證回 304，2026-11-16 實測）。`{sec}` 就是解出清單後的
+10 位數秒，直接使用。
 
 **有效觀測範圍不是宣告網格。** 宣告的是 115–126.5°E、18–29°N（921 × 881 格，
 0.0125°），但實際只有四座雷達測距圓的聯集裁到該網格內才有觀測；其餘是空的。
@@ -170,9 +171,10 @@ App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` �
 
 ### 未來1小時降水預報 QPESUMS（v2）—— `core-tnn1`
 
-QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **毫秒**
-（`[baseMs, Δ, …]`）；tile 在 **static** 主機。`{ms}` 就是解出清單後的 13 位數
-毫秒，直接使用（時間軸解析已同時支援秒與毫秒）。
+QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **秒**
+（`[baseSec, Δ, …]`，每 600 秒一筆）；tile 在 **static** 主機。`{sec}` 就是解出
+清單後的 10 位數秒，直接使用；改用 13 位數毫秒會回 500（2026-11-16 實測）。
+`framesFromList` 原樣使用清單的值，所以 App 不受影響。
 
 **覆蓋範圍是方形，整塊都有資料**：441 × 561 格，每格 0.0125°
 （與雷達同解析度）；118.0–123.5125°E、20.0–27.0125°N 是整塊格網的外緣，
@@ -185,7 +187,7 @@ QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **毫�
 | 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
 | `FrameTileApi.getFrames` | `/api/v2/tiles/qpesums/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `FrameTileApi.tileUrl` | `/api/v2/tiles/qpesums/{ms}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/qpesums/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 防災地圖 DPM（v2）—— `core-tnn1`
 
@@ -260,10 +262,9 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 > TD 也有）。地圖 overlay 由 client 從 typed payloads 組出（不抓 `/geojson`）。
 > `/warning` 的 CAP 通常一報（`cyclones` 長度 0–1）。
 
-> ⚠️ **`?range` 目前被伺服器忽略。** 對 weather 與 rain 的 `trend/{id}` 實測
-> （2026-08-02，多個測站）：`range=7d`、`7D`、`week`、`168h`、改用其他參數名、
-> 乃至完全不帶參數，回應一律是 `"range":"24h"` 且為 24 筆逐時資料。App 送出的參數
-> 是對的，是後端尚未實作 —— 在後端補上之前，「7 天」等同 24 小時。
+> **`?range` 已生效。** `trend/{id}?range=7d` 回 `"range":"7d"` 與 168 筆逐時資料
+> （2026-11-16 實測）；不帶參數仍是 24 小時、24 筆。2026-08-02 時後端還沒實作，
+> 那時 `7d` 等同 24 小時。
 
 ### 海嘯 CWA tsunami —— core 雙區
 
