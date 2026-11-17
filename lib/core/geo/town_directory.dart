@@ -8,7 +8,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 /// The Taiwan township directory, loaded from the bundled
-/// `assets/location.json.gz`, with lookup by code and by GPS coordinate.
+/// `assets/location.json.Z`, with lookup by code and by GPS coordinate.
 ///
 /// The centroid-based [nearest] lookup is the **fallback** for GPS→township
 /// resolution — used at sea, in a boundary gap, or before the boundary data
@@ -33,7 +33,7 @@ class TownDirectory {
   /// Loads and decodes the bundled directory in a background isolate
   /// (`gzip` → JSON); the towns are then built on the UI isolate.
   static Future<TownDirectory> load() async {
-    final bytes = await rootBundle.load('assets/location.json.gz');
+    final bytes = await rootBundle.load('assets/location.json.Z');
     final json = await Isolate.run(
       () =>
           jsonDecode(utf8.decode(gzip.decode(bytes.buffer.asUint8List())))

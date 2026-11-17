@@ -6,7 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 /// Loads the bundled RTS box grid into the domain [RtsBoxGrid].
 ///
-/// The asset (`assets/box.json.gz`, gzip → JSON) is a `FeatureCollection` of
+/// The asset (`assets/box.json.Z`, gzip → JSON) is a `FeatureCollection` of
 /// `Polygon` features, each carrying an integer `ID` property matched against
 /// `Rts.box`'s keys. Kept out of the pure domain (which only consumes the
 /// parsed grid) so the domain stays Flutter-free.
@@ -20,7 +20,7 @@ class RtsBoxGridSource {
   const RtsBoxGridSource();
 
   Future<RtsBoxGrid> load() async {
-    final bytes = await rootBundle.load('assets/box.json.gz');
+    final bytes = await rootBundle.load('assets/box.json.Z');
     final json = jsonDecode(
       utf8.decode(gzip.decode(bytes.buffer.asUint8List())),
     ) as Map<String, dynamic>;

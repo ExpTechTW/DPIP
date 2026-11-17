@@ -70,9 +70,9 @@ class StarCatalog {
   }
 
   static Future<StarCatalog> _load() async {
-    final starBytes = await rootBundle.load('assets/astro/stars.bin.gz');
+    final starBytes = await rootBundle.load('assets/astro/stars.bin.Z');
     final lineBytes = await rootBundle.load(
-      'assets/astro/constellations.bin.gz',
+      'assets/astro/constellations.bin.Z',
     );
     final decoded = await Isolate.run(
       () => _decode(

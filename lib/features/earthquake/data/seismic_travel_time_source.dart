@@ -8,7 +8,7 @@ import 'package:flutter/services.dart' show rootBundle;
 /// Loads the bundled seismic P/S travel-time table into the domain
 /// [SeismicTravelTimeTable].
 ///
-/// The asset (`assets/travel_time.json.gz`, gzip → JSON) is the CWA travel-time
+/// The asset (`assets/travel_time.json.Z`, gzip → JSON) is the CWA travel-time
 /// model keyed by focal depth: `{ "<depthKm>": [ {"P":…,"S":…,"R":…}, … ] }`,
 /// where each row is the P/S travel time (s) at epicentral radius `R` (km).
 /// Kept out of the pure domain (which only consumes the parsed table) so the
@@ -17,7 +17,7 @@ class SeismicTravelTimeSource {
   const SeismicTravelTimeSource();
 
   Future<SeismicTravelTimeTable> load() async {
-    final bytes = await rootBundle.load('assets/travel_time.json.gz');
+    final bytes = await rootBundle.load('assets/travel_time.json.Z');
     // gzip, JSON decode *and* the row build all off the UI isolate: this is a
     // 213 KB asset (833 KB inflated, 25,016 rows) and it loads at bootstrap,
     // so the assembly would land in the first-frame window.

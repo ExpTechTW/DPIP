@@ -26,8 +26,8 @@ from typing import Any
 
 
 REPO = Path(__file__).resolve().parents[2]
-DIRECTORY_SOURCE = REPO / "assets/location.json.gz"
-BOUNDARY_SOURCE = REPO / "assets/map/town_boundaries.bin.gz"
+DIRECTORY_SOURCE = REPO / "assets/location.json.Z"
+BOUNDARY_SOURCE = REPO / "assets/map/town_boundaries.bin.Z"
 DIRECTORY_OUTPUT = REPO / "ios/DPIPWidgets/WidgetTownshipDirectory.json"
 BOUNDARY_OUTPUT = REPO / "ios/DPIPWidgets/WidgetTownshipBoundaries.bin"
 # The Android Widget reads these from its APK's assets. Same bytes, same

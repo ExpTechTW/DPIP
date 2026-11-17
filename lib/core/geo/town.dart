@@ -6,7 +6,7 @@ part 'town.g.dart';
 /// One Taiwan township (鄉鎮市區) — the unit the user picks as a saved region and
 /// that GPS resolves to.
 ///
-/// Mirrors the bundled `assets/location.json.gz` entry (`code → {city, town,
+/// Mirrors the bundled `assets/location.json.Z` entry (`code → {city, town,
 /// lat, lng, cityLevel, townLevel}`); [code] is the map key, injected when the
 /// directory is built. [lat]/[lng] are the township centroid, used for the
 /// nearest-town GPS lookup and for framing the map.

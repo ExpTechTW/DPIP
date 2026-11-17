@@ -1,5 +1,5 @@
 /// Re-encodes the township boundary polygons into the compact binary the app
-/// bundles (`assets/map/town_boundaries.bin.gz`).
+/// bundles (`assets/map/town_boundaries.bin.Z`).
 ///
 /// Source of truth is the human-readable `town_boundaries.json.gz`
 /// (`{ code: { b: bbox, p: [polygon…] } }`, rings are flat `[lng,lat,…]`).
@@ -21,7 +21,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 const _src = 'assets/map/town_boundaries.json.gz';
-const _out = 'assets/map/town_boundaries.bin.gz';
+const _out = 'assets/map/town_boundaries.bin.Z';
 
 void main() {
   final json = jsonDecode(

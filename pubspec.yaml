@@ -194,17 +194,17 @@ flutter:
     - shaders/weather/card_water.frag
   assets:
     - assets/DPIP.png
-    - assets/box.json.gz
+    - assets/box.json.Z
     - assets/weather/clouds/
     - assets/weather/particles/
     - assets/weather/sky/
-    - assets/location.json.gz
+    - assets/location.json.Z
     - assets/eew_points.json
-    - assets/map/town_boundaries.bin.gz
+    - assets/map/town_boundaries.bin.Z
     # The basemap a map with no network falls back to — Taiwan z0–9 and the
     # world z0–2, 1.05 MiB. Built by tool/gen/basemap_seed.sh.
     - assets/map/basemap_seed/
-    - assets/travel_time.json.gz
+    - assets/travel_time.json.Z
     - assets/astro/
 
   # Weather glyphs Flutter's bundled MaterialIcons font simply does not have —

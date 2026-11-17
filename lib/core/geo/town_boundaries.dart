@@ -17,7 +17,7 @@ import 'package:flutter/services.dart' show rootBundle;
 /// index** that narrows each query to the handful of townships whose bounding
 /// box overlaps the query cell, so a lookup tests ~1–3 polygons instead of 367.
 ///
-/// The bundled asset (`town_boundaries.bin.gz`) is a gzipped **delta + zig-zag
+/// The bundled asset (`town_boundaries.bin.Z`) is a gzipped **delta + zig-zag
 /// varint** encoding of the polygons (see `tool/gen/town_boundaries.dart`):
 /// coordinates are ≤4-decimal, so each is stored as the `×1e4` integer delta
 /// from the previous vertex, LEB128-packed — ~72% smaller than the float-text
@@ -85,7 +85,7 @@ class TownBoundaries {
   /// parse — doing it on the UI isolate stalls the first frames on a slow
   /// phone.
   static Future<TownBoundaries> load() async {
-    final bytes = await rootBundle.load('assets/map/town_boundaries.bin.gz');
+    final bytes = await rootBundle.load('assets/map/town_boundaries.bin.Z');
     final decoded = await Isolate.run(
       () => _decodeTable(
         Uint8List.fromList(gzip.decode(bytes.buffer.asUint8List())),
