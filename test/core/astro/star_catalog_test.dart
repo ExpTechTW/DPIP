@@ -5,7 +5,7 @@
 /// transcription slip in the RA/Dec formula.
 ///
 /// The decode is exercised against the real shipped assets
-/// (`assets/astro/stars.bin.gz`, `assets/astro/constellations.bin.gz`) —
+/// (`assets/astro/stars.bin.Z`, `assets/astro/constellations.bin.Z`) —
 /// `flutter_test`'s asset bundle serves the project's actual files, so this
 /// is the real gzip-decode-plus-binary-unpack pipeline, not a synthetic
 /// stand-in. `StarCatalog._cached` is a static, process-lifetime memo with no

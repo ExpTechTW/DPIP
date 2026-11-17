@@ -43,7 +43,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 const _src = 'assets/map/town_boundaries.json.gz';
-const _directory = 'assets/location.json.gz';
+const _directory = 'assets/location.json.Z';
 const _out = 'lib/shared/map/town_label_points.g.dart';
 
 /// Stop subdividing once no cell can beat the best by more than this, in the
