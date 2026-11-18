@@ -29,6 +29,7 @@ import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/map/map_camera_handoff.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:foldable/foldable.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -72,64 +73,70 @@ class DpipApp extends StatelessWidget {
         // what re-derives it, which changes the memo key, which makes MapLibre
         // reload the style and every layer re-apply its paint. Without this the
         // legends would recolour and the map would not.
-        child:
-            Consumer4<
-              LocaleController,
-              ThemeController,
-              ColorVisionController,
-              DisplaySettings
-            >(
-              builder:
-                  (
-                    context,
-                    localeController,
-                    themeController,
-                    _,
-                    display,
-                    _,
-                  ) => MaterialApp.router(
-                    title: 'DPIP',
-                    debugShowCheckedModeBanner: false,
-                    theme: AppTheme.of(
-                      Brightness.light,
-                      weight: display.textWeight,
-                      contrast: display.contrast,
-                    ),
-                    darkTheme: AppTheme.of(
-                      Brightness.dark,
-                      weight: display.textWeight,
-                      contrast: display.contrast,
-                    ),
-                    themeMode: themeController.mode,
-                    locale: localeController.locale,
-                    localeListResolutionCallback: resolveAppLocale,
-                    localizationsDelegates: appLocalizationsDelegates,
-                    // Home locale first, so an unmatched device language falls back to
-                    // Traditional Chinese (Taiwan), not the English template.
-                    supportedLocales: appSupportedLocales,
-                    routerConfig: appRouter,
-                    // Text size is applied here, not in the theme: this
-                    // ThemeData declares only a colorScheme, and
-                    // textTheme.apply(fontSizeFactor:) asserts on Material's
-                    // colour-only default. Composed with the platform's own
-                    // scaler rather than replacing it — a user who has already
-                    // enlarged text system-wide has said something, and
-                    // overwriting it would shrink the app for exactly the
-                    // people who need it largest.
-                    builder: (context, child) {
-                      final media = MediaQuery.of(context);
-                      return MediaQuery(
-                        data: media.copyWith(
-                          textScaler: ComposedTextScaler(
-                            media.textScaler,
-                            display.textScale.factor,
+        //
+        // FoldableProvider feeds the iPhone Duo hinge signal to the shell's
+        // system-rail check; on every other device it reports unsupported and
+        // changes nothing.
+        child: FoldableProvider(
+          child:
+              Consumer4<
+                LocaleController,
+                ThemeController,
+                ColorVisionController,
+                DisplaySettings
+              >(
+                builder:
+                    (
+                      context,
+                      localeController,
+                      themeController,
+                      _,
+                      display,
+                      _,
+                    ) => MaterialApp.router(
+                      title: 'DPIP',
+                      debugShowCheckedModeBanner: false,
+                      theme: AppTheme.of(
+                        Brightness.light,
+                        weight: display.textWeight,
+                        contrast: display.contrast,
+                      ),
+                      darkTheme: AppTheme.of(
+                        Brightness.dark,
+                        weight: display.textWeight,
+                        contrast: display.contrast,
+                      ),
+                      themeMode: themeController.mode,
+                      locale: localeController.locale,
+                      localeListResolutionCallback: resolveAppLocale,
+                      localizationsDelegates: appLocalizationsDelegates,
+                      // Home locale first, so an unmatched device language falls back to
+                      // Traditional Chinese (Taiwan), not the English template.
+                      supportedLocales: appSupportedLocales,
+                      routerConfig: appRouter,
+                      // Text size is applied here, not in the theme: this
+                      // ThemeData declares only a colorScheme, and
+                      // textTheme.apply(fontSizeFactor:) asserts on Material's
+                      // colour-only default. Composed with the platform's own
+                      // scaler rather than replacing it — a user who has already
+                      // enlarged text system-wide has said something, and
+                      // overwriting it would shrink the app for exactly the
+                      // people who need it largest.
+                      builder: (context, child) {
+                        final media = MediaQuery.of(context);
+                        return MediaQuery(
+                          data: media.copyWith(
+                            textScaler: ComposedTextScaler(
+                              media.textScaler,
+                              display.textScale.factor,
+                            ),
                           ),
-                        ),
-                        child: child ?? const SizedBox.shrink(),
-                      );
-                    },
-                  ),
-            ),
+                          child: child ?? const SizedBox.shrink(),
+                        );
+                      },
+                    ),
+              ),
+        ),
       ),
     );
   }
