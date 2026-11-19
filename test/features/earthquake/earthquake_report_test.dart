@@ -36,6 +36,22 @@ void main() {
       expect(EarthquakeReport.fromJson(report.toJson()), report);
     });
 
+    test('replay starts at Taipei midnight on 2024-02-20 inclusive', () {
+      EarthquakeReport at(DateTime time) => EarthquakeReport.fromJson({
+        ...json,
+        'time': time.millisecondsSinceEpoch,
+      });
+
+      final cutoff = DateTime.parse('2024-02-20T00:00:00+08:00');
+      expect(
+        at(cutoff.subtract(const Duration(milliseconds: 1))).canReplay,
+        isFalse,
+      );
+      expect(at(cutoff).canReplay, isTrue);
+      expect(at(DateTime.parse('2024-02-20T21:50:00+08:00')).canReplay, isTrue);
+      expect(at(DateTime.utc(2026)).canReplay, isTrue);
+    });
+
     test('…000 serial is local-felt, not a numbered report', () {
       final report = EarthquakeReport.fromJson({
         ...json,
