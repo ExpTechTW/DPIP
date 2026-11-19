@@ -405,6 +405,40 @@ void main() {
     ],
   );
 
+  for (final (origin, visible) in [
+    (DateTime.utc(2024, 2, 19, 15, 59, 59, 999), false),
+    (DateTime.utc(2024, 2, 19, 16), true),
+  ]) {
+    testWidgets('replay visibility is $visible for $origin', (tester) async {
+      final report = _report(origin: origin);
+      final reports = _Reports()..next = Ok(report);
+      final settings = SettingsStore.inMemory();
+      await pumpPage(
+        tester,
+        reports: reports,
+        client: _BytesClient(RegionSelection(settings)),
+        settings: settings,
+        regions: RegionStore(settings),
+        towns: const TownDirectory({}),
+        router: nestedRouter(reports),
+      );
+      await tester.pump();
+      await _expandSheet(tester);
+      expect(find.text('Report page'), findsOneWidget);
+      expect(
+        find.byIcon(Icons.replay),
+        visible ? findsOneWidget : findsNothing,
+      );
+      expect(find.text('Replay'), visible ? findsOneWidget : findsNothing);
+      if (visible) {
+        await tester.tap(find.text('Replay'));
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('replay ${report.time - 2000}'), findsOneWidget);
+      }
+    });
+  }
+
   testWidgets('a pending report stays on the loading view', (tester) async {
     final reports = _Reports()..pending = Completer<Result<EarthquakeReport>>();
     final settings = SettingsStore.inMemory();

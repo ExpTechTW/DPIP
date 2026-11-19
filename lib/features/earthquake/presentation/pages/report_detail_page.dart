@@ -1038,11 +1038,12 @@ class _ReportHeader extends StatelessWidget {
               side: BorderSide(color: colors.primary),
               onPressed: () => _openReportPage(context),
             ),
-            ActionChip(
-              avatar: const Icon(Icons.replay, size: 16),
-              label: Text(l10n.reportDetailReplay),
-              onPressed: () => _openReplay(context),
-            ),
+            if (report.canReplay)
+              ActionChip(
+                avatar: const Icon(Icons.replay, size: 16),
+                label: Text(l10n.reportDetailReplay),
+                onPressed: () => _openReplay(context),
+              ),
           ],
         ),
       ],
