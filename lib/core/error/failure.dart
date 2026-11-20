@@ -50,8 +50,7 @@ final class UnexpectedFailure extends Failure {
 
 /// An image could not be handed to the platform's photo library.
 ///
-/// Its own type because the recovery differs by reason: a refused permission
-/// needs the user in Settings, while a failed write is a plain "try again".
+/// Its own type because recovery depends on what prevented the save.
 final class ImageSaveFailure extends Failure {
   const ImageSaveFailure(this.reason, super.message);
 
@@ -63,9 +62,14 @@ enum ImageSaveFailureReason {
   /// This build has no photo library to save into.
   unavailable,
 
-  /// The OS refused: photo-library access on iOS, or the legacy storage grant
-  /// on Android 9 and below.
+  /// The OS declined the grant and can still ask on another attempt.
   permissionDenied,
+
+  /// The OS will only grant access through the app's settings.
+  permissionSettingsRequired,
+
+  /// System policy prevents the app from obtaining photo access.
+  permissionRestricted,
 
   /// The write itself failed.
   failed,

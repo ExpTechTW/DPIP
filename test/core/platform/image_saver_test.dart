@@ -6,6 +6,8 @@
 /// gate, what crosses the channel, and how each error code is classified.
 library;
 
+import 'dart:async';
+
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/platform/image_saver.dart';
@@ -80,10 +82,63 @@ void main() {
 
       expect(
         failureOf(result)!.reason,
-        ImageSaveFailureReason.permissionDenied,
+        ImageSaveFailureReason.permissionSettingsRequired,
       );
       expect(saved, isFalse, reason: 'a refused save must not write');
     });
+
+    test(
+      'a declined first request requires Settings without writing',
+      () async {
+        final methods = <String>[];
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          methods.add(call.method);
+          return call.method == 'status' ? 'notDetermined' : 'denied';
+        });
+        final result = await IosImageSaver(isSupportedPlatform: true)
+            .saveToGallery(bytes: bytes, fileName: 'report.png');
+
+        expect(
+          failureOf(result)!.reason,
+          ImageSaveFailureReason.permissionSettingsRequired,
+        );
+        expect(methods, ['status', 'request']);
+      },
+    );
+
+    test(
+      'system restrictions cannot be recovered from the app settings',
+      () async {
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          expect(call.method, 'status');
+          return 'restricted';
+        });
+        final result = await IosImageSaver(isSupportedPlatform: true)
+            .saveToGallery(bytes: bytes, fileName: 'report.png');
+
+        expect(
+          failureOf(result)!.reason,
+          ImageSaveFailureReason.permissionRestricted,
+        );
+      },
+    );
+
+    test(
+      'revoking permission before the native write requires Settings',
+      () async {
+        messenger.setMockMethodCallHandler(channel, (call) async {
+          if (call.method == 'status') return 'granted';
+          throw PlatformException(code: 'permission_denied');
+        });
+        final result = await IosImageSaver(isSupportedPlatform: true)
+            .saveToGallery(bytes: bytes, fileName: 'report.png');
+
+        expect(
+          failureOf(result)!.reason,
+          ImageSaveFailureReason.permissionSettingsRequired,
+        );
+      },
+    );
 
     test('asks once when the library has never been asked', () async {
       final methods = <String>[];
@@ -175,7 +230,7 @@ void main() {
       expect(saved, isFalse);
       expect(
         failureOf(result)!.reason,
-        ImageSaveFailureReason.permissionDenied,
+        ImageSaveFailureReason.permissionSettingsRequired,
       );
     });
 
@@ -199,6 +254,64 @@ void main() {
         ImageSaveFailureReason.permissionDenied,
       );
     });
+  });
+
+  test(
+    'another caller cannot start a concurrent native write on the same saver',
+    () async {
+      final started = Completer<void>();
+      final finished = Completer<void>();
+      var writes = 0;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'status') return 'granted';
+        expect(call.method, 'save');
+        if (++writes == 1) {
+          started.complete();
+          await finished.future;
+        }
+        return null;
+      });
+      final saver = IosImageSaver(isSupportedPlatform: true);
+      final first = saver.saveToGallery(bytes: bytes, fileName: 'story.png');
+      await started.future;
+      final second = await saver.saveToGallery(
+        bytes: bytes,
+        fileName: 'story.png',
+      );
+      expect(second.isOk, isFalse);
+      expect(writes, 1);
+
+      finished.complete();
+      expect((await first).isOk, isTrue);
+      expect(
+        (await saver.saveToGallery(bytes: bytes, fileName: 'story.png')).isOk,
+        isTrue,
+      );
+      expect(writes, 2);
+    },
+  );
+
+  test('an absent Android channel never asks for storage permission', () async {
+    final saver = AndroidImageSaver(
+      isSupportedPlatform: true,
+      storageStatus: () async => fail('Unexpected storage status check'),
+      requestStorage: () async => fail('Unexpected storage request'),
+    );
+    final result = await saver.saveToGallery(
+      bytes: bytes,
+      fileName: 'report.png',
+    );
+    expect(failureOf(result)!.reason, ImageSaveFailureReason.unavailable);
+  });
+
+  test('a failed permission check cannot dispatch a native write', () async {
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      expect(call.method, 'status');
+      throw PlatformException(code: 'temporary_error');
+    });
+    final result = await IosImageSaver(isSupportedPlatform: true)
+        .saveToGallery(bytes: bytes, fileName: 'report.png');
+    expect(failureOf(result)!.reason, ImageSaveFailureReason.failed);
   });
 
   test(

@@ -42,10 +42,14 @@ public class ImageSaverPlugin: NSObject, FlutterPlugin {
     switch status {
     case .authorized, .limited:
       return "granted"
-    case .denied, .restricted:
+    case .denied:
       return "denied"
-    default:
+    case .restricted:
+      return "restricted"
+    case .notDetermined:
       return "notDetermined"
+    @unknown default:
+      return "unsupported"
     }
   }
 
@@ -62,37 +66,31 @@ public class ImageSaverPlugin: NSObject, FlutterPlugin {
     }
     let data = payload.data
 
-    PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
-      guard status == .authorized || status == .limited else {
-        // A refusal is not a failure to report as "try again": the only way
-        // forward is Settings, and the Dart side says exactly that.
-        DispatchQueue.main.async {
+    let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+    guard status == .authorized || status == .limited else {
+      // Authorization may have changed after the Dart preflight.
+      let code = status == .restricted ? "permission_restricted" : "permission_denied"
+      result(FlutterError(code: code, message: "Photo library access was refused", details: nil))
+      return
+    }
+
+    PHPhotoLibrary.shared().performChanges({
+      let request = PHAssetCreationRequest.forAsset()
+      let options = PHAssetResourceCreationOptions()
+      options.originalFilename = fileName
+      request.addResource(with: .photo, data: data, options: options)
+    }) { success, error in
+      // The completion handler runs off the main thread; Flutter's reply
+      // belongs to the platform thread.
+      DispatchQueue.main.async {
+        if success {
+          result(nil)
+        } else {
           result(
             FlutterError(
-              code: "permission_denied", message: "Photo library access was refused",
+              code: "save_failed",
+              message: error?.localizedDescription ?? "The image could not be saved",
               details: nil))
-        }
-        return
-      }
-
-      PHPhotoLibrary.shared().performChanges({
-        let request = PHAssetCreationRequest.forAsset()
-        let options = PHAssetResourceCreationOptions()
-        options.originalFilename = fileName
-        request.addResource(with: .photo, data: data, options: options)
-      }) { success, error in
-        // The completion handler runs off the main thread; Flutter's reply
-        // belongs to the platform thread.
-        DispatchQueue.main.async {
-          if success {
-            result(nil)
-          } else {
-            result(
-              FlutterError(
-                code: "save_failed",
-                message: error?.localizedDescription ?? "The image could not be saved",
-                details: nil))
-          }
         }
       }
     }
