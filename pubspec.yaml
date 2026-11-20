@@ -41,6 +41,10 @@ dependencies:
   # (iOS 15.0, minSdk 23). Every later 5.2.x requires a newer firebase_core —
   # which is the bump the pin above exists to stop.
   firebase_crashlytics: 5.2.4
+  # Direct because the report-image renderer allocates and reads native memory
+  # itself (`shared/seismic/report_picture`). Already in the lock through the
+  # SDK tooling; naming it is what makes the import legal.
+  ffi: ^2.2.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -204,6 +208,14 @@ flutter:
     - assets/map/basemap_seed/
     - assets/travel_time.json.gz
     - assets/astro/
+    # Fonts for the native report-image renderer (ExpTechTW/eq-report-pic).
+    # The library does not embed them — that would put a 13.8 MB copy in every
+    # Android ABI — so they travel as assets and are handed to it once, in this
+    # order, when the renderer is created. Same three as cwa-eq-map: M+ 2p for
+    # the monospaced digits, Gen Shin Gothic and Noto Sans TC for place names.
+    - assets/fonts/report/mplus-2p-bold.ttf
+    - assets/fonts/report/GenShinGothic-Bold.ttf
+    - assets/fonts/report/NotoSansTC-Black.ttf
 
   # Weather glyphs Flutter's bundled MaterialIcons font simply does not have —
   # there is no rain icon in it at all. A 6.7 KB subset of Material Symbols

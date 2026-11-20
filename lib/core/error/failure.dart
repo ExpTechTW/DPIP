@@ -111,3 +111,26 @@ final class WidgetSnapshotFailure extends Failure {
 
   final WidgetSnapshotFailureReason reason;
 }
+
+/// Why a native share-image render failed.
+enum ReportPictureFailureReason {
+  /// This build carries no `eq-report-pic` library for the device, or the one
+  /// it carries does not export the ABI the app was built against.
+  unavailable,
+
+  /// The library was there and the render itself failed — bad report JSON, or
+  /// a bug inside the renderer.
+  renderFailed,
+}
+
+/// A landscape earthquake-report image could not be drawn by the native
+/// renderer.
+///
+/// Its own type because the recovery differs: a missing library is a build
+/// problem and no retry helps, while a failed render can be retried or, if it
+/// keeps failing, fall back to the Flutter-drawn card.
+final class ReportPictureFailure extends Failure {
+  const ReportPictureFailure(this.reason, super.message);
+
+  final ReportPictureFailureReason reason;
+}
