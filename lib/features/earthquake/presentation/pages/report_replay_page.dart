@@ -28,6 +28,7 @@ import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/realtime_state.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/shared/seismic/spoken_intensity.dart';
 import 'package:dpip/features/earthquake/domain/monitor_eew_announcement_controller.dart';
@@ -49,6 +50,7 @@ import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.da
 import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart'
     show ReportListPage;
 import 'package:dpip/features/earthquake/presentation/widgets/eew_card.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/replay_eew_notice.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:dpip/features/earthquake/replay_session.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -126,6 +128,11 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// advances it through the alert set (modulo the count in the builder).
   int _eewIndex = 0;
 
+  /// What the three samples said about EEW for this event, once they answer.
+  /// `null` until then, and `undecided` when a sample failed — a dead request
+  /// must never be read as "no data".
+  final ValueNotifier<ReplayEewVerdict?> _eewVerdict = ValueNotifier(null);
+
   /// The app-wide immersive toggle, borrowed from the map tab for the length
   /// of this route. The shell draws the bottom nav bar for every branch,
   /// including this nested one, so a page-local flag could hide the replay's
@@ -174,6 +181,23 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       mlIntensity: context.read<MlIntensityEstimator>(),
     )..start();
     _session.eew.addListener(_syncAnnouncement);
+    // Started once per page, in parallel with the replay: three instants of
+    // the event are enough to say "not detected", so the answer is kept for
+    // as long as this page lives. Nothing outlives the page — opening the
+    // replay again asks the same three instants again.
+    final origin = DateTime.fromMillisecondsSinceEpoch(
+      widget.replayTimestamp,
+      isUtc: true,
+    ).add(replayLeadIn);
+    unawaited(
+      ReplayEewProbe(
+        context.read<ApiClient>(),
+        origin: origin,
+        cwaOnly: () => cwaOnly.enabled,
+      ).run().then((verdict) {
+        if (mounted) _eewVerdict.value = verdict;
+      }),
+    );
     _immersive = context.read<MapImmersiveController>()
       ..addListener(_onImmersiveChanged);
     // A replay opens with its controls, whatever the map tab was left in.
@@ -303,6 +327,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     _ticker?.cancel();
     _tick.dispose();
     _session.eew.removeListener(_syncAnnouncement);
+    _eewVerdict.dispose();
     _speechSettings?.removeListener(_syncAnnouncement);
     _announcement?.dispose();
     _clockSecond.dispose();
@@ -460,11 +485,19 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           ListenableBuilder(
-                            listenable: _session.eew,
+                            listenable: Listenable.merge([
+                              _session.eew,
+                              _eewVerdict,
+                            ]),
                             builder: (context, _) {
                               final alerts = _session.eew.alerts;
-                              if (alerts.isEmpty) {
-                                return const SizedBox.shrink();
+                              final slot = replayEewSlot(
+                                hasAlerts: alerts.isNotEmpty,
+                                feed: _session.eew.state,
+                                verdict: _eewVerdict.value,
+                              );
+                              if (slot != ReplayEewSlot.card) {
+                                return ReplayEewNotice(slot: slot);
                               }
                               // One card at a time — tapping cycles through the
                               // active alerts (parallel earthquakes, overlapping
