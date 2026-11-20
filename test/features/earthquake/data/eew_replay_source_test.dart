@@ -189,13 +189,18 @@ void main() {
     expect(source.sameData(a, c), isFalse);
   });
 
-  test('isIgnorableFailure defaults to false, unlike the RTS replay', () {
+  test('isIgnorableFailure is true only for the archive 404', () {
     final source = EewReplaySource(api, clock, cwaOnly: () => false);
-    expect(source.isIgnorableFailure(const NotFoundFailure('x')), isFalse);
+    // 404 is the endpoint saying "no record at that instant" — before the
+    // first row it holds, or past the end. Counting it as a fault would read
+    // as an outage for the whole tail of an old replay.
+    expect(source.isIgnorableFailure(const NotFoundFailure('x')), isTrue);
+    expect(source.isIgnorableFailure(const NetworkFailure('x')), isFalse);
+    expect(source.isIgnorableFailure(const TimeoutFailure('x')), isFalse);
   });
 
   test(
-    'a 404 still folds into NotFoundFailure (recorded, just not ignored)',
+    'a 404 is still recorded as NotFoundFailure, it is only not counted',
     () async {
       api.error = _dio(DioExceptionType.badResponse, status: 404);
       final source = EewReplaySource(api, clock, cwaOnly: () => false);

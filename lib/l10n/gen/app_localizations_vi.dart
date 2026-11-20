@@ -686,6 +686,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get feedReplaying => 'Đang phát lại';
 
   @override
+  String get replayEewWaiting => 'Chưa có cảnh báo cho thời điểm này';
+
+  @override
+  String get replayEewRetrying =>
+      'Không tải được dữ liệu cảnh báo — đang thử lại';
+
+  @override
+  String get replayEewUnavailable => 'Tạm thời không lấy được dữ liệu cảnh báo';
+
+  @override
+  String get replayEewNone =>
+      'Không phát hiện cảnh báo nào trong lần phát lại này';
+
+  @override
+  String get replayEewNoneDetail => 'Đã lấy mẫu đầu, giữa và cuối sự kiện';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
