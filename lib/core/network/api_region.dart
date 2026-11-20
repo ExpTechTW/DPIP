@@ -67,12 +67,10 @@ String staticLbOrigin(LbRegion region) =>
 /// the tile itself along [lbStatic] / [coreStatic]
 /// (`ApiClient.getTileBytes`).
 ///
-/// One request outside this enum does use a bare host: the HTTP time fallback
-/// in `core/realtime/http_time_source.dart` asks
-/// `https://api.lb.exptech.dev/ntp`. It is not an [ApiTier] request at all —
-/// a clock reading has no region to select, so there is nothing for the app to
-/// pin and no per-region failover to preserve, and the bare name is the one
-/// Cloudflare terminates with a valid certificate.
+/// The HTTP time fallback in `core/realtime/http_time_source.dart` is pinned
+/// by region too, without being an [ApiTier] request: it builds its hosts from
+/// the selected region's order and tries each in turn, but never through
+/// `ApiClient`, whose ETag cache must not hold a clock reading.
 enum ApiTier {
   /// LB API — multi-active across [LbRegion]s (`api.lb-{tpe1,khh1}`).
   lbApi,

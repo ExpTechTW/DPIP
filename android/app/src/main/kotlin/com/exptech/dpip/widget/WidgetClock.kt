@@ -131,7 +131,27 @@ object WidgetClock {
     private const val resynchronizeAfterMilliseconds = 60_000L
 
     private val sntpHosts = listOf("time.exptech.com.tw", "time.apple.com")
-    private val httpHosts = listOf("api.lb.exptech.dev")
+
+    /**
+     * The region-pinned LB names, `tpe1` first — the same list as iOS's
+     * `WidgetHTTPTimeSource.defaultHosts`.
+     *
+     * This used to be the DNS-balanced bare `api.lb.exptech.dev`, which stopped
+     * answering (it times out as of 2026-11), and which was balanced without
+     * regard for the region the app's other traffic picked, so the sample could
+     * come from a machine whose clock disagrees with the edge the app is
+     * talking to. The Widget has no region setting to read, so it takes the
+     * app's default order: `tpe1` first, `khh1` as the fallback. Each is asked
+     * in turn with the same two-second budget, and a reading that contradicts
+     * its own `Date` header ([HttpTimeValidation]) moves on to the next.
+     */
+    internal val httpHosts = listOf(
+        "api.lb-tpe1.exptech.dev",
+        "api.lb-khh1.exptech.dev",
+    )
+
+    /** The `/ntp` URL on [host]. HTTPS only: the names are Cloudflare's. */
+    internal fun httpTimeUrl(host: String): String = "https://$host/ntp"
 
     private val clock = CalibratedClock(
         wallMilliseconds = { System.currentTimeMillis() },
@@ -162,15 +182,17 @@ object WidgetClock {
     }
 
     /**
-     * Synchronizes the clock, blocking up to roughly ten seconds.
+     * Synchronizes the clock, blocking up to about fourteen seconds: two SNTP
+     * hosts at three seconds each, then two HTTPS hosts at two seconds to
+     * connect and two to read.
      *
      * Never throws: a failure is "no usable calibration", which the caller
      * answers by keeping the snapshot it already has.
      *
      * An anchor younger than [resynchronizeAfterMilliseconds] is reused. One
      * worker run refreshes several addresses, and without this each would spend
-     * up to ten seconds on its own UDP exchange for a reading that cannot have
-     * moved; Dart's realtime service resyncs on the same 60-second cadence.
+     * up to that long on its own exchange for a reading that cannot have moved;
+     * Dart's realtime service resyncs on the same 60-second cadence.
      */
     @Synchronized
     fun synchronize(): Boolean {
@@ -237,7 +259,7 @@ object WidgetClock {
     private fun httpTime(host: String): Long? {
         var connection: HttpURLConnection? = null
         return try {
-            connection = URL("https://$host/ntp").openConnection() as HttpURLConnection
+            connection = URL(httpTimeUrl(host)).openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
             connection.connectTimeout = httpHostTimeoutMilliseconds
             connection.readTimeout = httpHostTimeoutMilliseconds

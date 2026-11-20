@@ -26,9 +26,9 @@ enum WidgetHTTPTimeError: Error, Equatable {
     case responseTooLarge
 }
 
-/// `WidgetServerTimeSource` over `https://api.lb.exptech.dev/ntp`, for networks
-/// that block SNTP's UDP/123 — corporate Wi-Fi, hotel and campus networks, some
-/// carriers.
+/// `WidgetServerTimeSource` over `https://api.lb-<region>.exptech.dev/ntp`, for
+/// networks that block SNTP's UDP/123 — corporate Wi-Fi, hotel and campus
+/// networks, some carriers.
 ///
 /// Strictly a fallback behind `WidgetSNTPClient`: one HTTPS round trip resolves
 /// "now" to roughly ±RTT/2 (±150 ms measured), where the SNTP exchange resolves
@@ -39,31 +39,38 @@ enum WidgetHTTPTimeError: Error, Equatable {
 /// ## Why the `Date` header is checked
 ///
 /// The body is the *origin's* clock, and not every origin's clock is right: of
-/// the four `lb-*` nodes behind this name, two were 15.7 seconds behind at the
-/// time of writing — consistently, and in agreement with each other, so a
-/// quorum across them would not have caught it either.
+/// the four `lb-*` nodes, two were 15.7 seconds behind at the time of writing —
+/// consistently, and in agreement with each other, so a quorum across them would
+/// not have caught it either.
 ///
-/// What does catch it is the `Date` header of the very same response. This host
-/// sits behind Cloudflare, so `Date` is stamped at the edge, independently of
-/// whichever backend answered — which makes every response self-checking: a body
-/// more than `maximumDateSkew` from its own `Date` is a bad backend (or a frozen
-/// cache), and is discarded without needing to know which node it came from.
+/// What does catch it is the `Date` header of the very same response. Every
+/// `lb-*` name sits behind Cloudflare, so `Date` is stamped at the edge,
+/// independently of whichever backend answered — which makes every response
+/// self-checking: a body more than `maximumDateSkew` from its own `Date` is a bad
+/// backend (or a frozen cache), and is discarded without needing to know which
+/// node it came from.
 ///
 /// Every guard fails closed: installing a wrong offset is worse than not
 /// calibrating, so a rejected response throws and `WidgetServerClock` keeps its
 /// last anchor.
 struct WidgetHTTPTimeSource: WidgetServerTimeSource {
-    /// The DNS-balanced LB name — the one place the repository uses a bare
-    /// host.
+    /// The region-pinned LB names, `tpe1` first.
     ///
-    /// Region-pinned API traffic deliberately never does, because region
-    /// selection and failover belong to the app. A clock reading has no region
-    /// to select, and the bare name is what Cloudflare terminates with a valid
+    /// These used to be the DNS-balanced bare `api.lb.exptech.dev`, on the
+    /// reasoning that a clock reading has no region to select. The bare name is
+    /// balanced without regard for which region the app's other traffic picked,
+    /// so the sample could come from a machine whose clock disagrees with the
+    /// edge the app is talking to. The widget extension has no region setting
+    /// to read, so it takes the app's default order: `tpe1` first, `khh1` as the
+    /// fallback. These names are what Cloudflare terminates with a valid
     /// certificate — `time.exptech.com.tw`, SNTP's own primary, serves `/ntp`
     /// too but presents an expired certificate for the wrong name, and its
     /// `Date` comes from the same machine as its body, so it can neither be
     /// reached over HTTPS nor check itself.
-    static let defaultHosts = ["api.lb.exptech.dev"]
+    static let defaultHosts = [
+        "api.lb-tpe1.exptech.dev",
+        "api.lb-khh1.exptech.dev",
+    ]
 
     /// How far the body may sit from its own `Date` header.
     ///
