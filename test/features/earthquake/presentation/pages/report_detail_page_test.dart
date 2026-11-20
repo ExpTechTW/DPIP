@@ -175,6 +175,10 @@ class _Reports implements ReportRepository {
   Completer<Result<EarthquakeReport>>? pending;
   int gets = 0;
 
+  /// What the archive probe answers; tests flip it between visits.
+  Result<bool> replay = const Ok(true);
+  final List<int> replayProbes = [];
+
   @override
   Future<Result<EarthquakeReport>> get(String id) async {
     gets++;
@@ -192,6 +196,12 @@ class _Reports implements ReportRepository {
     int page = 1,
     ReportListQuery query = ReportListQuery.empty,
   }) => throw UnimplementedError();
+
+  @override
+  Future<Result<bool>> hasReplayAt(int timestamp) async {
+    replayProbes.add(timestamp);
+    return replay;
+  }
 }
 
 class _BytesClient extends ApiClient {
@@ -405,39 +415,82 @@ void main() {
     ],
   );
 
-  for (final (origin, visible) in [
-    (DateTime.utc(2024, 2, 19, 15, 59, 59, 999), false),
-    (DateTime.utc(2024, 2, 19, 16), true),
-  ]) {
-    testWidgets('replay visibility is $visible for $origin', (tester) async {
-      final report = _report(origin: origin);
-      final reports = _Reports()..next = Ok(report);
-      final settings = SettingsStore.inMemory();
-      await pumpPage(
-        tester,
-        reports: reports,
-        client: _BytesClient(RegionSelection(settings)),
-        settings: settings,
-        regions: RegionStore(settings),
-        towns: const TownDirectory({}),
-        router: nestedRouter(reports),
-      );
-      await tester.pump();
-      await _expandSheet(tester);
-      expect(find.text('Report page'), findsOneWidget);
-      expect(
-        find.byIcon(Icons.replay),
-        visible ? findsOneWidget : findsNothing,
-      );
-      expect(find.text('Replay'), visible ? findsOneWidget : findsNothing);
-      if (visible) {
-        await tester.tap(find.text('Replay'));
-        await tester.pump();
-        await tester.pump();
-        expect(find.text('replay ${report.time - 2000}'), findsOneWidget);
-      }
-    });
-  }
+  testWidgets('a 404 from the archive probe hides replay', (tester) async {
+    final report = _report(origin: DateTime.utc(2024, 2, 19, 15, 59, 59));
+    final reports = _Reports()
+      ..next = Ok(report)
+      ..replay = const Ok(false);
+    final settings = SettingsStore.inMemory();
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: nestedRouter(reports),
+    );
+    await tester.pump();
+    expect(reports.replayProbes, [report.time - 2000]);
+    await _expandSheet(tester);
+    expect(find.text('Report page'), findsOneWidget);
+    expect(find.byIcon(Icons.replay), findsNothing);
+    expect(find.text('Replay'), findsNothing);
+  });
+
+  testWidgets('a transient probe failure keeps replay', (tester) async {
+    final report = _report();
+    final reports = _Reports()
+      ..next = Ok(report)
+      ..replay = const Err(NetworkFailure('offline'));
+    final settings = SettingsStore.inMemory();
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: nestedRouter(reports),
+    );
+    await tester.pump();
+    await _expandSheet(tester);
+    expect(find.text('Replay'), findsOneWidget);
+    await tester.tap(find.text('Replay'));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('replay ${report.time - 2000}'), findsOneWidget);
+  });
+
+  testWidgets('every visit probes the archive again', (tester) async {
+    final report = _report();
+    final reports = _Reports()..next = Ok(report);
+    final settings = SettingsStore.inMemory();
+    final router = nestedRouter(reports);
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: router,
+    );
+    await tester.pump();
+    expect(reports.replayProbes, [report.time - 2000]);
+
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(find.text('catalogue'), findsOneWidget);
+
+    reports.replay = const Ok(false);
+    router.push('/earthquake/${report.id}');
+    await tester.pump();
+    await tester.pump();
+    expect(reports.replayProbes, [report.time - 2000, report.time - 2000]);
+    await _expandSheet(tester);
+    expect(find.text('Replay'), findsNothing);
+  });
 
   testWidgets('a pending report stays on the loading view', (tester) async {
     final reports = _Reports()..pending = Completer<Result<EarthquakeReport>>();

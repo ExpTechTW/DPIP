@@ -138,6 +138,46 @@ void main() {
         expect(result, {'ts': 1700000000000});
       },
     );
+
+    test(
+      'hasReplayAt accepts EEW alerts without asking the RTS archive',
+      () async {
+        client.nextGetResult = [
+          {'id': '1130465'},
+        ];
+        expect(await api.hasReplayAt(1), isTrue);
+        expect(client.getCalls.single.$2, '${ApiPaths.eew}/61');
+      },
+    );
+
+    test('hasReplayAt turns the RTS archive 404 into false', () async {
+      client.nextGetResult = <dynamic>[];
+      final options = RequestOptions(path: '/api/v3/trem/rts/1');
+      client.getError = DioException(
+        requestOptions: options,
+        response: Response(requestOptions: options, statusCode: 404),
+      );
+      expect(await api.hasReplayAt(1), isFalse);
+      expect(client.getCalls.map((call) => call.$2), [
+        '${ApiPaths.eew}/61',
+        '${ApiPaths.rtsArchive}/1',
+      ]);
+
+      client.getError = DioException(
+        requestOptions: options,
+        response: Response(requestOptions: options, statusCode: 500),
+      );
+      await expectLater(api.hasReplayAt(1), throwsA(isA<DioException>()));
+    });
+
+    test('hasReplayAt reads a 400 as a timestamp too old to archive', () async {
+      final options = RequestOptions(path: '/api/v2/eq/eew/1');
+      client.getError = DioException(
+        requestOptions: options,
+        response: Response(requestOptions: options, statusCode: 400),
+      );
+      expect(await api.hasReplayAt(1), isFalse);
+    });
   });
 
   group('getEewAt', () {

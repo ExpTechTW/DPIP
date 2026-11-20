@@ -47,6 +47,10 @@ class ReportRepositoryImpl implements ReportRepository {
     return EarthquakeReport.fromJson((raw as Map).cast<String, dynamic>());
   });
 
+  @override
+  Future<Result<bool>> hasReplayAt(int timestamp) =>
+      guardResult(() => _api.hasReplayAt(timestamp ~/ 1000));
+
   /// Skips malformed rows so one bad record cannot blank the catalogue.
   static List<PartialEarthquakeReport> parseReportList(List<dynamic> raw) {
     return [

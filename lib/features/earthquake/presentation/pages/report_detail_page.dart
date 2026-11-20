@@ -10,6 +10,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -303,6 +304,13 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
 
+  /// Whether the replay archive still holds this report's moment.
+  ///
+  /// Probed once on every visit rather than compared against a fixed date:
+  /// the archive's retained window moves as data is added and pruned. A 404
+  /// hides the chip; the check ends there, no polling.
+  bool _replayAvailable = false;
+
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
   /// north. Kept in sync from [BaseMap.onCameraMove] so the needle tracks
   /// rotation live, matching the map tab's compass.
@@ -339,6 +347,24 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
       mutuallyExclusiveTerrain: _showTerrain,
     );
     _gsi.addListener(_onGsiChanged);
+    unawaited(_probeReplay());
+  }
+
+  /// One request per page visit: the archive answers 404 once the report is
+  /// older than what it still keeps, and that window is not fixed. A probe
+  /// that fails for any other reason keeps the chip — a timeout does not mean
+  /// the event was never replayable.
+  Future<void> _probeReplay() async {
+    final repository = context.read<ReportRepository>();
+    final timestamp = widget.report.originTimeUtc.millisecondsSinceEpoch - 2000;
+    final result = await repository.hasReplayAt(timestamp);
+    if (!mounted) return;
+    setState(() {
+      _replayAvailable = switch (result) {
+        Ok(:final value) => value,
+        Err() => true,
+      };
+    });
   }
 
   @override
@@ -548,6 +574,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
               report: widget.report,
               expandedNotifier: widget.sheetExpanded,
               saver: widget.imageSaver,
+              replayAvailable: _replayAvailable,
             ),
           ),
           // Base-map options (OSM detailed map / terrain relief / township
@@ -600,9 +627,13 @@ class _ReportSheet extends StatefulWidget {
     required this.report,
     required this.expandedNotifier,
     required this.saver,
+    required this.replayAvailable,
   });
 
   final EarthquakeReport report;
+
+  /// Whether the archive probe found this report still replayable.
+  final bool replayAvailable;
 
   /// Mirrors this sheet's collapsed/expanded state up to the page, so it can
   /// hide its floating back button while the sheet's own header has one.
@@ -778,7 +809,10 @@ class _ReportSheetState extends State<_ReportSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ReportHeader(report: report),
+          _ReportHeader(
+            report: report,
+            replayAvailable: widget.replayAvailable,
+          ),
           const SizedBox(height: AppSpacing.lg),
           SectionHeader(l10n.reportDetailInfo),
           _ReportInfoCard(report: report),
@@ -971,9 +1005,12 @@ class _PeekStat extends StatelessWidget {
 /// Intensity badge + numbered/local-felt eyebrow + location — the expanded
 /// sheet's header, with a filled chip opening the official CWA report page.
 class _ReportHeader extends StatelessWidget {
-  const _ReportHeader({required this.report});
+  const _ReportHeader({required this.report, required this.replayAvailable});
 
   final EarthquakeReport report;
+
+  /// Whether the page's archive probe found this report still replayable.
+  final bool replayAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -1038,7 +1075,7 @@ class _ReportHeader extends StatelessWidget {
               side: BorderSide(color: colors.primary),
               onPressed: () => _openReportPage(context),
             ),
-            if (report.canReplay)
+            if (replayAvailable)
               ActionChip(
                 avatar: const Icon(Icons.replay, size: 16),
                 label: Text(l10n.reportDetailReplay),

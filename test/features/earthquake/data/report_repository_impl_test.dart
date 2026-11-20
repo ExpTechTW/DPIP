@@ -70,6 +70,12 @@ class _Api implements EarthquakeApi {
   Future<List<dynamic>> getEewAt(int seconds) => throw UnimplementedError();
 
   @override
+  Future<bool> hasReplayAt(int seconds) async {
+    await getRtsAt(seconds);
+    return true;
+  }
+
+  @override
   Future<Map<String, dynamic>> getRtsAt(int seconds) =>
       throw UnimplementedError();
 }

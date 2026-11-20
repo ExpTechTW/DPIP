@@ -29,6 +29,12 @@ class _FakeEarthquakeApi implements EarthquakeApi {
   int? lastSeconds;
 
   @override
+  Future<bool> hasReplayAt(int seconds) async {
+    await getRtsAt(seconds);
+    return true;
+  }
+
+  @override
   Future<Map<String, dynamic>> getRtsAt(int seconds) async {
     lastSeconds = seconds;
     if (error != null) throw error!;
