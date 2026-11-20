@@ -100,6 +100,30 @@ Each of these is a rule the code is expected to follow, not a description of
 what it happens to do. They live here so there is one copy: `CLAUDE.md` and
 `AGENTS.md` point at this file rather than restating it.
 
+## Story map snapshot
+
+On `com.exptech.dpip/map_snapshot`, `capture` returns PNG bytes.
+`captureWithProjection` takes the same style, center, zoom, logical
+`width`/`height`, `pixelRatio`, and optional `showLogo` arguments, plus
+`points`, a nonempty list of maps with unique nonempty string `id` and numeric
+`latitude`/`longitude` in degrees. Story uses a 360×640 logical viewport and
+integer pixel ratios 1–3. The pixel ratio is required, and width and height
+must be positive whole numbers.
+
+The response is a single map with `png` (typed bytes), `pngWidth` and
+`pngHeight` (integer raster pixels), `logicalWidth` and `logicalHeight`
+(requested logical dimensions), and `points` (ID to `[x, y]` in logical
+pixels from the top left). Off-canvas points are valid. All coordinates
+come from the completed native snapshot that produced the PNG. Android
+converts bitmap pixels against the actual bitmap dimensions. iOS converts
+image points against the corresponding UIImage dimensions in points.
+
+Story matches the reserved `epicenter` ID to the report epicenter and each
+observation ID to its JSON-encoded `[area name, station name]` pair. The app
+requires a finite point for every requested ID and matching PNG dimensions
+before export. Invalid requests fail with `bad_args`, and unusable native
+projections or mismatched dimensions fail with `invalid_projection`.
+
 ## Logging
 
 Always log through `Log` (`lib/core/logging/log.dart`):
