@@ -3705,4 +3705,85 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'คำนวณด้วยวิธีความรุนแรงที่วัดด้วยเครื่องมือของ JMA ซึ่ง ES-Net ใช้';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => 'ความเข้มสูงสุด';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return 'ความเข้มสูงสุด $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return 'การสังเกต $count รายการ ความเข้มสูงสุดในกลุ่ม $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      'ไม่สามารถจัดรายงานนี้ลงในสตอรี่ได้ เลือก 4:5 หรือเปิดรายละเอียด';
+
+  @override
+  String get reportDetailStoryLegendCount => 'ป้ายเลข: จำนวนการสังเกต';
+
+  @override
+  String get reportDetailStoryLegendIntensity =>
+      'ไอคอน: ความรุนแรงสูงสุดในกลุ่ม';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return 'การสังเกต $count รายการ ระดับความรุนแรงสูงสุดในกลุ่ม $intensity จุดสังเกตตัวแทนที่ $location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location ระดับความรุนแรง $intensity การสังเกตหนึ่งรายการ';
+  }
+
+  @override
+  String get reportDetailSharePreview => 'ดูตัวอย่างการ์ดสำหรับแชร์';
+
+  @override
+  String get reportDetailShareRichterScale => 'มาตราริกเตอร์';
+
+  @override
+  String get reportDetailShareObservedIntensity => 'ความรุนแรงที่ตรวจวัดได้';
+
+  @override
+  String get reportDetailShareKilometers => 'กม.';
+
+  @override
+  String get reportDetailShareSource =>
+      'แหล่งข้อมูล: สำนักอุตุนิยมวิทยากลางไต้หวัน (MOTC)';
+
+  @override
+  String get reportDetailSharePreparedBy => 'จัดทำโดย DPIP';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source\nแผนที่ฐาน: ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => 'ไม่สามารถแสดงรูปภาพรูปแบบนี้ได้';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'อนุญาตให้เข้าถึงรูปภาพในการตั้งค่า แล้วลองบันทึกอีกครั้ง';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'อุปกรณ์นี้ไม่รองรับการบันทึกลงในคลังรูปภาพ';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'อุปกรณ์ของคุณจำกัดการเข้าถึงรูปภาพ';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      'เปิดการตั้งค่าไม่ได้ โปรดเปิดการตั้งค่าของอุปกรณ์เพื่ออนุญาตให้เข้าถึงรูปภาพ';
 }

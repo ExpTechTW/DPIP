@@ -3715,4 +3715,92 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Computed with the JMA instrumental intensity method used by ES-Net';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => 'Maximum intensity';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return 'Maximum intensity $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations, maximum intensity $intensity',
+      one: '1 observation, intensity $intensity',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      'This report cannot fit in a Story. Choose 4:5 or open Details.';
+
+  @override
+  String get reportDetailStoryLegendCount => 'Badge: observation count';
+
+  @override
+  String get reportDetailStoryLegendIntensity =>
+      'Icon: group maximum intensity';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count observations, group maximum intensity $intensity, representative observation location $location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location, intensity $intensity, one observation';
+  }
+
+  @override
+  String get reportDetailSharePreview => 'Preview share card';
+
+  @override
+  String get reportDetailShareRichterScale => 'Richter scale';
+
+  @override
+  String get reportDetailShareObservedIntensity => 'Observed intensity';
+
+  @override
+  String get reportDetailShareKilometers => 'km';
+
+  @override
+  String get reportDetailShareSource =>
+      'Source: Taiwan Central Weather Administration (MOTC)';
+
+  @override
+  String get reportDetailSharePreparedBy => 'Prepared by DPIP';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source\nBasemap: ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid =>
+      'This image format cannot be displayed.';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Allow photo access in Settings, then try saving again.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Saving to photos is unavailable on this device.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Your device restricts access to photos.';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      'Could not open Settings. Open your device settings to allow photo access.';
 }

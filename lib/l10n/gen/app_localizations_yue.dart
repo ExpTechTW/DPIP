@@ -3618,4 +3618,79 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => '用 ES-Net 嗰套 JMA 計測震度演算法計';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '最大震度';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '最大震度 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count 筆觀測，組內最大震度 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      '呢份報告放唔入 Story。請揀 4:5 或開啟詳細資訊。';
+
+  @override
+  String get reportDetailStoryLegendCount => '數字徽章：觀測筆數';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '震度圖示：組內最大震度';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count 筆觀測，組內最大震度 $intensity，代表觀測地點係$location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location，震度 $intensity，一筆觀測';
+  }
+
+  @override
+  String get reportDetailSharePreview => '預覽分享卡';
+
+  @override
+  String get reportDetailShareRichterScale => '黎克特制';
+
+  @override
+  String get reportDetailShareObservedIntensity => '觀測烈度';
+
+  @override
+  String get reportDetailShareKilometers => '公里';
+
+  @override
+  String get reportDetailShareSource => '資料來源：台灣交通部中央氣象署';
+
+  @override
+  String get reportDetailSharePreparedBy => '由 DPIP 整理';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source｜底圖：ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => '顯示唔到呢種圖片格式。';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請喺設定允許取用相片，再試儲存。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '呢部裝置唔支援儲存到相簿。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '裝置限制咗相片存取權限。';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed => '開唔到設定。請開啟裝置設定，允許取用相片。';
 }

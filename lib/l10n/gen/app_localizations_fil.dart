@@ -3738,4 +3738,86 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => 'Pinakamataas na lakas';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return 'Pinakamataas na lakas $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count obserbasyon, pinakamataas na lakas $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      'Hindi magkasya ang ulat sa Story. Piliin ang 4:5 o buksan ang Mga Detalye.';
+
+  @override
+  String get reportDetailStoryLegendCount => 'Badge: bilang ng obserbasyon';
+
+  @override
+  String get reportDetailStoryLegendIntensity =>
+      'Icon: sukdulang tindi sa grupo';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count obserbasyon, pinakamataas na tindi sa grupo $intensity, kinatawang lokasyon ng obserbasyon $location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location, tindi $intensity, isang obserbasyon';
+  }
+
+  @override
+  String get reportDetailSharePreview => 'I-preview ang kard na ibabahagi';
+
+  @override
+  String get reportDetailShareRichterScale => 'Iskalang Richter';
+
+  @override
+  String get reportDetailShareObservedIntensity => 'Naitalang intensidad';
+
+  @override
+  String get reportDetailShareKilometers => 'km';
+
+  @override
+  String get reportDetailShareSource =>
+      'Pinagmulan: Central Weather Administration ng Taiwan (MOTC)';
+
+  @override
+  String get reportDetailSharePreparedBy => 'Inihanda ng DPIP';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source\nBatayang mapa: ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid =>
+      'Hindi maipakita ang format ng larawang ito.';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Payagan ang access sa mga larawan sa Mga Setting, saka subukang mag-save muli.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Hindi puwedeng mag-save sa mga larawan sa device na ito.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Nililimitahan ng device mo ang access sa mga larawan.';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      'Hindi mabuksan ang Mga Setting. Buksan ang mga setting ng device para payagan ang access sa mga larawan.';
 }

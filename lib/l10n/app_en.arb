@@ -4492,5 +4492,110 @@
   "seismometerAlgorithm": "Computed with the JMA instrumental intensity method used by ES-Net",
   "@seismometerAlgorithm": {
     "description": "Names the JMA instrumental-intensity method used to compute the reading"
+  },
+  "reportDetailMaximumIntensityLabel": "Maximum intensity",
+  "reportDetailMaximumIntensity": "Maximum intensity {intensity}",
+  "reportDetailStoryObservations": "{count, plural, one{1 observation, intensity {intensity}} other{{count} observations, maximum intensity {intensity}}}",
+  "reportDetailStoryLayoutUnavailable": "This report cannot fit in a Story. Choose 4:5 or open Details.",
+  "@reportDetailMaximumIntensity": {
+    "description": "Spoken or plain text label and value for observed maximum intensity.",
+    "placeholders": {
+      "intensity": {
+        "type": "String"
+      }
+    }
+  },
+  "@reportDetailStoryObservations": {
+    "description": "Accessible label for one Story marker, with the number of observations and its highest observed intensity.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "intensity": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailStoryLegendCount": "Badge: observation count",
+  "reportDetailStoryLegendIntensity": "Icon: group maximum intensity",
+  "reportDetailStoryObservationGroup": "{count} observations, group maximum intensity {intensity}, representative observation location {location}",
+  "reportDetailStorySingleObservation": "{location}, intensity {intensity}, one observation",
+  "@reportDetailStoryObservationGroup": {
+    "description": "Spoken label for a Story cluster. Count is the number of source observation records. Location is the representative observation location.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "intensity": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "@reportDetailStorySingleObservation": {
+    "description": "Spoken label for a single Story observation.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      },
+      "intensity": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailSharePreview": "Preview share card",
+  "@reportDetailSharePreview": {
+    "description": "Button in the earthquake report detail that opens the sharing preview."
+  },
+  "reportDetailShareRichterScale": "Richter scale",
+  "@reportDetailShareRichterScale": {
+    "description": "Caption below the magnitude value in the 4:5 artwork."
+  },
+  "reportDetailShareObservedIntensity": "Observed intensity",
+  "@reportDetailShareObservedIntensity": {
+    "description": "Caption below the maximum intensity in the 4:5 artwork."
+  },
+  "reportDetailShareKilometers": "km",
+  "@reportDetailShareKilometers": {
+    "description": "Unit under the focal depth in the 4:5 artwork."
+  },
+  "reportDetailShareSource": "Source: Taiwan Central Weather Administration (MOTC)",
+  "@reportDetailShareSource": {
+    "description": "Attribution for CWA earthquake data in both artworks. Preserve the agency identity."
+  },
+  "reportDetailSharePreparedBy": "Prepared by DPIP",
+  "@reportDetailSharePreparedBy": {
+    "description": "Credit for DPIP preparing the earthquake artwork."
+  },
+  "reportDetailStoryAttribution": "{source}\nBasemap: ExpTech Studio",
+  "@reportDetailStoryAttribution": {
+    "description": "Story artwork credits. The source placeholder is the localized earthquake data attribution. Preserve ExpTech Studio.",
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailShareImageInvalid": "This image format cannot be displayed.",
+  "@reportDetailShareImageInvalid": {
+    "description": "The app retrieved the official report image but cannot display its format."
+  },
+  "reportDetailImageSaveSettingsRequired": "Allow photo access in Settings, then try saving again.",
+  "@reportDetailImageSaveSettingsRequired": {
+    "description": "A gallery permission must be enabled in system settings before retrying."
+  },
+  "reportDetailImageSaveUnavailable": "Saving to photos is unavailable on this device.",
+  "@reportDetailImageSaveUnavailable": {
+    "description": "The platform does not offer gallery saving."
+  },
+  "reportDetailImageSaveRestricted": "Your device restricts access to photos.",
+  "@reportDetailImageSaveRestricted": {
+    "description": "OS restrictions prevent access to the gallery without an app-level recovery."
+  },
+  "reportDetailImageSaveSettingsFailed": "Could not open Settings. Open your device settings to allow photo access.",
+  "@reportDetailImageSaveSettingsFailed": {
+    "description": "The app could not navigate to system settings."
   }
 }

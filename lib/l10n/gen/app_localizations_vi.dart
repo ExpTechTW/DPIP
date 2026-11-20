@@ -3718,4 +3718,86 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => 'Cường độ tối đa';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return 'Cường độ tối đa $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count quan sát, cường độ tối đa trong nhóm $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      'Báo cáo này không vừa với Story. Hãy chọn 4:5 hoặc mở Chi tiết.';
+
+  @override
+  String get reportDetailStoryLegendCount => 'Huy hiệu: số lượt quan sát';
+
+  @override
+  String get reportDetailStoryLegendIntensity =>
+      'Biểu tượng: cường độ đỉnh nhóm';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count lượt quan sát, cường độ cao nhất trong nhóm $intensity, địa điểm quan sát đại diện là $location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location, cường độ $intensity, một lượt quan sát';
+  }
+
+  @override
+  String get reportDetailSharePreview => 'Xem trước thẻ chia sẻ';
+
+  @override
+  String get reportDetailShareRichterScale => 'Thang Richter';
+
+  @override
+  String get reportDetailShareObservedIntensity => 'Cường độ quan trắc';
+
+  @override
+  String get reportDetailShareKilometers => 'km';
+
+  @override
+  String get reportDetailShareSource =>
+      'Nguồn: Cơ quan Khí tượng Trung ương Đài Loan (MOTC)';
+
+  @override
+  String get reportDetailSharePreparedBy => 'Do DPIP tổng hợp';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source\nBản đồ nền: ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid =>
+      'Không thể hiển thị định dạng ảnh này.';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Cho phép truy cập ảnh trong Cài đặt rồi thử lưu lại.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Thiết bị này không hỗ trợ lưu vào thư viện ảnh.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Thiết bị của bạn hạn chế quyền truy cập ảnh.';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      'Không thể mở Cài đặt. Hãy mở cài đặt thiết bị để cho phép truy cập ảnh.';
 }

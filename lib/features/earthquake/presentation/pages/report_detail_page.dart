@@ -10,6 +10,7 @@ import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -25,6 +26,8 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_dialog.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -652,6 +655,14 @@ class _ReportSheetState extends State<_ReportSheet> {
     );
   }
 
+  void _expand() {
+    _dragController.animateTo(
+      _ReportSheet._expanded,
+      duration: AppMotion.medium,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -738,17 +749,29 @@ class _ReportSheetState extends State<_ReportSheet> {
                                 children: [
                                   Opacity(
                                     opacity: revealProgress,
-                                    child: IgnorePointer(
-                                      ignoring: !expanded,
-                                      child: expandedContent,
+                                    child: ExcludeSemantics(
+                                      excluding: !expanded,
+                                      child: IgnorePointer(
+                                        ignoring: !expanded,
+                                        child: expandedContent,
+                                      ),
                                     ),
                                   ),
                                   if (peekOpacity > 0)
                                     Opacity(
                                       opacity: peekOpacity,
-                                      child: IgnorePointer(
-                                        ignoring: expanded,
-                                        child: peekContent,
+                                      child: ExcludeSemantics(
+                                        excluding: expanded,
+                                        child: IgnorePointer(
+                                          ignoring: expanded,
+                                          child: Semantics(
+                                            container: true,
+                                            explicitChildNodes: true,
+                                            expanded: false,
+                                            onExpand: _expand,
+                                            child: peekContent,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                 ],
@@ -773,12 +796,29 @@ class _ReportSheetState extends State<_ReportSheet> {
 
   Widget _expandedContent(BuildContext context, EarthquakeReport report) {
     final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ReportHeader(report: report),
+          const SizedBox(height: AppSpacing.lg),
+
+          OutlinedButton.icon(
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (_) => EarthquakeShareDialog(
+                report: report,
+                saver: widget.saver,
+                isReportCurrent: () =>
+                    mounted && identical(widget.report, report),
+              ),
+            ),
+            icon: const Icon(Icons.visibility_outlined),
+            label: Text(l10n.reportDetailSharePreview),
+          ),
+
           const SizedBox(height: AppSpacing.lg),
           SectionHeader(l10n.reportDetailInfo),
           _ReportInfoCard(report: report),
@@ -829,7 +869,11 @@ class _ExpandedHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          IconButton(icon: const Icon(Icons.arrow_back), onPressed: onBack),
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: onBack,
+          ),
           Expanded(
             child: Text(
               l10n.reportDetailTitle,
@@ -904,10 +948,15 @@ class _ReportPeekSummary extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            IntensityBadge(
-              label: presentation.label,
-              color: IntensityColors.discrete(presentation.colorLevel),
-              size: 56,
+            Semantics(
+              label: l10n.reportDetailMaximumIntensity(presentation.label),
+              excludeSemantics: true,
+              child: IntensityBadge(
+                label: presentation.label,
+                color: IntensityColors.discrete(presentation.colorLevel),
+                size: 56,
+                expandForText: true,
+              ),
             ),
           ],
         ),
@@ -991,10 +1040,15 @@ class _ReportHeader extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            IntensityBadge(
-              label: presentation.label,
-              color: IntensityColors.discrete(presentation.colorLevel),
-              size: 56,
+            Semantics(
+              label: l10n.reportDetailMaximumIntensity(presentation.label),
+              excludeSemantics: true,
+              child: IntensityBadge(
+                label: presentation.label,
+                color: IntensityColors.discrete(presentation.colorLevel),
+                size: 56,
+                expandForText: true,
+              ),
             ),
             const SizedBox(width: AppSpacing.lg),
             Expanded(
@@ -1129,7 +1183,10 @@ class _InfoRow extends StatelessWidget {
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.md,
       ),
-      child: Row(
+      child: OverflowBar(
+        alignment: MainAxisAlignment.spaceBetween,
+        spacing: AppSpacing.sm,
+        overflowSpacing: AppSpacing.xs,
         children: [
           Text(
             label,
@@ -1137,17 +1194,23 @@ class _InfoRow extends StatelessWidget {
               color: colors.onSurfaceVariant,
             ),
           ),
-          const Spacer(),
-          if (dotColor != null) ...[
-            LegendDot(color: dotColor!),
-            const SizedBox(width: AppSpacing.sm),
-          ],
-          Text(
-            value,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (dotColor != null) ...[
+                LegendDot(color: dotColor!),
+                const SizedBox(width: AppSpacing.sm),
+              ],
+              Flexible(
+                child: Text(
+                  value,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1330,12 +1393,15 @@ class _LocalIntensityRow extends StatelessWidget {
               label: result.presentation.label,
               color: IntensityColors.discrete(result.presentation.colorLevel),
               size: 36,
+              expandForText: true,
             )
           else
-            Text(
-              l10n.reportDetailLocalIntensityUnavailable,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
+            Flexible(
+              child: Text(
+                l10n.reportDetailLocalIntensityUnavailable,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
             ),
         ],
@@ -1457,7 +1523,12 @@ class _IntensityGroupRow extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
-            child: IntensityBadge(label: label, color: color, size: 40),
+            child: IntensityBadge(
+              label: label,
+              color: color,
+              size: 40,
+              expandForText: true,
+            ),
           ),
           Expanded(
             child: Column(
@@ -1652,15 +1723,16 @@ class _TownChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 20,
-            height: 20,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: AppRadius.small,
               ),
-              child: Center(
+              child: Align(
+                widthFactor: 1,
+                heightFactor: 1,
                 child: Text(
                   label,
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -1677,7 +1749,7 @@ class _TownChip extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.xs),
-          Text(townName, style: theme.textTheme.labelLarge),
+          Flexible(child: Text(townName, style: theme.textTheme.labelLarge)),
         ],
       ),
     );
@@ -1727,41 +1799,57 @@ class _ReportImageCardState extends State<_ReportImageCard> {
 
   Future<void> _save(Uint8List bytes) async {
     if (_saving) return;
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     setState(() => _saving = true);
 
-    final result = await widget.saver.saveToGallery(
-      bytes: bytes,
-      fileName: _fileName,
-    );
+    ImageSaveFailureReason? reason;
+    try {
+      final result = await widget.saver.saveToGallery(
+        bytes: bytes,
+        fileName: _fileName,
+      );
+      if (result case Err(:final failure)) {
+        reason = imageSaveFailureReason(failure);
+      }
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'Saving the official report image failed');
+      reason = ImageSaveFailureReason.failed;
+    }
     if (!mounted) return;
     setState(() => _saving = false);
 
     final l10n = AppLocalizations.of(context);
-    final refused =
-        result.failureOrNull is ImageSaveFailure &&
-        (result.failureOrNull! as ImageSaveFailure).reason ==
-            ImageSaveFailureReason.permissionDenied;
-    final message = result.when(
-      ok: (_) => l10n.reportDetailImageSaved,
-      // A refusal is not "try again": the only way forward is Settings, so the
-      // two failures must not share a sentence — nor the same snackbar.
-      err: (_) => refused
-          ? l10n.reportDetailImageSavePermissionDenied
-          : l10n.reportDetailImageSaveFailed,
+    _showSaveMessage(
+      reason?.message(l10n) ?? l10n.reportDetailImageSaved,
+      action: switch (reason) {
+        ImageSaveFailureReason.permissionSettingsRequired => SnackBarAction(
+          label: l10n.permissionOpenSettings,
+          onPressed: _openSettings,
+        ),
+        ImageSaveFailureReason.permissionDenied ||
+        ImageSaveFailureReason.failed => SnackBarAction(
+          label: l10n.commonRetry,
+          onPressed: () => _save(bytes),
+        ),
+        _ => null,
+      },
     );
+  }
+
+  Future<void> _openSettings() async {
+    if (!mounted) return;
+    final opened = await openAppSettingsPage();
+    if (!opened && mounted) {
+      _showSaveMessage(
+        AppLocalizations.of(context).reportDetailImageSaveSettingsFailed,
+      );
+    }
+  }
+
+  void _showSaveMessage(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          action: refused
-              ? SnackBarAction(
-                  label: l10n.permissionOpenSettings,
-                  onPressed: openAppSettingsPage,
-                )
-              : null,
-        ),
-      );
+      ..showSnackBar(SnackBar(content: Text(message), action: action));
   }
 
   @override

@@ -25,6 +25,7 @@ class IntensityBadge extends StatelessWidget {
     required this.color,
     this.size = 48,
     this.outlined = false,
+    this.expandForText = false,
   });
 
   /// Text drawn on the badge (see [Intensity.displayForReport]).
@@ -34,11 +35,14 @@ class IntensityBadge extends StatelessWidget {
   /// must already be colour-vision corrected at its own definition.
   final Color color;
 
-  /// Edge length of the square badge.
+  /// Edge length of the square badge at its default size.
   final double size;
 
   /// Hollow-ring form (border only, no fill) — see the class doc.
   final bool outlined;
+
+  /// Allows text in a scrollable report to grow beyond the default bounds.
+  final bool expandForText;
 
   @override
   Widget build(BuildContext context) {
@@ -57,26 +61,31 @@ class IntensityBadge extends StatelessWidget {
             borderRadius: AppRadius.small,
           )
         : BoxDecoration(color: color, borderRadius: AppRadius.small);
+    final text = Text(
+      label,
+      style: titleLarge?.copyWith(
+        // The hollow ring sits on the surface, so use the surface's text color.
+        color: outlined ? null : onBadge,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        fontSize: fontSize,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+    );
     return DecoratedBox(
       decoration: decoration,
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: Center(
-          child: Text(
-            label,
-            style: titleLarge?.copyWith(
-              // The hollow ring sits on the surface — its label must read in
-              // the surface's own text colour, not guess from the ring colour.
-              color: outlined ? null : onBadge,
-              fontWeight: FontWeight.w900,
-              height: 1,
-              fontSize: fontSize,
-              fontFeatures: const [FontFeature.tabularFigures()],
+      child: expandForText
+          ? ConstrainedBox(
+              constraints: BoxConstraints(minWidth: size, minHeight: size),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Center(widthFactor: 1, heightFactor: 1, child: text),
+              ),
+            )
+          : SizedBox.square(
+              dimension: size,
+              child: Center(child: text),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
