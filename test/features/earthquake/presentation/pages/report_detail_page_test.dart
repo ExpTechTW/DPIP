@@ -107,6 +107,18 @@ class _MapPlatform extends MapLibrePlatform {
   Future<void> setRenderPaused(bool paused) async {}
 
   @override
+  Future<CameraPosition?> updateMapOptions(
+    Map<String, dynamic> optionsUpdate,
+  ) async {
+    if (!optionsUpdate.containsKey('styleString')) return null;
+    // A new style does not retain runtime images or sources.
+    calls.clear();
+    sources.clear();
+    emitStyle();
+    return null;
+  }
+
+  @override
   Future<void> addSource(String sourceId, SourceProperties properties) async {
     calls.add('addSource:$sourceId');
     final data = properties.toJson()['data'];
@@ -510,6 +522,48 @@ void main() {
     );
   });
 
+  testWidgets('switching map themes restores intensity and epicentre icons', (
+    tester,
+  ) async {
+    final reports = _Reports()..next = Ok(_report());
+    final settings = SettingsStore.inMemory();
+    final regions = RegionStore(settings);
+    final client = _BytesClient(RegionSelection(settings));
+    final router = nestedRouter(reports);
+
+    Future<void> applyTheme(ThemeData theme) => pumpPage(
+      tester,
+      reports: reports,
+      client: client,
+      settings: settings,
+      regions: regions,
+      towns: const TownDirectory({}),
+      router: router,
+      theme: theme,
+    );
+
+    await applyTheme(ThemeData.light());
+    await settleStyle(tester);
+    final map = find.byType(MapLibreMap);
+    final lightStyle = tester.widget<MapLibreMap>(map).styleString;
+    expect(platform.calls, contains('image:intensity-4-dark'));
+
+    await applyTheme(ThemeData.dark());
+    await tester.pumpAndSettle();
+    expect(tester.widget<MapLibreMap>(map).styleString, isNot(lightStyle));
+    await settleStyle(tester);
+
+    expect(platform.calls, containsAll(['image:intensity-4', 'image:cross']));
+    final source = platform.sources['report-detail-src']!;
+    final features = source['features'] as List<Map<String, dynamic>>;
+    expect(features.map((feature) => (feature['properties'] as Map)['icon']), [
+      'intensity-4',
+      'intensity-4',
+      'intensity-6',
+      'cross',
+    ]);
+  });
+
   testWidgets('the loaded sheet sorts, opens links, and frames the map', (
     tester,
   ) async {
@@ -645,6 +699,11 @@ void main() {
       lessThan(tester.getTopLeft(find.text('頭城鎮')).dx),
     );
 
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Report page')),
+      alignment: 0.5,
+    );
+    await tester.pump();
     await tester.tap(find.text('Report page'));
     await tester.pump();
     expect(launcher.launched.single, contains('scweb.cwa.gov.tw'));
