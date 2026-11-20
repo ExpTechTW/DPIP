@@ -185,7 +185,7 @@ jobs:
           diagnostics="$RUNNER_TEMP/ios-test-diagnostics"
           bash tool/dev/test_ios.sh \
             -parallel-testing-enabled NO \
-            -derivedDataPath "$RUNNER_TEMP/RunnerTests-DerivedData" \
+            -derivedDataPath "$RUNNER_TEMP/iOS-DerivedData" \
             -resultBundlePath "$diagnostics/RunnerTests.xcresult" \
             2>&1 | tee "$diagnostics/RunnerTests.log" || {
               codes=("${PIPESTATUS[@]}")
@@ -205,7 +205,7 @@ jobs:
           diagnostics="$RUNNER_TEMP/ios-test-diagnostics"
           bash tool/dev/test_widget_ui.sh \
             -parallel-testing-enabled NO \
-            -derivedDataPath "$RUNNER_TEMP/WidgetFixtureUITests-DerivedData" \
+            -derivedDataPath "$RUNNER_TEMP/iOS-DerivedData" \
             -clonedSourcePackagesDirPath build/ios/SourcePackages \
             -resultBundlePath "$diagnostics/WidgetFixtureUITests.xcresult" \
             2>&1 | tee "$diagnostics/WidgetFixtureUITests.log" || {

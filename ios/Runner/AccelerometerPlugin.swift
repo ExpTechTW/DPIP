@@ -23,7 +23,7 @@ import Foundation
 /// cannot start, `onListen` returns `FlutterError` code `unavailable`.
 public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   /// 1 g = 9.80665 m/s² = 980.665 gal.
-  private static let galsPerG = 980.665
+  private static let galsPerG = 980.665 
   private static let sampleInterval: TimeInterval = 0.02
   private static let flushInterval: TimeInterval = 0.1
 
