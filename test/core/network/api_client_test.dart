@@ -512,6 +512,34 @@ void main() {
       ]);
     });
 
+    test('a basemap 404 is final: every LB host has the same tiles', () async {
+      final adapter = _FakeAdapter((_, _) => tile(404));
+      await expectLater(
+        () => clientWith(adapter).getTileBytes(
+          'https://static.lb-tpe1.exptech.dev/api/v1/map/tiles/9/400/200.pbf',
+        ),
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.response?.statusCode,
+            'status',
+            404,
+          ),
+        ),
+      );
+      expect(adapter.hits, ['static.lb-tpe1.exptech.dev']);
+    });
+
+    test('a basemap tile fails over on a retryable error', () async {
+      final adapter = _FakeAdapter((call, _) => tile(call == 1 ? 503 : 200));
+      await clientWith(adapter).getTileBytes(
+        'https://static.lb-tpe1.exptech.dev/api/v1/map/tiles/9/400/200.pbf',
+      );
+      expect(adapter.hits, [
+        'static.lb-tpe1.exptech.dev',
+        'static.lb-khh1.exptech.dev',
+      ]);
+    });
+
     test('a family only tnn1 carries is one request', () async {
       final adapter = _FakeAdapter((_, _) => tile(503));
       await expectLater(

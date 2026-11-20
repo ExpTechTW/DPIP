@@ -5,6 +5,8 @@ import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/platform/render_tier.dart';
+import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/shared/map/map_connectivity.dart';
 import 'package:dpip/shared/map/map_frame_cap.dart';
 import 'package:dpip/shared/map/map_style.dart';
@@ -503,23 +505,25 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     });
   }
 
-  /// Style string memoised per palette — all other inputs are const, and
-  /// Every [build] used to re-interpolate the full style JSON — the string only
-  /// varies by palette, town-label directory, and terrain presence, so it is
-  /// memoised on that tuple.
-  static final Map<(MapPalette, String, bool), String> _styleCache = {};
+  /// Style string memoised per palette — the town-label directory, terrain
+  /// presence and the pinned LB region are the other inputs. Every [build] used
+  /// to re-interpolate the full style JSON — the string only varies by that
+  /// tuple, so it is memoised on it.
+  static final Map<(MapPalette, String, bool, LbRegion), String> _styleCache =
+      {};
 
   static String _styleString(
     MapPalette palette,
     String townLabelData,
     bool includeTerrain,
+    LbRegion region,
   ) => _styleCache.putIfAbsent(
-    (palette, townLabelData, includeTerrain),
+    (palette, townLabelData, includeTerrain, region),
     () => exptechVectorStyle(
       palette,
-      basemapTileUrl: basemapOriginTileUrl,
+      basemapTileUrl: basemapOriginTileUrl(region),
       glyphsUrl: glyphsOriginUrl,
-      terrainTileUrl: includeTerrain ? terrainOriginTileUrl : null,
+      terrainTileUrl: includeTerrain ? terrainOriginTileUrl(region) : null,
       townLabelData: townLabelData,
     ),
   );
@@ -528,6 +532,10 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final mountAttempt = _mountAttempt;
     final brightness = Theme.of(context).brightness;
+    // The basemap's own copy comes from the LB region the user picked, pinned by
+    // host rather than left to the bare CDN's balance (see [staticLbOrigin]).
+    // `watch`, so a region change reloads the style onto the other host.
+    final lbRegion = context.watch<RegionSelection>().lb;
     final palette =
         brightness == Brightness.light && widget.lightPalette != null
         ? widget.lightPalette!
@@ -560,6 +568,7 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
         palette,
         townLabelGeoJson(context.read<TownDirectory>()),
         widget.includeTerrainInStyle,
+        lbRegion,
       ),
       // A remount gets a fresh id, so a collided first attempt recovers (see
       // [_scheduleReadinessRetry]).

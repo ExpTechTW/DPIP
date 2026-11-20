@@ -12,6 +12,7 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
@@ -208,6 +209,10 @@ Widget _host({
         Provider<Future<TownBoundaries>>.value(value: boundaries),
         Provider<RadarRepository>.value(value: radar),
         Provider<TownDirectory>.value(value: const TownDirectory({})),
+        // The basemap host is pinned to the selected LB region.
+        ChangeNotifierProvider<RegionSelection>.value(
+          value: RegionSelection(SettingsStore.inMemory(const {})),
+        ),
       ],
       child: child,
     ),
@@ -311,6 +316,7 @@ class _Platform extends MapLibrePlatform {
   bool throwMove = false;
   bool includeLocation = false;
   int moves = 0;
+  bool _viewCreated = false;
   Completer<void>? gate;
 
   @override
@@ -324,7 +330,14 @@ class _Platform extends MapLibrePlatform {
     OnPlatformViewCreatedCallback onPlatformViewCreated,
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
   ) {
-    onPlatformViewCreated(1);
+    // A native view is created once; a widget rebuild does not create another.
+    // The map subtree does rebuild here (its style string now depends on the
+    // selected LB region), and calling this per build would complete the map's
+    // ready future twice.
+    if (!_viewCreated) {
+      _viewCreated = true;
+      onPlatformViewCreated(1);
+    }
     return const SizedBox.shrink();
   }
 

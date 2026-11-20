@@ -4,6 +4,7 @@
 library;
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
 import 'package:dpip/shared/map/map_style.dart';
 import 'package:material_ui/material_ui.dart' show Brightness;
@@ -12,14 +13,15 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 /// Runtime DEM source — identical to what the baked style declares (see
 /// [exptechVectorStyle]), so a surface can rebuild the relief after removing
 /// it, with no drift between the two descriptions.
-const RasterDemSourceProperties terrainSourceProps = RasterDemSourceProperties(
-  tiles: [terrainOriginTileUrl],
-  bounds: [110.0, 10.0, 132.0, 35.0],
-  minzoom: 0,
-  maxzoom: terrainSourceMaxZoom,
-  tileSize: 512,
-  encoding: 'mapbox',
-);
+RasterDemSourceProperties terrainSourceProps(LbRegion region) =>
+    RasterDemSourceProperties(
+      tiles: [terrainOriginTileUrl(region)],
+      bounds: [110.0, 10.0, 132.0, 35.0],
+      minzoom: 0,
+      maxzoom: terrainSourceMaxZoom,
+      tileSize: 512,
+      encoding: 'mapbox',
+    );
 
 /// Runtime hillshade layer — same id, same paint as the baked style.
 const HillshadeLayerProperties terrainLayerProps = HillshadeLayerProperties(
@@ -60,6 +62,7 @@ class BasemapOverlaySync {
     required bool Function() showTerrain,
     required GsiOverlayController gsi,
     required Brightness brightness,
+    required LbRegion region,
     required bool Function() stillCurrent,
   }) async {
     while (stillCurrent()) {
@@ -84,7 +87,10 @@ class BasemapOverlaySync {
         }
 
         if (effectiveTerrain && !_terrainOnMap) {
-          await controller.addSource(terrainSourceId, terrainSourceProps);
+          await controller.addSource(
+            terrainSourceId,
+            terrainSourceProps(region),
+          );
           if (!stillCurrent()) return;
           await controller.addHillshadeLayer(
             terrainSourceId,
@@ -101,6 +107,7 @@ class BasemapOverlaySync {
             selection: gsi,
             belowLayerId: townOutlineLayerId,
             groundBelowLayerId: townFillLayerId,
+            region: region,
           );
           if (!stillCurrent()) return;
           _gsiOnMap = true;

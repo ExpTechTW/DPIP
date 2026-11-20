@@ -30,7 +30,8 @@ final class _TileFamily {
   /// returns, in any order.
   final List<String> origins;
 
-  /// The origin a tile of this family is cached under.
+  /// The origin a tile of this family is cached under. It need not be one of
+  /// [origins]: a key is never requested.
   final String keyOrigin;
 
   /// The tier `ApiClient` fails over along for this family.
@@ -82,7 +83,34 @@ final _TileFamily _coreStatic = _TileFamily(
   notFoundFailsOver: true,
 );
 
-final List<_TileFamily> _families = [_coreStatic];
+/// The bare LB static origin: what [tileCacheKey] stores the basemap, OSM and
+/// terrain under. Nothing requests it.
+const String lbStaticKeyOrigin = 'https://static.lb.exptech.dev';
+
+/// LB static: basemap, OSM and terrain, the same dataset on every LB region —
+/// so a 404 (open sea, outside the data) is the answer on every host, and
+/// never worth a second request.
+///
+/// Cached under the bare `static.lb.exptech.dev` — exactly the URL every
+/// basemap row was stored under before the style named a region, and the one
+/// the bundled seed is planted under, so neither an installed cache nor the
+/// seed has to move, and switching LB region re-downloads nothing.
+final _TileFamily _lbStatic = _TileFamily(
+  origins: [
+    for (final region in LbRegion.values)
+      'https://static.lb-${region.code}.exptech.dev',
+  ],
+  keyOrigin: lbStaticKeyOrigin,
+  tier: ApiTier.lbStatic,
+  replicatedPaths: const [
+    ApiPaths.mapTilesV1,
+    ApiPaths.mapOsmV1,
+    ApiPaths.mapTerrainV1,
+  ],
+  notFoundFailsOver: false,
+);
+
+final List<_TileFamily> _families = [_lbStatic, _coreStatic];
 
 /// The origin of [family] that [url] is under, or null.
 String? _originOf(_TileFamily family, String url) {

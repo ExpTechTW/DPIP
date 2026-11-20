@@ -20,6 +20,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/models/lat_lng.dart' as geo;
 import 'package:dpip/core/platform/render_tier.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -892,12 +893,16 @@ class _ReplayMapState extends State<_ReplayMap> {
     final controller = _controller;
     if (!mounted || controller == null || !_styleLoaded) return;
     final brightness = Theme.of(context).brightness;
+    // Pinned to the LB region the user picked, so the OSM/DEM copies come from
+    // the same host as the basemap style (see [staticLbOrigin]).
+    final region = context.read<RegionSelection>().lb;
     _syncChain = _syncChain.then(
       (_) => _basemapSync.sync(
         controller,
         showTerrain: () => _showTerrain.value,
         gsi: _gsi,
         brightness: brightness,
+        region: region,
         stillCurrent: () =>
             mounted && identical(controller, _controller) && _styleLoaded,
       ),

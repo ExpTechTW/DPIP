@@ -1252,6 +1252,19 @@ void main() {
       ]);
     });
 
+    test('the region host the style names finds the row planted under the '
+        'bare host', () async {
+      const pinned =
+          'https://static.lb-khh1.exptech.dev/api/v1/map/tiles/7/107/55.pbf';
+      await plant(url, [1, 2, 3]);
+      await withNetwork(offline);
+
+      final reply = await demand([pinned]);
+
+      expect(fetched, [pinned], reason: 'the network is still asked first');
+      expect(dataOf(reply, pinned), [1, 2, 3]);
+    });
+
     test('a demand waits for planting that is still running', () async {
       final planting = Completer<void>();
       final planted = await withNetwork(offline);

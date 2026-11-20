@@ -1,4 +1,6 @@
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/base_map.dart';
 import 'package:dpip/shared/navigation/refresh_on_appear.dart';
 import 'package:flutter/foundation.dart';
@@ -61,10 +63,19 @@ void main() {
   Future<void> pump(WidgetTester tester, Widget child) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: Provider<TownDirectory>.value(
-          // The style string needs a (empty) directory for its town labels —
-          // a real one is the app bootstrap's job.
-          value: TownDirectory.fromJson(const {}),
+        home: MultiProvider(
+          providers: [
+            Provider<TownDirectory>.value(
+              // The style string needs a (empty) directory for its town labels —
+              // a real one is the app bootstrap's job.
+              value: TownDirectory.fromJson(const {}),
+            ),
+            // The basemap host is pinned to the selected LB region (see
+            // [staticLbOrigin]), so the map needs a selection to read.
+            ChangeNotifierProvider<RegionSelection>.value(
+              value: RegionSelection(SettingsStore.inMemory(const {})),
+            ),
+          ],
           child: child,
         ),
       ),

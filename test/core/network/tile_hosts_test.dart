@@ -33,6 +33,25 @@ void main() {
       }
     });
 
+    test('keys every LB region on the bare host installed caches use', () {
+      for (final path in [
+        '/api/v1/map/tiles/7/107/55.pbf',
+        '/api/v1/map/gsi/14/13703/7034.pbf',
+        '/api/v1/map/terrain/7/107/55.png',
+      ]) {
+        for (final region in LbRegion.values) {
+          expect(
+            tileCacheKey('https://static.lb-${region.code}.exptech.dev$path'),
+            '$lbStaticKeyOrigin$path',
+          );
+        }
+        expect(
+          tileCacheKey('$lbStaticKeyOrigin$path'),
+          '$lbStaticKeyOrigin$path',
+        );
+      }
+    });
+
     test('leaves every other URL as its own key', () {
       for (final url in [
         'https://api.core-tyo1.exptech.dev/api/v2/tiles/radar/list',
@@ -60,6 +79,22 @@ void main() {
       }
     });
 
+    test('routes the basemap, OSM and terrain along lbStatic', () {
+      const path = '/api/v1/map/tiles/7/107/55.pbf';
+      for (final region in LbRegion.values) {
+        expect(tileRoute('https://static.lb-${region.code}.exptech.dev$path'), (
+          tier: ApiTier.lbStatic,
+          path: path,
+          notFoundFailsOver: false,
+        ));
+      }
+      expect(
+        tileRoute('$lbStaticKeyOrigin$path'),
+        isNull,
+        reason: 'the bare host is a key, never a request',
+      );
+    });
+
     test('has no route for a family only tnn1 carries', () {
       for (final path in [satellitePath, windPath]) {
         expect(tileRoute('$tnn1$path'), isNull);
@@ -83,6 +118,16 @@ void main() {
         regions.core = core;
         for (final origin in client.hostsFor(ApiTier.coreStatic)) {
           expect(tileRoute('$origin$radarPath')?.tier, ApiTier.coreStatic);
+        }
+      }
+      for (final lb in LbRegion.values) {
+        regions.lb = lb;
+        expect(client.hostsFor(ApiTier.lbStatic).first, staticLbOrigin(lb));
+        for (final origin in client.hostsFor(ApiTier.lbStatic)) {
+          expect(
+            tileRoute('$origin/api/v1/map/tiles/0/0/0.pbf')?.tier,
+            ApiTier.lbStatic,
+          );
         }
       }
     });

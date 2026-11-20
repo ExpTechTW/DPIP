@@ -9,6 +9,8 @@ library;
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/tile_hosts.dart';
 import 'package:dpip/shared/map/basemap_seed.g.dart';
 import 'package:dpip/shared/map/basemap_seed_format.dart';
 import 'package:dpip/shared/map/map_style.dart';
@@ -51,14 +53,20 @@ void main() {
   });
 
   group('the committed bundle', () {
-    test('was fetched from the URL the style requests', () {
-      expect(
-        seed.source,
-        basemapOriginTileUrl,
-        reason:
-            'the tiles are stored under these URLs; a mismatch plants rows '
-            'MapLibre never asks for',
-      );
+    test('is planted where the style URL is looked up', () {
+      // The style names one LB region's host; the store looks every one of
+      // them up under its cache key. The seed is planted under its source, so
+      // that has to be the key of every region's template, or it would plant
+      // rows nothing asks for.
+      for (final region in LbRegion.values) {
+        expect(
+          tileCacheKey(basemapOriginTileUrl(region)),
+          seed.source,
+          reason:
+              'the tiles are stored under these URLs; a mismatch plants rows '
+              'MapLibre never asks for',
+        );
+      }
       expect(seed.maxZoom, basemapSourceMaxZoom.toInt());
     });
 
