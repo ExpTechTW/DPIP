@@ -301,7 +301,6 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   );
 
   MapLibreMapController? _controller;
-  bool _iconsLoaded = false;
   bool _styleLoaded = false;
 
   /// Feeds the Flutter [MapCompass] needle — camera heading, ° clockwise from
@@ -438,10 +437,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
     _styleLoaded = true;
     final dark = Theme.of(context).brightness == Brightness.dark;
     try {
-      if (!_iconsLoaded) {
-        await _loadIcons(controller);
-        _iconsLoaded = true;
-      }
+      await _loadIcons(controller);
       await controller.addSource(
         _sourceId,
         GeojsonSourceProperties(data: _geoJson(dark: dark)),
@@ -468,8 +464,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
     _frame();
   }
 
-  /// Registers every marker icon once — cheap enough (19 small PNGs) to load
-  /// eagerly rather than lazily per feature.
+  /// Registers cached marker PNGs because a style reload discards its images.
   Future<void> _loadIcons(MapLibreMapController controller) async {
     final icons = await IntensityIconRenderer.renderAll();
     for (final entry in icons.entries) {
