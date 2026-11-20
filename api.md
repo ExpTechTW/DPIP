@@ -6,9 +6,10 @@
 - **區域：** LB = `tpe1`（台北）、`khh1`（高雄）；Core = `tyo1`（東京）、
   `tnn1`（台南）。
 - **路徑前綴：** 所有路徑都是 `/api/...`。
-- **層級（Tier）：** `lbApi` = LB（多活）、`coreApi` = Core（多活）、
-  `coreExclusiveApi` = 僅 `api.core-tnn1`、`coreStaticExclusive` =
-  僅 `static.core-tnn1`、`legacyApi` = 舊 server `api-1`（逐步淘汰中）。
+- **層級（Tier）：** `lbApi` = LB（多活）、`lbStatic` = LB static（多活；
+  basemap、OSM、terrain 圖磚）、`coreApi` = Core（多活）、`coreStatic` = Core
+  static（多活）、`coreExclusiveApi` = 僅 `api.core-tnn1`、`coreStaticExclusive`
+  = 僅 `static.core-tnn1`、`legacyApi` = 舊 server `api-1`（逐步淘汰中）。
 
 > 沒有 `lib/api/` 巨石檔：每個端點在其所屬 feature 的 `data/`（基礎設施則在
 > `core/`）裡，各自建成一個輕薄的 datasource，並帶著自己的 `ApiTier`
@@ -25,21 +26,21 @@
 > `time.apple.com`（備）—— 見 `core/realtime/ntp_time_source.dart` 與
 > `app_time.dart`（`AppTime.utc` / `AppTime.utc8`）。
 >
-> 兩台都失敗才改打 **`https://api.lb.exptech.dev/ntp`**
-> （`core/realtime/http_time_source.dart`，iOS widget 的對應實作是
-> `WidgetHTTPTimeSource.swift`），因為企業 Wi-Fi、飯店與校園網路常擋掉
-> UDP/123，而那時唯一的替代品是完全不校時。順序是精度而非偏好：SNTP 的
+> 兩台都失敗才改打 **`https://api.lb-{tpe1,khh1}.exptech.dev/ntp`**
+> （`core/realtime/http_time_source.dart`；桌面小工具的對應實作是 iOS 的
+> `WidgetHTTPTimeSource.swift` 與 Android 的 `WidgetClock.kt`），因為企業
+> Wi-Fi、飯店與校園網路常擋掉 UDP/123，而那時唯一的替代品是完全不校時。順序是精度而非偏好：SNTP 的
 > RFC 5905 交換約到毫秒，單趟 HTTPS 只到 ±RTT/2（實測 ±150 ms）。
 >
-> **這是全 repo 唯一使用 bare host 的地方。** `ApiTier` 流量刻意不用（見下方
-> 「多活備援」與 `api_region.dart`），因為區域選擇與容錯要由 App 掌握；但對時
-> 沒有區域可選，沒有東西要 pin、也沒有 per-region 容錯要保留，而 bare name 正
-> 是 Cloudflare 用**有效憑證**（`CN=*.lb.exptech.dev`，Google Trust Services）
-> 終結的那一個。
+> **它是逐台的應用層容錯，跟 `ApiTier` 無關。** 主機清單來自區域選擇
+> （`hostsFor(regions.lbOrder)`，選定區域先打），所以這條退路跟著 App 的區域
+> 走；沒有 `ApiClient` 的 tier 換台，也沒有一份會過 `EtagInterceptor` 的絕對
+> URL。以前那個 bare `api.lb.exptech.dev` 已經不用了 —— 它把選擇權交給
+> Cloudflare，而那個池子裡有慢的後端；2026-11-28 實測它已經逾時不回。
 >
 > **`/ntp` 的 body 不可盲信，要用它自己的 `Date` header 驗證。** body 是後端的
-> 時鐘，而後端的時鐘不一定對：這個名字後面的四台 `lb-*` 當中，撰寫時 `lb-2`
-> 與 `lb-4` 都慢 15.7 秒，而且兩台數值一致 —— 跨主機取多數也抓不到。
+> 時鐘，而後端的時鐘不一定對：`lb-*` 這一池有四台，撰寫時 `lb-2` 與 `lb-4` 都
+> 慢 15.7 秒，而且兩台數值一致 —— 跨主機取多數也抓不到。
 >
 > 能抓到的是同一個回應的 `Date` header：這台在 Cloudflare 後面，`Date` 由
 > **edge** 蓋，跟哪一台後端回應無關,所以每個回應都能自我檢查 —— body 與自己的
@@ -65,6 +66,14 @@
 | `TremStationRepositoryImpl.refresh` | `/resource/station` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getReportList` | `/api/v2/eq/report` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
 | `EarthquakeApi.getReport` | `/api/v2/eq/report/{id}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/radar/list` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/qpesums/list` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/qpesums/{sec}/{z}/{x}/{y}.webp` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 
 > **地震報告 list（v2）query：** `limit`/`page`、`sort`/`order`
 > （`time`\|`intensity`\|`magnitude`\|`depth` × `asc`\|`desc`）、震度／規模／深度
@@ -84,8 +93,10 @@
 
 > **即時串流走 SSE（gzip 壓縮），不是輪詢，而且整個 App 只開一條連線。**
 > `SseMux.lb` 開 `/api/v1/sse?topics=<a,b>`：`topics` 是 App 正在串流的每一個
-> topic（常數在 `EarthquakeApi`，在 `earthquake_providers.dart` 註冊），每則事件
-> 以 topic 為名（`event: trem.rts.v1`），`data:` 一律是 **base64 的 gzip**，由
+> topic（常數在 `EarthquakeApi`，在 `earthquake_providers.dart` 註冊）——
+> `eq.eew.v1` 是地震速報清單（每則都是完整快照，連上就先送目前那份）、
+> `trem.rts.v1` 是即時測站。每則事件以 topic 為名（`event: eq.eew.v1`、
+> `event: trem.rts.v1`），`data:` 一律是 **base64 的 gzip**，由
 > **應用層**在 `sse_realtime_source.dart` 解壓。連線一開先送 `retry:` 與
 > `event: info`（列出允許與 `denied` 的 topic），之後約每 60 秒一行 `: ping`。
 > 只要還有一個 feed 在用就維持這一條，最後一個放手（進背景）就關掉；某個 feed
@@ -101,35 +112,7 @@
 > 生命週期都不變。EEW 是**突發型**（地震之間靜默 → 存活判定用「連線開著」）；
 > RTS live 時是**連續型**（約 2 Hz → 「最近有事件」），睡眠時靜默就是「平靜」。
 
-## 沒多活備援 (single host, no failover)
-
-### Basemap / OSM / Terrain（全域 static LB，無區域）
-
-Basemap、OSM 詳細街道建築與 terrain 都由 MapLibre 直接抓（app 的 tile bridge
-會以 URL 為鍵快取），不經 `ApiClient` 的區域 failover。OSM 是可選疊圖，只覆蓋
-臺灣資料範圍；一般 basemap 始終保留，因此資料範圍外不會變成空白。
-
-| 用途 | 路徑 | 主機 |
-|---|---|---|
-| basemap | `/api/v1/map/tiles/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
-| OSM 詳細圖資 | `/api/v1/map/gsi/{z}/{x}/{y}.pbf` | `static.lb.exptech.dev` |
-| terrain | `/api/v1/map/terrain/{z}/{x}/{y}.png` | `static.lb.exptech.dev` |
-
-> **App 內附一份 basemap，給沒有網路時用。** 臺灣（含離島）z0–9 加全球 z0–2，
-> 共 122 塊、1.05 MiB（`assets/map/basemap_seed/`），由 `tool/gen/basemap_seed.sh`
-> 從上表的 basemap 路徑抓下來產生。啟動時種進 tile store，但只是**退路**：
-> MapLibre 要到其中一塊時一律先問網路，網路答不出來才交出內附版本，第一次下載
-> 成功就永久取代它；server 給過的列（含 404）永遠不會被它蓋掉。
-
-> **Terrain 是 Mapbox terrain-RGB，MapLibre 原生讀得懂。** 每個像素編碼
-> `height = (R·65536 + G·256 + B)/10 − 10000` 公尺，正是 MapLibre
-> `raster-dem` 的 `encoding: 'mapbox'` —— style 直接以該 encoding 使用原始
-> PNG，**不需要任何 app 端轉換**（參照 `satellite-tiles-go/web` 的底圖處理）。
-> 底圖以 `encoding: 'mapbox'`、`tileSize: 512`、`bounds: [110, 10, 132, 35]`
-> 註冊 `raster-dem` source，疊半透明 `hillshade` layer 呈現立體感；`bounds`
-> 刻意大於真實 DEM bbox，讓 hillshade 邊緣永遠不會在畫面上碰到純背景。
-
-### 雷達（v2）—— `core-tnn1`
+### 雷達（v2）—— Core 雙區多活
 
 時間清單是差量編碼的 Unix 秒（`[baseSec, Δ, …]`），在 API 主機上帶 ETag/304；
 tile 是 WebP，放在 **static** 主機（由 MapLibre 直接抓取；`Cache-Control:
@@ -143,33 +126,31 @@ no-store` 加弱 ETag，重新驗證回 304，2026-11-16 實測）。`{sec}` 就
 
 | 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `FrameTileApi.getFrames` | `/api/v2/tiles/radar/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `FrameTileApi.tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/radar/list` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 
-### 衛星雲圖（v2）—— `core-tnn1`
 
-Himawari-9 AHI 的 XYZ WebP,預設是 Band-13 IR。時間清單是差量編碼的
-Unix 秒（`[baseSec, Δ, …]`）,在 API 主機上帶 ETag/304;tile 在 **static**
-主機。`{sec}` 就是解出清單後的 10 分鐘秒,直接使用。
+> **tile 由 MapLibre 直接抓，URL 只寫選定區域的那一台；那一台失敗時由
+> `MapTileCache` 接手。** MapLibre 下載失敗不會告訴 App，所以接手的時機有兩個：
+> MapLibre 又來要一塊它自己沒抓到、也不是 App 自己取消（`cancelFetches`）的
+> tile，或 App 自己對那一台的上一次 tile 請求就失敗了。接手後改由
+> `ApiClient.getTileBytes` 抓，每台最多一次，再用 MapLibre 原本那個 URL 交回去；
+> 順序照 `coreStatic`，只是 30 秒內剛失敗過的那一台排到最後（過了 30 秒再排回
+> 前面試一次，看它好了沒）。連線錯誤、逾時與 5xx 換台。
+>
+> **某一區少了某一幀時，後端回 500，不是 404**（兩區皆然，2026-11-28 實測），所以
+> 那個缺口照 5xx 換台，也照 5xx 計入主機健康度。`notFoundFailsOver` 仍然開著（同
+> 氣象 v5 的 `getAt`），後端哪天改回 404 也一樣會問另一區；404 不計入主機健康度。
+>
+> MapLibre 自己取消的下載（tile 下載到一半就捲出畫面）不會通知 Dart —— fork 的
+> tile bridge 只呼叫 `cacheablePatterns`、`getBatch`、`putBatch` —— 所以那種 tile
+> 再被要一次時會被接手一次，從選定區域先抓。
+>
+> **快取鍵不看區域。** tile 以 `tileCacheKey` 存：兩區的同一塊都存在
+> `static.core-tnn1` 的 URL 下（更新前雷達、QPESUMS、DPM 只在 tnn1，裝置上既有的
+> 快取就是這個名字），所以換區或換台都直接命中，不會重抓。
 
-**`{channel}` 與 `{style}` 是路徑段，不是 query。** `{channel}` 選頻道或產品
-—— 單一頻道用數字（`13`，也是省略時的預設）、命名產品用名稱（`btd_wvirw`、
-`cloudtop`…，即 `satellite-tiles-go/docs.md` 的產品目錄）。清單為該 channel 的
-交集（產品需要的頻道缺一就不可渲染，`list` 只列齊全的時刻）。
-
-`{style}` 只出現在 tile 路徑：數字頻道可選 `normal` / `jma` / `bd`，命名產品一律
-`normal`（調色盤是產品本身的一部分）。`gray` 會摺成 `normal`。推導在
-`FrameTileApi._satelliteStyle`。
-
-App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` 保留給 B13，其餘為
-`satellite-<channel>`）。
-
-| 類別.方法 | 路徑 | 層級 | 主機 |
-|---|---|---|---|
-| `FrameTileApi.getFrames` | `/api/v2/tiles/satellite/{channel}/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `FrameTileApi.tileUrl` | `/api/v2/tiles/satellite/{channel}/{style}/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-
-### 未來1小時降水預報 QPESUMS（v2）—— `core-tnn1`
+### 未來1小時降水預報 QPESUMS（v2）—— Core 雙區多活
 
 QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **秒**
 （`[baseSec, Δ, …]`，每 600 秒一筆）；tile 在 **static** 主機。`{sec}` 就是解出
@@ -186,10 +167,10 @@ QPESUMS 定量降水預報 XYZ WebP。時間清單是差量編碼的 Unix **秒*
 
 | 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `FrameTileApi.getFrames` | `/api/v2/tiles/qpesums/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `FrameTileApi.tileUrl` | `/api/v2/tiles/qpesums/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.getFrames` | `/api/v2/tiles/qpesums/list` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/qpesums/{sec}/{z}/{x}/{y}.webp` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 
-### 防災地圖 DPM（v2）—— `core-tnn1`
+### 防災地圖 DPM（v2）—— Core 雙區多活
 
 MapLibre **vector tiles**（gzip MVT）+ 點位詳情 JSON。目前有 **AED / 無障礙廁所 /
 避難所**三層；其他類型走同一路徑形狀 `/api/v2/tiles/dpm/{layer}/…`。Tile 與詳情都
@@ -200,29 +181,77 @@ cluster 帶 `point_count`。
 
 | 類別.方法 | 路徑 | 層級 | 主機 |
 |---|---|---|---|
-| `DisasterMapApi.tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `DisasterMapApi.getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `DisasterMapApi.getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `DisasterMapApi.getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `DisasterMapApi.tileUrl` | `/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.getAedDetail` | `/api/v2/tiles/dpm/aed/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
+| `DisasterMapApi.getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 
-### 風場 Wind（v2 / v1）—— `core-tnn1`
 
-風場 overlay：XYZ WebP 圖層 + 低 zoom 的 **`.bin` 向量風場**（`WND1` 格式，
-`fetchWindBin`）。圖層選擇器把 wind 註冊為獨立圖層。
+> **tile 的換台與快取鍵同雷達**（見上）；詳情經 `ApiClient`，照 `coreStatic`
+> 的順序換。
 
-**`{model}` 是路徑段，不是 query，而且一個 frame 定址需要兩個時間。** 預報是
-「哪一次模式跑」加「預報到哪個時刻」，所以 tile 與 `.bin` 都以
-`{cycle}`（模式執行時刻）+ `{validTime}`（預報有效時刻）定址；`getFrames` 回傳的
-不透明 frame id 由 `FrameTileApi.windFrameParts` 拆成這兩段。`{model}` 是
-`gfs` / `ecmwf`。
+### Basemap / OSM / Terrain（`lbStatic`）—— LB 雙區多活
 
-| 類別.方法 | 路徑 | 層級 | 主機 |
-|---|---|---|---|
-| `FrameTileApi.getFrames` | `/api/v2/tiles/wind/{model}/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
-| `FrameTileApi.tileUrl` | `/api/v2/tiles/wind/{model}/{cycle}/{validTime}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
-| `FrameTileApi.fetchWindBin` | `/api/v1/wind/{model}/{cycle}/{validTime}.bin` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+Basemap、OSM 詳細街道建築與 terrain 都由 MapLibre 直接抓。style 的 URL 寫選定
+區域的那一台（`staticLbOrigin(RegionSelection.lb)`）：選台北抓 `static.lb-tpe1`、
+選高雄抓 `static.lb-khh1`，換區時 style 一起換（`BaseMap` 以
+`watch<RegionSelection>()` 重建 style 字串）。那一台失敗時跟雷達一樣由
+`MapTileCache` 接手，照 `lbStatic` 的順序換到另一區（見雷達一節），只是 **404
+不換**：每台都是同一份資料，海面上的 404 在哪一台都是 404。OSM 是可選
+疊圖，只覆蓋臺灣資料範圍；一般 basemap 始終保留，因此資料範圍外不會變成空白。
 
-### 氣象家族（**v5**）—— core 雙區
+| 用途 | 路徑 | 主機 |
+|---|---|---|
+| basemap | `/api/v1/map/tiles/{z}/{x}/{y}.pbf` | `static.lb-{tpe1,khh1}.exptech.dev` |
+| OSM 詳細圖資 | `/api/v1/map/gsi/{z}/{x}/{y}.pbf` | `static.lb-{tpe1,khh1}.exptech.dev` |
+| terrain | `/api/v1/map/terrain/{z}/{x}/{y}.png` | `static.lb-{tpe1,khh1}.exptech.dev` |
+
+> **快取鍵是裸的 `static.lb.exptech.dev`。** 兩區的同一塊 tile 都以這個 URL 存
+> （`tileCacheKey`）—— 那正是釘區域之前每一列用的名字，所以更新後既有的快取照樣
+> 命中，換區也不會重抓整張地圖。這個裸主機只當鍵，App 不再對它發請求。
+
+> **App 內附一份 basemap，給沒有網路時用。** 臺灣（含離島）z0–9 加全球 z0–2，
+> 共 122 塊、1.05 MiB（`assets/map/basemap_seed/`），由 `tool/gen/basemap_seed.sh`
+> 從上表的 basemap 路徑抓下來產生。啟動時種進 tile store（種在上面那個快取鍵下，
+> 任一區域的 URL 都讀得到），但只是**退路**：MapLibre 要到其中一塊時一律先問
+> 網路，網路答不出來才交出內附版本，第一次下載成功就永久取代它；server 給過的列
+> （含 404）永遠不會被它蓋掉。
+
+> **Terrain 是 Mapbox terrain-RGB，MapLibre 原生讀得懂。** 每個像素編碼
+> `height = (R·65536 + G·256 + B)/10 − 10000` 公尺，正是 MapLibre
+> `raster-dem` 的 `encoding: 'mapbox'` —— style 直接以該 encoding 使用原始
+> PNG，**不需要任何 app 端轉換**（參照 `satellite-tiles-go/web` 的底圖處理）。
+> 底圖以 `encoding: 'mapbox'`、`tileSize: 512`、`bounds: [110, 10, 132, 35]`
+> 註冊 `raster-dem` source，疊半透明 `hillshade` layer 呈現立體感；`bounds`
+> 刻意大於真實 DEM bbox，讓 hillshade 邊緣永遠不會在畫面上碰到純背景。
+### 海嘯 CWA tsunami —— Core 雙區多活
+
+兩支端點都是**索引 + 詳情**：索引只有事件摘要與 `id`，詳情才是內文與
+`data.area`。**時間單位是 Unix 毫秒**（`sent`、`validUntil`、以及 area 內各自的
+時間），與氣象家族的秒不同、也不經差量編碼 —— 直接當 13 位數毫秒用。
+
+**`data.area` 是位置式陣列，欄位數隨 `data.type` 改變**：`predict` 五欄
+`[地區, 沿岸範圍, 預估浪高, 抵達時間, 顏色]`、`observe` 六欄
+`[測站代碼, 測站名, 觀測浪高, 觀測時間, 經度, 緯度]`。用錯分支不會拋錯，只會把
+海岸範圍當成測站名；`observe` 的經緯度**可以整組是 `null`**（2024-04-03 的
+臺中港就是），所以地圖只畫有座標的那幾筆。解碼與判斷都在
+`TsunamiReport.decode`。
+
+**索引 `reports` 是最新在前，且會混入往年事件** —— `no`（`113003`）才是同一個
+事件的鍵，`rep`（`第3報`）是該事件內的第幾報。事件的**最後一報通常是「海嘯警報
+解除」**（`observe`、只有實測），所以「只读最新一報」等於看不到預估；列表與報告
+選擇器因此都以**最新事件的整個事件**為單位（`TsunamiBulletin.newestEvent`）。
+
+| 類別.方法 | 路徑 | 層級 |
+|---|---|---|
+| `TsunamiApi.getReports` | `/api/v1/cwa/tsunami` | `coreApi` |
+| `TsunamiApi.getReport` | `/api/v1/cwa/tsunami/{id}` | `coreApi` |
+
+> `coreApi`（多活）而非 `coreExclusiveApi`：`core-tyo1` 與 `core-tnn1` 實測都回
+> 200（索引與詳情皆然，2026-10-05），所以它跟著區域容錯，沒有理由只釘在 tnn1。
+> 沒有 ETag，因此每次都由 App 重新抓取 —— 只在圖層開啟時抓，索引與內文都小。
+
+### 氣象家族（**v5**）—— Core 雙區多活
 
 **已自 `api-1` 的 v2/v3 遷移完成。** 四個家族（weather / rain / lightning /
 typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/list` 是可用時間
@@ -283,32 +312,55 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 > `7d` 的 168 筆落在整點，每筆與該整點小時最後一筆 10 分鐘資料相同（2026-11-28
 > 實測）。累計怎麼算見 `rainRunningTotals`。
 
-### 海嘯 CWA tsunami —— core 雙區
+> **`FrameTileApi` 的層級看 `path`：** `radar`／`qpesums` 走多活層，`satellite`／
+> `wind` 仍釘 tnn1（後端只有 Core 兩區複製了前兩者）。`DisasterMapApi` 一律
+> `coreStatic`。這是後端能力的差異，不是偏好 —— 衛星與風場在 tyo1 仍是 404。
 
-兩支端點都是**索引 + 詳情**：索引只有事件摘要與 `id`，詳情才是內文與
-`data.area`。**時間單位是 Unix 毫秒**（`sent`、`validUntil`、以及 area 內各自的
-時間），與氣象家族的秒不同、也不經差量編碼 —— 直接當 13 位數毫秒用。
+## 沒多活備援 (single host, no failover)
 
-**`data.area` 是位置式陣列，欄位數隨 `data.type` 改變**：`predict` 五欄
-`[地區, 沿岸範圍, 預估浪高, 抵達時間, 顏色]`、`observe` 六欄
-`[測站代碼, 測站名, 觀測浪高, 觀測時間, 經度, 緯度]`。用錯分支不會拋錯，只會把
-海岸範圍當成測站名；`observe` 的經緯度**可以整組是 `null`**（2024-04-03 的
-臺中港就是），所以地圖只畫有座標的那幾筆。解碼與判斷都在
-`TsunamiReport.decode`。
+留下來的是衛星、風場（後端還沒複製到 tyo1）、notify／location（熱備援，備援節點
+平常把寫入導回主節點）、事件家族（只在 `api-1`，而那台本身就是 `core-tnn1`），
+以及不走 `ApiTier` 的 `/ntp`（它自己逐台嘗試，見最後一節）。
 
-**索引 `reports` 是最新在前，且會混入往年事件** —— `no`（`113003`）才是同一個
-事件的鍵，`rep`（`第3報`）是該事件內的第幾報。事件的**最後一報通常是「海嘯警報
-解除」**（`observe`、只有實測），所以「只读最新一報」等於看不到預估；列表與報告
-選擇器因此都以**最新事件的整個事件**為單位（`TsunamiBulletin.newestEvent`）。
+### 衛星雲圖（v2）—— `core-tnn1`
 
-| 類別.方法 | 路徑 | 層級 |
-|---|---|---|
-| `TsunamiApi.getReports` | `/api/v1/cwa/tsunami` | `coreApi` |
-| `TsunamiApi.getReport` | `/api/v1/cwa/tsunami/{id}` | `coreApi` |
+Himawari-9 AHI 的 XYZ WebP,預設是 Band-13 IR。時間清單是差量編碼的
+Unix 秒（`[baseSec, Δ, …]`）,在 API 主機上帶 ETag/304;tile 在 **static**
+主機。`{sec}` 就是解出清單後的 10 分鐘秒,直接使用。
 
-> `coreApi`（多活）而非 `coreExclusiveApi`：`core-tyo1` 與 `core-tnn1` 實測都回
-> 200（索引與詳情皆然，2026-10-05），所以它跟著區域容錯，沒有理由只釘在 tnn1。
-> 沒有 ETag，因此每次都由 App 重新抓取 —— 只在圖層開啟時抓，索引與內文都小。
+**`{channel}` 與 `{style}` 是路徑段，不是 query。** `{channel}` 選頻道或產品
+—— 單一頻道用數字（`13`，也是省略時的預設）、命名產品用名稱（`btd_wvirw`、
+`cloudtop`…，即 `satellite-tiles-go/docs.md` 的產品目錄）。清單為該 channel 的
+交集（產品需要的頻道缺一就不可渲染，`list` 只列齊全的時刻）。
+
+`{style}` 只出現在 tile 路徑：數字頻道可選 `normal` / `jma` / `bd`，命名產品一律
+`normal`（調色盤是產品本身的一部分）。`gray` 會摺成 `normal`。推導在
+`FrameTileApi._satelliteStyle`。
+
+App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` 保留給 B13，其餘為
+`satellite-<channel>`）。
+
+| 類別.方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `FrameTileApi.getFrames` | `/api/v2/tiles/satellite/{channel}/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/satellite/{channel}/{style}/{sec}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+
+### 風場 Wind（v2 / v1）—— `core-tnn1`
+
+風場 overlay：XYZ WebP 圖層 + 低 zoom 的 **`.bin` 向量風場**（`WND1` 格式，
+`fetchWindBin`）。圖層選擇器把 wind 註冊為獨立圖層。
+
+**`{model}` 是路徑段，不是 query，而且一個 frame 定址需要兩個時間。** 預報是
+「哪一次模式跑」加「預報到哪個時刻」，所以 tile 與 `.bin` 都以
+`{cycle}`（模式執行時刻）+ `{validTime}`（預報有效時刻）定址；`getFrames` 回傳的
+不透明 frame id 由 `FrameTileApi.windFrameParts` 拆成這兩段。`{model}` 是
+`gfs` / `ecmwf`。
+
+| 類別.方法 | 路徑 | 層級 | 主機 |
+|---|---|---|---|
+| `FrameTileApi.getFrames` | `/api/v2/tiles/wind/{model}/list` | `coreExclusiveApi` | `api.core-tnn1.exptech.dev` |
+| `FrameTileApi.tileUrl` | `/api/v2/tiles/wind/{model}/{cycle}/{validTime}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
+| `FrameTileApi.fetchWindBin` | `/api/v1/wind/{model}/{cycle}/{validTime}.bin` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
 ### 裝置與通知 —— `core-tnn1`
 
@@ -317,6 +369,15 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 | `LocationApi.updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `coreExclusiveApi` |
 | `NotifyApi.getNotify` | `/api/v2/notify/{token}` | `coreExclusiveApi` |
 | `NotifyApi.setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `coreExclusiveApi` |
+
+> **熱備援，不是多活。** 一區是 primary、另一區是 standby：寫入只落在 primary，
+> standby 對同一條路徑回 **`307`**（不是 301 —— 307 不會被當成永久導向快取）加
+> 指向 primary 的 `location`，平常不承載業務流量。**哪一區是 primary 由後端決定，
+> 而且換過**：2026-11-20 實測是 tyo1 → `307` → tnn1；2026-11-28 實測反過來，
+> tnn1（App 打的那台）回 `307` 加 `location: https://api.core-tyo1.exptech.dev/…`，
+> tyo1 直接回 200。Dio 預設跟隨 redirect（`followRedirects: true`、
+> `maxRedirects: 5`），所以 tier 維持 `coreExclusiveApi`：沒有第二個 origin 可以
+> 換，只有一個指向 primary 的導向。
 
 ### 舊 server `api-1`（逐步淘汰中）
 
@@ -337,14 +398,18 @@ lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential
 
 | 路徑 | 主機 | 回應 |
 |---|---|---|
-| `/ntp` | `api.lb.exptech.dev`（**HTTPS only**；全 repo 唯一的 bare host） | Unix **毫秒**純文字，帶小數（`1791607233513.399`） |
+| `/ntp` | `api.lb-{tpe1,khh1}.exptech.dev`（**HTTPS only**） | Unix **毫秒**純文字，帶小數（`1791607233513.399`） |
 
-不是 `ApiTier`，所以沒有區域容錯；也刻意不經過 `ApiClient` —— 它的
-absolute-URL 路徑都會過 `EtagInterceptor`，而快取一個對時回應比不對時更糟。
-Dart 用裸 `HttpClient`、Swift 用 `URLSession` +
+主機清單是 `HttpTimeSource.hostsFor(regions.lbOrder)`：選定區域先打，答不出來
+（連不上、body 與自己的 `Date` 差超過 2 秒）才換另一區。不是 `ApiTier`，所以不
+經 `ApiClient` 的 tier 容錯 —— 它的 absolute-URL 路徑都會過 `EtagInterceptor`，
+而快取一個對時回應比不對時更糟。Dart 用裸 `HttpClient`、Swift 用 `URLSession` +
 `reloadIgnoringLocalAndRemoteCacheData`，兩邊都送 `Cache-Control: no-store`。
 
-為何用 bare host、以及為何每個回應都要拿 `Date` header 驗證，見上方「對時」段落。
+桌面小工具沒有區域設定，所以固定 `tpe1 → khh1`（iOS 的
+`WidgetHTTPTimeSource.swift`、Android 的 `WidgetClock.kt`），每台的逾時與 `Date`
+驗證規則都跟 App 相同。
+為何每個回應都要拿 `Date` header 驗證，見上方「對時」段落。
 
 ## 外部（第三方，無區域）
 
@@ -356,8 +421,7 @@ ETag 重新驗證。
 | `ChangelogApi.getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
 | `ChangelogApi.getAvatarBytes` | `https://avatars.githubusercontent.com/…`（貢獻者頭像，內容定址故長快取） |
 | `RainHourTrendApi.getForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
-| `ServerStatusApi.getStatus` | `https://status.exptech.dev/api/ds/query`（**POST**，Grafana datasource query；伺服器狀態頁） |
-| `CloudflareStatusApi.getComponents` | `https://www.cloudflarestatus.com/api/v2/components.json`（Cloudflare 元件狀態） |
+| `StatusPageMonitor.over` | `https://status.exptech.dev/data/summary.json`（狀態頁的摘要；它回報異常時點亮「更多」分頁的狀態點） |
 | `HasteApi.upload` | `https://haste.exptech.dev/api/pastes`（**POST**，上傳 App 日誌；回應的 `key` 組成 `https://haste.exptech.dev/<key>`） |
 | `MlIntensityService._download` | `https://exptechtw.github.io/TREM-Lite/models/intensity_ml_v1.onnx`，失敗再試 `https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@main/packages/core/static/models/intensity_ml_v1.onnx`（ML v1 震度模型，14.7 MB、gzip 傳輸約 2.3 MB） |
 
@@ -370,41 +434,61 @@ ETag 重新驗證。
 > **衛星 TLE 目前不打網路。** `TleSource` 有一條遠端更新路徑（`TleFetcher`），
 > 但正式碼沒有接線（`fetch` 為 null），實際只讀打包在 `assets/astro/` 的元素集。
 
-## curl 可用性（2026-08-02 實測，HTTP 狀態碼）
+## curl 可用性（2026-11-20 實測，HTTP 狀態碼）
+
+### API 主機
 
 | 端點 | lb-tpe1 | lb-khh1 | core-tyo1 | core-tnn1 | api-1 |
 |---|:--:|:--:|:--:|:--:|:--:|
-| `/api/v2/trem/rts` | 200 | 200 | 404 | 401 | 200 |
 | `/api/v2/eq/eew` | 200 | 200 | 200 | 200 | 404 |
 | `/api/v2/eq/report` | 404 | 404 | 200 | 200 | 404 |
-| `/api/v1/trem/station` | 404 | 404 | 404 | 404 | 200 |
-| `/api/v2/tiles/radar/list` | 404 | 404 | 404 | 200 | 404 |
-| `/api/v5/meteor/weather/station` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v5/meteor/weather/list` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v5/meteor/rain/station` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v5/meteor/rain/list` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v5/meteor/lightning/list` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v5/meteor/typhoon/geojson` | 404 | 404 | 404 | **200** | 404 |
-| `/api/v2/meteor/weather/list`（舊） | 404 | 404 | 404 | 404 | 200 |
-| `/api/v2/meteor/rain/list`（舊） | 404 | 404 | 404 | 404 | 200 |
-| `/api/v2/meteor/lightning/list`（舊） | 404 | 404 | 404 | 404 | 200 |
-| `/api/v2/meteor/typhoon/geojson`（舊） | 404 | 404 | 404 | 404 | 200 |
+| `/api/v3/trem/rts/{now−300}` | 404 | 404 | 200 | 200 | 404 |
+| `/api/v1/cwa/tsunami` | 404 | 404 | 200 | 200 | 404 |
+| `/api/v2/tiles/radar/list` | 404 | 404 | **200** | 200 | 404 |
+| `/api/v2/tiles/qpesums/list` | 404 | 404 | **200** | 200 | 404 |
+| `/api/v2/tiles/satellite/13/list` | 404 | 404 | 404 | 200 | 404 |
+| `/api/v2/tiles/wind/gfs/list` | 404 | 404 | 404 | 200 | 404 |
+| `/api/v5/meteor/weather/list` | 404 | 404 | **200**（11-28） | 200 | 404 |
+| `/api/v2/notify/{token}` | 404 | 404 | **307** → tnn1 | 401 | 429 |
 | `/api/v1/dpip/history/list` | 404 | 404 | 404 | 404 | 200 |
-| `/api/v1/dpip/realtime/list` | 404 | 404 | 404 | 404 | 200 |
-| `/api/v2/notify/{token}` | 404 | 404 | 404 | 401 | 429 |
+| `/api/v1/sse?topics=…` | 200 | 200 | 200（JSON） | 401 | 404 |
 
-v5 氣象家族與其 static 快照（`static.core-tnn1` 的
-`/api/v5/meteor/{weather,rain,lightning}/{sec}`）實測皆為 200。舊的 v2 路徑在
-`api-1` 上仍然存活，所以遷移是**新增而非切換** —— 但 App 只走 v5。
+### static 主機
 
-雷達 **tile** 不在這張表裡 —— 它們由 `static.core-tnn1.exptech.dev` 提供
-（`/api/v2/tiles/radar/{sec}/{z}/{x}/{y}.webp`，`image/webp`），和上面的時間清單
-是不同主機。
+| 端點 | static lb-tpe1 | static lb-khh1 | static core-tyo1 | static core-tnn1 |
+|---|:--:|:--:|:--:|:--:|
+| `basemap {z}/{x}/{y}.pbf` | 200 | 200 | — | — |
+| `/resource/station` | — | — | 200 | 200 |
+| `radar/{sec}/…webp` | — | — | 200 | 200 |
+| `qpesums/{sec}/…webp` | — | — | 200 | 200 |
+| `dpm/{layer}/…mvt`、`dpm/aed/{id}` | — | — | 200 | 200 |
+| `satellite/13/…webp` | — | — | 404 | 200 |
+| `wind/…webp`、`…bin` | — | — | 404 | 200 |
+| `v5/meteor/{family}/{sec}` | — | — | **200**（11-28） | 200 |
 
-只有 `lb-tpe1` / `lb-khh1` 對 `?sse=1` 回傳真正的 `text/event-stream`；
-`core-tyo1` 之於 `eew?sse=1`、`api-1` 之於 `rts?sse=1` 都是 HTTP 200 但
-`application/json`（旗標被忽略）。`core-tnn1` 對兩者都回 401。這就是 SSE
-串流固定用 `lbApi` 的原因。
+### 與 2026-08-02 的差異
+
+- **雷達 list 與 QPESUMS list 在 `core-tyo1` 從 404 變成 200**，tile 與 DPM 也是；
+  App 的 tier 因此從 `coreExclusiveApi`／`coreStaticExclusive` 換成
+  `coreApi`／`coreStatic`（`FrameTileApi` 依 `path` 決定）。
+- **`/api/v2/trem/rts` 換成 `/api/v3/trem/rts/{sec}`**（v2 是即時 SSE、v3 才是
+  歷史），SSE 改由 `SseMux` 的 `/api/v1/sse` 承擔。
+- **`/api/v1/trem/station` 不存在了**，測站清單是 `/resource/station`（CSV，在
+  `static.core-*` 上）。
+- **notify／location 在 `core-tyo1` 回 307 導回 tnn1**，而不是 404；那是熱備援
+  的導向，不是備援自己在服務。2026-11-28 再測方向反過來：tnn1 回 307 導到
+  tyo1、tyo1 回 200 —— primary 換到了 tyo1。
+- **v5 meteor 在 `core-tyo1` 從 404 變成 200**（2026-11-28 實測；11-20 時還是
+  404），API 與 static 兩邊都是，所以氣象家族換成 `coreApi`／`coreStatic`。
+- **`api-1` 的每一條回應 `x-served-by` 都是 `core-tnn1`** —— 它已經是同一個
+  origin 的另一個名字，不構成備援。
+
+`/api/v2/tiles/radar/list` 在 tyo1 與 tnn1 都 200，但 **tile 仍在各自區域的
+static 主機**上，所以「list 有」與「tile 有」要分開看。
+
+只有 `lb-tpe1` / `lb-khh1` 對 `/api/v1/sse?topics=…` 回傳真正的
+`text/event-stream`；`core-tyo1` 回 200 但是 `application/json`，`core-tnn1`
+回 401。這就是即時串流固定用 `lbApi` 的原因 —— 跨國的 core 兩區再穩，也接不住 SSE。
 
 ---
 
