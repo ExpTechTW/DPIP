@@ -289,6 +289,36 @@ open a second one for a new topic. Fatal and
 handled errors forward to the `CrashSink` set on `Log` — Crashlytics, in a
 prerelease build (see [Logging](#logging)).
 
+Redundancy is a property of the **tier**, not of the feature: `lbApi`,
+`lbStatic`, `coreApi` and `coreStatic` name both regions and fail over, the
+`*Exclusive` tiers and `legacyApi` name one origin. Which family lives where is
+the backend's decision and changes without a client release, so the tier is
+chosen per datasource from what the endpoint actually does — an endpoint that
+speaks SSE stays on `lbApi` (only the `lb-*` nodes terminate it), the archive
+and static families follow whichever regions have a copy (see
+`api.md#curl-可用性2026-11-20-實測http-狀態碼` and the multi-active table).
+
+Two families fit that model only in part. **Map tiles** are fetched by
+MapLibre, not `ApiClient`, so a style names one host — the selected region's
+(`staticLbOrigin(regions.lb)` for basemap/OSM/terrain, the first `coreStatic`
+host for radar, QPESUMS and DPM). MapLibre never reports a failed download, so
+`MapTileCache` takes a tile over when native asks for it again, or when the
+app's own last request to that host failed, and fetches it through
+`ApiClient.getTileBytes` — the tier's own failover and retryable split, each
+host once, with a host that failed in the last 30 s asked last. A cancel the
+app issues (`MapTileCache.cancelFetches`) is not a failure; MapLibre's own
+cancels never reach Dart. A frame one core region lacks comes back as 500, not
+404, so it fails over as a 5xx; `notFoundFailsOver` is set for the frame tiles
+anyway, while a basemap 404 is the same answer on every LB host. Every tile row
+is keyed by `tileCacheKey`, which maps each region host to one
+region-independent URL — the bare `static.lb.exptech.dev` and
+`static.core-tnn1`, the names installs cached under before the pin — so
+neither a failover nor a region switch downloads the map again. And
+notify/location run as a **hot standby**: one core region is primary and the
+other answers `307` naming it — the primary has moved between regions, and
+tnn1, the host the app asks, has been the one redirecting — so they stay
+`coreExclusiveApi` and rely on Dio following the redirect.
+
 ## Data & errors
 
 models are `@freezed` value types with generated
@@ -363,16 +393,22 @@ the `ServerClock` corrects device time via real **SNTP**
 timezone change can't move it (only a resync does).
 
 When both SNTP hosts fail, `fallback_time_source.dart` drops to
-`https://api.lb.exptech.dev/ntp` (`http_time_source.dart`; the iOS widget
-mirrors it in `WidgetHTTPTimeSource.swift`) — corporate Wi-Fi, hotel and campus
-networks block UDP/123, and there the alternative is no calibration at all. The
-order is precision, not preference: SNTP resolves "now" to about a millisecond,
-one HTTPS round trip only to ±RTT/2. This is the one bare host the repository
-requests, because a clock reading has no region to pin; the body is never
-trusted on its own but checked against the Cloudflare-stamped `Date` header of
-the same response, which is what catches a backend whose own clock is wrong —
-see [api.md](api.md) for the 15.7-second measurement that made the check
-necessary.
+`https://api.lb-<region>.exptech.dev/ntp` (`http_time_source.dart`; the
+widgets mirror it in `WidgetHTTPTimeSource.swift` and `WidgetClock.kt`, fixed to
+`tpe1` then `khh1` as they have no region setting) — corporate Wi-Fi, hotel and
+campus networks block UDP/123, and there the alternative is no calibration at
+all. The order is precision, not preference: SNTP resolves "now" to about a
+millisecond, one HTTPS round trip only to ±RTT/2.
+
+The hosts are the app's own region pair, its own region first
+(`HttpTimeSource.hostsFor(regions.lbOrder)`), so the fallback follows the region
+the user picked instead of leaving the choice to Cloudflare — that bare name
+was retired: the `lb-*` pool it hides contains backends 15.7 seconds slow, and
+it has since stopped answering at all. It is not an `ApiTier`: no `ApiClient`, no tier failover, and a per-host
+retry of its own when the body disagrees with the response's `Date` header. The
+body is never trusted on its own but checked against that header, which
+Cloudflare stamps at the edge and which is what catches a backend whose clock
+is wrong — see [api.md](api.md) for the measurement.
 `RealtimeService` resyncs it every 60s (paused in background, resynced on
 resume). Read corrected time anywhere via the global `AppTime` facade
 (`AppTime.utc` / `AppTime.utc8`, the fixed-offset Taipei wall clock) — never
