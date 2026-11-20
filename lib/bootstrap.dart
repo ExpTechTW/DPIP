@@ -316,7 +316,12 @@ Future<void> bootstrap() async {
   final serverClock = ServerClock(
     const SystemClock(),
     SystemElapsed(),
-    FallbackServerTimeSource([NtpTimeSource(), HttpTimeSource()]),
+    FallbackServerTimeSource([
+      NtpTimeSource(),
+      // The HTTP fallback asks the region the user picked, its own region
+      // first — see [HttpTimeSource.hostsFor].
+      HttpTimeSource(hosts: HttpTimeSource.hostsFor(regions.lbOrder)),
+    ]),
   );
   AppTime.install(serverClock);
   AppTime.sync().ignore();
