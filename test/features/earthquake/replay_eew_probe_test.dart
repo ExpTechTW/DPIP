@@ -20,6 +20,9 @@ class _Api extends ApiClient {
   /// Seconds that should fail instead of answering.
   final Set<int> down = {};
 
+  /// Seconds the archive answers 404 for — no record at that instant.
+  final Set<int> missing = {};
+
   final asked = <int>[];
 
   @override
@@ -35,6 +38,16 @@ class _Api extends ApiClient {
       throw DioException(
         requestOptions: RequestOptions(path: path),
         type: DioExceptionType.connectionError,
+      );
+    }
+    if (missing.contains(second)) {
+      throw DioException(
+        requestOptions: RequestOptions(path: path),
+        type: DioExceptionType.badResponse,
+        response: Response<void>(
+          requestOptions: RequestOptions(path: path),
+          statusCode: 404,
+        ),
       );
     }
     return replies[second] ?? const <Map<String, dynamic>>[];
@@ -93,6 +106,35 @@ void main() {
     test('stays undecided when a sample fails', () async {
       final api = _Api({})..down.add(secondAt(replayProbeOffsets[2]));
       // A dead request must never read as "no data".
+      expect(await probe(api).run(), ReplayEewVerdict.undecided);
+    });
+
+    test(
+      'leaves the answer undecided when the archive 404s a sample',
+      () async {
+        // Whether the archive holds the event at all is the report page's job
+        // (it hides the replay chip when nothing is retained); a 404 here can
+        // also mean the window moved mid-session, and neither may read as
+        // "nothing was detected".
+        final api = _Api({})
+          ..missing.addAll([
+            for (final offset in replayProbeOffsets) secondAt(offset),
+          ]);
+        expect(await probe(api).run(), ReplayEewVerdict.undecided);
+      },
+    );
+
+    test('a 404 never argues with a bulletin found elsewhere', () async {
+      final api = _Api({
+        secondAt(replayProbeOffsets[2]): [_eew()],
+      })..missing.add(secondAt(replayProbeOffsets[0]));
+      expect(await probe(api).run(), ReplayEewVerdict.found);
+    });
+
+    test('a network failure still outranks the 404s around it', () async {
+      final api = _Api({})
+        ..missing.add(secondAt(replayProbeOffsets[0]))
+        ..down.add(secondAt(replayProbeOffsets[1]));
       expect(await probe(api).run(), ReplayEewVerdict.undecided);
     });
 
