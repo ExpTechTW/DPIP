@@ -95,9 +95,10 @@ class ApiClient {
 
   /// Absolute-URL GET as bytes with ETag (no region failover).
   ///
-  /// For hosts already baked into the MapLibre style (basemap
-  /// `static.lb.exptech.dev`, glyphs CDN) that are not an [ApiTier]. Prefer
-  /// [getBytes] for region-pinned ExpTech paths.
+  /// For hosts that are not an [ApiTier] — the glyphs CDN a MapLibre style
+  /// names, third-party images. A tile on a region host goes through
+  /// [getTileBytes], and any other region-pinned ExpTech path through
+  /// [getBytes].
   Future<BytePayload> getBytesAbsolute(
     String url, {
     CancelToken? cancelToken,

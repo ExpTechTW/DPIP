@@ -376,6 +376,10 @@ void main() {
           Provider<SettingsStore>.value(value: settings),
           ChangeNotifierProvider<RegionStore>.value(value: regions),
           Provider<TownDirectory>.value(value: towns),
+          // The basemap host is pinned to the selected LB region.
+          ChangeNotifierProvider<RegionSelection>.value(
+            value: RegionSelection(settings),
+          ),
         ],
         child: MaterialApp.router(
           theme: theme,

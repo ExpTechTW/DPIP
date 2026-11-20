@@ -104,9 +104,14 @@ class EtagInterceptor extends Interceptor {
   static String _rowKey(RequestOptions o, Uri uri, String url) =>
       _isBytes(o) && isImmutableTile(uri) ? tileCacheKey(url) : url;
 
-  /// Bare-host static map vector tiles (no server ETag).
+  /// Basemap and OSM vector tiles on the LB static hosts (no server ETag).
+  ///
+  /// Judged on the URL's [tileCacheKey], so it holds for whichever
+  /// `static.lb-<region>` host the style names and for the bare
+  /// `static.lb.exptech.dev` every one of them is stored under — the name the
+  /// rows written before the style named a region already hold.
   static bool isBasemapPbf(Uri uri) =>
-      uri.host == 'static.lb.exptech.dev' &&
+      tileCacheKey(uri.toString()).startsWith('$lbStaticKeyOrigin/') &&
       (uri.path.contains(ApiPaths.mapTilesV1) ||
           uri.path.contains(ApiPaths.mapOsmV1)) &&
       uri.path.endsWith('.pbf');

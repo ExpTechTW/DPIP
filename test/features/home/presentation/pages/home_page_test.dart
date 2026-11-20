@@ -19,6 +19,7 @@ import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/home_area.dart';
 import 'package:dpip/core/settings/region_store.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
@@ -389,6 +390,7 @@ List<SingleChildWidget> _providers({
   required HomeResetSignal reset,
   required MapCameraHandoff handoff,
   TownDirectory directory = const TownDirectory({}),
+  SettingsStore? settings,
   MeteorWeatherRepository weather = const _Weather(),
   RainHourTrendRepository? hours,
 }) {
@@ -402,6 +404,10 @@ List<SingleChildWidget> _providers({
     ChangeNotifierProvider<MapCameraHandoff>.value(value: handoff),
     ChangeNotifierProvider(create: (_) => MapStationHandoff()),
     Provider<TownDirectory>.value(value: directory),
+    // The basemap host is pinned to the selected LB region.
+    ChangeNotifierProvider<RegionSelection>.value(
+      value: RegionSelection(settings ?? SettingsStore.inMemory()),
+    ),
     Provider<LocationService>.value(
       value: LocationService(
         directory,

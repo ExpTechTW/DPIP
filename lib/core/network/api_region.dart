@@ -38,12 +38,34 @@ enum CoreRegion {
   final String label;
 }
 
+/// The origin for the region-pinned LB static host — `static.lb-<code>`, the
+/// host [ApiTier.lbStatic] resolves to for that region.
+///
+/// For the URLs a MapLibre style names, which need one host per template.
+/// Basemap, terrain and OSM used to name the bare `static.lb.exptech.dev`,
+/// which balances without regard for the region the rest of the app selected,
+/// so a client could draw every tile from the far end while its API traffic
+/// came from the near one. Both hosts carry the same dataset; the pin is about
+/// one honest selection, not about which copy exists. When the pinned host
+/// fails, the app fetches the tile along [ApiTier.lbStatic] instead
+/// (`MapTileCache`), and either copy is stored under the bare name
+/// (`tileCacheKey`).
+String staticLbOrigin(LbRegion region) =>
+    'https://static.lb-${region.code}.exptech.dev';
+
 /// The host family and redundancy a request targets.
 ///
 /// Only concrete, region-pinned hosts are ever used; the DNS-balanced bare
 /// hosts (`api.lb.exptech.dev`, `api.core.exptech.dev`) are deliberately never
 /// requested **for tiered traffic**, so region selection and failover stay
 /// under app control.
+///
+/// The map tiles a MapLibre style names are pinned the same way, without a
+/// tier in between: a style needs one host per template, so it names the
+/// selected region's ([staticLbOrigin] for the basemap, the first
+/// [coreStatic] host for radar and DPM). When that host fails, the app fetches
+/// the tile itself along [lbStatic] / [coreStatic]
+/// (`ApiClient.getTileBytes`).
 ///
 /// One request outside this enum does use a bare host: the HTTP time fallback
 /// in `core/realtime/http_time_source.dart` asks
