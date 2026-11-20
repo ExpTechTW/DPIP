@@ -3641,4 +3641,81 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => 'ES-Net が用いる気象庁の計測震度の方法で計算しています';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '最大震度';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '最大震度 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '観測 $count 件、グループ内の最大震度 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      'この地震レポートはストーリーに収まりません。4:5 を選ぶか、詳細情報を開いてください。';
+
+  @override
+  String get reportDetailStoryLegendCount => '数字バッジ：観測件数';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '震度アイコン：グループ内の最大震度';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '観測 $count 件、グループ内の最大震度 $intensity、代表観測地点は$location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location、震度 $intensity、観測1件';
+  }
+
+  @override
+  String get reportDetailSharePreview => '共有カードをプレビュー';
+
+  @override
+  String get reportDetailShareRichterScale => 'リヒタースケール';
+
+  @override
+  String get reportDetailShareObservedIntensity => '観測震度';
+
+  @override
+  String get reportDetailShareKilometers => 'km';
+
+  @override
+  String get reportDetailShareSource => '出典：台湾交通部中央気象署';
+
+  @override
+  String get reportDetailSharePreparedBy => 'DPIPが作成';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source｜ベースマップ：ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => 'この画像形式は表示できません。';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      '設定で写真へのアクセスを許可してから、もう一度保存してください。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => 'この端末では写真に保存できません。';
+
+  @override
+  String get reportDetailImageSaveRestricted => 'この端末では写真へのアクセスが制限されています。';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      '設定を開けませんでした。端末の設定を開いて写真へのアクセスを許可してください。';
 }

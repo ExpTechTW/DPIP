@@ -3643,4 +3643,81 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => 'ES-Net에서 쓰는 일본 기상청 계측진도 방법으로 계산합니다';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '최대 진도';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '최대 진도 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '관측 $count건, 그룹 내 최대 진도 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      '이 보고서를 스토리에 담을 수 없습니다. 4:5를 선택하거나 상세 정보를 확인하세요.';
+
+  @override
+  String get reportDetailStoryLegendCount => '숫자 배지: 관측 건수';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '진도 아이콘: 그룹 내 최대 진도';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '관측 $count건, 그룹 내 최대 진도 $intensity, 대표 관측 위치는 $location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location, 진도 $intensity, 관측 1건';
+  }
+
+  @override
+  String get reportDetailSharePreview => '공유 카드 미리보기';
+
+  @override
+  String get reportDetailShareRichterScale => '리히터 규모';
+
+  @override
+  String get reportDetailShareObservedIntensity => '관측 진도';
+
+  @override
+  String get reportDetailShareKilometers => 'km';
+
+  @override
+  String get reportDetailShareSource => '출처: 대만 교통부 중앙기상서';
+
+  @override
+  String get reportDetailSharePreparedBy => 'DPIP에서 정리';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source | 배경 지도: ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => '이 이미지 형식은 표시할 수 없습니다.';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      '설정에서 사진 접근을 허용한 뒤 다시 저장해 주세요.';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '이 기기에서는 사진에 저장할 수 없습니다.';
+
+  @override
+  String get reportDetailImageSaveRestricted => '이 기기에서는 사진 접근이 제한되어 있습니다.';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      '설정을 열 수 없습니다. 기기 설정을 열어 사진 접근을 허용해 주세요.';
 }

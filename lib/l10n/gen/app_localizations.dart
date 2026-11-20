@@ -6947,6 +6947,130 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Computed with the JMA instrumental intensity method used by ES-Net'**
   String get seismometerAlgorithm;
+
+  /// No description provided for @reportDetailMaximumIntensityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum intensity'**
+  String get reportDetailMaximumIntensityLabel;
+
+  /// Spoken or plain text label and value for observed maximum intensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum intensity {intensity}'**
+  String reportDetailMaximumIntensity(String intensity);
+
+  /// Accessible label for one Story marker, with the number of observations and its highest observed intensity.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 observation, intensity {intensity}} other{{count} observations, maximum intensity {intensity}}}'**
+  String reportDetailStoryObservations(int count, String intensity);
+
+  /// No description provided for @reportDetailStoryLayoutUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This report cannot fit in a Story. Choose 4:5 or open Details.'**
+  String get reportDetailStoryLayoutUnavailable;
+
+  /// No description provided for @reportDetailStoryLegendCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Badge: observation count'**
+  String get reportDetailStoryLegendCount;
+
+  /// No description provided for @reportDetailStoryLegendIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon: group maximum intensity'**
+  String get reportDetailStoryLegendIntensity;
+
+  /// Spoken label for a Story cluster. Count is the number of source observation records. Location is the representative observation location.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} observations, group maximum intensity {intensity}, representative observation location {location}'**
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  );
+
+  /// Spoken label for a single Story observation.
+  ///
+  /// In en, this message translates to:
+  /// **'{location}, intensity {intensity}, one observation'**
+  String reportDetailStorySingleObservation(String location, String intensity);
+
+  /// Button in the earthquake report detail that opens the sharing preview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview share card'**
+  String get reportDetailSharePreview;
+
+  /// Caption below the magnitude value in the 4:5 artwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Richter scale'**
+  String get reportDetailShareRichterScale;
+
+  /// Caption below the maximum intensity in the 4:5 artwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Observed intensity'**
+  String get reportDetailShareObservedIntensity;
+
+  /// Unit under the focal depth in the 4:5 artwork.
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get reportDetailShareKilometers;
+
+  /// Attribution for CWA earthquake data in both artworks. Preserve the agency identity.
+  ///
+  /// In en, this message translates to:
+  /// **'Source: Taiwan Central Weather Administration (MOTC)'**
+  String get reportDetailShareSource;
+
+  /// Credit for DPIP preparing the earthquake artwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepared by DPIP'**
+  String get reportDetailSharePreparedBy;
+
+  /// Story artwork credits. The source placeholder is the localized earthquake data attribution. Preserve ExpTech Studio.
+  ///
+  /// In en, this message translates to:
+  /// **'{source}\nBasemap: ExpTech Studio'**
+  String reportDetailStoryAttribution(String source);
+
+  /// The app retrieved the official report image but cannot display its format.
+  ///
+  /// In en, this message translates to:
+  /// **'This image format cannot be displayed.'**
+  String get reportDetailShareImageInvalid;
+
+  /// A gallery permission must be enabled in system settings before retrying.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photo access in Settings, then try saving again.'**
+  String get reportDetailImageSaveSettingsRequired;
+
+  /// The platform does not offer gallery saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to photos is unavailable on this device.'**
+  String get reportDetailImageSaveUnavailable;
+
+  /// OS restrictions prevent access to the gallery without an app-level recovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device restricts access to photos.'**
+  String get reportDetailImageSaveRestricted;
+
+  /// The app could not navigate to system settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open Settings. Open your device settings to allow photo access.'**
+  String get reportDetailImageSaveSettingsFailed;
 }
 
 class _AppLocalizationsDelegate

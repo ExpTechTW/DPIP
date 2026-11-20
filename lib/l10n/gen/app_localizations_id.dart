@@ -3729,4 +3729,86 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Dihitung dengan metode intensitas instrumental JMA yang dipakai ES-Net';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => 'Intensitas maksimum';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return 'Intensitas maksimum $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count pengamatan, intensitas maksimum $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      'Laporan ini tidak muat dalam Story. Pilih 4:5 atau buka Detail.';
+
+  @override
+  String get reportDetailStoryLegendCount => 'Lencana: jumlah pengamatan';
+
+  @override
+  String get reportDetailStoryLegendIntensity =>
+      'Ikon: intensitas tertinggi grup';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count pengamatan, intensitas tertinggi di grup $intensity, lokasi pengamatan perwakilan $location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location, intensitas $intensity, satu pengamatan';
+  }
+
+  @override
+  String get reportDetailSharePreview => 'Pratinjau kartu berbagi';
+
+  @override
+  String get reportDetailShareRichterScale => 'Skala Richter';
+
+  @override
+  String get reportDetailShareObservedIntensity => 'Intensitas teramati';
+
+  @override
+  String get reportDetailShareKilometers => 'km';
+
+  @override
+  String get reportDetailShareSource =>
+      'Sumber: Administrasi Cuaca Pusat Taiwan (MOTC)';
+
+  @override
+  String get reportDetailSharePreparedBy => 'Disusun oleh DPIP';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source\nPeta dasar: ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid =>
+      'Format gambar ini tidak dapat ditampilkan.';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Izinkan akses foto di Pengaturan, lalu coba simpan lagi.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Penyimpanan ke galeri tidak tersedia di perangkat ini.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Perangkat Anda membatasi akses ke foto.';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed =>
+      'Pengaturan tidak dapat dibuka. Buka pengaturan perangkat untuk mengizinkan akses foto.';
 }

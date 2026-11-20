@@ -3618,6 +3618,81 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '最大震度';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '最大震度 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count 筆觀測，群內最大震度 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      '這份報告無法排入 Story。請切換至 4:5 或展開詳細資訊。';
+
+  @override
+  String get reportDetailStoryLegendCount => '數字徽章：觀測筆數';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '震度圖示：群內最大震度';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count 筆觀測，群內最大震度 $intensity，代表觀測地點為$location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location，震度 $intensity，一筆觀測';
+  }
+
+  @override
+  String get reportDetailSharePreview => '預覽分享卡片';
+
+  @override
+  String get reportDetailShareRichterScale => '芮氏規模';
+
+  @override
+  String get reportDetailShareObservedIntensity => '觀測震度';
+
+  @override
+  String get reportDetailShareKilometers => '公里';
+
+  @override
+  String get reportDetailShareSource => '資料來源：交通部中央氣象署';
+
+  @override
+  String get reportDetailSharePreparedBy => '由 DPIP 整理呈現';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source｜底圖：ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => '無法顯示此圖片格式。';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用照片，再試一次儲存。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '這部裝置限制了相簿取用權限。';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed => '無法開啟設定。請開啟裝置設定，允許取用照片。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -7230,6 +7305,81 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 计测震度算法计算';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '最大震度';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '最大震度 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count 条观测，组内最大震度 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      '此报告无法排入 Story。请选择 4:5 或展开详细信息。';
+
+  @override
+  String get reportDetailStoryLegendCount => '数字徽章：观测条数';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '烈度图标：组内最大烈度';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count 条观测，组内最大烈度 $intensity，代表观测地点为$location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location，烈度 $intensity，一条观测';
+  }
+
+  @override
+  String get reportDetailSharePreview => '预览分享卡片';
+
+  @override
+  String get reportDetailShareRichterScale => '里氏震级';
+
+  @override
+  String get reportDetailShareObservedIntensity => '观测烈度';
+
+  @override
+  String get reportDetailShareKilometers => '公里';
+
+  @override
+  String get reportDetailShareSource => '数据来源：台湾交通部中央气象署';
+
+  @override
+  String get reportDetailSharePreparedBy => '由 DPIP 整理呈现';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source｜底图：ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => '无法显示此图片格式。';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '请在设置中允许访问照片，然后重新保存。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '此设备不支持保存到相册。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '设备限制了照片访问权限。';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed => '无法打开设置。请打开设备设置以允许访问照片。';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10843,6 +10993,81 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '最大震度';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '最大震度 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count 筆觀測，群內最大震度 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      '這份報告無法排入 Story。請切換至 4:5 或展開詳細資訊。';
+
+  @override
+  String get reportDetailStoryLegendCount => '數字徽章：觀測筆數';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '震度圖示：組內最大震度';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count 筆觀測，組內最大震度 $intensity，代表觀測地點為$location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location，震度 $intensity，一筆觀測';
+  }
+
+  @override
+  String get reportDetailSharePreview => '預覽分享卡片';
+
+  @override
+  String get reportDetailShareRichterScale => '黎克特制';
+
+  @override
+  String get reportDetailShareObservedIntensity => '觀測烈度';
+
+  @override
+  String get reportDetailShareKilometers => '公里';
+
+  @override
+  String get reportDetailShareSource => '資料來源：台灣交通部中央氣象署';
+
+  @override
+  String get reportDetailSharePreparedBy => '由 DPIP 整理呈現';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source｜底圖：ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => '無法顯示此圖片格式。';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用相片，再試儲存。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '此裝置不支援儲存至相簿。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '裝置限制了相片存取權限。';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed => '無法開啟設定。請開啟裝置設定以允許取用相片。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -14456,4 +14681,79 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
+
+  @override
+  String get reportDetailMaximumIntensityLabel => '最大震度';
+
+  @override
+  String reportDetailMaximumIntensity(String intensity) {
+    return '最大震度 $intensity';
+  }
+
+  @override
+  String reportDetailStoryObservations(int count, String intensity) {
+    return '$count 筆觀測，群內最大震度 $intensity';
+  }
+
+  @override
+  String get reportDetailStoryLayoutUnavailable =>
+      '這份報告無法排入 Story。請切換至 4:5 或展開詳細資訊。';
+
+  @override
+  String get reportDetailStoryLegendCount => '數字徽章：觀測筆數';
+
+  @override
+  String get reportDetailStoryLegendIntensity => '震度圖示：群內最大震度';
+
+  @override
+  String reportDetailStoryObservationGroup(
+    int count,
+    String intensity,
+    String location,
+  ) {
+    return '$count 筆觀測，群內最大震度 $intensity，代表觀測地點為$location';
+  }
+
+  @override
+  String reportDetailStorySingleObservation(String location, String intensity) {
+    return '$location，震度 $intensity，一筆觀測';
+  }
+
+  @override
+  String get reportDetailSharePreview => '預覽分享卡片';
+
+  @override
+  String get reportDetailShareRichterScale => '芮氏規模';
+
+  @override
+  String get reportDetailShareObservedIntensity => '觀測震度';
+
+  @override
+  String get reportDetailShareKilometers => '公里';
+
+  @override
+  String get reportDetailShareSource => '資料來源：交通部中央氣象署';
+
+  @override
+  String get reportDetailSharePreparedBy => '由 DPIP 整理呈現';
+
+  @override
+  String reportDetailStoryAttribution(String source) {
+    return '$source｜底圖：ExpTech Studio';
+  }
+
+  @override
+  String get reportDetailShareImageInvalid => '無法顯示此圖片格式。';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用照片，再試一次儲存。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '這部裝置限制了相簿取用權限。';
+
+  @override
+  String get reportDetailImageSaveSettingsFailed => '無法開啟設定。請開啟裝置設定，允許取用照片。';
 }
