@@ -169,6 +169,38 @@ void main() {
     },
   );
 
+  test('a radar tile from either core region is one row', () async {
+    final payload = Uint8List.fromList([0x52, 0x49, 0x46, 0x46]);
+    final adapter = _BinaryAdapter(bytes: payload);
+    final dio = createDio(etagCache: store)..httpClientAdapter = adapter;
+    const path = '/api/v2/tiles/radar/1/7/1/1.webp';
+    const tyo1 = 'https://static.core-tyo1.exptech.dev$path';
+    const tnn1 = 'https://static.core-tnn1.exptech.dev$path';
+
+    final first = await dio.get<List<int>>(
+      tyo1,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    CachedBytes? entry;
+    for (var i = 0; i < 50 && entry == null; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      entry = await store.readBytes(tnn1);
+    }
+    expect(entry?.bytes, payload, reason: 'stored under the tnn1 key');
+    expect(
+      first.headers.value('etag'),
+      EtagInterceptor.etagFromUrl(Uri.parse(tnn1)),
+      reason: 'one tag per tile, whichever host served it',
+    );
+
+    final second = await dio.get<List<int>>(
+      tnn1,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    expect(adapter.calls, 1, reason: 'the other region\'s copy is a hit');
+    expect(second.data, payload);
+  });
+
   test('basemap PBF uses URL-hash ETag and hits locally on repeat', () async {
     final payload = Uint8List.fromList([0x1a, 0x2b, 0x3c]);
     final adapter = _BinaryAdapter(bytes: payload); // no server etag

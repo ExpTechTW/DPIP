@@ -62,6 +62,13 @@ class _RecordingApiClient implements ApiClient {
   }) => throw UnimplementedError();
 
   @override
+  Future<BytePayload> getTileBytes(String url, {CancelToken? cancelToken}) =>
+      throw UnimplementedError();
+
+  @override
+  bool tileHostFailing(String url) => throw UnimplementedError();
+
+  @override
   Future<dynamic> getAbsolute(
     String url, {
     Map<String, dynamic>? query,

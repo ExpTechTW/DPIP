@@ -13,6 +13,7 @@ import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/core/network/tile_hosts.dart';
 import 'package:dpip/shared/map/tile_url.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, visibleForTesting;
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -62,6 +63,25 @@ typedef TileFetch = Future<Uint8List> Function(String url);
 /// cannot supply the tile in time. The download replaces the row, so each
 /// planted tile is asked about at most until the first time the network
 /// answers. The warm path never injects one at all.
+///
+/// ## Region failover
+/// A tile on a region host ([tileRoute]) names one region, and MapLibre
+/// downloads it from that region alone: when that host is down the frame list
+/// fails over and the tiles do not, and a radar frame with no tiles reads as
+/// "no rain". MapLibre reports nothing about a download that failed, so this
+/// side takes over a miss on such a host in two cases — native has asked for it
+/// before and never delivered it (its download failed — a cancel this side
+/// issued does not count, see [_unanswered]), or the host failed the last tile
+/// request this side made. Those misses go through the cache's `fetch`
+/// ([fetchThrough] in the app), which fails over like any `ApiClient` request,
+/// inside the same `getBatch` budget as a planted tile; one that lands late is
+/// stored and pushed into L1 the same way.
+///
+/// ## One row per tile, not per host
+/// Every store read and write goes through [tileCacheKey]. Native and the
+/// warm path keep the URL MapLibre requests; the store keeps one row for the
+/// tile whichever region host the URL names, so a region switch or a failover
+/// finds the copy already on disk.
 class MapTileCache {
   /// Temporary, code-owned switch for the tile timing trace.
   ///
@@ -93,19 +113,27 @@ class MapTileCache {
   // Not an initializing formal: Dart has no private *named* parameter, and the
   // field must stay private.
   ///
-  /// [fetch] is how a demand for a planted tile asks the network first; with
-  /// none, planted rows are served only as a fallback to native's own
-  /// download failing, which this class never sees — so in practice not at
-  /// all. Bootstrap passes [fetchThrough].
+  /// [fetch] is how a demand for a planted tile asks the network first, and
+  /// how a tile whose region host is failing is fetched from the other region
+  /// (see "Region failover" above); with none, planted rows are served only as
+  /// a fallback to native's own download failing, which this class never sees
+  /// — so in practice not at all — and nothing fails over. Bootstrap passes
+  /// [fetchThrough].
+  ///
+  /// [hostFailing] says whether a tile's region host failed the last request
+  /// [fetch] made to it; bootstrap passes `ApiClient.tileHostFailing`.
   MapTileCache(
     this._store, {
     NetworkUsageStore? usage,
     TileFetch? fetch,
+    bool Function(String url)? hostFailing,
     Duration plantedNetworkBudget = defaultPlantedNetworkBudget,
     // ignore: prefer_initializing_formals
   }) : _usage = usage,
        // ignore: prefer_initializing_formals
        _fetch = fetch,
+       // ignore: prefer_initializing_formals
+       _hostFailing = hostFailing,
        // ignore: prefer_initializing_formals
        _plantedNetworkBudget = plantedNetworkBudget;
 
@@ -115,13 +143,15 @@ class MapTileCache {
   // ignore: prefer_initializing_formals
   final NetworkUsageStore? _usage;
   final TileFetch? _fetch;
+  final bool Function(String url)? _hostFailing;
 
   /// A [TileFetch] through the app's own HTTP stack, so the download is
   /// metered and stored like any other — the interceptor replaces the planted
-  /// row with it.
+  /// row with it — and a tile every region carries fails over to the other
+  /// region ([ApiClient.getTileBytes]).
   static TileFetch fetchThrough(ApiClient client) => (url) async {
     try {
-      return (await client.getBytesAbsolute(url)).bytes;
+      return (await client.getTileBytes(url)).bytes;
     } on DioException catch (error) {
       // The origin saying "nothing here" is an answer, and the interceptor has
       // already stored it in place of the planted row.
@@ -130,8 +160,8 @@ class MapTileCache {
     }
   };
 
-  /// How long a demand may spend asking the network about planted tiles
-  /// before it hands over the planted bodies.
+  /// How long a demand may spend asking the network — about planted tiles, or
+  /// about tiles failing over — before it answers native with what it has.
   ///
   /// Under native's own wait for a `getBatch` answer (2.5 s on Android, 4 s
   /// on iOS) — past it native gives up on this side and downloads the tile
@@ -158,6 +188,27 @@ class MapTileCache {
   /// where a repeat request would get the planted body again without asking
   /// this side, so they are dropped once the network is seen to answer.
   final Set<String> _plantedInL1 = {};
+
+  /// Region-host tiles this side answered with a miss and native has not
+  /// delivered since, oldest first. Native asks again only when its own
+  /// download did not land, which is the one sign of a failed download this
+  /// side ever gets (see "Region failover").
+  ///
+  /// A download that did not land because it was cancelled is not a failure.
+  /// The cancels this side issues ([cancelFetches]) are forgotten here as
+  /// they are sent. MapLibre's own — a tile that leaves the viewport
+  /// mid-download — never reach Dart: the fork's tile bridge
+  /// (`MapLibreDartTileBridge`, Java and Swift) calls only `cacheablePatterns`,
+  /// `getBatch` and `putBatch`, and says nothing when a request is dropped. A
+  /// tile like that, asked for again, is taken over once, from the selected
+  /// region first (`ApiClient.getTileBytes`) — one download in place of
+  /// native's.
+  final Set<String> _unanswered = {};
+
+  /// Ceiling on [_unanswered]. A delivered tile leaves it within one
+  /// `putBatch`, so what stays is what failed or was cancelled; the oldest of
+  /// those are the least likely to be asked for again.
+  static const int _unansweredCap = 1024;
 
   /// What a demand waits for before reading the store — see [servesAfter].
   Future<void>? _ready;
@@ -265,7 +316,7 @@ class MapTileCache {
     }
     // Hit metering lives inside [EtagCacheStore.readBytesBatch] — never
     // double-count these serves here.
-    final hits = await _store.readBytesBatch(wanted, accept: _notPlanted);
+    final hits = await _readTiles(wanted, accept: _notPlanted);
     final served = <String, MapLibreTile>{};
     for (final entry in hits.entries) {
       served[entry.key] = _tileFromCache(entry.key, entry.value);
@@ -275,11 +326,17 @@ class MapTileCache {
         if (!served.containsKey(url) && _mayBePlanted(url)) url,
     ], elapsed: elapsed);
     served.addAll(planted);
+    final failedOver = await _failOver([
+      for (final url in wanted)
+        if (!served.containsKey(url)) url,
+    ], elapsed: elapsed);
+    served.addAll(failedOver);
     trace(
       () =>
           'demand l1-miss=${wanted.length} '
           'l2-hit=${hits.length} l2-miss=${wanted.length - served.length} '
           '${planted.isEmpty ? '' : 'planted=${planted.length} '}'
+          '${failedOver.isEmpty ? '' : 'failover=${failedOver.length} '}'
           'bytes=${_bytes(_tileBytes(served.values))} '
           'dt=${elapsed.elapsedMilliseconds}ms '
           'sample=${_urls(wanted)}',
@@ -295,11 +352,13 @@ class MapTileCache {
     required Stopwatch elapsed,
   }) async {
     if (candidates.isEmpty) return const {};
-    final etags = await _store.etagsFor(candidates);
+    final keys = [for (final url in candidates) tileCacheKey(url)];
+    final etags = await _store.etagsFor(keys);
     final planted = [
-      for (final url in candidates)
-        if (etags[url] case final etag? when EtagCacheStore.isSeedEtag(etag))
-          url,
+      for (var i = 0; i < candidates.length; i++)
+        if (etags[keys[i]] case final etag?
+            when EtagCacheStore.isSeedEtag(etag))
+          candidates[i],
     ];
     if (planted.isEmpty) return const {};
 
@@ -317,7 +376,7 @@ class MapTileCache {
     // Re-checked by the read itself: a download that replaced the row while
     // the network was being asked is a real hit and is left to the next
     // demand rather than served as planted.
-    final bodies = await _store.readBytesBatch(fallback, accept: _isPlanted);
+    final bodies = await _readTiles(fallback, accept: _isPlanted);
     for (final entry in bodies.entries) {
       served[entry.key] = _tileFromCache(entry.key, entry.value);
       _plantedInL1.add(entry.key);
@@ -356,11 +415,19 @@ class MapTileCache {
           continue;
         }
         answered++;
+        final uri = Uri.parse(url);
+        // The origin's 404 arrives as an empty body. Only the basemap's is a
+        // tile (open sea, see [_onPutBatch]); anything else is left to native,
+        // which reports it to MapLibre as the 404 it is.
+        if (body.isEmpty && !EtagInterceptor.isBasemapPbf(uri)) continue;
+        // Repaired like a store read: a radar placeholder must not reach
+        // ImageIO in the form it rejects.
+        final payload = _safeRasterPayload(body, null);
         final tile = MapLibreTile(
           url: url,
-          data: body,
-          contentType: 'application/octet-stream',
-          etag: EtagInterceptor.etagFromUrl(Uri.parse(url)),
+          data: payload.bytes,
+          contentType: payload.contentType ?? 'application/octet-stream',
+          etag: EtagInterceptor.etagFromUrl(uri),
         );
         if (expired) {
           late.add(tile);
@@ -415,6 +482,53 @@ class MapTileCache {
     return false;
   }
 
+  /// Fetches, with region failover, the [misses] native's own download is not
+  /// trusted with — see "Region failover" in the class doc. Whatever is not
+  /// answered in the budget is left to native and remembered, so the next ask
+  /// for it comes back here.
+  Future<Map<String, MapLibreTile>> _failOver(
+    List<String> misses, {
+    required Stopwatch elapsed,
+  }) async {
+    final fetch = _fetch;
+    if (fetch == null || misses.isEmpty) return const {};
+    final due = <String>[];
+    for (final url in misses) {
+      // A tile only one region carries has nowhere to go: native's download
+      // is the only one there is.
+      if (tileRoute(url) == null) continue;
+      if (_unanswered.contains(url) || (_hostFailing?.call(url) ?? false)) {
+        due.add(url);
+      } else {
+        _rememberUnanswered(url);
+      }
+    }
+    if (due.isEmpty) return const {};
+    final budget = _plantedNetworkBudget - elapsed.elapsed;
+    final fresh = _networkBelievedDown || budget <= Duration.zero
+        ? const <String, MapLibreTile>{}
+        : await _fetchFresh(fetch, due, budget);
+    for (final url in due) {
+      if (fresh.containsKey(url)) {
+        _unanswered.remove(url);
+      } else {
+        _rememberUnanswered(url);
+      }
+    }
+    trace(() => 'failover network=${fresh.length}/${due.length}');
+    return fresh;
+  }
+
+  void _rememberUnanswered(String url) {
+    // Re-added, so the set stays ordered by the latest ask.
+    _unanswered
+      ..remove(url)
+      ..add(url);
+    if (_unanswered.length > _unansweredCap) {
+      _unanswered.remove(_unanswered.first);
+    }
+  }
+
   /// The network answered: stop holding planted fallbacks, and drop the ones
   /// native was handed from L1 so its next request for them reaches this side
   /// — and the network — instead of replaying the planted body.
@@ -450,6 +564,8 @@ class MapTileCache {
     final repaired = <MapLibreTile>[];
     var downloaded = 0;
     for (final tile in tiles) {
+      // Native delivered it, so a later ask for it is not a failed download.
+      _unanswered.remove(tile.url);
       final uri = Uri.tryParse(tile.url);
       if (uri == null || !EtagInterceptor.isImmutableTile(uri)) continue;
       // A 404 arrives as an empty body. For the basemap that is a deliberate
@@ -472,7 +588,7 @@ class MapTileCache {
         );
       }
       writes.add((
-        url: tile.url,
+        url: tileCacheKey(tile.url),
         // The URL is content-addressed, so the synthetic tag is the right key —
         // a new frame is a new URL, never a revalidation of this one.
         etag: EtagInterceptor.etagFromUrl(uri),
@@ -633,11 +749,7 @@ class MapTileCache {
       // past must not outrank one they actually looked at. Planted rows are
       // never warmed — only a demand may hand one over, and only after asking
       // the network (see the class doc).
-      final hits = await _store.readBytesBatch(
-        missing,
-        touch: false,
-        accept: _notPlanted,
-      );
+      final hits = await _readTiles(missing, touch: false, accept: _notPlanted);
       trace(
         () =>
             'warm#$traceId l2-hit=${hits.length} '
@@ -804,11 +916,7 @@ class MapTileCache {
       if (shouldContinue?.call() == false || used >= cap) break;
       final readEnd = math.min(readAt + _fillReadChunk, missing.length);
       final urls = missing.sublist(readAt, readEnd);
-      final hits = await _store.readBytesBatch(
-        urls,
-        touch: false,
-        accept: _notPlanted,
-      );
+      final hits = await _readTiles(urls, touch: false, accept: _notPlanted);
       scanned += urls.length;
       l2Hits += hits.length;
       l2Bytes += _binaryBytes(hits.values);
@@ -868,7 +976,7 @@ class MapTileCache {
     final payload = _safeRasterPayload(bytes, contentType);
     await _store.writeBytesBatch([
       (
-        url: url,
+        url: tileCacheKey(url),
         etag: EtagInterceptor.etagFromUrl(uri),
         bytes: payload.bytes,
         contentType: payload.contentType,
@@ -888,7 +996,25 @@ class MapTileCache {
           'cancel-fetch patterns=${urlContains.length} '
           'sample=${_urls(urlContains)}',
     );
+    // A download cancelled here was abandoned, not failed. When MapLibre asks
+    // for one of these tiles again, that is the second ask of a fetch nobody
+    // let finish — and taking it over would download, through Dio on this
+    // isolate and with nothing able to cancel it, exactly the tiles the
+    // abandon was shedding.
+    _forgetUnanswered(urlContains);
     await cancelMapLibreTileFetches(urlContains: urlContains);
+  }
+
+  /// Drops the [_unanswered] tiles a cancel of [urlContains] covers — every
+  /// one for an unscoped cancel, as native cancels everything then.
+  void _forgetUnanswered(List<String> urlContains) {
+    if (urlContains.isEmpty) {
+      _unanswered.clear();
+      return;
+    }
+    _unanswered.removeWhere(
+      (url) => urlContains.any((pattern) => url.contains(pattern)),
+    );
   }
 
   /// Drops tiles matching [urlContains] from native's mirror (bytes stay in
@@ -900,6 +1026,50 @@ class MapTileCache {
           'scope=${urlContains.isEmpty ? 'all' : _urls(urlContains)}',
     );
     await evictMapLibreTiles(urlContains);
+  }
+
+  /// [EtagCacheStore.readBytesBatch] for tile URLs: each row is looked up
+  /// under its [tileCacheKey] and handed back under the URL asked for, which
+  /// is the one native and the warm path have to keep.
+  Future<Map<String, CachedBytes>> _readTiles(
+    List<String> urls, {
+    bool touch = true,
+    EntryFilter? accept,
+  }) async {
+    // Each key holds the one URL that maps to it, and becomes a list only
+    // when a second does — the same tile named on two region hosts in one
+    // batch. A list per URL was an allocation per tile on every demand and
+    // every warm chunk, and a settled fill names some 12k of them.
+    final urlsByKey = <String, Object>{};
+    for (final url in urls) {
+      final key = tileCacheKey(url);
+      switch (urlsByKey[key]) {
+        case null:
+          urlsByKey[key] = url;
+        case final List<String> held:
+          held.add(url);
+        case final String held:
+          urlsByKey[key] = <String>[held, url];
+      }
+    }
+    final rows = await _store.readBytesBatch(
+      urlsByKey.keys.toList(growable: false),
+      touch: touch,
+      accept: accept,
+    );
+    if (rows.isEmpty) return const {};
+    final out = <String, CachedBytes>{};
+    for (final row in rows.entries) {
+      switch (urlsByKey[row.key]) {
+        case final String url:
+          out[url] = row.value;
+        case final List<String> held:
+          for (final url in held) {
+            out[url] = row.value;
+          }
+      }
+    }
+    return out;
   }
 
   static int _tileBytes(Iterable<MapLibreTile> tiles) =>

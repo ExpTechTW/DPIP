@@ -93,35 +93,32 @@ void main() {
     client = ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({})));
   });
 
-  test(
-    'prefetch targets the static-exclusive tier and the dpm mvt path template',
-    () async {
-      final warmer = _RecordingWarmer();
-      final prefetcher = DpmTilePrefetcher(client, warmer);
+  test('prefetch targets the region-pinned static tier and the dpm mvt path template', () async {
+    final warmer = _RecordingWarmer();
+    final prefetcher = DpmTilePrefetcher(client, warmer);
 
-      await prefetcher.prefetch(
-        layer: 'shelter',
-        south: 21.9,
-        west: 120.0,
-        north: 25.3,
-        east: 122.0,
-        zoom: 12,
-      );
+    await prefetcher.prefetch(
+      layer: 'shelter',
+      south: 21.9,
+      west: 120.0,
+      north: 25.3,
+      east: 122.0,
+      zoom: 12,
+    );
 
-      expect(warmer.warmViewportCalls, hasLength(1));
-      final call = warmer.warmViewportCalls.single;
-      expect(call.tier, ApiTier.coreStaticExclusive);
-      expect(call.pathFor(10, 5, 3), '/api/v2/tiles/dpm/shelter/10/5/3.mvt');
-      expect(call.south, 21.9);
-      expect(call.west, 120.0);
-      expect(call.north, 25.3);
-      expect(call.east, 122.0);
-      expect(call.zoom, 12.0);
-      expect(call.maxZoom, dpmSourceMaxZoom.toInt());
-      expect(call.logLabel, 'dpm-shelter');
-      expect(call.workingSet, 'dpm-shelter');
-    },
-  );
+    expect(warmer.warmViewportCalls, hasLength(1));
+    final call = warmer.warmViewportCalls.single;
+    expect(call.tier, ApiTier.coreStatic);
+    expect(call.pathFor(10, 5, 3), '/api/v2/tiles/dpm/shelter/10/5/3.mvt');
+    expect(call.south, 21.9);
+    expect(call.west, 120.0);
+    expect(call.north, 25.3);
+    expect(call.east, 122.0);
+    expect(call.zoom, 12.0);
+    expect(call.maxZoom, dpmSourceMaxZoom.toInt());
+    expect(call.logLabel, 'dpm-shelter');
+    expect(call.workingSet, 'dpm-shelter');
+  });
 
   test('each layer gets its own working set, log label and path — one layer '
       'never collides with another', () async {

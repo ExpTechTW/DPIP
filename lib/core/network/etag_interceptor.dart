@@ -7,6 +7,7 @@ import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/stale_if_error.dart';
+import 'package:dpip/core/network/tile_hosts.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
@@ -22,7 +23,8 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 ///
 /// **Immutable tiles** (basemap PBF / radar / satellite / cycle-pinned wind /
 /// DPM — frame or z/x/y in the path) are **URL-addressed**: local hit → serve,
-/// no `If-None-Match`.
+/// no `If-None-Match`. They are stored under [tileCacheKey], so the same tile
+/// fetched from either region host is one row.
 /// A `200` is always stored under a synthetic [etagFromUrl] (server ETag is
 /// ignored — the URL already pins the content). Basemap `404` is negatively
 /// cached (empty + [negativeTileEtag]); radar/sat/DPM 404s are not. A row the
@@ -93,6 +95,15 @@ class EtagInterceptor extends Interceptor {
   static bool _isBytes(RequestOptions o) =>
       o.responseType == ResponseType.bytes;
 
+  /// The store key for a request to [url] ([uri] parsed): a content-addressed
+  /// tile's [tileCacheKey], so the same tile from either region host is one
+  /// row, and the URL itself for anything else — a response revalidated by
+  /// ETag keeps its own row, since each region's server mints its own
+  /// validators. Every read and write below goes through this, so a lookup
+  /// always asks for the key its row was written under.
+  static String _rowKey(RequestOptions o, Uri uri, String url) =>
+      _isBytes(o) && isImmutableTile(uri) ? tileCacheKey(url) : url;
+
   /// Bare-host static map vector tiles (no server ETag).
   static bool isBasemapPbf(Uri uri) =>
       uri.host == 'static.lb.exptech.dev' &&
@@ -136,12 +147,14 @@ class EtagInterceptor extends Interceptor {
     return false;
   }
 
-  /// Stable weak ETag derived from the request URL (FNV-1a 64-bit).
+  /// Stable weak ETag derived from the request URL's [tileCacheKey]
+  /// (FNV-1a 64-bit), so a tile carries one tag whichever region host served
+  /// it.
   static String etagFromUrl(Uri uri) {
     const offset = 0xcbf29ce484222325;
     const prime = 0x100000001b3;
     var hash = offset;
-    for (final unit in utf8.encode(uri.toString())) {
+    for (final unit in utf8.encode(tileCacheKey(uri.toString()))) {
       hash ^= unit;
       hash = (hash * prime) & 0xFFFFFFFFFFFFFFFF;
     }
@@ -257,16 +270,18 @@ class EtagInterceptor extends Interceptor {
       return;
     }
     final url = uri.toString();
+    final key = _rowKey(options, uri, url);
 
-    // Immutable tiles: URL is the key — serve SQLite hits locally. Never send
-    // If-None-Match (content is pinned by the URL; revalidation is pointless).
+    // Immutable tiles: the URL's [tileCacheKey] is the key — serve SQLite hits
+    // locally. Never send If-None-Match (content is pinned by the URL;
+    // revalidation is pointless).
     //
     // A row the app planted from its own bundle is not a hit: nothing the
     // origin said is behind it. The request goes out and a 200 replaces the
     // row; falling back to it when the network cannot answer is the caller's
     // call (`MapTileCache`), because only the caller knows it wants a fallback.
     if (_isBytes(options) && isImmutableTile(uri)) {
-      final cached = await store.readBytes(url, accept: _notSeed);
+      final cached = await store.readBytes(key, accept: _notSeed);
       if (cached != null) {
         // Hit metering lives in [EtagCacheStore.readBytes].
         handler.resolve(
@@ -289,7 +304,7 @@ class EtagInterceptor extends Interceptor {
 
     // An older client may have cached this URL after decoding JSON. Only
     // revalidate if the row can supply the requested representation on 304.
-    final etag = await store.readEtag(url, binary: _isBytes(options));
+    final etag = await store.readEtag(key, binary: _isBytes(options));
     // Never send a synthetic URL-hash If-None-Match — the origin doesn't know it.
     if (etag != null && !_isUrlHashEtag(etag)) {
       options.headers[HttpHeadersEtag.ifNoneMatch] = etag;
@@ -315,13 +330,14 @@ class EtagInterceptor extends Interceptor {
     final uri = options.uri;
     if (store != null && _cacheable(options, uri)) {
       final url = uri.toString();
+      final key = _rowKey(options, uri, url);
       final binary = _isBytes(options);
       final post = options.method.toUpperCase() == 'POST';
       if (response.statusCode == 304) {
         final validated = options.headers[HttpHeadersEtag.ifNoneMatch];
         if (binary) {
           final cached = await store.readBytes(
-            url,
+            key,
             accept: (_, etag) => etag == validated,
           );
           if (cached != null) {
@@ -342,7 +358,7 @@ class EtagInterceptor extends Interceptor {
           // parse belongs on the worker hop the store's gunzip already pays —
           // Dio's own isolate offload never sees a 304, it has no body.
           final cached = await store.readJson(
-            url,
+            key,
             accept: (_, etag) => etag == validated,
           );
           if (cached != null) {
@@ -358,7 +374,7 @@ class EtagInterceptor extends Interceptor {
             // request's offline label counts its age from here. Only those
             // pay the write — nothing else reads it.
             if (StaleIfError.of(options) != null) {
-              unawaited(store.markFetched(url, AppTime.utc, etag: cached.etag));
+              unawaited(store.markFetched(key, AppTime.utc, etag: cached.etag));
             }
             handler.next(response);
             return;
@@ -404,7 +420,7 @@ class EtagInterceptor extends Interceptor {
             final bytes = _asBytes(response.data);
             unawaited(
               store.writeBytes(
-                url,
+                key,
                 etag: etag,
                 bytes: bytes,
                 contentType: response.headers.value(Headers.contentTypeHeader),
@@ -414,7 +430,7 @@ class EtagInterceptor extends Interceptor {
           } else {
             unawaited(
               store.write(
-                url,
+                key,
                 etag: etag,
                 body: jsonBody!,
                 contentType: response.headers.value(Headers.contentTypeHeader),
@@ -454,9 +470,8 @@ class EtagInterceptor extends Interceptor {
         _isBytes(options) &&
         status == 404 &&
         isBasemapPbf(uri)) {
-      final url = uri.toString();
       await store.writeBytes(
-        url,
+        _rowKey(options, uri, uri.toString()),
         etag: negativeTileEtag,
         bytes: Uint8List(0),
         contentType: 'application/octet-stream',
@@ -477,7 +492,9 @@ class EtagInterceptor extends Interceptor {
         options.method.toUpperCase() == 'POST' &&
         status == null &&
         uri.host == 'status.exptech.dev') {
-      final cached = await store.readJson(uri.toString());
+      final cached = await store.readJson(
+        _rowKey(options, uri, uri.toString()),
+      );
       if (cached != null) {
         handler.resolve(
           Response<dynamic>(
@@ -503,7 +520,9 @@ class EtagInterceptor extends Interceptor {
         options.method.toUpperCase() == 'GET' &&
         _cacheable(options, uri) &&
         StaleIfError.covers(err)) {
-      final cached = await store.readJson(uri.toString());
+      final cached = await store.readJson(
+        _rowKey(options, uri, uri.toString()),
+      );
       if (cached != null) {
         staleIfError.offer((data: cached.data, fetchedAt: cached.fetchedAt));
       }

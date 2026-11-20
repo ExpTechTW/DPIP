@@ -68,7 +68,8 @@ enum ApiTier {
   coreExclusiveApi,
 
   /// Core **static** assets available **only** in [CoreRegion.tnn1]
-  /// (`static.core-tnn1`). No failover — e.g. the v2 radar WebP tiles.
+  /// (`static.core-tnn1`). No failover — e.g. the v2 satellite and wind WebP
+  /// tiles.
   coreStaticExclusive,
 
   /// Legacy single host `api-1.exptech.dev`. No region, no failover — used by

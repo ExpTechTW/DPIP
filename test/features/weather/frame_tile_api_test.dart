@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/tile_hosts.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/weather/data/frame_tile_api.dart';
 import 'package:dpip/shared/map/map_layer.dart';
@@ -270,6 +272,93 @@ void main() {
       expect(
         adapter.urls.single,
         contains('/api/v1/wind/gfs/1783339200/1783360200.bin'),
+      );
+    });
+  });
+
+  group('tier by path', () {
+    test('radar and QPESUMS follow the selected core region', () async {
+      final adapter = _RecordingAdapter();
+      final regions = RegionSelection(SettingsStore.inMemory({}))
+        ..core = CoreRegion.tyo1;
+      final client = ApiClient(Dio()..httpClientAdapter = adapter, regions);
+
+      final radar = FrameTileApi(client, 'radar');
+      await radar.getFrames();
+      expect(
+        adapter.urls.single,
+        startsWith('https://api.core-tyo1.exptech.dev/'),
+      );
+      expect(
+        radar.tileUrl('1783360200'),
+        startsWith('https://static.core-tyo1.exptech.dev/'),
+      );
+
+      final qpesums = FrameTileApi(client, 'qpesums');
+      expect(
+        qpesums.tileUrl('1783360200'),
+        startsWith('https://static.core-tyo1.exptech.dev/'),
+      );
+    });
+
+    test('satellite and wind have no second region and stay on tnn1', () async {
+      final adapter = _RecordingAdapter();
+      final regions = RegionSelection(SettingsStore.inMemory({}))
+        ..core = CoreRegion.tyo1;
+      final client = ApiClient(Dio()..httpClientAdapter = adapter, regions);
+
+      final satellite = FrameTileApi(client, 'satellite', channel: '13');
+      await satellite.getFrames();
+      expect(
+        adapter.urls.single,
+        startsWith('https://api.core-tnn1.exptech.dev/'),
+      );
+      expect(
+        satellite.tileUrl('1783360200'),
+        startsWith('https://static.core-tnn1.exptech.dev/'),
+      );
+
+      final wind = FrameTileApi(client, 'wind', model: 'gfs');
+      expect(
+        wind.tileUrl('1783360200@1783339200'),
+        startsWith('https://static.core-tnn1.exptech.dev/'),
+      );
+    });
+
+    test('a tile fails over exactly when its family has a second region', () {
+      // The failover route is keyed off the URL, the tier off the path; this
+      // pins the two together so a family moved between tiers moves both.
+      final client = ApiClient(
+        Dio(),
+        RegionSelection(SettingsStore.inMemory({})),
+      );
+      expect(
+        tileRoute(FrameTileApi(client, 'radar').tileUrl('1783360200'))?.tier,
+        ApiTier.coreStatic,
+      );
+      expect(
+        tileRoute(FrameTileApi(client, 'qpesums').tileUrl('1783360200'))?.tier,
+        ApiTier.coreStatic,
+      );
+      expect(
+        tileRoute(
+          FrameTileApi(
+            client,
+            'satellite',
+            channel: '13',
+          ).tileUrl('1783360200'),
+        ),
+        isNull,
+      );
+      expect(
+        tileRoute(
+          FrameTileApi(
+            client,
+            'wind',
+            model: 'gfs',
+          ).tileUrl('1783360200@1783339200'),
+        ),
+        isNull,
       );
     });
   });

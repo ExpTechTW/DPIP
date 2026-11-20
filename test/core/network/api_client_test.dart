@@ -426,4 +426,154 @@ void main() {
     );
     expect(clientError.hits, hasLength(1));
   });
+
+  group('getTileBytes', () {
+    const path = '/api/v2/tiles/radar/1783360200/7/107/55.webp';
+    const tnn1 = 'https://static.core-tnn1.exptech.dev';
+    const tyo1 = 'https://static.core-tyo1.exptech.dev';
+
+    ResponseBody tile(int status) => ResponseBody.fromBytes(
+      status == 200 ? [0x52, 0x49, 0x46, 0x46] : const [],
+      status,
+    );
+
+    test('a retryable failure fails over to the same path on the next '
+        'region', () async {
+      final adapter = _FakeAdapter((call, options) {
+        if (call == 1) {
+          throw DioException(
+            requestOptions: options,
+            type: DioExceptionType.connectionTimeout,
+          );
+        }
+        return tile(200);
+      });
+      final payload = await clientWith(adapter).getTileBytes('$tnn1$path');
+      expect(payload.bytes, [0x52, 0x49, 0x46, 0x46]);
+      expect(adapter.hits, [
+        'static.core-tnn1.exptech.dev',
+        'static.core-tyo1.exptech.dev',
+      ]);
+    });
+
+    test('a 5xx fails over too', () async {
+      final adapter = _FakeAdapter((call, _) => tile(call == 1 ? 502 : 200));
+      await clientWith(adapter).getTileBytes('$tnn1$path');
+      expect(adapter.hits, hasLength(2));
+    });
+
+    test('a frame one region lacks is asked of the other, uncharged', () async {
+      // Each core region keeps its own history, so a 404 is a gap in this
+      // region, not the answer — and not a sick host either.
+      final health = EndpointHealthMonitor();
+      final adapter = _FakeAdapter((call, _) => tile(call == 1 ? 404 : 200));
+      final payload = await monitoredClient(
+        adapter,
+        health,
+      ).getTileBytes('$tnn1$path');
+      expect(payload.bytes, [0x52, 0x49, 0x46, 0x46]);
+      expect(adapter.hits, [
+        'static.core-tnn1.exptech.dev',
+        'static.core-tyo1.exptech.dev',
+      ]);
+      expect(
+        health
+            .of(EndpointService.radar, ApiTier.coreStatic, tnn1)
+            ?.consecutiveFailures,
+        anyOf(isNull, 0),
+      );
+    });
+
+    test('a 404 from every region is the answer', () async {
+      final adapter = _FakeAdapter((_, _) => tile(404));
+      await expectLater(
+        () => clientWith(adapter).getTileBytes('$tnn1$path'),
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.response?.statusCode,
+            'status',
+            404,
+          ),
+        ),
+      );
+      expect(adapter.hits, hasLength(2), reason: 'each region once');
+    });
+
+    test('asks each host at most once, in the selected order', () async {
+      regions.core = CoreRegion.tyo1;
+      final adapter = _FakeAdapter((_, _) => tile(503));
+      await expectLater(
+        () => clientWith(adapter).getTileBytes('$tnn1$path'),
+        throwsA(isA<DioException>()),
+      );
+      expect(adapter.hits, [
+        'static.core-tyo1.exptech.dev',
+        'static.core-tnn1.exptech.dev',
+      ]);
+    });
+
+    test('a family only tnn1 carries is one request', () async {
+      final adapter = _FakeAdapter((_, _) => tile(503));
+      await expectLater(
+        () => clientWith(adapter).getTileBytes(
+          '$tnn1/api/v2/tiles/satellite/13/normal/1783360200/5/26/14.webp',
+        ),
+        throwsA(isA<DioException>()),
+      );
+      expect(adapter.hits, ['static.core-tnn1.exptech.dev']);
+    });
+
+    test('a host that just failed a tile is asked last', () async {
+      // A takeover happens because the selected host failed; asking it first
+      // again would spend its timeout against the cache's 1.8 s budget.
+      final health = EndpointHealthMonitor()
+        ..failure(ApiTier.coreStatic, tnn1, path);
+      final adapter = _FakeAdapter((_, _) => tile(200));
+      await monitoredClient(adapter, health).getTileBytes('$tnn1$path');
+      expect(adapter.hits, ['static.core-tyo1.exptech.dev']);
+    });
+
+    test('a host asked last is still asked, once', () async {
+      final health = EndpointHealthMonitor()
+        ..failure(ApiTier.coreStatic, tnn1, path);
+      final adapter = _FakeAdapter((call, _) => tile(call == 1 ? 503 : 200));
+      await monitoredClient(adapter, health).getTileBytes('$tnn1$path');
+      expect(adapter.hits, [
+        'static.core-tyo1.exptech.dev',
+        'static.core-tnn1.exptech.dev',
+      ]);
+    });
+
+    test('with every host failing, the selected order stands', () async {
+      final health = EndpointHealthMonitor()
+        ..failure(ApiTier.coreStatic, tnn1, path)
+        ..failure(ApiTier.coreStatic, tyo1, path);
+      final adapter = _FakeAdapter((_, _) => tile(503));
+      await expectLater(
+        () => monitoredClient(adapter, health).getTileBytes('$tnn1$path'),
+        throwsA(isA<DioException>()),
+      );
+      expect(adapter.hits, [
+        'static.core-tnn1.exptech.dev',
+        'static.core-tyo1.exptech.dev',
+      ]);
+    });
+
+    test('tileHostFailing reports what the tile requests saw', () async {
+      final health = EndpointHealthMonitor();
+      final adapter = _FakeAdapter((call, _) => tile(call == 1 ? 503 : 200));
+      final client = monitoredClient(adapter, health);
+      expect(client.tileHostFailing('$tnn1$path'), isFalse);
+
+      await client.getTileBytes('$tnn1$path');
+
+      expect(client.tileHostFailing('$tnn1$path'), isTrue);
+      expect(client.tileHostFailing('$tyo1$path'), isFalse);
+      expect(
+        clientWith(adapter).tileHostFailing('$tnn1$path'),
+        isFalse,
+        reason: 'no monitor, no verdict',
+      );
+    });
+  });
 }

@@ -280,6 +280,7 @@ Future<void> bootstrap() async {
           cache.etag,
           usage: cache.usage,
           fetch: MapTileCache.fetchThrough(apiClient),
+          hostFailing: apiClient.tileHostFailing,
         );
   final tileStart = Log.sinceStartMs;
   await mapTileCache?.install();
