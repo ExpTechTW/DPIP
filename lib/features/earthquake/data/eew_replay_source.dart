@@ -1,3 +1,4 @@
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
@@ -35,7 +36,24 @@ class EewReplaySource extends RealtimeSource<List<Eew>> {
       for (final e in all)
         if (!e.isJma && (!onlyCwa || e.isCwa)) e,
     ];
-  });
+  }, shouldLog: (failure) => !isIgnorableFailure(failure));
+
+  /// A 404 is the archive saying "no record at that instant", which per the
+  /// endpoint's own contract covers both ends: a replay that has walked past
+  /// the retained range, and an event older than the first row the database
+  /// holds. Neither is a fault — the replay is running, there is just nothing
+  /// recorded there — and counting it as one would turn the whole tail of an
+  /// old event into a wall of retries. Inside the range the endpoint answers
+  /// 200 with `[]` for a second that simply carried no bulletin, so the two
+  /// cases stay distinguishable in the payload; for the card they mean the same
+  /// thing (nothing to show).
+  ///
+  /// Not counted is not the same as healthy: a feed that keeps getting 404s
+  /// still ages to offline on the channel's schedule, which is what the
+  /// replay's EEW slot reads (`replayEewSlot`) — so a region that has lost the
+  /// route cannot pass for one that simply has no bulletin this second.
+  @override
+  bool isIgnorableFailure(Failure failure) => failure is NotFoundFailure;
 
   /// Null: same fetch-freshness rationale as the live [EewRealtimeSource] —
   /// here doubly so, since the payload's own time is deliberately historical.

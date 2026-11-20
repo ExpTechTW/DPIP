@@ -78,15 +78,18 @@ class ReplayEewProbe {
     final samples = await Future.wait([
       for (final offset in replayProbeOffsets) _sample(origin.add(offset)),
     ]);
-    if (samples.any((sample) => sample == null)) {
-      return ReplayEewVerdict.undecided;
+    // A bulletin anywhere settles it, whatever the other two said.
+    if (samples.any((eews) => eews?.isNotEmpty ?? false)) {
+      return ReplayEewVerdict.found;
     }
-    final found = samples.any((sample) => sample!.isNotEmpty);
-    return found ? ReplayEewVerdict.found : ReplayEewVerdict.none;
+    if (samples.any((eews) => eews == null)) return ReplayEewVerdict.undecided;
+    return ReplayEewVerdict.none;
   }
 
   /// The bulletins at [instant], filtered exactly as [EewReplaySource] filters
-  /// them, or null when the request failed.
+  /// them. `null` is a failed sample — a timeout, a bad gateway, or the 404 the
+  /// archive answers for an instant it no longer holds; none of them may read
+  /// as "there was nothing".
   Future<List<Eew>?> _sample(DateTime instant) async {
     final seconds = instant.millisecondsSinceEpoch ~/ 1000;
     final result = await guardResult(() async {
