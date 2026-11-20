@@ -26,6 +26,9 @@ class _FakeReports implements ReportRepository {
 
   @override
   Future<Result<EarthquakeReport>> get(String id) => throw UnimplementedError();
+
+  @override
+  Future<Result<bool>> hasReplayAt(int timestamp) => throw UnimplementedError();
 }
 
 PartialEarthquakeReport _report({

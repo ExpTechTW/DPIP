@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
@@ -37,6 +38,47 @@ class EarthquakeApi {
   Future<Map<String, dynamic>> getRtsAt(int seconds) async =>
       (await _client.get(ApiTier.coreApi, '${ApiPaths.rtsArchive}/$seconds'))
           as Map<String, dynamic>;
+
+  /// Whether the replay archives still hold the moment at [seconds].
+  ///
+  /// Two feeds make a replay: the EEW alerts around the event and the RTS
+  /// frames from its start. They are pruned on different schedules, and the
+  /// EEW history is the longer-lived of the two (an old event can still have
+  /// alerts to replay and no shaking left to draw), so an EEW hit is enough.
+  ///
+  /// EEW alerts trail the origin by a few seconds, so the EEW probe looks
+  /// just past it rather than at the replay's lead-in second. A 404 from the
+  /// RTS archive is a "no such second", not a fault — what it retains moves
+  /// with time, which is exactly why this asks instead of comparing against
+  /// a fixed date. Every other failure is rethrown.
+  Future<bool> hasReplayAt(int seconds) async {
+    if (await _hasEewAt(seconds + 60)) return true;
+    try {
+      await getRtsAt(seconds);
+      return true;
+    } on DioException catch (error) {
+      if (_isMissing(error)) return false;
+      rethrow;
+    }
+  }
+
+  /// An EEW point query, with the archive's two "nothing there" answers —
+  /// 404, and 400 for a timestamp too old to be ten digits — folded to empty.
+  Future<bool> _hasEewAt(int seconds) async {
+    try {
+      return (await getEewAt(seconds)).isNotEmpty;
+    } on DioException catch (error) {
+      if (_isMissing(error)) return false;
+      rethrow;
+    }
+  }
+
+  /// Whether [error] is the archive saying it has nothing for that second,
+  /// rather than a transport/server fault.
+  static bool _isMissing(DioException error) {
+    final code = error.response?.statusCode;
+    return code == 404 || code == 400;
+  }
 
   /// Latest EEW list (one-shot snapshot) — what the live feed polls while
   /// its stream is down.

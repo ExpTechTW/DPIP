@@ -46,13 +46,6 @@ abstract class EarthquakeReport with _$EarthquakeReport {
   DateTime get originTimeUtc =>
       DateTime.fromMillisecondsSinceEpoch(time, isUtc: true);
 
-  /// Archive eligibility only; an eligible event may still have no EEW alerts.
-  bool get canReplay => !originTimeUtc.isBefore(_replayArchiveStartUtc);
-
-  // EEW archive coverage starts on 2024-02-20 (inclusive, Asia/Taipei).
-  // Keep the cutoff independent of the device's local timezone.
-  static final _replayArchiveStartUtc = DateTime.utc(2024, 2, 19, 16);
-
   /// Short place string — prefer the parenthetical CWA locality when present.
   String get shortLocation {
     final open = location.indexOf('(');

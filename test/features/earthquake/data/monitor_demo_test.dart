@@ -49,6 +49,9 @@ class _Reports implements ReportRepository {
       const Err(NoDataFailure('unused'));
 
   @override
+  Future<Result<bool>> hasReplayAt(int timestamp) => throw UnimplementedError();
+
+  @override
   Future<Result<List<PartialEarthquakeReport>>> list({
     int limit = 30,
     int page = 1,
