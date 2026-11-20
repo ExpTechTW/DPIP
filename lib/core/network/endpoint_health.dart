@@ -9,9 +9,9 @@
 ///
 /// Outcomes are bucketed by **service × tier × host**: the same region carries
 /// different services (EEW/RTS on `lbApi` — one shared stream feeding both
-/// rows, see [EndpointService.allOfPath] — radar lists on
-/// `coreExclusiveApi` → `api.core-tnn1`), and one service's dead host may be
-/// another's healthy one. The More → 伺服器狀態 screen renders this map as a
+/// rows, see [EndpointService.allOfPath] — radar lists on `coreApi` and radar
+/// tiles on `coreStatic`), and one service's dead host may be another's
+/// healthy one. The More → 伺服器狀態 screen renders this map as a
 /// table — rows are services, columns are tier groups, cells are the regions
 /// each service was observed on.
 library;
@@ -45,7 +45,12 @@ enum EndpointService {
   /// path after `/api/` decides; the families share the `ApiPaths` constants.
   static EndpointService ofPath(String path) {
     if (path.startsWith('/api/v2/eq/eew')) return eew;
-    if (path.startsWith('/api/v2/trem/rts')) return rts;
+    // Both the live v2 topic and the v3 archive are the same family: the
+    // status table should not care which generation a caller used.
+    if (path.startsWith('/api/v3/trem/rts') ||
+        path.startsWith('/api/v2/trem/rts')) {
+      return rts;
+    }
     if (path.contains('/tiles/radar')) return radar;
     if (path.contains('/tiles/satellite')) return satellite;
     if (path.contains('/tiles/qpesums')) return qpesums;
@@ -58,7 +63,13 @@ enum EndpointService {
     if (path.startsWith('/api/v5/meteor/lightning')) return lightning;
     if (path.startsWith('/api/v5/meteor/typhoon')) return typhoon;
     if (path.startsWith('/api/v2/eq/report')) return report;
-    if (path.startsWith('/api/v1/trem/')) return tremStation;
+    // The station directory is a static CSV (`/resource/station`); the
+    // legacy `/api/v1/trem/*` spelling is kept only so old call sites still
+    // land on the same row.
+    if (path.startsWith('/resource/station') ||
+        path.startsWith('/api/v1/trem/')) {
+      return tremStation;
+    }
     if (path.startsWith('/api/v1/dpip')) return event;
     if (path.startsWith('/api/v2/location')) return location;
     if (path.startsWith('/api/v2/notify')) return notify;

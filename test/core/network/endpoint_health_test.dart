@@ -208,4 +208,36 @@ void main() {
       expect(m.summary, EndpointState.down);
     });
   });
+
+  test('ofPath follows the families that moved off the exclusive tiers', () {
+    // RTS history is v3; the live topic is v2 — both are the RTS row.
+    expect(
+      EndpointService.ofPath('/api/v3/trem/rts/1783360200'),
+      EndpointService.rts,
+    );
+    expect(
+      EndpointService.ofPath('/api/v2/trem/rts?sse=1'),
+      EndpointService.rts,
+    );
+    // The station directory is a static CSV, not an `/api/v1/trem/*` path.
+    expect(
+      EndpointService.ofPath('/resource/station'),
+      EndpointService.tremStation,
+    );
+    for (final path in [
+      '/api/v2/tiles/radar/list',
+      '/api/v2/tiles/radar/1783360200/7/1/1.webp',
+      '/api/v2/tiles/qpesums/list',
+      '/api/v2/tiles/dpm/shelter/10/5/3.mvt',
+    ]) {
+      expect(
+        EndpointService.ofPath(path),
+        anyOf(
+          EndpointService.radar,
+          EndpointService.qpesums,
+          EndpointService.dpm,
+        ),
+      );
+    }
+  });
 }
