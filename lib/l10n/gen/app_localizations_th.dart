@@ -3342,6 +3342,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get statusLegendUnsupported => 'ไม่รองรับ';
 
   @override
+  String get statusLegendStandby => 'สแตนด์บายพร้อมใช้';
+
+  @override
   String get rainScaleSection => 'ช่วงระดับสี';
 
   @override

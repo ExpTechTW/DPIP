@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/ntp_time_source.dart';
 import 'package:dpip/core/realtime/server_time_source.dart';
@@ -20,9 +21,9 @@ typedef HttpTimeProbe = ({
   int receivedAtMs,
 });
 
-/// [ServerTimeSource] over `https://api.lb.exptech.dev/ntp`, for networks that
-/// block SNTP's UDP/123 — corporate Wi-Fi, hotel and campus networks, some
-/// carriers.
+/// [ServerTimeSource] over `https://api.lb-<region>.exptech.dev/ntp`, for
+/// networks that block SNTP's UDP/123 — corporate Wi-Fi, hotel and campus
+/// networks, some carriers.
 ///
 /// Strictly a fallback behind [NtpTimeSource]: one HTTPS round trip resolves
 /// "now" to roughly ±RTT/2 (±150 ms measured), where SNTP's RFC 5905 exchange
@@ -32,18 +33,18 @@ typedef HttpTimeProbe = ({
 /// ## Why the `Date` header is checked
 ///
 /// The body is the *origin's* clock, and not every origin's clock is right: of
-/// the four `lb-*` nodes behind this name, two were 15.7 seconds behind at the
-/// time of writing — consistently, and in agreement with each other, so a
-/// quorum across them would not have caught it either.
+/// the four `lb-*` nodes, two were 15.7 seconds behind at the time of writing —
+/// consistently, and in agreement with each other, so a quorum across them
+/// would not have caught it either.
 ///
-/// What does catch it is the `Date` header of the very same response. This host
-/// sits behind Cloudflare, so `Date` is stamped at the edge, independently of
-/// whichever backend answered — which makes every response self-checking: a
-/// body more than [maximumDateSkew] from its own `Date` is a bad backend (or a
-/// frozen cache), and is discarded without needing to know which node it came
-/// from. Thirty consecutive samples stayed inside 910 ms of their header, so
-/// this name does route to healthy backends today; the check is what keeps that
-/// from being a thing the app has to assume.
+/// What does catch it is the `Date` header of the very same response. Every
+/// `lb-*` name sits behind Cloudflare, so `Date` is stamped at the edge,
+/// independently of whichever backend answered — which makes every response
+/// self-checking: a body more than [maximumDateSkew] from its own `Date` is a
+/// bad backend (or a frozen cache), and is discarded without needing to know
+/// which node it came from. Thirty consecutive samples stayed inside 910 ms of
+/// their header, so these names do route to healthy backends today; the check is
+/// what keeps that from being a thing the app has to assume.
 ///
 /// Every guard fails closed: installing a wrong offset is worse than not
 /// calibrating, so a rejected response yields a [Failure] and `ServerClock`
@@ -53,23 +54,41 @@ typedef HttpTimeProbe = ({
 /// production uses [_httpProbe].
 class HttpTimeSource implements ServerTimeSource {
   HttpTimeSource({
-    this._hosts = defaultHosts,
+    List<String>? hosts,
     this._timeout = const Duration(seconds: 2),
     this._clock = const SystemClock(),
     Future<HttpTimeProbe> Function(Uri url, Duration timeout)? probe,
-  }) : _probe = probe ?? _httpProbe;
+  }) : _hosts = hosts ?? defaultHosts,
+       _probe = probe ?? _httpProbe;
 
-  /// The DNS-balanced LB name — the one place the repository uses a bare host.
+  /// The region-pinned LB names, `tpe1` first.
   ///
-  /// `ApiTier` traffic deliberately never does (see `api_region.dart`), because
-  /// region selection and failover belong to the app. A clock reading has no
-  /// region to select: there is nothing to pin and no per-region failover to
-  /// preserve, and the bare name is what Cloudflare terminates with a valid
-  /// certificate — `time.exptech.com.tw`, SNTP's own primary, serves `/ntp` too
-  /// but presents an expired certificate for the wrong name, and its `Date`
-  /// comes from the same machine as its body, so it can neither be reached over
-  /// HTTPS nor check itself.
-  static const List<String> defaultHosts = ['api.lb.exptech.dev'];
+  /// These used to be the DNS-balanced bare `api.lb.exptech.dev` — the only
+  /// bare host this repository used — on the reasoning that a clock reading has
+  /// no region to select. The bare name is balanced without regard for which
+  /// region the rest of the app's traffic picked, so the sample could come from
+  /// a machine on the far side of the island whose clock disagrees with the
+  /// edge the app is otherwise talking to (see below for why that is not
+  /// hypothetical). The app passes [hostsFor]`(RegionSelection.lbOrder)`, so the
+  /// order follows the user's selection and the other region is the fallback.
+  ///
+  /// `time.exptech.com.tw`, SNTP's own primary, serves `/ntp` too but presents
+  /// an expired certificate for the wrong name, and its `Date` comes from the
+  /// same machine as its body, so it can neither be reached over HTTPS nor
+  /// check itself.
+  static List<String> get defaultHosts => hostsFor(_defaultOrder);
+
+  /// Region codes behind [defaultHosts].
+  static const List<LbRegion> _defaultOrder = [LbRegion.tpe1, LbRegion.khh1];
+
+  /// Bare `/ntp` host names for [order], tried in the order given.
+  ///
+  /// The `api.lb-` shape is written here once, for the same reason
+  /// `ApiClient.hostsFor` writes the `ApiTier` hosts once: a host name spelled
+  /// by hand somewhere else is one that goes stale silently.
+  static List<String> hostsFor(Iterable<LbRegion> order) => [
+    for (final region in order) 'api.lb-${region.code}.exptech.dev',
+  ];
 
   /// How far the body may sit from its own `Date` header.
   ///
@@ -168,8 +187,11 @@ class HttpTimeSource implements ServerTimeSource {
   ///
   /// Deliberately not `ApiClient`: every absolute-URL path there runs through
   /// `EtagInterceptor`, and a cached clock reading is worse than no reading.
-  /// [HttpClient] also hands back `Date` already parsed, and this request is
-  /// not `ApiTier` traffic, so region failover would not apply to it either.
+  /// [HttpClient] also hands back `Date` already parsed. The request is not
+  /// `ApiTier` traffic either — the host list does come from the region
+  /// selection, but the retry a reading needs is not a failed request's: one
+  /// that contradicts its own `Date` is rejected and [serverTimeMs] moves on to
+  /// the next region.
   static Future<HttpTimeProbe> _httpProbe(Uri url, Duration timeout) async {
     final client = HttpClient()
       ..connectionTimeout = timeout

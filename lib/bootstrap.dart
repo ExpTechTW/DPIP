@@ -285,7 +285,12 @@ Future<void> bootstrap() async {
   // one query and no asset reads. The tile cache holds its first answers until
   // this lands, so a fresh install offline still draws.
   if (cache != null) {
-    mapTileCache?.servesAfter(BasemapSeeder(cache.etag).run());
+    // Seeded under the region-pinned template the style asks for: the tiles
+    // are the same everywhere, but a row keyed by another host would never be
+    // read, and a first launch offline would draw nothing.
+    mapTileCache?.servesAfter(
+      BasemapSeeder(cache.etag, region: regions.lb).run(),
+    );
   }
   // Turn off the OS-level disk HTTP cache (iOS NSURLCache) and drop its
   // residue: every cached byte now lives in the app's own SQLite, so a second
@@ -311,7 +316,12 @@ Future<void> bootstrap() async {
   final serverClock = ServerClock(
     const SystemClock(),
     SystemElapsed(),
-    FallbackServerTimeSource([NtpTimeSource(), HttpTimeSource()]),
+    FallbackServerTimeSource([
+      NtpTimeSource(),
+      // The HTTP fallback asks the region the user picked, its own region
+      // first — see [HttpTimeSource.hostsFor].
+      HttpTimeSource(hosts: HttpTimeSource.hostsFor(regions.lbOrder)),
+    ]),
   );
   AppTime.install(serverClock);
   AppTime.sync().ignore();

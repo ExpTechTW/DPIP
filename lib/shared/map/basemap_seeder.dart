@@ -3,9 +3,11 @@
 library;
 
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/shared/map/basemap_seed.g.dart';
 import 'package:dpip/shared/map/basemap_seed_format.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/services.dart';
 
 /// What one [BasemapSeeder.run] did: rows [planted], asset parts it had to
@@ -51,6 +53,7 @@ class BasemapSeeder {
   // fields must stay private.
   BasemapSeeder(
     this._store, {
+    required this.region,
     AssetBundle? bundle,
     BasemapSeedIndex index = bundledBasemapSeed,
   }) : _bundle = bundle ?? rootBundle,
@@ -58,6 +61,16 @@ class BasemapSeeder {
        _index = index;
 
   final EtagCacheStore _store;
+
+  /// Which LB region's map host the tiles are planted under.
+  ///
+  /// The style names a region-pinned host (`static.lb-tpe1`, `static.lb-khh1`),
+  /// and the tile store keys rows by URL, so a row planted under any other
+  /// host is a row MapLibre never asks for. Switching region leaves the other
+  /// host's rows to the eviction policy; the network fills them in as it does
+  /// on a map that has never had them.
+  final LbRegion region;
+
   final AssetBundle _bundle;
   final BasemapSeedIndex _index;
 
@@ -141,7 +154,7 @@ class BasemapSeeder {
   }
 
   String _url(BasemapSeedTile tile) =>
-      basemapSeedUrl(_index.source, tile.z, tile.x, tile.y);
+      basemapSeedUrl(basemapOriginTileUrl(region), tile.z, tile.x, tile.y);
 
   static Uint8List _copy(Uint8List bytes, int start, int end) =>
       start == end ? Uint8List(0) : bytes.sublist(start, end);

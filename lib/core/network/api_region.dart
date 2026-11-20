@@ -38,19 +38,31 @@ enum CoreRegion {
   final String label;
 }
 
+/// The origin for the region-pinned LB static host — `static.lb-<code>`.
+///
+/// Not an [ApiTier]: nothing here goes through `ApiClient`, because these are
+/// tiles MapLibre fetches itself. What is left is the pinning — basemap, terrain
+/// and OSM used to come from the bare `static.lb.exptech.dev`, which balances
+/// without regard for the region the rest of the app selected, so a client could
+/// draw every tile from the far end while its API traffic came from the near
+/// one. Both hosts carry the same dataset; the pin is about one honest
+/// selection, not about which copy exists.
+String staticLbOrigin(LbRegion region) =>
+    'https://static.lb-${region.code}.exptech.dev';
+
 /// The host family and redundancy a request targets.
 ///
 /// Only concrete, region-pinned hosts are ever used; the DNS-balanced bare
-/// hosts (`api.lb.exptech.dev`, `api.core.exptech.dev`) are deliberately never
-/// requested **for tiered traffic**, so region selection and failover stay
-/// under app control.
+/// hosts (`api.lb.exptech.dev`, `api.core.exptech.dev`) are never requested, so
+/// region selection and failover stay under app control.
 ///
-/// One request outside this enum does use a bare host: the HTTP time fallback
-/// in `core/realtime/http_time_source.dart` asks
-/// `https://api.lb.exptech.dev/ntp`. It is not an [ApiTier] request at all —
-/// a clock reading has no region to select, so there is nothing for the app to
-/// pin and no per-region failover to preserve, and the bare name is the one
-/// Cloudflare terminates with a valid certificate.
+/// Two requests fall outside this enum, and both are pinned by region too: the
+/// map host from [staticLbOrigin], and the HTTP time fallback in
+/// `core/realtime/http_time_source.dart`, which builds its hosts from the
+/// selected region's order. Neither is an [ApiTier] request — a clock reading
+/// and a MapLibre tile have no `ApiClient` between them and the network — but
+/// neither goes to a bare name either, because a bare name is balanced without
+/// regard for the region the rest of the app selected.
 enum ApiTier {
   /// LB API — multi-active across [LbRegion]s (`api.lb-{tpe1,khh1}`).
   lbApi,

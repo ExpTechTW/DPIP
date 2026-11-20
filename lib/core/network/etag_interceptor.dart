@@ -90,9 +90,17 @@ class EtagInterceptor extends Interceptor {
   static bool _isBytes(RequestOptions o) =>
       o.responseType == ResponseType.bytes;
 
-  /// Bare-host static map vector tiles (no server ETag).
+  /// Region-pinned static map vector tiles (no server ETag).
+  ///
+  /// The basemap/OSM copy is pinned to one LB host per session —
+  /// `static.lb-<region>.exptech.dev` — so this matches the family, not one
+  /// name. The bare `static.lb.exptech.dev` is still accepted: cached tile
+  /// entries written before the pin hold those URLs, and a store lookup has to
+  /// recognise what is already in it.
   static bool isBasemapPbf(Uri uri) =>
-      uri.host == 'static.lb.exptech.dev' &&
+      (uri.host == 'static.lb.exptech.dev' ||
+          (uri.host.startsWith('static.lb-') &&
+              uri.host.endsWith('.exptech.dev'))) &&
       (uri.path.contains(ApiPaths.mapTilesV1) ||
           uri.path.contains(ApiPaths.mapOsmV1)) &&
       uri.path.endsWith('.pbf');

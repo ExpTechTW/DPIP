@@ -1990,6 +1990,7 @@
   "dumpUploadFailed": "อัปโหลดไม่สำเร็จ",
   "statusLegendUnprobed": "ยังไม่ตรวจ",
   "statusLegendUnsupported": "ไม่รองรับ",
+  "statusLegendStandby": "สแตนด์บายพร้อมใช้",
   "rainScaleSection": "ช่วงระดับสี",
   "rainScaleFine": "ละเอียด",
   "rainScaleCoarse": "หยาบ",

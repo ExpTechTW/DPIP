@@ -507,6 +507,10 @@ void main() {
             Provider<Future<RtsBoxGrid>>.value(value: Future.value(grid)),
             Provider<TownDirectory>.value(value: towns),
             Provider<SettingsStore>.value(value: settings),
+            // The basemap host is pinned to the selected LB region.
+            ChangeNotifierProvider<RegionSelection>.value(
+              value: RegionSelection(settings),
+            ),
             ChangeNotifierProvider<RegionStore>.value(
               value: RegionStore(settings),
             ),
@@ -724,6 +728,10 @@ void main() {
             ),
             Provider<TownDirectory>.value(value: const TownDirectory({})),
             Provider<SettingsStore>.value(value: settings),
+            // The basemap host is pinned to the selected LB region.
+            ChangeNotifierProvider<RegionSelection>.value(
+              value: RegionSelection(settings),
+            ),
             ChangeNotifierProvider<RegionStore>.value(
               value: RegionStore(settings),
             ),
@@ -812,6 +820,10 @@ void main() {
                 ),
                 Provider<TownDirectory>.value(value: const TownDirectory({})),
                 Provider<SettingsStore>.value(value: settings),
+                // The basemap host is pinned to the selected LB region.
+                ChangeNotifierProvider<RegionSelection>.value(
+                  value: RegionSelection(settings),
+                ),
                 ChangeNotifierProvider<RegionStore>.value(
                   value: RegionStore(settings),
                 ),
@@ -907,6 +919,10 @@ void main() {
               ),
               Provider<TownDirectory>.value(value: const TownDirectory({})),
               Provider<SettingsStore>.value(value: settings),
+              // The basemap host is pinned to the selected LB region.
+              ChangeNotifierProvider<RegionSelection>.value(
+                value: RegionSelection(settings),
+              ),
               ChangeNotifierProvider<RegionStore>.value(
                 value: RegionStore(settings),
               ),

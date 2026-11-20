@@ -1,4 +1,5 @@
 import 'package:dpip/core/network/api_paths.dart';
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -11,9 +12,11 @@ import '../../features/map/raster_timeline_harness.dart';
 
 void main() {
   test('OSM source follows the documented endpoint and zoom contract', () {
-    expect(gsiOriginTileUrl, contains(ApiPaths.mapOsmV1));
-    expect(gsiSourceProperties.tiles, [gsiOriginTileUrl]);
-    expect(gsiSourceProperties.maxzoom, gsiSourceMaxZoom);
+    expect(gsiOriginTileUrl(LbRegion.tpe1), contains(ApiPaths.mapOsmV1));
+    expect(gsiSourceProperties(LbRegion.tpe1).tiles, [
+      gsiOriginTileUrl(LbRegion.tpe1),
+    ]);
+    expect(gsiSourceProperties(LbRegion.tpe1).maxzoom, gsiSourceMaxZoom);
     expect(gsiDisplayMaxZoom, greaterThan(gsiSourceMaxZoom));
     expect(gsiBounds, [114.28579, 10.32677, 122.3283, 26.43722]);
   });
@@ -200,6 +203,7 @@ void main() {
       selection: selection,
       belowLayerId: townOutlineLayerId,
       groundBelowLayerId: townFillLayerId,
+      region: LbRegion.tpe1,
     );
 
     expect(map.calls.first, 'addSource:$gsiSourceId');
@@ -251,6 +255,7 @@ void main() {
       selection: selection,
       belowLayerId: townOutlineLayerId,
       groundBelowLayerId: townFillLayerId,
+      region: LbRegion.tpe1,
     );
 
     for (final layer in gsiStyleLayers(Brightness.dark)) {

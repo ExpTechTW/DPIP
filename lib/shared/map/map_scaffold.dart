@@ -4,6 +4,8 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -37,10 +39,6 @@ import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
-
-/// Basemap XYZ origin — warmed from the app's tile store into MapLibre's tile
-/// memory on camera idle. LB has no ETag; the store keys these by URL hash.
-const String _basemapTileUrl = basemapOriginTileUrl;
 
 /// The reusable map surface — a base map with a switchable, time-scrubbable
 /// overlay layer.
@@ -786,12 +784,16 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     final controller = _controller;
     if (!mounted || controller == null || !_styleLoaded) return;
     final brightness = Theme.of(context).brightness;
+    // The pinned LB region, so the DEM and OSM sources point at the same host
+    // copy as the basemap style that [BaseMap] built (see [staticLbOrigin]).
+    final region = context.read<RegionSelection>().lb;
     _queue(
       () => _basemapSync.sync(
         controller,
         showTerrain: () => _showTerrain.value,
         gsi: _gsi,
         brightness: brightness,
+        region: region,
         stillCurrent: () =>
             mounted && identical(controller, _controller) && _styleLoaded,
       ),
@@ -817,15 +819,19 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
   Future<void> _warmBasemap(MapLibreMapController controller) async {
     await _tileCacheReady;
     final warmer = _basemapWarmer;
-    if (warmer == null) return;
+    if (warmer == null || !mounted) return;
+    // Warm exactly what the style will be reading: the region-pinned host, not
+    // a bare CDN name that balances somewhere else (see [staticLbOrigin]).
+    final region = context.read<RegionSelection>().lb;
     try {
       final bounds = await controller.getVisibleRegion();
       final zoom = controller.cameraPosition?.zoom ?? 8;
       await warmer.warmViewportAbsolute(
-        urlFor: (z, x, y) => _basemapTileUrl
-            .replaceAll('{z}', '$z')
-            .replaceAll('{x}', '$x')
-            .replaceAll('{y}', '$y'),
+        urlFor: (z, x, y) =>
+            basemapOriginTileUrl(region)
+                .replaceAll('{z}', '$z')
+                .replaceAll('{x}', '$x')
+                .replaceAll('{y}', '$y'),
         south: bounds.southwest.latitude,
         west: bounds.southwest.longitude,
         north: bounds.northeast.latitude,
@@ -837,7 +843,7 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
         immediate: true,
       );
       if (_gsi.enabled) {
-        await _warmGsiViewport(warmer, bounds, zoom);
+        await _warmGsiViewport(warmer, bounds, zoom, region);
       }
       // DEM tiles too — the relief renders at every zoom, so warm them the
       // same way as the basemap. Native downloads a hillshade viewport as one
@@ -851,10 +857,11 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
       // applier's on-map flag, which is transiently wrong mid style-reload.
       if (_showTerrain.value) {
         await warmer.warmViewportAbsolute(
-          urlFor: (z, x, y) => terrainOriginTileUrl
-              .replaceAll('{z}', '$z')
-              .replaceAll('{x}', '$x')
-              .replaceAll('{y}', '$y'),
+          urlFor: (z, x, y) =>
+              terrainOriginTileUrl(region)
+                  .replaceAll('{z}', '$z')
+                  .replaceAll('{x}', '$x')
+                  .replaceAll('{y}', '$y'),
           south: bounds.southwest.latitude,
           west: bounds.southwest.longitude,
           north: bounds.northeast.latitude,
@@ -881,11 +888,14 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     }
     try {
       final bounds = await controller.getVisibleRegion();
-      if (!_gsi.enabled || !identical(controller, _controller)) return;
+      if (!_gsi.enabled || !identical(controller, _controller) || !mounted) {
+        return;
+      }
       await _warmGsiViewport(
         warmer,
         bounds,
         controller.cameraPosition?.zoom ?? 8,
+        context.read<RegionSelection>().lb,
       );
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'OSM viewport warm');
@@ -896,11 +906,13 @@ class _MapScaffoldState extends State<MapScaffold> with WidgetsBindingObserver {
     MapTileWarmer warmer,
     LatLngBounds bounds,
     double zoom,
+    LbRegion region,
   ) => warmer.warmViewportAbsolute(
-    urlFor: (z, x, y) => gsiOriginTileUrl
-        .replaceAll('{z}', '$z')
-        .replaceAll('{x}', '$x')
-        .replaceAll('{y}', '$y'),
+    urlFor: (z, x, y) =>
+        gsiOriginTileUrl(region)
+            .replaceAll('{z}', '$z')
+            .replaceAll('{x}', '$x')
+            .replaceAll('{y}', '$y'),
     south: bounds.southwest.latitude,
     west: bounds.southwest.longitude,
     north: bounds.northeast.latitude,

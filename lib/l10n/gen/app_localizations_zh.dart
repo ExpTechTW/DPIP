@@ -3275,6 +3275,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statusLegendUnsupported => '不支援';
 
   @override
+  String get statusLegendStandby => '熱備援';
+
+  @override
   String get rainScaleSection => '色階間距';
 
   @override
@@ -6886,6 +6889,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get statusLegendUnsupported => '不支持';
+
+  @override
+  String get statusLegendStandby => '热备援';
 
   @override
   String get rainScaleSection => '色阶间距';
@@ -10500,6 +10506,9 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get statusLegendUnsupported => '不支援';
 
   @override
+  String get statusLegendStandby => '熱備援';
+
+  @override
   String get rainScaleSection => '色階間距';
 
   @override
@@ -14111,6 +14120,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get statusLegendUnsupported => '不支援';
+
+  @override
+  String get statusLegendStandby => '熱備援';
 
   @override
   String get rainScaleSection => '色階間距';

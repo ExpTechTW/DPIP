@@ -1990,6 +1990,7 @@
   "dumpUploadFailed": "Nabigong mag-upload",
   "statusLegendUnprobed": "Hindi pa nasuri",
   "statusLegendUnsupported": "Hindi suportado",
+  "statusLegendStandby": "Hot standby",
   "rainScaleSection": "Antas ng kulay",
   "rainScaleFine": "Pino",
   "rainScaleCoarse": "Magaspang",

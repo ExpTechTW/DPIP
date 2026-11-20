@@ -3352,6 +3352,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statusLegendUnsupported => 'Không có';
 
   @override
+  String get statusLegendStandby => 'Dự phòng nóng';
+
+  @override
   String get rainScaleSection => 'Thang màu';
 
   @override

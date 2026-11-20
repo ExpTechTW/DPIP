@@ -1990,6 +1990,7 @@
   "dumpUploadFailed": "上传失败，请稍后再试",
   "statusLegendUnprobed": "未探测",
   "statusLegendUnsupported": "不支持",
+  "statusLegendStandby": "热备援",
   "rainScaleSection": "色阶间距",
   "rainScaleFine": "小间距",
   "rainScaleCoarse": "大间距",

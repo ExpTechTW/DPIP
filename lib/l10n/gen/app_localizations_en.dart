@@ -3352,6 +3352,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusLegendUnsupported => 'Not offered';
 
   @override
+  String get statusLegendStandby => 'Hot standby';
+
+  @override
   String get rainScaleSection => 'Colour scale';
 
   @override
