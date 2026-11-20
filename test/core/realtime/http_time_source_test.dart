@@ -1,3 +1,4 @@
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/http_time_source.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -175,14 +176,25 @@ void main() {
     expect(result.isOk, isFalse);
   });
 
-  test('asks the DNS-balanced LB name over HTTPS', () {
-    // The one bare host the repository uses: a clock reading has no region to
-    // pin, and this is the name Cloudflare terminates with a valid cert.
-    expect(HttpTimeSource.defaultHosts, ['api.lb.exptech.dev']);
+  test('asks the region-pinned LB names over HTTPS, tpe1 first', () {
+    // No bare host: the reading comes from the same edge the rest of the app
+    // talks to, and the second name is a fallback rather than a load-sharing
+    // peer — serverTimeMs stops at the first reading its own Date accepts.
+    expect(HttpTimeSource.defaultHosts, [
+      'api.lb-tpe1.exptech.dev',
+      'api.lb-khh1.exptech.dev',
+    ]);
     expect(
-      HttpTimeSource.urlFor(HttpTimeSource.defaultHosts.single).toString(),
-      'https://api.lb.exptech.dev/ntp',
+      HttpTimeSource.urlFor(HttpTimeSource.defaultHosts.first).toString(),
+      'https://api.lb-tpe1.exptech.dev/ntp',
     );
+  });
+
+  test('orders the hosts by the selected region', () {
+    expect(HttpTimeSource.hostsFor(const [LbRegion.khh1, LbRegion.tpe1]), [
+      'api.lb-khh1.exptech.dev',
+      'api.lb-tpe1.exptech.dev',
+    ]);
   });
 
   test('never builds a cleartext url', () {

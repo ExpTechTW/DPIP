@@ -225,18 +225,22 @@ final class WidgetHTTPTimeSourceTests: XCTestCase {
         )
     }
 
-    func testAsksTheDNSBalancedLBNameOverHTTPS() {
-        // The one bare host the repository uses: a clock reading has no region
-        // to pin, and this is the name Cloudflare terminates with a valid cert.
+    func testAsksTheRegionPinnedLBNamesOverHTTPS() {
+        // No bare host: the reading comes from the same edge the app talks to,
+        // and the widget has no region setting, so it takes the app's default
+        // order with the other region as the fallback.
         XCTAssertEqual(
             WidgetHTTPTimeSource.defaultHosts,
-            ["api.lb.exptech.dev"]
+            [
+                "api.lb-tpe1.exptech.dev",
+                "api.lb-khh1.exptech.dev",
+            ]
         )
         XCTAssertEqual(
             WidgetHTTPTimeSource.url(
-                host: "api.lb.exptech.dev"
+                host: WidgetHTTPTimeSource.defaultHosts[0]
             )?.absoluteString,
-            "https://api.lb.exptech.dev/ntp"
+            "https://api.lb-tpe1.exptech.dev/ntp"
         )
     }
 
