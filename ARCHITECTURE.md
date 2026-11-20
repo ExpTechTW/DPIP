@@ -352,6 +352,43 @@ radio and takes every other channel with it.
 prefer platform channels / built-ins over third-party
 plugins where practical (e.g. `core/platform/` device_info, compass).
 
+### Native libraries (FFI)
+
+The landscape earthquake-report share image is drawn by a Rust library,
+[`ExpTechTW/eq-report-pic`](https://github.com/ExpTechTW/eq-report-pic), called
+through `dart:ffi`. It is groundwork, not a shipped feature: no screen calls it
+yet, and the repository contains no native binary, so `ReportPicture.open()`
+returns `ReportPictureFailure(unavailable)` in every build until the packaging
+step below is run.
+
+The Dart side is `shared/seismic/report_picture/`: a copy of the library's own
+binding (keep it in step with the upstream file; the local edits are marked
+`DPIP:`), and `ReportPicture`, which owns the native handle and hands each
+render to a throwaway isolate. The drawing itself — basemap, clustering, font
+layout — is the library's job, which is why it is not reimplemented in Flutter.
+
+- **Opening** goes through `core/platform/native_library.dart`. iOS links the
+  library into the app, so the symbols are already in the process
+  (`DynamicLibrary.process`, and the static archive needs `-force_load` plus
+  the six `_eqr_*` symbols kept alive in Runner's `OTHER_LDFLAGS`). Every other
+  target opens a packaged file: `libeq_report_pic.so` on Android/Linux,
+  `libeq_report_pic.dylib` on macOS, `eq_report_pic.dll` on Windows.
+- **A missing library is a `Result`, never a throw.** A build that skipped the
+  native step must still alert people about an earthquake; it just cannot draw
+  this one image.
+- **Isolates**: a `DynamicLibrary` handle cannot cross an isolate boundary, so
+  each render isolate opens the library again and adopts the renderer by
+  address. The native renderer is thread-safe and may be shared that way; only
+  the isolate that created it frees it.
+- **Fonts** are the app's assets (`assets/fonts/report/`), passed once at
+  creation in fallback order. The library does not embed them: 13.8 MB per
+  Android ABI is the alternative. The copy keeps the exact three files
+  cwa-eq-map draws with, so the two render the same image.
+- **Packaging** is a build step outside Flutter: `cargo ndk` into
+  `android/app/src/main/jniLibs/<abi>/`, and an xcframework whose static
+  archive is force-loaded into Runner. Nothing in `lib/` builds Rust, so a
+  missing toolchain cannot break a normal Flutter build.
+
 ## Persistence
 
 everything persisted lives in **SQLite**. Flutter's stores are split
