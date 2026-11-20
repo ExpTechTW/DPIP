@@ -5,7 +5,15 @@ import 'package:dpip/core/network/api_region.dart';
 /// Device-location endpoint on the region-aware [ApiClient].
 ///
 /// Migrated from the legacy `api-1` host to `api.core-tnn1`
-/// ([ApiTier.coreExclusiveApi]).
+/// ([ApiTier.coreExclusiveApi]). One core region is the **primary** and the
+/// other a hot standby, which answers `307` naming the primary rather than
+/// serving the write itself. Which region is primary is the backend's call and
+/// has moved: tyo1 redirected to tnn1 on 2026-11-20, and tnn1 to tyo1 on
+/// 2026-11-28. That is why the tier stays exclusive instead of becoming
+/// region-redundant: there is no second origin to fail over to, only a redirect
+/// that names the one primary. Dio follows it (the default `followRedirects`),
+/// and the redirect never reaches `validateStatus`, which accepts 2xx and 304
+/// only.
 class LocationApi {
   const LocationApi(this._client);
 

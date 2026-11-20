@@ -29,6 +29,15 @@ Dio createDio({EtagCacheStore? etagCache, NetworkUsageStore? usage}) {
       // If-None-Match, so this is inert without a cache.
       validateStatus: (status) =>
           status != null && ((status >= 200 && status < 300) || status == 304),
+      // Redirects are followed by the adapter (`followRedirects` defaults to
+      // true, `maxRedirects` to 5), which matters for one endpoint family:
+      // notify/location run as a hot standby — one core region is primary and
+      // the other answers `307` naming it, and the primary has moved between
+      // regions. Following it means the write lands on the primary, wherever
+      // that is. A 307, unlike a 301, is not cached as permanent, so the next
+      // request asks again. A 3xx never reaches [validateStatus] — by the time
+      // the status is checked the chain has already settled on its final
+      // response.
     ),
   );
   dio.interceptors.add(EtagInterceptor(etagCache, usage: usage));
