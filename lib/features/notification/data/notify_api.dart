@@ -8,6 +8,17 @@ import 'package:dpip/core/network/api_region.dart';
 /// The `notify` endpoints, migrated from the legacy `api-1` host to
 /// `api.core-tnn1` ([ApiTier.coreExclusiveApi]). Both return the settings as a
 /// flat integer list (one per channel); the repository maps it to a model.
+///
+/// One core region is the **primary** and the other a hot standby, which
+/// answers `307` naming the primary instead of serving the request itself —
+/// settings are written in one place. Which region is primary is the backend's
+/// call and has moved: tyo1 redirected to tnn1 on 2026-11-20, and tnn1 (the
+/// host this class asks) to tyo1 on 2026-11-28. That is why the tier stays
+/// exclusive rather than region-redundant: a redundant tier would treat the
+/// standby as an equal and split writes across two origins. Dio follows the
+/// redirect (its default `followRedirects`), so no request here ever sees the
+/// 307 itself, and it never reaches `validateStatus`, which accepts 2xx and 304
+/// only.
 class NotifyApi {
   const NotifyApi(this._client);
 
