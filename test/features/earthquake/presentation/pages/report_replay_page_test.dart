@@ -605,7 +605,10 @@ void main() {
       platform.failNextBlink = true;
       await tester.pump(const Duration(milliseconds: 1100));
       await tester.pump(const Duration(seconds: 1));
-      expect(find.text('花蓮縣'), findsNothing);
+      // Sticky: `[]` means this second carries no *new* bulletin, not that
+      // the alert ended — the archive keeps one answer up for about two
+      // minutes, so a card driven straight off the poll would vanish mid-event.
+      expect(find.text('花蓮縣'), findsOneWidget);
 
       // Settle, never a bare pump: the menu opens on an animation, so one
       // frame leaves every row mid-flight and a tap lands wherever it was
@@ -629,10 +632,21 @@ void main() {
       expect(find.byTooltip('Reset north'), findsNothing);
       expect(platform.moves, greaterThan(0));
 
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      await tester.pump();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      await tester.pump();
+      // Walk the chain the platform actually sends. Jumping straight from
+      // paused to resumed trips AppLifecycleListener's transition assert, which
+      // any listener built while the app was backgrounded would hit — and the
+      // card now keeps one such listener alive across the whole replay.
+      for (final state in const [
+        AppLifecycleState.inactive,
+        AppLifecycleState.hidden,
+        AppLifecycleState.paused,
+        AppLifecycleState.hidden,
+        AppLifecycleState.inactive,
+        AppLifecycleState.resumed,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+        await tester.pump();
+      }
 
       // The replay carries the same immersive chip as the map tab, and hides
       // its own back/legend/ranking and base-map chrome while it is on.

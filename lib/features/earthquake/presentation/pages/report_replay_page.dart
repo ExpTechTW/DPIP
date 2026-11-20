@@ -120,6 +120,16 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// advances it through the alert set (modulo the count in the builder).
   int _eewIndex = 0;
 
+  /// The last non-empty alert set the feed published.
+  ///
+  /// `/api/v2/eq/eew/{sec}` answers with the bulletins *still in force* at that
+  /// second, not the ones issued that second: for the 2026-11-01 M5.6 event one
+  /// serial stayed in the set for about 90 seconds and the endpoint then went
+  /// back to `[]`. Driving the card straight off the poll therefore made it
+  /// vanish while the alert was still current, so the card holds the newest set
+  /// it has seen — a later empty answer means "nothing new", not "nothing".
+  List<Eew> _stickyAlerts = const [];
+
   /// The app-wide immersive toggle, borrowed from the map tab for the length
   /// of this route. The shell draws the bottom nav bar for every branch,
   /// including this nested one, so a page-local flag could hide the replay's
@@ -167,6 +177,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
       cwaOnly: () => cwaOnly.enabled,
     )..start();
     _session.eew.addListener(_syncAnnouncement);
+    _session.eew.addListener(_captureAlerts);
     _immersive = context.read<MapImmersiveController>()
       ..addListener(_onImmersiveChanged);
     // A replay opens with its controls, whatever the map tab was left in.
@@ -274,6 +285,12 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
   /// The listener's last cached fix, for choosing which alert to speak.
   geo.LatLng? _rankObserver;
 
+  /// Keeps the newest non-empty alert set — see [_stickyAlerts].
+  void _captureAlerts() {
+    final alerts = _session.eew.alerts;
+    if (alerts.isNotEmpty) _stickyAlerts = alerts;
+  }
+
   void _syncAnnouncement() {
     final controller = _announcement;
     final l10n = _l10n;
@@ -296,6 +313,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
     _ticker?.cancel();
     _tick.dispose();
     _session.eew.removeListener(_syncAnnouncement);
+    _session.eew.removeListener(_captureAlerts);
     _speechSettings?.removeListener(_syncAnnouncement);
     _announcement?.dispose();
     _clockSecond.dispose();
@@ -446,7 +464,7 @@ class _ReportReplayPageState extends State<ReportReplayPage> {
                           ListenableBuilder(
                             listenable: _session.eew,
                             builder: (context, _) {
-                              final alerts = _session.eew.alerts;
+                              final alerts = _stickyAlerts;
                               if (alerts.isEmpty) {
                                 return const SizedBox.shrink();
                               }
