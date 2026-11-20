@@ -358,7 +358,9 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
   /// the event was never replayable.
   Future<void> _probeReplay() async {
     final repository = context.read<ReportRepository>();
-    final timestamp = widget.report.originTimeUtc.millisecondsSinceEpoch - 2000;
+    final timestamp =
+        widget.report.originTimeUtc.millisecondsSinceEpoch -
+        replayLeadIn.inMilliseconds;
     final result = await repository.hasReplayAt(timestamp);
     if (!mounted) return;
     setState(() {
