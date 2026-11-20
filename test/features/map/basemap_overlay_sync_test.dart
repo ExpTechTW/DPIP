@@ -1,3 +1,4 @@
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/shared/map/basemap_overlay_sync.dart';
 import 'package:dpip/shared/map/map_gsi_overlay.dart';
@@ -28,6 +29,7 @@ void main() {
       showTerrain: () => showTerrain,
       gsi: gsi,
       brightness: Brightness.dark,
+      region: LbRegion.tpe1,
       stillCurrent: () => current,
     );
 

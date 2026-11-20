@@ -9,6 +9,7 @@ library;
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/shared/map/basemap_seed.g.dart';
 import 'package:dpip/shared/map/basemap_seed_format.dart';
 import 'package:dpip/shared/map/map_style.dart';
@@ -52,11 +53,16 @@ void main() {
 
   group('the committed bundle', () {
     test('was fetched from the URL the style requests', () {
+      // The host is pinned per LB region at run time, so the template's host
+      // is not what has to match — the path is. `BasemapSeeder` builds each
+      // planted URL from the selected region's template, and this asserts the
+      // bundle was fetched from that same path, or it would plant rows nothing
+      // asks for.
       expect(
-        seed.source,
-        basemapOriginTileUrl,
+        Uri.parse(seed.source).path,
+        Uri.parse(basemapOriginTileUrl(LbRegion.tpe1)).path,
         reason:
-            'the tiles are stored under these URLs; a mismatch plants rows '
+            'the tiles are stored under these paths; a mismatch plants rows '
             'MapLibre never asks for',
       );
       expect(seed.maxZoom, basemapSourceMaxZoom.toInt());

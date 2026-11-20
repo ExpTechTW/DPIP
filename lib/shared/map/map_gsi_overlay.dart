@@ -13,6 +13,7 @@ import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/network/api_paths.dart';
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -23,19 +24,24 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 const String gsiSourceId = 'gsi';
-const String gsiOriginTileUrl =
-    'https://static.lb.exptech.dev${ApiPaths.mapOsmV1}{z}/{x}/{y}.pbf';
+
+/// OSM detailed-tile origin for [region] (static LB CDN), pinned the same way
+/// as the basemap and terrain — see [staticLbOrigin].
+String gsiOriginTileUrl(LbRegion region) =>
+    '${staticLbOrigin(region)}${ApiPaths.mapOsmV1}{z}/{x}/{y}.pbf';
+
 const double gsiSourceMaxZoom = 14;
 const double gsiDisplayMaxZoom = 18;
 const List<double> gsiBounds = [114.28579, 10.32677, 122.3283, 26.43722];
 
-const VectorSourceProperties gsiSourceProperties = VectorSourceProperties(
-  tiles: [gsiOriginTileUrl],
-  bounds: gsiBounds,
-  minzoom: 0,
-  maxzoom: gsiSourceMaxZoom,
-  attribution: '© OpenStreetMap contributors © OpenMapTiles',
-);
+VectorSourceProperties gsiSourceProperties(LbRegion region) =>
+    VectorSourceProperties(
+      tiles: [gsiOriginTileUrl(region)],
+      bounds: gsiBounds,
+      minzoom: 0,
+      maxzoom: gsiSourceMaxZoom,
+      attribution: '© OpenStreetMap contributors © OpenMapTiles',
+    );
 
 /// User-facing groups from the reference implementation. Some groups own two
 /// MapLibre layers (fill + outline, or road casing + road body), but expose one
@@ -707,10 +713,11 @@ Future<void> addGsiOverlay(
   required GsiOverlayController selection,
   required String belowLayerId,
   required String groundBelowLayerId,
+  required LbRegion region,
 }) async {
   final layers = gsiStyleLayers(brightness);
   final added = <String>[];
-  await controller.addSource(gsiSourceId, gsiSourceProperties);
+  await controller.addSource(gsiSourceId, gsiSourceProperties(region));
   try {
     for (final layer in layers) {
       final properties = layer.propertiesWithVisibility(

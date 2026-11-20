@@ -11,6 +11,7 @@ import 'package:dpip/core/a11y/color_vision.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/shared/map/town_label_points.g.dart';
 import 'package:dpip/core/network/api_paths.dart';
+import 'package:dpip/core/network/api_region.dart';
 
 /// Highest source levels that add useful visual information. The map's camera
 /// may continue past these; MapLibre then overzooms the final native tile.
@@ -236,19 +237,19 @@ const String dpmRestroomPointsLayerId = 'dpm-restroom-points';
 const String dpmShelterSourceId = 'dpm-shelter-src';
 const String dpmShelterPointsLayerId = 'dpm-shelter-points';
 
-/// Origin basemap XYZ (static LB CDN). Fetched by MapLibre, served from the
-/// app's tile store through the Dart bridge, and warmed by `MapTileWarmer` —
-/// the same three tiers as every other ExpTech tile.
-const String basemapOriginTileUrl =
-    'https://static.lb.exptech.dev${ApiPaths.mapTilesV1}{z}/{x}/{y}.pbf';
+/// Origin basemap XYZ for [region] (static LB CDN). Fetched by MapLibre, served
+/// from the app's tile store through the Dart bridge, and warmed by
+/// `MapTileWarmer` — the same three tiers as every other ExpTech tile.
+String basemapOriginTileUrl(LbRegion region) =>
+    '${staticLbOrigin(region)}${ApiPaths.mapTilesV1}{z}/{x}/{y}.pbf';
 
-/// Origin terrain XYZ (static LB CDN) — the elevation mesh backing the
-/// base map's hillshade relief.
+/// Origin terrain XYZ for [region] (static LB CDN) — the elevation mesh backing
+/// the base map's hillshade relief.
 ///
 /// The tiles are **Mapbox.com terrain-RGB PNGs**, which MapLibre's
 /// `encoding: 'mapbox'` decodes natively — no app-side rewrite.
-const String terrainOriginTileUrl =
-    'https://static.lb.exptech.dev${ApiPaths.mapTerrainV1}{z}/{x}/{y}.png';
+String terrainOriginTileUrl(LbRegion region) =>
+    '${staticLbOrigin(region)}${ApiPaths.mapTerrainV1}{z}/{x}/{y}.png';
 
 /// Origin glyph template — MapLibre HTTPS.
 const String glyphsOriginUrl =

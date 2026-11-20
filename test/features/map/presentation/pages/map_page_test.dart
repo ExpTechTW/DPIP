@@ -8,6 +8,7 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/domain/meshtastic_service.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/realtime/clock.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
@@ -267,6 +268,10 @@ void main() {
           ),
           Provider<TownDirectory>.value(
             value: TownDirectory.fromJson(const {}),
+          ),
+          // The basemap host is pinned to the selected LB region.
+          ChangeNotifierProvider<RegionSelection>.value(
+            value: RegionSelection(settings),
           ),
           Provider<RtsLiveDemand>.value(value: RtsLiveDemand()),
           Provider<RtsStationEncoder>.value(value: _NoEncoder()),

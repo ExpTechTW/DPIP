@@ -9,6 +9,7 @@ import 'dart:math' show Point;
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town_directory.dart';
+import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/map_layer_order_controller.dart';
 import 'package:dpip/core/settings/map_layer_visibility_controller.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
@@ -367,6 +368,10 @@ void main() {
             value: TownDirectory.fromJson(const {}),
           ),
           Provider<MapTileCache?>.value(value: null),
+          // The basemap host is pinned to the selected LB region.
+          ChangeNotifierProvider<RegionSelection>.value(
+            value: RegionSelection(settings),
+          ),
         ],
         child: MaterialApp(
           locale: const Locale('en'),

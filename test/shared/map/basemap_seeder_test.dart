@@ -5,11 +5,13 @@ library;
 
 import 'dart:io';
 
+import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/shared/map/basemap_seed.g.dart';
 import 'package:dpip/shared/map/basemap_seed_format.dart';
 import 'package:dpip/shared/map/basemap_seeder.dart';
+import 'package:dpip/shared/map/map_style.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite_async/sqlite_async.dart';
@@ -49,7 +51,12 @@ void main() {
   final allUrls = [
     for (final part in seed.parts)
       for (final tile in part.tiles)
-        basemapSeedUrl(seed.source, tile.z, tile.x, tile.y),
+        basemapSeedUrl(
+          basemapOriginTileUrl(LbRegion.tpe1),
+          tile.z,
+          tile.x,
+          tile.y,
+        ),
   ];
   final tileCount = allUrls.length;
 
@@ -66,7 +73,8 @@ void main() {
 
   tearDown(() async => db.close());
 
-  BasemapSeeder seeder() => BasemapSeeder(store, bundle: bundle);
+  BasemapSeeder seeder() =>
+      BasemapSeeder(store, region: LbRegion.tpe1, bundle: bundle);
 
   test(
     'a fresh install plants every bundled tile, one part at a time',
@@ -92,7 +100,12 @@ void main() {
       asset.sublist(tile.offset, tile.offset + tile.length),
     );
     final row = await store.readBytes(
-      basemapSeedUrl(seed.source, tile.z, tile.x, tile.y),
+      basemapSeedUrl(
+        basemapOriginTileUrl(LbRegion.tpe1),
+        tile.z,
+        tile.x,
+        tile.y,
+      ),
     );
     expect(row?.bytes, expected);
     expect(row?.etag, etag);
@@ -109,7 +122,12 @@ void main() {
     expect(empty, isNotEmpty, reason: 'open sea at z8–9');
     final tile = empty.first;
     final row = await store.readBytes(
-      basemapSeedUrl(seed.source, tile.z, tile.x, tile.y),
+      basemapSeedUrl(
+        basemapOriginTileUrl(LbRegion.tpe1),
+        tile.z,
+        tile.x,
+        tile.y,
+      ),
     );
     expect(row?.bytes, isEmpty);
   });
@@ -152,7 +170,12 @@ void main() {
   test('a part whose tiles are all downloaded is not even loaded', () async {
     final first = seed.parts.first;
     for (final tile in first.tiles) {
-      final url = basemapSeedUrl(seed.source, tile.z, tile.x, tile.y);
+      final url = basemapSeedUrl(
+        basemapOriginTileUrl(LbRegion.tpe1),
+        tile.z,
+        tile.x,
+        tile.y,
+      );
       await store.writeBytes(
         url,
         etag: EtagInterceptor.etagFromUrl(Uri.parse(url)),
@@ -201,7 +224,12 @@ void main() {
     expect(report.planted, tileCount - bad.tiles.length);
     final etags = await store.etagsFor([
       for (final tile in bad.tiles)
-        basemapSeedUrl(seed.source, tile.z, tile.x, tile.y),
+        basemapSeedUrl(
+          basemapOriginTileUrl(LbRegion.tpe1),
+          tile.z,
+          tile.x,
+          tile.y,
+        ),
     ]);
     expect(etags, isEmpty);
   });
