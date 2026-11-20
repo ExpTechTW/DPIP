@@ -207,12 +207,13 @@ void main() {
   });
 
   group('the page', () {
-    testWidgets('opens on page 1 with no filter applied', (tester) async {
+    testWidgets('opens the earthquake report list on page 1', (tester) async {
       final repository = _FakeReportRepository()
         ..nextPage = [_report('a', originUtc: _todayMorning)];
 
       await _pump(tester, repository);
 
+      expect(find.widgetWithText(AppBar, 'Earthquake reports'), findsOneWidget);
       expect(repository.calls, hasLength(1));
       expect(repository.calls.single.limit, 30);
       expect(repository.calls.single.page, 1);

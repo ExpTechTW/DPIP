@@ -101,7 +101,7 @@ class _ReportListPageState extends State<ReportListPage> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.navEarthquake),
+        title: Text(l10n.dataEarthquakeSubtitle),
         actions: [
           ListenableBuilder(
             listenable: _controller,
