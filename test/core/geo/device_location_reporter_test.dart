@@ -172,7 +172,14 @@ void main() {
     expect(sink.handled, isEmpty);
 
     reporter.restart();
-    controllers[1].addError(StateError('gps'));
+    controllers[1].addError(
+      const PositionUpdateException('無法完成作業。（kCLErrorDomain錯誤1 。）'),
+    );
+    await pumpEventQueue();
+    expect(sink.handled, isEmpty);
+
+    reporter.restart();
+    controllers[2].addError(StateError('gps'));
     await pumpEventQueue();
     expect(sink.handled.single, isA<StateError>());
 

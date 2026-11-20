@@ -242,7 +242,31 @@ void main() {
     );
     expect(await live.currentFix(), isNull);
     expect(await live.currentTown(), isNull);
-    expect(sink.handled, isEmpty);
+    // iOS sends kCLErrorDenied (code 1) as a PositionUpdateException whose
+    // text is localized. Code 2 is a different Core Location failure and
+    // still a report.
+    final deniedZh = LocationService(
+      _dir(),
+      lastKnown: () async =>
+          throw const PositionUpdateException('無法完成作業。（kCLErrorDomain錯誤1 。）'),
+    );
+    expect(await deniedZh.lastKnownFix(), isNull);
+    final deniedEn = LocationService(
+      _dir(),
+      isAvailable: () async => true,
+      fix: () async => throw const PositionUpdateException(
+        'The operation couldn’t be completed. (kCLErrorDomain error 1.)',
+      ),
+    );
+    expect(await deniedEn.currentFix(), isNull);
+    final other = LocationService(
+      _dir(),
+      lastKnown: () async => throw const PositionUpdateException(
+        'The operation couldn’t be completed. (kCLErrorDomain error 2.)',
+      ),
+    );
+    expect(await other.lastKnownFix(), isNull);
+    expect(sink.handled, hasLength(1));
   });
 
   test('a GPS timeout is a null fix, not a crash', () async {

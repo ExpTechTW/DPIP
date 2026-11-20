@@ -5,6 +5,15 @@
 # fork whose protobuf sources are generated with relative imports; rewriting
 # them would be undone by the next regeneration and would buy the layering gate
 # nothing, since it never looks here.
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 include: ../../analysis_options.yaml
 
 linter:

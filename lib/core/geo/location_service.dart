@@ -21,9 +21,22 @@ typedef GpsFix = ({double lat, double lng});
 /// Geolocator raises these instead of returning an empty fix. Callers already
 /// treat that as "no location". Filing it as a crash report makes a phone with
 /// location off look broken.
+///
+/// iOS is the awkward one. A denied `CLLocationManager` update arrives as
+/// [PositionUpdateException], not [PermissionDeniedException], and the message
+/// is `NSError.localizedDescription` — the words follow the phone's language,
+/// the stable part is `kCLErrorDomain` and code 1 (`kCLErrorDenied`).
 bool isLocationRefusal(Object error) =>
     error is LocationServiceDisabledException ||
-    error is PermissionDeniedException;
+    error is PermissionDeniedException ||
+    (error is PositionUpdateException && _coreLocationDenied(error.message));
+
+/// Code 1 after `kCLErrorDomain`, in whatever locale wrapped the words.
+bool _coreLocationDenied(String? message) {
+  if (message == null) return false;
+  final code = RegExp(r'kCLErrorDomain\D*(\d+)').firstMatch(message)?.group(1);
+  return code == '1';
+}
 
 /// Resolves the device's current township from GPS.
 ///

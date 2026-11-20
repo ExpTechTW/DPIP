@@ -344,7 +344,9 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
                   'render-sync native-error pause=$pause '
                   'dt=${started.elapsedMilliseconds}ms error=$error',
             );
-            if (_isDetachedSurface(error)) return;
+            if (_isDetachedSurface(error) || _isCancelledResume(error)) {
+              return;
+            }
             Log.handle(error, stackTrace, 'map render pause');
             if (!pause &&
                 mounted &&
@@ -385,6 +387,22 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
       _trace(() => 'render-sync resume ignored: surface is not in a window');
     }
     return detached;
+  }
+
+  /// Pause arrived while `map#resume` was still waiting for a frame.
+  ///
+  /// The native side completes that wait with an error so the future does not
+  /// hang; the pause itself succeeded. Rebuilding the platform view from here
+  /// — which a failed resume otherwise does on iOS — would discard a map that
+  /// was just told to stop, and the error is not a stuck renderer.
+  bool _isCancelledResume(Object error) {
+    if (error is! PlatformException || error.code != 'map_resume_cancelled') {
+      return false;
+    }
+    _trace(
+      () => 'render-sync resume ignored: paused before its frame rendered',
+    );
+    return true;
   }
 
   void _onTabChanged() {

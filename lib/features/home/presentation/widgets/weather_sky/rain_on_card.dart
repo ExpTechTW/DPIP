@@ -110,6 +110,11 @@ class _RainOnCardState extends State<RainOnCard>
     with SingleTickerProviderStateMixin {
   static const String _asset = 'shaders/weather/card_water.frag';
 
+  /// Frames to wait for a repaint-boundary layer before giving up on this
+  /// attempt. One frame is the common case; the rest cover a boundary that
+  /// was scheduled before it had been laid out.
+  static const int _unpaintedCaptureLimit = 8;
+
   /// Blank pixels between the two halves of the accumulation atlas, so the
   /// composite's bilinear fetch on one half cannot reach the other.
   static const int _fieldGutter = 4;
@@ -206,6 +211,15 @@ class _RainOnCardState extends State<RainOnCard>
   CardWaterSurface? _surface;
   bool _captureScheduled = false;
 
+  /// How many times the current attempt has found the outline not painted yet.
+  ///
+  /// Release builds report [RenderObject.debugNeedsPaint] as false even when
+  /// the boundary has never been painted, and `toImage` then throws on
+  /// `layer!`. A few frames later the layer exists. Past the cap the attempt
+  /// stops quietly — logging it filled Crashlytics, and an off-screen card
+  /// never grows a layer no matter how many times it is asked.
+  int _unpaintedCaptures = 0;
+
   @override
   void initState() {
     super.initState();
@@ -225,9 +239,28 @@ class _RainOnCardState extends State<RainOnCard>
         _captureScheduled) {
       return;
     }
+    _unpaintedCaptures = 0;
     _captureScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) => _capture());
   }
+
+  /// One more frame, until [_unpaintedCaptureLimit]. Does not reset the count:
+  /// [_scheduleCapture] is the fresh attempt, this is the same one waiting
+  /// for a layer.
+  void _retryUnpaintedCapture() {
+    if (_unpaintedCaptures >= _unpaintedCaptureLimit) return;
+    _unpaintedCaptures++;
+    if (_captureScheduled) return;
+    _captureScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _capture());
+  }
+
+  /// `RenderRepaintBoundary.toImage` throws this when its layer is still null.
+  /// The text is the engine's own null-check message, on every compiler. A
+  /// cast elsewhere in the capture says "is not a subtype" and is still
+  /// reported.
+  bool _isUnpaintedBoundary(Object error) =>
+      error.toString().contains('Null check operator used on a null value');
 
   /// Rasterises [_captureKey]'s subtree — [RainOnCard.child], not whatever
   /// [RainOnGlass] does to it, since the boundary sits *inside* that filter
@@ -240,7 +273,7 @@ class _RainOnCardState extends State<RainOnCard>
     if (boundary is! RenderRepaintBoundary || boundary.debugNeedsPaint) {
       // Laid out but not yet painted (common on the very first frame) — try
       // again next frame instead of reading a boundary with nothing in it.
-      _scheduleCapture();
+      _retryUnpaintedCapture();
       return;
     }
     ui.Image? image;
@@ -253,7 +286,16 @@ class _RainOnCardState extends State<RainOnCard>
       final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
       if (!mounted || data == null) return;
       _surface = silhouetteSurface(data, image.width, image.height);
+      _unpaintedCaptures = 0;
     } catch (error, stackTrace) {
+      // Release builds report debugNeedsPaint as false, so the guard above
+      // never sees an unpainted boundary. toImage then throws on `layer!`,
+      // and that null check was the whole Crashlytics issue. The next frame
+      // usually has the layer; an off-screen card never does.
+      if (_isUnpaintedBoundary(error)) {
+        _retryUnpaintedCapture();
+        return;
+      }
       Log.handle(error, stackTrace, 'Failed to capture the splash outline');
     } finally {
       image?.dispose();

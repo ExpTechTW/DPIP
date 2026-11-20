@@ -220,6 +220,48 @@ void main() {
     }
   });
 
+  testWidgets('a resume cancelled by pause is left alone, not rebuilt', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final visibleTab = VisibleTab(2);
+      final created = <MapLibreMapController>[];
+      final invalidated = <MapLibreMapController>[];
+      // Pause landed while resume was still waiting for a frame. The native
+      // future fails so it does not hang; the map is already paused.
+      platform.resumeError = PlatformException(
+        code: 'map_resume_cancelled',
+        message: 'The map was paused before its resumed frame rendered.',
+      );
+      await pump(
+        tester,
+        VisibleTabScope(
+          visibleTab: visibleTab,
+          child: BaseMap(
+            tabIndex: 2,
+            recreateOnReturn: true,
+            onMapCreated: created.add,
+            onMapInvalidated: invalidated.add,
+          ),
+        ),
+      );
+
+      visibleTab.value = 0;
+      await tester.pump();
+      visibleTab.value = 2;
+      await tester.pump();
+      await tester.pump();
+
+      expect(platform.paused, [true, false], reason: 'the resume still ran');
+      expect(platform.buildCount, 1);
+      expect(invalidated, isEmpty);
+      expect(created, hasLength(1));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
   testWidgets('Android keeps pause-resume when recreation is requested', (
     tester,
   ) async {
