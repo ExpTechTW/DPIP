@@ -675,6 +675,21 @@ class AppLocalizationsYue extends AppLocalizations {
   String get feedReplaying => '重播緊';
 
   @override
+  String get replayEewWaiting => '目前重播時間未有速報資料';
+
+  @override
+  String get replayEewRetrying => '速報資料載入失敗，正在重試';
+
+  @override
+  String get replayEewUnavailable => '速報資料暫時未能取得';
+
+  @override
+  String get replayEewNone => '今次重播未偵測到速報資料';
+
+  @override
+  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
+
+  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override

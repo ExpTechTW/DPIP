@@ -885,6 +885,11 @@
     }
   },
   "feedReplaying": "Replaying",
+  "replayEewWaiting": "No EEW yet for this instant",
+  "replayEewRetrying": "Couldn't load the EEW replay — retrying",
+  "replayEewUnavailable": "The EEW replay is temporarily unavailable",
+  "replayEewNone": "No EEW was detected for this replay",
+  "replayEewNoneDetail": "Sampled the start, middle, and end of the event",
   "mapLayerStyleBd": "Dvorak BD",
   "@mapLayerSatelliteB09": {
     "description": "Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name"
@@ -1199,6 +1204,26 @@
   },
   "@feedReplaying": {
     "description": "Status word on the replay page when the replayed instant is older than the RTS retention window: the replay is running, the server just has no shaking snapshot that far back. Never 'offline' — the feed is not broken"
+  },
+  "replayEewWaiting": "No EEW yet for this instant",
+  "@replayEewWaiting": {
+    "description": "Low-key line on the replay page when the replayed instant has no EEW yet: the replay is running and the feed is healthy, this second simply carries no bulletin"
+  },
+  "replayEewRetrying": "Couldn't load the EEW replay — retrying",
+  "@replayEewRetrying": {
+    "description": "Replay EEW line after repeated request failures. The feed is being retried; this must never read as 'no data'"
+  },
+  "replayEewUnavailable": "The EEW replay is temporarily unavailable",
+  "@replayEewUnavailable": {
+    "description": "Replay EEW line once the feed has been unreachable long enough to be considered offline"
+  },
+  "replayEewNone": "No EEW was detected for this replay",
+  "@replayEewNone": {
+    "description": "Replay EEW line when three samples taken across the event found no bulletin. Deliberately 'was not detected', never 'none exists' — three samples cannot prove absence"
+  },
+  "replayEewNoneDetail": "Sampled the start, middle, and end of the event",
+  "@replayEewNoneDetail": {
+    "description": "Second line under replayEewNone, naming which instants were sampled so the headline is not read as a stronger claim"
   },
   "reportFilterIntensityInfoModernTitle": "Current (from 2020)",
   "@mapAppGoogleMaps": {

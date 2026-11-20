@@ -24,6 +24,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
+import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
@@ -1096,8 +1097,11 @@ class _ReportHeader extends StatelessWidget {
   }
 
   void _openReplay(BuildContext context) {
-    // 2s lead-in before the report's origin time, matching the legacy replay.
-    final replayTimestamp = report.originTimeUtc.millisecondsSinceEpoch - 2000;
+    // [replayLeadIn] before the report's origin time — the replay page needs
+    // the same constant to recover the origin for its availability probe.
+    final replayTimestamp =
+        report.originTimeUtc.millisecondsSinceEpoch -
+        replayLeadIn.inMilliseconds;
     context.pushNamed(
       AppRoutes.earthquakeReplay,
       pathParameters: {'id': report.id},
