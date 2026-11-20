@@ -1990,6 +1990,7 @@
   "dumpUploadFailed": "Tải lên thất bại",
   "statusLegendUnprobed": "Chưa dò",
   "statusLegendUnsupported": "Không có",
+  "statusLegendStandby": "Dự phòng nóng",
   "rainScaleSection": "Thang màu",
   "rainScaleFine": "Mịn",
   "rainScaleCoarse": "Thô",

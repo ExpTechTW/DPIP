@@ -229,7 +229,9 @@ class _WebDashboardCard extends StatelessWidget {
 /// Each table lists **all** the services and region columns its category can
 /// ever carry (per api.md and who actually calls what). The probe is passive —
 /// a cell shows that host's icon only when a request has actually touched it;
-/// an untouched cell is an em-dash, not a hidden row.
+/// an untouched cell is either 未探測 (a host that should answer), 不支援 (this
+/// region has no such host at all) or 熱備援 (the region only answers with a
+/// redirect to the one that owns the service).
 ///
 /// The four categories are judged by host name: an `api.*` host is API, a
 /// `static.*` host is Static; LB is the `lb-*` family, Core is the `core-*`
@@ -275,10 +277,10 @@ class _ClientEndpoints extends StatelessWidget {
       isCore: true,
       regions: ['TYO1', 'TNN1', 'API-1'],
       services: [
-        // Historical replay + reports are multi-active across tyo1/tnn1; the
-        // meteor family, location, notify and the TNN1-exclusive list endpoints
-        // only answer on api.core-tnn1; trem-station/events/RTS history only
-        // on the legacy api-1 host.
+        // Historical replay + reports + radar/QPESUMS lists are multi-active
+        // across tyo1/tnn1; the meteor family, satellite/wind lists and the
+        // hot-standby writes (location, notify) only answer on
+        // api.core-tnn1; the event feed only on the legacy api-1 host.
         EndpointService.eew,
         EndpointService.report,
         EndpointService.radar,
@@ -291,14 +293,21 @@ class _ClientEndpoints extends StatelessWidget {
         EndpointService.typhoon,
         EndpointService.location,
         EndpointService.notify,
-        EndpointService.tremStation,
         EndpointService.event,
         EndpointService.rts,
+        // The station directory is a static CSV (`/resource/station`), so it
+        // has no row here — it lives in the Core Static table.
       ],
       supported: {
-        'TYO1': [EndpointService.eew, EndpointService.report],
-        // The exclusive api.core-tnn1 family (meteor, tiles lists, location,
-        // notify) has no tyo1 sibling.
+        'TYO1': [
+          EndpointService.eew,
+          EndpointService.report,
+          EndpointService.radar,
+          EndpointService.qpesums,
+          EndpointService.rts,
+        ],
+        // The TNN1-exclusive api.core-tnn1 family (meteor, satellite/wind
+        // lists) has no tyo1 sibling.
         'TNN1': [
           EndpointService.eew,
           EndpointService.report,
@@ -312,14 +321,17 @@ class _ClientEndpoints extends StatelessWidget {
           EndpointService.typhoon,
           EndpointService.location,
           EndpointService.notify,
-        ],
-        // The legacy api-1 host only carries the old strong-motion/event/history
-        // endpoints.
-        'API-1': [
-          EndpointService.tremStation,
-          EndpointService.event,
           EndpointService.rts,
         ],
+        // The legacy api-1 host only carries the old event feed.
+        'API-1': [EndpointService.event],
+      },
+      // The hot standby: tnn1 owns the service and takes all traffic; tyo1
+      // answers with a 301 back to it and only takes over when tnn1 is gone.
+      // A redirect is not a second origin, so it must not read as 不支援
+      // either.
+      standby: {
+        'TYO1': [EndpointService.location, EndpointService.notify],
       },
     ),
     _Group(
@@ -338,11 +350,19 @@ class _ClientEndpoints extends StatelessWidget {
         EndpointService.rain,
         EndpointService.lightning,
         EndpointService.typhoon,
+        EndpointService.tremStation,
       ],
-      // api.md: every static host is core-tnn1. TYO1 has no static side at all,
-      // so its whole column is 不支援 rather than an em-dash that implies a
-      // host we simply have not probed yet.
+      // api.md: radar/QPESUMS/DPM tiles, the station CSV and satellite/wind/
+      // meteor assets all live under `static.core-*`. Radar, QPESUMS, DPM and
+      // the station directory are multi-active; satellite tiles, wind `.bin`
+      // and the v5 meteor snapshots only exist on tnn1's static host.
       supported: {
+        'TYO1': [
+          EndpointService.radar,
+          EndpointService.qpesums,
+          EndpointService.dpm,
+          EndpointService.tremStation,
+        ],
         'TNN1': [
           EndpointService.radar,
           EndpointService.satellite,
@@ -353,6 +373,7 @@ class _ClientEndpoints extends StatelessWidget {
           EndpointService.rain,
           EndpointService.lightning,
           EndpointService.typhoon,
+          EndpointService.tremStation,
         ],
       },
     ),
@@ -420,6 +441,11 @@ class _Legend extends StatelessWidget {
         l10n.statusLegendUnprobed,
       ),
       (
+        Icons.swap_horiz,
+        Theme.of(context).colorScheme.tertiary,
+        l10n.statusLegendStandby,
+      ),
+      (
         Icons.block,
         Theme.of(context).colorScheme.outlineVariant,
         l10n.statusLegendUnsupported,
@@ -460,6 +486,7 @@ class _Group {
     required this.regions,
     required this.services,
     required this.supported,
+    this.standby = const {},
   });
 
   final String titleKey;
@@ -480,9 +507,18 @@ class _Group {
   /// missing from [supported] means that region does not carry that service.
   final Map<String, List<EndpointService>> supported;
 
+  /// Services whose backup region answers with a redirect to the primary
+  /// instead of serving them — tnn1 owns the write path and tyo1 only takes
+  /// over when tnn1 is gone.
+  final Map<String, List<EndpointService>> standby;
+
   /// Whether [region] actually runs [service] on this tier family.
   bool supports(EndpointService service, String region) =>
       supported[region]?.contains(service) ?? false;
+
+  /// Whether [region] only holds a hot standby for [service].
+  bool holdsStandby(EndpointService service, String region) =>
+      standby[region]?.contains(service) ?? false;
 
   /// Whether [h] belongs in this group, judged by its host.
   bool matches(EndpointHealth h) {
@@ -547,17 +583,24 @@ class _ServiceTable extends StatelessWidget {
       for (final r in group.regions) _headerCell(context, r),
     ]);
 
-    // A cell with no hit is one of two honest answers depending on whether the
-    // region actually serves this service: 未探測 when it should (a host exists
-    // the probe simply has not touched), 不支援 when it should not (api.md says
-    // the region has no such host at all — e.g. every TYO1 static cell).
+    // A cell with no hit is one of three honest answers depending on whether
+    // the region actually serves this service: 未探測 when it should (a host
+    // exists the probe simply has not touched), 熱備援 when the region only
+    // redirects back to the region that owns it, 不支援 when it should not
+    // (api.md says the region has no such host at all — e.g. every TYO1
+    // static cell for a satellite tile).
     for (final s in group.services) {
       rows.add([
         _serviceCell(context, s),
         for (final r in group.regions)
-          group.supports(s, r)
-              ? _probeCell(context, cell[(s, r)])
-              : _unsupportedCell(context),
+          switch ((cell[(s, r)], group.supports(s, r))) {
+            (final hit?, _) => _probeCell(context, hit),
+            (null, true) => _probeCell(context, null),
+            (null, false) when group.holdsStandby(s, r) => _standbyCell(
+              context,
+            ),
+            (null, false) => _unsupportedCell(context),
+          },
       ]);
     }
 
@@ -656,6 +699,24 @@ class _ServiceTable extends StatelessWidget {
       Icons.block,
       size: 16,
       color: Theme.of(context).colorScheme.outlineVariant,
+    ),
+  );
+
+  /// A cell for the standby region of a write path: a redirect arrow rather
+  /// than a tick, because that host answers with a 301 back to the primary
+  /// and never serves the request itself.
+  Widget _standbyCell(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+    child: Tooltip(
+      message: context.l10n.statusLegendStandby,
+      child: SizedBox(
+        height: 24,
+        child: Icon(
+          Icons.swap_horiz,
+          size: 18,
+          color: Theme.of(context).colorScheme.tertiary,
+        ),
+      ),
     ),
   );
 

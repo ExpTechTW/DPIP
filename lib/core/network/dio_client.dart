@@ -28,6 +28,13 @@ Dio createDio({EtagCacheStore? etagCache, NetworkUsageStore? usage}) {
       // If-None-Match, so this is inert without a cache.
       validateStatus: (status) =>
           status != null && ((status >= 200 && status < 300) || status == 304),
+      // Redirects are followed by the adapter (`followRedirects` defaults to
+      // true, `maxRedirects` to 5), which matters for one endpoint family:
+      // notify/location are primary-on-tnn1 with a hot standby, and a standby
+      // that is up while the primary is not answers `307` at the *interim*
+      // node, not at tnn1. Following it means the write lands on tnn1, where it
+      // belongs. A 3xx never reaches [validateStatus] — by the time the status
+      // is checked the chain has already settled on its final response.
     ),
   );
   if (etagCache != null) {

@@ -3369,6 +3369,9 @@ class AppLocalizationsFil extends AppLocalizations {
   String get statusLegendUnsupported => 'Hindi suportado';
 
   @override
+  String get statusLegendStandby => 'Hot standby';
+
+  @override
   String get rainScaleSection => 'Antas ng kulay';
 
   @override

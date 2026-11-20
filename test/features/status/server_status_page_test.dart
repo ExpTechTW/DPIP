@@ -218,7 +218,7 @@ void main() {
     expect(find.text(l10n.endpointHealthUnknown), findsOneWidget);
   });
 
-  testWidgets('local status legend spells out the four cell states', (
+  testWidgets('local status legend spells out the five cell states', (
     tester,
   ) async {
     final repo = _FakeRepository(Ok(okStatus()));
@@ -235,10 +235,13 @@ void main() {
     expect(find.text(l10n.endpointStateOk), findsWidgets);
     expect(find.text(l10n.endpointStateDown), findsWidgets);
     expect(find.text(l10n.statusLegendUnprobed), findsOneWidget);
+    // A standby region redirects to the primary instead of serving — neither
+    // a probe state nor 不支援.
+    expect(find.text(l10n.statusLegendStandby), findsOneWidget);
     expect(find.text(l10n.statusLegendUnsupported), findsOneWidget);
   });
 
-  testWidgets('core static tyo1 column is unsupported, not unprobed', (
+  testWidgets('core static tyo1 offers only the families it copied', (
     tester,
   ) async {
     final repo = _FakeRepository(Ok(okStatus()));
@@ -275,14 +278,42 @@ void main() {
     // Icon-based cells: a healthy check and a down error are both present.
     expect(find.byIcon(Icons.check_circle), findsWidgets);
     expect(find.byIcon(Icons.error), findsWidgets);
-    // The Core Static table's TYO1 column is entirely 不支援 — no static host
-    // exists for tyo1, so not even the radar row shows a probe state.
+    // The Core Static table's TYO1 column supports radar, QPESUMS, DPM and
+    // the station CSV; satellite, wind and the v5 meteor snapshots are the
+    // 不支援 cells there.
     expect(find.byIcon(Icons.block), findsWidgets);
     // The unprobed question-marks outnumber everything: the LB API rows and
     // Core API rows for every service/region the probe did not touch.
     expect(find.byIcon(Icons.help_outline), findsWidgets);
-    // Radar rows exist in both Core tables; TYO1's radar cell is 不支援.
+    // Radar rows exist in both Core tables; TYO1's radar cells are now
+    // probeable (未探測) rather than 不支援, because tyo1 runs the backend.
     expect(find.text(l10n.endpointServiceRadar), findsNWidgets(2));
+  });
+
+  testWidgets('core api tyo1 shows hot standby for the write paths', (
+    tester,
+  ) async {
+    final repo = _FakeRepository(Ok(okStatus()));
+    final health = EndpointHealthMonitor();
+    // EEW history on tyo1 is a real second origin; notify/location on tyo1
+    // only redirect back to tnn1, so their cells must not read as 不支援.
+    health.success(
+      ApiTier.coreApi,
+      'https://api.core-tyo1.exptech.dev',
+      '/api/v2/eq/eew/1700000000',
+    );
+
+    tester.view.physicalSize = const Size(800, 5000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(wrap(repo, health: health));
+    await tester.pumpAndSettle();
+
+    final l10n = l10nOf(tester);
+    // One cell for location and one for notify, both under TYO1.
+    expect(find.byTooltip(l10n.statusLegendStandby), findsNWidgets(2));
+    // The legend names the state once, next to the other four.
+    expect(find.text(l10n.statusLegendStandby), findsOneWidget);
   });
 
   testWidgets('a high error rate is degraded, and a blank host is a dash', (

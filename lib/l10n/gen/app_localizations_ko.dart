@@ -3291,6 +3291,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get statusLegendUnsupported => '미지원';
 
   @override
+  String get statusLegendStandby => '핫 스탠바이';
+
+  @override
   String get rainScaleSection => '색상 간격';
 
   @override

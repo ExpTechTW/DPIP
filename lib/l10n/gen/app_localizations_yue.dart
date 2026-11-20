@@ -3275,6 +3275,9 @@ class AppLocalizationsYue extends AppLocalizations {
   String get statusLegendUnsupported => '唔支援';
 
   @override
+  String get statusLegendStandby => '熱備援';
+
+  @override
   String get rainScaleSection => '色階間距';
 
   @override

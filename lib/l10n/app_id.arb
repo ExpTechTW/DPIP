@@ -1990,6 +1990,7 @@
   "dumpUploadFailed": "Gagal mengunggah",
   "statusLegendUnprobed": "Belum diperiksa",
   "statusLegendUnsupported": "Tidak tersedia",
+  "statusLegendStandby": "Siaga panas",
   "rainScaleSection": "Skala warna",
   "rainScaleFine": "Halus",
   "rainScaleCoarse": "Kasar",

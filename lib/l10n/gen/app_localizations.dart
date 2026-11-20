@@ -6318,6 +6318,12 @@ abstract class AppLocalizations {
   /// **'Not offered'**
   String get statusLegendUnsupported;
 
+  /// No description provided for @statusLegendStandby.
+  ///
+  /// In en, this message translates to:
+  /// **'Hot standby'**
+  String get statusLegendStandby;
+
   /// Menu section header for the rainfall colour-scale interval choice
   ///
   /// In en, this message translates to:

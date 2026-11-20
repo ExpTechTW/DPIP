@@ -4007,6 +4007,7 @@
   },
   "statusLegendUnprobed": "Not yet probed",
   "statusLegendUnsupported": "Not offered",
+  "statusLegendStandby": "Hot standby",
   "rainScaleSection": "Colour scale",
   "rainScaleFine": "Fine",
   "rainScaleCoarse": "Coarse",
