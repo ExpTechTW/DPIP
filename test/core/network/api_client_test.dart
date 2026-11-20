@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/region_selection.dart';
@@ -426,6 +427,49 @@ void main() {
     );
     expect(clientError.hits, hasLength(1));
   });
+
+  test(
+    'the shared realtime stream reports to both the EEW and RTS rows',
+    () async {
+      // `SseMux` opens one connection on `ApiPaths.sse` for every live feed.
+      // Charged to `other`, an SSE outage would never reach the server-status
+      // dot as the EEW or RTS feed it actually is.
+      final health = EndpointHealthMonitor();
+      final adapter = _FakeAdapter(
+        (call, _) =>
+            ResponseBody(Stream.value(Uint8List(0)), call == 1 ? 503 : 200),
+      );
+      final opened = await monitoredClient(adapter, health).openStream(
+        ApiTier.lbApi,
+        ApiPaths.sse,
+        query: {'topics': 'eq.eew.v1,trem.rts.v1'},
+      );
+      opened.cancel();
+      for (final service in [EndpointService.eew, EndpointService.rts]) {
+        expect(
+          health
+              .of(service, ApiTier.lbApi, 'api.lb-tpe1.exptech.dev')!
+              .consecutiveFailures,
+          1,
+          reason: '$service: the failed region',
+        );
+        expect(
+          health.of(service, ApiTier.lbApi, 'api.lb-khh1.exptech.dev')!.state,
+          EndpointState.healthy,
+          reason: '$service: the region that answered',
+        );
+      }
+      expect(
+        health.of(
+          EndpointService.other,
+          ApiTier.lbApi,
+          'api.lb-tpe1.exptech.dev',
+        ),
+        isNull,
+      );
+      expect(health.needsAttention, isTrue);
+    },
+  );
 
   group('getTileBytes', () {
     const path = '/api/v2/tiles/radar/1783360200/7/107/55.webp';
