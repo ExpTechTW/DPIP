@@ -14,7 +14,9 @@ class DpmTilePrefetcher {
   final ApiClient _client;
   final MapTileWarmer _warmer;
 
-  static const ApiTier _tier = ApiTier.coreStaticExclusive;
+  /// Both core regions carry the DPM backend, so warming follows the region
+  /// selection like the style's tile template does.
+  static const ApiTier _tier = ApiTier.coreStatic;
 
   void cancel() => _warmer.cancel();
 

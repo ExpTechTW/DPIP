@@ -1,4 +1,4 @@
-/// Disaster-prevention map (DPM) HTTP surface on `static.core-tnn1`.
+/// Disaster-prevention map (DPM) HTTP surface on `static.core-{tyo1,tnn1}`.
 library;
 
 import 'package:dpip/core/network/api_client.dart';
@@ -16,9 +16,14 @@ class DisasterMapApi {
 
   final ApiClient _client;
 
-  static const ApiTier _tier = ApiTier.coreStaticExclusive;
+  /// The DPM backend is copied to both core regions, so tiles and details
+  /// follow the region selection.
+  static const ApiTier _tier = ApiTier.coreStatic;
 
-  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
+  /// `https://static.core-<region>.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
+  ///
+  /// Only the selected region's host is used: MapLibre fetches every tile
+  /// itself, so a tile request cannot fail over per request.
   String tileUrl(String layer) =>
       '${_client.hostsFor(_tier).first}'
       '${ApiPaths.dpm}/$layer/{z}/{x}/{y}.mvt';

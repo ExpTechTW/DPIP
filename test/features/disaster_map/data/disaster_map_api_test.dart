@@ -14,9 +14,9 @@
 ///   venue's data.
 ///
 /// So this pins the exact URL each of the four methods builds, on the
-/// `static.core-tnn1` host ([ApiTier.coreStaticExclusive] — single host, no
-/// region failover), and that a detail response's JSON object is handed back
-/// as a plain `Map<String, dynamic>`.
+/// selected region's `static.core-<region>` host ([ApiTier.coreStatic] — both
+/// core regions carry the DPM backend), and that a detail response's JSON
+/// object is handed back as a plain `Map<String, dynamic>`.
 library;
 
 import 'dart:typed_data';
