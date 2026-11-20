@@ -11,7 +11,7 @@ import 'package:dpip/features/disaster_map/domain/shelter_detail.dart';
 abstract interface class DisasterMapRepository {
   /// XYZ MVT template for [layer] (e.g. `aed`, `restroom`, `shelter`).
   ///
-  /// `https://static.core-tnn1.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
+  /// `https://static.core-<region>.exptech.dev/api/v2/tiles/dpm/{layer}/{z}/{x}/{y}.mvt`
   String tileUrl(String layer);
 
   /// AED detail by internal tile feature [id] (not `aed_id`).

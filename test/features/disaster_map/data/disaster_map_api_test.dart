@@ -1,7 +1,8 @@
 /// [DisasterMapApi] has two very different jobs sharing one class: [tileUrl]
-/// is a pure string template consumed by MapLibre's native tile loader (never
-/// by this app's own HTTP stack), while the three detail getters are ordinary
-/// app-fetched JSON GETs that share one `_detail(kind, id)` helper.
+/// is a pure string template consumed by MapLibre's native tile loader (the
+/// app's own HTTP stack fetches it only when that region's host is failing),
+/// while the three detail getters are ordinary app-fetched JSON GETs that
+/// share one `_detail(kind, id)` helper.
 ///
 /// Both are quiet failure modes:
 /// - a wrong host or path in [tileUrl] never throws — MapLibre just 404s the
@@ -14,9 +15,9 @@
 ///   venue's data.
 ///
 /// So this pins the exact URL each of the four methods builds, on the
-/// `static.core-tnn1` host ([ApiTier.coreStaticExclusive] — single host, no
-/// region failover), and that a detail response's JSON object is handed back
-/// as a plain `Map<String, dynamic>`.
+/// selected region's `static.core-<region>` host ([ApiTier.coreStatic] — both
+/// core regions carry the DPM backend), and that a detail response's JSON
+/// object is handed back as a plain `Map<String, dynamic>`.
 library;
 
 import 'dart:typed_data';

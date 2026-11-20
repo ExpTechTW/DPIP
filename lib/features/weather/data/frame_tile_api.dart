@@ -39,11 +39,20 @@ class FrameTileApi {
   /// radar / satellite / QPESUMS never set it.
   final String? model;
 
-  /// The v2 frame list lives on `api.core-tnn1` (no region failover).
-  static const ApiTier _listTier = ApiTier.coreExclusiveApi;
+  /// Radar and QPESUMS are copied to both core regions, so their list and
+  /// tiles follow the region selection; satellite and wind exist only on
+  /// `core-tnn1` and keep the exclusive tiers.
+  bool get _multiRegion => path == 'radar' || path == 'qpesums';
 
-  /// v2 tiles live on `static.core-tnn1` (no region failover).
-  static const ApiTier _tileTier = ApiTier.coreStaticExclusive;
+  /// The v2 frame list: `api.core-{tyo1,tnn1}` for radar and QPESUMS,
+  /// `api.core-tnn1` for the rest.
+  ApiTier get _listTier =>
+      _multiRegion ? ApiTier.coreApi : ApiTier.coreExclusiveApi;
+
+  /// v2 tiles: `static.core-{tyo1,tnn1}` for radar and QPESUMS,
+  /// `static.core-tnn1` for the rest.
+  ApiTier get _tileTier =>
+      _multiRegion ? ApiTier.coreStatic : ApiTier.coreStaticExclusive;
 
   /// Available opaque frame ids, **newest valid time first**.
   Future<List<String>> getFrames() async {
@@ -58,6 +67,12 @@ class FrameTileApi {
   };
 
   /// XYZ WebP raster tile URL template for [frame].
+  ///
+  /// The selected region's host: MapLibre fetches each tile itself from the
+  /// URL its source names, and a region change replaces that source. When the
+  /// host fails, `MapTileCache` fetches the same path from the other region and
+  /// answers MapLibre with it — for radar and QPESUMS only; satellite and wind
+  /// have no other region to go to.
   String tileUrl(String frame) {
     final host = _client.hostsFor(_tileTier).first;
     if (path == 'satellite') {

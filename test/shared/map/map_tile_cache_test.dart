@@ -1264,4 +1264,193 @@ void main() {
       expect(dataOf(await pending, url), [4]);
     });
   });
+
+  group('region hosts', () {
+    const path = '/api/v2/tiles/radar/1783360200/7/107/55.webp';
+    const tnn1 = 'https://static.core-tnn1.exptech.dev$path';
+    const tyo1 = 'https://static.core-tyo1.exptech.dev$path';
+    const satellite =
+        'https://static.core-tnn1.exptech.dev/api/v2/tiles/satellite/13/'
+        'normal/1783360200/5/26/14.webp';
+    final body = Uint8List.fromList([0x52, 0x49, 0x46, 0x46]);
+
+    late List<String> fetched;
+    late Set<String> failing;
+
+    Future<MapTileCache> withFailover(
+      Future<Uint8List> Function(String url) answer,
+    ) async {
+      fetched = [];
+      failing = {};
+      final region = MapTileCache(
+        store,
+        fetch: (target) {
+          fetched.add(target);
+          return answer(target);
+        },
+        hostFailing: failing.contains,
+      );
+      await region.install();
+      return region;
+    }
+
+    Future<Map<Object?, Object?>> demand(List<String> urls) async =>
+        (await fromNative('getBatch', {'urls': urls}))!
+            as Map<Object?, Object?>;
+
+    test('a tile stored under one core region answers the other', () async {
+      await withFailover((_) async => body);
+      await fromNative('putBatch', {
+        'entries': [
+          {'url': tyo1, 'data': body, 'contentType': 'image/webp'},
+        ],
+      });
+
+      expect(
+        (await store.readBytes(tnn1))?.bytes,
+        body,
+        reason: 'one row under the key, not one per host',
+      );
+      final reply = await demand([tnn1, tyo1]);
+      expect((reply[tnn1]! as Map)['data'], body);
+      expect((reply[tyo1]! as Map)['data'], body);
+      expect(fetched, isEmpty);
+    });
+
+    test('the warm path reads the key and injects the URL native asks '
+        'for', () async {
+      await store.writeBytes(
+        tnn1,
+        etag: 'W/"t"',
+        bytes: body,
+        contentType: 'image/webp',
+      );
+      await cache.warm([tyo1]);
+
+      expect(injectedUrls, [tyo1]);
+    });
+
+    test('a first miss is left to native', () async {
+      await withFailover((_) async => body);
+
+      final reply = await demand([tnn1]);
+
+      expect(reply, isEmpty);
+      expect(fetched, isEmpty, reason: 'MapLibre downloads it the usual way');
+    });
+
+    test('a tile native asks for again was never delivered, and is fetched '
+        'with failover', () async {
+      await withFailover((_) async => body);
+      await demand([tnn1]);
+
+      final reply = await demand([tnn1]);
+
+      expect(fetched, [tnn1]);
+      expect((reply[tnn1]! as Map)['data'], body);
+    });
+
+    test('a tile native delivered is not a failed download', () async {
+      await withFailover((_) async => body);
+      await demand([tnn1]);
+      await fromNative('putBatch', {
+        'entries': [
+          // Empty, so nothing is stored and the next ask is a miss again.
+          {'url': tnn1, 'data': Uint8List(0), 'contentType': 'image/webp'},
+        ],
+      });
+
+      await demand([tnn1]);
+
+      expect(fetched, isEmpty);
+    });
+
+    test('a tile this side cancelled is not a failed download', () async {
+      // The timeline abandons incomplete frames on every settle; MapLibre
+      // asking for those tiles again must not hand them to Dio.
+      final region = await withFailover((_) async => body);
+      await demand([tnn1, satellite]);
+      await region.cancelFetches(urlContains: const ['/api/v2/tiles/radar/']);
+
+      await demand([tnn1]);
+
+      expect(fetched, isEmpty);
+    });
+
+    test('an unscoped cancel forgets every unanswered tile', () async {
+      final region = await withFailover((_) async => body);
+      await demand([tnn1]);
+      await region.cancelFetches();
+
+      await demand([tnn1]);
+
+      expect(fetched, isEmpty);
+    });
+
+    test('after a cancel, a real failure is still taken over', () async {
+      final region = await withFailover((_) async => body);
+      await demand([tnn1]);
+      await region.cancelFetches(urlContains: const ['/api/v2/tiles/radar/']);
+
+      // Asked again after the cancel and still not delivered: that one failed.
+      await demand([tnn1]);
+      final reply = await demand([tnn1]);
+      expect(fetched, [tnn1]);
+      expect((reply[tnn1]! as Map)['data'], body);
+
+      // And a host this side saw fail needs no second ask at all.
+      fetched.clear();
+      await demand([tyo1]);
+      await region.cancelFetches(urlContains: const ['/api/v2/tiles/radar/']);
+      failing.add(tyo1);
+      await demand([tyo1]);
+      expect(fetched, [tyo1]);
+    });
+
+    test(
+      'a failing host sends even a first miss through the failover',
+      () async {
+        await withFailover((_) async => body);
+        failing.add(tnn1);
+
+        final reply = await demand([tnn1]);
+
+        expect(fetched, [tnn1]);
+        expect((reply[tnn1]! as Map)['data'], body);
+      },
+    );
+
+    test('a family only one region carries is never taken over', () async {
+      await withFailover((_) async => body);
+      failing.add(satellite);
+      await demand([satellite]);
+
+      final reply = await demand([satellite]);
+
+      expect(fetched, isEmpty);
+      expect(reply, isEmpty);
+    });
+
+    test("the origin's 404 is left to native", () async {
+      await withFailover((_) async => Uint8List(0));
+      failing.add(tnn1);
+
+      final reply = await demand([tnn1]);
+
+      expect(fetched, [tnn1]);
+      expect(reply, isEmpty, reason: 'an empty raster is not a tile');
+    });
+
+    test('a failover nobody answers leaves the tile to native', () async {
+      await withFailover(
+        (_) async => throw const SocketException('Connection timed out'),
+      );
+      failing.add(tnn1);
+
+      final reply = await demand([tnn1]);
+
+      expect(fetched, [tnn1]);
+      expect(reply, isEmpty);
+    });
+  });
 }

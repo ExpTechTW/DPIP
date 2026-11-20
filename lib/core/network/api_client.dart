@@ -6,6 +6,7 @@ import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/tile_hosts.dart';
 
 /// A live byte stream plus the handle that aborts it — the result of
 /// [ApiClient.openStream]. [cancel] closes the underlying connection; [stream]
@@ -109,6 +110,94 @@ class ApiClient {
     return _bytePayload(response);
   }
 
+  /// GET a map tile by the absolute URL a MapLibre style names.
+  ///
+  /// A tile whose family every region carries ([tileRoute]) fails over as a
+  /// frame list does: the same [_isRetryable] split, each host at most once,
+  /// in [hostsFor] order — except that a host which failed a tile request in
+  /// the last [_tileHostRetryAfter] is asked last (see [_tileHostOrder]). A 404
+  /// moves on only where the family sets `notFoundFailsOver` (the core frame
+  /// tiles); a basemap 404 is the answer on every host. A 404 is never charged
+  /// to the host. Anything else is one [getBytesAbsolute] to the URL as given.
+  ///
+  /// Whichever host answers, [EtagInterceptor] stores the body under
+  /// [tileCacheKey], which is also where MapLibre's own URL is looked up.
+  Future<BytePayload> getTileBytes(
+    String url, {
+    CancelToken? cancelToken,
+  }) async {
+    final route = tileRoute(url);
+    if (route == null) return getBytesAbsolute(url, cancelToken: cancelToken);
+    final response = await _requestAlong(
+      _tileHostOrder(route),
+      route.tier,
+      route.path,
+      cancelToken: cancelToken,
+      options: Options(responseType: ResponseType.bytes),
+      notFoundFailsOver: route.notFoundFailsOver,
+    );
+    return _bytePayload(response);
+  }
+
+  /// How long a host that failed a tile request is asked last. Past it, the
+  /// host goes back to the front, so one request finds out whether it has
+  /// recovered.
+  static const Duration _tileHostRetryAfter = Duration(seconds: 30);
+
+  /// [hostsFor] for [route]'s tier, with every host that failed a tile request
+  /// in the last [_tileHostRetryAfter] moved to the end — still each host once.
+  ///
+  /// A takeover in `MapTileCache` happens because the selected host failed.
+  /// Asking it first again spends its connect timeout (8 s) against native's
+  /// 1.8 s budget, so the tile misses that budget and the cache reads the
+  /// network as down. Only for a while, though: a host kept last for good is
+  /// never asked while the other region answers, so its failing verdict —
+  /// which is what keeps the takeover going — would never clear.
+  List<String> _tileHostOrder(TileRoute route) {
+    final hosts = hostsFor(route.tier);
+    final health = _health;
+    if (health == null) return hosts;
+    final service = EndpointService.ofPath(route.path);
+    // wall-clock: aged against the monitor's own `lastFailure`, which is this
+    // device's clock as well; never compared with anything a server stamped.
+    final now = DateTime.now();
+    bool failedLately(String host) {
+      final seen = health.of(service, route.tier, host);
+      final at = seen?.lastFailure;
+      return seen != null &&
+          (seen.state == EndpointState.degraded ||
+              seen.state == EndpointState.down) &&
+          at != null &&
+          now.difference(at) < _tileHostRetryAfter;
+    }
+
+    final failing = hosts.where(failedLately).toList(growable: false);
+    if (failing.isEmpty || failing.length == hosts.length) return hosts;
+    return [
+      for (final host in hosts)
+        if (!failing.contains(host)) host,
+      ...failing,
+    ];
+  }
+
+  /// Whether the region host [url] names is failing its tile requests: the
+  /// health monitor saw its last one fail ([EndpointState.degraded] or
+  /// [EndpointState.down]).
+  ///
+  /// Only [getTileBytes] reports a tile host's outcomes, so this is what Dart
+  /// itself observed — MapLibre's own downloads report nothing. False without
+  /// a monitor, and for a tile with nowhere to fail over to.
+  bool tileHostFailing(String url) {
+    final health = _health;
+    final route = tileRoute(url);
+    if (health == null || route == null) return false;
+    final origin = url.substring(0, url.length - route.path.length);
+    final state = health
+        .of(EndpointService.ofPath(route.path), route.tier, origin)
+        ?.state;
+    return state == EndpointState.degraded || state == EndpointState.down;
+  }
+
   /// Absolute-URL GET with JSON decode + ETag (no region failover).
   ///
   /// For third-party hosts (e.g. GitHub releases) that still go through Dio so
@@ -198,8 +287,30 @@ class ApiClient {
     Options? options,
     CancelToken? cancelToken,
     bool notFoundFailsOver = false,
+  }) => _requestAlong(
+    hostsFor(tier),
+    tier,
+    path,
+    method: method,
+    data: data,
+    query: query,
+    options: options,
+    cancelToken: cancelToken,
+    notFoundFailsOver: notFoundFailsOver,
+  );
+
+  /// [request] along [hosts], which are [tier]'s in the order to try them.
+  Future<Response<dynamic>> _requestAlong(
+    List<String> hosts,
+    ApiTier tier,
+    String path, {
+    String method = 'GET',
+    Object? data,
+    Map<String, dynamic>? query,
+    Options? options,
+    CancelToken? cancelToken,
+    bool notFoundFailsOver = false,
   }) async {
-    final hosts = hostsFor(tier);
     for (var i = 0; i < hosts.length; i++) {
       try {
         final response = await _dio.request(
