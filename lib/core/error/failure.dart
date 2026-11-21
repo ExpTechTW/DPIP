@@ -111,3 +111,21 @@ final class WidgetSnapshotFailure extends Failure {
 
   final WidgetSnapshotFailureReason reason;
 }
+
+enum ReportPictureFailureReason {
+  unavailable,
+  unsupportedAbi,
+  invalidInput,
+  unsupportedVersion,
+  unsupportedFeature,
+  limitExceeded,
+  renderFailed,
+  disposed,
+}
+
+final class ReportPictureFailure extends Failure {
+  const ReportPictureFailure(this.reason, super.message, {this.nativeStatus});
+
+  final ReportPictureFailureReason reason;
+  final int? nativeStatus;
+}
