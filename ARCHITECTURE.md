@@ -100,6 +100,91 @@ Each of these is a rule the code is expected to follow, not a description of
 what it happens to do. They live here so there is one copy: `CLAUDE.md` and
 `AGENTS.md` point at this file rather than restating it.
 
+## Native report-image renderer
+
+`ReportPicture` in `lib/shared/seismic/report_picture/` accepts the original
+UTF-8 Share Render Input v2 bytes. It checks the ABI (major 1, minor 2 or later)
+and the v2 and production 16:9 capability bits before loading fonts. Rust
+validates the input and returns a 1920×1080 PNG. The service returns a
+`Result<Uint8List>` with an app-owned copy or a structured
+`ReportPictureFailure`. The upstream Dart bindings copy native bytes and
+release the original buffer in the same isolate. Native initialization and
+each render run in background isolates. One handle serves the renderer's
+queued requests. Await `dispose()` to drain those requests and release the
+handle. Ignoring a request Future does not cancel native work.
+
+### Native build inputs
+
+The mobile runtime is opt-in. With a local checkout containing eq-report-pic
+merge commit `b135d02bd1ba5103cd3d116a951b1b63a710a312` (PR #12), run these
+commands from the DPIP repository root.
+
+```sh
+tool/dev/build_report_picture.sh ios ../eq-report-pic
+tool/dev/build_report_picture.sh android ../eq-report-pic
+shasum -a 256 -c native/eq_report_pic/ios/SHA256SUMS
+shasum -a 256 -c native/eq_report_pic/android/SHA256SUMS
+```
+
+The script archives that commit, checks `Cargo.lock`, and builds offline with
+the committed Cargo vendor snapshot and Rust 1.99.1. Install the Rust targets
+for the platform you build.
+
+- **iOS** uses Xcode and `aarch64-apple-ios`, `aarch64-apple-ios-sim`, and
+  `x86_64-apple-ios`. Runner picks the static XCFramework slice for the SDK.
+  Linker roots keep all nine ABI symbols through dead stripping for Dart
+  `DynamicLibrary.process()` lookup. The extensions use their own link settings.
+- **Android** uses NDK `28.2.13676358`, API 26, and
+  `aarch64-linux-android` / `x86_64-linux-android`. Set `ANDROID_HOME` or
+  `ANDROID_SDK_ROOT` if needed. Gradle includes the ELF files as `jniLibs`
+  for `arm64-v8a` and `x86_64`. The script checks all nine exports and 16 KiB
+  ELF segment alignment. DPIP excludes `armeabi-v7a` from its supported set.
+  Dart opens `libeq_report_pic.so`.
+
+The generated native libraries, fonts, and notices are local build inputs.
+Each platform's `source-revision.txt`, `toolchain.txt`, and `SHA256SUMS` record
+what was built and staged. Flutter packages a single set of the original TTFs
+with their notices. Standard CI builds omit the optional native inputs.
+A missing library or unsupported ABI becomes an ordinary `Failure`.
+Distribution of the native runtime also requires clearance for the embedded
+basemap and assets.
+
+### Offline smoke test
+
+Use the alternate entry point with the original synthetic fixture from
+eq-report-pic's `testdata/share-input-v2/synthetic-zero-missing.json`, checked
+in here for QA. The `.jcs.json` companion is the canonical comparison payload
+and omits fields expected by the renderer.
+
+```sh
+tool/run.sh -d <simulator-or-emulator-id> --target tool/qa/report_picture_smoke.dart \
+  --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < tool/qa/fixtures/report_picture_v2.json | tr -d '\n')"
+```
+
+Check for `REPORT_PICTURE_SMOKE PASS`, the ABI and capabilities, and the
+fixture SHA-256. The smoke test checks queuing, invalid input and version,
+recovery, and disposal. Each `REPORT_PICTURE_PNG` line gives the theme,
+decoded dimensions, SHA-256 and app-sandbox path for one generated PNG.
+Copy `report-picture-light.png` and `report-picture-dark.png` out of the
+debug app to inspect the rendered maps:
+
+```sh
+xcrun simctl get_app_container booted com.exptech.dpip.dpip data
+adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-light.png > report-picture-light.png
+adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-dark.png > report-picture-dark.png
+```
+
+On iOS, the PNGs are under `Documents` in the returned data container.
+For a negative smoke test, pass `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unavailable`
+or `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unsupportedAbi` with a build
+prepared without the library or with an incompatible ABI.
+
+Run `tool/dev/test_report_picture.sh` on macOS or Linux for host-side ABI
+and lifecycle tests. It compiles small C test doubles with `cc` and uses
+the pinned Flutter toolchain. A separate QA job can run this script
+without Rust or mobile artifacts. Use the mobile smoke test above to
+verify the real Rust library and mobile packaging.
+
 ## Logging
 
 Always log through `Log` (`lib/core/logging/log.dart`):

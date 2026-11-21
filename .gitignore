@@ -56,3 +56,9 @@ android/key.properties
 
 # Local dependency overrides (e.g. a working copy of the maplibre fork).
 pubspec_overrides.yaml
+
+# Optional eq-report-pic build outputs (tool/dev/build_report_picture.sh).
+/native/eq_report_pic/
+/assets/fonts/report/*.ttf
+/assets/fonts/report/third-party-notices.txt
+/assets/fonts/report/rust-library-copyright.html

@@ -1395,6 +1395,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LD_EXPORT_SYMBOLS = YES;
+				OTHER_LDFLAGS = ("$(inherited)", "$(DPIP_EQR_LINK)");
 				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.dpip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -1910,6 +1912,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LD_EXPORT_SYMBOLS = YES;
+				OTHER_LDFLAGS = ("$(inherited)", "$(DPIP_EQR_LINK)");
 				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.dpip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -1937,6 +1941,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LD_EXPORT_SYMBOLS = YES;
+				OTHER_LDFLAGS = ("$(inherited)", "$(DPIP_EQR_LINK)");
 				PRODUCT_BUNDLE_IDENTIFIER = com.exptech.dpip.dpip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

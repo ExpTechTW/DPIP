@@ -1,1 +1,2 @@
 #include "Generated.xcconfig"
+#include? "../../native/eq_report_pic/ios/link.xcconfig"

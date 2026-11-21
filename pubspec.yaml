@@ -29,6 +29,7 @@ dependencies:
   # ml_intensity_service.dart). Already in the lock through the SDK tooling.
   crypto: ^3.0.6
   dio: ^5.11.0
+  ffi: ^2.2.0
   # Firebase pinned deliberately — a newer major bumps the min iOS target and
   # breaks older-device compatibility. Do not upgrade without checking that.
   # Pinned to the exact version (not `^`) so a plain `pub upgrade` can't drift
@@ -193,6 +194,7 @@ flutter:
     - shaders/weather/rainbow.frag
     - shaders/weather/card_water.frag
   assets:
+    - assets/fonts/report/
     - assets/DPIP.png
     - assets/box.json.Z
     - assets/weather/clouds/

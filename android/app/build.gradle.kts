@@ -48,6 +48,9 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    // Optional artifacts built by tool/dev/build_report_picture.sh.
+    sourceSets.getByName("main").jniLibs.srcDir("../../native/eq_report_pic/android")
+
     // Robolectric inflates the Widget's real layouts and resolves its real
     // resources, so the unit-test run needs the merged resource table — which
     // is off by default for Android unit tests.

@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "source": {
+    "namespace": "example.synthetic",
+    "report_id": "modern-42",
+    "event_id": {
+      "namespace": "example.events",
+      "id": "42"
+    },
+    "revision": null,
+    "publication": {
+      "issued_at_unix_ms": 1577808100000,
+      "valid_until_unix_ms": 1577808200000
+    },
+    "scale_evidence": {
+      "kind": "dataset_contract",
+      "reference": "Synthetic fixture scale contract"
+    }
+  },
+  "locale": "zh-Hant",
+  "report": {
+    "origin_time_unix_ms": 1577808000000,
+    "epicenter": {
+      "lon_e6": 121560000,
+      "lat_e6": 23978000
+    },
+    "location": {
+      "zh-Hant": "花蓮縣近海",
+      "en-US": "Offshore \"Hualien\" / East 🗺 é \\ "
+    },
+    "magnitude": {
+      "kind": "ml",
+      "centi": 570
+    },
+    "depth_m": 12100,
+    "intensity_scale": "cwa-2020",
+    "published_max_intensity": 0,
+    "areas": [
+      {
+        "id": "TW-HUA",
+        "name": {
+          "zh-Hant": "花蓮縣",
+          "en-US": "Hualien County"
+        },
+        "intensity": 6
+      },
+      {
+        "id": "TW-ILA",
+        "name": {
+          "zh-Hant": "宜蘭縣"
+        },
+        "intensity": 0
+      },
+      {
+        "id": "TW-CHA",
+        "name": {
+          "zh-Hant": "彰化縣"
+        }
+      }
+    ],
+    "observations": [
+      {
+        "id": "cwa:station:Z02",
+        "area_id": "TW-HUA",
+        "name": {
+          "zh-Hant": "花蓮"
+        },
+        "position": null,
+        "intensity": 7,
+        "station_id": {
+          "namespace": "example.stations",
+          "id": "42"
+        }
+      },
+      {
+        "id": "cwa:station:A01",
+        "area_id": "TW-ILA",
+        "name": {
+          "zh-Hant": "南澳"
+        },
+        "position": {
+          "lat_e6": 24465000,
+          "lon_e6": 121801000
+        },
+        "intensity": null
+      }
+    ]
+  },
+  "map": {
+    "dataset_id": "taiwan-boundaries",
+    "dataset_revision": "2020.1",
+    "viewport": {
+      "west_e6": 119000000,
+      "south_e6": 22000000,
+      "east_e6": 123000000,
+      "north_e6": 26000000
+    }
+  }
+}
