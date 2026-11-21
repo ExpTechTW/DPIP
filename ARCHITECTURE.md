@@ -113,6 +113,26 @@ each render run in background isolates. One handle serves the renderer's
 queued requests. Await `dispose()` to drain those requests and release the
 handle. Ignoring a request Future does not cancel native work.
 
+### Earthquake report source evidence
+
+The Core v2 detail endpoint is fetched as bytes. The cache revalidates only
+against a row of the requested representation and restores the body with its
+matching ETag. `EarthquakeReportSnapshot` keeps the existing display model,
+the requested report ID, the optional ETag, the body SHA-256 and the exact
+JSON number tokens. It validates the source before the ordinary model
+decoder can discard duplicate keys or coerce integers. The detail screen
+still decodes the plain model: this stricter evidence belongs to the share
+path and must never turn a report the app could show into an error page.
+
+`adaptEarthquakeShareSnapshot` accepts verified county and station codes,
+the intensity scale and the magnitude kind, all bound to that body SHA-256.
+The adapter uses the snapshot's original number tokens and emits
+deterministic Share Render Input v2 UTF-8 bytes for `ReportPicture`. A
+different body needs its own verified evidence even when the report ID and
+decoded model are equal. The Core v2 detail omits station identifiers, a
+per-report scale identifier and the original publication's revision
+metadata.
+
 ### Native build inputs
 
 The mobile runtime is opt-in. With a local checkout containing eq-report-pic
