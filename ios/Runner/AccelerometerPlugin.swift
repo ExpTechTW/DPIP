@@ -1,6 +1,7 @@
 import CoreMotion
 import Flutter
 import Foundation
+import UIKit
 
 /// Streams the accelerometer at about 50 Hz on `com.exptech.dpip/accelerometer`,
 /// flushed on the main thread about every 100 ms.
@@ -28,6 +29,11 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
   private static let flushInterval: TimeInterval = 0.1
 
   private let motion = CMMotionManager()
+  private var lastDelivery: TimeInterval = 0
+  private var lastFlush: TimeInterval = 0
+  private var lastTimestamp: Double?
+  private var streamError: String?
+  private var generation = 0
   private let samplesQueue: OperationQueue = {
     let queue = OperationQueue()
     queue.name = "com.exptech.dpip.accelerometer"
@@ -40,6 +46,20 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
   private var listening = false
   private var sink: FlutterEventSink?
   private var timer: Timer?
+
+  public override init() {
+    super.init()
+    NotificationCenter.default.addObserver(
+      self, selector: #selector(didBecomeActive),
+      name: UIApplication.didBecomeActiveNotification, object: nil)
+  }
+
+  @objc private func didBecomeActive() {
+    lock.lock()
+    lastDelivery = ProcessInfo.processInfo.systemUptime
+    lastFlush = lastDelivery
+    lock.unlock()
+  }
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterEventChannel(
@@ -62,23 +82,51 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
     sink = events
     lock.lock()
     listening = true
+    lastDelivery = ProcessInfo.processInfo.systemUptime
+    lastFlush = lastDelivery
+    streamError = nil
+    let session = generation
     samples.removeAll(keepingCapacity: true)
     lock.unlock()
 
     motion.accelerometerUpdateInterval = Self.sampleInterval
     motion.startAccelerometerUpdates(to: samplesQueue) { [weak self] data, error in
-      guard let self, error == nil, let data else { return }
-      let acceleration = data.acceleration
-      // Negated so the sign matches Android. See the type comment.
-      let x = -acceleration.x * Self.galsPerG
-      let y = -acceleration.y * Self.galsPerG
-      let z = -acceleration.z * Self.galsPerG
-      let timestampNanos = data.timestamp * 1_000_000_000
-      self.lock.lock()
-      if self.listening {
-        self.samples.append(contentsOf: [timestampNanos, x, y, z])
+      guard let self else { return }
+      // Scaling and validation touch only `data`, so do them before taking the
+      // lock: the callback runs at 50 Hz and flush takes the same lock on the
+      // main thread, so the shorter the critical section the less a flush ever
+      // waits on it.
+      var timestampNanos = 0.0
+      var x = 0.0
+      var y = 0.0
+      var z = 0.0
+      var invalid = false
+      if let data {
+        let acceleration = data.acceleration
+        // Negated so the sign matches Android. See the type comment.
+        x = -acceleration.x * Self.galsPerG
+        y = -acceleration.y * Self.galsPerG
+        z = -acceleration.z * Self.galsPerG
+        timestampNanos = data.timestamp * 1_000_000_000
+        invalid = !timestampNanos.isFinite || timestampNanos < 0
+          || !x.isFinite || !y.isFinite || !z.isFinite
       }
-      self.lock.unlock()
+      self.lock.lock()
+      defer { self.lock.unlock() }
+      guard self.listening, self.generation == session else { return }
+      if let error {
+        self.streamError = error.localizedDescription
+        return
+      }
+      guard data != nil else { return }
+      guard !invalid else {
+        self.streamError = "Accelerometer returned an invalid reading"
+        return
+      }
+      if let previous = self.lastTimestamp, timestampNanos <= previous { return }
+      self.lastTimestamp = timestampNanos
+      self.lastDelivery = ProcessInfo.processInfo.systemUptime
+      self.samples.append(contentsOf: [timestampNanos, x, y, z])
     }
 
     let timer = Timer(timeInterval: Self.flushInterval, repeats: true) { [weak self] timer in
@@ -105,6 +153,9 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
     timer = nil
     lock.lock()
     listening = false
+    generation += 1
+    lastTimestamp = nil
+    streamError = nil
     samples.removeAll(keepingCapacity: true)
     lock.unlock()
     sink = nil
@@ -113,6 +164,26 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
   /// Sends the samples taken since the previous flush. Runs on the main thread.
   private func flush() {
     lock.lock()
+    // Availability alone does not guarantee Core Motion will deliver samples.
+    // Use monotonic delivery time so a missing or stalled sensor cannot hang
+    // calibration forever, including when an iOS app runs on a Mac.
+    let now = ProcessInfo.processInfo.systemUptime
+    // Suspension and a blocked main run loop delay both samples and this timer.
+    // Give delivery a fresh grace period rather than treating that gap as failure.
+    let appActive = UIApplication.shared.applicationState == .active
+    if !appActive || now - lastFlush >= 2 {
+      lastDelivery = now
+    }
+    lastFlush = now
+    let failure = streamError ?? (listening && appActive && now - lastDelivery >= 2
+      ? "Accelerometer stopped delivering valid samples" : nil)
+    if let failure {
+      lock.unlock()
+      let events = sink
+      stopUpdates()
+      events?(FlutterError(code: "unavailable", message: failure, details: nil))
+      return
+    }
     let batch = samples
     samples.removeAll(keepingCapacity: true)
     let active = listening
