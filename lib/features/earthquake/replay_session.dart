@@ -14,9 +14,11 @@ import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/core/realtime/ticker.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
+import 'package:dpip/features/earthquake/data/eew_ml_max_source.dart';
 import 'package:dpip/features/earthquake/data/eew_replay_source.dart';
 import 'package:dpip/features/earthquake/data/rts_replay_source.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
+import 'package:dpip/features/earthquake/domain/eew_town_levels.dart';
 import 'package:dpip/features/earthquake/domain/rts.dart';
 import 'package:dpip/features/earthquake/presentation/eew_realtime_controller.dart';
 import 'package:dpip/features/earthquake/presentation/rts_realtime_controller.dart';
@@ -44,6 +46,7 @@ class ReplaySession {
     Clock serverClock,
     int replayTimestamp, {
     required bool Function() cwaOnly,
+    MlIntensityEstimator? mlIntensity,
   }) {
     final api = EarthquakeApi(apiClient);
     final clock = ReplayClock(
@@ -58,7 +61,12 @@ class ReplaySession {
       label: 'rts-replay',
     );
     final eewChannel = RealtimeChannel<List<Eew>>(
-      source: EewReplaySource(api, clock, cwaOnly: cwaOnly),
+      source: mlIntensity == null
+          ? EewReplaySource(api, clock, cwaOnly: cwaOnly)
+          : EewMlMaxSource(
+              EewReplaySource(api, clock, cwaOnly: cwaOnly),
+              mlIntensity,
+            ),
       clock: serverClock,
       elapsed: SystemElapsed(),
       ticker: const SystemTicker(),

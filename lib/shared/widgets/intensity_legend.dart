@@ -29,6 +29,11 @@ class IntensityLegend extends StatelessWidget {
   /// Highest discrete EEW level to show (`0`–`9`). Null shows the full scale.
   /// Levels above it carry no information for the current warning and are
   /// omitted to preserve map space.
+  ///
+  /// This includes the maximum of the *wash*, which may differ from an
+  /// incoming warning's original reported maximum.
+  /// A level the map paints but this scale omits would be read as another
+  /// intensity.
   final int? maxEewLevel;
 
   /// Height of one scale cell / gradient step (px).
