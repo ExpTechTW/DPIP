@@ -1,16 +1,22 @@
+import 'dart:ffi';
+import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/platform/native_library.dart';
 import 'package:dpip/shared/seismic/report_picture/eq_report_pic_bindings.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
 
 export 'eq_report_pic_bindings.dart' show EqMapMode, EqTheme;
 
 /// Renders Share Render Input v2 into a Dart-owned, 1920×1080 landscape PNG.
 final class ReportPicture {
-  ReportPicture._(this._address, this._bindings);
+  ReportPicture._(this._render, this._release);
+
+  @visibleForTesting
+  ReportPicture.forTesting(this._render, this._release);
 
   static const libraryName = 'eq_report_pic';
   static const _maxInputBytes = 1024 * 1024;
@@ -20,8 +26,8 @@ final class ReportPicture {
     'assets/fonts/report/NotoSansTC-Black.ttf',
   ];
 
-  final int _address;
-  final EqReportPicBindings _bindings;
+  final Future<Uint8List> Function(Uint8List, EqMapMode, EqTheme) _render;
+  final void Function() _release;
   Future<void> _pending = Future.value();
   Future<void>? _disposal;
 
@@ -40,7 +46,12 @@ final class ReportPicture {
         );
       }
       final address = await _createRenderer(fonts);
-      return Ok(ReportPicture._(address, bindings));
+      return Ok(
+        ReportPicture._(
+          (input, mode, theme) => _renderInIsolate(address, input, mode, theme),
+          () => bindings.freeRenderer(address),
+        ),
+      );
     } catch (error) {
       return Err(
         ReportPictureFailure(
@@ -85,7 +96,7 @@ final class ReportPicture {
 
     final input = Uint8List.fromList(json);
     final render = _pending.then(
-      (_) => _renderRequest(_address, input, mode, theme),
+      (_) => _renderRequest(() => _render(input, mode, theme)),
     );
     _pending = render.then((_) {});
     return render;
@@ -93,12 +104,19 @@ final class ReportPicture {
 
   /// Stops accepting work and frees the handle once scheduled calls finish.
   /// Dropping a render Future does not cancel its synchronous FFI call.
-  Future<void> dispose() =>
-      _disposal ??= _pending.then((_) => _bindings.freeRenderer(_address));
+  Future<void> dispose() => _disposal ??= _pending.then((_) => _release());
 }
 
-Result<EqReportPicBindings> _openBindings() {
-  final probe = NativeLibrary.open(ReportPicture.libraryName);
+Result<EqReportPicBindings> _openBindings() => probeReportPictureBindings(
+  NativeLibrary.open(ReportPicture.libraryName),
+  fromProcess: Platform.isIOS,
+);
+
+@visibleForTesting
+Result<EqReportPicBindings> probeReportPictureBindings(
+  Result<DynamicLibrary> probe, {
+  required bool fromProcess,
+}) {
   final library = probe.valueOrNull;
   if (library == null) {
     return Err(
@@ -110,7 +128,8 @@ Result<EqReportPicBindings> _openBindings() {
   }
   try {
     // iOS opens the process even when the optional static library is absent.
-    if (!library.providesSymbol('eqr_renderer_new') &&
+    if (fromProcess &&
+        !library.providesSymbol('eqr_renderer_new') &&
         !library.providesSymbol('eqr_abi_info')) {
       return const Err(
         ReportPictureFailure(
@@ -168,13 +187,10 @@ Future<Uint8List> _renderInIsolate(
 );
 
 Future<Result<Uint8List>> _renderRequest(
-  int address,
-  Uint8List input,
-  EqMapMode mode,
-  EqTheme theme,
+  Future<Uint8List> Function() render,
 ) async {
   try {
-    return Ok(await _renderInIsolate(address, input, mode, theme));
+    return Ok(await render());
   } on ReportPictureFailure catch (failure) {
     return Err(failure);
   } on EqShareRenderException catch (error) {

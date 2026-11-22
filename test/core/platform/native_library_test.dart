@@ -5,13 +5,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('nativeLibraryFileName', () {
-    test('Android and Linux load the .so by its base name', () {
+    test('Android, Linux, and Fuchsia use a .so file name', () {
       expect(
         nativeLibraryFileName('eq_report_pic', NativeLibraryHost.android),
         'libeq_report_pic.so',
       );
       expect(
         nativeLibraryFileName('eq_report_pic', NativeLibraryHost.linux),
+        'libeq_report_pic.so',
+      );
+      expect(
+        nativeLibraryFileName('eq_report_pic', NativeLibraryHost.fuchsia),
         'libeq_report_pic.so',
       );
     });
@@ -72,7 +76,6 @@ void main() {
           fileOpens++;
           return DynamicLibrary.process();
         },
-        openProcess: DynamicLibrary.process,
       );
 
       expect(result.isOk, isTrue);

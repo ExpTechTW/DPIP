@@ -338,7 +338,17 @@ class EqReportPic {
 
     final png = outPtr.value;
     final pngLength = outLen.value;
+    if (png == nullptr) {
+      throw EqReportPicException(
+        'Native render succeeded without a PNG buffer',
+      );
+    }
     try {
+      if (pngLength == 0) {
+        throw EqReportPicException(
+          'Native render returned an empty PNG buffer',
+        );
+      }
       return Uint8List.fromList(png.asTypedList(pngLength));
     } finally {
       _b._bytesFree(png, pngLength);
