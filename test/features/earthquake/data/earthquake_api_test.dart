@@ -5,6 +5,8 @@
 /// straight back out, unchanged, for the repository layer to convert.
 library;
 
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
@@ -46,7 +48,12 @@ class _RecordingApiClient implements ApiClient {
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
-  }) => throw UnimplementedError();
+    bool validateJson = false,
+  }) async {
+    getCalls.add((tier, path, query));
+    if (getError != null) throw getError!;
+    return nextGetResult as BytePayload;
+  }
 
   @override
   Future<BytePayload> getBytesAbsolute(
@@ -122,8 +129,10 @@ void main() {
     });
 
     test('getReport', () async {
-      client.nextGetResult = {'id': '115032'};
-      await api.getReport('115032');
+      final bytes = Uint8List.fromList([123, 125]);
+      final payload = BytePayload(bytes: bytes, etag: '"report"');
+      client.nextGetResult = payload;
+      expect(await api.getReport('115032'), same(payload));
       expect(client.getCalls.single.$1, ApiTier.coreApi);
       expect(client.getCalls.single.$2, '/api/v2/eq/report/115032');
     });

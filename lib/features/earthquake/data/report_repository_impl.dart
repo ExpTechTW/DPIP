@@ -1,10 +1,13 @@
 /// [ReportRepository] backed by [EarthquakeApi].
 library;
 
+import 'dart:convert';
+
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -44,8 +47,24 @@ class ReportRepositoryImpl implements ReportRepository {
   @override
   Future<Result<EarthquakeReport>> get(String id) => guardResult(() async {
     final raw = await _api.getReport(id);
-    return EarthquakeReport.fromJson((raw as Map).cast<String, dynamic>());
+    // Display only needs a decodable model. The stricter source evidence is
+    // for the share card, and must not turn a report the app could show into
+    // an error page.
+    return EarthquakeReport.fromJson(
+      (jsonDecode(utf8.decode(raw.bytes)) as Map).cast<String, dynamic>(),
+    );
   });
+
+  /// The detail model and exact evidence from a single Core v2 detail fetch.
+  Future<Result<EarthquakeReportSnapshot>> getSnapshot(String id) =>
+      guardResult(() async {
+        final raw = await _api.getReport(id);
+        return EarthquakeReportSnapshot.decode(
+          raw.bytes,
+          requestedReportId: id,
+          etag: raw.etag,
+        );
+      });
 
   @override
   Future<Result<bool>> hasReplayAt(int timestamp) =>

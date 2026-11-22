@@ -52,7 +52,7 @@ class _EvictedStore extends EtagCacheStore {
   _EvictedStore(super.db);
 
   @override
-  Future<String?> readEtag(String url) async => 'v1';
+  Future<String?> readEtag(String url, {bool? binary}) async => 'v1';
 }
 
 void main() {

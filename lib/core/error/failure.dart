@@ -23,7 +23,10 @@ final class TimeoutFailure extends Failure {
 /// The response arrived but could not be decoded into the expected shape
 /// (unexpected/renamed fields, a non-JSON error body, etc.).
 final class DecodeFailure extends Failure {
-  const DecodeFailure(super.message);
+  const DecodeFailure(super.message, {this.cause});
+
+  /// The source decoder's diagnostics. Use [message] for display.
+  final FormatException? cause;
 }
 
 /// The request succeeded but there is no data to show (empty list / 204).

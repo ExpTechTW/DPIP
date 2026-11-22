@@ -8,6 +8,7 @@ library;
 import 'package:dio/dio.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,7 +56,7 @@ class _FakeEarthquakeApi implements EarthquakeApi {
   }) => throw UnimplementedError();
 
   @override
-  Future<dynamic> getReport(String reportId) => throw UnimplementedError();
+  Future<BytePayload> getReport(String reportId) => throw UnimplementedError();
 }
 
 Map<String, dynamic> _eewJson(String id, String author) => {

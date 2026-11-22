@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
+import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/region_selection.dart';
 
 /// A live byte stream plus the handle that aborts it — the result of
@@ -67,18 +68,26 @@ class ApiClient {
   /// Uses [ResponseType.bytes] so [EtagInterceptor] stores a binary envelope
   /// instead of `jsonEncode`. Returns the body plus the response ETag (for
   /// MapLibre ambient preload at the same URL).
+  /// Set [validateJson] for JSON endpoints that need source bytes. Invalid
+  /// UTF-8 or JSON participates in failover just like a JSON decode error.
   Future<BytePayload> getBytes(
     ApiTier tier,
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
+    bool validateJson = false,
   }) async {
     final response = await request(
       tier,
       path,
       query: query,
       cancelToken: cancelToken,
-      options: Options(responseType: ResponseType.bytes),
+      options: Options(
+        responseType: ResponseType.bytes,
+        extra: validateJson
+            ? {EtagInterceptor.validateJsonBytesKey: true}
+            : null,
+      ),
     );
     return _bytePayload(response);
   }
