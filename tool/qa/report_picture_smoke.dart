@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:crypto/crypto.dart';
@@ -12,6 +13,7 @@ import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Alternate entry point used by tool/run.sh. No app navigation is registered.
 Future<void> main() async {
@@ -62,8 +64,9 @@ Future<String> _smoke() async {
     final bytes = base64Decode(
       const String.fromEnvironment('DPIP_REPORT_PICTURE_FIXTURE'),
     );
+    final fixtureHash = sha256.convert(bytes);
     _check(
-      sha256.convert(bytes).toString() ==
+      fixtureHash.toString() ==
           '702a04ecdcd5fe7c81a45de86e122296cd3e30014b395a1ae52c351eb797f9f1',
       'Unexpected v2 fixture',
     );
@@ -107,22 +110,10 @@ Future<String> _smoke() async {
       listEquals(png, nextPng),
       'Identical requests returned different PNG bytes',
     );
-    final codec = await ui.instantiateImageCodec(png);
-    try {
-      final frame = await codec.getNextFrame();
-      try {
-        _check(
-          frame.image.width == 1920 && frame.image.height == 1080,
-          'Unexpected decoded dimensions',
-        );
-      } finally {
-        frame.image.dispose();
-      }
-    } finally {
-      codec.dispose();
-    }
+    await _checkPng(png, EqTheme.light);
 
     final reopened = _requireValue(await ReportPicture.open());
+    final Uint8List dark;
     try {
       _requireFailure(
         await reopened.renderSharePngV2(Uint8List(1024 * 1024 + 1)),
@@ -136,22 +127,50 @@ Future<String> _smoke() async {
         ReportPictureFailureReason.unsupportedVersion,
         nativeStatus: -2,
       );
-      final dark = _requireValue(
+      dark = _requireValue(
         await reopened.renderSharePngV2(bytes, theme: EqTheme.dark),
       );
       _check(!listEquals(png, dark), 'Dark theme did not change the output');
-      _check(
-        listEquals(png.sublist(0, 8), const [137, 80, 78, 71, 13, 10, 26, 10]),
-        'Unexpected PNG signature',
-      );
     } finally {
       await reopened.dispose();
     }
+    await _checkPng(dark, EqTheme.dark);
+    final documents = await getApplicationDocumentsDirectory();
+    for (final (theme, bytes) in [(EqTheme.light, png), (EqTheme.dark, dark)]) {
+      final output = File('${documents.path}/report-picture-${theme.name}.png');
+      await output.writeAsBytes(bytes, flush: true);
+      Log.info(
+        'REPORT_PICTURE_PNG theme=${theme.name} dimensions=1920x1080 '
+        'bytes=${bytes.length} sha256=${sha256.convert(bytes)} file=${output.path}',
+      );
+    }
     return 'ABI=1.2 caps=0x11f exports=9 decoded=1920x1080 '
-        'bytes=${png.length} sha256=${sha256.convert(png)} '
+        'fixture_sha256=$fixtureHash themes=light,dark '
         'root-event=responsive invalid=-1 version=-2 retry=pass dispose=pass reopen=pass';
   } finally {
     await picture.dispose();
+  }
+}
+
+Future<void> _checkPng(Uint8List png, EqTheme theme) async {
+  _check(
+    png.length >= 8 &&
+        listEquals(png.sublist(0, 8), const [137, 80, 78, 71, 13, 10, 26, 10]),
+    '${theme.name}: unexpected PNG signature',
+  );
+  final codec = await ui.instantiateImageCodec(png);
+  try {
+    final frame = await codec.getNextFrame();
+    try {
+      _check(
+        frame.image.width == 1920 && frame.image.height == 1080,
+        '${theme.name}: unexpected decoded dimensions',
+      );
+    } finally {
+      frame.image.dispose();
+    }
+  } finally {
+    codec.dispose();
   }
 }
 

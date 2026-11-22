@@ -161,9 +161,29 @@ tool/run.sh -d <simulator-or-emulator-id> --target tool/qa/report_picture_smoke.
   --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < tool/qa/fixtures/report_picture_v2.json | tr -d '\n')"
 ```
 
-Check for `REPORT_PICTURE_SMOKE PASS` and the logged ABI, PNG dimensions and
-SHA-256. The harness also accepts `DPIP_REPORT_PICTURE_EXPECT=unavailable` or
-`unsupportedAbi` for builds prepared with missing or incompatible libraries.
+Check for `REPORT_PICTURE_SMOKE PASS`, the ABI and capabilities, and the
+fixture SHA-256. The smoke test checks queuing, invalid input and version,
+recovery, and disposal. Each `REPORT_PICTURE_PNG` line gives the theme,
+decoded dimensions, SHA-256 and app-sandbox path for one generated PNG.
+Copy `report-picture-light.png` and `report-picture-dark.png` out of the
+debug app to inspect the rendered maps:
+
+```sh
+xcrun simctl get_app_container booted com.exptech.dpip.dpip data
+adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-light.png > report-picture-light.png
+adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-dark.png > report-picture-dark.png
+```
+
+On iOS, the PNGs are under `Documents` in the returned data container.
+For a negative smoke test, pass `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unavailable`
+or `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unsupportedAbi` with a build
+prepared without the library or with an incompatible ABI.
+
+Run `tool/dev/test_report_picture.sh` on macOS or Linux for host-side ABI
+and lifecycle tests. It compiles small C test doubles with `cc` and uses
+the pinned Flutter toolchain. A separate QA job can run this script
+without Rust or mobile artifacts. Use the mobile smoke test above to
+verify the real Rust library and mobile packaging.
 
 ## Logging
 
