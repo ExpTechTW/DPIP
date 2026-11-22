@@ -226,9 +226,9 @@ prepared without the library or with an incompatible ABI.
 
 Run `tool/dev/test_report_picture.sh` on macOS or Linux for host-side ABI
 and lifecycle tests. It compiles small C test doubles with `cc` and uses
-the pinned Flutter toolchain. A separate QA job can run this script
-without Rust or mobile artifacts. Use the mobile smoke test above to
-verify the real Rust library and mobile packaging.
+the pinned Flutter toolchain; CI runs it in the test job, so it needs no
+Rust or mobile artifacts. Use the mobile smoke test above to verify the
+real Rust library and mobile packaging.
 
 ## Logging
 

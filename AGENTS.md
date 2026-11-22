@@ -48,6 +48,7 @@ tool/dev/analyze.sh
 |---|---|
 | Start the app | `tool/run.sh` (see [Running](#running)) |
 | Run the tests | `tool/dev/test.sh` |
+| Run the report-picture FFI tests (macOS/Linux) | `tool/dev/test_report_picture.sh` — compiles a C test double with `cc`; a plain `flutter test` skips this group |
 | Run the Swift tests (macOS only) | `tool/dev/test_ios.sh` — `ios/RunnerTests`, which `tool/dev/test.sh` cannot reach |
 | Test coverage, into `coverage/` | `tool/dev/coverage.sh` (see [Coverage](#coverage)) |
 | Format + analyze | `tool/dev/analyze.sh` |
@@ -228,6 +229,7 @@ tool/check/tooling.sh
 tool/dev/analyze.sh
 tool/dev/codegen.sh          # then git diff --exit-code
 tool/dev/test.sh
+tool/dev/test_report_picture.sh   # host C ABI/lifecycle fixtures; macOS or Linux
 tool/dev/test_ios.sh         # only if you touched ios/ — macOS, and slow
 ```
 

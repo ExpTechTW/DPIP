@@ -193,6 +193,13 @@ jobs:
       - name: Install SQLite
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
 
+      # The report-picture FFI group skips itself in a plain `flutter test` (it
+      # needs a C test double compiled by `cc`), so without this step the only
+      # tests that exercise buffer ownership and ABI negotiation would never
+      # run in CI. No Rust or mobile artifact is required.
+      - name: Report-picture C ABI tests
+        run: bash tool/dev/test_report_picture.sh
+
       # The test suite, run once, with coverage. The coverage run *is* the test
       # run — a failing test fails this step exactly as tool/dev/test.sh would —
       # so the lcov below costs a few seconds of instrumentation rather than a
