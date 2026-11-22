@@ -1,0 +1,53 @@
+# 地震分享圖 QA
+
+在 DPIP 根目錄執行下列指令。請先啟動 iOS Simulator 或 Android Emulator，並將
+`<device-id>` 換成 Flutter 裝置 ID，例如 `emulator-5554` 或 iOS 模擬器的 UDID。
+
+```sh
+tool/dev/qa_report_picture.sh <device-id>
+```
+
+首次使用時，先以專案鎖定的工具鏈解析依賴（已有本機快取可用
+`tool/dev/deps.sh --offline`）。原生函式庫為選用建置輸入。若啟動器提示缺少產物，
+請備妥相鄰的 `eq-report-pic` checkout，依平台執行其中一組指令。
+
+```sh
+tool/dev/build_report_picture.sh ios ../eq-report-pic
+shasum -a 256 -c native/eq_report_pic/ios/SHA256SUMS
+
+tool/dev/build_report_picture.sh android ../eq-report-pic
+shasum -a 256 -c native/eq_report_pic/android/SHA256SUMS
+```
+
+建置腳本從固定 Git 修訂離線編譯，並一併放入字型。Rust targets、Xcode／Android NDK
+版本與路徑見[原生建置說明](../../ARCHITECTURE.md#native-build-inputs)。
+啟動器從版本庫讀取離線樣本，報告產圖可在斷網下操作。
+
+## 手動檢查
+
+- [ ] 讓「臺東縣近海 · 已查證」保持選取，按「產生 PNG」。看到「產圖成功」、
+  `1920 × 1080 px`、ABI `1.2`、Capabilities `0x11f` 及 PNG SHA-256。
+  尺寸來自解碼後的 PNG；可雙指放大檢視原圖。
+- [ ] 在卡片上核對臺東縣近海、ML 3.9、深度 43.5 km、臺東縣震度 2、花蓮縣震度 1。
+  QA 畫面顯示完整報告 ID `115000-2026-0422-111524`，以及 Core v2 原始本文 SHA-256。
+  [縣市與五筆測站的查證紀錄](../../test/features/earthquake/domain/fixtures/share_input/README.md)
+- [ ] 按「重新產生 PNG」，確認同主題的 SHA-256 相同。切換深色再產圖，確認配色及 SHA-256
+  改變，再重新產生一次確認深色也可重現。
+- [ ] 選「缺少身分證據」或「美濃歷史報告」，按「產生 PNG」。確認各自顯示
+  `missingSourceIdentity` 或 `missingAreaIdentity` 與 JSON Pointer；按「重試」可再次檢查。
+  切回已查證樣本後應能成功產圖。
+- [ ] 在尚未準備原生產物的環境，執行 `tool/dev/qa_report_picture.sh <device-id> --allow-missing-native`。
+  按「產生 PNG」，確認顯示 `unavailable` 與建置提示。此旗標會略過啟動器的存在檢查，
+  已安裝的原生產物仍會由建置系統納入。
+
+## 回報與限制
+
+請附上 Git SHA、模擬器 ID／系統與架構、樣本、主題、操作步驟及畫面截圖。若產圖成功，
+附上 ABI、Capabilities、尺寸與 PNG SHA-256；若失敗，貼上完整錯誤碼、JSON Pointer
+或 Native status，以及啟動指令的相關輸出。
+
+本畫面提供離線 16:9 預覽。現行 PNG 的資料來源命名空間可能以省略號顯示。
+若需取出 PNG 檔案，執行
+`tool/dev/qa_report_picture.sh <device-id> --smoke` 並依[原有 smoke 說明](../../ARCHITECTURE.md#offline-smoke-test)
+取得 app 沙盒內的檔案。自動 smoke 仍可直接透過自己的 Dart 入口執行。
+原生資產的公開散布與實體裝置驗收仍適用[原生建置限制](../../ARCHITECTURE.md#native-build-inputs)。

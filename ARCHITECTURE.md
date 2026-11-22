@@ -169,6 +169,11 @@ A missing library or unsupported ABI becomes an ordinary `Failure`.
 Distribution of the native runtime also requires clearance for the embedded
 basemap and assets.
 
+### Interactive QA
+
+See the [地震分享圖 QA guide](tool/qa/README.md) for the development-only
+preview, one-command launch, and manual checks with the verified offline report.
+
 ### Offline smoke test
 
 Use the alternate entry point with the original synthetic fixture from
@@ -195,6 +200,26 @@ adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-dark.png > r
 ```
 
 On iOS, the PNGs are under `Documents` in the returned data container.
+
+To render the verified Taitung offshore report through the snapshot and
+adapter, supply the original Core v2 bytes and the independent v2 envelope
+from the [source fixtures](test/features/earthquake/domain/fixtures/share_input/README.md).
+
+```sh
+fixture_dir=test/features/earthquake/domain/fixtures/share_input
+tool/run.sh -d <simulator-or-emulator-id> --no-pub --target tool/qa/report_picture_smoke.dart \
+  --dart-define="DPIP_REPORT_PICTURE_CORE_V2=$(base64 < "$fixture_dir/exptech-modern.json" | tr -d '\n')" \
+  --dart-define="DPIP_REPORT_PICTURE_HISTORICAL=$(base64 < "$fixture_dir/exptech-historical.json" | tr -d '\n')" \
+  --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < "$fixture_dir/exptech-modern.v2.json" | tr -d '\n')"
+```
+
+This mode checks the source fingerprint, the original report ID, the two
+regional intensities, five verified stations and byte equality with the v2
+envelope. It rejects missing identity evidence and checks that the historical
+Meinong fixture cannot render without verified regional and station codes.
+Both themes must return identical bytes on repeated renders of their
+respective inputs.
+
 For a negative smoke test, pass `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unavailable`
 or `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unsupportedAbi` with a build
 prepared without the library or with an incompatible ABI.
