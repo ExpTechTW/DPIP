@@ -8,6 +8,7 @@ import 'package:dpip/core/settings/locale_config.dart';
 import 'dart:typed_data';
 
 import 'package:dpip/app/shell/main_shell.dart';
+import 'package:dpip/app/shell/system_rail.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -20,6 +21,7 @@ import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
@@ -112,6 +114,9 @@ void main() {
           ChangeNotifierProvider<MapCameraHandoff>.value(value: handoff),
           ChangeNotifierProvider<DefaultMapLayerController>.value(
             value: layers,
+          ),
+          ChangeNotifierProvider<DisplaySettings>(
+            create: (_) => DisplaySettings(settings),
           ),
           ChangeNotifierProvider<PermissionHealth>(
             create: (_) => PermissionHealth(
@@ -236,10 +241,31 @@ void main() {
     expect(find.text('home-body'), findsOneWidget);
     expect(find.text('replay-body'), findsNothing);
 
+    // The Display setting's floating style replaces the strip with the Duo
+    // pill: icons only, so the same tab is reached through its tooltip.
+    await Provider.of<DisplaySettings>(
+      tester.element(find.byType(MainShell)),
+      listen: false,
+    ).setNavBarStyle(NavBarStyle.floating);
+    await tester.pump();
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(FloatingTabBar), findsOneWidget);
+    expect(find.text(l10n.navHome), findsNothing);
+    await tester.tap(_cell(l10n.navEvents));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('events-body'), findsOneWidget);
+
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
   });
 }
+
+/// A pill cell by the label it carries in its tooltip — see the same helper in
+/// `system_rail_test.dart`.
+Finder _cell(String label) => find.byWidgetPredicate(
+  (widget) => widget is Tooltip && widget.message == label,
+);
 
 StatefulShellBranch _branch(String path, String name, String label) =>
     StatefulShellBranch(

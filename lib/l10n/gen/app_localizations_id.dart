@@ -2196,6 +2196,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get displayTheme => 'Tema';
 
   @override
+  String get displayNavBar => 'Bilah navigasi';
+
+  @override
+  String get displayNavBarDesc =>
+      'Gaya melayang hanya menyisakan ikon, melayang di atas tepi bawah layar.';
+
+  @override
+  String get displayNavBarStandard => 'Standar';
+
+  @override
+  String get displayNavBarFloating => 'Melayang';
+
+  @override
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override

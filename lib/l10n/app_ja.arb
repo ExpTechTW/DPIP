@@ -1021,6 +1021,10 @@
   },
   "notifyOptAll": "すべて受信",
   "displayTheme": "テーマ",
+  "displayNavBar": "ナビゲーションバー",
+  "displayNavBarDesc": "フローティングではアイコンだけを画面下端に浮かせて表示します。",
+  "displayNavBarStandard": "標準",
+  "displayNavBarFloating": "フローティング",
   "mapLayerSatelliteB07": "ひまわり 短波長赤外(B07)",
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."

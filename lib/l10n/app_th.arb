@@ -1021,6 +1021,10 @@
   },
   "notifyOptAll": "รับทั้งหมด",
   "displayTheme": "ธีม",
+  "displayNavBar": "แถบนำทาง",
+  "displayNavBarDesc": "แบบลอยแสดงเฉพาะไอคอน ลอยอยู่เหนือขอบล่างของหน้าจอ",
+  "displayNavBarStandard": "มาตรฐาน",
+  "displayNavBarFloating": "ลอย",
   "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."

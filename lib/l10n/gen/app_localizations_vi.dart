@@ -2193,6 +2193,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get displayTheme => 'Giao diện';
 
   @override
+  String get displayNavBar => 'Thanh điều hướng';
+
+  @override
+  String get displayNavBarDesc =>
+      'Kiểu nổi chỉ giữ lại biểu tượng, nổi phía trên mép dưới màn hình.';
+
+  @override
+  String get displayNavBarStandard => 'Chuẩn';
+
+  @override
+  String get displayNavBarFloating => 'Nổi';
+
+  @override
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override

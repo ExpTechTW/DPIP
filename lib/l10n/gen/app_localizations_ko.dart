@@ -2150,6 +2150,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get displayTheme => '테마';
 
   @override
+  String get displayNavBar => '내비게이션 바';
+
+  @override
+  String get displayNavBarDesc => '플로팅은 아이콘만 화면 아래쪽에 띄워 표시합니다.';
+
+  @override
+  String get displayNavBarStandard => '표준';
+
+  @override
+  String get displayNavBarFloating => '플로팅';
+
+  @override
   String get mapLayerSatelliteB07 => '히마와리 단파 적외(B07)';
 
   @override

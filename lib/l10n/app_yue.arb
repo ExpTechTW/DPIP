@@ -1021,6 +1021,10 @@
   },
   "notifyOptAll": "接收全部",
   "displayTheme": "主題",
+  "displayNavBar": "導航列",
+  "displayNavBarDesc": "浮動只保留圖示，以膠囊浮喺畫面底部。",
+  "displayNavBarStandard": "標準",
+  "displayNavBarFloating": "浮動",
   "mapLayerSatelliteB07": "ひまわり 短波紅外(B07)",
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."

@@ -4,6 +4,7 @@ import 'package:dpip/app/shell/system_rail.dart';
 import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
 import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
@@ -222,6 +223,11 @@ class _MainShellState extends State<MainShell>
       );
     }
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
+    // `select`, not `watch`: a text-size or contrast change must not rebuild
+    // every mounted tab with the shell.
+    final navBarStyle = context.select<DisplaySettings, NavBarStyle>(
+      (display) => display.navBarStyle,
+    );
     // `select`, not `watch`: the whole shell (every mounted tab with it) must
     // not rebuild because an unrelated permission field moved.
     final needsPermissionAttention = context.select<PermissionHealth, bool>(
@@ -412,11 +418,18 @@ class _MainShellState extends State<MainShell>
             ),
           );
         },
-        child: NavigationBar(
-          selectedIndex: index,
-          destinations: destinations,
-          onDestinationSelected: _onDestinationSelected,
-        ),
+        child: switch (navBarStyle) {
+          NavBarStyle.standard => NavigationBar(
+            selectedIndex: index,
+            destinations: destinations,
+            onDestinationSelected: _onDestinationSelected,
+          ),
+          NavBarStyle.floating => FloatingTabBar(
+            selectedIndex: index,
+            destinations: destinations,
+            onDestinationSelected: _onDestinationSelected,
+          ),
+        },
       ),
     );
   }

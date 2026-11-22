@@ -2138,6 +2138,18 @@ class AppLocalizationsYue extends AppLocalizations {
   String get displayTheme => '主題';
 
   @override
+  String get displayNavBar => '導航列';
+
+  @override
+  String get displayNavBarDesc => '浮動只保留圖示，以膠囊浮喺畫面底部。';
+
+  @override
+  String get displayNavBarStandard => '標準';
+
+  @override
+  String get displayNavBarFloating => '浮動';
+
+  @override
   String get mapLayerSatelliteB07 => 'ひまわり 短波紅外(B07)';
 
   @override

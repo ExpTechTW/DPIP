@@ -78,6 +78,8 @@ void main() {
       l10n.themeSystem,
       l10n.themeLight,
       l10n.themeDark,
+      l10n.displayNavBarStandard,
+      l10n.displayNavBarFloating,
       l10n.displayScaleSmall,
       l10n.displayScaleDefault,
       l10n.displayScaleLarge,
@@ -150,6 +152,20 @@ void main() {
     await tester.tap(find.text(l10n.themeDark).first);
     await tester.pumpAndSettle();
     expect(settings.getString(SettingKeys.themeMode), 'dark');
+
+    await tester.tap(find.text(l10n.displayNavBarFloating).first);
+    await tester.pumpAndSettle();
+    expect(settings.getString(SettingKeys.navBarStyle), 'floating');
+
+    // "Standard" is also the contrast chip's label; the navigation one is the
+    // first on the page, and a tap on the wrong chip leaves the key null.
+    await tester.tap(find.text(l10n.displayNavBarStandard).first);
+    await tester.pumpAndSettle();
+    expect(
+      settings.getString(SettingKeys.navBarStyle),
+      isNull,
+      reason: 'the default is stored as absence, not as a magic string',
+    );
 
     expect(
       find.byType(DisplayPreview),

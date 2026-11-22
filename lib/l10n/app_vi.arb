@@ -1021,6 +1021,10 @@
   },
   "notifyOptAll": "Nhận tất cả",
   "displayTheme": "Giao diện",
+  "displayNavBar": "Thanh điều hướng",
+  "displayNavBarDesc": "Kiểu nổi chỉ giữ lại biểu tượng, nổi phía trên mép dưới màn hình.",
+  "displayNavBarStandard": "Chuẩn",
+  "displayNavBarFloating": "Nổi",
   "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."

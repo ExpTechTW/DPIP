@@ -2184,6 +2184,19 @@ class AppLocalizationsTh extends AppLocalizations {
   String get displayTheme => 'ธีม';
 
   @override
+  String get displayNavBar => 'แถบนำทาง';
+
+  @override
+  String get displayNavBarDesc =>
+      'แบบลอยแสดงเฉพาะไอคอน ลอยอยู่เหนือขอบล่างของหน้าจอ';
+
+  @override
+  String get displayNavBarStandard => 'มาตรฐาน';
+
+  @override
+  String get displayNavBarFloating => 'ลอย';
+
+  @override
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override

@@ -9,8 +9,8 @@ import 'package:foldable/foldable.dart';
 ///
 /// There the HIG puts the tab bar in that strip, pinned to its bottom, instead
 /// of along the bottom edge. Every other device keeps the ordinary bottom
-/// [NavigationBar]; this file only decides when the rail applies and draws the
-/// vertical bar.
+/// [NavigationBar] unless the display setting asks for that same pill along the
+/// bottom edge ([FloatingTabBar]) — this file owns both so there is one cell.
 
 /// Test hook standing in for the hinge signal. `null` reads the real one.
 @visibleForTesting
@@ -85,7 +85,7 @@ class SystemRailTabBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   for (var i = 0; i < destinations.length; i++)
-                    _RailCell(
+                    _PillCell(
                       destination: destinations[i],
                       selected: i == selectedIndex,
                       onTap: () => onDestinationSelected(i),
@@ -100,8 +100,67 @@ class SystemRailTabBar extends StatelessWidget {
   }
 }
 
-class _RailCell extends StatelessWidget {
-  const _RailCell({
+/// The same pill laid along the bottom edge instead of down the rail — the
+/// alternative bottom bar (`NavBarStyle.floating`).
+///
+/// Icons only, for the same reason the rail has none: five labels do not fit
+/// across a phone without shrinking them past the point of being readable, and
+/// the pill is meant to be smaller than the strip it replaces. The labels stay
+/// on [Tooltip] and [Semantics], so nothing the Material bar told a screen
+/// reader is lost.
+class FloatingTabBar extends StatelessWidget {
+  const FloatingTabBar({
+    super.key,
+    required this.destinations,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+  });
+
+  final List<NavigationDestination> destinations;
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        bottom > 0 ? bottom : AppSpacing.lg,
+      ),
+      // `heightFactor: 1` because the bottom-bar slot hands down a loose
+      // 0–full-height constraint: a bare Center takes all of it and draws the
+      // pill in the middle of the screen.
+      child: Center(
+        heightFactor: 1,
+        child: FrostedSurface(
+          borderRadius: BorderRadius.circular(kSystemRailControlExtent / 2),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < destinations.length; i++)
+                  _PillCell(
+                    destination: destinations[i],
+                    selected: i == selectedIndex,
+                    onTap: () => onDestinationSelected(i),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// One 48 pt cell of the pill: the icon, and a rounded indicator while it is
+/// the current tab.
+class _PillCell extends StatelessWidget {
+  const _PillCell({
     required this.destination,
     required this.selected,
     required this.onTap,

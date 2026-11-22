@@ -1,10 +1,19 @@
-/// iPhone Duo's system rail: when it applies, and the vertical tab bar drawn
-/// down it. Insets are the measured iOS 27.1 simulator values.
+/// iPhone Duo's system rail: when it applies, the tab bar drawn down it, and
+/// the same pill floated along the bottom edge. Insets are the measured iOS
+/// 27.1 simulator values.
 library;
 
 import 'package:dpip/app/shell/system_rail.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
+
+/// A pill cell by the label it carries in its tooltip. `find.byTooltip` only
+/// matches `flutter/material`'s [Tooltip], and there are two Tooltip classes in
+/// this app since the Material widgets come from `material_ui`.
+Finder _cell(String label) => find.byWidgetPredicate(
+  (widget) => widget is Tooltip && widget.message == label,
+);
 
 void main() {
   group('systemRailEdgeFor', () {
@@ -106,9 +115,52 @@ void main() {
     final last = tester.getBottomLeft(find.byIcon(Icons.menu));
     expect(last.dy, greaterThan(678 - 34 - kSystemRailControlExtent));
     expect(last.dy, lessThan(678 - 34));
-    expect(tester.getSize(find.byTooltip('map')).width, 48);
+    expect(tester.getSize(_cell('map')).width, 48);
 
-    await tester.tap(find.byTooltip('map'));
+    await tester.tap(_cell('map'));
+    await tester.pump();
+    expect(selected, 1);
+  });
+
+  testWidgets('the same pill along the bottom edge keeps its labels', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    tester.view.padding = const FakeViewPadding(bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(bottom: 34);
+    addTearDown(tester.view.reset);
+
+    var selected = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: StatefulBuilder(
+            builder: (context, setState) => FloatingTabBar(
+              selectedIndex: selected,
+              onDestinationSelected: (i) => setState(() => selected = i),
+              destinations: const [
+                NavigationDestination(icon: Icon(Icons.home), label: 'home'),
+                NavigationDestination(icon: Icon(Icons.map), label: 'map'),
+                NavigationDestination(icon: Icon(Icons.menu), label: 'more'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Floating, centred, and clear of the home indicator.
+    final pill = tester.getRect(find.byType(FrostedSurface));
+    expect(pill.center.dx, closeTo(160, 0.01));
+    expect(pill.bottom, closeTo(568 - 34, 0.01));
+    expect(pill.top, greaterThan(568 / 2), reason: 'a pill, not a bar');
+
+    // No labels on screen — they are the tooltip and the semantics only.
+    expect(find.text('home'), findsNothing);
+    expect(tester.getSize(_cell('map')).width, 48);
+
+    await tester.tap(_cell('map'));
     await tester.pump();
     expect(selected, 1);
   });
