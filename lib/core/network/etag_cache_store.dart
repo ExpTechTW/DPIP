@@ -335,10 +335,12 @@ class EtagCacheStore {
   /// `jsonDecode` on the caller's side put exactly that parse on the UI
   /// isolate — the one path Dio's own ≥50 KB isolate offload cannot see,
   /// because a 304 has no body for the transformer to parse.
-  Future<CachedJson?> readJson(String url) async {
+  Future<CachedJson?> readJson(String url, {EntryFilter? accept}) async {
     try {
       final row = await _queryRow(url);
       if (row == null || (row['kind'] as int) != kindJson) return null;
+      final etag = row['etag'] as String;
+      if (accept != null && !accept(url, etag)) return null;
       _scheduleTouch(url);
       final blob = row['body'] as Uint8List;
       final Object? data;
@@ -360,7 +362,7 @@ class EtagCacheStore {
       }
       final fetched = (row[_fetchedColumn] as num?)?.toInt();
       return CachedJson(
-        etag: row['etag'] as String,
+        etag: etag,
         data: data,
         size: (row['size'] as num).toInt(),
         fetchedAt: fetched == null
@@ -619,17 +621,22 @@ class EtagCacheStore {
   }
 
   /// Records that the server has just confirmed the JSON entry for [url]
-  /// unchanged (a `304`) at [at], calibrated time. Best-effort; a miss is a
-  /// no-op.
+  /// unchanged (a `304`) at [at], calibrated time. Best-effort; a miss or
+  /// replacement with a different validator or representation is a no-op.
   ///
   /// Separate from the LRU `time`, which a mere read bumps too: a saved copy
   /// shown offline is labelled with how old it is, and that age runs from the
   /// last time the server vouched for it, not from the last time anyone asked.
-  Future<void> markFetched(String url, DateTime at) async {
+  Future<void> markFetched(
+    String url,
+    DateTime at, {
+    required String etag,
+  }) async {
     try {
       await _db.execute(
-        'UPDATE $_table SET $_fetchedColumn = ? WHERE key = ?',
-        [at.millisecondsSinceEpoch, url],
+        'UPDATE $_table SET $_fetchedColumn = ? '
+        'WHERE key = ? AND etag = ? AND kind = ?',
+        [at.millisecondsSinceEpoch, url, etag, kindJson],
       );
     } catch (_) {}
   }

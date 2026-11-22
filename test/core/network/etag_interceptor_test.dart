@@ -14,10 +14,11 @@ import '../storage/memory_db.dart';
 /// `If-None-Match`, else `200` with [body] and (optionally) an ETag — enough to
 /// exercise the full revalidation path without a network.
 class _FakeAdapter implements HttpClientAdapter {
-  _FakeAdapter({required this.body, this.etag});
+  _FakeAdapter({required this.body, this.etag, this.beforeNotModified});
 
   final String body;
   final String? etag;
+  final Future<void> Function()? beforeNotModified;
   int calls = 0;
 
   @override
@@ -28,6 +29,7 @@ class _FakeAdapter implements HttpClientAdapter {
   ) async {
     calls++;
     if (etag != null && options.headers['if-none-match'] == etag) {
+      await beforeNotModified?.call();
       return ResponseBody.fromString('', 304, headers: {});
     }
     return ResponseBody.fromString(
@@ -51,9 +53,6 @@ class _EvictedStore extends EtagCacheStore {
 
   @override
   Future<String?> readEtag(String url) async => 'v1';
-
-  @override
-  Future<CachedResponse?> read(String url) async => null;
 }
 
 void main() {
@@ -103,6 +102,32 @@ void main() {
       );
     },
   );
+
+  test('a JSON 304 does not serve a row replaced under a new ETag', () async {
+    const url = 'https://x.test/replaced';
+    await store.write(url, etag: 'v1', body: '{"n":1}');
+    var revalidated = false;
+    final dio = dioWith(
+      _FakeAdapter(
+        body: '{"n":1}',
+        etag: 'v1',
+        beforeNotModified: () async {
+          revalidated = true;
+          await store.write(url, etag: 'v2', body: '{"n":2}');
+        },
+      ),
+    );
+    addTearDown(dio.close);
+
+    await expectLater(
+      dio.get<dynamic>(url),
+      throwsA(
+        isA<DioException>().having((e) => e.error, 'error', isA<StateError>()),
+      ),
+    );
+    expect(revalidated, isTrue);
+    expect((await store.readJson(url))?.data, {'n': 2});
+  });
 
   test('a 200 without an ETag is not cached', () async {
     final adapter = _FakeAdapter(body: '{"n":2}'); // no etag

@@ -117,11 +117,15 @@ void main() {
       expect((await store.readJson('https://x/r'))?.fetchedAt, sent);
 
       final confirmed = sent.add(const Duration(hours: 3));
-      await store.markFetched('https://x/r', confirmed);
+      await store.markFetched('https://x/r', confirmed, etag: '1');
       expect((await store.readJson('https://x/r'))?.fetchedAt, confirmed);
 
+      await store.write('https://x/r', etag: '2', body: '[]', fetchedAt: sent);
+      await store.markFetched('https://x/r', confirmed, etag: '1');
+      expect((await store.readJson('https://x/r'))?.fetchedAt, sent);
+
       // A miss is a no-op, not a throw.
-      await store.markFetched('https://x/none', confirmed);
+      await store.markFetched('https://x/none', confirmed, etag: '1');
       expect(await store.readJson('https://x/none'), isNull);
     },
   );
