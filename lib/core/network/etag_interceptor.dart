@@ -266,8 +266,12 @@ class EtagInterceptor extends Interceptor {
       final binary = _isBytes(options);
       final post = options.method.toUpperCase() == 'POST';
       if (response.statusCode == 304) {
+        final validated = options.headers[HttpHeadersEtag.ifNoneMatch];
         if (binary) {
-          final cached = await _store.readBytes(url);
+          final cached = await _store.readBytes(
+            url,
+            accept: (_, etag) => etag == validated,
+          );
           if (cached != null) {
             response.statusCode = 200;
             response.data = cached.bytes;
@@ -281,7 +285,10 @@ class EtagInterceptor extends Interceptor {
           // (the big station catalogues 304 on almost every open), and the
           // parse belongs on the worker hop the store's gunzip already pays —
           // Dio's own isolate offload never sees a 304, it has no body.
-          final cached = await _store.readJson(url);
+          final cached = await _store.readJson(
+            url,
+            accept: (_, etag) => etag == validated,
+          );
           if (cached != null) {
             // Present the revalidated cache as a normal 200 to callers above.
             response.statusCode = 200;
@@ -295,14 +302,16 @@ class EtagInterceptor extends Interceptor {
             // request's offline label counts its age from here. Only those
             // pay the write — nothing else reads it.
             if (StaleIfError.of(options) != null) {
-              unawaited(_store.markFetched(url, AppTime.utc));
+              unawaited(
+                _store.markFetched(url, AppTime.utc, etag: cached.etag),
+              );
             }
             handler.next(response);
             return;
           }
         }
-        // The entry was evicted between request and response, so there is no
-        // body to serve. Never hand a bodyless 304 up as a success: reject as
+        // The entry was evicted or replaced between request and response, so
+        // there is no confirmed body to serve. Reject a bodyless 304 as
         // retryable so the region client fails over (and on retry the now-empty
         // cache sends no If-None-Match → a full 200) or raises an honest error
         // on the last host.
@@ -311,7 +320,7 @@ class EtagInterceptor extends Interceptor {
             requestOptions: options,
             response: response,
             type: DioExceptionType.unknown,
-            error: StateError('ETag 304 but cache entry was evicted'),
+            error: StateError('ETag 304 without a matching cached body'),
           ),
         );
         return;
