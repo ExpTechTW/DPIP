@@ -115,7 +115,7 @@ void main() {
     final last = tester.getBottomLeft(find.byIcon(Icons.menu));
     expect(last.dy, greaterThan(678 - 34 - kSystemRailControlExtent));
     expect(last.dy, lessThan(678 - 34));
-    expect(tester.getSize(_cell('map')).width, 48);
+    expect(tester.getSize(_cell('map')).width, kSystemRailControlExtent);
 
     await tester.tap(_cell('map'));
     await tester.pump();
@@ -150,15 +150,22 @@ void main() {
       ),
     );
 
-    // Floating, centred, and clear of the home indicator.
+    // Floating, centred, and dipped 12 pt into the home-indicator strip.
     final pill = tester.getRect(find.byType(FrostedSurface));
     expect(pill.center.dx, closeTo(160, 0.01));
-    expect(pill.bottom, closeTo(568 - 34, 0.01));
+    expect(pill.bottom, closeTo(568 - 22, 0.01));
     expect(pill.top, greaterThan(568 / 2), reason: 'a pill, not a bar');
+
+    // The bar reserves 8 pt above the pill — that is the gap the map's
+    // observation card sits in, since the shell extends the body behind it.
+    expect(
+      tester.getTopLeft(find.byType(FloatingTabBar)).dy,
+      closeTo(pill.top - 8, 0.01),
+    );
 
     // No labels on screen — they are the tooltip and the semantics only.
     expect(find.text('home'), findsNothing);
-    expect(tester.getSize(_cell('map')).width, 48);
+    expect(tester.getSize(_cell('map')).width, kFloatingTabCellExtent);
 
     await tester.tap(_cell('map'));
     await tester.pump();

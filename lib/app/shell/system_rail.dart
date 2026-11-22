@@ -89,6 +89,9 @@ class SystemRailTabBar extends StatelessWidget {
                       destination: destinations[i],
                       selected: i == selectedIndex,
                       onTap: () => onDestinationSelected(i),
+                      extent: kSystemRailControlExtent,
+                      indicator: const Size(40, 32),
+                      iconSize: 24,
                     ),
                 ],
               ),
@@ -108,6 +111,10 @@ class SystemRailTabBar extends StatelessWidget {
 /// the pill is meant to be smaller than the strip it replaces. The labels stay
 /// on [Tooltip] and [Semantics], so nothing the Material bar told a screen
 /// reader is lost.
+///
+/// The cells are [kFloatingTabCellExtent] rather than the rail's 48, and the
+/// pill dips into the home-indicator strip: at the full inset and the rail's
+/// cell, a bar this wide read as a thin strip hovering above the window.
 class FloatingTabBar extends StatelessWidget {
   const FloatingTabBar({
     super.key,
@@ -122,13 +129,21 @@ class FloatingTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 12 pt off the safe-area inset, so the pill rests on the bottom of the
+    // window instead of hovering above it. It overlaps the home-indicator
+    // strip; the indicator is drawn over it and still takes the gesture.
     final bottom = MediaQuery.paddingOf(context).bottom;
     return Padding(
+      // The top slot is not visual: the shell extends its body behind the bar,
+      // and `Scaffold` hands the body `max(padding, bar height)` as its bottom
+      // inset — so this is the gap the map's observation card keeps above the
+      // pill. Without it the card's bottom edge and the pill's top edge are the
+      // same line, and the two read as one block.
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        0,
+        AppSpacing.sm,
         AppSpacing.lg,
-        bottom > 0 ? bottom : AppSpacing.lg,
+        bottom > _indicatorDip ? bottom - _indicatorDip : AppSpacing.sm,
       ),
       // `heightFactor: 1` because the bottom-bar slot hands down a loose
       // 0–full-height constraint: a bare Center takes all of it and draws the
@@ -136,9 +151,14 @@ class FloatingTabBar extends StatelessWidget {
       child: Center(
         heightFactor: 1,
         child: FrostedSurface(
-          borderRadius: BorderRadius.circular(kSystemRailControlExtent / 2),
+          borderRadius: BorderRadius.circular(
+            kFloatingTabCellExtent / 2 + _pillPadding,
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            padding: const EdgeInsets.symmetric(
+              horizontal: _pillPadding,
+              vertical: _pillPadding,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -147,6 +167,9 @@ class FloatingTabBar extends StatelessWidget {
                     destination: destinations[i],
                     selected: i == selectedIndex,
                     onTap: () => onDestinationSelected(i),
+                    extent: kFloatingTabCellExtent,
+                    indicator: const Size(48, 36),
+                    iconSize: 26,
                   ),
               ],
             ),
@@ -157,18 +180,39 @@ class FloatingTabBar extends StatelessWidget {
   }
 }
 
-/// One 48 pt cell of the pill: the icon, and a rounded indicator while it is
-/// the current tab.
+/// The floating bar's cell, 56 rather than the rail's 48: along the bottom of a
+/// phone the rail's cell read as a thin strip, and a horizontal pill has the
+/// width to give each tab more room.
+const double kFloatingTabCellExtent = 56;
+
+/// Gap between the pill and the cells inside it. Half the pill's height is
+/// `extent / 2 + this`, which is where the capsule radius comes from.
+const double _pillPadding = AppSpacing.xs;
+
+/// How far the pill is allowed to sit inside the home-indicator strip.
+const double _indicatorDip = 12;
+
+/// One cell of the pill: the icon, and a rounded indicator while it is the
+/// current tab. The rail passes [kSystemRailControlExtent], the bottom bar
+/// [kFloatingTabCellExtent]; the indicator and the icon come with the cell so
+/// the two bars are the same shape at two sizes.
 class _PillCell extends StatelessWidget {
   const _PillCell({
     required this.destination,
     required this.selected,
     required this.onTap,
+    required this.extent,
+    required this.indicator,
+    required this.iconSize,
   });
 
   final NavigationDestination destination;
   final bool selected;
   final VoidCallback onTap;
+
+  final double extent;
+  final Size indicator;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -184,26 +228,26 @@ class _PillCell extends StatelessWidget {
         message: destination.label,
         excludeFromSemantics: true,
         child: SizedBox.square(
-          dimension: kSystemRailControlExtent,
+          dimension: extent,
           child: Material(
             type: MaterialType.transparency,
             child: InkResponse(
               onTap: onTap,
-              radius: kSystemRailControlExtent / 2,
+              radius: extent / 2,
               child: Center(
                 child: AnimatedContainer(
                   duration: AppMotion.fast,
-                  width: 40,
-                  height: 32,
+                  width: indicator.width,
+                  height: indicator.height,
                   decoration: BoxDecoration(
                     color: selected
                         ? colors.secondaryContainer
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(indicator.height / 2),
                   ),
                   child: IconTheme.merge(
                     data: IconThemeData(
-                      size: 24,
+                      size: iconSize,
                       color: selected
                           ? colors.onSecondaryContainer
                           : colors.onSurfaceVariant,
