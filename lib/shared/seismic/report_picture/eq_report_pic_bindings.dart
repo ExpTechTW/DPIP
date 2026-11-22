@@ -225,31 +225,27 @@ class EqReportPic {
 
   /// [fonts]: TTF bytes in fallback order —
   /// mplus-2p-bold, GenShinGothic-Bold, NotoSansTC-Black. The bytes are copied.
-  factory EqReportPic.create(EqReportPicBindings b, List<Uint8List> fonts) {
-    final ptrs = malloc<Pointer<Uint8>>(fonts.length);
-    final lens = malloc<Size>(fonts.length);
-    final buffers = <Pointer<Uint8>>[];
-    try {
-      for (var i = 0; i < fonts.length; i++) {
-        final buf = malloc<Uint8>(fonts[i].length);
-        buffers.add(buf);
-        buf.asTypedList(fonts[i].length).setAll(0, fonts[i]);
-        ptrs[i] = buf;
-        lens[i] = fonts[i].length;
-      }
-      final handle = b._new(ptrs, lens, fonts.length);
-      if (handle == nullptr) {
-        throw EqReportPicException(b._error('eqr_renderer_new failed'));
-      }
-      return EqReportPic._(b, handle, true);
-    } finally {
-      for (final buf in buffers) {
-        malloc.free(buf);
-      }
-      malloc.free(ptrs);
-      malloc.free(lens);
+  /// [fontAllocator] supplies temporary storage for those copies.
+  factory EqReportPic.create(
+    EqReportPicBindings b,
+    List<Uint8List> fonts, {
+    Allocator fontAllocator = malloc,
+  }) => using((arena) {
+    final ptrs = arena<Pointer<Uint8>>(fonts.length);
+    final lens = arena<Size>(fonts.length);
+    for (var i = 0; i < fonts.length; i++) {
+      final font = fonts[i];
+      final buffer = arena<Uint8>(font.length);
+      buffer.asTypedList(font.length).setAll(0, font);
+      ptrs[i] = buffer;
+      lens[i] = font.length;
     }
-  }
+    final handle = b._new(ptrs, lens, fonts.length);
+    if (handle == nullptr) {
+      throw EqReportPicException(b._error('eqr_renderer_new failed'));
+    }
+    return EqReportPic._(b, handle, true);
+  }, fontAllocator);
 
   /// A non-owning view of a renderer created elsewhere (e.g. in the main
   /// isolate); [dispose] on it does nothing.

@@ -6,6 +6,7 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/shared/seismic/report_picture/eq_report_pic_bindings.dart';
 import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
+import 'package:ffi/ffi.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _fixtureDir = String.fromEnvironment('DPIP_EQR_FFI_FIXTURES');
@@ -21,6 +22,28 @@ Uint8List _render(EqReportPic renderer, List<int> bytes) =>
       mode: EqMapMode.stations,
       theme: EqTheme.dark,
     );
+
+final class _FailingAllocator implements Allocator {
+  _FailingAllocator(this.failAt);
+
+  final int failAt;
+  final outstanding = <Pointer<NativeType>>{};
+  var allocations = 0;
+
+  @override
+  Pointer<T> allocate<T extends NativeType>(int byteCount, {int? alignment}) {
+    if (++allocations == failAt) throw StateError('fixture allocation failure');
+    final pointer = malloc.allocate<T>(byteCount, alignment: alignment);
+    outstanding.add(pointer);
+    return pointer;
+  }
+
+  @override
+  void free(Pointer<NativeType> pointer) {
+    expect(outstanding.remove(pointer), isTrue);
+    malloc.free(pointer);
+  }
+}
 
 void main() {
   group(
@@ -58,6 +81,28 @@ void main() {
           );
         });
       }
+
+      test('frees temporary fonts after partial initialization fails', () {
+        final bindings = EqReportPicBindings(_library('supported'));
+        final fonts = [
+          Uint8List.fromList([7]),
+          Uint8List.fromList([8]),
+        ];
+        for (final failAt in [2, 4]) {
+          final allocator = _FailingAllocator(failAt);
+          addTearDown(() {
+            for (final pointer in allocator.outstanding) {
+              malloc.free(pointer);
+            }
+          });
+          expect(
+            () => EqReportPic.create(bindings, fonts, fontAllocator: allocator),
+            throwsStateError,
+          );
+          expect(allocator.allocations, failAt);
+          expect(allocator.outstanding, isEmpty);
+        }
+      });
 
       test('copies output, frees once, and releases failed copies and owned handles', () {
         final lib = _library('supported');
