@@ -9,8 +9,8 @@ import 'package:dpip/core/network/stale_if_error.dart';
 ///
 /// The live feeds fail over across the LB regions (tpe1, khh1); reports and
 /// the replay archives across the Core regions (tyo1, tnn1) — the redundancy is a
-/// transport property carried by [ApiTier], not a module boundary. Returns raw
-/// decoded JSON; the repository maps it to domain models.
+/// transport property carried by [ApiTier], not a module boundary. The
+/// repository maps response bodies to domain models.
 class EarthquakeApi {
   const EarthquakeApi(this._client);
 
@@ -153,6 +153,9 @@ class EarthquakeApi {
   /// Full earthquake report by [reportId] (includes area `list`).
   ///
   /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/eq/report/{reportId}`
-  Future<dynamic> getReport(String reportId) =>
-      _client.get(ApiTier.coreApi, '/api/v2/eq/report/$reportId');
+  Future<BytePayload> getReport(String reportId) => _client.getBytes(
+    ApiTier.coreApi,
+    '/api/v2/eq/report/${Uri.encodeComponent(reportId)}',
+    validateJson: true,
+  );
 }

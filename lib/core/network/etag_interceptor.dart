@@ -39,7 +39,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 class EtagInterceptor extends Interceptor {
   EtagInterceptor(this._store, {this._usage});
 
-  final EtagCacheStore _store;
+  final EtagCacheStore? _store;
 
   /// Optional traffic accounting: records downloaded bytes, cache misses, and
   /// JSON `304` hits. Binary serves (immutable tile / binary `304`) are metered
@@ -48,6 +48,9 @@ class EtagInterceptor extends Interceptor {
 
   /// Synthetic ETag for a cached immutable-tile `404` (empty body).
   static const String negativeTileEtag = 'W/"404"';
+
+  /// Request opt-in for JSON that must be returned and cached as source bytes.
+  static const String validateJsonBytesKey = 'dpip.validateJsonBytes';
 
   /// Whether a request may enter the store.
   ///
@@ -205,13 +208,51 @@ class EtagInterceptor extends Interceptor {
     throw StateError('Expected bytes, got ${data.runtimeType}');
   }
 
+  static bool _validateJsonBytes(
+    Object? body,
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    try {
+      if (body is! List<int>) {
+        throw const FormatException('Expected JSON bytes');
+      }
+      jsonDecode(utf8.decode(body));
+      return true;
+    } on FormatException catch (error, stackTrace) {
+      handler.reject(
+        DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.unknown,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+      );
+      return false;
+    }
+  }
+
+  static void _rejectUnrestored304(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) => handler.reject(
+    DioException(
+      requestOptions: response.requestOptions,
+      response: response,
+      type: DioExceptionType.unknown,
+      error: StateError('ETag 304 without a matching cached body'),
+    ),
+  );
+
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    final store = _store;
     final uri = options.uri;
-    if (!_cacheable(options, uri)) {
+    if (store == null || !_cacheable(options, uri)) {
       handler.next(options);
       return;
     }
@@ -225,7 +266,7 @@ class EtagInterceptor extends Interceptor {
     // row; falling back to it when the network cannot answer is the caller's
     // call (`MapTileCache`), because only the caller knows it wants a fallback.
     if (_isBytes(options) && isImmutableTile(uri)) {
-      final cached = await _store.readBytes(url, accept: _notSeed);
+      final cached = await store.readBytes(url, accept: _notSeed);
       if (cached != null) {
         // Hit metering lives in [EtagCacheStore.readBytes].
         handler.resolve(
@@ -246,7 +287,9 @@ class EtagInterceptor extends Interceptor {
       return;
     }
 
-    final etag = await _store.readEtag(url);
+    // An older client may have cached this URL after decoding JSON. Only
+    // revalidate if the row can supply the requested representation on 304.
+    final etag = await store.readEtag(url, binary: _isBytes(options));
     // Never send a synthetic URL-hash If-None-Match — the origin doesn't know it.
     if (etag != null && !_isUrlHashEtag(etag)) {
       options.headers[HttpHeadersEtag.ifNoneMatch] = etag;
@@ -260,19 +303,32 @@ class EtagInterceptor extends Interceptor {
     ResponseInterceptorHandler handler,
   ) async {
     final options = response.requestOptions;
+    final validateJson = options.extra[validateJsonBytesKey] == true;
+    // Validate before a fresh response can replace a cache row or reach the
+    // region client. A 304 has no body until the matching row is restored.
+    if (validateJson &&
+        response.statusCode != 304 &&
+        !_validateJsonBytes(response.data, response, handler)) {
+      return;
+    }
+    final store = _store;
     final uri = options.uri;
-    if (_cacheable(options, uri)) {
+    if (store != null && _cacheable(options, uri)) {
       final url = uri.toString();
       final binary = _isBytes(options);
       final post = options.method.toUpperCase() == 'POST';
       if (response.statusCode == 304) {
         final validated = options.headers[HttpHeadersEtag.ifNoneMatch];
         if (binary) {
-          final cached = await _store.readBytes(
+          final cached = await store.readBytes(
             url,
             accept: (_, etag) => etag == validated,
           );
           if (cached != null) {
+            if (validateJson &&
+                !_validateJsonBytes(cached.bytes, response, handler)) {
+              return;
+            }
             response.statusCode = 200;
             response.data = cached.bytes;
             response.headers.set('etag', cached.etag);
@@ -285,7 +341,7 @@ class EtagInterceptor extends Interceptor {
           // (the big station catalogues 304 on almost every open), and the
           // parse belongs on the worker hop the store's gunzip already pays —
           // Dio's own isolate offload never sees a 304, it has no body.
-          final cached = await _store.readJson(
+          final cached = await store.readJson(
             url,
             accept: (_, etag) => etag == validated,
           );
@@ -302,9 +358,7 @@ class EtagInterceptor extends Interceptor {
             // request's offline label counts its age from here. Only those
             // pay the write — nothing else reads it.
             if (StaleIfError.of(options) != null) {
-              unawaited(
-                _store.markFetched(url, AppTime.utc, etag: cached.etag),
-              );
+              unawaited(store.markFetched(url, AppTime.utc, etag: cached.etag));
             }
             handler.next(response);
             return;
@@ -315,14 +369,7 @@ class EtagInterceptor extends Interceptor {
         // retryable so the region client fails over (and on retry the now-empty
         // cache sends no If-None-Match → a full 200) or raises an honest error
         // on the last host.
-        handler.reject(
-          DioException(
-            requestOptions: options,
-            response: response,
-            type: DioExceptionType.unknown,
-            error: StateError('ETag 304 without a matching cached body'),
-          ),
-        );
+        _rejectUnrestored304(response, handler);
         return;
       } else if (response.statusCode == 200) {
         // Encode the JSON body once and reuse it for both the byte estimate
@@ -356,7 +403,7 @@ class EtagInterceptor extends Interceptor {
           if (binary) {
             final bytes = _asBytes(response.data);
             unawaited(
-              _store.writeBytes(
+              store.writeBytes(
                 url,
                 etag: etag,
                 bytes: bytes,
@@ -366,7 +413,7 @@ class EtagInterceptor extends Interceptor {
             );
           } else {
             unawaited(
-              _store.write(
+              store.write(
                 url,
                 etag: etag,
                 body: jsonBody!,
@@ -382,6 +429,9 @@ class EtagInterceptor extends Interceptor {
           unawaited(usage.record(down: down, hit: false, saved: 0));
         }
       }
+    } else if (validateJson && response.statusCode == 304) {
+      _rejectUnrestored304(response, handler);
+      return;
     }
     handler.next(response);
   }
@@ -391,6 +441,11 @@ class EtagInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
+    final store = _store;
+    if (store == null) {
+      handler.next(err);
+      return;
+    }
     final options = err.requestOptions;
     final uri = options.uri;
     final status = err.response?.statusCode;
@@ -400,7 +455,7 @@ class EtagInterceptor extends Interceptor {
         status == 404 &&
         isBasemapPbf(uri)) {
       final url = uri.toString();
-      await _store.writeBytes(
+      await store.writeBytes(
         url,
         etag: negativeTileEtag,
         bytes: Uint8List(0),
@@ -422,7 +477,7 @@ class EtagInterceptor extends Interceptor {
         options.method.toUpperCase() == 'POST' &&
         status == null &&
         uri.host == 'status.exptech.dev') {
-      final cached = await _store.readJson(uri.toString());
+      final cached = await store.readJson(uri.toString());
       if (cached != null) {
         handler.resolve(
           Response<dynamic>(
@@ -448,7 +503,7 @@ class EtagInterceptor extends Interceptor {
         options.method.toUpperCase() == 'GET' &&
         _cacheable(options, uri) &&
         StaleIfError.covers(err)) {
-      final cached = await _store.readJson(uri.toString());
+      final cached = await store.readJson(uri.toString());
       if (cached != null) {
         staleIfError.offer((data: cached.data, fetchedAt: cached.fetchedAt));
       }

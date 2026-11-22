@@ -10,6 +10,7 @@ library;
 import 'package:dio/dio.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/realtime/elapsed.dart';
 import 'package:dpip/core/realtime/replay_clock.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
@@ -67,7 +68,7 @@ class _FakeEarthquakeApi implements EarthquakeApi {
   }) => throw UnimplementedError();
 
   @override
-  Future<dynamic> getReport(String reportId) => throw UnimplementedError();
+  Future<BytePayload> getReport(String reportId) => throw UnimplementedError();
 }
 
 DioException _dio(DioExceptionType type, {int? status}) {

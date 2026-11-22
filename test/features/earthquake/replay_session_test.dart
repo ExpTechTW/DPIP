@@ -52,6 +52,7 @@ class _RecordingApiClient implements ApiClient {
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
+    bool validateJson = false,
   }) => throw UnimplementedError();
 
   @override

@@ -11,6 +11,7 @@ import 'package:dpip/core/network/network_usage_store.dart';
 /// adapter is required. When an [etagCache] is supplied, an [EtagInterceptor]
 /// adds global HTTP ETag revalidation — JSON and compressible binaries (PBF /
 /// MVT / …) are gzip-1 on disk; WebP etc. stay raw. A `304` is served from cache.
+/// Requests that opt into JSON byte validation are checked even without a cache.
 ///
 /// Timeouts are kept tight: the payloads are small JSON snapshots and a realtime
 /// feed polls every second, so a hung request should fail over (or surface as a
@@ -30,8 +31,6 @@ Dio createDio({EtagCacheStore? etagCache, NetworkUsageStore? usage}) {
           status != null && ((status >= 200 && status < 300) || status == 304),
     ),
   );
-  if (etagCache != null) {
-    dio.interceptors.add(EtagInterceptor(etagCache, usage: usage));
-  }
+  dio.interceptors.add(EtagInterceptor(etagCache, usage: usage));
   return dio;
 }

@@ -3,9 +3,12 @@
 /// filter did nothing.
 library;
 
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/error/failure.dart';
+import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
@@ -15,7 +18,7 @@ class _Api implements EarthquakeApi {
   _Api(this.listBody, this.reportBody);
 
   final List<dynamic> listBody;
-  final dynamic reportBody;
+  final Map<String, Object?>? reportBody;
   ReportListQuery? seen;
   Object? error;
   Staleness? stale;
@@ -58,9 +61,9 @@ class _Api implements EarthquakeApi {
   }
 
   @override
-  Future<dynamic> getReport(String reportId) async {
+  Future<BytePayload> getReport(String reportId) async {
     if (error != null) throw error!;
-    return reportBody;
+    return BytePayload(bytes: utf8.encode(jsonEncode(reportBody)));
   }
 
   @override
@@ -155,6 +158,39 @@ void main() {
         type: DioExceptionType.connectionTimeout,
       );
       expect((await repo.get('115032')).failureOrNull, isA<TimeoutFailure>());
+    },
+  );
+
+  test(
+    'get displays a report the share-grade evidence decoder would reject',
+    () async {
+      final api = _Api(const [], {
+        'id': '115032',
+        'lon': 121.5,
+        'lat': 24.0,
+        'loc': '花蓮縣',
+        'depth': 10,
+        'mag': 5.2,
+        'time': 1700000000000,
+        'trem': 1,
+        // The model coerces these spellings; the v2 evidence scan is stricter
+        // and only the share path needs it.
+        'list': {
+          '花蓮縣': {
+            'int': 4.0,
+            'town': {
+              '花蓮市': {'lon': 121.6, 'lat': 23.9, 'int': 4.0},
+            },
+          },
+        },
+      });
+      final repo = ReportRepositoryImpl(api);
+
+      expect((await repo.get('115032')).valueOrNull!.maxIntensity, 4);
+      expect(
+        (await repo.getSnapshot('115032')).failureOrNull,
+        isA<DecodeFailure>(),
+      );
     },
   );
 

@@ -130,6 +130,15 @@ void main() {
     },
   );
 
+  test('an unknown cache kind cannot provide a typed validator', () async {
+    const url = 'https://x/unknown-kind';
+    await store.write(url, etag: 'v1', body: '[]');
+    await db.execute('UPDATE http_cache SET kind = ? WHERE key = ?', [99, url]);
+
+    expect(await store.readEtag(url, binary: true), isNull);
+    expect(await store.readEtag(url, binary: false), isNull);
+  });
+
   Future<void> setTime(String url, int time) =>
       db.execute('UPDATE http_cache SET time = ? WHERE key = ?', [time, url]);
 

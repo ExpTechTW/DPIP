@@ -77,7 +77,10 @@ Failure mapException(Object error) {
     }
   }
   // `as`-cast / shape mismatches while decoding, or malformed JSON.
-  if (error is TypeError || error is FormatException) {
+  if (error is FormatException) {
+    return DecodeFailure('Unexpected response format', cause: error);
+  }
+  if (error is TypeError) {
     return const DecodeFailure('Unexpected response format');
   }
   return UnexpectedFailure(error.toString());

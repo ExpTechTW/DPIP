@@ -499,14 +499,20 @@ class EtagCacheStore {
     }
   }
 
-  /// Returns just the cached etag for [url], or null on a miss.
-  Future<String?> readEtag(String url) async {
+  /// Returns just the cached ETag for [url], or null on a miss.
+  /// A request that needs a specific body representation can require it.
+  Future<String?> readEtag(String url, {bool? binary}) async {
     try {
       final row = await _db.getOptional(
-        'SELECT etag FROM $_table WHERE key = ? LIMIT 1',
+        'SELECT etag, kind FROM $_table WHERE key = ? LIMIT 1',
         [url],
       );
       if (row == null) return null;
+      final kind = row['kind'];
+      if (binary == true && kind != kindBinary && kind != kindBinaryGzip) {
+        return null;
+      }
+      if (binary == false && kind != kindJson) return null;
       _scheduleTouch(url);
       return row['etag'] as String?;
     } catch (_) {
