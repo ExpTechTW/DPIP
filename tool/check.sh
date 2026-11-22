@@ -14,12 +14,12 @@
 # toolchain; the tests are last because they are the only part measured in
 # minutes.
 #
-# Three steps are content-hash cached (see `cached` in dev/_lib.sh): the
-# analyzer, codegen and the test suite. Together they are almost all of the
-# wall-clock, and all three depend only on files — so a second run over an
-# unchanged tree is free, and a one-byte edit anywhere in their inputs re-runs
-# them. The cheap gates are never cached: they finish in about a second each,
-# and a stale answer from a cache is worth less than that.
+# Four steps are content-hash cached (see `cached` in dev/_lib.sh): the
+# analyzer, codegen, the report-picture fixtures and the test suite. Together
+# they are almost all of the wall-clock, and all four depend only on files — so
+# a second run over an unchanged tree is free, and a one-byte edit anywhere in
+# their inputs re-runs them. The cheap gates are never cached: they finish in
+# about a second each, and a stale answer from a cache is worth less than that.
 #
 # Not run here, and on purpose:
 #   - `pub get`. CI installs dependencies; a developer already has them, and
@@ -88,6 +88,23 @@ codegen_check() {
   return 1
 }
 cached codegen "$(cache_key "${CODE_INPUTS[@]}")" codegen_check
+
+step 'report-picture C ABI (host fixtures)'
+# A plain `flutter test` skips this group: it needs a C test double compiled by
+# `cc`, and only tool/dev/test_report_picture.sh passes the define. Left out of
+# this list it would never gate a PR, and `coverage.sh` would report it as
+# skipped rather than failed.
+case "$(uname -s)" in
+  Darwin|Linux)
+    cached report_picture "$(
+      cache_key test/shared/seismic \
+        test/core/platform/native_library_test.dart \
+        lib/shared/seismic/report_picture tool/dev/test_report_picture.sh \
+        pubspec.yaml pubspec.lock
+    )" tool/dev/test_report_picture.sh
+    ;;
+  *) printf '  skipped — the host C fixtures need macOS or Linux\n' >&2 ;;
+esac
 
 step 'test (with coverage)'
 # The suite as CI runs it. CI's test step is tool/dev/coverage.sh, and running a
