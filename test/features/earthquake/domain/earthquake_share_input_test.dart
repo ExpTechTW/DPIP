@@ -341,10 +341,36 @@ void main() {
     );
   });
 
-  test('snapshot evidence owns a copy of the model maps', () {
-    final list = Map.of(modern.list);
+  test('snapshot evidence owns the nested model maps and source lookups', () {
+    final area = modern.list['臺東縣']!;
+    final town = Map.of(area.town);
+    final list = {...modern.list, '臺東縣': area.copyWith(town: town)};
     final model = modern.copyWith(list: list);
-    final evidence = _evidence(model);
+    final decimals = Map.of(_decimals);
+    final counties = Map.of(_counties);
+    final stations = Map.of(_stations);
+    final evidence = _evidence(
+      model,
+      decimals: decimals,
+      counties: counties,
+      stations: stations,
+    );
+    decimals.clear();
+    counties.clear();
+    stations.clear();
+    final input = adaptEarthquakeShareInput(
+      model,
+      evidence: evidence,
+    ) as EarthquakeShareInputV2;
+    expect(input.bytes, _convert(modern).bytes);
+
+    town.clear();
+    _expectFailure(
+      adaptEarthquakeShareInput(model, evidence: evidence),
+      EarthquakeShareInputError.snapshotMismatch,
+      '',
+    );
+    town.addAll(area.town);
     list.clear();
     _expectFailure(
       adaptEarthquakeShareInput(model, evidence: evidence),
@@ -412,4 +438,116 @@ void main() {
       '/list/臺東縣/town/成功/int',
     );
   });
+
+  test('rejects out-of-range timestamps and invalid source labels', () {
+    for (final time in [-62135625600001, 253402272000000]) {
+      final report = modern.copyWith(time: time);
+      _expectFailure(
+        adaptEarthquakeShareInput(report, evidence: _evidence(report)),
+        EarthquakeShareInputError.malformedSource,
+        '/time',
+      );
+    }
+    for (final location in ['   ', '臺東\n近海', '震' * 171]) {
+      final report = modern.copyWith(location: location);
+      _expectFailure(
+        adaptEarthquakeShareInput(report, evidence: _evidence(report)),
+        EarthquakeShareInputError.malformedSource,
+        '/loc',
+      );
+    }
+  });
+
+  test('rejects duplicated county identity at the second source area', () {
+    _expectFailure(
+      adaptEarthquakeShareInput(
+        modern,
+        evidence: _evidence(modern, counties: {..._counties, '花蓮縣': '10014'}),
+      ),
+      EarthquakeShareInputError.duplicateIdentity,
+      '/list/花蓮縣',
+    );
+  });
+
+  test('rejects invalid intensity and escapes source JSON Pointer tokens', () {
+    const county = '縣/~';
+    const station = '站~/';
+    final reading = modern.list['臺東縣']!.town['成功']!;
+    final report = modern.copyWith(
+      list: {
+        county: AreaIntensity(
+          intensity: 9,
+          town: {station: reading.copyWith(intensity: 10)},
+        ),
+      },
+    );
+    _expectFailure(
+      adaptEarthquakeShareInput(
+        report,
+        evidence: _evidence(
+          report,
+          counties: {county: '10014'},
+          stations: {(county, station): 'CHK'},
+        ),
+      ),
+      EarthquakeShareInputError.malformedSource,
+      '/list/縣~1~0/town/站~0~1/int',
+    );
+  });
+
+  test('rejects more than 256 source areas', () {
+    final report = modern.copyWith(
+      list: {for (var i = 0; i < 257; i++) 'Area $i': modern.list['臺東縣']!},
+    );
+    _expectFailure(
+      adaptEarthquakeShareInput(report, evidence: _evidence(report)),
+      EarthquakeShareInputError.inputLimit,
+      '/list',
+    );
+  });
+
+  test(
+    'enforces observation count and serialized UTF-8 size independently',
+    () {
+      final area = modern.list['臺東縣']!;
+      final station = area.town['成功']!;
+
+      void expectLimit(int count, String suffix, String errorPath) {
+        final names = [
+          for (var i = 0; i < count; i++)
+            '${i.toString().padLeft(4, '0')}$suffix',
+        ];
+        final report = modern.copyWith(
+          list: {
+            '臺東縣': area.copyWith(
+              town: {for (final name in names) name: station},
+            ),
+          },
+        );
+        _expectFailure(
+          adaptEarthquakeShareInput(
+            report,
+            evidence: _evidence(
+              report,
+              decimals: {
+                ..._decimals,
+                for (final name in names) ...{
+                  '/list/臺東縣/town/$name/lat': '23.1',
+                  '/list/臺東縣/town/$name/lon': '121.37',
+                },
+              },
+              stations: {
+                for (var i = 0; i < count; i++) ('臺東縣', names[i]): 'S$i',
+              },
+            ),
+          ),
+          EarthquakeShareInputError.inputLimit,
+          errorPath,
+        );
+      }
+
+      expectLimit(2049, '', '/list/臺東縣/town/2048');
+      expectLimit(1800, '震' * 169, '');
+    },
+  );
 }
