@@ -19,6 +19,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -174,13 +175,13 @@ const _namedRoutes = <(String, String)>[
   (AppRoutes.bugTracker, AppRoutes.bugTrackerPath),
   (AppRoutes.developer, AppRoutes.developerPath),
   (AppRoutes.sponsor, AppRoutes.sponsorPath),
-  (AppRoutes.serverStatus, AppRoutes.serverStatusPath),
 ];
 
 Future<void> _pump(
   WidgetTester tester,
   GoRouter router, {
   MeshUnread? unread,
+  StatusPageMonitor? status,
   ChangelogRepository changelog = const _EmptyChangelogRepository(),
   TownDirectory towns = const TownDirectory({}),
   Size size = const Size(800, 4000),
@@ -208,6 +209,9 @@ Future<void> _pump(
         ChangeNotifierProvider(create: (_) => unread ?? MeshUnread(null)),
         // The status card wears the same dot as the More tab.
         ChangeNotifierProvider(create: (_) => EndpointHealthMonitor()),
+        ChangeNotifierProvider(
+          create: (_) => status ?? StatusPageMonitor(fetch: () async => null),
+        ),
         // MorePage badges its permission row from this. Both services are pure
         // constructors and nothing calls start(), so it holds its optimistic
         // defaults and the row renders unbadged — which is what these tests are
@@ -545,6 +549,54 @@ void main() {
     expect(meshBadge(), findsNothing);
   });
 
+  testWidgets('the status card carries a dot while the status page reports '
+      'a problem', (tester) async {
+    final generated = DateTime.utc(2026, 11, 23, 12);
+    var level = 'partial';
+    final status = StatusPageMonitor(
+      fetch: () async => {
+        'generated_at': generated.millisecondsSinceEpoch ~/ 1000,
+        'level': level,
+      },
+      now: () => generated,
+    );
+    await _pump(tester, _router([]), status: status);
+    Finder statusBadge() => find.descendant(
+      of: find.ancestor(
+        of: find.text('Server status'),
+        matching: find.byType(InkWell),
+      ),
+      matching: find.byWidgetPredicate((w) => w is Badge && w.isLabelVisible),
+    );
+    expect(statusBadge(), findsNothing);
+
+    await status.refresh();
+    await tester.pump();
+    expect(statusBadge(), findsOneWidget);
+
+    level = 'ok';
+    await status.refresh();
+    await tester.pump();
+    expect(statusBadge(), findsNothing);
+  });
+
+  test('the status page follows the UI language', () {
+    expect(
+      statusPageUrl(const Locale('zh', 'TW')),
+      'https://exptech.dev/status/',
+    );
+    expect(
+      statusPageUrl(
+        const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+      ),
+      'https://exptech.dev/status/',
+    );
+    expect(statusPageUrl(const Locale('yue')), 'https://exptech.dev/status/');
+    expect(statusPageUrl(const Locale('ja')), 'https://exptech.dev/ja/status/');
+    expect(statusPageUrl(const Locale('en')), 'https://exptech.dev/en/status/');
+    expect(statusPageUrl(const Locale('ko')), 'https://exptech.dev/en/status/');
+  });
+
   testWidgets('the version card names this build and its train', (
     tester,
   ) async {
@@ -753,11 +805,6 @@ void main() {
       expect(visited, [route], reason: label);
       await leave();
     }
-
-    visited.clear();
-    await tester.tap(find.text('Server status'));
-    await tester.pumpAndSettle();
-    expect(visited, [AppRoutes.serverStatus]);
   });
 
   testWidgets('external rows open, and a refused launch says so', (
@@ -774,6 +821,13 @@ void main() {
     await tester.tap(find.text('Discord community'));
     await tester.pump();
     expect(launcher.launched, ['https://exptech.com.tw/dc']);
+
+    // The status card leaves the app for the public status page, in the UI's
+    // language (English here).
+    await tester.tap(find.text('Server status'));
+    await tester.pump();
+    expect(launcher.launched, contains('https://exptech.dev/en/status/'));
+    expect(visited, isEmpty);
 
     await tester.tap(find.text('Announcements'));
     await tester.pump();

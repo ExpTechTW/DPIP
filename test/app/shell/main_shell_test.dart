@@ -16,6 +16,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -52,6 +53,14 @@ void main() {
     final handoff = MapCameraHandoff();
     final unread = MeshUnread(null);
     final endpoints = EndpointHealthMonitor();
+    final generated = DateTime.utc(2026, 11, 23, 12);
+    final status = StatusPageMonitor(
+      fetch: () async => {
+        'generated_at': generated.millisecondsSinceEpoch ~/ 1000,
+        'level': 'outage',
+      },
+      now: () => generated,
+    );
     final layers = DefaultMapLayerController(settings);
     final location = LocationService(
       const TownDirectory({}),
@@ -111,6 +120,7 @@ void main() {
             ),
           ),
           ChangeNotifierProvider<EndpointHealthMonitor>.value(value: endpoints),
+          ChangeNotifierProvider<StatusPageMonitor>.value(value: status),
           ChangeNotifierProvider<MeshUnread>.value(value: unread),
           ChangeNotifierProvider<MapImmersiveController>(
             create: (_) => MapImmersiveController(),
@@ -178,6 +188,14 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     expect(tester.getTopLeft(label).dy, lessThan(600));
+
+    // The status page reporting an outage lights the More tab on its own.
+    Finder litBadge() =>
+        find.byWidgetPredicate((w) => w is Badge && w.isLabelVisible);
+    expect(litBadge(), findsNothing);
+    await status.refresh();
+    await tester.pump();
+    expect(litBadge(), findsWidgets);
 
     unread.recordIncoming(1, 1);
     endpoints.failure(

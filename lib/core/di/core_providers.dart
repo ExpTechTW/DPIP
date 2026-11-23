@@ -22,6 +22,7 @@ import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
@@ -95,10 +96,12 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   // Where a diagnostics dump goes. The contract rather than the paste service
   // behind it, so a page depends on "somewhere to send this" and not on Haste.
   Provider<DumpUploader>.value(value: HasteApi(deps.apiClient)),
-  // Fed by ApiClient on every request outcome; read by the 伺服器狀態 page.
+  // Fed by ApiClient on every request outcome; with StatusPageMonitor, drives the
+  // More tab's server-status dot.
   ChangeNotifierProvider<EndpointHealthMonitor>.value(
     value: deps.endpointHealth,
   ),
+  ChangeNotifierProvider<StatusPageMonitor>.value(value: deps.statusPage),
   // Nullable — absent when the cache DB couldn't open; read by the Debug page.
   Provider<EtagCacheStore?>.value(value: deps.etagCache),
   Provider<NetworkUsageStore?>.value(value: deps.networkUsage),

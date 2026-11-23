@@ -18,6 +18,7 @@ import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
@@ -84,6 +85,7 @@ class SharedDeps {
     this.meshStore,
     required this.meshGateway,
     required this.endpointHealth,
+    required this.statusPage,
     this.etagCache,
     this.networkUsage,
     this.mapTileCache,
@@ -208,8 +210,11 @@ class SharedDeps {
   final DpipMeshGateway meshGateway;
 
   /// Client-side health of the multi-active endpoints — fed by [apiClient],
-  /// rendered by the More → 伺服器狀態 screen.
+  /// one half of the More tab's server-status dot.
   final EndpointHealthMonitor endpointHealth;
+
+  /// The status page's own verdict — the other half of that dot.
+  final StatusPageMonitor statusPage;
 
   /// On-disk ETag HTTP cache (also provided) — null if the cache DB couldn't be
   /// opened. Exposed for the Debug page's cache stats.

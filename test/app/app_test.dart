@@ -26,6 +26,7 @@ import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
@@ -234,6 +235,7 @@ SharedDeps _deps(SettingsStore settings) {
     meshUnread: MeshUnread(null),
     meshGateway: DpipMeshGatewayImpl(mesh, () => null),
     endpointHealth: EndpointHealthMonitor(),
+    statusPage: StatusPageMonitor(fetch: () async => null),
   );
 }
 

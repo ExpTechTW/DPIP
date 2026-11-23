@@ -27,6 +27,7 @@ import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
@@ -77,9 +78,6 @@ import 'package:dpip/features/release_highlights/domain/release_highlight.dart';
 import 'package:dpip/features/release_highlights/release_highlights_providers.dart';
 import 'package:dpip/features/sponsor/domain/sponsor_repository.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
-import 'package:dpip/features/status/domain/cloudflare_status_repository.dart';
-import 'package:dpip/features/status/domain/server_status_repository.dart';
-import 'package:dpip/features/status/status_providers.dart';
 import 'package:dpip/features/typhoon/domain/meteor_typhoon_repository.dart';
 import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/domain/meteor_lightning_repository.dart';
@@ -294,6 +292,7 @@ SharedDeps _deps() {
     meshUnread: MeshUnread(null),
     meshGateway: DpipMeshGatewayImpl(mesh, () => null),
     endpointHealth: EndpointHealthMonitor(),
+    statusPage: StatusPageMonitor(fetch: () async => null),
   );
 }
 
@@ -311,7 +310,6 @@ void main() {
           ...changelogProviders(deps),
           ...eventsProviders(deps),
           ...typhoonProviders(deps),
-          ...statusProviders(deps),
           ...disasterMapProviders(deps),
           ...bugTrackerProviders(deps),
           ...notificationProviders(deps),
@@ -329,8 +327,7 @@ void main() {
     expect(context.read<ChangelogRepository>(), isNotNull);
     expect(context.read<EventRepository>(), isNotNull);
     expect(context.read<MeteorTyphoonRepository>(), isNotNull);
-    expect(context.read<ServerStatusRepository>(), isNotNull);
-    expect(context.read<CloudflareStatusRepository>(), isNotNull);
+    expect(context.read<StatusPageMonitor>(), isNotNull);
     expect(context.read<DisasterMapRepository>(), isNotNull);
     expect(context.read<BugRepository>(), isNotNull);
     expect(context.read<BugTrackerCounter>(), isNotNull);

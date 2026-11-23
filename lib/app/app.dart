@@ -10,6 +10,7 @@ import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
@@ -62,6 +63,7 @@ class DpipApp extends StatelessWidget {
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
         permissionHealth: deps.permissionHealth,
+        statusPage: deps.statusPage,
         onboarding: deps.onboarding,
         // Rebuild MaterialApp when the language override, theme mode or
         // colour-vision setting changes (a null locale / system mode follows
@@ -158,6 +160,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.backgroundLocation,
     required this.locationMonitor,
     required this.permissionHealth,
+    required this.statusPage,
     required this.onboarding,
     required this.child,
   });
@@ -172,6 +175,7 @@ class _AppServicesHost extends StatefulWidget {
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
   final PermissionHealth permissionHealth;
+  final StatusPageMonitor statusPage;
   final OnboardingStore onboarding;
   final Widget child;
 
@@ -252,6 +256,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     _ready = true;
     widget.locationMonitor.start();
     widget.permissionHealth.start();
+    widget.statusPage.start();
     _startLocationIfGranted();
   }
 
@@ -347,6 +352,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     _observer.dispose();
     widget.locationMonitor.dispose();
     widget.permissionHealth.dispose();
+    widget.statusPage.dispose();
     widget.deviceLocationReporter.dispose();
     widget.realtimeService.dispose();
     super.dispose();
