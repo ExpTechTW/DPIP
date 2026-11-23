@@ -10,9 +10,9 @@ import 'package:dpip/shared/seismic/report_picture/eq_report_pic_bindings.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
 
-export 'eq_report_pic_bindings.dart' show EqMapMode, EqTheme;
+export 'eq_report_pic_bindings.dart' show EqMapMode, EqShareFormat, EqTheme;
 
-/// Renders Share Render Input v2 into a Dart-owned, 1920×1080 landscape PNG.
+/// Renders Share Render Input v2 into a Dart-owned PNG at a native share format.
 final class ReportPicture {
   ReportPicture._(this._render, this._release);
 
@@ -27,7 +27,8 @@ final class ReportPicture {
     'assets/fonts/report/NotoSansTC-Black.ttf',
   ];
 
-  final Future<Uint8List> Function(Uint8List, EqMapMode, EqTheme) _render;
+  final Future<Uint8List> Function(Uint8List, EqMapMode, EqTheme, EqShareFormat)
+  _render;
   final void Function() _release;
   Future<void> _pending = Future.value();
   Future<void>? _disposal;
@@ -49,7 +50,8 @@ final class ReportPicture {
       final address = await _createRenderer(fonts);
       return Ok(
         ReportPicture._(
-          (input, mode, theme) => _renderInIsolate(address, input, mode, theme),
+          (input, mode, theme, format) =>
+              _renderInIsolate(address, input, mode, theme, format),
           () => bindings.freeRenderer(address),
         ),
       );
@@ -73,6 +75,7 @@ final class ReportPicture {
     Uint8List json, {
     EqMapMode mode = EqMapMode.cluster,
     EqTheme theme = EqTheme.light,
+    EqShareFormat format = EqShareFormat.landscape16By9,
   }) {
     if (_disposal != null) {
       return Future.value(
@@ -97,7 +100,7 @@ final class ReportPicture {
 
     final input = Uint8List.fromList(json);
     final render = _pending.then(
-      (_) => _renderRequest(() => _render(input, mode, theme)),
+      (_) => _renderRequest(() => _render(input, mode, theme, format)),
     );
     _pending = render.then((_) {});
     return render;
@@ -179,11 +182,12 @@ Future<Uint8List> _renderInIsolate(
   Uint8List input,
   EqMapMode mode,
   EqTheme theme,
+  EqShareFormat format,
 ) => Isolate.run(
   () => EqReportPic.fromAddress(
     _workerBindings(),
     address,
-  ).renderSharePngV2(input, mode: mode, theme: theme),
+  ).renderSharePngV2(input, mode: mode, theme: theme, format: format),
   debugName: 'report-picture-render',
 );
 

@@ -4,16 +4,18 @@ source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 cd "$(repo_root)"
 
 usage() {
-  printf '用法：%s <Flutter device ID> [--smoke | --allow-missing-native]\n' "$0" >&2
+  printf '用法：%s <Flutter device ID> [--smoke | --smoke-4x5 | --allow-missing-native]\n' "$0" >&2
   exit 2
 }
 
 device="${1:-}"
 option="${2:-}"
 [[ $# -le 2 && -n $device && $device != -* ]] || usage
+smoke_format=landscape16By9
 case "$option" in
   '') target=report_picture_preview ;;
   --smoke) target=report_picture_smoke ;;
+  --smoke-4x5) target=report_picture_smoke; smoke_format=information4By5 ;;
   --allow-missing-native) target=report_picture_preview ;;
   *) usage ;;
 esac
@@ -61,6 +63,7 @@ fixtures=test/features/earthquake/domain/fixtures/share_input
 encode() { base64 < "$fixtures/$1" | tr -d '\n'; }
 
 exec tool/run.sh -d "$device" --no-pub --target "tool/qa/$target.dart" \
+  --dart-define="DPIP_REPORT_PICTURE_SMOKE_FORMAT=$smoke_format" \
   --dart-define="DPIP_REPORT_PICTURE_CORE_V2=$(encode exptech-modern.json)" \
   --dart-define="DPIP_REPORT_PICTURE_HISTORICAL=$(encode exptech-historical.json)" \
   --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(encode exptech-modern.v2.json)"

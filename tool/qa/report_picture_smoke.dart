@@ -48,6 +48,14 @@ Future<String> _smoke() async {
     'DPIP_REPORT_PICTURE_EXPECT',
     defaultValue: 'ready',
   );
+  final format = EqShareFormat.values.byName(
+    const String.fromEnvironment(
+      'DPIP_REPORT_PICTURE_SMOKE_FORMAT',
+      defaultValue: 'landscape16By9',
+    ),
+  );
+  final portrait = format == EqShareFormat.information4By5;
+  final dimensions = '${format.width}x${format.height}';
   final opened = await ReportPicture.open();
   if (expected != 'ready') {
     final reason = ReportPictureFailureReason.values.byName(expected);
@@ -60,24 +68,33 @@ Future<String> _smoke() async {
     final library = _requireValue(
       NativeLibrary.open(ReportPicture.libraryName),
     );
-    for (final symbol in reportPictureAbiSymbols) {
+    final (abi, capabilities) = readReportPictureAbi(library);
+    final withOptions = abi >= 0x00010003 && (capabilities & 0x200) != 0;
+    final symbols = [
+      ...reportPictureAbiSymbols,
+      if (withOptions) reportPictureOptionsSymbol,
+    ];
+    for (final symbol in symbols) {
       _check(library.providesSymbol(symbol), 'Missing $symbol');
     }
-    final abi = readReportPictureAbi(library);
     _check(
-      abi == (0x00010002, 0x11f),
-      'Unexpected native ABI or capabilities: $abi',
+      abi >> 16 == 1 &&
+          (abi & 0xffff) >= 2 &&
+          (capabilities & 0x11f) == 0x11f &&
+          (!portrait || withOptions),
+      'Unexpected native ABI or capabilities: $abi/$capabilities',
     );
 
     final (bytes, sourceEvidence) = _loadFixture();
     final fixtureHash = sha256.convert(bytes);
 
-    final first = picture.renderSharePngV2(bytes);
+    final first = picture.renderSharePngV2(bytes, format: format);
     final invalid = picture.renderSharePngV2(
       Uint8List.fromList(utf8.encode('{')),
+      format: format,
     );
     final callerBuffer = Uint8List.fromList(bytes);
-    final recovered = picture.renderSharePngV2(callerBuffer);
+    final recovered = picture.renderSharePngV2(callerBuffer, format: format);
     callerBuffer.fillRange(0, callerBuffer.length, 0);
 
     var completed = false;
@@ -94,7 +111,7 @@ Future<String> _smoke() async {
 
     final dispose = picture.dispose();
     _requireFailure(
-      await picture.renderSharePngV2(bytes),
+      await picture.renderSharePngV2(bytes, format: format),
       ReportPictureFailureReason.disposed,
     );
     final png = _requireValue(await first);
@@ -111,13 +128,16 @@ Future<String> _smoke() async {
       listEquals(png, nextPng),
       'Identical requests returned different PNG bytes',
     );
-    await _checkPng(png, EqTheme.light);
+    await _checkPng(png, EqTheme.light, format);
 
     final reopened = _requireValue(await ReportPicture.open());
     final Uint8List dark;
     try {
       _requireFailure(
-        await reopened.renderSharePngV2(Uint8List(1024 * 1024 + 1)),
+        await reopened.renderSharePngV2(
+          Uint8List(1024 * 1024 + 1),
+          format: format,
+        ),
         ReportPictureFailureReason.limitExceeded,
       );
       final badVersion = utf8
@@ -127,15 +147,26 @@ Future<String> _smoke() async {
             '"schema_version":3',
           );
       _requireFailure(
-        await reopened.renderSharePngV2(utf8.encode(badVersion)),
+        await reopened.renderSharePngV2(
+          utf8.encode(badVersion),
+          format: format,
+        ),
         ReportPictureFailureReason.unsupportedVersion,
         nativeStatus: -2,
       );
       dark = _requireValue(
-        await reopened.renderSharePngV2(bytes, theme: EqTheme.dark),
+        await reopened.renderSharePngV2(
+          bytes,
+          theme: EqTheme.dark,
+          format: format,
+        ),
       );
       final nextDark = _requireValue(
-        await reopened.renderSharePngV2(bytes, theme: EqTheme.dark),
+        await reopened.renderSharePngV2(
+          bytes,
+          theme: EqTheme.dark,
+          format: format,
+        ),
       );
       _check(
         listEquals(dark, nextDark),
@@ -145,17 +176,19 @@ Future<String> _smoke() async {
     } finally {
       await reopened.dispose();
     }
-    await _checkPng(dark, EqTheme.dark);
+    await _checkPng(dark, EqTheme.dark, format);
     final documents = await getApplicationDocumentsDirectory();
+    final filename = portrait ? 'report-picture-4x5' : 'report-picture';
     for (final (theme, bytes) in [(EqTheme.light, png), (EqTheme.dark, dark)]) {
-      final output = File('${documents.path}/report-picture-${theme.name}.png');
+      final output = File('${documents.path}/$filename-${theme.name}.png');
       await output.writeAsBytes(bytes, flush: true);
       Log.info(
-        'REPORT_PICTURE_PNG theme=${theme.name} dimensions=1920x1080 '
+        'REPORT_PICTURE_PNG theme=${theme.name} dimensions=$dimensions '
         'bytes=${bytes.length} sha256=${sha256.convert(bytes)} file=${output.path}',
       );
     }
-    return 'ABI=1.2 caps=0x11f exports=9 decoded=1920x1080 '
+    return 'ABI=${abi >> 16}.${abi & 0xffff} '
+        'caps=0x${capabilities.toRadixString(16)} exports=${symbols.length} decoded=$dimensions '
         'fixture_sha256=$fixtureHash themes=light,dark deterministic=pass '
         '$sourceEvidence '
         'root-event=responsive invalid=-1 version=-2 retry=pass dispose=pass reopen=pass';
@@ -203,7 +236,11 @@ void _requireInputFailure(
   );
 }
 
-Future<void> _checkPng(Uint8List png, EqTheme theme) async {
+Future<void> _checkPng(
+  Uint8List png,
+  EqTheme theme,
+  EqShareFormat format,
+) async {
   _check(
     png.length >= 8 &&
         listEquals(png.sublist(0, 8), const [137, 80, 78, 71, 13, 10, 26, 10]),
@@ -214,7 +251,8 @@ Future<void> _checkPng(Uint8List png, EqTheme theme) async {
     final frame = await codec.getNextFrame();
     try {
       _check(
-        frame.image.width == 1920 && frame.image.height == 1080,
+        frame.image.width == format.width &&
+            frame.image.height == format.height,
         '${theme.name}: unexpected decoded dimensions',
       );
     } finally {

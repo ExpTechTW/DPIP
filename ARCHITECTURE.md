@@ -105,7 +105,9 @@ what it happens to do. They live here so there is one copy: `CLAUDE.md` and
 `ReportPicture` in `lib/shared/seismic/report_picture/` accepts the original
 UTF-8 Share Render Input v2 bytes. It checks the ABI (major 1, minor 2 or later)
 and the v2 and production 16:9 capability bits before loading fonts. Rust
-validates the input and returns a 1920×1080 PNG. The service returns a
+validates the input and returns a 1920×1080 PNG by default. The 4:5 information
+card returns 1080×1350 and requires ABI 1.3 or later, the production 4:5 capability
+and `eqr_render_share_png_with_options`. The service returns a
 `Result<Uint8List>` with an app-owned copy or a structured
 `ReportPictureFailure`. The upstream Dart bindings copy native bytes and
 release the original buffer in the same isolate. Native initialization and
@@ -136,7 +138,8 @@ metadata.
 ### Native build inputs
 
 The mobile runtime is opt-in. With a local checkout containing eq-report-pic
-merge commit `b135d02bd1ba5103cd3d116a951b1b63a710a312` (PR #12), run these
+merge commit `d9c7b9e586e433ed703741828f1b9c5f95792fe1`
+([eq-report-pic #13](https://github.com/ExpTechTW/eq-report-pic/pull/13)), run these
 commands from the DPIP repository root.
 
 ```sh
@@ -152,12 +155,12 @@ for the platform you build.
 
 - **iOS** uses Xcode and `aarch64-apple-ios`, `aarch64-apple-ios-sim`, and
   `x86_64-apple-ios`. Runner picks the static XCFramework slice for the SDK.
-  Linker roots keep all nine ABI symbols through dead stripping for Dart
+  Linker roots keep all ten ABI symbols through dead stripping for Dart
   `DynamicLibrary.process()` lookup. The extensions use their own link settings.
 - **Android** uses NDK `28.2.13676358`, API 26, and
   `aarch64-linux-android` / `x86_64-linux-android`. Set `ANDROID_HOME` or
   `ANDROID_SDK_ROOT` if needed. Gradle includes the ELF files as `jniLibs`
-  for `arm64-v8a` and `x86_64`. The script checks all nine exports and 16 KiB
+  for `arm64-v8a` and `x86_64`. The script checks all ten exports and 16 KiB
   ELF segment alignment. DPIP excludes `armeabi-v7a` from its supported set.
   Dart opens `libeq_report_pic.so`.
 

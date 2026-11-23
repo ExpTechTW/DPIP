@@ -2,7 +2,7 @@
 # Build the optional report-image runtime from a verified local source checkout.
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 root="$(repo_root)"
-revision=b135d02bd1ba5103cd3d116a951b1b63a710a312
+revision=d9c7b9e586e433ed703741828f1b9c5f95792fe1
 
 platform="${1:-}"
 source_checkout="${2:-}"
@@ -46,7 +46,7 @@ build() {
 symbols="$scratch/symbols"
 sed -nE 's/^[[:alnum:]_ *]+[ *](eqr_[[:alnum:]_]+)\(.*/\1/p' \
   include/eq_report_pic.h | LC_ALL=C sort > "$symbols"
-[[ "$(wc -l < "$symbols" | tr -d ' ')" == 9 ]]
+[[ "$(wc -l < "$symbols" | tr -d ' ')" == 10 ]]
 
 case "$platform" in
   ios)

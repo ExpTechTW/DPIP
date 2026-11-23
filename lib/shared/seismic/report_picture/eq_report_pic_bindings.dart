@@ -1,6 +1,6 @@
 /// Dart binding for the eq_report_pic C ABI (`include/eq_report_pic.h`).
 ///
-/// Vendored from eq-report-pic b135d02bd1ba5103cd3d116a951b1b63a710a312.
+/// Vendored from eq-report-pic d9c7b9e586e433ed703741828f1b9c5f95792fe1.
 /// DPIP uses NativeLibrary to load it and owns renderer handles in ReportPicture.
 library;
 
@@ -63,6 +63,37 @@ typedef _RenderV2Dart = int Function(
   Pointer<Pointer<Uint8>>,
   Pointer<Size>,
 );
+
+final class _EqrShareRenderOptions extends Struct {
+  @Uint32()
+  external int size;
+
+  @Uint32()
+  external int format;
+
+  @Uint32()
+  external int theme;
+
+  @Uint32()
+  external int mode;
+}
+
+typedef _RenderWithOptionsC = Int32 Function(
+  Pointer<_EqrRenderer>,
+  Pointer<Uint8>,
+  Size,
+  Pointer<_EqrShareRenderOptions>,
+  Pointer<Pointer<Uint8>>,
+  Pointer<Size>,
+);
+typedef _RenderWithOptionsDart = int Function(
+  Pointer<_EqrRenderer>,
+  Pointer<Uint8>,
+  int,
+  Pointer<_EqrShareRenderOptions>,
+  Pointer<Pointer<Uint8>>,
+  Pointer<Size>,
+);
 typedef _RenderCall = int Function(
   Pointer<Uint8>,
   int,
@@ -84,6 +115,18 @@ enum EqMapMode {
 
   /// Townships coloured by their strongest station.
   towns,
+}
+
+/// Native Share Render Input v2 output formats.
+enum EqShareFormat {
+  landscape16By9(1, 1920, 1080),
+  information4By5(2, 1080, 1350);
+
+  const EqShareFormat(this.nativeId, this.width, this.height);
+
+  final int nativeId;
+  final int width;
+  final int height;
 }
 
 /// Colour theme. The index is the C ABI value.
@@ -151,7 +194,15 @@ class EqReportPicBindings {
   void freeRenderer(int address) =>
       _free(Pointer<_EqrRenderer>.fromAddress(address));
 
-  ({_RenderV2Dart? render, String? unavailable}) _discoverShareV2() {
+  /// Whether the loaded runtime exposes the ABI 1.3 information card.
+  bool get supportsInformation4By5 => _shareV2.renderWithOptions != null;
+
+  ({
+    _RenderV2Dart? render,
+    _RenderWithOptionsDart? renderWithOptions,
+    String? unavailable,
+  })
+  _discoverShareV2() {
     const abiSymbol = 'eqr_abi_info';
     const renderSymbol = 'eqr_render_share_png_v2';
     const shareInputV2 = 1 << 4;
@@ -159,7 +210,11 @@ class EqReportPicBindings {
     const requiredCapabilities = shareInputV2 | production16By9;
 
     if (!_lib.providesSymbol(abiSymbol)) {
-      return (render: null, unavailable: 'Missing $abiSymbol');
+      return (
+        render: null,
+        renderWithOptions: null,
+        unavailable: 'Missing $abiSymbol',
+      );
     }
     final abiInfo = _lib.lookupFunction<_AbiInfoC, _AbiInfoDart>(abiSymbol);
     final (abi, capabilities) = using((arena) {
@@ -174,29 +229,48 @@ class EqReportPicBindings {
     if (major != 1 || minor < 2) {
       return (
         render: null,
+        renderWithOptions: null,
         unavailable: 'Unsupported native ABI $major.$minor',
       );
     }
     if ((capabilities & requiredCapabilities) != requiredCapabilities) {
       return (
         render: null,
+        renderWithOptions: null,
         unavailable:
             'Native ABI needs EQR_CAP_SHARE_INPUT_V2 and '
             'EQR_CAP_PRODUCTION_16_9',
       );
     }
     if (!_lib.providesSymbol(renderSymbol)) {
-      return (render: null, unavailable: 'Missing $renderSymbol');
+      return (
+        render: null,
+        renderWithOptions: null,
+        unavailable: 'Missing $renderSymbol',
+      );
     }
+    const optionsSymbol = 'eqr_render_share_png_with_options';
+    final hasInformationCard =
+        minor >= 3 &&
+        (capabilities & (1 << 9)) != 0 &&
+        _lib.providesSymbol(optionsSymbol);
     return (
+      renderWithOptions: hasInformationCard
+          ? _lib.lookupFunction<_RenderWithOptionsC, _RenderWithOptionsDart>(
+              optionsSymbol,
+            )
+          : null,
       render: _lib.lookupFunction<_RenderV2C, _RenderV2Dart>(renderSymbol),
       unavailable: null,
     );
   }
 
-  EqShareRenderException _shareV2Error(int status) {
+  EqShareRenderException _shareV2Error(
+    int status, [
+    String symbol = 'eqr_render_share_png_v2',
+  ]) {
     // Copy the thread-local diagnostic before making another eqr_* call.
-    final message = _error('eqr_render_share_png_v2 failed ($status)');
+    final message = _error('$symbol failed ($status)');
     final reason = switch (status) {
       -1 => EqShareRenderError.invalidArgument,
       -2 => EqShareRenderError.unsupportedVersion,
@@ -285,7 +359,7 @@ class EqReportPic {
   }
 
   /// Renders original UTF-8 Share Render Input v2 [jsonBytes] to a
-  /// Dart-owned 1920×1080 PNG. The native library validates the input.
+  /// Dart-owned PNG. The native library validates the input.
   ///
   /// Throws [EqShareRenderException] for unsupported native libraries and
   /// native rendering failures. There is no synthetic or legacy fallback.
@@ -293,6 +367,7 @@ class EqReportPic {
     Uint8List jsonBytes, {
     required EqMapMode mode,
     required EqTheme theme,
+    EqShareFormat format = EqShareFormat.landscape16By9,
   }) {
     if (_handle == nullptr) {
       throw EqShareRenderException(
@@ -300,7 +375,31 @@ class EqReportPic {
         EqShareRenderError.invalidArgument,
       );
     }
-    final (:render, :unavailable) = _b._shareV2;
+    if (format == EqShareFormat.information4By5) {
+      final render = _b._shareV2.renderWithOptions;
+      if (render == null) {
+        throw EqShareRenderException(
+          'Native 4:5 rendering requires ABI 1.3, EQR_CAP_PRODUCTION_4_5, '
+          'and eqr_render_share_png_with_options',
+          EqShareRenderError.unsupportedFeature,
+        );
+      }
+      return using((arena) {
+        final options = arena<_EqrShareRenderOptions>()
+          ..ref.size = sizeOf<_EqrShareRenderOptions>()
+          ..ref.format = format.nativeId
+          ..ref.theme = theme.index
+          ..ref.mode = mode.index;
+        return _renderAndCopy(
+          jsonBytes,
+          (input, length, outPtr, outLen) =>
+              render(_handle, input, length, options, outPtr, outLen),
+          (status) =>
+              _b._shareV2Error(status, 'eqr_render_share_png_with_options'),
+        );
+      });
+    }
+    final (:render, :unavailable, renderWithOptions: _) = _b._shareV2;
     if (render == null) {
       throw EqShareRenderException(
         unavailable!,

@@ -22,6 +22,9 @@ build_fixture() {
     -o "$fixtures/$name.$extension"
 }
 build_fixture supported
+build_fixture abi-1-3 -DABI=0x00010003 -DCAPS=0x310 -DWITH_OPTIONS
+build_fixture missing-4-5-symbol -DABI=0x00010003 -DCAPS=0x310
+build_fixture missing-4-5-capability -DABI=0x00010003 -DWITH_OPTIONS
 build_fixture missing-abi -DOMIT_ABI
 build_fixture old-abi -DABI=0x00010001
 build_fixture incompatible-major -DABI=0x00020002

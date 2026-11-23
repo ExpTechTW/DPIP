@@ -35,7 +35,11 @@ typedef PreviewImage = ({
   int capabilities,
 });
 
-Future<PreviewImage> _generate(PreviewScenario scenario, EqTheme theme) async {
+Future<PreviewImage> _generate(
+  PreviewScenario scenario,
+  EqTheme theme,
+  EqShareFormat format,
+) async {
   final input = switch (scenario) {
     PreviewScenario.verified =>
       ReportPictureFixtures.loadVerified().verifiedInput(),
@@ -52,6 +56,7 @@ Future<PreviewImage> _generate(PreviewScenario scenario, EqTheme theme) async {
   final png = await renderPreviewPng(
     (input as EarthquakeShareInputV2).bytes,
     theme,
+    format: format,
   );
   final library = NativeLibrary.open(ReportPicture.libraryName);
   final (abi, capabilities) = readReportPictureAbi(
@@ -62,6 +67,10 @@ Future<PreviewImage> _generate(PreviewScenario scenario, EqTheme theme) async {
   try {
     final frame = await codec.getNextFrame();
     try {
+      if (frame.image.width != format.width ||
+          frame.image.height != format.height) {
+        throw StateError('原生 PNG 尺寸與所選格式不符。');
+      }
       return (
         png: png,
         width: frame.image.width,
@@ -84,13 +93,18 @@ String _hashPng(Uint8List png) => sha256.convert(png).toString();
 Future<Uint8List> renderPreviewPng(
   Uint8List input,
   EqTheme theme, {
+  EqShareFormat format = EqShareFormat.landscape16By9,
   Future<Result<ReportPicture>> Function() open = ReportPicture.open,
 }) async {
   final opened = await open();
   final renderer = opened.valueOrNull ?? (throw opened.failureOrNull!);
   // This request owns the handle even if the screen is disposed mid-render.
   try {
-    final output = await renderer.renderSharePngV2(input, theme: theme);
+    final output = await renderer.renderSharePngV2(
+      input,
+      theme: theme,
+      format: format,
+    );
     return output.valueOrNull ?? (throw output.failureOrNull!);
   } finally {
     await renderer.dispose();
@@ -100,14 +114,16 @@ Future<Uint8List> renderPreviewPng(
 class ReportPicturePreview extends StatefulWidget {
   const ReportPicturePreview({super.key, this.generate = _generate});
 
-  final Future<PreviewImage> Function(PreviewScenario, EqTheme) generate;
+  final Future<PreviewImage> Function(PreviewScenario, EqTheme, EqShareFormat)
+  generate;
 
   @override
   State<ReportPicturePreview> createState() => _ReportPicturePreviewState();
 }
 
 class _ReportPicturePreviewState extends State<ReportPicturePreview> {
-  final _previousHashes = <EqTheme, String>{};
+  final _previousHashes = <(EqShareFormat, EqTheme), String>{};
+  var _format = EqShareFormat.landscape16By9;
   var _theme = EqTheme.light;
   var _scenario = PreviewScenario.verified;
   var _busy = false;
@@ -122,13 +138,14 @@ class _ReportPicturePreviewState extends State<ReportPicturePreview> {
       _resetResult();
     });
     try {
-      final image = await widget.generate(_scenario, _theme);
+      final key = (_format, _theme);
+      final image = await widget.generate(_scenario, _theme, _format);
       if (!mounted) return;
-      final previous = _previousHashes[_theme];
+      final previous = _previousHashes[key];
       setState(() {
         _image = image;
         _matchesPrevious = previous == null ? null : previous == image.sha256;
-        _previousHashes[_theme] = image.sha256;
+        _previousHashes[key] = image.sha256;
       });
     } catch (error) {
       if (mounted) setState(() => _error = error);
@@ -204,6 +221,27 @@ class _ReportPicturePreviewState extends State<ReportPicturePreview> {
                     runSpacing: 8,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
+                      SegmentedButton<EqShareFormat>(
+                        segments: const [
+                          ButtonSegment(
+                            value: EqShareFormat.landscape16By9,
+                            label: Text('16:9'),
+                          ),
+                          ButtonSegment(
+                            value: EqShareFormat.information4By5,
+                            label: Text('4:5'),
+                          ),
+                        ],
+                        selected: {_format},
+                        onSelectionChanged: _busy
+                            ? null
+                            : (formats) {
+                                setState(() {
+                                  _format = formats.single;
+                                  _resetResult();
+                                });
+                              },
+                      ),
                       SegmentedButton<EqTheme>(
                         segments: const [
                           ButtonSegment(
@@ -259,9 +297,9 @@ class _ReportPicturePreviewState extends State<ReportPicturePreview> {
                       'Capabilities 0x${image.capabilities.toRadixString(16)}\n'
                       'PNG SHA-256 ${image.sha256}\n'
                       '${switch (_matchesPrevious) {
-                        null => '此主題首次產圖',
-                        true => '與上一次同主題的 SHA-256 相同',
-                        false => '與上一次同主題的 SHA-256 不同',
+                        null => '此格式與主題首次產圖',
+                        true => '與上一次同格式與主題的 SHA-256 相同',
+                        false => '與上一次同格式與主題的 SHA-256 不同',
                       }}',
                     ),
                     const SizedBox(height: 8),

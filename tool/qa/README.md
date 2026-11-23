@@ -26,12 +26,14 @@ shasum -a 256 -c native/eq_report_pic/android/SHA256SUMS
 ## 手動檢查
 
 - [ ] 讓「臺東縣近海 · 已查證」保持選取，按「產生 PNG」。看到「產圖成功」、
-  `1920 × 1080 px`、ABI `1.2`、Capabilities `0x11f` 及 PNG SHA-256。
+  `1920 × 1080 px`、ABI `1.3`、Capabilities `0x31f` 及 PNG SHA-256。
   尺寸來自解碼後的 PNG；可雙指放大檢視原圖。
 - [ ] 在卡片上核對臺東縣近海、ML 3.9、深度 43.5 km、臺東縣震度 2、花蓮縣震度 1。
   QA 畫面顯示完整報告 ID `115000-2026-0422-111524`，以及 Core v2 原始本文 SHA-256。
   [縣市與五筆測站的查證紀錄](../../test/features/earthquake/domain/fixtures/share_input/README.md)
-- [ ] 按「重新產生 PNG」，確認同主題的 SHA-256 相同。切換深色再產圖，確認配色及 SHA-256
+- [ ] 切到 4:5，確認解碼尺寸為 `1080 × 1350 px`。核對完整地名、最大震度 2、
+  報告 ID、氣象署與 ExpTech Core v2 的完整署名及量表依據網址。
+- [ ] 按「重新產生 PNG」，確認同格式與主題的 SHA-256 相同。切換深色再產圖，確認配色及 SHA-256
   改變，再重新產生一次確認深色也可重現。
 - [ ] 選「缺少身分證據」或「美濃歷史報告」，按「產生 PNG」。確認各自顯示
   `missingSourceIdentity` 或 `missingAreaIdentity` 與 JSON Pointer；按「重試」可再次檢查。
@@ -46,8 +48,10 @@ shasum -a 256 -c native/eq_report_pic/android/SHA256SUMS
 附上 ABI、Capabilities、尺寸與 PNG SHA-256；若失敗，貼上完整錯誤碼、JSON Pointer
 或 Native status，以及啟動指令的相關輸出。
 
-本畫面提供離線 16:9 預覽。現行 PNG 的資料來源命名空間可能以省略號顯示。
+本畫面提供離線 16:9 與 4:5 預覽。16:9 沿用既有來源列。
 若需取出 PNG 檔案，執行
 `tool/dev/qa_report_picture.sh <device-id> --smoke` 並依[原有 smoke 說明](../../ARCHITECTURE.md#offline-smoke-test)
-取得 app 沙盒內的檔案。自動 smoke 仍可直接透過自己的 Dart 入口執行。
+取得 app 沙盒內的 16:9 PNG。另用 `tool/dev/qa_report_picture.sh <device-id> --smoke-4x5`
+獨立驗證 1080×1350，輸出檔名為 `report-picture-4x5-light.png` 及
+`report-picture-4x5-dark.png`。互動預覽可切換 16:9 與 4:5，並依各格式和主題比對重複產圖的 SHA-256。
 原生資產的公開散布與實體裝置驗收仍適用[原生建置限制](../../ARCHITECTURE.md#native-build-inputs)。

@@ -82,6 +82,53 @@ void main() {
         });
       }
 
+      for (final variant in [
+        'supported',
+        'missing-4-5-symbol',
+        'missing-4-5-capability',
+        'abi-1-3',
+      ]) {
+        test('negotiates 4:5 support with $variant', () {
+          final lib = _library(variant);
+          final bindings = EqReportPicBindings(lib);
+          final invalidFrees = lib
+              .lookupFunction<Uint32 Function(), int Function()>(
+                'fixture_invalid_buffer_frees',
+              );
+          final owner = EqReportPic.create(bindings, [
+            Uint8List.fromList([7]),
+          ]);
+          addTearDown(owner.dispose);
+          expect(_render(owner, [3]), [3, 1, 1]);
+          Uint8List portrait() => owner.renderSharePngV2(
+            Uint8List.fromList([4]),
+            mode: EqMapMode.towns,
+            theme: EqTheme.light,
+            format: EqShareFormat.information4By5,
+          );
+          final supported = variant == 'abi-1-3';
+          expect(bindings.supportsInformation4By5, supported);
+          if (supported) {
+            expect(portrait(), [4, 2, 0]);
+          } else {
+            expect(
+              portrait,
+              throwsA(
+                isA<EqShareRenderException>()
+                    .having(
+                      (e) => e.reason,
+                      'reason',
+                      EqShareRenderError.unsupportedFeature,
+                    )
+                    .having((e) => e.nativeStatus, 'native status', isNull),
+              ),
+            );
+          }
+          expect(_render(owner, [5]), [5, 1, 1]);
+          expect(invalidFrees(), 0);
+        });
+      }
+
       test('frees temporary fonts after partial initialization fails', () {
         final bindings = EqReportPicBindings(_library('supported'));
         final fonts = [
