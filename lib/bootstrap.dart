@@ -34,6 +34,7 @@ import 'package:dpip/shared/map/basemap_seeder.dart';
 import 'package:dpip/shared/map/map_connectivity.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/meshtastic/data/dpip_mesh_gateway_impl.dart';
 import 'package:dpip/core/meshtastic/data/mesh_store.dart';
 import 'package:dpip/core/meshtastic/data/meshtastic_client_impl.dart';
@@ -85,7 +86,6 @@ import 'package:dpip/features/meshtastic/meshtastic_providers.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
 import 'package:dpip/features/bug_tracker/bug_tracker_providers.dart';
-import 'package:dpip/features/status/status_providers.dart';
 import 'package:dpip/features/tsunami/tsunami_providers.dart';
 import 'package:dpip/features/typhoon/typhoon_providers.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
@@ -264,6 +264,7 @@ Future<void> bootstrap() async {
   final dio = createDio(etagCache: cache?.etag, usage: cache?.usage);
   final endpointHealth = EndpointHealthMonitor();
   final apiClient = ApiClient(dio, regions, endpointHealth);
+  final statusPage = StatusPageMonitor.over(apiClient);
   // The app's requests recovering is the cue for Android's MapLibre to retry
   // the tiles it gave up on while the network was gone — see [MapConnectivity].
   MapConnectivity.instance.watch(endpointHealth);
@@ -480,6 +481,7 @@ Future<void> bootstrap() async {
     tleStore: TleStore(durable),
     meshGateway: DpipMeshGatewayImpl(meshtastic, () => meshLink.dpipChannel),
     endpointHealth: endpointHealth,
+    statusPage: statusPage,
     etagCache: cache?.etag,
     networkUsage: cache?.usage,
     mapTileCache: mapTileCache,
@@ -534,7 +536,6 @@ Future<void> bootstrap() async {
         ...releaseHighlightsProviders(deps),
         ...sponsorProviders(),
         ...homeProviders(),
-        ...statusProviders(deps),
         ...bugTrackerProviders(deps),
       ],
     ),

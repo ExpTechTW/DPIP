@@ -9,6 +9,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/features/bug_tracker/bug_tracker_counter.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
+import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
@@ -1217,9 +1218,18 @@ class _BugReportCount extends StatelessWidget {
   }
 }
 
+/// The public status page in the app's language: the site serves Chinese at
+/// its root and has English and Japanese editions; every other language reads
+/// the English one.
+String statusPageUrl(Locale locale) => switch (locale.languageCode) {
+  'zh' || 'yue' => 'https://exptech.dev/status/',
+  'ja' => 'https://exptech.dev/ja/status/',
+  _ => 'https://exptech.dev/en/status/',
+};
+
 /// Server status, directly under the announcement card — the same flat,
 /// quiet construction, because a status check is a passive read and needs no
-/// more weight than a link.
+/// more weight than a link. It opens the public status page in the browser.
 class _StatusCard extends StatelessWidget {
   const _StatusCard();
 
@@ -1228,17 +1238,25 @@ class _StatusCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    // The same dot the More tab carries: a service host the client has
-    // stopped reaching is as actionable as a missing permission.
-    final alert = context.select<EndpointHealthMonitor, bool>(
+    // The same dot the More tab carries, lit while either side sees a problem:
+    // a service host this device has stopped reaching, or the status page
+    // itself reporting a partial outage or worse.
+    final unreachable = context.select<EndpointHealthMonitor, bool>(
       (health) => health.needsAttention,
     );
+    final reported = context.select<StatusPageMonitor, bool>(
+      (status) => status.abnormal,
+    );
+    final alert = unreachable || reported;
     return Material(
       color: colors.surfaceContainerHigh,
       borderRadius: AppRadius.large,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.pushNamed(AppRoutes.serverStatus),
+        onTap: () => openExternalLink(
+          context,
+          statusPageUrl(Localizations.localeOf(context)),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Row(
@@ -1275,7 +1293,7 @@ class _StatusCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.xs),
               Icon(
-                Icons.chevron_right,
+                Icons.open_in_new,
                 size: 14,
                 color: colors.onSurfaceVariant.withValues(alpha: 0.6),
               ),

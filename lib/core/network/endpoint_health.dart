@@ -9,11 +9,11 @@
 ///
 /// Outcomes are bucketed by **service × tier × host**: the same region carries
 /// different services (EEW/RTS on `lbApi` — one shared stream feeding both
-/// rows, see [EndpointService.allOfPath] — radar lists on
+/// services, see [EndpointService.allOfPath] — radar lists on
 /// `coreExclusiveApi` → `api.core-tnn1`), and one service's dead host may be
-/// another's healthy one. The More → 伺服器狀態 screen renders this map as a
-/// table — rows are services, columns are tier groups, cells are the regions
-/// each service was observed on.
+/// another's healthy one. [EndpointHealthMonitor.needsAttention] is this
+/// device's half of the More tab's server-status dot; the status page's own
+/// verdict (`StatusPageMonitor`) is the other half.
 library;
 
 import 'package:dpip/core/network/api_paths.dart';
@@ -67,8 +67,8 @@ enum EndpointService {
 
   /// Every service a request to [path] carried: the one [ofPath] names —
   /// except for the shared realtime stream ([ApiPaths.sse]), whose one
-  /// connection carries the live EEW and RTS feeds at once, so its outcome is
-  /// both rows' outcome on the status screen.
+  /// connection carries the live EEW and RTS feeds at once, so its outcome
+  /// counts for both.
   static List<EndpointService> allOfPath(String path) =>
       path.startsWith(ApiPaths.sse) ? const [eew, rts] : [ofPath(path)];
 }

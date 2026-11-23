@@ -42,7 +42,6 @@ import 'package:dpip/features/settings/presentation/pages/permissions_page.dart'
 import 'package:dpip/features/sponsor/presentation/pages/sponsor_page.dart';
 import 'package:dpip/features/bug_tracker/presentation/pages/bug_list_page.dart';
 import 'package:dpip/features/bug_tracker/presentation/pages/bug_thread_page.dart';
-import 'package:dpip/features/status/presentation/pages/server_status_page.dart';
 import 'package:dpip/features/weather/domain/weather_ranking.dart';
 import 'package:dpip/features/weather/presentation/pages/weather_ranking_page.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
@@ -404,14 +403,6 @@ final GoRouter appRouter = GoRouter(
       name: AppRoutes.sponsor,
       pageBuilder: (_, state) =>
           MaterialPage<void>(key: state.pageKey, child: const SponsorPage()),
-    ),
-    GoRoute(
-      path: AppRoutes.serverStatusPath,
-      name: AppRoutes.serverStatus,
-      pageBuilder: (_, state) => MaterialPage<void>(
-        key: state.pageKey,
-        child: const ServerStatusPage(),
-      ),
     ),
     GoRoute(
       path: AppRoutes.bugTrackerPath,

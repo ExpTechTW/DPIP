@@ -168,10 +168,6 @@ abstract final class AppRoutes {
   static const String sponsor = 'sponsor';
   static const String sponsorPath = '/sponsor';
 
-  /// ExpTech server status dashboard — pushed from the More hero cards.
-  static const String serverStatus = 'serverStatus';
-  static const String serverStatusPath = '/server-status';
-
   /// The read-only bug-tracker mirror, pushed from the More list.
   static const String bugTracker = 'bugTracker';
   static const String bugTrackerPath = '/bug-tracker';

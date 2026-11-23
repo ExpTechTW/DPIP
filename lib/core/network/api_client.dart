@@ -41,8 +41,8 @@ class ApiClient {
   final RegionSelection _regions;
 
   /// Optional observer of per-host outcomes. When set, every retryable failure
-  /// and every success is reported — the More → 伺服器狀態 screen uses it to
-  /// show which region the client is actually seeing.
+  /// and every success is reported — it is what lights the More tab's
+  /// server-status dot when this device stops reaching a region.
   final EndpointHealthMonitor? _health;
 
   /// GET [path] on [tier] with failover; returns the decoded body.
@@ -164,7 +164,7 @@ class ApiClient {
   /// timeouts, 5xx): a 4xx is a client error that would repeat on every region,
   /// and a cancellation is deliberate, so both throw immediately without trying
   /// the next host. Every failover is logged so a silent region switch is
-  /// visible, and reported to [_health] so the status screen can show it too.
+  /// visible, and reported to [_health] so the server-status dot can show it.
   /// Pass a [cancelToken] to abort a superseded request.
   Future<Response<dynamic>> request(
     ApiTier tier,
@@ -193,7 +193,7 @@ class ApiClient {
         // already separates. A 404 says the route or the resource is wrong, not
         // that the region is sick: replaying an event older than the RTS
         // retention 404s once a second, and charging those to the host parked
-        // `api-1` at `down` on the status screen for the rest of the session.
+        // `api-1` at `down` for the rest of the session.
         if (retryable) _health?.failure(tier, hosts[i], path);
         final isLastHost = i == hosts.length - 1;
         if (isLastHost || !retryable) rethrow;
