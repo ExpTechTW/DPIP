@@ -14,6 +14,7 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../core/storage/memory_db.dart';
@@ -173,6 +174,33 @@ void main() {
     expect(snapshot.hasMatchingReportId, isTrue);
     expect(snapshot.sourceNumbers['/list/臺南市/int'], '9');
     expect(snapshot.sourceNumbers['/list/臺南市/town/新化/int'], '9');
+  });
+
+  test('production share source emits v2 only for the verified body', () async {
+    var body = modern;
+    final repository = _repository(_Origin((_) async => _response(body)));
+    final report = (await repository.get(_modernId)).valueOrNull!;
+    final input = (await repository.getShareInput(report)).valueOrNull!;
+    expect((input as EarthquakeShareInputV2).bytes, _fixture('modern.v2'));
+
+    // The same display model from a revised source needs new evidence.
+    body = utf8.encode(modernText.replaceFirst('"mag":3.9', '"mag":3.90'));
+    final revised = (await repository.getShareInput(report)).valueOrNull;
+    expect(
+      revised,
+      isA<UnsupportedEarthquakeShareInput>().having(
+        (value) => value.code,
+        'code',
+        EarthquakeShareInputError.snapshotMismatch,
+      ),
+    );
+
+    body = _fixture('historical');
+    final historical = (await repository.get(_historicalId)).valueOrNull!;
+    expect(
+      (await repository.getShareInput(historical)).valueOrNull,
+      isA<UnsupportedEarthquakeShareInput>(),
+    );
   });
 
   test(

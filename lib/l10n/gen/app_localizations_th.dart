@@ -947,6 +947,42 @@ class AppLocalizationsTh extends AppLocalizations {
   String get shelterCapacityLabel => 'ความจุ';
 
   @override
+  String get reportShareTitle => 'ภาพแผ่นดินไหวสำหรับแชร์';
+
+  @override
+  String get reportSharePreview => 'ตัวอย่างภาพแผ่นดินไหวขนาด 4:5';
+
+  @override
+  String get reportShareSend => 'แชร์ภาพ';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'ขณะนี้ภาพสำหรับแชร์รองรับเฉพาะภาษาจีนตัวเต็ม (ไต้หวัน)';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'รายงานนี้มีข้อมูลที่ผ่านการตรวจสอบไม่เพียงพอสำหรับสร้างภาพ';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'เวอร์ชันนี้ไม่สามารถโหลดไลบรารีสร้างภาพได้';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'ไลบรารีในเวอร์ชันนี้ไม่รองรับภาพแผ่นดินไหวขนาด 4:5';
+
+  @override
+  String get reportShareTimeout => 'หมดเวลาสร้างภาพ โปรดลองอีกครั้ง';
+
+  @override
+  String get reportShareRenderFailed =>
+      'ไม่สามารถสร้างภาพแผ่นดินไหวได้ โปรดลองอีกครั้ง';
+
+  @override
+  String get reportShareExportFailed =>
+      'ไม่สามารถเปิดเมนูแชร์ของระบบได้ โปรดลองอีกครั้ง';
+
+  @override
   String get reportDetailImage => 'ภาพรายงานแผ่นดินไหว';
 
   @override

@@ -510,6 +510,43 @@ void main() {
     expect(reports.gets, 1);
   });
 
+  testWidgets('changing the route report ID replaces the loaded report', (
+    tester,
+  ) async {
+    final first = _report();
+    final second = _report(id: '115054-2026-0310-150000', location: '臺東縣近海');
+    final reports = _Reports()..next = Ok(first);
+    final settings = SettingsStore.inMemory();
+    final router = nestedRouter(reports);
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: router,
+    );
+    await tester.pumpAndSettle();
+    expect(reports.gets, 1);
+    expect(find.text(first.shortLocation), findsWidgets);
+
+    final pending = Completer<Result<EarthquakeReport>>();
+    reports.pending = pending;
+    router.goNamed(
+      AppRoutes.earthquakeReport,
+      pathParameters: {'id': second.id},
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(reports.gets, 2);
+    expect(find.text(first.shortLocation), findsNothing);
+
+    pending.complete(Ok(second));
+    await tester.pumpAndSettle();
+    expect(find.text(second.shortLocation), findsWidgets);
+  });
+
   testWidgets('a network failure retries into the loaded report', (
     tester,
   ) async {

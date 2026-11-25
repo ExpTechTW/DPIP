@@ -959,6 +959,43 @@ class AppLocalizationsFil extends AppLocalizations {
   String get shelterCapacityLabel => 'Kapasidad';
 
   @override
+  String get reportShareTitle => 'Larawan ng lindol para sa pagbabahagi';
+
+  @override
+  String get reportSharePreview => 'Preview ng 4:5 na larawan ng lindol';
+
+  @override
+  String get reportShareSend => 'Ibahagi ang larawan';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Traditional Chinese (Taiwan) pa lang ang sinusuportahan ng mga larawang ito.';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'Kulang ang beripikadong datos ng ulat para makagawa ng larawan.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'Hindi available ang native na tagagawa ng larawan sa bersyong ito.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'Hindi sinusuportahan ng bersyong ito ang 4:5 na larawan ng lindol.';
+
+  @override
+  String get reportShareTimeout =>
+      'Naubos ang oras sa paggawa ng larawan. Subukan ulit.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Hindi nagawa ang larawan ng lindol. Subukan ulit.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Hindi mabuksan ang menu ng pagbabahagi. Subukan ulit.';
+
+  @override
   String get reportDetailImage => 'Larawan ng Ulat';
 
   @override

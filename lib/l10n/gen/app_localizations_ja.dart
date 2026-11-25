@@ -932,6 +932,39 @@ class AppLocalizationsJa extends AppLocalizations {
   String get shelterCapacityLabel => '収容人数';
 
   @override
+  String get reportShareTitle => '地震の共有画像';
+
+  @override
+  String get reportSharePreview => '4:5 の地震共有画像プレビュー';
+
+  @override
+  String get reportShareSend => '画像を共有';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      '地震の共有画像は現在、繁体字中国語（台湾）のみに対応しています。';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      '確認済みのデータが不足しているため、この地震情報の共有画像を作成できません。';
+
+  @override
+  String get reportShareRendererUnavailable => 'このバージョンではネイティブ画像ライブラリを読み込めません。';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'このバージョンのネイティブライブラリは 4:5 の地震共有画像に対応していません。';
+
+  @override
+  String get reportShareTimeout => '画像の作成がタイムアウトしました。もう一度お試しください。';
+
+  @override
+  String get reportShareRenderFailed => '地震の共有画像を作成できませんでした。もう一度お試しください。';
+
+  @override
+  String get reportShareExportFailed => 'システムの共有画面を開けませんでした。もう一度お試しください。';
+
+  @override
   String get reportDetailImage => '地震レポート画像';
 
   @override

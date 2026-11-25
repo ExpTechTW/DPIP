@@ -141,6 +141,7 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
       value: eewSpokenAnnouncement,
     ),
     Provider<ReportRepository>.value(value: reports),
+    Provider<EarthquakeShareSource>.value(value: reports),
     ChangeNotifierProvider<EewRealtimeController>.value(value: eewController),
     ChangeNotifierProvider<RtsRealtimeController>.value(value: rtsController),
     // The EEW feed under its core supertype + the seismic station directory, so

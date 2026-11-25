@@ -122,6 +122,7 @@ dependencies:
   permission_handler: ^12.0.3
   package_info_plus: ^10.2.0
   path_provider: ^2.1.6
+  share_plus: ^13.3.0
   provider: ^6.1.5+1
   # SQLite access, all files, via one connection pool per file. Replaces
   # sqflite: every operation runs on a background isolate through sqlite3 FFI,

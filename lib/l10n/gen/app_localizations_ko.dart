@@ -931,6 +931,40 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shelterCapacityLabel => '수용 인원';
 
   @override
+  String get reportShareTitle => '지진 공유 이미지';
+
+  @override
+  String get reportSharePreview => '4:5 지진 공유 이미지 미리보기';
+
+  @override
+  String get reportShareSend => '이미지 공유';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      '지진 공유 이미지는 현재 중국어 번체(대만)만 지원합니다.';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      '확인된 데이터가 부족하여 이 지진 보고서의 공유 이미지를 만들 수 없습니다.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      '이 버전에서는 네이티브 이미지 라이브러리를 불러올 수 없습니다.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      '이 버전의 네이티브 라이브러리는 4:5 지진 공유 이미지를 지원하지 않습니다.';
+
+  @override
+  String get reportShareTimeout => '이미지를 만드는 시간이 초과되었습니다. 다시 시도해 주세요.';
+
+  @override
+  String get reportShareRenderFailed => '지진 공유 이미지를 만들 수 없습니다. 다시 시도해 주세요.';
+
+  @override
+  String get reportShareExportFailed => '시스템 공유 화면을 열 수 없습니다. 다시 시도해 주세요.';
+
+  @override
   String get reportDetailImage => '지진 보고서 이미지';
 
   @override

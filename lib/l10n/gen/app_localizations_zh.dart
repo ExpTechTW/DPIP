@@ -927,6 +927,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shelterCapacityLabel => '收容人數';
 
   @override
+  String get reportShareTitle => '地震分享圖';
+
+  @override
+  String get reportSharePreview => '4:5 地震分享圖預覽';
+
+  @override
+  String get reportShareSend => '分享圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖目前僅支援繁體中文（臺灣）。';
+
+  @override
+  String get reportShareUnsupportedReport => '這份地震報告缺少可驗證的資料，無法產生分享圖。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本無法載入地震分享圖的原生函式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '此版本的原生函式庫不支援 4:5 地震分享圖。';
+
+  @override
+  String get reportShareTimeout => '產生分享圖逾時，請重試。';
+
+  @override
+  String get reportShareRenderFailed => '無法產生地震分享圖，請重試。';
+
+  @override
+  String get reportShareExportFailed => '無法開啟系統分享，請重試。';
+
+  @override
   String get reportDetailImage => '地震報告圖';
 
   @override
@@ -4387,6 +4417,36 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get shelterCapacityLabel => '收容人数';
+
+  @override
+  String get reportShareTitle => '地震分享图片';
+
+  @override
+  String get reportSharePreview => '4:5 地震分享图片预览';
+
+  @override
+  String get reportShareSend => '分享图片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享图片目前仅支持繁体中文（台湾）。';
+
+  @override
+  String get reportShareUnsupportedReport => '这份地震报告缺少可验证的数据，无法生成分享图片。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本无法加载地震分享图片所需的原生库。';
+
+  @override
+  String get reportShareRendererIncompatible => '此版本的原生库不支持 4:5 地震分享图片。';
+
+  @override
+  String get reportShareTimeout => '生成分享图片超时，请重试。';
+
+  @override
+  String get reportShareRenderFailed => '无法生成地震分享图片，请重试。';
+
+  @override
+  String get reportShareExportFailed => '无法打开系统分享，请重试。';
 
   @override
   String get reportDetailImage => '地震报告图';
@@ -7850,6 +7910,36 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get shelterCapacityLabel => '收容人數';
 
   @override
+  String get reportShareTitle => '地震分享圖片';
+
+  @override
+  String get reportSharePreview => '4:5 地震分享圖片預覽';
+
+  @override
+  String get reportShareSend => '分享圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖片目前只支援繁體中文（台灣）。';
+
+  @override
+  String get reportShareUnsupportedReport => '這份地震報告缺少可驗證的資料，無法製作分享圖片。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本無法載入地震分享圖片的原生程式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '此版本的原生程式庫不支援 4:5 地震分享圖片。';
+
+  @override
+  String get reportShareTimeout => '製作分享圖片逾時，請重試。';
+
+  @override
+  String get reportShareRenderFailed => '無法製作地震分享圖片，請重試。';
+
+  @override
+  String get reportShareExportFailed => '無法開啟系統分享，請重試。';
+
+  @override
   String get reportDetailImage => '地震報告圖';
 
   @override
@@ -11310,6 +11400,36 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get shelterCapacityLabel => '收容人數';
+
+  @override
+  String get reportShareTitle => '地震分享圖';
+
+  @override
+  String get reportSharePreview => '4:5 地震分享圖預覽';
+
+  @override
+  String get reportShareSend => '分享圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖目前僅支援繁體中文（臺灣）。';
+
+  @override
+  String get reportShareUnsupportedReport => '這份地震報告缺少可驗證的資料，無法產生分享圖。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本無法載入地震分享圖的原生函式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '此版本的原生函式庫不支援 4:5 地震分享圖。';
+
+  @override
+  String get reportShareTimeout => '產生分享圖逾時，請重試。';
+
+  @override
+  String get reportShareRenderFailed => '無法產生地震分享圖，請重試。';
+
+  @override
+  String get reportShareExportFailed => '無法開啟系統分享，請重試。';
 
   @override
   String get reportDetailImage => '地震報告圖';

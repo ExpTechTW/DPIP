@@ -349,7 +349,7 @@ void main() {
     );
 
     final widgets = earthquakeProviders(deps);
-    expect(widgets, hasLength(14));
+    expect(widgets, hasLength(15));
 
     await tester.pumpWidget(
       MultiProvider(providers: widgets, child: const SizedBox.shrink()),
@@ -362,6 +362,10 @@ void main() {
     final spoken = context.read<EewSpokenAnnouncementSettings>();
     expect(context.read<EewRepository>(), isA<EewRepository>());
     expect(context.read<ReportRepository>(), isA<ReportRepository>());
+    expect(
+      context.read<EarthquakeShareSource>(),
+      same(context.read<ReportRepository>()),
+    );
     expect(cwaOnly.enabled, isTrue);
     expect(spoken.enabled, isFalse);
     expect(context.read<RealtimeNotifier<List<Eew>>>(), same(eew));

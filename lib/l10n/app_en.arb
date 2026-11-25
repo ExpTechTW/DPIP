@@ -1241,6 +1241,16 @@
     "description": "Map layer switcher label for the wind-direction layer"
   },
   "shelterCapacityLabel": "Capacity",
+  "reportShareTitle": "Earthquake share image",
+  "reportSharePreview": "4:5 earthquake share image preview",
+  "reportShareSend": "Share image",
+  "reportShareUnsupportedLanguage": "Earthquake share images currently support Traditional Chinese (Taiwan) only.",
+  "reportShareUnsupportedReport": "This report lacks the verified data required to create a share image.",
+  "reportShareRendererUnavailable": "The native image renderer is unavailable in this build.",
+  "reportShareRendererIncompatible": "The native renderer in this build does not support 4:5 earthquake share images.",
+  "reportShareTimeout": "Creating the image timed out. Try again.",
+  "reportShareRenderFailed": "Could not create the earthquake share image. Try again.",
+  "reportShareExportFailed": "Could not open system sharing. Try again.",
   "reportDetailImage": "Report image",
   "@eewCountdown": {
     "description": "S-wave arrival countdown in seconds",

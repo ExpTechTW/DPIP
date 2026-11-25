@@ -927,6 +927,36 @@ class AppLocalizationsYue extends AppLocalizations {
   String get shelterCapacityLabel => '收容人數';
 
   @override
+  String get reportShareTitle => '地震分享圖片';
+
+  @override
+  String get reportSharePreview => '4:5 地震分享圖片預覽';
+
+  @override
+  String get reportShareSend => '分享圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖片暫時只支援台灣繁體中文。';
+
+  @override
+  String get reportShareUnsupportedReport => '呢份地震報告缺少可以核實嘅資料，整唔到分享圖片。';
+
+  @override
+  String get reportShareRendererUnavailable => '呢個版本載入唔到製作地震分享圖片嘅原生程式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '呢個版本嘅原生程式庫唔支援 4:5 地震分享圖片。';
+
+  @override
+  String get reportShareTimeout => '製作分享圖片逾時，請再試。';
+
+  @override
+  String get reportShareRenderFailed => '整唔到地震分享圖片，請再試。';
+
+  @override
+  String get reportShareExportFailed => '開唔到系統分享，請再試。';
+
+  @override
   String get reportDetailImage => '地震報告圖';
 
   @override

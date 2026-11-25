@@ -35,6 +35,21 @@ abstract interface class ImageSaver {
   Future<Result<void>> ensurePermission();
 }
 
+extension GuardedImageSave on ImageSaver {
+  /// A null result means the request became stale before the native write.
+  Future<Result<void>?> saveToGalleryIfCurrent({
+    required Uint8List bytes,
+    required String fileName,
+    required bool Function() isCurrent,
+  }) async {
+    if (!isCurrent()) return null;
+    if (this case final _MethodChannelImageSaver saver) {
+      return saver._save(bytes, fileName, 'image/png', isCurrent);
+    }
+    return saveToGallery(bytes: bytes, fileName: fileName);
+  }
+}
+
 /// The one MethodChannel protocol both platforms speak.
 ///
 /// iOS's `ImageSaverPlugin` and Android's `ImageSaverChannel` implement the same
@@ -83,10 +98,18 @@ base class _MethodChannelImageSaver implements ImageSaver {
     required Uint8List bytes,
     required String fileName,
     String mimeType = 'image/png',
-  }) async {
+  }) async => (await _save(bytes, fileName, mimeType))!;
+
+  Future<Result<void>?> _save(
+    Uint8List bytes,
+    String fileName,
+    String mimeType, [
+    bool Function()? isCurrent,
+  ]) async {
     if (!_isSupportedPlatform) return _unavailable();
 
     final permission = await ensurePermission();
+    if (isCurrent?.call() == false) return null;
     if (permission case Err(:final failure)) return Err(failure);
 
     return _invoke(bytes, fileName, mimeType);

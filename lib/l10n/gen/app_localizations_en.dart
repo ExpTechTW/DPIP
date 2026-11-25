@@ -951,6 +951,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shelterCapacityLabel => 'Capacity';
 
   @override
+  String get reportShareTitle => 'Earthquake share image';
+
+  @override
+  String get reportSharePreview => '4:5 earthquake share image preview';
+
+  @override
+  String get reportShareSend => 'Share image';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Earthquake share images currently support Traditional Chinese (Taiwan) only.';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'This report lacks the verified data required to create a share image.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'The native image renderer is unavailable in this build.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'The native renderer in this build does not support 4:5 earthquake share images.';
+
+  @override
+  String get reportShareTimeout => 'Creating the image timed out. Try again.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Could not create the earthquake share image. Try again.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Could not open system sharing. Try again.';
+
+  @override
   String get reportDetailImage => 'Report image';
 
   @override

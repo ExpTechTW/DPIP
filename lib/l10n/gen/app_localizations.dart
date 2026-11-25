@@ -1812,6 +1812,66 @@ abstract class AppLocalizations {
   /// **'Capacity'**
   String get shelterCapacityLabel;
 
+  /// No description provided for @reportShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake share image'**
+  String get reportShareTitle;
+
+  /// No description provided for @reportSharePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'4:5 earthquake share image preview'**
+  String get reportSharePreview;
+
+  /// No description provided for @reportShareSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Share image'**
+  String get reportShareSend;
+
+  /// No description provided for @reportShareUnsupportedLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake share images currently support Traditional Chinese (Taiwan) only.'**
+  String get reportShareUnsupportedLanguage;
+
+  /// No description provided for @reportShareUnsupportedReport.
+  ///
+  /// In en, this message translates to:
+  /// **'This report lacks the verified data required to create a share image.'**
+  String get reportShareUnsupportedReport;
+
+  /// No description provided for @reportShareRendererUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The native image renderer is unavailable in this build.'**
+  String get reportShareRendererUnavailable;
+
+  /// No description provided for @reportShareRendererIncompatible.
+  ///
+  /// In en, this message translates to:
+  /// **'The native renderer in this build does not support 4:5 earthquake share images.'**
+  String get reportShareRendererIncompatible;
+
+  /// No description provided for @reportShareTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the image timed out. Try again.'**
+  String get reportShareTimeout;
+
+  /// No description provided for @reportShareRenderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the earthquake share image. Try again.'**
+  String get reportShareRenderFailed;
+
+  /// No description provided for @reportShareExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open system sharing. Try again.'**
+  String get reportShareExportFailed;
+
   /// Section header over the CWA-rendered report image
   ///
   /// In en, this message translates to:

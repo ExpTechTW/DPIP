@@ -952,6 +952,42 @@ class AppLocalizationsId extends AppLocalizations {
   String get shelterCapacityLabel => 'Kapasitas';
 
   @override
+  String get reportShareTitle => 'Gambar berbagi gempa';
+
+  @override
+  String get reportSharePreview => 'Pratinjau gambar gempa 4:5';
+
+  @override
+  String get reportShareSend => 'Bagikan gambar';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Gambar berbagi gempa saat ini hanya mendukung bahasa Mandarin Tradisional (Taiwan).';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'Laporan ini tidak memiliki data terverifikasi yang diperlukan untuk membuat gambar.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'Pustaka pembuat gambar tidak tersedia dalam versi ini.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'Pustaka dalam versi ini tidak mendukung gambar berbagi gempa 4:5.';
+
+  @override
+  String get reportShareTimeout => 'Waktu pembuatan gambar habis. Coba lagi.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Gagal membuat gambar berbagi gempa. Coba lagi.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Gagal membuka menu berbagi sistem. Coba lagi.';
+
+  @override
   String get reportDetailImage => 'Gambar laporan';
 
   @override

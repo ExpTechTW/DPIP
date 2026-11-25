@@ -3,8 +3,14 @@ library;
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
+
+/// Resolves share input for the exact report displayed on the detail page.
+abstract interface class EarthquakeShareSource {
+  Future<Result<EarthquakeShareInput>> getShareInput(EarthquakeReport report);
+}
 
 /// Fetches paginated report summaries. Implementations live in `data/`.
 abstract interface class ReportRepository {

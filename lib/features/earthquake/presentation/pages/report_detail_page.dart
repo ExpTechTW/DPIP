@@ -27,6 +27,7 @@ import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_dialog.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -103,10 +104,11 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   void _leaveForList() {
     if (_leaving) return;
     _leaving = true;
+    final reportId = widget.reportId;
     // After the frame: this runs from inside a build, where navigating is not
     // allowed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted || widget.reportId != reportId) return;
       final l10n = AppLocalizations.of(context);
       final messenger = ScaffoldMessenger.maybeOf(context);
       final router = GoRouter.of(context);
@@ -123,6 +125,14 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 
   @override
+  void didUpdateWidget(covariant ReportDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.reportId == oldWidget.reportId) return;
+    _leaving = false;
+    _sheetExpanded.value = false;
+  }
+
+  @override
   void dispose() {
     _sheetExpanded.dispose();
     super.dispose();
@@ -136,6 +146,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
         children: [
           Positioned.fill(
             child: AsyncView<EarthquakeReport>(
+              key: ValueKey(widget.reportId),
               future: () => repository.get(widget.reportId),
               builder: (context, report) => _ReportMapDetail(
                 report: report,
@@ -816,6 +827,25 @@ class _ReportSheetState extends State<_ReportSheet> {
           _ReportHeader(
             report: report,
             replayAvailable: widget.replayAvailable,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          OutlinedButton.icon(
+            onPressed: () {
+              final source = context.read<EarthquakeShareSource>();
+              unawaited(
+                showDialog<void>(
+                  context: context,
+                  builder: (_) => EarthquakeShareDialog(
+                    report: report,
+                    loadInput: () => source.getShareInput(report),
+                    saver: widget.saver,
+                    isReportCurrent: () => mounted && widget.report == report,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.share_outlined),
+            label: Text(l10n.reportShareTitle),
           ),
           const SizedBox(height: AppSpacing.lg),
           SectionHeader(l10n.reportDetailInfo),
