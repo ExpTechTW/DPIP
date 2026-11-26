@@ -99,7 +99,10 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
   late EqTheme _theme;
   Locale? _locale;
   ModalRoute<dynamic>? _route;
-  late Future<Uint8List> _preview;
+  ui.Image? _visiblePreview;
+  Uint8List? _readyPng;
+  _ShareIssue? _issue;
+  bool _rendering = false;
   Timer? _previewTimer;
   final _cache = EarthquakeSharePngCache<_RenderKey>();
   final _inFlight = <_RenderKey, Future<Uint8List>>{};
@@ -129,6 +132,12 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
     _inFlight.clear();
     ++_cacheEpoch;
     _cache.clear();
+    _replacePreview(null);
+  }
+
+  void _replacePreview(ui.Image? image) {
+    _visiblePreview?.dispose();
+    _visiblePreview = image;
   }
 
   @override
@@ -150,6 +159,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
           : EqTheme.light;
     }
     if (locale != _locale) {
+      _replacePreview(null);
       _locale = locale;
       _start();
     }
@@ -164,42 +174,67 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
     }
   }
 
+  bool _isActive(int generation) =>
+      mounted && generation == _generation && _route?.isCurrent == true;
+
   bool _isCurrent(int generation) =>
-      mounted &&
-      generation == _generation &&
-      _route?.isCurrent == true &&
-      widget.isReportCurrent();
+      _isActive(generation) && widget.isReportCurrent();
 
   void _start() {
     final generation = ++_generation;
     _feedback = null;
     _requested = null;
+    _issue = null;
+    _readyPng = null;
+    _rendering = false;
     _previewTimer?.cancel();
-    final result = Completer<Uint8List>();
-    _preview = result.future;
-    // A second selection can replace this future before the next build.
-    _preview.ignore();
-    final timer = Timer(widget.renderTimeout, () {
-      // An already-running FFI call must finish, but retry creates a fresh
-      // request rather than joining the timed-out one.
-      _inFlight.remove(_requested);
-      _requested = null;
-      ++_generation;
-      result.completeError(_ShareIssue.timeout);
+    _previewTimer = Timer(widget.renderTimeout, () {
+      if (!_isActive(generation)) return;
+      setState(() {
+        // FFI must finish, but retry must not join the timed-out request.
+        _inFlight.remove(_requested);
+        _requested = null;
+        ++_generation;
+        _issue = _ShareIssue.timeout;
+        _replacePreview(null);
+      });
     });
-    _previewTimer = timer;
-    unawaited(
-      _generate(generation, _options).then(
-        (png) {
-          timer.cancel();
-          if (!result.isCompleted) result.complete(png);
-        },
-        onError: (Object error, StackTrace stackTrace) {
-          timer.cancel();
-          if (!result.isCompleted) result.completeError(error, stackTrace);
-        },
-      ),
-    );
+    unawaited(_preparePreview(generation, _options));
+  }
+
+  Future<void> _preparePreview(int generation, _ShareOptions options) async {
+    try {
+      final png = await _generate(generation, options);
+      if (!_isActive(generation)) return;
+      if (!widget.isReportCurrent()) throw _ShareIssue.report;
+      // The PNG cache stores compressed bytes. Keep the displayed frame
+      // until the selected PNG has decoded, including on a cache hit.
+      final image = await _decodePreview(
+        png,
+        options.format,
+        targetWidth: math.min(
+          options.format.width,
+          (1440 * options.format.width / options.format.height).round(),
+        ),
+      );
+      if (!_isCurrent(generation)) {
+        image.dispose();
+        if (_isActive(generation)) throw _ShareIssue.report;
+        return;
+      }
+      setState(() {
+        _replacePreview(image);
+        _readyPng = png;
+      });
+    } catch (error) {
+      if (!_isActive(generation)) return;
+      setState(() {
+        _issue = _issueFor(error);
+        _replacePreview(null);
+      });
+    } finally {
+      if (generation == _generation) _previewTimer?.cancel();
+    }
   }
 
   Future<Uint8List> _generate(int generation, _ShareOptions options) async {
@@ -228,8 +263,10 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
       renderSha256: input.renderSha256,
     );
     if (_snapshot != snapshot) {
-      _invalidateSnapshot();
-      _snapshot = snapshot;
+      setState(() {
+        _invalidateSnapshot();
+        _snapshot = snapshot;
+      });
     }
     final key = (
       snapshot: snapshot,
@@ -239,9 +276,10 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
       locale: locale,
     );
     _requested = key;
-    return _cache.lookup(key) ??
-        _inFlight[key] ??
-        _scheduleRender(key, input.bytes);
+    final cached = _cache.lookup(key);
+    if (cached != null) return cached;
+    setState(() => _rendering = true);
+    return _inFlight[key] ?? _scheduleRender(key, input.bytes);
   }
 
   Future<Uint8List> _scheduleRender(_RenderKey key, Uint8List input) {
@@ -271,13 +309,18 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
             png = (response.valueOrNull ?? (throw response.failureOrNull!))
                 .asUnmodifiableView();
             if (!isPending()) throw _ShareIssue.report;
-            await _validatePreview(png, key.format);
+            final validation = await _decodePreview(
+              png,
+              key.format,
+              targetWidth: 256,
+            );
+            validation.dispose();
           } finally {
             await renderer.dispose();
           }
 
-          // A completed render can be useful on a later selection. Only the
-          // FutureBuilder for the current selection can present its result.
+          // A completed render can be useful on a later selection. Preview
+          // publication still depends on the current selection's generation.
           if (isPending() && cacheEpoch == _cacheEpoch) _cache.store(key, png);
           return png;
         })
@@ -292,7 +335,11 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
     return render;
   }
 
-  Future<void> _validatePreview(Uint8List png, EqShareFormat format) async {
+  Future<ui.Image> _decodePreview(
+    Uint8List png,
+    EqShareFormat format, {
+    required int targetWidth,
+  }) async {
     final buffer = await ui.ImmutableBuffer.fromUint8List(png);
     try {
       final descriptor = await ui.ImageDescriptor.encoded(buffer);
@@ -301,10 +348,11 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
             descriptor.height != format.height) {
           throw const FormatException('Unexpected report PNG dimensions');
         }
-        final codec = await descriptor.instantiateCodec(targetWidth: 256);
+        final codec = await descriptor.instantiateCodec(
+          targetWidth: targetWidth,
+        );
         try {
-          final frame = await codec.getNextFrame();
-          frame.image.dispose();
+          return (await codec.getNextFrame()).image;
         } finally {
           codec.dispose();
         }
@@ -436,169 +484,159 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return FutureBuilder(
-      future: _preview,
-      builder: (context, snapshot) {
-        final generation = _generation;
-        final done = snapshot.connectionState == ConnectionState.done;
-        final error = done ? snapshot.error : null;
-        final issue = error == null ? null : _issueFor(error);
-        final png = done && widget.isReportCurrent() ? snapshot.data : null;
-        final message = switch (issue) {
-          _ShareIssue.language => l10n.reportShareUnsupportedLanguage,
-          _ShareIssue.report => l10n.reportShareUnsupportedReport,
-          _ShareIssue.renderer => l10n.reportShareRendererUnavailable,
-          _ShareIssue.incompatible => l10n.reportShareRendererIncompatible,
-          _ShareIssue.timeout => l10n.reportShareTimeout,
-          _ShareIssue.failed => l10n.reportShareRenderFailed,
-          null =>
-            done && png == null ? l10n.reportShareUnsupportedReport : null,
-        };
-        final canRetry =
-            issue == _ShareIssue.failed || issue == _ShareIssue.timeout;
-        return AlertDialog(
-          // The preview and map controls change height as options are tapped.
-          // Keep the format row in place while those changes settle.
-          alignment: Alignment.topCenter,
-          scrollable: true,
-          title: Text(l10n.reportShareTitle),
-          content: SizedBox(
-            width: _previewMaxWidth,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (issue != _ShareIssue.language &&
-                    issue != _ShareIssue.report &&
-                    issue != _ShareIssue.renderer) ...[
-                  _ShareChoices<EqShareFormat>(
-                    label: l10n.reportShareFormat,
-                    options: {
-                      EqShareFormat.landscape16By9: '16:9',
-                      EqShareFormat.information4By5: '4:5',
-                      if (reportPictureStoryQa)
-                        EqShareFormat.story9By16: '9:16',
-                    },
-                    value: _format,
-                    onChanged: _exporting
-                        ? null
-                        : (format) => setState(() {
-                            _format = format;
-                            _start();
-                          }),
-                  ),
-                  if (_options.showsMap) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    _ShareChoices<EqMapMode>(
-                      label: l10n.reportShareMapMode,
-                      options: {
-                        EqMapMode.cluster: l10n.reportShareCluster,
-                        EqMapMode.stations: l10n.reportShareStations,
-                        EqMapMode.towns: l10n.reportShareTowns,
-                      },
-                      value: _mode,
-                      onChanged: _exporting
-                          ? null
-                          : (mode) => setState(() {
-                              _mode = mode;
-                              _start();
-                            }),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.sm),
-                  _ShareChoices<EqTheme>(
-                    label: l10n.reportShareTheme,
-                    options: {
-                      EqTheme.light: l10n.themeLight,
-                      EqTheme.dark: l10n.themeDark,
-                    },
-                    value: _theme,
-                    onChanged: _exporting
-                        ? null
-                        : (theme) => setState(() {
-                            _theme = theme;
-                            _start();
-                          }),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                ],
-                if (message != null)
-                  Semantics(liveRegion: true, child: Text(message))
-                else if (png == null)
-                  Center(
-                    child: CircularProgressIndicator(
-                      semanticsLabel: l10n.commonLoading,
-                    ),
-                  )
-                else
-                  _PngPreview(bytes: png, label: l10n.reportSharePreview),
-                if (_feedback case final feedback?) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  Semantics(
-                    liveRegion: true,
-                    child: Text(switch (feedback) {
-                      _ExportFeedback.saved => l10n.reportDetailImageSaved,
-                      _ExportFeedback.copied => l10n.reportShareCopied,
-                      _ExportFeedback.copyFailed => l10n.reportShareCopyFailed,
-                      ImageSaveFailureReason reason => reason.message(l10n),
-                      _ => l10n.reportShareExportFailed,
-                    }),
-                  ),
-                  if (feedback ==
-                      ImageSaveFailureReason.permissionSettingsRequired)
-                    TextButton(
-                      onPressed: openAppSettingsPage,
-                      child: Text(l10n.permissionOpenSettings),
-                    ),
-                ],
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(done ? l10n.commonClose : l10n.commonCancel),
-            ),
-            if (canRetry)
-              FilledButton(
-                onPressed: () => setState(_start),
-                child: Text(l10n.commonRetry),
-              ),
-            if (png != null) ...[
-              TextButton(
-                onPressed: _exporting
+    final generation = _generation;
+    final current = widget.isReportCurrent();
+    final issue = current ? _issue : _ShareIssue.report;
+    final png = current ? _readyPng : null;
+    final message = switch (issue) {
+      _ShareIssue.language => l10n.reportShareUnsupportedLanguage,
+      _ShareIssue.report => l10n.reportShareUnsupportedReport,
+      _ShareIssue.renderer => l10n.reportShareRendererUnavailable,
+      _ShareIssue.incompatible => l10n.reportShareRendererIncompatible,
+      _ShareIssue.timeout => l10n.reportShareTimeout,
+      _ShareIssue.failed => l10n.reportShareRenderFailed,
+      null => null,
+    };
+    final canRetry =
+        issue == _ShareIssue.failed || issue == _ShareIssue.timeout;
+    return AlertDialog(
+      // The preview and map controls change height as options are tapped.
+      // Keep the format row in place while those changes settle.
+      alignment: Alignment.topCenter,
+      scrollable: true,
+      title: Text(l10n.reportShareTitle),
+      content: SizedBox(
+        width: _previewMaxWidth,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (issue != _ShareIssue.language &&
+                issue != _ShareIssue.report &&
+                issue != _ShareIssue.renderer) ...[
+              _ShareChoices<EqShareFormat>(
+                label: l10n.reportShareFormat,
+                options: {
+                  EqShareFormat.landscape16By9: '16:9',
+                  EqShareFormat.information4By5: '4:5',
+                  if (reportPictureStoryQa) EqShareFormat.story9By16: '9:16',
+                },
+                value: _format,
+                onChanged: _exporting
                     ? null
-                    : () => _export(generation, png, _ExportAction.save),
-                child: Text(l10n.reportDetailImageSave),
+                    : (format) => setState(() {
+                        _format = format;
+                        _start();
+                      }),
               ),
-              TextButton(
-                onPressed: _exporting
-                    ? null
-                    : () => _export(generation, png, _ExportAction.copy),
-                child: Text(l10n.reportShareCopy),
-              ),
-              Builder(
-                builder: (buttonContext) => FilledButton(
-                  onPressed: _exporting
+              if (_options.showsMap) ...[
+                const SizedBox(height: AppSpacing.sm),
+                _ShareChoices<EqMapMode>(
+                  label: l10n.reportShareMapMode,
+                  options: {
+                    EqMapMode.cluster: l10n.reportShareCluster,
+                    EqMapMode.stations: l10n.reportShareStations,
+                    EqMapMode.towns: l10n.reportShareTowns,
+                  },
+                  value: _mode,
+                  onChanged: _exporting
                       ? null
-                      : () {
-                          final box =
-                              buttonContext.findRenderObject()! as RenderBox;
-                          _export(
-                            generation,
-                            png,
-                            _ExportAction.share,
-                            shareOrigin:
-                                box.localToGlobal(Offset.zero) & box.size,
-                          );
-                        },
-                  child: Text(l10n.reportShareSend),
+                      : (mode) => setState(() {
+                          _mode = mode;
+                          _start();
+                        }),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.sm),
+              _ShareChoices<EqTheme>(
+                label: l10n.reportShareTheme,
+                options: {
+                  EqTheme.light: l10n.themeLight,
+                  EqTheme.dark: l10n.themeDark,
+                },
+                value: _theme,
+                onChanged: _exporting
+                    ? null
+                    : (theme) => setState(() {
+                        _theme = theme;
+                        _start();
+                      }),
+              ),
+              const SizedBox(height: AppSpacing.md),
+            ],
+            if (message != null)
+              Semantics(liveRegion: true, child: Text(message))
+            else if (_visiblePreview case final image?)
+              _PngPreview(image: image, label: l10n.reportSharePreview)
+            else if (_snapshot == null || _rendering)
+              Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: l10n.commonLoading,
                 ),
               ),
+            if (_feedback case final feedback?) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Semantics(
+                liveRegion: true,
+                child: Text(switch (feedback) {
+                  _ExportFeedback.saved => l10n.reportDetailImageSaved,
+                  _ExportFeedback.copied => l10n.reportShareCopied,
+                  _ExportFeedback.copyFailed => l10n.reportShareCopyFailed,
+                  ImageSaveFailureReason reason => reason.message(l10n),
+                  _ => l10n.reportShareExportFailed,
+                }),
+              ),
+              if (feedback == ImageSaveFailureReason.permissionSettingsRequired)
+                TextButton(
+                  onPressed: openAppSettingsPage,
+                  child: Text(l10n.permissionOpenSettings),
+                ),
             ],
           ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.commonClose),
+        ),
+        if (canRetry)
+          FilledButton(
+            onPressed: () => setState(_start),
+            child: Text(l10n.commonRetry),
+          ),
+        if (png != null) ...[
+          TextButton(
+            onPressed: _exporting
+                ? null
+                : () => _export(generation, png, _ExportAction.save),
+            child: Text(l10n.reportDetailImageSave),
+          ),
+          TextButton(
+            onPressed: _exporting
+                ? null
+                : () => _export(generation, png, _ExportAction.copy),
+            child: Text(l10n.reportShareCopy),
+          ),
+          Builder(
+            builder: (buttonContext) => FilledButton(
+              onPressed: _exporting
+                  ? null
+                  : () {
+                      final box =
+                          buttonContext.findRenderObject()! as RenderBox;
+                      _export(
+                        generation,
+                        png,
+                        _ExportAction.share,
+                        shareOrigin: box.localToGlobal(Offset.zero) & box.size,
+                      );
+                    },
+              child: Text(l10n.reportShareSend),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -640,47 +678,21 @@ class _ShareChoices<T> extends StatelessWidget {
   );
 }
 
-class _PngPreview extends StatefulWidget {
-  const _PngPreview({required this.bytes, required this.label});
+class _PngPreview extends StatelessWidget {
+  const _PngPreview({required this.image, required this.label});
 
-  final Uint8List bytes;
+  final ui.Image image;
   final String label;
 
   @override
-  State<_PngPreview> createState() => _PngPreviewState();
-}
-
-class _PngPreviewState extends State<_PngPreview> {
-  ImageProvider? _image;
-
-  @override
-  void dispose() {
-    if (_image case final image?) unawaited(image.evict());
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screen = MediaQuery.sizeOf(context);
-    final maxWidth = math.min(_previewMaxWidth, screen.width);
-    final maxHeight = screen.height * .38;
-    final dpr = MediaQuery.devicePixelRatioOf(context);
-    final image = ResizeImage(
-      MemoryImage(widget.bytes),
-      width: math.max(1, (maxWidth * dpr).ceil()),
-      height: math.max(1, (maxHeight * dpr).ceil()),
-      policy: ResizeImagePolicy.fit,
-    );
-    final previous = _image;
-    if (previous != null && previous != image) unawaited(previous.evict());
-    _image = image;
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight),
-      child: Image(
-        image: image,
-        fit: BoxFit.contain,
-        semanticLabel: widget.label,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.sizeOf(context).height * .38,
+    ),
+    child: Semantics(
+      image: true,
+      label: label,
+      child: RawImage(image: image, fit: BoxFit.contain),
+    ),
+  );
 }

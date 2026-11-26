@@ -119,22 +119,31 @@ void main() {
     ),
   );
 
-  Uint8List preview(WidgetTester tester) {
-    final resized =
-        tester.widget<Image>(find.byType(Image)).image as ResizeImage;
-    return (resized.imageProvider as MemoryImage).bytes;
+  ui.Image preview(WidgetTester tester) =>
+      tester.widget<RawImage>(find.byType(RawImage)).image!;
+
+  Future<int> previewPixel(WidgetTester tester) async {
+    final image = preview(tester);
+    final pixel = await tester.runAsync(image.toByteData);
+    return pixel!.getUint32(0);
+  }
+
+  bool canSave(WidgetTester tester) {
+    final button = find.ancestor(of: save, matching: find.byType(TextButton));
+    return button.evaluate().isNotEmpty &&
+        tester.widget<TextButton>(button).onPressed != null;
   }
 
   Future<void> waitForImage(WidgetTester tester) async {
     // The engine decodes asynchronously outside the fake clock.
     for (var i = 0; i < 100; i++) {
       await tester.pump();
-      if (find.byType(Image).evaluate().isNotEmpty) return;
+      if (canSave(tester)) return;
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 10)),
       );
     }
-    expect(find.byType(Image), findsOneWidget);
+    expect(canSave(tester), isTrue);
   }
 
   testWidgets('both themes export the identical bytes shown in the preview', (
@@ -164,22 +173,23 @@ void main() {
       ),
     );
     await waitForImage(tester);
-    expect(preview(tester), lightPng);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
 
     await tester.tap(find.text(l10n.themeDark));
     await tester.pump();
-    expect(find.byType(Image), findsNothing);
+    expect(find.byType(RawImage), findsOneWidget);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(save, findsNothing);
     await waitForImage(tester);
-    final bytes = preview(tester);
-    expect(bytes, darkPng);
+    expect(await previewPixel(tester), 0x000000FF);
     await tester.tap(save);
     await tester.pump();
-    expect(identical(saver.saved, bytes), isTrue);
+    expect(saver.saved, darkPng);
     expect(find.text(l10n.reportDetailImageSaved), findsOneWidget);
     await tester.tap(shareButton);
     await tester.pump();
-    expect(shared, bytes);
+    expect(shared, darkPng);
     expect(find.text(l10n.reportShareExportFailed), findsNothing);
     expect(released, 2);
     expect(requests, [
@@ -259,7 +269,7 @@ void main() {
       ),
     );
     await waitForImage(tester);
-    final card = preview(tester);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
 
     Future<void> select(String label) async {
       await tester.tap(find.text(label));
@@ -270,17 +280,23 @@ void main() {
     await select('16:9');
     await select(l10n.reportShareStations);
     await select(l10n.themeDark);
-    final darkStations = preview(tester);
+    final landscapeWidth = preview(tester).width;
     await select(l10n.themeLight);
     await select(l10n.reportShareCluster);
     await select(l10n.reportShareStations);
     await select(l10n.themeDark);
-    expect(preview(tester), same(darkStations));
+    expect(preview(tester).width, landscapeWidth);
     expect(renders, 4);
     await select('4:5');
-    expect(preview(tester), darkPng);
-    await select(l10n.themeLight);
-    expect(preview(tester), same(card));
+    expect(await previewPixel(tester), 0x000000FF);
+    final darkCard = preview(tester);
+    await tester.tap(find.text(l10n.themeLight));
+    await tester.pump();
+    expect(preview(tester), same(darkCard));
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(canSave(tester), isFalse);
+    await waitForImage(tester);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
     expect(renders, 5);
 
     // The preview's live bytes survive memory pressure, but other selections
@@ -288,6 +304,7 @@ void main() {
     final observer = tester.state(
       find.byType(EarthquakeShareDialog),
     ) as WidgetsBindingObserver;
+    final card = preview(tester);
     observer.didHaveMemoryPressure();
     expect(preview(tester), same(card));
     await select(l10n.themeDark);
@@ -318,7 +335,7 @@ void main() {
     expect(save, findsNothing);
     pending.complete(lightPng);
     await waitForImage(tester);
-    expect(preview(tester), lightPng);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
     expect(requests, [EqTheme.light]);
     expect(releases, 1);
   });
@@ -382,7 +399,7 @@ void main() {
     expect(find.text(l10n.reportShareRenderFailed), findsOneWidget);
     await tester.tap(retry);
     await waitForImage(tester);
-    expect(preview(tester), lightPng);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
     expect(renders, 2);
   });
 
@@ -465,7 +482,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(disposed, isTrue);
     expect(find.text(l10n.reportShareUnsupportedReport), findsOneWidget);
-    expect(find.byType(Image), findsNothing);
+    expect(find.byType(RawImage), findsNothing);
     expect(save, findsNothing);
     expect(shareButton, findsNothing);
   });
@@ -499,7 +516,7 @@ void main() {
     await waitForImage(tester);
     expect(opens, 2);
     expect(releases, 2);
-    expect(preview(tester), darkPng);
+    expect(await previewPixel(tester), 0x000000FF);
   });
 
   testWidgets('closing during Rust work still releases the handle', (
@@ -595,19 +612,19 @@ void main() {
       ),
     );
     await waitForImage(tester);
-    final bytes = preview(tester);
+    final image = preview(tester);
     await tester.tap(save);
     await tester.pump();
     expect(find.text(l10n.reportDetailImageSaveFailed), findsOneWidget);
     await tester.tap(shareButton);
     await tester.pump();
     expect(find.text(l10n.reportShareExportFailed), findsOneWidget);
-    expect(preview(tester), same(bytes));
+    expect(preview(tester), same(image));
 
     saver.error = null;
     await tester.tap(save);
     await tester.pump();
-    expect(identical(saver.saved, bytes), isTrue);
+    expect(saver.saved, lightPng);
     expect(find.text(l10n.reportDetailImageSaved), findsOneWidget);
   });
 
@@ -649,7 +666,7 @@ void main() {
         ),
       );
       await waitForImage(tester);
-      final bytes = preview(tester);
+      final image = preview(tester);
       final copy = find.widgetWithText(TextButton, '複製圖片');
       final semantics = tester.ensureSemantics();
       try {
@@ -660,10 +677,10 @@ void main() {
       await tester.tap(copy);
       await tester.pump();
       expect(calls.map((call) => call.method), ['copyPng']);
-      expect(calls.single.arguments, bytes);
+      expect(calls.single.arguments, lightPng);
       expect(writable.saved, isNull);
       expect(renders, 1);
-      expect(preview(tester), same(bytes));
+      expect(preview(tester), same(image));
       expect(find.text('已複製圖片'), reply == true ? findsOneWidget : findsNothing);
       if (message != null) expect(find.text(message), findsOneWidget);
     });
