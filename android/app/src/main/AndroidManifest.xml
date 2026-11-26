@@ -47,6 +47,16 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="false">
 
+        <provider
+            android:name="com.exptech.dpip.ClipboardImageProvider"
+            android:authorities="${applicationId}.clipboard-images"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/clipboard_image_paths" />
+        </provider>
+
         <!-- Hybrid Composition++ — the map is a platform view, and the default
              strategy is Virtual Display, which the engine itself logs as
              "legacy" and which Flutter's own docs say "can cause jank during

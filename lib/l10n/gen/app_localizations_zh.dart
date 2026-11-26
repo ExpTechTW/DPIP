@@ -963,6 +963,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportShareSend => '分享圖片';
 
   @override
+  String get reportShareCopy => '複製圖片';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '無法複製圖片';
+
+  @override
   String get reportShareUnsupportedLanguage => '地震分享圖目前僅支援繁體中文（臺灣）。';
 
   @override
@@ -4480,6 +4489,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get reportShareSend => '分享图片';
+
+  @override
+  String get reportShareCopy => '复制图片';
+
+  @override
+  String get reportShareCopied => '已复制图片';
+
+  @override
+  String get reportShareCopyFailed => '无法复制图片';
 
   @override
   String get reportShareUnsupportedLanguage => '地震分享图片目前仅支持繁体中文（台湾）。';
@@ -8000,6 +8018,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportShareSend => '分享圖片';
 
   @override
+  String get reportShareCopy => '複製圖片';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '未能複製圖片';
+
+  @override
   String get reportShareUnsupportedLanguage => '地震分享圖片目前只支援繁體中文（台灣）。';
 
   @override
@@ -11517,6 +11544,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get reportShareSend => '分享圖片';
+
+  @override
+  String get reportShareCopy => '複製圖片';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '無法複製圖片';
 
   @override
   String get reportShareUnsupportedLanguage => '地震分享圖目前僅支援繁體中文（臺灣）。';

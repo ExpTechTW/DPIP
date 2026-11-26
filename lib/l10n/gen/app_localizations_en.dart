@@ -990,6 +990,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportShareSend => 'Share image';
 
   @override
+  String get reportShareCopy => 'Copy image';
+
+  @override
+  String get reportShareCopied => 'Image copied';
+
+  @override
+  String get reportShareCopyFailed => 'Could not copy the image';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       'Earthquake share images currently support Traditional Chinese (Taiwan) only.';
 

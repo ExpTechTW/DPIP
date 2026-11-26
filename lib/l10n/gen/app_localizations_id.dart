@@ -991,6 +991,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportShareSend => 'Bagikan gambar';
 
   @override
+  String get reportShareCopy => 'Salin gambar';
+
+  @override
+  String get reportShareCopied => 'Gambar disalin';
+
+  @override
+  String get reportShareCopyFailed => 'Gambar tidak dapat disalin';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       'Gambar berbagi gempa saat ini hanya mendukung bahasa Mandarin Tradisional (Taiwan).';
 

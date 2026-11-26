@@ -968,6 +968,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportShareSend => '이미지 공유';
 
   @override
+  String get reportShareCopy => '이미지 복사';
+
+  @override
+  String get reportShareCopied => '이미지를 복사했습니다';
+
+  @override
+  String get reportShareCopyFailed => '이미지를 복사할 수 없습니다';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       '지진 공유 이미지는 현재 중국어 번체(대만)만 지원합니다.';
 

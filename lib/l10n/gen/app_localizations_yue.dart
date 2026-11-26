@@ -963,6 +963,15 @@ class AppLocalizationsYue extends AppLocalizations {
   String get reportShareSend => '分享圖片';
 
   @override
+  String get reportShareCopy => '複製圖片';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '未能複製圖片';
+
+  @override
   String get reportShareUnsupportedLanguage => '地震分享圖片暫時只支援台灣繁體中文。';
 
   @override

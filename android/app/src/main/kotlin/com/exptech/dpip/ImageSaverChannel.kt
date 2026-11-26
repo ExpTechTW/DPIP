@@ -46,9 +46,24 @@ class ImageSaverChannel(private val context: Context) :
         private const val ALBUM = "DPIP"
     }
 
+    private val clipboard = ClipboardImageStore(context)
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "save" -> save(call, result)
+            "copyPng" -> {
+                val bytes = call.arguments as? ByteArray
+                if (bytes == null || bytes.isEmpty()) {
+                    result.error("invalid_args", "PNG bytes are required", null)
+                    return
+                }
+                try {
+                    clipboard.copyPng(bytes)
+                    result.success(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                } catch (error: Exception) {
+                    result.error("copy_failed", error.message, null)
+                }
+            }
             "status" -> result.success(status())
             else -> result.notImplemented()
         }

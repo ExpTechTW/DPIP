@@ -7,6 +7,7 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/permissions/system_settings.dart';
+import 'package:dpip/core/platform/image_clipboard.dart';
 import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
@@ -21,7 +22,9 @@ import 'package:share_plus/share_plus.dart';
 
 enum _ShareIssue { language, report, renderer, incompatible, timeout, failed }
 
-enum _ExportFeedback { saved, shareFailed }
+enum _ExportFeedback { saved, copied, copyFailed, shareFailed }
+
+enum _ExportAction { save, copy, share }
 
 /// Displays and exports the current PNG rendered for one report.
 class _ShareOptions {
@@ -178,7 +181,8 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
 
   Future<void> _export(
     int generation,
-    Uint8List png, {
+    Uint8List png,
+    _ExportAction action, {
     Rect? shareOrigin,
   }) async {
     if (_exporting || !_isCurrent(generation)) return;
@@ -190,21 +194,29 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
         'dpip-earthquake-${widget.report.id}-${_options.fileSuffix}.png';
     Object? feedback;
     try {
-      if (shareOrigin != null) {
-        final result = await _sharePng(generation, png, fileName, shareOrigin);
-        if (result?.status == ShareResultStatus.unavailable) {
-          feedback = _ExportFeedback.shareFailed;
-        }
-      } else {
-        final result = await widget.saver.saveToGalleryIfCurrent(
-          bytes: png,
-          fileName: fileName,
-          isCurrent: () => _isCurrent(generation),
-        );
-        feedback = result?.when(
-          ok: (_) => _ExportFeedback.saved,
-          err: imageSaveFailureReason,
-        );
+      switch (action) {
+        case _ExportAction.share:
+          final result = await _sharePng(
+            generation,
+            png,
+            fileName,
+            shareOrigin!,
+          );
+          if (result?.status == ShareResultStatus.unavailable) {
+            feedback = _ExportFeedback.shareFailed;
+          }
+        case _ExportAction.save:
+          final result = await widget.saver.saveToGalleryIfCurrent(
+            bytes: png,
+            fileName: fileName,
+            isCurrent: () => _isCurrent(generation),
+          );
+          feedback = result?.when(
+            ok: (_) => _ExportFeedback.saved,
+            err: imageSaveFailureReason,
+          );
+        case _ExportAction.copy:
+          if (await copyPngToClipboard(png)) feedback = _ExportFeedback.copied;
       }
     } catch (error, stackTrace) {
       Log.handle(
@@ -212,9 +224,11 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
         stackTrace,
         'Exporting the earthquake share image failed',
       );
-      feedback = shareOrigin != null
-          ? _ExportFeedback.shareFailed
-          : ImageSaveFailureReason.failed;
+      feedback = switch (action) {
+        _ExportAction.save => ImageSaveFailureReason.failed,
+        _ExportAction.copy => _ExportFeedback.copyFailed,
+        _ExportAction.share => _ExportFeedback.shareFailed,
+      };
     } finally {
       if (mounted) {
         setState(() {
@@ -387,6 +401,8 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
                     liveRegion: true,
                     child: Text(switch (feedback) {
                       _ExportFeedback.saved => l10n.reportDetailImageSaved,
+                      _ExportFeedback.copied => l10n.reportShareCopied,
+                      _ExportFeedback.copyFailed => l10n.reportShareCopyFailed,
                       ImageSaveFailureReason reason => reason.message(l10n),
                       _ => l10n.reportShareExportFailed,
                     }),
@@ -413,8 +429,16 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
               ),
             if (png != null) ...[
               TextButton(
-                onPressed: _exporting ? null : () => _export(generation, png),
+                onPressed: _exporting
+                    ? null
+                    : () => _export(generation, png, _ExportAction.save),
                 child: Text(l10n.reportDetailImageSave),
+              ),
+              TextButton(
+                onPressed: _exporting
+                    ? null
+                    : () => _export(generation, png, _ExportAction.copy),
+                child: Text(l10n.reportShareCopy),
               ),
               Builder(
                 builder: (buttonContext) => FilledButton(
@@ -426,6 +450,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
                           _export(
                             generation,
                             png,
+                            _ExportAction.share,
                             shareOrigin:
                                 box.localToGlobal(Offset.zero) & box.size,
                           );

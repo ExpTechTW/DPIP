@@ -1,6 +1,7 @@
 import Flutter
 import Photos
 import UIKit
+import UniformTypeIdentifiers
 
 /// Saves encoded image bytes into the photo library — the counterpart of
 /// Android's `ImageSaverChannel`, with the same channel name and protocol.
@@ -25,6 +26,13 @@ public class ImageSaverPlugin: NSObject, FlutterPlugin {
     switch call.method {
     case "save":
       save(call.arguments as? [String: Any] ?? [:], result: result)
+    case "copyPng":
+      guard let payload = call.arguments as? FlutterStandardTypedData, !payload.data.isEmpty else {
+        result(FlutterError(code: "invalid_args", message: "PNG bytes are required", details: nil))
+        return
+      }
+      UIPasteboard.general.setData(payload.data, forPasteboardType: UTType.png.identifier)
+      result(true)
     case "status":
       result(statusName(PHPhotoLibrary.authorizationStatus(for: .addOnly)))
     case "request":

@@ -969,6 +969,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportShareSend => '画像を共有';
 
   @override
+  String get reportShareCopy => '画像をコピー';
+
+  @override
+  String get reportShareCopied => '画像をコピーしました';
+
+  @override
+  String get reportShareCopyFailed => '画像をコピーできませんでした';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       '地震の共有画像は現在、繁体字中国語（台湾）のみに対応しています。';
 

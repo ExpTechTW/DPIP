@@ -998,6 +998,15 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportShareSend => 'Ibahagi ang larawan';
 
   @override
+  String get reportShareCopy => 'Kopyahin ang larawan';
+
+  @override
+  String get reportShareCopied => 'Nakopya na ang larawan';
+
+  @override
+  String get reportShareCopyFailed => 'Hindi makopya ang larawan';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       'Traditional Chinese (Taiwan) pa lang ang sinusuportahan ng mga larawang ito.';
 

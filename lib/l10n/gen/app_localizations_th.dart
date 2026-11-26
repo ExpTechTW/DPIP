@@ -986,6 +986,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportShareSend => 'แชร์ภาพ';
 
   @override
+  String get reportShareCopy => 'คัดลอกรูปภาพ';
+
+  @override
+  String get reportShareCopied => 'คัดลอกรูปภาพแล้ว';
+
+  @override
+  String get reportShareCopyFailed => 'ไม่สามารถคัดลอกรูปภาพได้';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       'ขณะนี้ภาพสำหรับแชร์รองรับเฉพาะภาษาจีนตัวเต็ม (ไต้หวัน)';
 

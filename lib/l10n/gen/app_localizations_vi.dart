@@ -988,6 +988,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportShareSend => 'Chia sẻ ảnh';
 
   @override
+  String get reportShareCopy => 'Sao chép hình ảnh';
+
+  @override
+  String get reportShareCopied => 'Đã sao chép hình ảnh';
+
+  @override
+  String get reportShareCopyFailed => 'Không thể sao chép hình ảnh';
+
+  @override
   String get reportShareUnsupportedLanguage =>
       'Ảnh chia sẻ động đất hiện chỉ hỗ trợ tiếng Trung phồn thể (Đài Loan).';
 

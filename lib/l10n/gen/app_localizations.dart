@@ -1884,6 +1884,24 @@ abstract class AppLocalizations {
   /// **'Share image'**
   String get reportShareSend;
 
+  /// No description provided for @reportShareCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy image'**
+  String get reportShareCopy;
+
+  /// No description provided for @reportShareCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Image copied'**
+  String get reportShareCopied;
+
+  /// No description provided for @reportShareCopyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy the image'**
+  String get reportShareCopyFailed;
+
   /// No description provided for @reportShareUnsupportedLanguage.
   ///
   /// In en, this message translates to:

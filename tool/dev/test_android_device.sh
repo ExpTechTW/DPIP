@@ -48,7 +48,10 @@ fi
 # The wrapper and android/local.properties the Gradle call below needs, written
 # the way tool/dev/test_android.sh writes them. After the device checks, so a
 # run with nothing attached still fails without doing this first.
+# Tests that launch MainActivity need the same bootstrap flag as tool/run.sh.
 step "Configuring the Android project for Gradle"
 pinned flutter build apk --config-only
 
-exec android/gradlew -p android :app:connectedProductionDebugAndroidTest "$@"
+dart_defines="$(printf %s 'DPIP_RUN_SH=true' | base64 | tr -d '\n')"
+exec android/gradlew -p android :app:connectedProductionDebugAndroidTest \
+  "-Pdart-defines=$dart_defines" "$@"

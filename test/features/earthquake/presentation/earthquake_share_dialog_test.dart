@@ -457,6 +457,64 @@ void main() {
     expect(find.text(l10n.reportDetailImageSaved), findsOneWidget);
   });
 
+  for (final (reply, message) in [
+    (true, '已複製圖片'),
+    (false, null),
+    (null, '無法複製圖片'),
+  ]) {
+    testWidgets('copy uses the current PNG and reports native reply $reply', (
+      tester,
+    ) async {
+      const channel = MethodChannel('com.exptech.dpip/image_saver');
+      final calls = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+        call,
+      ) async {
+        calls.add(call);
+        if (reply == null) throw PlatformException(code: 'copy_failed');
+        return reply;
+      });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          channel,
+          null,
+        ),
+      );
+
+      var renders = 0;
+      final writable = _Saver();
+      await tester.pumpWidget(
+        dialog(
+          saver: writable,
+          open: () async => Ok(
+            ReportPicture.forTesting((_, _, _, _) async {
+              renders++;
+              return lightPng;
+            }, () {}),
+          ),
+        ),
+      );
+      await waitForImage(tester);
+      final bytes = preview(tester);
+      final copy = find.widgetWithText(TextButton, '複製圖片');
+      final semantics = tester.ensureSemantics();
+      try {
+        expect(find.bySemanticsLabel('複製圖片'), findsOneWidget);
+      } finally {
+        semantics.dispose();
+      }
+      await tester.tap(copy);
+      await tester.pump();
+      expect(calls.map((call) => call.method), ['copyPng']);
+      expect(calls.single.arguments, bytes);
+      expect(writable.saved, isNull);
+      expect(renders, 1);
+      expect(preview(tester), same(bytes));
+      expect(find.text('已複製圖片'), reply == true ? findsOneWidget : findsNothing);
+      if (message != null) expect(find.text(message), findsOneWidget);
+    });
+  }
+
   testWidgets('a report dialog closed during gallery permission never saves', (
     tester,
   ) async {
