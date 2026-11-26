@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:crypto/crypto.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -10,7 +11,8 @@ import 'package:dpip/shared/seismic/report_picture/eq_report_pic_bindings.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
 
-export 'eq_report_pic_bindings.dart' show EqMapMode, EqShareFormat, EqTheme;
+export 'eq_report_pic_bindings.dart'
+    show EqMapMode, EqShareFormat, EqTheme, reportPictureStoryQa;
 
 /// Renders Share Render Input v2 into a Dart-owned PNG at a native share format.
 final class ReportPicture {
@@ -19,12 +21,23 @@ final class ReportPicture {
   @visibleForTesting
   ReportPicture.forTesting(this._render, this._release);
 
-  static const libraryName = 'eq_report_pic';
+  static const libraryName = reportPictureStoryQa
+      ? 'eq_report_pic_story_qa'
+      : 'eq_report_pic';
   static const _maxInputBytes = 1024 * 1024;
   static const _fontAssets = [
-    'assets/fonts/report/mplus-2p-bold.ttf',
-    'assets/fonts/report/GenShinGothic-Bold.ttf',
-    'assets/fonts/report/NotoSansTC-Black.ttf',
+    (
+      'mplus-2p-bold.ttf',
+      '6f1d3d4e52a27922f613861ce7013570a0d3e7ced2a63133656764bbad8bb377',
+    ),
+    (
+      'GenShinGothic-Bold.ttf',
+      '5d2e4192894bf9c41c8fee25ff1c5a1af983e2d489f66f3d6f98f1ac6a6211dd',
+    ),
+    (
+      'NotoSansTC-Black.ttf',
+      '4dd7294060de686017dfa58c999f02ccbb2658a8519f897fa3681e33a66d6aaa',
+    ),
   ];
 
   final Future<Uint8List> Function(Uint8List, EqMapMode, EqTheme, EqShareFormat)
@@ -41,11 +54,16 @@ final class ReportPicture {
 
     try {
       final fonts = <Uint8List>[];
-      for (final asset in _fontAssets) {
-        final data = await rootBundle.load(asset);
-        fonts.add(
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+      for (final (name, hash) in _fontAssets) {
+        final data = await rootBundle.load('assets/fonts/report/$name');
+        final bytes = data.buffer.asUint8List(
+          data.offsetInBytes,
+          data.lengthInBytes,
         );
+        if (sha256.convert(bytes).toString() != hash) {
+          throw StateError('Unexpected report font bytes: $name');
+        }
+        fonts.add(bytes);
       }
       final address = await _createRenderer(fonts);
       return Ok(

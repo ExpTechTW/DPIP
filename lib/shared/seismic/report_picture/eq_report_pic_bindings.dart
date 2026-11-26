@@ -1,6 +1,6 @@
 /// Dart binding for the eq_report_pic C ABI (`include/eq_report_pic.h`).
 ///
-/// Vendored from eq-report-pic d9c7b9e586e433ed703741828f1b9c5f95792fe1.
+/// Based on the C headers at the eq-report-pic revision pinned by DPIP.
 /// DPIP uses NativeLibrary to load it and owns renderer handles in ReportPicture.
 library;
 
@@ -8,6 +8,11 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
+
+/// Story's separate ABI is reachable only in the development flavor.
+const reportPictureStoryQa =
+    kDebugMode && String.fromEnvironment('FLUTTER_APP_FLAVOR') == 'storyqa';
 
 final class _EqrRenderer extends Opaque {}
 
@@ -120,7 +125,8 @@ enum EqMapMode {
 /// Native Share Render Input v2 output formats.
 enum EqShareFormat {
   landscape16By9(1, 1920, 1080),
-  information4By5(2, 1080, 1350);
+  information4By5(2, 1080, 1350),
+  story9By16(3, 1080, 1920);
 
   const EqShareFormat(this.nativeId, this.width, this.height);
 
@@ -196,6 +202,23 @@ class EqReportPicBindings {
 
   /// Whether the loaded runtime exposes the ABI 1.3 information card.
   bool get supportsInformation4By5 => _shareV2.renderWithOptions != null;
+
+  static const _storySymbol = 'eqr_qa_render_story_png_v1';
+
+  late final _RenderWithOptionsDart? _renderStory = _discoverStoryQa();
+
+  bool get supportsStoryQa => reportPictureStoryQa && _renderStory != null;
+
+  _RenderWithOptionsDart? _discoverStoryQa() {
+    if (!reportPictureStoryQa ||
+        !supportsInformation4By5 ||
+        !_lib.providesSymbol(_storySymbol)) {
+      return null;
+    }
+    return _lib.lookupFunction<_RenderWithOptionsC, _RenderWithOptionsDart>(
+      _storySymbol,
+    );
+  }
 
   ({
     _RenderV2Dart? render,
@@ -375,12 +398,17 @@ class EqReportPic {
         EqShareRenderError.invalidArgument,
       );
     }
-    if (format == EqShareFormat.information4By5) {
-      final render = _b._shareV2.renderWithOptions;
+    if (format != EqShareFormat.landscape16By9) {
+      final isStory = format == EqShareFormat.story9By16;
+      final render = isStory
+          ? (reportPictureStoryQa ? _b._renderStory : null)
+          : _b._shareV2.renderWithOptions;
       if (render == null) {
         throw EqShareRenderException(
-          'Native 4:5 rendering requires ABI 1.3, EQR_CAP_PRODUCTION_4_5, '
-          'and eqr_render_share_png_with_options',
+          isStory
+              ? 'Story rendering requires the development QA renderer'
+              : 'Native 4:5 rendering requires ABI 1.3, EQR_CAP_PRODUCTION_4_5, '
+                    'and eqr_render_share_png_with_options',
           EqShareRenderError.unsupportedFeature,
         );
       }
@@ -394,8 +422,12 @@ class EqReportPic {
           jsonBytes,
           (input, length, outPtr, outLen) =>
               render(_handle, input, length, options, outPtr, outLen),
-          (status) =>
-              _b._shareV2Error(status, 'eqr_render_share_png_with_options'),
+          (status) => _b._shareV2Error(
+            status,
+            isStory && reportPictureStoryQa
+                ? EqReportPicBindings._storySymbol
+                : 'eqr_render_share_png_with_options',
+          ),
         );
       });
     }

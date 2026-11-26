@@ -23,6 +23,7 @@ build_fixture() {
 }
 build_fixture supported
 build_fixture abi-1-3 -DABI=0x00010003 -DCAPS=0x310 -DWITH_OPTIONS
+build_fixture story-qa -DABI=0x00010003 -DCAPS=0x31f -DWITH_OPTIONS -DWITH_STORY
 build_fixture missing-4-5-symbol -DABI=0x00010003 -DCAPS=0x310
 build_fixture missing-4-5-capability -DABI=0x00010003 -DWITH_OPTIONS
 build_fixture missing-abi -DOMIT_ABI
@@ -32,7 +33,7 @@ build_fixture missing-v2-capability -DCAPS=0x100
 build_fixture missing-16-9-capability -DCAPS=0x010
 build_fixture missing-render -DOMIT_RENDER
 
-pinned flutter test --dart-define="DPIP_EQR_FFI_FIXTURES=$fixtures" \
+pinned flutter test --flavor storyqa --dart-define="DPIP_EQR_FFI_FIXTURES=$fixtures" \
   test/core/platform/native_library_test.dart \
   test/shared/seismic/report_picture_test.dart \
   test/shared/seismic/eq_report_pic_bindings_test.dart "$@"

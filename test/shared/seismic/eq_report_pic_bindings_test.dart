@@ -82,6 +82,33 @@ void main() {
         });
       }
 
+      test('Story QA uses format 3 and frees the native PNG', () {
+        final library = _library('story-qa');
+        final bindings = EqReportPicBindings(library);
+        final renderer = EqReportPic.create(bindings, [
+          Uint8List.fromList([7]),
+        ]);
+        addTearDown(renderer.dispose);
+        expect(bindings.supportsStoryQa, isTrue);
+        expect(
+          renderer.renderSharePngV2(
+            Uint8List.fromList([4]),
+            format: EqShareFormat.story9By16,
+            mode: EqMapMode.towns,
+            theme: EqTheme.dark,
+          ),
+          [4, 2, 1],
+        );
+        final live = library.lookupFunction<Uint32 Function(), int Function()>(
+          'fixture_outstanding_buffers',
+        );
+        expect(live(), 0);
+        expect(
+          EqReportPicBindings(_library('abi-1-3')).supportsStoryQa,
+          isFalse,
+        );
+      });
+
       for (final variant in [
         'supported',
         'missing-4-5-symbol',

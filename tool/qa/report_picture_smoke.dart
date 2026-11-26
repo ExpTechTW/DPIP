@@ -55,6 +55,7 @@ Future<String> _smoke() async {
     ),
   );
   final portrait = format == EqShareFormat.information4By5;
+  final story = format == EqShareFormat.story9By16;
   final dimensions = '${format.width}x${format.height}';
   final opened = await ReportPicture.open();
   if (expected != 'ready') {
@@ -73,15 +74,22 @@ Future<String> _smoke() async {
     final symbols = [
       ...reportPictureAbiSymbols,
       if (withOptions) reportPictureOptionsSymbol,
+      if (reportPictureStoryQa) 'eqr_qa_render_story_png_v1',
     ];
     for (final symbol in symbols) {
       _check(library.providesSymbol(symbol), 'Missing $symbol');
     }
     _check(
+      library.providesSymbol('eqr_qa_render_story_png_v1') ==
+          reportPictureStoryQa,
+      'Unexpected Story QA symbol for this build',
+    );
+    _check(
       abi >> 16 == 1 &&
           (abi & 0xffff) >= 2 &&
           (capabilities & 0x11f) == 0x11f &&
-          (!portrait || withOptions),
+          (!portrait || withOptions) &&
+          (!story || reportPictureStoryQa),
       'Unexpected native ABI or capabilities: $abi/$capabilities',
     );
 
@@ -178,7 +186,11 @@ Future<String> _smoke() async {
     }
     await _checkPng(dark, EqTheme.dark, format);
     final documents = await getApplicationDocumentsDirectory();
-    final filename = portrait ? 'report-picture-4x5' : 'report-picture';
+    final filename = switch (format) {
+      EqShareFormat.landscape16By9 => 'report-picture',
+      EqShareFormat.information4By5 => 'report-picture-4x5',
+      EqShareFormat.story9By16 => 'report-picture-story',
+    };
     for (final (theme, bytes) in [(EqTheme.light, png), (EqTheme.dark, dark)]) {
       final output = File('${documents.path}/$filename-${theme.name}.png');
       await output.writeAsBytes(bytes, flush: true);

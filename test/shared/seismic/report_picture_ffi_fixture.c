@@ -107,3 +107,13 @@ int32_t eqr_render_share_png_with_options(
                                  options->theme, out_ptr, out_len);
 }
 #endif
+
+#ifdef WITH_STORY
+int32_t eqr_qa_render_story_png_v1(
+    const void *renderer, const uint8_t *json, size_t len,
+    const EqrShareRenderOptions *options, uint8_t **out_ptr, size_t *out_len) {
+  if (options->size != sizeof(*options) || options->format != 3) return -1;
+  return eqr_render_share_png_v2(renderer, json, len, options->mode,
+                                 options->theme, out_ptr, out_len);
+}
+#endif
