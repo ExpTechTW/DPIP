@@ -138,8 +138,8 @@ metadata.
 ### Native build inputs
 
 The native runtime is opt-in. DPIP pins the merged eq-report-pic commit
-`e9f066fb83fabfcd2184d1483d34212534b64e6e`
-([eq-report-pic #16](https://github.com/ExpTechTW/eq-report-pic/pull/16)).
+`76662bb9710eafa2a77a694605513163db7c5967`
+([eq-report-pic #17](https://github.com/ExpTechTW/eq-report-pic/pull/17)), which includes the ABI and packaging from #16.
 The build driver archives that commit and builds from the frozen Cargo lock
 and vendored sources. See the [QA guide](tool/qa/README.md) for launch commands.
 

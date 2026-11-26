@@ -1,12 +1,12 @@
 # 地震分享圖 QA
 
 在 DPIP 根目錄執行。相鄰的 eq-report-pic checkout 必須含有已合併的
-`e9f066fb83fabfcd2184d1483d34212534b64e6e`（Rust #16）。需要 Rust 鎖定工具鏈、
+`76662bb9710eafa2a77a694605513163db7c5967`（Rust #17）。需要 Rust 鎖定工具鏈、
 Xcode、Android NDK `28.2.13676358`，以及 Rust 的 iOS arm64、iOS Simulator
 arm64／x86_64、Android arm64／x86_64 targets。
 
 ```sh
-DPIP_EQR_BUILD="$PWD/native/eq_report_pic/reviewed-e9f066f"
+DPIP_EQR_BUILD="$PWD/native/eq_report_pic/reviewed-76662bb"
 mkdir -p "$(dirname "$DPIP_EQR_BUILD")"
 tool/dev/build_report_picture.sh ../eq-report-pic "$DPIP_EQR_BUILD"
 export DPIP_EQR_BUILD
@@ -82,5 +82,5 @@ tool/dev/verify_report_picture_package.sh android "$apk" "$android_stage" "$zipa
 正式 app 只提供 16:9 和 4:5。ABI 維持 1.3、能力遮罩為 `0x31f`，bit 10 關閉。
 
 Story 保留「開發預覽・底圖完整性未驗證」頁尾。底圖與字型散布權利、地理完整性、
-實體裝置簽署版本與公開發行需各自驗收。Rust #17 尚未合併時，本分支維持 Rust #16
-的報告識別碼呈現。
+實體裝置簽署版本與公開發行需各自驗收。Rust #17 將臺東樣本標為「小區域有感地震」。
+完整的來源 ID 仍用於查證與匯出檔名。

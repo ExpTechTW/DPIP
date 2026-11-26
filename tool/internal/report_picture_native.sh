@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sourced by the native build and launch scripts from the DPIP repository root.
-eqr_revision=e9f066fb83fabfcd2184d1483d34212534b64e6e
+eqr_revision=76662bb9710eafa2a77a694605513163db7c5967
 
 eqr_android_llvm() {
   local sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
