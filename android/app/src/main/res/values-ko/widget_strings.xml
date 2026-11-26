@@ -48,6 +48,9 @@
     <string name="widget_weather_snow">눈</string>
     <string name="widget_weather_fog">안개</string>
     <string name="widget_weather_unknown">알 수 없음</string>
+    <string name="widget_weather_hail">우박</string>
+    <string name="widget_weather_sleet">진눈깨비</string>
+    <string name="widget_weather_thunder">천둥·번개</string>
     <string name="widget_forecast_pop_description">강수 확률 %1$s</string>
     <string name="widget_forecast_pop_unavailable">강수 확률 정보 없음</string>
 

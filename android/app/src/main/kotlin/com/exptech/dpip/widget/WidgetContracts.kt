@@ -26,8 +26,8 @@ enum class WidgetSnapshotKind(val wire: String) {
 /**
  * Dart's `CurrentWeatherWidgetCondition`, spelled the same in the payload.
  *
- * The coarse meaning is versioned here; a finer glyph is derived from
- * `weatherCode` at render time so this enum does not grow a case per icon.
+ * The coarse meaning is versioned here. [WidgetWeatherCondition] derives the
+ * finer glyph at render time, so this enum does not need a case per icon.
  */
 enum class WeatherCondition(val wire: String) {
     Clear("clear"),
@@ -67,6 +67,77 @@ fun weatherConditionForCode(code: Int): WeatherCondition {
         2 -> WeatherCondition.Cloudy
         3 -> WeatherCondition.Overcast
         else -> WeatherCondition.Unknown
+    }
+}
+
+/**
+ * The glyph semantic the Widget draws, finer than [WeatherCondition].
+ *
+ * Hail, mixed rain and snow, and lightning alone need distinct glyphs but share
+ * one coarse condition in the payload, so they are derived at render time rather
+ * than persisted. Both the current observation and the hourly forecast use
+ * [from], so one code draws one glyph.
+ */
+enum class WidgetWeatherCondition {
+    Clear,
+    Cloudy,
+    Overcast,
+    Fog,
+    Rain,
+    Sleet,
+    Snow,
+    Hail,
+    Thunder,
+    Thunderstorm,
+    Unknown,
+    ;
+
+    companion object {
+        /**
+         * Classifies one observation or forecast point.
+         *
+         * The suffix (`code % 100`) names the phenomenon; the family supplies
+         * the plain sky; the text is read only when neither classifies the code.
+         */
+        fun from(weather: String, weatherCode: Int): WidgetWeatherCondition {
+            if (weatherCode > 0) {
+                when (weatherCode % 100) {
+                    3, 4, 19 -> return Thunder
+                    7, 12 -> return Sleet
+                    13, 16, 18 -> return Hail
+                    15 -> return Snow
+                }
+            }
+            val standard = standard(weatherConditionForCode(weatherCode))
+            if (standard != Unknown) return standard
+
+            val hasRain = '雨' in weather
+            val hasSnow = '雪' in weather
+            if ('雷' in weather && hasRain) return Thunderstorm
+            if ('雹' in weather) return Hail
+            if (hasRain && hasSnow) return Sleet
+            if (!hasSnow && '雷' in weather) return Thunder
+            return when {
+                hasSnow -> Snow
+                hasRain -> Rain
+                '霧' in weather || '靄' in weather || '霾' in weather -> Fog
+                '晴' in weather -> Clear
+                "多雲" in weather -> Cloudy
+                '陰' in weather -> Overcast
+                else -> Unknown
+            }
+        }
+
+        private fun standard(condition: WeatherCondition): WidgetWeatherCondition = when (condition) {
+            WeatherCondition.Clear -> Clear
+            WeatherCondition.Cloudy -> Cloudy
+            WeatherCondition.Overcast -> Overcast
+            WeatherCondition.Rain -> Rain
+            WeatherCondition.Thunderstorm -> Thunderstorm
+            WeatherCondition.Snow -> Snow
+            WeatherCondition.Fog -> Fog
+            WeatherCondition.Unknown -> Unknown
+        }
     }
 }
 
@@ -182,7 +253,7 @@ data class ForecastPoint(
     val weatherCode: Int,
     val pop: Int?,
 ) {
-    val condition: WeatherCondition get() = weatherConditionForCode(weatherCode)
+    val condition: WidgetWeatherCondition get() = WidgetWeatherCondition.from(weather, weatherCode)
 
     /** Minutes since local midnight, or null when the label is not `HH:mm`. */
     val minutesSinceMidnight: Int?

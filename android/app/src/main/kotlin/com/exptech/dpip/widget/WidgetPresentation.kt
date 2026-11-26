@@ -37,7 +37,7 @@ data class ForecastPresentation(
      * and the medium layout's whole purpose is the four-line forecast.
      */
     val popText: String,
-    val condition: WeatherCondition,
+    val condition: WidgetWeatherCondition,
     val isNight: Boolean,
 )
 
@@ -80,7 +80,7 @@ data class WidgetPresentation(
     val temperatureText: String?,
     val apparentText: String?,
     val weatherText: String?,
-    val condition: WeatherCondition?,
+    val condition: WidgetWeatherCondition?,
     val isNight: Boolean,
     /** The small layout's metric row and the large grid's first cell. */
     val humidityText: String?,
@@ -430,7 +430,7 @@ object WidgetPresenter {
                 "${strings.apparent} ${temperatureText(it)}"
             },
             weatherText = snapshot.weather,
-            condition = snapshot.condition,
+            condition = WidgetWeatherCondition.from(snapshot.weather, snapshot.weatherCode),
             isNight = isNight,
             // A null reading is drawn as its placeholder, not dropped: iOS shows
             // `--%` and `-- mm`, and the large grid keeps its labels either way.

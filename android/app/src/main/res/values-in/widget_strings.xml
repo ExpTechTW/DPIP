@@ -44,6 +44,9 @@
     <string name="widget_weather_snow">Salju</string>
     <string name="widget_weather_fog">Kabut</string>
     <string name="widget_weather_unknown">Tidak diketahui</string>
+    <string name="widget_weather_hail">Hujan es</string>
+    <string name="widget_weather_sleet">Hujan bercampur salju</string>
+    <string name="widget_weather_thunder">Guntur atau kilat</string>
     <string name="widget_forecast_pop_description">Peluang hujan %1$s</string>
     <string name="widget_forecast_pop_unavailable">Data peluang hujan tidak tersedia</string>
 

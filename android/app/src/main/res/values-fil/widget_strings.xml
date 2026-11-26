@@ -44,6 +44,9 @@
     <string name="widget_weather_snow">Niyebe</string>
     <string name="widget_weather_fog">Makapal na Hamog</string>
     <string name="widget_weather_unknown">Hindi alam</string>
+    <string name="widget_weather_hail">Pag-ulan ng yelo</string>
+    <string name="widget_weather_sleet">Ulan na may niyebe</string>
+    <string name="widget_weather_thunder">Kulog o kidlat</string>
     <string name="widget_forecast_pop_description">Posibilidad ng ulan %1$s</string>
     <string name="widget_forecast_pop_unavailable">Walang datos sa posibilidad ng ulan</string>
 

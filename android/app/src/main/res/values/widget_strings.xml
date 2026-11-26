@@ -67,6 +67,9 @@
     <string name="widget_weather_snow">Snow</string>
     <string name="widget_weather_fog">Fog</string>
     <string name="widget_weather_unknown">Unknown</string>
+    <string name="widget_weather_hail">Hail</string>
+    <string name="widget_weather_sleet">Sleet</string>
+    <string name="widget_weather_thunder">Thunder or lightning</string>
     <string name="widget_forecast_pop_description">Chance of rain %1$s</string>
     <string name="widget_forecast_pop_unavailable">Chance of rain unavailable</string>
 

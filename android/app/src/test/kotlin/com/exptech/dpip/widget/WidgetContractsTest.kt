@@ -30,6 +30,50 @@ class WidgetContractsTest {
     }
 
     @Test
+    fun `widget codes distinguish mixed precipitation hail thunder and thunder snow`() {
+        val cases = mapOf(
+            3 to WidgetWeatherCondition.Thunder,
+            4 to WidgetWeatherCondition.Thunder,
+            7 to WidgetWeatherCondition.Sleet,
+            12 to WidgetWeatherCondition.Sleet,
+            13 to WidgetWeatherCondition.Hail,
+            15 to WidgetWeatherCondition.Snow,
+            16 to WidgetWeatherCondition.Hail,
+            18 to WidgetWeatherCondition.Hail,
+            19 to WidgetWeatherCondition.Thunder,
+        )
+        for (sky in listOf(100, 200, 300)) {
+            for ((suffix, expected) in cases) {
+                val code = sky + suffix
+                val point = ForecastPoint("15:00", 20.0, "短暫雨", code, null)
+                assertEquals("code=$code", expected, point.condition)
+            }
+        }
+        assertEquals(WidgetWeatherCondition.Clear, WidgetWeatherCondition.from("晴", 100))
+        assertEquals(WidgetWeatherCondition.Cloudy, WidgetWeatherCondition.from("多雲", 200))
+        assertEquals(WidgetWeatherCondition.Overcast, WidgetWeatherCondition.from("陰", 300))
+    }
+
+    @Test
+    fun `widget text distinguishes thunder hail rain snow and mixed precipitation`() {
+        val cases = mapOf(
+            "短暫雷陣雨或雪" to WidgetWeatherCondition.Thunderstorm,
+            "雷雪" to WidgetWeatherCondition.Snow,
+            "雷雹" to WidgetWeatherCondition.Hail,
+            "雨雪" to WidgetWeatherCondition.Sleet,
+            "雷聲" to WidgetWeatherCondition.Thunder,
+            "有霾" to WidgetWeatherCondition.Fog,
+            "有雨或雪" to WidgetWeatherCondition.Sleet,
+            "雨夾雪" to WidgetWeatherCondition.Sleet,
+            "積冰" to WidgetWeatherCondition.Unknown,
+        )
+        for ((weather, expected) in cases) {
+            val point = ForecastPoint("15:00", 20.0, weather, 0, null)
+            assertEquals(weather, expected, point.condition)
+        }
+    }
+
+    @Test
     fun `parses the two legal source identifiers and nothing else`() {
         assertEquals(WidgetAddress.CurrentLocation, WidgetAddress.fromSourceIdentifier("current-location"))
         assertEquals(WidgetAddress.Saved("407"), WidgetAddress.fromSourceIdentifier("region:407"))

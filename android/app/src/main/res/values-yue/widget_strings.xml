@@ -48,6 +48,9 @@
     <string name="widget_weather_snow">下雪</string>
     <string name="widget_weather_fog">大霧</string>
     <string name="widget_weather_unknown">未知</string>
+    <string name="widget_weather_hail">冰雹</string>
+    <string name="widget_weather_sleet">雨雪</string>
+    <string name="widget_weather_thunder">雷電</string>
     <string name="widget_forecast_pop_description">落雨機率 %1$s</string>
     <string name="widget_forecast_pop_unavailable">冇落雨機率資料</string>
 

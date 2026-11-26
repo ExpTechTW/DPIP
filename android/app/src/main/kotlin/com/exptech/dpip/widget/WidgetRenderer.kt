@@ -393,40 +393,46 @@ object WidgetRenderer {
      * Never a Material `Icons` codepoint and never a system drawable: the
      * renderer runs in the launcher's process, where the app's bundled font is
      * not resolvable, and a system drawable's name is not a stable contract
-     * across OEM builds. `WeatherCondition.Unknown` — which an unrecognised
-     * code maps to — has its own neutral marker rather than a guessed glyph,
-     * the same rule DESIGN.md states for the Flutter weather font.
+     * across OEM builds. `WidgetWeatherCondition.Unknown` — which an
+     * unrecognised code maps to — has its own neutral marker rather than a
+     * guessed glyph.
      */
-    private fun iconResource(condition: WeatherCondition?, isNight: Boolean): Int = when (condition) {
-        WeatherCondition.Clear ->
+    private fun iconResource(condition: WidgetWeatherCondition?, isNight: Boolean): Int = when (condition) {
+        WidgetWeatherCondition.Clear ->
             if (isNight) R.drawable.ic_widget_weather_clear_night
             else R.drawable.ic_widget_weather_clear_day
 
-        WeatherCondition.Cloudy ->
+        WidgetWeatherCondition.Cloudy ->
             if (isNight) R.drawable.ic_widget_weather_cloudy_night
             else R.drawable.ic_widget_weather_cloudy_day
 
-        WeatherCondition.Overcast -> R.drawable.ic_widget_weather_overcast
-        WeatherCondition.Rain -> R.drawable.ic_widget_weather_rain
-        WeatherCondition.Thunderstorm -> R.drawable.ic_widget_weather_thunderstorm
-        WeatherCondition.Snow -> R.drawable.ic_widget_weather_snow
-        WeatherCondition.Fog -> R.drawable.ic_widget_weather_fog
-        WeatherCondition.Unknown, null -> R.drawable.ic_widget_weather_unknown
+        WidgetWeatherCondition.Overcast -> R.drawable.ic_widget_weather_overcast
+        WidgetWeatherCondition.Rain -> R.drawable.ic_widget_weather_rain
+        WidgetWeatherCondition.Thunderstorm -> R.drawable.ic_widget_weather_thunderstorm
+        WidgetWeatherCondition.Snow -> R.drawable.ic_widget_weather_snow
+        WidgetWeatherCondition.Sleet -> R.drawable.ic_widget_weather_sleet
+        WidgetWeatherCondition.Hail -> R.drawable.ic_widget_weather_hail
+        WidgetWeatherCondition.Thunder -> R.drawable.ic_widget_weather_thunder
+        WidgetWeatherCondition.Fog -> R.drawable.ic_widget_weather_fog
+        WidgetWeatherCondition.Unknown, null -> R.drawable.ic_widget_weather_unknown
     }
 
     private fun secondary(context: Context): Int = context.getColor(R.color.widget_secondary)
 
     /** Mirrors the glyph's meaning in the system language, not the API's text. */
-    private fun conditionDescription(context: Context, condition: WeatherCondition): String =
+    private fun conditionDescription(context: Context, condition: WidgetWeatherCondition): String =
         context.getString(when (condition) {
-            WeatherCondition.Clear -> R.string.widget_weather_clear
-            WeatherCondition.Cloudy -> R.string.widget_weather_cloudy
-            WeatherCondition.Overcast -> R.string.widget_weather_overcast
-            WeatherCondition.Rain -> R.string.widget_weather_rain
-            WeatherCondition.Thunderstorm -> R.string.widget_weather_thunderstorm
-            WeatherCondition.Snow -> R.string.widget_weather_snow
-            WeatherCondition.Fog -> R.string.widget_weather_fog
-            WeatherCondition.Unknown -> R.string.widget_weather_unknown
+            WidgetWeatherCondition.Clear -> R.string.widget_weather_clear
+            WidgetWeatherCondition.Cloudy -> R.string.widget_weather_cloudy
+            WidgetWeatherCondition.Overcast -> R.string.widget_weather_overcast
+            WidgetWeatherCondition.Rain -> R.string.widget_weather_rain
+            WidgetWeatherCondition.Thunderstorm -> R.string.widget_weather_thunderstorm
+            WidgetWeatherCondition.Snow -> R.string.widget_weather_snow
+            WidgetWeatherCondition.Sleet -> R.string.widget_weather_sleet
+            WidgetWeatherCondition.Hail -> R.string.widget_weather_hail
+            WidgetWeatherCondition.Thunder -> R.string.widget_weather_thunder
+            WidgetWeatherCondition.Fog -> R.string.widget_weather_fog
+            WidgetWeatherCondition.Unknown -> R.string.widget_weather_unknown
         })
 
     /**

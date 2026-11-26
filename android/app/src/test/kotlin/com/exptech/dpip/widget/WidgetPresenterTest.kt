@@ -677,6 +677,47 @@ class WidgetPresenterTest {
     }
 
     @Test
+    fun `hourly forecast icons use weather text only when the code is unknown`() {
+        val presentation = present(
+            sizeClass = WidgetSizeClass.Medium,
+            stored = stored(snapshot()),
+            forecast = forecast(points = listOf(
+                ForecastPoint("15:00", 20.0, "短暫雨", 0, 20),
+                ForecastPoint("16:00", 20.0, "短暫雷陣雨", 0, 30),
+                ForecastPoint("17:00", 20.0, "陰", 400, 20),
+                ForecastPoint("18:00", 20.0, "多雲短暫雨", 200, 20),
+                ForecastPoint("19:00", 20.0, "-", 0, 20),
+            )),
+        )
+
+        assertEquals(
+            listOf(
+                WidgetWeatherCondition.Rain,
+                WidgetWeatherCondition.Thunderstorm,
+                WidgetWeatherCondition.Overcast,
+                WidgetWeatherCondition.Cloudy,
+                WidgetWeatherCondition.Unknown,
+            ),
+            presentation.forecast.map { it.condition },
+        )
+    }
+
+    @Test
+    fun `current and hourly classify the same code the same way`() {
+        val hail = snapshot().copy(weather = "冰雹", weatherCode = 213)
+        val presentation = present(
+            sizeClass = WidgetSizeClass.Medium,
+            stored = stored(hail),
+            forecast = forecast(points = listOf(
+                ForecastPoint("15:00", 20.0, "冰雹", 213, 20),
+            )),
+        )
+
+        assertEquals(WidgetWeatherCondition.Hail, presentation.condition)
+        assertEquals(WidgetWeatherCondition.Hail, presentation.forecast.single().condition)
+    }
+
+    @Test
     fun `a compact instance never draws a forecast`() {
         val presentation = present(
             sizeClass = WidgetSizeClass.Small,
