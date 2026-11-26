@@ -33,7 +33,8 @@ build_fixture missing-v2-capability -DCAPS=0x100
 build_fixture missing-16-9-capability -DCAPS=0x010
 build_fixture missing-render -DOMIT_RENDER
 
-pinned flutter test --flavor storyqa --dart-define="DPIP_EQR_FFI_FIXTURES=$fixtures" \
+pinned flutter test --flavor storyqa \
+  --dart-define=DPIP_EQR_STORY_SYMBOL=eqr_qa_render_story_png_v1 --dart-define="DPIP_EQR_FFI_FIXTURES=$fixtures" \
   test/core/platform/native_library_test.dart \
   test/shared/seismic/report_picture_test.dart \
   test/shared/seismic/eq_report_pic_bindings_test.dart "$@"

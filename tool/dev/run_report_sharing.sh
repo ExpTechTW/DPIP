@@ -31,7 +31,19 @@ eqr_stage_fonts "$package"
 shift 6
 
 flavor=production
-if [[ $profile == qa ]]; then flavor=storyqa; fi
+qa_defines=()
+if [[ $profile == qa ]]; then
+  flavor=storyqa
+  story_symbol="$(python3 - "$package/manifest.json" <<'PYQA'
+import json
+import sys
+with open(sys.argv[1]) as manifest:
+    (symbol,) = (name for name in json.load(manifest)["symbols"] if name.startswith("eqr_qa_"))
+    print(symbol)
+PYQA
+)"
+  qa_defines=(--dart-define="DPIP_EQR_STORY_SYMBOL=$story_symbol")
+fi
 if [[ $platform == ios ]]; then
   # Xcode reads this per-invocation file. The project selects the only matching
   # profile, independently of the Flutter flavor passed below.
@@ -62,4 +74,4 @@ else
 fi
 
 printf 'Report renderer staging: %s\n' "$stage" >&2
-exec tool/run.sh --flavor "$flavor" -d "$device" "$@"
+exec tool/run.sh --flavor "$flavor" -d "$device" ${qa_defines[@]+"${qa_defines[@]}"} "$@"

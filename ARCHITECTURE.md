@@ -137,95 +137,44 @@ metadata.
 
 ### Native build inputs
 
-The mobile runtime is opt-in. With a local checkout containing eq-report-pic
-merge commit `d9c7b9e586e433ed703741828f1b9c5f95792fe1`
-([eq-report-pic #13](https://github.com/ExpTechTW/eq-report-pic/pull/13)), run these
-commands from the DPIP repository root.
+The native runtime is opt-in. DPIP pins the merged eq-report-pic commit
+`e9f066fb83fabfcd2184d1483d34212534b64e6e`
+([eq-report-pic #16](https://github.com/ExpTechTW/eq-report-pic/pull/16)).
+The build driver archives that commit and builds from the frozen Cargo lock
+and vendored sources. See the [QA guide](tool/qa/README.md) for launch commands.
 
-```sh
-tool/dev/build_report_picture.sh ios ../eq-report-pic
-tool/dev/build_report_picture.sh android ../eq-report-pic
-shasum -a 256 -c native/eq_report_pic/ios/SHA256SUMS
-shasum -a 256 -c native/eq_report_pic/android/SHA256SUMS
-```
+- iOS Runner selects one verified static archive for the active SDK.
+  `Debug-storyqa` selects the QA archive. Production configurations select
+  the production archive. Force-load, linker roots and export-dynamic keep
+  the selected C ABI visible to `DynamicLibrary.process()`.
+- Android Gradle flavors select their own JNI source sets. Story QA is
+  debug-only, with a distinct application ID and library SONAME; the
+  production flavor uses the original application ID. The NDK pin is
+  `28.2.13676358` and the supported ABIs are arm64-v8a and x86_64.
+- Each invocation stages from a candidate package and a separately trusted
+  manifest into a fresh directory. If staging fails, the app build cannot
+  begin. An ordinary build without a stage has no report renderer.
+- Both profiles expose ABI 1.3 and capability mask `0x31f`. Story uses the
+  extra QA symbol, compiled into the debug QA flavor only. The production
+  options entry point rejects format 3.
+- Both profiles pass the same verified fonts to the renderer in order:
+  M PLUS 2p Bold, Gen Shin Gothic Bold, then Noto Sans TC Black.
+  The final-app verifier checks the actual bundled font hashes, the iOS link
+  map and signed export trie, or the packaged Android ELF bytes and APK
+  page alignment.
 
-The script archives that commit, checks `Cargo.lock`, and builds offline with
-the committed Cargo vendor snapshot and Rust 1.99.1. Install the Rust targets
-for the platform you build.
+Distribution of the native runtime requires clearance for its fonts and
+embedded basemap. Story's rendered diagnostic footer records the outstanding
+geographic validation.
 
-- **iOS** uses Xcode and `aarch64-apple-ios`, `aarch64-apple-ios-sim`, and
-  `x86_64-apple-ios`. Runner picks the static XCFramework slice for the SDK.
-  Linker roots keep all ten ABI symbols through dead stripping for Dart
-  `DynamicLibrary.process()` lookup. The extensions use their own link settings.
-- **Android** uses NDK `28.2.13676358`, API 26, and
-  `aarch64-linux-android` / `x86_64-linux-android`. Set `ANDROID_HOME` or
-  `ANDROID_SDK_ROOT` if needed. Gradle includes the ELF files as `jniLibs`
-  for `arm64-v8a` and `x86_64`. The script checks all ten exports and 16 KiB
-  ELF segment alignment. DPIP excludes `armeabi-v7a` from its supported set.
-  Dart opens `libeq_report_pic.so`.
+### Installed and offline QA
 
-The generated native libraries, fonts, and notices are local build inputs.
-Each platform's `source-revision.txt`, `toolchain.txt`, and `SHA256SUMS` record
-what was built and staged. Flutter packages a single set of the original TTFs
-with their notices. Standard CI builds omit the optional native inputs.
-A missing library or unsupported ABI becomes an ordinary `Failure`.
-Distribution of the native runtime also requires clearance for the embedded
-basemap and assets.
-
-### Interactive QA
-
-See the [地震分享圖 QA guide](tool/qa/README.md) for the development-only
-preview, one-command launch, and manual checks with the verified offline report.
-
-### Offline smoke test
-
-Use the alternate entry point with the original synthetic fixture from
-eq-report-pic's `testdata/share-input-v2/synthetic-zero-missing.json`, checked
-in here for QA. The `.jcs.json` companion is the canonical comparison payload
-and omits fields expected by the renderer.
-
-```sh
-tool/run.sh -d <simulator-or-emulator-id> --target tool/qa/report_picture_smoke.dart \
-  --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < tool/qa/fixtures/report_picture_v2.json | tr -d '\n')"
-```
-
-Check for `REPORT_PICTURE_SMOKE PASS`, the ABI and capabilities, and the
-fixture SHA-256. The smoke test checks queuing, invalid input and version,
-recovery, and disposal. Each `REPORT_PICTURE_PNG` line gives the theme,
-decoded dimensions, SHA-256 and app-sandbox path for one generated PNG.
-Copy `report-picture-light.png` and `report-picture-dark.png` out of the
-debug app to inspect the rendered maps:
-
-```sh
-xcrun simctl get_app_container booted com.exptech.dpip.dpip data
-adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-light.png > report-picture-light.png
-adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-dark.png > report-picture-dark.png
-```
-
-On iOS, the PNGs are under `Documents` in the returned data container.
-
-To render the verified Taitung offshore report through the snapshot and
-adapter, supply the original Core v2 bytes and the independent v2 envelope
-from the [source fixtures](test/features/earthquake/domain/fixtures/share_input/README.md).
-
-```sh
-fixture_dir=test/features/earthquake/domain/fixtures/share_input
-tool/run.sh -d <simulator-or-emulator-id> --no-pub --target tool/qa/report_picture_smoke.dart \
-  --dart-define="DPIP_REPORT_PICTURE_CORE_V2=$(base64 < "$fixture_dir/exptech-modern.json" | tr -d '\n')" \
-  --dart-define="DPIP_REPORT_PICTURE_HISTORICAL=$(base64 < "$fixture_dir/exptech-historical.json" | tr -d '\n')" \
-  --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < "$fixture_dir/exptech-modern.v2.json" | tr -d '\n')"
-```
-
-This mode checks the source fingerprint, the original report ID, the two
-regional intensities, five verified stations and byte equality with the v2
-envelope. It rejects missing identity evidence and checks that the historical
-Meinong fixture cannot render without verified regional and station codes.
-Both themes must return identical bytes on repeated renders of their
-respective inputs.
-
-For a negative smoke test, pass `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unavailable`
-or `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unsupportedAbi` with a build
-prepared without the library or with an incompatible ABI.
+The ordinary report detail page loads the original Core v2 report response.
+The supported report ID, original bytes, source identity, intensity scale
+and magnitude evidence are checked before rendering; a revised body requires
+new verification. The alternate smoke targets under `tool/qa/` exercise the
+same snapshot adapter and worker with the verified offline fixtures.
+The production app entry point does not import them.
 
 Run `tool/dev/test_report_picture.sh` on macOS or Linux for host-side ABI
 and lifecycle tests. It compiles small C test doubles with `cc` and uses

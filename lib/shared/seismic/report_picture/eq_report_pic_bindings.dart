@@ -203,7 +203,9 @@ class EqReportPicBindings {
   /// Whether the loaded runtime exposes the ABI 1.3 information card.
   bool get supportsInformation4By5 => _shareV2.renderWithOptions != null;
 
-  static const _storySymbol = 'eqr_qa_render_story_png_v1';
+  // The QA launcher takes the entry point from the verified native manifest.
+  // A production kernel snapshot has no QA symbol name to look up.
+  static const _storySymbol = String.fromEnvironment('DPIP_EQR_STORY_SYMBOL');
 
   late final _RenderWithOptionsDart? _renderStory = _discoverStoryQa();
 
@@ -211,6 +213,7 @@ class EqReportPicBindings {
 
   _RenderWithOptionsDart? _discoverStoryQa() {
     if (!reportPictureStoryQa ||
+        _storySymbol.isEmpty ||
         !supportsInformation4By5 ||
         !_lib.providesSymbol(_storySymbol)) {
       return null;
