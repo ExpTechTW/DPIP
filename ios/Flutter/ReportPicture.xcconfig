@@ -1,0 +1,4 @@
+// Imported only by the active Xcode invocation via XCODE_XCCONFIG_FILE.
+// The legacy shared native directory is never searched.
+DPIP_EQR_SLICE[sdk=iphoneos*] = ios-arm64
+DPIP_EQR_SLICE[sdk=iphonesimulator*] = ios-arm64_x86_64-simulator

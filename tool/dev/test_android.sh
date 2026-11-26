@@ -9,7 +9,7 @@
 # without this script a Kotlin test is indistinguishable from one that passes.
 # CI runs it from android.yml; see AGENTS.md.
 #
-# Arguments are passed straight to Gradle's `:app:testDebugUnitTest`.
+# Arguments are passed straight to Gradle's `:app:testProductionDebugUnitTest`.
 #
 # The pinned Flutter SDK is required first, through `require_mise`: it is what
 # writes the Gradle wrapper and android/local.properties below, and the build
@@ -32,4 +32,4 @@ require_mise
 step "Configuring the Android project for Gradle"
 pinned flutter build apk --config-only
 
-exec android/gradlew -p android :app:testDebugUnitTest "$@"
+exec android/gradlew -p android :app:testProductionDebugUnitTest "$@"

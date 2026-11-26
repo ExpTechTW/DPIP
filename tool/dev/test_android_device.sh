@@ -15,7 +15,7 @@
 # separate script and not part of `tool/dev/test_android.sh`: a JVM run must stay
 # runnable everywhere. CI runs it from android.yml on an emulator.
 #
-# Arguments are passed straight to Gradle's `:app:connectedDebugAndroidTest`.
+# Arguments are passed straight to Gradle's `:app:connectedProductionDebugAndroidTest`.
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 cd "$(repo_root)"
 
@@ -51,4 +51,4 @@ fi
 step "Configuring the Android project for Gradle"
 pinned flutter build apk --config-only
 
-exec android/gradlew -p android :app:connectedDebugAndroidTest "$@"
+exec android/gradlew -p android :app:connectedProductionDebugAndroidTest "$@"

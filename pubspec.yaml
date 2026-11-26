@@ -176,6 +176,7 @@ dependency_overrides:
       ref: 455f0b33c09064d1943a2750d3ef1667d55d1296
 
 flutter:
+  default-flavor: production
   config:
     enable-swift-package-manager: true
   uses-material-design: true

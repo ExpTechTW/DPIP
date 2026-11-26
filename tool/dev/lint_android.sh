@@ -15,7 +15,7 @@
 # so this fails on anything *new*. Run `./gradlew updateLintBaseline` from
 # android/ to re-record deliberately.
 #
-# Arguments are passed straight to Gradle's `:app:lintDebug`.
+# Arguments are passed straight to Gradle's `:app:lintProductionDebug`.
 #
 # The pinned Flutter SDK is required first, through `require_mise`, for the same
 # reason `tool/dev/test_android.sh` needs it: the Android build reads
@@ -32,4 +32,4 @@ require_mise
 step "Configuring the Android project for Gradle"
 pinned flutter build apk --config-only
 
-exec android/gradlew -p android :app:lintDebug "$@"
+exec android/gradlew -p android :app:lintProductionDebug "$@"
