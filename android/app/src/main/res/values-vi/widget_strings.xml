@@ -44,6 +44,9 @@
     <string name="widget_weather_snow">Tuyết rơi</string>
     <string name="widget_weather_fog">Sương mù</string>
     <string name="widget_weather_unknown">Không rõ</string>
+    <string name="widget_weather_hail">Mưa đá</string>
+    <string name="widget_weather_sleet">Mưa tuyết</string>
+    <string name="widget_weather_thunder">Sấm hoặc chớp</string>
     <string name="widget_forecast_pop_description">Khả năng mưa %1$s</string>
     <string name="widget_forecast_pop_unavailable">Không có dữ liệu khả năng mưa</string>
 

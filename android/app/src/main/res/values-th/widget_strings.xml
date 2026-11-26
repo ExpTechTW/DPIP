@@ -44,6 +44,9 @@
     <string name="widget_weather_snow">หิมะตก</string>
     <string name="widget_weather_fog">หมอกหนา</string>
     <string name="widget_weather_unknown">ไม่ทราบ</string>
+    <string name="widget_weather_hail">ลูกเห็บ</string>
+    <string name="widget_weather_sleet">ฝนปนหิมะ</string>
+    <string name="widget_weather_thunder">ฟ้าร้องหรือฟ้าแลบ</string>
     <string name="widget_forecast_pop_description">โอกาสฝนตก %1$s</string>
     <string name="widget_forecast_pop_unavailable">ไม่มีข้อมูลโอกาสฝนตก</string>
 

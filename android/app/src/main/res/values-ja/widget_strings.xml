@@ -48,6 +48,9 @@
     <string name="widget_weather_snow">雪</string>
     <string name="widget_weather_fog">霧</string>
     <string name="widget_weather_unknown">不明</string>
+    <string name="widget_weather_hail">ひょう</string>
+    <string name="widget_weather_sleet">みぞれ</string>
+    <string name="widget_weather_thunder">雷</string>
     <string name="widget_forecast_pop_description">降水確率 %1$s</string>
     <string name="widget_forecast_pop_unavailable">降水確率のデータなし</string>
 

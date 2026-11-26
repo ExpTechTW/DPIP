@@ -460,8 +460,8 @@ class WidgetRendererTest {
     fun `each forecast hour groups its localized weather and rain probability`() {
         for (size in listOf(WidgetSizeClass.Medium, WidgetSizeClass.Large)) {
             val forecast = listOf(
-                ForecastPresentation("15:00", "27°", "20%", WeatherCondition.Cloudy, false),
-                ForecastPresentation("16:00", "26°", "60%", WeatherCondition.Thunderstorm, false),
+                ForecastPresentation("15:00", "27°", "20%", WidgetWeatherCondition.Cloudy, false),
+                ForecastPresentation("16:00", "26°", "60%", WidgetWeatherCondition.Thunderstorm, false),
             )
             assertEquals(
                 listOf(
@@ -477,14 +477,17 @@ class WidgetRendererTest {
     @org.robolectric.annotation.Config(qualifiers = "en")
     fun `forecast descriptions localize every condition and name an unknown rain probability`() {
         val labels = mapOf(
-            WeatherCondition.Clear to "Clear",
-            WeatherCondition.Cloudy to "Cloudy",
-            WeatherCondition.Overcast to "Overcast",
-            WeatherCondition.Rain to "Rain",
-            WeatherCondition.Thunderstorm to "Thunderstorm",
-            WeatherCondition.Snow to "Snow",
-            WeatherCondition.Fog to "Fog",
-            WeatherCondition.Unknown to "Unknown",
+            WidgetWeatherCondition.Clear to "Clear",
+            WidgetWeatherCondition.Cloudy to "Cloudy",
+            WidgetWeatherCondition.Overcast to "Overcast",
+            WidgetWeatherCondition.Rain to "Rain",
+            WidgetWeatherCondition.Thunderstorm to "Thunderstorm",
+            WidgetWeatherCondition.Snow to "Snow",
+            WidgetWeatherCondition.Sleet to "Sleet",
+            WidgetWeatherCondition.Hail to "Hail",
+            WidgetWeatherCondition.Thunder to "Thunder or lightning",
+            WidgetWeatherCondition.Fog to "Fog",
+            WidgetWeatherCondition.Unknown to "Unknown",
         )
         for ((condition, label) in labels) {
             val point = ForecastPresentation("15:00", "27°", "—", condition, false)
@@ -543,22 +546,28 @@ class WidgetRendererTest {
         val night = true
         val day = false
         val glyphs = listOf(
-            Triple(WeatherCondition.Clear, day, R.drawable.ic_widget_weather_clear_day),
-            Triple(WeatherCondition.Clear, night, R.drawable.ic_widget_weather_clear_night),
-            Triple(WeatherCondition.Cloudy, day, R.drawable.ic_widget_weather_cloudy_day),
-            Triple(WeatherCondition.Cloudy, night, R.drawable.ic_widget_weather_cloudy_night),
-            Triple(WeatherCondition.Overcast, day, R.drawable.ic_widget_weather_overcast),
-            Triple(WeatherCondition.Overcast, night, R.drawable.ic_widget_weather_overcast),
-            Triple(WeatherCondition.Rain, day, R.drawable.ic_widget_weather_rain),
-            Triple(WeatherCondition.Rain, night, R.drawable.ic_widget_weather_rain),
-            Triple(WeatherCondition.Thunderstorm, day, R.drawable.ic_widget_weather_thunderstorm),
-            Triple(WeatherCondition.Thunderstorm, night, R.drawable.ic_widget_weather_thunderstorm),
-            Triple(WeatherCondition.Snow, day, R.drawable.ic_widget_weather_snow),
-            Triple(WeatherCondition.Snow, night, R.drawable.ic_widget_weather_snow),
-            Triple(WeatherCondition.Fog, day, R.drawable.ic_widget_weather_fog),
-            Triple(WeatherCondition.Fog, night, R.drawable.ic_widget_weather_fog),
-            Triple(WeatherCondition.Unknown, day, R.drawable.ic_widget_weather_unknown),
-            Triple(WeatherCondition.Unknown, night, R.drawable.ic_widget_weather_unknown),
+            Triple(WidgetWeatherCondition.Clear, day, R.drawable.ic_widget_weather_clear_day),
+            Triple(WidgetWeatherCondition.Clear, night, R.drawable.ic_widget_weather_clear_night),
+            Triple(WidgetWeatherCondition.Cloudy, day, R.drawable.ic_widget_weather_cloudy_day),
+            Triple(WidgetWeatherCondition.Cloudy, night, R.drawable.ic_widget_weather_cloudy_night),
+            Triple(WidgetWeatherCondition.Overcast, day, R.drawable.ic_widget_weather_overcast),
+            Triple(WidgetWeatherCondition.Overcast, night, R.drawable.ic_widget_weather_overcast),
+            Triple(WidgetWeatherCondition.Rain, day, R.drawable.ic_widget_weather_rain),
+            Triple(WidgetWeatherCondition.Rain, night, R.drawable.ic_widget_weather_rain),
+            Triple(WidgetWeatherCondition.Thunderstorm, day, R.drawable.ic_widget_weather_thunderstorm),
+            Triple(WidgetWeatherCondition.Thunderstorm, night, R.drawable.ic_widget_weather_thunderstorm),
+            Triple(WidgetWeatherCondition.Snow, day, R.drawable.ic_widget_weather_snow),
+            Triple(WidgetWeatherCondition.Snow, night, R.drawable.ic_widget_weather_snow),
+            Triple(WidgetWeatherCondition.Sleet, day, R.drawable.ic_widget_weather_sleet),
+            Triple(WidgetWeatherCondition.Sleet, night, R.drawable.ic_widget_weather_sleet),
+            Triple(WidgetWeatherCondition.Hail, day, R.drawable.ic_widget_weather_hail),
+            Triple(WidgetWeatherCondition.Hail, night, R.drawable.ic_widget_weather_hail),
+            Triple(WidgetWeatherCondition.Thunder, day, R.drawable.ic_widget_weather_thunder),
+            Triple(WidgetWeatherCondition.Thunder, night, R.drawable.ic_widget_weather_thunder),
+            Triple(WidgetWeatherCondition.Fog, day, R.drawable.ic_widget_weather_fog),
+            Triple(WidgetWeatherCondition.Fog, night, R.drawable.ic_widget_weather_fog),
+            Triple(WidgetWeatherCondition.Unknown, day, R.drawable.ic_widget_weather_unknown),
+            Triple(WidgetWeatherCondition.Unknown, night, R.drawable.ic_widget_weather_unknown),
         )
         for ((condition, isNight, expected) in glyphs) {
             val current = WidgetRenderer.render(
@@ -575,7 +584,9 @@ class WidgetRendererTest {
             val hourly = WidgetRenderer.render(
                 context,
                 presentation(WidgetSizeClass.Medium).copy(
-                    forecast = listOf(ForecastPresentation("15:00", "27°", "20%", condition, isNight)),
+                    forecast = listOf(
+                        ForecastPresentation("15:00", "27°", "20%", condition, isNight),
+                    ),
                 ),
                 42,
             ).apply(context, FrameLayout(context))
@@ -599,6 +610,34 @@ class WidgetRendererTest {
             R.drawable.ic_widget_weather_unknown,
             shadowOf(missing.findViewById<ImageView>(R.id.widget_icon).drawable).createdFromResId,
         )
+    }
+
+    @Test
+    @org.robolectric.annotation.Config(qualifiers = "zh-rTW")
+    fun `hourly hail mixed precipitation and thunder render distinct glyphs and announcements`() {
+        val cases = listOf(
+            Triple(ForecastPoint("15:00", 20.0, "有雹", 213, 50), R.drawable.ic_widget_weather_hail, "冰雹"),
+            Triple(ForecastPoint("16:00", 20.0, "雨雪", 0, 50), R.drawable.ic_widget_weather_sleet, "雨雪"),
+            Triple(ForecastPoint("17:00", 20.0, "有閃電", 203, 50), R.drawable.ic_widget_weather_thunder, "雷電"),
+        )
+        for (size in listOf(WidgetSizeClass.Medium, WidgetSizeClass.Large)) {
+            val forecast = cases.mapIndexed { index, (point, _, _) ->
+                ForecastPresentation(point.time, "20°", "50%", point.condition, isNight = index % 2 != 0)
+            }
+            val rendered = WidgetRenderer.render(
+                context,
+                presentation(size).copy(forecast = forecast),
+                42,
+            ).apply(context, FrameLayout(context))
+            val columns = rendered.findViewById<android.widget.LinearLayout>(R.id.widget_forecast_container)
+            assertEquals(cases.size, columns.childCount)
+            for ((index, case) in cases.withIndex()) {
+                val (_, expectedGlyph, expectedLabel) = case
+                val image = columns.getChildAt(index).findViewById<ImageView>(R.id.widget_forecast_icon)
+                assertEquals(expectedGlyph, shadowOf(image.drawable).createdFromResId)
+                assertEquals(expectedLabel, image.contentDescription)
+            }
+        }
     }
 
     @Test
