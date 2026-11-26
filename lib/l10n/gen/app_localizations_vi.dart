@@ -952,7 +952,37 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportShareTitle => 'Ảnh chia sẻ động đất';
 
   @override
-  String get reportSharePreview => 'Xem trước ảnh chia sẻ động đất 4:5';
+  String get reportSharePreview => 'Xem trước ảnh động đất';
+
+  @override
+  String get reportShareFormat => 'Định dạng';
+
+  @override
+  String get reportShareMapMode => 'Kiểu bản đồ';
+
+  @override
+  String get reportShareTheme => 'Chủ đề';
+
+  @override
+  String get reportShareCluster => 'Cụm';
+
+  @override
+  String get reportShareStations => 'Trạm đo';
+
+  @override
+  String get reportShareTowns => 'Địa phương';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Cho phép truy cập ảnh trong Cài đặt rồi thử lưu lại.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Thiết bị của bạn hạn chế quyền truy cập ảnh.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Thiết bị này không hỗ trợ lưu vào thư viện ảnh.';
 
   @override
   String get reportShareSend => 'Chia sẻ ảnh';
@@ -971,7 +1001,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reportShareRendererIncompatible =>
-      'Thư viện gốc trong phiên bản này không hỗ trợ ảnh chia sẻ động đất 4:5.';
+      'Trình kết xuất không hỗ trợ định dạng này.';
 
   @override
   String get reportShareTimeout =>

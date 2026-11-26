@@ -1821,8 +1821,62 @@ abstract class AppLocalizations {
   /// No description provided for @reportSharePreview.
   ///
   /// In en, this message translates to:
-  /// **'4:5 earthquake share image preview'**
+  /// **'Image preview'**
   String get reportSharePreview;
+
+  /// No description provided for @reportShareFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get reportShareFormat;
+
+  /// No description provided for @reportShareMapMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Map style'**
+  String get reportShareMapMode;
+
+  /// No description provided for @reportShareTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get reportShareTheme;
+
+  /// No description provided for @reportShareCluster.
+  ///
+  /// In en, this message translates to:
+  /// **'Clusters'**
+  String get reportShareCluster;
+
+  /// No description provided for @reportShareStations.
+  ///
+  /// In en, this message translates to:
+  /// **'Stations'**
+  String get reportShareStations;
+
+  /// No description provided for @reportShareTowns.
+  ///
+  /// In en, this message translates to:
+  /// **'Townships'**
+  String get reportShareTowns;
+
+  /// No description provided for @reportDetailImageSaveSettingsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photo access in Settings, then try saving again.'**
+  String get reportDetailImageSaveSettingsRequired;
+
+  /// No description provided for @reportDetailImageSaveRestricted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device restricts access to photos.'**
+  String get reportDetailImageSaveRestricted;
+
+  /// No description provided for @reportDetailImageSaveUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to photos is unavailable on this device.'**
+  String get reportDetailImageSaveUnavailable;
 
   /// No description provided for @reportShareSend.
   ///
@@ -1851,7 +1905,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportShareRendererIncompatible.
   ///
   /// In en, this message translates to:
-  /// **'The native renderer in this build does not support 4:5 earthquake share images.'**
+  /// **'The native renderer does not support this format.'**
   String get reportShareRendererIncompatible;
 
   /// No description provided for @reportShareTimeout.

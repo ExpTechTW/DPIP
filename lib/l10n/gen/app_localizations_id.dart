@@ -955,7 +955,37 @@ class AppLocalizationsId extends AppLocalizations {
   String get reportShareTitle => 'Gambar berbagi gempa';
 
   @override
-  String get reportSharePreview => 'Pratinjau gambar gempa 4:5';
+  String get reportSharePreview => 'Pratinjau gambar gempa';
+
+  @override
+  String get reportShareFormat => 'Format';
+
+  @override
+  String get reportShareMapMode => 'Gaya peta';
+
+  @override
+  String get reportShareTheme => 'Tema';
+
+  @override
+  String get reportShareCluster => 'Klaster';
+
+  @override
+  String get reportShareStations => 'Stasiun';
+
+  @override
+  String get reportShareTowns => 'Kecamatan';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Izinkan akses foto di Pengaturan, lalu coba simpan lagi.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Perangkat Anda membatasi akses ke foto.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Penyimpanan ke galeri tidak tersedia di perangkat ini.';
 
   @override
   String get reportShareSend => 'Bagikan gambar';
@@ -974,7 +1004,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get reportShareRendererIncompatible =>
-      'Pustaka dalam versi ini tidak mendukung gambar berbagi gempa 4:5.';
+      'Perender native tidak mendukung format ini.';
 
   @override
   String get reportShareTimeout => 'Waktu pembuatan gambar habis. Coba lagi.';

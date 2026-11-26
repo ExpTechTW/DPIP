@@ -1000,12 +1000,18 @@ void main() {
     // A refusal must say so in its own words, and offer the only way out:
     // Settings, not another tap.
     saver.result = const Err(
-      ImageSaveFailure(ImageSaveFailureReason.permissionDenied, 'refused'),
+      ImageSaveFailure(
+        ImageSaveFailureReason.permissionSettingsRequired,
+        'refused',
+      ),
     );
     await tester.tap(find.byTooltip('Save image'));
     await tester.pump();
 
-    expect(find.text('Allow photo access to save the image'), findsOneWidget);
+    expect(
+      find.text('Allow photo access in Settings, then try saving again.'),
+      findsOneWidget,
+    );
     expect(find.text('Open Settings'), findsOneWidget);
   });
 }

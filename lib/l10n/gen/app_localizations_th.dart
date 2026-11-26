@@ -950,7 +950,37 @@ class AppLocalizationsTh extends AppLocalizations {
   String get reportShareTitle => 'ภาพแผ่นดินไหวสำหรับแชร์';
 
   @override
-  String get reportSharePreview => 'ตัวอย่างภาพแผ่นดินไหวขนาด 4:5';
+  String get reportSharePreview => 'ตัวอย่างภาพแผ่นดินไหว';
+
+  @override
+  String get reportShareFormat => 'รูปแบบ';
+
+  @override
+  String get reportShareMapMode => 'รูปแบบแผนที่';
+
+  @override
+  String get reportShareTheme => 'ธีม';
+
+  @override
+  String get reportShareCluster => 'กลุ่ม';
+
+  @override
+  String get reportShareStations => 'สถานี';
+
+  @override
+  String get reportShareTowns => 'เขตการปกครอง';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'อนุญาตให้เข้าถึงรูปภาพในการตั้งค่า แล้วลองบันทึกอีกครั้ง';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'อุปกรณ์ของคุณจำกัดการเข้าถึงรูปภาพ';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'อุปกรณ์นี้ไม่รองรับการบันทึกลงในคลังรูปภาพ';
 
   @override
   String get reportShareSend => 'แชร์ภาพ';
@@ -968,8 +998,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'เวอร์ชันนี้ไม่สามารถโหลดไลบรารีสร้างภาพได้';
 
   @override
-  String get reportShareRendererIncompatible =>
-      'ไลบรารีในเวอร์ชันนี้ไม่รองรับภาพแผ่นดินไหวขนาด 4:5';
+  String get reportShareRendererIncompatible => 'ตัวเรนเดอร์ไม่รองรับรูปแบบนี้';
 
   @override
   String get reportShareTimeout => 'หมดเวลาสร้างภาพ โปรดลองอีกครั้ง';

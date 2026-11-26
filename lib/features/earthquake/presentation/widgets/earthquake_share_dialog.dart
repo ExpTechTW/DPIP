@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:dpip/app/theme/app_spacing.dart';
@@ -10,18 +11,35 @@ import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 enum _ShareIssue { language, report, renderer, incompatible, timeout, failed }
 
-enum _ExportFeedback { saved, saveFailed, permissionDenied, shareFailed }
+enum _ExportFeedback { saved, shareFailed }
 
-/// A single 4:5 information card. Each attempt owns its renderer until Rust
-/// returns, even if the user closes the dialog or changes the theme first.
+/// Displays and exports the current PNG rendered for one report.
+class _ShareOptions {
+  const _ShareOptions(this.format, this.mode, this.theme);
+
+  final EqShareFormat format;
+  final EqMapMode mode;
+  final EqTheme theme;
+
+  bool get showsMap => format != EqShareFormat.information4By5;
+
+  String get fileSuffix => switch (format) {
+    EqShareFormat.information4By5 => '${theme.name}-4x5',
+    EqShareFormat.landscape16By9 => '${theme.name}-16x9-${mode.name}',
+    EqShareFormat.story9By16 => '${theme.name}-9x16-${mode.name}',
+  };
+}
+
 class EarthquakeShareDialog extends StatefulWidget {
   const EarthquakeShareDialog({
     super.key,
@@ -47,7 +65,14 @@ class EarthquakeShareDialog extends StatefulWidget {
 }
 
 class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
-  static const _format = EqShareFormat.information4By5;
+  EqShareFormat _format = EqShareFormat.information4By5;
+  EqMapMode _mode = EqMapMode.cluster;
+
+  _ShareOptions get _options => _ShareOptions(
+    _format,
+    _format == EqShareFormat.information4By5 ? EqMapMode.cluster : _mode,
+    _theme,
+  );
 
   late EqTheme _theme;
   Locale? _locale;
@@ -56,7 +81,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
   Future<void> _renderTail = Future.value();
   int _generation = 0;
   bool _exporting = false;
-  _ExportFeedback? _feedback;
+  Object? _feedback;
 
   @override
   void didChangeDependencies() {
@@ -89,7 +114,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
   void _start() {
     final generation = ++_generation;
     _feedback = null;
-    _preview = _generate(generation, _theme).timeout(
+    _preview = _generate(generation, _options).timeout(
       widget.renderTimeout,
       onTimeout: () {
         if (generation == _generation) ++_generation;
@@ -98,7 +123,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
     );
   }
 
-  Future<Uint8List> _generate(int generation, EqTheme theme) async {
+  Future<Uint8List> _generate(int generation, _ShareOptions options) async {
     if (_locale != kHomeLocale) throw _ShareIssue.language;
     final loaded = await widget.loadInput();
     if (loaded.failureOrNull case final failure?) throw failure;
@@ -115,12 +140,13 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
         if (!_isCurrent(generation)) throw _ShareIssue.report;
         final response = await renderer.renderSharePngV2(
           input.bytes,
-          theme: theme,
-          format: _format,
+          mode: options.mode,
+          theme: options.theme,
+          format: options.format,
         );
         final png = response.valueOrNull ?? (throw response.failureOrNull!);
         if (!_isCurrent(generation)) throw _ShareIssue.report;
-        await _validatePreview(png);
+        await _validatePreview(png, options.format);
         return png.asUnmodifiableView();
       } finally {
         await renderer.dispose();
@@ -133,13 +159,13 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
     return render;
   }
 
-  Future<void> _validatePreview(Uint8List png) async {
+  Future<void> _validatePreview(Uint8List png, EqShareFormat format) async {
     final codec = await ui.instantiateImageCodec(png);
     try {
       final frame = await codec.getNextFrame();
       try {
-        if (frame.image.width != _format.width ||
-            frame.image.height != _format.height) {
+        if (frame.image.width != format.width ||
+            frame.image.height != format.height) {
           throw const FormatException('Unexpected report PNG dimensions');
         }
       } finally {
@@ -161,19 +187,12 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
       _feedback = null;
     });
     final fileName =
-        'dpip-earthquake-${widget.report.id}-${_theme.name}-4x5.png';
-    _ExportFeedback? feedback;
+        'dpip-earthquake-${widget.report.id}-${_options.fileSuffix}.png';
+    Object? feedback;
     try {
       if (shareOrigin != null) {
-        final share = widget.share ?? SharePlus.instance.share;
-        final result = await share(
-          ShareParams(
-            files: [XFile.fromData(png, mimeType: 'image/png')],
-            fileNameOverrides: [fileName],
-            sharePositionOrigin: shareOrigin,
-          ),
-        );
-        if (result.status == ShareResultStatus.unavailable) {
+        final result = await _sharePng(generation, png, fileName, shareOrigin);
+        if (result?.status == ShareResultStatus.unavailable) {
           feedback = _ExportFeedback.shareFailed;
         }
       } else {
@@ -184,11 +203,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
         );
         feedback = result?.when(
           ok: (_) => _ExportFeedback.saved,
-          err: (failure) => switch (failure) {
-            ImageSaveFailure(reason: ImageSaveFailureReason.permissionDenied) =>
-              _ExportFeedback.permissionDenied,
-            _ => _ExportFeedback.saveFailed,
-          },
+          err: imageSaveFailureReason,
         );
       }
     } catch (error, stackTrace) {
@@ -199,13 +214,52 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
       );
       feedback = shareOrigin != null
           ? _ExportFeedback.shareFailed
-          : _ExportFeedback.saveFailed;
+          : ImageSaveFailureReason.failed;
     } finally {
       if (mounted) {
         setState(() {
           _exporting = false;
           if (_isCurrent(generation)) _feedback = feedback;
         });
+      }
+    }
+  }
+
+  Future<ShareResult?> _sharePng(
+    int generation,
+    Uint8List bytes,
+    String fileName,
+    Rect origin,
+  ) async {
+    if (widget.share case final share?) {
+      return share(
+        ShareParams(
+          files: [XFile.fromData(bytes, mimeType: 'image/png')],
+          fileNameOverrides: [fileName],
+          sharePositionOrigin: origin,
+        ),
+      );
+    }
+
+    final cache = await getTemporaryDirectory();
+    final directory = await cache.createTemp('dpip-earthquake-share-');
+    try {
+      final file = File.fromUri(directory.uri.resolve(fileName));
+      await file.writeAsBytes(bytes);
+      if (!_isCurrent(generation)) return null;
+      return await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          sharePositionOrigin: origin,
+        ),
+      );
+    } finally {
+      // Android's chooser uses Share Plus's separate shared cache. On iOS
+      // the activity controller has completed before the future returns.
+      try {
+        await directory.delete(recursive: true);
+      } on FileSystemException catch (error) {
+        Log.warning('Could not remove temporary earthquake image: $error');
       }
     }
   }
@@ -260,28 +314,57 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (message == null || canRetry) ...[
-                  SegmentedButton<EqTheme>(
-                    segments: [
-                      ButtonSegment(
-                        value: EqTheme.light,
-                        label: Text(l10n.themeLight),
-                      ),
-                      ButtonSegment(
-                        value: EqTheme.dark,
-                        label: Text(l10n.themeDark),
-                      ),
-                    ],
-                    selected: {_theme},
-                    onSelectionChanged: _exporting
+                if (issue != _ShareIssue.language &&
+                    issue != _ShareIssue.report &&
+                    issue != _ShareIssue.renderer) ...[
+                  _ShareChoices<EqShareFormat>(
+                    label: l10n.reportShareFormat,
+                    options: {
+                      EqShareFormat.landscape16By9: '16:9',
+                      EqShareFormat.information4By5: '4:5',
+                      if (reportPictureStoryQa)
+                        EqShareFormat.story9By16: '9:16',
+                    },
+                    value: _format,
+                    onChanged: _exporting
                         ? null
-                        : (selected) {
-                            if (selected.single == _theme) return;
-                            setState(() {
-                              _theme = selected.single;
+                        : (format) => setState(() {
+                            _format = format;
+                            _start();
+                          }),
+                  ),
+                  if (_options.showsMap) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    _ShareChoices<EqMapMode>(
+                      label: l10n.reportShareMapMode,
+                      options: {
+                        EqMapMode.cluster: l10n.reportShareCluster,
+                        EqMapMode.stations: l10n.reportShareStations,
+                        EqMapMode.towns: l10n.reportShareTowns,
+                      },
+                      value: _mode,
+                      onChanged: _exporting
+                          ? null
+                          : (mode) => setState(() {
+                              _mode = mode;
                               _start();
-                            });
-                          },
+                            }),
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.sm),
+                  _ShareChoices<EqTheme>(
+                    label: l10n.reportShareTheme,
+                    options: {
+                      EqTheme.light: l10n.themeLight,
+                      EqTheme.dark: l10n.themeDark,
+                    },
+                    value: _theme,
+                    onChanged: _exporting
+                        ? null
+                        : (theme) => setState(() {
+                            _theme = theme;
+                            _start();
+                          }),
                   ),
                   const SizedBox(height: AppSpacing.md),
                 ],
@@ -294,26 +377,19 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
                     ),
                   )
                 else
-                  Image.memory(
-                    png,
-                    fit: BoxFit.contain,
-                    semanticLabel: l10n.reportSharePreview,
-                  ),
+                  _PngPreview(bytes: png, label: l10n.reportSharePreview),
                 if (_feedback case final feedback?) ...[
                   const SizedBox(height: AppSpacing.sm),
                   Semantics(
                     liveRegion: true,
                     child: Text(switch (feedback) {
                       _ExportFeedback.saved => l10n.reportDetailImageSaved,
-                      _ExportFeedback.saveFailed =>
-                        l10n.reportDetailImageSaveFailed,
-                      _ExportFeedback.permissionDenied =>
-                        l10n.reportDetailImageSavePermissionDenied,
-                      _ExportFeedback.shareFailed =>
-                        l10n.reportShareExportFailed,
+                      ImageSaveFailureReason reason => reason.message(l10n),
+                      _ => l10n.reportShareExportFailed,
                     }),
                   ),
-                  if (feedback == _ExportFeedback.permissionDenied)
+                  if (feedback ==
+                      ImageSaveFailureReason.permissionSettingsRequired)
                     TextButton(
                       onPressed: openAppSettingsPage,
                       child: Text(l10n.permissionOpenSettings),
@@ -360,4 +436,79 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
       },
     );
   }
+}
+
+class _ShareChoices<T> extends StatelessWidget {
+  const _ShareChoices({
+    required this.label,
+    required this.options,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final Map<T, String> options;
+  final T value;
+  final ValueChanged<T>? onChanged;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: Theme.of(context).textTheme.labelLarge),
+      Wrap(
+        spacing: AppSpacing.sm,
+        children: [
+          for (final entry in options.entries)
+            ChoiceChip(
+              label: Text(entry.value),
+              selected: value == entry.key,
+              onSelected: onChanged == null
+                  ? null
+                  : (selected) {
+                      if (selected) onChanged!(entry.key);
+                    },
+            ),
+        ],
+      ),
+    ],
+  );
+}
+
+class _PngPreview extends StatefulWidget {
+  const _PngPreview({required this.bytes, required this.label});
+
+  final Uint8List bytes;
+  final String label;
+
+  @override
+  State<_PngPreview> createState() => _PngPreviewState();
+}
+
+class _PngPreviewState extends State<_PngPreview> {
+  @override
+  void didUpdateWidget(covariant _PngPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.bytes != widget.bytes) {
+      unawaited(MemoryImage(oldWidget.bytes).evict());
+    }
+  }
+
+  @override
+  void dispose() {
+    unawaited(MemoryImage(widget.bytes).evict());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.sizeOf(context).height * .38,
+    ),
+    child: Image.memory(
+      widget.bytes,
+      fit: BoxFit.contain,
+      semanticLabel: widget.label,
+    ),
+  );
 }

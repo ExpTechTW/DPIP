@@ -954,7 +954,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportShareTitle => 'Earthquake share image';
 
   @override
-  String get reportSharePreview => '4:5 earthquake share image preview';
+  String get reportSharePreview => 'Image preview';
+
+  @override
+  String get reportShareFormat => 'Format';
+
+  @override
+  String get reportShareMapMode => 'Map style';
+
+  @override
+  String get reportShareTheme => 'Theme';
+
+  @override
+  String get reportShareCluster => 'Clusters';
+
+  @override
+  String get reportShareStations => 'Stations';
+
+  @override
+  String get reportShareTowns => 'Townships';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Allow photo access in Settings, then try saving again.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Your device restricts access to photos.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Saving to photos is unavailable on this device.';
 
   @override
   String get reportShareSend => 'Share image';
@@ -973,7 +1003,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportShareRendererIncompatible =>
-      'The native renderer in this build does not support 4:5 earthquake share images.';
+      'The native renderer does not support this format.';
 
   @override
   String get reportShareTimeout => 'Creating the image timed out. Try again.';

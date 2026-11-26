@@ -934,7 +934,35 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportShareTitle => '지진 공유 이미지';
 
   @override
-  String get reportSharePreview => '4:5 지진 공유 이미지 미리보기';
+  String get reportSharePreview => '지진 이미지 미리보기';
+
+  @override
+  String get reportShareFormat => '형식';
+
+  @override
+  String get reportShareMapMode => '지도 유형';
+
+  @override
+  String get reportShareTheme => '테마';
+
+  @override
+  String get reportShareCluster => '군집';
+
+  @override
+  String get reportShareStations => '관측소';
+
+  @override
+  String get reportShareTowns => '읍면';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      '설정에서 사진 접근을 허용한 뒤 다시 저장해 주세요.';
+
+  @override
+  String get reportDetailImageSaveRestricted => '이 기기에서는 사진 접근이 제한되어 있습니다.';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '이 기기에서는 사진에 저장할 수 없습니다.';
 
   @override
   String get reportShareSend => '이미지 공유';
@@ -952,8 +980,7 @@ class AppLocalizationsKo extends AppLocalizations {
       '이 버전에서는 네이티브 이미지 라이브러리를 불러올 수 없습니다.';
 
   @override
-  String get reportShareRendererIncompatible =>
-      '이 버전의 네이티브 라이브러리는 4:5 지진 공유 이미지를 지원하지 않습니다.';
+  String get reportShareRendererIncompatible => '네이티브 렌더러에서 이 형식을 지원하지 않습니다.';
 
   @override
   String get reportShareTimeout => '이미지를 만드는 시간이 초과되었습니다. 다시 시도해 주세요.';

@@ -28,6 +28,7 @@ import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_dialog.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -1812,24 +1813,16 @@ class _ReportImageCardState extends State<_ReportImageCard> {
     setState(() => _saving = false);
 
     final l10n = AppLocalizations.of(context);
-    final refused =
-        result.failureOrNull is ImageSaveFailure &&
-        (result.failureOrNull! as ImageSaveFailure).reason ==
-            ImageSaveFailureReason.permissionDenied;
-    final message = result.when(
-      ok: (_) => l10n.reportDetailImageSaved,
-      // A refusal is not "try again": the only way forward is Settings, so the
-      // two failures must not share a sentence — nor the same snackbar.
-      err: (_) => refused
-          ? l10n.reportDetailImageSavePermissionDenied
-          : l10n.reportDetailImageSaveFailed,
-    );
+    final reason = result.failureOrNull == null
+        ? null
+        : imageSaveFailureReason(result.failureOrNull!);
+    final message = reason?.message(l10n) ?? l10n.reportDetailImageSaved;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           content: Text(message),
-          action: refused
+          action: reason == ImageSaveFailureReason.permissionSettingsRequired
               ? SnackBarAction(
                   label: l10n.permissionOpenSettings,
                   onPressed: openAppSettingsPage,

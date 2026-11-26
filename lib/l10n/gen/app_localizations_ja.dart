@@ -935,7 +935,35 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportShareTitle => '地震の共有画像';
 
   @override
-  String get reportSharePreview => '4:5 の地震共有画像プレビュー';
+  String get reportSharePreview => '地震画像のプレビュー';
+
+  @override
+  String get reportShareFormat => '形式';
+
+  @override
+  String get reportShareMapMode => '地図の表示';
+
+  @override
+  String get reportShareTheme => 'テーマ';
+
+  @override
+  String get reportShareCluster => 'クラスタ';
+
+  @override
+  String get reportShareStations => '観測点';
+
+  @override
+  String get reportShareTowns => '市区町村';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      '設定で写真へのアクセスを許可してから、もう一度保存してください。';
+
+  @override
+  String get reportDetailImageSaveRestricted => 'この端末では写真へのアクセスが制限されています。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => 'この端末では写真に保存できません。';
 
   @override
   String get reportShareSend => '画像を共有';
@@ -952,8 +980,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportShareRendererUnavailable => 'このバージョンではネイティブ画像ライブラリを読み込めません。';
 
   @override
-  String get reportShareRendererIncompatible =>
-      'このバージョンのネイティブライブラリは 4:5 の地震共有画像に対応していません。';
+  String get reportShareRendererIncompatible => 'ネイティブレンダラーがこの形式に対応していません。';
 
   @override
   String get reportShareTimeout => '画像の作成がタイムアウトしました。もう一度お試しください。';

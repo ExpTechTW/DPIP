@@ -930,7 +930,34 @@ class AppLocalizationsYue extends AppLocalizations {
   String get reportShareTitle => '地震分享圖片';
 
   @override
-  String get reportSharePreview => '4:5 地震分享圖片預覽';
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群組';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請喺設定允許取用相片，再試儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '裝置限制咗相片存取權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '呢部裝置唔支援儲存到相簿。';
 
   @override
   String get reportShareSend => '分享圖片';
@@ -945,7 +972,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get reportShareRendererUnavailable => '呢個版本載入唔到製作地震分享圖片嘅原生程式庫。';
 
   @override
-  String get reportShareRendererIncompatible => '呢個版本嘅原生程式庫唔支援 4:5 地震分享圖片。';
+  String get reportShareRendererIncompatible => '原生函式庫唔支援呢個格式。';
 
   @override
   String get reportShareTimeout => '製作分享圖片逾時，請再試。';

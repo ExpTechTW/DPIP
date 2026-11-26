@@ -962,7 +962,37 @@ class AppLocalizationsFil extends AppLocalizations {
   String get reportShareTitle => 'Larawan ng lindol para sa pagbabahagi';
 
   @override
-  String get reportSharePreview => 'Preview ng 4:5 na larawan ng lindol';
+  String get reportSharePreview => 'Preview ng larawan ng lindol';
+
+  @override
+  String get reportShareFormat => 'Format';
+
+  @override
+  String get reportShareMapMode => 'Estilo ng mapa';
+
+  @override
+  String get reportShareTheme => 'Tema';
+
+  @override
+  String get reportShareCluster => 'Mga grupo';
+
+  @override
+  String get reportShareStations => 'Mga istasyon';
+
+  @override
+  String get reportShareTowns => 'Mga bayan';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Payagan ang access sa mga larawan sa Mga Setting, saka subukang mag-save muli.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Nililimitahan ng device mo ang access sa mga larawan.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Hindi puwedeng mag-save sa mga larawan sa device na ito.';
 
   @override
   String get reportShareSend => 'Ibahagi ang larawan';
@@ -981,7 +1011,7 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get reportShareRendererIncompatible =>
-      'Hindi sinusuportahan ng bersyong ito ang 4:5 na larawan ng lindol.';
+      'Hindi suportado ng native renderer ang format na ito.';
 
   @override
   String get reportShareTimeout =>

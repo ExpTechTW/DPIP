@@ -930,7 +930,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportShareTitle => '地震分享圖';
 
   @override
-  String get reportSharePreview => '4:5 地震分享圖預覽';
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群集';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用照片，再試一次儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '這部裝置限制了相簿取用權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
 
   @override
   String get reportShareSend => '分享圖片';
@@ -945,7 +972,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportShareRendererUnavailable => '此版本無法載入地震分享圖的原生函式庫。';
 
   @override
-  String get reportShareRendererIncompatible => '此版本的原生函式庫不支援 4:5 地震分享圖。';
+  String get reportShareRendererIncompatible => '原生函式庫不支援此格式。';
 
   @override
   String get reportShareTimeout => '產生分享圖逾時，請重試。';
@@ -4422,7 +4449,34 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportShareTitle => '地震分享图片';
 
   @override
-  String get reportSharePreview => '4:5 地震分享图片预览';
+  String get reportSharePreview => '地震分享图预览';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地图模式';
+
+  @override
+  String get reportShareTheme => '主题';
+
+  @override
+  String get reportShareCluster => '聚合';
+
+  @override
+  String get reportShareStations => '测站';
+
+  @override
+  String get reportShareTowns => '乡镇';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '请在设置中允许访问照片，然后重新保存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '设备限制了照片访问权限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '此设备不支持保存到相册。';
 
   @override
   String get reportShareSend => '分享图片';
@@ -4437,7 +4491,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportShareRendererUnavailable => '此版本无法加载地震分享图片所需的原生库。';
 
   @override
-  String get reportShareRendererIncompatible => '此版本的原生库不支持 4:5 地震分享图片。';
+  String get reportShareRendererIncompatible => '原生函数库不支持此格式。';
 
   @override
   String get reportShareTimeout => '生成分享图片超时，请重试。';
@@ -7913,7 +7967,34 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportShareTitle => '地震分享圖片';
 
   @override
-  String get reportSharePreview => '4:5 地震分享圖片預覽';
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群組';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用相片，再試儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '裝置限制了相片存取權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '此裝置不支援儲存至相簿。';
 
   @override
   String get reportShareSend => '分享圖片';
@@ -7928,7 +8009,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportShareRendererUnavailable => '此版本無法載入地震分享圖片的原生程式庫。';
 
   @override
-  String get reportShareRendererIncompatible => '此版本的原生程式庫不支援 4:5 地震分享圖片。';
+  String get reportShareRendererIncompatible => '原生函式庫不支援此格式。';
 
   @override
   String get reportShareTimeout => '製作分享圖片逾時，請重試。';
@@ -11405,7 +11486,34 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get reportShareTitle => '地震分享圖';
 
   @override
-  String get reportSharePreview => '4:5 地震分享圖預覽';
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群集';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用照片，再試一次儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '這部裝置限制了相簿取用權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
 
   @override
   String get reportShareSend => '分享圖片';
@@ -11420,7 +11528,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get reportShareRendererUnavailable => '此版本無法載入地震分享圖的原生函式庫。';
 
   @override
-  String get reportShareRendererIncompatible => '此版本的原生函式庫不支援 4:5 地震分享圖。';
+  String get reportShareRendererIncompatible => '原生函式庫不支援此格式。';
 
   @override
   String get reportShareTimeout => '產生分享圖逾時，請重試。';

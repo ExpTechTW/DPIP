@@ -17,12 +17,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:share_plus/share_plus.dart';
 
-Future<Uint8List> _fixturePng(ui.Color color) async {
+Future<Uint8List> _fixturePng(
+  ui.Color color, [
+  EqShareFormat format = EqShareFormat.information4By5,
+]) async {
   final recorder = ui.PictureRecorder();
   ui.Canvas(recorder).drawColor(color, ui.BlendMode.src);
   final picture = recorder.endRecording();
   try {
-    final image = picture.toImageSync(1080, 1350);
+    final image = picture.toImageSync(format.width, format.height);
     try {
       return (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer
           .asUint8List();
@@ -178,6 +181,104 @@ void main() {
       (EqTheme.light, EqShareFormat.information4By5),
       (EqTheme.dark, EqShareFormat.information4By5),
     ]);
+  });
+
+  testWidgets('switching layout and map style invalidates previous export', (
+    tester,
+  ) async {
+    final landscape = await tester.runAsync(
+      () =>
+          _fixturePng(const ui.Color(0xffeeeeee), EqShareFormat.landscape16By9),
+    );
+    final requests = <(EqShareFormat, EqMapMode, EqTheme)>[];
+    final stationResult = Completer<Uint8List>();
+    final saver = _Saver();
+    await tester.pumpWidget(
+      dialog(
+        saver: saver,
+        open: () async => Ok(
+          ReportPicture.forTesting((_, mode, theme, format) async {
+            requests.add((format, mode, theme));
+            if (mode == EqMapMode.stations) return stationResult.future;
+            return format == EqShareFormat.landscape16By9
+                ? landscape!
+                : lightPng;
+          }, () {}),
+        ),
+      ),
+    );
+    await waitForImage(tester);
+    expect(find.text('測站'), findsNothing);
+    await tester.tap(find.text('16:9'));
+    await waitForImage(tester);
+    await tester.tap(find.text('測站'));
+    await tester.pump();
+    expect(save, findsNothing);
+    await tester.tap(find.text('4:5'));
+    await tester.pump();
+    stationResult.complete(landscape!);
+    await waitForImage(tester);
+    await tester.tap(save);
+    await tester.pump();
+    expect(saver.saved, lightPng);
+    expect(requests, [
+      (EqShareFormat.information4By5, EqMapMode.cluster, EqTheme.light),
+      (EqShareFormat.landscape16By9, EqMapMode.cluster, EqTheme.light),
+      (EqShareFormat.landscape16By9, EqMapMode.stations, EqTheme.light),
+      (EqShareFormat.information4By5, EqMapMode.cluster, EqTheme.light),
+    ]);
+  });
+
+  testWidgets('large text preserves accessible options and export actions', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(360, 640);
+    tester.platformDispatcher.textScaleFactorTestValue = 2.5;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    final saver = _Saver();
+    try {
+      await tester.pumpWidget(
+        dialog(
+          saver: saver,
+          open: () async => Ok(
+            ReportPicture.forTesting(
+              (_, _, theme, _) async =>
+                  theme == EqTheme.dark ? darkPng : lightPng,
+              () {},
+            ),
+          ),
+        ),
+      );
+      await waitForImage(tester);
+      expect(
+        find.text('9:16'),
+        reportPictureStoryQa ? findsOneWidget : findsNothing,
+      );
+      final card = find.widgetWithText(ChoiceChip, '4:5');
+      expect(
+        tester.getSemantics(card).flagsCollection.isSelected,
+        ui.Tristate.isTrue,
+      );
+
+      final dark = find.text(l10n.themeDark);
+      await tester.ensureVisible(dark);
+      await tester.tap(dark);
+      await waitForImage(tester);
+      expect(find.bySemanticsLabel(l10n.reportSharePreview), findsOneWidget);
+      await tester.ensureVisible(save);
+      await tester.tap(save);
+      await tester.pump();
+      expect(saver.saved, darkPng);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
   });
 
   testWidgets('report replacement clears an earlier result and actions', (
