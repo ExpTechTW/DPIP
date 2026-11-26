@@ -12,7 +12,8 @@ tool/dev/build_report_picture.sh ../eq-report-pic "$DPIP_EQR_BUILD"
 export DPIP_EQR_BUILD
 ```
 
-建置輸出須為新目錄。腳本從已審查的 Git 修訂建置兩個 profile，並在套件目錄外
+已備妥相同修訂的可信套件時可直接設定 `DPIP_EQR_BUILD`。自行建置時輸出須為新目錄。
+腳本從已審查的 Git 修訂建置兩個 profile，並在套件目錄外
 產生個別的可信 manifest。使用來自受信任建置或受控管道的 manifest。啟動器每次把
 已驗證的套件放入新的 staging 目錄。Flutter Hot Reload 沿用該次建置連結的 Rust 函式庫。
 
@@ -46,15 +47,70 @@ tool/dev/run_report_sharing.sh android qa "$android_device_id" ../eq-report-pic 
 | 4:5 | 1080 × 1350 | 版型固定 | 淺色、深色 | 2 |
 | 9:16 | 1080 × 1920 | 群集、測站、鄉鎮 | 淺色、深色 | 6 |
 
-切換選項後，確認載入時儲存與分享按鈕消失，完成後回到同一張預覽。關閉對話框、
-改選報告再開啟，確認舊結果無法匯出。臺東縣近海樣本應顯示 ML 3.9、深度 43.5 km、
+切換到首次選取的組合時，確認載入期間複製、儲存和分享按鈕消失。切回同一個已完成
+的版型、地圖模式和主題，應立即回到原圖。從不同地圖模式回到 4:5 應選到同一張資訊卡。
+關閉對話框再開啟，應重新產圖。改選報告時確認舊結果無法匯出。
+臺東縣近海樣本應顯示 ML 3.9、深度 43.5 km、
 臺東縣震度 2 與花蓮縣震度 1。報告舊版資料請看
 [原始本文與身分證據](../../test/features/earthquake/domain/fixtures/share_input/README.md)。
 現有報告若缺少身分或行政區證據，應顯示不支援。另檢查非臺灣繁體中文顯示的語言狀態。
 
-確認相簿新增影像原檔的 SHA-256 與系統分享交付的檔案一致。iOS 驗證拒絕新增照片、
-從設定授權、再按儲存。Android API 29 以上透過 MediaStore 寫入，API 26–28
-需另驗證舊版儲存授權。iPad 系統分享視窗應錨定至發送按鈕。
+選一張圖，依序複製、儲存和分享，確認接收方讀到相同尺寸及 SHA-256。先關閉分享
+對話框，再到支援貼上圖片的 App 貼上。iOS 以 `public.png` 存入系統剪貼簿。
+Android 用獨立的私有目錄提供唯讀 URI，最多保留四張、每張上限 16 MiB，滿一小時
+後在程序存活期間清理，或於下次初始化時清理。Android 13 以上由系統提示複製成功。
+以兩個獨立接收 App 驗證對話框關閉後貼上。iOS 26.5 讀回 1080 × 1350，
+Android 17 讀回 1080 × 1920，兩者皆以 PNG 解碼並逐張與 Rust 輸出核對 SHA-256。
+
+另在 iOS 拒絕新增照片後確認仍可複製，再從設定授權並測試儲存。Android API 29
+以上透過 MediaStore 寫入，API 26–28 需另驗證舊版儲存授權。iPad 的系統分享視窗
+應錨定至發送按鈕。
+
+## iOS 詳情底部面板量測
+
+三個隔離 Debug 建置固定 Flutter 3.50.1，Framework
+`ae9b586f34a8443573f82ef57c3bf914a908cbf7`，Engine
+`4d35714800b9266b6693a58e1225ecd7e9e45ed7`。同一台 iPhone 17 Pro／iOS 26.5
+模擬器開啟相同報告，面板先展開，再各執行十次下拉與十次上拉。
+`FrameTiming` 記錄擷取期間的 Flutter build 和 raster 時間。
+
+| 建置 | 警告數 | 取樣幀數 | Build p95 | Raster p95 | 任一階段超過 16.67 ms |
+|---|---:|---:|---:|---:|---:|
+| main `77f8049a` | 30 | 650 | 4.71 ms | 3.16 ms | 3 |
+| PR #681 `708b1fe0` | 48 | 1,696 | 3.46 ms | 1.55 ms | 4 |
+| 整合檢查點 `1ca3b4eb` | 33 | 753 | 4.12 ms | 2.61 ms | 5 |
+
+Flutter 的 iOS 觸控分支用單調時鐘的當下時間推算目標，display link 則以其 frame
+時間推算。兩條路徑的目標逆序時，`BeginFrame` 將時間戳夾回上一值，因此三個版本
+都能觸發同一項警告。PR #681 與整合版另錄製 DevTools 的 VM timeline，兩者皆有
+平台視圖合成、面板 extent 更新與 layout，但未觀察到 `BaseMap`、`MapLibreMap`
+或完整詳情內容跟著每次拖曳重建。下拉跨過門檻時才會重設捲動位置，分享圖僅在
+按下按鈕後產生。這組 Debug 取樣同時有少數慢幀，現有證據不足以定位為此次整合的
+掉幀回歸。這次未修改面板。參見 [Flutter #197370](https://github.com/flutter/flutter/issues/197370)、
+[Flutter #191444](https://github.com/flutter/flutter/pull/191444)。
+
+實機可使用上方啟動指令，將設定與套件路徑改成 `production` 並加上 `--profile`。
+在 DevTools Performance 錄製相同拖曳，分別記錄 UI、raster 與卡頓時的 timeline，
+供上游修正釋出後以同一手法比對。
+
+## 分享圖快取量測
+
+Android 17 Pixel 10 Pro 模擬器的 Debug QA 建置使用固定 Rust 修訂與已驗證的臺東
+報告，在兩個冷啟動程序中各依序選取十四種組合，再重跑同一輪。時間從提交選項量到
+PNG 可供預覽及匯出，使用離線報告 fixture，未包含網路或面板合成時間。
+
+| 量測 | 檢查點 `1ca3b4eb` | 加入快取 |
+|---|---:|---:|
+| 第一輪 FFI 呼叫 | 14 | 14 |
+| 第二輪 FFI 呼叫 | 14 | 0 |
+| 第二輪 PNG 就緒時間中位數 | 842 ms | 1.35 ms |
+| 第二輪程序 RSS 中位數 | 549 MiB | 555 MiB |
+| 整次程序 RSS 峰值 | 626 MiB | 601 MiB |
+| 快取內壓縮 PNG | 0 | 14 張，共 2.90 MiB |
+
+兩輪每張圖的 SHA-256 逐一相同。上限維持 8 MiB 與 14 筆，依最近使用順序淘汰，
+記憶體壓力時釋出快取，目前預覽與進行中的匯出保有原圖。RSS 為單次模擬器程序
+取樣，包含 Flutter 引擎及原生渲染期間的配置。
 
 ## 離線煙霧測試與矩陣
 
