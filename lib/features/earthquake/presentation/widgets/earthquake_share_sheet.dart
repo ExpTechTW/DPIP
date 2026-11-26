@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
@@ -21,8 +22,6 @@ import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-
-const _previewMaxWidth = 364.0;
 
 enum _ShareIssue { language, report, renderer, incompatible, timeout, failed }
 
@@ -61,8 +60,8 @@ class _ShareOptions {
   };
 }
 
-class EarthquakeShareDialog extends StatefulWidget {
-  const EarthquakeShareDialog({
+class EarthquakeShareSheet extends StatefulWidget {
+  const EarthquakeShareSheet({
     super.key,
     required this.report,
     required this.loadInput,
@@ -82,10 +81,10 @@ class EarthquakeShareDialog extends StatefulWidget {
   final Duration renderTimeout;
 
   @override
-  State<EarthquakeShareDialog> createState() => _EarthquakeShareDialogState();
+  State<EarthquakeShareSheet> createState() => _EarthquakeShareSheetState();
 }
 
-class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
+class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
     with WidgetsBindingObserver {
   EqShareFormat _format = EqShareFormat.information4By5;
   EqMapMode _mode = EqMapMode.cluster;
@@ -166,7 +165,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
   }
 
   @override
-  void didUpdateWidget(covariant EarthquakeShareDialog oldWidget) {
+  void didUpdateWidget(covariant EarthquakeShareSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.report != oldWidget.report) {
       _invalidateSnapshot();
@@ -497,145 +496,265 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
       _ShareIssue.failed => l10n.reportShareRenderFailed,
       null => null,
     };
-    final canRetry =
-        issue == _ShareIssue.failed || issue == _ShareIssue.timeout;
-    return AlertDialog(
-      // The preview and map controls change height as options are tapped.
-      // Keep the format row in place while those changes settle.
-      alignment: Alignment.topCenter,
-      scrollable: true,
-      title: Text(l10n.reportShareTitle),
-      content: SizedBox(
-        width: _previewMaxWidth,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (issue != _ShareIssue.language &&
-                issue != _ShareIssue.report &&
-                issue != _ShareIssue.renderer) ...[
-              _ShareChoices<EqShareFormat>(
-                label: l10n.reportShareFormat,
-                options: {
-                  EqShareFormat.landscape16By9: '16:9',
-                  EqShareFormat.information4By5: '4:5',
-                  if (reportPictureStoryQa) EqShareFormat.story9By16: '9:16',
-                },
-                value: _format,
-                onChanged: _exporting
-                    ? null
-                    : (format) => setState(() {
-                        _format = format;
-                        _start();
-                      }),
-              ),
-              if (_options.showsMap) ...[
-                const SizedBox(height: AppSpacing.sm),
-                _ShareChoices<EqMapMode>(
-                  label: l10n.reportShareMapMode,
-                  options: {
-                    EqMapMode.cluster: l10n.reportShareCluster,
-                    EqMapMode.stations: l10n.reportShareStations,
-                    EqMapMode.towns: l10n.reportShareTowns,
-                  },
-                  value: _mode,
-                  onChanged: _exporting
-                      ? null
-                      : (mode) => setState(() {
-                          _mode = mode;
-                          _start();
-                        }),
+    return SafeArea(
+      top: false,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final theme = Theme.of(context);
+          final preview = _buildPreview(
+            context,
+            message: message,
+            canRetry:
+                issue == _ShareIssue.failed || issue == _ShareIssue.timeout,
+            maxHeight: constraints.maxHeight * 0.5,
+          );
+          final showOptions =
+              issue != _ShareIssue.language &&
+              issue != _ShareIssue.report &&
+              issue != _ShareIssue.renderer;
+          final options = showOptions ? _buildOptions(l10n) : null;
+          final sideBySide =
+              options != null &&
+              constraints.maxWidth >= 600 &&
+              constraints.maxHeight < 500;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.sm,
+                  AppSpacing.sm,
                 ),
-              ],
-              const SizedBox(height: AppSpacing.sm),
-              _ShareChoices<EqTheme>(
-                label: l10n.reportShareTheme,
-                options: {
-                  EqTheme.light: l10n.themeLight,
-                  EqTheme.dark: l10n.themeDark,
-                },
-                value: _theme,
-                onChanged: _exporting
-                    ? null
-                    : (theme) => setState(() {
-                        _theme = theme;
-                        _start();
-                      }),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Semantics(
+                        header: true,
+                        child: Text(
+                          l10n.reportShareTitle,
+                          style: theme.textTheme.titleLarge,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      tooltip: l10n.commonClose,
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (sideBySide)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: options),
+                            const SizedBox(width: AppSpacing.lg),
+                            Expanded(child: preview),
+                          ],
+                        )
+                      else ...[
+                        if (options != null) ...[
+                          options,
+                          const SizedBox(height: AppSpacing.lg),
+                        ],
+                        preview,
+                      ],
+                      if (_feedback case final feedback?) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        Semantics(
+                          liveRegion: true,
+                          child: Text(switch (feedback) {
+                            _ExportFeedback.saved =>
+                              l10n.reportDetailImageSaved,
+                            _ExportFeedback.copied => l10n.reportShareCopied,
+                            _ExportFeedback.copyFailed =>
+                              l10n.reportShareCopyFailed,
+                            ImageSaveFailureReason reason => reason.message(
+                              l10n,
+                            ),
+                            _ => l10n.reportShareExportFailed,
+                          }),
+                        ),
+                        if (feedback ==
+                            ImageSaveFailureReason.permissionSettingsRequired)
+                          TextButton(
+                            onPressed: openAppSettingsPage,
+                            child: Text(l10n.permissionOpenSettings),
+                          ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.sm,
+                ),
+                child: _buildActions(l10n, generation, png),
+              ),
             ],
-            if (message != null)
-              Semantics(liveRegion: true, child: Text(message))
-            else if (_visiblePreview case final image?)
-              _PngPreview(image: image, label: l10n.reportSharePreview)
-            else if (_snapshot == null || _rendering)
-              Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: l10n.commonLoading,
-                ),
-              ),
-            if (_feedback case final feedback?) ...[
-              const SizedBox(height: AppSpacing.sm),
-              Semantics(
-                liveRegion: true,
-                child: Text(switch (feedback) {
-                  _ExportFeedback.saved => l10n.reportDetailImageSaved,
-                  _ExportFeedback.copied => l10n.reportShareCopied,
-                  _ExportFeedback.copyFailed => l10n.reportShareCopyFailed,
-                  ImageSaveFailureReason reason => reason.message(l10n),
-                  _ => l10n.reportShareExportFailed,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildOptions(AppLocalizations l10n) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _ShareChoices<EqShareFormat>(
+        label: l10n.reportShareFormat,
+        options: {
+          EqShareFormat.landscape16By9: '16:9',
+          EqShareFormat.information4By5: '4:5',
+          if (reportPictureStoryQa) EqShareFormat.story9By16: '9:16',
+        },
+        value: _format,
+        onChanged: _exporting
+            ? null
+            : (format) => setState(() {
+                _format = format;
+                _start();
+              }),
+      ),
+      if (_options.showsMap) ...[
+        const SizedBox(height: AppSpacing.sm),
+        _ShareChoices<EqMapMode>(
+          label: l10n.reportShareMapMode,
+          options: {
+            EqMapMode.cluster: l10n.reportShareCluster,
+            EqMapMode.stations: l10n.reportShareStations,
+            EqMapMode.towns: l10n.reportShareTowns,
+          },
+          value: _mode,
+          onChanged: _exporting
+              ? null
+              : (mode) => setState(() {
+                  _mode = mode;
+                  _start();
                 }),
+        ),
+      ],
+      const SizedBox(height: AppSpacing.sm),
+      _ShareChoices<EqTheme>(
+        label: l10n.reportShareTheme,
+        options: {EqTheme.light: l10n.themeLight, EqTheme.dark: l10n.themeDark},
+        value: _theme,
+        onChanged: _exporting
+            ? null
+            : (theme) => setState(() {
+                _theme = theme;
+                _start();
+              }),
+      ),
+    ],
+  );
+
+  Widget _buildPreview(
+    BuildContext context, {
+    required String? message,
+    required bool canRetry,
+    required double maxHeight,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    if (message != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Semantics(liveRegion: true, child: Text(message)),
+          if (canRetry)
+            TextButton(
+              onPressed: () => setState(_start),
+              child: Text(l10n.commonRetry),
+            ),
+        ],
+      );
+    }
+
+    // One stage size for all formats. The displayed image can lag the
+    // selection by a decode without moving or resizing the options.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        borderRadius: AppRadius.medium,
+      ),
+      child: SizedBox(
+        height: maxHeight,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: switch (_visiblePreview) {
+            final image? => Semantics(
+              image: true,
+              label: l10n.reportSharePreview,
+              child: RawImage(image: image, fit: BoxFit.contain),
+            ),
+            null when _snapshot == null || _rendering => Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: l10n.commonLoading,
               ),
-              if (feedback == ImageSaveFailureReason.permissionSettingsRequired)
-                TextButton(
-                  onPressed: openAppSettingsPage,
-                  child: Text(l10n.permissionOpenSettings),
-                ),
-            ],
-          ],
+            ),
+            null => null,
+          },
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.commonClose),
+    );
+  }
+
+  Widget _buildActions(AppLocalizations l10n, int generation, Uint8List? png) {
+    final enabled = png != null && !_exporting;
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.xs,
+      children: [
+        OutlinedButton.icon(
+          onPressed: enabled
+              ? () => _export(generation, png, _ExportAction.copy)
+              : null,
+          icon: const Icon(Icons.content_copy_outlined),
+          label: Text(l10n.reportShareCopy),
         ),
-        if (canRetry)
-          FilledButton(
-            onPressed: () => setState(_start),
-            child: Text(l10n.commonRetry),
+        OutlinedButton.icon(
+          onPressed: enabled
+              ? () => _export(generation, png, _ExportAction.save)
+              : null,
+          icon: const Icon(Icons.download_outlined),
+          label: Text(l10n.reportShareSave),
+        ),
+        Builder(
+          builder: (buttonContext) => FilledButton.icon(
+            onPressed: enabled
+                ? () {
+                    final box = buttonContext.findRenderObject()! as RenderBox;
+                    _export(
+                      generation,
+                      png,
+                      _ExportAction.share,
+                      shareOrigin: box.localToGlobal(Offset.zero) & box.size,
+                    );
+                  }
+                : null,
+            icon: const Icon(Icons.share_outlined),
+            label: Text(l10n.reportShareSend),
           ),
-        if (png != null) ...[
-          TextButton(
-            onPressed: _exporting
-                ? null
-                : () => _export(generation, png, _ExportAction.save),
-            child: Text(l10n.reportDetailImageSave),
-          ),
-          TextButton(
-            onPressed: _exporting
-                ? null
-                : () => _export(generation, png, _ExportAction.copy),
-            child: Text(l10n.reportShareCopy),
-          ),
-          Builder(
-            builder: (buttonContext) => FilledButton(
-              onPressed: _exporting
-                  ? null
-                  : () {
-                      final box =
-                          buttonContext.findRenderObject()! as RenderBox;
-                      _export(
-                        generation,
-                        png,
-                        _ExportAction.share,
-                        shareOrigin: box.localToGlobal(Offset.zero) & box.size,
-                      );
-                    },
-              child: Text(l10n.reportShareSend),
-            ),
-          ),
-        ],
+        ),
       ],
     );
   }
@@ -675,24 +794,5 @@ class _ShareChoices<T> extends StatelessWidget {
         ],
       ),
     ],
-  );
-}
-
-class _PngPreview extends StatelessWidget {
-  const _PngPreview({required this.image, required this.label});
-
-  final ui.Image image;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => ConstrainedBox(
-    constraints: BoxConstraints(
-      maxHeight: MediaQuery.sizeOf(context).height * .38,
-    ),
-    child: Semantics(
-      image: true,
-      label: label,
-      child: RawImage(image: image, fit: BoxFit.contain),
-    ),
   );
 }

@@ -33,12 +33,13 @@ tool/dev/run_report_sharing.sh android qa "$android_device_id" ../eq-report-pic 
 ```
 
 首次安裝會先顯示初次設定。選擇繁體中文（臺灣）後，重新執行上方指令可直接開啟
-臺東縣近海報告。展開詳情卡片後點「地震分享圖」。修改 Flutter 元件後，在還在執行的
-終端機按 `r`。UI 的修改入口在
-[earthquake_share_dialog.dart](../../lib/features/earthquake/presentation/widgets/earthquake_share_dialog.dart)
-的 `EarthquakeShareDialog`、`_ShareChoices`、`_PngPreview` 與
+臺東縣近海報告。點地圖右上角、地圖設定左邊的分享按鈕。詳情展開時，也可從
+標頭右側開啟分享面板。修改 Flutter 元件後，可在仍在執行的終端機按 `r`。
+UI 的修改入口在
+[earthquake_share_sheet.dart](../../lib/features/earthquake/presentation/widgets/earthquake_share_sheet.dart)
+的 `EarthquakeShareSheet` 和
 [report_detail_page.dart](../../lib/features/earthquake/presentation/pages/report_detail_page.dart)
-的 `_expandedContent`。調整介面文案時編輯 `lib/l10n/app_*.arb`，執行
+的 `_openShare`。調整介面文案時編輯 `lib/l10n/app_*.arb`，執行
 `tool/dev/l10n.sh` 後再 Hot Reload。
 
 | 版型 | 尺寸 | 地圖模式 | 主題 | 組數 |
@@ -47,9 +48,9 @@ tool/dev/run_report_sharing.sh android qa "$android_device_id" ../eq-report-pic 
 | 4:5 | 1080 × 1350 | 版型固定 | 淺色、深色 | 2 |
 | 9:16 | 1080 × 1920 | 群集、測站、鄉鎮 | 淺色、深色 | 6 |
 
-切換到首次選取的組合時，確認載入期間複製、儲存和分享按鈕消失。切回同一個已完成
-的版型、地圖模式和主題，應立即回到原圖。從不同地圖模式回到 4:5 應選到同一張資訊卡。
-關閉對話框再開啟，應重新產圖。改選報告時確認舊結果無法匯出。
+切換選項時，應保留上一張預覽。複製、儲存和分享固定在底部，待所選圖片解碼完成後
+可操作。切回已產圖的組合時，快取命中不會顯示載入動畫。從不同地圖模式回到 4:5
+應選到同一張資訊卡。關閉分享面板再開啟時應重新產圖。改選報告時確認舊結果無法匯出。
 臺東縣近海樣本應顯示 ML 3.9、深度 43.5 km、
 臺東縣震度 2 與花蓮縣震度 1。報告舊版資料請看
 [原始本文與身分證據](../../test/features/earthquake/domain/fixtures/share_input/README.md)。

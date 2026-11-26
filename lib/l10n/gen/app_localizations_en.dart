@@ -987,10 +987,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Saving to photos is unavailable on this device.';
 
   @override
-  String get reportShareSend => 'Share image';
+  String get reportShareSend => 'Share';
 
   @override
-  String get reportShareCopy => 'Copy image';
+  String get reportShareCopy => 'Copy';
+
+  @override
+  String get reportShareSave => 'Save';
 
   @override
   String get reportShareCopied => 'Image copied';

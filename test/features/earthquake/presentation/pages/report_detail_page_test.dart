@@ -29,6 +29,7 @@ import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -172,7 +173,7 @@ class _MapPlatform extends MapLibrePlatform {
   }
 }
 
-class _Reports implements ReportRepository {
+class _Reports implements ReportRepository, EarthquakeShareSource {
   Result<EarthquakeReport>? next;
   Completer<Result<EarthquakeReport>>? pending;
   int gets = 0;
@@ -180,6 +181,11 @@ class _Reports implements ReportRepository {
   /// What the archive probe answers; tests flip it between visits.
   Result<bool> replay = const Ok(true);
   final List<int> replayProbes = [];
+
+  @override
+  Future<Result<EarthquakeShareInput>> getShareInput(
+    EarthquakeReport report,
+  ) async => Ok(adaptEarthquakeShareInput(report));
 
   @override
   Future<Result<EarthquakeReport>> get(String id) async {
@@ -372,6 +378,7 @@ void main() {
       MultiProvider(
         providers: [
           Provider<ReportRepository>.value(value: reports),
+          Provider<EarthquakeShareSource>.value(value: reports),
           Provider<ApiClient>.value(value: client),
           Provider<SettingsStore>.value(value: settings),
           ChangeNotifierProvider<RegionStore>.value(value: regions),
@@ -416,6 +423,66 @@ void main() {
       ),
     ],
   );
+
+  testWidgets('sharing opens above the collapsed and expanded detail', (
+    tester,
+  ) async {
+    final reports = _Reports()..next = Ok(_report());
+    final settings = SettingsStore.inMemory();
+    final router = nestedRouter(reports);
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: router,
+    );
+    await tester.pump();
+
+    final share = find.byTooltip('Earthquake share image');
+    final semantics = tester.ensureSemantics();
+    try {
+      expect(
+        tester
+            .getSemantics(find.bySemanticsLabel('Earthquake share image'))
+            .flagsCollection
+            .isButton,
+        isTrue,
+      );
+    } finally {
+      semantics.dispose();
+    }
+    final settingsButton = find.byTooltip('Map settings panel');
+    final modal = find.byType(BottomSheet);
+    expect(tester.getSize(share), tester.getSize(settingsButton));
+    expect(tester.getCenter(share).dy, tester.getCenter(settingsButton).dy);
+    expect(
+      tester.getCenter(share).dx,
+      lessThan(tester.getCenter(settingsButton).dx),
+    );
+
+    await tester.tap(share);
+    await tester.pumpAndSettle();
+    expect(modal, findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(modal, findsNothing);
+    expect(settingsButton.hitTestable(), findsOneWidget);
+
+    await _expandSheet(tester);
+    expect(settingsButton, findsNothing);
+    expect(share.hitTestable(), findsOneWidget);
+    await tester.tap(share);
+    await tester.pumpAndSettle();
+    expect(modal, findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(modal, findsNothing);
+    expect(find.text('Report page').hitTestable(), findsOneWidget);
+    expect(share.hitTestable(), findsOneWidget);
+  });
 
   testWidgets('a 404 from the archive probe hides replay', (tester) async {
     final report = _report(origin: DateTime.utc(2024, 2, 19, 15, 59, 59));

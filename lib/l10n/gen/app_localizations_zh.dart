@@ -960,10 +960,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
 
   @override
-  String get reportShareSend => '分享圖片';
+  String get reportShareSend => '分享';
 
   @override
-  String get reportShareCopy => '複製圖片';
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
 
   @override
   String get reportShareCopied => '已複製圖片';
@@ -4488,10 +4491,13 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get reportDetailImageSaveUnavailable => '此设备不支持保存到相册。';
 
   @override
-  String get reportShareSend => '分享图片';
+  String get reportShareSend => '分享';
 
   @override
-  String get reportShareCopy => '复制图片';
+  String get reportShareCopy => '复制';
+
+  @override
+  String get reportShareSave => '保存';
 
   @override
   String get reportShareCopied => '已复制图片';
@@ -8015,10 +8021,13 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get reportDetailImageSaveUnavailable => '此裝置不支援儲存至相簿。';
 
   @override
-  String get reportShareSend => '分享圖片';
+  String get reportShareSend => '分享';
 
   @override
-  String get reportShareCopy => '複製圖片';
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
 
   @override
   String get reportShareCopied => '已複製圖片';
@@ -11543,10 +11552,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
 
   @override
-  String get reportShareSend => '分享圖片';
+  String get reportShareSend => '分享';
 
   @override
-  String get reportShareCopy => '複製圖片';
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
 
   @override
   String get reportShareCopied => '已複製圖片';

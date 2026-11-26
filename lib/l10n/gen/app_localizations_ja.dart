@@ -966,10 +966,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reportDetailImageSaveUnavailable => 'この端末では写真に保存できません。';
 
   @override
-  String get reportShareSend => '画像を共有';
+  String get reportShareSend => '共有';
 
   @override
-  String get reportShareCopy => '画像をコピー';
+  String get reportShareCopy => 'コピー';
+
+  @override
+  String get reportShareSave => '保存';
 
   @override
   String get reportShareCopied => '画像をコピーしました';

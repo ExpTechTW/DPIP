@@ -988,10 +988,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Penyimpanan ke galeri tidak tersedia di perangkat ini.';
 
   @override
-  String get reportShareSend => 'Bagikan gambar';
+  String get reportShareSend => 'Bagikan';
 
   @override
-  String get reportShareCopy => 'Salin gambar';
+  String get reportShareCopy => 'Salin';
+
+  @override
+  String get reportShareSave => 'Simpan';
 
   @override
   String get reportShareCopied => 'Gambar disalin';

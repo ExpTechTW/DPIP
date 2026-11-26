@@ -1881,14 +1881,20 @@ abstract class AppLocalizations {
   /// No description provided for @reportShareSend.
   ///
   /// In en, this message translates to:
-  /// **'Share image'**
+  /// **'Share'**
   String get reportShareSend;
 
   /// No description provided for @reportShareCopy.
   ///
   /// In en, this message translates to:
-  /// **'Copy image'**
+  /// **'Copy'**
   String get reportShareCopy;
+
+  /// No description provided for @reportShareSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get reportShareSave;
 
   /// No description provided for @reportShareCopied.
   ///

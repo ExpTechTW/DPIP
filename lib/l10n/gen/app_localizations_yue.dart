@@ -960,10 +960,13 @@ class AppLocalizationsYue extends AppLocalizations {
   String get reportDetailImageSaveUnavailable => '呢部裝置唔支援儲存到相簿。';
 
   @override
-  String get reportShareSend => '分享圖片';
+  String get reportShareSend => '分享';
 
   @override
-  String get reportShareCopy => '複製圖片';
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
 
   @override
   String get reportShareCopied => '已複製圖片';

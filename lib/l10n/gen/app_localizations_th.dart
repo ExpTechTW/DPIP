@@ -983,10 +983,13 @@ class AppLocalizationsTh extends AppLocalizations {
       'อุปกรณ์นี้ไม่รองรับการบันทึกลงในคลังรูปภาพ';
 
   @override
-  String get reportShareSend => 'แชร์ภาพ';
+  String get reportShareSend => 'แชร์';
 
   @override
-  String get reportShareCopy => 'คัดลอกรูปภาพ';
+  String get reportShareCopy => 'คัดลอก';
+
+  @override
+  String get reportShareSave => 'บันทึก';
 
   @override
   String get reportShareCopied => 'คัดลอกรูปภาพแล้ว';

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-/// Stores successful, Dart-owned compressed PNGs for one sharing dialog.
+/// Stores successful, Dart-owned compressed PNGs for one sharing sheet.
 final class EarthquakeSharePngCache<Key> {
   static const _maxEntries = 14;
   static const _maxBytes = 8 * 1024 * 1024;

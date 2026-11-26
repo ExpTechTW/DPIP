@@ -995,10 +995,13 @@ class AppLocalizationsFil extends AppLocalizations {
       'Hindi puwedeng mag-save sa mga larawan sa device na ito.';
 
   @override
-  String get reportShareSend => 'Ibahagi ang larawan';
+  String get reportShareSend => 'Ibahagi';
 
   @override
-  String get reportShareCopy => 'Kopyahin ang larawan';
+  String get reportShareCopy => 'Kopyahin';
+
+  @override
+  String get reportShareSave => 'I-save';
 
   @override
   String get reportShareCopied => 'Nakopya na ang larawan';

@@ -965,10 +965,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reportDetailImageSaveUnavailable => '이 기기에서는 사진에 저장할 수 없습니다.';
 
   @override
-  String get reportShareSend => '이미지 공유';
+  String get reportShareSend => '공유';
 
   @override
-  String get reportShareCopy => '이미지 복사';
+  String get reportShareCopy => '복사';
+
+  @override
+  String get reportShareSave => '저장';
 
   @override
   String get reportShareCopied => '이미지를 복사했습니다';

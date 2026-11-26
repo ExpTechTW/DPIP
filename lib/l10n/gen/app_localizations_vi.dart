@@ -985,10 +985,13 @@ class AppLocalizationsVi extends AppLocalizations {
       'Thiết bị này không hỗ trợ lưu vào thư viện ảnh.';
 
   @override
-  String get reportShareSend => 'Chia sẻ ảnh';
+  String get reportShareSend => 'Chia sẻ';
 
   @override
-  String get reportShareCopy => 'Sao chép hình ảnh';
+  String get reportShareCopy => 'Sao chép';
+
+  @override
+  String get reportShareSave => 'Lưu';
 
   @override
   String get reportShareCopied => 'Đã sao chép hình ảnh';

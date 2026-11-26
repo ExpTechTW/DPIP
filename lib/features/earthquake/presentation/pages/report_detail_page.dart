@@ -27,7 +27,7 @@ import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
-import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_dialog.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_sheet.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -46,6 +46,7 @@ import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -569,6 +570,32 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
     return {'type': 'FeatureCollection', 'features': features};
   }
 
+  void _openShare() {
+    final report = widget.report;
+    final source = context.read<EarthquakeShareSource>();
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        useSafeArea: true,
+        showDragHandle: false,
+        constraints: const BoxConstraints(maxWidth: 720),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.topSheet),
+        clipBehavior: Clip.antiAlias,
+        builder: (_) => FractionallySizedBox(
+          heightFactor: 0.96,
+          child: EarthquakeShareSheet(
+            report: report,
+            loadInput: () => source.getShareInput(report),
+            saver: widget.imageSaver,
+            isReportCurrent: () => mounted && widget.report == report,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GsiOverlayScope(
@@ -591,6 +618,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
               expandedNotifier: widget.sheetExpanded,
               saver: widget.imageSaver,
               replayAvailable: _replayAvailable,
+              onShare: _openShare,
             ),
           ),
           // Base-map options (OSM detailed map / terrain relief / township
@@ -613,11 +641,18 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      MapBasemapMenu(
-                        showTownLabels: _showTownLabels,
-                        onShowTownLabelsChanged: _setShowTownLabels,
-                        showTerrain: _showTerrain,
-                        onShowTerrainChanged: _setShowTerrain,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _ReportShareButton(onTap: _openShare),
+                          const SizedBox(width: AppSpacing.sm),
+                          MapBasemapMenu(
+                            showTownLabels: _showTownLabels,
+                            onShowTownLabelsChanged: _setShowTownLabels,
+                            showTerrain: _showTerrain,
+                            onShowTerrainChanged: _setShowTerrain,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       MapCompass(bearing: _bearing, onPressed: _resetNorth),
@@ -628,6 +663,29 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ReportShareButton extends StatelessWidget {
+  const _ReportShareButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = AppLocalizations.of(context).reportShareTitle;
+    return Semantics(
+      button: true,
+      label: label,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: MapChipButton(
+        icon: Icons.share_outlined,
+        tooltip: label,
+        active: false,
+        onTap: onTap,
       ),
     );
   }
@@ -644,9 +702,11 @@ class _ReportSheet extends StatefulWidget {
     required this.expandedNotifier,
     required this.saver,
     required this.replayAvailable,
+    required this.onShare,
   });
 
   final EarthquakeReport report;
+  final VoidCallback onShare;
 
   /// Whether the archive probe found this report still replayable.
   final bool replayAvailable;
@@ -767,6 +827,7 @@ class _ReportSheetState extends State<_ReportSheet> {
                             child: _ExpandedHeader(
                               atTop: atTop,
                               onBack: _collapse,
+                              onShare: widget.onShare,
                             ),
                           ),
                         Expanded(
@@ -829,25 +890,6 @@ class _ReportSheetState extends State<_ReportSheet> {
             report: report,
             replayAvailable: widget.replayAvailable,
           ),
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton.icon(
-            onPressed: () {
-              final source = context.read<EarthquakeShareSource>();
-              unawaited(
-                showDialog<void>(
-                  context: context,
-                  builder: (_) => EarthquakeShareDialog(
-                    report: report,
-                    loadInput: () => source.getShareInput(report),
-                    saver: widget.saver,
-                    isReportCurrent: () => mounted && widget.report == report,
-                  ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.share_outlined),
-            label: Text(l10n.reportShareTitle),
-          ),
           const SizedBox(height: AppSpacing.lg),
           SectionHeader(l10n.reportDetailInfo),
           _ReportInfoCard(report: report),
@@ -873,7 +915,13 @@ class _ReportSheetState extends State<_ReportSheet> {
 /// pops the page — the floating button is what leaves (and only it is visible
 /// in the collapsed state), so each state has exactly one sensible action.
 class _ExpandedHeader extends StatelessWidget {
-  const _ExpandedHeader({required this.atTop, required this.onBack});
+  const _ExpandedHeader({
+    required this.atTop,
+    required this.onBack,
+    required this.onShare,
+  });
+
+  final VoidCallback onShare;
 
   /// Whether the sheet is flush with the screen top — adds the status-bar
   /// inset back as padding so the row doesn't render underneath it.
@@ -909,7 +957,10 @@ class _ExpandedHeader extends StatelessWidget {
             ),
           ),
           // Balances the leading back button so the title stays centred.
-          const SizedBox(width: 48),
+          SizedBox(
+            width: 48,
+            child: Center(child: _ReportShareButton(onTap: onShare)),
+          ),
         ],
       ),
     );

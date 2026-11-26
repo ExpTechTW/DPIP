@@ -9,7 +9,7 @@ import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
-import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_dialog.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
 import 'package:flutter/services.dart';
@@ -84,7 +84,7 @@ void main() {
   final input = verified(source);
   final l10n = lookupAppLocalizations(kHomeLocale);
   final retry = find.text(l10n.commonRetry);
-  final save = find.text(l10n.reportDetailImageSave);
+  final save = find.text(l10n.reportShareSave);
   final shareButton = find.text(l10n.reportShareSend);
   late Uint8List lightPng;
   late Uint8List darkPng;
@@ -107,7 +107,7 @@ void main() {
     supportedLocales: appSupportedLocales,
     localizationsDelegates: appLocalizationsDelegates,
     home: Scaffold(
-      body: EarthquakeShareDialog(
+      body: EarthquakeShareSheet(
         report: report ?? source.report,
         loadInput: load ?? () async => Ok(input),
         openRenderer: open ?? () async => throw StateError('Unexpected open'),
@@ -129,9 +129,12 @@ void main() {
   }
 
   bool canSave(WidgetTester tester) {
-    final button = find.ancestor(of: save, matching: find.byType(TextButton));
+    final button = find.ancestor(
+      of: save,
+      matching: find.bySubtype<OutlinedButton>(),
+    );
     return button.evaluate().isNotEmpty &&
-        tester.widget<TextButton>(button).onPressed != null;
+        tester.widget<OutlinedButton>(button).onPressed != null;
   }
 
   Future<void> waitForImage(WidgetTester tester) async {
@@ -174,13 +177,16 @@ void main() {
     );
     await waitForImage(tester);
     expect(await previewPixel(tester), 0xFFFFFFFF);
+    final copy = find.text(l10n.reportShareCopy);
+    expect(tester.getCenter(copy).dy, tester.getCenter(save).dy);
+    expect(tester.getCenter(save).dy, tester.getCenter(shareButton).dy);
 
     await tester.tap(find.text(l10n.themeDark));
     await tester.pump();
     expect(find.byType(RawImage), findsOneWidget);
     expect(await previewPixel(tester), 0xFFFFFFFF);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-    expect(save, findsNothing);
+    expect(canSave(tester), isFalse);
     await waitForImage(tester);
     expect(await previewPixel(tester), 0x000000FF);
     await tester.tap(save);
@@ -230,7 +236,7 @@ void main() {
     await waitForImage(tester);
     await tester.tap(find.text('測站'));
     await tester.pump();
-    expect(save, findsNothing);
+    expect(canSave(tester), isFalse);
     expect(tester.getTopLeft(layoutChoice), choicePosition);
     await tester.tap(find.text('4:5'));
     await tester.pump();
@@ -272,7 +278,7 @@ void main() {
     expect(await previewPixel(tester), 0xFFFFFFFF);
 
     Future<void> select(String label) async {
-      await tester.tap(find.text(label));
+      await tester.tap(find.widgetWithText(ChoiceChip, label));
       await tester.pump();
       await waitForImage(tester);
     }
@@ -302,7 +308,7 @@ void main() {
     // The preview's live bytes survive memory pressure, but other selections
     // need to render again.
     final observer = tester.state(
-      find.byType(EarthquakeShareDialog),
+      find.byType(EarthquakeShareSheet),
     ) as WidgetsBindingObserver;
     final card = preview(tester);
     observer.didHaveMemoryPressure();
@@ -332,7 +338,7 @@ void main() {
     await tester.tap(find.text(l10n.themeLight));
     await tester.pump();
     expect(requests, [EqTheme.light]);
-    expect(save, findsNothing);
+    expect(canSave(tester), isFalse);
     pending.complete(lightPng);
     await waitForImage(tester);
     expect(await previewPixel(tester), 0xFFFFFFFF);
@@ -445,7 +451,14 @@ void main() {
       await tester.tap(dark);
       await waitForImage(tester);
       expect(find.bySemanticsLabel(l10n.reportSharePreview), findsOneWidget);
-      await tester.ensureVisible(save);
+      final savePosition = tester.getCenter(save);
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(0, -240),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.getCenter(save), savePosition);
+      expect(save.hitTestable(), findsOneWidget);
       await tester.tap(save);
       await tester.pump();
       expect(saver.saved, darkPng);
@@ -483,8 +496,18 @@ void main() {
     expect(disposed, isTrue);
     expect(find.text(l10n.reportShareUnsupportedReport), findsOneWidget);
     expect(find.byType(RawImage), findsNothing);
-    expect(save, findsNothing);
-    expect(shareButton, findsNothing);
+    expect(canSave(tester), isFalse);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.ancestor(
+              of: shareButton,
+              matching: find.bySubtype<FilledButton>(),
+            ),
+          )
+          .onPressed,
+      isNull,
+    );
   });
 
   testWidgets('timeout discards an in-flight result and allows retry', (
@@ -595,7 +618,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(message), findsOneWidget);
       expect(retry, findsNothing);
-      expect(save, findsNothing);
+      expect(canSave(tester), isFalse);
     });
   }
 
@@ -667,10 +690,10 @@ void main() {
       );
       await waitForImage(tester);
       final image = preview(tester);
-      final copy = find.widgetWithText(TextButton, '複製圖片');
+      final copy = find.text(l10n.reportShareCopy);
       final semantics = tester.ensureSemantics();
       try {
-        expect(find.bySemanticsLabel('複製圖片'), findsOneWidget);
+        expect(find.bySemanticsLabel(l10n.reportShareCopy), findsOneWidget);
       } finally {
         semantics.dispose();
       }
@@ -686,7 +709,7 @@ void main() {
     });
   }
 
-  testWidgets('a report dialog closed during gallery permission never saves', (
+  testWidgets('a share sheet closed during gallery permission never saves', (
     tester,
   ) async {
     final permission = Completer<String>();
