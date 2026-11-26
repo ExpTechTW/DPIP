@@ -209,11 +209,14 @@ void main() {
     );
     await waitForImage(tester);
     expect(find.text('測站'), findsNothing);
-    await tester.tap(find.text('16:9'));
+    final layoutChoice = find.text('16:9');
+    final choicePosition = tester.getTopLeft(layoutChoice);
+    await tester.tap(layoutChoice);
     await waitForImage(tester);
     await tester.tap(find.text('測站'));
     await tester.pump();
     expect(save, findsNothing);
+    expect(tester.getTopLeft(layoutChoice), choicePosition);
     await tester.tap(find.text('4:5'));
     await tester.pump();
     stationResult.complete(landscape!);

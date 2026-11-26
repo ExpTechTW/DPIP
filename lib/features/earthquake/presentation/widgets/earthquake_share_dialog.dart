@@ -306,6 +306,9 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
         final canRetry =
             issue == _ShareIssue.failed || issue == _ShareIssue.timeout;
         return AlertDialog(
+          // The preview and map controls change height as options are tapped.
+          // Keep the format row in place while those changes settle.
+          alignment: Alignment.topCenter,
           scrollable: true,
           title: Text(l10n.reportShareTitle),
           content: SizedBox(
