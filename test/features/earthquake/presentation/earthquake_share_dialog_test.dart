@@ -64,22 +64,24 @@ void main() {
     ).readAsBytesSync(),
     requestedReportId: '115000-2026-0422-111524',
   );
-  final input = adaptEarthquakeShareSnapshot(
-    source,
-    identities: VerifiedEarthquakeReportIdentities(
-      bodySha256: source.bodySha256,
-      scale: ReportIntensityScale.cwa2020,
-      magnitudeIsMl: true,
-      countyCodes: const {'臺東縣': '10014', '花蓮縣': '10015'},
-      stationCodes: const {
-        ('臺東縣', '成功'): 'CHK',
-        ('臺東縣', '長濱'): 'ECB',
-        ('臺東縣', '池上'): 'ECS',
-        ('臺東縣', '東河'): 'EDH',
-        ('花蓮縣', '紅葉'): 'EHY',
-      },
-    ),
-  ) as EarthquakeShareInputV2;
+  EarthquakeShareInputV2 verified(EarthquakeReportSnapshot snapshot) =>
+      adaptEarthquakeShareSnapshot(
+        snapshot,
+        identities: VerifiedEarthquakeReportIdentities(
+          bodySha256: snapshot.bodySha256,
+          scale: ReportIntensityScale.cwa2020,
+          magnitudeIsMl: true,
+          countyCodes: const {'臺東縣': '10014', '花蓮縣': '10015'},
+          stationCodes: const {
+            ('臺東縣', '成功'): 'CHK',
+            ('臺東縣', '長濱'): 'ECB',
+            ('臺東縣', '池上'): 'ECS',
+            ('臺東縣', '東河'): 'EDH',
+            ('花蓮縣', '紅葉'): 'EHY',
+          },
+        ),
+      ) as EarthquakeShareInputV2;
+  final input = verified(source);
   final l10n = lookupAppLocalizations(kHomeLocale);
   final retry = find.text(l10n.commonRetry);
   final save = find.text(l10n.reportDetailImageSave);
@@ -117,8 +119,11 @@ void main() {
     ),
   );
 
-  Uint8List preview(WidgetTester tester) =>
-      (tester.widget<Image>(find.byType(Image)).image as MemoryImage).bytes;
+  Uint8List preview(WidgetTester tester) {
+    final resized =
+        tester.widget<Image>(find.byType(Image)).image as ResizeImage;
+    return (resized.imageProvider as MemoryImage).bytes;
+  }
 
   Future<void> waitForImage(WidgetTester tester) async {
     // The engine decodes asynchronously outside the fake clock.
@@ -228,8 +233,157 @@ void main() {
       (EqShareFormat.information4By5, EqMapMode.cluster, EqTheme.light),
       (EqShareFormat.landscape16By9, EqMapMode.cluster, EqTheme.light),
       (EqShareFormat.landscape16By9, EqMapMode.stations, EqTheme.light),
-      (EqShareFormat.information4By5, EqMapMode.cluster, EqTheme.light),
     ]);
+  });
+
+  testWidgets('reuses completed format, mode and theme combinations', (
+    tester,
+  ) async {
+    final landscape = await tester.runAsync(
+      () =>
+          _fixturePng(const ui.Color(0xffeeeeee), EqShareFormat.landscape16By9),
+    );
+    var renders = 0;
+    await tester.pumpWidget(
+      dialog(
+        open: () async => Ok(
+          ReportPicture.forTesting((_, _, theme, format) async {
+            renders++;
+            return format == EqShareFormat.landscape16By9
+                ? landscape!
+                : theme == EqTheme.light
+                ? lightPng
+                : darkPng;
+          }, () {}),
+        ),
+      ),
+    );
+    await waitForImage(tester);
+    final card = preview(tester);
+
+    Future<void> select(String label) async {
+      await tester.tap(find.text(label));
+      await tester.pump();
+      await waitForImage(tester);
+    }
+
+    await select('16:9');
+    await select(l10n.reportShareStations);
+    await select(l10n.themeDark);
+    final darkStations = preview(tester);
+    await select(l10n.themeLight);
+    await select(l10n.reportShareCluster);
+    await select(l10n.reportShareStations);
+    await select(l10n.themeDark);
+    expect(preview(tester), same(darkStations));
+    expect(renders, 4);
+    await select('4:5');
+    expect(preview(tester), darkPng);
+    await select(l10n.themeLight);
+    expect(preview(tester), same(card));
+    expect(renders, 5);
+
+    // The preview's live bytes survive memory pressure, but other selections
+    // need to render again.
+    final observer = tester.state(
+      find.byType(EarthquakeShareDialog),
+    ) as WidgetsBindingObserver;
+    observer.didHaveMemoryPressure();
+    expect(preview(tester), same(card));
+    await select(l10n.themeDark);
+    expect(renders, 6);
+  });
+
+  testWidgets('joining the same in-flight render skips a queued selection', (
+    tester,
+  ) async {
+    final pending = Completer<Uint8List>();
+    final requests = <EqTheme>[];
+    var releases = 0;
+    await tester.pumpWidget(
+      dialog(
+        open: () async => Ok(
+          ReportPicture.forTesting((_, _, theme, _) {
+            requests.add(theme);
+            return pending.future;
+          }, () => releases++),
+        ),
+      ),
+    );
+    await tester.tap(find.text(l10n.themeDark));
+    await tester.pump();
+    await tester.tap(find.text(l10n.themeLight));
+    await tester.pump();
+    expect(requests, [EqTheme.light]);
+    expect(save, findsNothing);
+    pending.complete(lightPng);
+    await waitForImage(tester);
+    expect(preview(tester), lightPng);
+    expect(requests, [EqTheme.light]);
+    expect(releases, 1);
+  });
+
+  testWidgets(
+    'a new body hash invalidates the cache even with the same model',
+    (tester) async {
+      final revision = EarthquakeReportSnapshot.decode(
+        Uint8List.fromList([
+          ...File(
+            'test/features/earthquake/domain/fixtures/share_input/exptech-modern.json',
+          ).readAsBytesSync(),
+          32,
+        ]),
+        requestedReportId: source.report.id,
+      );
+      expect(revision.report, source.report);
+      final updated = verified(revision);
+      expect(updated.bytes, input.bytes);
+      var activeInput = input;
+      var renders = 0;
+      await tester.pumpWidget(
+        dialog(
+          load: () async => Ok(activeInput),
+          open: () async => Ok(
+            ReportPicture.forTesting((_, _, theme, _) async {
+              renders++;
+              return theme == EqTheme.light ? lightPng : darkPng;
+            }, () {}),
+          ),
+        ),
+      );
+      await waitForImage(tester);
+      await tester.tap(find.text(l10n.themeDark));
+      await waitForImage(tester);
+      expect(renders, 2);
+      activeInput = updated;
+      await tester.tap(find.text(l10n.themeLight));
+      await waitForImage(tester);
+      await tester.tap(find.text(l10n.themeDark));
+      await waitForImage(tester);
+      expect(renders, 4);
+    },
+  );
+
+  testWidgets('failed images are not cached and a retry can succeed', (
+    tester,
+  ) async {
+    var renders = 0;
+    await tester.pumpWidget(
+      dialog(
+        open: () async => Ok(
+          ReportPicture.forTesting((_, _, _, _) async {
+            if (++renders == 1) throw StateError('render failed');
+            return lightPng;
+          }, () {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.reportShareRenderFailed), findsOneWidget);
+    await tester.tap(retry);
+    await waitForImage(tester);
+    expect(preview(tester), lightPng);
+    expect(renders, 2);
   });
 
   testWidgets('large text preserves accessible options and export actions', (

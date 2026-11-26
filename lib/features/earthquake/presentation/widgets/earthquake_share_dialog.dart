@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:dpip/app/theme/app_spacing.dart';
@@ -12,6 +13,7 @@ import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_png_cache.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
@@ -20,11 +22,27 @@ import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+const _previewMaxWidth = 364.0;
+
 enum _ShareIssue { language, report, renderer, incompatible, timeout, failed }
 
 enum _ExportFeedback { saved, copied, copyFailed, shareFailed }
 
 enum _ExportAction { save, copy, share }
+
+typedef _SnapshotKey = ({
+  String reportId,
+  String bodySha256,
+  String renderSha256,
+});
+
+typedef _RenderKey = ({
+  _SnapshotKey snapshot,
+  EqShareFormat format,
+  EqMapMode mode,
+  EqTheme theme,
+  Locale locale,
+});
 
 /// Displays and exports the current PNG rendered for one report.
 class _ShareOptions {
@@ -67,7 +85,8 @@ class EarthquakeShareDialog extends StatefulWidget {
   State<EarthquakeShareDialog> createState() => _EarthquakeShareDialogState();
 }
 
-class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
+class _EarthquakeShareDialogState extends State<EarthquakeShareDialog>
+    with WidgetsBindingObserver {
   EqShareFormat _format = EqShareFormat.information4By5;
   EqMapMode _mode = EqMapMode.cluster;
 
@@ -81,10 +100,44 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
   Locale? _locale;
   ModalRoute<dynamic>? _route;
   late Future<Uint8List> _preview;
+  Timer? _previewTimer;
+  final _cache = EarthquakeSharePngCache<_RenderKey>();
+  final _inFlight = <_RenderKey, Future<Uint8List>>{};
   Future<void> _renderTail = Future.value();
+  _SnapshotKey? _snapshot;
+  _RenderKey? _requested;
+  int _cacheEpoch = 0;
   int _generation = 0;
   bool _exporting = false;
   Object? _feedback;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didHaveMemoryPressure() {
+    ++_cacheEpoch;
+    _cache.clear();
+  }
+
+  void _invalidateSnapshot() {
+    _snapshot = null;
+    _requested = null;
+    _inFlight.clear();
+    ++_cacheEpoch;
+    _cache.clear();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _previewTimer?.cancel();
+    _invalidateSnapshot();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -105,7 +158,10 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
   @override
   void didUpdateWidget(covariant EarthquakeShareDialog oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.report != oldWidget.report) _start();
+    if (widget.report != oldWidget.report) {
+      _invalidateSnapshot();
+      _start();
+    }
   }
 
   bool _isCurrent(int generation) =>
@@ -117,44 +173,118 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
   void _start() {
     final generation = ++_generation;
     _feedback = null;
-    _preview = _generate(generation, _options).timeout(
-      widget.renderTimeout,
-      onTimeout: () {
-        if (generation == _generation) ++_generation;
-        throw _ShareIssue.timeout;
-      },
+    _requested = null;
+    _previewTimer?.cancel();
+    final result = Completer<Uint8List>();
+    _preview = result.future;
+    // A second selection can replace this future before the next build.
+    _preview.ignore();
+    final timer = Timer(widget.renderTimeout, () {
+      // An already-running FFI call must finish, but retry creates a fresh
+      // request rather than joining the timed-out one.
+      _inFlight.remove(_requested);
+      _requested = null;
+      ++_generation;
+      result.completeError(_ShareIssue.timeout);
+    });
+    _previewTimer = timer;
+    unawaited(
+      _generate(generation, _options).then(
+        (png) {
+          timer.cancel();
+          if (!result.isCompleted) result.complete(png);
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          timer.cancel();
+          if (!result.isCompleted) result.completeError(error, stackTrace);
+        },
+      ),
     );
   }
 
   Future<Uint8List> _generate(int generation, _ShareOptions options) async {
-    if (_locale != kHomeLocale) throw _ShareIssue.language;
+    final locale = _locale!;
+    if (locale != kHomeLocale) throw _ShareIssue.language;
     final loaded = await widget.loadInput();
-    if (loaded.failureOrNull case final failure?) throw failure;
+    if (!_isCurrent(generation)) throw _ShareIssue.report;
+    if (loaded.failureOrNull case final failure?) {
+      _invalidateSnapshot();
+      throw failure;
+    }
     final input = loaded.valueOrNull;
-    if (input is! EarthquakeShareInputV2) throw _ShareIssue.report;
+    if (input is! EarthquakeShareInputV2) {
+      _invalidateSnapshot();
+      throw _ShareIssue.report;
+    }
+    final verified = input.verifiedSnapshot;
+    if (verified == null || verified.reportId != widget.report.id) {
+      _invalidateSnapshot();
+      throw _ShareIssue.report;
+    }
 
-    // Skip superseded work before allocating native state. A synchronous FFI
-    // call already in progress is allowed to finish and release its handle.
-    final render = _renderTail.then((_) async {
-      if (!_isCurrent(generation)) throw _ShareIssue.report;
-      final opened = await widget.openRenderer();
-      final renderer = opened.valueOrNull ?? (throw opened.failureOrNull!);
-      try {
-        if (!_isCurrent(generation)) throw _ShareIssue.report;
-        final response = await renderer.renderSharePngV2(
-          input.bytes,
-          mode: options.mode,
-          theme: options.theme,
-          format: options.format,
-        );
-        final png = response.valueOrNull ?? (throw response.failureOrNull!);
-        if (!_isCurrent(generation)) throw _ShareIssue.report;
-        await _validatePreview(png, options.format);
-        return png.asUnmodifiableView();
-      } finally {
-        await renderer.dispose();
-      }
-    });
+    final snapshot = (
+      reportId: verified.reportId,
+      bodySha256: verified.bodySha256,
+      renderSha256: input.renderSha256,
+    );
+    if (_snapshot != snapshot) {
+      _invalidateSnapshot();
+      _snapshot = snapshot;
+    }
+    final key = (
+      snapshot: snapshot,
+      format: options.format,
+      mode: options.mode,
+      theme: options.theme,
+      locale: locale,
+    );
+    _requested = key;
+    return _cache.lookup(key) ??
+        _inFlight[key] ??
+        _scheduleRender(key, input.bytes);
+  }
+
+  Future<Uint8List> _scheduleRender(_RenderKey key, Uint8List input) {
+    late final Future<Uint8List> render;
+    bool isPending() =>
+        mounted &&
+        _route?.isCurrent == true &&
+        widget.isReportCurrent() &&
+        identical(_inFlight[key], render);
+
+    render = _renderTail
+        .then((_) async {
+          // Only start queued work for the selection the user landed on.
+          if (!isPending() || _requested != key) throw _ShareIssue.report;
+          final cacheEpoch = _cacheEpoch;
+          final opened = await widget.openRenderer();
+          final renderer = opened.valueOrNull ?? (throw opened.failureOrNull!);
+          final Uint8List png;
+          try {
+            if (!isPending() || _requested != key) throw _ShareIssue.report;
+            final response = await renderer.renderSharePngV2(
+              input,
+              mode: key.mode,
+              theme: key.theme,
+              format: key.format,
+            );
+            png = (response.valueOrNull ?? (throw response.failureOrNull!))
+                .asUnmodifiableView();
+            if (!isPending()) throw _ShareIssue.report;
+            await _validatePreview(png, key.format);
+          } finally {
+            await renderer.dispose();
+          }
+
+          // A completed render can be useful on a later selection. Only the
+          // FutureBuilder for the current selection can present its result.
+          if (isPending() && cacheEpoch == _cacheEpoch) _cache.store(key, png);
+          return png;
+        })
+        .whenComplete(() {
+          if (identical(_inFlight[key], render)) _inFlight.remove(key);
+        });
+    _inFlight[key] = render;
     _renderTail = render.then<void>(
       (_) {},
       onError: (Object _, StackTrace _) {},
@@ -163,19 +293,26 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
   }
 
   Future<void> _validatePreview(Uint8List png, EqShareFormat format) async {
-    final codec = await ui.instantiateImageCodec(png);
+    final buffer = await ui.ImmutableBuffer.fromUint8List(png);
     try {
-      final frame = await codec.getNextFrame();
+      final descriptor = await ui.ImageDescriptor.encoded(buffer);
       try {
-        if (frame.image.width != format.width ||
-            frame.image.height != format.height) {
+        if (descriptor.width != format.width ||
+            descriptor.height != format.height) {
           throw const FormatException('Unexpected report PNG dimensions');
         }
+        final codec = await descriptor.instantiateCodec(targetWidth: 256);
+        try {
+          final frame = await codec.getNextFrame();
+          frame.image.dispose();
+        } finally {
+          codec.dispose();
+        }
       } finally {
-        frame.image.dispose();
+        descriptor.dispose();
       }
     } finally {
-      codec.dispose();
+      buffer.dispose();
     }
   }
 
@@ -326,7 +463,7 @@ class _EarthquakeShareDialogState extends State<EarthquakeShareDialog> {
           scrollable: true,
           title: Text(l10n.reportShareTitle),
           content: SizedBox(
-            width: 364,
+            width: _previewMaxWidth,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -514,29 +651,36 @@ class _PngPreview extends StatefulWidget {
 }
 
 class _PngPreviewState extends State<_PngPreview> {
-  @override
-  void didUpdateWidget(covariant _PngPreview oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.bytes != widget.bytes) {
-      unawaited(MemoryImage(oldWidget.bytes).evict());
-    }
-  }
+  ImageProvider? _image;
 
   @override
   void dispose() {
-    unawaited(MemoryImage(widget.bytes).evict());
+    if (_image case final image?) unawaited(image.evict());
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-    constraints: BoxConstraints(
-      maxHeight: MediaQuery.sizeOf(context).height * .38,
-    ),
-    child: Image.memory(
-      widget.bytes,
-      fit: BoxFit.contain,
-      semanticLabel: widget.label,
-    ),
-  );
+  Widget build(BuildContext context) {
+    final screen = MediaQuery.sizeOf(context);
+    final maxWidth = math.min(_previewMaxWidth, screen.width);
+    final maxHeight = screen.height * .38;
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final image = ResizeImage(
+      MemoryImage(widget.bytes),
+      width: math.max(1, (maxWidth * dpr).ceil()),
+      height: math.max(1, (maxHeight * dpr).ceil()),
+      policy: ResizeImagePolicy.fit,
+    );
+    final previous = _image;
+    if (previous != null && previous != image) unawaited(previous.evict());
+    _image = image;
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: Image(
+        image: image,
+        fit: BoxFit.contain,
+        semanticLabel: widget.label,
+      ),
+    );
+  }
 }
