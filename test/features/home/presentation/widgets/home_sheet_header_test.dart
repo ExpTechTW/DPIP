@@ -10,6 +10,8 @@ import 'dart:async';
 
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/core/geo/location_mode.dart';
+import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -122,6 +124,7 @@ Widget _wrap(
   Future<({double lat, double lng})?> Function()? gpsFix,
   bool expanded = false,
   double textScale = 1,
+  LocationMode? mode,
 }) {
   final router = GoRouter(
     initialLocation: '/',
@@ -133,6 +136,8 @@ Widget _wrap(
             ChangeNotifierProvider<RegionStore>.value(value: store),
             Provider<TownDirectory>.value(value: _directory),
             ChangeNotifierProvider<MapStationHandoff>.value(value: handoff),
+            if (mode != null)
+              ChangeNotifierProvider<LocationMode>.value(value: mode),
             ChangeNotifierProvider<HomeWeatherController>(
               create: (_) => HomeWeatherController(
                 repo,
@@ -161,6 +166,11 @@ Widget _wrap(
         path: '/map',
         name: 'map',
         builder: (_, _) => const Scaffold(body: SizedBox()),
+      ),
+      GoRoute(
+        path: '/location-mode',
+        name: AppRoutes.locationMode,
+        builder: (_, _) => const Scaffold(body: Text('location-page')),
       ),
     ],
   );
@@ -291,5 +301,42 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('信義'), findsOneWidget);
+  });
+
+  testWidgets('所在地 set by hand says so, and a tap opens the way back', (
+    tester,
+  ) async {
+    final store = await _store()
+      ..setCurrentCode('100')
+      ..select(1); // 所在地
+    final mode = LocationMode(SettingsStore.inMemory({}), _directory);
+    await mode.setManual(_directory.byCode('100')!);
+    await tester.pumpWidget(
+      _wrap(store, _GatedWeatherRepository(), MapStationHandoff(), mode: mode),
+    );
+    await tester.pump();
+    final l10n = await AppLocalizations.delegate.load(const Locale('zh', 'TW'));
+    expect(find.text(l10n.homeManualLocationHint), findsOneWidget);
+
+    await tester.tap(find.text(l10n.homeManualLocationHint));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('location-page'), findsOneWidget);
+  });
+
+  testWidgets('a saved township is not 所在地 and carries no manual hint', (
+    tester,
+  ) async {
+    final store = await _store()
+      ..setCurrentCode('100')
+      ..select(2); // the '100' saved township
+    final mode = LocationMode(SettingsStore.inMemory({}), _directory);
+    await mode.setManual(_directory.byCode('100')!);
+    await tester.pumpWidget(
+      _wrap(store, _GatedWeatherRepository(), MapStationHandoff(), mode: mode),
+    );
+    await tester.pump();
+    final l10n = await AppLocalizations.delegate.load(const Locale('zh', 'TW'));
+    expect(find.text(l10n.homeManualLocationHint), findsNothing);
   });
 }

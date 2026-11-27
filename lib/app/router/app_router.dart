@@ -4,6 +4,7 @@ import 'package:dpip/features/ai_chat/presentation/pages/ai_chat_page.dart';
 import 'package:dpip/features/ai_chat/presentation/pages/ai_settings_page.dart';
 import 'package:dpip/app/router/route_params.dart';
 import 'package:dpip/app/router/widget_location_routes.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
@@ -13,6 +14,8 @@ import 'package:dpip/features/earthquake/presentation/pages/report_replay_page.d
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
+import 'package:dpip/features/location/presentation/pages/location_mode_page.dart';
+import 'package:dpip/features/location/presentation/pages/location_town_picker_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
@@ -413,6 +416,24 @@ final GoRouter appRouter = GoRouter(
       name: AppRoutes.aiSettings,
       pageBuilder: (_, state) =>
           MaterialPage<void>(key: state.pageKey, child: const AiSettingsPage()),
+    ),
+    GoRoute(
+      path: AppRoutes.locationModePath,
+      name: AppRoutes.locationMode,
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: const LocationModePage(),
+      ),
+      routes: [
+        GoRoute(
+          path: AppRoutes.locationModeTownPath,
+          name: AppRoutes.locationModeTown,
+          pageBuilder: (_, state) => MaterialPage<Town>(
+            key: state.pageKey,
+            child: const LocationTownPickerPage(),
+          ),
+        ),
+      ],
     ),
     GoRoute(
       path: AppRoutes.sponsorPath,

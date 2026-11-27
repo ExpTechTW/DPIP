@@ -197,6 +197,18 @@ abstract final class SettingKeys {
     'notification.channelVersion',
   );
 
+  /// The township code the user pinned as their location by hand; absent while
+  /// the location comes from the device (GPS). See `LocationMode`.
+  static const SettingKey<String> manualLocationTown = SettingKey<String>._(
+    'location.manualTown',
+  );
+
+  /// When the More page's warning about a township set by hand was last
+  /// dismissed (device-clock millis); absent while it has not been dismissed
+  /// since the location was last set by hand. See `LocationMode.showsWarning`.
+  static const SettingKey<int> manualLocationWarningDismissedAtMs =
+      SettingKey<int>._('location.manualWarningDismissedAt');
+
   /// Last successful *attempt* to POST `updateDeviceLocation` (UTC millis).
   /// Foreground reporter skips a new call within 60s — server 429 guard.
   static const SettingKey<int> deviceLocationUpdatedAtMs = SettingKey<int>._(

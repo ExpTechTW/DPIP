@@ -3928,4 +3928,74 @@ class AppLocalizationsId extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return 'Pesan layanan: $detail';
   }
+
+  @override
+  String get locationModeTitle => 'Lokasi dan area peringatan';
+
+  @override
+  String get locationModeAuto => 'Otomatis (GPS)';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      'Lokasi dan area peringatan mengikuti ponsel Anda dan diperbarui otomatis saat Anda berpindah. Disarankan.';
+
+  @override
+  String get locationModeManual => 'Tetapkan kecamatan secara manual';
+
+  @override
+  String get locationModeManualSubtitle =>
+      'Selalu memakai kecamatan yang Anda pilih dan mematikan GPS.';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return 'Manual: $place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return 'Diatur manual. Lokasi dan semua peringatan ditetapkan ke $place, dan GPS mati. Saat Anda tidak berada di sana, Anda mungkin tidak menerima peringatan darurat untuk tempat Anda berada.';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => 'Kembali ke otomatis (GPS)';
+
+  @override
+  String get locationModeChangeTown => 'Ganti kecamatan';
+
+  @override
+  String get locationModeWarningTitle =>
+      'Jangan atur lokasi secara manual kecuali benar-benar perlu';
+
+  @override
+  String get locationModeWarningBody =>
+      'Mengatur secara manual akan mematikan GPS. Semua peringatan — termasuk peringatan dini gempa bumi, tsunami, dan peringatan cuaca — akan dikirim untuk kecamatan yang Anda pilih, bukan untuk tempat Anda sebenarnya berada.\n\nSaat Anda tidak berada di kecamatan itu, Anda mungkin melewatkan peringatan darurat untuk tempat Anda berada dan menerima peringatan untuk tempat lain.\n\nBiarkan tetap otomatis kecuali Anda benar-benar tahu apa yang Anda lakukan (misalnya, ponsel Anda tidak dapat menentukan lokasi).';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      'Saya mengerti saya mungkin melewatkan peringatan darurat untuk tempat saya berada';
+
+  @override
+  String get locationModeWarningContinue => 'Tetap atur manual';
+
+  @override
+  String get locationModeKeepAuto => 'Tetap otomatis';
+
+  @override
+  String get locationModePickTownTitle => 'Pilih kecamatan';
+
+  @override
+  String get locationModeSwitchedToAuto =>
+      'Kembali ke otomatis — mencari lokasi dengan GPS';
+
+  @override
+  String get homeManualLocationHint =>
+      'Lokasi diatur manual — ketuk untuk kembali ke otomatis';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return 'Tutup selama $days hari';
+  }
+
+  @override
+  String get locationModeManualBadge => 'Lokasi diatur manual';
 }

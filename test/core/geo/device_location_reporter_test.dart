@@ -7,6 +7,7 @@ import 'package:dpip/core/logging/crash_sink.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -331,6 +332,100 @@ void main() {
       expect(await registration, ReportOutcome.throttled);
       expect(calls, 1);
       await positions.close();
+    });
+  });
+
+  group('reportWhenAllowed', () {
+    final start = DateTime.utc(2024, 1, 1);
+    const pinned = (lat: 22.6, lng: 120.6);
+
+    DeviceLocationReporter reporterAt(
+      FakeAsync async,
+      List<GpsFix> reported, {
+      DateTime? lastReport,
+    }) => DeviceLocationReporter(
+      positions: () => const Stream<GpsFix>.empty(),
+      settings: SettingsStore.inMemory({
+        if (lastReport != null)
+          SettingKeys.deviceLocationUpdatedAtMs.name:
+              lastReport.millisecondsSinceEpoch,
+      }),
+      now: () => start.add(async.elapsed),
+      onMoved: (fix) async {
+        reported.add(fix);
+        return true;
+      },
+    );
+
+    test('reports at once when the window is open', () {
+      fakeAsync((async) {
+        final reported = <GpsFix>[];
+        ReportOutcome? outcome;
+        reporterAt(
+          async,
+          reported,
+        ).reportWhenAllowed(pinned).then((o) => outcome = o);
+        async.flushMicrotasks();
+        expect(reported, [pinned]);
+        expect(outcome, ReportOutcome.sent);
+      });
+    });
+
+    test('waits out a window a report just took, then reports', () {
+      // A township pinned a moment after a move was reported must still reach
+      // the server, or it keeps alerting for where the move put the device.
+      fakeAsync((async) {
+        final reported = <GpsFix>[];
+        ReportOutcome? outcome;
+        reporterAt(
+          async,
+          reported,
+          lastReport: start.subtract(const Duration(seconds: 20)),
+        ).reportWhenAllowed(pinned).then((o) => outcome = o);
+
+        async.elapse(const Duration(seconds: 39));
+        expect(reported, isEmpty);
+        async.elapse(const Duration(seconds: 2));
+        expect(reported, [pinned]);
+        expect(outcome, ReportOutcome.sent);
+      });
+    });
+
+    test('a later placement supersedes one still waiting', () {
+      fakeAsync((async) {
+        final reported = <GpsFix>[];
+        final reporter = reporterAt(
+          async,
+          reported,
+          lastReport: start.subtract(const Duration(seconds: 20)),
+        );
+        ReportOutcome? first;
+        ReportOutcome? second;
+        reporter
+            .reportWhenAllowed((lat: 25.0, lng: 121.5))
+            .then((o) => first = o);
+        reporter.reportWhenAllowed(pinned).then((o) => second = o);
+
+        async.elapse(const Duration(seconds: 41));
+        expect(reported, [pinned]);
+        expect(first, ReportOutcome.throttled);
+        expect(second, ReportOutcome.sent);
+      });
+    });
+
+    test('a fix the server already has is not sent again', () {
+      fakeAsync((async) {
+        final reported = <GpsFix>[];
+        final reporter = reporterAt(async, reported);
+        reporter.reportNow(pinned);
+        async.flushMicrotasks();
+
+        ReportOutcome? outcome;
+        reporter.reportWhenAllowed(pinned).then((o) => outcome = o);
+        async.flushMicrotasks();
+        expect(reported, [pinned]);
+        expect(outcome, ReportOutcome.sent);
+      });
     });
   });
 }

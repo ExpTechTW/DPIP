@@ -6,6 +6,8 @@ library;
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
+import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -49,10 +51,22 @@ class _Repo implements NotifyRepository {
   }
 }
 
+final TownDirectory _towns = TownDirectory.fromJson({
+  '970': {
+    'city': '花蓮',
+    'town': '花蓮',
+    'lat': 23.99,
+    'lng': 121.60,
+    'cityLevel': '縣',
+    'townLevel': '市',
+  },
+});
+
 Future<void> _pump(
   WidgetTester tester, {
   required NotifyRepository repo,
   String? token,
+  LocationMode? mode,
 }) async {
   tester.view.physicalSize = _tall;
   tester.view.devicePixelRatio = 1;
@@ -69,6 +83,11 @@ Future<void> _pump(
         path: '/test',
         builder: (_, _) => const Scaffold(body: Text('test-page')),
       ),
+      GoRoute(
+        name: AppRoutes.locationMode,
+        path: '/location-mode',
+        builder: (_, _) => const Scaffold(body: Text('location-page')),
+      ),
     ],
   );
   addTearDown(router.dispose);
@@ -78,6 +97,9 @@ Future<void> _pump(
       providers: [
         Provider<NotifyRepository>.value(value: repo),
         Provider(create: (_) => NotificationService(store)),
+        ChangeNotifierProvider<LocationMode>.value(
+          value: mode ?? LocationMode(SettingsStore.inMemory({}), _towns),
+        ),
       ],
       child: MaterialApp.router(
         routerConfig: router,
@@ -91,6 +113,37 @@ Future<void> _pump(
 
 void main() {
   presetTests();
+
+  testWidgets('the alert area reads automatic and opens its page', (
+    tester,
+  ) async {
+    await _pump(tester, repo: _Repo(Ok(_settings())), token: 'token');
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.locationModeTitle), findsOneWidget);
+    expect(find.text(l10n.locationModeAuto), findsOneWidget);
+
+    await tester.tap(find.text(l10n.locationModeTitle));
+    await tester.pumpAndSettle();
+    expect(find.text('location-page'), findsOneWidget);
+  });
+
+  testWidgets('a township set by hand is named on the alert area row', (
+    tester,
+  ) async {
+    final mode = LocationMode(SettingsStore.inMemory({}), _towns);
+    await mode.setManual(_towns.byCode('970')!);
+    await _pump(
+      tester,
+      repo: _Repo(Ok(_settings())),
+      token: 'token',
+      mode: mode,
+    );
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(
+      find.text(l10n.locationModeManualSummary('花蓮縣 花蓮市')),
+      findsOneWidget,
+    );
+  });
 
   testWidgets('no token shows the unavailable state', (tester) async {
     await _pump(tester, repo: _Repo(Ok(_settings())));

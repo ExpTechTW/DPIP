@@ -3917,4 +3917,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return 'Service said: $detail';
   }
+
+  @override
+  String get locationModeTitle => 'Location and alert area';
+
+  @override
+  String get locationModeAuto => 'Automatic (GPS)';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      'Your location and alert area follow your phone and update as you move. Recommended.';
+
+  @override
+  String get locationModeManual => 'Set a township by hand';
+
+  @override
+  String get locationModeManualSubtitle =>
+      'Always uses the township you pick, and turns GPS off.';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return 'Set by hand: $place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return 'Set by hand. Your location and every alert are fixed to $place, and GPS is off. When you are not there, you may miss emergency alerts for where you are.';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => 'Switch back to automatic (GPS)';
+
+  @override
+  String get locationModeChangeTown => 'Change township';
+
+  @override
+  String get locationModeWarningTitle =>
+      'Don\'t set your location by hand unless you must';
+
+  @override
+  String get locationModeWarningBody =>
+      'Setting it by hand turns GPS off. Every alert — earthquake early warnings, tsunami warnings and weather warnings included — is then sent for the township you pick, not for where you actually are.\n\nWhenever you are not in that township, you may miss emergency alerts for where you are, and get alerts meant for somewhere else.\n\nKeep it automatic unless you know exactly what you are doing (for example, your phone cannot get a location).';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      'I understand I may miss emergency alerts for where I am';
+
+  @override
+  String get locationModeWarningContinue => 'Set by hand anyway';
+
+  @override
+  String get locationModeKeepAuto => 'Keep automatic';
+
+  @override
+  String get locationModePickTownTitle => 'Choose a township';
+
+  @override
+  String get locationModeSwitchedToAuto =>
+      'Back to automatic — locating with GPS';
+
+  @override
+  String get homeManualLocationHint =>
+      'Location set by hand — tap to switch back to automatic';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return 'Dismiss for $days days';
+  }
+
+  @override
+  String get locationModeManualBadge => 'Location set by hand';
 }

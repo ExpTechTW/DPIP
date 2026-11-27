@@ -172,6 +172,15 @@ abstract final class AppRoutes {
   static const String notifyTest = 'notifyTest';
   static const String notifyTestPath = 'test';
 
+  /// Where the location comes from: the GPS (the default), or one township
+  /// set by hand behind a warning.
+  static const String locationMode = 'locationMode';
+  static const String locationModePath = '/location-mode';
+
+  /// The township picker of [locationMode]; pops with the chosen `Town`.
+  static const String locationModeTown = 'locationModeTown';
+  static const String locationModeTownPath = 'town';
+
   // Support / in-app-purchase page.
   static const String sponsor = 'sponsor';
   static const String sponsorPath = '/sponsor';

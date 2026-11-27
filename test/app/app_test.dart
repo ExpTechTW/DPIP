@@ -12,11 +12,13 @@ import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/data/dpip_mesh_gateway_impl.dart';
 import 'package:dpip/core/meshtastic/mesh_alerts.dart';
@@ -154,15 +156,82 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
   });
+
+  testWidgets('a township set by hand keeps background reporting off', (
+    tester,
+  ) async {
+    // Native reporting runs while the app is closed; armed under a township
+    // set by hand, it would put the device back where the GPS says the moment
+    // the app went to the background.
+    const channel = MethodChannel('test/app_bg');
+    final calls = <String>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (call) async {
+          calls.add(call.method);
+          return null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null),
+    );
+    final settings = SettingsStore.inMemory();
+    await settings.setString(SettingKeys.locale, 'en');
+    await settings.setString(SettingKeys.pushToken, 'token-1');
+    final mode = LocationMode(settings, const TownDirectory({}));
+    final deps = _deps(settings, mode: mode);
+    geo.permission = LocationPermission.always;
+
+    await tester.pumpWidget(
+      DpipApp(
+        deps: deps,
+        providers: [
+          ...coreProviders(deps),
+          ...mapProviders(),
+          ChangeNotifierProvider<MapCameraHandoff>.value(
+            value: MapCameraHandoff(),
+          ),
+        ],
+      ),
+    );
+    await deps.onboarding.complete();
+    await tester.pump();
+    await tester.pump();
+    expect(calls, contains('start'), reason: 'automatic arms it');
+
+    calls.clear();
+    await mode.setManual(
+      const Town(
+        code: '100',
+        city: '臺北',
+        town: '中正',
+        lat: 25.03,
+        lng: 121.52,
+        cityLevel: '市',
+        townLevel: '區',
+      ),
+    );
+    await tester.pump();
+    expect(calls, ['stop']);
+
+    calls.clear();
+    await mode.setAuto();
+    await tester.pump();
+    expect(calls, ['start']);
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
 }
 
-SharedDeps _deps(SettingsStore settings) {
+SharedDeps _deps(SettingsStore settings, {LocationMode? mode}) {
   final regions = RegionSelection(settings);
   final mesh = FakeMeshService();
   const townDirectory = TownDirectory({});
   final regionStore = RegionStore(settings);
+  final locationMode = mode ?? LocationMode(settings, townDirectory);
   final location = LocationService(
     townDirectory,
+    manualTown: () => locationMode.manualTown,
     isAvailable: () async => false,
     fix: () async => null,
     lastKnown: () async => null,
@@ -195,6 +264,7 @@ SharedDeps _deps(SettingsStore settings) {
       IosWidgetSnapshotWriter(isSupportedPlatform: false),
     ),
     locationService: location,
+    locationMode: locationMode,
     deviceLocationReporter: reporter,
     backgroundLocation: BackgroundLocationService(
       platform: 0,

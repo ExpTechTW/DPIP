@@ -3919,4 +3919,73 @@ class AppLocalizationsVi extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return 'Thông báo từ dịch vụ: $detail';
   }
+
+  @override
+  String get locationModeTitle => 'Vị trí và khu vực nhận cảnh báo';
+
+  @override
+  String get locationModeAuto => 'Tự động (GPS)';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      'Vị trí và khu vực nhận cảnh báo theo điện thoại của bạn và tự cập nhật khi bạn di chuyển. Nên dùng.';
+
+  @override
+  String get locationModeManual => 'Tự chọn xã';
+
+  @override
+  String get locationModeManualSubtitle => 'Luôn dùng xã bạn chọn và tắt GPS.';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return 'Tự chọn: $place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return 'Đang tự chọn. Vị trí và mọi cảnh báo được cố định tại $place, GPS đã tắt. Khi bạn không ở đó, bạn có thể không nhận được cảnh báo khẩn cấp cho nơi mình đang ở.';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => 'Chuyển lại tự động (GPS)';
+
+  @override
+  String get locationModeChangeTown => 'Đổi xã';
+
+  @override
+  String get locationModeWarningTitle =>
+      'Đừng tự chọn vị trí trừ khi thật cần thiết';
+
+  @override
+  String get locationModeWarningBody =>
+      'Khi tự chọn, GPS sẽ tắt. Mọi cảnh báo — kể cả cảnh báo động đất sớm, sóng thần và cảnh báo thời tiết — sẽ được gửi theo xã bạn chọn, không theo nơi bạn thực sự đang ở.\n\nBất cứ khi nào bạn không ở xã đó, bạn có thể bỏ lỡ cảnh báo khẩn cấp cho nơi mình đang ở và nhận cảnh báo của nơi khác.\n\nHãy để chế độ tự động, trừ khi bạn biết rõ mình đang làm gì (ví dụ: điện thoại không xác định được vị trí).';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      'Tôi hiểu rằng tôi có thể bỏ lỡ cảnh báo khẩn cấp cho nơi mình đang ở';
+
+  @override
+  String get locationModeWarningContinue => 'Vẫn tự chọn';
+
+  @override
+  String get locationModeKeepAuto => 'Giữ tự động';
+
+  @override
+  String get locationModePickTownTitle => 'Chọn xã';
+
+  @override
+  String get locationModeSwitchedToAuto =>
+      'Đã chuyển lại tự động — đang định vị bằng GPS';
+
+  @override
+  String get homeManualLocationHint =>
+      'Vị trí đang được tự chọn — chạm để chuyển lại tự động';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return 'Đóng (nhắc lại sau $days ngày)';
+  }
+
+  @override
+  String get locationModeManualBadge => 'Vị trí do bạn tự chọn';
 }

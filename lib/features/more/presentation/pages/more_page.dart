@@ -1,10 +1,13 @@
 import 'dart:typed_data';
 
+import 'package:dpip/app/theme/app_caution.dart';
 import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/geo/location_mode.dart';
+import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/features/bug_tracker/bug_tracker_counter.dart';
@@ -42,6 +45,8 @@ class MorePage extends StatelessWidget {
     final spokenIntensity = context
         .watch<EewSpokenAnnouncementSettings>()
         .enabled;
+    final locationMode = context.watch<LocationMode>();
+    final manualTown = locationMode.manualTown;
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -70,11 +75,19 @@ class MorePage extends StatelessWidget {
               ],
             ),
             SectionHeader(l10n.moreSectionNotify),
+            // Heading the notification group: a township set by hand decides
+            // every alert this device gets, so the group says so until
+            // dismissed — and again a week after each dismissal.
+            if (manualTown != null && locationMode.showsWarning)
+              _ManualLocationWarning(town: manualTown),
             _MoreGroup(
               children: [
                 _MoreTile(
                   icon: Icons.notifications_outlined,
                   title: l10n.notifySettingsMenu,
+                  // Stays while the location is set by hand, dismissed warning
+                  // or not: the row whose page leads with the way back.
+                  caution: manualTown != null,
                   onTap: () => context.pushNamed(AppRoutes.notifySettings),
                 ),
                 // Kept beside the notification settings: when an alert does not
@@ -493,6 +506,103 @@ class _MoreGroup extends StatelessWidget {
   }
 }
 
+/// The reminder that the location is set by hand, heading the notification
+/// group.
+///
+/// Yellow, not red: nothing is broken, the user chose this. But the township
+/// decides every alert the device gets, so the card names it, says what that
+/// means and offers the way back. Its close button only quiets it for
+/// [LocationMode.warningSnooze]; tapping the card opens the location settings.
+class _ManualLocationWarning extends StatelessWidget {
+  const _ManualLocationWarning({required this.town});
+
+  final Town town;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final ink = AppCaution.onContainer(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        0,
+        AppSpacing.lg,
+        AppSpacing.md,
+      ),
+      child: Material(
+        color: AppCaution.container(context),
+        borderRadius: AppRadius.large,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.pushNamed(AppRoutes.locationMode),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.xs,
+              AppSpacing.sm,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Icon(Icons.warning_amber_rounded, color: ink),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.xs),
+                        child: Text(
+                          l10n.locationModeManualBanner(town.fullName),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: ink,
+                          ),
+                        ),
+                      ),
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          foregroundColor: ink,
+                          padding: EdgeInsets.zero,
+                        ),
+                        onPressed: () => _switchToAuto(context),
+                        icon: const Icon(Icons.gps_fixed),
+                        label: Text(l10n.locationModeSwitchToAuto),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: l10n.locationModeWarningDismiss(
+                    LocationMode.warningSnooze.inDays,
+                  ),
+                  color: ink,
+                  icon: const Icon(Icons.close),
+                  onPressed: () =>
+                      context.read<LocationMode>().dismissWarning(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Future<void> _switchToAuto(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final message = AppLocalizations.of(context).locationModeSwitchedToAuto;
+    await context.read<LocationMode>().setAuto();
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
 /// A navigable row into an in-app screen — leading icon, title, chevron.
 class _MoreTile extends StatelessWidget {
   const _MoreTile({
@@ -500,6 +610,7 @@ class _MoreTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.alert = false,
+    this.caution = false,
     this.trailing,
     required this.onTap,
   });
@@ -507,6 +618,10 @@ class _MoreTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
+
+  /// Marks the row with a yellow exclamation mark: not broken, but set in a
+  /// way the user should keep in mind — the location set by hand.
+  final bool caution;
 
   /// Marks the row with the same dot the shell uses, for something the user
   /// should act on. Off for every row that is merely a destination.
@@ -521,8 +636,25 @@ class _MoreTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget leading;
+    if (caution) {
+      leading = Badge(
+        backgroundColor: AppCaution.container(context),
+        label: Semantics(
+          label: AppLocalizations.of(context).locationModeManualBadge,
+          child: Icon(
+            Icons.priority_high_rounded,
+            size: 12,
+            color: AppCaution.onContainer(context),
+          ),
+        ),
+        child: Icon(icon),
+      );
+    } else {
+      leading = alert ? Badge(child: Icon(icon)) : Icon(icon);
+    }
     return ListTile(
-      leading: alert ? Badge(child: Icon(icon)) : Icon(icon),
+      leading: leading,
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       trailing: trailing ?? const Icon(Icons.chevron_right),

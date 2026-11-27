@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dpip/core/di/shared_deps.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
@@ -87,6 +88,7 @@ List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   Provider<Future<TownBoundaries>>.value(value: deps.townBoundaries),
   Provider<LocationService>.value(value: deps.locationService),
   ChangeNotifierProvider<LocationMonitor>.value(value: deps.locationMonitor),
+  ChangeNotifierProvider<LocationMode>.value(value: deps.locationMode),
   // Exposed for the developer page's health readout; the arming itself is
   // driven from the app shell, not from a page.
   Provider<BackgroundLocationService>.value(value: deps.backgroundLocation),

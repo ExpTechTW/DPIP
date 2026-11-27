@@ -3942,4 +3942,74 @@ class AppLocalizationsFil extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return 'Sabi ng serbisyo: $detail';
   }
+
+  @override
+  String get locationModeTitle => 'Lokasyon at lugar ng alerto';
+
+  @override
+  String get locationModeAuto => 'Awtomatiko (GPS)';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      'Sinusundan ng lokasyon at lugar ng alerto ang iyong telepono at kusang nag-a-update habang gumagalaw ka. Inirerekomenda.';
+
+  @override
+  String get locationModeManual => 'Manwal na pumili ng bayan';
+
+  @override
+  String get locationModeManualSubtitle =>
+      'Laging ginagamit ang bayang pinili mo, at pinapatay ang GPS.';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return 'Manwal: $place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return 'Manwal na nakatakda. Nakapirmi sa $place ang iyong lokasyon at lahat ng alerto, at nakapatay ang GPS. Kapag wala ka roon, maaaring hindi mo matanggap ang mga emergency alert para sa kinaroroonan mo.';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => 'Bumalik sa awtomatiko (GPS)';
+
+  @override
+  String get locationModeChangeTown => 'Palitan ang bayan';
+
+  @override
+  String get locationModeWarningTitle =>
+      'Huwag itakda nang manwal ang lokasyon maliban kung kailangan';
+
+  @override
+  String get locationModeWarningBody =>
+      'Kapag manwal ang setting, papatayin ang GPS. Lahat ng alerto — kasama ang earthquake early warning, tsunami, at mga babala sa panahon — ay ipapadala para sa bayang pinili mo, hindi para sa totoong kinaroroonan mo.\n\nKapag wala ka sa bayang iyon, maaaring hindi mo matanggap ang mga emergency alert para sa kinaroroonan mo, at makatanggap ka ng mga alerto para sa ibang lugar.\n\nPanatilihin itong awtomatiko maliban kung alam mo talaga ang ginagawa mo (halimbawa, hindi makakuha ng lokasyon ang telepono mo).';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      'Naiintindihan kong maaaring hindi ko matanggap ang mga emergency alert para sa kinaroroonan ko';
+
+  @override
+  String get locationModeWarningContinue => 'Itakda pa rin nang manwal';
+
+  @override
+  String get locationModeKeepAuto => 'Manatiling awtomatiko';
+
+  @override
+  String get locationModePickTownTitle => 'Pumili ng bayan';
+
+  @override
+  String get locationModeSwitchedToAuto =>
+      'Bumalik sa awtomatiko — hinahanap ang lokasyon gamit ang GPS';
+
+  @override
+  String get homeManualLocationHint =>
+      'Manwal na nakatakda ang lokasyon — i-tap para bumalik sa awtomatiko';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return 'Isara nang $days araw';
+  }
+
+  @override
+  String get locationModeManualBadge => 'Manwal na nakatakda ang lokasyon';
 }

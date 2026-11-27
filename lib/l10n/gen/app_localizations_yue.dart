@@ -3794,4 +3794,68 @@ class AppLocalizationsYue extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return '服務嘅訊息：$detail';
   }
+
+  @override
+  String get locationModeTitle => '所在地同通知區域';
+
+  @override
+  String get locationModeAuto => '自動（GPS 定位）';
+
+  @override
+  String get locationModeAutoSubtitle => '跟手機位置決定所在地同通知區域，郁動嗰陣會自動更新。建議用呢個。';
+
+  @override
+  String get locationModeManual => '手動指定鄉鎮';
+
+  @override
+  String get locationModeManualSubtitle => '固定用你揀嘅鄉鎮，並且停用 GPS。';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '手動：$place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '而家係手動設定。所在地同所有通知都固定喺$place，GPS 已經停用；你唔喺呢度嘅時候，可能收唔到所在地嘅緊急警報。';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '切返自動（GPS）';
+
+  @override
+  String get locationModeChangeTown => '改鄉鎮';
+
+  @override
+  String get locationModeWarningTitle => '除非必要，唔好手動設定';
+
+  @override
+  String get locationModeWarningBody =>
+      '手動設定之後，App 會停用 GPS。地震速報、海嘯、各種警報同特報等所有通知，都只會跟你揀嘅鄉鎮發出，唔會跟住你實際嘅位置改變。\n\n只要你唔喺呢個鄉鎮，就可能收唔到所在地嘅緊急警報，亦可能收到其他地區嘅通知。\n\n除非你好清楚自己做緊乜（例如部手機定唔到位），否則請保持自動。';
+
+  @override
+  String get locationModeWarningAcknowledge => '我明白手動設定可能令我收唔到所在地嘅緊急警報';
+
+  @override
+  String get locationModeWarningContinue => '都係要手動設定';
+
+  @override
+  String get locationModeKeepAuto => '保持自動';
+
+  @override
+  String get locationModePickTownTitle => '揀鄉鎮';
+
+  @override
+  String get locationModeSwitchedToAuto => '已經切返自動，改用 GPS 定位';
+
+  @override
+  String get homeManualLocationHint => '所在地係手動設定，撳呢度可以切返自動';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '關閉，$days 日後再提醒';
+  }
+
+  @override
+  String get locationModeManualBadge => '所在地係手動設定';
 }

@@ -111,6 +111,12 @@ class _FakeLocationService implements LocationService {
   Future<bool> backgroundGranted() async => false;
 
   @override
+  bool get isManual => false;
+
+  @override
+  Future<GpsFix> manualFix(Town town) => throw UnimplementedError();
+
+  @override
   Future<LocationStatus> status() => throw UnimplementedError();
 
   @override

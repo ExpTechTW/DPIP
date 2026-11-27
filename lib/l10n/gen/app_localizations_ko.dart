@@ -3828,4 +3828,71 @@ class AppLocalizationsKo extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return '서비스 메시지: $detail';
   }
+
+  @override
+  String get locationModeTitle => '현재 위치 및 알림 지역';
+
+  @override
+  String get locationModeAuto => '자동(GPS)';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      '휴대전화 위치에 따라 현재 위치와 알림 지역을 정하고, 이동하면 자동으로 업데이트합니다. 권장합니다.';
+
+  @override
+  String get locationModeManual => '읍·면·동 직접 지정';
+
+  @override
+  String get locationModeManualSubtitle => '선택한 읍·면·동을 항상 사용하고 GPS를 끕니다.';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '직접 지정: $place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '직접 지정 중입니다. 현재 위치와 모든 알림이 $place(으)로 고정되며 GPS는 꺼져 있습니다. 그곳에 있지 않으면 현재 위치의 긴급 경보를 받지 못할 수 있습니다.';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '자동(GPS)으로 되돌리기';
+
+  @override
+  String get locationModeChangeTown => '읍·면·동 변경';
+
+  @override
+  String get locationModeWarningTitle => '꼭 필요한 경우가 아니면 직접 지정하지 마세요';
+
+  @override
+  String get locationModeWarningBody =>
+      '직접 지정하면 GPS가 꺼집니다. 지진 조기경보, 쓰나미, 각종 기상 특보 등 모든 알림이 실제 위치가 아닌 선택한 읍·면·동을 기준으로 발송됩니다.\n\n그 지역에 있지 않으면 현재 위치의 긴급 경보를 받지 못할 수 있고, 다른 지역의 알림을 받을 수도 있습니다.\n\n무엇을 하는지 정확히 아는 경우(예: 휴대전화로 위치를 확인할 수 없는 경우)가 아니라면 자동으로 두세요.';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      '직접 지정하면 현재 위치의 긴급 경보를 받지 못할 수 있음을 이해했습니다';
+
+  @override
+  String get locationModeWarningContinue => '그래도 직접 지정';
+
+  @override
+  String get locationModeKeepAuto => '자동으로 유지';
+
+  @override
+  String get locationModePickTownTitle => '읍·면·동 선택';
+
+  @override
+  String get locationModeSwitchedToAuto => '자동으로 되돌렸습니다. GPS로 위치를 확인합니다';
+
+  @override
+  String get homeManualLocationHint =>
+      '현재 위치가 직접 지정되어 있습니다. 탭하면 자동으로 되돌릴 수 있습니다';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '닫기($days일 후 다시 표시)';
+  }
+
+  @override
+  String get locationModeManualBadge => '위치를 직접 지정함';
 }

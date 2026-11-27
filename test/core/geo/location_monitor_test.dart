@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -243,6 +244,48 @@ void main() {
       expect(await monitor.openSettings(), isTrue);
 
       monitor.dispose();
+    },
+  );
+
+  test(
+    'pinning a township by hand places the device there and reports it',
+    () async {
+      final settings = SettingsStore.inMemory({});
+      final mode = LocationMode(settings, _directory());
+      final reported = <GpsFix>[];
+      final pinned = LocationService(
+        _directory(),
+        isAvailable: () async => true,
+        fix: () async => _taipeiFix,
+        manualTown: () => mode.manualTown,
+      );
+      final pinnedReporter = DeviceLocationReporter(
+        positions: () => pinned.positionStream(),
+        settings: settings,
+        onMoved: (fix) async {
+          reported.add(fix);
+          return true;
+        },
+      );
+      final monitor = LocationMonitor(
+        location: pinned,
+        reporter: pinnedReporter,
+        regions: regions,
+        mode: mode,
+      )..start();
+      await pumpEventQueue();
+
+      await mode.setManual(_directory().byCode(_tainanCode)!);
+      await pumpEventQueue();
+
+      expect(regions.currentCode, _tainanCode);
+      final tainan = _directory().byCode(_tainanCode)!;
+      // Once: the position stream reports it, and the placement finds the
+      // server already has it.
+      expect(reported, [(lat: tainan.lat, lng: tainan.lng)]);
+
+      monitor.dispose();
+      pinnedReporter.dispose();
     },
   );
 }
