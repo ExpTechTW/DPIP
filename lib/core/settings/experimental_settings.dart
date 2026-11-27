@@ -46,6 +46,20 @@ class ExperimentalSettings extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Whether the Data tab lists the phone seismometer. **Off** by default: it
+  /// is still experimental, and a phone's own reading is easy to mistake for
+  /// an official intensity, so nobody meets it without asking for it.
+  bool get seismometerEnabled =>
+      _settings.getBool(SettingKeys.experimentalSeismometer) ?? false;
+
+  /// Persists [value] and notifies listeners, so the Data tab adds or drops
+  /// its entry at once.
+  Future<void> setSeismometerEnabled(bool value) async {
+    if (value == seismometerEnabled) return;
+    await _settings.setBool(SettingKeys.experimentalSeismometer, value);
+    notifyListeners();
+  }
+
   /// The forced weather-animation mode, or [WeatherMode.auto] to follow real
   /// conditions.
   WeatherMode get weatherMode => _weatherMode.value;

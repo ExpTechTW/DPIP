@@ -3498,6 +3498,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => '工具';
+
+  @override
+  String get experimentalSeismometer => '地震儀';
+
+  @override
+  String get experimentalSeismometerSubtitle => '在資料分頁顯示地震儀';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6990,6 +6996,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get experimentalCategoryTools => '工具';
+
+  @override
+  String get experimentalSeismometer => '地震仪';
+
+  @override
+  String get experimentalSeismometerSubtitle => '在资料标签页显示地震仪';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10483,6 +10495,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get experimentalCategoryTools => '工具';
+
+  @override
+  String get experimentalSeismometer => '地震儀';
+
+  @override
+  String get experimentalSeismometerSubtitle => '在資料分頁顯示地震儀';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13976,4 +13994,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get experimentalCategoryTools => '工具';
+
+  @override
+  String get experimentalSeismometer => '地震儀';
+
+  @override
+  String get experimentalSeismometerSubtitle => '在資料分頁顯示地震儀';
 }

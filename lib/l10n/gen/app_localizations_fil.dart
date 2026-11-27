@@ -3623,4 +3623,11 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => 'Mga tool';
+
+  @override
+  String get experimentalSeismometer => 'Seismometer';
+
+  @override
+  String get experimentalSeismometerSubtitle =>
+      'Ipakita ang seismometer sa tab ng Datos';
 }

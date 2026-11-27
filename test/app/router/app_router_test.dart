@@ -2,10 +2,13 @@
 /// redirect and each page builder; they do not start Firebase or a database.
 library;
 
+import 'dart:async';
+
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dio/dio.dart';
 import 'package:dpip/app/router/app_router.dart';
 import 'package:dpip/app/router/notification_routes.dart';
+import 'package:dpip/app/router/route_gates.dart';
 import 'package:dpip/app/shell/main_shell.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
@@ -58,6 +61,7 @@ import 'package:dpip/core/meshtastic/mesh_link.dart';
 import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/features/changelog/changelog_providers.dart';
+import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
@@ -75,6 +79,7 @@ import 'package:dpip/features/weather/domain/rain_hour_trend.dart';
 import 'package:dpip/features/weather/domain/weather_forecast.dart';
 import 'package:dpip/features/weather/domain/weather_realtime.dart';
 import 'package:dpip/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:dpip/features/seismometer/presentation/seismometer_page.dart';
 import 'package:dpip/features/weather/domain/radar_repository.dart';
 import 'package:dpip/features/weather/weather_providers.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -391,6 +396,196 @@ void main() {
       await tester.pump();
     });
   }
+
+  // The seismometer is behind an Experimental features switch. These drive
+  // the real route table and shell, and count the platform sensor's listen and
+  // cancel calls, because what the switch has to stop is the sensor.
+  group('the seismometer follows its experimental switch', () {
+    testWidgets('a link with the switch off lands on the Data tab', (
+      tester,
+    ) async {
+      final app = await _launchSeismometer(tester, enabled: false);
+      await _openLink(tester, 'dpip:///data/seismometer');
+      expect(appRouter.state.uri.path, AppRoutes.dataPath);
+      expect(find.byType(SeismometerPage, skipOffstage: false), findsNothing);
+      expect(find.byType(DataPage).hitTestable(), findsOneWidget);
+      expect(app.sensor.listens, 0);
+      await _closeApp(tester);
+    });
+
+    // A switch restored from a backup onto a phone with no accelerometer is
+    // on, and nothing there can turn it off: the option is not offered.
+    testWidgets('a link with the switch on but no accelerometer is refused', (
+      tester,
+    ) async {
+      final app = await _launchSeismometer(
+        tester,
+        enabled: true,
+        accelerometer: false,
+      );
+      await _openLink(tester, 'dpip:///data/seismometer');
+      expect(appRouter.state.uri.path, AppRoutes.dataPath);
+      expect(find.byType(SeismometerPage, skipOffstage: false), findsNothing);
+      expect(app.sensor.listens, 0);
+      await _closeApp(tester);
+    });
+
+    testWidgets('a link with the switch on opens it', (tester) async {
+      final app = await _launchSeismometer(tester, enabled: true);
+      await _openLink(tester, 'dpip:///data/seismometer');
+      expect(appRouter.state.uri.path, '/data/seismometer');
+      expect(find.byType(SeismometerPage).hitTestable(), findsOneWidget);
+      expect(app.sensor.running, isTrue);
+      await _closeApp(tester);
+    });
+
+    testWidgets('turning the switch off closes the page on screen', (
+      tester,
+    ) async {
+      final app = await _launchSeismometer(tester, enabled: true);
+      await _openLink(tester, 'dpip:///data/seismometer');
+      expect(find.byType(SeismometerPage), findsOneWidget);
+
+      await app.deps.experimental.setSeismometerEnabled(false);
+      await _settle(tester);
+      expect(appRouter.state.uri.path, AppRoutes.dataPath);
+      expect(find.byType(SeismometerPage, skipOffstage: false), findsNothing);
+      expect(find.byType(DataPage).hitTestable(), findsOneWidget);
+      expect(app.sensor.running, isFalse);
+      await _closeApp(tester);
+    });
+
+    // The report: open it from the Data tab, leave the tab, turn the switch
+    // off on Experimental features, come back. The Data tab keeps its own
+    // stack, so the page used to be waiting there, and the sensor started
+    // again. (The app reaches Experimental features from More; Events stands
+    // in for it here because the page under the pushed route does not matter
+    // and More needs every settings provider in the app.)
+    testWidgets('a page left open on the Data tab is gone on return', (
+      tester,
+    ) async {
+      final app = await _launchSeismometer(tester, enabled: true);
+      await tester.tap(_navTab('Data'));
+      await _settle(tester);
+      await tester.tap(find.text('Seismometer'));
+      await _settle(tester);
+      expect(find.byType(SeismometerPage).hitTestable(), findsOneWidget);
+      expect(app.sensor.running, isTrue);
+
+      await tester.tap(_navTab('Events'));
+      await _settle(tester);
+      expect(app.sensor.running, isFalse, reason: 'off screen, so stopped');
+      final listens = app.sensor.listens;
+
+      unawaited(appRouter.pushNamed<void>(AppRoutes.experimental));
+      await _settle(tester);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Seismometer'));
+      await _settle(tester);
+      expect(app.deps.experimental.seismometerEnabled, isFalse);
+      appRouter.pop();
+      await _settle(tester);
+
+      await tester.tap(_navTab('Data'));
+      await _settle(tester);
+      expect(appRouter.state.uri.path, AppRoutes.dataPath);
+      expect(find.byType(SeismometerPage, skipOffstage: false), findsNothing);
+      expect(find.byType(DataPage).hitTestable(), findsOneWidget);
+      expect(
+        app.sensor.listens,
+        listens,
+        reason: 'the sensor must not start again on the way out',
+      );
+      expect(app.sensor.running, isFalse);
+      await _closeApp(tester);
+    });
+  });
+}
+
+/// The seismometer tests' app: onboarded, the switch set to [enabled], on the
+/// Home tab, with the platform accelerometer replaced by a counter that
+/// reports itself present when [accelerometer] is true.
+Future<({SharedDeps deps, _Accelerometer sensor})> _launchSeismometer(
+  WidgetTester tester, {
+  required bool enabled,
+  bool accelerometer = true,
+}) async {
+  tester.view.physicalSize = const Size(800, 1600);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  final previous = MapLibrePlatform.createInstance;
+  MapLibrePlatform.createInstance = () => _MapPlatform();
+  addTearDown(() => MapLibrePlatform.createInstance = previous);
+  final sensor = _Accelerometer(tester, present: accelerometer);
+  final deps = _deps(complete: true);
+  await deps.experimental.setSeismometerEnabled(enabled);
+  // What bootstrap does for the app's own settings.
+  routeGateRefresh.watch(deps.experimental);
+  appRouter.go(AppRoutes.homePath);
+  await tester.pumpWidget(_widgetRouterApp(deps, _WidgetWeather()));
+  await _settle(tester);
+  return (deps: deps, sensor: sensor);
+}
+
+/// [link] as the platform delivers a deep link.
+Future<void> _openLink(WidgetTester tester, String link) async {
+  await appRouter.routeInformationProvider.didPushRouteInformation(
+    RouteInformation(uri: Uri.parse(link)),
+  );
+  await _settle(tester);
+}
+
+/// Long enough for a page transition and the shell's post-frame tab update.
+/// Not `pumpAndSettle`: a calibrating seismometer shows an indeterminate
+/// progress bar, which never settles.
+Future<void> _settle(WidgetTester tester) async {
+  for (var i = 0; i < 4; i++) {
+    await tester.pump(const Duration(milliseconds: 250));
+  }
+}
+
+Future<void> _closeApp(WidgetTester tester) async {
+  expect(tester.takeException(), isNull);
+  appRouter.go('/nowhere');
+  await tester.pump();
+  await tester.pumpWidget(const SizedBox());
+  await tester.pump();
+}
+
+/// The bottom navigation destination labelled [label].
+Finder _navTab(String label) =>
+    find.descendant(of: find.byType(NavigationBar), matching: find.text(label));
+
+/// Counts the accelerometer channel's `listen` and `cancel` calls — what the
+/// seismometer actually costs the phone — and answers the presence probe
+/// `DeviceSensors` makes at launch with [present].
+final class _Accelerometer {
+  _Accelerometer(WidgetTester tester, {required bool present}) {
+    const channel = MethodChannel('com.exptech.dpip/accelerometer');
+    const presence = MethodChannel('com.exptech.dpip/accelerometer_presence');
+    final messenger = tester.binding.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      switch (call.method) {
+        case 'listen':
+          listens++;
+        case 'cancel':
+          cancels++;
+      }
+      return null;
+    });
+    messenger.setMockMethodCallHandler(
+      presence,
+      (call) async => call.method == 'isPresent' ? present : null,
+    );
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(channel, null);
+      messenger.setMockMethodCallHandler(presence, null);
+    });
+  }
+
+  int listens = 0;
+  int cancels = 0;
+
+  bool get running => listens > cancels;
 }
 
 Widget _widgetRouterApp(SharedDeps deps, _WidgetWeather weather) =>
@@ -491,7 +686,8 @@ GoRouterState _state(
   pageKey: ValueKey<String>(path),
 );
 
-/// The route-level redirects read only the state; none touches its context.
+/// The parameterised routes' redirects read only the state; none touches its
+/// context.
 class _NoContext extends Fake implements BuildContext {}
 
 ChangeNotifierProvider<RealtimeNotifier<List<Eew>>> _eew() =>

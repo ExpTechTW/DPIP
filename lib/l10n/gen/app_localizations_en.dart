@@ -3601,4 +3601,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => 'Tools';
+
+  @override
+  String get experimentalSeismometer => 'Seismometer';
+
+  @override
+  String get experimentalSeismometerSubtitle =>
+      'Show the seismometer in the Data tab';
 }

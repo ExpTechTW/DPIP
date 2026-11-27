@@ -3591,4 +3591,11 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => 'เครื่องมือ';
+
+  @override
+  String get experimentalSeismometer => 'เครื่องวัดแผ่นดินไหว';
+
+  @override
+  String get experimentalSeismometerSubtitle =>
+      'แสดงเครื่องวัดแผ่นดินไหวในแท็บข้อมูล';
 }

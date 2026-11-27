@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:dpip/core/logging/log.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
 
@@ -27,6 +28,39 @@ final class AccelerometerSample {
 }
 
 const _channel = EventChannel('com.exptech.dpip/accelerometer');
+
+const _presence = MethodChannel('com.exptech.dpip/accelerometer_presence');
+
+/// Whether this device has an accelerometer, asked of the platform without
+/// starting the stream.
+///
+/// Android answers `SensorManager.getDefaultSensor(TYPE_ACCELEROMETER) !=
+/// null`, iOS `CMMotionManager.isAccelerometerAvailable` — the same checks
+/// [accelerometerBatches] makes before it starts. Present is not a promise
+/// that samples will come: a sensor that is there can still refuse to start,
+/// and that still arrives as an `unavailable` error on the stream.
+///
+/// Every call is a platform round trip; `DeviceSensors` asks once and keeps
+/// the answer. A call that fails, answers nothing, or reaches no handler at
+/// all (a desktop, a test) is logged and answers false: offering a sensor
+/// feature on a device that cannot run it is worse than leaving it off one
+/// that could.
+Future<bool> accelerometerPresent() async {
+  try {
+    final present = await _presence.invokeMethod<bool>('isPresent');
+    if (present != null) return present;
+    Log.warning(
+      'Accelerometer presence check answered nothing; '
+      'treating the accelerometer as absent',
+    );
+  } catch (error) {
+    Log.warning(
+      'Accelerometer presence check failed; '
+      'treating the accelerometer as absent: $error',
+    );
+  }
+  return false;
+}
 
 /// Batches from the accelerometer event channel.
 ///

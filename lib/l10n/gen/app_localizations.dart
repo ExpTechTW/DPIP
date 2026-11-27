@@ -6695,6 +6695,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tools'**
   String get experimentalCategoryTools;
+
+  /// Title of the Experimental features switch that lists the phone seismometer on the Data tab
+  ///
+  /// In en, this message translates to:
+  /// **'Seismometer'**
+  String get experimentalSeismometer;
+
+  /// Subtitle of the seismometer switch on the Experimental features page: what turning it on does
+  ///
+  /// In en, this message translates to:
+  /// **'Show the seismometer in the Data tab'**
+  String get experimentalSeismometerSubtitle;
 }
 
 class _AppLocalizationsDelegate

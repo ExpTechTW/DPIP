@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/device_sensors.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/astro/tle_store.dart';
@@ -48,6 +51,17 @@ import 'package:provider/single_child_widget.dart';
 List<SingleChildWidget> coreProviders(SharedDeps deps) => [
   ChangeNotifierProvider<RegionSelection>.value(value: deps.regions),
   ChangeNotifierProvider<ExperimentalSettings>.value(value: deps.experimental),
+  // Not lazy: the probe starts with the app, so by the time a page that needs
+  // a sensor opens, the answer is already in rather than arriving under the
+  // user's eyes.
+  ChangeNotifierProvider<DeviceSensors>(
+    create: (_) {
+      final sensors = DeviceSensors();
+      unawaited(sensors.resolve());
+      return sensors;
+    },
+    lazy: false,
+  ),
   ChangeNotifierProvider<RegionStore>.value(value: deps.regionStore),
   ChangeNotifierProvider<OnboardingStore>.value(value: deps.onboarding),
   ChangeNotifierProvider<LocaleController>.value(value: deps.locale),

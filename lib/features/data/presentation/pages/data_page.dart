@@ -6,11 +6,14 @@ import 'dart:math' as math;
 
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/platform/device_sensors.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 /// Catalogue of in-app data surfaces. The shell's 4th tab; entries push nested
 /// routes under `/data/…` so the bottom nav stays visible.
@@ -51,6 +54,21 @@ class DataPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    // Experimental, and off until its switch on the Experimental features
+    // page is turned on. The card is only the way in: the route refuses on
+    // its own under the same condition (`seismometerRedirect` in app/router),
+    // which also turns away a link and closes a page left open when the
+    // switch goes off. The switch alone is not enough: one restored from a
+    // backup can be on for a device with no accelerometer, where the
+    // Experimental features page does not even offer it — and an
+    // accelerometer still being asked about counts as none, so the card can
+    // arrive late but never comes and goes.
+    final seismometerEnabled = context.select<ExperimentalSettings, bool>(
+      (s) => s.seismometerEnabled,
+    );
+    final hasAccelerometer = context.select<DeviceSensors, bool>(
+      (s) => s.has(DeviceSensor.accelerometer),
+    );
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -74,19 +92,23 @@ class DataPage extends StatelessWidget {
                 onTap: () => context.pushNamed(AppRoutes.earthquake),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                0,
-                AppSpacing.lg,
-                AppSpacing.sm,
+            if (seismometerEnabled && hasAccelerometer)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                ),
+                child: _SeismicCard(
+                  icon: Icons.vibration,
+                  title: l10n.seismometerTitle,
+                  // `go`, not `push` like the cards around it: a push leaves
+                  // the location at /data, so the route's redirect would
+                  // never see this page to close it.
+                  onTap: () => context.goNamed(AppRoutes.seismometer),
+                ),
               ),
-              child: _SeismicCard(
-                icon: Icons.vibration,
-                title: l10n.seismometerTitle,
-                onTap: () => context.pushNamed(AppRoutes.seismometer),
-              ),
-            ),
             SectionHeader(l10n.dataSectionWeather),
             // Wide and short: icon left, label right, one glance per tile.
             GridView(

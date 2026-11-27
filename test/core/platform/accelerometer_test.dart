@@ -1,11 +1,14 @@
 /// The wire format is the whole contract of the accelerometer pipe: four
 /// float64s per sample, an `unavailable` platform error on the stream, and a
-/// cancel that reaches the platform without waiting for another sample.
+/// cancel that reaches the platform without waiting for another sample. Beside
+/// it, the presence check, whose every failure must read as "no
+/// accelerometer" rather than offer a seismometer the phone cannot run.
 library;
 
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/platform/accelerometer.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,9 +21,69 @@ void main() {
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
+  const presenceChannel = MethodChannel(
+    'com.exptech.dpip/accelerometer_presence',
+  );
+
   tearDown(() {
     messenger.setMockStreamHandler(eventChannel, null);
     messenger.setMockMethodCallHandler(const MethodChannel(channelName), null);
+    messenger.setMockMethodCallHandler(presenceChannel, null);
+  });
+
+  /// Log lines written while [body] runs.
+  Future<String> logged(Future<void> Function() body) async {
+    final before = Log.talker.history.length;
+    await body();
+    return Log.talker.history
+        .skip(before)
+        .map((entry) => entry.generateTextMessage())
+        .join('\n');
+  }
+
+  for (final answer in [true, false]) {
+    test('presence passes the platform answer through: $answer', () async {
+      final calls = <String>[];
+      messenger.setMockMethodCallHandler(presenceChannel, (call) async {
+        calls.add(call.method);
+        return answer;
+      });
+      expect(await accelerometerPresent(), answer);
+      expect(calls, ['isPresent']);
+    });
+  }
+
+  test('a failed presence check is no accelerometer, and is logged', () async {
+    messenger.setMockMethodCallHandler(
+      presenceChannel,
+      (_) async => throw PlatformException(code: 'boom'),
+    );
+    late bool present;
+    final lines = await logged(
+      () async => present = await accelerometerPresent(),
+    );
+    expect(present, isFalse);
+    expect(lines, contains('Accelerometer presence check failed'));
+  });
+
+  test('a platform with no presence handler has no accelerometer', () async {
+    // No mock handler: the call is a MissingPluginException, as on a desktop.
+    late bool present;
+    final lines = await logged(
+      () async => present = await accelerometerPresent(),
+    );
+    expect(present, isFalse);
+    expect(lines, contains('Accelerometer presence check failed'));
+  });
+
+  test('a presence check that answers nothing is no accelerometer', () async {
+    messenger.setMockMethodCallHandler(presenceChannel, (_) async => null);
+    late bool present;
+    final lines = await logged(
+      () async => present = await accelerometerPresent(),
+    );
+    expect(present, isFalse);
+    expect(lines, contains('Accelerometer presence check answered nothing'));
   });
 
   test('a float64 batch becomes samples', () async {

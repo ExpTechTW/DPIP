@@ -5,6 +5,7 @@
 /// what an entry is, so a new option never has to touch it.
 library;
 
+import 'package:dpip/core/platform/device_sensors.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -68,6 +69,7 @@ class ExperimentalOption {
     required this.platforms,
     required this.build,
     this.requiresUnlock = false,
+    this.requiredSensors = const {},
   });
 
   /// The section it is listed under.
@@ -81,29 +83,44 @@ class ExperimentalOption {
   /// (`ExperimentalSettings.unlocked`).
   final bool requiresUnlock;
 
+  /// The sensors it cannot work without. It is listed only on a device known
+  /// to have every one of them; while [DeviceSensors] is still asking, it is
+  /// not listed, so it can appear a moment late but never appears and then
+  /// vanishes.
+  final Set<DeviceSensor> requiredSensors;
+
   /// Builds its tile.
   final ExperimentalTileBuilder build;
 
-  /// Whether the page lists it on [platform], given the unlock state.
-  bool isOffered(TargetPlatform platform, {required bool unlocked}) =>
-      platforms.contains(platform) && (unlocked || !requiresUnlock);
+  /// Whether the page lists it on [platform], given the unlock state and the
+  /// [sensors] the device is known to have.
+  bool isOffered(
+    TargetPlatform platform, {
+    required bool unlocked,
+    required Set<DeviceSensor> sensors,
+  }) =>
+      platforms.contains(platform) &&
+      (unlocked || !requiresUnlock) &&
+      sensors.containsAll(requiredSensors);
 }
 
 /// The page's sections, in [ExperimentalCategory] order: each category with
 /// the [options] offered on [platform] (an unlock-only one only once
-/// [unlocked]), registry order kept within it. A category left with nothing is
-/// dropped, so no header ever sits over an empty group.
+/// [unlocked], one that needs a sensor only when [sensors] has it), registry
+/// order kept within it. A category left with nothing is dropped, so no header
+/// ever sits over an empty group.
 List<(ExperimentalCategory, List<ExperimentalOption>)> experimentalSections(
   Iterable<ExperimentalOption> options, {
   required TargetPlatform platform,
   required bool unlocked,
+  required Set<DeviceSensor> sensors,
 }) {
   final sections = <(ExperimentalCategory, List<ExperimentalOption>)>[];
   for (final category in ExperimentalCategory.values) {
     final offered = [
       for (final option in options)
         if (option.category == category &&
-            option.isOffered(platform, unlocked: unlocked))
+            option.isOffered(platform, unlocked: unlocked, sensors: sensors))
           option,
     ];
     if (offered.isNotEmpty) sections.add((category, offered));

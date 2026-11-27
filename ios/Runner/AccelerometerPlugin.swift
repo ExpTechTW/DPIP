@@ -35,6 +35,11 @@ import UIKit
 /// Samples arrive on a private queue and are flushed from a main-run-loop
 /// timer. Cancelling stops updates and the timer. When the accelerometer
 /// cannot start, `onListen` returns `FlutterError` code `unavailable`.
+///
+/// It also answers `isPresent` on `com.exptech.dpip/accelerometer_presence`,
+/// so Dart can ask whether there is an accelerometer at all without starting
+/// the stream: `isAccelerometerAvailable`, from the same `CMMotionManager`
+/// `onListen` checks, so the two cannot disagree about the device.
 public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   /// 1 g = 9.80665 m/s² = 980.665 gal.
   private static let galsPerG = 980.665
@@ -76,10 +81,24 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
   }
 
   public static func register(with registrar: FlutterPluginRegistrar) {
+    let instance = AccelerometerPlugin()
     let channel = FlutterEventChannel(
       name: "com.exptech.dpip/accelerometer",
       binaryMessenger: registrar.messenger())
-    channel.setStreamHandler(AccelerometerPlugin())
+    channel.setStreamHandler(instance)
+    let presence = FlutterMethodChannel(
+      name: "com.exptech.dpip/accelerometer_presence",
+      binaryMessenger: registrar.messenger())
+    registrar.addMethodCallDelegate(instance, channel: presence)
+  }
+
+  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+    case "isPresent":
+      result(motion.isAccelerometerAvailable)
+    default:
+      result(FlutterMethodNotImplemented)
+    }
   }
 
   public func onListen(

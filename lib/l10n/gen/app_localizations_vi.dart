@@ -3603,4 +3603,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => 'Công cụ';
+
+  @override
+  String get experimentalSeismometer => 'Máy đo địa chấn';
+
+  @override
+  String get experimentalSeismometerSubtitle =>
+      'Hiển thị máy đo địa chấn trong tab Dữ liệu';
 }

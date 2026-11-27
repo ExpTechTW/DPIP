@@ -2097,6 +2097,8 @@
   "experimentalCategorySound": "Suara",
   "experimentalCategoryGraphics": "Grafis",
   "experimentalCategoryTools": "Alat",
+  "experimentalSeismometer": "Seismometer",
+  "experimentalSeismometerSubtitle": "Tampilkan seismometer di tab Data",
   "trendRainPastHour": "Curah hujan 1 jam terakhir",
   "trendRainHourLastReading": "Curah hujan 1 jam hingga pengukuran terakhir jam ini"
 }

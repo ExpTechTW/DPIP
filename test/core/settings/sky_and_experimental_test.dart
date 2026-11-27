@@ -57,4 +57,24 @@ void main() {
     settings.skyTimeMode = SkyTimeMode.night;
     expect(notified, 3);
   });
+
+  test('the seismometer option starts off and survives a reload', () async {
+    final store = SettingsStore.inMemory();
+    final settings = ExperimentalSettings(store);
+    expect(settings.seismometerEnabled, isFalse);
+
+    var notified = 0;
+    settings.addListener(() => notified++);
+    await settings.setSeismometerEnabled(true);
+    expect(settings.seismometerEnabled, isTrue);
+    expect(notified, 1);
+
+    // A repeat is not a change.
+    await settings.setSeismometerEnabled(true);
+    expect(notified, 1);
+
+    // It is its own switch: the hidden-options unlock is untouched.
+    expect(settings.unlocked, isFalse);
+    expect(ExperimentalSettings(store).seismometerEnabled, isTrue);
+  });
 }

@@ -3521,4 +3521,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => 'ツール';
+
+  @override
+  String get experimentalSeismometer => '地震計';
+
+  @override
+  String get experimentalSeismometerSubtitle => 'データタブに地震計を表示します';
 }
