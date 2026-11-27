@@ -4074,4 +4074,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get eventFactStation => '観測所';
+
+  @override
+  String get eventUntranslatedTag => '未翻訳';
+
+  @override
+  String get eventUntranslatedNotice => 'まだお使いの言語に翻訳されていないため、中国語の原文を表示しています。';
 }

@@ -4041,6 +4041,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get eventFactStation => '測站';
+
+  @override
+  String get eventUntranslatedTag => '尚未翻譯';
+
+  @override
+  String get eventUntranslatedNotice => '這則還沒有翻譯成你使用的語言，先顯示中文原文。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -8076,6 +8082,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get eventFactStation => '测站';
+
+  @override
+  String get eventUntranslatedTag => '尚未翻译';
+
+  @override
+  String get eventUntranslatedNotice => '这则还没有翻译成你使用的语言，先显示中文原文。';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -12112,6 +12124,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get eventFactStation => '監測站';
+
+  @override
+  String get eventUntranslatedTag => '尚未翻譯';
+
+  @override
+  String get eventUntranslatedNotice => '這則還沒有翻譯成你使用的語言，先顯示中文原文。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -16148,4 +16166,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get eventFactStation => '測站';
+
+  @override
+  String get eventUntranslatedTag => '尚未翻譯';
+
+  @override
+  String get eventUntranslatedNotice => '這則還沒有翻譯成你使用的語言，先顯示中文原文。';
 }

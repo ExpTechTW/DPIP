@@ -2269,5 +2269,7 @@
   "eventFactLightningStrikes": "Jumlah petir",
   "eventFactRoad": "Jalan",
   "eventFactLocation": "Lokasi",
-  "eventFactStation": "Stasiun"
+  "eventFactStation": "Stasiun",
+  "eventUntranslatedTag": "Belum diterjemahkan",
+  "eventUntranslatedNotice": "Ini belum diterjemahkan ke bahasa Anda, jadi ditampilkan dalam bahasa Mandarin aslinya."
 }

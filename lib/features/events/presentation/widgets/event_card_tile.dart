@@ -6,6 +6,7 @@ import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/events/presentation/event_hazard_style.dart';
 import 'package:dpip/features/events/presentation/event_labels.dart';
 import 'package:dpip/features/events/presentation/widgets/event_status_chip.dart';
+import 'package:dpip/features/events/presentation/widgets/event_untranslated.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:go_router/go_router.dart';
@@ -154,6 +155,8 @@ class EventCardTile extends StatelessWidget {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         if (status != null) EventStatusChip(status: status),
+                        // The text above is the original, not a mistake.
+                        if (card.untranslated) const EventUntranslatedTag(),
                         Text(
                           meta,
                           style: theme.textTheme.labelSmall?.copyWith(

@@ -4041,4 +4041,10 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get eventFactStation => '監測站';
+
+  @override
+  String get eventUntranslatedTag => '未翻譯';
+
+  @override
+  String get eventUntranslatedNotice => '呢則仲未翻譯做你用緊嘅語言，暫時顯示中文原文。';
 }

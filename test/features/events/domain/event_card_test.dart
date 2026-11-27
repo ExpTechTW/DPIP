@@ -579,6 +579,45 @@ void main() {
     });
   });
 
+  group('translation', () {
+    // The server falls back a whole card at a time: a card it has not
+    // translated yet comes in its original language under the requested one.
+    test('a card in another language than asked for is untranslated', () {
+      final list = EventCardList.fromJson({
+        'lang': 'en',
+        'cards': [
+          {..._card(id: 1), 'lang': 'en'},
+          {..._card(id: 2), 'lang': 'zh-TW'},
+        ],
+      });
+      expect([for (final c in list.cards) c.untranslated], [false, true]);
+      expect(list.cards.last.requestedLang, 'en');
+    });
+
+    test('each report of a detail is judged on its own', () {
+      final detail = EventCardDetail.fromJson({
+        'lang': 'ja',
+        'cards': [
+          {..._report(serial: 1), 'lang': 'ja'},
+          {..._report(serial: 2), 'lang': 'zh-TW'},
+        ],
+      });
+      expect([for (final r in detail.reports) r.untranslated], [false, true]);
+    });
+
+    test('the original language asked for is never untranslated', () {
+      final list = EventCardList.fromJson({
+        'lang': 'zh-TW',
+        'cards': [_card()],
+      });
+      expect(list.cards.single.untranslated, isFalse);
+    });
+
+    test('a card parsed on its own takes its own language as asked for', () {
+      expect(EventCard.tryParse(_card())!.untranslated, isFalse);
+    });
+  });
+
   group('degrades instead of throwing', () {
     test('an unknown type is kept and the hazard comes from the server', () {
       final card = EventCard.tryParse({

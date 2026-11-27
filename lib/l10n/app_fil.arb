@@ -2269,5 +2269,7 @@
   "eventFactLightningStrikes": "Bilang ng kidlat",
   "eventFactRoad": "Kalsada",
   "eventFactLocation": "Lokasyon",
-  "eventFactStation": "Istasyon"
+  "eventFactStation": "Istasyon",
+  "eventUntranslatedTag": "Hindi pa naisasalin",
+  "eventUntranslatedNotice": "Hindi pa ito naisasalin sa iyong wika, kaya ipinapakita ang orihinal na Chinese."
 }

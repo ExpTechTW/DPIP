@@ -38,7 +38,9 @@ void main() {
       const Locale('th'): 'th',
       const Locale('vi'): 'vi',
       const Locale('yue'): 'yue',
-      const Locale('zh'): 'zh',
+      // Bare zh is the original text under another name; the server answers
+      // it in zh-TW, so the app asks for zh-TW.
+      const Locale('zh'): 'zh-TW',
       const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'):
           'zh-Hans',
       const Locale.fromSubtags(

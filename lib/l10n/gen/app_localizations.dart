@@ -7721,6 +7721,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Station'**
   String get eventFactStation;
+
+  /// Small tag on an event row whose text is shown in the original (Taiwan Traditional Chinese) because its translation into the reader's language is not done yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not translated'**
+  String get eventUntranslatedTag;
+
+  /// Notice on an event report shown in the original Chinese because its translation into the reader's language is not done yet.
+  ///
+  /// In en, this message translates to:
+  /// **'This hasn\'t been translated into your language yet, so it\'s shown in the original Chinese.'**
+  String get eventUntranslatedNotice;
 }
 
 class _AppLocalizationsDelegate

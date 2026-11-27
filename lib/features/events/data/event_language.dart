@@ -51,6 +51,9 @@ final Map<String, String> _byLowerTag = {
 String eventApiLanguage(Locale locale) {
   final tag = locale.toLanguageTag().replaceAll('_', '-').toLowerCase();
   final exact = _byLowerTag[tag];
+  // Bare `zh` is the same original text under another name; the server
+  // answers it with cards in `zh-TW`, which would read as untranslated.
+  if (exact == 'zh') return eventApiFallbackLanguage;
   if (exact != null) return exact;
 
   final subtags = tag.split('-');

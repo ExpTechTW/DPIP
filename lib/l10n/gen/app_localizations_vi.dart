@@ -4171,4 +4171,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get eventFactStation => 'Trạm';
+
+  @override
+  String get eventUntranslatedTag => 'Chưa dịch';
+
+  @override
+  String get eventUntranslatedNotice =>
+      'Nội dung này chưa được dịch sang ngôn ngữ của bạn nên đang hiển thị bản gốc tiếng Trung.';
 }

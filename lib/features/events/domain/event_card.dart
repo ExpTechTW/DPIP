@@ -84,13 +84,14 @@ final class EventCard {
     required this.status,
     required this.author,
     required this.lang,
+    String? requestedLang,
     required this.title,
     required this.subtitle,
     required this.send,
     required this.expires,
     this.expiresOpen = false,
     required this.hasPolygon,
-  });
+  }) : requestedLang = requestedLang ?? lang;
 
   EventCard._read(_Reader r)
     : id = r.id(),
@@ -102,6 +103,7 @@ final class EventCard {
       status = r.integer('status'),
       author = r.string('author'),
       lang = r.string('lang'),
+      requestedLang = r.requestedLang ?? r.string('lang'),
       title = r.string('title'),
       subtitle = r.string('subtitle'),
       send = r.time('send'),
@@ -136,6 +138,14 @@ final class EventCard {
   /// when its translation is not complete yet.
   final String lang;
 
+  /// The language the list or detail was asked for — the body's own `lang`.
+  final String requestedLang;
+
+  /// Whether the server fell back to the original text for this card because
+  /// its translation into [requestedLang] is not done yet. The server falls
+  /// back a whole card at a time, so the card's [lang] says it.
+  bool get untranslated => lang != requestedLang;
+
   final String title;
   final String subtitle;
 
@@ -160,8 +170,11 @@ final class EventCard {
 
   /// The card in [json]; null, with a warning logged, when it is not an
   /// object or lacks a field it cannot be shown without. Never throws.
-  static EventCard? tryParse(Object? json) =>
-      _parse(json, 'card', EventCard._read);
+  ///
+  /// [requestedLang] is the language the list was asked for; [untranslated]
+  /// compares the card's own `lang` against it.
+  static EventCard? tryParse(Object? json, {String? requestedLang}) =>
+      _parse(json, 'card', EventCard._read, requestedLang: requestedLang);
 }
 
 /// One report of a card's detail.
@@ -176,6 +189,7 @@ final class EventReport extends EventCard {
     required super.status,
     required super.author,
     required super.lang,
+    super.requestedLang,
     required super.title,
     required super.subtitle,
     required super.send,
@@ -213,8 +227,8 @@ final class EventReport extends EventCard {
 
   /// The report in [json]; null, with a warning logged, when it is not an
   /// object or lacks a field it cannot be shown without. Never throws.
-  static EventReport? tryParse(Object? json) =>
-      _parse(json, 'report', EventReport._read);
+  static EventReport? tryParse(Object? json, {String? requestedLang}) =>
+      _parse(json, 'report', EventReport._read, requestedLang: requestedLang);
 }
 
 /// A list response: the latest report of each card.
@@ -233,7 +247,8 @@ final class EventCardList {
     return EventCardList(
       lang: lang,
       cards: List.unmodifiable([
-        for (final item in items) ?EventCard.tryParse(item),
+        for (final item in items)
+          ?EventCard.tryParse(item, requestedLang: lang),
       ]),
     );
   }
@@ -258,7 +273,10 @@ final class EventCardDetail {
   /// be read is left out.
   static EventCardDetail fromJson(Object? json) {
     final (lang, items) = _envelope(json, 'detail');
-    final reports = [for (final item in items) ?EventReport.tryParse(item)];
+    final reports = [
+      for (final item in items)
+        ?EventReport.tryParse(item, requestedLang: lang),
+    ];
     if (reports.isEmpty) {
       throw const FormatException('App API v2 detail: no readable report');
     }
@@ -295,13 +313,18 @@ final class EventCardDetail {
 }
 
 /// Reads one card or report with [read], logging what was dropped or ignored.
-T? _parse<T>(Object? json, String what, T Function(_Reader) read) {
+T? _parse<T>(
+  Object? json,
+  String what,
+  T Function(_Reader) read, {
+  String? requestedLang,
+}) {
   final object = _asObject(json);
   if (object == null) {
     Log.warning('events v2: dropped a $what that is not a JSON object');
     return null;
   }
-  final reader = _Reader(object);
+  final reader = _Reader(object, requestedLang);
   try {
     final value = read(reader);
     if (reader.ignored.isNotEmpty) {
@@ -334,7 +357,10 @@ final class _MissingField implements Exception {
 /// An optional one reads as null when absent, and also when of the wrong
 /// shape, in which case its name is added to [ignored].
 final class _Reader {
-  _Reader(this._json);
+  _Reader(this._json, this.requestedLang);
+
+  /// The language the body was asked for; null when parsed on its own.
+  final String? requestedLang;
 
   final Map<String, dynamic> _json;
 

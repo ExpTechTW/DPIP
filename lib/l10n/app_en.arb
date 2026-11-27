@@ -5174,5 +5174,9 @@
   "eventFactStation": "Station",
   "@eventFactStation": {
     "description": "Label before a sensor station name on an event report"
-  }
+  },
+  "eventUntranslatedTag": "Not translated",
+  "eventUntranslatedNotice": "This hasn't been translated into your language yet, so it's shown in the original Chinese.",
+  "@eventUntranslatedTag": {"description": "Small tag on an event row whose text is shown in the original (Taiwan Traditional Chinese) because its translation into the reader's language is not done yet."},
+  "@eventUntranslatedNotice": {"description": "Notice on an event report shown in the original Chinese because its translation into the reader's language is not done yet."}
 }

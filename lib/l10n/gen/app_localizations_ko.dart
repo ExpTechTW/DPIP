@@ -4078,4 +4078,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get eventFactStation => '관측소';
+
+  @override
+  String get eventUntranslatedTag => '번역 전';
+
+  @override
+  String get eventUntranslatedNotice => '아직 사용 중인 언어로 번역되지 않아 중국어 원문을 표시합니다.';
 }

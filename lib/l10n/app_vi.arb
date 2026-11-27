@@ -2269,5 +2269,7 @@
   "eventFactLightningStrikes": "Số lần sét",
   "eventFactRoad": "Đường",
   "eventFactLocation": "Địa điểm",
-  "eventFactStation": "Trạm"
+  "eventFactStation": "Trạm",
+  "eventUntranslatedTag": "Chưa dịch",
+  "eventUntranslatedNotice": "Nội dung này chưa được dịch sang ngôn ngữ của bạn nên đang hiển thị bản gốc tiếng Trung."
 }

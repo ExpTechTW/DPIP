@@ -2261,5 +2261,7 @@
   "eventFactLightningStrikes": "雷擊次數",
   "eventFactRoad": "道路",
   "eventFactLocation": "地點",
-  "eventFactStation": "測站"
+  "eventFactStation": "測站",
+  "eventUntranslatedTag": "尚未翻譯",
+  "eventUntranslatedNotice": "這則還沒有翻譯成你使用的語言，先顯示中文原文。"
 }
