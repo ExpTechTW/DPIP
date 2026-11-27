@@ -3,8 +3,21 @@ import Flutter
 import Foundation
 import UIKit
 
-/// Streams the accelerometer at about 50 Hz on `com.exptech.dpip/accelerometer`,
-/// flushed on the main thread about every 100 ms.
+/// Streams the accelerometer on `com.exptech.dpip/accelerometer` at no more
+/// than one sample per 20 ms of sensor time — never above 50 Hz — flushed on
+/// the main thread about every 100 ms.
+///
+/// `accelerometerUpdateInterval` is a request, not a contract: Core Motion can
+/// deliver faster than asked, and unevenly. The seismometer runs on a 50 Hz
+/// grid, so anything faster only costs channel traffic and makes the page's
+/// raw-rate readout report Core Motion's choice instead of the rate the app
+/// works at. `AccelerometerDecimator` keeps the first sample in each 20 ms slot
+/// and drops the rest. It decimates rather than averages: averaging one
+/// reading in some slots and two in others would be a filter whose response
+/// changes with whatever rate the device picked, while a kept sample is a
+/// reading the sensor really took, at the timestamp it carries. Spacing stays
+/// irregular — Dart still interpolates onto the exact 20 ms grid and does all
+/// the filtering.
 ///
 /// Each batch is host-endian float64 groups of `timestampNanos, x, y, z`. An
 /// interval with no samples sends nothing. Acceleration is gal.
@@ -34,6 +47,7 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
   private var lastTimestamp: Double?
   private var streamError: String?
   private var generation = 0
+  private var decimator = AccelerometerDecimator()
   private let samplesQueue: OperationQueue = {
     let queue = OperationQueue()
     queue.name = "com.exptech.dpip.accelerometer"
@@ -93,9 +107,9 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
     motion.startAccelerometerUpdates(to: samplesQueue) { [weak self] data, error in
       guard let self else { return }
       // Scaling and validation touch only `data`, so do them before taking the
-      // lock: the callback runs at 50 Hz and flush takes the same lock on the
-      // main thread, so the shorter the critical section the less a flush ever
-      // waits on it.
+      // lock: the callback runs at 50 Hz or more and flush takes the same lock
+      // on the main thread, so the shorter the critical section the less a
+      // flush ever waits on it.
       var timestampNanos = 0.0
       var x = 0.0
       var y = 0.0
@@ -124,8 +138,12 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
         return
       }
       if let previous = self.lastTimestamp, timestampNanos <= previous { return }
+      // Recorded before decimation: a dropped sample still proves the sensor
+      // is alive, and the stall check in `flush` must not read a decimated
+      // stream as a stalled one.
       self.lastTimestamp = timestampNanos
       self.lastDelivery = ProcessInfo.processInfo.systemUptime
+      guard self.decimator.admit(timestampNanos) else { return }
       self.samples.append(contentsOf: [timestampNanos, x, y, z])
     }
 
@@ -155,6 +173,7 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
     listening = false
     generation += 1
     lastTimestamp = nil
+    decimator.reset()
     streamError = nil
     samples.removeAll(keepingCapacity: true)
     lock.unlock()
@@ -191,5 +210,47 @@ public class AccelerometerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler 
     guard active, !batch.isEmpty, let sink else { return }
     let bytes = batch.withUnsafeBufferPointer { Data(buffer: $0) }
     sink(FlutterStandardTypedData(float64: bytes))
+  }
+}
+
+/// Keeps at most one sample per 20 ms slot of sensor time.
+///
+/// Slots are 20 ms wide and centred on `anchor + k × 20 ms`, where the anchor
+/// is the first sample kept since `reset()`. A sample is kept only when its
+/// slot is later than the last kept sample's. Judging against a fixed grid,
+/// rather than the time since the last kept sample, is what lets a 50 Hz
+/// source through whole: a minimum-spacing rule drops every sample that
+/// arrives slightly early, so jitter alone would cost samples. On the grid a
+/// 50 Hz source keeps everything while its jitter stays under 10 ms either
+/// side of the anchor's phase, and a faster source keeps one sample per
+/// slot, averaging 50 Hz with no drift.
+///
+/// No Core Motion or Flutter here, so it is tested on its own.
+struct AccelerometerDecimator {
+  /// 20 ms, the period of the seismometer's 50 Hz grid.
+  static let periodNanos = 20_000_000.0
+
+  private var anchor: Double?
+  private var lastSlot = 0.0
+
+  /// Whether to keep the sample taken at `timestampNanos`, in nanoseconds
+  /// since boot. Expects increasing timestamps; the plugin drops any that are
+  /// not before asking.
+  mutating func admit(_ timestampNanos: Double) -> Bool {
+    guard let anchor else {
+      self.anchor = timestampNanos
+      lastSlot = 0
+      return true
+    }
+    let slot = ((timestampNanos - anchor) / Self.periodNanos + 0.5).rounded(.down)
+    guard slot > lastSlot else { return false }
+    lastSlot = slot
+    return true
+  }
+
+  /// Forgets the anchor, so the next sample starts a new grid.
+  mutating func reset() {
+    anchor = nil
+    lastSlot = 0
   }
 }
