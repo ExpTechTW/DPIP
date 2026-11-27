@@ -1794,6 +1794,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get experimentalFeatures => '実験的機能';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'あと $count 回タップすると「実験的機能」に隠しオプションが表示されます',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '「実験的機能」に隠しオプションを表示しました';
+
+  @override
+  String get experimentalUnlockAlready => '「実験的機能」の隠しオプションはすでに表示されています';
+
+  @override
   String get onboardingTermsBody =>
       'DPIP をご利用になる前に、以下の注意事項を必ずお読みください:\n\n• すべての情報は、台湾中央気象署(CWA)が発表する内容を優先してください。\n\n• ネットワーク、サーバー、アプリ、上流のデータソースの状態によっては、情報を受信できない場合があります。可能な限り回避に努めますが、決して発生しないことを保証するものではありません。\n\n• 強い揺れが、通知より先にあなたの所在地へ到達する場合があります。\n\n• 緊急地震速報は高速に計算された結果であり、大きな誤差を含む可能性があります。この点を理解したうえで、慎重にご利用ください。\n\n• 公的機関に認められていない行為には法的リスクが伴う可能性があります。関連する規定を必ずお守りください。\n\nまた、地域に応じた警報を提供するため、本サービスは、どの警報をあなたに送信するかを判断する目的にのみ、あなたのおおよその位置情報とプッシュ識別子を、フォアグラウンドおよびバックグラウンドで収集・アップロードします。\n\n下部の「同意して続行」をタップすることで、上記を読み、理解し、同意したものとみなされます。';
 
@@ -3496,4 +3512,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => 'この時間帯の最終観測までの1時間雨量';
+
+  @override
+  String get experimentalCategorySound => 'サウンド';
+
+  @override
+  String get experimentalCategoryGraphics => 'グラフィック';
+
+  @override
+  String get experimentalCategoryTools => 'ツール';
 }

@@ -6,6 +6,11 @@
 /// bug report or pasted to a maintainer, so a fixed vocabulary is worth more
 /// than a localized one — and the values beside the labels (`arm64`, `release`,
 /// an APNs token) never translate anyway.
+///
+/// The one exception is the version-row unlock's snackbars. They are not
+/// diagnostics but the only word on what the taps do to the Experimental
+/// features page, which every user can open and which is localized, so they
+/// go through `AppLocalizations` like the page they describe.
 library;
 
 import 'package:dpip/app/theme/app_radius.dart';
@@ -21,6 +26,7 @@ import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/storage/app_storage_scan.dart';
 import 'package:dpip/features/settings/presentation/widgets/network_usage_chart.dart';
 import 'package:dpip/features/settings/presentation/widgets/storage_breakdown.dart';
+import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/map_tile_cache.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -241,28 +247,30 @@ class _DeveloperPageState extends State<DeveloperPage> {
     );
   }
 
-  /// Version-row taps: count to [_unlockVersionTaps], then unlock the
-  /// experimental-features menu (see `ExperimentalSettings.unlock`). Shows the
+  /// Version-row taps: count to [_unlockVersionTaps], then unlock the hidden
+  /// experimental options (see `ExperimentalSettings.unlock`). Shows the
   /// remaining count so the easter egg is discoverable, and confirms once it
   /// flips.
+  ///
+  /// The Experimental features page itself is always listed in More; what
+  /// the taps add is its unlock-only options, so that is what the messages
+  /// promise.
   void _onVersionTap() {
+    final l10n = AppLocalizations.of(context);
     final settings = context.read<ExperimentalSettings>();
     if (settings.unlocked) {
-      _showHint('Experimental features are already unlocked');
+      _showHint(l10n.experimentalUnlockAlready);
       return;
     }
     _versionTaps++;
     final remaining = _unlockVersionTaps - _versionTaps;
     if (remaining > 0) {
-      _showHint(
-        '$remaining more tap${remaining == 1 ? '' : 's'} to unlock '
-        'experimental features',
-      );
+      _showHint(l10n.experimentalUnlockTapsLeft(remaining));
       return;
     }
     _versionTaps = 0;
     settings.unlock();
-    _showHint('Experimental features unlocked');
+    _showHint(l10n.experimentalUnlockDone);
   }
 
   void _showHint(String message) {

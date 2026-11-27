@@ -10,9 +10,9 @@ import 'package:flutter/foundation.dart';
 /// Provided near the app root so any feature (e.g. the home weather backdrop)
 /// can react to changes.
 ///
-/// The whole surface is gated behind [unlocked], which starts false and is
-/// turned on by ten taps on the Developer page's version row — the More-menu
-/// entry is hidden until then.
+/// The Experimental features page is always reachable from More; [unlocked]
+/// gates only the options that ask for it. It starts false and is turned on by
+/// ten taps on the Developer page's version row.
 class ExperimentalSettings extends ChangeNotifier {
   /// Loads persisted values from [settings].
   ExperimentalSettings(SettingsStore settings)
@@ -34,13 +34,13 @@ class ExperimentalSettings extends ChangeNotifier {
   final PersistedEnum<WeatherMode> _weatherMode;
   final PersistedEnum<SkyTimeMode> _skyTimeMode;
 
-  /// Whether the experimental-features menu is unlocked. Defaults to false; see
-  /// the class doc for how it flips.
+  /// Whether the hidden experimental options are unlocked. Defaults to false;
+  /// see the class doc for how it flips.
   bool get unlocked =>
       _settings.getBool(SettingKeys.experimentalUnlocked) ?? false;
 
-  /// Persists the unlock and notifies listeners (the More menu shows the
-  /// entry only after this).
+  /// Persists the unlock and notifies listeners (the Experimental features
+  /// page lists its unlock-only options only after this).
   Future<void> unlock() async {
     await _settings.setBool(SettingKeys.experimentalUnlocked, true);
     notifyListeners();

@@ -409,6 +409,24 @@ void main() {
     expect(permissions - notify, lessThan(120));
   });
 
+  testWidgets('the experimental entry is listed before any unlock', (
+    tester,
+  ) async {
+    final visited = <String>[];
+    await _pump(tester, _router(visited));
+    final page = tester.element(find.byType(MorePage));
+    // The Developer page's ten-tap unlock now gates options on the page, not
+    // the entry: a fresh install still reaches it.
+    expect(page.read<ExperimentalSettings>().unlocked, isFalse);
+
+    final entry = find.widgetWithText(ListTile, 'Experimental features');
+    expect(entry, findsOneWidget);
+    await tester.ensureVisible(entry);
+    await tester.tap(entry);
+    await tester.pumpAndSettle();
+    expect(visited, [AppRoutes.experimental]);
+  });
+
   for (final (route, label) in _tiles) {
     testWidgets('the $label tile navigates to $route', (tester) async {
       final visited = <String>[];
@@ -773,7 +791,6 @@ void main() {
     final page = tester.element(find.byType(MorePage));
     await page.read<EewCwaOnlySettings>().setEnabled(false);
     await page.read<EewSpokenAnnouncementSettings>().setEnabled(true);
-    await page.read<ExperimentalSettings>().unlock();
     await tester.pump();
 
     expect(find.text('All sources'), findsOneWidget);

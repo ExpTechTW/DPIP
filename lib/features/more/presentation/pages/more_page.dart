@@ -13,7 +13,6 @@ import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
-import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/changelog/domain/changelog_repository.dart';
@@ -163,16 +162,13 @@ class MorePage extends StatelessWidget {
             SectionHeader(l10n.moreSectionAdvanced),
             _MoreGroup(
               children: [
-                // Hidden until ten taps on the Developer page's version row
-                // (ExperimentalSettings.unlocked).
-                if (context.select<ExperimentalSettings, bool>(
-                  (s) => s.unlocked,
-                ))
-                  _MoreTile(
-                    icon: Icons.science_outlined,
-                    title: l10n.experimentalFeatures,
-                    onTap: () => context.pushNamed(AppRoutes.experimental),
-                  ),
+                // Always listed: the page itself decides which options this
+                // device sees, and which wait for the Developer page's unlock.
+                _MoreTile(
+                  icon: Icons.science_outlined,
+                  title: l10n.experimentalFeatures,
+                  onTap: () => context.pushNamed(AppRoutes.experimental),
+                ),
                 _MoreTile(
                   icon: Icons.history_outlined,
                   title: l10n.changelogTitle,

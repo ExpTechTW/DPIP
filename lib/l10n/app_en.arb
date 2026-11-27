@@ -2445,6 +2445,23 @@
     "description": "Empty scan result"
   },
   "experimentalFeatures": "Experimental features",
+  "experimentalUnlockTapsLeft": "{count, plural, =1{1 more tap to show the hidden options in Experimental features} other{{count} more taps to show the hidden options in Experimental features}}",
+  "@experimentalUnlockTapsLeft": {
+    "description": "Snackbar on the Developer page while the version row is being tapped toward the unlock: how many taps are left before the hidden options appear on the Experimental features page",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "experimentalUnlockDone": "Hidden options are now shown in Experimental features",
+  "@experimentalUnlockDone": {
+    "description": "Snackbar on the Developer page once the version-row taps have unlocked the hidden options on the Experimental features page"
+  },
+  "experimentalUnlockAlready": "Hidden options are already shown in Experimental features",
+  "@experimentalUnlockAlready": {
+    "description": "Snackbar on the Developer page when the version row is tapped after the hidden options on the Experimental features page are already unlocked"
+  },
   "onboardingTermsBody": "Please read the following notices before using DPIP:\n\n• All information should defer to the content published by the Central Weather Administration (CWA).\n\n• Depending on network, server, app, and upstream data-source conditions, information may not be received; we make every effort to avoid this but cannot guarantee it never happens.\n\n• Strong shaking may reach your location before the notification does.\n\n• Earthquake early warnings are fast-computed results that may carry significant error — understand this and use them with caution.\n\n• Any behavior not sanctioned by the authorities may carry legal risk; please follow all applicable regulations.\n\nIn addition, to provide localized alerts, this service collects and uploads your approximate location and push identifier — in the foreground and background — solely to decide which alerts to send you.\n\nBy tapping \"Agree and continue\" you confirm that you have read, understood, and agree to the above.",
   "@mapTimelineObserved": {
     "description": "Label above the map timeline's date (the radar observation time), e.g. Observed / 2026/07/14"
@@ -4467,5 +4484,17 @@
   "trendRainHourLastReading": "1-hour rain up to this hour's last reading",
   "@trendRainHourLastReading": {
     "description": "Line in a 7-day rain-trend bar's tooltip, above the bar's date and hour (e.g. 11/27 14h): the bar's value is the 1-hour rainfall of the last 10-minute reading within that clock hour, so for 14h it covers about 13:50-14:50, not 13:00-14:00."
+  },
+  "experimentalCategorySound": "Sound",
+  "@experimentalCategorySound": {
+    "description": "Section header on the Experimental features page grouping options about alert sounds and volume"
+  },
+  "experimentalCategoryGraphics": "Graphics",
+  "@experimentalCategoryGraphics": {
+    "description": "Section header on the Experimental features page grouping options about animation and rendering"
+  },
+  "experimentalCategoryTools": "Tools",
+  "@experimentalCategoryTools": {
+    "description": "Section header on the Experimental features page grouping options that add or show tools"
   }
 }

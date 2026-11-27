@@ -1,6 +1,6 @@
-/// The experimental page is two independent axes. A check that stays on the
-/// previous mode, or a weather tap that also moves the sky, would make the
-/// home backdrop lie about which override is in force.
+/// The backdrop overrides on the experimental page are two independent axes.
+/// A check that stays on the previous mode, or a weather tap that also moves
+/// the sky, would make the home backdrop lie about which override is in force.
 library;
 
 import 'package:dpip/core/settings/locale_config.dart';
@@ -24,7 +24,10 @@ Future<ExperimentalSettings> _pump(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
+  // Both overrides wait for the Developer page's unlock; these tests are
+  // about what they do once they are listed.
   final settings = ExperimentalSettings(SettingsStore.inMemory());
+  await settings.unlock();
   await tester.pumpWidget(
     ChangeNotifierProvider.value(
       value: settings,

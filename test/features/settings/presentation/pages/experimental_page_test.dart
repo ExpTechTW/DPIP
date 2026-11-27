@@ -20,7 +20,9 @@ Future<ExperimentalSettings> _pump(WidgetTester tester) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
+  // Both overrides wait for the Developer page's unlock.
   final settings = ExperimentalSettings(SettingsStore.inMemory());
+  await settings.unlock();
   await tester.pumpWidget(
     MultiProvider(
       providers: [ChangeNotifierProvider.value(value: settings)],

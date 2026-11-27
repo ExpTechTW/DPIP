@@ -1830,6 +1830,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get experimentalFeatures => 'Experimental features';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count more taps to show the hidden options in Experimental features',
+      one: '1 more tap to show the hidden options in Experimental features',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone =>
+      'Hidden options are now shown in Experimental features';
+
+  @override
+  String get experimentalUnlockAlready =>
+      'Hidden options are already shown in Experimental features';
+
+  @override
   String get onboardingTermsBody =>
       'Please read the following notices before using DPIP:\n\n• All information should defer to the content published by the Central Weather Administration (CWA).\n\n• Depending on network, server, app, and upstream data-source conditions, information may not be received; we make every effort to avoid this but cannot guarantee it never happens.\n\n• Strong shaking may reach your location before the notification does.\n\n• Earthquake early warnings are fast-computed results that may carry significant error — understand this and use them with caution.\n\n• Any behavior not sanctioned by the authorities may carry legal risk; please follow all applicable regulations.\n\nIn addition, to provide localized alerts, this service collects and uploads your approximate location and push identifier — in the foreground and background — solely to decide which alerts to send you.\n\nBy tapping \"Agree and continue\" you confirm that you have read, understood, and agree to the above.';
 
@@ -3572,4 +3592,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       '1-hour rain up to this hour\'s last reading';
+
+  @override
+  String get experimentalCategorySound => 'Sound';
+
+  @override
+  String get experimentalCategoryGraphics => 'Graphics';
+
+  @override
+  String get experimentalCategoryTools => 'Tools';
 }

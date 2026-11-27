@@ -1,132 +1,62 @@
-import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
-import 'package:dpip/core/weather/weather_condition.dart';
-import 'package:dpip/core/weather/weather_icons.dart';
-import 'package:dpip/core/settings/sky_time_mode.dart';
-import 'package:dpip/core/settings/weather_mode.dart';
+import 'package:dpip/features/settings/presentation/experimental/experimental_option.dart';
+import 'package:dpip/features/settings/presentation/experimental/experimental_options.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 /// Experimental / in-progress features, reachable from the More tab.
 ///
-/// Hosts the two overrides that drive the home backdrop. They are separate
-/// axes on purpose: the look is the product of the weather *and* where the
-/// keyframe ring sits, so testing needs both without squaring the entries.
+/// The entry is always there; what the page lists is decided per option by the
+/// registry (`experimental_options.dart`): only what this platform supports,
+/// and an option that needs the Developer page's unlock only once it is
+/// unlocked. Options are grouped under one header per category, in the
+/// categories' fixed order, and a category with nothing to show is left out.
+/// With nothing to show at all the page is simply empty — there is no
+/// placeholder, because the only thing it could say is that this device has no
+/// experiments, which the empty page already says.
 class ExperimentalPage extends StatelessWidget {
-  const ExperimentalPage({super.key, required this.watchWeatherCode});
+  const ExperimentalPage({
+    super.key,
+    required this.watchWeatherCode,
+    this.options = experimentalOptions,
+  });
 
   /// Watches the live weather code from the page's context. The app wires
   /// this to the home feed, since one feature cannot import another's.
   final int? Function(BuildContext context) watchWeatherCode;
 
+  /// The registry to list. Only tests pass anything but the default.
+  final List<ExperimentalOption> options;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final settings = context.watch<ExperimentalSettings>();
-    final colors = Theme.of(context).colorScheme;
-    // What Auto is showing right now, from the same inputs the backdrop uses.
-    // The weather stays plain Auto until the station has reported a code.
-    final autoWeather = weatherModeFor(watchWeatherCode(context) ?? 0);
-    final local = AppTime.utc8;
-    final autoSky = skyTimeModeForHour(local.hour + local.minute / 60.0);
+    final unlocked = context.select<ExperimentalSettings, bool>(
+      (s) => s.unlocked,
+    );
+    // defaultTargetPlatform rather than the theme's platform: availability is
+    // a fact about the device, not about how the UI is styled — and tests can
+    // still override it.
+    final sections = experimentalSections(
+      options,
+      platform: defaultTargetPlatform,
+      unlocked: unlocked,
+    );
+    final host = ExperimentalHost(watchWeatherCode: watchWeatherCode);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.experimentalFeatures)),
       body: ListView(
         children: [
-          SectionHeader(l10n.weatherDynamicState),
-          for (final mode in WeatherMode.values)
-            ListTile(
-              leading: Icon(_iconFor(mode)),
-              title: Text(
-                mode == WeatherMode.auto && autoWeather != WeatherMode.auto
-                    ? l10n.autoResolved(
-                        l10n.weatherModeAuto,
-                        _labelFor(autoWeather, l10n),
-                      )
-                    : _labelFor(mode, l10n),
-              ),
-              trailing: settings.weatherMode == mode
-                  ? Icon(Icons.check, color: colors.primary)
-                  : null,
-              onTap: () =>
-                  context.read<ExperimentalSettings>().weatherMode = mode,
-            ),
-          SectionHeader(l10n.skyTime),
-          for (final mode in SkyTimeMode.values)
-            ListTile(
-              leading: Icon(_timeIconFor(mode)),
-              title: Text(
-                mode == SkyTimeMode.auto
-                    ? l10n.autoResolved(
-                        l10n.skyTimeAuto,
-                        _timeLabelFor(autoSky, l10n),
-                      )
-                    : _timeLabelFor(mode, l10n),
-              ),
-              trailing: settings.skyTimeMode == mode
-                  ? Icon(Icons.check, color: colors.primary)
-                  : null,
-              onTap: () =>
-                  context.read<ExperimentalSettings>().skyTimeMode = mode,
-            ),
+          for (final (category, entries) in sections) ...[
+            SectionHeader(category.label(l10n)),
+            for (final option in entries) option.build(context, host),
+          ],
         ],
       ),
     );
   }
-
-  // The same glyphs the weather surfaces use, so the mode picker previews
-  // what it will actually draw.
-  IconData _iconFor(WeatherMode mode) => switch (mode) {
-    WeatherMode.auto => Icons.auto_mode,
-    WeatherMode.clear => clearDay,
-    WeatherMode.cloudy => partlyCloudyDay,
-    WeatherMode.overcast => cloudy,
-    WeatherMode.rain => rainy,
-    WeatherMode.snow => snowing,
-    WeatherMode.sand => air,
-    WeatherMode.fog => foggy,
-    WeatherMode.thunderstorm => thunderstorm,
-  };
-
-  String _labelFor(WeatherMode mode, AppLocalizations l10n) => switch (mode) {
-    WeatherMode.auto => l10n.weatherModeAuto,
-    WeatherMode.clear => l10n.weatherModeClear,
-    WeatherMode.cloudy => l10n.weatherModeCloudy,
-    WeatherMode.overcast => l10n.weatherModeOvercast,
-    WeatherMode.rain => l10n.weatherModeRain,
-    WeatherMode.snow => l10n.weatherModeSnow,
-    WeatherMode.sand => l10n.weatherModeSand,
-    WeatherMode.fog => l10n.weatherModeFog,
-    WeatherMode.thunderstorm => l10n.weatherModeThunderstorm,
-  };
-
-  IconData _timeIconFor(SkyTimeMode mode) => switch (mode) {
-    SkyTimeMode.auto => Icons.auto_mode,
-    SkyTimeMode.dawn => Icons.nights_stay_outlined,
-    SkyTimeMode.sunrise => Icons.wb_twilight_outlined,
-    SkyTimeMode.morning => Icons.wb_sunny_outlined,
-    SkyTimeMode.noon => Icons.light_mode_outlined,
-    SkyTimeMode.afternoon => Icons.wb_sunny_outlined,
-    SkyTimeMode.golden => Icons.wb_twilight_outlined,
-    SkyTimeMode.sunset => Icons.wb_twilight_outlined,
-    SkyTimeMode.dusk => Icons.nights_stay_outlined,
-    SkyTimeMode.night => Icons.dark_mode_outlined,
-  };
-
-  String _timeLabelFor(SkyTimeMode mode, AppLocalizations l10n) =>
-      switch (mode) {
-        SkyTimeMode.auto => l10n.skyTimeAuto,
-        SkyTimeMode.dawn => l10n.skyTimeDawn,
-        SkyTimeMode.sunrise => l10n.skyTimeSunrise,
-        SkyTimeMode.morning => l10n.skyTimeMorning,
-        SkyTimeMode.noon => l10n.skyTimeNoon,
-        SkyTimeMode.afternoon => l10n.skyTimeAfternoon,
-        SkyTimeMode.golden => l10n.skyTimeGolden,
-        SkyTimeMode.sunset => l10n.skyTimeSunset,
-        SkyTimeMode.dusk => l10n.skyTimeDusk,
-        SkyTimeMode.night => l10n.skyTimeNight,
-      };
 }

@@ -1832,6 +1832,25 @@ class AppLocalizationsId extends AppLocalizations {
   String get experimentalFeatures => 'Fitur eksperimental';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ketuk $count kali lagi untuk menampilkan opsi tersembunyi di Fitur eksperimental',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone =>
+      'Opsi tersembunyi kini ditampilkan di Fitur eksperimental';
+
+  @override
+  String get experimentalUnlockAlready =>
+      'Opsi tersembunyi sudah ditampilkan di Fitur eksperimental';
+
+  @override
   String get onboardingTermsBody =>
       'Harap baca pemberitahuan berikut sebelum menggunakan DPIP:\n\n• Semua informasi harus mengacu pada konten yang diterbitkan oleh Central Weather Administration (CWA) Taiwan.\n\n• Bergantung pada kondisi jaringan, server, aplikasi, dan sumber data hulu, informasi mungkin tidak diterima; kami berupaya sebaik mungkin untuk menghindari hal ini tetapi tidak dapat menjamin bahwa hal itu tidak akan pernah terjadi.\n\n• Guncangan kuat dapat mencapai lokasi Anda sebelum notifikasi tiba.\n\n• Peringatan dini gempa adalah hasil perhitungan cepat yang mungkin mengandung kesalahan yang signifikan — pahami hal ini dan gunakan dengan hati-hati.\n\n• Setiap tindakan yang tidak disahkan oleh pihak berwenang dapat menimbulkan risiko hukum; harap patuhi semua peraturan yang berlaku.\n\nSelain itu, untuk menyediakan peringatan yang dilokalkan, layanan ini mengumpulkan dan mengunggah perkiraan lokasi Anda dan pengidentifikasi push — di latar depan maupun latar belakang — semata-mata untuk menentukan peringatan mana yang akan dikirimkan kepada Anda.\n\nDengan mengetuk \"Setuju dan lanjutkan\", Anda mengonfirmasi bahwa Anda telah membaca, memahami, dan menyetujui hal-hal di atas.';
 
@@ -3584,4 +3603,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       'Curah hujan 1 jam hingga pengukuran terakhir jam ini';
+
+  @override
+  String get experimentalCategorySound => 'Suara';
+
+  @override
+  String get experimentalCategoryGraphics => 'Grafis';
+
+  @override
+  String get experimentalCategoryTools => 'Alat';
 }
