@@ -117,6 +117,11 @@ String eventTimeLabel(
   return '${day.format(taipei)} $clock';
 }
 
+/// [instant] as Taipei wall-clock `HH:mm`, for a row under a heading that
+/// already names its day.
+String eventClockLabel(DateTime instant) =>
+    _clockFormat.format(AppTime.taipei(instant));
+
 /// [instant] in Taipei wall time with the year, for a field that names one
 /// exact moment (a report's end time on the detail page).
 String eventDateTimeLabel(DateTime instant, {required String locale}) {

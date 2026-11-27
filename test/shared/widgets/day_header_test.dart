@@ -1,5 +1,6 @@
-/// The report list's day heading: what its date text says, and where the rule
-/// and the count land.
+/// The day heading of the lists grouped by Taipei day (earthquake reports,
+/// the event timeline): what its date text says, and where the rule and the
+/// count land.
 ///
 /// Both halves have already been wrong in ways nothing caught. The text used to
 /// lead with `今天` and drop the weekday for today and yesterday only, so two
@@ -13,7 +14,7 @@ library;
 
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
-import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
+import 'package:dpip/shared/widgets/day_header.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,7 +42,7 @@ Widget _wrap(Widget child, {required Locale locale, required double width}) =>
     );
 
 void main() {
-  group('reportDayLabel', () {
+  group('dayHeaderLabel', () {
     // The widget path gets this from the Material localizations delegate; a
     // plain unit test has to load the date symbols itself.
     setUpAll(initializeDateFormatting);
@@ -51,11 +52,11 @@ void main() {
       () async {
         final l10n = await _l10n(const Locale('en'));
         expect(
-          reportDayLabel(_day, todayTaipei: _day, l10n: l10n, locale: 'en'),
+          dayHeaderLabel(_day, todayTaipei: _day, l10n: l10n, locale: 'en'),
           'Sat, Sep 19, 2026 (Today)',
         );
         expect(
-          reportDayLabel(
+          dayHeaderLabel(
             _day.subtract(const Duration(days: 1)),
             todayTaipei: _day,
             l10n: l10n,
@@ -69,7 +70,7 @@ void main() {
     test('an older day is the date alone — no empty parentheses', () async {
       final l10n = await _l10n(const Locale('en'));
       expect(
-        reportDayLabel(
+        dayHeaderLabel(
           _day.subtract(const Duration(days: 2)),
           todayTaipei: _day,
           l10n: l10n,
@@ -85,7 +86,7 @@ void main() {
       // all the others sitting right under it.
       final l10n = await _l10n(const Locale('en'));
       String label(DateTime day) =>
-          reportDayLabel(day, todayTaipei: _day, l10n: l10n, locale: 'en');
+          dayHeaderLabel(day, todayTaipei: _day, l10n: l10n, locale: 'en');
 
       expect(label(_day), startsWith('Sat, '));
       expect(
@@ -102,18 +103,18 @@ void main() {
       final zh = await _l10n(const Locale('zh', 'TW'));
       final en = await _l10n(const Locale('en'));
       expect(
-        reportDayLabel(_day, todayTaipei: _day, l10n: zh, locale: 'zh_TW'),
+        dayHeaderLabel(_day, todayTaipei: _day, l10n: zh, locale: 'zh_TW'),
         endsWith('(今天)'),
       );
       expect(
-        reportDayLabel(_day, todayTaipei: _day, l10n: en, locale: 'en'),
+        dayHeaderLabel(_day, todayTaipei: _day, l10n: en, locale: 'en'),
         endsWith('(Today)'),
       );
     });
 
     test('a day two years back is still just a date', () async {
       final l10n = await _l10n(const Locale('en'));
-      final label = reportDayLabel(
+      final label = dayHeaderLabel(
         DateTime(2024, 4, 3),
         todayTaipei: _day,
         l10n: l10n,
@@ -124,7 +125,7 @@ void main() {
     });
   });
 
-  group('ReportDayHeader layout', () {
+  group('DayHeader layout', () {
     /// Rect of the date's own box — the [FittedBox] sizes itself to the text,
     /// so this is the width the date actually occupies, not its flex share.
     Rect labelRect(WidgetTester tester) =>
@@ -137,7 +138,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           _wrap(
-            ReportDayHeader(day: _day, count: 3),
+            DayHeader(day: _day, count: 3),
             locale: const Locale('zh', 'TW'),
             width: 800,
           ),
@@ -157,7 +158,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _wrap(
-          ReportDayHeader(day: _day, count: 12),
+          DayHeader(day: _day, count: 12),
           locale: const Locale('zh', 'TW'),
           width: 400,
         ),
@@ -176,7 +177,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           // German runs long: "Sa., 19. Sept. 2026 (Heute)".
-          ReportDayHeader(day: _day, count: 999),
+          DayHeader(day: _day, count: 999),
           locale: const Locale('de'),
           width: 240,
         ),
@@ -206,7 +207,7 @@ void main() {
       for (final rowWidth in const [324.0, 800.0]) {
         await tester.pumpWidget(
           _wrap(
-            ReportDayHeader(day: _day, count: 3),
+            DayHeader(day: _day, count: 3),
             locale: const Locale('zh', 'TW'),
             width: rowWidth,
           ),
