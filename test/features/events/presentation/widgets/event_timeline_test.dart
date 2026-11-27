@@ -13,6 +13,7 @@ import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/events/presentation/widgets/event_card_tile.dart';
 import 'package:dpip/features/events/presentation/widgets/event_timeline.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
+import 'package:dpip/shared/widgets/day_header.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +83,71 @@ void main() {
     expect(find.text('detail 1'), findsOneWidget);
     expect(find.text('03:04'), findsNWidgets(2));
     expect(repo.requests, ['63000']);
+  });
+
+  test('cards group under one heading per Taipei day', () {
+    // 23:30 and 16:30 UTC are 07:30 and 00:30 the next day in Taipei; 15:30
+    // UTC is still 23:30 on the first day.
+    final late = eventCard(id: 3, send: DateTime.utc(2026, 11, 27, 23, 30));
+    final early = eventCard(id: 2, send: DateTime.utc(2026, 11, 27, 16, 30));
+    final before = eventCard(id: 1, send: DateTime.utc(2026, 11, 27, 15, 30));
+
+    final rows = EventTimeline.rowsOf([late, early, before]);
+
+    expect(rows, hasLength(5));
+    expect(
+      rows[0],
+      isA<EventTimelineDay>()
+          .having((r) => r.day, 'day', DateTime(2026, 11, 28))
+          .having((r) => r.count, 'count', 2)
+          .having((r) => r.first, 'first', isTrue),
+    );
+    expect(
+      rows[1],
+      isA<EventTimelineCard>()
+          .having((r) => r.card, 'card', late)
+          .having((r) => r.isFirst, 'isFirst', isTrue)
+          .having((r) => r.isLast, 'isLast', isFalse),
+    );
+    expect(
+      rows[2],
+      isA<EventTimelineCard>()
+          .having((r) => r.card, 'card', early)
+          .having((r) => r.isLast, 'isLast', isTrue),
+    );
+    expect(
+      rows[3],
+      isA<EventTimelineDay>()
+          .having((r) => r.day, 'day', DateTime(2026, 11, 27))
+          .having((r) => r.count, 'count', 1)
+          .having((r) => r.first, 'first', isFalse),
+    );
+    expect(
+      rows[4],
+      isA<EventTimelineCard>()
+          .having((r) => r.isFirst, 'isFirst', isTrue)
+          .having((r) => r.isLast, 'isLast', isTrue),
+    );
+    expect(EventTimeline.rowsOf(const []), isEmpty);
+  });
+
+  testWidgets('an older card shows its clock under its day heading', (
+    tester,
+  ) async {
+    final today = AppTime.taipei(AppTime.utc);
+    // 19:04 UTC three days back is 03:04 Taipei two days ago.
+    final older = eventCard(
+      id: 5,
+      title: 'Older',
+      send: DateTime.utc(today.year, today.month, today.day - 3, 19, 4),
+      expires: AppTime.utc.subtract(const Duration(days: 1)),
+    );
+    final repo = _Repo(Ok([_card(1, 'Quake'), older]));
+    await _pump(tester, repo);
+
+    expect(find.byType(DayHeader), findsNWidgets(2));
+    // The heading names the day; the row does not repeat it.
+    expect(find.text('03:04'), findsNWidgets(2));
   });
 
   testWidgets('a feed of one card can be pulled to fetch it again', (

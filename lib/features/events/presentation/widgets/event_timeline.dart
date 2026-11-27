@@ -3,6 +3,7 @@ import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/events/presentation/widgets/event_card_tile.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
+import 'package:dpip/shared/widgets/day_header.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,8 @@ import 'package:provider/provider.dart';
 /// an error with retry rather than an empty thread — "nothing happened here" and
 /// "we could not reach the server" must never look the same in a disaster app.
 ///
-/// Pulling the list down fetches it again.
+/// Cards are grouped under a heading per Taipei day, so each row shows its
+/// clock time alone. Pulling the list down fetches it again.
 ///
 /// The server lists cards by ascending id; this shows them by [EventCard.send],
 /// newest first (see [newestFirst]).
@@ -50,26 +52,110 @@ class EventTimeline extends StatelessWidget {
       isEmpty: (cards) => cards.isEmpty,
       refreshSignal: refreshSignal,
       pullToRefresh: true,
-      builder: (context, cards) => ListView.builder(
-        // A short feed must still be pullable.
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.lg,
-          // Clear the bottom nav (the shell body extends behind it).
-          AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
-        ),
-        itemCount: cards.length,
-        itemBuilder: (context, index) => _TimelineEntry(
-          card: cards[index],
-          regionCode: regionCode,
-          isFirst: index == 0,
-          isLast: index == cards.length - 1,
-        ),
-      ),
+      builder: (context, cards) {
+        final rows = rowsOf(cards);
+        return ListView.builder(
+          // A short feed must still be pullable.
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            // Clear the bottom nav (the shell body extends behind it).
+            AppSpacing.lg + MediaQuery.paddingOf(context).bottom,
+          ),
+          itemCount: rows.length,
+          itemBuilder: (context, index) => switch (rows[index]) {
+            EventTimelineDay(:final day, :final count, :final first) => Padding(
+              padding: EdgeInsets.only(top: first ? 0 : AppSpacing.md),
+              child: DayHeader(day: day, count: count),
+            ),
+            EventTimelineCard(:final card, :final isFirst, :final isLast) =>
+              _TimelineEntry(
+                card: card,
+                regionCode: regionCode,
+                isFirst: isFirst,
+                isLast: isLast,
+              ),
+          },
+        );
+      },
     );
   }
+
+  /// The rows for [cards] (newest first): a heading before each Taipei day,
+  /// then that day's cards. Each day is its own thread — the rail starts at
+  /// the day's first card and ends at its last — so it never runs through a
+  /// heading.
+  @visibleForTesting
+  static List<EventTimelineRow> rowsOf(List<EventCard> cards) {
+    final rows = <EventTimelineRow>[];
+    var start = 0;
+    while (start < cards.length) {
+      final day = taipeiCalendarDay(cards[start].send);
+      var end = start + 1;
+      while (end < cards.length && taipeiCalendarDay(cards[end].send) == day) {
+        end++;
+      }
+      rows.add(
+        EventTimelineDay(day: day, count: end - start, first: rows.isEmpty),
+      );
+      for (var i = start; i < end; i++) {
+        rows.add(
+          EventTimelineCard(
+            card: cards[i],
+            isFirst: i == start,
+            isLast: i == end - 1,
+          ),
+        );
+      }
+      start = end;
+    }
+    return rows;
+  }
+}
+
+/// One row of an [EventTimeline].
+@visibleForTesting
+sealed class EventTimelineRow {
+  const EventTimelineRow();
+}
+
+/// A day's heading.
+@visibleForTesting
+final class EventTimelineDay extends EventTimelineRow {
+  const EventTimelineDay({
+    required this.day,
+    required this.count,
+    required this.first,
+  });
+
+  /// The Taipei calendar day, as [taipeiCalendarDay] returns it.
+  final DateTime day;
+
+  /// How many cards the day holds.
+  final int count;
+
+  /// Whether this is the list's first heading, which needs no gap above it.
+  final bool first;
+}
+
+/// A card on its day's thread.
+@visibleForTesting
+final class EventTimelineCard extends EventTimelineRow {
+  const EventTimelineCard({
+    required this.card,
+    required this.isFirst,
+    required this.isLast,
+  });
+
+  final EventCard card;
+
+  /// Whether the card opens its day's thread.
+  final bool isFirst;
+
+  /// Whether the card closes its day's thread.
+  final bool isLast;
 }
 
 /// One card on the thread: the rail drawn behind an [EventCardTile].
@@ -113,7 +199,13 @@ class _TimelineEntry extends StatelessWidget {
             isLast: isLast,
           ),
         ),
-        EventCardTile(card: card, regionCode: regionCode, padding: _padding),
+        EventCardTile(
+          card: card,
+          regionCode: regionCode,
+          padding: _padding,
+          // The day heading above names the date.
+          showDate: false,
+        ),
       ],
     );
   }

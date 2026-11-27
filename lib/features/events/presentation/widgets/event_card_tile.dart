@@ -37,6 +37,7 @@ class EventCardTile extends StatelessWidget {
     this.secondary,
     this.compact = false,
     this.padding = const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+    this.showDate = true,
   });
 
   /// Badge diameter in the regular row.
@@ -66,6 +67,10 @@ class EventCardTile extends StatelessWidget {
   /// Space around the row, inside its tap target.
   final EdgeInsetsGeometry padding;
 
+  /// Whether the time names its day when that is not today. False under a
+  /// day heading that already does, where the row shows the clock alone.
+  final bool showDate;
+
   /// The badge diameter this row uses.
   double get badgeDiameter => compact ? compactBadgeSize : badgeSize;
 
@@ -78,11 +83,13 @@ class EventCardTile extends StatelessWidget {
     final muted = secondary ?? colors.onSurfaceVariant;
     final now = AppTime.utc;
     final status = EventCardStatus.ofCard(card, now);
-    final time = eventTimeLabel(
-      card.send,
-      nowUtc: now,
-      locale: intlDateLocale(Localizations.localeOf(context)),
-    );
+    final time = showDate
+        ? eventTimeLabel(
+            card.send,
+            nowUtc: now,
+            locale: intlDateLocale(Localizations.localeOf(context)),
+          )
+        : eventClockLabel(card.send);
     final meta = [
       card.hazard.label(l10n),
       if (card.serial >= 2) l10n.eventReportSerial(card.serial),
