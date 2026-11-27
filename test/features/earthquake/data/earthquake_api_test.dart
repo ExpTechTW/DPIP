@@ -49,6 +49,8 @@ class _RecordingApiClient implements ApiClient {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
     bool validateJson = false,
+    void Function(Uint8List)? validateCacheBody,
+    bool requireOriginBody = false,
   }) async {
     getCalls.add((tier, path, query));
     if (getError != null) throw getError!;

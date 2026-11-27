@@ -1,0 +1,74 @@
+[
+  {
+    "report_id": "088043-1999-0921-014715",
+    "body_sha256": "031906ecd06cfefdc7086fc1db4f7549c701c5be2d82c17044be7d75e681f185",
+    "areas": 14,
+    "observations": 52,
+    "maximum_code": null,
+    "eligible": false
+  },
+  {
+    "report_id": "098154-2009-1231-133841",
+    "body_sha256": "b1fbb4ec38d4f28871d1f21b45867d5fbbcaf4eb613b8f5a181d10b68c7e493f",
+    "areas": 7,
+    "observations": 20,
+    "maximum_code": null,
+    "eligible": false
+  },
+  {
+    "report_id": "105006-2016-0206-035726",
+    "body_sha256": "45846febd73dde3e0d2bb29f456093cdb27663dee9b0217a6655c9eaf59a4971",
+    "areas": 20,
+    "observations": 88,
+    "maximum_code": null,
+    "eligible": false
+  },
+  {
+    "report_id": "113000-2024-0408-034722",
+    "body_sha256": "b23ecf3061d945c051bed64a3df90d15c4bd71d9dd59d16622bffb65e141330f",
+    "areas": 0,
+    "observations": 0,
+    "maximum_code": null,
+    "eligible": true
+  },
+  {
+    "report_id": "113019-2024-0403-075809",
+    "body_sha256": "38c062b3e8e887cbdfb8dbf6d4bf4a0ff299418d51fbcf7f6114806156a667e9",
+    "areas": 22,
+    "observations": 145,
+    "maximum_code": 8,
+    "eligible": true
+  },
+  {
+    "report_id": "115000-2026-0422-111524",
+    "body_sha256": "e6761038a7eea6b8afa58c936693f35d663bd5ca1ecdb2ad4613b72e2d46e4c1",
+    "areas": 2,
+    "observations": 5,
+    "maximum_code": 2,
+    "eligible": true
+  },
+  {
+    "report_id": "115000-2026-1124-161135",
+    "body_sha256": "d41a6a151f52b7a1dffa568d06e38870156067fb7822e373204b99b48ac12aa3",
+    "areas": 1,
+    "observations": 1,
+    "maximum_code": 1,
+    "eligible": true
+  },
+  {
+    "report_id": "115000-2026-1124-230645",
+    "body_sha256": "2584d158297ae987ec7b87034d1c4a1286da40bf02678ba17f1a035a8f83fc8b",
+    "areas": 2,
+    "observations": 6,
+    "maximum_code": 2,
+    "eligible": true
+  },
+  {
+    "report_id": "115081-2026-1125-164717",
+    "body_sha256": "f1fce68c1b166639f01adc2c2fb5a1d9e7ba4d25e66244f5a3fec41cbd190b3d",
+    "areas": 11,
+    "observations": 51,
+    "maximum_code": 4,
+    "eligible": true
+  }
+]

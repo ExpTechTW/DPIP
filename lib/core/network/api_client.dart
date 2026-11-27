@@ -6,6 +6,7 @@ import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_interceptor.dart';
 import 'package:dpip/core/network/region_selection.dart';
+import 'package:dpip/core/realtime/app_time.dart';
 
 /// A live byte stream plus the handle that aborts it — the result of
 /// [ApiClient.openStream]. [cancel] closes the underlying connection; [stream]
@@ -20,10 +21,19 @@ class StreamedResponse {
 /// Raw bytes from [ApiClient.getBytes], with the response [etag] when present
 /// (from a fresh `200` or a revalidated `304` rewrite).
 class BytePayload {
-  const BytePayload({required this.bytes, this.etag});
+  const BytePayload({
+    required this.bytes,
+    this.etag,
+    this.endpoint,
+    this.confirmedAt,
+    this.revalidated = false,
+  });
 
   final Uint8List bytes;
   final String? etag;
+  final Uri? endpoint;
+  final DateTime? confirmedAt;
+  final bool revalidated;
 }
 
 /// Region-aware HTTP client.
@@ -70,12 +80,17 @@ class ApiClient {
   /// MapLibre ambient preload at the same URL).
   /// Set [validateJson] for JSON endpoints that need source bytes. Invalid
   /// UTF-8 or JSON participates in failover just like a JSON decode error.
+  /// [validateCacheBody] may reject a body for caching independently of
+  /// whether it can be displayed. [requireOriginBody] disables redirects and
+  /// accepts only a complete 200 or a cache-revalidated 304.
   Future<BytePayload> getBytes(
     ApiTier tier,
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
     bool validateJson = false,
+    ByteCacheValidator? validateCacheBody,
+    bool requireOriginBody = false,
   }) async {
     final response = await request(
       tier,
@@ -84,12 +99,18 @@ class ApiClient {
       cancelToken: cancelToken,
       options: Options(
         responseType: ResponseType.bytes,
-        extra: validateJson
-            ? {EtagInterceptor.validateJsonBytesKey: true}
+        followRedirects: requireOriginBody ? false : null,
+        validateStatus: requireOriginBody
+            ? (status) => status == 200 || status == 304
             : null,
+        extra: {
+          if (validateJson || requireOriginBody)
+            EtagInterceptor.validateJsonBytesKey: true,
+          EtagInterceptor.validateCacheBodyKey: ?validateCacheBody,
+        },
       ),
     );
-    return _bytePayload(response);
+    return _bytePayload(response, readOnly: requireOriginBody);
   }
 
   /// Absolute-URL GET as bytes with ETag (no region failover).
@@ -148,14 +169,26 @@ class ApiClient {
     return response.data;
   }
 
-  static BytePayload _bytePayload(Response<dynamic> response) {
+  static BytePayload _bytePayload(
+    Response<dynamic> response, {
+    bool readOnly = false,
+  }) {
     final data = response.data;
     final Uint8List bytes = switch (data) {
       final Uint8List b => b,
       final List<int> list => Uint8List.fromList(list),
       _ => throw StateError('Expected bytes, got ${data.runtimeType}'),
     };
-    return BytePayload(bytes: bytes, etag: response.headers.value('etag'));
+    final etag = response.headers['etag']?.singleOrNull;
+    return BytePayload(
+      bytes: readOnly ? bytes.asUnmodifiableView() : bytes,
+      etag: readOnly && etag != null && !EtagInterceptor.isEntityTag(etag)
+          ? null
+          : etag,
+      endpoint: response.realUri,
+      confirmedAt: AppTime.utc,
+      revalidated: response.extra[EtagInterceptor.revalidatedBytesKey] == true,
+    );
   }
 
   /// POST [data] to [path] on [tier] with failover; returns the decoded body.

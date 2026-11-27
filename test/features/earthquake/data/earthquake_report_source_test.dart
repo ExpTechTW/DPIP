@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
@@ -15,6 +16,7 @@ import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input_v3.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../core/storage/memory_db.dart';
@@ -100,6 +102,16 @@ ResponseBody _response(Uint8List bytes, {String? etag}) =>
       },
     );
 
+class _LoopbackApiClient extends ApiClient {
+  _LoopbackApiClient(Dio dio, this.url)
+    : super(dio, RegionSelection(SettingsStore.inMemory({})));
+
+  final String url;
+
+  @override
+  List<String> hostsFor(ApiTier tier) => [url];
+}
+
 void main() {
   late Uint8List modern;
   late String modernText;
@@ -165,6 +177,86 @@ void main() {
       expect(unverified.hasMatchingReportId, isFalse);
     }
   });
+
+  test(
+    'v3 binds the same detail instance and original bytes from one fetch',
+    () async {
+      final origin = _Origin((_) async => _response(modern, etag: '"exact"'));
+      final result = await _repository(origin).getDetailWithSource(_modernId);
+      final detail = result.valueOrNull!;
+      final snapshot = detail.source.valueOrNull!;
+      final input = adaptEarthquakeShareSnapshotV3(snapshot);
+
+      expect(snapshot.report, same(detail.report));
+      expect(input.snapshot, same(snapshot));
+      expect(snapshot.body, modern);
+      expect(snapshot.bodySha256, _modernHash);
+      expect(snapshot.endpoint, Uri.parse(_reportUrl));
+      expect(snapshot.confirmedAt, isNotNull);
+      expect(snapshot.etag, '"exact"');
+      expect(snapshot.revalidated, isFalse);
+      expect(origin.requests, hasLength(1));
+      expect(origin.requests.single.followRedirects, isFalse);
+    },
+  );
+
+  test(
+    'gzip content decoding and 304 reuse preserve the same source bytes',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => server.close(force: true));
+      final db = openMemoryDb();
+      addTearDown(db.close);
+      await EtagCacheStore.createSchema(db);
+      final cache = EtagCacheStore(db);
+      final base = 'http://127.0.0.1:${server.port}';
+      final url = '$base/api/v2/eq/report/$_modernId';
+      final zipped = gzip.encode(modern);
+      final requests = <String?>[];
+      const etag = '"gzipped"';
+      server.listen((request) async {
+        final tag = request.headers.value('if-none-match');
+        requests.add(tag);
+        final response = request.response;
+        response.headers.set('etag', etag);
+        if (tag == etag) {
+          response.statusCode = 304;
+        } else {
+          response.headers.contentType = ContentType.json;
+          response.headers.set(HttpHeaders.contentEncodingHeader, 'gzip');
+          response.add(zipped);
+        }
+        await response.close();
+      });
+      final dio = createDio(etagCache: cache)
+        ..httpClientAdapter = IOHttpClientAdapter();
+      addTearDown(dio.close);
+      final repository = ReportRepositoryImpl(
+        EarthquakeApi(_LoopbackApiClient(dio, base)),
+      );
+      final fresh = (await repository.getSourceSnapshot(_modernId))
+          .valueOrNull!;
+      for (
+        var attempt = 0;
+        attempt < 40 && await cache.readEtag(url, binary: true) == null;
+        attempt++
+      ) {
+        await Future<void>.delayed(const Duration(milliseconds: 25));
+      }
+      final reused = (await repository.getSourceSnapshot(_modernId))
+          .valueOrNull!;
+      expect(requests, [null, etag]);
+      expect(fresh.body, modern);
+      expect(reused.body, modern);
+      expect(reused.bodySha256, _modernHash);
+      expect(reused.endpoint, Uri.parse(url));
+      expect(reused.revalidated, isTrue);
+      expect(
+        adaptEarthquakeShareSnapshotV3(reused).bytes,
+        adaptEarthquakeShareSnapshotV3(fresh).bytes,
+      );
+    },
+  );
 
   test('retains the documented Core v2 encoding on historical detail', () {
     final snapshot = EarthquakeReportSnapshot.decode(
@@ -282,6 +374,140 @@ void main() {
       });
     }
 
+    for (final (label, code, canBuildSnapshot) in [
+      ('duplicate', EarthquakeReportSourceError.duplicateKey, false),
+      ('decimal', EarthquakeReportSourceError.invalidField, true),
+    ]) {
+      test('display can use a fresh 200 rejected for v3 with $code', () async {
+        final badBody = switch (label) {
+          'duplicate' => modernText.replaceFirst(
+            '"lat":23.1',
+            r'"lat":23.1,"\u006cat":23.1',
+          ),
+          _ => modernText.replaceFirst(
+            '"mag":3.9',
+            '"mag":10.0000000000000000001',
+          ),
+        };
+        final origin = _Origin(
+          (_) async => _response(utf8.encode(badBody), etag: '"bad"'),
+        );
+        final repository = _repository(origin, cache: cache);
+        final detail = (await repository.getDetailWithSource(_modernId))
+            .valueOrNull!;
+        expect(detail.report.location, contains('臺東縣近海'));
+        expect(origin.requests, hasLength(1));
+        expect(cache.writes, isEmpty);
+        expect(await cache.readBytes(_reportUrl), isNull);
+        if (canBuildSnapshot) {
+          expect(
+            () => adaptEarthquakeShareSnapshotV3(detail.source.valueOrNull!),
+            throwsA(
+              isA<EarthquakeReportSourceException>().having(
+                (e) => e.code,
+                'code',
+                code,
+              ),
+            ),
+          );
+        } else {
+          final error =
+              (detail.source.failureOrNull as DecodeFailure).cause
+                  as EarthquakeReportSourceException;
+          expect(error.code, code);
+        }
+      });
+    }
+
+    test(
+      'a 304 never swaps the pinned bytes for another row with the same ETag',
+      () async {
+        const tag = '"identical-validator"';
+        await cache.writeBytes(_reportUrl, etag: tag, bytes: modern);
+        final replacement = utf8.encode('$modernText\n');
+        final origin = _Origin((request) async {
+          await cache.writeBytes(_reportUrl, etag: tag, bytes: replacement);
+          return ResponseBody.fromString('', 304);
+        });
+        final snapshot = (await _repository(
+          origin,
+          cache: cache,
+        ).getSourceSnapshot(_modernId)).valueOrNull!;
+        expect(origin.requests.single.headers['if-none-match'], tag);
+        expect(snapshot.body, modern);
+        expect(snapshot.bodySha256, _modernHash);
+        expect((await cache.readBytes(_reportUrl))!.bytes, replacement);
+      },
+    );
+
+    test('a 304 with a different response ETag fails over', () async {
+      await cache.writeBytes(_reportUrl, etag: '"original"', bytes: modern);
+      final origin = _Origin((request) async {
+        if (request.uri.host == _primary) {
+          return ResponseBody.fromString(
+            '',
+            304,
+            headers: {
+              'etag': ['"other"'],
+            },
+          );
+        }
+        return _response(modern);
+      });
+      final snapshot = (await _repository(
+        origin,
+        cache: cache,
+      ).getSourceSnapshot(_modernId)).valueOrNull!;
+      expect(origin.requests.first.headers['if-none-match'], '"original"');
+      expect(origin.requests, hasLength(2));
+      expect(snapshot.endpoint!.host, _backup);
+      expect(snapshot.revalidated, isFalse);
+    });
+
+    test(
+      'a different report ID cannot become the current detail or enter cache',
+      () async {
+        final wrong = utf8.encode(
+          modernText.replaceFirst(_modernId, '115999-2026-0422-111524'),
+        );
+        final repository = _repository(
+          _Origin((_) async => _response(wrong, etag: '"wrong"')),
+          cache: cache,
+        );
+        expect(
+          (await repository.get(_modernId)).failureOrNull,
+          isA<DecodeFailure>(),
+        );
+        final source = await repository.getSourceSnapshot(_modernId);
+        expect(
+          (source.failureOrNull as DecodeFailure).cause,
+          isA<EarthquakeReportSourceException>().having(
+            (e) => e.code,
+            'code',
+            EarthquakeReportSourceError.identityMismatch,
+          ),
+        );
+        expect(cache.writes, isEmpty);
+        expect(await cache.readBytes(_reportUrl), isNull);
+      },
+    );
+
+    test(
+      'a wildcard ETag cannot condition a Core request or seed the cache',
+      () async {
+        await cache.writeBytes(_reportUrl, etag: '*', bytes: modern);
+        cache.writes.clear();
+        final origin = _Origin((_) async => _response(modern, etag: '*'));
+        final source = await _repository(
+          origin,
+          cache: cache,
+        ).getSourceSnapshot(_modernId);
+        expect(source.valueOrNull!.etag, isNull);
+        expect(origin.requests.single.headers['if-none-match'], isNull);
+        expect(cache.writes, isEmpty);
+      },
+    );
+
     test('a 304 cannot restore a cached malformed body', () async {
       await cache.writeBytes(
         _reportUrl,
@@ -300,7 +526,7 @@ void main() {
       ).getSnapshot(_modernId);
 
       expect(origin.requests.map((r) => r.uri.host), [_primary, _backup]);
-      expect(origin.requests.first.headers['if-none-match'], '"invalid"');
+      expect(origin.requests.first.headers['if-none-match'], isNull);
       expect(origin.requests.last.headers['if-none-match'], isNull);
       expect(result.valueOrNull!.etag, '"backup"');
       expect(result.valueOrNull!.bodySha256, _modernHash);
@@ -324,6 +550,23 @@ void main() {
       );
     },
   );
+
+  test('v3 distinguishes decode errors from transport failures', () async {
+    final malformed = _repository(
+      _Origin((_) async => _response(utf8.encode('{"report":'))),
+    );
+    expect(
+      (await malformed.getSourceSnapshot(_modernId)).failureOrNull,
+      isA<DecodeFailure>(),
+    );
+    final transport = _repository(
+      _Origin((_) async => ResponseBody.fromString('', 503)),
+    );
+    expect(
+      (await transport.getSourceSnapshot(_modernId)).failureOrNull,
+      isA<NetworkFailure>(),
+    );
+  });
 
   test('escapes diagnostic pointers and checks extra nested objects', () {
     final body = utf8.encode(r'{"~x":[{"a/b":1,"a\/b":2}]}');

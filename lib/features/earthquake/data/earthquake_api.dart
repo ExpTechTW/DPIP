@@ -4,6 +4,8 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/stale_if_error.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input_v3.dart';
 
 /// Earthquake endpoints on the region-aware [ApiClient].
 ///
@@ -156,6 +158,22 @@ class EarthquakeApi {
   Future<BytePayload> getReport(String reportId) => _client.getBytes(
     ApiTier.coreApi,
     '/api/v2/eq/report/${Uri.encodeComponent(reportId)}',
-    validateJson: true,
+    requireOriginBody: true,
+    validateCacheBody: (bytes) {
+      final snapshot = CoreEarthquakeReportSnapshot.decode(
+        bytes,
+        requestedReportId: reportId,
+      );
+      try {
+        adaptEarthquakeShareSnapshotV3(snapshot);
+      } on EarthquakeReportSourceException catch (error) {
+        if (error.code != EarthquakeReportSourceError.unsupportedProfile) {
+          rethrow;
+        }
+        // Historical detail is still useful as an ordinary report, with its
+        // existing display schema. V3 eligibility is always checked separately.
+        EarthquakeReportSnapshot.decode(bytes, requestedReportId: reportId);
+      }
+    },
   );
 }
