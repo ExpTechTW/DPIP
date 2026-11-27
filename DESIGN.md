@@ -38,6 +38,11 @@ logging and localization — is covered at the end.
 - Literal colours are also allowed where no theme role applies: shader
   fallback/mood colours (`weather_sky_background.dart`, `_fallbackColour`) and
   the one sheet shadow.
+- **Caution** — something is off but nothing is wrong (a report shown in its
+  original language): `AppCaution` (`lib/app/theme/app_caution.dart`), a
+  container / on-container pair derived from one amber seed per brightness the
+  way the scheme derives its roles. Not `error` (red reads as alarming) and not
+  `tertiary` (it follows the app seed and reads as decoration).
 
 ## Spacing — `AppSpacing`
 
