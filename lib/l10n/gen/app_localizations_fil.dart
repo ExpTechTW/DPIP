@@ -3587,4 +3587,11 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net';
+
+  @override
+  String get trendRainPastHour => 'Ulan sa nakaraang 1 oras';
+
+  @override
+  String get trendRainHourLastReading =>
+      'Ulan sa 1 oras hanggang sa huling sukat ng oras na ito';
 }

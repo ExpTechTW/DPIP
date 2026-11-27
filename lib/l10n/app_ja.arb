@@ -2090,5 +2090,7 @@
   "seismometerSampleRate": "サンプリングレート",
   "seismometerReset": "リセット",
   "seismometerDisclaimer": "スマートフォンを安定した平らな面に置いてください。端末のセンサー精度には限界があるため、この値は参考であり、中央気象署が発表する震度ではありません。",
-  "seismometerAlgorithm": "ES-Net が用いる気象庁の計測震度の方法で計算しています"
+  "seismometerAlgorithm": "ES-Net が用いる気象庁の計測震度の方法で計算しています",
+  "trendRainPastHour": "過去1時間の雨量",
+  "trendRainHourLastReading": "この時間帯の最終観測までの1時間雨量"
 }

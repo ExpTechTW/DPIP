@@ -3565,4 +3565,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Computed with the JMA instrumental intensity method used by ES-Net';
+
+  @override
+  String get trendRainPastHour => 'Rain in the past hour';
+
+  @override
+  String get trendRainHourLastReading =>
+      '1-hour rain up to this hour\'s last reading';
 }

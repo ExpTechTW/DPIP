@@ -2090,5 +2090,7 @@
   "seismometerSampleRate": "Tốc độ lấy mẫu",
   "seismometerReset": "Đặt lại",
   "seismometerDisclaimer": "Đặt điện thoại nằm phẳng trên mặt phẳng vững. Cảm biến điện thoại có độ chính xác hạn chế, nên kết quả chỉ để tham khảo và không phải cường độ chính thức của CWA.",
-  "seismometerAlgorithm": "Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng"
+  "seismometerAlgorithm": "Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng",
+  "trendRainPastHour": "Lượng mưa trong 1 giờ qua",
+  "trendRainHourLastReading": "Lượng mưa 1 giờ tính đến lần đo cuối của giờ này"
 }

@@ -6647,6 +6647,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Computed with the JMA instrumental intensity method used by ES-Net'**
   String get seismometerAlgorithm;
+
+  /// Line in a 24-hour rain-trend bar's tooltip, above the bar's time to the minute (e.g. 14:10): the bar's value is the rain of the hour up to that time (CWA's 1-hour rainfall), not of the bar's own 10 minutes. The 7-day chart uses trendRainHourLastReading instead.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain in the past hour'**
+  String get trendRainPastHour;
+
+  /// Line in a 7-day rain-trend bar's tooltip, above the bar's date and hour (e.g. 11/27 14h): the bar's value is the 1-hour rainfall of the last 10-minute reading within that clock hour, so for 14h it covers about 13:50-14:50, not 13:00-14:00.
+  ///
+  /// In en, this message translates to:
+  /// **'1-hour rain up to this hour\'s last reading'**
+  String get trendRainHourLastReading;
 }
 
 class _AppLocalizationsDelegate

@@ -3492,4 +3492,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => 'ES-Net에서 쓰는 일본 기상청 계측진도 방법으로 계산합니다';
+
+  @override
+  String get trendRainPastHour => '지난 1시간 강수량';
+
+  @override
+  String get trendRainHourLastReading => '이 시간대 마지막 관측까지의 1시간 강수량';
 }
